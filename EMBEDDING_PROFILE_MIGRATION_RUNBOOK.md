@@ -130,6 +130,37 @@ Expected healthy current state:
    npm test
    ```
 
+## Legacy Cleanup
+
+Legacy chunks are rows with no `embedding_fingerprint`. They are ignored by current-profile search, but they may still be useful as a temporary baseline before final cleanup.
+
+Before cleanup:
+
+```powershell
+npm run profile-health
+npm run profile-gate -- --json --summary-only
+npm run cleanup-legacy-chunks -- --dry-run --json
+```
+
+If you need a hard recall comparison, capture or preserve a real previous fingerprint before deleting legacy rows. Once legacy rows are removed, `profile-gate` can still verify that the current profile returns results, but it will report `baseline-missing` until another baseline profile exists.
+
+Create a rollback point before the destructive command. For SQLite-backed local runs, copy `data/codex-memory.sqlite` to `data/backups/` or another local backup path first.
+
+Only after the dry-run count and backup look correct:
+
+```powershell
+npm run cleanup-legacy-chunks -- --confirm --json
+npm run profile-health
+npm run profile-gate -- --json --summary-only
+```
+
+Expected post-cleanup state:
+
+- `profile-health` status is `ready`
+- `legacy chunks` is `0`
+- current chunks still match the current profile
+- `profile-gate` may return `warn` with `baseline-missing` when no baseline profile remains
+
 ## Acceptance Criteria
 
 Minimum acceptance for local migration:
