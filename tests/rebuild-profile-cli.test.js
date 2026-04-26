@@ -560,6 +560,25 @@ test('profile-gate CLI should fail require-pass when thresholds are missed', asy
   }
 });
 
+test('default profile migration suite should cover core VCP recall surfaces', async () => {
+  const suitePath = path.join(process.cwd(), 'benchmarks', 'profile-migration-suite.json');
+  const suite = JSON.parse(await fs.readFile(suitePath, 'utf8'));
+  const ids = new Set(suite.queries.map(query => query.id));
+
+  assert.equal(suite.name, 'default-profile-migration-suite');
+  assert.ok(suite.queries.length >= 8);
+  assert.equal(ids.size, suite.queries.length);
+  assert.equal(ids.has('deepmemo-basic'), true);
+  assert.equal(ids.has('deepmemo-advanced-syntax'), true);
+  assert.equal(ids.has('topicmemo-routing'), true);
+  assert.equal(ids.has('lightmemo-directory-policy'), true);
+  assert.equal(ids.has('tagmemo-geodesic'), true);
+  assert.equal(ids.has('time-group-rerank'), true);
+  assert.equal(ids.has('v8-terrain'), true);
+  assert.equal(ids.has('rollback-safety'), true);
+  assert.equal(suite.queries.every(item => typeof item.query === 'string' && item.query.trim().length > 0), true);
+});
+
 test('rag params profile example should load for default bge-m3-local fingerprint', () => {
   const config = createConfig({
     projectBasePath: process.cwd(),

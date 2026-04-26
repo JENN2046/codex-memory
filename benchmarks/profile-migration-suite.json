@@ -12,8 +12,36 @@
       "query": "embedding profile migration rebuild shadow health"
     },
     {
+      "id": "deepmemo-basic",
+      "query": "DeepMemo Phase C recall audit donor compatibility"
+    },
+    {
+      "id": "deepmemo-advanced-syntax",
+      "query": "\"DeepMemo\" {TopicMemo|audit} (recall:2) blocked effective keywords"
+    },
+    {
+      "id": "topicmemo-routing",
+      "query": "TopicMemo ListTopics GetTopicContent topic_id agent-not-found history-read-error"
+    },
+    {
+      "id": "lightmemo-directory-policy",
+      "query": "LightMemo maid folder search_all_knowledge_bases directory alias hard filter"
+    },
+    {
+      "id": "active-memory-ordering",
+      "query": "active memory multi topic ordering freshness compactness window_size tie breaker"
+    },
+    {
       "id": "tagmemo-geodesic",
       "query": "[[checkpoint vector schema migration]] ::TagMemo+1.5"
+    },
+    {
+      "id": "time-group-rerank",
+      "query": "[[Phase C recall audit]] ::Time(2026-04) ::Group(tag) ::Rerank"
+    },
+    {
+      "id": "v8-terrain",
+      "query": "V8 terrain EPA residual pyramid geodesic rerank meta thinking score"
     },
     {
       "id": "rollback-safety",
