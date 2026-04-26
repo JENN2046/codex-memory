@@ -92,6 +92,7 @@
 - `src/cli/provider-smoke.js`：真实 provider 连通性检查
 - `src/cli/provider-benchmark.js`：真实 provider 召回基准对比
 - `src/cli/rebuild-profile.js`：embedding profile 安全清理预检 / 确认执行
+- `src/cli/cleanup-legacy-chunks.js`：只清理旧版无 fingerprint shadow chunks
 - `src/cli/profile-health.js`：当前 embedding profile 健康面板
 - `src/cli/shadow-compare.js`：当前 profile 与 baseline profile 的只读召回对照
 - `src/cli/v8-diagnose.js`：只读 V8 terrain / TagMemo / MetaThinking 诊断
@@ -125,6 +126,7 @@ npm run rollback:mainline:plan -- --json
 npm run provider-smoke -- --json
 npm run provider-benchmark -- --json
 npm run rebuild-profile -- --dry-run --json
+npm run cleanup-legacy-chunks -- --dry-run --json
 npm run profile-health
 npm run shadow-compare -- --query "embedding profile migration"
 npm run v8-diagnose -- --query "[[checkpoint migration]] ::TagMemo+1.5"
@@ -139,6 +141,8 @@ npm run start:http:watchdog:once
 - provider smoke 示例：[examples/provider-smoke.env.example](/A:/codex-memory/examples/provider-smoke.env.example)
 - provider benchmark 示例：[examples/provider-benchmark.env.example](/A:/codex-memory/examples/provider-benchmark.env.example)
 - RAG 多 profile 参数示例：[examples/rag-params.profiles.example.json](/A:/codex-memory/examples/rag-params.profiles.example.json)
+
+CI 在 `.github/workflows/ci.yml` 中运行 `npm ci`、`npm test`，并额外 smoke `rebuild-profile`、`profile-health`、`v8-diagnose` 三条 profile 相关 CLI。
 
 Embedding profile 会按 `<model>__<dimensions>__<version>` 生成 fingerprint，例如默认本地 BGE-M3 是 `bge-m3-local__1024__v1`。切换模型或维度时，先设置 `CODEX_MEMORY_EMBEDDING_PROFILE_VERSION` 和 `CODEX_MEMORY_RAG_PARAMS_PATH`，再依次运行：
 

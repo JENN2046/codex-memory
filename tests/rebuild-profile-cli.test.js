@@ -372,6 +372,93 @@ test('v8-diagnose CLI should expose terrain and meta thinking diagnostics', asyn
   }
 });
 
+test('cleanup-legacy-chunks CLI should remove only legacy chunks on confirm', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cleanup-legacy-'));
+  const dataDir = path.join(tempBasePath, 'data');
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+  const fingerprint = 'bge-m3-local__1024__cleanup-legacy-test';
+  const otherFingerprint = 'other-model__1024__v1';
+
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+    const db = new DatabaseSync(dbPath);
+    try {
+      db.exec(`
+        CREATE TABLE memory_chunks (
+          chunk_id TEXT PRIMARY KEY,
+          memory_id TEXT,
+          title TEXT,
+          relative_path TEXT,
+          chunk_index INTEGER,
+          embedding_fingerprint TEXT,
+          updated_at TEXT
+        );
+      `);
+      const now = new Date().toISOString();
+      const insert = db.prepare(`
+        INSERT INTO memory_chunks (chunk_id, memory_id, title, relative_path, chunk_index, embedding_fingerprint, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `);
+      insert.run('legacy-null', 'legacy-memory', 'Legacy null', 'legacy.md', 0, null, now);
+      insert.run('legacy-empty', 'legacy-memory', 'Legacy empty', 'legacy.md', 1, '', now);
+      insert.run('current', 'current-memory', 'Current', 'current.md', 0, fingerprint, now);
+      insert.run('other', 'other-memory', 'Other', 'other.md', 0, otherFingerprint, now);
+    } finally {
+      db.close();
+    }
+
+    const dryRun = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/cleanup-legacy-chunks.js',
+      args: ['--dry-run', '--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'cleanup-legacy-test'
+      }
+    });
+
+    assert.equal(dryRun.code, 0);
+    const dryPayload = JSON.parse(dryRun.stdout);
+    assert.equal(dryPayload.destructive, false);
+    assert.equal(dryPayload.before.legacyChunkCount, 2);
+    assert.equal(dryPayload.after.legacyChunkCount, 2);
+
+    const confirm = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/cleanup-legacy-chunks.js',
+      args: ['--confirm', '--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'cleanup-legacy-test'
+      }
+    });
+
+    assert.equal(confirm.code, 0);
+    const payload = JSON.parse(confirm.stdout);
+    assert.equal(payload.destructive, true);
+    assert.equal(payload.action.removedChunks, 2);
+    assert.equal(payload.after.legacyChunkCount, 0);
+
+    const verifyDb = new DatabaseSync(dbPath, { readOnly: true });
+    try {
+      const rows = verifyDb.prepare('SELECT chunk_id, embedding_fingerprint FROM memory_chunks ORDER BY chunk_id').all();
+      assert.deepEqual(rows.map(row => row.chunk_id), ['current', 'other']);
+      assert.equal(rows.find(row => row.chunk_id === 'current').embedding_fingerprint, fingerprint);
+      assert.equal(rows.find(row => row.chunk_id === 'other').embedding_fingerprint, otherFingerprint);
+    } finally {
+      verifyDb.close();
+    }
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
 test('rebuild-profile CLI should reject missing mode', async () => {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-rebuild-profile-'));
   try {
