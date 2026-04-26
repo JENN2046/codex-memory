@@ -1,0 +1,7 @@
+{
+  "maid": "Keke",
+  "keyword": "\"Phase D\",rollback,{compare|migration}",
+  "exclude_latest": false,
+  "window_size": 1,
+  "limit": 3
+}

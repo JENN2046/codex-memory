@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "We should discuss the codex-memory system plan."
+  },
+  {
+    "role": "assistant",
+    "content": "Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+  }
+]

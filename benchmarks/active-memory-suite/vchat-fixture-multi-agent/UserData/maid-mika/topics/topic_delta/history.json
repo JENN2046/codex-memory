@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "Rollback suite signal should stay green before cutover."
+  },
+  {
+    "role": "assistant",
+    "content": "Mika can review rollback readiness and suite coverage."
+  }
+]

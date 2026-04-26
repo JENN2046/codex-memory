@@ -1,0 +1,190 @@
+﻿{
+  "deepmemo:missing-maid": {
+    "stream": "stderr",
+    "payload": {
+      "status": "error",
+      "error": "[DeepMemo] 请求中缺少 'maid' 参数。",
+      "meta": {
+        "toolName": "DeepMemo",
+        "tool_name": "DeepMemo",
+        "code": "missing-maid",
+        "command": "Search",
+        "maid": "",
+        "maidName": "",
+        "keyword": "Phase C",
+        "rawKeyword": "Phase C",
+        "raw_keyword": "Phase C",
+        "query": "Phase C",
+        "rawQuery": "Phase C",
+        "raw_query": "Phase C"
+      }
+    },
+    "exitCode": 1
+  },
+  "deepmemo:basic-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nMaster: We should discuss the codex-memory system plan.\nKeke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:advanced-syntax-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nMaster: We should discuss the codex-memory system plan.\nKeke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:blocked-filtered-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nMaster: We should discuss the codex-memory system plan.\nKeke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:all-keywords-blocked": {
+    "stream": "stderr",
+    "payload": {
+      "status": "error",
+      "error": "[DeepMemo] 关键词均被屏蔽，无有效搜索词。",
+      "meta": {
+        "toolName": "DeepMemo",
+        "tool_name": "DeepMemo",
+        "code": "all-keywords-blocked",
+        "command": "Search",
+        "maid": "Keke",
+        "maidName": "Keke",
+        "keyword": "\"system plan\"",
+        "rawKeyword": "\"system plan\"",
+        "raw_keyword": "\"system plan\"",
+        "query": "\"system plan\"",
+        "rawQuery": "\"system plan\"",
+        "raw_query": "\"system plan\"",
+        "blockedKeywords": [
+          "system plan"
+        ],
+        "blockedKeywordCount": 1,
+        "blocked_keyword_count": 1,
+        "effectiveKeywords": [],
+        "effectiveKeywordCount": 0,
+        "effective_keyword_count": 0,
+        "effectiveKeywordText": "",
+        "effective_keyword_text": ""
+      }
+    },
+    "exitCode": 1
+  },
+  "deepmemo:rerank-fallback-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nMaster: We should discuss the codex-memory system plan.\nKeke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:multi-topic-order-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nMaster: Delivery schedule also needs Phase C coverage and benchmark tracking.\nKeke: Benchmark review should finish before the schedule sign-off.\n\n[回忆片段2]:\nMaster: We should discuss the codex-memory system plan.\nKeke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:multi-agent-mika-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nLead: Rollback suite signal should stay green before cutover.\nMika: Mika can review rollback readiness and suite coverage."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:mika-alias-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nLead: Compare diffs should be reviewed before migration starts.\nMika: Mika will keep compare notes ready for the next checkpoint.\n\n[回忆片段2]:\nLead: Rollback suite signal should stay green before cutover.\nMika: Mika can review rollback readiness and suite coverage."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:mika-exclude-latest-default-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nLead: Rollback suite signal should stay green before cutover.\nMika: Mika can review rollback readiness and suite coverage."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:mika-current-topic-exclusion-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nLead: Compare diffs should be reviewed before migration starts.\nMika: Mika will keep compare notes ready for the next checkpoint."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:ranking-window-order-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nKeke: Old checklist only mentions docs.\nArchitect: Phase D rollback compare migration priority should be reviewed now.\nKeke: That should gate the cutover.\n\n[回忆片段2]:\nKeke: Later we can refine compare dashboards.\nArchitect: Phase D compare migration can resume after docs review.\nKeke: Migration should wait until compare is green."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:ranking-three-window-order-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nKeke: Noted for the backlog.\nArchitect: Phase D rollback compare migration must be checked now.\nKeke: This strongest checkpoint should gate the cutover.\n\n[回忆片段2]:\nKeke: Saved for the suite.\nArchitect: Phase D compare should be reviewed next.\nKeke: Migration can wait until rollback is stable.\n\n[回忆片段3]:\nKeke: Later we can trim the backlog.\nArchitect: Compare migration can resume after docs review.\nKeke: No rollback sign-off is needed for that later step."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:large-multi-topic-order-success": {
+    "stream": "stdout",
+    "payload": {
+      "status": "success",
+      "result": "[回忆片段1]:\nPlanner: Phase D compare migration should be reviewed before launch in gamma.\nKeke: Gamma keeps the newest migration checkpoint.\n\n[回忆片段2]:\nPlanner: Phase D compare migration needs a second beta checkpoint.\nKeke: Beta should remain the middle migration signal.\n\n[回忆片段3]:\nPlanner: Phase D compare migration began in the earliest alpha checkpoint.\nKeke: Alpha keeps the oldest migration note."
+    },
+    "exitCode": 0
+  },
+  "deepmemo:agent-not-found": {
+    "stream": "stderr",
+    "payload": {
+      "status": "error",
+      "error": "[DeepMemo] 未找到名为 \"MissingMaid\" 的Agent。",
+      "meta": {
+        "toolName": "DeepMemo",
+        "tool_name": "DeepMemo",
+        "code": "agent-not-found",
+        "command": "Search",
+        "maid": "MissingMaid",
+        "maidName": "MissingMaid",
+        "keyword": "Phase C",
+        "rawKeyword": "Phase C",
+        "raw_keyword": "Phase C",
+        "query": "Phase C",
+        "rawQuery": "Phase C",
+        "raw_query": "Phase C"
+      }
+    },
+    "exitCode": 1
+  },
+  "topicmemo:agent-not-found": {
+    "stream": "stderr",
+    "payload": {
+      "status": "error",
+      "error": "[TopicMemo] 未找到名为 \"MissingMaid\" 的Agent。",
+      "meta": {
+        "toolName": "TopicMemo",
+        "tool_name": "TopicMemo",
+        "code": "agent-not-found",
+        "command": "ListTopics",
+        "maid": "MissingMaid",
+        "topicId": ""
+      }
+    },
+    "exitCode": 1
+  }
+}

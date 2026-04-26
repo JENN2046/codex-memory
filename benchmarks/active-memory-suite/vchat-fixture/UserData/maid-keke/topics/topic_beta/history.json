@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "Delivery schedule also needs Phase C coverage and benchmark tracking."
+  },
+  {
+    "role": "assistant",
+    "content": "Benchmark review should finish before the schedule sign-off."
+  }
+]

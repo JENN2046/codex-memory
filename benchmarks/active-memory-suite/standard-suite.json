@@ -1,0 +1,639 @@
+{
+  "cases": [
+    {
+      "name": "deepmemo-invalid-json",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-invalid-json.txt",
+      "legacyScript": "./legacy/deepmemo-invalid-json-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "invalid-json"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-invalid-json",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-invalid-json.txt",
+      "legacyScript": "./legacy/topicmemo-invalid-json-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "invalid-json"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-unknown-command",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-unknown-command.json",
+      "legacyScript": "./legacy/topicmemo-unknown-command-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "unknown-command"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-missing-maid",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-missing-maid.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-maid"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-basic-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-basic-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "query-semantics",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "basic-search"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-advanced-syntax-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-advanced-syntax-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "query-semantics",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "advanced-syntax"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-blocked-filtered-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-blocked-filtered-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture",
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "deepmemo"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "blocked-keyword"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-blocked-filtered-success-multi",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-blocked-filtered-success-multi.json",
+      "legacyScript": "./legacy/deepmemo-blocked-filtered-success-multi-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture",
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "deepmemo,audit"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "blocked-keyword",
+          "multi-blocked-keyword"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-blocked-filtered-success-duplicate",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-blocked-filtered-success-duplicate.json",
+      "legacyScript": "./legacy/deepmemo-blocked-filtered-success-duplicate-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture",
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "deepmemo,audit"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "blocked-keyword",
+          "multi-blocked-keyword",
+          "duplicate-keyword"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-blocked-filtered-success-advanced",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-blocked-filtered-success-advanced.json",
+      "legacyScript": "./legacy/deepmemo-blocked-filtered-success-advanced-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture",
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "deepmemo,audit"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "blocked-keyword",
+          "advanced-syntax"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-blocked-filtered-success-blocked-config-duplicate",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-blocked-filtered-success-blocked-config-duplicate.json",
+      "legacyScript": "./legacy/deepmemo-blocked-filtered-success-blocked-config-duplicate-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture",
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "DeepMemo,deepmemo,AUDIT,audit"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "blocked-keyword",
+          "blocked-config-duplicate"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-all-keywords-blocked",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-all-keywords-blocked.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture",
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "system plan"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "blocked-keyword",
+          "all-keywords-blocked"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-all-keywords-blocked-multi",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-all-keywords-blocked-multi.json",
+      "legacyScript": "./legacy/deepmemo-all-keywords-blocked-multi-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture",
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "deepmemo,topicmemo,recall,audit"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "blocked-keyword",
+          "all-keywords-blocked",
+          "multi-blocked-keyword"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-rerank-fallback-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-rerank-fallback-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture",
+        "CODEX_MEMORY_ACTIVE_RERANK_SEARCH": "true",
+        "CODEX_MEMORY_RERANK_URL": "http://127.0.0.1:1",
+        "CODEX_MEMORY_RERANK_API_KEY": "suite-test-key",
+        "CODEX_MEMORY_RERANK_MODEL": "suite-test-model"
+      },
+      "meta": {
+        "category": "fallback",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "rerank-failure",
+          "fallback"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-multi-topic-order-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-multi-topic-order-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "ordering",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "multi-topic-order"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-multi-agent-mika-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-multi-agent-mika-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-agent"
+      },
+      "meta": {
+        "category": "agent-selection",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-agent",
+        "tags": [
+          "multi-agent",
+          "maid-selection"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-mika-alias-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-mika-alias-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-agent"
+      },
+      "meta": {
+        "category": "agent-selection",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-agent",
+        "tags": [
+          "multi-agent",
+          "alias"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-mika-exclude-latest-default-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-mika-exclude-latest-default-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-agent"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-agent",
+        "tags": [
+          "exclude-latest",
+          "multi-agent"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-mika-current-topic-exclusion-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-mika-current-topic-exclusion-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-agent"
+      },
+      "meta": {
+        "category": "filtering",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-agent",
+        "tags": [
+          "current-topic-id",
+          "multi-agent"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-ranking-window-order-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-ranking-window-order-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-ranking"
+      },
+      "meta": {
+        "category": "ordering",
+        "expectation": "success",
+        "fixture": "vchat-fixture-ranking",
+        "tags": [
+          "window-order",
+          "single-topic"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-ranking-three-window-order-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-ranking-three-window-order-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-ranking-extended"
+      },
+      "meta": {
+        "category": "ordering",
+        "expectation": "success",
+        "fixture": "vchat-fixture-ranking-extended",
+        "tags": [
+          "window-order",
+          "three-window"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-large-multi-topic-order-success",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-large-multi-topic-order-success.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-topic-large"
+      },
+      "meta": {
+        "category": "ordering",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-topic-large",
+        "tags": [
+          "multi-topic-order",
+          "large-fixture"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-agent-not-found",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-agent-not-found.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "agent-selection",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "agent-not-found"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-agent-not-found",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-agent-not-found.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "agent-selection",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "agent-not-found"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-listtopics-mika",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-listtopics-mika.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-agent"
+      },
+      "meta": {
+        "category": "topic-navigation",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-agent",
+        "tags": [
+          "list-topics",
+          "multi-agent"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-listtopics-mika-agentid-alias",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-listtopics-mika-agentid-alias.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-agent"
+      },
+      "meta": {
+        "category": "agent-selection",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-agent",
+        "tags": [
+          "list-topics",
+          "agent-id",
+          "alias",
+          "multi-agent"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-gettopiccontent-mika",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-mika.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-agent"
+      },
+      "meta": {
+        "category": "topic-navigation",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-agent",
+        "tags": [
+          "get-topic-content",
+          "multi-agent"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-listtopics-basic",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-listtopics-basic.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "topic-navigation",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "list-topics",
+          "default-dispatch"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-gettopiccontent-basic",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-basic.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "topic-navigation",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "get-topic-content"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-gettopiccontent-no-settings-fallback",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-basic.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-no-settings"
+      },
+      "meta": {
+        "category": "fallback",
+        "expectation": "success",
+        "fixture": "vchat-fixture-no-settings",
+        "tags": [
+          "missing-settings",
+          "default-user-name"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-gettopiccontent-empty-history",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-empty-history.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "topic-state",
+        "expectation": "success",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "empty-history"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-gettopiccontent-missing-history",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-missing-history.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "topic-state",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-history"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-gettopiccontent-missing-topic",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-missing-topic.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "topic-state",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-topic"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-gettopiccontent-history-read-error",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-history-read-error.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-history-read-error"
+      },
+      "meta": {
+        "category": "topic-state",
+        "expectation": "error",
+        "fixture": "vchat-fixture-history-read-error",
+        "tags": [
+          "history-read-error"
+        ]
+      }
+    }
+  ],
+  "metaVersion": 1,
+  "metaSchema": {
+    "requiredCaseFields": [
+      "category",
+      "expectation",
+      "fixture",
+      "tags"
+    ],
+    "categoryValues": [
+      "input-validation",
+      "query-semantics",
+      "filtering",
+      "fallback",
+      "ordering",
+      "agent-selection",
+      "topic-navigation",
+      "topic-state"
+    ],
+    "expectationValues": [
+      "success",
+      "error"
+    ]
+  }
+}

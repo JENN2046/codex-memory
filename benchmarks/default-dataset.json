@@ -1,0 +1,80 @@
+{
+  "name": "codex-memory-provider-benchmark-v1",
+  "description": "Semantic retrieval benchmark for standalone codex-memory embedding providers.",
+  "documents": [
+    {
+      "id": "memory_overview",
+      "text": "The standalone Codex memory MCP server exposes a memory overview tool that summarizes audit logs, recall activity, shadow sync health, and adapter status."
+    },
+    {
+      "id": "dual_write_shadow",
+      "text": "After a diary write succeeds, the system dual-writes into SQLite shadow storage and the vector index. If a side write fails, it records a reconcile task instead of rejecting the diary entry."
+    },
+    {
+      "id": "candidate_cache",
+      "text": "The candidate cache stores ranked chunk candidates and is invalidated whenever knowledge base sync detects updates or stale shadow entries."
+    },
+    {
+      "id": "context_vector",
+      "text": "Context vectors blend active blocks, optional context text, and recent conversation history into the search query representation before retrieval."
+    },
+    {
+      "id": "rerank_providers",
+      "text": "Provider-aware rerank adapters support Cohere, Voyage, Jina, and generic endpoints with different request payloads and paths."
+    },
+    {
+      "id": "embedding_providers",
+      "text": "External embedding adapters support Cohere, Voyage, and Jina APIs while falling back to local hash embeddings when remote providers are unavailable."
+    },
+    {
+      "id": "diary_vectors",
+      "text": "Diary enhanced vectors summarize the process and knowledge notebooks and add notebook-level semantic routing bias during candidate scoring."
+    },
+    {
+      "id": "provider_smoke",
+      "text": "The provider smoke CLI verifies remote embedding and rerank connectivity from environment variables and prints a JSON or text report."
+    }
+  ],
+  "queries": [
+    {
+      "id": "q1",
+      "query": "How can I inspect audit logs and recall health for Codex memory?",
+      "relevant": ["memory_overview"]
+    },
+    {
+      "id": "q2",
+      "query": "What happens if the side index write fails after the diary entry is already saved?",
+      "relevant": ["dual_write_shadow"]
+    },
+    {
+      "id": "q3",
+      "query": "Which component reuses ranked retrieval candidates until the knowledge base changes?",
+      "relevant": ["candidate_cache"]
+    },
+    {
+      "id": "q4",
+      "query": "How does retrieval inject recent conversation state into the query embedding?",
+      "relevant": ["context_vector"]
+    },
+    {
+      "id": "q5",
+      "query": "Which providers have dedicated reranking request formats in this project?",
+      "relevant": ["rerank_providers"]
+    },
+    {
+      "id": "q6",
+      "query": "Which remote services are supported for real embedding generation?",
+      "relevant": ["embedding_providers"]
+    },
+    {
+      "id": "q7",
+      "query": "What adds notebook-level semantic bias during candidate generation?",
+      "relevant": ["diary_vectors"]
+    },
+    {
+      "id": "q8",
+      "query": "Which command checks remote provider connectivity and prints a report?",
+      "relevant": ["provider_smoke"]
+    }
+  ]
+}

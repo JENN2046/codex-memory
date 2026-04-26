@@ -1,0 +1,50 @@
+[
+  {
+    "role": "user",
+    "content": "Archive the old draft later."
+  },
+  {
+    "role": "assistant",
+    "content": "Noted for the backlog."
+  },
+  {
+    "role": "user",
+    "content": "Phase D rollback compare migration must be checked now."
+  },
+  {
+    "role": "assistant",
+    "content": "This strongest checkpoint should gate the cutover."
+  },
+  {
+    "role": "user",
+    "content": "Capture the top-ranked note."
+  },
+  {
+    "role": "assistant",
+    "content": "Saved for the suite."
+  },
+  {
+    "role": "user",
+    "content": "Phase D compare should be reviewed next."
+  },
+  {
+    "role": "assistant",
+    "content": "Migration can wait until rollback is stable."
+  },
+  {
+    "role": "user",
+    "content": "Keep another note for later."
+  },
+  {
+    "role": "assistant",
+    "content": "Later we can trim the backlog."
+  },
+  {
+    "role": "user",
+    "content": "Compare migration can resume after docs review."
+  },
+  {
+    "role": "assistant",
+    "content": "No rollback sign-off is needed for that later step."
+  }
+]

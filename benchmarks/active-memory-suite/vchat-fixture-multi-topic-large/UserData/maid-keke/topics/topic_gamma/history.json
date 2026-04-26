@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "Phase D compare migration should be reviewed before launch in gamma."
+  },
+  {
+    "role": "assistant",
+    "content": "Gamma keeps the newest migration checkpoint."
+  }
+]

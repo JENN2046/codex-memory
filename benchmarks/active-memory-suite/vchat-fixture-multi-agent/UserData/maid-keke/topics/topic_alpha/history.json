@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "Keke should keep the local benchmark notes isolated."
+  },
+  {
+    "role": "assistant",
+    "content": "I will keep Keke-specific benchmark notes separate from Mika."
+  }
+]

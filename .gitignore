@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Local configuration and secrets
+.env
+.env.local
+.env.*.local
+
+# Runtime storage
+data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Runtime logs and generated audit streams.
+# Keep markdown rollout/status records under logs/ because project docs link them.
+logs/*.log
+logs/*.jsonl
+
+# Local scratch files
+.tmp/
+tmp-compare.json

@@ -1,0 +1,44 @@
+{
+  "name": "codex-memory",
+  "version": "0.1.0",
+  "description": "Standalone Codex memory MCP server with diary-compatible storage and shadow indexing.",
+  "private": true,
+  "type": "commonjs",
+  "bin": {
+    "codex-memory": "./src/index.js",
+    "codex-memory-http": "./src/http-index.js",
+    "codex-memory-active-memory": "./src/cli/active-memory.js",
+    "codex-memory-deepmemo": "./src/cli/deepmemo.js",
+    "codex-memory-topicmemo": "./src/cli/topicmemo.js",
+    "codex-memory-compare-vcp-active-memory": "./src/cli/compare-vcp-active-memory.js",
+    "codex-memory-rollback-active-memory": "./src/cli/rollback-active-memory.js",
+    "codex-memory-rebuild-shadow": "./src/cli/rebuild-shadow.js",
+    "codex-memory-provider-smoke": "./src/cli/provider-smoke.js",
+    "codex-memory-provider-benchmark": "./src/cli/provider-benchmark.js"
+  },
+  "scripts": {
+    "start": "node ./src/index.js",
+    "start:http": "node ./src/http-index.js",
+    "start:http:ensure": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/ensure-codex-memory-http.ps1",
+    "start:http:install-task": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-codex-memory-http-task.ps1",
+    "start:http:watchdog:once": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/watch-codex-memory-http.ps1 -Once",
+    "start:http:watchdog:ensure": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/ensure-codex-memory-http-watchdog.ps1",
+    "start:http:watchdog:install": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/install-codex-memory-http-watchdog.ps1",
+    "active-memory": "node ./src/cli/active-memory.js",
+    "deepmemo": "node ./src/cli/deepmemo.js",
+    "topicmemo": "node ./src/cli/topicmemo.js",
+    "compare-active-memory": "node ./src/cli/compare-vcp-active-memory.js",
+    "rollback-active-memory": "node ./src/cli/rollback-active-memory.js",
+    "gate:mainline": "node ./src/cli/mainline-gate.js",
+    "gate:mainline:strict": "node ./src/cli/mainline-gate.js strict",
+    "observe:http": "node ./src/cli/http-observe.js",
+    "rollback:mainline:plan": "node ./src/cli/mainline-rollback.js",
+    "rebuild-shadow": "node ./src/cli/rebuild-shadow.js",
+    "provider-smoke": "node ./src/cli/provider-smoke.js",
+    "provider-benchmark": "node ./src/cli/provider-benchmark.js",
+    "test": "node --test ./tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

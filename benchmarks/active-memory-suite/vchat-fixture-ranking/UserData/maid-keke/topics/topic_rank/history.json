@@ -1,0 +1,42 @@
+[
+  {
+    "role": "user",
+    "content": "Let's baseline the release notes."
+  },
+  {
+    "role": "assistant",
+    "content": "Old checklist only mentions docs."
+  },
+  {
+    "role": "user",
+    "content": "Phase D rollback compare migration priority should be reviewed now."
+  },
+  {
+    "role": "assistant",
+    "content": "That should gate the cutover."
+  },
+  {
+    "role": "user",
+    "content": "Okay, capture that for the checklist."
+  },
+  {
+    "role": "assistant",
+    "content": "Noted for the immediate review."
+  },
+  {
+    "role": "user",
+    "content": "Archive the docs later."
+  },
+  {
+    "role": "assistant",
+    "content": "Later we can refine compare dashboards."
+  },
+  {
+    "role": "user",
+    "content": "Phase D compare migration can resume after docs review."
+  },
+  {
+    "role": "assistant",
+    "content": "Migration should wait until compare is green."
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "name": "Keke",
+  "topics": [
+    {
+      "id": "topic_alpha",
+      "name": "Phase D Alpha",
+      "createdAt": "2026-04-24T10:00:00.000Z",
+      "locked": false
+    },
+    {
+      "id": "topic_beta",
+      "name": "Phase D Beta",
+      "createdAt": "2026-04-24T11:00:00.000Z",
+      "locked": false
+    },
+    {
+      "id": "topic_gamma",
+      "name": "Phase D Gamma",
+      "createdAt": "2026-04-24T12:00:00.000Z",
+      "locked": false
+    }
+  ]
+}

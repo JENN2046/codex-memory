@@ -1,0 +1,29 @@
+{
+  "name": "Keke",
+  "topics": [
+    {
+      "id": "topic_alpha",
+      "name": "System Plan",
+      "createdAt": "2026-04-21T10:00:00.000Z",
+      "locked": true
+    },
+    {
+      "id": "topic_beta",
+      "name": "Delivery Schedule",
+      "createdAt": "2026-04-21T12:00:00.000Z",
+      "locked": false
+    },
+    {
+      "id": "topic_empty",
+      "name": "Quiet Topic",
+      "createdAt": "2026-04-21T14:00:00.000Z",
+      "locked": false
+    },
+    {
+      "id": "topic_missing_history",
+      "name": "Missing History",
+      "createdAt": "2026-04-21T15:00:00.000Z",
+      "locked": false
+    }
+  ]
+}

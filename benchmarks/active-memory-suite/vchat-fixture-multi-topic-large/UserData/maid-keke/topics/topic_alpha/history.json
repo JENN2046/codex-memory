@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "Phase D compare migration began in the earliest alpha checkpoint."
+  },
+  {
+    "role": "assistant",
+    "content": "Alpha keeps the oldest migration note."
+  }
+]

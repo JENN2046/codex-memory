@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "Compare diffs should be reviewed before migration starts."
+  },
+  {
+    "role": "assistant",
+    "content": "Mika will keep compare notes ready for the next checkpoint."
+  }
+]

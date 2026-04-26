@@ -1,0 +1,390 @@
+﻿# codex-memory Status
+
+更新时间：2026-04-23
+
+## 当前结论
+
+- `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
+- Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
+- `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
+- `Phase C` 已基本收口到“高 donor 兼容度”，现在具备全量重建、自动回填、增量同步，以及 `DeepMemo/TopicMemo` 的主要边界语义与展示语义兼容。
+- `Phase D` 的兼容与回滚层已经继续向前：除了 donor 风格 `DeepMemo/TopicMemo` 独立 CLI、只读 compare harness、active-memory 运维 CLI 外，现在还具备字段级 diff、批量 suite 对照、汇总级 diff 报告、只读 rollback readiness 报告，以及仓库内可复用的标准 active-memory suite 数据集。
+- `Phase D` 的标准 suite 过滤链又稳定了一层：`--expectation` 的多值 OR、顺序归一化、重复值去重都已经被 compare / rollback 回归固化。
+- `Phase D` 的 rollback readiness 报告又补了一层可观测性：suite summary / category / fixture 现在都会结构化汇总 rollback blocker 原因。
+- `Phase D` 的 compare harness 也补上了对称的“差异原因视角”：suite summary / category / fixture 现在都会结构化汇总 comparison outcome 和 drift reason。
+- `Phase D` 的 compare case 级诊断也补齐了：每条 case 现在都会直接暴露 `comparison.outcome` 和 `comparison.driftReasons`，文本报告也会预览这些原因。
+- `Phase D` 的 rollback case 级诊断也补齐了：每条 case 现在都会直接暴露 `summary.outcome` 和 `summary.blockerReasons`，文本报告也会预览这些原因。
+- `Phase D` 的文本报告也完成了一轮可读性收口：compare / rollback 的 suite 文本输出现在都会直接给 breakdown 行、category/fixture reason 预览，以及 case 级 reason 预览。
+- `Phase D` 的 README 现在也补上了更接近真实操作的 compare / rollback 排障流程，不再只是参数列表。
+- `Phase D` 现在已经补出独立的迁移验收清单：[PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md](/A:/codex-memory/PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md)，可以直接拿来做 compare / rollback 的切换前验收。
+- `Phase D` 的首轮独立迁移验收已经跑完：`npm test`、`compare --require-match`、`rollback --require-ready` 全部通过，当前结论是 `Pass with Known Gaps`，可进入灰度切主链阶段。
+- `Phase D` 现在还补出了一份独立的灰度切主链 playbook：[PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md)，把切换顺序、观察项、暂停条件和回滚动作写成了可执行步骤。
+- `Phase D` 现在还补出了一份独立的灰度执行记录模板：[PHASE_D_GRAY_ROLLOUT_LOG_TEMPLATE.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_LOG_TEMPLATE.md)，可以把每轮灰度的门禁结果和继续/暂停/回滚判断写成标准化记录。
+- `Phase D` 的第一份真实灰度记录也已落盘：[phase-d-gray-rollout-gray-01.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-01.md)。当前它是“灰度前基线记录”，结论是可进入 `Gray-02` 的真实切换观察。
+- `Phase D` 的 `Gray-02` 执行前清单也已补出：[PHASE_D_GRAY_02_PRECHECK.md](/A:/codex-memory/PHASE_D_GRAY_02_PRECHECK.md)，现在真实切换前需要看的入口点、端口、脚本和回退点都已经收口。
+- `Gray-02` 的执行前实跑也已经完成：[phase-d-gray-rollout-gray-02-precheck-pass.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-02-precheck-pass.md)。当前配置已指向 `codex-memory` HTTP MCP，门禁已绿，只差一次新会话观察。
+- `Gray-02` 的真实主入口观察也已完成：[phase-d-gray-rollout-gray-02.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-02.md)。当前可以确认：配置已生效、重启恢复正常、服务健康、compare/rollback 仍绿。
+- `Gray-03` 的持续稳定性观察也已完成：[phase-d-gray-rollout-gray-03.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-03.md)。当前可以确认：运行态健康、MCP 契约持续可用、compare/rollback 持续为绿。
+- `Gray-03` 现在还补出了持续稳定性观察计划和后续轮次记录骨架：
+  - [PHASE_D_GRAY_03_STABILITY_PLAN.md](/A:/codex-memory/PHASE_D_GRAY_03_STABILITY_PLAN.md)
+  - [PHASE_D_GRAY_FOLLOWUP_LOG_SKELETON.md](/A:/codex-memory/PHASE_D_GRAY_FOLLOWUP_LOG_SKELETON.md)
+- `Gray-04` 的后续稳定性观察也已完成：[phase-d-gray-rollout-gray-04.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-04.md)。当前可以确认：compare/rollback 继续全绿，日志侧也没有新的异常迹象。
+- `Gray-05` 的后续稳定性观察也已完成：[phase-d-gray-rollout-gray-05.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-05.md)。当前可以确认：Gray-03 计划里的后续两轮稳定性观察已经完整跑通。
+- `Phase D` 的默认主链切换结论也已形成：[PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md](/A:/codex-memory/PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md)。当前结论是：`codex-memory` 可以作为 `vcp_codex_memory` 的默认主链实现。
+- `Phase E` 的后续精修 backlog 也已整理：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)。当前已经把后续工作按 `P0 / P1 / P2` 和“主线 / 精修线 / 可维护性”分组。
+- `Phase E` 的阶段总结也已整理：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)。当前可以更清楚地区分：哪些已经是稳定基线，哪些还属于后续 backlog。
+- 阶段导航页也已整理：[PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md)。当前 README / STATUS / MEMORY / 各阶段资产之间已有一张更薄的入口页可直接跳转。
+- 项目正式收官说明也已整理：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)。当前项目边界已明确切到“主项目收官，后续转维护与精修期”。
+- `Phase E / P0-1` 已开始落成仓库标准门禁入口：新增 `gate:mainline` / `gate:mainline:strict`，把默认主链的 health、contract、compare、rollback 和全量回归收口成可复用 CLI。
+- `Phase E / P0-2` 也已开始落成仓库标准诊断入口：新增 `observe:http`，把 `/health`、HTTP 日志、watchdog 日志、bridge audit、recall audit 收口成一份可复用运行态报告。
+- `Phase E / P0-3` 已从“回滚预案入口”推进到“真实回滚演练已跑通”：`rollback:mainline:plan` 已不只是输出计划，当前 donor `6005` 也已经完成一次临时切换、握手验证与切回主链的闭环演练。
+- `Phase E / P1-1` 已完成第一刀扩展字段 drift 收口：CLI `--full` 与错误输出已把 donor 不需要的顶层扩展字段下沉到 `meta`，标准 active-memory suite 的 `extended-only-drift` 现已归零。
+- `Phase E / P1` 已开始收错误语义 / 诊断输出：当前先不改 donor 风格错误顶层，只把 `DeepMemo/TopicMemo` 的输入来源、命令、关键词与 blocked-keyword 诊断上下文补进 `meta`，并继续补齐 `DeepMemo` 的 `snake_case` donor 别名字段和 `query/rawQuery` 诊断别名。
+- `Phase E / P1` 继续收 `TopicMemo` 路由边界：`topic_id/topicId` 在未显式写 `command` 时会自动推断为 `GetTopicContent`，`topic-not-found / missing-history` 的诊断也已可回归。
+- `Phase E / P1` 再补 `TopicMemo` 的 `empty-history / history-read-error` 边界：`empty-history` 现在在 `--full` 下可见，`history-read-error` 也已带着 `meta.historyStatus` 稳定回归。
+- `Phase E / P1-2` 已继续收 donor 排序手感：第一刀先把 `DeepMemo` 的同分 tie-breaker 改成“同一话题内优先更靠后的命中窗口”；第二刀已把跨 topic 的同分边界收成“优先 fresher topic”；第三刀已把“更紧凑窗口优先”限制在跨 topic 同分结果里；第四刀把 `compactness > freshness` 的冲突优先级显式锁成回归；第五刀则把最末级 `topicId` 词典序兜底也补成稳定回归。
+
+## 分阶段进度
+
+- `Phase A` 独立核心与 Codex MCP：约 `95%`
+- `Phase B` 高级被动召回主链：约 `85%`
+- `Phase C` 主动记忆体系：约 `90%`
+- `Phase D` 兼容层与迁移收口：约 `98%`
+
+整体粗估：约 `95%`
+
+## 今天新增完成
+
+- `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
+- `Phase C` 的 `DeepMemo` 高级查询语法继续收口：
+  - 引号短语
+  - `(term:weight)`
+  - `{a|b}`
+  - `[negative]`
+  - 英文逗号 / 全角逗号分段
+- 主动记忆现在能区分并暴露 donor 风格边界：
+  - `agent-not-found`
+  - `topic-not-found`
+  - `empty-history`
+  - `missing-history`
+  - `history-read-error`
+- `DeepMemo` 的 donor 风格外围边界已并入：
+  - blocked keyword 过滤
+  - rerank 失败后继续成功返回并回退原结果
+- `execute({ maid })` 现在在无显式 command 且无 query 时，默认按 donor 风格走 `ListTopics`
+- `TopicMemo` 的 donor 风格展示细节继续贴齐：
+  - 锁定话题显示 `🔒`
+  - 话题详情里的说话人按 donor 风格加粗
+- donor `settings.userName` 缺失时，主动记忆回退用户名现在对齐为 `主人`
+- `Phase D` 第一批兼容入口已新增：
+  - `src/cli/deepmemo.js`
+  - `src/cli/topicmemo.js`
+  - `src/cli/compare-vcp-active-memory.js`
+- active-memory 运维 CLI 已新增：
+  - `src/cli/active-memory.js`
+  - 支持 `health / rebuild / sync`
+- rollback readiness CLI 已新增：
+  - `src/cli/rollback-active-memory.js`
+  - 支持只读生成 rollback-ready 报告
+- donor 风格 CLI 现在支持：
+  - `stdin JSON -> stdout/stderr JSON -> exit code`
+  - 默认紧凑 `status/result` 包络
+  - `--full` 输出完整结构化 payload
+- compare harness 现在支持：
+  - 同一份输入同时跑新 CLI 和 legacy script
+  - 只读输出对照报告
+  - `--require-match` / `--require-legacy` 门槛控制
+  - success-path 与 error-path 两条回归链都已覆盖
+  - `coreDiff / extendedDiff` 两级字段差异输出
+  - suite 模式批量样本对照
+  - `aggregateDiff` 汇总级字段漂移统计
+- 仓库内标准 active-memory suite 数据集已落盘：
+  - `benchmarks/active-memory-suite/standard-suite.json`
+  - `benchmarks/active-memory-suite/README.md`
+  - `benchmarks/active-memory-suite/legacy/standard-legacy-runner.js`
+  - `benchmarks/active-memory-suite/vchat-fixture/`
+- compare harness 现在支持 suite 级按-case `env` 注入。
+- 当前仓库标准集已扩到 `25` 个 mixed-tool case。
+- compare / rollback 现在不再只依赖临时测试 case，也能直接跑仓库标准集。
+- 标准集新增覆盖：
+  - `DeepMemo` 多 topic 排序
+  - `DeepMemo` 多 agent / 多 fixture 成功检索
+  - `DeepMemo` 多 agent 默认 `exclude_latest`
+  - `DeepMemo` 多 agent `current_topic_id` 显式排除
+  - `DeepMemo` maid alias 命中
+  - `DeepMemo` 单 topic 多窗口复杂排序
+  - `DeepMemo` 单 topic 三窗口排序稳定性
+  - `DeepMemo` 更大的跨多 topic 排序集
+  - `DeepMemo` `agent-not-found`
+  - `TopicMemo` `agent-not-found`
+  - `TopicMemo` `agentId + maid` 混合过滤
+  - `TopicMemo` 多 agent `ListTopics / GetTopicContent`
+  - `TopicMemo` `settings.userName` 缺失回退到 `主人`
+- compare suite 的按-case `env` 现在会自动解析 `_PATH / _ROOT / _DIR` 相对路径到 suite 目录，备用 fixture root 已可直接写进标准集。
+- 仓库标准 suite 现在已经是自描述集：默认主 fixture 也显式带 root，不再依赖父进程环境变量。
+- compare suite 现在还支持 fixture manifest 预处理：
+  - fixture root 可带 `.codex-fixture-manifest.json`
+  - suite 运行时会复制到临时目录并打固定 `mtime`
+  - 多 topic / 多 agent 排序标准集现在更抗环境漂移
+  - 当前 `6` 个标准 fixture root 已全部 manifest 化
+- 标准 suite 现在还带一条 manifest 守门回归：
+  - 标准 suite 里引用的 fixture root 必须使用 `vchat-fixture*` 命名，并且位于 `benchmarks/active-memory-suite` 下
+  - 新增 `vchat-fixture*` 根目录但没补 manifest，会直接测试失败
+  - 在已有 fixture 里新增 `history.json` 但没补 manifest，也会直接测试失败
+  - 标准 suite 现在还带一层 case 分类元数据：
+    - 根级有 `metaVersion / metaSchema`
+    - 每个 case 都有 `meta.category / meta.expectation / meta.fixture / meta.tags`
+    - compare suite 报告会透传 `metaVersion / metaSchema / cases[*].meta`
+    - compare / rollback suite 报告现在还会输出按 `meta.category` 聚合的 `categoryAggregate`
+  - suite 过滤再前进一版：
+    - `--tag-all`（AND 语义）
+    - `--exclude-tag`
+    - `--exclude-fixture`
+    - suite 透传 `tagAllFilter / excludeTagFilter / excludeFixtureFilter`
+  - suite CLI 现在支持 `--category <meta.category>` 过滤
+  - suite CLI 现在支持 `--expectation <meta.expectation>` 过滤
+  - suite CLI 现在支持 `--tool <deepmemo|topicmemo>` 过滤
+  - suite CLI 现在支持 `--fixture <meta.fixture>` 过滤
+- suite CLI 现在支持 `--tag <meta.tags item>` 过滤
+  - `categoryAggregate` 现在还会按 `fixture` 输出二级分组 `fixtureAggregate`
+- `Phase D` 的 `--expectation` 多值过滤语义继续固化：
+  - compare / rollback 文档说明已明确为“逗号分隔 OR”
+  - `error,success` 多值场景已有回归
+  - `success,error` 反向顺序输入已有回归，过滤结果会归一化为稳定序列
+  - `success,error,success` 重复值输入已有回归，过滤结果会自动去重
+  - 对应断言会继续校验 case 总量、fixture 准备数量，以及 `meta.expectation` 值域只落在目标集合内
+- `Phase D` 的 rollback 汇总现在还会输出：
+  - `summary.recommendationBreakdown`
+  - `summary.blockerBreakdown`
+  - `categoryAggregate[*].recommendationBreakdown`
+  - `categoryAggregate[*].blockerBreakdown`
+  - `fixtureAggregate[*].recommendationBreakdown`
+  - `fixtureAggregate[*].blockerBreakdown`
+  - 新增 mixed-reason 回归覆盖 `rollback-safe + investigate-before-rollback + legacy-unavailable` 的并存场景
+  - `cases[*].summary.outcome`
+  - `cases[*].summary.blockerReasons`
+  - 单 case mismatch 现在也会稳定暴露更细的阻断原因，例如 `core-diff / result-mismatch`
+- rollback 文本输出现在还会：
+  - 在顶部输出紧凑的 `recommendationBreakdown` / `blockerBreakdown`
+  - 在 `categoryAggregate` / `fixtureAggregate` 行内直接预览 blocker
+  - 有专门的文本模式回归锁住关键行
+- `Phase D` 的 compare 汇总现在还会输出：
+  - `summary.comparisonBreakdown`
+  - `summary.driftReasonBreakdown`
+  - `categoryAggregate[*].comparisonBreakdown`
+  - `categoryAggregate[*].driftReasonBreakdown`
+  - `fixtureAggregate[*].comparisonBreakdown`
+  - `fixtureAggregate[*].driftReasonBreakdown`
+  - 新增 mixed-reason compare 回归覆盖 `matched + mismatched + legacy-unavailable` 并存，以及 `result-mismatch / core-diff / extended-only-drift` 的聚合语义
+  - `cases[*].comparison.outcome`
+  - `cases[*].comparison.driftReasons`
+  - suite 文本输出里的 case 预览现在也会直接显示 `outcome` 与 `driftReasons`
+- compare 文本输出现在还会：
+  - 在顶部输出紧凑的 `comparison-breakdown` / `drift-reason-breakdown`
+  - 在 `categoryAggregate` / `fixtureAggregate` 行内直接预览 drift reason
+  - 有专门的文本模式回归锁住关键行
+- README 现在还补了：
+  - compare 的“三步排障流程”
+  - rollback 的“三步回滚判定流程”
+  - 文本模式先扫摘要、JSON 模式再深挖的推荐顺序
+- `Phase E / P0-1` 已新增默认主链持续门禁 CLI：
+  - `src/cli/mainline-gate.js`
+  - `npm run gate:mainline`
+  - `npm run gate:mainline:strict`
+  - 日常模式检查 `health + compare --require-match + rollback --require-ready`
+  - 严格模式额外检查 `mcp-contract + mcp-http + npm test`
+- `Phase E / P0-2` 已新增 HTTP 运行态诊断 CLI：
+  - `src/cli/http-observe.js`
+  - `npm run observe:http`
+  - 汇总 `/health`、HTTP 日志、watchdog 日志、bridge audit、recall audit
+  - 输出 `ok / warn / error` 三级运行态诊断结论
+- `Phase E / P0-3` 已新增默认主链回滚预案 CLI：
+  - `src/cli/mainline-rollback.js`
+  - `npm run rollback:mainline:plan`
+  - 读取当前 `C:\Users\617\.codex\config.toml` 的 `vcp_codex_memory` 配置块
+  - 可自动从 `A:\VCP\VCPToolBox\config.env` 推断 legacy MCP URL
+  - 输出当前入口模式、legacy 目标、最小 rollback patch 和回滚步骤
+  - 当前真实环境里已提升为 `ok`：旧服务已在 `127.0.0.1:6005` 上可达，回滚 patch 可直接落地
+  - 已完成一次真实演练：[phase-e-mainline-rollback-drill-01.md](/A:/codex-memory/logs/phase-e-mainline-rollback-drill-01.md)
+
+## 当前已验证
+
+- `node --test .\tests\phase-c-active-recall.test.js`：`16/16` 通过
+- `node --test .\tests\active-memory-cli.test.js`：`1/1` 通过
+- `node --test .\tests\vcp-active-memory-cli.test.js`：`5/5` 通过
+- `node --test .\tests\compare-vcp-active-memory-cli.test.js`：`14/14` 通过
+- `node --test .\tests\rollback-active-memory-cli.test.js`：`11/11` 通过
+- `node --test .\tests\compare-vcp-active-memory-cli.test.js .\tests\rollback-active-memory-cli.test.js`：`25/25` 通过
+- `node --test .\tests\mainline-gate-cli.test.js`：`2/2` 通过
+- `node --test .\tests\http-observe-cli.test.js`：`2/2` 通过
+- `node --test .\tests\mainline-rollback-cli.test.js`：`3/3` 通过
+- `npm run gate:mainline`：通过
+- `npm run gate:mainline:strict`：通过
+- `npm run observe:http -- --json`：通过
+- `npm run rollback:mainline:plan -- --json`：通过
+- 当前 `summary.status=ok`
+- `rollbackTargetReachable=true`
+- legacy target = `http://127.0.0.1:6005/mcp/codex-memory`
+- `tools/list` 实探通过，返回 `record_memory / search_memory / memory_overview`
+- 临时把 `C:\Users\617\.codex\config.toml` 从 `7605` 切到 `6005` 后，`initialize` 返回 `200 + Mcp-Session-Id`
+- 演练后已切回 `http://127.0.0.1:7605/mcp/codex-memory`
+- 切回后 `npm run gate:mainline`：通过
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`：通过
+- compare 当前 `extendedMismatchCountTotal=0`
+- compare 当前 `driftReasonBreakdown={}`
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`：通过
+- rollback 当前 `extendedMismatchCountTotal=0`
+- `node --test .\tests\phase-c-active-recall.test.js`：`21/21` 通过
+- `npm test`：`94/94` 通过
+- 覆盖内容包括：
+  - donor-style VChat rebuild
+  - `DeepMemo/TopicMemo` 基础兼容与 donor 风格输出
+  - 空索引自动回填
+  - 当前 topic 排除
+  - 新增 / 更新 / 删除 topic 的增量同步
+  - 已建索引后的自动增量追平
+  - blocked keyword donor 边界
+  - rerank failure donor 边界
+  - agent / topic / history 状态分辨
+  - donor 锁定图标、加粗说话人、默认用户名回退
+  - donor 风格 `DeepMemo/TopicMemo` CLI 进程语义
+  - active-memory `health / rebuild / sync` CLI
+  - compare harness 对 error-path / success-path 的兼容比对
+  - rollback readiness 报告
+  - suite 级 compare / rollback 汇总报告
+  - 仓库内标准 suite 数据集的 compare / rollback 门禁
+  - fixture manifest 复制 + 固定 `mtime` 预处理
+  - `6` 个标准 fixture root 全量 manifest 化
+  - manifest 根目录级 / history 文件级覆盖检查
+  - 标准 suite case 分类元数据与 compare 报告透传
+  - compare / rollback 的按分类聚合视图
+  - `--expectation` 的多值 OR、反向顺序归一化、重复值去重
+  - rollback suite 的 recommendation/blocker 结构化原因汇总
+  - compare suite 的 comparison/drift 结构化原因汇总
+  - compare / rollback 文本模式的可读性回归
+  - 默认主链持续门禁 CLI
+  - 默认主链日常 gate 与严格 gate
+  - HTTP 运行态诊断 CLI
+  - 默认主链回滚预案 CLI
+  - `DeepMemo` 高级查询语法标准集
+  - `DeepMemo` blocked-keyword / rerank-fallback 标准集
+- `DeepMemo` 多 topic 排序 / 多 agent / 多 fixture / `exclude_latest` / `current_topic_id` / alias / 复杂排序 / `agent-not-found` 标准集
+- `TopicMemo` 多 agent / `agentId + maid` / `agent-not-found` / `settings.userName` 缺失回退标准集
+- `TopicMemo` 空历史 / 缺历史 / 缺话题标准集
+- 新增独立的 `Phase D` 迁移验收清单：
+  - compare / rollback 各自的文本模式、JSON 模式、门禁模式检查项
+  - 标准 suite / fixture manifest / case 元数据稳定性检查项
+  - 风险、阻断项、切换建议的手工收口模板
+- 首轮 `Phase D` 独立迁移验收已回填到清单：
+  - `npm test`：`80/80`
+  - `compare --require-match`：`25/25 matched`
+  - `rollback --require-ready`：`25/25 rollback-safe`
+  - 当前无 blocker，结论为 `Pass with Known Gaps`
+  - 当时的已知差距主要是 `extended-only-drift=25`、`extendedMismatchCountTotal=185`
+- 新增独立的灰度切主链 playbook：
+  - 切换前检查
+  - 灰度执行顺序
+  - 观察项与继续灰度标准
+  - 立即暂停灰度的触发条件
+  - 最小回滚动作与记录项
+- 新增独立的灰度执行记录模板：
+  - 每轮灰度的环境、变更、compare 结果、rollback 结果
+  - MCP / 主调用链观察
+  - 继续灰度 / 暂停灰度 / 回滚判断
+  - 已知差距变化与下一步动作
+- 新增 `Gray-01` 基线记录：
+  - 当前仍未切主入口
+  - compare 仍是 `25/25 matched`
+  - rollback 仍是 `25/25 rollback-safe`
+  - 当前建议推进到 `Gray-02` 的真实主入口切换观察
+- 新增 `Gray-02` 执行前清单：
+  - 明确主入口切换层在 `vcp_codex_memory` 的 Codex 接入层，而不是记忆核心层
+  - 明确默认目标地址是 `http://127.0.0.1:7605/mcp/codex-memory`
+  - 明确切换前命令、回退点和现场证据
+- 新增 `Gray-02` 预检查通过记录：
+  - `npm test=80/80`
+  - HTTP `/health` 已通过
+  - compare `25/25 matched`
+  - rollback `25/25 rollback-safe`
+  - `C:\Users\617\.codex\config.toml` 已指向 `http://127.0.0.1:7605/mcp/codex-memory`
+- 新增 `Gray-02` 真实观察记录：
+  - 用户重启后已成功回到当前会话
+  - 当前未出现 `vcp_codex_memory` 初始化失败或握手超时
+  - HTTP MCP 健康检查通过
+  - compare / rollback 在重启后再次复跑仍然全绿
+  - 当前建议进入 `Gray-03` 持续稳定性观察
+- 新增 `Gray-03` 稳定性观察记录：
+  - HTTP `/health` 持续通过
+  - `mcp-contract + mcp-http` 定向测试 `5/5`
+  - compare 持续 `25/25 matched`
+  - rollback 持续 `25/25 rollback-safe`
+  - 当前可开始讨论从“灰度主链”推进到“默认主链”
+- 新增 `Gray-03` 持续稳定性观察计划：
+  - 标准化 `Gray-04 / Gray-05` 的观察周期
+  - 固定每轮必查项、继续灰度标准、暂停灰度标准
+  - 固定推进到“默认主链”的门槛
+- 新增后续轮次记录骨架：
+  - 让 `Gray-04 / Gray-05` 可以直接复制填写
+  - 不再每轮重新组织观察字段
+- 新增 `Gray-04` 稳定性观察记录：
+  - health 继续通过
+  - compare 继续 `25/25 matched`
+  - rollback 继续 `25/25 rollback-safe`
+  - `codex-memory-http.log` 未出现新的异常迹象
+- 新增 `Gray-05` 稳定性观察记录：
+  - health 继续通过
+  - compare 继续 `25/25 matched`
+  - rollback 继续 `25/25 rollback-safe`
+  - `Gray-04 / Gray-05` 两轮后续稳定性观察均已完成
+- 新增默认主链切换结论：
+  - `codex-memory` 现在可以作为 `vcp_codex_memory` 的默认主链实现
+  - donor / 旧实现保留为只读对照和回滚参考，不再建议作为日常主链
+  - 当前剩余工作转为 donor 扩展 payload 的精修线
+- 新增 `Phase E / P1` 错误语义标准 suite 门禁收口：
+  - compare harness 现已把 `query / rawQuery / blockedKeywords / inputSource` 收窄为 error-path 专属 extended diff
+  - 标准 suite 新增 `DeepMemo invalid-json` case
+  - 标准 suite 新增 `TopicMemo invalid-json` case
+  - 标准 suite 新增 `TopicMemo unknown-command` case
+  - 标准 suite 新增 `DeepMemo` 多关键词组合 `all-keywords-blocked` case
+  - compare harness 现在会在新旧 success payload 都显式暴露 `meta` 时，额外比对 blocked/effective success-meta 字段
+  - 标准 suite 新增 `DeepMemo` 多关键词组合“部分屏蔽但仍成功”case
+  - 标准 suite 新增 `DeepMemo` 重复关键词去重 success case，把 blocked/effective 的去重与顺序稳定性也纳入门禁
+  - 标准 suite 新增 `DeepMemo` 高级查询语法混用 success case，把短语 / 可选组 / 权重项混用时的 blocked/effective donor 语义也纳入门禁
+  - 标准 suite 新增 `DeepMemo` blocked 配置重复值和大小写混用 success case，把 blocked config 归一化下的 blocked/effective donor 语义也纳入门禁
+  - 标准 suite 新增 `TopicMemo history-read-error` fixture 与 case
+  - legacy standard runner 现已按当前 Node 运行时真实 parser message 生成 `history-read-error` donor 文案
+  - `node --test .\tests\vcp-active-memory-cli.test.js = 17/17`
+  - `node --test .\tests\compare-vcp-active-memory-cli.test.js = 14/14`
+  - `node --test .\tests\rollback-active-memory-cli.test.js = 11/11`
+  - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
+    - `matchedCaseCount = 34`
+  - `extendedMismatchCountTotal = 0`
+  - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
+    - `readyCaseCount = 34`
+  - `extendedMismatchCountTotal = 0`
+  - `npm test = 106/106`
+
+## 当前风险
+
+- `Phase C` 的“增量”仍属于“增量解析 + 全树扫描”，规模继续放大后可能需要更细的快照或目录游标。
+- 主动记忆仍未完整并入 donor 侧全部 `LightMemo / DeepMemo / TopicMemo / MetaThinking` 语义细节。
+- `DeepMemo` 当前的 blocked-keyword 与 rerank 对齐属于“兼容级实现”，不是 donor 原插件的逐行复刻。
+- 新增的 donor 风格 CLI 已覆盖主动记忆的 `stdin/stderr/process.exit` 兼容入口；当前 compare / rollback 门禁已能守住标准 suite 的 donor 风格错误语义，但更细的 donor 别名层仍有继续精修空间。
+- `VCPToolBox / VCPChat` 仍是 donor 参考源，但当前边界保持只读，不再作为运行时依赖。
+
+## 下一步建议
+
+- `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
+## Phase E 建议
+
+- `P0` 先做：
+  - compare / rollback 持续门禁常态化
+  - HTTP MCP 运行态可观测性再补一层
+  - 回滚流程再收紧一层
+- `P1` 再做：
+  - donor 排序手感继续贴齐
+  - suite 数据集继续扩容
+  - 错误语义 / 诊断输出继续贴齐
+- `P2` 最后做：
+  - 文档导航优化
+  - provider / benchmark 资产继续沉淀

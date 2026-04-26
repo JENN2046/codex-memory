@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "Phase D compare migration needs a second beta checkpoint."
+  },
+  {
+    "role": "assistant",
+    "content": "Beta should remain the middle migration signal."
+  }
+]
