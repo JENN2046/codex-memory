@@ -340,6 +340,38 @@ test('rag params profile example should load for default bge-m3-local fingerprin
   assert.equal(config.metaThinkingAutoThreshold, 0.7);
 });
 
+test('v8-diagnose CLI should expose terrain and meta thinking diagnostics', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-v8-diagnose-'));
+  try {
+    const result = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/v8-diagnose.js',
+      args: ['--query', '[[checkpoint vector schema migration]] ::TagMemo+1.5', '--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: path.join(tempBasePath, 'data'),
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'diagnose-test'
+      }
+    });
+
+    assert.equal(result.code, 0);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.mode, 'v8-diagnose');
+    assert.equal(payload.destructive, false);
+    assert.equal(payload.embeddingProfile.fingerprint, 'bge-m3-local__1024__diagnose-test');
+    assert.equal(payload.query.normalized, 'checkpoint vector schema migration');
+    assert.equal(payload.geodesic.willUse, true);
+    assert.ok(payload.terrain.energySignature.activation > 0);
+    assert.ok(Array.isArray(payload.residualPyramid.levels));
+    assert.ok(Array.isArray(payload.tagMemo.coreTags));
+    assert.ok(Number.isFinite(payload.metaThinking.score));
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
 test('rebuild-profile CLI should reject missing mode', async () => {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-rebuild-profile-'));
   try {

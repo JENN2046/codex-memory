@@ -94,6 +94,7 @@
 - `src/cli/rebuild-profile.js`：embedding profile 安全清理预检 / 确认执行
 - `src/cli/profile-health.js`：当前 embedding profile 健康面板
 - `src/cli/shadow-compare.js`：当前 profile 与 baseline profile 的只读召回对照
+- `src/cli/v8-diagnose.js`：只读 V8 terrain / TagMemo / MetaThinking 诊断
 
 ## 快速开始
 
@@ -126,6 +127,7 @@ npm run provider-benchmark -- --json
 npm run rebuild-profile -- --dry-run --json
 npm run profile-health
 npm run shadow-compare -- --query "embedding profile migration"
+npm run v8-diagnose -- --query "[[checkpoint migration]] ::TagMemo+1.5"
 npm run start:http:ensure
 npm run start:http:watchdog:once
 ```
