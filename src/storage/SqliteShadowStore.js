@@ -43,6 +43,7 @@ class SqliteShadowStore {
         chunk_index INTEGER NOT NULL,
         text TEXT NOT NULL,
         vector_json TEXT NOT NULL,
+        embedding_fingerprint TEXT,
         tags_json TEXT NOT NULL,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
@@ -61,6 +62,13 @@ class SqliteShadowStore {
         created_at TEXT NOT NULL
       );
     `);
+    this.ensureColumn('memory_chunks', 'embedding_fingerprint', 'TEXT');
+  }
+
+  ensureColumn(tableName, columnName, definition) {
+    const columns = this.db.prepare(`PRAGMA table_info(${tableName})`).all();
+    if (columns.some(column => column.name === columnName)) return;
+    this.db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
   }
 
   async upsertRecord(record) {
@@ -108,21 +116,29 @@ class SqliteShadowStore {
 
   async replaceChunksForRecord(record, chunks = []) {
     await this.ensureReady();
-    const deleteStatement = this.db.prepare('DELETE FROM memory_chunks WHERE memory_id = ?');
+    const deleteStatement = this.db.prepare(`
+      DELETE FROM memory_chunks
+      WHERE memory_id = ?
+        AND (
+          embedding_fingerprint = ?
+          OR embedding_fingerprint IS NULL
+          OR chunk_id GLOB ?
+        )
+    `);
     const insertStatement = this.db.prepare(`
       INSERT INTO memory_chunks (
         chunk_id, memory_id, target, title, source_file, relative_path, chunk_index,
-        text, vector_json, tags_json, created_at, updated_at
+        text, vector_json, embedding_fingerprint, tags_json, created_at, updated_at
       ) VALUES (
         $chunk_id, $memory_id, $target, $title, $source_file, $relative_path, $chunk_index,
-        $text, $vector_json, $tags_json, $created_at, $updated_at
+        $text, $vector_json, $embedding_fingerprint, $tags_json, $created_at, $updated_at
       )
     `);
 
-    deleteStatement.run(record.memoryId);
+    deleteStatement.run(record.memoryId, this.config.embeddingFingerprint, `${this.config.embeddingFingerprint}:*`);
     for (const chunk of chunks) {
       insertStatement.run({
-        $chunk_id: chunk.chunkId,
+        $chunk_id: this.getProfileChunkId(chunk.chunkId),
         $memory_id: record.memoryId,
         $target: record.target,
         $title: record.title,
@@ -131,6 +147,7 @@ class SqliteShadowStore {
         $chunk_index: chunk.chunkIndex,
         $text: chunk.text,
         $vector_json: JSON.stringify(chunk.vector || []),
+        $embedding_fingerprint: this.config.embeddingFingerprint,
         $tags_json: JSON.stringify(record.tags || []),
         $created_at: record.createdAt || new Date().toISOString(),
         $updated_at: record.updatedAt || record.createdAt || new Date().toISOString()
@@ -250,8 +267,8 @@ class SqliteShadowStore {
   }
 
   buildChunkQuery(target = 'both', filters = {}) {
-    const where = [];
-    const params = [];
+    const where = ['embedding_fingerprint = ?'];
+    const params = [this.config.embeddingFingerprint];
 
     if (target !== 'both') {
       where.push('target = ?');
@@ -309,10 +326,28 @@ class SqliteShadowStore {
 
     const placeholders = uniquePaths.map(() => '?').join(',');
     const rows = this.db.prepare(`
-      SELECT * FROM memory_chunks WHERE relative_path IN (${placeholders}) ORDER BY updated_at DESC, chunk_index ASC
-    `).all(...uniquePaths);
+      SELECT * FROM memory_chunks
+      WHERE embedding_fingerprint = ? AND relative_path IN (${placeholders})
+      ORDER BY updated_at DESC, chunk_index ASC
+    `).all(this.config.embeddingFingerprint, ...uniquePaths);
 
     return rows.map(row => this.mapChunkRow(row));
+  }
+
+  getProfileChunkId(chunkId) {
+    return `${this.config.embeddingFingerprint}:${chunkId}`;
+  }
+
+  async countChunksForRecord(memoryId, { currentFingerprintOnly = true } = {}) {
+    await this.ensureReady();
+    if (currentFingerprintOnly) {
+      return this.db.prepare(`
+        SELECT COUNT(*) AS count FROM memory_chunks WHERE memory_id = ? AND embedding_fingerprint = ?
+      `).get(memoryId, this.config.embeddingFingerprint).count;
+    }
+
+    return this.db.prepare('SELECT COUNT(*) AS count FROM memory_chunks WHERE memory_id = ?')
+      .get(memoryId).count;
   }
 
   async listChunksByTimeRanges(target = 'both', ranges = [], filters = {}) {
@@ -369,13 +404,17 @@ class SqliteShadowStore {
   async getHealth() {
     await this.ensureReady();
     const recordCount = this.db.prepare('SELECT COUNT(*) AS count FROM memory_records').get().count;
-    const chunkCount = this.db.prepare('SELECT COUNT(*) AS count FROM memory_chunks').get().count;
+    const chunkCount = this.db.prepare('SELECT COUNT(*) AS count FROM memory_chunks WHERE embedding_fingerprint = ?')
+      .get(this.config.embeddingFingerprint).count;
+    const totalChunkCount = this.db.prepare('SELECT COUNT(*) AS count FROM memory_chunks').get().count;
     const reconcileCount = this.db.prepare('SELECT COUNT(*) AS count FROM reconcile_queue').get().count;
     return {
       available: true,
       dbPath: this.config.dbPath,
+      embeddingFingerprint: this.config.embeddingFingerprint,
       recordCount,
       chunkCount,
+      totalChunkCount,
       reconcileCount
     };
   }
@@ -416,6 +455,7 @@ class SqliteShadowStore {
       chunkIndex: row.chunk_index,
       text: row.text,
       vector: JSON.parse(row.vector_json || '[]'),
+      embeddingFingerprint: row.embedding_fingerprint || null,
       tags: JSON.parse(row.tags_json || '[]'),
       createdAt: row.created_at,
       updatedAt: row.updated_at

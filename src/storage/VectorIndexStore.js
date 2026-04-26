@@ -32,8 +32,13 @@ class VectorIndexStore {
       embeddingHits: 0,
       embeddingMisses: 0
     };
-    this.index = {
-      version: 2,
+    this.index = this.createEmptyIndex();
+  }
+
+  createEmptyIndex() {
+    return {
+      version: 3,
+      embeddingFingerprint: this.config.embeddingFingerprint,
       updatedAt: null,
       vectors: {},
       embeddingCache: {},
@@ -53,8 +58,14 @@ class VectorIndexStore {
     }
 
     if (!this.index || typeof this.index !== 'object') {
-      this.index = { version: 2, updatedAt: null, vectors: {}, embeddingCache: {}, diaryVectors: {} };
+      this.index = this.createEmptyIndex();
     }
+    if (this.index.embeddingFingerprint !== this.config.embeddingFingerprint) {
+      this.index = this.createEmptyIndex();
+      await this.flush();
+    }
+    this.index.version = 3;
+    this.index.embeddingFingerprint = this.config.embeddingFingerprint;
     this.index.vectors = this.index.vectors && typeof this.index.vectors === 'object' ? this.index.vectors : {};
     this.index.embeddingCache = this.index.embeddingCache && typeof this.index.embeddingCache === 'object' ? this.index.embeddingCache : {};
     this.index.diaryVectors = this.index.diaryVectors && typeof this.index.diaryVectors === 'object' ? this.index.diaryVectors : {};
@@ -87,7 +98,8 @@ class VectorIndexStore {
       model: this.externalEmbeddingAdapter?.isConfigured()
         ? 'external-chain'
         : 'local-hash',
-      dims: this.config.embedDimensions
+      dims: this.config.embedDimensions,
+      embeddingFingerprint: this.config.embeddingFingerprint
     })).digest('hex');
   }
 
@@ -137,6 +149,7 @@ class VectorIndexStore {
       text: normalizedText,
       inputKind: options.inputKind || 'document',
       vector,
+      embeddingFingerprint: this.config.embeddingFingerprint,
       createdAt: new Date().toISOString(),
       lastAccessedAt: new Date().toISOString()
     };
@@ -238,6 +251,7 @@ class VectorIndexStore {
       relativePath: record.relativePath || null,
       tags: record.tags || [],
       vector,
+      embeddingFingerprint: this.config.embeddingFingerprint,
       updatedAt: record.updatedAt || record.createdAt || new Date().toISOString()
     };
 
@@ -259,7 +273,9 @@ class VectorIndexStore {
 
     for (const record of records) {
       const cached = this.index.vectors[record.memoryId];
-      const vector = cached && Array.isArray(cached.vector)
+      const vector = cached
+        && cached.embeddingFingerprint === this.config.embeddingFingerprint
+        && Array.isArray(cached.vector)
         ? cached.vector
         : this.embedText(this.buildRecordText(record));
       scoreMap.set(record.memoryId, cosineSimilarity(queryVector, vector));
@@ -287,7 +303,10 @@ class VectorIndexStore {
       const vectors = [];
 
       for (const record of targetRecords) {
-        let vector = this.index.vectors[record.memoryId]?.vector;
+        const cached = this.index.vectors[record.memoryId];
+        let vector = cached?.embeddingFingerprint === this.config.embeddingFingerprint
+          ? cached.vector
+          : null;
         if (!Array.isArray(vector)) {
           vector = await this.getSingleEmbeddingCached(this.buildRecordText(record), { inputKind: 'document' });
         }
@@ -301,6 +320,7 @@ class VectorIndexStore {
       nextDiaryVectors[target] = {
         target,
         vector: this.averageVectors(vectors),
+        embeddingFingerprint: this.config.embeddingFingerprint,
         recordCount: targetRecords.length,
         updatedAt: now
       };
@@ -343,6 +363,7 @@ class VectorIndexStore {
     return {
       available: this.config.enableVectorIndex,
       vectorIndexPath: this.config.vectorIndexPath,
+      embeddingFingerprint: this.config.embeddingFingerprint,
       vectorCount: Object.keys(this.index.vectors || {}).length,
       diaryVectorCount: Object.keys(this.index.diaryVectors || {}).length,
       embeddingCacheCount: Object.keys(this.index.embeddingCache || {}).length,

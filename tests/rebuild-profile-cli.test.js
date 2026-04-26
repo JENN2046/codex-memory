@@ -1,0 +1,446 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
+const { DatabaseSync } = require('node:sqlite');
+const { spawn } = require('node:child_process');
+const { createConfig } = require('../src/config/createConfig');
+
+function runCli({ cwd, env, args = [], script = 'src/cli/rebuild-profile.js' }) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [script, ...args], {
+      cwd,
+      env: {
+        ...process.env,
+        ...env
+      },
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', chunk => {
+      stdout += chunk.toString('utf8');
+    });
+    child.stderr.on('data', chunk => {
+      stderr += chunk.toString('utf8');
+    });
+    child.on('error', reject);
+    child.on('close', code => {
+      resolve({ code, stdout, stderr });
+    });
+  });
+}
+
+test('rebuild-profile CLI should report dry-run profile artifacts in json mode', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-rebuild-profile-'));
+  try {
+    const result = await runCli({
+      cwd: process.cwd(),
+      args: ['--dry-run', '--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: path.join(tempBasePath, 'data'),
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'cli-test'
+      }
+    });
+
+    assert.equal(result.code, 0);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.mode, 'dry-run');
+    assert.equal(payload.destructive, false);
+    assert.equal(payload.embeddingProfile.fingerprint, 'bge-m3-local__1024__cli-test');
+    assert.match(payload.paths.vectorIndexPath.replace(/\\/g, '/'), /embedding-profiles\/bge-m3-local__1024__cli-test\/memory-vectors\.json$/);
+    assert.equal(payload.artifacts.vectorIndex.exists, false);
+    assert.equal(payload.artifacts.sqlite.exists, false);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('profile-health CLI should report ready current profile artifacts', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-profile-health-'));
+  const dataDir = path.join(tempBasePath, 'data');
+  const fingerprint = 'bge-m3-local__1024__health-test';
+  const vectorIndexPath = path.join(dataDir, 'embedding-profiles', fingerprint, 'memory-vectors.json');
+  const candidateCachePath = path.join(dataDir, 'candidate-cache.json');
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+
+  try {
+    await fs.mkdir(path.dirname(vectorIndexPath), { recursive: true });
+    await fs.writeFile(vectorIndexPath, JSON.stringify({
+      version: 3,
+      embeddingFingerprint: fingerprint,
+      vectors: { one: { vector: [1, 0] } },
+      diaryVectors: { diary: { vector: [0, 1] } },
+      embeddingCache: { cached: { embeddingFingerprint: fingerprint, vector: [1, 0] } }
+    }), 'utf8');
+    await fs.writeFile(candidateCachePath, JSON.stringify({
+      version: 1,
+      entries: {
+        current: { embeddingFingerprint: fingerprint, value: { ok: true } },
+        other: { embeddingFingerprint: 'other-model__1024__v1', value: { ok: true } }
+      }
+    }), 'utf8');
+
+    const db = new DatabaseSync(dbPath);
+    try {
+      db.exec(`
+        CREATE TABLE memory_records (memory_id TEXT PRIMARY KEY);
+        CREATE TABLE memory_chunks (
+          chunk_id TEXT PRIMARY KEY,
+          memory_id TEXT,
+          embedding_fingerprint TEXT
+        );
+      `);
+      db.prepare('INSERT INTO memory_records (memory_id) VALUES (?)').run('memory-one');
+      db.prepare('INSERT INTO memory_chunks (chunk_id, memory_id, embedding_fingerprint) VALUES (?, ?, ?)')
+        .run('current-chunk', 'memory-one', fingerprint);
+    } finally {
+      db.close();
+    }
+
+    const result = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/profile-health.js',
+      args: ['--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'health-test'
+      }
+    });
+
+    assert.equal(result.code, 0);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.mode, 'profile-health');
+    assert.equal(payload.destructive, false);
+    assert.equal(payload.status, 'ready');
+    assert.equal(payload.summary.records, 1);
+    assert.equal(payload.summary.currentChunks, 1);
+    assert.equal(payload.summary.vectors, 1);
+    assert.equal(payload.summary.currentCandidateCacheEntries, 1);
+    assert.deepEqual(payload.checks, [
+      {
+        level: 'info',
+        code: 'current-candidate-cache-present',
+        message: 'Current profile has warm candidate cache entries.'
+      }
+    ]);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('profile-health CLI should warn for legacy chunks without fingerprint column', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-profile-health-'));
+  const dataDir = path.join(tempBasePath, 'data');
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+    const db = new DatabaseSync(dbPath);
+    try {
+      db.exec(`
+        CREATE TABLE memory_records (memory_id TEXT PRIMARY KEY);
+        CREATE TABLE memory_chunks (
+          chunk_id TEXT PRIMARY KEY,
+          memory_id TEXT
+        );
+      `);
+      db.prepare('INSERT INTO memory_records (memory_id) VALUES (?)').run('memory-one');
+      db.prepare('INSERT INTO memory_chunks (chunk_id, memory_id) VALUES (?, ?)').run('legacy-chunk', 'memory-one');
+    } finally {
+      db.close();
+    }
+
+    const result = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/profile-health.js',
+      args: ['--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'legacy-health-test'
+      }
+    });
+
+    assert.equal(result.code, 0);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.status, 'needs-attention');
+    assert.equal(payload.summary.legacyChunks, 1);
+    assert.equal(payload.checks.some(check => check.code === 'sqlite-fingerprint-column-missing'), true);
+    assert.equal(payload.recommendations.includes('Run npm run rebuild-shadow to regenerate current-profile chunks and vectors.'), true);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('shadow-compare CLI should compare current and baseline profile chunks', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-shadow-compare-'));
+  const dataDir = path.join(tempBasePath, 'data');
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+  const currentFingerprint = 'bge-m3-local__1024__compare-test';
+  const baselineFingerprint = 'baseline-model__1024__v1';
+
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+    const db = new DatabaseSync(dbPath);
+    try {
+      db.exec(`
+        CREATE TABLE memory_chunks (
+          chunk_id TEXT PRIMARY KEY,
+          memory_id TEXT,
+          target TEXT,
+          title TEXT,
+          relative_path TEXT,
+          chunk_index INTEGER,
+          text TEXT,
+          vector_json TEXT,
+          embedding_fingerprint TEXT,
+          tags_json TEXT,
+          created_at TEXT,
+          updated_at TEXT
+        );
+      `);
+      const now = new Date().toISOString();
+      const insert = db.prepare(`
+        INSERT INTO memory_chunks (
+          chunk_id, memory_id, target, title, relative_path, chunk_index, text,
+          vector_json, embedding_fingerprint, tags_json, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      insert.run('current-alpha', 'alpha-memory', 'process', 'Alpha current', 'current.md', 0,
+        'alpha migration current profile chunk', '[]', currentFingerprint, JSON.stringify(['alpha']), now, now);
+      insert.run('current-beta', 'beta-memory', 'process', 'Beta current', 'current.md', 1,
+        'beta unrelated profile chunk', '[]', currentFingerprint, JSON.stringify(['beta']), now, now);
+      insert.run('baseline-alpha', 'alpha-memory', 'process', 'Alpha baseline', 'baseline.md', 0,
+        'alpha migration baseline profile chunk', '[]', baselineFingerprint, JSON.stringify(['alpha']), now, now);
+      insert.run('baseline-gamma', 'gamma-memory', 'process', 'Gamma baseline', 'baseline.md', 1,
+        'gamma older profile chunk', '[]', baselineFingerprint, JSON.stringify(['gamma']), now, now);
+    } finally {
+      db.close();
+    }
+
+    const result = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/shadow-compare.js',
+      args: ['--query', 'alpha migration', '--baseline-fingerprint', baselineFingerprint, '--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'compare-test'
+      }
+    });
+
+    assert.equal(result.code, 0);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.mode, 'shadow-compare');
+    assert.equal(payload.destructive, false);
+    assert.equal(payload.status, 'lexical-only');
+    assert.equal(payload.baselineProfile.fingerprint, baselineFingerprint);
+    assert.equal(payload.summary.queryCount, 1);
+    assert.equal(payload.summary.currentChunkCount, 2);
+    assert.equal(payload.summary.baselineChunkCount, 2);
+    assert.equal(payload.comparisons[0].current[0].memoryId, 'alpha-memory');
+    assert.equal(payload.comparisons[0].baseline[0].memoryId, 'alpha-memory');
+    assert.equal(payload.comparisons[0].metrics.overlapCount, 1);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('shadow-compare CLI should report no-baseline without another profile', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-shadow-compare-'));
+  const dataDir = path.join(tempBasePath, 'data');
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+  const currentFingerprint = 'bge-m3-local__1024__single-profile-test';
+
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+    const db = new DatabaseSync(dbPath);
+    try {
+      db.exec(`
+        CREATE TABLE memory_chunks (
+          chunk_id TEXT PRIMARY KEY,
+          memory_id TEXT,
+          target TEXT,
+          title TEXT,
+          relative_path TEXT,
+          chunk_index INTEGER,
+          text TEXT,
+          vector_json TEXT,
+          embedding_fingerprint TEXT,
+          tags_json TEXT,
+          created_at TEXT,
+          updated_at TEXT
+        );
+      `);
+      const now = new Date().toISOString();
+      db.prepare(`
+        INSERT INTO memory_chunks (
+          chunk_id, memory_id, target, title, relative_path, chunk_index, text,
+          vector_json, embedding_fingerprint, tags_json, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run('current-alpha', 'alpha-memory', 'process', 'Alpha current', 'current.md', 0,
+        'alpha migration current profile chunk', '[]', currentFingerprint, JSON.stringify(['alpha']), now, now);
+    } finally {
+      db.close();
+    }
+
+    const result = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/shadow-compare.js',
+      args: ['--query', 'alpha migration', '--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'single-profile-test'
+      }
+    });
+
+    assert.equal(result.code, 0);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.status, 'no-baseline');
+    assert.equal(payload.baselineProfile.fingerprint, null);
+    assert.equal(payload.summary.currentChunkCount, 1);
+    assert.equal(payload.summary.baselineChunkCount, 0);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('rag params profile example should load for default bge-m3-local fingerprint', () => {
+  const config = createConfig({
+    projectBasePath: process.cwd(),
+    dataDir: path.join(os.tmpdir(), 'codex-memory-rag-example-data'),
+    localEmbeddingUrl: 'http://127.0.0.1:18081/',
+    localEmbeddingModel: 'bge-m3-local',
+    embeddingProfileVersion: 'v1',
+    ragParamsPath: path.join(process.cwd(), 'examples', 'rag-params.profiles.example.json')
+  });
+
+  assert.equal(config.embeddingFingerprint, 'bge-m3-local__1024__v1');
+  assert.equal(config.ragProfile.available, true);
+  assert.equal(config.ragProfile.selectedProfile, 'bge-m3-local__1024__v1');
+  assert.deepEqual(config.tagMemoDynamicWeightRange, [0.04, 0.3]);
+  assert.deepEqual(config.tagMemoCoreBoostRange, [1.18, 1.32]);
+  assert.equal(config.geodesicRerank.alpha, 0.24);
+  assert.equal(config.metaThinkingAutoThreshold, 0.7);
+});
+
+test('rebuild-profile CLI should reject missing mode', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-rebuild-profile-'));
+  try {
+    const result = await runCli({
+      cwd: process.cwd(),
+      args: ['--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: path.join(tempBasePath, 'data')
+      }
+    });
+
+    assert.notEqual(result.code, 0);
+    assert.match(result.stderr, /--dry-run or --confirm/i);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('rebuild-profile CLI confirm should clear only current profile artifacts', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-rebuild-profile-'));
+  const dataDir = path.join(tempBasePath, 'data');
+  const fingerprint = 'bge-m3-local__1024__clean-test';
+  const otherFingerprint = 'other-model__1024__v1';
+  const vectorIndexPath = path.join(dataDir, 'embedding-profiles', fingerprint, 'memory-vectors.json');
+  const candidateCachePath = path.join(dataDir, 'candidate-cache.json');
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+
+  try {
+    await fs.mkdir(path.dirname(vectorIndexPath), { recursive: true });
+    await fs.writeFile(vectorIndexPath, JSON.stringify({
+      version: 3,
+      embeddingFingerprint: fingerprint,
+      vectors: { one: { vector: [1, 0] } },
+      diaryVectors: {},
+      embeddingCache: { cached: { vector: [1, 0] } }
+    }), 'utf8');
+    await fs.writeFile(candidateCachePath, JSON.stringify({
+      version: 1,
+      entries: {
+        current: { embeddingFingerprint: fingerprint, value: { ok: true } },
+        other: { embeddingFingerprint: otherFingerprint, value: { ok: true } }
+      }
+    }), 'utf8');
+
+    const db = new DatabaseSync(dbPath);
+    try {
+      db.exec(`
+        CREATE TABLE memory_chunks (
+          chunk_id TEXT PRIMARY KEY,
+          memory_id TEXT,
+          embedding_fingerprint TEXT
+        );
+      `);
+      db.prepare('INSERT INTO memory_chunks (chunk_id, memory_id, embedding_fingerprint) VALUES (?, ?, ?)')
+        .run('current-chunk', 'current-memory', fingerprint);
+      db.prepare('INSERT INTO memory_chunks (chunk_id, memory_id, embedding_fingerprint) VALUES (?, ?, ?)')
+        .run('other-chunk', 'other-memory', otherFingerprint);
+    } finally {
+      db.close();
+    }
+
+    const result = await runCli({
+      cwd: process.cwd(),
+      args: ['--confirm', '--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'clean-test'
+      }
+    });
+
+    assert.equal(result.code, 0);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.mode, 'confirm');
+    assert.equal(payload.destructive, true);
+    assert.equal(payload.actions.vectorIndex.deleted, true);
+    assert.equal(payload.actions.candidateCache.removedEntries, 1);
+    assert.equal(payload.actions.sqlite.removedChunks, 1);
+    assert.equal(payload.after.vectorIndex.exists, false);
+    assert.equal(payload.after.candidateCache.entryCount, 1);
+    assert.equal(payload.after.sqlite.chunkCount, 0);
+    assert.equal(payload.after.sqlite.totalChunkCount, 1);
+    await assert.rejects(fs.stat(vectorIndexPath));
+
+    const cache = JSON.parse(await fs.readFile(candidateCachePath, 'utf8'));
+    assert.equal(cache.entries.current, undefined);
+    assert.equal(cache.entries.other.embeddingFingerprint, otherFingerprint);
+
+    const verifyDb = new DatabaseSync(dbPath, { readOnly: true });
+    try {
+      const rows = verifyDb.prepare('SELECT chunk_id, embedding_fingerprint FROM memory_chunks ORDER BY chunk_id')
+        .all()
+        .map(row => ({ ...row }));
+      assert.deepEqual(rows, [{ chunk_id: 'other-chunk', embedding_fingerprint: otherFingerprint }]);
+    } finally {
+      verifyDb.close();
+    }
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});

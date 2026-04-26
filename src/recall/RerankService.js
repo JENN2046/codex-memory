@@ -28,6 +28,9 @@ class RerankService {
     if (this.isRemoteConfigured() && !this.isCircuitOpen()) {
       const remote = await this.remoteRerank(query, prepared, originalK, options);
       if (remote) {
+        if (options.geodesicRerank) {
+          remote.mode = `${remote.mode}-geodesic`;
+        }
         return remote;
       }
     }
@@ -83,7 +86,11 @@ class RerankService {
 
     return {
       results: this.finalizeRerankResults(reranked, originalK, options),
-      mode: options.rrfAlpha !== undefined ? 'local-rrf' : 'local',
+      mode: [
+        'local',
+        options.rrfAlpha !== undefined ? 'rrf' : '',
+        options.geodesicRerank ? 'geodesic' : ''
+      ].filter(Boolean).join('-'),
       successRate: 1
     };
   }
@@ -91,6 +98,7 @@ class RerankService {
   finalizeRerankResults(documents, originalK, options = {}) {
     const alpha = options.rrfAlpha;
     const working = [...documents];
+    const geodesicEnabled = !!options.geodesicRerank;
 
     if (alpha !== undefined) {
       const boundedAlpha = clamp(Number(alpha) || 0.5, 0, 1);
@@ -107,10 +115,22 @@ class RerankService {
           + (1 - boundedAlpha) * (1 / (RRF_K + retrievalRank));
       });
 
-      working.sort((left, right) => (right.rrf_score || 0) - (left.rrf_score || 0));
+      if (geodesicEnabled) {
+        this.applyGeodesicScores(working, options);
+      }
+      working.sort((left, right) => (right.geodesic_score ?? right.rrf_score ?? 0) - (left.geodesic_score ?? left.rrf_score ?? 0));
       return working.slice(0, originalK).map(document => ({
         ...document,
-        score: Number((document.rrf_score || document.score || 0).toFixed(6))
+        score: Number((document.geodesic_score ?? document.rrf_score ?? document.score ?? 0).toFixed(6))
+      }));
+    }
+
+    if (geodesicEnabled) {
+      this.applyGeodesicScores(working, options);
+      working.sort((left, right) => (right.geodesic_score || 0) - (left.geodesic_score || 0));
+      return working.slice(0, originalK).map(document => ({
+        ...document,
+        score: Number((document.geodesic_score || document.score || 0).toFixed(6))
       }));
     }
 
@@ -124,6 +144,45 @@ class RerankService {
       ...document,
       score: Number(((document.rerank_score ?? document.score) || 0).toFixed(6))
     }));
+  }
+
+  applyGeodesicScores(documents, options = {}) {
+    const config = options.geodesicConfig || {};
+    const alpha = clamp(Number(config.alpha ?? 0.3), 0, 1);
+    const minGeoSamples = Math.max(1, Number.parseInt(String(config.minGeoSamples ?? 4), 10) || 4);
+    const queryActivation = options.queryAnalysis?.metrics?.energySignature?.activation || 0;
+    const metaThinkingScore = options.queryAnalysis?.metaThinking?.score || 0;
+    const sampleCount = Math.max(1, Math.min(documents.length, minGeoSamples));
+
+    documents.forEach((document, index) => {
+      const localNeighborhood = documents
+        .slice(Math.max(0, index - sampleCount), Math.min(documents.length, index + sampleCount + 1))
+        .filter(neighbor => neighbor !== document);
+      const neighborScore = localNeighborhood.length > 0
+        ? localNeighborhood.reduce((sum, neighbor) => sum + Number(neighbor.rerank_score ?? neighbor.score ?? 0), 0) / localNeighborhood.length
+        : Number(document.rerank_score ?? document.score ?? 0);
+      const baseScore = Number(document.rerank_score ?? document.rrf_score ?? document.score ?? 0);
+      const terrainScore = clamp(
+        (document.vectorScore || 0) * 0.26
+          + (document.tagMemoScore || 0) * 0.2
+          + (document.lexicalScore || 0) * 0.16
+          + (document.structuralBias || 0) * 0.14
+          + (document.diaryScore || 0) * 0.08
+          + (document.contextScore || 0) * 0.08
+          + queryActivation * 0.04
+          + metaThinkingScore * 0.04,
+        0,
+        1
+      );
+      const continuity = clamp((neighborScore + baseScore) / 2, 0, 1);
+      document.geodesic_score = Number(((1 - alpha) * baseScore + alpha * (terrainScore * 0.7 + continuity * 0.3)).toFixed(6));
+      document.geodesic_rank_signal = {
+        alpha,
+        terrainScore: Number(terrainScore.toFixed(6)),
+        continuity: Number(continuity.toFixed(6)),
+        sampleCount: localNeighborhood.length
+      };
+    });
   }
 
   computeLocalScore(queryTokens, document) {

@@ -7,7 +7,8 @@ function clamp(value, min, max) {
 }
 
 class TagMemoEngine {
-  constructor({ epaModule = new EPAModule(), residualPyramid = new ResidualPyramid() } = {}) {
+  constructor({ config = {}, epaModule = new EPAModule(), residualPyramid = new ResidualPyramid() } = {}) {
+    this.config = config;
     this.epaModule = epaModule;
     this.residualPyramid = residualPyramid;
   }
@@ -36,6 +37,7 @@ class TagMemoEngine {
     const explicitWeight = this.parseExplicitTagMemoWeight(input.directives || {});
     const dynamicWeight = this.computeDynamicWeight(metrics, pyramid, explicitWeight);
     const dynamicCoreWeight = this.computeDynamicCoreWeight(metrics, pyramid);
+    const metaThinking = this.evaluateMetaThinking(metrics, pyramid, input.directives || {});
 
     return {
       queryText,
@@ -43,6 +45,7 @@ class TagMemoEngine {
       coreTags,
       metrics,
       pyramid,
+      metaThinking,
       timeRanges: input.timeRanges || [],
       directives: input.directives || {},
       dynamicTagWeight: dynamicWeight,
@@ -152,13 +155,48 @@ class TagMemoEngine {
     const activation = pyramid.features.tagMemoActivation || 0;
     const base = 0.14 + metrics.logicDepth * 0.16 + metrics.resonance * 0.08 + activation * 0.12 + (1 - coverage) * 0.08;
     const weighted = explicitWeight !== null ? base * explicitWeight : base;
-    return Number(clamp(weighted, 0.05, 0.45).toFixed(6));
+    const [minWeight, maxWeight] = this.config.tagMemoDynamicWeightRange || [0.05, 0.45];
+    return Number(clamp(weighted, minWeight, maxWeight).toFixed(6));
   }
 
   computeDynamicCoreWeight(metrics, pyramid) {
     const coverage = pyramid.features.coverage || 0;
     const coreMetric = metrics.logicDepth * 0.5 + (1 - coverage) * 0.5;
-    return Number(clamp(1.2 + coreMetric * 0.2, 1.2, 1.4).toFixed(6));
+    const [minWeight, maxWeight] = this.config.tagMemoCoreBoostRange || [1.2, 1.4];
+    return Number(clamp(1.2 + coreMetric * 0.2, minWeight, maxWeight).toFixed(6));
+  }
+
+  evaluateMetaThinking(metrics, pyramid, directives = {}) {
+    const threshold = Number.isFinite(Number(this.config.metaThinkingAutoThreshold))
+      ? Number(this.config.metaThinkingAutoThreshold)
+      : 0.65;
+    const novelty = pyramid.features?.novelty || 0;
+    const breadth = pyramid.features?.breadth || 0;
+    const tension = metrics.energySignature?.tension || 0;
+    const activation = metrics.energySignature?.activation || 0;
+    const directiveBoost = directives.geodesicrerank || directives.rerankplus !== undefined ? 0.08 : 0;
+    const score = Number(clamp(
+      metrics.logicDepth * 0.28
+        + metrics.resonance * 0.22
+        + novelty * 0.18
+        + breadth * 0.12
+        + tension * 0.12
+        + activation * 0.08
+        + directiveBoost,
+      0,
+      1
+    ).toFixed(6));
+    const reasons = [];
+    if (metrics.logicDepth >= 0.55) reasons.push('logic-depth');
+    if (metrics.resonance >= 0.35) reasons.push('axis-resonance');
+    if (novelty >= 0.45) reasons.push('residual-novelty');
+    if (directives.geodesicrerank) reasons.push('geodesic-directive');
+    return {
+      score,
+      threshold,
+      auto: score >= threshold,
+      reasons
+    };
   }
 }
 

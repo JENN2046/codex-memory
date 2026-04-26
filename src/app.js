@@ -43,7 +43,7 @@ function createCodexMemoryApplication(overrides = {}) {
   const executionContextResolver = new ExecutionContextResolver(config);
   const compatibilitySyntaxAdapter = new CompatibilitySyntaxAdapter();
   const timeExpressionParser = new TimeExpressionParser();
-  const tagMemoEngine = new TagMemoEngine();
+  const tagMemoEngine = new TagMemoEngine({ config });
   const resultDeduplicator = new ResultDeduplicator();
   const semanticGroupManager = new SemanticGroupManager();
   const recallEnhancer = new RecallEnhancer({
@@ -72,6 +72,7 @@ function createCodexMemoryApplication(overrides = {}) {
     externalRerankAdapter
   });
   const recallAuditService = new RecallAuditService({
+    config,
     auditLogStore
   });
   const knowledgeBaseSyncService = new KnowledgeBaseSyncService({

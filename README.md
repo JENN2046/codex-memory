@@ -31,6 +31,7 @@
 - 项目正式收官说明：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
 - 当前阶段记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
 - Phase D 迁移验收清单：[PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md](/A:/codex-memory/PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md)
+- Embedding profile 迁移 runbook：[EMBEDDING_PROFILE_MIGRATION_RUNBOOK.md](/A:/codex-memory/EMBEDDING_PROFILE_MIGRATION_RUNBOOK.md)
 - Phase D 灰度切主链 playbook：[PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md)
 - Phase D 灰度执行记录模板：[PHASE_D_GRAY_ROLLOUT_LOG_TEMPLATE.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_LOG_TEMPLATE.md)
 - Phase D Gray-01 基线记录：[phase-d-gray-rollout-gray-01.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-01.md)
@@ -90,6 +91,9 @@
 - `src/cli/mainline-rollback.js`：默认主链回滚预案 CLI
 - `src/cli/provider-smoke.js`：真实 provider 连通性检查
 - `src/cli/provider-benchmark.js`：真实 provider 召回基准对比
+- `src/cli/rebuild-profile.js`：embedding profile 安全清理预检 / 确认执行
+- `src/cli/profile-health.js`：当前 embedding profile 健康面板
+- `src/cli/shadow-compare.js`：当前 profile 与 baseline profile 的只读召回对照
 
 ## 快速开始
 
@@ -119,6 +123,9 @@ npm run observe:http -- --json
 npm run rollback:mainline:plan -- --json
 npm run provider-smoke -- --json
 npm run provider-benchmark -- --json
+npm run rebuild-profile -- --dry-run --json
+npm run profile-health
+npm run shadow-compare -- --query "embedding profile migration"
 npm run start:http:ensure
 npm run start:http:watchdog:once
 ```
@@ -129,6 +136,17 @@ npm run start:http:watchdog:once
 - 完整高级模板：[.env.advanced.example](/A:/codex-memory/.env.advanced.example)
 - provider smoke 示例：[examples/provider-smoke.env.example](/A:/codex-memory/examples/provider-smoke.env.example)
 - provider benchmark 示例：[examples/provider-benchmark.env.example](/A:/codex-memory/examples/provider-benchmark.env.example)
+- RAG 多 profile 参数示例：[examples/rag-params.profiles.example.json](/A:/codex-memory/examples/rag-params.profiles.example.json)
+
+Embedding profile 会按 `<model>__<dimensions>__<version>` 生成 fingerprint，例如默认本地 BGE-M3 是 `bge-m3-local__1024__v1`。切换模型或维度时，先设置 `CODEX_MEMORY_EMBEDDING_PROFILE_VERSION` 和 `CODEX_MEMORY_RAG_PARAMS_PATH`，再依次运行：
+
+```powershell
+npm run rebuild-profile -- --dry-run --json
+npm run rebuild-profile -- --confirm --json
+npm run rebuild-shadow
+npm run profile-health
+npm run shadow-compare -- --query "your migration query"
+```
 
 ## Codex 接入
 

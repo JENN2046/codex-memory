@@ -20,7 +20,7 @@ class CandidateGenerator {
 
   buildSearchPlan({ limit, directives = {}, timeRanges = [] }) {
     const finalLimit = clampLimit(limit, this.config.defaultSearchLimit, this.config.maxSearchLimit);
-    const useRerank = !!directives.rerank || directives.rerankplus !== undefined;
+    const useRerank = !!directives.rerank || directives.rerankplus !== undefined || !!directives.geodesicrerank;
     const useTime = !!directives.time || timeRanges.length > 0;
     const multiplier = useRerank ? this.config.rerankMultiplier : this.config.candidatePoolMultiplier;
 
@@ -124,6 +124,7 @@ class CandidateGenerator {
   buildCacheKey({ target, queryText, queryAnalysis, directives, searchPlan, syncToken, contextState, candidateFilters = {} }) {
     const payload = {
       target,
+      embeddingFingerprint: this.config.embeddingFingerprint,
       queryText: compactText(queryText).toLowerCase(),
       coreTags: queryAnalysis.coreTags || [],
       tokens: queryAnalysis.tokens || [],
@@ -237,6 +238,10 @@ class CandidateGenerator {
       diaryScore: Number(diaryScore.toFixed(6)),
       lexicalScore: Number(lexical.score.toFixed(6)),
       tagMemoScore: tagMemo.normalizedScore,
+      terrainActivation: queryAnalysis.metrics?.energySignature?.activation || 0,
+      terrainTension: queryAnalysis.metrics?.energySignature?.tension || 0,
+      metaThinkingScore: queryAnalysis.metaThinking?.score || 0,
+      metaThinkingAuto: !!queryAnalysis.metaThinking?.auto,
       matchedTags: uniqueTokens([...(lexical.matchedTags || []), ...(tagMemo.matchedTags || [])]),
       coreTagsMatched: uniqueTokens(tagMemo.matchedCoreTags || []),
       matchedCoreTags: uniqueTokens(tagMemo.matchedCoreTags || []),

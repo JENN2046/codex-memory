@@ -156,6 +156,7 @@ function normalizeRecallEntries(entries, limit) {
     .slice(0, limit)
     .map(entry => ({
       timestamp: entry.timestamp || null,
+      embeddingFingerprint: entry.embeddingFingerprint || null,
       dbName: entry.dbName || null,
       target: entry.target || null,
       recallType: entry.recallType || 'unknown',
@@ -360,6 +361,18 @@ class MemoryOverviewService {
         vectorIndexPath: this.config.vectorIndexPath,
         chatIndexPath: this.config.chatIndexPath,
         candidateCachePath: this.config.candidateCachePath
+      },
+      embeddingProfile: {
+        fingerprint: this.config.embeddingFingerprint,
+        version: this.config.embeddingProfileVersion,
+        model: this.config.embeddingModel || 'local-hash',
+        provider: this.config.embeddingProvider || 'local',
+        dimensions: this.config.embedDimensions,
+        ragProfile: {
+          available: !!this.config.ragProfile?.available,
+          selectedProfile: this.config.ragProfile?.selectedProfile || null,
+          error: this.config.ragProfile?.error || null
+        }
       },
       summary: buildWriteSummary(writeEntries),
       recentAudit: normalizeAuditEntries(writeEntries, listLimit),

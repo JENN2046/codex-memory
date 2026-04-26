@@ -218,8 +218,10 @@ test('recall audit should include candidate, rerank, and query-axis details', as
     assert.equal(latest.target, 'process');
     assert.ok(latest.candidateCount >= 2);
     assert.ok(latest.semanticCandidateCount >= 2);
-    assert.equal(latest.rerankMode, 'local-rrf');
+    assert.equal(latest.rerankMode, 'local-rrf-geodesic');
     assert.equal(latest.rrfAlpha, 0.6);
     assert.ok(Array.isArray(latest.queryAxes));
+    assert.ok(Number.isFinite(latest.metaThinkingScore));
+    assert.equal(Array.isArray(latest.metaThinkingReasons), true);
   });
 });

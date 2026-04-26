@@ -13,6 +13,9 @@
     "codex-memory-compare-vcp-active-memory": "./src/cli/compare-vcp-active-memory.js",
     "codex-memory-rollback-active-memory": "./src/cli/rollback-active-memory.js",
     "codex-memory-rebuild-shadow": "./src/cli/rebuild-shadow.js",
+    "codex-memory-rebuild-profile": "./src/cli/rebuild-profile.js",
+    "codex-memory-profile-health": "./src/cli/profile-health.js",
+    "codex-memory-shadow-compare": "./src/cli/shadow-compare.js",
     "codex-memory-provider-smoke": "./src/cli/provider-smoke.js",
     "codex-memory-provider-benchmark": "./src/cli/provider-benchmark.js"
   },
@@ -34,6 +37,9 @@
     "observe:http": "node ./src/cli/http-observe.js",
     "rollback:mainline:plan": "node ./src/cli/mainline-rollback.js",
     "rebuild-shadow": "node ./src/cli/rebuild-shadow.js",
+    "rebuild-profile": "node ./src/cli/rebuild-profile.js",
+    "profile-health": "node ./src/cli/profile-health.js",
+    "shadow-compare": "node ./src/cli/shadow-compare.js",
     "provider-smoke": "node ./src/cli/provider-smoke.js",
     "provider-benchmark": "node ./src/cli/provider-benchmark.js",
     "test": "node --test ./tests/*.test.js"

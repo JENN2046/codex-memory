@@ -47,7 +47,7 @@ class CandidateCacheStore {
     this.pruneExpiredEntries();
 
     const entry = this.cache.entries[key];
-    if (!entry) {
+    if (!entry || entry.embeddingFingerprint !== this.config.embeddingFingerprint) {
       this.stats.misses += 1;
       return null;
     }
@@ -67,6 +67,7 @@ class CandidateCacheStore {
       key,
       value,
       target: metadata.target || 'both',
+      embeddingFingerprint: this.config.embeddingFingerprint,
       createdAt: now.toISOString(),
       lastAccessedAt: now.toISOString(),
       expiresAt: new Date(now.getTime() + this.config.candidateCacheTtlMs).toISOString()
@@ -80,6 +81,21 @@ class CandidateCacheStore {
     await this.ensureReady();
     this.cache.entries = {};
     await this.flush();
+  }
+
+  async clearCurrentFingerprint() {
+    await this.ensureReady();
+    let removedEntries = 0;
+    for (const [key, entry] of Object.entries(this.cache.entries || {})) {
+      if (entry?.embeddingFingerprint === this.config.embeddingFingerprint) {
+        delete this.cache.entries[key];
+        removedEntries += 1;
+      }
+    }
+    if (removedEntries > 0) {
+      await this.flush();
+    }
+    return removedEntries;
   }
 
   pruneExpiredEntries() {
@@ -118,6 +134,7 @@ class CandidateCacheStore {
     return {
       available: this.config.enableCandidateCache,
       candidateCachePath: this.config.candidateCachePath,
+      embeddingFingerprint: this.config.embeddingFingerprint,
       entryCount: Object.keys(this.cache.entries || {}).length,
       maxEntries: this.config.candidateCacheMaxEntries,
       ttlMs: this.config.candidateCacheTtlMs,

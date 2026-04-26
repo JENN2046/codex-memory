@@ -9,6 +9,8 @@ const {
   WRITE_AUDIT_FILE_NAME,
   RECALL_AUDIT_FILE_NAME
 } = require('../core/constants');
+const { getEmbeddingFingerprint } = require('./embeddingFingerprint');
+const { applyRagProfileToConfig, loadRagProfileConfig } = require('./ragProfileConfig');
 
 function toBoolean(value, fallback = false) {
   if (typeof value === 'boolean') return value;
@@ -266,8 +268,25 @@ function createConfig(overrides = {}) {
     ),
     64
   );
+  const embeddingProfileVersion = String(pickFirstNonEmpty(
+    overrides.embeddingProfileVersion,
+    process.env.CODEX_MEMORY_EMBEDDING_PROFILE_VERSION,
+    process.env.EMBEDDING_PROFILE_VERSION,
+    'v1'
+  ));
+  const embeddingFingerprint = getEmbeddingFingerprint({
+    provider: activeEmbeddingEndpoint.provider || 'local',
+    model: activeEmbeddingEndpoint.model || (activeEmbeddingEndpoint.url ? 'external-chain' : 'local-hash'),
+    dimension: inferredEmbedDimensions,
+    version: embeddingProfileVersion
+  });
+  const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
+  const vectorIndexPath = resolveAbsolutePath(
+    basePath,
+    overrides.vectorIndexPath || process.env.CODEX_MEMORY_VECTOR_PATH || path.join(embeddingProfileDir, VECTOR_INDEX_FILE_NAME)
+  );
 
-  return {
+  const baseConfig = {
     projectBasePath: basePath,
     dataDir,
     logsDir,
@@ -284,10 +303,7 @@ function createConfig(overrides = {}) {
       basePath,
       overrides.dbPath || process.env.CODEX_MEMORY_DB_PATH || path.join(dataDir, SQLITE_FILE_NAME)
     ),
-    vectorIndexPath: resolveAbsolutePath(
-      basePath,
-      overrides.vectorIndexPath || process.env.CODEX_MEMORY_VECTOR_PATH || path.join(dataDir, VECTOR_INDEX_FILE_NAME)
-    ),
+    vectorIndexPath,
     httpLogPath: resolveAbsolutePath(
       basePath,
       overrides.httpLogPath || process.env.CODEX_MEMORY_HTTP_LOG || path.join(logsDir, 'codex-memory-http.log')
@@ -316,6 +332,19 @@ function createConfig(overrides = {}) {
     httpMcpPath: normalizeHttpPath(overrides.httpMcpPath || process.env.CODEX_MEMORY_HTTP_PATH || '/mcp/codex-memory'),
     httpBearerToken: overrides.httpBearerToken || process.env.CODEX_MEMORY_HTTP_TOKEN || '',
     embedDimensions: inferredEmbedDimensions,
+    embeddingFingerprint,
+    embeddingProfileVersion,
+    ragParamsPath: resolveAbsolutePath(
+      basePath,
+      overrides.ragParamsPath || process.env.CODEX_MEMORY_RAG_PARAMS_PATH || ''
+    ),
+    tagMemoDynamicWeightRange: [0.05, 0.45],
+    tagMemoCoreBoostRange: [1.2, 1.4],
+    geodesicRerank: {
+      alpha: 0.3,
+      minGeoSamples: 4
+    },
+    metaThinkingAutoThreshold: 0.65,
     embeddingProvider: activeEmbeddingEndpoint.provider,
     embeddingUrl: activeEmbeddingEndpoint.url,
     embeddingApiKey: activeEmbeddingEndpoint.apiKey,
@@ -393,6 +422,14 @@ function createConfig(overrides = {}) {
     autoRebuildShadowOnStart: toBoolean(overrides.autoRebuildShadowOnStart ?? process.env.CODEX_MEMORY_AUTO_REBUILD, false),
     autoRebuildActiveMemoryOnStart: toBoolean(overrides.autoRebuildActiveMemoryOnStart ?? process.env.CODEX_MEMORY_AUTO_REBUILD_ACTIVE_MEMORY, false)
   };
+
+  return applyRagProfileToConfig(
+    baseConfig,
+    loadRagProfileConfig({
+      filePath: baseConfig.ragParamsPath,
+      embeddingFingerprint
+    })
+  );
 }
 
 module.exports = {

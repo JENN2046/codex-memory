@@ -29,7 +29,10 @@ class KnowledgeBaseSyncService {
 
       const recordKey = this.getRecordKey(record);
       const existing = existingMap.get(recordKey);
-      const needsRefresh = force || this.shouldRefreshRecord(existing, record);
+      const hasCurrentFingerprintChunks = existing
+        ? await this.hasCurrentFingerprintChunks(record)
+        : false;
+      const needsRefresh = force || this.shouldRefreshRecord(existing, record) || !hasCurrentFingerprintChunks;
 
       if (this.config.enableShadowWrites && needsRefresh) {
         await this.shadowStore.upsertRecord(record);
@@ -73,7 +76,11 @@ class KnowledgeBaseSyncService {
       diaryVectorWrites = await this.vectorStore.rebuildDiaryVectors(diaryRecords);
     }
     if (changed && this.candidateCacheStore) {
-      await this.candidateCacheStore.clearAll();
+      if (this.candidateCacheStore.clearCurrentFingerprint) {
+        await this.candidateCacheStore.clearCurrentFingerprint();
+      } else {
+        await this.candidateCacheStore.clearAll();
+      }
     }
 
     return {
@@ -126,6 +133,13 @@ class KnowledgeBaseSyncService {
       !!existing.validated !== !!incoming.validated,
       !!existing.reusable !== !!incoming.reusable
     ].some(Boolean);
+  }
+
+  async hasCurrentFingerprintChunks(record) {
+    if (!this.chunkIndexingService || !this.shadowStore.countChunksForRecord || !record?.memoryId) {
+      return true;
+    }
+    return (await this.shadowStore.countChunksForRecord(record.memoryId)) > 0;
   }
 }
 

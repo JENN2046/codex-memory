@@ -55,7 +55,38 @@ class EPAModule {
       resonance,
       semanticWidth,
       entropy: normalizedEntropy,
-      dominantAxes
+      dominantAxes,
+      terrainBasis: this.buildTerrainBasis(dominantAxes),
+      energySignature: this.buildEnergySignature({
+        logicDepth,
+        resonance,
+        semanticWidth,
+        entropy: normalizedEntropy,
+        dominantAxes
+      })
+    };
+  }
+
+  buildTerrainBasis(dominantAxes = []) {
+    const labels = ['procedural', 'knowledge', 'technical', 'temporal', 'anchored'];
+    const energyByLabel = new Map((dominantAxes || []).map(axis => [axis.label, axis.energy]));
+    const vector = labels.map(label => Number((energyByLabel.get(label) || 0).toFixed(6)));
+    const norm = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0));
+    return {
+      labels,
+      vector: norm > 0 ? vector.map(value => Number((value / norm).toFixed(6))) : vector,
+      primaryAxis: dominantAxes[0]?.label || null
+    };
+  }
+
+  buildEnergySignature({ logicDepth, resonance, semanticWidth, entropy, dominantAxes }) {
+    const axisCount = (dominantAxes || []).filter(axis => axis.energy > 0.1).length;
+    const concentration = dominantAxes[0]?.energy || 0;
+    return {
+      concentration: Number(concentration.toFixed(6)),
+      axisCount,
+      tension: Number(Math.max(0, resonance * (1 - entropy)).toFixed(6)),
+      activation: Number(Math.min(1, logicDepth * 0.35 + resonance * 0.3 + semanticWidth * 0.2 + axisCount * 0.03).toFixed(6))
     };
   }
 

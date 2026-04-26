@@ -89,6 +89,7 @@ class KnowledgeBaseRecallPipeline {
     const rerankState = await this.finalizeChunkCandidates({
       queryText,
       directives,
+      queryAnalysis,
       candidateState
     });
 
@@ -117,14 +118,17 @@ class KnowledgeBaseRecallPipeline {
     return finalResults;
   }
 
-  async finalizeChunkCandidates({ queryText, directives, candidateState }) {
+  async finalizeChunkCandidates({ queryText, directives, queryAnalysis = {}, candidateState }) {
     const { searchPlan, semanticCandidates, timeCandidates } = candidateState;
     const useRerank = searchPlan.useRerank;
     const chunkResultLimit = directives.group
       ? Math.max(searchPlan.finalLimit * 3, searchPlan.finalLimit + 4)
       : searchPlan.finalLimit;
     const rerankOptions = {
-      rrfAlpha: directives.rerankplus
+      rrfAlpha: directives.rerankplus,
+      geodesicRerank: !!directives.geodesicrerank,
+      geodesicConfig: this.rerankService.config?.geodesicRerank || {},
+      queryAnalysis
     };
 
     if (searchPlan.useTime) {

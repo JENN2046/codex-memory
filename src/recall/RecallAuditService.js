@@ -7,8 +7,9 @@ function normalizeTagArray(tags) {
 }
 
 class RecallAuditService {
-  constructor({ auditLogStore }) {
+  constructor({ auditLogStore, config = null }) {
     this.auditLogStore = auditLogStore;
+    this.config = config;
   }
 
   async record(payload = {}) {
@@ -50,6 +51,7 @@ class RecallAuditService {
 
     return {
       timestamp: new Date().toISOString(),
+      embeddingFingerprint: this.config?.embeddingFingerprint || null,
       dbName,
       target: getTargetForDiaryName(dbName),
       recallType,
@@ -75,6 +77,9 @@ class RecallAuditService {
       rrfAlpha: directives.rerankplus !== undefined ? Number(directives.rerankplus) : null,
       rerankMode: rerankMeta.mode || 'none',
       rerankSuccessRate: rerankMeta.successRate ?? null,
+      metaThinkingScore: Number.isFinite(queryAnalysis.metaThinking?.score) ? queryAnalysis.metaThinking.score : null,
+      metaThinkingAuto: !!queryAnalysis.metaThinking?.auto,
+      metaThinkingReasons: Array.isArray(queryAnalysis.metaThinking?.reasons) ? queryAnalysis.metaThinking.reasons : [],
       queryAxes,
       contextVectorUsed: !!contextState?.available,
       contextSourceKinds: Array.isArray(contextState?.sourceKinds) ? contextState.sourceKinds : [],

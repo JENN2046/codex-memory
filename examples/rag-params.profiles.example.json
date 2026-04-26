@@ -1,0 +1,160 @@
+{
+  "default": {
+    "RAGDiaryPlugin": {
+      "noise_penalty": 0.05,
+      "tagWeightRange": [0.05, 0.45],
+      "tagTruncationBase": 0.6,
+      "tagTruncationRange": [0.5, 0.9],
+      "timeDecay": {
+        "halfLifeDays": 30,
+        "minScore": 0.5
+      },
+      "mainSearchWeights": [0.7, 0.3],
+      "refreshWeights": [0.5, 0.35, 0.15],
+      "metaThinkingWeights": [0.8, 0.2]
+    },
+    "KnowledgeBaseManager": {
+      "geodesicRerank": {
+        "alpha": 0.3,
+        "minGeoSamples": 4
+      },
+      "spikeRouting": {
+        "maxSafeHops": 4,
+        "baseMomentum": 2,
+        "firingThreshold": 0.1,
+        "baseDecay": 0.25,
+        "wormholeDecay": 0.7,
+        "tensionThreshold": 1,
+        "maxEmergentNodes": 50,
+        "maxNeighborsPerNode": 20
+      },
+      "activationMultiplier": [0.5, 1.5],
+      "dynamicBoostRange": [0.3, 2],
+      "coreBoostRange": [1.2, 1.4],
+      "deduplicationThreshold": 0.88,
+      "techTagThreshold": 0.08,
+      "normalTagThreshold": 0.015,
+      "languageCompensator": {
+        "penaltyUnknown": 0.05,
+        "penaltyCrossDomain": 0.1
+      }
+    },
+    "MetaThinkingManager": {
+      "autoThreshold": 0.65
+    }
+  },
+  "profiles": {
+    "bge-m3-local__1024__v1": {
+      "inherits": "default",
+      "RAGDiaryPlugin": {
+        "noise_penalty": 0.06,
+        "tagWeightRange": [0.04, 0.3],
+        "tagTruncationBase": 0.6,
+        "tagTruncationRange": [0.5, 0.85],
+        "mainSearchWeights": [0.74, 0.26],
+        "metaThinkingWeights": [0.84, 0.16]
+      },
+      "KnowledgeBaseManager": {
+        "geodesicRerank": {
+          "alpha": 0.24,
+          "minGeoSamples": 4
+        },
+        "activationMultiplier": [0.5, 1.3],
+        "dynamicBoostRange": [0.3, 1.6],
+        "coreBoostRange": [1.18, 1.32],
+        "deduplicationThreshold": 0.89,
+        "techTagThreshold": 0.08,
+        "normalTagThreshold": 0.018
+      },
+      "MetaThinkingManager": {
+        "autoThreshold": 0.7
+      }
+    },
+    "baai-bge-m3__1024__nvidia-v1": {
+      "inherits": "default",
+      "RAGDiaryPlugin": {
+        "noise_penalty": 0.06,
+        "tagWeightRange": [0.04, 0.3],
+        "mainSearchWeights": [0.74, 0.26],
+        "metaThinkingWeights": [0.84, 0.16]
+      },
+      "KnowledgeBaseManager": {
+        "geodesicRerank": {
+          "alpha": 0.24,
+          "minGeoSamples": 4
+        },
+        "coreBoostRange": [1.18, 1.32]
+      },
+      "MetaThinkingManager": {
+        "autoThreshold": 0.7
+      }
+    },
+    "text-embedding-3-large__3072__v1": {
+      "inherits": "default",
+      "RAGDiaryPlugin": {
+        "noise_penalty": 0.07,
+        "tagWeightRange": [0.03, 0.28],
+        "tagTruncationBase": 0.55,
+        "tagTruncationRange": [0.45, 0.8],
+        "mainSearchWeights": [0.78, 0.22],
+        "metaThinkingWeights": [0.84, 0.16]
+      },
+      "KnowledgeBaseManager": {
+        "geodesicRerank": {
+          "alpha": 0.18,
+          "minGeoSamples": 5
+        },
+        "activationMultiplier": [0.5, 1.2],
+        "dynamicBoostRange": [0.3, 1.4],
+        "coreBoostRange": [1.15, 1.28],
+        "deduplicationThreshold": 0.9,
+        "techTagThreshold": 0.1,
+        "normalTagThreshold": 0.02
+      },
+      "MetaThinkingManager": {
+        "autoThreshold": 0.72
+      }
+    },
+    "qwen-embedding-x__1536__v1": {
+      "inherits": "default",
+      "RAGDiaryPlugin": {
+        "noise_penalty": 0.08,
+        "tagWeightRange": [0.03, 0.22],
+        "tagTruncationBase": 0.55,
+        "tagTruncationRange": [0.45, 0.75],
+        "mainSearchWeights": [0.78, 0.22],
+        "refreshWeights": [0.58, 0.27, 0.15],
+        "metaThinkingWeights": [0.86, 0.14]
+      },
+      "KnowledgeBaseManager": {
+        "geodesicRerank": {
+          "alpha": 0.18,
+          "minGeoSamples": 5
+        },
+        "spikeRouting": {
+          "maxSafeHops": 4,
+          "baseMomentum": 2,
+          "firingThreshold": 0.1,
+          "baseDecay": 0.25,
+          "wormholeDecay": 0.7,
+          "tensionThreshold": 1,
+          "maxEmergentNodes": 40,
+          "maxNeighborsPerNode": 16
+        },
+        "activationMultiplier": [0.5, 1.1],
+        "dynamicBoostRange": [0.3, 1.25],
+        "coreBoostRange": [1.15, 1.28],
+        "deduplicationThreshold": 0.9,
+        "techTagThreshold": 0.1,
+        "normalTagThreshold": 0.02,
+        "languageCompensator": {
+          "penaltyUnknown": 0.03,
+          "penaltyCrossDomain": 0.08
+        }
+      },
+      "MetaThinkingManager": {
+        "autoThreshold": 0.75
+      }
+    }
+  }
+}
