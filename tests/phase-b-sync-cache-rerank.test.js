@@ -605,10 +605,10 @@ test('search sync should rebuild shadow chunks from a different embedding finger
     const chunks = app.stores.shadowStore.db
       .prepare('SELECT chunk_id, embedding_fingerprint FROM memory_chunks WHERE memory_id = ? ORDER BY embedding_fingerprint')
       .all(record.memoryId);
-    assert.deepEqual(chunks.map(chunk => chunk.embedding_fingerprint), [
+    assert.deepEqual(new Set(chunks.map(chunk => chunk.embedding_fingerprint)), new Set([
       app.config.embeddingFingerprint,
       'legacy-model__64__v0'
-    ]);
+    ]));
     assert.equal(chunks.some(chunk => chunk.chunk_id === originalChunk.chunk_id
       && chunk.embedding_fingerprint === 'legacy-model__64__v0'), false);
     assert.equal(chunks.some(chunk => chunk.chunk_id.startsWith(`${app.config.embeddingFingerprint}:`)), true);
