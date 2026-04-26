@@ -95,6 +95,7 @@
 - `src/cli/cleanup-legacy-chunks.js`：只清理旧版无 fingerprint shadow chunks
 - `src/cli/profile-health.js`：当前 embedding profile 健康面板
 - `src/cli/shadow-compare.js`：当前 profile 与 baseline profile 的只读召回对照
+- `src/cli/profile-gate.js`：固定 query suite 的 profile 迁移质量门禁
 - `src/cli/v8-diagnose.js`：只读 V8 terrain / TagMemo / MetaThinking 诊断
 
 ## 快速开始
@@ -129,6 +130,7 @@ npm run rebuild-profile -- --dry-run --json
 npm run cleanup-legacy-chunks -- --dry-run --json
 npm run profile-health
 npm run shadow-compare -- --query "embedding profile migration"
+npm run profile-gate -- --json
 npm run v8-diagnose -- --query "[[checkpoint migration]] ::TagMemo+1.5"
 npm run start:http:ensure
 npm run start:http:watchdog:once
@@ -142,7 +144,7 @@ npm run start:http:watchdog:once
 - provider benchmark 示例：[examples/provider-benchmark.env.example](/A:/codex-memory/examples/provider-benchmark.env.example)
 - RAG 多 profile 参数示例：[examples/rag-params.profiles.example.json](/A:/codex-memory/examples/rag-params.profiles.example.json)
 
-CI 在 `.github/workflows/ci.yml` 中运行 `npm ci`、`npm test`，并额外 smoke `rebuild-profile`、`profile-health`、`v8-diagnose` 三条 profile 相关 CLI。
+CI 在 `.github/workflows/ci.yml` 中运行 `npm ci`、`npm test`，并额外 smoke `rebuild-profile`、`profile-health`、`profile-gate`、`v8-diagnose` 四条 profile 相关 CLI。
 
 Embedding profile 会按 `<model>__<dimensions>__<version>` 生成 fingerprint，例如默认本地 BGE-M3 是 `bge-m3-local__1024__v1`。切换模型或维度时，先设置 `CODEX_MEMORY_EMBEDDING_PROFILE_VERSION` 和 `CODEX_MEMORY_RAG_PARAMS_PATH`，再依次运行：
 
@@ -152,7 +154,10 @@ npm run rebuild-profile -- --confirm --json
 npm run rebuild-shadow
 npm run profile-health
 npm run shadow-compare -- --query "your migration query"
+npm run profile-gate -- --baseline-fingerprint "<old-profile>" --require-pass
 ```
+
+默认 suite 在 [benchmarks/profile-migration-suite.json](/A:/codex-memory/benchmarks/profile-migration-suite.json)。没有 baseline 时门禁会给出 `warn`；需要把它作为硬门禁时，传 `--disallow-no-baseline --require-pass`。
 
 ## Codex 接入
 

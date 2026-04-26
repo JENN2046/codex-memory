@@ -321,6 +321,171 @@ test('shadow-compare CLI should report no-baseline without another profile', asy
   }
 });
 
+test('profile-gate CLI should evaluate a fixed migration suite', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-profile-gate-'));
+  const dataDir = path.join(tempBasePath, 'data');
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+  const suitePath = path.join(tempBasePath, 'suite.json');
+  const currentFingerprint = 'bge-m3-local__1024__gate-test';
+  const baselineFingerprint = 'baseline-model__1024__v1';
+
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+    await fs.writeFile(suitePath, JSON.stringify({
+      name: 'test-suite',
+      limit: 3,
+      thresholds: {
+        minAverageJaccard: 1,
+        minAverageOverlap: 1,
+        allowNoBaseline: false
+      },
+      queries: [
+        { id: 'alpha', query: 'alpha migration' }
+      ]
+    }), 'utf8');
+
+    const db = new DatabaseSync(dbPath);
+    try {
+      db.exec(`
+        CREATE TABLE memory_chunks (
+          chunk_id TEXT PRIMARY KEY,
+          memory_id TEXT,
+          target TEXT,
+          title TEXT,
+          relative_path TEXT,
+          chunk_index INTEGER,
+          text TEXT,
+          vector_json TEXT,
+          embedding_fingerprint TEXT,
+          tags_json TEXT,
+          created_at TEXT,
+          updated_at TEXT
+        );
+      `);
+      const now = new Date().toISOString();
+      const insert = db.prepare(`
+        INSERT INTO memory_chunks (
+          chunk_id, memory_id, target, title, relative_path, chunk_index, text,
+          vector_json, embedding_fingerprint, tags_json, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      insert.run('current-alpha', 'alpha-memory', 'process', 'Alpha current', 'current.md', 0,
+        'alpha migration current profile chunk', '[]', currentFingerprint, JSON.stringify(['alpha']), now, now);
+      insert.run('baseline-alpha', 'alpha-memory', 'process', 'Alpha baseline', 'baseline.md', 0,
+        'alpha migration baseline profile chunk', '[]', baselineFingerprint, JSON.stringify(['alpha']), now, now);
+    } finally {
+      db.close();
+    }
+
+    const result = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/profile-gate.js',
+      args: ['--suite', suitePath, '--baseline-fingerprint', baselineFingerprint, '--json', '--require-pass'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'gate-test'
+      }
+    });
+
+    assert.equal(result.code, 0);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.mode, 'profile-gate');
+    assert.equal(payload.destructive, false);
+    assert.equal(payload.status, 'warn');
+    assert.equal(payload.suite.name, 'test-suite');
+    assert.equal(payload.summary.queryCount, 1);
+    assert.equal(payload.summary.averageJaccard, 1);
+    assert.equal(payload.summary.averageOverlap, 1);
+    assert.equal(payload.checks.some(check => check.code === 'lexical-only'), true);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('profile-gate CLI should fail require-pass when thresholds are missed', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-profile-gate-'));
+  const dataDir = path.join(tempBasePath, 'data');
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+  const suitePath = path.join(tempBasePath, 'suite.json');
+  const currentFingerprint = 'bge-m3-local__1024__gate-fail-test';
+  const baselineFingerprint = 'baseline-model__1024__v1';
+
+  try {
+    await fs.mkdir(dataDir, { recursive: true });
+    await fs.writeFile(suitePath, JSON.stringify({
+      name: 'strict-suite',
+      limit: 3,
+      thresholds: {
+        minAverageJaccard: 1,
+        minAverageOverlap: 1,
+        allowNoBaseline: false
+      },
+      queries: [
+        { id: 'alpha', query: 'alpha migration' }
+      ]
+    }), 'utf8');
+
+    const db = new DatabaseSync(dbPath);
+    try {
+      db.exec(`
+        CREATE TABLE memory_chunks (
+          chunk_id TEXT PRIMARY KEY,
+          memory_id TEXT,
+          target TEXT,
+          title TEXT,
+          relative_path TEXT,
+          chunk_index INTEGER,
+          text TEXT,
+          vector_json TEXT,
+          embedding_fingerprint TEXT,
+          tags_json TEXT,
+          created_at TEXT,
+          updated_at TEXT
+        );
+      `);
+      const now = new Date().toISOString();
+      const insert = db.prepare(`
+        INSERT INTO memory_chunks (
+          chunk_id, memory_id, target, title, relative_path, chunk_index, text,
+          vector_json, embedding_fingerprint, tags_json, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+      insert.run('current-alpha', 'alpha-memory', 'process', 'Alpha current', 'current.md', 0,
+        'alpha migration current profile chunk', '[]', currentFingerprint, JSON.stringify(['alpha']), now, now);
+      insert.run('baseline-gamma', 'gamma-memory', 'process', 'Gamma baseline', 'baseline.md', 0,
+        'gamma baseline profile chunk', '[]', baselineFingerprint, JSON.stringify(['gamma']), now, now);
+    } finally {
+      db.close();
+    }
+
+    const result = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/profile-gate.js',
+      args: ['--suite', suitePath, '--baseline-fingerprint', baselineFingerprint, '--json', '--require-pass'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'gate-fail-test'
+      }
+    });
+
+    assert.equal(result.code, 1);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.status, 'fail');
+    assert.equal(payload.summary.averageJaccard, 0);
+    assert.equal(payload.summary.averageOverlap, 0);
+    assert.equal(payload.checks.some(check => check.code === 'average-jaccard-low'), true);
+    assert.equal(payload.checks.some(check => check.code === 'average-overlap-low'), true);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
 test('rag params profile example should load for default bge-m3-local fingerprint', () => {
   const config = createConfig({
     projectBasePath: process.cwd(),

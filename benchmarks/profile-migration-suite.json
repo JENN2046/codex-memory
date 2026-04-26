@@ -1,0 +1,23 @@
+{
+  "name": "default-profile-migration-suite",
+  "limit": 5,
+  "thresholds": {
+    "minAverageJaccard": 0,
+    "minAverageOverlap": 0,
+    "allowNoBaseline": true
+  },
+  "queries": [
+    {
+      "id": "embedding-profile",
+      "query": "embedding profile migration rebuild shadow health"
+    },
+    {
+      "id": "tagmemo-geodesic",
+      "query": "[[checkpoint vector schema migration]] ::TagMemo+1.5"
+    },
+    {
+      "id": "rollback-safety",
+      "query": "rollback profile health cleanup legacy chunks"
+    }
+  ]
+}

@@ -17,6 +17,7 @@
     "codex-memory-cleanup-legacy-chunks": "./src/cli/cleanup-legacy-chunks.js",
     "codex-memory-profile-health": "./src/cli/profile-health.js",
     "codex-memory-shadow-compare": "./src/cli/shadow-compare.js",
+    "codex-memory-profile-gate": "./src/cli/profile-gate.js",
     "codex-memory-v8-diagnose": "./src/cli/v8-diagnose.js",
     "codex-memory-provider-smoke": "./src/cli/provider-smoke.js",
     "codex-memory-provider-benchmark": "./src/cli/provider-benchmark.js"
@@ -43,6 +44,7 @@
     "cleanup-legacy-chunks": "node ./src/cli/cleanup-legacy-chunks.js",
     "profile-health": "node ./src/cli/profile-health.js",
     "shadow-compare": "node ./src/cli/shadow-compare.js",
+    "profile-gate": "node ./src/cli/profile-gate.js",
     "v8-diagnose": "node ./src/cli/v8-diagnose.js",
     "provider-smoke": "node ./src/cli/provider-smoke.js",
     "provider-benchmark": "node ./src/cli/provider-benchmark.js",
