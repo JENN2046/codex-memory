@@ -1,12 +1,28 @@
 ﻿# codex-memory Memory
 
-最后更新：2026-04-23
+最后更新：2026-04-26
 
 ## 当前边界
 
 - `A:\VCP\VCPToolBox` 与 `A:\VCP\VCPChat` 只作为 donor / behavior reference。
 - 后续实现继续只落在 `A:\codex-memory`。
 - 不再把 donor 项目当作运行时依赖，也不继续在 donor 仓库里做功能开发。
+- `docs/` 目录目前是本地参考资料，保持未跟踪，不纳入正式提交，除非后续明确整理成项目文档。
+
+## 2026-04-26 项目记忆
+
+- 当前 `main` 已推送到 `origin/main`，最新提交是 `618d854 docs: add vcp memory capability assessment`。
+- 最新 CI 已通过：`https://github.com/JENN2046/codex-memory/actions/runs/24959264708`。
+- `cleanup-legacy-chunks --confirm` 已真实执行过，删除 `39` 个 legacy chunks；执行前已备份 SQLite 到 `data/backups/codex-memory-before-legacy-cleanup-20260426-222138.sqlite`。
+- 当前 `profile-health` 状态为 `ready`，当前 fingerprint 是 `bge-m3-local__1024__v1`，`legacy chunks` 已归零。
+- 清理后 `profile-gate --json --summary-only` 可运行，但当前返回 `warn / baseline-missing`；这是因为没有可比 baseline profile，不代表当前 profile 失败。
+- `EMBEDDING_PROFILE_MIGRATION_RUNBOOK.md` 已补充 legacy cleanup 流程，明确清理前要做 dry-run、备份，以及清理后 `baseline-missing` 的解释。
+- GitHub Actions 的 Node.js 20 action deprecation 已处理：`.github/workflows/ci.yml` 已升级到 `actions/checkout@v6` 和 `actions/setup-node@v6`，CI 通过且不再显示该 annotation。
+- 新增 `VCP_MEMORY_CAPABILITY_ASSESSMENT.md`，把当前浪潮对 VCP 记忆主链的能力评估写成正式项目文档：
+  - VCP 记忆主链约 `7.5 - 8 / 10`
+  - 完整 VCP 生态约 `4 - 5 / 10`
+  - 下一步重点是真实 previous profile baseline、donor 手感继续收口、V8 真实 query 效果评估
+- 当前最值得接的下一步不是继续清理数据，而是补真实 baseline 门禁：在下次 embedding profile 切换前保留 previous fingerprint，并使用 `profile-gate --baseline-fingerprint "<old-profile>" --require-pass` 做硬门槛。
 
 ## 今天的关键决策
 
