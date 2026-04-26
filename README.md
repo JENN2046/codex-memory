@@ -30,6 +30,7 @@
 - 阶段导航：[PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md)
 - 项目正式收官说明：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
 - 当前阶段记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
+- 浪潮 VCP 记忆能力评估：[VCP_MEMORY_CAPABILITY_ASSESSMENT.md](/A:/codex-memory/VCP_MEMORY_CAPABILITY_ASSESSMENT.md)
 - Phase D 迁移验收清单：[PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md](/A:/codex-memory/PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md)
 - Embedding profile 迁移 runbook：[EMBEDDING_PROFILE_MIGRATION_RUNBOOK.md](/A:/codex-memory/EMBEDDING_PROFILE_MIGRATION_RUNBOOK.md)
 - Phase D 灰度切主链 playbook：[PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md)
