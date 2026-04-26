@@ -130,7 +130,7 @@ npm run rebuild-profile -- --dry-run --json
 npm run cleanup-legacy-chunks -- --dry-run --json
 npm run profile-health
 npm run shadow-compare -- --query "embedding profile migration"
-npm run profile-gate -- --json
+npm run profile-gate -- --json --summary-only
 npm run v8-diagnose -- --query "[[checkpoint migration]] ::TagMemo+1.5"
 npm run start:http:ensure
 npm run start:http:watchdog:once
@@ -154,10 +154,10 @@ npm run rebuild-profile -- --confirm --json
 npm run rebuild-shadow
 npm run profile-health
 npm run shadow-compare -- --query "your migration query"
-npm run profile-gate -- --baseline-fingerprint "<old-profile>" --require-pass
+npm run profile-gate -- --baseline-fingerprint "<old-profile>" --summary-only --require-pass
 ```
 
-默认 suite 在 [benchmarks/profile-migration-suite.json](/A:/codex-memory/benchmarks/profile-migration-suite.json)。没有 baseline 时门禁会给出 `warn`；需要把它作为硬门禁时，传 `--disallow-no-baseline --require-pass`。
+默认 suite 在 [benchmarks/profile-migration-suite.json](/A:/codex-memory/benchmarks/profile-migration-suite.json)。没有 baseline 时门禁会给出 `warn`；需要把它作为硬门禁时，传 `--disallow-no-baseline --require-pass`。日常面板和 CI 建议加 `--summary-only`，避免输出完整 Top-K 明细。
 
 ## Codex 接入
 

@@ -24,6 +24,7 @@ function parseArgs(argv) {
     baselineFingerprint: '',
     limit: null,
     requirePass: false,
+    summaryOnly: false,
     minAverageJaccard: null,
     minAverageOverlap: null,
     allowNoBaseline: null
@@ -37,6 +38,10 @@ function parseArgs(argv) {
     }
     if (token === '--require-pass') {
       options.requirePass = true;
+      continue;
+    }
+    if (token === '--summary-only') {
+      options.summaryOnly = true;
       continue;
     }
     if (token === '--disallow-no-baseline') {
@@ -187,6 +192,27 @@ function evaluateGate(compare, suite, options) {
   };
 }
 
+function summarizeComparisons(comparisons) {
+  return comparisons.map(item => ({
+    query: item.query,
+    metrics: item.metrics,
+    currentTop: item.current[0]
+      ? {
+          memoryId: item.current[0].memoryId,
+          title: item.current[0].title,
+          score: item.current[0].score
+        }
+      : null,
+    baselineTop: item.baseline[0]
+      ? {
+          memoryId: item.baseline[0].memoryId,
+          title: item.baseline[0].title,
+          score: item.baseline[0].score
+        }
+      : null
+  }));
+}
+
 async function buildProfileGateReport(config, options) {
   const suite = await loadSuite(options.suitePath);
   const limit = options.limit || suite.limit;
@@ -212,9 +238,11 @@ async function buildProfileGateReport(config, options) {
     baselineProfile: compare.baselineProfile,
     summary: evaluation.summary,
     checks: evaluation.checks,
-    compare,
+    comparisons: summarizeComparisons(compare.comparisons),
+    compare: options.summaryOnly ? undefined : compare,
     notes: [
       'This command is read-only.',
+      'Use --summary-only to omit full ranked results from JSON output.',
       'Use --require-pass to make a failing gate return a non-zero exit code.'
     ]
   };

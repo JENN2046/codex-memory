@@ -62,6 +62,7 @@ git status --short
 git diff --stat
 npm run profile-health
 npm run rebuild-profile -- --dry-run --json
+npm run profile-gate -- --json --summary-only
 ```
 
 Expected healthy current state:
@@ -118,9 +119,10 @@ Expected healthy current state:
    ```powershell
    npm run shadow-compare -- --query "embedding profile migration"
    npm run shadow-compare -- --query "your domain query" --json
+   npm run profile-gate -- --json --summary-only
    ```
 
-   Use several real queries from recent work. Treat `approximate` and `lexical-only` as directional signals, not final proof.
+   Use several real queries from recent work. `profile-gate` runs the fixed migration suite from `benchmarks/profile-migration-suite.json`; pass `--baseline-fingerprint "<old-profile>" --require-pass` when you have a real previous profile and want a hard gate. Treat `approximate` and `lexical-only` as directional signals, not final proof.
 
 7. Run validation:
 
@@ -137,6 +139,7 @@ Minimum acceptance for local migration:
 - vector index exists and fingerprint matches current profile
 - `npm test` passes
 - `shadow-compare` has been run on representative queries
+- `profile-gate` has been run on the fixed migration suite
 - no `.env` secret values were printed, copied, or committed
 
 Recommended acceptance before publishing:
@@ -197,6 +200,12 @@ Do not delete other profile directories during rollback unless you have an expli
 - The compared chunks are cross-profile.
 - Use it as an inspection aid, not as a final quality gate.
 
+`profile-gate` returns `warn`:
+
+- Inspect `checks` first.
+- `baseline-missing`, `lexical-only`, and `approximate-vector-compare` mean the gate ran, but the comparison is directional.
+- For release gating, use a known baseline fingerprint and `--require-pass`.
+
 `rebuild-shadow` prints a result but the shell times out:
 
 - Run `npm run rebuild-profile -- --dry-run --json` and `npm run profile-health`.
@@ -210,6 +219,7 @@ Before commit or push:
 git status --short
 git diff --stat
 npm run profile-health
+npm run profile-gate -- --json --summary-only
 npm test
 ```
 

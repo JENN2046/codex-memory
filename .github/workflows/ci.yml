@@ -33,5 +33,5 @@ jobs:
         run: |
           npm run rebuild-profile -- --dry-run --json
           npm run profile-health
-          npm run profile-gate -- --json
+          npm run profile-gate -- --json --summary-only
           npm run v8-diagnose -- --query "[[checkpoint vector schema migration]] ::TagMemo+1.5"
