@@ -126,7 +126,7 @@ test('provider benchmark CLI should compare local and jina retrieval in json mod
 
   try {
     const result = await runCli({
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       args: ['--json', '--dataset', datasetPath, '--providers', 'local,jina', '--top-k', '2'],
       env: {
         CODEX_MEMORY_BENCH_JINA_EMBEDDING_URL: providerServer.baseUrl,
@@ -161,7 +161,7 @@ test('provider benchmark CLI should compare local and jina retrieval in json mod
 
 test('provider benchmark CLI should fail when an explicitly requested remote provider is not configured', async () => {
   const result = await runCli({
-    cwd: 'A:\\codex-memory',
+    cwd: process.cwd(),
     args: ['--json', '--providers', 'local,cohere'],
     env: {}
   });
@@ -192,7 +192,7 @@ test('provider benchmark CLI should support unauthenticated bge-m3-local provide
 
   try {
     const result = await runCli({
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       args: ['--json', '--dataset', datasetPath, '--providers', 'local,bge-m3-local'],
       env: {
         CODEX_MEMORY_BENCH_BGE_M3_LOCAL_EMBEDDING_URL: providerServer.baseUrl,

@@ -29,7 +29,7 @@ async function startLegacyServer() {
 function runCli({ args = [], env = {} }) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['src/cli/mainline-rollback.js', ...args], {
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       env: {
         ...process.env,
         ...env

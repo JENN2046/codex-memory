@@ -5,10 +5,14 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
+const STANDARD_SUITE_DIR = path.join(process.cwd(), 'benchmarks', 'active-memory-suite');
+const STANDARD_SUITE_PATH = path.join(STANDARD_SUITE_DIR, 'standard-suite.json');
+const STANDARD_FIXTURE_ROOT = path.join(STANDARD_SUITE_DIR, 'vchat-fixture');
+
 function runCli({ scriptPath, env = {}, args = [], stdin = '' }) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [scriptPath, ...args], {
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       env: {
         ...process.env,
         ...env
@@ -534,13 +538,13 @@ test('rollback active-memory CLI should run the repository standard suite in req
         CODEX_MEMORY_BASE_PATH: tempBasePath,
         CODEX_MEMORY_DATA_DIR: 'data',
         CODEX_MEMORY_LOGS_DIR: 'logs',
-        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
         CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
       },
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--require-ready'
       ]
     });
@@ -583,13 +587,13 @@ test('rollback active-memory CLI should filter standard suite cases by category'
         CODEX_MEMORY_BASE_PATH: tempBasePath,
         CODEX_MEMORY_DATA_DIR: 'data',
         CODEX_MEMORY_LOGS_DIR: 'logs',
-        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
         CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
       },
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--category',
         'ordering',
         '--require-ready'
@@ -623,13 +627,13 @@ test('rollback active-memory CLI should filter standard suite cases by multiple 
         CODEX_MEMORY_BASE_PATH: tempBasePath,
         CODEX_MEMORY_DATA_DIR: 'data',
         CODEX_MEMORY_LOGS_DIR: 'logs',
-        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
         CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
       },
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--category',
         'ordering,agent-selection',
         '--require-ready'
@@ -660,7 +664,7 @@ test('rollback active-memory CLI should filter standard suite cases by fixture a
       CODEX_MEMORY_BASE_PATH: tempBasePath,
       CODEX_MEMORY_DATA_DIR: 'data',
       CODEX_MEMORY_LOGS_DIR: 'logs',
-      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
       CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
     };
 
@@ -670,7 +674,7 @@ test('rollback active-memory CLI should filter standard suite cases by fixture a
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--fixture',
         'vchat-fixture-multi-agent',
         '--require-ready'
@@ -692,7 +696,7 @@ test('rollback active-memory CLI should filter standard suite cases by fixture a
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--tag',
         'window-order',
         '--require-ready'
@@ -722,7 +726,7 @@ test('rollback active-memory CLI should filter standard suite cases by tag-all a
       CODEX_MEMORY_BASE_PATH: tempBasePath,
       CODEX_MEMORY_DATA_DIR: 'data',
       CODEX_MEMORY_LOGS_DIR: 'logs',
-      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
       CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
     };
 
@@ -732,7 +736,7 @@ test('rollback active-memory CLI should filter standard suite cases by tag-all a
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--tag-all',
         'multi-agent,alias',
         '--require-ready'
@@ -754,7 +758,7 @@ test('rollback active-memory CLI should filter standard suite cases by tag-all a
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--exclude-tag',
         'multi-agent',
         '--require-ready'
@@ -775,7 +779,7 @@ test('rollback active-memory CLI should filter standard suite cases by tag-all a
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--exclude-fixture',
         'vchat-fixture-no-settings',
         '--require-ready'
@@ -802,7 +806,7 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
       CODEX_MEMORY_BASE_PATH: tempBasePath,
       CODEX_MEMORY_DATA_DIR: 'data',
       CODEX_MEMORY_LOGS_DIR: 'logs',
-      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
       CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
     };
 
@@ -812,7 +816,7 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--expectation',
         'error',
         '--require-ready'
@@ -833,7 +837,7 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--expectation',
         'error,success',
         '--require-ready'
@@ -855,7 +859,7 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--expectation',
         'success,error',
         '--require-ready'
@@ -881,7 +885,7 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--expectation',
         'success,error,success',
         '--require-ready'
@@ -904,7 +908,7 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--tool',
         'topicmemo',
         '--require-ready'

@@ -5,15 +5,16 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
-const STANDARD_SUITE_DIR = 'A:\\codex-memory\\benchmarks\\active-memory-suite';
+const STANDARD_SUITE_DIR = path.join(process.cwd(), 'benchmarks', 'active-memory-suite');
 const STANDARD_SUITE_PATH = path.join(STANDARD_SUITE_DIR, 'standard-suite.json');
+const STANDARD_FIXTURE_ROOT = path.join(STANDARD_SUITE_DIR, 'vchat-fixture');
 const STANDARD_FIXTURE_PREFIX = 'vchat-fixture';
 const FIXTURE_MANIFEST_BASENAME = '.codex-fixture-manifest.json';
 
 function runCli({ scriptPath, env = {}, args = [], stdin = '' }) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [scriptPath, ...args], {
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       env: {
         ...process.env,
         ...env
@@ -815,13 +816,13 @@ test('compare active-memory CLI should run the repository standard suite in requ
         CODEX_MEMORY_BASE_PATH: tempBasePath,
         CODEX_MEMORY_DATA_DIR: 'data',
         CODEX_MEMORY_LOGS_DIR: 'logs',
-        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
         CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
       },
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--require-match'
       ]
     });
@@ -870,13 +871,13 @@ test('compare active-memory CLI should filter standard suite cases by category',
         CODEX_MEMORY_BASE_PATH: tempBasePath,
         CODEX_MEMORY_DATA_DIR: 'data',
         CODEX_MEMORY_LOGS_DIR: 'logs',
-        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
         CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
       },
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--category',
         'ordering',
         '--require-match'
@@ -909,13 +910,13 @@ test('compare active-memory CLI should filter standard suite cases by multiple c
         CODEX_MEMORY_BASE_PATH: tempBasePath,
         CODEX_MEMORY_DATA_DIR: 'data',
         CODEX_MEMORY_LOGS_DIR: 'logs',
-        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+        CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
         CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
       },
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--category',
         'ordering,agent-selection',
         '--require-match'
@@ -948,7 +949,7 @@ test('compare active-memory CLI should filter standard suite cases by fixture an
       CODEX_MEMORY_BASE_PATH: tempBasePath,
       CODEX_MEMORY_DATA_DIR: 'data',
       CODEX_MEMORY_LOGS_DIR: 'logs',
-      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
       CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
     };
 
@@ -958,7 +959,7 @@ test('compare active-memory CLI should filter standard suite cases by fixture an
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--fixture',
         'vchat-fixture-multi-agent',
         '--require-match'
@@ -979,7 +980,7 @@ test('compare active-memory CLI should filter standard suite cases by fixture an
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--tag',
         'window-order',
         '--require-match'
@@ -1008,7 +1009,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
       CODEX_MEMORY_BASE_PATH: tempBasePath,
       CODEX_MEMORY_DATA_DIR: 'data',
       CODEX_MEMORY_LOGS_DIR: 'logs',
-      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
       CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
     };
 
@@ -1018,7 +1019,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--expectation',
         'error',
         '--require-match'
@@ -1038,7 +1039,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--expectation',
         'error,success',
         '--require-match'
@@ -1058,7 +1059,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--expectation',
         'success,error',
         '--require-match'
@@ -1094,7 +1095,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--expectation',
         'success,error,success',
         '--require-match'
@@ -1115,7 +1116,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--tool',
         'topicmemo',
         '--require-match'
@@ -1141,7 +1142,7 @@ test('compare active-memory CLI should support tag-all and exclude filters', asy
       CODEX_MEMORY_BASE_PATH: tempBasePath,
       CODEX_MEMORY_DATA_DIR: 'data',
       CODEX_MEMORY_LOGS_DIR: 'logs',
-      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: 'A:\\codex-memory\\benchmarks\\active-memory-suite\\vchat-fixture',
+      CODEX_MEMORY_ACTIVE_MEMORY_ROOT: STANDARD_FIXTURE_ROOT,
       CODEX_MEMORY_ACTIVE_MEMORY_SYNC_MIN_INTERVAL_MS: '0'
     };
 
@@ -1151,7 +1152,7 @@ test('compare active-memory CLI should support tag-all and exclude filters', asy
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--tag-all',
         'multi-agent,alias',
         '--require-match'
@@ -1171,7 +1172,7 @@ test('compare active-memory CLI should support tag-all and exclude filters', asy
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--exclude-tag',
         'multi-agent',
         '--require-match'
@@ -1190,7 +1191,7 @@ test('compare active-memory CLI should support tag-all and exclude filters', asy
       args: [
         '--json',
         '--suite',
-        'A:\\codex-memory\\benchmarks\\active-memory-suite\\standard-suite.json',
+        STANDARD_SUITE_PATH,
         '--exclude-fixture',
         'vchat-fixture-no-settings',
         '--require-match'

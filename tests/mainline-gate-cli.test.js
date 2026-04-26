@@ -101,7 +101,7 @@ process.exit(2);
 function runCli({ args = [], env = {} }) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['src/cli/mainline-gate.js', ...args], {
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       env: {
         ...process.env,
         ...env

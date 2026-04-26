@@ -107,7 +107,7 @@ async function mutateVchatFixtureForIncrementalSync(rootPath) {
 function runCli({ args = [], env = {} }) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['src/cli/active-memory.js', ...args], {
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       env: {
         ...process.env,
         ...env

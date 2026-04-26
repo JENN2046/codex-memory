@@ -95,7 +95,7 @@ test('provider smoke CLI should report embedding and rerank success in json mode
 
   try {
     const result = await runCli({
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       args: ['--json', '--query', 'migration query', '--documents', 'doc one || doc two'],
       env: {
         CODEX_MEMORY_BASE_PATH: tempBasePath,

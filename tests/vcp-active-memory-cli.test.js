@@ -112,7 +112,7 @@ async function seedVchatHistoryReadErrorFixture(rootPath) {
 function runCli({ scriptPath, env = {}, args = [], stdin = '' }) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [scriptPath, ...args], {
-      cwd: 'A:\\codex-memory',
+      cwd: process.cwd(),
       env: {
         ...process.env,
         ...env
