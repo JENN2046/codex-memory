@@ -58,7 +58,7 @@ function resolveHealthUrl(options) {
 }
 
 function resolveEnvCommand(name) {
-  const raw = process.env[`CODEX_MEMORY_GATE_${name}_COMMAND_JSON`];
+  const raw = process.env[`CODEX_MEMORY_GATE_${String(name).toUpperCase()}_COMMAND_JSON`];
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
