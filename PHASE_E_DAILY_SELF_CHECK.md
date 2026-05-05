@@ -27,7 +27,7 @@ npm run gate:mainline
 - compare：`35/35 matched`
 - rollback：`35/35 rollback-ready`
 - 最新 suite 收口记录：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
-- 最新 gate 复核记录：[phase-e-mainline-gate-checkpoint-09.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-09.md)
+- 最新 gate 复核记录：[phase-e-mainline-gate-checkpoint-10.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-10.md)
 
 ## 什么时候跑严格门禁
 
@@ -106,6 +106,7 @@ npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\stand
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-07.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-07.md)
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-08.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-08.md)
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-09.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-09.md)
+- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-10.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-10.md)
 - `MEMORY.md` 状态 handoff：[phase-e-memory-status-handoff-01.md](/A:/codex-memory/logs/phase-e-memory-status-handoff-01.md)
 
 ## 一句话结论
