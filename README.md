@@ -50,6 +50,8 @@
 - Phase E / 日常自检验收记录：[phase-e-daily-self-check-01.md](/A:/codex-memory/logs/phase-e-daily-self-check-01.md)
 - Phase E / HTTP MCP 运行态排障入口：[PHASE_E_HTTP_OBSERVABILITY.md](/A:/codex-memory/PHASE_E_HTTP_OBSERVABILITY.md)
 - Phase E / HTTP MCP 运行态观察记录：[phase-e-http-observability-01.md](/A:/codex-memory/logs/phase-e-http-observability-01.md)
+- Phase E / 默认主链回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
+- Phase E / 默认主链回滚 runbook 验收记录：[phase-e-rollback-runbook-01.md](/A:/codex-memory/logs/phase-e-rollback-runbook-01.md)
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 - Phase E / P1-1 扩展字段 drift 收口记录：[phase-e-extended-drift-closure-01.md](/A:/codex-memory/logs/phase-e-extended-drift-closure-01.md)
 - Phase E / P1 错误语义与诊断输出收口记录：[phase-e-error-diagnostics-01.md](/A:/codex-memory/logs/phase-e-error-diagnostics-01.md)
@@ -404,24 +406,25 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 - `steps`
   - 最小回滚动作和回滚后验证顺序
 
-当前这台机器上的自动发现结果：
+当前这台机器上的最近一次只读计划结果：
 
 - legacy target = `http://127.0.0.1:6005/mcp/codex-memory`
 - 来源 = `A:\VCP\VCPToolBox\config.env`
-- 当前 probe = `reachable=true`
-- `tools/list` 实探 = `record_memory / search_memory / memory_overview`
-- 真实回滚演练 = 已临时把 `C:\Users\617\.codex\config.toml` 切到 `6005`，完成 `initialize + tools/list` 握手后再切回 `7605`
+- 当前 probe = `reachable=false`
+- `rollbackTargetReady=true`，但 `rollbackTargetReachable=false`
 
-也就是说，现在不是“只有回滚 patch 可生成”，而是“回滚目标已自动发现、已真实可达、已可做握手验证”。
+也就是说，当前只能说明“回滚 patch 可生成、回滚目标可推断”，不能说明“现在可以直接真实回滚”。
+
+历史回滚演练曾临时把 `C:\Users\617\.codex\config.toml` 切到 `6005`，完成 `initialize + tools/list` 握手后再切回 `7605`；但 reachability 是运行态事实，后续仍必须以最新 `rollback:mainline:plan` 和 MCP 握手实测为准。
 
 当前建议：
 
 1. 平时先跑 `npm run rollback:mainline:plan -- --json`
 2. 真要准备回滚时，先确认 `summary.status=ok` 和 `rollbackTargetReachable=true`
 3. 用生成的 `rollbackPatch` 替换 `config.toml` 中的 `[mcp_servers.vcp_codex_memory]`
-4. 重启 Codex 后，再跑：
-   - `npm run observe:http -- --json`
-   - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json`
+4. 重启 Codex 后，先验证 MCP `initialize` / `tools/list`
+5. 如需确认本仓库默认 HTTP 主链仍健康，再跑 `npm run observe:http -- --json`
+6. 留存 rollback suite 现场材料：`npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json`
 
 ## 扩展字段 Drift 收口
 

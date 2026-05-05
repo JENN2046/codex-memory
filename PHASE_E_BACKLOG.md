@@ -84,6 +84,8 @@
 
 ### P0-3 回滚流程再收紧一层
 
+状态：已落地为只读回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
+
 目标：
 
 - 保证默认主链状态下，仍能快速回到 donor / 旧实现参考链
