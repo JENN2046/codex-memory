@@ -151,6 +151,9 @@ function resolveKey(input = {}) {
   if (maid === 'Mika' && command === 'gettopiccontent' && topicId === 'topic_delta') {
     return 'topicmemo:gettopiccontent-mika';
   }
+  if (maid === 'Mi' && command === 'gettopiccontent' && topicId === 'topic_delta' && String(input.agentId || '').trim() === 'maid-mika') {
+    return 'topicmemo:gettopiccontent-mika-agentid-alias';
+  }
   if (maid === 'Keke' && command === 'gettopiccontent' && topicId === 'topic_empty') {
     return 'topicmemo:gettopiccontent-empty-history';
   }
@@ -483,7 +486,11 @@ async function main() {
     return;
   }
 
-  if (key === 'topicmemo:gettopiccontent-basic' || key === 'topicmemo:gettopiccontent-mika') {
+  if (
+    key === 'topicmemo:gettopiccontent-basic'
+    || key === 'topicmemo:gettopiccontent-mika'
+    || key === 'topicmemo:gettopiccontent-mika-agentid-alias'
+  ) {
     writeJson(process.stdout, {
       status: 'success',
       result: formatTopicContentOutput(topic, fixture)

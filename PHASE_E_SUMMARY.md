@@ -66,6 +66,7 @@
 - 标准 suite 现在还新增了 `DeepMemo` 重复关键词去重 success case，把 blocked/effective 的去重与顺序稳定性也推进进门禁
 - 标准 suite 现在还新增了 `DeepMemo` 高级查询语法混用 success case，把短语 / 可选组 / 权重项混用时的 blocked/effective donor 语义也推进进门禁
 - 标准 suite 现在还新增了 `DeepMemo` blocked 配置重复值和大小写混用 success case，把 blocked config 归一化下的 blocked/effective donor 语义也推进进门禁
+- 标准 suite 现在还新增了 `TopicMemo GetTopicContent agentId/topicId alias` success case，把多 agent alias 下的内容取回路径也推进进门禁
 
 ## 当前基线
 
@@ -76,10 +77,10 @@
 - `node --test .\tests\rollback-active-memory-cli.test.js`
   - `11/11`
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount = 35`
+  - `matchedCaseCount = 36`
   - `extendedMismatchCountTotal = 0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount = 35`
+  - `readyCaseCount = 36`
   - `extendedMismatchCountTotal = 0`
 - `npm test`
   - `123/123`

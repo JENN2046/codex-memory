@@ -106,7 +106,7 @@
 
 ### P1-1 扩展字段 drift 收口
 
-状态：当前标准 suite 已扩至 `35/35 matched`，`extendedMismatchCountTotal=0`；P1-1 基线记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)，本轮复验记录：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
+状态：当前标准 suite 已扩至 `36/36 matched`，`extendedMismatchCountTotal=0`；P1-1 基线记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)，本轮复验记录：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
 
 目标：
 
@@ -176,6 +176,8 @@
 ## C. 可维护性 Backlog
 
 ### P1-4 suite 数据集继续扩容
+
+状态：已继续扩容至 `36/36 matched`，最新新增 `TopicMemo GetTopicContent agentId/topicId alias` case；记录：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
 
 目标：
 

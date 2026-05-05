@@ -510,6 +510,26 @@
       }
     },
     {
+      "name": "topicmemo-gettopiccontent-mika-agentid-alias",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-mika-agentid-alias.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture-multi-agent"
+      },
+      "meta": {
+        "category": "agent-selection",
+        "expectation": "success",
+        "fixture": "vchat-fixture-multi-agent",
+        "tags": [
+          "get-topic-content",
+          "agent-id",
+          "alias",
+          "multi-agent"
+        ]
+      }
+    },
+    {
       "name": "topicmemo-listtopics-basic",
       "tool": "topicmemo",
       "inputFile": "./inputs/topicmemo-listtopics-basic.json",

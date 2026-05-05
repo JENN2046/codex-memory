@@ -1,0 +1,6 @@
+{
+  "maid": "Mi",
+  "agentId": "maid-mika",
+  "command": "GetTopicContent",
+  "topicId": "topic_delta"
+}

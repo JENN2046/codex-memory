@@ -70,6 +70,7 @@
   [phase-e-standard-suite-expansion-05.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-05.md)
   [phase-e-standard-suite-expansion-06.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-06.md)
   [phase-e-standard-suite-expansion-07.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-07.md)
+  [phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
 - Phase E / P1-2 排序 tie-breaker 收口记录：
   [phase-e-ordering-tiebreaker-01.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-01.md)
   [phase-e-ordering-tiebreaker-02.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-02.md)
@@ -444,11 +445,11 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 当前最新基线：
 
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount=35`
+  - `matchedCaseCount=36`
   - `extendedMismatchCountTotal=0`
   - `driftReasonBreakdown={}`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount=35`
+  - `readyCaseCount=36`
   - `extendedMismatchCountTotal=0`
 
 ## 错误语义标准 Suite 门禁
@@ -469,6 +470,7 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 - 标准 suite 新增 `DeepMemo` blocked 配置重复值和大小写混用 success case，把 blocked/effective 在 blocked config 归一化下的 donor 语义也推进进 compare / rollback 门禁
 - 标准 suite 新增 `TopicMemo history-read-error` fixture 和 case
 - 标准 suite 新增 `TopicMemo GetTopicContent agent-not-found` case，把显式内容取回路径上的 donor 错误语义也推进进 compare / rollback 门禁
+- 标准 suite 新增 `TopicMemo GetTopicContent agentId/topicId alias` case，把多 agent alias 下的内容取回成功路径也推进进 compare / rollback 门禁
 - legacy standard runner 现在会按当前 Node 运行时真实解析 `history.json`，生成同源的 `history-read-error` 错误文案
 - ad-hoc compare donor-style error 回归也补齐了 `meta`
 
@@ -481,10 +483,10 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 - `node --test .\tests\rollback-active-memory-cli.test.js`
   - `11/11`
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount=35`
+  - `matchedCaseCount=36`
   - `extendedMismatchCountTotal=0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount=35`
+  - `readyCaseCount=36`
   - `extendedMismatchCountTotal=0`
 - `npm test`
   - `123/123`

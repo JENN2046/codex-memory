@@ -1,54 +1,53 @@
 # Phase E Standard Suite Expansion 08
 
-## Summary
+更新时间：2026-05-05
 
-- 标准 active-memory suite 从 `33` 扩到 `34` 个 case。
-- 新增 `DeepMemo` blocked 配置重复值和大小写混用 success case：
-  - `deepmemo-blocked-filtered-success-blocked-config-duplicate`
-- 这条 case 用来锁住 `CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS` 自身存在重复值与大小写混用时，`blocked/effective` success meta 仍保持 donor 风格归一化输出。
+## 本轮新增
 
-## Added Assets
+- 标准 active-memory suite 新增 `TopicMemo GetTopicContent` 的 `agentId + topicId` alias 成功样本：
+  - case：`topicmemo-gettopiccontent-mika-agentid-alias`
+  - input：`benchmarks/active-memory-suite/inputs/topicmemo-gettopiccontent-mika-agentid-alias.json`
+  - legacy：`benchmarks/active-memory-suite/legacy/standard-legacy-runner.js`
+- compare / rollback harness 的标准 suite 计数断言已同步到 `36` 个 case。
 
-- 输入：
-  - `benchmarks/active-memory-suite/inputs/deepmemo-blocked-filtered-success-blocked-config-duplicate.json`
-- legacy 对照：
-  - `benchmarks/active-memory-suite/legacy/deepmemo-blocked-filtered-success-blocked-config-duplicate-legacy.js`
-- 标准集：
-  - `benchmarks/active-memory-suite/standard-suite.json`
-- CLI 回归：
-  - `tests/vcp-active-memory-cli.test.js`
+## 这轮补的 donor 边界
 
-## Locked Semantics
+这条样本收的是 `TopicMemo` 内容取回路径上的多 agent alias 组合：
 
-- `CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS=DeepMemo,deepmemo,AUDIT,audit`
-- success meta 归一化后稳定为：
-  - `blockedKeywords = ['deepmemo', 'audit']`
-  - `blocked_keyword_count = 2`
-  - `effectiveKeywords = ['topicmemo', 'recall']`
-  - `effective_keyword_count = 2`
-  - `effectiveKeywordText = 'topicmemo, recall'`
-  - `effective_keyword_text = 'topicmemo, recall'`
+- `maid` 使用别名：`Mi`
+- `agentId` 指向真实 agent：`maid-mika`
+- `topicId` 使用 camelCase alias
+- `command` 显式为 `GetTopicContent`
 
-## Validation
+目标是确认 `ListTopics` 已覆盖的 `agentId` alias，不只在列表路径成立，也在具体话题内容取回路径稳定成立。
 
-- `node --test .\tests\vcp-active-memory-cli.test.js` -> `17/17`
-- `node --test .\tests\compare-vcp-active-memory-cli.test.js .\tests\rollback-active-memory-cli.test.js` -> `25/25`
-- `node .\src\cli\compare-vcp-active-memory.js --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount = 34`
+## 当前基线
+
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
+  - `matchedCaseCount = 36`
   - `extendedMismatchCountTotal = 0`
-- `node .\src\cli\rollback-active-memory.js --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount = 34`
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
+  - `readyCaseCount = 36`
   - `extendedMismatchCountTotal = 0`
-- `npm test` -> `106/106`
+- `node --test .\tests\compare-vcp-active-memory-cli.test.js`
+  - `14/14`
+- `node --test .\tests\rollback-active-memory-cli.test.js`
+  - `11/11`
+- `npm run gate:mainline`
+  - `status: ok`
+  - health `200`
+  - compare `36/36 matched`
+  - rollback `36/36 rollback-ready`
 
-## Result
+## 未执行
 
-- `DeepMemo blocked/effective` 这条 donor 精修线当前已覆盖：
-  - 全屏蔽错误
-  - 部分屏蔽成功
-  - 重复关键词去重成功
-  - 高级查询语法混用成功
-  - blocked 配置重复值和大小写混用成功
-- 到这里为止，这条线可以标记为“封板”：
-  - 不再主动扩样本
-  - 仅在真实 bug 出现时按需补 case
+- `npm test`
+- `npm run gate:mainline:strict`
+
+未执行原因：本轮没有触达运行时代码，已用标准 suite compare / rollback、harness 定向回归和日常主线 gate 覆盖主要风险；全量与 strict gate 留给更广运行时改动。
+
+## 结果
+
+标准 suite 当前已扩到 `36` 个 case。
+
+本轮不改运行时代码，只把已经存在的 TopicMemo alias 行为推进到仓库标准 suite、compare harness、rollback harness 和日常主线 gate 里。

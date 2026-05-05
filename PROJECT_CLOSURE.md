@@ -41,10 +41,10 @@
 ## 当前稳定基线
 
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount = 35`
+  - `matchedCaseCount = 36`
   - `extendedMismatchCountTotal = 0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount = 35`
+  - `readyCaseCount = 36`
   - `extendedMismatchCountTotal = 0`
 - `npm test`
   - `123/123`
