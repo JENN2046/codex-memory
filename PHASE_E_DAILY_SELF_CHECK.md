@@ -97,6 +97,7 @@ npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\stand
 
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-01.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-01.md)
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-02.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-02.md)
+- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-03.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-03.md)
 - `MEMORY.md` 状态 handoff：[phase-e-memory-status-handoff-01.md](/A:/codex-memory/logs/phase-e-memory-status-handoff-01.md)
 
 ## 一句话结论
