@@ -11,15 +11,15 @@
 
 ## 2026-05-05 项目记忆
 
-- 当前 `main` 已推送到 `origin/main`，最新提交是 `d2978bc test: add topicmemo gettopiccontent agent-not-found suite case`。
+- 当前 `main` 已推送到 `origin/main`，最新提交是 `263a575 docs: add mainline gate checkpoint 04 and refresh memory`。
 - 本轮 `Phase E / P1-3` suite 收口记录是 [phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)，已把 `TopicMemo GetTopicContent -> agent-not-found` 正式纳入标准 suite。
-- 新增推送后运行检查点 [phase-e-mainline-gate-checkpoint-04.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-04.md)，并已从 [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) / [PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md) 挂到“日常运维 / 排障 / 回滚”入口。
-- `d2978bc` 推送后的 [phase-e-mainline-gate-checkpoint-04.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-04.md) 与 `npm run gate:mainline` 已通过：
+- 最新推送后运行检查点是 [phase-e-mainline-gate-checkpoint-05.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-05.md)，并已从 [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) / [PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md) 挂到“日常运维 / 排障 / 回滚”入口。
+- `263a575` 推送后的 [phase-e-mainline-gate-checkpoint-05.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-05.md) 与 `npm run gate:mainline` 已通过：
   - `status: ok`
   - health `200` at `http://127.0.0.1:7605/health`
--  - compare `35/35 matched`
--  - rollback `35/35 rollback-ready`
-- 当前可把这组结果当成新的 Phase E 维护锚点：它证明本轮 `P1-3` 标准 suite 扩容和随后的远端同步，没有破坏默认 HTTP MCP 主链、compare 标准 suite 或 rollback readiness。
+  - compare `35/35 matched`
+  - rollback `35/35 rollback-ready`
+- 当前可把这组结果当成新的 Phase E 维护锚点：它证明本轮文档检查点推送后的主线，仍保持默认 HTTP MCP 主链健康、compare 标准 suite 全匹配、rollback readiness 全绿。
 - 当前仓库状态在这次检查点完成后为：`main` 本地与 `origin/main` 对齐，工作区 clean。
 
 ## 2026-04-26 项目记忆
