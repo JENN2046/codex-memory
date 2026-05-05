@@ -50,6 +50,8 @@
 - Phase E / 日常自检验收记录：[phase-e-daily-self-check-01.md](/A:/codex-memory/logs/phase-e-daily-self-check-01.md)
 - Phase E / HTTP MCP 运行态排障入口：[PHASE_E_HTTP_OBSERVABILITY.md](/A:/codex-memory/PHASE_E_HTTP_OBSERVABILITY.md)
 - Phase E / HTTP MCP 运行态观察记录：[phase-e-http-observability-01.md](/A:/codex-memory/logs/phase-e-http-observability-01.md)
+- Phase E / HTTP MCP 运行态观察记录：[phase-e-http-observability-02.md](/A:/codex-memory/logs/phase-e-http-observability-02.md)
+- Phase E / HTTP MCP 运行态观察记录：[phase-e-http-observability-03.md](/A:/codex-memory/logs/phase-e-http-observability-03.md)
 - Phase E / 默认主链回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
 - Phase E / 默认主链回滚 runbook 验收记录：[phase-e-rollback-runbook-01.md](/A:/codex-memory/logs/phase-e-rollback-runbook-01.md)
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
