@@ -106,9 +106,11 @@
 
 ### P1-1 扩展字段 drift 收口
 
+状态：当前标准 suite 已复验为 `34/34 matched`，`extendedMismatchCountTotal=0`；最新记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)
+
 目标：
 
-- 继续消化当前 `extended-only-drift`
+- 保持当前 `extended-only-drift` 归零状态；后续只在新增 case 或新增字段族出现 drift 时再收口。
 
 当前已知集中项：
 

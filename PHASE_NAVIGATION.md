@@ -44,6 +44,7 @@
 关键收口记录：
 
 - 扩展字段 drift：[phase-e-extended-drift-closure-01.md](/A:/codex-memory/logs/phase-e-extended-drift-closure-01.md)
+- 扩展字段 drift 复验：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)
 - 错误语义诊断：[phase-e-error-diagnostics-01.md](/A:/codex-memory/logs/phase-e-error-diagnostics-01.md)
 - `TopicMemo` 路由边界：[phase-e-topicmemo-topic-id-routing-01.md](/A:/codex-memory/logs/phase-e-topicmemo-topic-id-routing-01.md)
 - `TopicMemo empty-history / history-read-error`：[phase-e-error-diagnostics-02.md](/A:/codex-memory/logs/phase-e-error-diagnostics-02.md)

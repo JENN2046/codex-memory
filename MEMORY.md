@@ -297,8 +297,8 @@
   - `DeepMemo / TopicMemo` 在 `--full` 和错误输出下，把 donor 不需要的顶层扩展字段下沉到 `meta`
   - 这样保留了调试信息，但 compare/rollback 的顶层契约更贴 donor
   - 标准 active-memory suite 现已从 `extended-only-drift=25`、`extendedMismatchCountTotal=185` 收到 `0/0`
-  - `compare --require-match` 现在是 `matched=25` 且 `driftReasonBreakdown={}`
-  - `rollback --require-ready` 现在是 `ready=25` 且 `extendedMismatchCountTotal=0`
+  - 当时 `compare --require-match` 是 `matched=25` 且 `driftReasonBreakdown={}`
+  - 当时 `rollback --require-ready` 是 `ready=25` 且 `extendedMismatchCountTotal=0`
 - Phase E 的第七刀开始收 `P1-2` donor 排序手感：
   - 先不改跨 topic 主排序，只收同分 tie-breaker
   - `ChatHistoryIndexStore.search()` 在同一话题内若 `matchedClauseCount / keywordMatchCount / score` 全相同，改为优先更靠后的 `messageIndex`
@@ -447,7 +447,7 @@
 - 当前 compare / rollback 联合定向回归也已通过：
   - `compare-vcp-active-memory-cli + rollback-active-memory-cli = 25/25`
 - 当前全量回归最新基线：
-  - `npm test = 87/87`
+  - `npm test = 123/123`
 - 当前默认主链 gate 最新基线：
   - `npm run gate:mainline = passed`
   - `npm run gate:mainline:strict = passed`
@@ -466,11 +466,13 @@
   - 切回后 `npm run gate:mainline = passed`
 - 当前扩展字段 drift 收口最新基线：
   - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match = passed`
+  - `matchedCaseCount = 34`
   - `extendedMismatchCountTotal = 0`
   - `driftReasonBreakdown = {}`
   - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready = passed`
+  - `readyCaseCount = 34`
   - rollback `extendedMismatchCountTotal = 0`
-  - `npm test = 87/87`
+  - 当前复验记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)
 - 当前排序 tie-breaker 收口最新基线：
   - `node --test .\tests\phase-c-active-recall.test.js = 21/21`
   - `npm test = 94/94`

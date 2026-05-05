@@ -54,6 +54,7 @@
 - Phase E / 默认主链回滚 runbook 验收记录：[phase-e-rollback-runbook-01.md](/A:/codex-memory/logs/phase-e-rollback-runbook-01.md)
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 - Phase E / P1-1 扩展字段 drift 收口记录：[phase-e-extended-drift-closure-01.md](/A:/codex-memory/logs/phase-e-extended-drift-closure-01.md)
+- Phase E / P1-1 扩展字段 drift 复验记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)
 - Phase E / P1 错误语义与诊断输出收口记录：[phase-e-error-diagnostics-01.md](/A:/codex-memory/logs/phase-e-error-diagnostics-01.md)
 - Phase E / P1 `TopicMemo` `topic_id` 路由与诊断收口记录：[phase-e-topicmemo-topic-id-routing-01.md](/A:/codex-memory/logs/phase-e-topicmemo-topic-id-routing-01.md)
 - Phase E / P1 `TopicMemo` `empty-history / history-read-error` 收口记录：[phase-e-error-diagnostics-02.md](/A:/codex-memory/logs/phase-e-error-diagnostics-02.md)
@@ -439,11 +440,11 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 当前最新基线：
 
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount=30`
+  - `matchedCaseCount=34`
   - `extendedMismatchCountTotal=0`
   - `driftReasonBreakdown={}`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount=30`
+  - `readyCaseCount=34`
   - `extendedMismatchCountTotal=0`
 
 ## 错误语义标准 Suite 门禁
