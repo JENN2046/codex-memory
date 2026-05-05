@@ -14,10 +14,10 @@
 
 ## 当前最新状态
 
-- 最新远端主线提交：`c230721 docs: add mainline gate checkpoint 14`
-- 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-15.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-15.md)
+- 最新远端主线提交：`7c2a234 docs: add mainline gate checkpoint 15`
+- 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-16.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-16.md)
 - 最新标准 suite 扩容记录：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
-- `c230721` 推送后已复核 `git status --short` + `npm run gate:mainline`：
+- `7c2a234` 当前本地/远端主线状态已复核 `git status --short` + `npm run gate:mainline`：
   - `git status --short`：工作区干净
   - health：`ok`，`httpStatus=200`
   - compare：`36/36 matched`
@@ -41,6 +41,7 @@
 - 主线 gate 检查点 13：[phase-e-mainline-gate-checkpoint-13.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-13.md)
 - 主线 gate 检查点 14：[phase-e-mainline-gate-checkpoint-14.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-14.md)
 - 主线 gate 检查点 15：[phase-e-mainline-gate-checkpoint-15.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-15.md)
+- 主线 gate 检查点 16：[phase-e-mainline-gate-checkpoint-16.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-16.md)
 
 ## HTTP 运行态记录
 

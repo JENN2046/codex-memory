@@ -9,6 +9,7 @@
 | CMV-0005 | `bash -n ./scripts/validate-local.sh` | P6-docs-drift | autopilot rail | COMPLETED_VALIDATED | shell script syntax check passed | none | 2026-05-05 |
 | CMV-0006 | `npm run observe:http -- --json` | P0-mainline-health | HTTP runtime observability | COMPLETED_VALIDATED | `summary.status` is `warn`, `httpStatus=200`, `watchdogRecoveryCount=12`, no HTTP errors; health and recoverability considered runnable | monitor recovery trend in long-run | 2026-05-05 20:13:29 +08:00 |
 | CMV-0007 | `npm run gate:mainline` | P0-mainline-health | mainline gate | COMPLETED_VALIDATED | health ok（200）, compare `36/36 matched`, rollback `36/36 rollback-ready` | none | 2026-05-05 |
+| CMV-0008 | `git status --short` + `npm run gate:mainline` | P0-mainline-health | docs sync / checkpoint update | COMPLETED_VALIDATED | 工作区干净；health/compare/rollback 全绿 | update phase-e checkpoint index + daily/checkpoint docs | 2026-05-05 20:30:41 +08:00 |
 
 ## Result Labels
 
