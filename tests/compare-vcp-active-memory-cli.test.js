@@ -832,10 +832,10 @@ test('compare active-memory CLI should run the repository standard suite in requ
     assert.equal(payload.mode, 'suite');
     assert.equal(payload.metaVersion, 1);
     assert.equal(payload.summary.ok, true);
-    assert.equal(payload.summary.totalCaseCount, 37);
-    assert.equal(payload.summary.matchedCaseCount, 37);
+    assert.equal(payload.summary.totalCaseCount, 39);
+    assert.equal(payload.summary.matchedCaseCount, 39);
     assert.equal(payload.summary.mismatchedCaseCount, 0);
-    assert.deepEqual(payload.summary.comparisonBreakdown, { matched: 37 });
+    assert.deepEqual(payload.summary.comparisonBreakdown, { matched: 39 });
     assert.equal(payload.summary.coreMismatchCountTotal, 0);
     assert.equal(payload.summary.extendedMismatchCountTotal, 0);
     assert.deepEqual(payload.summary.driftReasonBreakdown, {});
@@ -850,10 +850,10 @@ test('compare active-memory CLI should run the repository standard suite in requ
     assert.equal(orderingAggregate?.fixtureAggregate?.length, 4);
     assert.equal(orderingAggregate?.fixtureAggregate?.find(item => item.fixture === 'vchat-fixture-ranking')?.totalCaseCount, 1);
     assert.equal(orderingAggregate?.fixtureAggregate?.find(item => item.fixture === 'vchat-fixture-multi-topic-large')?.matchedCaseCount, 1);
-    assert.equal(agentSelectionAggregate?.totalCaseCount, 7);
+    assert.equal(agentSelectionAggregate?.totalCaseCount, 8);
     assert.equal(agentSelectionAggregate?.fixtureAggregate?.find(item => item.fixture === 'vchat-fixture-multi-agent')?.totalCaseCount, 4);
     assert.equal(topicStateAggregate?.expectedErrorCaseCount, 4);
-    assert.equal(payload.categoryAggregate.find(item => item.category === 'input-validation')?.expectedErrorCaseCount, 4);
+    assert.equal(payload.categoryAggregate.find(item => item.category === 'input-validation')?.expectedErrorCaseCount, 5);
     assert.equal(payload.categoryAggregate.find(item => item.category === 'filtering')?.expectedSuccessCaseCount, 7);
     assert.ok(payload.cases.every(caseReport => caseReport.meta && caseReport.meta.category));
   } finally {
@@ -927,15 +927,15 @@ test('compare active-memory CLI should filter standard suite cases by multiple c
     const payload = parseJsonOutput(result.stdout);
     assert.equal(payload.mode, 'suite');
     assert.deepEqual(payload.categoryFilter, ['agent-selection', 'ordering']);
-    assert.equal(payload.summary.totalCaseCount, 11);
-    assert.equal(payload.summary.matchedCaseCount, 11);
+    assert.equal(payload.summary.totalCaseCount, 12);
+    assert.equal(payload.summary.matchedCaseCount, 12);
     assert.equal(payload.summary.mismatchedCaseCount, 0);
     assert.equal(payload.fixturePreparation.preparedFixtureCount, 5);
     assert.equal(payload.categoryAggregate.length, 2);
     const orderingAggregate = payload.categoryAggregate.find(item => item.category === 'ordering');
     const agentSelectionAggregate = payload.categoryAggregate.find(item => item.category === 'agent-selection');
     assert.equal(orderingAggregate?.totalCaseCount, 4);
-    assert.equal(agentSelectionAggregate?.totalCaseCount, 7);
+    assert.equal(agentSelectionAggregate?.totalCaseCount, 8);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
@@ -1029,7 +1029,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
     assert.equal(expectationResult.code, 0, expectationResult.stderr);
     const expectationPayload = parseJsonOutput(expectationResult.stdout);
     assert.deepEqual(expectationPayload.expectationFilter, ['error']);
-    assert.equal(expectationPayload.summary.totalCaseCount, 13);
+    assert.equal(expectationPayload.summary.totalCaseCount, 15);
     assert.equal(expectationPayload.fixturePreparation.preparedFixtureCount, 2);
     assert.ok(expectationPayload.cases.every(caseReport => caseReport.meta?.expectation === 'error'));
 
@@ -1049,7 +1049,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
     assert.equal(expectationMultiResult.code, 0, expectationMultiResult.stderr);
     const expectationMultiPayload = parseJsonOutput(expectationMultiResult.stdout);
     assert.deepEqual(expectationMultiPayload.expectationFilter, ['error', 'success']);
-    assert.equal(expectationMultiPayload.summary.totalCaseCount, 37);
+    assert.equal(expectationMultiPayload.summary.totalCaseCount, 39);
     assert.equal(expectationMultiPayload.fixturePreparation.preparedFixtureCount, 7);
     assert.ok(expectationMultiPayload.cases.every(caseReport => ['error', 'success'].includes(caseReport.meta?.expectation)));
 
@@ -1069,7 +1069,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
     assert.equal(expectationReverseResult.code, 0, expectationReverseResult.stderr);
     const expectationReversePayload = parseJsonOutput(expectationReverseResult.stdout);
     assert.deepEqual(expectationReversePayload.expectationFilter, ['error', 'success']);
-    assert.equal(expectationReversePayload.summary.totalCaseCount, 37);
+    assert.equal(expectationReversePayload.summary.totalCaseCount, 39);
     assert.equal(expectationReversePayload.fixturePreparation.preparedFixtureCount, 7);
     const expectationReverseCounts = expectationReversePayload.cases.reduce(
       (acc, item) => {
@@ -1081,7 +1081,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
       },
       {}
     );
-    assert.equal(expectationReverseCounts.error, 13);
+    assert.equal(expectationReverseCounts.error, 15);
     assert.equal(expectationReverseCounts.success, 24);
     const expectationReverseSet = new Set(expectationReversePayload.cases.map(item => item.meta?.expectation));
     assert.deepEqual(
@@ -1105,7 +1105,7 @@ test('compare active-memory CLI should filter standard suite cases by expectatio
     assert.equal(expectationDupResult.code, 0, expectationDupResult.stderr);
     const expectationDupPayload = parseJsonOutput(expectationDupResult.stdout);
     assert.deepEqual(expectationDupPayload.expectationFilter, ['error', 'success']);
-    assert.equal(expectationDupPayload.summary.totalCaseCount, 37);
+    assert.equal(expectationDupPayload.summary.totalCaseCount, 39);
     assert.equal(expectationDupPayload.fixturePreparation.preparedFixtureCount, 7);
     assert.ok(expectationDupPayload.cases.every(caseReport => ['error', 'success'].includes(caseReport.meta?.expectation)));
     assert.equal(expectationDupPayload.cases.length, expectationDupPayload.summary.totalCaseCount);
@@ -1182,7 +1182,7 @@ test('compare active-memory CLI should support tag-all and exclude filters', asy
     assert.equal(excludeTagResult.code, 0, excludeTagResult.stderr);
     const excludeTagPayload = parseJsonOutput(excludeTagResult.stdout);
     assert.deepEqual(excludeTagPayload.excludeTagFilter, ['multi-agent']);
-    assert.equal(excludeTagPayload.summary.totalCaseCount, 29);
+    assert.equal(excludeTagPayload.summary.totalCaseCount, 31);
     assert.ok(excludeTagPayload.cases.every(caseReport => !caseReport.meta?.tags?.includes('multi-agent')));
 
     const excludeFixtureResult = await runCli({
@@ -1201,7 +1201,7 @@ test('compare active-memory CLI should support tag-all and exclude filters', asy
     assert.equal(excludeFixtureResult.code, 0, excludeFixtureResult.stderr);
     const excludeFixturePayload = parseJsonOutput(excludeFixtureResult.stdout);
     assert.deepEqual(excludeFixturePayload.excludeFixtureFilter, ['vchat-fixture-no-settings']);
-    assert.equal(excludeFixturePayload.summary.totalCaseCount, 36);
+    assert.equal(excludeFixturePayload.summary.totalCaseCount, 38);
     assert.ok(excludeFixturePayload.cases.every(caseReport => caseReport.meta?.fixture !== 'vchat-fixture-no-settings'));
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });

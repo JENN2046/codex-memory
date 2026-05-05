@@ -51,7 +51,13 @@ function buildDeepMemoErrorMeta({ app, options, rawInput, parsedInput, error, pa
 
   const maid = firstNonEmpty(parsedInput?.maid, parsedInput?.maidName, '');
   const agentId = firstNonEmpty(parsedInput?.agentId, null);
-  const keyword = firstNonEmpty(parsedInput?.keyword, parsedInput?.query, '');
+  const keyword = firstNonEmpty(
+    parsedInput?.keyword,
+    parsedInput?.key_word,
+    parsedInput?.KeyWord,
+    parsedInput?.query,
+    ''
+  );
   const meta = {
     command: 'Search',
     maid: typeof maid === 'string' ? maid : '',
