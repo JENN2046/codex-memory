@@ -1,6 +1,6 @@
 # Phase E Backlog
 
-更新时间：2026-04-23
+更新时间：2026-05-05
 
 这份 backlog 用于承接 `Phase D` 收官之后的后续精修工作。
 
@@ -106,7 +106,7 @@
 
 ### P1-1 扩展字段 drift 收口
 
-状态：当前标准 suite 已复验为 `34/34 matched`，`extendedMismatchCountTotal=0`；最新记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)
+状态：当前标准 suite 已扩至 `35/35 matched`，`extendedMismatchCountTotal=0`；P1-1 基线记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)，本轮复验记录：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
 
 目标：
 
@@ -154,6 +154,8 @@
 阻断级别：`P1`
 
 ### P1-3 错误语义与诊断输出继续贴齐
+
+状态：当前标准 suite 已补入 `TopicMemo GetTopicContent agent-not-found` case；最新记录：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
 
 目标：
 

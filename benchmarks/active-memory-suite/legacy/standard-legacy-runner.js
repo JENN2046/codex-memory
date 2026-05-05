@@ -46,6 +46,9 @@ function formatZhDateTime(value, { includeSeconds = true } = {}) {
 function normalizeCommand(input = {}) {
   const command = String(input.command || input.Command || '').trim().toLowerCase();
   if (command) return command;
+  if (String(input.topic_id || input.topicId || input.TopicId || '').trim()) {
+    return 'gettopiccontent';
+  }
   if (typeof input.maid === 'string' && input.maid.trim() && !input.keyword && !input.key_word && !input.KeyWord) {
     return 'listtopics';
   }

@@ -1,6 +1,6 @@
 ﻿# codex-memory Status
 
-更新时间：2026-04-23
+更新时间：2026-05-05
 
 ## 当前结论
 
@@ -354,15 +354,16 @@
   - 标准 suite 新增 `DeepMemo` 高级查询语法混用 success case，把短语 / 可选组 / 权重项混用时的 blocked/effective donor 语义也纳入门禁
   - 标准 suite 新增 `DeepMemo` blocked 配置重复值和大小写混用 success case，把 blocked config 归一化下的 blocked/effective donor 语义也纳入门禁
   - 标准 suite 新增 `TopicMemo history-read-error` fixture 与 case
+  - 标准 suite 新增 `TopicMemo GetTopicContent agent-not-found` case，把显式内容取回路径上的 donor 错误语义也纳入门禁
   - legacy standard runner 现已按当前 Node 运行时真实 parser message 生成 `history-read-error` donor 文案
   - `node --test .\tests\vcp-active-memory-cli.test.js = 17/17`
   - `node --test .\tests\compare-vcp-active-memory-cli.test.js = 14/14`
   - `node --test .\tests\rollback-active-memory-cli.test.js = 11/11`
   - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-    - `matchedCaseCount = 34`
+    - `matchedCaseCount = 35`
   - `extendedMismatchCountTotal = 0`
   - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-    - `readyCaseCount = 34`
+    - `readyCaseCount = 35`
   - `extendedMismatchCountTotal = 0`
   - `npm test = 123/123`
 

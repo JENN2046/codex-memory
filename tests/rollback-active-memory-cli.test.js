@@ -554,11 +554,11 @@ test('rollback active-memory CLI should run the repository standard suite in req
     assert.equal(payload.mode, 'suite');
     assert.equal(payload.summary.ok, true);
     assert.equal(payload.summary.rollbackReady, true);
-    assert.equal(payload.summary.totalCaseCount, 34);
-    assert.equal(payload.summary.readyCaseCount, 34);
+    assert.equal(payload.summary.totalCaseCount, 35);
+    assert.equal(payload.summary.readyCaseCount, 35);
     assert.equal(payload.summary.notReadyCaseCount, 0);
     assert.equal(payload.summary.extendedMismatchCountTotal, 0);
-    assert.deepEqual(payload.summary.recommendationBreakdown, { 'rollback-safe': 34 });
+    assert.deepEqual(payload.summary.recommendationBreakdown, { 'rollback-safe': 35 });
     assert.deepEqual(payload.summary.blockerBreakdown, {});
     assert.equal(payload.compareReport.metaVersion, 1);
     assert.equal(payload.compareReport.fixturePreparation.preparedFixtureCount, 7);
@@ -643,14 +643,14 @@ test('rollback active-memory CLI should filter standard suite cases by multiple 
     assert.equal(result.code, 0, result.stderr);
     const payload = parseJsonOutput(result.stdout);
     assert.deepEqual(payload.categoryFilter, ['agent-selection', 'ordering']);
-    assert.equal(payload.summary.totalCaseCount, 9);
-    assert.equal(payload.summary.readyCaseCount, 9);
+    assert.equal(payload.summary.totalCaseCount, 10);
+    assert.equal(payload.summary.readyCaseCount, 10);
     assert.equal(payload.summary.notReadyCaseCount, 0);
     assert.equal(payload.summary.ok, true);
     assert.equal(payload.summary.rollbackReady, true);
     assert.equal(payload.compareReport?.categoryAggregate?.length, 2);
     assert.equal(payload.compareReport?.categoryAggregate.find(item => item.category === 'ordering')?.totalCaseCount, 4);
-    assert.equal(payload.compareReport?.categoryAggregate.find(item => item.category === 'agent-selection')?.totalCaseCount, 5);
+    assert.equal(payload.compareReport?.categoryAggregate.find(item => item.category === 'agent-selection')?.totalCaseCount, 6);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
@@ -768,8 +768,8 @@ test('rollback active-memory CLI should filter standard suite cases by tag-all a
     assert.equal(excludeTagResult.code, 0, excludeTagResult.stderr);
     const excludeTagPayload = parseJsonOutput(excludeTagResult.stdout);
     assert.deepEqual(excludeTagPayload.excludeTagFilter, ['multi-agent']);
-    assert.equal(excludeTagPayload.summary.totalCaseCount, 27);
-    assert.equal(excludeTagPayload.summary.readyCaseCount, 27);
+    assert.equal(excludeTagPayload.summary.totalCaseCount, 28);
+    assert.equal(excludeTagPayload.summary.readyCaseCount, 28);
     assert.equal(excludeTagPayload.summary.notReadyCaseCount, 0);
     assert.ok(excludeTagPayload.cases.every(caseReport => !caseReport.meta?.tags?.includes('multi-agent')));
 
@@ -789,8 +789,8 @@ test('rollback active-memory CLI should filter standard suite cases by tag-all a
     assert.equal(excludeFixtureResult.code, 0, excludeFixtureResult.stderr);
     const excludeFixturePayload = parseJsonOutput(excludeFixtureResult.stdout);
     assert.deepEqual(excludeFixturePayload.excludeFixtureFilter, ['vchat-fixture-no-settings']);
-    assert.equal(excludeFixturePayload.summary.totalCaseCount, 33);
-    assert.equal(excludeFixturePayload.summary.readyCaseCount, 33);
+    assert.equal(excludeFixturePayload.summary.totalCaseCount, 34);
+    assert.equal(excludeFixturePayload.summary.readyCaseCount, 34);
     assert.equal(excludeFixturePayload.summary.notReadyCaseCount, 0);
     assert.ok(excludeFixturePayload.cases.every(caseReport => caseReport.meta?.fixture !== 'vchat-fixture-no-settings'));
   } finally {
@@ -826,8 +826,8 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
     assert.equal(expectationResult.code, 0, expectationResult.stderr);
     const expectationPayload = parseJsonOutput(expectationResult.stdout);
     assert.deepEqual(expectationPayload.expectationFilter, ['error']);
-    assert.equal(expectationPayload.summary.totalCaseCount, 11);
-    assert.equal(expectationPayload.summary.readyCaseCount, 11);
+    assert.equal(expectationPayload.summary.totalCaseCount, 12);
+    assert.equal(expectationPayload.summary.readyCaseCount, 12);
     assert.equal(expectationPayload.compareReport.fixturePreparation.preparedFixtureCount, 2);
     assert.ok(expectationPayload.cases.every(caseReport => caseReport.meta?.expectation === 'error'));
 
@@ -847,8 +847,8 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
     assert.equal(expectationMultiResult.code, 0, expectationMultiResult.stderr);
     const expectationMultiPayload = parseJsonOutput(expectationMultiResult.stdout);
     assert.deepEqual(expectationMultiPayload.expectationFilter, ['error', 'success']);
-    assert.equal(expectationMultiPayload.summary.totalCaseCount, 34);
-    assert.equal(expectationMultiPayload.summary.readyCaseCount, 34);
+    assert.equal(expectationMultiPayload.summary.totalCaseCount, 35);
+    assert.equal(expectationMultiPayload.summary.readyCaseCount, 35);
     assert.equal(expectationMultiPayload.summary.notReadyCaseCount, 0);
     assert.equal(expectationMultiPayload.compareReport.fixturePreparation.preparedFixtureCount, 7);
     assert.ok(expectationMultiPayload.cases.every(caseReport => ['error', 'success'].includes(caseReport.meta?.expectation)));
@@ -869,8 +869,8 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
     assert.equal(expectationReverseResult.code, 0, expectationReverseResult.stderr);
     const expectationReversePayload = parseJsonOutput(expectationReverseResult.stdout);
     assert.deepEqual(expectationReversePayload.expectationFilter, ['error', 'success']);
-    assert.equal(expectationReversePayload.summary.totalCaseCount, 34);
-    assert.equal(expectationReversePayload.summary.readyCaseCount, 34);
+    assert.equal(expectationReversePayload.summary.totalCaseCount, 35);
+    assert.equal(expectationReversePayload.summary.readyCaseCount, 35);
     assert.equal(expectationReversePayload.summary.notReadyCaseCount, 0);
     assert.equal(expectationReversePayload.compareReport.fixturePreparation.preparedFixtureCount, 7);
     const expectationReverseSet = new Set(expectationReversePayload.cases.map(item => item.meta?.expectation));
@@ -895,8 +895,8 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
     assert.equal(expectationDupResult.code, 0, expectationDupResult.stderr);
     const expectationDupPayload = parseJsonOutput(expectationDupResult.stdout);
     assert.deepEqual(expectationDupPayload.expectationFilter, ['error', 'success']);
-    assert.equal(expectationDupPayload.summary.totalCaseCount, 34);
-    assert.equal(expectationDupPayload.summary.readyCaseCount, 34);
+    assert.equal(expectationDupPayload.summary.totalCaseCount, 35);
+    assert.equal(expectationDupPayload.summary.readyCaseCount, 35);
     assert.equal(expectationDupPayload.summary.notReadyCaseCount, 0);
     assert.equal(expectationDupPayload.compareReport.fixturePreparation.preparedFixtureCount, 7);
     assert.ok(expectationDupPayload.cases.every(caseReport => ['error', 'success'].includes(caseReport.meta?.expectation)));
@@ -918,8 +918,8 @@ test('rollback active-memory CLI should filter standard suite cases by expectati
     assert.equal(toolResult.code, 0, toolResult.stderr);
     const toolPayload = parseJsonOutput(toolResult.stdout);
     assert.deepEqual(toolPayload.toolFilter, ['topicmemo']);
-    assert.equal(toolPayload.summary.totalCaseCount, 13);
-    assert.equal(toolPayload.summary.readyCaseCount, 13);
+    assert.equal(toolPayload.summary.totalCaseCount, 14);
+    assert.equal(toolPayload.summary.readyCaseCount, 14);
     assert.equal(toolPayload.compareReport.fixturePreparation.preparedFixtureCount, 4);
     assert.ok(toolPayload.cases.every(caseReport => caseReport.tool === 'topicmemo'));
   } finally {

@@ -1,6 +1,6 @@
 # Phase E Summary
 
-更新时间：2026-04-23
+更新时间：2026-05-05
 
 ## 一句话结论
 
@@ -47,6 +47,7 @@
   - `missing-history`
   - `empty-history`
   - `history-read-error`
+  - `GetTopicContent -> agent-not-found` 已进入标准 suite
 - `DeepMemo` 错误 `meta` 也已往 donor 原始字段收了一层：
   - `maidName`
   - `agent_id`
@@ -75,10 +76,10 @@
 - `node --test .\tests\rollback-active-memory-cli.test.js`
   - `11/11`
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount = 34`
+  - `matchedCaseCount = 35`
   - `extendedMismatchCountTotal = 0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount = 34`
+  - `readyCaseCount = 35`
   - `extendedMismatchCountTotal = 0`
 - `npm test`
   - `123/123`

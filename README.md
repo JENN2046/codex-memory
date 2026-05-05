@@ -60,6 +60,7 @@
 - Phase E / P1 错误语义与诊断输出收口记录：[phase-e-error-diagnostics-01.md](/A:/codex-memory/logs/phase-e-error-diagnostics-01.md)
 - Phase E / P1 `TopicMemo` `topic_id` 路由与诊断收口记录：[phase-e-topicmemo-topic-id-routing-01.md](/A:/codex-memory/logs/phase-e-topicmemo-topic-id-routing-01.md)
 - Phase E / P1 `TopicMemo` `empty-history / history-read-error` 收口记录：[phase-e-error-diagnostics-02.md](/A:/codex-memory/logs/phase-e-error-diagnostics-02.md)
+- Phase E / P1 `TopicMemo` `GetTopicContent agent-not-found` 收口记录：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
 - Phase E / P1 错误语义标准 suite 门禁收口记录：[phase-e-error-semantics-suite-gate-01.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-01.md)
 - Phase E / 标准 suite 扩容记录：
   [phase-e-standard-suite-expansion-01.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-01.md)
@@ -443,11 +444,11 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 当前最新基线：
 
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount=34`
+  - `matchedCaseCount=35`
   - `extendedMismatchCountTotal=0`
   - `driftReasonBreakdown={}`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount=34`
+  - `readyCaseCount=35`
   - `extendedMismatchCountTotal=0`
 
 ## 错误语义标准 Suite 门禁
@@ -467,6 +468,7 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 - 标准 suite 新增 `DeepMemo` 高级查询语法混用 success case，把 blocked/effective 在短语、可选组和权重项混用时的 donor 语义也推进进 compare / rollback 门禁
 - 标准 suite 新增 `DeepMemo` blocked 配置重复值和大小写混用 success case，把 blocked/effective 在 blocked config 归一化下的 donor 语义也推进进 compare / rollback 门禁
 - 标准 suite 新增 `TopicMemo history-read-error` fixture 和 case
+- 标准 suite 新增 `TopicMemo GetTopicContent agent-not-found` case，把显式内容取回路径上的 donor 错误语义也推进进 compare / rollback 门禁
 - legacy standard runner 现在会按当前 Node 运行时真实解析 `history.json`，生成同源的 `history-read-error` 错误文案
 - ad-hoc compare donor-style error 回归也补齐了 `meta`
 
@@ -479,10 +481,10 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 - `node --test .\tests\rollback-active-memory-cli.test.js`
   - `11/11`
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount=34`
+  - `matchedCaseCount=35`
   - `extendedMismatchCountTotal=0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount=34`
+  - `readyCaseCount=35`
   - `extendedMismatchCountTotal=0`
 - `npm test`
   - `123/123`

@@ -24,8 +24,9 @@ npm run gate:mainline
 
 当前标准 suite 基线：
 
-- compare：`34/34 matched`
-- rollback：`34/34 rollback-ready`
+- compare：`35/35 matched`
+- rollback：`35/35 rollback-ready`
+- 最新相关记录：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
 
 ## 什么时候跑严格门禁
 

@@ -1,6 +1,6 @@
 # Project Closure
 
-更新时间：2026-04-23
+更新时间：2026-05-05
 
 ## 正式结论
 
@@ -41,10 +41,10 @@
 ## 当前稳定基线
 
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount = 34`
+  - `matchedCaseCount = 35`
   - `extendedMismatchCountTotal = 0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount = 34`
+  - `readyCaseCount = 35`
   - `extendedMismatchCountTotal = 0`
 - `npm test`
   - `123/123`

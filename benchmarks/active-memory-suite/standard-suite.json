@@ -436,6 +436,24 @@
       }
     },
     {
+      "name": "topicmemo-agent-not-found-gettopiccontent",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-agent-not-found-gettopiccontent.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "agent-selection",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "agent-not-found",
+          "gettopiccontent"
+        ]
+      }
+    },
+    {
       "name": "topicmemo-listtopics-mika",
       "tool": "topicmemo",
       "inputFile": "./inputs/topicmemo-listtopics-mika.json",
