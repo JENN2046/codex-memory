@@ -139,6 +139,8 @@
 
 - 继续把 `DeepMemo / TopicMemo / LightMemo` 的结果顺序和边界手感向 donor 靠近
 
+当前 `ordering` 专项复验：`4/4 matched`，`4/4 rollback-ready`（最新记录：[phase-e-ordering-tiebreaker-06.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-06.md)）
+
 建议动作：
 
 - 继续补标准集 case，而不是依赖临时样本

@@ -60,6 +60,7 @@
 - [phase-e-ordering-tiebreaker-03.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-03.md)
 - [phase-e-ordering-tiebreaker-04.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-04.md)
 - [phase-e-ordering-tiebreaker-05.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-05.md)
+- [phase-e-ordering-tiebreaker-06.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-06.md)
 
 ## 想做日常运维 / 排障 / 回滚
 
