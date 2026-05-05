@@ -2,21 +2,22 @@
 
 ## Current Goal
 
-Prepare the sustained autopilot rail changes for safe version-control inclusion without mixing unrelated runtime work.
+Track P0/P1 runbook and health-visibility baseline updates for default mainline stability and observability.
 
 ## Current Area
 
-P6-docs-drift / local autopilot governance
+P0-mainline-health / HTTP runtime observability
 
 ## Current Status
 
-In progress. Autopilot rail files are present locally and under review.
+In progress. Mainline observability snapshot is under collection in `phase-e-http-observability-04.md`.
 
 ## Completed Work
 
 - P1-4 suite expansion committed as `1159873` and pushed to `origin/main`.
 - P2-1 checkpoint index committed as `57aa164` and pushed to `origin/main`.
 - Remaining autopilot/AGENTS-related files identified as a separate local change group.
+- HTTP MCP 运行态观察 `phase-e-http-observability-04.md` 已落盘。
 
 ## Changed Files
 
@@ -25,18 +26,22 @@ In progress. Autopilot rail files are present locally and under review.
 - `README_CODEX_MEMORY_AUTOPILOT.md`
 - `scripts/validate-local.ps1`
 - `scripts/validate-local.sh`
+- `logs/phase-e-http-observability-04.md`
+- `PHASE_E_CHECKPOINT_INDEX.md`
 
 ## Validation Run
 
 - `git diff --check -- AGENTS.md README_CODEX_MEMORY_AUTOPILOT.md scripts/validate-local.ps1 scripts/validate-local.sh .agent_board/*.md` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` initially failed because `Run-Step` did not pass command args to `git`; fixed and reran successfully.
 - `bash -n ./scripts/validate-local.sh` passed.
+- `npm run observe:http -- --json` executed and returned `warn` health with HTTP status 200, watchdog recoveries, and zero HTTP errors.
+- `npm run gate:mainline` executed locally and passed (`health`/`compare`/`rollback` all `ok`).
 
 ## Validation Not Run
 
 - `npm test`
-- `npm run gate:mainline`
 - `npm run gate:mainline:strict`
+
 
 ## MCP / Runtime State
 
@@ -44,7 +49,7 @@ In progress. Autopilot rail files are present locally and under review.
 |---|---|
 | MCP mode | HTTP mainline assumption; verify before runtime claims |
 | HTTP health | latest known `200` from mainline gate |
-| Mainline gate | last pushed mainline verification passed after `1159873` |
+| Mainline gate | last pushed mainline verification passed after `a7c96f9` |
 | Compare suite | latest known baseline `36/36 matched` |
 | Rollback readiness | latest known baseline `36/36 rollback-ready` |
 | Profile gate | not run |
@@ -68,8 +73,9 @@ In progress. Autopilot rail files are present locally and under review.
 
 ## Next Safe Action
 
-Stage only autopilot rail files and stop before commit.
+Stage HTTP observability + board同步变更；完成后若授权可提交当前 `checkpoint` 聚合点。
 
 ## Last Local Commit
 
 - `57aa164 docs: add phase e checkpoint index`
+

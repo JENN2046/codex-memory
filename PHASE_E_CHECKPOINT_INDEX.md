@@ -14,10 +14,10 @@
 
 ## 当前最新状态
 
-- 最新远端主线提交：`8ad9307 docs: add mainline gate checkpoint 12`
+- 最新远端主线提交：`a7c96f9 docs: add mainline gate checkpoint 13`
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-13.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-13.md)
 - 最新标准 suite 扩容记录：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
-- `8ad9307` 推送后已复核 `git status --short` + `npm run gate:mainline`：
+- `a7c96f9` 推送后已复核 `git status --short` + `npm run gate:mainline`：
   - `git status --short`：工作区干净
   - health：`ok`，`httpStatus=200`
   - compare：`36/36 matched`
@@ -45,6 +45,7 @@
 - HTTP MCP 运行态观察 01：[phase-e-http-observability-01.md](/A:/codex-memory/logs/phase-e-http-observability-01.md)
 - HTTP MCP 运行态观察 02：[phase-e-http-observability-02.md](/A:/codex-memory/logs/phase-e-http-observability-02.md)
 - HTTP MCP 运行态观察 03：[phase-e-http-observability-03.md](/A:/codex-memory/logs/phase-e-http-observability-03.md)
+- HTTP MCP 运行态观察 04：[phase-e-http-observability-04.md](/A:/codex-memory/logs/phase-e-http-observability-04.md)
 
 ## 回滚与 handoff 记录
 
