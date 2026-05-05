@@ -197,6 +197,8 @@
 
 ### P2-1 文档压缩与导航优化
 
+状态：已落地为运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
+
 目标：
 
 - 当前文档资产已经很多，后续要避免“信息全在但不好找”

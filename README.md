@@ -55,6 +55,7 @@
 - Phase E / 默认主链回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
 - Phase E / 默认主链回滚 runbook 验收记录：[phase-e-rollback-runbook-01.md](/A:/codex-memory/logs/phase-e-rollback-runbook-01.md)
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
+- Phase E / 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 - Phase E / P1-1 扩展字段 drift 收口记录：[phase-e-extended-drift-closure-01.md](/A:/codex-memory/logs/phase-e-extended-drift-closure-01.md)
 - Phase E / P1-1 扩展字段 drift 复验记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)
 - Phase E / P1 错误语义与诊断输出收口记录：[phase-e-error-diagnostics-01.md](/A:/codex-memory/logs/phase-e-error-diagnostics-01.md)

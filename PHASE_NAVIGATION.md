@@ -79,30 +79,16 @@
 
 日常入口：
 
+- Phase E 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 - Phase E 日常自检：[PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)
 - HTTP MCP 运行态排障：[PHASE_E_HTTP_OBSERVABILITY.md](/A:/codex-memory/PHASE_E_HTTP_OBSERVABILITY.md)
 - 默认主链回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
 
 对应运行记录：
 
-- 日常自检验收：[phase-e-daily-self-check-01.md](/A:/codex-memory/logs/phase-e-daily-self-check-01.md)
-- HTTP MCP 运行态观察：[phase-e-http-observability-01.md](/A:/codex-memory/logs/phase-e-http-observability-01.md)
-- HTTP MCP 运行态观察：[phase-e-http-observability-02.md](/A:/codex-memory/logs/phase-e-http-observability-02.md)
-- HTTP MCP 运行态观察：[phase-e-http-observability-03.md](/A:/codex-memory/logs/phase-e-http-observability-03.md)
-- 回滚 runbook 验收：[phase-e-rollback-runbook-01.md](/A:/codex-memory/logs/phase-e-rollback-runbook-01.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-01.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-01.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-02.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-02.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-03.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-03.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-04.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-04.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-05.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-05.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-06.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-06.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-07.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-07.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-08.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-08.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-09.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-09.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-10.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-10.md)
-- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-11.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-11.md)
-- `MEMORY.md` 状态 handoff：[phase-e-memory-status-handoff-01.md](/A:/codex-memory/logs/phase-e-memory-status-handoff-01.md)
-- 回滚演练：[phase-e-mainline-rollback-drill-01.md](/A:/codex-memory/logs/phase-e-mainline-rollback-drill-01.md)
+- 运行记录汇总：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
+- 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-11.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-11.md)
+- 最新 suite 扩容记录：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
 
 ## 想继续推进什么
 
