@@ -14,16 +14,14 @@
 
 ## 当前最新状态
 
-- 最新远端主线提交：`1159873 test: add topicmemo gettopiccontent alias suite case`
-- 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-11.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-11.md)
+- 最新远端主线提交：`9b21bad chore: add sustained autopilot rail`
+- 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-12.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-12.md)
 - 最新标准 suite 扩容记录：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
-- `1159873` 推送后已复核 `git status --short` + `npm run gate:mainline`：
+- `9b21bad` 推送后已复核 `git status --short` + `npm run gate:mainline`：
   - `git status --short`：工作区干净
   - health：`ok`，`httpStatus=200`
   - compare：`36/36 matched`
   - rollback：`36/36 rollback-ready`
-
-说明：`1159873` 推送后的复核结果暂未单独新建 `checkpoint-12`，按当前聚合节奏，后续和下一批文档/任务收口一起记录。
 
 ## 日常运行记录
 
@@ -39,6 +37,7 @@
 - 主线 gate 检查点 09：[phase-e-mainline-gate-checkpoint-09.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-09.md)
 - 主线 gate 检查点 10：[phase-e-mainline-gate-checkpoint-10.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-10.md)
 - 主线 gate 检查点 11：[phase-e-mainline-gate-checkpoint-11.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-11.md)
+- 主线 gate 检查点 12：[phase-e-mainline-gate-checkpoint-12.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-12.md)
 
 ## HTTP 运行态记录
 
