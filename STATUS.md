@@ -44,7 +44,9 @@
 - `Phase E / P1` 再补 `TopicMemo` 的 `empty-history / history-read-error` 边界：`empty-history` 现在在 `--full` 下可见，`history-read-error` 也已带着 `meta.historyStatus` 稳定回归。
 - `Phase E / P1-2` 已继续收 donor 排序手感：第一刀先把 `DeepMemo` 的同分 tie-breaker 改成“同一话题内优先更靠后的命中窗口”；第二刀已把跨 topic 的同分边界收成“优先 fresher topic”；第三刀已把“更紧凑窗口优先”限制在跨 topic 同分结果里；第四刀把 `compactness > freshness` 的冲突优先级显式锁成回归；第五刀则把最末级 `topicId` 词典序兜底也补成稳定回归。
 
-## 分阶段进度
+## 历史分阶段进度快照
+
+下面百分比是 Phase D/E 收官前的历史粗估，用来解释迁移过程，不再作为当前项目完成度判断。当前权威状态以 `PROJECT_CLOSURE.md`、`PHASE_E_SUMMARY.md`、README 和最新验证输出为准。
 
 - `Phase A` 独立核心与 Codex MCP：约 `95%`
 - `Phase B` 高级被动召回主链：约 `85%`
@@ -362,7 +364,7 @@
   - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
     - `readyCaseCount = 34`
   - `extendedMismatchCountTotal = 0`
-  - `npm test = 106/106`
+  - `npm test = 123/123`
 
 ## 当前风险
 

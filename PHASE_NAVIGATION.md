@@ -50,6 +50,7 @@
 - 错误语义进标准 suite 门禁：[phase-e-error-semantics-suite-gate-01.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-01.md)
 - donor 别名字段：[phase-e-deepmemo-donor-alias-meta-01.md](/A:/codex-memory/logs/phase-e-deepmemo-donor-alias-meta-01.md)
 - query 别名字段：[phase-e-deepmemo-query-alias-meta-01.md](/A:/codex-memory/logs/phase-e-deepmemo-query-alias-meta-01.md)
+- 文档收口检查点：[phase-e-documentation-closure-checkpoint-01.md](/A:/codex-memory/logs/phase-e-documentation-closure-checkpoint-01.md)
 
 排序 tie-breaker：
 

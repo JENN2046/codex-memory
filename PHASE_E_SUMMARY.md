@@ -81,7 +81,7 @@
   - `readyCaseCount = 34`
   - `extendedMismatchCountTotal = 0`
 - `npm test`
-  - `106/106`
+  - `123/123`
 
 ## 阶段产出
 

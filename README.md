@@ -66,6 +66,7 @@
   [phase-e-ordering-tiebreaker-03.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-03.md)
   [phase-e-ordering-tiebreaker-04.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-04.md)
   [phase-e-ordering-tiebreaker-05.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-05.md)
+- Phase E / 文档收口检查点：[phase-e-documentation-closure-checkpoint-01.md](/A:/codex-memory/logs/phase-e-documentation-closure-checkpoint-01.md)
 
 ## 架构分层
 
@@ -103,7 +104,7 @@
 
 ```powershell
 cd A:\codex-memory
-npm install
+npm ci
 npm test
 npm run start:http
 ```
@@ -113,7 +114,6 @@ npm run start:http
 ```powershell
 cd A:\codex-memory
 npm test
-npm run rebuild-shadow
 npm run active-memory -- health --json
 npm run deepmemo
 npm run topicmemo
@@ -137,6 +137,8 @@ npm run start:http:ensure
 npm run start:http:watchdog:once
 ```
 
+维护命令需要单独确认：`npm run rebuild-shadow` 会按当前配置重建本地 shadow/index；`npm run rebuild-profile -- --confirm --json` 会清理当前 profile 生成物；`cleanup-legacy-chunks -- --confirm` 和 `start:http:*:install` 也会写本地状态。日常排查优先使用 dry-run、fixture tests、`profile-health`、`shadow-compare`、`profile-gate` 和 `observe:http`。
+
 环境变量模板：
 
 - 最小可启动模板：[.env.example](/A:/codex-memory/.env.example)
@@ -147,15 +149,22 @@ npm run start:http:watchdog:once
 
 CI 在 `.github/workflows/ci.yml` 中运行 `npm ci`、`npm test`，并额外 smoke `rebuild-profile`、`profile-health`、`profile-gate`、`v8-diagnose` 四条 profile 相关 CLI。
 
-Embedding profile 会按 `<model>__<dimensions>__<version>` 生成 fingerprint，例如默认本地 BGE-M3 是 `bge-m3-local__1024__v1`。切换模型或维度时，先设置 `CODEX_MEMORY_EMBEDDING_PROFILE_VERSION` 和 `CODEX_MEMORY_RAG_PARAMS_PATH`，再依次运行：
+Embedding profile 会按 `<model>__<dimensions>__<version>` 生成 fingerprint，例如默认本地 BGE-M3 是 `bge-m3-local__1024__v1`。切换模型或维度时，先设置 `CODEX_MEMORY_EMBEDDING_PROFILE_VERSION` 和 `CODEX_MEMORY_RAG_PARAMS_PATH`。
+
+先做只读/轻写预检：
 
 ```powershell
 npm run rebuild-profile -- --dry-run --json
-npm run rebuild-profile -- --confirm --json
-npm run rebuild-shadow
 npm run profile-health
 npm run shadow-compare -- --query "your migration query"
 npm run profile-gate -- --baseline-fingerprint "<old-profile>" --summary-only --require-pass
+```
+
+只有在 dry-run、baseline、备份和迁移窗口都确认无误后，才执行会写本地 profile/shadow/index 状态的步骤：
+
+```powershell
+npm run rebuild-profile -- --confirm --json
+npm run rebuild-shadow
 ```
 
 默认 suite 在 [benchmarks/profile-migration-suite.json](/A:/codex-memory/benchmarks/profile-migration-suite.json)。没有 baseline 时门禁会给出 `warn`；需要把它作为硬门禁时，传 `--disallow-no-baseline --require-pass`。日常面板和 CI 建议加 `--summary-only`，避免输出完整 Top-K 明细。
@@ -464,7 +473,7 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
   - `readyCaseCount=34`
   - `extendedMismatchCountTotal=0`
 - `npm test`
-  - `106/106`
+  - `123/123`
 
 ## 排序 Tie-Breaker
 
@@ -507,7 +516,7 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 - `node --test .\tests\phase-c-active-recall.test.js`
   - `21/21`
 - `npm test`
-  - `92/92`
+  - `123/123`
 
 ## MCP 工具
 
@@ -1256,6 +1265,8 @@ $env:CODEX_MEMORY_LIGHTMEMO_DIRECTORY_MAP_JSON='{
 
 当你需要从 diary 重新构建 shadow store、向量索引和候选缓存时，可以运行：
 
+这是维护动作，会写本地 shadow/index/cache 状态；实现验证优先用 fixture tests，真实维护前先确认当前配置、备份点和回滚路径。
+
 ```powershell
 cd A:\codex-memory
 npm run rebuild-shadow
@@ -1298,6 +1309,8 @@ npm run start:http:watchdog:ensure
 ```
 
 安装 watchdog 开机自启：
+
+这会写入用户态自启动配置；只在明确要安装常驻 watchdog 时执行。
 
 ```powershell
 cd A:\codex-memory

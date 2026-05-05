@@ -482,7 +482,7 @@
   - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
     - `readyCaseCount = 34`
   - `extendedMismatchCountTotal = 0`
-  - `npm test = 106/106`
+  - `npm test = 123/123`
 
 ## 恢复点
 
