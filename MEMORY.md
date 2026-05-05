@@ -1,13 +1,26 @@
 ﻿# codex-memory Memory
 
-最后更新：2026-04-26
+最后更新：2026-05-05
 
 ## 当前边界
 
 - `A:\VCP\VCPToolBox` 与 `A:\VCP\VCPChat` 只作为 donor / behavior reference。
 - 后续实现继续只落在 `A:\codex-memory`。
 - 不再把 donor 项目当作运行时依赖，也不继续在 donor 仓库里做功能开发。
-- `docs/` 目录目前是本地参考资料，保持未跟踪，不纳入正式提交，除非后续明确整理成项目文档。
+- `docs/` 目录和治理/路线类文档现已纳入版本控制，作为当前仓库的参考与治理资料存在，但不覆盖 README / source / tests 所代表的运行时现实。
+
+## 2026-05-05 项目记忆
+
+- 当前 `main` 已推送到 `origin/main`，最新提交是 `c12a73b docs: record mainline gate checkpoint`。
+- 上一个文档基线提交是 `ccbeb3e docs: formalize documentation baseline and closure checkpoint`；当前远端主分支已连续包含这两次文档收口。
+- 新增运行检查点 [phase-e-mainline-gate-checkpoint-01.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-01.md)，并已从 [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) 挂到“日常运维 / 排障 / 回滚”入口。
+- 文档收口后的 `npm run gate:mainline` 已通过：
+  - `status: ok`
+  - health `200` at `http://127.0.0.1:7605/health`
+  - compare `34/34 matched`
+  - rollback `34/34 rollback-ready`
+- 当前可把这组结果当成新的 Phase E 维护锚点：它证明文档基线调整没有破坏默认 HTTP MCP 主链、compare 标准 suite 或 rollback readiness。
+- 当前仓库状态在这次检查点完成后为：`main` 本地与 `origin/main` 对齐，工作区 clean。
 
 ## 2026-04-26 项目记忆
 
