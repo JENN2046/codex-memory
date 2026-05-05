@@ -11,21 +11,15 @@
 
 ## 2026-05-05 项目记忆
 
-- 当前 `main` 已推送到 `origin/main`，最新提交是 `8e75d40 docs: add mainline gate checkpoint 11 and refresh memory`。
-- 本轮 `Phase E / P1-4` suite 扩容记录是 [phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)，已把 `TopicMemo GetTopicContent agentId/topicId alias` 成功路径正式纳入标准 suite。
-- 最新推送后运行检查点是 [phase-e-mainline-gate-checkpoint-11.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-11.md)，并已从 [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) / [PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md) 挂到“日常运维 / 排障 / 回滚”入口。
-- `4b51d6d` 推送后的 [phase-e-mainline-gate-checkpoint-11.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-11.md) 与 `npm run gate:mainline` 已通过：
+- 当前 `main` 已推送到 `origin/main`，最新远端提交是 `c70b00e docs: sync phase e checkpoint 16`。
+- 本轮 `Phase E / P1-3` suite 扩容记录是 [phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)，已把 `TopicMemo GetTopicContent topicId alias topic-not-found` 错误路径正式纳入标准 suite。
+- 本轮 `Phase E / P1-3` 本地扩容后的 [phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md) 与 `npm run gate:mainline` 已通过：
   - `status: ok`
   - health `200` at `http://127.0.0.1:7605/health`
-  - compare `35/35 matched`
-  - rollback `35/35 rollback-ready`
-- 本轮 `Phase E / P1-4` 本地扩容后的 [phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md) 与 `npm run gate:mainline` 已通过：
-  - `status: ok`
-  - health `200` at `http://127.0.0.1:7605/health`
-  - compare `36/36 matched`
-  - rollback `36/36 rollback-ready`
-- 当前可把这组结果当成新的 Phase E suite 扩容候选锚点：它证明新增 alias case 后，默认 HTTP MCP 主链健康、compare 标准 suite 全匹配、rollback readiness 全绿。
-- 这组 P1-4 扩容结果仍需提交并推送后，才算正式进入远端主线。
+  - compare `37/37 matched`
+  - rollback `37/37 rollback-ready`
+- 当前可把这组结果当成新的 Phase E suite 扩容候选锚点：它证明新增错误语义 alias case 后，默认 HTTP MCP 主链健康、compare 标准 suite 全匹配、rollback readiness 全绿。
+- 这组 P1-3 扩容结果仍需提交并推送后，才算正式进入远端主线。
 
 ## 2026-04-26 项目记忆
 

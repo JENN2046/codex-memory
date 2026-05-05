@@ -63,6 +63,8 @@
 - Phase E / P1 `TopicMemo` `empty-history / history-read-error` 收口记录：[phase-e-error-diagnostics-02.md](/A:/codex-memory/logs/phase-e-error-diagnostics-02.md)
 - Phase E / P1 `TopicMemo` `GetTopicContent agent-not-found` 收口记录：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
 - Phase E / P1 错误语义标准 suite 门禁收口记录：[phase-e-error-semantics-suite-gate-01.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-01.md)
+- Phase E / P1-3 错误语义复验基线：[phase-e-error-semantics-suite-gate-02.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-02.md)
+- Phase E / P1-3 `TopicMemo` `topicId` alias 错误路径收口记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - Phase E / 标准 suite 扩容记录：
   [phase-e-standard-suite-expansion-01.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-01.md)
   [phase-e-standard-suite-expansion-02.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-02.md)
@@ -72,6 +74,7 @@
   [phase-e-standard-suite-expansion-06.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-06.md)
   [phase-e-standard-suite-expansion-07.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-07.md)
   [phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
+  [phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - Phase E / P1-2 排序 tie-breaker 收口记录：
   [phase-e-ordering-tiebreaker-01.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-01.md)
   [phase-e-ordering-tiebreaker-02.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-02.md)

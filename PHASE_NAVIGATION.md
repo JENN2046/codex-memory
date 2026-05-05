@@ -50,7 +50,9 @@
 - `TopicMemo empty-history / history-read-error`：[phase-e-error-diagnostics-02.md](/A:/codex-memory/logs/phase-e-error-diagnostics-02.md)
 - `TopicMemo GetTopicContent agent-not-found`：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
 - `TopicMemo GetTopicContent agentId/topicId alias`：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
+- `TopicMemo GetTopicContent topicId alias error`：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - 错误语义进标准 suite 门禁：[phase-e-error-semantics-suite-gate-01.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-01.md)
+- P1-3 错误语义与诊断输出复验基线（二）：[phase-e-error-semantics-suite-gate-02.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-02.md)
 - donor 别名字段：[phase-e-deepmemo-donor-alias-meta-01.md](/A:/codex-memory/logs/phase-e-deepmemo-donor-alias-meta-01.md)
 - query 别名字段：[phase-e-deepmemo-query-alias-meta-01.md](/A:/codex-memory/logs/phase-e-deepmemo-query-alias-meta-01.md)
 - 文档收口检查点：[phase-e-documentation-closure-checkpoint-01.md](/A:/codex-memory/logs/phase-e-documentation-closure-checkpoint-01.md)
@@ -88,7 +90,7 @@
 
 - 运行记录汇总：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 - 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-16.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-16.md)
-- 最新 suite 扩容记录：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
+- 最新 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 
 ## 想继续推进什么
 

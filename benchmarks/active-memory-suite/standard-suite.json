@@ -634,6 +634,25 @@
       }
     },
     {
+      "name": "topicmemo-gettopiccontent-missing-topic-topicid-alias",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-missing-topic-topicid-alias.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "topic-state",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-topic",
+          "topic-id",
+          "alias"
+        ]
+      }
+    },
+    {
       "name": "topicmemo-gettopiccontent-history-read-error",
       "tool": "topicmemo",
       "inputFile": "./inputs/topicmemo-gettopiccontent-history-read-error.json",

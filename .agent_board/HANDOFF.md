@@ -2,42 +2,50 @@
 
 ## Goal
 
-Prepare the sustained autopilot rail change set for a clean, separate commit.
+Prepare the P1-3 error semantics suite expansion for a clean, separate commit.
 
 ## Safe State
 
-Runtime code is not being changed. The active worktree changes are documentation, policy, board files, and local validation scripts.
+Runtime code is not being changed. The active worktree changes are standard suite fixtures/tests plus documentation and board records.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: autopilot rail changes present locally
+- Worktree: P1-3 suite expansion changes present locally
 
 ## Queue Summary
 
-- done: P1-4 suite expansion, P2-1 checkpoint index
-- in_progress: CM-0003 autopilot rail review
+- done: P1-3 baseline record, P1-3 suite expansion case, compare/rollback/mainline validation
+- in_progress: P1-3 local change set review
 - blocked: none
 - remaining: stage, then wait for commit approval
 
 ## Changed Files
 
-- `AGENTS.md`
 - `.agent_board/*.md`
-- `README_CODEX_MEMORY_AUTOPILOT.md`
-- `scripts/validate-local.ps1`
-- `scripts/validate-local.sh`
+- `benchmarks/active-memory-suite/inputs/topicmemo-gettopiccontent-missing-topic-topicid-alias.json`
+- `benchmarks/active-memory-suite/standard-suite.json`
+- `tests/compare-vcp-active-memory-cli.test.js`
+- `tests/rollback-active-memory-cli.test.js`
+- `logs/phase-e-error-semantics-suite-gate-02.md`
+- `logs/phase-e-standard-suite-expansion-09.md`
+- `PHASE_E_BACKLOG.md`
+- `PHASE_E_CHECKPOINT_INDEX.md`
+- `PHASE_E_DAILY_SELF_CHECK.md`
+- `PHASE_NAVIGATION.md`
 
 ## Validation Evidence
 
-- npm test: not run
-- gate:mainline: not run for autopilot rail; last pushed mainline was green after `1159873`
+- npm test: passed (`123/123`)
+- gate:mainline: passed for local P1-3 expansion
 - gate:mainline:strict: not run
-- validate-local.ps1 docs path: passed after fixing argument forwarding
-- validate-local.sh syntax: passed
-- compare suite: latest known `36/36 matched`
-- rollback suite: latest known `36/36 rollback-ready`
+- compare harness test: `14/14`
+- rollback harness test: `11/11`
+- compare suite: latest known `37/37 matched`
+- rollback suite: latest known `37/37 rollback-ready`
+- topic-state compare/rollback: latest known `5/5`
+- git diff --check: passed
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -46,7 +54,7 @@ Runtime code is not being changed. The active worktree changes are documentation
 
 - MCP mode: HTTP mainline assumption, verify before runtime claims
 - HTTP health: latest known `200` from gate
-- Rollback readiness: latest known `36/36 rollback-ready`
+- Rollback readiness: latest known `37/37 rollback-ready`
 - Audit impact: none expected
 - Recall impact: none expected
 
@@ -56,12 +64,12 @@ Runtime code is not being changed. The active worktree changes are documentation
 
 ## Decisions
 
-- Keep sustained autopilot rail separate from runtime changes.
+- Keep P1-3 suite/test expansion separate from unrelated policy or runtime changes.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Stage only the autopilot files and stop before commit.
+Inspect diff, then stage/commit only after explicit local commit authorization.
 
 ## Warnings
 

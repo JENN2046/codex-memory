@@ -14,14 +14,15 @@
 
 ## 当前最新状态
 
-- 最新远端主线提交：`7c2a234 docs: add mainline gate checkpoint 15`
+- 最新远端主线提交：`c70b00e docs: sync phase e checkpoint 16`
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-16.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-16.md)
-- 最新标准 suite 扩容记录：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
-- `7c2a234` 当前本地/远端主线状态已复核 `git status --short` + `npm run gate:mainline`：
-  - `git status --short`：工作区干净
+- 最新标准 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
+- 最新 P1-3 错误语义记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
+- 当前本地 P1-3 suite 扩容已复核 `npm run gate:mainline`：
+  - `git status --short`：工作区存在本轮未提交变更
   - health：`ok`，`httpStatus=200`
-  - compare：`36/36 matched`
-  - rollback：`36/36 rollback-ready`
+  - compare：`37/37 matched`
+  - rollback：`37/37 rollback-ready`
 
 ## 日常运行记录
 
@@ -66,6 +67,13 @@
 - suite 扩容 06：[phase-e-standard-suite-expansion-06.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-06.md)
 - suite 扩容 07：[phase-e-standard-suite-expansion-07.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-07.md)
 - suite 扩容 08：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
+- suite 扩容 09：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
+
+## P1-3 错误语义与诊断基线
+
+- baseline 01：[phase-e-error-semantics-suite-gate-01.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-01.md)
+- baseline 02：[phase-e-error-semantics-suite-gate-02.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-02.md)
+- suite 扩容 09：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 
 ## 后续维护规则
 

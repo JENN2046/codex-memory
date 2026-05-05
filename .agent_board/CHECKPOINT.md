@@ -2,44 +2,52 @@
 
 ## Current Goal
 
-Track P0/P1 runbook and health-visibility baseline updates for default mainline stability and observability.
+Track P1-3 error semantics suite expansion and current mainline validation state.
 
 ## Current Area
 
-P0-mainline-health / HTTP runtime observability
+P1-donor-compatibility / error semantics and diagnostics
 
 ## Current Status
 
-In progress. Mainline observability snapshot is under collection in `phase-e-http-observability-04.md`.
+In progress. `topicmemo-gettopiccontent-missing-topic-topicid-alias` is added locally and validated.
 
 ## Completed Work
 
 - P1-4 suite expansion committed as `1159873` and pushed to `origin/main`.
 - P2-1 checkpoint index committed as `57aa164` and pushed to `origin/main`.
-- Remaining autopilot/AGENTS-related files identified as a separate local change group.
-- HTTP MCP 运行态观察 `phase-e-http-observability-04.md` 已落盘。
+- P1-3 baseline record `phase-e-error-semantics-suite-gate-02.md` prepared.
+- P1-3 suite expansion record `phase-e-standard-suite-expansion-09.md` prepared.
+- Standard suite expanded to `37` cases with `TopicMemo GetTopicContent topicId alias` error coverage.
 
 ## Changed Files
 
-- `AGENTS.md`
 - `.agent_board/*.md`
-- `README_CODEX_MEMORY_AUTOPILOT.md`
-- `scripts/validate-local.ps1`
-- `scripts/validate-local.sh`
-- `logs/phase-e-http-observability-04.md`
+- `benchmarks/active-memory-suite/inputs/topicmemo-gettopiccontent-missing-topic-topicid-alias.json`
+- `benchmarks/active-memory-suite/standard-suite.json`
+- `tests/compare-vcp-active-memory-cli.test.js`
+- `tests/rollback-active-memory-cli.test.js`
+- `logs/phase-e-error-semantics-suite-gate-02.md`
+- `logs/phase-e-standard-suite-expansion-09.md`
+- `PHASE_E_BACKLOG.md`
 - `PHASE_E_CHECKPOINT_INDEX.md`
+- `PHASE_E_DAILY_SELF_CHECK.md`
+- `PHASE_NAVIGATION.md`
 
 ## Validation Run
 
-- `git diff --check -- AGENTS.md README_CODEX_MEMORY_AUTOPILOT.md scripts/validate-local.ps1 scripts/validate-local.sh .agent_board/*.md` passed.
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` initially failed because `Run-Step` did not pass command args to `git`; fixed and reran successfully.
-- `bash -n ./scripts/validate-local.sh` passed.
-- `npm run observe:http -- --json` executed and returned `warn` health with HTTP status 200, watchdog recoveries, and zero HTTP errors.
-- `npm run gate:mainline` executed locally and passed (`health`/`compare`/`rollback` all `ok`).
+- `node --test .\tests\compare-vcp-active-memory-cli.test.js` passed (`14/14`).
+- `node --test .\tests\rollback-active-memory-cli.test.js` passed (`11/11`).
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match` passed (`37/37 matched`).
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready` passed (`37/37 rollback-ready`).
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category topic-state --json --require-match` passed (`5/5 matched`).
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category topic-state --json --require-ready` passed (`5/5 rollback-ready`).
+- `npm run gate:mainline` passed (`health`/`compare`/`rollback` all `ok`).
+- `git diff --check` passed.
+- `npm test` passed (`123/123`).
 
 ## Validation Not Run
 
-- `npm test`
 - `npm run gate:mainline:strict`
 
 
@@ -49,9 +57,9 @@ In progress. Mainline observability snapshot is under collection in `phase-e-htt
 |---|---|
 | MCP mode | HTTP mainline assumption; verify before runtime claims |
 | HTTP health | latest known `200` from mainline gate |
-| Mainline gate | last pushed mainline verification passed after `a7c96f9` |
-| Compare suite | latest known baseline `36/36 matched` |
-| Rollback readiness | latest known baseline `36/36 rollback-ready` |
+| Mainline gate | local P1-3 expansion verification passed |
+| Compare suite | latest known baseline `37/37 matched` |
+| Rollback readiness | latest known baseline `37/37 rollback-ready` |
 | Profile gate | not run |
 | Provider smoke | not run |
 
@@ -60,7 +68,7 @@ In progress. Mainline observability snapshot is under collection in `phase-e-htt
 - Write audit impact: none expected
 - Recall audit impact: none expected
 - Shadow/index impact: none expected
-- Active-memory impact: none expected
+- Active-memory impact: standard suite fixture coverage only; runtime code unchanged
 
 ## Current Blockers
 
@@ -68,14 +76,14 @@ In progress. Mainline observability snapshot is under collection in `phase-e-htt
 
 ## Remaining Risks
 
-- `AGENTS.md` is a large policy rewrite and should be committed separately from runtime or suite changes.
-- Local validation scripts must remain local-only and must not imply remote authorization.
+- Local suite expansion is validated but not committed.
+- Push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Stage HTTP observability + board同步变更；完成后若授权可提交当前 `checkpoint` 聚合点。
+Inspect diff, then stage/commit only after explicit local commit authorization. Push still requires explicit remote authorization.
 
 ## Last Local Commit
 
-- `57aa164 docs: add phase e checkpoint index`
+- `c70b00e docs: sync phase e checkpoint 16`
 
