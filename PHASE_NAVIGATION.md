@@ -73,6 +73,10 @@
 - HTTP observe：`npm run observe:http`
 - rollback plan：`npm run rollback:mainline:plan`
 
+日常入口：
+
+- Phase E 日常自检：[PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)
+
 对应运行记录：
 
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-01.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-01.md)

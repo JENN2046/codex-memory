@@ -42,6 +42,8 @@
 
 ### P0-1 持续门禁常态化
 
+状态：已落地为日常入口：[PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)
+
 目标：
 
 - 把 compare / rollback 从“阶段性验证工具”收成默认主链的日常门禁
