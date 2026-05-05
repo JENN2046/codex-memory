@@ -63,6 +63,8 @@
 
 ### P0-2 HTTP MCP 运行态可观测性再补一层
 
+状态：已落地为运行态排障入口：[PHASE_E_HTTP_OBSERVABILITY.md](/A:/codex-memory/PHASE_E_HTTP_OBSERVABILITY.md)
+
 目标：
 
 - 让默认主链在日常使用里更容易定位“健康但不好用”这类问题
