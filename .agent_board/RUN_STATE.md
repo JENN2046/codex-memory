@@ -6,17 +6,17 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P1-3 DeepMemo keyword alias error-meta cases |
-| Current area | P1-donor-compatibility |
-| Last action | Added `deepmemo-missing-maid-keyword-alias` and `deepmemo-agent-not-found-keyword-alias`; aligned DeepMemo error meta alias extraction |
-| Last validation | `npm run gate:mainline` passed with health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`; `npm test` passed `123/123`; `git diff --check` passed |
-| Worktree summary | 本地有未提交的 P1-3 两个小 case 变更；按用户要求暂不生成正式 checkpoint 日志，等待下一批聚合 |
+| Current task | Mainline gate checkpoint 18 |
+| Current area | P0-mainline-health |
+| Last action | Pushed `56c647a` to `origin/main`, then ran `git status --short` and `npm run gate:mainline`; prepared checkpoint-18 documentation locally |
+| Last validation | push succeeded (`a386bed..56c647a`), `git status --short` was clean, `npm run gate:mainline` passed with health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready` |
+| Worktree summary | 已补 `phase-e-mainline-gate-checkpoint-18.md`，并更新 checkpoint index / daily self-check / agent board，尚未提交 |
 | Mainline assumption | HTTP MCP 7605 is reachable; health remains ok but monitor recovery pattern |
 | Legacy rollback assumption | 6005 target may exist, verify via `rollback:mainline:plan` |
 | Active-memory suite status | `39/39 matched`, `39/39 rollback-ready` |
 | Guarded auto-commit allowed | no remote write; local commit only with explicit user approval in this session |
-| Last checkpoint | `logs/phase-e-mainline-gate-checkpoint-17.md` committed and pushed as `a386bed` |
-| Next planned action | 等待用户授权聚合提交，或继续补第三个低风险 P1-3 小 case；推送仍需显式远端授权 |
+| Last checkpoint | `logs/phase-e-mainline-gate-checkpoint-18.md` prepared（对应 `56c647a` 推送后主线绿灯复核） |
+| Next planned action | 检查 diff 后等待本地提交授权；推送仍需显式远端授权 |
 
 ## Notes
 

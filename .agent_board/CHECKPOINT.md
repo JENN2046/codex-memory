@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-Track the local P1-3 DeepMemo keyword-alias error-meta cases and current validation state.
+Track `56c647a` push-after mainline gate checkpoint and current validation state.
 
 ## Current Area
 
-P1-donor-compatibility / error semantics and diagnostics
+P0-mainline-health / push-after validation
 
 ## Current Status
 
-Completed locally and validated. The worktree now contains uncommitted P1-3 suite/runtime/test changes for two small cases; no formal checkpoint log was created yet because the user asked to wait for the next batch.
+In progress. `56c647a` has been pushed to `origin/main`; checkpoint-18 log is prepared locally.
 
 ## Completed Work
 
@@ -27,6 +27,9 @@ Completed locally and validated. The worktree now contains uncommitted P1-3 suit
 - Updated DeepMemo CLI error meta to preserve `key_word` / `KeyWord` aliases in `keyword` / `query` diagnostics.
 - Added `deepmemo-agent-not-found-keyword-alias` to the standard suite.
 - Standard suite expanded to `39` cases.
+- `56c647a` committed and pushed to `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed.
+- Mainline checkpoint record `phase-e-mainline-gate-checkpoint-18.md` prepared.
 
 ## Changed Files
 
@@ -45,6 +48,7 @@ Completed locally and validated. The worktree now contains uncommitted P1-3 suit
 - `benchmarks/active-memory-suite/inputs/deepmemo-missing-maid-keyword-alias.json`
 - `benchmarks/active-memory-suite/inputs/deepmemo-agent-not-found-keyword-alias.json`
 - `src/cli/deepmemo.js`
+- `logs/phase-e-mainline-gate-checkpoint-18.md`
 
 ## Validation Run
 
@@ -74,6 +78,9 @@ Completed locally and validated. The worktree now contains uncommitted P1-3 suit
 - `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
 - `npm test` passed (`123/123`).
 - `git diff --check` passed.
+- `git push origin main` succeeded (`a386bed..56c647a`).
+- Push-after `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
 
 ## Validation Not Run
 
@@ -105,15 +112,14 @@ Completed locally and validated. The worktree now contains uncommitted P1-3 suit
 
 ## Remaining Risks
 
-- P1-3 alias cases are local and uncommitted.
-- Formal checkpoint log for this alias case is intentionally deferred to the next batch.
+- Checkpoint-18 log is prepared locally but not committed.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Wait for explicit local commit authorization to aggregate this batch, or continue with one more small P1-3 case. Push still requires explicit remote authorization.
+Inspect diff, then stage/commit checkpoint-18 only after explicit local commit authorization. Push still requires explicit remote authorization.
 
 ## Last Local Commit
 
-- `a386bed docs: add mainline gate checkpoint 17`
+- `56c647a test: add deepmemo keyword alias error cases`
 

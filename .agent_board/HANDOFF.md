@@ -2,39 +2,36 @@
 
 ## Goal
 
-Continue P1-3 error semantics hardening with two local DeepMemo keyword-alias diagnostic cases.
+Prepare checkpoint-18 for a clean, separate commit after `56c647a` was pushed.
 
 ## Safe State
 
-Local changes are small and validated. No commit or push has been performed for this batch. Push remains a hard stop without explicit user authorization.
+Runtime code is not being changed. The active worktree changes are checkpoint-18 documentation and board/entrypoint records.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: P1-3 local changes present and uncommitted
+- Worktree: checkpoint-18 documentation changes present locally
 
 ## Queue Summary
 
-- done: checkpoint-17 committed/pushed as `a386bed`; P1-3 DeepMemo missing-maid and agent-not-found keyword-alias cases implemented and validated locally
-- in_progress: waiting to aggregate next small case or commit batch
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; push-after gate passed
+- in_progress: checkpoint-18 documentation record
 - blocked: none
-- remaining: add one more P1-3 case or request explicit commit authorization
+- remaining: stage, then wait for commit approval
 
 ## Changed Files
 
 - `.agent_board/*.md`
-- `src/cli/deepmemo.js`
-- `benchmarks/active-memory-suite/inputs/deepmemo-missing-maid-keyword-alias.json`
-- `benchmarks/active-memory-suite/inputs/deepmemo-agent-not-found-keyword-alias.json`
-- `benchmarks/active-memory-suite/standard-suite.json`
-- `tests/compare-vcp-active-memory-cli.test.js`
-- `tests/rollback-active-memory-cli.test.js`
+- `PHASE_E_CHECKPOINT_INDEX.md`
+- `PHASE_E_DAILY_SELF_CHECK.md`
+- `logs/phase-e-mainline-gate-checkpoint-18.md`
 
 ## Validation Evidence
 
 - npm test: passed (`123/123`)
-- gate:mainline: passed locally with compare `39/39` and rollback `39/39`
+- gate:mainline: passed after `56c647a` push
 - gate:mainline:strict: not run
 - compare harness test: `14/14`
 - rollback harness test: `11/11`
@@ -45,6 +42,7 @@ Local changes are small and validated. No commit or push has been performed for 
 - agent-selection compare/rollback: latest known `8/8`
 - git diff --check: passed
 - push-after gate: latest pushed checkpoint `a386bed` previously passed; this local batch is not pushed
+- push-after gate: passed after `56c647a`
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -63,13 +61,12 @@ Local changes are small and validated. No commit or push has been performed for 
 
 ## Decisions
 
-- Keep DeepMemo error meta alias extraction aligned with runtime query alias support across missing-maid and agent-not-found errors.
-- Defer a formal checkpoint log until the next batch, per user instruction.
+- Keep checkpoint-18 as a small documentation checkpoint.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Stage/commit the current P1-3 batch only after explicit local commit authorization, or add one more low-risk P1-3 case first.
+Inspect diff, then stage/commit checkpoint-18 only after explicit local commit authorization.
 
 ## Warnings
 
