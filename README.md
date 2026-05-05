@@ -67,6 +67,7 @@
   [phase-e-ordering-tiebreaker-04.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-04.md)
   [phase-e-ordering-tiebreaker-05.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-05.md)
 - Phase E / 文档收口检查点：[phase-e-documentation-closure-checkpoint-01.md](/A:/codex-memory/logs/phase-e-documentation-closure-checkpoint-01.md)
+- Phase E / `MEMORY.md` 状态 handoff：[phase-e-memory-status-handoff-01.md](/A:/codex-memory/logs/phase-e-memory-status-handoff-01.md)
 
 ## 架构分层
 
