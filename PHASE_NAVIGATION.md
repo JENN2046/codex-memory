@@ -1,6 +1,6 @@
 # Phase Navigation
 
-更新时间：2026-04-23
+更新时间：2026-05-05
 
 ## 先看哪里
 
@@ -75,6 +75,7 @@
 
 对应运行记录：
 
+- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-01.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-01.md)
 - 回滚演练：[phase-e-mainline-rollback-drill-01.md](/A:/codex-memory/logs/phase-e-mainline-rollback-drill-01.md)
 
 ## 想继续推进什么
