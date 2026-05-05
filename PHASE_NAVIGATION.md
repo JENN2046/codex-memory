@@ -89,6 +89,7 @@
 - HTTP MCP 运行态观察：[phase-e-http-observability-03.md](/A:/codex-memory/logs/phase-e-http-observability-03.md)
 - 回滚 runbook 验收：[phase-e-rollback-runbook-01.md](/A:/codex-memory/logs/phase-e-rollback-runbook-01.md)
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-01.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-01.md)
+- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-02.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-02.md)
 - `MEMORY.md` 状态 handoff：[phase-e-memory-status-handoff-01.md](/A:/codex-memory/logs/phase-e-memory-status-handoff-01.md)
 - 回滚演练：[phase-e-mainline-rollback-drill-01.md](/A:/codex-memory/logs/phase-e-mainline-rollback-drill-01.md)
 
