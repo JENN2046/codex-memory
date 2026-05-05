@@ -11,10 +11,10 @@
 
 ## 2026-05-05 项目记忆
 
-- 当前 `main` 已推送到 `origin/main`，最新提交是 `c12a73b docs: record mainline gate checkpoint`。
-- 上一个文档基线提交是 `ccbeb3e docs: formalize documentation baseline and closure checkpoint`；当前远端主分支已连续包含这两次文档收口。
-- 新增运行检查点 [phase-e-mainline-gate-checkpoint-01.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-01.md)，并已从 [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) 挂到“日常运维 / 排障 / 回滚”入口。
-- 文档收口后的 `npm run gate:mainline` 已通过：
+- 当前 `main` 已推送到 `origin/main`，最新提交是 `dd2fb50 docs: add phase e mainline gate checkpoint 02`。
+- 上一个文档收口提交是 `28a8fa9 chore(docs): add phase e http observability 03 snapshot and links`；当前远端主分支已连续包含这两次文档收口。
+- 新增运行检查点 [phase-e-mainline-gate-checkpoint-02.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-02.md)，并已从 [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) / [PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md) 挂到“日常运维 / 排障 / 回滚”入口。
+- 文档收口后的 [phase-e-mainline-gate-checkpoint-02.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-02.md) 与 `npm run gate:mainline` 已通过：
   - `status: ok`
   - health `200` at `http://127.0.0.1:7605/health`
   - compare `34/34 matched`
