@@ -96,6 +96,7 @@
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-05.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-05.md)
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-06.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-06.md)
 - 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-07.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-07.md)
+- 主线 gate 检查点：[phase-e-mainline-gate-checkpoint-08.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-08.md)
 - `MEMORY.md` 状态 handoff：[phase-e-memory-status-handoff-01.md](/A:/codex-memory/logs/phase-e-memory-status-handoff-01.md)
 - 回滚演练：[phase-e-mainline-rollback-drill-01.md](/A:/codex-memory/logs/phase-e-mainline-rollback-drill-01.md)
 
