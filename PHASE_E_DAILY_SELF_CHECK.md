@@ -27,7 +27,7 @@ npm run gate:mainline
 - compare：`37/37 matched`
 - rollback：`37/37 rollback-ready`
 - 最新 suite 收口记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
-- 最新 gate 复核记录：[phase-e-mainline-gate-checkpoint-16.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-16.md)
+- 最新 gate 复核记录：[phase-e-mainline-gate-checkpoint-17.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-17.md)
 - 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 
 ## 什么时候跑严格门禁
@@ -99,7 +99,7 @@ npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\stand
 ## 当前参考记录
 
 - 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
-- 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-16.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-16.md)
+- 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-17.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-17.md)
 - 最新 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 
 ## 一句话结论

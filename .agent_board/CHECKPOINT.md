@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-Track P1-3 error semantics suite expansion and current mainline validation state.
+Track `a39c1ff` push-after mainline gate checkpoint and current validation state.
 
 ## Current Area
 
-P1-donor-compatibility / error semantics and diagnostics
+P0-mainline-health / push-after validation
 
 ## Current Status
 
-In progress. `topicmemo-gettopiccontent-missing-topic-topicid-alias` is added locally and validated.
+In progress. `a39c1ff` has been pushed to `origin/main`; checkpoint-17 log is prepared locally.
 
 ## Completed Work
 
@@ -19,6 +19,9 @@ In progress. `topicmemo-gettopiccontent-missing-topic-topicid-alias` is added lo
 - P1-3 baseline record `phase-e-error-semantics-suite-gate-02.md` prepared.
 - P1-3 suite expansion record `phase-e-standard-suite-expansion-09.md` prepared.
 - Standard suite expanded to `37` cases with `TopicMemo GetTopicContent topicId alias` error coverage.
+- `a39c1ff` committed and pushed to `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed.
+- Mainline checkpoint record `phase-e-mainline-gate-checkpoint-17.md` prepared.
 
 ## Changed Files
 
@@ -33,6 +36,7 @@ In progress. `topicmemo-gettopiccontent-missing-topic-topicid-alias` is added lo
 - `PHASE_E_CHECKPOINT_INDEX.md`
 - `PHASE_E_DAILY_SELF_CHECK.md`
 - `PHASE_NAVIGATION.md`
+- `logs/phase-e-mainline-gate-checkpoint-17.md`
 
 ## Validation Run
 
@@ -45,6 +49,9 @@ In progress. `topicmemo-gettopiccontent-missing-topic-topicid-alias` is added lo
 - `npm run gate:mainline` passed (`health`/`compare`/`rollback` all `ok`).
 - `git diff --check` passed.
 - `npm test` passed (`123/123`).
+- `git push origin main` succeeded (`c70b00e..a39c1ff`).
+- Push-after `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `37/37 matched`, rollback `37/37 rollback-ready`.
 
 ## Validation Not Run
 
@@ -57,7 +64,7 @@ In progress. `topicmemo-gettopiccontent-missing-topic-topicid-alias` is added lo
 |---|---|
 | MCP mode | HTTP mainline assumption; verify before runtime claims |
 | HTTP health | latest known `200` from mainline gate |
-| Mainline gate | local P1-3 expansion verification passed |
+| Mainline gate | push-after `a39c1ff` verification passed |
 | Compare suite | latest known baseline `37/37 matched` |
 | Rollback readiness | latest known baseline `37/37 rollback-ready` |
 | Profile gate | not run |
@@ -76,14 +83,14 @@ In progress. `topicmemo-gettopiccontent-missing-topic-topicid-alias` is added lo
 
 ## Remaining Risks
 
-- Local suite expansion is validated but not committed.
-- Push remains a hard stop without explicit remote authorization.
+- Checkpoint-17 log is prepared locally but not committed.
+- Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Inspect diff, then stage/commit only after explicit local commit authorization. Push still requires explicit remote authorization.
+Inspect diff, then stage/commit checkpoint-17 only after explicit local commit authorization. Push still requires explicit remote authorization.
 
 ## Last Local Commit
 
-- `c70b00e docs: sync phase e checkpoint 16`
+- `a39c1ff test: add p1-3 topicmemo topicid error suite case`
 

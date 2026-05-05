@@ -2,43 +2,37 @@
 
 ## Goal
 
-Prepare the P1-3 error semantics suite expansion for a clean, separate commit.
+Prepare checkpoint-17 for a clean, separate commit after `a39c1ff` was pushed.
 
 ## Safe State
 
-Runtime code is not being changed. The active worktree changes are standard suite fixtures/tests plus documentation and board records.
+Runtime code is not being changed. The active worktree changes are checkpoint-17 documentation and board/entrypoint records.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: P1-3 suite expansion changes present locally
+- Worktree: checkpoint-17 documentation changes present locally
 
 ## Queue Summary
 
-- done: P1-3 baseline record, P1-3 suite expansion case, compare/rollback/mainline validation
-- in_progress: P1-3 local change set review
+- done: P1-3 suite expansion committed as `a39c1ff` and pushed to `origin/main`; push-after gate passed
+- in_progress: checkpoint-17 documentation record
 - blocked: none
 - remaining: stage, then wait for commit approval
 
 ## Changed Files
 
 - `.agent_board/*.md`
-- `benchmarks/active-memory-suite/inputs/topicmemo-gettopiccontent-missing-topic-topicid-alias.json`
-- `benchmarks/active-memory-suite/standard-suite.json`
-- `tests/compare-vcp-active-memory-cli.test.js`
-- `tests/rollback-active-memory-cli.test.js`
-- `logs/phase-e-error-semantics-suite-gate-02.md`
-- `logs/phase-e-standard-suite-expansion-09.md`
-- `PHASE_E_BACKLOG.md`
 - `PHASE_E_CHECKPOINT_INDEX.md`
 - `PHASE_E_DAILY_SELF_CHECK.md`
 - `PHASE_NAVIGATION.md`
+- `logs/phase-e-mainline-gate-checkpoint-17.md`
 
 ## Validation Evidence
 
 - npm test: passed (`123/123`)
-- gate:mainline: passed for local P1-3 expansion
+- gate:mainline: passed after `a39c1ff` push
 - gate:mainline:strict: not run
 - compare harness test: `14/14`
 - rollback harness test: `11/11`
@@ -46,6 +40,7 @@ Runtime code is not being changed. The active worktree changes are standard suit
 - rollback suite: latest known `37/37 rollback-ready`
 - topic-state compare/rollback: latest known `5/5`
 - git diff --check: passed
+- push-after gate: passed after `a39c1ff`
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -64,12 +59,12 @@ Runtime code is not being changed. The active worktree changes are standard suit
 
 ## Decisions
 
-- Keep P1-3 suite/test expansion separate from unrelated policy or runtime changes.
+- Keep checkpoint-17 as a small documentation checkpoint.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Inspect diff, then stage/commit only after explicit local commit authorization.
+Inspect diff, then stage/commit checkpoint-17 only after explicit local commit authorization.
 
 ## Warnings
 
