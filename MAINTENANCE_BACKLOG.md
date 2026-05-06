@@ -43,13 +43,15 @@
 | M-006 | docs-governance | A0 | todo | 文档入口继续压缩，减少重复 checkpoint 噪音 | `git diff --check` / link check | 优先改索引和导航，不堆 README |
 | M-007 | docs-governance | A0 | todo | `.agent_board` board-only 记录按批次聚合 | diff inspection | 不为普通 push-after gate 创建 checkpoint-20 |
 | M-008 | next-phase | A1 | todo | 准备 Phase F / Codex-Claude memory governance / client scope 的候选计划 | docs review / no runtime change | 只是候选计划，不自动启动新阶段 |
+| M-009 | claude-client | A1 | partial | Claude MCP 接入最小验收 | HTTP health / `claude mcp list` / docs check；实际 `claude mcp add` 需授权 | 预检已完成，等待授权写入 Claude 配置 |
 
 ## 推荐执行顺序
 
 1. `M-006` 和 `M-007`：先保持维护期入口清爽，避免 Phase E 收官后继续堆噪音。
 2. `M-001`：挑一个用户真实可感知的 donor case，补进标准 suite。
 3. `M-004`：只有需要 provider 证据时，再在明确授权下跑真实 benchmark 并留档。
-4. `M-008`：等维护期入口稳定后，再把下一阶段候选计划单独成文。
+4. `M-009`：明确授权后再执行 `claude mcp add`，完成 Claude Code 实机接入验收。
+5. `M-008`：等维护期入口稳定后，再把下一阶段候选计划单独成文。
 
 ## 授权边界
 
@@ -59,10 +61,12 @@
 - 小型 suite case 的本地准备
 - 只读 compare / rollback / gate
 - dry-run 型 profile 检查
+- Claude MCP 只读预检和验收文档更新
 
 需要明确授权：
 
 - `git push origin main`
+- `claude mcp add` / `claude mcp remove` 等会写入 Claude 配置的命令
 - 真实远端 `provider-smoke`
 - 真实远端 `provider-benchmark`
 - `rebuild-profile -- --confirm`

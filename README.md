@@ -58,6 +58,7 @@
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 - Phase E 最终收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 - 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+- Claude MCP 最小验收：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)
 - Phase E / 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 - Phase E / P1-1 扩展字段 drift 收口记录：[phase-e-extended-drift-closure-01.md](/A:/codex-memory/logs/phase-e-extended-drift-closure-01.md)
 - Phase E / P1-1 扩展字段 drift 复验记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)
@@ -188,6 +189,12 @@ npm run rebuild-shadow
 ```
 
 默认 suite 在 [benchmarks/profile-migration-suite.json](/A:/codex-memory/benchmarks/profile-migration-suite.json)。没有 baseline 时门禁会给出 `warn`；需要把它作为硬门禁时，传 `--disallow-no-baseline --require-pass`。日常面板和 CI 建议加 `--summary-only`，避免输出完整 Top-K 明细。
+
+## Codex / Claude 接入
+
+Claude MCP 接入先看：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。
+
+当前结论：Claude Code 本地 HTTP MCP 接入路径已完成预检；实际执行 `claude mcp add` 会写入 Claude 本地/用户配置，需要明确授权后再做。
 
 ## Codex 接入
 

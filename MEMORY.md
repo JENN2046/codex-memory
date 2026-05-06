@@ -21,6 +21,7 @@
 - Phase E 已补最终收官入口：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)；当前没有 Phase E open blocker，后续工作转入维护期增量任务。
 - `.agent_board` 的 `bcb2d84` board-only note 会纳入下一次维护期聚合提交。
 - 维护期第一批低风险任务已新增 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)，把 donor/provider/docs 后续项从 Phase E 迁出，作为维护期增量队列管理。
+- Claude MCP 最小验收入口已准备：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。当前已确认本机 `claude` CLI 可用、HTTP MCP health 可达、`claude mcp list` 可运行；实际 `claude mcp add` 仍需明确授权，因为它会写入 Claude 配置。
 
 ## 2026-05-05 项目记忆（历史快照）
 

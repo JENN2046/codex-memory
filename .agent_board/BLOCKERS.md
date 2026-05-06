@@ -3,6 +3,7 @@
 | ID | Status | Type | Area | Affected Task | Reason | Required Human Action | Created |
 |---|---|---|---|---|---|---|---|
 | CMB-0001 | closed | template | none | none | Template row retired | none | 2026-05-05 |
+| CMB-0002 | open | outside-workspace-write | P9-codex-claude-client-scope | CM-0025 | `claude mcp add` writes Claude local/user configuration outside `A:\codex-memory` | Explicitly authorize `claude mcp add --transport http --scope local vcp_codex_memory http://127.0.0.1:7605/mcp/codex-memory` | 2026-05-06 |
 
 ## Project-Specific Hard Stops
 

@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-Align the project target to a Codex/Claude-only memory service.
+Prepare Claude MCP minimal acceptance.
 
 ## Current Area
 
-P6-docs-drift
+P9-codex-claude-client-scope
 
 ## Current Status
 
-`bcb2d84 docs: add maintenance backlog` is already synchronized with `origin/main`. The latest local docs batch records the push-after gate result and aligns the final product target to `Codex` and `Claude`, removing generic multi-agent platform wording from goal/roadmap/architecture/policy docs. The result is recorded in `.agent_board`; no checkpoint-20 file was created.
+`bcb2d84 docs: add maintenance backlog` is already synchronized with `origin/main`. The local batch now also prepares Claude MCP minimal acceptance: local HTTP health and `claude mcp list` were checked without writing Claude config, and the actual `claude mcp add` step is documented as an explicit-authorization boundary.
 
 ## Completed Work
 
@@ -76,6 +76,10 @@ P6-docs-drift
 - Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
 - Project goal, roadmap, architecture, memory policy, validation policy, and maintenance docs now scope the product to `Codex` and `Claude`.
 - Historical fixture identifiers containing `multi-agent` were left unchanged because they are standard suite names, not product targets.
+- Added `CLAUDE_MCP_ACCEPTANCE.md`.
+- Added `logs/claude-mcp-minimal-acceptance-01.md`.
+- Linked Claude MCP acceptance from README, Phase navigation, status, memory, and maintenance backlog.
+- Recorded `claude mcp add` as blocked until explicitly authorized because it writes Claude config outside the workspace.
 
 ## Changed Files
 
@@ -116,6 +120,10 @@ P6-docs-drift
 - `MEMORY_POLICY.md`
 - `AGENTS.md`
 - `VALIDATION.md`
+- `CLAUDE_MCP_ACCEPTANCE.md`
+- `logs/claude-mcp-minimal-acceptance-01.md`
+- `.agent_board/BLOCKERS.md`
+- `.agent_board/DECISIONS.md`
 
 ## Validation Run
 
@@ -201,6 +209,11 @@ P6-docs-drift
 - `git diff --check` passed for the Codex/Claude target-scope docs batch, with CRLF warnings only.
 - Trailing whitespace scan passed.
 - Target wording scan passed for old product-target phrases.
+- `Get-Command claude` found `C:\Users\617\.local\bin\claude.exe` version `2.1.100.0`.
+- `Invoke-RestMethod -Uri 'http://127.0.0.1:7605/health'` returned `ok=true`, `protocol=streamable-http`, path `/mcp/codex-memory`.
+- `claude mcp list` ran successfully and showed `vcp_codex_memory` is not configured yet.
+- Final docs validation passed: `git diff --check`, trailing whitespace scan, and local link check.
+- `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
 
 ## Validation Not Run
 
@@ -234,12 +247,13 @@ P6-docs-drift
 
 ## Remaining Risks
 
-- Current local changes are a docs-governance aggregate batch: `bcb2d84` board-only post-push note plus Codex/Claude target-scope alignment.
+- Current local changes are a docs-governance/client-scope aggregate batch: `bcb2d84` board-only post-push note, Codex/Claude target-scope alignment, and Claude MCP minimal acceptance preflight.
+- Actual Claude configuration write remains blocked until explicit approval.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Run final diff inspection, then create a guarded local aggregate commit if the diff remains coherent. Stop before any new remote write.
+Create a guarded local commit for this docs/preflight batch. Stop before `claude mcp add` and any remote write.
 
 ## Last Local Commit
 

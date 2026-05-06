@@ -11,8 +11,9 @@
 3. 阶段结论：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 4. Phase E 收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 5. 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
-6. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
-7. Phase E 历史 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+6. Claude MCP 最小验收：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)
+7. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
+8. Phase E 历史 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
 
 ## 想确认“主链是否已经收官”
 
@@ -84,6 +85,7 @@
 - strict gate：`npm run gate:mainline:strict`
 - HTTP observe：`npm run observe:http`
 - rollback plan：`npm run rollback:mainline:plan`
+- Claude MCP acceptance：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)
 
 日常入口：
 

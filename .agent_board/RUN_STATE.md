@@ -6,17 +6,17 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | Align project target to Codex/Claude-only memory service |
-| Current area | P6-docs-drift |
-| Last action | Updated project goal / roadmap / architecture / memory policy / maintenance docs to remove generic multi-agent platform targeting and add Claude as the second first-class client |
-| Last validation | docs checks passed: `git diff --check` with CRLF warnings only, trailing whitespace scan clean, target wording scan clean |
-| Worktree summary | Local aggregate batch contains the `bcb2d84` board-only push-after result plus Codex/Claude target-scope docs alignment; no checkpoint-20 file was created |
+| Current task | Claude MCP minimal acceptance preflight |
+| Current area | P9-codex-claude-client-scope |
+| Last action | Added `CLAUDE_MCP_ACCEPTANCE.md` and the first preflight record; verified local HTTP health and `claude mcp list` without writing Claude config |
+| Last validation | docs/gate validated: `git diff --check`, trailing whitespace scan, local link check, and `npm run gate:mainline` passed; actual `claude mcp add` not run because it writes outside the workspace |
+| Worktree summary | Local batch contains Codex/Claude scope docs plus Claude MCP acceptance docs and `.agent_board` blocker state; no checkpoint-20 file was created |
 | Mainline assumption | HTTP MCP 7605 is reachable; health remains ok but monitor recovery pattern |
 | Legacy rollback assumption | 6005 target may exist, verify via `rollback:mainline:plan` |
 | Active-memory suite status | `39/39 matched`, `39/39 rollback-ready` |
 | Guarded auto-commit allowed | yes for this local docs-only maintenance batch after final diff inspection; push still requires explicit remote approval |
 | Last checkpoint | `logs/phase-e-mainline-gate-checkpoint-19.md`（对应 `000c149` 推送后主线绿灯复核）；`8e3ae8d` / `ba7031a` / `f40a6f6` / `13d7c6b` / `59f1b03` / `49537f6` / `bcb2d84` 推送后结果仅记入 `.agent_board`，暂不补 checkpoint-20 |
-| Next planned action | Run final diff inspection, then create a guarded local aggregate commit if the diff remains coherent; stop before any new remote write |
+| Next planned action | Create a guarded local commit for the Claude MCP acceptance/preflight batch; then stop before `claude mcp add` and any remote write |
 
 ## Notes
 

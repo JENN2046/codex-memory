@@ -25,7 +25,7 @@ P5-rollback-readiness
 P6-docs-drift
 P7-vcp-parity-hardening
 P8-memory-governance
-P9-multi-agent-arbitration
+P9-codex-claude-client-scope
 P10-observability-admin
 ```
 
@@ -55,3 +55,4 @@ P10-observability-admin
 | CM-0022 | 22 | done | P6-docs-drift | A0 | `MAINTENANCE_BACKLOG.md` / `PHASE_E_FINAL_CLOSEOUT.md` / `PHASE_NAVIGATION.md` / `README.md` / `STATUS.md` / `MEMORY.md` / `.agent_board` | Add maintenance backlog and migrate post-Phase-E donor/provider/docs follow-ups out of Phase E | `git diff --check` / trailing whitespace scan / referenced local file check / secret pattern scan | no runtime change | no | Docs-only maintenance entrypoint; no provider calls; no checkpoint-20 |
 | CM-0023 | 23 | done | P0-mainline-health | A0 | `.agent_board` | Record `bcb2d84` push-after gate result as board-only delayed note | `git push origin main` / `git status --short` / `npm run gate:mainline` | `39/39 rollback-ready` | yes | Push was already up to date; no checkpoint-20; aggregate this board note with the next maintenance batch |
 | CM-0024 | 24 | done | P6-docs-drift | A0 | `PROJECT_GOAL.md` / `ROADMAP.md` / `ARCHITECTURE.md` / `MEMORY_POLICY.md` / `AGENTS.md` / `VALIDATION.md` / status docs / `.agent_board` | Align final target from generic multi-agent platform to Codex/Claude-only memory service | `git diff --check` / trailing whitespace scan / target wording scan | no runtime change | no | Fixture identifiers such as `vchat-fixture-multi-agent` are historical test names and were not renamed |
+| CM-0025 | 25 | blocked | P9-codex-claude-client-scope | A1 | `CLAUDE_MCP_ACCEPTANCE.md` / `logs/claude-mcp-minimal-acceptance-01.md` / README/navigation/status/memory/backlog / `.agent_board` | Prepare Claude MCP minimal acceptance and preflight local HTTP path | HTTP health / `claude mcp list` / docs check / `npm run gate:mainline` | `39/39 rollback-ready` expected | yes | Preflight is ready; actual `claude mcp add` writes Claude config outside workspace and needs explicit authorization |
