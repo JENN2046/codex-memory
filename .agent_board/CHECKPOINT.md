@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-Polish Phase E P2-2 provider benchmark documentation so future provider/profile benchmark evidence has a reusable record template and clearer interpretation rules.
+Sync Phase E checkpoint/navigation docs to the current board-only push-after cadence.
 
 ## Current Area
 
-P3-provider-profile
+P6-docs-drift
 
 ## Current Status
 
-The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` only. P2-2 provider docs now include a benchmark record template, interpretation guidance, and clearer retention rules. The docs batch was committed locally as `3eaf11f`; no checkpoint-20 file was created.
+`13d7c6b` has been pushed to `origin/main`; one push-after gate passed and remains recorded in `.agent_board` only. The Phase E checkpoint index now points to `13d7c6b`, explains the board-only cadence, and keeps P2-2 provider report/template links findable. No checkpoint-20 file was created.
 
 ## Completed Work
 
@@ -52,6 +52,13 @@ The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` on
 - Linked the record template from `PHASE_E_PROVIDER_BENCHMARK.md` and `benchmarks/reports/README.md`.
 - Clarified provider benchmark留档粒度 and result interpretation order.
 - Updated `PHASE_E_BACKLOG.md` P2-2 status to reflect entrypoint, reports index, and record template coverage.
+- `3eaf11f docs: polish provider benchmark retention docs` pushed to `origin/main`.
+- `13d7c6b docs: sync p2-2 provider handoff state` pushed to `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed for `13d7c6b`.
+- Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
+- Updated `PHASE_E_CHECKPOINT_INDEX.md` to show `13d7c6b` as the latest remote mainline commit while keeping checkpoint-19 as the latest independent checkpoint.
+- Added a board-only push-after table for `8e3ae8d`, `ba7031a`, `f40a6f6`, and `13d7c6b`.
+- Linked provider benchmark reports and record template from Phase E navigation/summary surfaces.
 
 ## Changed Files
 
@@ -83,6 +90,7 @@ The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` on
 - `benchmarks/reports/README.md`
 - `benchmarks/provider-benchmark.md`
 - `logs/phase-e-provider-benchmark-record-template.md`
+- `PHASE_E_CHECKPOINT_INDEX.md`
 
 ## Validation Run
 
@@ -140,6 +148,13 @@ The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` on
 - Local link target check passed for referenced provider docs/template/report files.
 - Package script reference check passed for provider/profile/mainline commands.
 - High-confidence secret pattern scan passed.
+- `git push origin main` succeeded (`f40a6f6..13d7c6b`).
+- Pre-board-update `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git diff --check` passed for the P2-1 checkpoint index/navigation sync, with CRLF warnings only.
+- Trailing whitespace scan passed.
+- Referenced local file check passed for checkpoint/provider/navigation links.
+- High-confidence secret pattern scan passed.
 
 ## Validation Not Run
 
@@ -173,14 +188,14 @@ The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` on
 
 ## Remaining Risks
 
-- Local docs and `.agent_board` changes have been committed locally.
+- Current local docs and `.agent_board` changes form one coherent aggregate batch.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-If the user explicitly authorizes remote write, push the local commits to `origin/main`, then run one push-after `git status --short` + `npm run gate:mainline` and record the result in `.agent_board` only.
+Stop before remote write. If the user explicitly authorizes push, run `git push origin main`, then one push-after `git status --short` + `npm run gate:mainline`, and record the result in `.agent_board` only.
 
 ## Last Local Commit
 
-- `3eaf11f docs: polish provider benchmark retention docs` (local only; not pushed)
+- Current P2-1 docs navigation batch is local only until explicitly pushed; previous pushed commit is `13d7c6b docs: sync p2-2 provider handoff state`.
 

@@ -2,32 +2,31 @@
 
 ## Goal
 
-Polish Phase E P2-2 provider benchmark documentation with a reusable record template and clearer retention/interpretation guidance.
+Sync Phase E checkpoint/navigation docs to the current board-only push-after cadence.
 
 ## Safe State
 
-Runtime code is not being changed. The P2-2 provider benchmark guidance batch was committed locally as `3eaf11f`; the prior `f40a6f6` push-after gate note remains aggregated in the local history. Checkpoint-20 was not created.
+Runtime code is not being changed. The active worktree changes are docs-only P2-1 navigation/index updates plus board-only notes for the `13d7c6b` push-after gate result.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: local branch is ahead of `origin/main`; no checkpoint-20 file created
+- Worktree: P2-1 docs/navigation updates plus `.agent_board` changes present locally; no checkpoint-20 file created
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6` and pushed to `origin/main`; push-after gate passed; P2-2 provider benchmark record template added locally
-- in_progress: waiting for explicit remote authorization before push
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; push-after gate passed
+- in_progress: P2-1 docs navigation batch is local-only until explicit push authorization
 - blocked: none
 - remaining: push requires explicit remote authorization; after push run one `git status --short` + `npm run gate:mainline` and record the result in `.agent_board` only
 
 ## Changed Files
 
 - `.agent_board/*.md`
-- `PHASE_E_BACKLOG.md`
-- `PHASE_E_PROVIDER_BENCHMARK.md`
-- `benchmarks/reports/README.md`
-- `logs/phase-e-provider-benchmark-record-template.md`
+- `PHASE_E_CHECKPOINT_INDEX.md`
+- `PHASE_NAVIGATION.md`
+- `PHASE_E_SUMMARY.md`
 
 ## Validation Evidence
 
@@ -51,6 +50,8 @@ Runtime code is not being changed. The P2-2 provider benchmark guidance batch wa
 - provider benchmark docs validation: `git diff --check` passed with CRLF warnings only; package script references exist
 - provider reports index validation: `git diff --check` passed with CRLF warnings only; report links present; secret scan only found placeholder/safety text
 - provider record template validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; local link target check passed; package script reference check passed; high-confidence secret pattern scan passed
+- push-after gate: passed after `13d7c6b`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
+- P2-1 docs navigation validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -70,9 +71,10 @@ Runtime code is not being changed. The P2-2 provider benchmark guidance batch wa
 
 ## Decisions
 
-- Keep the `f40a6f6` push-after result as a board-only delayed note.
+- Keep the `13d7c6b` push-after result as a board-only delayed note.
 - Do not create checkpoint-20 unless a later batch needs a formal checkpoint.
 - Treat provider benchmark records as sanitized evidence for provider/profile comparison, not as a replacement for compare / rollback / mainline gate.
+- Keep checkpoint-19 as the latest independent checkpoint; board-only push-after gate results can stay in `.agent_board` until a later formal checkpoint is warranted.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
