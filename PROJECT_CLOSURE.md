@@ -37,11 +37,13 @@
   - `TopicMemo` 错误语义与路由边界收口
   - `DeepMemo` 错误 `meta` donor 别名层收口
   - donor 风格错误语义进入标准 suite 与 compare / rollback 门禁
+- `Phase E` 已最终收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 
 ## 当前稳定基线
 
-- 最新远端主线提交：`000c149 docs: add mainline gate checkpoint 18`
-- 最新推送后主线 gate 复核：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
+- 最新远端主线提交：`59f1b03 docs: sync phase e board-only checkpoint index`
+- 最新独立推送后主线 gate 复核：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
+- 最新 board-only 推送后主线 gate 复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0026`
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
   - `matchedCaseCount = 39`
   - `extendedMismatchCountTotal = 0`

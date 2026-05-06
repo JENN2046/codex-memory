@@ -10,6 +10,12 @@
 - `Phase E` 不再解决“能不能独立出来”
 - `Phase E` 主要解决“如何把默认主链继续打磨得更稳、更像 donor、更易维护”
 
+收官状态：
+
+- `Phase E` 已完成：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
+- 当前没有 Phase E open blocker
+- 后续 donor 边角、suite 扩容、provider benchmark 和文档压缩统一迁入维护期增量任务
+
 配套文档：
 
 - 默认主链切换结论：[PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md](/A:/codex-memory/PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md)
@@ -42,7 +48,7 @@
 
 ### P0-1 持续门禁常态化
 
-状态：已落地为日常入口：[PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)
+状态：已收口；日常入口：[PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)
 
 目标：
 
@@ -63,7 +69,7 @@
 
 ### P0-2 HTTP MCP 运行态可观测性再补一层
 
-状态：已落地为运行态排障入口：[PHASE_E_HTTP_OBSERVABILITY.md](/A:/codex-memory/PHASE_E_HTTP_OBSERVABILITY.md)
+状态：已收口；运行态排障入口：[PHASE_E_HTTP_OBSERVABILITY.md](/A:/codex-memory/PHASE_E_HTTP_OBSERVABILITY.md)
 
 目标：
 
@@ -84,7 +90,7 @@
 
 ### P0-3 回滚流程再收紧一层
 
-状态：已落地为只读回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
+状态：已收口；只读回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
 
 目标：
 
@@ -106,7 +112,7 @@
 
 ### P1-1 扩展字段 drift 收口
 
-状态：当前标准 suite 已扩至 `39/39 matched`，`extendedMismatchCountTotal=0`；P1-1 基线记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)，最新推送后复验记录：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
+状态：已收口；当前标准 suite 已扩至 `39/39 matched`，`extendedMismatchCountTotal=0`；P1-1 基线记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)，最新推送后复验记录：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 
 目标：
 
@@ -135,6 +141,8 @@
 
 ### P1-2 donor 排序手感继续贴齐
 
+状态：已收口为当前 Phase E 排序基线；后续新增排序边角按维护期 case 处理。
+
 目标：
 
 - 继续把 `DeepMemo / TopicMemo / LightMemo` 的结果顺序和边界手感向 donor 靠近
@@ -155,7 +163,7 @@
 
 ### P1-3 错误语义与诊断输出继续贴齐
 
-状态：当前标准 suite 已补入 `TopicMemo GetTopicContent topicId alias topic-not-found` case；最新错误语义收口记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
+状态：已收口；当前标准 suite 已补入 `TopicMemo GetTopicContent topicId alias topic-not-found` case；最新错误语义收口记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 
 目标：
 
@@ -177,7 +185,7 @@
 
 ### P1-4 suite 数据集继续扩容
 
-状态：已继续扩容至 `39/39 matched`，最新新增 `DeepMemo key_word / KeyWord keyword alias` error-path case；最新推送后复验记录：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
+状态：已收口；已继续扩容至 `39/39 matched`，最新新增 `DeepMemo key_word / KeyWord keyword alias` error-path case；最新推送后复验记录：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 
 目标：
 
@@ -197,7 +205,7 @@
 
 ### P2-1 文档压缩与导航优化
 
-状态：已落地为运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
+状态：已收口；已落地为运行记录索引和 board-only checkpoint cadence：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 
 目标：
 
@@ -220,7 +228,7 @@
 
 ### P2-2 provider / embedding / rerank 对照继续完善
 
-状态：已补轻量留档入口、reports 索引和记录模板：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
+状态：已收口；已补轻量留档入口、reports 索引和记录模板：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
 
 目标：
 
@@ -239,6 +247,8 @@
 
 ## 建议的 Phase E 起步顺序
 
+历史建议顺序如下；Phase E 当前已收官，后续不再按这组顺序作为 open backlog 执行。
+
 建议顺序：
 
 1. `P0-1` 持续门禁常态化
@@ -255,4 +265,6 @@ Phase E 的重点不再是“切不切主链”，而是：
 
 在 codex-memory 已经成为默认主链的前提下，
 继续把它打磨得更稳、更易维护、更贴 donor 手感。
+
+当前 Phase E 已完成这个目标。后续工作转入维护期。
 ```

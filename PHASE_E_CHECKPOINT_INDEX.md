@@ -14,15 +14,16 @@
 
 ## 当前最新状态
 
-- 最新远端主线提交：`13d7c6b docs: sync p2-2 provider handoff state`
+- 最新远端主线提交：`59f1b03 docs: sync phase e board-only checkpoint index`
+- Phase E 最终收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)（对应 `000c149` 推送后正式 checkpoint）
-- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0024`（对应 `13d7c6b`，不创建 checkpoint-20）
+- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0026`（对应 `59f1b03`，不创建 checkpoint-20）
 - 最新标准 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - 最新 P1-3 错误语义记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - 最新 P2-2 provider 留档入口：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
 - 最新 P2-2 provider reports 索引：[benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
 - 最新 P2-2 provider 记录模板：[phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)
-- `13d7c6b` 推送后已复核 `git status --short` + `npm run gate:mainline`：
+- `59f1b03` 推送后已复核 `git status --short` + `npm run gate:mainline`：
   - `git status --short`：工作区干净
   - health：`ok`，`httpStatus=200`
   - compare：`39/39 matched`
@@ -61,6 +62,7 @@
 | `ba7031a` | provider benchmark entrypoint | health `200`; compare `39/39`; rollback `39/39` | `.agent_board/VALIDATION_LOG.md` `CMV-0020` |
 | `f40a6f6` | provider benchmark reports index | health `200`; compare `39/39`; rollback `39/39` | `.agent_board/VALIDATION_LOG.md` `CMV-0022` |
 | `13d7c6b` | provider record template + handoff state | health `200`; compare `39/39`; rollback `39/39` | `.agent_board/VALIDATION_LOG.md` `CMV-0024` |
+| `59f1b03` | board-only checkpoint index sync | health `200`; compare `39/39`; rollback `39/39` | `.agent_board/VALIDATION_LOG.md` `CMV-0026` |
 
 ## HTTP 运行态记录
 

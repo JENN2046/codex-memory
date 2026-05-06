@@ -9,14 +9,16 @@
 1. 当前状态：[STATUS.md](/A:/codex-memory/STATUS.md)
 2. 项目收官：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
 3. 阶段结论：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
-4. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
-5. 后续 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+4. Phase E 收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
+5. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
+6. 后续 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
 
 ## 想确认“主链是否已经收官”
 
 - 项目正式收官说明：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
 - 默认主链切换结论：[PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md](/A:/codex-memory/PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md)
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
+- Phase E 最终收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 
 ## 想看“Phase D 是怎么验收和灰度的”
 
@@ -39,6 +41,7 @@
 ## 想看“Phase E 现在已经做完了什么”
 
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
+- Phase E 最终收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 - Phase E backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
 
 关键收口记录：
@@ -91,7 +94,7 @@
 
 - 运行记录汇总：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 - 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：[.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)（`CMV-0024` / `13d7c6b`，不创建 checkpoint-20）
+- 最新 board-only 推送后复核：[.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)（`CMV-0026` / `59f1b03`，不创建 checkpoint-20）
 - 最新 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - Provider benchmark reports 索引：[benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
 - Provider benchmark 记录模板：[phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)
@@ -109,4 +112,5 @@
 1. 看 [STATUS.md](/A:/codex-memory/STATUS.md)
 2. 看 [PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
 3. 看 [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
-4. 如果要继续做事，再看 [PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+4. 看 [PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
+5. 如果要继续做事，再看 [PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)

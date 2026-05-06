@@ -11,14 +11,14 @@
 
 ## 2026-05-06 恢复状态
 
-- 当前 `main` 已推送到 `origin/main`，最新远端提交是 `000c149 docs: add mainline gate checkpoint 18`。
-- `000c149` 推送后已跑 `git status --short` 和 `npm run gate:mainline`：
+- 当前 `main` 已推送到 `origin/main`，最新远端提交是 `59f1b03 docs: sync phase e board-only checkpoint index`。
+- `59f1b03` 推送后已跑 `git status --short` 和 `npm run gate:mainline`，结果只记在 `.agent_board`，未创建 checkpoint-20：
   - `git status --short`：工作区干净
   - health `200` at `http://127.0.0.1:7605/health`
   - compare `39/39 matched`
   - rollback `39/39 rollback-ready`
-- 当前本地已补 [phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)，并挂入 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md) 与 [PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)；这批文档按聚合节奏暂未提交。
-- 本轮低风险 Phase E 小项是 `P2-1 文档压缩与导航优化`：同步恢复入口、Phase E 摘要/backlog 和 memory 基线到 checkpoint-19 / `39/39` 状态。
+- Phase E 已补最终收官入口：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)；当前没有 Phase E open blocker，后续工作转入维护期增量任务。
+- `.agent_board` 的 `59f1b03` board-only note 已纳入 Phase E final closeout 本地批次，等待统一提交。
 
 ## 2026-05-05 项目记忆（历史快照）
 
