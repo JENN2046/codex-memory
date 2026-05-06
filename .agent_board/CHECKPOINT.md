@@ -223,6 +223,11 @@ P9-codex-claude-client-scope
 - `deepseek-ai/deepseek-v4-flash` read-only repository capability assessment succeeded.
 - `deepseek-ai/deepseek-v4-flash` model-mediated MCP `memory_overview` succeeded; verbose stream confirmed `memory_overview 调用成功`.
 - `.omc/` was added to `.gitignore` as local Claude/OMC runtime state.
+- `1628381 docs: record claude flash acceptance` was pushed to `origin/main`; the first push attempt hit a transient TLS handshake failure, and the retry succeeded.
+- Push-after `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- Current-status docs were synced to `1628381` / `CMV-0039`.
+- Docs baseline sync validation passed: `git diff --check`, trailing whitespace scan, local link check, and `npm run gate:mainline`.
 
 ## Validation Not Run
 
@@ -237,7 +242,7 @@ P9-codex-claude-client-scope
 |---|---|
 | MCP mode | HTTP mainline assumption; verify before runtime claims |
 | HTTP health | latest known `200` from mainline gate |
-| Mainline gate | latest local verification passed after `deepseek-ai/deepseek-v4-flash` MCP validation |
+| Mainline gate | latest post-push verification passed after `1628381` |
 | Compare suite | latest known baseline `39/39 matched` |
 | Rollback readiness | latest known baseline `39/39 rollback-ready` |
 | Profile gate | not run |
@@ -256,16 +261,16 @@ P9-codex-claude-client-scope
 
 ## Remaining Risks
 
-- Current local changes are a docs-governance/client-scope aggregate batch: `bcb2d84` board-only post-push note, Codex/Claude target-scope alignment, Claude MCP minimal acceptance records, and `.omc/` local runtime ignore.
+- Current local changes are a docs-only baseline sync for `1628381` / `CMV-0039`.
 - Claude configuration write is complete.
 - Model-mediated `memory_overview` is now validated with `deepseek-ai/deepseek-v4-flash`; `deepseek-v4-pro` remains historical evidence only.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Validate docs after the `deepseek-ai/deepseek-v4-flash` success record, then create a guarded local commit if coherent. Stop before any remote write.
+Create a guarded local commit for the `1628381` baseline sync if final diff inspection stays clean. Stop before any remote write.
 
 ## Last Local Commit
 
-- `bcb2d84 docs: add maintenance backlog` is on `origin/main`.
+- `1628381 docs: record claude flash acceptance` is on `origin/main`.
 

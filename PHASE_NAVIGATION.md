@@ -99,7 +99,7 @@
 
 - 运行记录汇总：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 - 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：[.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)（`CMV-0030` / `bcb2d84`，不创建 checkpoint-20）
+- 最新 board-only 推送后复核：[.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)（`CMV-0039` / `1628381`，不创建 checkpoint-20）
 - 最新 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - Provider benchmark reports 索引：[benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
 - Provider benchmark 记录模板：[phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)

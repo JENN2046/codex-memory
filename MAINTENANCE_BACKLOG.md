@@ -23,9 +23,9 @@
 
 ## 当前基线
 
-- 最新已推送主线提交：`bcb2d84 docs: add maintenance backlog`
+- 最新已推送主线提交：`1628381 docs: record claude flash acceptance`
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0030`
+- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0039`
 - 标准 suite：`39/39 matched`
 - rollback readiness：`39/39 rollback-ready`
 - HTTP health：`200`

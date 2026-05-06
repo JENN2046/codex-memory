@@ -12,14 +12,14 @@
 
 ## 2026-05-06 恢复状态
 
-- 当前 `main` 已推送到 `origin/main`，最新远端提交是 `bcb2d84 docs: add maintenance backlog`。
-- `bcb2d84` 推送后已跑 `git status --short` 和 `npm run gate:mainline`，结果只记在 `.agent_board`，未创建 checkpoint-20：
+- 当前 `main` 已推送到 `origin/main`，最新远端提交是 `1628381 docs: record claude flash acceptance`。
+- `1628381` 推送后已跑 `git status --short` 和 `npm run gate:mainline`，结果只记在 `.agent_board`，未创建 checkpoint-20：
   - `git status --short`：工作区干净
   - health `200` at `http://127.0.0.1:7605/health`
   - compare `39/39 matched`
   - rollback `39/39 rollback-ready`
 - Phase E 已补最终收官入口：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)；当前没有 Phase E open blocker，后续工作转入维护期增量任务。
-- `.agent_board` 的 `bcb2d84` board-only note 会纳入下一次维护期聚合提交。
+- `.agent_board` 的 `1628381` board-only note 会纳入下一次维护期聚合提交。
 - 维护期第一批低风险任务已新增 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)，把 donor/provider/docs 后续项从 Phase E 迁出，作为维护期增量队列管理。
 - Claude MCP 最小验收入口已准备：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp add --transport http --scope local vcp_codex_memory http://127.0.0.1:7605/mcp/codex-memory` 已在明确授权后执行，`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 成功；按用户最新批准，当前 Claude Code 侧模型调用改用 `deepseek-ai/deepseek-v4-flash`，且模型侧 `memory_overview` 已成功，交互式 `/mcp` 待补验。
 

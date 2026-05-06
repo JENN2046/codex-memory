@@ -6,17 +6,17 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | Claude MCP `deepseek-ai/deepseek-v4-flash` model-side acceptance |
-| Current area | P9-codex-claude-client-scope |
-| Last action | Switched Claude Code model-side validation to `deepseek-ai/deepseek-v4-flash`; ran read-only capability assessment and MCP `memory_overview` |
-| Last validation | `deepseek-ai/deepseek-v4-flash` model-mediated `memory_overview` succeeded; `npm run gate:mainline` passed health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready` |
-| Worktree summary | Local batch contains Codex/Claude scope docs, Claude MCP acceptance records, `deepseek-v4-pro` historical success note, new `deepseek-ai/deepseek-v4-flash` success note, `.omc/` ignore rule, and `.agent_board` updates; no checkpoint-20 file was created |
+| Current task | Sync `1628381` board-only baseline docs |
+| Current area | P6-docs-drift |
+| Last action | Updated current-status docs and `.agent_board` to point at `1628381` / `CMV-0039` |
+| Last validation | `git diff --check`, trailing whitespace scan, local link check, and `npm run gate:mainline` passed; gate health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready` |
+| Worktree summary | Local board/docs baseline sync is ready for guarded local commit; no checkpoint-20 file was created |
 | Mainline assumption | HTTP MCP 7605 is reachable; health remains ok but monitor recovery pattern |
 | Legacy rollback assumption | 6005 target may exist, verify via `rollback:mainline:plan` |
 | Active-memory suite status | `39/39 matched`, `39/39 rollback-ready` |
 | Guarded auto-commit allowed | yes for this local docs-only maintenance batch after final diff inspection; push still requires explicit remote approval |
-| Last checkpoint | `logs/phase-e-mainline-gate-checkpoint-19.md`（对应 `000c149` 推送后主线绿灯复核）；`8e3ae8d` / `ba7031a` / `f40a6f6` / `13d7c6b` / `59f1b03` / `49537f6` / `bcb2d84` 推送后结果仅记入 `.agent_board`，暂不补 checkpoint-20 |
-| Next planned action | Validate docs after the `deepseek-ai/deepseek-v4-flash` success record, then create a guarded local commit if coherent; stop before push |
+| Last checkpoint | `logs/phase-e-mainline-gate-checkpoint-19.md`（对应 `000c149` 推送后主线绿灯复核）；`8e3ae8d` / `ba7031a` / `f40a6f6` / `13d7c6b` / `59f1b03` / `49537f6` / `bcb2d84` / `1628381` 推送后结果仅记入 `.agent_board`，暂不补 checkpoint-20 |
+| Next planned action | Create a guarded local commit for the `1628381` baseline sync if final diff inspection stays clean; stop before push |
 
 ## Notes
 
