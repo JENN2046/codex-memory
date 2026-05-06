@@ -2,9 +2,9 @@
 
 ## 1. Final Goal
 
-`codex-memory` is the independent, Codex-oriented implementation of the full VCP memory system.
+`codex-memory` is the independent Codex- and Claude-oriented implementation of the full VCP memory system.
 
-It is designed as a local-first, auditable, reversible, privacy-safe, MCP-accessible long-term memory kernel for Codex, VCP, codex-router, Photo Studio OS, and multi-agent workflows.
+It is designed as a local-first, auditable, reversible, privacy-safe, MCP-accessible long-term memory kernel for Codex and Claude.
 
 The project must eventually reproduce and evolve the practical capability set of the VCP memory system, while adding stronger governance for Codex-style autonomous execution.
 
@@ -16,7 +16,7 @@ It is a governed memory kernel for agents that need a trustworthy past.
 
 ## 2. One-Sentence Mission
 
-Give Codex and multi-agent systems a durable, searchable, correctable, auditable, and VCP-compatible long-term memory layer.
+Give Codex and Claude a durable, searchable, correctable, auditable, and VCP-compatible long-term memory layer.
 
 ---
 
@@ -96,12 +96,12 @@ Target capabilities include:
 40. Novelty detection.
 41. Coherence scoring.
 42. Background association / dream-like memory processing.
-43. Multi-agent memory proposal and arbitration.
-44. MCP tools for Codex and external agents.
-45. Integration with VCPToolBox.
-46. Integration with codex-router.
-47. Integration with Photo Studio OS.
-48. Integration with future agent desktop/mobile entrances.
+43. Client-scoped memory proposal and approval for Codex and Claude.
+44. MCP tools for Codex and Claude clients.
+45. VCPToolBox donor-format and behavior compatibility.
+46. Codex Desktop integration hardening.
+47. Claude MCP client integration.
+48. Local client import / export / migration safety.
 
 The project may implement these capabilities in phases.
 
@@ -346,22 +346,22 @@ The agent must not treat retrieval results as unquestionable truth.
 
 ---
 
-## 12. Multi-Agent Strategy
+## 12. Codex / Claude Client Strategy
 
-`codex-memory` must support future multi-agent workflows.
+`codex-memory` serves Codex and Claude clients.
 
 Target model:
 
-- workers retrieve relevant memory
-- workers create memory proposals
-- commander/reviewer deduplicates and approves
-- only approved proposals become durable memory
+- Codex and Claude retrieve scoped memory through governed MCP/client surfaces
+- Codex and Claude may create memory proposals or durable writes only through policy
+- policy deduplicates, validates, and audits client-originated writes
+- only approved writes become durable memory
 - all durable writes create audit events
-- conflicting memory is marked and resolved instead of silently merged
+- conflicting client observations are marked and resolved instead of silently merged
 
-Workers should not freely write long-term memory without policy checks.
+Codex and Claude should not freely write long-term memory without policy checks.
 
-Many agents without memory governance will only produce faster confusion.
+The project does not target a general-purpose multi-agent arbitration platform.
 
 ---
 
@@ -519,11 +519,11 @@ Acceptance:
 - residual information can be preserved
 - background association remains inspectable
 
-### Phase 6 — MCP and Multi-Agent Integration
+### Phase 6 — MCP and Codex / Claude Integration
 
 Goal:
 
-Expose governed memory tools to Codex and workers.
+Expose governed memory tools to Codex and Claude.
 
 Deliverables:
 
@@ -537,26 +537,26 @@ Deliverables:
 - `checkpoint_memory`
 - `handoff_memory`
 - `audit_memory`
-- worker memory proposal flow
+- client memory proposal flow
 
 Acceptance:
 
 - Codex can retrieve memory safely
-- Codex can propose/write memory through policy
-- worker proposals can be reviewed
+- Claude can retrieve memory safely
+- client proposals can be reviewed
 - durable writes are audited
 
 ### Phase 7 — Ecosystem Integration
 
 Goal:
 
-Become the shared memory spine across the user's agent ecosystem.
+Become the shared memory spine for the user's Codex and Claude workflows.
 
 Deliverables:
 
-- VCPToolBox integration plan
-- codex-router integration plan
-- Photo Studio OS integration plan
+- Codex Desktop integration plan
+- Claude MCP client integration plan
+- VCPToolBox donor/reference compatibility plan
 - migration tools
 - permission/scoping model
 - observability/admin interface draft
@@ -604,7 +604,7 @@ First make the memory safe.
 
 Then make it deep.
 
-Current repository note: the safe local memory spine already exists. Future milestones should start from the Phase E maintenance baseline and preserve current contracts while adding governance, supersession, forgetting, import/export, and multi-agent arbitration incrementally.
+Current repository note: the safe local memory spine already exists. Future milestones should start from the Phase E maintenance baseline and preserve current contracts while adding governance, supersession, forgetting, import/export, and Codex/Claude client scoping incrementally.
 
 ---
 
@@ -650,7 +650,7 @@ Completion requires:
 - audit logging
 - secret protection
 - MCP access
-- multi-agent usability
+- Codex/Claude usability
 - migration path
 - validation suite
 - documentation

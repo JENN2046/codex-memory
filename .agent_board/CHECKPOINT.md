@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-Create the first maintenance-phase backlog batch.
+Align the project target to a Codex/Claude-only memory service.
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P6-docs-drift
 
 ## Current Status
 
-`MAINTENANCE_BACKLOG.md` is prepared locally and post-Phase-E donor/provider/docs follow-ups have been moved into the maintenance-phase queue. The batch also carries the `49537f6` board-only push-after gate result. No checkpoint-20 file was created.
+`bcb2d84 docs: add maintenance backlog` is already synchronized with `origin/main`. The latest local docs batch records the push-after gate result and aligns the final product target to `Codex` and `Claude`, removing generic multi-agent platform wording from goal/roadmap/architecture/policy docs. The result is recorded in `.agent_board`; no checkpoint-20 file was created.
 
 ## Completed Work
 
@@ -71,6 +71,11 @@ P6-docs-drift
 - Added `MAINTENANCE_BACKLOG.md`.
 - Linked the maintenance backlog from Phase E closeout, Phase navigation, README, status, project closure, and memory.
 - Migrated donor/provider/docs follow-up items out of Phase E into the maintenance-phase queue.
+- `bcb2d84 docs: add maintenance backlog` is present on `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed for `bcb2d84`.
+- Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
+- Project goal, roadmap, architecture, memory policy, validation policy, and maintenance docs now scope the product to `Codex` and `Claude`.
+- Historical fixture identifiers containing `multi-agent` were left unchanged because they are standard suite names, not product targets.
 
 ## Changed Files
 
@@ -105,6 +110,12 @@ P6-docs-drift
 - `benchmarks/provider-benchmark.md`
 - `logs/phase-e-provider-benchmark-record-template.md`
 - `PHASE_E_CHECKPOINT_INDEX.md`
+- `PROJECT_GOAL.md`
+- `ROADMAP.md`
+- `ARCHITECTURE.md`
+- `MEMORY_POLICY.md`
+- `AGENTS.md`
+- `VALIDATION.md`
 
 ## Validation Run
 
@@ -184,6 +195,12 @@ P6-docs-drift
 - Trailing whitespace scan passed.
 - Referenced local file check passed.
 - High-confidence secret pattern scan passed.
+- `git push origin main` reported `Everything up-to-date` for `bcb2d84`.
+- Pre-board-update `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git diff --check` passed for the Codex/Claude target-scope docs batch, with CRLF warnings only.
+- Trailing whitespace scan passed.
+- Target wording scan passed for old product-target phrases.
 
 ## Validation Not Run
 
@@ -217,14 +234,14 @@ P6-docs-drift
 
 ## Remaining Risks
 
-- Current local docs and `.agent_board` changes form one coherent maintenance backlog batch.
+- Current local changes are a docs-governance aggregate batch: `bcb2d84` board-only post-push note plus Codex/Claude target-scope alignment.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Stop before remote write. If the user explicitly authorizes push, run `git push origin main`, then one push-after `git status --short` + `npm run gate:mainline`, and record the result in `.agent_board` only.
+Run final diff inspection, then create a guarded local aggregate commit if the diff remains coherent. Stop before any new remote write.
 
 ## Last Local Commit
 
-- Current maintenance backlog batch is local only until explicitly pushed; previous pushed commit is `49537f6 docs: close phase e`.
+- `bcb2d84 docs: add maintenance backlog` is on `origin/main`.
 

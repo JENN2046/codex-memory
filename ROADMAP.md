@@ -37,7 +37,7 @@ Do not let advanced memory intelligence arrive before the local memory core is t
 
 ## 2. North Star
 
-`codex-memory` exists to give Codex, VCP, codex-router, Photo Studio OS, and multi-agent workflows a trustworthy long-term memory kernel.
+`codex-memory` exists to give Codex and Claude a trustworthy VCP-compatible long-term memory kernel.
 
 It must eventually support:
 
@@ -52,8 +52,8 @@ It must eventually support:
 - supersession
 - deletion / tombstone
 - MCP tools
-- multi-agent coordination
-- ecosystem integration
+- Codex/Claude client governance
+- VCP-compatible donor/reference integration
 
 The route must remain staged.
 
@@ -72,8 +72,8 @@ Phase 2  VCP-Compatible Data Model
 Phase 3  Controlled Hybrid Retrieval
 Phase 4  TagMemo / Semantic Association
 Phase 5  Advanced VCP Memory Intelligence
-Phase 6  MCP and Multi-Agent Workflow
-Phase 7  Ecosystem Integration
+Phase 6  MCP and Codex/Claude Workflow
+Phase 7  Local Client and VCP Compatibility Integration
 Phase 8  Observability, Admin, and Long-Term Maintenance
 ```
 
@@ -581,11 +581,11 @@ Phase 5 is complete when:
 
 ---
 
-## 11. Phase 6 — MCP and Multi-Agent Workflow
+## 11. Phase 6 — MCP and Codex/Claude Workflow
 
 ### Goal
 
-Expose governed memory tools to Codex, workers, and external agents.
+Expose governed memory tools to Codex and Claude.
 
 ### Deliverables
 
@@ -615,10 +615,10 @@ Later MCP tools:
 - `compact_memory`
 - `propose_memory`
 
-Multi-agent deliverables:
+Codex/Claude client deliverables:
 
-- worker memory proposal flow
-- commander review flow
+- client memory proposal flow
+- policy review flow
 - proposal deduplication
 - conflict resolution
 - durable write approval path
@@ -635,7 +635,7 @@ Multi-agent deliverables:
 ### Not Allowed
 
 - external writes without approval
-- workers writing directly to durable memory without policy
+- clients writing directly to durable memory without policy
 - remote storage mutation
 - hidden background recording
 - broad memory import/export through MCP without safeguards
@@ -649,39 +649,38 @@ Minimum tests:
 - search tool respects scope
 - overview tool does not expose secrets
 - checkpoint/handoff memory can be created safely
-- worker proposal does not equal durable write
+- client proposal does not equal durable write
 
 ### Exit Criteria
 
 Phase 6 is complete when:
 
 - Codex can use memory through MCP safely
-- worker memory proposals are supported
+- Claude can use memory through MCP safely
+- client memory proposals are supported
 - durable writes are governed and audited
 - tests pass
 
 ---
 
-## 12. Phase 7 — Ecosystem Integration
+## 12. Phase 7 — Local Client and VCP Compatibility Integration
 
 ### Goal
 
-Connect `codex-memory` to the user's wider agent ecosystem.
+Connect `codex-memory` to the user's Codex and Claude workflows while preserving VCP-compatible donor/reference behavior.
 
 ### Integration Targets
 
-- VCPToolBox
-- codex-router
-- Photo Studio OS
-- Codex_Autonomous_Work_Harness
-- Agent visual studio workflows
-- future desktop or mobile agent entrances
+- Codex Desktop
+- Claude MCP client
+- VCPToolBox donor/reference formats
+- local migration and import/export dry-runs
 
 ### Deliverables
 
-- VCPToolBox integration plan
-- codex-router integration plan
-- Photo Studio OS integration plan
+- Codex Desktop integration plan
+- Claude MCP client integration plan
+- VCPToolBox donor/reference compatibility plan
 - migration tools
 - scope and permission model
 - shared vs project-local memory rules
@@ -719,7 +718,7 @@ Minimum checks:
 
 Phase 7 is complete when:
 
-- ecosystem integration is safe
+- Codex/Claude integration is safe
 - scopes are enforceable
 - migration path exists
 - integration behavior is validated
@@ -810,7 +809,7 @@ Create the minimal local memory core for codex-memory:
 - audit log
 - targeted tests
 
-Do not implement TagMemo, vector search, EPA, Residual Pyramid, VCP migration, cloud sync, remote writes, or advanced multi-agent workflows yet.
+Do not implement TagMemo, vector search, EPA, Residual Pyramid, VCP migration, cloud sync, remote writes, or advanced client automation workflows yet.
 
 Before editing, inspect workspace and Git state.
 After editing, run available validation and report changed files, validation status, and remaining risks.
@@ -848,7 +847,7 @@ Plan first, stage carefully:
 - vector integration
 - schema migration
 - import/export tools
-- multi-agent write workflows
+- cross-client write workflows
 - compaction engine
 - VCP compatibility migration
 
@@ -926,8 +925,8 @@ Completion requires:
 - audit logging
 - secret protection
 - MCP access
-- multi-agent proposal/review
-- ecosystem integration
+- client proposal/review
+- Codex/Claude integration
 - validation suite
 - honest documentation
 
@@ -942,7 +941,7 @@ Use the current Phase E maintenance baseline as the starting point:
 1. Start from `PHASE_E_SUMMARY.md`, `PHASE_E_BACKLOG.md`, and `PROJECT_CLOSURE.md`.
 2. Keep `record_memory`, `search_memory`, `memory_overview`, HTTP MCP, compare/rollback, and gate behavior stable.
 3. Pick the smallest local, reversible, validated improvement from the maintenance backlog.
-4. Treat future tools such as `update_memory`, `supersede_memory`, `forget_memory`, checkpoint/handoff memory, import/export, and multi-agent arbitration as planned evolution, not current public contracts.
+4. Treat future tools such as `update_memory`, `supersede_memory`, `forget_memory`, checkpoint/handoff memory, import/export, and Codex/Claude client-scoped proposal review as planned evolution, not current public contracts.
 
 Do not reopen the project as a blank Phase 1 implementation.
 

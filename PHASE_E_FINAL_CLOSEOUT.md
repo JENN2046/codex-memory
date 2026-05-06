@@ -17,9 +17,9 @@
 
 ## 收官基线
 
-- 最新已推送主线提交：`59f1b03 docs: sync phase e board-only checkpoint index`
+- 最新已推送主线提交：`bcb2d84 docs: add maintenance backlog`
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0026`
+- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0030`
 - 标准 suite：`39/39 matched`
 - rollback readiness：`39/39 rollback-ready`
 - HTTP health：`200`
@@ -48,7 +48,7 @@
 - provider benchmark 真实报告留档
 - profile migration 证据沉淀
 - 文档入口继续压缩
-- 进入下一阶段的 VCP parity / memory governance / multi-agent arbitration
+- 进入下一阶段的 VCP parity / Codex-Claude memory governance / client scope
 
 维护期 backlog：
 

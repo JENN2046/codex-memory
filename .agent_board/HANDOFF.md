@@ -2,36 +2,40 @@
 
 ## Goal
 
-Create the first maintenance-phase backlog batch.
+Align the project target to a Codex/Claude-only memory service.
 
 ## Safe State
 
-Runtime code is not being changed. The active worktree changes are docs-only maintenance backlog updates plus `.agent_board` notes. The batch includes `MAINTENANCE_BACKLOG.md` and carries the `49537f6` board-only push-after gate result.
+Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is synchronized with `origin/main`. The active worktree changes are docs-governance updates that scope the project to `Codex` and `Claude`, plus `.agent_board` notes for the authorized push-after gate result.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: maintenance backlog docs plus `.agent_board` changes present locally; no checkpoint-20 file created
+- Worktree: Codex/Claude target-scope docs plus `.agent_board` changes present locally; no checkpoint-20 file created
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; push-after gate passed; maintenance backlog docs validated locally
-- in_progress: maintenance backlog batch is local-only until explicit push authorization
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; maintenance backlog committed and pushed as `bcb2d84`; push-after gate passed; Codex/Claude target-scope docs updated
+- in_progress: local docs-governance aggregate is ready for final diff inspection and guarded local commit
 - blocked: none
-- remaining: push requires explicit remote authorization; after push run one `git status --short` + `npm run gate:mainline` and record the result in `.agent_board` only
+- remaining: create guarded local aggregate commit if final diff inspection remains clean; push requires explicit remote authorization
 
 ## Changed Files
 
 - `.agent_board/*.md`
+- `PROJECT_GOAL.md`
+- `ROADMAP.md`
+- `ARCHITECTURE.md`
+- `MEMORY_POLICY.md`
+- `AGENTS.md`
+- `VALIDATION.md`
 - `MAINTENANCE_BACKLOG.md`
-- `PHASE_E_FINAL_CLOSEOUT.md`
-- `PHASE_E_BACKLOG.md`
-- `PHASE_E_SUMMARY.md`
+- `PHASE_E_CHECKPOINT_INDEX.md`
 - `PHASE_NAVIGATION.md`
-- `PROJECT_CLOSURE.md`
+- `PHASE_E_FINAL_CLOSEOUT.md`
 - `STATUS.md`
-- `README.md`
+- `PROJECT_CLOSURE.md`
 - `MEMORY.md`
 
 ## Validation Evidence
@@ -62,6 +66,8 @@ Runtime code is not being changed. The active worktree changes are docs-only mai
 - Phase E final closeout validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed; `npm run gate:mainline` passed with health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
 - push-after gate: passed after `49537f6`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
 - maintenance backlog validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed
+- push-after gate: passed after `bcb2d84`: push reported `Everything up-to-date`; pre-board-update status clean; health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
+- Codex/Claude target-scope docs validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; target wording scan passed
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -87,11 +93,13 @@ Runtime code is not being changed. The active worktree changes are docs-only mai
 - Keep checkpoint-19 as the latest independent checkpoint; board-only push-after gate results can stay in `.agent_board` until a later formal checkpoint is warranted.
 - Phase E is closed; future donor/provider/docs polish belongs to maintenance-phase incremental work.
 - `MAINTENANCE_BACKLOG.md` is now the maintenance-phase queue for donor/provider/docs follow-up work.
+- Keep the `bcb2d84` push-after result as a board-only delayed note.
+- Product target is now Codex and Claude only; VCPToolBox remains donor/reference compatibility, not a service target.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Do not push without explicit remote authorization. If authorized, push local commits to `origin/main`, then run one push-after `git status --short` + `npm run gate:mainline`.
+Run final diff inspection and create a guarded local aggregate commit if coherent. Do not push without explicit remote authorization.
 
 ## Warnings
 

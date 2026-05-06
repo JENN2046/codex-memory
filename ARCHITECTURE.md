@@ -4,7 +4,7 @@
 
 `codex-memory` is an independent, Codex-oriented implementation of the full VCP memory system.
 
-This architecture defines how the system should grow from a safe local memory core into a VCP-compatible, MCP-accessible, auditable, multi-agent memory kernel.
+This architecture defines how the system should grow from a safe local memory core into a VCP-compatible, MCP-accessible, auditable memory kernel for Codex and Claude.
 
 Current repository reality: the local memory core already exists and the project is in Phase E maintenance/refinement. This document is an evolution guide; it must not be read as a request to rebuild the current CommonJS runtime from a new Phase 1 skeleton.
 
@@ -278,16 +278,14 @@ Purpose:
 
 Targets:
 
-- VCPToolBox
-- codex-router
-- Photo Studio OS
-- Codex_Autonomous_Work_Harness
-- Agent visual studio workflow
-- future desktop/mobile agent entrances
+- Codex Desktop
+- Claude MCP client
+- VCPToolBox donor/reference formats
+- local migration and import/export dry-runs
 
 Purpose:
 
-- make `codex-memory` the shared memory spine across projects
+- make `codex-memory` the shared memory spine for Codex and Claude
 - keep project scopes separate
 - enable reusable cross-project memory without privacy leakage
 
@@ -855,7 +853,7 @@ Required test families:
 - duplicate detection
 - import/export safety
 - MCP tool contracts
-- multi-agent proposal flow
+- client proposal / approval flow
 - VCP model compatibility
 
 Historical Phase 1 minimum tests:
@@ -958,23 +956,23 @@ They should not bypass policy, audit, or validation.
 
 It should not directly replace VCP runtime tools.
 
-### codex-router
+### Codex Desktop
 
-`codex-router` may use `codex-memory` as durable context.
+Codex Desktop is the primary client for `codex-memory` through the HTTP MCP mainline.
 
-`codex-memory` should not take over routing, authorization, or task execution.
+`codex-memory` should not take over task execution or Codex configuration management.
 
-### Photo Studio OS
+### Claude MCP Client
 
-Photo Studio OS may use scoped project memory, production rules, studio preferences, and workflow checkpoints.
+Claude may use `codex-memory` through MCP-compatible local client integration.
 
-It should not receive unrelated private or cross-project memory by default.
+Claude should receive only scoped memory allowed by policy.
 
-### Multi-Agent Workers
+### Other Local Systems
 
-Workers may retrieve memory and create memory proposals.
+Other local tools are not first-class service targets.
 
-Durable writes should pass through policy and optional commander review.
+They may contribute fixtures, donor behavior, or migration references, but they should not expand the product target beyond Codex and Claude without a new explicit decision.
 
 ---
 
@@ -991,7 +989,7 @@ The architecture must defend against:
 - irreversible deletion without audit
 - broad migration corruption
 - vector similarity treated as truth
-- multi-agent workers writing conflicting memories
+- Codex and Claude writing conflicting memories
 - docs claiming features that code does not implement
 
 These are not edge cases.
@@ -1045,7 +1043,7 @@ The architecture is successful when the project can grow without losing these pr
 - deletable
 - VCP-compatible
 - Codex-friendly
-- multi-agent ready
+- Claude-friendly
 - validation-driven
 
 The system must not merely remember.

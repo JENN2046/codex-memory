@@ -23,7 +23,7 @@ This policy governs:
 - how memory is superseded
 - how memory is forgotten
 - how memory is audited
-- how multi-agent memory proposals are handled
+- how Codex/Claude memory proposals are handled
 - how VCP-compatible memory should evolve safely
 
 Memory is a map.
@@ -901,20 +901,20 @@ They must not secretly remember.
 
 ---
 
-## 24. Multi-Agent Memory Policy
+## 24. Codex / Claude Client Memory Policy
 
-Multiple workers increase memory pollution risk.
+Multiple client surfaces increase memory pollution risk.
 
-### 24.1 Worker Rules
+### 24.1 Client Rules
 
-Workers may:
+Codex and Claude may:
 
 - retrieve scoped memory
 - create checkpoints
 - create memory proposals
 - report observations
 
-Workers should not:
+Codex and Claude should not:
 
 - write durable long-term memory freely
 - hard-delete memory
@@ -922,9 +922,9 @@ Workers should not:
 - import/export broad memory
 - resolve conflicting memories alone
 
-### 24.2 Commander Rules
+### 24.2 Policy Rules
 
-A commander/reviewer should:
+The memory policy layer should:
 
 - review memory proposals
 - deduplicate proposals
@@ -936,7 +936,7 @@ A commander/reviewer should:
 ### 24.3 Proposal Flow
 
 ```text
-Worker observation
+Codex/Claude observation
   |
   v
 MemoryProposal
@@ -948,7 +948,7 @@ Policy scan
 Deduplication
   |
   v
-Commander review
+Policy review
   |
   v
 Durable MemoryRecord or rejection
@@ -957,7 +957,7 @@ Durable MemoryRecord or rejection
 Audit event
 ```
 
-If no commander exists, proposal mode is safer than uncontrolled durable writes.
+Proposal mode is safer than uncontrolled durable writes.
 
 ---
 
@@ -1222,7 +1222,7 @@ Not required yet:
 - dream/background association
 - external vector database
 - full VCP import
-- multi-agent arbitration
+- general-purpose multi-agent arbitration
 
 The first memory core should be modest and trustworthy.
 

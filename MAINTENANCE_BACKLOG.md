@@ -6,7 +6,7 @@
 
 `Phase E` 已完成：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 
-维护期的目标不是继续证明默认主链能不能用，而是让已经可用的 `codex-memory` 长期保持：
+维护期的目标不是继续证明默认主链能不能用，而是让已经可用的 `codex-memory` 作为 `Codex` / `Claude` 的本地记忆主线长期保持：
 
 - 可守门
 - 可回滚
@@ -23,9 +23,9 @@
 
 ## 当前基线
 
-- 最新已推送主线提交：`49537f6 docs: close phase e`
+- 最新已推送主线提交：`bcb2d84 docs: add maintenance backlog`
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0028`
+- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0030`
 - 标准 suite：`39/39 matched`
 - rollback readiness：`39/39 rollback-ready`
 - HTTP health：`200`
@@ -42,7 +42,7 @@
 | M-005 | provider-profile | A1 | todo | profile migration 证据沉淀 | dry-run/profile health/profile gate；confirm 需显式授权 | 默认只读或 dry-run |
 | M-006 | docs-governance | A0 | todo | 文档入口继续压缩，减少重复 checkpoint 噪音 | `git diff --check` / link check | 优先改索引和导航，不堆 README |
 | M-007 | docs-governance | A0 | todo | `.agent_board` board-only 记录按批次聚合 | diff inspection | 不为普通 push-after gate 创建 checkpoint-20 |
-| M-008 | next-phase | A1 | todo | 准备 Phase F / memory governance / multi-agent arbitration 的候选计划 | docs review / no runtime change | 只是候选计划，不自动启动新阶段 |
+| M-008 | next-phase | A1 | todo | 准备 Phase F / Codex-Claude memory governance / client scope 的候选计划 | docs review / no runtime change | 只是候选计划，不自动启动新阶段 |
 
 ## 推荐执行顺序
 

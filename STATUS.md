@@ -5,7 +5,7 @@
 ## 当前结论
 
 - `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
-- 最新远端主线提交是 `59f1b03 docs: sync phase e board-only checkpoint index`；最新独立推送后主线 gate 复核见 [phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)，最新 board-only 复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0026`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。
+- 最新远端主线提交是 `bcb2d84 docs: add maintenance backlog`；最新独立推送后主线 gate 复核见 [phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)，最新 board-only 复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0030`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
 - `Phase C` 已基本收口到“高 donor 兼容度”，现在具备全量重建、自动回填、增量同步，以及 `DeepMemo/TopicMemo` 的主要边界语义与展示语义兼容。

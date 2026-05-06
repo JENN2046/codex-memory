@@ -105,16 +105,13 @@ Do not treat these as future features unless source proves otherwise.
 
 Final goal:
 
-`codex-memory` should become the default Codex-oriented VCP memory mainline: local-first, auditable, rollback-ready, provider-flexible, VCP-compatible, and safe for sustained multi-agent workflows.
+`codex-memory` should become the default Codex- and Claude-oriented VCP memory mainline: local-first, auditable, rollback-ready, provider-flexible, VCP-compatible, and safe for sustained Codex/Claude workflows.
 
 This means hardening the existing runtime into a long-term memory spine for:
 
 - Codex
-- VCPToolBox
-- codex-router
-- Photo Studio OS
-- future multi-agent workers
-- future desktop/mobile agent entrances
+- Claude
+- VCP-compatible donor behavior and migration references
 
 The goal is not to restart the project.
 
@@ -197,13 +194,13 @@ Long-term direction:
 - stale memory detection
 - supersession / tombstone / forget flow
 - memory proposal / approval flow
-- multi-agent memory arbitration
+- Codex/Claude client-scoped memory proposal and approval flow
 - project/user/agent/task/checkpoint/handoff memory layering
 - safe import/export/migration chain
 - profile migration quality gate
 - provider fallback quality benchmark
 - observability/admin review surface
-- safe integration with VCPToolBox, codex-router, and future agent systems
+- safe integration with Codex and Claude MCP clients; VCPToolBox remains donor/reference only
 
 ### 4.4 Next Strategic Direction
 
@@ -212,7 +209,7 @@ Reasonable next-phase labels:
 ```text
 Phase F — VCP full-memory parity hardening
 Phase G — memory governance / proposal / supersession / tombstone
-Phase H — multi-agent memory arbitration
+Phase H — Codex/Claude client governance and memory scoping
 Phase I — observability / admin review surface
 ```
 
@@ -364,7 +361,7 @@ P5-rollback-readiness
 P6-docs-drift
 P7-vcp-parity-hardening
 P8-memory-governance
-P9-multi-agent-arbitration
+P9-codex-claude-client-scope
 P10-observability-admin
 ```
 
@@ -855,7 +852,7 @@ Audit logs may contain sensitive operational metadata. Treat them carefully.
 
 ---
 
-## 20. Multi-Agent Work Policy
+## 20. Multi-Worker Contributor Policy
 
 If multiple Codex workers are used:
 
@@ -866,11 +863,11 @@ If multiple Codex workers are used:
 - final integration is serial
 - final validation is run once from the controlling state
 
-For future memory-governance work:
+For future Codex/Claude memory-governance work:
 
 - workers may create memory proposals
 - durable memory changes must pass policy/gate
-- commander reviews proposals
+- policy review approves proposals
 - final write/audit path remains controlled
 
 ---

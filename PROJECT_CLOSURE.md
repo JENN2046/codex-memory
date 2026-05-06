@@ -41,9 +41,9 @@
 
 ## 当前稳定基线
 
-- 最新远端主线提交：`59f1b03 docs: sync phase e board-only checkpoint index`
+- 最新远端主线提交：`bcb2d84 docs: add maintenance backlog`
 - 最新独立推送后主线 gate 复核：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后主线 gate 复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0026`
+- 最新 board-only 推送后主线 gate 复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0030`
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
   - `matchedCaseCount = 39`
   - `extendedMismatchCountTotal = 0`

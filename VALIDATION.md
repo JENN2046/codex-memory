@@ -717,16 +717,17 @@ Import/export/migrate/compact should support dry-run.
 
 ---
 
-## 21. Multi-Agent Validation
+## 21. Codex / Claude Client Validation
 
-Multi-agent memory must prevent worker pollution.
+Codex/Claude memory must prevent client-originated pollution.
 
 Validate:
 
-- worker can retrieve scoped memory
-- worker can create memory proposal
+- Codex can retrieve scoped memory
+- Claude can retrieve scoped memory
+- client can create memory proposal
 - proposal is not durable memory
-- commander can approve proposal
+- policy review can approve proposal
 - approved proposal becomes durable record
 - rejected proposal is audited
 - duplicate proposals are detected
@@ -735,15 +736,15 @@ Validate:
 Minimum test flow:
 
 ```text
-worker proposal
+client proposal
 -> policy scan
 -> deduplication
--> commander approval
+-> policy approval
 -> durable write
 -> audit event
 ```
 
-If no commander exists, default to proposal mode for uncertain writes.
+Default to proposal mode for uncertain writes.
 
 ---
 
@@ -846,7 +847,7 @@ The matrix below is a generic evolution model. For the current repository, prefe
 | Phase 3 | scoped retrieval, filters, dedup, stale handling |
 | Phase 4 | tag graph, bounded association, traceability |
 | Phase 5 | compaction, novelty/residual preservation, proposal-only background association |
-| Phase 6 | MCP contracts, tool safety, multi-agent proposal flow |
+| Phase 6 | MCP contracts, tool safety, Codex/Claude proposal flow |
 | Phase 7 | integration scopes, dry-run migration, cross-project isolation |
 | Phase 8 | observability counts, review flows, safe admin operations |
 
