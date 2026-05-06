@@ -145,7 +145,7 @@ npm run gate:mainline
 
 ## 当前状态
 
-`PARTIAL` for full Claude model-mediated acceptance.
+`COMPLETED_VALIDATED` for the non-interactive `deepseek-v4-pro` model-mediated `memory_overview` path.
 
 已完成：
 
@@ -156,20 +156,20 @@ npm run gate:mainline
 - `claude mcp get vcp_codex_memory` 显示 connected。
 - `claude mcp list` 显示 `vcp_codex_memory` connected。
 - 直接 MCP 协议 `tools/call memory_overview` 成功，`overviewIsError=false`。
+- 使用 `deepseek-v4-pro` 的模型侧 `memory_overview` 调用成功，最终结果包含 `memory_overview 调用成功`。
 - `npm run gate:mainline` 仍通过：health `200`，compare `39/39 matched`，rollback `39/39 rollback-ready`。
 - 验收命令、通过标准和回滚命令文档化。
 
 未完成：
 
 - 未在交互式 Claude Code 中跑 `/mcp`；非交互 `claude -p "/mcp"` 返回 `Unknown skill: mcp`。
-- 未由 `deepseek-v4-pro` 实际调用 `memory_overview`；非交互模型调用失败于 API `ConnectionRefused`。
 
 阻塞条件：
 
-- 需要 Claude Code 到所选模型提供方的 API connectivity 恢复。
 - 需要交互式 Claude Code 会话运行 `/mcp`。
 
 最新记录：
 
 - [claude-mcp-minimal-acceptance-02.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-02.md)
 - [claude-mcp-minimal-acceptance-03.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-03.md)
+- [claude-mcp-minimal-acceptance-04.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-04.md)

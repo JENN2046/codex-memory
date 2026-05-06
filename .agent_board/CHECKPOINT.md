@@ -217,6 +217,7 @@ P9-codex-claude-client-scope
 - `claude mcp add` was explicitly authorized and succeeded; `claude mcp get/list` showed `vcp_codex_memory` connected.
 - Direct MCP protocol `tools/call memory_overview` succeeded with `overviewIsError=false`.
 - User requested `deepseek-v4-pro`; model-mediated retry used `--model deepseek-v4-pro` but failed before tool execution with API `ConnectionRefused`.
+- Rerun with `--model deepseek-v4-pro` succeeded; verbose stream confirmed `memory_overview 调用成功`.
 
 ## Validation Not Run
 
@@ -252,12 +253,12 @@ P9-codex-claude-client-scope
 
 - Current local changes are a docs-governance/client-scope aggregate batch: `bcb2d84` board-only post-push note, Codex/Claude target-scope alignment, and Claude MCP minimal acceptance preflight.
 - Claude configuration write is complete.
-- Model-mediated `memory_overview` remains blocked on model provider API connectivity, not on MCP server health.
+- Model-mediated `memory_overview` is now validated with `deepseek-v4-pro`.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Validate docs after the `deepseek-v4-pro` retry record, then create a guarded local commit if coherent. Stop before any remote write.
+Validate docs after the `deepseek-v4-pro` success record, then create a guarded local commit if coherent. Stop before any remote write.
 
 ## Last Local Commit
 

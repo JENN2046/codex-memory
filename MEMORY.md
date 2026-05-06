@@ -21,7 +21,7 @@
 - Phase E 已补最终收官入口：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)；当前没有 Phase E open blocker，后续工作转入维护期增量任务。
 - `.agent_board` 的 `bcb2d84` board-only note 会纳入下一次维护期聚合提交。
 - 维护期第一批低风险任务已新增 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)，把 donor/provider/docs 后续项从 Phase E 迁出，作为维护期增量队列管理。
-- Claude MCP 最小验收入口已准备：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp add --transport http --scope local vcp_codex_memory http://127.0.0.1:7605/mcp/codex-memory` 已在明确授权后执行，`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 成功；按用户要求改用 `deepseek-v4-pro` 后，模型侧调用仍被 API `ConnectionRefused` 阻塞，交互式 `/mcp` 待补验。
+- Claude MCP 最小验收入口已准备：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp add --transport http --scope local vcp_codex_memory http://127.0.0.1:7605/mcp/codex-memory` 已在明确授权后执行，`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 成功；按用户要求使用 `deepseek-v4-pro` 后，模型侧 `memory_overview` 也已成功，交互式 `/mcp` 待补验。
 
 ## 2026-05-05 项目记忆（历史快照）
 

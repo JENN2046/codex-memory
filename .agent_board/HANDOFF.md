@@ -17,9 +17,9 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 ## Queue Summary
 
 - done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; maintenance backlog committed and pushed as `bcb2d84`; push-after gate passed; Codex/Claude target-scope docs updated; Claude MCP local preflight completed
-- in_progress: local docs/client-scope aggregate includes the authorized Claude config write, direct MCP `memory_overview` success, and `deepseek-v4-pro` retry result
-- blocked: model-mediated `memory_overview` retry with `deepseek-v4-pro` failed at API `ConnectionRefused`
-- remaining: validate docs after the `deepseek-v4-pro` retry record and commit local batch if clean; push requires explicit remote authorization
+- in_progress: local docs/client-scope aggregate includes the authorized Claude config write, direct MCP `memory_overview` success, and `deepseek-v4-pro` model-mediated success
+- blocked: none for minimal non-interactive acceptance; interactive `/mcp` panel remains optional manual follow-up
+- remaining: validate docs after the `deepseek-v4-pro` success record and commit local batch if clean; push requires explicit remote authorization
 
 ## Changed Files
 
@@ -79,6 +79,7 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 - Claude MCP config write: `claude mcp add` succeeded after explicit authorization; `claude mcp get/list` showed connected
 - Direct MCP `memory_overview`: succeeded via protocol probe with `overviewIsError=false`
 - `deepseek-v4-pro` model-mediated retry: failed before tool execution with API `ConnectionRefused`
+- `deepseek-v4-pro` model-mediated rerun: succeeded; final result included `memory_overview 调用成功`
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -112,7 +113,7 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 
 ## Next Safe Task
 
-Validate docs after the `deepseek-v4-pro` retry record, then create a guarded local aggregate commit if coherent. Do not push without explicit authorization.
+Validate docs after the `deepseek-v4-pro` success record, then create a guarded local aggregate commit if coherent. Do not push without explicit authorization.
 
 ## Warnings
 

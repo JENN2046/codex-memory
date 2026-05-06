@@ -43,7 +43,7 @@
 | M-006 | docs-governance | A0 | todo | 文档入口继续压缩，减少重复 checkpoint 噪音 | `git diff --check` / link check | 优先改索引和导航，不堆 README |
 | M-007 | docs-governance | A0 | todo | `.agent_board` board-only 记录按批次聚合 | diff inspection | 不为普通 push-after gate 创建 checkpoint-20 |
 | M-008 | next-phase | A1 | todo | 准备 Phase F / Codex-Claude memory governance / client scope 的候选计划 | docs review / no runtime change | 只是候选计划，不自动启动新阶段 |
-| M-009 | claude-client | A1 | partial | Claude MCP 接入最小验收 | HTTP health / `claude mcp get/list` / direct MCP `memory_overview` / `gate:mainline` | config 已写入且 MCP connected；`deepseek-v4-pro` 模型侧仍因 API `ConnectionRefused` 待补验 |
+| M-009 | claude-client | A1 | done | Claude MCP 接入最小验收 | HTTP health / `claude mcp get/list` / direct MCP `memory_overview` / `deepseek-v4-pro` model-mediated `memory_overview` / `gate:mainline` | config 已写入且 MCP connected；`deepseek-v4-pro` 模型侧调用已成功；仅交互式 `/mcp` 面板可后补 |
 
 ## 推荐执行顺序
 
