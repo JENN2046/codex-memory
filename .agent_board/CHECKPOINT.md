@@ -10,7 +10,7 @@ P9-codex-claude-client-scope
 
 ## Current Status
 
-`bcb2d84 docs: add maintenance backlog` is already synchronized with `origin/main`. The local batch now also prepares Claude MCP minimal acceptance: local HTTP health and `claude mcp list` were checked without writing Claude config, and the actual `claude mcp add` step is documented as an explicit-authorization boundary.
+`bcb2d84 docs: add maintenance backlog` is already synchronized with `origin/main`. The local batch now records Claude MCP minimal acceptance through the latest approved model, `deepseek-ai/deepseek-v4-flash`: local HTTP health, Claude config connection, direct MCP, model-mediated MCP, and mainline gate are all validated.
 
 ## Completed Work
 
@@ -218,6 +218,11 @@ P9-codex-claude-client-scope
 - Direct MCP protocol `tools/call memory_overview` succeeded with `overviewIsError=false`.
 - User requested `deepseek-v4-pro`; model-mediated retry used `--model deepseek-v4-pro` but failed before tool execution with API `ConnectionRefused`.
 - Rerun with `--model deepseek-v4-pro` succeeded; verbose stream confirmed `memory_overview 调用成功`.
+- User later approved switching the Claude Code model to `deepseek-ai/deepseek-v4-flash`.
+- `deepseek-ai/deepseek-v4-flash` model smoke returned `OK`.
+- `deepseek-ai/deepseek-v4-flash` read-only repository capability assessment succeeded.
+- `deepseek-ai/deepseek-v4-flash` model-mediated MCP `memory_overview` succeeded; verbose stream confirmed `memory_overview 调用成功`.
+- `.omc/` was added to `.gitignore` as local Claude/OMC runtime state.
 
 ## Validation Not Run
 
@@ -232,7 +237,7 @@ P9-codex-claude-client-scope
 |---|---|
 | MCP mode | HTTP mainline assumption; verify before runtime claims |
 | HTTP health | latest known `200` from mainline gate |
-| Mainline gate | latest local verification passed |
+| Mainline gate | latest local verification passed after `deepseek-ai/deepseek-v4-flash` MCP validation |
 | Compare suite | latest known baseline `39/39 matched` |
 | Rollback readiness | latest known baseline `39/39 rollback-ready` |
 | Profile gate | not run |
@@ -251,14 +256,14 @@ P9-codex-claude-client-scope
 
 ## Remaining Risks
 
-- Current local changes are a docs-governance/client-scope aggregate batch: `bcb2d84` board-only post-push note, Codex/Claude target-scope alignment, and Claude MCP minimal acceptance preflight.
+- Current local changes are a docs-governance/client-scope aggregate batch: `bcb2d84` board-only post-push note, Codex/Claude target-scope alignment, Claude MCP minimal acceptance records, and `.omc/` local runtime ignore.
 - Claude configuration write is complete.
-- Model-mediated `memory_overview` is now validated with `deepseek-v4-pro`.
+- Model-mediated `memory_overview` is now validated with `deepseek-ai/deepseek-v4-flash`; `deepseek-v4-pro` remains historical evidence only.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Validate docs after the `deepseek-v4-pro` success record, then create a guarded local commit if coherent. Stop before any remote write.
+Validate docs after the `deepseek-ai/deepseek-v4-flash` success record, then create a guarded local commit if coherent. Stop before any remote write.
 
 ## Last Local Commit
 

@@ -2,24 +2,24 @@
 
 ## Goal
 
-Prepare Claude MCP minimal acceptance.
+Prepare Claude MCP minimal acceptance and switch the model-side validation path to `deepseek-ai/deepseek-v4-flash`.
 
 ## Safe State
 
-Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is synchronized with `origin/main`. The active worktree changes are docs-governance updates that scope the project to `Codex` and `Claude`, plus Claude MCP minimal acceptance docs and `.agent_board` blocker notes.
+Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is synchronized with `origin/main`. The active local commits and worktree changes are docs-governance updates that scope the project to `Codex` and `Claude`, plus Claude MCP minimal acceptance docs, model-side validation records, `.agent_board` notes, and `.omc/` ignore handling.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: Codex/Claude target-scope docs, Claude MCP acceptance docs, and `.agent_board` changes present locally; no checkpoint-20 file created
+- Worktree: Codex/Claude target-scope docs, Claude MCP acceptance docs, `deepseek-ai/deepseek-v4-flash` validation notes, `.gitignore`, and `.agent_board` changes present locally; no checkpoint-20 file created
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; maintenance backlog committed and pushed as `bcb2d84`; push-after gate passed; Codex/Claude target-scope docs updated; Claude MCP local preflight completed
-- in_progress: local docs/client-scope aggregate includes the authorized Claude config write, direct MCP `memory_overview` success, and `deepseek-v4-pro` model-mediated success
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; maintenance backlog committed and pushed as `bcb2d84`; push-after gate passed; Codex/Claude target-scope docs updated; Claude MCP local preflight completed; `deepseek-v4-pro` historical model-mediated success recorded; `deepseek-ai/deepseek-v4-flash` model-mediated success recorded
+- in_progress: local docs/client-scope aggregate is ready for final diff validation and guarded local commit
 - blocked: none for minimal non-interactive acceptance; interactive `/mcp` panel remains optional manual follow-up
-- remaining: validate docs after the `deepseek-v4-pro` success record and commit local batch if clean; push requires explicit remote authorization
+- remaining: validate docs after the `deepseek-ai/deepseek-v4-flash` success record and commit local batch if clean; push requires explicit remote authorization
 
 ## Changed Files
 
@@ -41,6 +41,9 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 - `logs/claude-mcp-minimal-acceptance-01.md`
 - `logs/claude-mcp-minimal-acceptance-02.md`
 - `logs/claude-mcp-minimal-acceptance-03.md`
+- `logs/claude-mcp-minimal-acceptance-04.md`
+- `logs/claude-mcp-minimal-acceptance-05.md`
+- `.gitignore`
 - `.agent_board/BLOCKERS.md`
 - `.agent_board/DECISIONS.md`
 
@@ -80,6 +83,10 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 - Direct MCP `memory_overview`: succeeded via protocol probe with `overviewIsError=false`
 - `deepseek-v4-pro` model-mediated retry: failed before tool execution with API `ConnectionRefused`
 - `deepseek-v4-pro` model-mediated rerun: succeeded; final result included `memory_overview 调用成功`
+- `deepseek-ai/deepseek-v4-flash` model smoke: succeeded
+- `deepseek-ai/deepseek-v4-flash` read-only capability assessment: succeeded
+- `deepseek-ai/deepseek-v4-flash` model-mediated MCP `memory_overview`: succeeded; final result included `memory_overview 调用成功`
+- `npm run gate:mainline`: passed after Flash validation; health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -107,13 +114,13 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 - `MAINTENANCE_BACKLOG.md` is now the maintenance-phase queue for donor/provider/docs follow-up work.
 - Keep the `bcb2d84` push-after result as a board-only delayed note.
 - Product target is now Codex and Claude only; VCPToolBox remains donor/reference compatibility, not a service target.
-- Claude Code local HTTP MCP is the first Claude acceptance path; model-side acceptance should use `deepseek-v4-pro` per user instruction.
+- Claude Code local HTTP MCP is the first Claude acceptance path; model-side acceptance should now use `deepseek-ai/deepseek-v4-flash` per latest user instruction.
 - Claude config write was explicitly authorized and completed.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Validate docs after the `deepseek-v4-pro` success record, then create a guarded local aggregate commit if coherent. Do not push without explicit authorization.
+Validate docs after the `deepseek-ai/deepseek-v4-flash` success record, then create a guarded local aggregate commit if coherent. Do not push without explicit authorization.
 
 ## Warnings
 

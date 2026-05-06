@@ -106,6 +106,7 @@
 - Claude MCP 接入记录：[claude-mcp-minimal-acceptance-02.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-02.md)
 - Claude MCP `deepseek-v4-pro` 重试记录：[claude-mcp-minimal-acceptance-03.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-03.md)
 - Claude MCP `deepseek-v4-pro` 成功验收：[claude-mcp-minimal-acceptance-04.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-04.md)
+- Claude MCP `deepseek-ai/deepseek-v4-flash` 成功验收：[claude-mcp-minimal-acceptance-05.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-05.md)
 
 ## 想继续推进什么
 

@@ -18,7 +18,7 @@
 
 优先验收：
 
-- Claude Code 本地 HTTP MCP 接入；模型侧验收使用 `deepseek-v4-pro`
+- Claude Code 本地 HTTP MCP 接入；当前模型侧验收使用 `deepseek-ai/deepseek-v4-flash`
 
 暂不自动验收：
 
@@ -145,7 +145,7 @@ npm run gate:mainline
 
 ## 当前状态
 
-`COMPLETED_VALIDATED` for the non-interactive `deepseek-v4-pro` model-mediated `memory_overview` path.
+`COMPLETED_VALIDATED` for the non-interactive `deepseek-ai/deepseek-v4-flash` model-mediated `memory_overview` path.
 
 已完成：
 
@@ -156,7 +156,9 @@ npm run gate:mainline
 - `claude mcp get vcp_codex_memory` 显示 connected。
 - `claude mcp list` 显示 `vcp_codex_memory` connected。
 - 直接 MCP 协议 `tools/call memory_overview` 成功，`overviewIsError=false`。
-- 使用 `deepseek-v4-pro` 的模型侧 `memory_overview` 调用成功，最终结果包含 `memory_overview 调用成功`。
+- 历史使用 `deepseek-v4-pro` 的模型侧 `memory_overview` 调用成功，最终结果包含 `memory_overview 调用成功`。
+- 按用户新批准，切换到 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用成功，最终结果包含 `memory_overview 调用成功`。
+- 使用 `deepseek-ai/deepseek-v4-flash` 的只读仓库能力评估成功返回。
 - `npm run gate:mainline` 仍通过：health `200`，compare `39/39 matched`，rollback `39/39 rollback-ready`。
 - 验收命令、通过标准和回滚命令文档化。
 
@@ -173,3 +175,4 @@ npm run gate:mainline
 - [claude-mcp-minimal-acceptance-02.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-02.md)
 - [claude-mcp-minimal-acceptance-03.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-03.md)
 - [claude-mcp-minimal-acceptance-04.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-04.md)
+- [claude-mcp-minimal-acceptance-05.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-05.md)

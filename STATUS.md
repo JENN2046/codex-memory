@@ -7,7 +7,7 @@
 - `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
 - 最新远端主线提交是 `bcb2d84 docs: add maintenance backlog`；最新独立推送后主线 gate 复核见 [phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)，最新 board-only 复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0030`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
-- Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户要求使用 `deepseek-v4-pro` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
+- Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
 - `Phase C` 已基本收口到“高 donor 兼容度”，现在具备全量重建、自动回填、增量同步，以及 `DeepMemo/TopicMemo` 的主要边界语义与展示语义兼容。
 - `Phase D` 的兼容与回滚层已经继续向前：除了 donor 风格 `DeepMemo/TopicMemo` 独立 CLI、只读 compare harness、active-memory 运维 CLI 外，现在还具备字段级 diff、批量 suite 对照、汇总级 diff 报告、只读 rollback readiness 报告，以及仓库内可复用的标准 active-memory suite 数据集。
