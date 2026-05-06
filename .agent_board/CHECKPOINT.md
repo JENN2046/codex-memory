@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-Track Phase E P2-2 provider benchmark docs plus delayed `8e3ae8d` board-only gate note.
+Track Phase E P2-2 provider benchmark reports index plus delayed `ba7031a` board-only gate note.
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P3-provider-profile / P0-mainline-health
 
 ## Current Status
 
-Provider benchmark retention docs are prepared locally with the delayed `8e3ae8d` board-only gate note. No real provider call was run.
+Provider benchmark reports index is prepared locally with the delayed `ba7031a` board-only gate note. No real provider call was run.
 
 ## Completed Work
 
@@ -40,6 +40,11 @@ Provider benchmark retention docs are prepared locally with the delayed `8e3ae8d
 - Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
 - Added `PHASE_E_PROVIDER_BENCHMARK.md` as the Phase E P2-2 lightweight provider benchmark retention entrypoint.
 - Linked the provider benchmark entrypoint from README, Phase navigation, Phase E backlog, and Phase E summary.
+- `ba7031a docs: add phase e provider benchmark entrypoint` pushed to `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed for `ba7031a`.
+- Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
+- Added `benchmarks/reports/README.md` as the provider benchmark reports retention index.
+- Linked the reports index from `PHASE_E_PROVIDER_BENCHMARK.md` and `benchmarks/provider-benchmark.md`.
 
 ## Changed Files
 
@@ -68,6 +73,8 @@ Provider benchmark retention docs are prepared locally with the delayed `8e3ae8d
 - `PROJECT_CLOSURE.md`
 - `PHASE_E_PROVIDER_BENCHMARK.md`
 - `README.md`
+- `benchmarks/reports/README.md`
+- `benchmarks/provider-benchmark.md`
 
 ## Validation Run
 
@@ -111,6 +118,12 @@ Provider benchmark retention docs are prepared locally with the delayed `8e3ae8d
 - Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
 - `git diff --check` passed for provider benchmark docs with CRLF warnings only.
 - Package script references exist for `provider-smoke`, `provider-benchmark`, `profile-health`, `profile-gate`, `gate:mainline`, `compare-active-memory`, and `rollback-active-memory`.
+- `git push origin main` succeeded (`8e3ae8d..ba7031a`).
+- Pre-board-update `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git diff --check` passed for provider reports index with CRLF warnings only.
+- Provider reports link/secret/trailing-space scan passed; secret scan only found placeholder/safety text.
+- Package script references still exist for provider/profile/mainline commands.
 
 ## Validation Not Run
 
@@ -142,14 +155,14 @@ Provider benchmark retention docs are prepared locally with the delayed `8e3ae8d
 
 ## Remaining Risks
 
-- Current docs and `.agent_board` changes are ready for guarded local aggregate commit.
+- Current `.agent_board` changes are intentionally uncommitted and should be aggregated with the next local batch.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Create a guarded local aggregate commit for provider benchmark docs plus board note. Push still requires explicit remote authorization.
+Continue the next local low-risk batch; include this board-only push-after note in the next aggregate commit. Push still requires explicit remote authorization.
 
 ## Last Local Commit
 
-- `8e3ae8d docs: sync phase e checkpoint 19 baseline`
+- `ba7031a docs: add phase e provider benchmark entrypoint`
 

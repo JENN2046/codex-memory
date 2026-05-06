@@ -102,6 +102,10 @@ JSON 报告会包含：
 - `latency.averageQueryLatencyMs`
 - `queries[*].firstRelevantRank`
 
+报告留档目录：
+
+- [reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
+
 ## 注意事项
 
 - 如果显式要求了远端 provider，但没有配置 key，CLI 会把该 provider 标成 `skipped` 并返回非零退出码。

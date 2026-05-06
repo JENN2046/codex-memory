@@ -83,6 +83,10 @@ CLI 报告默认进入：
 A:\codex-memory\benchmarks\reports\provider-benchmark-*.json
 ```
 
+历史报告索引：
+
+- [benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
+
 建议每次真实 benchmark 后补一条简短记录，至少包括：
 
 - 时间
