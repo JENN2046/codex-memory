@@ -6,20 +6,20 @@ Polish Phase E P2-2 provider benchmark documentation with a reusable record temp
 
 ## Safe State
 
-Runtime code is not being changed. The active worktree changes are docs-only P2-2 provider benchmark guidance plus `.agent_board` updates. The prior `f40a6f6` push-after gate note remains aggregated locally; checkpoint-20 was not created.
+Runtime code is not being changed. The P2-2 provider benchmark guidance batch was committed locally as `3eaf11f`; the prior `f40a6f6` push-after gate note remains aggregated in the local history. Checkpoint-20 was not created.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: P2-2 docs/template plus `.agent_board` changes present locally; no checkpoint-20 file created
+- Worktree: local branch is ahead of `origin/main`; no checkpoint-20 file created
 
 ## Queue Summary
 
 - done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6` and pushed to `origin/main`; push-after gate passed; P2-2 provider benchmark record template added locally
-- in_progress: guarded local aggregate commit preparation
+- in_progress: waiting for explicit remote authorization before push
 - blocked: none
-- remaining: create guarded local aggregate commit if final diff inspection is clean; push requires explicit remote authorization
+- remaining: push requires explicit remote authorization; after push run one `git status --short` + `npm run gate:mainline` and record the result in `.agent_board` only
 
 ## Changed Files
 
@@ -77,7 +77,7 @@ Runtime code is not being changed. The active worktree changes are docs-only P2-
 
 ## Next Safe Task
 
-Create a guarded local aggregate commit for the docs-only P2-2 batch. Do not push without explicit remote authorization.
+Do not push without explicit remote authorization. If authorized, push local commits to `origin/main`, then run one push-after `git status --short` + `npm run gate:mainline`.
 
 ## Warnings
 

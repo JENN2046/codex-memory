@@ -10,7 +10,7 @@ P3-provider-profile
 
 ## Current Status
 
-The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` only. P2-2 provider docs now include a benchmark record template, interpretation guidance, and clearer retention rules. No checkpoint-20 file was created.
+The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` only. P2-2 provider docs now include a benchmark record template, interpretation guidance, and clearer retention rules. The docs batch was committed locally as `3eaf11f`; no checkpoint-20 file was created.
 
 ## Completed Work
 
@@ -173,14 +173,14 @@ The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` on
 
 ## Remaining Risks
 
-- Current local docs and `.agent_board` changes are ready for a guarded aggregate commit.
+- Local docs and `.agent_board` changes have been committed locally.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Create a guarded local aggregate commit for this docs-only P2-2 batch. Push still requires explicit remote authorization.
+If the user explicitly authorizes remote write, push the local commits to `origin/main`, then run one push-after `git status --short` + `npm run gate:mainline` and record the result in `.agent_board` only.
 
 ## Last Local Commit
 
-- Pending guarded local aggregate commit for this P2-2 docs batch; previous pushed commit is `f40a6f6 docs: add provider benchmark reports index`.
+- `3eaf11f docs: polish provider benchmark retention docs` (local only; not pushed)
 
