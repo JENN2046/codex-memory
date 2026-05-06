@@ -220,7 +220,7 @@
 
 ### P2-2 provider / embedding / rerank 对照继续完善
 
-状态：已补轻量留档入口：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
+状态：已补轻量留档入口、reports 索引和记录模板：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
 
 目标：
 

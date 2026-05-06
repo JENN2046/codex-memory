@@ -24,6 +24,10 @@
 - 如果 provider 被 `skipped` 或报告 `complete=false`，在摘要里保留 blocker 原因
 - 不把 provider benchmark 结果当作 mainline gate 的替代品
 
+如果报告会作为 profile 迁移、provider 切换或长期对照证据，同步补一条脱敏记录：
+
+- [phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)
+
 ## 读取顺序
 
 1. 先看 JSON 顶层 `summary`。

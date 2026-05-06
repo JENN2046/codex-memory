@@ -2,31 +2,32 @@
 
 ## Goal
 
-Prepare Phase E P2-2 provider benchmark reports index plus delayed `ba7031a` board-only gate note for local aggregate commit.
+Polish Phase E P2-2 provider benchmark documentation with a reusable record template and clearer retention/interpretation guidance.
 
 ## Safe State
 
-Runtime code is not being changed. The active worktree changes are provider benchmark report-index docs plus board-only notes for the `ba7031a` push-after gate result.
+Runtime code is not being changed. The active worktree changes are docs-only P2-2 provider benchmark guidance plus `.agent_board` updates. The prior `f40a6f6` push-after gate note remains aggregated locally; checkpoint-20 was not created.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: provider benchmark report-index docs plus `.agent_board` changes present locally; no checkpoint-20 file created
+- Worktree: P2-2 docs/template plus `.agent_board` changes present locally; no checkpoint-20 file created
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a` and pushed to `origin/main`; push-after gate passed
-- in_progress: provider benchmark reports index plus board-only note for `ba7031a` push-after gate
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6` and pushed to `origin/main`; push-after gate passed; P2-2 provider benchmark record template added locally
+- in_progress: guarded local aggregate commit preparation
 - blocked: none
-- remaining: continue next local batch; aggregate this board note later; push requires explicit remote authorization
+- remaining: create guarded local aggregate commit if final diff inspection is clean; push requires explicit remote authorization
 
 ## Changed Files
 
 - `.agent_board/*.md`
-- `benchmarks/reports/README.md`
-- `benchmarks/provider-benchmark.md`
+- `PHASE_E_BACKLOG.md`
 - `PHASE_E_PROVIDER_BENCHMARK.md`
+- `benchmarks/reports/README.md`
+- `logs/phase-e-provider-benchmark-record-template.md`
 
 ## Validation Evidence
 
@@ -46,11 +47,14 @@ Runtime code is not being changed. The active worktree changes are provider benc
 - push-after gate: passed after `000c149`
 - push-after gate: passed after `8e3ae8d`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
 - push-after gate: passed after `ba7031a`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
+- push-after gate: passed after `f40a6f6`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
 - provider benchmark docs validation: `git diff --check` passed with CRLF warnings only; package script references exist
 - provider reports index validation: `git diff --check` passed with CRLF warnings only; report links present; secret scan only found placeholder/safety text
+- provider record template validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; local link target check passed; package script reference check passed; high-confidence secret pattern scan passed
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
+- provider benchmark: not run
 
 ## Runtime Notes
 
@@ -66,13 +70,14 @@ Runtime code is not being changed. The active worktree changes are provider benc
 
 ## Decisions
 
-- Keep the `ba7031a` push-after result as a board-only delayed note and aggregate it with provider benchmark report-index docs.
+- Keep the `f40a6f6` push-after result as a board-only delayed note.
 - Do not create checkpoint-20 unless a later batch needs a formal checkpoint.
+- Treat provider benchmark records as sanitized evidence for provider/profile comparison, not as a replacement for compare / rollback / mainline gate.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Create the local aggregate commit for the provider benchmark reports index and board note. Do not push without explicit remote authorization.
+Create a guarded local aggregate commit for the docs-only P2-2 batch. Do not push without explicit remote authorization.
 
 ## Warnings
 

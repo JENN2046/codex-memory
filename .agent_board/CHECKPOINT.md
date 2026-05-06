@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-Track Phase E P2-2 provider benchmark reports index plus delayed `ba7031a` board-only gate note.
+Polish Phase E P2-2 provider benchmark documentation so future provider/profile benchmark evidence has a reusable record template and clearer interpretation rules.
 
 ## Current Area
 
-P3-provider-profile / P0-mainline-health
+P3-provider-profile
 
 ## Current Status
 
-Provider benchmark reports index is prepared locally with the delayed `ba7031a` board-only gate note. No real provider call was run.
+The prior `f40a6f6` push-after gate result remains recorded in `.agent_board` only. P2-2 provider docs now include a benchmark record template, interpretation guidance, and clearer retention rules. No checkpoint-20 file was created.
 
 ## Completed Work
 
@@ -45,6 +45,13 @@ Provider benchmark reports index is prepared locally with the delayed `ba7031a` 
 - Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
 - Added `benchmarks/reports/README.md` as the provider benchmark reports retention index.
 - Linked the reports index from `PHASE_E_PROVIDER_BENCHMARK.md` and `benchmarks/provider-benchmark.md`.
+- `f40a6f6 docs: add provider benchmark reports index` pushed to `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed for `f40a6f6`.
+- Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
+- Added `logs/phase-e-provider-benchmark-record-template.md` as a reusable sanitized record template for real provider benchmark / smoke / profile migration evidence.
+- Linked the record template from `PHASE_E_PROVIDER_BENCHMARK.md` and `benchmarks/reports/README.md`.
+- Clarified provider benchmark留档粒度 and result interpretation order.
+- Updated `PHASE_E_BACKLOG.md` P2-2 status to reflect entrypoint, reports index, and record template coverage.
 
 ## Changed Files
 
@@ -75,6 +82,7 @@ Provider benchmark reports index is prepared locally with the delayed `ba7031a` 
 - `README.md`
 - `benchmarks/reports/README.md`
 - `benchmarks/provider-benchmark.md`
+- `logs/phase-e-provider-benchmark-record-template.md`
 
 ## Validation Run
 
@@ -124,10 +132,20 @@ Provider benchmark reports index is prepared locally with the delayed `ba7031a` 
 - `git diff --check` passed for provider reports index with CRLF warnings only.
 - Provider reports link/secret/trailing-space scan passed; secret scan only found placeholder/safety text.
 - Package script references still exist for provider/profile/mainline commands.
+- `git push origin main` succeeded (`ba7031a..f40a6f6`).
+- Pre-board-update `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git diff --check` passed for the P2-2 provider benchmark record template batch, with CRLF warnings only.
+- Trailing whitespace scan passed for the P2-2 provider docs/template files.
+- Local link target check passed for referenced provider docs/template/report files.
+- Package script reference check passed for provider/profile/mainline commands.
+- High-confidence secret pattern scan passed.
 
 ## Validation Not Run
 
 - `npm run gate:mainline:strict`
+- `npm run provider-smoke -- --json`
+- `npm run provider-benchmark -- --json`
 
 
 ## MCP / Runtime State
@@ -155,14 +173,14 @@ Provider benchmark reports index is prepared locally with the delayed `ba7031a` 
 
 ## Remaining Risks
 
-- Current `.agent_board` changes are intentionally uncommitted and should be aggregated with the next local batch.
+- Current local docs and `.agent_board` changes are ready for a guarded aggregate commit.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Continue the next local low-risk batch; include this board-only push-after note in the next aggregate commit. Push still requires explicit remote authorization.
+Create a guarded local aggregate commit for this docs-only P2-2 batch. Push still requires explicit remote authorization.
 
 ## Last Local Commit
 
-- `ba7031a docs: add phase e provider benchmark entrypoint`
+- Pending guarded local aggregate commit for this P2-2 docs batch; previous pushed commit is `f40a6f6 docs: add provider benchmark reports index`.
 

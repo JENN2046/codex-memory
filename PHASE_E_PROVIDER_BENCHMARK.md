@@ -87,6 +87,10 @@ A:\codex-memory\benchmarks\reports\provider-benchmark-*.json
 
 - [benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
 
+记录模板：
+
+- [phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)
+
 建议每次真实 benchmark 后补一条简短记录，至少包括：
 
 - 时间
@@ -99,7 +103,11 @@ A:\codex-memory\benchmarks\reports\provider-benchmark-*.json
 - 未验证项
 - 是否影响默认主线判断
 
-如果只是本地 baseline 或 dry-run 型查看，可以只记在 `.agent_board/VALIDATION_LOG.md`，不必新增独立日志。
+留档粒度：
+
+- 本地 baseline、dry-run 型查看或纯文档核对：只记 `.agent_board/VALIDATION_LOG.md` 即可。
+- 触达真实远端 provider、用于 profile 迁移判断、或将作为后续对照证据：复制记录模板生成一条正式 `logs/phase-e-provider-benchmark-*.md`。
+- 如果 JSON 报告 `complete=false` 或 provider 被 `skipped`，正式记录里保留 blocker 原因，不把它写成全量通过。
 
 ## 禁止自动执行
 
@@ -115,6 +123,13 @@ A:\codex-memory\benchmarks\reports\provider-benchmark-*.json
 ## 结果判断
 
 provider benchmark 只说明 embedding provider 的检索差异，不等同于完整 recall 主链质量。
+
+判读顺序：
+
+1. 先看 JSON 顶层 `summary.ok` / `summary.complete` / `summary.message`。
+2. 再看 `selectedProviders` 和 `dataset`，确认本次对照范围是否符合任务目标。
+3. 再看各 provider 的 `status`、`metrics.top1`、`metrics.recallAtK`、`metrics.mrr` 和 latency。
+4. 最后按需要抽查 query 级证据，例如 `queries[*].firstRelevantRank` 与 Top-K 候选。
 
 最终主线判断仍以这些入口为准：
 
