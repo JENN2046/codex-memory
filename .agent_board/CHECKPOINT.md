@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-Close Phase E as a final local governance batch.
+Create the first maintenance-phase backlog batch.
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P6-docs-drift
 
 ## Current Status
 
-Phase E final closeout docs are prepared as one local aggregate batch. The batch marks every Phase E backlog item as closed or moved into maintenance-phase incremental work, carries the `59f1b03` board-only push-after result, and keeps checkpoint-20 uncreated.
+`MAINTENANCE_BACKLOG.md` is prepared locally and post-Phase-E donor/provider/docs follow-ups have been moved into the maintenance-phase queue. The batch also carries the `49537f6` board-only push-after gate result. No checkpoint-20 file was created.
 
 ## Completed Work
 
@@ -65,6 +65,12 @@ Phase E final closeout docs are prepared as one local aggregate batch. The batch
 - Added `PHASE_E_FINAL_CLOSEOUT.md`.
 - Updated Phase E backlog/summary/navigation/status/project closure/memory to reflect Phase E closeout.
 - Moved remaining donor/provider/docs work into maintenance-phase incremental work instead of Phase E open backlog.
+- `49537f6 docs: close phase e` pushed to `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed for `49537f6`.
+- Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
+- Added `MAINTENANCE_BACKLOG.md`.
+- Linked the maintenance backlog from Phase E closeout, Phase navigation, README, status, project closure, and memory.
+- Migrated donor/provider/docs follow-up items out of Phase E into the maintenance-phase queue.
 
 ## Changed Files
 
@@ -78,6 +84,7 @@ Phase E final closeout docs are prepared as one local aggregate batch. The batch
 - `PHASE_E_BACKLOG.md`
 - `PHASE_E_CHECKPOINT_INDEX.md`
 - `PHASE_E_FINAL_CLOSEOUT.md`
+- `MAINTENANCE_BACKLOG.md`
 - `PHASE_E_DAILY_SELF_CHECK.md`
 - `PHASE_NAVIGATION.md`
 - `logs/phase-e-mainline-gate-checkpoint-17.md`
@@ -170,6 +177,13 @@ Phase E final closeout docs are prepared as one local aggregate batch. The batch
 - Referenced local file check passed.
 - High-confidence secret pattern scan passed.
 - `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git push origin main` succeeded (`59f1b03..49537f6`).
+- Pre-board-update `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git diff --check` passed for the maintenance backlog docs batch, with CRLF warnings only.
+- Trailing whitespace scan passed.
+- Referenced local file check passed.
+- High-confidence secret pattern scan passed.
 
 ## Validation Not Run
 
@@ -203,7 +217,7 @@ Phase E final closeout docs are prepared as one local aggregate batch. The batch
 
 ## Remaining Risks
 
-- Current local docs and `.agent_board` changes form one coherent final closeout batch.
+- Current local docs and `.agent_board` changes form one coherent maintenance backlog batch.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
@@ -212,5 +226,5 @@ Stop before remote write. If the user explicitly authorizes push, run `git push 
 
 ## Last Local Commit
 
-- Current Phase E final closeout batch is local only until explicitly pushed; previous pushed commit is `59f1b03 docs: sync phase e board-only checkpoint index`.
+- Current maintenance backlog batch is local only until explicitly pushed; previous pushed commit is `49537f6 docs: close phase e`.
 

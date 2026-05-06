@@ -118,6 +118,8 @@
   - 当前已有 reports 索引：[benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
   - 当前已有脱敏记录模板：[phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)
 
+维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+
 ## 结论
 
 `Phase E` 已经完成“默认主链稳定化 + 高价值 donor 精修 + 可维护入口收口”的主体目标。

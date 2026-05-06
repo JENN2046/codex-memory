@@ -10,8 +10,9 @@
 2. 项目收官：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
 3. 阶段结论：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 4. Phase E 收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
-5. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
-6. 后续 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+5. 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+6. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
+7. Phase E 历史 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
 
 ## 想确认“主链是否已经收官”
 
@@ -19,6 +20,7 @@
 - 默认主链切换结论：[PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md](/A:/codex-memory/PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md)
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 - Phase E 最终收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
+- 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
 
 ## 想看“Phase D 是怎么验收和灰度的”
 
@@ -43,6 +45,7 @@
 - Phase E 阶段总结：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 - Phase E 最终收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 - Phase E backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+- 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
 
 关键收口记录：
 
@@ -102,7 +105,7 @@
 ## 想继续推进什么
 
 - 如果目标是“继续稳定维护默认主链”：先看 [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
-- 如果目标是“继续排优先级做后续精修”：先看 [PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+- 如果目标是“继续排优先级做后续精修”：先看 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
 - 如果目标是“恢复最近决策和基线”：先看 [MEMORY.md](/A:/codex-memory/MEMORY.md)
 
 ## 当前推荐恢复路径
@@ -113,4 +116,4 @@
 2. 看 [PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
 3. 看 [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 4. 看 [PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
-5. 如果要继续做事，再看 [PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+5. 如果要继续做事，再看 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)

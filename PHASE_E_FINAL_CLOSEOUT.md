@@ -50,12 +50,17 @@
 - 文档入口继续压缩
 - 进入下一阶段的 VCP parity / memory governance / multi-agent arbitration
 
+维护期 backlog：
+
+- [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+
 推荐后续从这些入口恢复上下文：
 
 1. [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md)
-2. [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
-3. [PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
-4. [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
+2. [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+3. [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
+4. [PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+5. [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 
 ## 验证要求
 

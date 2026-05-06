@@ -19,6 +19,7 @@
   - rollback `39/39 rollback-ready`
 - Phase E 已补最终收官入口：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)；当前没有 Phase E open blocker，后续工作转入维护期增量任务。
 - `.agent_board` 的 `59f1b03` board-only note 已纳入 Phase E final closeout 本地批次，等待统一提交。
+- 维护期第一批低风险任务是新增 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)，把 donor/provider/docs 后续项从 Phase E 迁出，作为维护期增量队列管理。
 
 ## 2026-05-05 项目记忆（历史快照）
 

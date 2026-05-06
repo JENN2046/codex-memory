@@ -79,7 +79,8 @@
 
 1. [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md)
 2. [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
-3. [PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+3. [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+4. [PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
 
 ## 一句话收尾
 

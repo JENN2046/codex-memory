@@ -35,6 +35,7 @@
 - `Phase E` 的后续精修 backlog 也已整理：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)。当前已经把后续工作按 `P0 / P1 / P2` 和“主线 / 精修线 / 可维护性”分组。
 - `Phase E` 的阶段总结也已整理：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)。当前可以更清楚地区分：哪些已经是稳定基线，哪些还属于后续 backlog。
 - `Phase E` 的最终收官说明也已整理：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)。当前没有 Phase E open blocker，后续 donor 边角、suite 扩容、provider benchmark 和文档压缩统一迁入维护期增量任务。
+- 维护期 backlog 也已整理：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)。当前维护期从 donor compatibility、provider/profile evidence、docs governance 三条低风险增量线开始。
 - 阶段导航页也已整理：[PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md)。当前 README / STATUS / MEMORY / 各阶段资产之间已有一张更薄的入口页可直接跳转。
 - 项目正式收官说明也已整理：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)。当前项目边界已明确切到“主项目收官，后续转维护与精修期”。
 - `Phase E / P0-1` 已开始落成仓库标准门禁入口：新增 `gate:mainline` / `gate:mainline:strict`，把默认主链的 health、contract、compare、rollback 和全量回归收口成可复用 CLI。

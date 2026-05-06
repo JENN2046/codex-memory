@@ -14,7 +14,7 @@
 
 - `Phase E` 已完成：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 - 当前没有 Phase E open blocker
-- 后续 donor 边角、suite 扩容、provider benchmark 和文档压缩统一迁入维护期增量任务
+- 后续 donor 边角、suite 扩容、provider benchmark 和文档压缩统一迁入维护期增量任务：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
 
 配套文档：
 

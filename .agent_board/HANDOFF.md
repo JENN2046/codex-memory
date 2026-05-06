@@ -2,33 +2,33 @@
 
 ## Goal
 
-Close Phase E as one final local governance batch.
+Create the first maintenance-phase backlog batch.
 
 ## Safe State
 
-Runtime code is not being changed. The active worktree changes are docs/governance closeout plus `.agent_board` notes. The batch includes `PHASE_E_FINAL_CLOSEOUT.md` and carries the `59f1b03` board-only push-after gate result.
+Runtime code is not being changed. The active worktree changes are docs-only maintenance backlog updates plus `.agent_board` notes. The batch includes `MAINTENANCE_BACKLOG.md` and carries the `49537f6` board-only push-after gate result.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: Phase E final closeout docs plus `.agent_board` changes present locally; no checkpoint-20 file created
+- Worktree: maintenance backlog docs plus `.agent_board` changes present locally; no checkpoint-20 file created
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; push-after gate passed; Phase E final closeout docs validated locally
-- in_progress: Phase E final closeout batch is local-only until explicit push authorization
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; push-after gate passed; maintenance backlog docs validated locally
+- in_progress: maintenance backlog batch is local-only until explicit push authorization
 - blocked: none
 - remaining: push requires explicit remote authorization; after push run one `git status --short` + `npm run gate:mainline` and record the result in `.agent_board` only
 
 ## Changed Files
 
 - `.agent_board/*.md`
+- `MAINTENANCE_BACKLOG.md`
 - `PHASE_E_FINAL_CLOSEOUT.md`
 - `PHASE_E_BACKLOG.md`
 - `PHASE_E_SUMMARY.md`
 - `PHASE_NAVIGATION.md`
-- `PHASE_E_CHECKPOINT_INDEX.md`
 - `PROJECT_CLOSURE.md`
 - `STATUS.md`
 - `README.md`
@@ -60,6 +60,8 @@ Runtime code is not being changed. The active worktree changes are docs/governan
 - P2-1 docs navigation validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed
 - push-after gate: passed after `59f1b03`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
 - Phase E final closeout validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed; `npm run gate:mainline` passed with health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
+- push-after gate: passed after `49537f6`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
+- maintenance backlog validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -79,11 +81,12 @@ Runtime code is not being changed. The active worktree changes are docs/governan
 
 ## Decisions
 
-- Carry the `59f1b03` push-after result into the final closeout batch.
+- Keep the `49537f6` push-after result as a board-only delayed note.
 - Do not create checkpoint-20 unless a later batch needs a formal checkpoint.
 - Treat provider benchmark records as sanitized evidence for provider/profile comparison, not as a replacement for compare / rollback / mainline gate.
 - Keep checkpoint-19 as the latest independent checkpoint; board-only push-after gate results can stay in `.agent_board` until a later formal checkpoint is warranted.
 - Phase E is closed; future donor/provider/docs polish belongs to maintenance-phase incremental work.
+- `MAINTENANCE_BACKLOG.md` is now the maintenance-phase queue for donor/provider/docs follow-up work.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
