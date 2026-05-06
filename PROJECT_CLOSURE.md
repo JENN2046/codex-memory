@@ -1,6 +1,6 @@
 # Project Closure
 
-更新时间：2026-05-05
+更新时间：2026-05-06
 
 ## 正式结论
 
@@ -40,11 +40,13 @@
 
 ## 当前稳定基线
 
+- 最新远端主线提交：`000c149 docs: add mainline gate checkpoint 18`
+- 最新推送后主线 gate 复核：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount = 36`
+  - `matchedCaseCount = 39`
   - `extendedMismatchCountTotal = 0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount = 36`
+  - `readyCaseCount = 39`
   - `extendedMismatchCountTotal = 0`
 - `npm test`
   - `123/123`

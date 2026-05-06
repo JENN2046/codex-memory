@@ -2,31 +2,37 @@
 
 ## Goal
 
-Prepare checkpoint-18 for a clean, separate commit after `56c647a` was pushed.
+Prepare checkpoint-19 and a Phase E docs/status baseline sync for the aggregate commit after `000c149` was pushed.
 
 ## Safe State
 
-Runtime code is not being changed. The active worktree changes are checkpoint-18 documentation and board/entrypoint records.
+Runtime code is not being changed. The active worktree changes are checkpoint-19 documentation, recovery/status/closure baseline sync, and board/entrypoint records.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: checkpoint-18 documentation changes present locally
+- Worktree: checkpoint-19 documentation and docs/status baseline sync changes present locally
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; push-after gate passed
-- in_progress: checkpoint-18 documentation record
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149` and pushed to `origin/main`; push-after gate passed
+- in_progress: checkpoint-19 documentation record plus Phase E docs/status baseline sync, ready for local aggregate commit
 - blocked: none
-- remaining: stage, then wait for commit approval
+- remaining: create local aggregate commit; push requires explicit remote authorization
 
 ## Changed Files
 
 - `.agent_board/*.md`
 - `PHASE_E_CHECKPOINT_INDEX.md`
 - `PHASE_E_DAILY_SELF_CHECK.md`
-- `logs/phase-e-mainline-gate-checkpoint-18.md`
+- `logs/phase-e-mainline-gate-checkpoint-19.md`
+- `PHASE_NAVIGATION.md`
+- `PHASE_E_SUMMARY.md`
+- `PHASE_E_BACKLOG.md`
+- `MEMORY.md`
+- `STATUS.md`
+- `PROJECT_CLOSURE.md`
 
 ## Validation Evidence
 
@@ -41,8 +47,9 @@ Runtime code is not being changed. The active worktree changes are checkpoint-18
 - input-validation compare/rollback: latest known `5/5`
 - agent-selection compare/rollback: latest known `8/8`
 - git diff --check: passed
-- push-after gate: latest pushed checkpoint `a386bed` previously passed; this local batch is not pushed
+- push-after gate: latest pushed checkpoint `000c149` passed; this local batch is not pushed
 - push-after gate: passed after `56c647a`
+- push-after gate: passed after `000c149`
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -61,12 +68,12 @@ Runtime code is not being changed. The active worktree changes are checkpoint-18
 
 ## Decisions
 
-- Keep checkpoint-18 as a small documentation checkpoint.
+- Keep checkpoint-19 plus docs/status baseline sync as a small documentation batch and aggregate it in one commit.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Inspect diff, then stage/commit checkpoint-18 only after explicit local commit authorization.
+Create the local aggregate commit for checkpoint-19 plus docs/status baseline sync; do not push without explicit remote authorization.
 
 ## Warnings
 

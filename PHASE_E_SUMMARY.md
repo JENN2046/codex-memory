@@ -1,6 +1,6 @@
 # Phase E Summary
 
-更新时间：2026-05-05
+更新时间：2026-05-06
 
 ## 一句话结论
 
@@ -67,6 +67,7 @@
 - 标准 suite 现在还新增了 `DeepMemo` 高级查询语法混用 success case，把短语 / 可选组 / 权重项混用时的 blocked/effective donor 语义也推进进门禁
 - 标准 suite 现在还新增了 `DeepMemo` blocked 配置重复值和大小写混用 success case，把 blocked config 归一化下的 blocked/effective donor 语义也推进进门禁
 - 标准 suite 现在还新增了 `TopicMemo GetTopicContent agentId/topicId alias` success case，把多 agent alias 下的内容取回路径也推进进门禁
+- 标准 suite 现在还新增了 `DeepMemo` `key_word / KeyWord` 错误路径 alias case，把 missing-maid 与 agent-not-found 的 keyword 诊断别名推进进门禁
 
 ## 当前基线
 
@@ -77,10 +78,10 @@
 - `node --test .\tests\rollback-active-memory-cli.test.js`
   - `11/11`
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount = 36`
+  - `matchedCaseCount = 39`
   - `extendedMismatchCountTotal = 0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount = 36`
+  - `readyCaseCount = 39`
   - `extendedMismatchCountTotal = 0`
 - `npm test`
   - `123/123`

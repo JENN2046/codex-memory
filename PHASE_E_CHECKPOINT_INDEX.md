@@ -1,6 +1,6 @@
 # Phase E Checkpoint Index
 
-更新时间：2026-05-05
+更新时间：2026-05-06
 
 这份文档用于收束 Phase E 的重复运行记录链接。
 
@@ -14,11 +14,11 @@
 
 ## 当前最新状态
 
-- 最新远端主线提交：`56c647a test: add deepmemo keyword alias error cases`
-- 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-18.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-18.md)
+- 最新远端主线提交：`000c149 docs: add mainline gate checkpoint 18`
+- 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 - 最新标准 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - 最新 P1-3 错误语义记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
-- `56c647a` 推送后已复核 `git status --short` + `npm run gate:mainline`：
+- `000c149` 推送后已复核 `git status --short` + `npm run gate:mainline`：
   - `git status --short`：工作区干净
   - health：`ok`，`httpStatus=200`
   - compare：`39/39 matched`
@@ -45,6 +45,7 @@
 - 主线 gate 检查点 16：[phase-e-mainline-gate-checkpoint-16.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-16.md)
 - 主线 gate 检查点 17：[phase-e-mainline-gate-checkpoint-17.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-17.md)
 - 主线 gate 检查点 18：[phase-e-mainline-gate-checkpoint-18.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-18.md)
+- 主线 gate 检查点 19：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 
 ## HTTP 运行态记录
 

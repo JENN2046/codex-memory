@@ -1,6 +1,6 @@
 ﻿# codex-memory Memory
 
-最后更新：2026-05-05
+最后更新：2026-05-06
 
 ## 当前边界
 
@@ -9,17 +9,28 @@
 - 不再把 donor 项目当作运行时依赖，也不继续在 donor 仓库里做功能开发。
 - `docs/` 目录和治理/路线类文档现已纳入版本控制，作为当前仓库的参考与治理资料存在，但不覆盖 README / source / tests 所代表的运行时现实。
 
-## 2026-05-05 项目记忆
+## 2026-05-06 恢复状态
 
-- 当前 `main` 已推送到 `origin/main`，最新远端提交是 `c70b00e docs: sync phase e checkpoint 16`。
+- 当前 `main` 已推送到 `origin/main`，最新远端提交是 `000c149 docs: add mainline gate checkpoint 18`。
+- `000c149` 推送后已跑 `git status --short` 和 `npm run gate:mainline`：
+  - `git status --short`：工作区干净
+  - health `200` at `http://127.0.0.1:7605/health`
+  - compare `39/39 matched`
+  - rollback `39/39 rollback-ready`
+- 当前本地已补 [phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)，并挂入 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md) 与 [PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)；这批文档按聚合节奏暂未提交。
+- 本轮低风险 Phase E 小项是 `P2-1 文档压缩与导航优化`：同步恢复入口、Phase E 摘要/backlog 和 memory 基线到 checkpoint-19 / `39/39` 状态。
+
+## 2026-05-05 项目记忆（历史快照）
+
+- 当时 `main` 已推送到 `origin/main`，远端提交是 `c70b00e docs: sync phase e checkpoint 16`。
 - 本轮 `Phase E / P1-3` suite 扩容记录是 [phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)，已把 `TopicMemo GetTopicContent topicId alias topic-not-found` 错误路径正式纳入标准 suite。
 - 本轮 `Phase E / P1-3` 本地扩容后的 [phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md) 与 `npm run gate:mainline` 已通过：
   - `status: ok`
   - health `200` at `http://127.0.0.1:7605/health`
   - compare `37/37 matched`
   - rollback `37/37 rollback-ready`
-- 当前可把这组结果当成新的 Phase E suite 扩容候选锚点：它证明新增错误语义 alias case 后，默认 HTTP MCP 主链健康、compare 标准 suite 全匹配、rollback readiness 全绿。
-- 这组 P1-3 扩容结果仍需提交并推送后，才算正式进入远端主线。
+- 当时可把这组结果当成新的 Phase E suite 扩容候选锚点：它证明新增错误语义 alias case 后，默认 HTTP MCP 主链健康、compare 标准 suite 全匹配、rollback readiness 全绿。
+- 这组 P1-3 扩容结果后来已被后续 `56c647a` / `000c149` 远端主线状态取代；当前基线以 2026-05-06 恢复状态为准。
 
 ## 2026-04-26 项目记忆
 

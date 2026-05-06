@@ -1,6 +1,6 @@
 # Phase E Backlog
 
-更新时间：2026-05-05
+更新时间：2026-05-06
 
 这份 backlog 用于承接 `Phase D` 收官之后的后续精修工作。
 
@@ -106,7 +106,7 @@
 
 ### P1-1 扩展字段 drift 收口
 
-状态：当前标准 suite 已扩至 `37/37 matched`，`extendedMismatchCountTotal=0`；P1-1 基线记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)，本轮复验记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
+状态：当前标准 suite 已扩至 `39/39 matched`，`extendedMismatchCountTotal=0`；P1-1 基线记录：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)，最新推送后复验记录：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 
 目标：
 
@@ -177,7 +177,7 @@
 
 ### P1-4 suite 数据集继续扩容
 
-状态：已继续扩容至 `37/37 matched`，最新新增 `TopicMemo GetTopicContent topicId alias topic-not-found` case；记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
+状态：已继续扩容至 `39/39 matched`，最新新增 `DeepMemo key_word / KeyWord keyword alias` error-path case；最新推送后复验记录：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 
 目标：
 

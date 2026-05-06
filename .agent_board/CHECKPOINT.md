@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-Track `56c647a` push-after mainline gate checkpoint and current validation state.
+Track `000c149` push-after mainline gate checkpoint plus Phase E docs/status baseline sync.
 
 ## Current Area
 
-P0-mainline-health / push-after validation
+P0-mainline-health / P6-docs-drift
 
 ## Current Status
 
-In progress. `56c647a` has been pushed to `origin/main`; checkpoint-18 log is prepared locally.
+Ready for aggregate commit. `000c149` has been pushed to `origin/main`; checkpoint-19 plus recovery/status/closure baseline sync are prepared locally, and the user explicitly authorized this local aggregate commit.
 
 ## Completed Work
 
@@ -30,6 +30,11 @@ In progress. `56c647a` has been pushed to `origin/main`; checkpoint-18 log is pr
 - `56c647a` committed and pushed to `origin/main`.
 - Push-after `git status --short` + `npm run gate:mainline` passed.
 - Mainline checkpoint record `phase-e-mainline-gate-checkpoint-18.md` prepared.
+- Checkpoint-18 documentation committed as `000c149` and pushed to `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed for `000c149`.
+- Mainline checkpoint record `phase-e-mainline-gate-checkpoint-19.md` prepared.
+- Phase E P2-1 recovery docs synced to checkpoint-19 / `39/39` baseline.
+- STATUS / PROJECT_CLOSURE current baseline synced to checkpoint-19 / `39/39`.
 
 ## Changed Files
 
@@ -49,6 +54,13 @@ In progress. `56c647a` has been pushed to `origin/main`; checkpoint-18 log is pr
 - `benchmarks/active-memory-suite/inputs/deepmemo-agent-not-found-keyword-alias.json`
 - `src/cli/deepmemo.js`
 - `logs/phase-e-mainline-gate-checkpoint-18.md`
+- `logs/phase-e-mainline-gate-checkpoint-19.md`
+- `PHASE_NAVIGATION.md`
+- `PHASE_E_SUMMARY.md`
+- `PHASE_E_BACKLOG.md`
+- `MEMORY.md`
+- `STATUS.md`
+- `PROJECT_CLOSURE.md`
 
 ## Validation Run
 
@@ -81,6 +93,12 @@ In progress. `56c647a` has been pushed to `origin/main`; checkpoint-18 log is pr
 - `git push origin main` succeeded (`a386bed..56c647a`).
 - Push-after `git status --short` was clean.
 - Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git push origin main` succeeded (`56c647a..000c149`).
+- Push-after `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git diff --check` passed for checkpoint-19 plus docs baseline sync, with CRLF warnings only.
+- Recovery-doc stale/current reference scan confirmed current recovery docs point to checkpoint-19 / `39/39`; older `37/37` memory section is marked historical.
+- STATUS / PROJECT_CLOSURE / Phase E entrypoint scan confirmed current baseline points to checkpoint-19 / `000c149` / `39/39`.
 
 ## Validation Not Run
 
@@ -112,14 +130,13 @@ In progress. `56c647a` has been pushed to `origin/main`; checkpoint-18 log is pr
 
 ## Remaining Risks
 
-- Checkpoint-18 log is prepared locally but not committed.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Inspect diff, then stage/commit checkpoint-18 only after explicit local commit authorization. Push still requires explicit remote authorization.
+Create the local aggregate commit for checkpoint-19 plus docs/status baseline sync. Push still requires explicit remote authorization.
 
 ## Last Local Commit
 
-- `56c647a test: add deepmemo keyword alias error cases`
+- `000c149 docs: add mainline gate checkpoint 18`
 

@@ -1,6 +1,6 @@
 # Phase E Daily Self-Check
 
-更新时间：2026-05-05
+更新时间：2026-05-06
 
 这份文档是 `Phase E / P0-1 持续门禁常态化` 的日常入口。
 
@@ -27,7 +27,7 @@ npm run gate:mainline
 - compare：`39/39 matched`
 - rollback：`39/39 rollback-ready`
 - 最新 suite 收口记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
-- 最新 gate 复核记录：[phase-e-mainline-gate-checkpoint-18.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-18.md)
+- 最新 gate 复核记录：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 - 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 
 ## 什么时候跑严格门禁
@@ -99,7 +99,7 @@ npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\stand
 ## 当前参考记录
 
 - 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
-- 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-18.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-18.md)
+- 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 - 最新 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 
 ## 一句话结论
