@@ -214,6 +214,9 @@ P9-codex-claude-client-scope
 - `claude mcp list` ran successfully and showed `vcp_codex_memory` is not configured yet.
 - Final docs validation passed: `git diff --check`, trailing whitespace scan, and local link check.
 - `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `claude mcp add` was explicitly authorized and succeeded; `claude mcp get/list` showed `vcp_codex_memory` connected.
+- Direct MCP protocol `tools/call memory_overview` succeeded with `overviewIsError=false`.
+- User requested `deepseek-v4-pro`; model-mediated retry used `--model deepseek-v4-pro` but failed before tool execution with API `ConnectionRefused`.
 
 ## Validation Not Run
 
@@ -248,12 +251,13 @@ P9-codex-claude-client-scope
 ## Remaining Risks
 
 - Current local changes are a docs-governance/client-scope aggregate batch: `bcb2d84` board-only post-push note, Codex/Claude target-scope alignment, and Claude MCP minimal acceptance preflight.
-- Actual Claude configuration write remains blocked until explicit approval.
+- Claude configuration write is complete.
+- Model-mediated `memory_overview` remains blocked on model provider API connectivity, not on MCP server health.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Create a guarded local commit for this docs/preflight batch. Stop before `claude mcp add` and any remote write.
+Validate docs after the `deepseek-v4-pro` retry record, then create a guarded local commit if coherent. Stop before any remote write.
 
 ## Last Local Commit
 

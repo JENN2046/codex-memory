@@ -103,6 +103,8 @@
 - 最新 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - Provider benchmark reports 索引：[benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
 - Provider benchmark 记录模板：[phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)
+- Claude MCP 接入记录：[claude-mcp-minimal-acceptance-02.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-02.md)
+- Claude MCP `deepseek-v4-pro` 重试记录：[claude-mcp-minimal-acceptance-03.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-03.md)
 
 ## 想继续推进什么
 

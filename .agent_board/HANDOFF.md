@@ -17,9 +17,9 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 ## Queue Summary
 
 - done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; maintenance backlog committed and pushed as `bcb2d84`; push-after gate passed; Codex/Claude target-scope docs updated; Claude MCP local preflight completed
-- in_progress: local docs/client-scope aggregate is validated and ready for guarded local commit
-- blocked: actual `claude mcp add` until explicit approval
-- remaining: validate docs/gate and commit local batch if clean; push requires explicit remote authorization; Claude config write requires explicit authorization
+- in_progress: local docs/client-scope aggregate includes the authorized Claude config write, direct MCP `memory_overview` success, and `deepseek-v4-pro` retry result
+- blocked: model-mediated `memory_overview` retry with `deepseek-v4-pro` failed at API `ConnectionRefused`
+- remaining: validate docs after the `deepseek-v4-pro` retry record and commit local batch if clean; push requires explicit remote authorization
 
 ## Changed Files
 
@@ -39,6 +39,8 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 - `MEMORY.md`
 - `CLAUDE_MCP_ACCEPTANCE.md`
 - `logs/claude-mcp-minimal-acceptance-01.md`
+- `logs/claude-mcp-minimal-acceptance-02.md`
+- `logs/claude-mcp-minimal-acceptance-03.md`
 - `.agent_board/BLOCKERS.md`
 - `.agent_board/DECISIONS.md`
 
@@ -74,6 +76,9 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 - Codex/Claude target-scope docs validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; target wording scan passed
 - Claude MCP preflight: `claude` found at `C:\Users\617\.local\bin\claude.exe` version `2.1.100.0`; HTTP health ok; `claude mcp list` ran and showed `vcp_codex_memory` not configured yet
 - Claude MCP docs/gate validation: `git diff --check`, trailing whitespace scan, local link check, and `npm run gate:mainline` passed; mainline gate remained health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
+- Claude MCP config write: `claude mcp add` succeeded after explicit authorization; `claude mcp get/list` showed connected
+- Direct MCP `memory_overview`: succeeded via protocol probe with `overviewIsError=false`
+- `deepseek-v4-pro` model-mediated retry: failed before tool execution with API `ConnectionRefused`
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -101,13 +106,13 @@ Runtime code is not being changed. `bcb2d84 docs: add maintenance backlog` is sy
 - `MAINTENANCE_BACKLOG.md` is now the maintenance-phase queue for donor/provider/docs follow-up work.
 - Keep the `bcb2d84` push-after result as a board-only delayed note.
 - Product target is now Codex and Claude only; VCPToolBox remains donor/reference compatibility, not a service target.
-- Claude Code local HTTP MCP is the first Claude acceptance path.
-- Do not execute `claude mcp add` without explicit authorization because it writes Claude config outside the workspace.
+- Claude Code local HTTP MCP is the first Claude acceptance path; model-side acceptance should use `deepseek-v4-pro` per user instruction.
+- Claude config write was explicitly authorized and completed.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Create a guarded local commit for the Claude MCP acceptance/preflight batch. Do not push or run `claude mcp add` without explicit authorization.
+Validate docs after the `deepseek-v4-pro` retry record, then create a guarded local aggregate commit if coherent. Do not push without explicit authorization.
 
 ## Warnings
 

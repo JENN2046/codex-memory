@@ -12,13 +12,13 @@
 - public tools 仍是 `record_memory` / `search_memory` / `memory_overview`
 - 本机已检测到 `claude` CLI
 
-实际把服务器写入 Claude 配置需要执行 `claude mcp add ...`，这会修改 Claude 的用户/本地配置文件，属于工作区外写入；必须明确授权后再执行。
+已在明确授权后执行 `claude mcp add ...`。该命令修改了 `C:\Users\617\.claude.json` 的当前项目 local 配置。
 
 ## 适用范围
 
 优先验收：
 
-- Claude Code 本地 HTTP MCP 接入
+- Claude Code 本地 HTTP MCP 接入；模型侧验收使用 `deepseek-v4-pro`
 
 暂不自动验收：
 
@@ -57,12 +57,12 @@ npm run gate:mainline
 | `Get-Command claude` | found: `C:\Users\617\.local\bin\claude.exe` |
 | `claude` version | `2.1.100.0` |
 | HTTP health | `ok=true`, `protocol=streamable-http`, path `/mcp/codex-memory` |
-| `claude mcp list` | runnable; current list has no `vcp_codex_memory` |
+| `claude mcp list` | runnable; `vcp_codex_memory` is now connected |
 | mainline gate | latest known `39/39 matched`, `39/39 rollback-ready` |
 
 ## 最小接入命令
 
-需要明确授权后执行：
+已授权并执行：
 
 ```powershell
 cd A:\codex-memory
@@ -145,22 +145,31 @@ npm run gate:mainline
 
 ## 当前状态
 
-`COMPLETED_UNVALIDATED` for actual Claude connection.
+`PARTIAL` for full Claude model-mediated acceptance.
 
 已完成：
 
 - 本地 HTTP MCP 预检。
 - Claude CLI 可用性检查。
-- Claude MCP 当前列表只读检查。
+- Claude MCP 当前列表检查。
+- `claude mcp add --transport http --scope local vcp_codex_memory http://127.0.0.1:7605/mcp/codex-memory` 已执行。
+- `claude mcp get vcp_codex_memory` 显示 connected。
+- `claude mcp list` 显示 `vcp_codex_memory` connected。
+- 直接 MCP 协议 `tools/call memory_overview` 成功，`overviewIsError=false`。
+- `npm run gate:mainline` 仍通过：health `200`，compare `39/39 matched`，rollback `39/39 rollback-ready`。
 - 验收命令、通过标准和回滚命令文档化。
 
 未完成：
 
-- 未执行 `claude mcp add`。
-- 未修改 Claude 用户配置。
-- 未在 Claude Code 中跑 `/mcp`。
-- 未由 Claude 实际调用 `memory_overview`。
+- 未在交互式 Claude Code 中跑 `/mcp`；非交互 `claude -p "/mcp"` 返回 `Unknown skill: mcp`。
+- 未由 `deepseek-v4-pro` 实际调用 `memory_overview`；非交互模型调用失败于 API `ConnectionRefused`。
 
 阻塞条件：
 
-- 需要明确授权写入 Claude 配置。
+- 需要 Claude Code 到所选模型提供方的 API connectivity 恢复。
+- 需要交互式 Claude Code 会话运行 `/mcp`。
+
+最新记录：
+
+- [claude-mcp-minimal-acceptance-02.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-02.md)
+- [claude-mcp-minimal-acceptance-03.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-03.md)
