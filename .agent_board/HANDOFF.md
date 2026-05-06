@@ -2,37 +2,33 @@
 
 ## Goal
 
-Prepare checkpoint-19 and a Phase E docs/status baseline sync for the aggregate commit after `000c149` was pushed.
+Prepare Phase E P2-2 provider benchmark docs plus the delayed `8e3ae8d` board-only gate note for local aggregate commit.
 
 ## Safe State
 
-Runtime code is not being changed. The active worktree changes are checkpoint-19 documentation, recovery/status/closure baseline sync, and board/entrypoint records.
+Runtime code is not being changed. The active worktree changes are provider benchmark docs/links plus board-only notes for the `8e3ae8d` push-after gate result.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: checkpoint-19 documentation and docs/status baseline sync changes present locally
+- Worktree: provider benchmark docs plus `.agent_board` changes present locally; no checkpoint-20 file created
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149` and pushed to `origin/main`; push-after gate passed
-- in_progress: checkpoint-19 documentation record plus Phase E docs/status baseline sync, ready for local aggregate commit
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d` and pushed to `origin/main`; push-after gate passed
+- in_progress: provider benchmark docs plus board-only note for `8e3ae8d` push-after gate, ready for local aggregate commit
 - blocked: none
 - remaining: create local aggregate commit; push requires explicit remote authorization
 
 ## Changed Files
 
 - `.agent_board/*.md`
-- `PHASE_E_CHECKPOINT_INDEX.md`
-- `PHASE_E_DAILY_SELF_CHECK.md`
-- `logs/phase-e-mainline-gate-checkpoint-19.md`
+- `PHASE_E_PROVIDER_BENCHMARK.md`
 - `PHASE_NAVIGATION.md`
-- `PHASE_E_SUMMARY.md`
 - `PHASE_E_BACKLOG.md`
-- `MEMORY.md`
-- `STATUS.md`
-- `PROJECT_CLOSURE.md`
+- `PHASE_E_SUMMARY.md`
+- `README.md`
 
 ## Validation Evidence
 
@@ -50,6 +46,8 @@ Runtime code is not being changed. The active worktree changes are checkpoint-19
 - push-after gate: latest pushed checkpoint `000c149` passed; this local batch is not pushed
 - push-after gate: passed after `56c647a`
 - push-after gate: passed after `000c149`
+- push-after gate: passed after `8e3ae8d`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
+- provider benchmark docs validation: `git diff --check` passed with CRLF warnings only; package script references exist
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -68,12 +66,13 @@ Runtime code is not being changed. The active worktree changes are checkpoint-19
 
 ## Decisions
 
-- Keep checkpoint-19 plus docs/status baseline sync as a small documentation batch and aggregate it in one commit.
+- Keep the `8e3ae8d` push-after result as a board-only delayed note and aggregate it with the provider benchmark docs.
+- Do not create checkpoint-20 unless a later batch needs a formal checkpoint.
 - Do not push without explicit user approval.
 
 ## Next Safe Task
 
-Create the local aggregate commit for checkpoint-19 plus docs/status baseline sync; do not push without explicit remote authorization.
+Create the local aggregate commit. Do not push without explicit remote authorization.
 
 ## Warnings
 

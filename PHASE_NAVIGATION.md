@@ -85,6 +85,7 @@
 - Phase E 日常自检：[PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)
 - HTTP MCP 运行态排障：[PHASE_E_HTTP_OBSERVABILITY.md](/A:/codex-memory/PHASE_E_HTTP_OBSERVABILITY.md)
 - 默认主链回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
+- Provider benchmark 留档入口：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
 
 对应运行记录：
 

@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-Track `000c149` push-after mainline gate checkpoint plus Phase E docs/status baseline sync.
+Track Phase E P2-2 provider benchmark docs plus delayed `8e3ae8d` board-only gate note.
 
 ## Current Area
 
-P0-mainline-health / P6-docs-drift
+P3-provider-profile / P0-mainline-health
 
 ## Current Status
 
-Ready for aggregate commit. `000c149` has been pushed to `origin/main`; checkpoint-19 plus recovery/status/closure baseline sync are prepared locally, and the user explicitly authorized this local aggregate commit.
+Provider benchmark retention docs are prepared locally with the delayed `8e3ae8d` board-only gate note. No real provider call was run.
 
 ## Completed Work
 
@@ -35,6 +35,11 @@ Ready for aggregate commit. `000c149` has been pushed to `origin/main`; checkpoi
 - Mainline checkpoint record `phase-e-mainline-gate-checkpoint-19.md` prepared.
 - Phase E P2-1 recovery docs synced to checkpoint-19 / `39/39` baseline.
 - STATUS / PROJECT_CLOSURE current baseline synced to checkpoint-19 / `39/39`.
+- `8e3ae8d docs: sync phase e checkpoint 19 baseline` pushed to `origin/main`.
+- Push-after `git status --short` + `npm run gate:mainline` passed for `8e3ae8d`.
+- Result recorded in `.agent_board` only; checkpoint-20 intentionally not created.
+- Added `PHASE_E_PROVIDER_BENCHMARK.md` as the Phase E P2-2 lightweight provider benchmark retention entrypoint.
+- Linked the provider benchmark entrypoint from README, Phase navigation, Phase E backlog, and Phase E summary.
 
 ## Changed Files
 
@@ -61,6 +66,8 @@ Ready for aggregate commit. `000c149` has been pushed to `origin/main`; checkpoi
 - `MEMORY.md`
 - `STATUS.md`
 - `PROJECT_CLOSURE.md`
+- `PHASE_E_PROVIDER_BENCHMARK.md`
+- `README.md`
 
 ## Validation Run
 
@@ -99,6 +106,11 @@ Ready for aggregate commit. `000c149` has been pushed to `origin/main`; checkpoi
 - `git diff --check` passed for checkpoint-19 plus docs baseline sync, with CRLF warnings only.
 - Recovery-doc stale/current reference scan confirmed current recovery docs point to checkpoint-19 / `39/39`; older `37/37` memory section is marked historical.
 - STATUS / PROJECT_CLOSURE / Phase E entrypoint scan confirmed current baseline points to checkpoint-19 / `000c149` / `39/39`.
+- `git push origin main` succeeded (`000c149..8e3ae8d`).
+- Pre-board-update `git status --short` was clean.
+- Push-after `npm run gate:mainline` passed: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`.
+- `git diff --check` passed for provider benchmark docs with CRLF warnings only.
+- Package script references exist for `provider-smoke`, `provider-benchmark`, `profile-health`, `profile-gate`, `gate:mainline`, `compare-active-memory`, and `rollback-active-memory`.
 
 ## Validation Not Run
 
@@ -130,13 +142,14 @@ Ready for aggregate commit. `000c149` has been pushed to `origin/main`; checkpoi
 
 ## Remaining Risks
 
+- Current docs and `.agent_board` changes are ready for guarded local aggregate commit.
 - Any next push remains a hard stop without explicit remote authorization.
 
 ## Next Safe Action
 
-Create the local aggregate commit for checkpoint-19 plus docs/status baseline sync. Push still requires explicit remote authorization.
+Create a guarded local aggregate commit for provider benchmark docs plus board note. Push still requires explicit remote authorization.
 
 ## Last Local Commit
 
-- `000c149 docs: add mainline gate checkpoint 18`
+- `8e3ae8d docs: sync phase e checkpoint 19 baseline`
 

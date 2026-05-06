@@ -220,6 +220,8 @@
 
 ### P2-2 provider / embedding / rerank 对照继续完善
 
+状态：已补轻量留档入口：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
+
 目标：
 
 - 在默认主链稳定后，再继续把 provider 侧表现差异做成长期可跟踪资产

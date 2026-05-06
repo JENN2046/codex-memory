@@ -112,6 +112,7 @@
 - donor 别名字段继续做边角 polish
 - 文档导航和长期维护入口继续压缩整理
 - provider / benchmark 资产继续沉淀
+  - 当前已有轻量留档入口：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
 
 ## 结论
 
