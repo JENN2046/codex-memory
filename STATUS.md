@@ -5,7 +5,7 @@
 ## 当前结论
 
 - `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
-- 最新远端主线提交是 `1628381 docs: record claude flash acceptance`；最新独立推送后主线 gate 复核见 [phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)，最新 board-only 复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0039`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。
+- 最新远端主线提交是 `1628381 docs: record claude flash acceptance`；最新独立推送后主线 gate 复核见运行记录索引 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)，最新 board-only 复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0039`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -211,7 +211,7 @@
   - 可自动从 `A:\VCP\VCPToolBox\config.env` 推断 legacy MCP URL
   - 输出当前入口模式、legacy 目标、最小 rollback patch 和回滚步骤
   - 当前真实环境里已提升为 `ok`：旧服务已在 `127.0.0.1:6005` 上可达，回滚 patch 可直接落地
-  - 已完成一次真实演练：[phase-e-mainline-rollback-drill-01.md](/A:/codex-memory/logs/phase-e-mainline-rollback-drill-01.md)
+  - 已完成一次真实演练：[phase-e-mainline-rollback-drill-01.md](/A:/codex-memory/logs/phase-e-mainline-rollback-drill-01.md)（详见运行记录索引 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)）
 
 ## 当前已验证
 
