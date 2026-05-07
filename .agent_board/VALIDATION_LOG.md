@@ -44,6 +44,16 @@
 | CMV-0040 | `git diff --check` ; trailing whitespace scan ; local link check ; `npm run gate:mainline` | P6-docs-drift | 1628381 baseline docs sync | COMPLETED_VALIDATED | current-status docs now point to `1628381` / `CMV-0039`; diff check passed with CRLF warnings only；mainline gate passed health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready` | guarded local commit prepared; push still requires explicit authorization | 2026-05-06 |
 | CMV-0041 | `git diff --check` ; `npm test` | P6-docs-drift | M-006 docs compression — PHASE_NAVIGATION + README | COMPLETED_VALIDATED | docs checkpoint link lists compressed; 23 record lines → 2 pointer lines; `npm test 123/123` | commit `39cf948` | 2026-05-07 |
 
+## Batch Summary
+
+维护期入口文档已压缩，此节按日期批次聚合，不再分散到各入口文档。
+
+| Batch | Date Range | Range | Core Events | Key Baseline |
+|-------|------------|-------|-------------|--------------|
+| Batch 1 | 2026-05-05 | CMV-0001 ~ CMV-0015 | docs sync → suite 36→37→39 → push-after 000c149 | health `200`, compare `39/39`, rollback `39/39`, `npm test 123/123` |
+| Batch 2 | 2026-05-06 | CMV-0016 ~ CMV-0040 | docs aggregate → provider docs → checkpoint index → Phase E closeout → maintenance backlog → Claude scope → Claude MCP acceptance (config + retry + success + flash) | health `200`, compare `39/39`, rollback `39/39` throughout |
+| Batch 3 | 2026-05-07+ | CMV-0041+ | M-006 docs compression (PHASE_NAVIGATION + README + STATUS) | `npm test 123/123` |
+
 ## Result Labels
 
 ```text
