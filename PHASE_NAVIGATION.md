@@ -89,24 +89,11 @@
 
 日常入口：
 
-- Phase E 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
-- Phase E 日常自检：[PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)
+- 所有运行记录统一索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)（gate checkpoint、board-only 复核、HTTP 运行态、回滚、suite 扩容、错误语义基线）
 - HTTP MCP 运行态排障：[PHASE_E_HTTP_OBSERVABILITY.md](/A:/codex-memory/PHASE_E_HTTP_OBSERVABILITY.md)
-- 默认主链回滚 runbook：[PHASE_E_ROLLBACK_RUNBOOK.md](/A:/codex-memory/PHASE_E_ROLLBACK_RUNBOOK.md)
-- Provider benchmark 留档入口：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
+- 维护期自推进计划：[.omc/plans/MAINTENANCE_AUTOPILOT.md](/.omc/plans/MAINTENANCE_AUTOPILOT.md)
 
-对应运行记录：
-
-- 运行记录汇总：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
-- 最新独立主线 gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：[.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)（`CMV-0039` / `1628381`，不创建 checkpoint-20）
-- 最新 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
-- Provider benchmark reports 索引：[benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
-- Provider benchmark 记录模板：[phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)
-- Claude MCP 接入记录：[claude-mcp-minimal-acceptance-02.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-02.md)
-- Claude MCP `deepseek-v4-pro` 重试记录：[claude-mcp-minimal-acceptance-03.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-03.md)
-- Claude MCP `deepseek-v4-pro` 成功验收：[claude-mcp-minimal-acceptance-04.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-04.md)
-- Claude MCP `deepseek-ai/deepseek-v4-flash` 成功验收：[claude-mcp-minimal-acceptance-05.md](/A:/codex-memory/logs/claude-mcp-minimal-acceptance-05.md)
+所有对应运行记录统一汇总于索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)（gate checkpoint、board-only 复核、HTTP 运行态、回滚、suite 扩容、错误语义基线、Claude MCP 接入验收等全量历史记录，不再散列于本入口文档）
 
 ## 想继续推进什么
 
