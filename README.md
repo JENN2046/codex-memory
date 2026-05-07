@@ -35,38 +35,10 @@
 - Embedding profile 迁移 runbook：[EMBEDDING_PROFILE_MIGRATION_RUNBOOK.md](/A:/codex-memory/EMBEDDING_PROFILE_MIGRATION_RUNBOOK.md)
 - Phase D 灰度切主链 playbook：[PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md)
 - Phase D 灰度执行记录模板：[PHASE_D_GRAY_ROLLOUT_LOG_TEMPLATE.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_LOG_TEMPLATE.md)
-- Phase D Gray-01 基线记录：[phase-d-gray-rollout-gray-01.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-01.md)
-- Phase D Gray-02 执行前清单：[PHASE_D_GRAY_02_PRECHECK.md](/A:/codex-memory/PHASE_D_GRAY_02_PRECHECK.md)
-- Phase D Gray-02 预检查通过记录：[phase-d-gray-rollout-gray-02-precheck-pass.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-02-precheck-pass.md)
-- Phase D Gray-02 真实观察记录：[phase-d-gray-rollout-gray-02.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-02.md)
-- Phase D Gray-03 稳定性观察记录：[phase-d-gray-rollout-gray-03.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-03.md)
-- Phase D Gray-04 稳定性观察记录：[phase-d-gray-rollout-gray-04.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-04.md)
-- Phase D Gray-05 稳定性观察记录：[phase-d-gray-rollout-gray-05.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-05.md)
-- Phase D Gray-03 持续稳定性观察计划：[PHASE_D_GRAY_03_STABILITY_PLAN.md](/A:/codex-memory/PHASE_D_GRAY_03_STABILITY_PLAN.md)
-- Phase D 后续轮次记录骨架：[PHASE_D_GRAY_FOLLOWUP_LOG_SKELETON.md](/A:/codex-memory/PHASE_D_GRAY_FOLLOWUP_LOG_SKELETON.md)
-- Phase D 默认主链切换结论：[PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md](/A:/codex-memory/PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md)
-- Phase E / 后续精修 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
-- Phase E / 日常自检入口：[PHASE_E_DAILY_SELF_CHECK.md](/A:/codex-memory/PHASE_E_DAILY_SELF_CHECK.md)
+- Phase D 灰度执行记录：完整清单见 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)（Gray-01 至 Gray-05 等全量记录）
 - Phase E / 运行记录索引（全量）：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
-- Phase E / 标准 suite 扩容记录：
-  [phase-e-standard-suite-expansion-01.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-01.md)
-  [phase-e-standard-suite-expansion-02.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-02.md)
-  [phase-e-standard-suite-expansion-03.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-03.md)
-  [phase-e-standard-suite-expansion-04.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-04.md)
-  [phase-e-standard-suite-expansion-05.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-05.md)
-  [phase-e-standard-suite-expansion-06.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-06.md)
-  [phase-e-standard-suite-expansion-07.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-07.md)
-  [phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
-  [phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
-- Phase E / P1-2 排序 tie-breaker 收口记录：
-  [phase-e-ordering-tiebreaker-01.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-01.md)
-  [phase-e-ordering-tiebreaker-02.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-02.md)
-  [phase-e-ordering-tiebreaker-03.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-03.md)
-  [phase-e-ordering-tiebreaker-04.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-04.md)
-  [phase-e-ordering-tiebreaker-05.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-05.md)
-  [phase-e-ordering-tiebreaker-06.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-06.md)
-- Phase E / 文档收口检查点：[phase-e-documentation-closure-checkpoint-01.md](/A:/codex-memory/logs/phase-e-documentation-closure-checkpoint-01.md)
-- Phase E / `MEMORY.md` 状态 handoff：[phase-e-memory-status-handoff-01.md](/A:/codex-memory/logs/phase-e-memory-status-handoff-01.md)
+- Phase E / 标准 suite 扩容记录：完整清单见 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)（01~09 等全量记录）
+- Phase E / P1-2 排序 tie-breaker 收口记录：完整清单见 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)（tie-breaker 01~06 等全量记录）
 
 ## 架构分层
 

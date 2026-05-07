@@ -32,14 +32,7 @@
 - Gray-03 稳定性计划：[PHASE_D_GRAY_03_STABILITY_PLAN.md](/A:/codex-memory/PHASE_D_GRAY_03_STABILITY_PLAN.md)
 - 后续轮次骨架：[PHASE_D_GRAY_FOLLOWUP_LOG_SKELETON.md](/A:/codex-memory/PHASE_D_GRAY_FOLLOWUP_LOG_SKELETON.md)
 
-对应记录：
-
-- [phase-d-gray-rollout-gray-01.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-01.md)
-- [phase-d-gray-rollout-gray-02-precheck-pass.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-02-precheck-pass.md)
-- [phase-d-gray-rollout-gray-02.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-02.md)
-- [phase-d-gray-rollout-gray-03.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-03.md)
-- [phase-d-gray-rollout-gray-04.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-04.md)
-- [phase-d-gray-rollout-gray-05.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-05.md)
+对应记录：完整清单见 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)（gate checkpoint、灰度记录、suite 扩容、tie-breaker、错误语义等全量历史记录）
 
 ## 想看“Phase E 现在已经做完了什么”
 
@@ -48,30 +41,9 @@
 - Phase E backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
 - 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
 
-关键收口记录：
+关键收口记录：完整清单见 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 
-- 扩展字段 drift：[phase-e-extended-drift-closure-01.md](/A:/codex-memory/logs/phase-e-extended-drift-closure-01.md)
-- 扩展字段 drift 复验：[phase-e-extended-drift-baseline-02.md](/A:/codex-memory/logs/phase-e-extended-drift-baseline-02.md)
-- 错误语义诊断：[phase-e-error-diagnostics-01.md](/A:/codex-memory/logs/phase-e-error-diagnostics-01.md)
-- `TopicMemo` 路由边界：[phase-e-topicmemo-topic-id-routing-01.md](/A:/codex-memory/logs/phase-e-topicmemo-topic-id-routing-01.md)
-- `TopicMemo empty-history / history-read-error`：[phase-e-error-diagnostics-02.md](/A:/codex-memory/logs/phase-e-error-diagnostics-02.md)
-- `TopicMemo GetTopicContent agent-not-found`：[phase-e-error-diagnostics-03.md](/A:/codex-memory/logs/phase-e-error-diagnostics-03.md)
-- `TopicMemo GetTopicContent agentId/topicId alias`：[phase-e-standard-suite-expansion-08.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-08.md)
-- `TopicMemo GetTopicContent topicId alias error`：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
-- 错误语义进标准 suite 门禁：[phase-e-error-semantics-suite-gate-01.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-01.md)
-- P1-3 错误语义与诊断输出复验基线（二）：[phase-e-error-semantics-suite-gate-02.md](/A:/codex-memory/logs/phase-e-error-semantics-suite-gate-02.md)
-- donor 别名字段：[phase-e-deepmemo-donor-alias-meta-01.md](/A:/codex-memory/logs/phase-e-deepmemo-donor-alias-meta-01.md)
-- query 别名字段：[phase-e-deepmemo-query-alias-meta-01.md](/A:/codex-memory/logs/phase-e-deepmemo-query-alias-meta-01.md)
-- 文档收口检查点：[phase-e-documentation-closure-checkpoint-01.md](/A:/codex-memory/logs/phase-e-documentation-closure-checkpoint-01.md)
-
-排序 tie-breaker：
-
-- [phase-e-ordering-tiebreaker-01.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-01.md)
-- [phase-e-ordering-tiebreaker-02.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-02.md)
-- [phase-e-ordering-tiebreaker-03.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-03.md)
-- [phase-e-ordering-tiebreaker-04.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-04.md)
-- [phase-e-ordering-tiebreaker-05.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-05.md)
-- [phase-e-ordering-tiebreaker-06.md](/A:/codex-memory/logs/phase-e-ordering-tiebreaker-06.md)
+排序 tie-breaker：完整清单见 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)
 
 ## 想做日常运维 / 排障 / 回滚
 
