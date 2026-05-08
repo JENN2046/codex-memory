@@ -11,9 +11,11 @@
 3. 阶段结论：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 4. Phase E 收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 5. 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
-6. Claude MCP 最小验收：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)
-7. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
-8. Phase E 历史 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+6. 文档治理规则：[DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
+7. 下一阶段薄版计划：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
+8. Claude MCP 最小验收：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)
+9. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
+10. Phase E 历史 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
 
 ## 想确认“主链是否已经收官”
 
@@ -71,6 +73,8 @@
 
 - 如果目标是“继续稳定维护默认主链”：先看 [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 - 如果目标是“继续排优先级做后续精修”：先看 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+- 如果目标是“收束文档事实源”：先看 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
+- 如果目标是“规划下一阶段”：先看 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
 - 如果目标是“恢复最近决策和基线”：先看 [MEMORY.md](/A:/codex-memory/MEMORY.md)
 
 ## 当前推荐恢复路径
@@ -82,3 +86,4 @@
 3. 看 [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
 4. 看 [PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 5. 如果要继续做事，再看 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+6. 如果要改文档入口，先看 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)

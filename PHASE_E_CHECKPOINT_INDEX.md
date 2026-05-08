@@ -14,16 +14,16 @@
 
 ## 当前最新状态
 
-- 最新远端主线提交：`1628381 docs: record claude flash acceptance`
+- 最新远端主线提交：`93ec4bf docs: sync claude flash push baseline`
 - Phase E 最终收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)（对应 `000c149` 推送后正式 checkpoint）
-- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0039`（对应 `1628381`，不创建 checkpoint-20）
+- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0042`（对应 `93ec4bf`，不创建 checkpoint-20）
 - 最新标准 suite 扩容记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - 最新 P1-3 错误语义记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - 最新 P2-2 provider 留档入口：[PHASE_E_PROVIDER_BENCHMARK.md](/A:/codex-memory/PHASE_E_PROVIDER_BENCHMARK.md)
 - 最新 P2-2 provider reports 索引：[benchmarks/reports/README.md](/A:/codex-memory/benchmarks/reports/README.md)
 - 最新 P2-2 provider 记录模板：[phase-e-provider-benchmark-record-template.md](/A:/codex-memory/logs/phase-e-provider-benchmark-record-template.md)
-- `1628381` 推送后已复核 `git status --short` + `npm run gate:mainline`：
+- `93ec4bf` 推送后已复核 `git status --short` + `npm run gate:mainline`：
   - `git status --short`：工作区干净
   - health：`ok`，`httpStatus=200`
   - compare：`39/39 matched`
@@ -66,6 +66,7 @@
 | `49537f6` | Phase E final closeout | health `200`; compare `39/39`; rollback `39/39` | `.agent_board/VALIDATION_LOG.md` `CMV-0028` |
 | `bcb2d84` | maintenance backlog entrypoint | health `200`; compare `39/39`; rollback `39/39` | `.agent_board/VALIDATION_LOG.md` `CMV-0030` |
 | `1628381` | Claude Flash acceptance | health `200`; compare `39/39`; rollback `39/39` | `.agent_board/VALIDATION_LOG.md` `CMV-0039` |
+| `93ec4bf` | Claude Flash push baseline sync | health `200`; compare `39/39`; rollback `39/39` | `.agent_board/VALIDATION_LOG.md` `CMV-0042` |
 
 ## HTTP 运行态记录
 

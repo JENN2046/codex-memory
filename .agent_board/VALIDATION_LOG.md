@@ -35,6 +35,8 @@
 | CMV-0038 | `claude -p ... --model deepseek-ai/deepseek-v4-flash --allowedTools mcp__vcp_codex_memory__memory_overview` ; `npm run gate:mainline` | P9-codex-claude-client-scope | Claude MCP Flash model-mediated memory overview | COMPLETED_VALIDATED | `deepseek-ai/deepseek-v4-flash` called `memory_overview` successfully; mainline gate passed health `200`, compare `39/39`, rollback `39/39` | push still requires explicit authorization | 2026-05-06 |
 | CMV-0040 | `git diff --check` ; trailing whitespace/local link check ; `npm run gate:mainline` | P6-docs-drift | 1628381 baseline docs sync | COMPLETED_VALIDATED | docs now point to `1628381` / `CMV-0039`; mainline gate passed health `200`, compare `39/39`, rollback `39/39` | guarded local commit prepared | 2026-05-06 |
 | CMV-0041 | `git diff --check` ; `npm test` | P6-docs-drift | M-006 docs compression — PHASE_NAVIGATION + README | COMPLETED_VALIDATED | docs checkpoint link lists compressed; 23 record lines → 2 pointer lines; `npm test 123/123` | commit `39cf948` | 2026-05-07 |
+| CMV-0042 | `git push origin main` ; `git status --short` ; `npm run gate:mainline` | P0-mainline-health | push-after-93ec4bf | COMPLETED_VALIDATED | push `1628381..93ec4bf` succeeded; post-push status clean; mainline gate passed health `200`, compare `39/39`, rollback `39/39` | recorded in `.agent_board` only; no checkpoint-20 | 2026-05-08 |
+| CMV-0043 | `git diff --check` ; trailing whitespace scan ; local link check ; package script reference check ; `npm run gate:mainline` | P6-docs-drift | Thin next-phase plan and docs governance | COMPLETED_VALIDATED | added `CODEX_MEMORY_NEXT_PHASE_PLAN.md` and `DOCS_GOVERNANCE.md`; docs checks passed; sandboxed gate hit `spawn EPERM`, escalated rerun passed health `200`, compare `39/39`, rollback `39/39` | guarded local commit prepared; push still requires explicit authorization | 2026-05-08 |
 
 ## Batch Summary
 
@@ -46,6 +48,7 @@
 | Batch 2 | 2026-05-06 | CMV-0016 ~ CMV-0040 | docs aggregate → provider docs → checkpoint index → Phase E closeout → maintenance backlog → Claude scope → Claude MCP acceptance (config + retry + success + flash) | health `200`, compare `39/39`, rollback `39/39` throughout |
 | Batch 3 | 2026-05-07 | CMV-0041 | M-006 docs compression (PHASE_NAVIGATION + README + STATUS) | `npm test 123/123` |
 | Batch 4 | 2026-05-07 | CMV-0041 (cont.) | M-006+M-007 docs compression + board-only aggregation (PHASE_NAVIGATION pointer reduction, README list compression, VALIDATION_LOG board-only row compaction) | `npm test 123/123`, `git diff --check` |
+| Batch 5 | 2026-05-08 | CMV-0042 ~ CMV-0043 | 93ec4bf push-after gate + thin next-phase plan + docs governance + maintenance backlog entrance | `git diff --check`; link/script checks; `npm run gate:mainline` health `200`, compare `39/39`, rollback `39/39` |
 
 ## Result Labels
 

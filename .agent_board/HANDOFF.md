@@ -6,20 +6,20 @@ Prepare Claude MCP minimal acceptance and switch the model-side validation path 
 
 ## Safe State
 
-Runtime code is not being changed. `1628381 docs: record claude flash acceptance` is synchronized with `origin/main`. The local worktree change is a docs-only baseline sync pointing current-status docs at `1628381` / `CMV-0039`.
+Runtime code is not being changed. `origin/main` currently points at `93ec4bf docs: sync claude flash push baseline`; local `main` has additional docs-governance maintenance commits ahead of remote. The active worktree change is docs-only: a thin next-phase plan, docs governance rules, maintenance backlog entrypoints, and navigation/status links.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Worktree: docs-only baseline sync present locally; no checkpoint-20 file created
+- Worktree: docs-only next-phase/governance batch present locally; no checkpoint-20 file created
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; maintenance backlog committed and pushed as `bcb2d84`; Codex/Claude target-scope docs updated; Claude MCP local preflight completed; `deepseek-v4-pro` historical model-mediated success recorded; `deepseek-ai/deepseek-v4-flash` model-mediated success recorded; `1628381` pushed to `origin/main`; push-after gate passed; baseline docs synced to `1628381` / `CMV-0039`
-- in_progress: guarded local commit for baseline sync
+- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; maintenance backlog committed and pushed as `bcb2d84`; Codex/Claude target-scope docs updated; Claude MCP local preflight completed; `deepseek-v4-pro` historical model-mediated success recorded; `deepseek-ai/deepseek-v4-flash` model-mediated success recorded; `1628381` pushed to `origin/main`; push-after gate passed; baseline docs synced to `1628381` / `CMV-0039`; local M-006/M-007 docs compression commits exist ahead of remote
+- in_progress: docs-only next-phase/governance batch
 - blocked: none for minimal non-interactive acceptance; interactive `/mcp` panel remains optional manual follow-up
-- remaining: commit the docs-only baseline sync locally if final diff inspection stays clean; push requires explicit remote authorization
+- remaining: validate and commit the next-phase/governance batch locally if clean; push requires explicit remote authorization
 
 ## Changed Files
 
@@ -45,6 +45,8 @@ Runtime code is not being changed. `1628381 docs: record claude flash acceptance
 - `logs/claude-mcp-minimal-acceptance-05.md`
 - `.agent_board/BLOCKERS.md`
 - `.agent_board/DECISIONS.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `DOCS_GOVERNANCE.md`
 
 ## Validation Evidence
 
@@ -90,6 +92,7 @@ Runtime code is not being changed. `1628381 docs: record claude flash acceptance
 - push-after `git status --short`: clean
 - push-after `npm run gate:mainline`: passed; health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
 - docs baseline sync validation: `git diff --check`, trailing whitespace scan, local link check, and `npm run gate:mainline` passed; current-status docs now point to `1628381` / `CMV-0039`
+- next-phase/governance batch validation: `git diff --check`, trailing whitespace scan, local link check, package script reference check, and `npm run gate:mainline` passed; sandboxed gate hit `spawn EPERM`, escalated rerun passed health `200`, compare `39/39`, rollback `39/39`
 - observe:http: not run
 - profile gate: not run
 - provider smoke: not run
@@ -124,7 +127,7 @@ Runtime code is not being changed. `1628381 docs: record claude flash acceptance
 
 ## Next Safe Task
 
-Create a guarded local commit for the docs-only baseline sync if final diff inspection stays clean. Do not push without explicit authorization.
+Create a guarded local commit for the next-phase/governance batch if final diff inspection stays clean. Do not push without explicit authorization.
 
 ## Warnings
 

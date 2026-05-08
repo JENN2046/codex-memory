@@ -29,6 +29,8 @@
 - 当前项目状态：[STATUS.md](/A:/codex-memory/STATUS.md)
 - 阶段导航：[PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md)
 - 项目正式收官说明：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
+- 文档治理规则：[DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
+- 下一阶段薄版计划：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
 - 当前阶段记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
 - 浪潮 VCP 记忆能力评估：[VCP_MEMORY_CAPABILITY_ASSESSMENT.md](/A:/codex-memory/VCP_MEMORY_CAPABILITY_ASSESSMENT.md)
 - Phase D 迁移验收清单：[PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md](/A:/codex-memory/PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md)

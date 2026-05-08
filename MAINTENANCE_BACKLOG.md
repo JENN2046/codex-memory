@@ -23,9 +23,9 @@
 
 ## 当前基线
 
-- 最新已推送主线提交：`1628381 docs: record claude flash acceptance`
+- 最新已推送主线提交：`93ec4bf docs: sync claude flash push baseline`
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0039`
+- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0042`
 - 标准 suite：`39/39 matched`
 - rollback readiness：`39/39 rollback-ready`
 - HTTP health：`200`
@@ -40,10 +40,14 @@
 | M-003 | donor-compatibility | A1 | todo | 排序和错误语义边角继续回归化 | category compare / rollback；必要时 `npm test` | Phase E 已收主体，维护期只补新增 case |
 | M-004 | provider-profile | A0/A2 | todo | 真实 provider benchmark 报告留档 | `provider-benchmark` 需显式授权；记录用 provider 模板 | 不自动调用远端 provider |
 | M-005 | provider-profile | A1 | todo | profile migration 证据沉淀 | dry-run/profile health/profile gate；confirm 需显式授权 | 默认只读或 dry-run |
-| M-006 | docs-governance | A0 | todo | 文档入口继续压缩，减少重复 checkpoint 噪音 | `git diff --check` / link check | 优先改索引和导航，不堆 README |
-| M-007 | docs-governance | A0 | todo | `.agent_board` board-only 记录按批次聚合 | diff inspection | 不为普通 push-after gate 创建 checkpoint-20 |
-| M-008 | next-phase | A1 | todo | 准备 Phase F / Codex-Claude memory governance / client scope 的候选计划 | docs review / no runtime change | 只是候选计划，不自动启动新阶段 |
+| M-006 | docs-governance | A0 | done | 文档入口继续压缩，减少重复 checkpoint 噪音 | `git diff --check` / link check | 已在本地维护批次压缩 README / PHASE_NAVIGATION / STATUS 的重复记录入口；尚待远端同步 |
+| M-007 | docs-governance | A0 | done | `.agent_board` board-only 记录按批次聚合 | diff inspection | 已在本地维护批次聚合 board-only 验证 ledger；不创建 checkpoint-20 |
+| M-008 | next-phase | A1 | done | 准备 Phase F / Codex-Claude memory governance / client scope 的候选计划 | docs review / no runtime change | 已压缩为 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)；尚待远端同步 |
 | M-009 | claude-client | A1 | done | Claude MCP 接入最小验收 | HTTP health / `claude mcp get/list` / direct MCP `memory_overview` / `deepseek-ai/deepseek-v4-flash` model-mediated `memory_overview` / `gate:mainline` | config 已写入且 MCP connected；当前模型侧调用使用 `deepseek-ai/deepseek-v4-flash` 并已成功；仅交互式 `/mcp` 面板可后补 |
+| M-010 | docs-governance | A0 | done | 建立文档事实源分工规则 | `git diff --check` / link check / `npm run gate:mainline` | 新增 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)；尚待远端同步 |
+| M-011 | ci-gate | A1 | todo | 设计 `gate:ci` fixture-only 边界 | docs review / no runtime change | 先设计，不改 `package.json` / `.github/workflows` |
+| M-012 | memory-governance | A1 | todo | 起草 memory governance model | docs review / no runtime change | 先写模型，不做 SQLite migration |
+| M-013 | client-scope | A1 | todo | 起草 Codex / Claude client scope model | docs review / no runtime change | 先写 scope model，不改 MCP contract |
 
 ## 推荐执行顺序
 
@@ -51,7 +55,8 @@
 2. `M-001`：挑一个用户真实可感知的 donor case，补进标准 suite。
 3. `M-004`：只有需要 provider 证据时，再在明确授权下跑真实 benchmark 并留档。
 4. `M-009`：明确授权后再执行 `claude mcp add`，完成 Claude Code 实机接入验收。
-5. `M-008`：等维护期入口稳定后，再把下一阶段候选计划单独成文。
+5. `M-011`：先把 CI-safe gate 的 fixture-only 边界写清楚，再决定是否实现。
+6. `M-012` 和 `M-013`：只做治理 / scope 模型设计，不直接改 runtime。
 
 ## 授权边界
 
