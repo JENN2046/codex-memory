@@ -39,10 +39,9 @@
 |---|---|---|---|---|---|---|
 | M-001 | donor-compatibility | A1 | done | 继续补高价值 `DeepMemo / TopicMemo` 标准 suite case | targeted compare / rollback；必要时 `npm run gate:mainline` | 已新增 `deepmemo-missing-keyword` 和 `topicmemo-missing-topic-id`；suite 39→41 |
 | M-002 | donor-compatibility | A1 | done | donor 别名字段边角 polish | compare / rollback / `npm run gate:mainline` | `normalizeScalarForDiff` 空字符串归一化消除 6 个 extended-only-drift；compare 0/0 核心/扩展漂移 |
-| M-002 | donor-compatibility | A1 | todo | donor 别名字段边角 polish | relevant CLI tests + compare / rollback | 只在 source/suite 证明 drift 或用户可感知时做 |
 | M-003 | donor-compatibility | A1 | done | 排序和错误语义边角继续回归化 | category compare / rollback；`npm test` | 新增 `topicmemo-missing-maid-listtopics` 和 `topicmemo-missing-maid-gettopiccontent`；suite 41→43 |
 | M-004 | provider-profile | A0/A2 | todo | 真实 provider benchmark 报告留档 | `provider-benchmark` 需显式授权；记录用 provider 模板 | 不自动调用远端 provider |
-| M-005 | provider-profile | A1 | todo | profile migration 证据沉淀 | dry-run/profile health/profile gate；confirm 需显式授权 | 默认只读或 dry-run |
+| M-005 | provider-profile | A1 | done | profile migration 证据沉淀 | profile-health / rebuild-profile --dry-run / profile-gate；confirm 需显式授权 | 只读证据已沉淀：[phase-e-profile-migration-evidence-01.md](/A:/codex-memory/logs/phase-e-profile-migration-evidence-01.md)；0 legacy chunks，无需迁移 |
 | M-006 | docs-governance | A0 | done | 文档入口继续压缩，减少重复 checkpoint 噪音 | `git diff --check` / link check | 已在 `39cf948` 等批次压缩 README / PHASE_NAVIGATION / STATUS 的重复记录入口；已推送 |
 | M-007 | docs-governance | A0 | done | `.agent_board` board-only 记录按批次聚合 | diff inspection | 已在 `6071779` 等批次聚合 board-only 验证 ledger；不创建 checkpoint-20 |
 | M-008 | next-phase | A1 | done | 准备 Phase F / Codex-Claude memory governance / client scope 的候选计划 | docs review / no runtime change | 已压缩为 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)；已推送 |
