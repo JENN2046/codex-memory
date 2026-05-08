@@ -20,8 +20,8 @@
 
 - HTTP MCP 是默认推荐入口
 - public tools 保持 `record_memory` / `search_memory` / `memory_overview`
-- standard suite 当前基线为 `39/39 matched`
-- rollback readiness 当前基线为 `39/39 rollback-ready`
+- standard suite 当前基线为 `43/43 matched`
+- rollback readiness 当前基线为 `43/43 rollback-ready`
 - Claude Code local HTTP MCP 已完成最小验收
 - 当前模型侧 Claude 验收使用 `deepseek-ai/deepseek-v4-flash`
 

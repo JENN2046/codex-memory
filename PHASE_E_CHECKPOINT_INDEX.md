@@ -26,8 +26,8 @@
 - `95c525b` 推送后已复核 `git status --short` + `npm run gate:mainline`：
   - `git status --short`：工作区干净
   - health：`ok`，`httpStatus=200`
-  - compare：`39/39 matched`
-  - rollback：`39/39 rollback-ready`
+  - compare：（当前历史记录均为 39/39 时期，最新基线 43/43）
+  - rollback：（当前历史记录均为 39/39 时期，最新基线 43/43）
 
 ## 日常运行记录
 

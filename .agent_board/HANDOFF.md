@@ -39,8 +39,8 @@ Runtime code is not being changed. This is a docs-only board sync batch. No `src
 
 - MCP mode: HTTP mainline assumption
 - HTTP health: latest known `200` from CMV-0045
-- Standard suite: `39/39 matched`
-- Rollback readiness: `39/39 rollback-ready`
+- Standard suite: `43/43 matched`
+- Rollback readiness: `43/43 rollback-ready`
 - Audit impact: none
 - Recall impact: none
 

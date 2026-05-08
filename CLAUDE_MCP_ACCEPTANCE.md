@@ -58,7 +58,7 @@ npm run gate:mainline
 | `claude` version | `2.1.100.0` |
 | HTTP health | `ok=true`, `protocol=streamable-http`, path `/mcp/codex-memory` |
 | `claude mcp list` | runnable; `vcp_codex_memory` is now connected |
-| mainline gate | latest known `39/39 matched`, `39/39 rollback-ready` |
+| mainline gate | latest known `43/43 matched`, `43/43 rollback-ready` |
 
 ## 最小接入命令
 
@@ -129,7 +129,7 @@ npm run gate:mainline
 - `/mcp` 面板显示 `vcp_codex_memory` 可用。
 - Claude 能看到或调用 `record_memory` / `search_memory` / `memory_overview`。
 - 至少一次只读 `memory_overview` 调用成功。
-- `npm run gate:mainline` 仍通过：health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。
+- `npm run gate:mainline` 仍通过：health `200`、compare `43/43 matched`、rollback `43/43 rollback-ready`。
 - 没有写入 `.env`、provider key、Codex config、watchdog task 或远端系统。
 
 ## 失败判定
@@ -159,7 +159,7 @@ npm run gate:mainline
 - 历史使用 `deepseek-v4-pro` 的模型侧 `memory_overview` 调用成功，最终结果包含 `memory_overview 调用成功`。
 - 按用户新批准，切换到 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用成功，最终结果包含 `memory_overview 调用成功`。
 - 使用 `deepseek-ai/deepseek-v4-flash` 的只读仓库能力评估成功返回。
-- `npm run gate:mainline` 仍通过：health `200`，compare `39/39 matched`，rollback `39/39 rollback-ready`。
+- `npm run gate:mainline` 仍通过：health `200`，compare `43/43 matched`，rollback `43/43 rollback-ready`。
 - 验收命令、通过标准和回滚命令文档化。
 
 未完成：

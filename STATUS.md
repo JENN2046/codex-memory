@@ -5,7 +5,7 @@
 ## 当前结论
 
 - `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
-- 最新远端主线提交是 `95c525b docs: add next phase governance plan`；最新独立推送后主线 gate 复核见运行记录索引 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)，最新 board-only 推送后复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0044`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。本地维护期 docs-governance 批次可能领先远端，实际分支状态以 `git status --branch --short` 为准。
+- 最新远端主线提交是 `95c525b docs: add next phase governance plan`；最新独立推送后主线 gate 复核见运行记录索引 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)，最新 board-only 推送后复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0044`，当前 health `200`、compare `43/43 matched`、rollback `43/43 rollback-ready`。本地维护期 docs-governance 批次可能领先远端，实际分支状态以 `git status --branch --short` 为准。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。

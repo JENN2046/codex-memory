@@ -24,8 +24,8 @@ npm run gate:mainline
 
 当前标准 suite 基线：
 
-- compare：`39/39 matched`
-- rollback：`39/39 rollback-ready`
+- compare：`43/43 matched`
+- rollback：`43/43 rollback-ready`
 - 最新 suite 收口记录：[phase-e-standard-suite-expansion-09.md](/A:/codex-memory/logs/phase-e-standard-suite-expansion-09.md)
 - 最新 gate 复核记录：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 - 运行记录索引：[PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)

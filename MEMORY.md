@@ -16,8 +16,8 @@
 - `1628381` 推送后已跑 `git status --short` 和 `npm run gate:mainline`，结果只记在 `.agent_board`，未创建 checkpoint-20：
   - `git status --short`：工作区干净
   - health `200` at `http://127.0.0.1:7605/health`
-  - compare `39/39 matched`
-  - rollback `39/39 rollback-ready`
+  - compare `43/43 matched`
+  - rollback `43/43 rollback-ready`
 - Phase E 已补最终收官入口：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)；当前没有 Phase E open blocker，后续工作转入维护期增量任务。
 - `.agent_board` 的 `1628381` board-only note 会纳入下一次维护期聚合提交。
 - 维护期第一批低风险任务已新增 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)，把 donor/provider/docs 后续项从 Phase E 迁出，作为维护期增量队列管理。
