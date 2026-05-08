@@ -2,68 +2,55 @@
 
 ## Goal
 
-Complete M-011 by documenting the future `gate:ci` fixture-only boundary without changing `package.json` or `.github/workflows`.
+Sync MAINTENANCE_BACKLOG, RUN_STATE, and HANDOFF with actual git state. M-006 through M-011 are all done and committed; M-011 (`3493480`) is local-only, not pushed. Next real work is M-001.
 
 ## Safe State
 
-Runtime code is not being changed. The current worktree batch is docs-only and should remain limited to `GATE_CI_FIXTURE_ONLY_DESIGN.md`, documentation entrypoints, and `.agent_board` state.
+Runtime code is not being changed. This is a docs-only board sync batch. No `src/`, `tests/`, `package.json`, or `.github/workflows` changes.
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Remote baseline: `95c525b docs: add next phase governance plan`
-- Worktree: M-011 docs-only batch validated and pending guarded local commit
+- Local HEAD: `3493480 docs: add gate ci fixture-only design`
+- Remote HEAD: `95c525b docs: add next phase governance plan`
+- Unpushed: `3493480` (M-011 gate:ci design document)
 
 ## Queue Summary
 
-- done: M-006/M-007 docs compression, M-008 thin next-phase plan, M-010 docs governance, M-011 fixture-only CI gate design draft
-- in_progress: guarded local commit for M-011
+- done: M-006/M-007 docs compression, M-008 next-phase plan, M-009 Claude MCP acceptance, M-010 docs governance, M-011 gate:ci design
+- done: board sync (current task)
+- in_progress: guarded local commit for board sync batch
 - blocked: none locally
-- remaining: push requires explicit remote authorization after local commit
+- remaining: M-001/M-002/M-003 donor-compatibility, M-004/M-005 provider-profile, M-012/M-013 governance/scope models
+- push: requires explicit remote authorization; `3493480` (M-011) is still unpushed
 
-## Changed Files
+## Changed Files (this batch)
 
-- `GATE_CI_FIXTURE_ONLY_DESIGN.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
-- `PHASE_E_CHECKPOINT_INDEX.md`
-- `PHASE_NAVIGATION.md`
-- `README.md`
-- `STATUS.md`
-- `.agent_board/TASK_QUEUE.md`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/HANDOFF.md`
-- `.agent_board/DECISIONS.md`
-- `.agent_board/VALIDATION_LOG.md`
 
 ## Validation
 
-- M-011 validation: `git diff --check`, trailing whitespace scan, local link check, package/workflow unchanged check, package script boundary check, and `npm run gate:mainline` passed; sandboxed gate hit `spawn EPERM`, escalated rerun passed health `200`, compare `39/39`, rollback `39/39`
-- Latest remote push-after baseline: `CMV-0044`, health `200`, compare `39/39`, rollback `39/39`
-- Runtime/profile/provider validation: not in scope for this docs-only task
+- `git diff --check` (docs-only board sync, no runtime change)
 
 ## Runtime Notes
 
-- MCP mode: HTTP mainline assumption, verify before runtime claims
-- HTTP health: latest known `200` from push-after gate
-- Rollback readiness: latest known `39/39 rollback-ready`
-- Audit impact: none expected
-- Recall impact: none expected
-
-## Decisions
-
-- Keep M-011 as design-only.
-- Do not implement `npm run gate:ci` in this batch.
-- Do not edit `.github/workflows` in this batch.
-- Keep `gate:mainline` as the local real-mainline gate and reserve future `gate:ci` for fixture-only CI checks.
+- MCP mode: HTTP mainline assumption
+- HTTP health: latest known `200` from CMV-0045
+- Standard suite: `39/39 matched`
+- Rollback readiness: `39/39 rollback-ready`
+- Audit impact: none
+- Recall impact: none
 
 ## Next Safe Task
 
-Create a guarded local commit for the validated M-011 docs-only batch, then stop before push.
+After this board sync commit: start M-001 — pick one user-perceptible donor DeepMemo/TopicMemo case, create input fixture, register in standard suite, run compare.
 
 ## Warnings
 
 - Do not push without explicit approval.
-- Do not add `gate:ci` scripts or workflows as part of M-011.
-- Do not run provider/profile/cleanup confirm paths for this task.
+- Do not run provider-smoke or provider-benchmark without explicit authorization.
+- Do not run rebuild-profile --confirm or cleanup apply without explicit authorization.
+- Keep M-012/M-013 as design-only; do not modify SQLite schema or MCP contract.
