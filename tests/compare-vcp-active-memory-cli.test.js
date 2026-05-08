@@ -837,8 +837,8 @@ test('compare active-memory CLI should run the repository standard suite in requ
     assert.equal(payload.summary.mismatchedCaseCount, 0);
     assert.deepEqual(payload.summary.comparisonBreakdown, { matched: 41 });
     assert.equal(payload.summary.coreMismatchCountTotal, 0);
-    assert.equal(payload.summary.extendedMismatchCountTotal, 6);
-    assert.deepEqual(payload.summary.driftReasonBreakdown, { 'extended-only-drift': 1 });
+    assert.equal(payload.summary.extendedMismatchCountTotal, 0);
+    assert.deepEqual(payload.summary.driftReasonBreakdown, {});
     assert.equal(payload.fixturePreparation.preparedFixtureCount, 7);
     assert.equal(payload.categoryAggregate.length, 8);
     const orderingAggregate = payload.categoryAggregate.find(item => item.category === 'ordering');

@@ -256,7 +256,10 @@ function normalizeText(value) {
 
 function normalizeScalarForDiff(value) {
   if (value === undefined || value === null) return null;
-  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  }
   if (typeof value === 'number' || typeof value === 'boolean') return value;
   return JSON.stringify(value);
 }

@@ -27,16 +27,18 @@
 - 最新本地主线提交：`3493480 docs: add gate ci fixture-only design`（M-011，尚未推送）
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 - 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0045`
-- 标准 suite：`39/39 matched`
-- rollback readiness：`39/39 rollback-ready`
+- 标准 suite：`41/41 matched`，`extendedMismatchCountTotal=0`
+- rollback readiness：`41/41 rollback-ready`，`extendedMismatchCountTotal=0`
 - HTTP health：`200`
 - checkpoint-20 未创建
+- M-001 / M-002 已完成；下一个待办 M-003
 
 ## 维护期队列
 
 | ID | Area | Risk | Status | Task | Validation | Notes |
 |---|---|---|---|---|---|---|
-| M-001 | donor-compatibility | A1 | todo | 继续补高价值 `DeepMemo / TopicMemo` 标准 suite case | targeted compare / rollback；必要时 `npm run gate:mainline` | 优先真实可感知边界，不追无价值枚举 |
+| M-001 | donor-compatibility | A1 | done | 继续补高价值 `DeepMemo / TopicMemo` 标准 suite case | targeted compare / rollback；必要时 `npm run gate:mainline` | 已新增 `deepmemo-missing-keyword` 和 `topicmemo-missing-topic-id`；suite 39→41 |
+| M-002 | donor-compatibility | A1 | done | donor 别名字段边角 polish | compare / rollback / `npm run gate:mainline` | `normalizeScalarForDiff` 空字符串归一化消除 6 个 extended-only-drift；compare 0/0 核心/扩展漂移 |
 | M-002 | donor-compatibility | A1 | todo | donor 别名字段边角 polish | relevant CLI tests + compare / rollback | 只在 source/suite 证明 drift 或用户可感知时做 |
 | M-003 | donor-compatibility | A1 | todo | 排序和错误语义边角继续回归化 | category compare / rollback；必要时 `npm test` | Phase E 已收主体，维护期只补新增 case |
 | M-004 | provider-profile | A0/A2 | todo | 真实 provider benchmark 报告留档 | `provider-benchmark` 需显式授权；记录用 provider 模板 | 不自动调用远端 provider |

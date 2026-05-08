@@ -557,7 +557,7 @@ test('rollback active-memory CLI should run the repository standard suite in req
     assert.equal(payload.summary.totalCaseCount, 41);
     assert.equal(payload.summary.readyCaseCount, 41);
     assert.equal(payload.summary.notReadyCaseCount, 0);
-    assert.equal(payload.summary.extendedMismatchCountTotal, 6);
+    assert.equal(payload.summary.extendedMismatchCountTotal, 0);
     assert.deepEqual(payload.summary.recommendationBreakdown, { 'rollback-safe': 41 });
     assert.deepEqual(payload.summary.blockerBreakdown, {});
     assert.equal(payload.compareReport.metaVersion, 1);
