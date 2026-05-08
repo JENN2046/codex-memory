@@ -102,7 +102,11 @@ Codex / Claude scope 先建模型，不改 `record_memory` 外部 schema。
 - `visibility`
 - `retention_policy`
 
-第一刀只做 `CLIENT_SCOPE_MODEL.md` 候选文档。本步已完成：见 [CLIENT_SCOPE_MODEL.md](/A:/codex-memory/CLIENT_SCOPE_MODEL.md)。audit / overview / search scope filter 属于后续实现任务。
+Phase I 进度：
+- M-013 ✅ [CLIENT_SCOPE_MODEL.md](/A:/codex-memory/CLIENT_SCOPE_MODEL.md) — client scope 模型
+- I-002a ✅ [SCOPE_SCHEMA_EXTENSION.md](/A:/codex-memory/docs/SCOPE_SCHEMA_EXTENSION.md) — scope schema 扩展设计（含入 H-002a 合并迁移方案）
+
+audit / overview / search scope filter 属于后续实现任务。
 
 ## Phase J 候选
 
