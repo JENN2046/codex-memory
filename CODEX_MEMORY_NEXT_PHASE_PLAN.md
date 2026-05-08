@@ -80,7 +80,7 @@ memory governance 先做设计文档，不直接改 runtime。
 | Step | 目标 | 风险 |
 |---|---|---|
 | H-001 | 写 `MEMORY_GOVERNANCE_MODEL.md` | A0 — 已完成：见 [MEMORY_GOVERNANCE_MODEL.md](/A:/codex-memory/MEMORY_GOVERNANCE_MODEL.md) |
-| H-002a | 设计 proposal / tombstone / supersession schema | A0 |
+| H-002a | 设计 proposal / tombstone / supersession schema | A0 — 已完成：见 [PROPOSAL_TOMBSTONE_SUPERSESSION_SCHEMA.md](/A:/codex-memory/docs/PROPOSAL_TOMBSTONE_SUPERSESSION_SCHEMA.md) |
 | H-002b | migration dry-run / fixture migration plan | A1 |
 | H-002c | 真实 SQLite schema change | A2，需要单独验证 |
 

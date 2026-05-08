@@ -30,9 +30,9 @@
 - profile health：`ready`，0 legacy chunks，single fingerprint `bge-m3-local__1024__v1`
 - HTTP health：`200`
 - 维护期 tag：`v0.1.0-maint-20260508`
-- 维护期全部 13 个任务已完成（M-001 ~ M-013）
+- 维护期首批 13 个任务已完成（M-001 ~ M-013）；Phase H-001/H-002a 已完成
 
-## 维护期队列
+## 维护期队列（首批 M-001~M-013 已全部完成）
 
 | ID | Area | Risk | Status | Task | Validation | Notes |
 |---|---|---|---|---|---|---|
@@ -49,6 +49,9 @@
 | M-011 | ci-gate | A1 | done | 设计 `gate:ci` fixture-only 边界 | docs review / no runtime change / `npm run gate:mainline` | 设计入口：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)；已本地提交 `3493480`，未推送；未改 `package.json` / `.github/workflows` |
 | M-012 | memory-governance | A1 | done | 起草 memory governance model | docs review / no runtime change | 已创建 [MEMORY_GOVERNANCE_MODEL.md](/A:/codex-memory/MEMORY_GOVERNANCE_MODEL.md)；定义治理分层、角色、lifecycle、scope、proposal、enforcement 模型 |
 | M-013 | client-scope | A1 | done | 起草 Codex / Claude client scope model | docs review / no runtime change | 已创建 [CLIENT_SCOPE_MODEL.md](/A:/codex-memory/CLIENT_SCOPE_MODEL.md)；定义 client_id、workspace_id、project_id、task_id、conversation_id、visibility、retention_policy 维度 |
+| H-002a | memory-governance | A0 | done | 设计 proposal / tombstone / supersession schema | docs review | 已创建 [PROPOSAL_TOMBSTONE_SUPERSESSION_SCHEMA.md](/A:/codex-memory/docs/PROPOSAL_TOMBSTONE_SUPERSESSION_SCHEMA.md) |
+| H-002b | memory-governance | A1 | todo | migration dry-run / fixture 验证计划 | docs + dry-run | 在临时副本上跑 ALTER TABLE，验证回填和现有 CLI 不报错 |
+| H-002c | memory-governance | A2 | todo | 真实 SQLite schema migration | 需单独验证 + Commander 授权 | 不自动执行 |
 
 ## 推荐执行顺序
 
