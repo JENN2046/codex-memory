@@ -33,6 +33,7 @@
     "active-memory": "node ./src/cli/active-memory.js",
     "deepmemo": "node ./src/cli/deepmemo.js",
     "topicmemo": "node ./src/cli/topicmemo.js",
+    "lightmemo": "node ./src/cli/lightmemo.js",
     "compare-active-memory": "node ./src/cli/compare-vcp-active-memory.js",
     "rollback-active-memory": "node ./src/cli/rollback-active-memory.js",
     "gate:mainline": "node ./src/cli/mainline-gate.js",

@@ -8,12 +8,14 @@ const { readStdin } = require('./active-memory-cli-common');
 
 const TOOL_MAP = {
   deepmemo: 'deepmemo',
-  topicmemo: 'topicmemo'
+  topicmemo: 'topicmemo',
+  lightmemo: 'lightmemo'
 };
 
 const DEFAULT_NEW_SCRIPT = {
   deepmemo: path.resolve(__dirname, 'deepmemo.js'),
-  topicmemo: path.resolve(__dirname, 'topicmemo.js')
+  topicmemo: path.resolve(__dirname, 'topicmemo.js'),
+  lightmemo: path.resolve(__dirname, 'lightmemo.js')
 };
 
 const DEFAULT_LEGACY_SCRIPT = {
@@ -1498,7 +1500,7 @@ async function main() {
   } else {
     const tool = normalizeTool(options.tool);
     if (!tool) {
-      throw new Error('Missing or unsupported --tool. Supported values: deepmemo, topicmemo.');
+      throw new Error('Missing or unsupported --tool. Supported values: deepmemo, topicmemo, lightmemo.');
     }
 
     const rawInput = await loadInput(options);
