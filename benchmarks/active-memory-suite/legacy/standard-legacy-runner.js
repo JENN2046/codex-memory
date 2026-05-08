@@ -126,6 +126,9 @@ function resolveKey(input = {}) {
   if (maid === 'Keke' && keyword === 'Phase D compare migration' && input.exclude_latest === false && Number(input.limit) === 3) {
     return 'deepmemo:large-multi-topic-order-success';
   }
+  if (maid === 'Keke' && command === 'search' && !keyword) {
+    return 'deepmemo:missing-keyword';
+  }
   if (maid === 'MissingMaid' && keyword === 'Phase C') {
     return 'deepmemo:agent-not-found';
   }
@@ -135,6 +138,9 @@ function resolveKey(input = {}) {
   }
   if (maid === 'MissingMaid' && command === 'gettopiccontent') {
     return 'topicmemo:agent-not-found';
+  }
+  if (maid === 'Keke' && command === 'gettopiccontent' && !topicId) {
+    return 'topicmemo:missing-topic-id';
   }
   if (maid === 'Keke' && command === 'listtopics') {
     return 'topicmemo:listtopics-basic';
@@ -409,6 +415,23 @@ async function main() {
         maid: 'Keke',
         topicId: 'topic_history_read_error',
         historyStatus: 'history-read-error'
+      }
+    });
+    process.exit(1);
+    return;
+  }
+
+  if (key === 'topicmemo:missing-topic-id') {
+    writeJson(process.stderr, {
+      status: 'error',
+      error: '[TopicMemo] 请求中缺少 \'topic_id\' 参数。',
+      meta: {
+        toolName: 'TopicMemo',
+        tool_name: 'TopicMemo',
+        code: 'missing-topic-id',
+        command: 'GetTopicContent',
+        maid: 'Keke',
+        topicId: ''
       }
     });
     process.exit(1);

@@ -88,6 +88,23 @@
       }
     },
     {
+      "name": "deepmemo-missing-keyword",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-missing-keyword.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-keyword"
+        ]
+      }
+    },
+    {
       "name": "deepmemo-basic-success",
       "tool": "deepmemo",
       "inputFile": "./inputs/deepmemo-basic-success.json",
@@ -651,6 +668,23 @@
         "fixture": "vchat-fixture",
         "tags": [
           "missing-history"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-missing-topic-id",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-missing-topic-id.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-topic-id"
         ]
       }
     },
