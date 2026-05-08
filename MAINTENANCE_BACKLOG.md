@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-06
+更新时间：2026-05-08
 
 这份文档承接 `Phase E` 收官之后的后续增量工作。
 
@@ -23,9 +23,9 @@
 
 ## 当前基线
 
-- 最新已推送主线提交：`93ec4bf docs: sync claude flash push baseline`
+- 最新已推送主线提交：`95c525b docs: add next phase governance plan`
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0042`
+- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0044`
 - 标准 suite：`39/39 matched`
 - rollback readiness：`39/39 rollback-ready`
 - HTTP health：`200`
@@ -45,7 +45,7 @@
 | M-008 | next-phase | A1 | done | 准备 Phase F / Codex-Claude memory governance / client scope 的候选计划 | docs review / no runtime change | 已压缩为 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)；尚待远端同步 |
 | M-009 | claude-client | A1 | done | Claude MCP 接入最小验收 | HTTP health / `claude mcp get/list` / direct MCP `memory_overview` / `deepseek-ai/deepseek-v4-flash` model-mediated `memory_overview` / `gate:mainline` | config 已写入且 MCP connected；当前模型侧调用使用 `deepseek-ai/deepseek-v4-flash` 并已成功；仅交互式 `/mcp` 面板可后补 |
 | M-010 | docs-governance | A0 | done | 建立文档事实源分工规则 | `git diff --check` / link check / `npm run gate:mainline` | 新增 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)；尚待远端同步 |
-| M-011 | ci-gate | A1 | todo | 设计 `gate:ci` fixture-only 边界 | docs review / no runtime change | 先设计，不改 `package.json` / `.github/workflows` |
+| M-011 | ci-gate | A1 | done | 设计 `gate:ci` fixture-only 边界 | docs review / no runtime change / `npm run gate:mainline` | 设计入口：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)；未改 `package.json` / `.github/workflows` |
 | M-012 | memory-governance | A1 | todo | 起草 memory governance model | docs review / no runtime change | 先写模型，不做 SQLite migration |
 | M-013 | client-scope | A1 | todo | 起草 Codex / Claude client scope model | docs review / no runtime change | 先写 scope model，不改 MCP contract |
 

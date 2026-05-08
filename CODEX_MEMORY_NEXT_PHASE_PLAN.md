@@ -69,6 +69,8 @@
 
 第一版 `gate:ci` 应该只跑 fixture-only 检查。`rebuild-profile --dry-run`、`profile-gate`、`v8-diagnose` 只有在明确 fixture/profile sandbox 后才可纳入默认 CI gate。
 
+设计入口：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)
+
 ## Phase H 候选
 
 memory governance 先做设计文档，不直接改 runtime。

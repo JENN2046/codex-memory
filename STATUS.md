@@ -1,11 +1,11 @@
 ﻿# codex-memory Status
 
-更新时间：2026-05-06
+更新时间：2026-05-08
 
 ## 当前结论
 
 - `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
-- 最新远端主线提交是 `93ec4bf docs: sync claude flash push baseline`；最新独立推送后主线 gate 复核见运行记录索引 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)，最新 board-only 推送后复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0042`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。本地维护期 docs-governance 批次可能领先远端，实际分支状态以 `git status --branch --short` 为准。
+- 最新远端主线提交是 `95c525b docs: add next phase governance plan`；最新独立推送后主线 gate 复核见运行记录索引 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)，最新 board-only 推送后复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0044`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。本地维护期 docs-governance 批次可能领先远端，实际分支状态以 `git status --branch --short` 为准。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -41,6 +41,7 @@
 - 项目正式收官说明也已整理：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)。当前项目边界已明确切到“主项目收官，后续转维护与精修期”。
 - 维护期下一阶段薄版计划已整理：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)。当前只作为方向锚点，详细任务仍由 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md) 管理。
 - 文档治理规则已整理：[DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)。当前约定 README 是 operation map，STATUS 是当前事实状态，MAINTENANCE_BACKLOG 是维护期唯一任务队列，`.agent_board` 是本地执行轨道。
+- `gate:ci` fixture-only 设计已整理：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)。当前只是设计文档，尚未实现命令，未改 `package.json` 或 `.github/workflows`。
 - `Phase E / P0-1` 已开始落成仓库标准门禁入口：新增 `gate:mainline` / `gate:mainline:strict`，把默认主链的 health、contract、compare、rollback 和全量回归收口成可复用 CLI。
 - `Phase E / P0-2` 也已开始落成仓库标准诊断入口：新增 `observe:http`，把 `/health`、HTTP 日志、watchdog 日志、bridge audit、recall audit 收口成一份可复用运行态报告。
 - `Phase E / P0-3` 已从“回滚预案入口”推进到“真实回滚演练已跑通”：`rollback:mainline:plan` 已不只是输出计划，当前 donor `6005` 也已经完成一次临时切换、握手验证与切回主链的闭环演练。
