@@ -102,7 +102,7 @@ Codex / Claude scope 先建模型，不改 `record_memory` 外部 schema。
 - `visibility`
 - `retention_policy`
 
-第一刀只做 `CLIENT_SCOPE_MODEL.md` 候选文档。audit / overview / search scope filter 属于后续实现任务。
+第一刀只做 `CLIENT_SCOPE_MODEL.md` 候选文档。本步已完成：见 [CLIENT_SCOPE_MODEL.md](/A:/codex-memory/CLIENT_SCOPE_MODEL.md)。audit / overview / search scope filter 属于后续实现任务。
 
 ## Phase J 候选
 
