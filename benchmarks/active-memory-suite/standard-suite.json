@@ -740,6 +740,42 @@
           "history-read-error"
         ]
       }
+    },
+    {
+      "name": "topicmemo-missing-maid-listtopics",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-missing-maid-listtopics.json",
+      "legacyScript": "./legacy/topicmemo-missing-maid-listtopics-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-maid",
+          "listtopics"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-missing-maid-gettopiccontent",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-missing-maid-gettopiccontent.json",
+      "legacyScript": "./legacy/topicmemo-missing-maid-gettopiccontent-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-maid",
+          "gettopiccontent"
+        ]
+      }
     }
   ],
   "metaVersion": 1,

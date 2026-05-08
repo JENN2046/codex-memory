@@ -6,9 +6,9 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | M-003 — 排序和错误语义边角继续回归化 |
-| Current area | P1-donor-compatibility |
-| Last action | M-002: `normalizeScalarForDiff` 空字符串→null 归一化，消除 `deepmemo-missing-keyword` 6 个 null-vs-"" extended-only-drift；compare 41/41、extendedMismatch=0、driftBreakdown={}；npm test 123/123 |
+| Current task | 等待下一个维护期任务 — M-004（需授权）、M-005（需授权）、M-012（docs-only）或 M-013（docs-only） |
+| Current area | P1-donor-compatibility → pending |
+| Last action | M-003: 新增 `topicmemo-missing-maid-listtopics` 和 `topicmemo-missing-maid-gettopiccontent` 两个 suite case + 对应 legacy 脚本；suite 41→43；compare/rollback 全绿；npm test 123/123 |
 | Last validation | `npm run gate:mainline` (health 200, compare 41/41 matched 0/0 core/extended, rollback 41/41 rollback-ready 0/0 core/extended) + `npm test` (123/123) |
 | Worktree summary | M-001 (suite 39→41) 和 M-002 (空字符串归一化消除漂移) 已完成。M-003 待开始。M-004/M-005 需授权。M-012/M-013 待起草案。 |
 | Mainline assumption | HTTP MCP 7605 is reachable; verify through `npm run gate:mainline` before claiming green |
