@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const { createCodexMemoryApplication } = require('../src/app');
 const { CodexMemoryMcpServer } = require('../src/adapters/codex-mcp/server');
+const { TOOL_DEFINITIONS } = require('../src/core/constants');
 
 async function withApp(handler) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-scope-test-'));
@@ -38,7 +39,6 @@ test('scope filter: record_memory writes scope metadata (project A / project B)'
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
 
-    // Write to project A
     const recordA = await server.handleJsonRpc({
       jsonrpc: '2.0',
       id: 1,
@@ -62,7 +62,6 @@ test('scope filter: record_memory writes scope metadata (project A / project B)'
 
     assert.equal(recordA.response.result.structuredContent.decision, 'accepted');
 
-    // Write to project B
     const recordB = await server.handleJsonRpc({
       jsonrpc: '2.0',
       id: 2,
@@ -88,9 +87,58 @@ test('scope filter: record_memory writes scope metadata (project A / project B)'
   });
 });
 
-test('scope filter: search_memory with scope filter returns only matching project', async () => {
+test('scope filter: search_memory project A returns only project A (results > 0, no project B)', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
+    const { shadowStore } = app.stores;
+
+    // Write project A
+    const ra = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'PA Checkpoint',
+          content: 'Type: checkpoint\nrisk: PA scope isolation',
+          evidence: 'PA only',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'pa'],
+          sensitivity: 'none',
+          project_id: 'project-a',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(ra.response.result.structuredContent.decision, 'accepted');
+    const paMemoryId = ra.response.result.structuredContent.memoryId;
+
+    // Write project B
+    const rb = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'PB Checkpoint',
+          content: 'Type: checkpoint\nrisk: PB scope isolation',
+          evidence: 'PB only',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'pb'],
+          sensitivity: 'none',
+          project_id: 'project-b',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(rb.response.result.structuredContent.decision, 'accepted');
+    const pbMemoryId = rb.response.result.structuredContent.memoryId;
 
     // Search with project A filter
     const searchA = await server.handleJsonRpc({
@@ -112,69 +160,96 @@ test('scope filter: search_memory with scope filter returns only matching projec
     }, requestContext);
 
     const resultsA = searchA.response.result.structuredContent.results || [];
-    for (const r of resultsA) {
-      assert.equal(r.projectId, 'project-a', 'scope filter should only return project-a records');
-    }
+    assert.ok(resultsA.length > 0, 'project A filter must return at least one result');
 
-    // Search with project B filter
-    const searchB = await server.handleJsonRpc({
+    const aMemoryIds = resultsA.map(r => r.memoryId);
+    assert.ok(aMemoryIds.includes(paMemoryId), 'project A filter must return project A record');
+    assert.ok(!aMemoryIds.includes(pbMemoryId), 'project A filter must NOT return project B record');
+  });
+});
+
+test('scope filter: search_memory with wrong project_id returns 0', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+
+    // Write a record
+    const r = await server.handleJsonRpc({
       jsonrpc: '2.0',
-      id: 4,
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Test Checkpoint',
+          content: 'Type: checkpoint\nrisk: test',
+          evidence: 'test',
+          validated: true,
+          reusable: false,
+          tags: ['scope'],
+          sensitivity: 'none',
+          project_id: 'real-project',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(r.response.result.structuredContent.decision, 'accepted');
+
+    // Search with wrong project
+    const search = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
       method: 'tools/call',
       params: {
         name: 'search_memory',
         arguments: {
-          query: 'checkpoint scope',
+          query: 'checkpoint',
           target: 'process',
           limit: 10,
           include_content: true,
           scope: {
-            project_id: 'project-b'
+            project_id: 'other-project'
           }
         }
       }
     }, requestContext);
 
-    const resultsB = searchB.response.result.structuredContent.results || [];
-    for (const r of resultsB) {
-      assert.equal(r.projectId, 'project-b', 'scope filter should only return project-b records');
-    }
+    const results = search.response.result.structuredContent.results || [];
+    assert.equal(results.length, 0, 'wrong project_id must return 0 results');
   });
 });
 
-test('scope filter: strict mode blocks missing records', async () => {
-  await withApp(async ({ app, tempBasePath }) => {
+test('scope filter: strict mode must NOT leak records from other projects', async () => {
+  await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
-    const { shadowStore } = app.stores;
 
-    // Write a record directly to shadow store with scope metadata
-    const testRecord = {
-      memoryId: 'codex-process-strictmode001',
-      target: 'process',
-      title: 'Strict Mode Test',
-      content: 'Type: checkpoint\nrisk: strict mode test',
-      evidence: 'strict mode test',
-      tags: ['scope', 'strict'],
-      sensitivity: 'none',
-      validated: true,
-      reusable: false,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      projectId: 'strict-project',
-      visibility: 'project',
-      clientId: 'codex',
-      workspaceId: tempBasePath,
-      taskId: null,
-      conversationId: null,
-      retentionPolicy: 'permanent'
-    };
-
-    await shadowStore.upsertRecord(testRecord);
-
-    // Search with strict mode on non-matching project
-    const searchStrict = await server.handleJsonRpc({
+    // Write record with project_id = 'strict-project' via MCP (goes to diary + shadow)
+    const r = await server.handleJsonRpc({
       jsonrpc: '2.0',
-      id: 5,
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Strict Mode Test',
+          content: 'Type: checkpoint\nrisk: strict mode test',
+          evidence: 'strict mode test',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'strict'],
+          sensitivity: 'none',
+          project_id: 'strict-project',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(r.response.result.structuredContent.decision, 'accepted');
+
+    // strict mode with wrong project: must return 0
+    const searchWrong = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
       method: 'tools/call',
       params: {
         name: 'search_memory',
@@ -184,15 +259,15 @@ test('scope filter: strict mode blocks missing records', async () => {
           limit: 10,
           include_content: true,
           scope: {
-            project_id: 'other-project',
+            project_id: 'nonexistent-project',
             strict: true
           }
         }
       }
     }, requestContext);
 
-    const strictResults = searchStrict.response.result.structuredContent.results || [];
-    assert.equal(strictResults.length, 0, 'strict mode should block records from other projects');
+    const wrongResults = searchWrong.response.result.structuredContent.results || [];
+    assert.equal(wrongResults.length, 0, 'strict mode must block records from other projects');
   });
 });
 
@@ -200,7 +275,6 @@ test('mapRow does not fake project_id (legacyProjectIdFallback test)', async () 
   await withApp(async ({ app, tempBasePath }) => {
     const { shadowStore } = app.stores;
 
-    // Write record with explicit project_id
     const testRecord = {
       memoryId: 'codex-process-explicit-project',
       target: 'process',
@@ -221,7 +295,6 @@ test('mapRow does not fake project_id (legacyProjectIdFallback test)', async () 
 
     await shadowStore.upsertRecord(testRecord);
 
-    // Retrieve and verify mapRow preserves the actual project_id
     const retrieved = await shadowStore.getRecord('codex-process-explicit-project');
     assert.equal(retrieved.projectId, 'explicit-project', 'mapRow should preserve actual project_id, not fake it');
     assert.notEqual(retrieved.projectId, 'codex-memory', 'mapRow should not default to codex-memory');
@@ -232,10 +305,9 @@ test('HTTP MCP tools/call end-to-end scope parameter verification', async () => 
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
 
-    // Record with full scope metadata
     const recordResult = await server.handleJsonRpc({
       jsonrpc: '2.0',
-      id: 6,
+      id: 1,
       method: 'tools/call',
       params: {
         name: 'record_memory',
@@ -259,11 +331,11 @@ test('HTTP MCP tools/call end-to-end scope parameter verification', async () => 
     }, requestContext);
 
     assert.equal(recordResult.response.result.structuredContent.decision, 'accepted');
+    const memId = recordResult.response.result.structuredContent.memoryId;
 
-    // Search with scope filter
     const searchResult = await server.handleJsonRpc({
       jsonrpc: '2.0',
-      id: 7,
+      id: 2,
       method: 'tools/call',
       params: {
         name: 'search_memory',
@@ -282,7 +354,30 @@ test('HTTP MCP tools/call end-to-end scope parameter verification', async () => 
 
     const results = searchResult.response.result.structuredContent.results || [];
     assert.ok(results.length > 0, 'should find records matching scope filter');
+    assert.ok(results.some(r => r.memoryId === memId), 'should include the E2E record');
   });
+});
+
+test('schema: record_memory and search_memory tool definitions cover scope fields', () => {
+  const recordSchema = TOOL_DEFINITIONS.find(t => t.name === 'record_memory');
+  const searchSchema = TOOL_DEFINITIONS.find(t => t.name === 'search_memory');
+
+  assert.ok(recordSchema, 'record_memory tool definition must exist');
+  assert.ok(searchSchema, 'search_memory tool definition must exist');
+
+  // record_memory scope fields
+  const recordProps = Object.keys(recordSchema.inputSchema.properties);
+  for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'task_id', 'conversation_id', 'retention_policy']) {
+    assert.ok(recordProps.includes(field), `record_memory schema must include ${field}`);
+  }
+  assert.ok(recordSchema.inputSchema.additionalProperties === false, 'record_memory must reject additional properties');
+
+  // search_memory scope fields
+  const searchScopeProps = Object.keys(searchSchema.inputSchema.properties.scope.properties);
+  for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'strict']) {
+    assert.ok(searchScopeProps.includes(field), `search_memory scope schema must include ${field}`);
+  }
+  assert.ok(searchSchema.inputSchema.additionalProperties === false, 'search_memory must reject additional properties');
 });
 
 test('old DB schema drift report: verify scope columns exist', async () => {
@@ -290,7 +385,6 @@ test('old DB schema drift report: verify scope columns exist', async () => {
     const { shadowStore } = app.stores;
     await shadowStore.ensureReady();
 
-    // Verify scope columns exist in schema
     const tableInfo = shadowStore.db.prepare('PRAGMA table_info(memory_records)').all();
     const columnNames = tableInfo.map(col => col.name);
 

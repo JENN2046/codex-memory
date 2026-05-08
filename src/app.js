@@ -1,27 +1,27 @@
 const { createConfig } = require('./config/createConfig');
 
-async function applyScopeFilter(results, scopeFilter, shadowStore, strictMode = false) {
+async function applyScopeFilter(results, scopeFilter, shadowStore) {
   if (!results || !results.length) return results;
   const ids = results.map(r => r.memoryId || r.memory_id).filter(Boolean);
   if (!ids.length) return results;
-  const records = shadowStore.getRecordsByIds(ids);
+  const records = await shadowStore.getRecordsByIds(ids);
   if (!records || !records.length) return results;
   const recordMap = {};
-  for (const r of records) { recordMap[r.memory_id] = r; }
+  const strictMode = !!scopeFilter.strict;
+  for (const r of records) { recordMap[r.memoryId] = r; }
   return results.filter(r => {
     const id = r.memoryId || r.memory_id;
     const record = recordMap[id];
-    // strict mode: missing record = false (no穿透)
     if (!record) return strictMode ? false : true;
-    if (scopeFilter.project_id && record.project_id !== scopeFilter.project_id) return false;
+    if (scopeFilter.project_id && record.projectId !== scopeFilter.project_id) return false;
     if (scopeFilter.visibility) {
       const allowed = Array.isArray(scopeFilter.visibility)
         ? scopeFilter.visibility
         : [scopeFilter.visibility];
       if (!allowed.includes(record.visibility)) return false;
     }
-    if (scopeFilter.workspace_id && record.workspace_id !== scopeFilter.workspace_id) return false;
-    if (scopeFilter.client_id && record.client_id !== scopeFilter.client_id) return false;
+    if (scopeFilter.workspace_id && record.workspaceId !== scopeFilter.workspace_id) return false;
+    if (scopeFilter.client_id && record.clientId !== scopeFilter.client_id) return false;
     return true;
   });
 }
@@ -229,7 +229,7 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'search_memory') {
-        const results = await passiveRecallService.search({
+        const searchResults = await passiveRecallService.search({
           query: args.query,
           target: args.target || 'both',
           limit: args.limit,
@@ -238,10 +238,10 @@ function createCodexMemoryApplication(overrides = {}) {
           source: 'mcp'
         });
         const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
-        if (scopeFilter && results.results) {
-          results.results = await applyScopeFilter(results.results, scopeFilter, shadowStore);
-        }
-        return { results };
+        const filtered = (scopeFilter && searchResults && searchResults.length)
+          ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)
+          : searchResults;
+        return { results: filtered };
       }
 
       if (toolName === 'memory_overview') {
