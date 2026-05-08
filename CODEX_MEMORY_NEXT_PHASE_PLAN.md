@@ -117,7 +117,7 @@ audit / overview / search scope filter 属于后续实现任务。
 1. 设计 `memory-dashboard` report shape ✅ [MEMORY_DASHBOARD_REPORT_DESIGN.md](/A:/codex-memory/docs/MEMORY_DASHBOARD_REPORT_DESIGN.md)
 2. ✅ 做只读 CLI / Markdown / JSON 输出（`npm run dashboard`）
 3. ✅ 汇总 health、overview、audit、profile、rollback readiness
-4. CLI 稳定后再评估 local-only Web UI
+4. CLI 稳定后再评估 local-only Web UI ✅ [LOCAL_WEB_UI_ASSESSMENT.md](/A:/codex-memory/docs/LOCAL_WEB_UI_ASSESSMENT.md) — 结论：当前不建议实现
 
 ## 禁止自动执行
 
