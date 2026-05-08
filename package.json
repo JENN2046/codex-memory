@@ -38,6 +38,7 @@
     "gate:mainline": "node ./src/cli/mainline-gate.js",
     "gate:mainline:strict": "node ./src/cli/mainline-gate.js strict",
     "observe:http": "node ./src/cli/http-observe.js",
+    "dashboard": "node ./src/cli/dashboard.js",
     "rollback:mainline:plan": "node ./src/cli/mainline-rollback.js",
     "rebuild-shadow": "node ./src/cli/rebuild-shadow.js",
     "rebuild-profile": "node ./src/cli/rebuild-profile.js",
