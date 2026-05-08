@@ -34,7 +34,14 @@ const TOOL_DEFINITIONS = [
             { type: 'array', items: { type: 'string' } }
           ]
         },
-        sensitivity: { type: 'string' }
+        sensitivity: { type: 'string' },
+        project_id: { type: 'string' },
+        workspace_id: { type: 'string' },
+        client_id: { type: 'string' },
+        visibility: { type: 'string' },
+        task_id: { type: 'string' },
+        conversation_id: { type: 'string' },
+        retention_policy: { type: 'string' }
       },
       required: ['target', 'title', 'content', 'evidence', 'validated', 'reusable', 'sensitivity']
     }
@@ -51,7 +58,18 @@ const TOOL_DEFINITIONS = [
         target: { type: 'string', enum: ['process', 'knowledge', 'both'] },
         limit: { type: 'integer', minimum: 1, maximum: 10 },
         include_content: { type: 'boolean' },
-        context_text: { type: 'string' }
+        context_text: { type: 'string' },
+        scope: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            project_id: { type: 'string' },
+            workspace_id: { type: 'string' },
+            client_id: { type: 'string' },
+            visibility: { type: 'string' },
+            strict: { type: 'boolean' }
+          }
+        }
       },
       required: ['query']
     }
