@@ -48,6 +48,7 @@
     "v8-diagnose": "node ./src/cli/v8-diagnose.js",
     "scope:acceptance": "node ./src/cli/scope-acceptance.js",
     "scope:backfill:dry-run": "node ./src/cli/scope-backfill-dry-run.js",
+    "real-query-suite": "node ./src/cli/real-query-suite.js",
     "provider-smoke": "node ./src/cli/provider-smoke.js",
     "provider-benchmark": "node ./src/cli/provider-benchmark.js",
     "test": "node --test ./tests/*.test.js"
