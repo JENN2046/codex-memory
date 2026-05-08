@@ -2,45 +2,39 @@
 
 ## Current State
 
-所有 Plan 内任务完成（Phase A-J，M-001~M-013，H-002a~c，I-002a~c，J-001~J-003，G-001，8-task batch）。
+P0 + P0.1 可靠性修复完成，等待 push 授权。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
-- Branch: main
-- HEAD: `61b6279`
-- Tag: `v0.1.0-maint-20260508`
-- Remote: origin/main synced
+- Branch: main (ahead of origin/main by 2)
+- HEAD: `98d0f04`
+- Base: `cb3bac9` (origin/main)
+
+## P0/P0.1 Summary
+
+**P0 (7dbed69)** — applyScopeFilter async fix, mapRow governance columns, MCP schema scope, ensureReady migration, governance-report params
+
+**P0.1 (98d0f04)** — restore additionalProperties:false, upsertRecord 14 governance/scope columns, nullable project_id/workspace_id/client_id, upsertRecord write-through tests
 
 ## Key Baseline
 
-- compare: 43/43 matched, 0/0 core/extended
-- rollback: 43/43 rollback-ready, 0/0
-- npm test: 131/131
+- npm test: 141/141
+- gate:mainline:strict: contract 5/5, compare 43/43, rollback 43/43
 - gate:ci: 119/119 (fixture-only)
-- gate:mainline: ok (health 200)
-- profile: bge-m3-local__1024__v1, vectors 205, ready
-- dashboard: npm run dashboard
+- profile: ready (vectors 205)
+- dashboard: `npm run dashboard`
 
-## Recent Work
+## Changed Files (P0+P0.1)
 
-- LightMemo CLI + compare harness support
-- gate:ci + dashboard tests
-- search_memory scope filter (project_id, visibility, workspace_id, client_id)
-- 39→43 baseline sync across 8 docs
-- ROADMAP.md archived, checkpoint logs compressed
-- SQLite 28-column migration with governance + scope fields
+- src/app.js — applyScopeFilter await + camelCase keys
+- src/cli/governance-report.js — params, totalRecords, schemaStatus
+- src/core/constants.js — additionalProperties:false + scope schema
+- src/storage/SqliteShadowStore.js — upsertRecord 14 cols + ensureColumn + mapRow
+- tests/governance-schema.test.js — schema migration + upsertRecord + MCP contract
+- tests/scope-filter.test.js — scope filter backward compat + filtering
 
 ## Next
 
-- P1: Codex/Claude scope acceptance (end-to-end verify scope filter)
-- P2: Governance report CLI (proposal/tombstone/supersession/stale metrics)
-- `npm run rebuild-shadow` recommended (profile needs-attention, vectors=0)
-
-## Auth Required
-
-- push to origin
-- provider benchmark / smoke
-- rebuild-profile --confirm
-- cleanup apply / confirm
-- real SQLite migration (already done in H-002c)
+- Push requires Commander authorization
+- P2 governance productization pending
