@@ -104,6 +104,14 @@ class MemoryWriteService {
     const tags = normalizeTags(payload.tags);
     const validated = normalizeBoolean(payload.validated);
     const reusable = normalizeBoolean(payload.reusable);
+    // scope metadata
+    const clientId = normalizeString(payload.client_id || payload.clientId || 'codex');
+    const workspaceId = normalizeString(payload.workspace_id || payload.workspaceId || '');
+    const projectId = normalizeString(payload.project_id || payload.projectId || 'codex-memory');
+    const taskId = payload.task_id || payload.taskId || null;
+    const conversationId = payload.conversation_id || payload.conversationId || null;
+    const visibility = normalizeString(payload.visibility || 'project');
+    const retentionPolicy = normalizeString(payload.retention_policy || payload.retentionPolicy || 'permanent');
     let result;
 
     if (!this.executionContextResolver.isWritableByCodex(executionContext)) {
@@ -160,7 +168,15 @@ class MemoryWriteService {
       createdAt,
       updatedAt: createdAt,
       visibilityPolicy: VisibilityPolicy.CODEX_ONLY,
-      namespace: target === 'knowledge' ? Namespace.KNOWLEDGE : Namespace.PROCESS
+      namespace: target === 'knowledge' ? Namespace.KNOWLEDGE : Namespace.PROCESS,
+    /* scope metadata */
+    clientId,
+    workspaceId,
+    projectId,
+    taskId,
+    conversationId,
+    visibility,
+    retentionPolicy
     };
 
     const diaryWrite = await this.diaryStore.writeRecord(record);

@@ -13,55 +13,65 @@ class SqliteShadowStore {
     await fs.mkdir(path.dirname(this.config.dbPath), { recursive: true });
     this.db = new DatabaseSync(this.config.dbPath);
     this.db.exec(`
-      PRAGMA foreign_keys = ON;
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS memory_records (
-        memory_id TEXT PRIMARY KEY,
-        target TEXT NOT NULL,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        evidence TEXT NOT NULL,
-        tags_json TEXT NOT NULL,
-        validated INTEGER NOT NULL,
-        reusable INTEGER NOT NULL,
-        sensitivity TEXT NOT NULL,
-        file_path TEXT,
-        relative_path TEXT,
-        raw_text TEXT,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS idx_memory_records_target ON memory_records(target);
-      CREATE INDEX IF NOT EXISTS idx_memory_records_updated ON memory_records(updated_at);
-      CREATE TABLE IF NOT EXISTS memory_chunks (
-        chunk_id TEXT PRIMARY KEY,
-        memory_id TEXT NOT NULL,
-        target TEXT NOT NULL,
-        title TEXT NOT NULL,
-        source_file TEXT,
-        relative_path TEXT,
-        chunk_index INTEGER NOT NULL,
-        text TEXT NOT NULL,
-        vector_json TEXT NOT NULL,
-        embedding_fingerprint TEXT,
-        tags_json TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY(memory_id) REFERENCES memory_records(memory_id) ON DELETE CASCADE
-      );
-      CREATE INDEX IF NOT EXISTS idx_memory_chunks_memory ON memory_chunks(memory_id);
-      CREATE INDEX IF NOT EXISTS idx_memory_chunks_target ON memory_chunks(target);
-      CREATE INDEX IF NOT EXISTS idx_memory_chunks_source ON memory_chunks(relative_path);
-      CREATE INDEX IF NOT EXISTS idx_memory_chunks_created ON memory_chunks(created_at);
-      CREATE TABLE IF NOT EXISTS reconcile_queue (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        memory_id TEXT,
-        store_kind TEXT NOT NULL,
-        reason TEXT NOT NULL,
-        payload_json TEXT NOT NULL,
-        created_at TEXT NOT NULL
-      );
-    `);
+  PRAGMA foreign_keys = ON;
+  PRAGMA journal_mode = WAL;
+  CREATE TABLE IF NOT EXISTS memory_records (
+    memory_id TEXT PRIMARY KEY,
+    target TEXT NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    evidence TEXT NOT NULL,
+    tags_json TEXT NOT NULL,
+    validated INTEGER NOT NULL,
+    reusable INTEGER NOT NULL,
+    sensitivity TEXT NOT NULL,
+    file_path TEXT,
+    relative_path TEXT,
+    raw_text TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    client_id TEXT NOT NULL DEFAULT 'codex',
+    workspace_id TEXT NOT NULL DEFAULT '',
+    project_id TEXT NOT NULL DEFAULT 'codex-memory',
+    task_id TEXT,
+    conversation_id TEXT,
+    visibility TEXT NOT NULL DEFAULT 'project',
+    retention_policy TEXT NOT NULL DEFAULT 'permanent'
+  );
+  CREATE INDEX IF NOT EXISTS idx_memory_records_target ON memory_records(target);
+  CREATE INDEX IF NOT EXISTS idx_memory_records_updated ON memory_records(updated_at);
+  CREATE INDEX IF NOT EXISTS idx_memory_records_project ON memory_records(project_id);
+  CREATE INDEX IF NOT EXISTS idx_memory_records_visibility ON memory_records(visibility);
+  CREATE INDEX IF NOT EXISTS idx_memory_records_client ON memory_records(client_id);
+  CREATE TABLE IF NOT EXISTS memory_chunks (
+    chunk_id TEXT PRIMARY KEY,
+    memory_id TEXT NOT NULL,
+    target TEXT NOT NULL,
+    title TEXT NOT NULL,
+    source_file TEXT,
+    relative_path TEXT,
+    chunk_index INTEGER NOT NULL,
+    text TEXT NOT NULL,
+    vector_json TEXT NOT NULL,
+    embedding_fingerprint TEXT,
+    tags_json TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY(memory_id) REFERENCES memory_records(memory_id) ON DELETE CASCADE
+  );
+  CREATE INDEX IF NOT EXISTS idx_memory_chunks_memory ON memory_chunks(memory_id);
+  CREATE INDEX IF NOT EXISTS idx_memory_chunks_target ON memory_chunks(target);
+  CREATE INDEX IF NOT EXISTS idx_memory_chunks_source ON memory_chunks(relative_path);
+  CREATE INDEX IF NOT EXISTS idx_memory_chunks_created ON memory_chunks(created_at);
+  CREATE TABLE IF NOT EXISTS reconcile_queue (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    memory_id TEXT,
+    store_kind TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+`);
     this.ensureColumn('memory_chunks', 'embedding_fingerprint', 'TEXT');
   }
 
@@ -74,27 +84,36 @@ class SqliteShadowStore {
   async upsertRecord(record) {
     await this.ensureReady();
     const statement = this.db.prepare(`
-      INSERT INTO memory_records (
-        memory_id, target, title, content, evidence, tags_json, validated, reusable, sensitivity,
-        file_path, relative_path, raw_text, created_at, updated_at
-      ) VALUES (
-        $memory_id, $target, $title, $content, $evidence, $tags_json, $validated, $reusable, $sensitivity,
-        $file_path, $relative_path, $raw_text, $created_at, $updated_at
-      )
-      ON CONFLICT(memory_id) DO UPDATE SET
-        target = excluded.target,
-        title = excluded.title,
-        content = excluded.content,
-        evidence = excluded.evidence,
-        tags_json = excluded.tags_json,
-        validated = excluded.validated,
-        reusable = excluded.reusable,
-        sensitivity = excluded.sensitivity,
-        file_path = excluded.file_path,
-        relative_path = excluded.relative_path,
-        raw_text = excluded.raw_text,
-        updated_at = excluded.updated_at
-    `);
+INSERT INTO memory_records (
+  memory_id, target, title, content, evidence, tags_json, validated, reusable, sensitivity,
+  file_path, relative_path, raw_text, created_at, updated_at,
+  client_id, workspace_id, project_id, task_id, conversation_id, visibility, retention_policy
+) VALUES (
+  $memory_id, $target, $title, $content, $evidence, $tags_json, $validated, $reusable, $sensitivity,
+  $file_path, $relative_path, $raw_text, $created_at, $updated_at,
+  $client_id, $workspace_id, $project_id, $task_id, $conversation_id, $visibility, $retention_policy
+)
+ON CONFLICT(memory_id) DO UPDATE SET
+  target = excluded.target,
+  title = excluded.title,
+  content = excluded.content,
+  evidence = excluded.evidence,
+  tags_json = excluded.tags_json,
+  validated = excluded.validated,
+  reusable = excluded.reusable,
+  sensitivity = excluded.sensitivity,
+  file_path = excluded.file_path,
+  relative_path = excluded.relative_path,
+  raw_text = excluded.raw_text,
+  updated_at = excluded.updated_at,
+  client_id = excluded.client_id,
+  workspace_id = excluded.workspace_id,
+  project_id = excluded.project_id,
+  task_id = excluded.task_id,
+  conversation_id = excluded.conversation_id,
+  visibility = excluded.visibility,
+  retention_policy = excluded.retention_policy
+`);
 
     statement.run({
       $memory_id: record.memoryId,
@@ -110,30 +129,37 @@ class SqliteShadowStore {
       $relative_path: record.relativePath || null,
       $raw_text: record.rawText || null,
       $created_at: record.createdAt || new Date().toISOString(),
-      $updated_at: record.updatedAt || record.createdAt || new Date().toISOString()
+      $updated_at: record.updatedAt || record.createdAt || new Date().toISOString(),
+      $client_id: record.clientId || 'codex',
+      $workspace_id: record.workspaceId || '',
+      $project_id: record.projectId || 'codex-memory',
+      $task_id: record.taskId || null,
+      $conversation_id: record.conversationId || null,
+      $visibility: record.visibility || 'project',
+      $retention_policy: record.retentionPolicy || 'permanent'
     });
   }
 
   async replaceChunksForRecord(record, chunks = []) {
     await this.ensureReady();
     const deleteStatement = this.db.prepare(`
-      DELETE FROM memory_chunks
-      WHERE memory_id = ?
-        AND (
-          embedding_fingerprint = ?
-          OR embedding_fingerprint IS NULL
-          OR chunk_id GLOB ?
-        )
-    `);
+DELETE FROM memory_chunks
+WHERE memory_id = ?
+AND (
+embedding_fingerprint = ?
+OR embedding_fingerprint IS NULL
+OR chunk_id GLOB ?
+)
+`);
     const insertStatement = this.db.prepare(`
-      INSERT INTO memory_chunks (
-        chunk_id, memory_id, target, title, source_file, relative_path, chunk_index,
-        text, vector_json, embedding_fingerprint, tags_json, created_at, updated_at
-      ) VALUES (
-        $chunk_id, $memory_id, $target, $title, $source_file, $relative_path, $chunk_index,
-        $text, $vector_json, $embedding_fingerprint, $tags_json, $created_at, $updated_at
-      )
-    `);
+INSERT INTO memory_chunks (
+  chunk_id, memory_id, target, title, source_file, relative_path, chunk_index,
+  text, vector_json, embedding_fingerprint, tags_json, created_at, updated_at
+) VALUES (
+  $chunk_id, $memory_id, $target, $title, $source_file, $relative_path, $chunk_index,
+  $text, $vector_json, $embedding_fingerprint, $tags_json, $created_at, $updated_at
+)
+`);
 
     deleteStatement.run(record.memoryId, this.config.embeddingFingerprint, `${this.config.embeddingFingerprint}:*`);
     for (const chunk of chunks) {
@@ -158,8 +184,8 @@ class SqliteShadowStore {
   async getRecord(memoryId) {
     await this.ensureReady();
     const row = this.db.prepare(`
-      SELECT * FROM memory_records WHERE memory_id = ?
-    `).get(memoryId);
+SELECT * FROM memory_records WHERE memory_id = ?
+`).get(memoryId);
     return row ? this.mapRow(row) : null;
   }
 
@@ -188,8 +214,8 @@ class SqliteShadowStore {
 
     const placeholders = uniqueIds.map(() => '?').join(',');
     const rows = this.db.prepare(`
-      SELECT * FROM memory_records WHERE memory_id IN (${placeholders})
-    `).all(...uniqueIds);
+SELECT * FROM memory_records WHERE memory_id IN (${placeholders})
+`).all(...uniqueIds);
 
     return rows.map(row => this.mapRow(row));
   }
@@ -326,10 +352,10 @@ class SqliteShadowStore {
 
     const placeholders = uniquePaths.map(() => '?').join(',');
     const rows = this.db.prepare(`
-      SELECT * FROM memory_chunks
-      WHERE embedding_fingerprint = ? AND relative_path IN (${placeholders})
-      ORDER BY updated_at DESC, chunk_index ASC
-    `).all(this.config.embeddingFingerprint, ...uniquePaths);
+SELECT * FROM memory_chunks
+WHERE embedding_fingerprint = ? AND relative_path IN (${placeholders})
+ORDER BY updated_at DESC, chunk_index ASC
+`).all(this.config.embeddingFingerprint, ...uniquePaths);
 
     return rows.map(row => this.mapChunkRow(row));
   }
@@ -342,8 +368,8 @@ class SqliteShadowStore {
     await this.ensureReady();
     if (currentFingerprintOnly) {
       return this.db.prepare(`
-        SELECT COUNT(*) AS count FROM memory_chunks WHERE memory_id = ? AND embedding_fingerprint = ?
-      `).get(memoryId, this.config.embeddingFingerprint).count;
+SELECT COUNT(*) AS count FROM memory_chunks WHERE memory_id = ? AND embedding_fingerprint = ?
+`).get(memoryId, this.config.embeddingFingerprint).count;
     }
 
     return this.db.prepare('SELECT COUNT(*) AS count FROM memory_chunks WHERE memory_id = ?')
@@ -366,9 +392,9 @@ class SqliteShadowStore {
   async enqueueReconcileTask(task) {
     await this.ensureReady();
     this.db.prepare(`
-      INSERT INTO reconcile_queue (memory_id, store_kind, reason, payload_json, created_at)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(
+INSERT INTO reconcile_queue (memory_id, store_kind, reason, payload_json, created_at)
+VALUES (?, ?, ?, ?, ?)
+`).run(
       task.memoryId || null,
       task.storeKind,
       task.reason,
@@ -390,8 +416,8 @@ class SqliteShadowStore {
   async listReconcileTasks(limit = 50) {
     await this.ensureReady();
     return this.db.prepare(`
-      SELECT * FROM reconcile_queue ORDER BY created_at ASC LIMIT ?
-    `).all(limit).map(row => ({
+SELECT * FROM reconcile_queue ORDER BY created_at ASC LIMIT ?
+`).all(limit).map(row => ({
       id: row.id,
       memoryId: row.memory_id,
       storeKind: row.store_kind,
@@ -440,7 +466,15 @@ class SqliteShadowStore {
       relativePath: row.relative_path,
       rawText: row.raw_text,
       createdAt: row.created_at,
-      updatedAt: row.updated_at
+      updatedAt: row.updated_at,
+      // scope fields - preserve raw values (no fallback defaults)
+      clientId: row.client_id ?? null,
+      workspaceId: row.workspace_id ?? null,
+      projectId: row.project_id ?? null,
+      taskId: row.task_id ?? null,
+      conversationId: row.conversation_id ?? null,
+      visibility: row.visibility ?? null,
+      retentionPolicy: row.retention_policy ?? null
     };
   }
 

@@ -1,6 +1,6 @@
 const { createConfig } = require('./config/createConfig');
 
-async function applyScopeFilter(results, scopeFilter, shadowStore) {
+async function applyScopeFilter(results, scopeFilter, shadowStore, strictMode = false) {
   if (!results || !results.length) return results;
   const ids = results.map(r => r.memoryId || r.memory_id).filter(Boolean);
   if (!ids.length) return results;
@@ -11,7 +11,8 @@ async function applyScopeFilter(results, scopeFilter, shadowStore) {
   return results.filter(r => {
     const id = r.memoryId || r.memory_id;
     const record = recordMap[id];
-    if (!record) return true; // no record = no filter
+    // strict mode: missing record = false (no穿透)
+    if (!record) return strictMode ? false : true;
     if (scopeFilter.project_id && record.project_id !== scopeFilter.project_id) return false;
     if (scopeFilter.visibility) {
       const allowed = Array.isArray(scopeFilter.visibility)
