@@ -32,7 +32,7 @@
 | Phase | 名称 | 当前动作 |
 |---|---|---|
 | Phase F | docs governance / maintenance foundation | 当前优先 |
-| Phase G | CI-safe gate | 先设计，再实现 |
+| Phase G | CI-safe gate | ✅ 已实现 `npm run gate:ci` |
 | Phase H | memory governance | 先模型设计，不直接改 runtime |
 | Phase I | Codex / Claude client scope | 先 scope model，不改 MCP contract |
 | Phase J | observability / review report | 先 CLI/Markdown/JSON report，不先做 Web UI |

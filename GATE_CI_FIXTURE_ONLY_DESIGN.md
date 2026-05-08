@@ -8,8 +8,9 @@
 
 当前状态：
 
-- `gate:ci` 还没有实现
-- 不修改 `package.json`
+- `gate:ci` 已实现：`npm run gate:ci`（`src/cli/gate-ci.js`）
+- compare 43/43 + rollback 43/43 + tests 116/116 + docs check
+- fixture-only，不依赖 HTTP MCP / provider / real config
 - 不修改 `.github/workflows`
 - 不替代 `gate:mainline`
 

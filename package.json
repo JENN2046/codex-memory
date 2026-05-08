@@ -37,6 +37,7 @@
     "rollback-active-memory": "node ./src/cli/rollback-active-memory.js",
     "gate:mainline": "node ./src/cli/mainline-gate.js",
     "gate:mainline:strict": "node ./src/cli/mainline-gate.js strict",
+    "gate:ci": "node ./src/cli/gate-ci.js",
     "observe:http": "node ./src/cli/http-observe.js",
     "dashboard": "node ./src/cli/dashboard.js",
     "rollback:mainline:plan": "node ./src/cli/mainline-rollback.js",
