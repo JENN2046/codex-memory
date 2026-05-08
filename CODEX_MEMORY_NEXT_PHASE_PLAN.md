@@ -33,9 +33,9 @@
 |---|---|---|
 | Phase F | docs governance / maintenance foundation | 当前优先 |
 | Phase G | CI-safe gate | ✅ 已实现 `npm run gate:ci` |
-| Phase H | memory governance | 先模型设计，不直接改 runtime |
-| Phase I | Codex / Claude client scope | 先 scope model，不改 MCP contract |
-| Phase J | observability / review report | 先 CLI/Markdown/JSON report，不先做 Web UI |
+| Phase H | memory governance | ✅ H-001~H-002c 全部完成（含真实 SQLite migration） |
+| Phase I | Codex / Claude client scope | ✅ I-002a~I-002c 全部完成 |
+| Phase J | observability / review report | ✅ J-001~J-003 全部完成（含 dashboard CLI） |
 
 不要跳过 Phase F。文档入口、事实源和维护队列不清楚时，后续 runtime 变化会越来越难审。
 
