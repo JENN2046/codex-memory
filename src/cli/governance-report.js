@@ -15,14 +15,35 @@ function getDbPath() {
   return path.join(process.cwd(), 'data', 'codex-memory.sqlite');
 }
 
-function runQuery(db, sql) {
-  try { return db.prepare(sql).all(); }
+function runQuery(db, sql, params = []) {
+  try { return db.prepare(sql).all(...params); }
   catch { return []; }
 }
 
-function runQueryOne(db, sql) {
-  try { return db.prepare(sql).get(); }
+function runQueryOne(db, sql, params = []) {
+  try { return db.prepare(sql).get(...params); }
   catch { return null; }
+}
+
+function columnExists(db, table, column) {
+  try {
+    const cols = db.prepare('PRAGMA table_info(' + table + ')').all();
+    return cols.some(c => c.name === column);
+  } catch { return false; }
+}
+
+function checkGovernanceSchema(db) {
+  const required = [
+    'status', 'scope', 'confidence', 'provenance',
+    'superseded_by', 'supersedes', 'tombstone_reason',
+    'client_id', 'workspace_id', 'project_id',
+    'task_id', 'conversation_id', 'visibility', 'retention_policy'
+  ];
+  const missing = required.filter(col => !columnExists(db, 'memory_records', col));
+  return {
+    allPresent: missing.length === 0,
+    missingColumns: missing
+  };
 }
 
 function collectReport() {
@@ -32,93 +53,69 @@ function collectReport() {
   }
   const db = new DatabaseSync(dbPath);
 
-  // Status distribution
-  const statusDist = runQuery(db,
-    'SELECT status, COUNT(*) as cnt FROM memory_records GROUP BY status ORDER BY cnt DESC');
+  const schemaStatus = checkGovernanceSchema(db);
+  const totalRecords = runQueryOne(db, 'SELECT COUNT(*) as cnt FROM memory_records')?.cnt || 0;
 
-  // Scope coverage
-  const projectDist = runQuery(db,
-    'SELECT project_id, COUNT(*) as cnt FROM memory_records GROUP BY project_id ORDER BY cnt DESC');
-  const visibilityDist = runQuery(db,
-    'SELECT visibility, COUNT(*) as cnt FROM memory_records GROUP BY visibility ORDER BY cnt DESC');
-  const clientDist = runQuery(db,
-    'SELECT client_id, COUNT(*) as cnt FROM memory_records GROUP BY client_id ORDER BY cnt DESC');
+  let statusDist = [],
+    projectDist = [],
+    visibilityDist = [],
+    clientDist = [],
+    confHigh = 0, confMed = 0, confLow = 0,
+    stale30d = 0, stale90d = 0,
+    supersededCount = 0, supersessionInitiated = 0,
+    tombstonedCount = 0, proposalCount = 0,
+    scopeNullCount = 0, taskScopedCount = 0,
+    retentionDist = [];
 
-  // Confidence distribution (bucketed)
-  const confHigh = runQueryOne(db,
-    'SELECT COUNT(*) as cnt FROM memory_records WHERE confidence >= 0.8')?.cnt || 0;
-  const confMed = runQueryOne(db,
-    'SELECT COUNT(*) as cnt FROM memory_records WHERE confidence >= 0.4 AND confidence < 0.8')?.cnt || 0;
-  const confLow = runQueryOne(db,
-    'SELECT COUNT(*) as cnt FROM memory_records WHERE confidence < 0.4')?.cnt || 0;
-  const totalRecords = confHigh + confMed + confLow;
+  if (schemaStatus.allPresent) {
+    statusDist = runQuery(db, 'SELECT status, COUNT(*) as cnt FROM memory_records GROUP BY status ORDER BY cnt DESC');
+    projectDist = runQuery(db, 'SELECT project_id, COUNT(*) as cnt FROM memory_records GROUP BY project_id ORDER BY cnt DESC');
+    visibilityDist = runQuery(db, 'SELECT visibility, COUNT(*) as cnt FROM memory_records GROUP BY visibility ORDER BY cnt DESC');
+    clientDist = runQuery(db, 'SELECT client_id, COUNT(*) as cnt FROM memory_records GROUP BY client_id ORDER BY cnt DESC');
 
-  // Stale indicators
-  const now = new Date();
-  const stale30d = runQueryOne(db,
-    `SELECT COUNT(*) as cnt FROM memory_records WHERE updated_at < ? AND status = 'active'`,
-    [new Date(now - 30 * 86400000).toISOString()])?.cnt || 0;
-  const stale90d = runQueryOne(db,
-    `SELECT COUNT(*) as cnt FROM memory_records WHERE updated_at < ? AND status = 'active'`,
-    [new Date(now - 90 * 86400000).toISOString()])?.cnt || 0;
+    confHigh = runQueryOne(db, 'SELECT COUNT(*) as cnt FROM memory_records WHERE confidence >= 0.8')?.cnt || 0;
+    confMed = runQueryOne(db, 'SELECT COUNT(*) as cnt FROM memory_records WHERE confidence >= 0.4 AND confidence < 0.8')?.cnt || 0;
+    confLow = runQueryOne(db, 'SELECT COUNT(*) as cnt FROM memory_records WHERE confidence < 0.4')?.cnt || 0;
 
-  // Supersession chains
-  const supersededCount = runQueryOne(db,
-    "SELECT COUNT(*) as cnt FROM memory_records WHERE superseded_by IS NOT NULL")?.cnt || 0;
-  const supersessionInitiated = runQueryOne(db,
-    "SELECT COUNT(*) as cnt FROM memory_records WHERE supersedes IS NOT NULL")?.cnt || 0;
+    const now = new Date();
+    stale30d = runQueryOne(db, 'SELECT COUNT(*) as cnt FROM memory_records WHERE updated_at < ? AND status = ?', [new Date(now - 30 * 86400000).toISOString(), 'active'])?.cnt || 0;
+    stale90d = runQueryOne(db, 'SELECT COUNT(*) as cnt FROM memory_records WHERE updated_at < ? AND status = ?', [new Date(now - 90 * 86400000).toISOString(), 'active'])?.cnt || 0;
 
-  // Tombstone records
-  const tombstonedCount = runQueryOne(db,
-    "SELECT COUNT(*) as cnt FROM memory_records WHERE status = 'tombstoned'")?.cnt || 0;
-
-  // Proposal records
-  const proposalCount = runQueryOne(db,
-    "SELECT COUNT(*) as cnt FROM memory_records WHERE status = 'proposal'")?.cnt || 0;
-
-  // Scope coverage (NULL vs filled)
-  const scopeNullCount = runQueryOne(db,
-    "SELECT COUNT(*) as cnt FROM memory_records WHERE project_id = '' OR project_id IS NULL")?.cnt || 0;
-  const scopeFilledCount = totalRecords - scopeNullCount;
-
-  // Unscoped records (no task_id)
-  const taskScopedCount = runQueryOne(db,
-    "SELECT COUNT(*) as cnt FROM memory_records WHERE task_id IS NOT NULL AND task_id != ''")?.cnt || 0;
-
-  // Retention policy distribution
-  const retentionDist = runQuery(db,
-    'SELECT retention_policy, COUNT(*) as cnt FROM memory_records GROUP BY retention_policy ORDER BY cnt DESC');
+    supersededCount = runQueryOne(db, "SELECT COUNT(*) as cnt FROM memory_records WHERE superseded_by IS NOT NULL")?.cnt || 0;
+    supersessionInitiated = runQueryOne(db, "SELECT COUNT(*) as cnt FROM memory_records WHERE supersedes IS NOT NULL")?.cnt || 0;
+    tombstonedCount = runQueryOne(db, "SELECT COUNT(*) as cnt FROM memory_records WHERE status = 'tombstoned'")?.cnt || 0;
+    proposalCount = runQueryOne(db, "SELECT COUNT(*) as cnt FROM memory_records WHERE status = 'proposal'")?.cnt || 0;
+    scopeNullCount = runQueryOne(db, "SELECT COUNT(*) as cnt FROM memory_records WHERE project_id = '' OR project_id IS NULL")?.cnt || 0;
+    taskScopedCount = runQueryOne(db, "SELECT COUNT(*) as cnt FROM memory_records WHERE task_id IS NOT NULL AND task_id != ''")?.cnt || 0;
+    retentionDist = runQuery(db, 'SELECT retention_policy, COUNT(*) as cnt FROM memory_records GROUP BY retention_policy ORDER BY cnt DESC');
+  }
 
   db.close();
 
+  const scopeFilledCount = totalRecords - scopeNullCount;
+
   return {
     generatedAt: new Date().toISOString(),
+    schemaStatus: {
+      allPresent: schemaStatus.allPresent,
+      missingColumns: schemaStatus.missingColumns
+    },
     totalRecords,
-    statusDistribution: Object.fromEntries(statusDist.map(r => [r.status, r.cnt])),
+    statusDistribution: statusDist.length > 0 ? Object.fromEntries(statusDist.map(r => [r.status, r.cnt])) : {},
     scopeCoverage: {
-      project: Object.fromEntries(projectDist.map(r => [r.project_id, r.cnt])),
-      visibility: Object.fromEntries(visibilityDist.map(r => [r.visibility, r.cnt])),
-      client: Object.fromEntries(clientDist.map(r => [r.client_id, r.cnt])),
+      project: projectDist.length > 0 ? Object.fromEntries(projectDist.map(r => [r.project_id, r.cnt])) : {},
+      visibility: visibilityDist.length > 0 ? Object.fromEntries(visibilityDist.map(r => [r.visibility, r.cnt])) : {},
+      client: clientDist.length > 0 ? Object.fromEntries(clientDist.map(r => [r.client_id, r.cnt])) : {},
       scopeFilledRecords: scopeFilledCount,
       scopeNullRecords: scopeNullCount,
       taskScopedRecords: taskScopedCount
     },
-    confidence: {
-      high: confHigh,
-      medium: confMed,
-      low: confLow
-    },
-    staleness: {
-      activeNotUpdated30d: stale30d,
-      activeNotUpdated90d: stale90d
-    },
-    supersession: {
-      supersededRecords: supersededCount,
-      supersessionInitiated: supersessionInitiated
-    },
+    confidence: { high: confHigh, medium: confMed, low: confLow },
+    staleness: { activeNotUpdated30d: stale30d, activeNotUpdated90d: stale90d },
+    supersession: { supersededRecords: supersededCount, supersessionInitiated: supersessionInitiated },
     tombstoned: tombstonedCount,
     proposals: proposalCount,
-    retention: Object.fromEntries(retentionDist.map(r => [r.retention_policy, r.cnt]))
+    retention: retentionDist.length > 0 ? Object.fromEntries(retentionDist.map(r => [r.retention_policy, r.cnt])) : {}
   };
 }
 
@@ -128,6 +125,12 @@ function renderText(report) {
   l.push(`Governance Report — ${report.generatedAt}`);
   l.push('─'.repeat(50));
   l.push('');
+
+  if (report.schemaStatus && !report.schemaStatus.allPresent) {
+    l.push(`⚠ Schema incomplete — missing columns: [${report.schemaStatus.missingColumns.join(', ')}]`);
+    l.push('  Run migration (H-002c) to add governance/scope columns.');
+    l.push('');
+  }
   l.push(`Total Records: ${report.totalRecords}`);
   l.push('');
   l.push('Status Distribution:');

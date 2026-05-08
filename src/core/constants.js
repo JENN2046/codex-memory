@@ -45,13 +45,26 @@ const TOOL_DEFINITIONS = [
     description: 'Search over the Codex process and knowledge diaries with diary-compatible recall output.',
     inputSchema: {
       type: 'object',
-      additionalProperties: false,
       properties: {
         query: { type: 'string' },
         target: { type: 'string', enum: ['process', 'knowledge', 'both'] },
         limit: { type: 'integer', minimum: 1, maximum: 10 },
         include_content: { type: 'boolean' },
-        context_text: { type: 'string' }
+        context_text: { type: 'string' },
+        scope: {
+          type: 'object',
+          properties: {
+            project_id: { type: 'string' },
+            visibility: {
+              anyOf: [
+                { type: 'string' },
+                { type: 'array', items: { type: 'string' } }
+              ]
+            },
+            workspace_id: { type: 'string' },
+            client_id: { type: 'string' }
+          }
+        }
       },
       required: ['query']
     }

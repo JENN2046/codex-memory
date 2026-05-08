@@ -63,6 +63,24 @@ class SqliteShadowStore {
       );
     `);
     this.ensureColumn('memory_chunks', 'embedding_fingerprint', 'TEXT');
+
+    // H-002a governance columns
+    this.ensureColumn('memory_records', 'status', "TEXT NOT NULL DEFAULT 'active'");
+    this.ensureColumn('memory_records', 'scope', "TEXT NOT NULL DEFAULT 'project:codex-memory'");
+    this.ensureColumn('memory_records', 'confidence', "REAL NOT NULL DEFAULT 1.0");
+    this.ensureColumn('memory_records', 'provenance', "TEXT NOT NULL DEFAULT ''");
+    this.ensureColumn('memory_records', 'superseded_by', 'TEXT');
+    this.ensureColumn('memory_records', 'supersedes', 'TEXT');
+    this.ensureColumn('memory_records', 'tombstone_reason', 'TEXT');
+
+    // I-002a client scope columns
+    this.ensureColumn('memory_records', 'client_id', "TEXT NOT NULL DEFAULT 'codex'");
+    this.ensureColumn('memory_records', 'workspace_id', "TEXT NOT NULL DEFAULT ''");
+    this.ensureColumn('memory_records', 'project_id', "TEXT NOT NULL DEFAULT 'codex-memory'");
+    this.ensureColumn('memory_records', 'task_id', 'TEXT');
+    this.ensureColumn('memory_records', 'conversation_id', 'TEXT');
+    this.ensureColumn('memory_records', 'visibility', "TEXT NOT NULL DEFAULT 'project'");
+    this.ensureColumn('memory_records', 'retention_policy', "TEXT NOT NULL DEFAULT 'permanent'");
   }
 
   ensureColumn(tableName, columnName, definition) {
@@ -436,6 +454,23 @@ class SqliteShadowStore {
       validated: !!row.validated,
       reusable: !!row.reusable,
       sensitivity: row.sensitivity,
+      // Governance columns
+      status: row.status || 'active',
+      scope: row.scope || 'project:codex-memory',
+      confidence: row.confidence ?? 1.0,
+      provenance: row.provenance || '',
+      supersededBy: row.superseded_by || null,
+      supersedes: row.supersedes || null,
+      tombstoneReason: row.tombstone_reason || null,
+      // Client scope columns
+      clientId: row.client_id || 'codex',
+      workspaceId: row.workspace_id || '',
+      projectId: row.project_id || 'codex-memory',
+      taskId: row.task_id || null,
+      conversationId: row.conversation_id || null,
+      visibility: row.visibility || 'project',
+      retentionPolicy: row.retention_policy || 'permanent',
+      // Original
       filePath: row.file_path,
       relativePath: row.relative_path,
       rawText: row.raw_text,
