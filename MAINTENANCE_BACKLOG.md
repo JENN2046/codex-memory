@@ -53,6 +53,7 @@
 | H-002b | memory-governance | A1 | done | migration dry-run / fixture 验证计划 | docs + dry-run | dry-run 成功：7 列 + 3 索引 + 428 records 回填；计划见 [MIGRATION_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MIGRATION_DRY_RUN_PLAN.md) |
 | H-002c | memory-governance | A2 | todo | 真实 SQLite schema migration | 需单独验证 + Commander 授权 | 不自动执行 |
 | I-002a | client-scope | A0 | done | 设计 scope schema extension | docs review | 已创建 [SCOPE_SCHEMA_EXTENSION.md](/A:/codex-memory/docs/SCOPE_SCHEMA_EXTENSION.md)；14 新列合并 migration 方案 |
+| J-001 | observability | A0 | done | 设计 memory dashboard report shape | docs review | 已创建 [MEMORY_DASHBOARD_REPORT_DESIGN.md](/A:/codex-memory/docs/MEMORY_DASHBOARD_REPORT_DESIGN.md) |
 
 ## 推荐执行顺序
 
