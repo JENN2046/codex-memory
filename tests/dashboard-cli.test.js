@@ -1,12 +1,15 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
 
-function runDashboard({ args = [] } = {}) {
+function runDashboard({ args = [], env = {} } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['src/cli/dashboard.js', ...args], {
       cwd: process.cwd(),
-      env: process.env,
+      env: { ...process.env, ...env },
       stdio: ['ignore', 'pipe', 'pipe']
     });
     let stdout = '';
@@ -22,9 +25,19 @@ function parseJsonOutput(text) {
   return JSON.parse(text);
 }
 
+function formatFailure(result) {
+  return [
+    `exit=${result.code}`,
+    '--- stdout ---',
+    result.stdout || '<empty>',
+    '--- stderr ---',
+    result.stderr || '<empty>'
+  ].join('\n');
+}
+
 test('dashboard CLI should report all sections in json mode', async () => {
   const result = await runDashboard({ args: ['--json'] });
-  assert.equal(result.code, 0, result.stderr || 'non-zero exit');
+  assert.equal(result.code, 0, formatFailure(result));
   const payload = parseJsonOutput(result.stdout);
 
   assert.equal(payload.mode, 'memory-dashboard');
@@ -65,7 +78,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
 
 test('dashboard CLI should support --json --summary-only', async () => {
   const result = await runDashboard({ args: ['--json', '--summary-only'] });
-  assert.equal(result.code, 0, result.stderr || 'non-zero exit');
+  assert.equal(result.code, 0, formatFailure(result));
   const payload = parseJsonOutput(result.stdout);
 
   assert.equal(payload.mode, 'memory-dashboard');
@@ -76,7 +89,7 @@ test('dashboard CLI should support --json --summary-only', async () => {
 
 test('dashboard CLI should emit text output by default', async () => {
   const result = await runDashboard();
-  assert.equal(result.code, 0, result.stderr || 'non-zero exit');
+  assert.equal(result.code, 0, formatFailure(result));
   const text = result.stdout;
   assert.ok(text.includes('Memory Dashboard'), 'should include title');
   assert.ok(text.includes('Service'), 'should include Service section');
@@ -85,4 +98,27 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
   assert.ok(text.includes('Checks'), 'should include Checks section');
   assert.ok(text.includes('Recommendations'), 'should include Recommendations');
+});
+
+test('dashboard CLI should tolerate clean CI runner warnings', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-dashboard-ci-'));
+  const missingDataDir = path.join(tempBasePath, 'missing-data');
+  const result = await runDashboard({
+    args: ['--json'],
+    env: {
+      CODEX_MEMORY_HTTP_PORT: '1',
+      CODEX_MEMORY_DATA_DIR: missingDataDir,
+      CODEX_MEMORY_DB_PATH: path.join(missingDataDir, 'codex-memory.sqlite'),
+      CODEX_MEMORY_LOGS_DIR: path.join(tempBasePath, 'logs')
+    }
+  });
+
+  assert.equal(result.code, 0, formatFailure(result));
+  const payload = parseJsonOutput(result.stdout);
+
+  assert.equal(payload.summary.status, 'warn');
+  assert.equal(payload.service.status, 'warn');
+  assert.equal(payload.store.status, 'warn');
+  assert.match(payload.store.message, /Database not found/);
+  assert.notEqual(payload.gate.status, 'error', formatFailure(result));
 });

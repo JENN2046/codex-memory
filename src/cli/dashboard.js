@@ -24,6 +24,14 @@ function resolveLogDir() {
   return process.env.CODEX_MEMORY_LOGS_DIR || path.join(process.cwd(), 'logs');
 }
 
+function resolveDbPath() {
+  if (process.env.CODEX_MEMORY_DB_PATH) {
+    return path.resolve(process.cwd(), process.env.CODEX_MEMORY_DB_PATH);
+  }
+  const dataDir = process.env.CODEX_MEMORY_DATA_DIR || path.join(process.cwd(), 'data');
+  return path.join(path.resolve(process.cwd(), dataDir), 'codex-memory.sqlite');
+}
+
 function spawnJson(args, env = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, args, {
@@ -97,7 +105,7 @@ function classifyStatus(...levels) {
 async function collectService() {
   const url = resolveHealthUrl();
   const result = await httpGet(url);
-  const status = result.statusCode === 200 ? 'ok' : 'error';
+  const status = result.statusCode === 200 ? 'ok' : 'warn';
   return {
     status,
     url,
@@ -111,9 +119,9 @@ async function collectService() {
 async function collectStore() {
   try {
     const { DatabaseSync } = require('node:sqlite');
-    const dbPath = path.join(process.cwd(), 'data', 'codex-memory.sqlite');
+    const dbPath = resolveDbPath();
     if (!fs.existsSync(dbPath)) {
-      return { status: 'error', records: 0, chunks: 0, vectors: 0, message: 'Database not found' };
+      return { status: 'warn', records: 0, chunks: 0, vectors: 0, message: `Database not found: ${dbPath}` };
     }
     const db = new DatabaseSync(dbPath);
     const recordCount = db.prepare('SELECT COUNT(*) as cnt FROM memory_records').get().cnt;
@@ -156,7 +164,7 @@ async function collectStore() {
 
 async function collectProfile() {
   const data = await spawnJson([path.join(process.cwd(), 'src', 'cli', 'profile-health.js'), '--json']);
-  if (!data) return { status: 'error', fingerprint: null, legacyChunks: 0, message: 'Failed to read profile' };
+  if (!data) return { status: 'warn', fingerprint: null, legacyChunks: 0, message: 'Failed to read profile' };
   return {
     status: data.status === 'ready' ? 'ok' : 'warn',
     fingerprint: data.embeddingProfile?.fingerprint || null,
