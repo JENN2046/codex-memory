@@ -23,15 +23,14 @@
 
 ## 当前基线
 
-- 最新已推送主线提交：`95c525b docs: add next phase governance plan`
-- 最新本地主线提交：`3493480 docs: add gate ci fixture-only design`（M-011，尚未推送）
-- 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0045`
-- 标准 suite：`41/41 matched`，`extendedMismatchCountTotal=0`
-- rollback readiness：`41/41 rollback-ready`，`extendedMismatchCountTotal=0`
+- 最新已推送主线提交：`9ea3cf3 maint(profile): deposit M-005 read-only profile migration evidence`
+- 最新 mainline gate：health `200`、compare `43/43`、rollback `43/43`、`0/0` core/extended
+- 标准 suite：`43/43 matched`，`extendedMismatchCountTotal=0`，`driftReasonBreakdown={}`
+- rollback readiness：`43/43 rollback-ready`，`extendedMismatchCountTotal=0`
+- profile health：`ready`，0 legacy chunks，single fingerprint `bge-m3-local__1024__v1`
 - HTTP health：`200`
-- checkpoint-20 未创建
-- M-001 / M-002 / M-003 / M-012 / M-013 已完成；下一个待办 M-004 或 M-005（均需授权）
+- 维护期 tag：`v0.1.0-maint-20260508`
+- M-001~M-003、M-005~M-013 已完成；仅剩 M-004（需 provider 调用授权）
 
 ## 维护期队列
 
