@@ -30,7 +30,7 @@
 - profile health：`ready`，0 legacy chunks，single fingerprint `bge-m3-local__1024__v1`
 - HTTP health：`200`
 - 维护期 tag：`v0.1.0-maint-20260508`
-- 维护期首批 13 个任务已完成（M-001 ~ M-013）；Phase H-001/H-002a 已完成
+- 全部维护期及后续阶段任务已完成（M-001~M-013、H-001~H-002c、I-002a~I-002c、J-001~J-003）
 
 ## 维护期队列（首批 M-001~M-013 已全部完成）
 
@@ -51,8 +51,9 @@
 | M-013 | client-scope | A1 | done | 起草 Codex / Claude client scope model | docs review / no runtime change | 已创建 [CLIENT_SCOPE_MODEL.md](/A:/codex-memory/CLIENT_SCOPE_MODEL.md)；定义 client_id、workspace_id、project_id、task_id、conversation_id、visibility、retention_policy 维度 |
 | H-002a | memory-governance | A0 | done | 设计 proposal / tombstone / supersession schema | docs review | 已创建 [PROPOSAL_TOMBSTONE_SUPERSESSION_SCHEMA.md](/A:/codex-memory/docs/PROPOSAL_TOMBSTONE_SUPERSESSION_SCHEMA.md) |
 | H-002b | memory-governance | A1 | done | migration dry-run / fixture 验证计划 | docs + dry-run | dry-run 成功：7 列 + 3 索引 + 428 records 回填；计划见 [MIGRATION_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MIGRATION_DRY_RUN_PLAN.md) |
-| H-002c | memory-governance | A2 | done | 真实 SQLite schema migration | gate:mainline + npm test | 14 列 + 6 索引迁移完成；442 records 回填；gate 43/43、test 123/123；备份在 `codex-memory-pre-migration.sqlite` |
+| H-002c | memory-governance | A2 | done | 真实 SQLite schema migration（含 I-002a 列） | gate:mainline + npm test | 14 列 + 6 索引迁移完成；442 records 回填；备份在 `codex-memory-pre-migration.sqlite` |
 | I-002a | client-scope | A0 | done | 设计 scope schema extension | docs review | 已创建 [SCOPE_SCHEMA_EXTENSION.md](/A:/codex-memory/docs/SCOPE_SCHEMA_EXTENSION.md)；14 新列合并 migration 方案 |
+| I-002c | client-scope | A2 | done | 真实 scope migration（已含入 H-002c） | gate:mainline + npm test | 与 H-002c 合并执行 |
 | J-001 | observability | A0 | done | 设计 memory dashboard report shape | docs review | 已创建 [MEMORY_DASHBOARD_REPORT_DESIGN.md](/A:/codex-memory/docs/MEMORY_DASHBOARD_REPORT_DESIGN.md) |
 | J-002 | observability | A1 | done | 实现 memory dashboard CLI | `npm run dashboard` / `npm run dashboard -- --json` + `npm run gate:mainline` | 已实现 `src/cli/dashboard.js`；gate 43/43 通过 |
 | J-003 | observability | A0 | done | 评估 local-only Web UI | docs review | 已创建 [LOCAL_WEB_UI_ASSESSMENT.md](/A:/codex-memory/docs/LOCAL_WEB_UI_ASSESSMENT.md)；结论：当前不建议实现 |
