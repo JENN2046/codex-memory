@@ -91,7 +91,9 @@ async function runTests() {
     const httpDependent = ['mcp-http.test.js'];
     // These test files may call real providers
     const providerDependent = ['provider-smoke-cli.test.js', 'provider-benchmark-cli.test.js'];
-    const excluded = [...httpDependent, ...providerDependent];
+    // These test files call gate:ci/dashboard themselves (avoid self-referential runs)
+    const selfReferential = ['gate-ci-cli.test.js', 'dashboard-cli.test.js'];
+    const excluded = [...httpDependent, ...providerDependent, ...selfReferential];
     return !excluded.includes(f);
   });
 
