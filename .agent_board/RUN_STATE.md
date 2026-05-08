@@ -14,7 +14,7 @@
 | Mainline assumption | HTTP MCP 7605 is reachable |
 | Active-memory suite status | `43/43 matched`, `43/43 rollback-ready`, `extendedMismatchCountTotal=0` |
 | npm test | `131/131` |
-| Profile health | `needs-attention` — vectors 0, recommend `npm run rebuild-shadow` |
+| Profile health | `ready` — vectors 205, 822 embedding cache, 0 legacy |
 | Guarded auto-commit allowed | yes for docs-only; push still requires explicit remote approval |
 | Last checkpoint | [maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md) |
 | Next planned action | P1: Codex/Claude scope acceptance — end-to-end verification of search_memory scope filter |

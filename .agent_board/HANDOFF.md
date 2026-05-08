@@ -19,7 +19,7 @@
 - npm test: 131/131
 - gate:ci: 119/119 (fixture-only)
 - gate:mainline: ok (health 200)
-- profile: bge-m3-local__1024__v1, vectors 0 (needs rebuild-shadow)
+- profile: bge-m3-local__1024__v1, vectors 205, ready
 - dashboard: npm run dashboard
 
 ## Recent Work
