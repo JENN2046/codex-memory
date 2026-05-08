@@ -41,6 +41,8 @@
 | CMV-0045 | `git diff --check` ; trailing whitespace scan ; local link check ; package/workflow unchanged check ; package script boundary check ; `npm run gate:mainline` | P6-docs-drift | M-011 gate:ci fixture-only design | COMPLETED_VALIDATED | added `GATE_CI_FIXTURE_ONLY_DESIGN.md`; docs checks passed; no `package.json`, `.github/workflows`, `src/`, or `tests/` changes; `gate:ci` remains absent from package scripts; sandboxed gate hit `spawn EPERM`, escalated rerun passed health `200`, compare `39/39`, rollback `39/39` | guarded local commit prepared; push still requires explicit authorization | 2026-05-08 |
 | CMV-0046 | `npm run gate:mainline` ; `npm test` | P1-donor-compatibility | M-002 empty-string normalization | COMPLETED_VALIDATED | `normalizeScalarForDiff` 空字符串→null 归一化；compare `41/41` matched、`0` core、`0` extended、driftBreakdown=`{}`；rollback `41/41` rollback-ready、`0/0` core/extended；`npm test` `123/123` | commit M-002 fix | 2026-05-08 |
 
+| CMV-0047 | `node --test tests/dashboard-cli.test.js` ; `npm test` ; `npm run gate:mainline:strict` | P0-mainline-health | P0.5 dashboard 空 store 兼容修复 | COMPLETED_VALIDATED | dashboard json 断言收口通过，empty store 下 status 要求 `warn`；`npm test` 140/140；`gate:mainline:strict` 全绿 | 无 | 2026-05-08 |
+
 ## Batch Summary
 
 维护期入口文档已压缩，此节按日期批次聚合，不再分散到各入口文档。

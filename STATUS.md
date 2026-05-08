@@ -5,7 +5,7 @@
 ## 当前结论
 
 - `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
-- 最新主线提交 `61b6279` / tag `v0.1.0-maint-20260508`；health `200`、compare `43/43 matched (0/0)`、rollback `43/43 rollback-ready (0/0)`、npm test `131/131`、gate:ci `119/119`、gate:mainline `ok`。维护期验收快照：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)。
+- 最新主线提交 `01b46f7`（无新 tag）；health `200`、compare `43/43 matched (0/0)`、rollback `43/43 rollback-ready (0/0)`、npm test `140/140`、`gate:mainline:strict` `ok`、`gate:ci` 历史值为 `119/119`。维护期验收快照：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)。最新修正：`tests/dashboard-cli.test.js` 已兼容 clean CI runner 空 store 场景。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -64,6 +64,7 @@
 
 ## 今天新增完成
 
+- `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：
   - 引号短语
@@ -218,6 +219,8 @@
 
 ## 当前已验证
 
+- `node --test tests/dashboard-cli.test.js`：`4/4` 通过
+- `npm run gate:mainline:strict`：`status: ok`（`health`、`contract`、`test`、`compare`、`rollback` 全绿）
 - `node --test .\tests\phase-c-active-recall.test.js`：`16/16` 通过
 - `node --test .\tests\active-memory-cli.test.js`：`1/1` 通过
 - `node --test .\tests\vcp-active-memory-cli.test.js`：`5/5` 通过

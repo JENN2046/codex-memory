@@ -2,18 +2,19 @@
 
 ## Current Goal
 
-Prepare Claude MCP minimal acceptance.
+P0.5 — Fix dashboard CLI tests for empty CI store。
 
 ## Current Area
 
-P9-codex-claude-client-scope
+P0-mainline-health
 
 ## Current Status
 
-`bcb2d84 docs: add maintenance backlog` is already synchronized with `origin/main`. The local batch now records Claude MCP minimal acceptance through the latest approved model, `deepseek-ai/deepseek-v4-flash`: local HTTP health, Claude config connection, direct MCP, model-mediated MCP, and mainline gate are all validated.
+`01b46f7 fix(p0.5): allow dashboard tests on empty CI store` is now synchronized with `origin/main`。本次仅更新测试断言以兼容 clean CI runner 空 store 场景：`records` 允许为 0，0 时要求 `store.status='warn'`，清空警告用例保留。
 
 ## Completed Work
 
+- P0.5：完成 dashboard CLI 测试的 empty CI store 兼容修复：更新 `tests/dashboard-cli.test.js` 两处 `store.records > 0` 断言为非负数断言 + `warn` 回退语义，并保留 clean CI runner warning 用例。
 - P1-4 suite expansion committed as `1159873` and pushed to `origin/main`.
 - P2-1 checkpoint index committed as `57aa164` and pushed to `origin/main`.
 - P1-3 baseline record `phase-e-error-semantics-suite-gate-02.md` prepared.
@@ -127,6 +128,9 @@ P9-codex-claude-client-scope
 
 ## Validation Run
 
+- `node --test tests/dashboard-cli.test.js` passed（4/4）
+- `npm test` passed（140/140）
+- `npm run gate:mainline:strict` passed（status: ok）
 - `node --test .\tests\compare-vcp-active-memory-cli.test.js` passed (`14/14`).
 - `node --test .\tests\rollback-active-memory-cli.test.js` passed (`11/11`).
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match` passed (`37/37 matched`).
