@@ -41,6 +41,7 @@
     "gate:ci": "node ./src/cli/gate-ci.js",
     "observe:http": "node ./src/cli/http-observe.js",
     "dashboard": "node ./src/cli/dashboard.js",
+    "governance:report": "node ./src/cli/governance-report.js",
     "rollback:mainline:plan": "node ./src/cli/mainline-rollback.js",
     "rebuild-shadow": "node ./src/cli/rebuild-shadow.js",
     "rebuild-profile": "node ./src/cli/rebuild-profile.js",
