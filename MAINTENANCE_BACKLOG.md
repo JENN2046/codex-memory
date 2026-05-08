@@ -23,14 +23,12 @@
 
 ## 当前基线
 
-- 最新已推送主线提交：`9ea3cf3 maint(profile): deposit M-005 read-only profile migration evidence`
-- 最新 mainline gate：health `200`、compare `43/43`、rollback `43/43`、`0/0` core/extended
-- 标准 suite：`43/43 matched`，`extendedMismatchCountTotal=0`，`driftReasonBreakdown={}`
-- rollback readiness：`43/43 rollback-ready`，`extendedMismatchCountTotal=0`
-- profile health：`ready`，0 legacy chunks，single fingerprint `bge-m3-local__1024__v1`
-- HTTP health：`200`
-- 维护期 tag：`v0.1.0-maint-20260508`
-- 全部维护期及后续阶段任务已完成（M-001~M-013、H-001~H-002c、I-002a~I-002c、J-001~J-003）
+- 最新主线提交：`61b6279` / tag `v0.1.0-maint-20260508`
+- gate:ci：`119/119`（fixture-only）、gate:mainline：health `200`、compare `43/43`、rollback `43/43`
+- 标准 suite：`43/43 matched (0/0)`、npm test：`131/131`
+- profile health：`needs-attention`（vectors=0，需 rebuild-shadow）
+- 维护期验收：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)
+- 全部 Phase A-J + 维护期 M-001~M-013 + 8-task batch 已完成
 
 ## 维护期队列（首批 M-001~M-013 已全部完成）
 

@@ -20,4 +20,5 @@ logs/*.jsonl
 # Local scratch files
 .tmp/
 .omc/
+.claude/
 tmp-compare.json

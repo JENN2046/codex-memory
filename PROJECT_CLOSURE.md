@@ -1,6 +1,6 @@
 # Project Closure
 
-更新时间：2026-05-06
+更新时间：2026-05-08
 
 ## 正式结论
 
@@ -42,26 +42,26 @@
 ## 当前稳定基线
 
 - 最新远端主线提交：`bcb2d84 docs: add maintenance backlog`
-- 最新独立推送后主线 gate 复核：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
-- 最新 board-only 推送后主线 gate 复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0030`
+- 最新维护期验收：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
-  - `matchedCaseCount = 39`
+  - `matchedCaseCount = 43`
   - `extendedMismatchCountTotal = 0`
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
-  - `readyCaseCount = 39`
+  - `readyCaseCount = 43`
   - `extendedMismatchCountTotal = 0`
 - `npm test`
-  - `123/123`
+  - `131/131`
+
+## 收官后进展（2026-05-08）
+
+- Phase H-J 全部完成（governance + client scope + observability）
+- 28-column SQLite migration（governance + scope 字段）
+- `npm run dashboard` 统一观测 CLI
+- `npm run gate:ci` fixture-only CI 门禁
+- LightMemo CLI
+- `search_memory` scope filter
 
 ## 不再作为 blocker 的事项
-
-下面这些事情以后还可以继续做，但不再作为“项目未完成”的理由：
-
-- donor 边角别名字段继续 polish
-- 标准 suite 继续扩容
-- 文档导航继续压缩
-- provider / benchmark 资产继续沉淀
-- 更细的 donor 手感继续打磨
 
 这些事项统一归入维护与精修期 backlog，而不是主项目交付阻断项。
 

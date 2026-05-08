@@ -1,56 +1,46 @@
 # HANDOFF.md — codex-memory
 
-## Goal
+## Current State
 
-Sync MAINTENANCE_BACKLOG, RUN_STATE, and HANDOFF with actual git state. M-006 through M-011 are all done and committed; M-011 (`3493480`) is local-only, not pushed. Next real work is M-001.
-
-## Safe State
-
-Runtime code is not being changed. This is a docs-only board sync batch. No `src/`, `tests/`, `package.json`, or `.github/workflows` changes.
+所有 Plan 内任务完成（Phase A-J，M-001~M-013，H-002a~c，I-002a~c，J-001~J-003，G-001，8-task batch）。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- Local HEAD: `3493480 docs: add gate ci fixture-only design`
-- Remote HEAD: `95c525b docs: add next phase governance plan`
-- Unpushed: `3493480` (M-011 gate:ci design document)
+- HEAD: `61b6279`
+- Tag: `v0.1.0-maint-20260508`
+- Remote: origin/main synced
 
-## Queue Summary
+## Key Baseline
 
-- done: M-006/M-007 docs compression, M-008 next-phase plan, M-009 Claude MCP acceptance, M-010 docs governance, M-011 gate:ci design
-- done: board sync (current task)
-- in_progress: guarded local commit for board sync batch
-- blocked: none locally
-- remaining: M-001/M-002/M-003 donor-compatibility, M-004/M-005 provider-profile, M-012/M-013 governance/scope models
-- push: requires explicit remote authorization; `3493480` (M-011) is still unpushed
+- compare: 43/43 matched, 0/0 core/extended
+- rollback: 43/43 rollback-ready, 0/0
+- npm test: 131/131
+- gate:ci: 119/119 (fixture-only)
+- gate:mainline: ok (health 200)
+- profile: bge-m3-local__1024__v1, vectors 0 (needs rebuild-shadow)
+- dashboard: npm run dashboard
 
-## Changed Files (this batch)
+## Recent Work
 
-- `MAINTENANCE_BACKLOG.md`
-- `.agent_board/RUN_STATE.md`
-- `.agent_board/HANDOFF.md`
+- LightMemo CLI + compare harness support
+- gate:ci + dashboard tests
+- search_memory scope filter (project_id, visibility, workspace_id, client_id)
+- 39→43 baseline sync across 8 docs
+- ROADMAP.md archived, checkpoint logs compressed
+- SQLite 28-column migration with governance + scope fields
 
-## Validation
+## Next
 
-- `git diff --check` (docs-only board sync, no runtime change)
+- P1: Codex/Claude scope acceptance (end-to-end verify scope filter)
+- P2: Governance report CLI (proposal/tombstone/supersession/stale metrics)
+- `npm run rebuild-shadow` recommended (profile needs-attention, vectors=0)
 
-## Runtime Notes
+## Auth Required
 
-- MCP mode: HTTP mainline assumption
-- HTTP health: latest known `200` from CMV-0045
-- Standard suite: `43/43 matched`
-- Rollback readiness: `43/43 rollback-ready`
-- Audit impact: none
-- Recall impact: none
-
-## Next Safe Task
-
-After this board sync commit: start M-001 — pick one user-perceptible donor DeepMemo/TopicMemo case, create input fixture, register in standard suite, run compare.
-
-## Warnings
-
-- Do not push without explicit approval.
-- Do not run provider-smoke or provider-benchmark without explicit authorization.
-- Do not run rebuild-profile --confirm or cleanup apply without explicit authorization.
-- Keep M-012/M-013 as design-only; do not modify SQLite schema or MCP contract.
+- push to origin
+- provider benchmark / smoke
+- rebuild-profile --confirm
+- cleanup apply / confirm
+- real SQLite migration (already done in H-002c)
