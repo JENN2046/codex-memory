@@ -51,7 +51,12 @@ test('dashboard CLI should report all sections in json mode', async () => {
 
   // Store section
   assert.ok(payload.store, 'should have store section');
-  assert.ok(payload.store.records > 0, 'should have records');
+  assert.equal(typeof payload.store.records, 'number');
+  assert.ok(payload.store.records >= 0, 'records should be non-negative');
+  assert.ok(['ok', 'warn'].includes(payload.store.status), 'store status should be ok or warn');
+  if (payload.store.records === 0) {
+    assert.equal(payload.store.status, 'warn', 'empty clean runner store should warn');
+  }
 
   // Profile section
   assert.ok(payload.profile, 'should have profile section');
@@ -83,7 +88,12 @@ test('dashboard CLI should support --json --summary-only', async () => {
 
   assert.equal(payload.mode, 'memory-dashboard');
   // Summary-only should have compact store/profile
-  assert.ok(payload.store.records > 0);
+  assert.equal(typeof payload.store.records, 'number');
+  assert.ok(payload.store.records >= 0, 'records should be non-negative');
+  assert.ok(['ok', 'warn'].includes(payload.store.status), 'store status should be ok or warn');
+  if (payload.store.records === 0) {
+    assert.equal(payload.store.status, 'warn', 'empty clean runner store should warn');
+  }
   assert.ok(!payload.store.ageBreakdown, 'summary-only should omit age breakdown');
 });
 
