@@ -45,6 +45,7 @@ const TOOL_DEFINITIONS = [
     description: 'Search over the Codex process and knowledge diaries with diary-compatible recall output.',
     inputSchema: {
       type: 'object',
+      additionalProperties: false,
       properties: {
         query: { type: 'string' },
         target: { type: 'string', enum: ['process', 'knowledge', 'both'] },

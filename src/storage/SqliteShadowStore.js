@@ -73,10 +73,10 @@ class SqliteShadowStore {
     this.ensureColumn('memory_records', 'supersedes', 'TEXT');
     this.ensureColumn('memory_records', 'tombstone_reason', 'TEXT');
 
-    // I-002a client scope columns
-    this.ensureColumn('memory_records', 'client_id', "TEXT NOT NULL DEFAULT 'codex'");
-    this.ensureColumn('memory_records', 'workspace_id', "TEXT NOT NULL DEFAULT ''");
-    this.ensureColumn('memory_records', 'project_id', "TEXT NOT NULL DEFAULT 'codex-memory'");
+    // I-002a client scope columns (nullable: caller provides or leaves null)
+    this.ensureColumn('memory_records', 'client_id', 'TEXT');
+    this.ensureColumn('memory_records', 'workspace_id', 'TEXT');
+    this.ensureColumn('memory_records', 'project_id', 'TEXT');
     this.ensureColumn('memory_records', 'task_id', 'TEXT');
     this.ensureColumn('memory_records', 'conversation_id', 'TEXT');
     this.ensureColumn('memory_records', 'visibility', "TEXT NOT NULL DEFAULT 'project'");
@@ -89,15 +89,41 @@ class SqliteShadowStore {
     this.db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
   }
 
+  // Default value policy:
+  //   status:           'active'        — new records start active
+  //   visibility:       'project'       — project-scoped by default
+  //   confidence:       1.0             — directly verified by default
+  //   retention_policy: 'permanent'     — no auto-expiry by default
+  //   scope:            'project:codex-memory'
+  //   client_id:        null            — caller provides or leaves null
+  //   workspace_id:     null            — not tracked unless explicitly set
+  //   project_id:       null            — not fabricated; caller should provide
+  //   task_id:          null            — only for checkpoint/handoff records
+  //   conversation_id:  null            — only for session-scoped records
+  //   provenance:       ''              — fill when source is known
+  //   supersededBy:     null            — only when superseded
+  //   supersedes:       null            — only when replacing another record
+  //   tombstoneReason:  null            — only when tombstoned
+
   async upsertRecord(record) {
     await this.ensureReady();
     const statement = this.db.prepare(`
       INSERT INTO memory_records (
         memory_id, target, title, content, evidence, tags_json, validated, reusable, sensitivity,
-        file_path, relative_path, raw_text, created_at, updated_at
+        file_path, relative_path, raw_text,
+        status, scope, confidence, provenance,
+        superseded_by, supersedes, tombstone_reason,
+        client_id, workspace_id, project_id, task_id, conversation_id,
+        visibility, retention_policy,
+        created_at, updated_at
       ) VALUES (
         $memory_id, $target, $title, $content, $evidence, $tags_json, $validated, $reusable, $sensitivity,
-        $file_path, $relative_path, $raw_text, $created_at, $updated_at
+        $file_path, $relative_path, $raw_text,
+        $status, $scope, $confidence, $provenance,
+        $superseded_by, $supersedes, $tombstone_reason,
+        $client_id, $workspace_id, $project_id, $task_id, $conversation_id,
+        $visibility, $retention_policy,
+        $created_at, $updated_at
       )
       ON CONFLICT(memory_id) DO UPDATE SET
         target = excluded.target,
@@ -111,6 +137,20 @@ class SqliteShadowStore {
         file_path = excluded.file_path,
         relative_path = excluded.relative_path,
         raw_text = excluded.raw_text,
+        status = excluded.status,
+        scope = excluded.scope,
+        confidence = excluded.confidence,
+        provenance = excluded.provenance,
+        superseded_by = excluded.superseded_by,
+        supersedes = excluded.supersedes,
+        tombstone_reason = excluded.tombstone_reason,
+        client_id = excluded.client_id,
+        workspace_id = excluded.workspace_id,
+        project_id = excluded.project_id,
+        task_id = excluded.task_id,
+        conversation_id = excluded.conversation_id,
+        visibility = excluded.visibility,
+        retention_policy = excluded.retention_policy,
         updated_at = excluded.updated_at
     `);
 
@@ -127,6 +167,20 @@ class SqliteShadowStore {
       $file_path: record.filePath || null,
       $relative_path: record.relativePath || null,
       $raw_text: record.rawText || null,
+      $status: record.status || 'active',
+      $scope: record.scope || 'project:codex-memory',
+      $confidence: record.confidence ?? 1.0,
+      $provenance: record.provenance || '',
+      $superseded_by: record.supersededBy || null,
+      $supersedes: record.supersedes || null,
+      $tombstone_reason: record.tombstoneReason || null,
+      $client_id: record.clientId || null,
+      $workspace_id: record.workspaceId || null,
+      $project_id: record.projectId || null,
+      $task_id: record.taskId || null,
+      $conversation_id: record.conversationId || null,
+      $visibility: record.visibility || 'project',
+      $retention_policy: record.retentionPolicy || 'permanent',
       $created_at: record.createdAt || new Date().toISOString(),
       $updated_at: record.updatedAt || record.createdAt || new Date().toISOString()
     });
@@ -463,7 +517,7 @@ class SqliteShadowStore {
       supersedes: row.supersedes || null,
       tombstoneReason: row.tombstone_reason || null,
       // Client scope columns
-      clientId: row.client_id || 'codex',
+      clientId: row.client_id || null,
       workspaceId: row.workspace_id || '',
       projectId: row.project_id || 'codex-memory',
       taskId: row.task_id || null,
