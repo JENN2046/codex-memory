@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Prepare Claude MCP minimal acceptance.
+Maintenance Phase → VCP Memory Core 100%: follow [VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md) as the master construction blueprint.
 
 ## Current Area
 
-P9-codex-claude-client-scope
+P0-mainline-health / Maintenance-start
 
 ## Current Status
 
@@ -14,6 +14,7 @@ P9-codex-claude-client-scope
 
 ## Completed Work
 
+- P1.0 VCP Memory Core 100% implementation plan landed: `docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md` created as the master construction blueprint. README / STATUS / `.agent_board` index entries added. Docs-only; no src, tests, or package.json touched.
 - P1-4 suite expansion committed as `1159873` and pushed to `origin/main`.
 - P2-1 checkpoint index committed as `57aa164` and pushed to `origin/main`.
 - P1-3 baseline record `phase-e-error-semantics-suite-gate-02.md` prepared.

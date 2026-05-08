@@ -6,9 +6,9 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | Sync `1628381` board-only baseline docs |
+| Current task | P1.0 VCP Memory Core 100% plan document landing (docs-only) |
 | Current area | P6-docs-drift |
-| Last action | Updated current-status docs and `.agent_board` to point at `1628381` / `CMV-0039` |
+| Last action | Landed `docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md`; added index entries in README / STATUS / `.agent_board`; no src/tests/package.json touched |
 | Last validation | `git diff --check`, trailing whitespace scan, local link check, and `npm run gate:mainline` passed; gate health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready` |
 | Worktree summary | Local board/docs baseline sync is ready for guarded local commit; no checkpoint-20 file was created |
 | Mainline assumption | HTTP MCP 7605 is reachable; health remains ok but monitor recovery pattern |

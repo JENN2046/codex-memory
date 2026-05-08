@@ -1,10 +1,11 @@
 ﻿# codex-memory Status
 
-更新时间：2026-05-06
+更新时间：2026-05-09
 
 ## 当前结论
 
-- `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
+- 当前稳定版本 `v0.1.1-scope-boundary-20260508`（commit `8c2836b`）是 **个人本地生产可用版**，已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
+- 新增 [VCP Memory Core 100% 实施总计划](/A:/codex-memory/docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md)。**100% 指 VCP Memory Core 独立主链能力，不等于完整复刻 VCPToolBox 全生态**（插件、UI、多端、SaaS 等不在范围内）。后续推进以该计划为施工总图。
 - 最新远端主线提交是 `1628381 docs: record claude flash acceptance`；最新独立推送后主线 gate 复核见 [phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)，最新 board-only 复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0039`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
@@ -382,7 +383,8 @@
 
 ## 下一步建议
 
-- `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
+- VCP 记忆核心 100% 实施总计划已落盘：[docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md)。后续推进以该计划为施工总图。
+- `Phase C` 现在更适合转入”维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 
 - `P0` 先做：

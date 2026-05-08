@@ -70,3 +70,5 @@ npm run profile-health
 npm run shadow-compare -- --query "embedding profile migration"
 npm run profile-gate -- --json --summary-only
 ```
+| CMV-0041 | `npm run gate:mainline` | P0-mainline-health | maintenance-start | COMPLETED_VALIDATED | health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready` | maintenance phase entry point | 2026-05-08 |
+| CMV-0042 | `npm test` / `npm run gate:mainline:strict` | P1.0-docs | VCP Memory Core 100% plan landing | COMPLETED_VALIDATED | `npm test 123/123`；gate strict health 200, contract ok, test ok, compare 39/39, rollback 39/39；docs-only, no src/tests/pkg | P1.0 committed; proceed to P1.1 | 2026-05-09 |

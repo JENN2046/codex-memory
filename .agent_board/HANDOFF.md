@@ -2,7 +2,7 @@
 
 ## Goal
 
-Prepare Claude MCP minimal acceptance and switch the model-side validation path to `deepseek-ai/deepseek-v4-flash`.
+Execute P1.0 through P1.8: land the VCP Memory Core 100% implementation plan, then build Phase 1 low-risk, verifiable, rollback-safe CLI tooling and docs. No push, no tag, no release, no env changes.
 
 ## Safe State
 
@@ -11,89 +11,33 @@ Runtime code is not being changed. `1628381 docs: record claude flash acceptance
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
-- Branch: main
-- Worktree: docs-only baseline sync present locally; no checkpoint-20 file created
+- Branch: codex/p1-vcp-memory-core-100-roadmap (local only, not pushed)
+- Worktree: P1.0 docs landed; P1.1-P1.8 in progress
 
 ## Queue Summary
 
-- done: P1-3 DeepMemo keyword-alias cases committed as `56c647a` and pushed to `origin/main`; checkpoint-18 docs committed as `000c149`; checkpoint-19 baseline committed as `8e3ae8d`; provider benchmark docs committed as `ba7031a`; provider reports index committed as `f40a6f6`; provider benchmark record template committed as `3eaf11f`; handoff state committed as `13d7c6b`; board-only checkpoint index committed as `59f1b03`; Phase E final closeout committed and pushed as `49537f6`; maintenance backlog committed and pushed as `bcb2d84`; Codex/Claude target-scope docs updated; Claude MCP local preflight completed; `deepseek-v4-pro` historical model-mediated success recorded; `deepseek-ai/deepseek-v4-flash` model-mediated success recorded; `1628381` pushed to `origin/main`; push-after gate passed; baseline docs synced to `1628381` / `CMV-0039`
-- in_progress: guarded local commit for baseline sync
-- blocked: none for minimal non-interactive acceptance; interactive `/mcp` panel remains optional manual follow-up
-- remaining: commit the docs-only baseline sync locally if final diff inspection stays clean; push requires explicit remote authorization
+- done: P1.0 VCP Memory Core 100% plan landed as docs-only
+- in_progress: P1.1 Real MCP Scope Acceptance CLI
+- blocked: none
+- remaining: P1.1-P1.8 for tonight; no push/tag/release
 
 ## Changed Files
 
-- `.agent_board/*.md`
-- `PROJECT_GOAL.md`
-- `ROADMAP.md`
-- `ARCHITECTURE.md`
-- `MEMORY_POLICY.md`
-- `AGENTS.md`
-- `VALIDATION.md`
-- `MAINTENANCE_BACKLOG.md`
-- `PHASE_E_CHECKPOINT_INDEX.md`
-- `PHASE_NAVIGATION.md`
-- `PHASE_E_FINAL_CLOSEOUT.md`
+- `docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md`
+- `README.md`
 - `STATUS.md`
-- `PROJECT_CLOSURE.md`
-- `MEMORY.md`
-- `CLAUDE_MCP_ACCEPTANCE.md`
-- `logs/claude-mcp-minimal-acceptance-01.md`
-- `logs/claude-mcp-minimal-acceptance-02.md`
-- `logs/claude-mcp-minimal-acceptance-03.md`
-- `logs/claude-mcp-minimal-acceptance-04.md`
-- `logs/claude-mcp-minimal-acceptance-05.md`
-- `.agent_board/BLOCKERS.md`
-- `.agent_board/DECISIONS.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/HANDOFF.md`
+- `.agent_board/RUN_STATE.md`
+- `.agent_board/TASK_QUEUE.md`
+- `.agent_board/VALIDATION_LOG.md`
 
 ## Validation Evidence
 
 - npm test: passed (`123/123`)
-- gate:mainline: passed after `56c647a` push
-- gate:mainline:strict: not run
-- compare harness test: `14/14`
-- rollback harness test: `11/11`
-- active CLI diagnostics test: `17/17`
-- compare suite: latest known `39/39 matched`
-- rollback suite: latest known `39/39 rollback-ready`
-- input-validation compare/rollback: latest known `5/5`
-- agent-selection compare/rollback: latest known `8/8`
-- git diff --check: passed
-- push-after gate: latest pushed checkpoint `000c149` passed; this local batch is not pushed
-- push-after gate: passed after `56c647a`
-- push-after gate: passed after `000c149`
-- push-after gate: passed after `8e3ae8d`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- push-after gate: passed after `ba7031a`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- push-after gate: passed after `f40a6f6`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- provider benchmark docs validation: `git diff --check` passed with CRLF warnings only; package script references exist
-- provider reports index validation: `git diff --check` passed with CRLF warnings only; report links present; secret scan only found placeholder/safety text
-- provider record template validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; local link target check passed; package script reference check passed; high-confidence secret pattern scan passed
-- push-after gate: passed after `13d7c6b`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- P2-1 docs navigation validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed
-- push-after gate: passed after `59f1b03`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- Phase E final closeout validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed; `npm run gate:mainline` passed with health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- push-after gate: passed after `49537f6`: health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- maintenance backlog validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; referenced local file check passed; high-confidence secret pattern scan passed
-- push-after gate: passed after `bcb2d84`: push reported `Everything up-to-date`; pre-board-update status clean; health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- Codex/Claude target-scope docs validation: `git diff --check` passed with CRLF warnings only; trailing whitespace scan passed; target wording scan passed
-- Claude MCP preflight: `claude` found at `C:\Users\617\.local\bin\claude.exe` version `2.1.100.0`; HTTP health ok; `claude mcp list` ran and showed `vcp_codex_memory` not configured yet
-- Claude MCP docs/gate validation: `git diff --check`, trailing whitespace scan, local link check, and `npm run gate:mainline` passed; mainline gate remained health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- Claude MCP config write: `claude mcp add` succeeded after explicit authorization; `claude mcp get/list` showed connected
-- Direct MCP `memory_overview`: succeeded via protocol probe with `overviewIsError=false`
-- `deepseek-v4-pro` model-mediated retry: failed before tool execution with API `ConnectionRefused`
-- `deepseek-v4-pro` model-mediated rerun: succeeded; final result included `memory_overview 调用成功`
-- `deepseek-ai/deepseek-v4-flash` model smoke: succeeded
-- `deepseek-ai/deepseek-v4-flash` read-only capability assessment: succeeded
-- `deepseek-ai/deepseek-v4-flash` model-mediated MCP `memory_overview`: succeeded; final result included `memory_overview 调用成功`
-- `npm run gate:mainline`: passed after Flash validation; health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- `git push origin main`: first attempt failed with transient HTTPS TLS handshake error, retry succeeded (`bcb2d84..1628381`)
-- push-after `git status --short`: clean
-- push-after `npm run gate:mainline`: passed; health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready`
-- docs baseline sync validation: `git diff --check`, trailing whitespace scan, local link check, and `npm run gate:mainline` passed; current-status docs now point to `1628381` / `CMV-0039`
-- observe:http: not run
-- profile gate: not run
-- provider smoke: not run
-- provider benchmark: not run
+- gate:mainline:strict: passed — health 200, contract ok, test ok, compare 39/39 matched, rollback 39/39 rollback-ready
+- compare suite: 39/39 matched
+- rollback suite: 39/39 rollback-ready
 
 ## Runtime Notes
 
@@ -124,7 +68,7 @@ Runtime code is not being changed. `1628381 docs: record claude flash acceptance
 
 ## Next Safe Task
 
-Create a guarded local commit for the docs-only baseline sync if final diff inspection stays clean. Do not push without explicit authorization.
+Commit P1.0 docs-only changes locally. Begin P1.1 scope acceptance CLI. Do not push.
 
 ## Warnings
 
