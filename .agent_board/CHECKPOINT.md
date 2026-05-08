@@ -2,19 +2,19 @@
 
 ## Current Goal
 
-Maintenance Phase → VCP Memory Core 100%: follow [VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md) as the master construction blueprint.
+Phase 1 (80%→85%) completed on branch `codex/p1-vcp-memory-core-100-roadmap`. P1.0–P1.8 all landed as local commits. Next: human acceptance, then continue to Phase 2.
 
 ## Current Area
 
-P0-mainline-health / Maintenance-start
+P1.8-board-closeout / Phase 1 complete
 
 ## Current Status
 
-`bcb2d84 docs: add maintenance backlog` is already synchronized with `origin/main`. The local batch now records Claude MCP minimal acceptance through the latest approved model, `deepseek-ai/deepseek-v4-flash`: local HTTP health, Claude config connection, direct MCP, model-mediated MCP, and mainline gate are all validated.
+Branch `codex/p1-vcp-memory-core-100-roadmap` (local only, not pushed). All Phase 1 tasks P1.0–P1.8 committed. npm test 145/145 passing, gate:mainline:strict all green. No push, tag, or release.
 
 ## Completed Work
 
-- P1.0 VCP Memory Core 100% implementation plan landed: `docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md` created as the master construction blueprint. README / STATUS / `.agent_board` index entries added. Docs-only; no src, tests, or package.json touched.
+- P1.0 VCP Memory Core 100% implementation plan landed: `docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md`. Docs-only.
 - P1-4 suite expansion committed as `1159873` and pushed to `origin/main`.
 - P2-1 checkpoint index committed as `57aa164` and pushed to `origin/main`.
 - P1-3 baseline record `phase-e-error-semantics-suite-gate-02.md` prepared.

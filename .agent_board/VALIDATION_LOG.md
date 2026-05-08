@@ -71,4 +71,12 @@ npm run shadow-compare -- --query "embedding profile migration"
 npm run profile-gate -- --json --summary-only
 ```
 | CMV-0041 | `npm run gate:mainline` | P0-mainline-health | maintenance-start | COMPLETED_VALIDATED | health `200`, compare `39/39 matched`, rollback `39/39 rollback-ready` | maintenance phase entry point | 2026-05-08 |
-| CMV-0042 | `npm test` / `npm run gate:mainline:strict` | P1.0-docs | VCP Memory Core 100% plan landing | COMPLETED_VALIDATED | `npm test 123/123`；gate strict health 200, contract ok, test ok, compare 39/39, rollback 39/39；docs-only, no src/tests/pkg | P1.0 committed; proceed to P1.1 | 2026-05-09 |
+| CMV-0042 | `npm test` / `npm run gate:mainline:strict` | P1.0-docs | VCP Memory Core 100% plan landing | COMPLETED_VALIDATED | `npm test 123/123`；gate strict health 200, contract ok, test ok, compare 39/39, rollback 39/39；docs-only | P1.0 committed 6e64e23 | 2026-05-09 |
+| CMV-0043 | `npm test` / `npm run scope:acceptance -- --json` / `npm run gate:mainline:strict` | P1.1-scope | Scope acceptance CLI | COMPLETED_VALIDATED | `npm test 128/128`；scope:acceptance status=ok, no leakage；gate all green | P1.1 committed 52ea7b1 | 2026-05-09 |
+| CMV-0044 | `npm test` / `npm run scope:backfill:dry-run -- --json` | P1.2-scope | Scope backfill dry-run | COMPLETED_VALIDATED | 5/5 tests；mutated=false；wouldUpdate=0 | P1.2 committed 35a268a | 2026-05-09 |
+| CMV-0045 | `npm test` / `npm run real-query-suite -- --json` | P1.3-query | Real query suite scaffold | COMPLETED_VALIDATED | 5/5 tests；caseCount=5, invalidCount=0, placeholderCount=5 | P1.3 committed 201b9d3 | 2026-05-09 |
+| CMV-0046 | `node --test tests/mcp-contract.test.js` / `npm test` | P1.4-contract | MCP schema contract hardening | COMPLETED_VALIDATED | 4/4 mcp-contract tests；record_memory/search_memory schemas include scope fields；additionalProperties false | P1.4 committed ce3b695 | 2026-05-09 |
+| CMV-0047 | `npm test` / `npm run query:quality -- --json --dry-run` | P1.5-query | Query quality report scaffold | COMPLETED_VALIDATED | 5/5 tests；mutated=false, placeholderCount=5 | P1.5 committed cb95e15 | 2026-05-09 |
+| CMV-0048 | `git diff --check` | P1.6-docs | Scope backfill policy | COMPLETED_VALIDATED | docs/scope-backfill-policy.md created | P1.6 committed 2b8ec83 | 2026-05-09 |
+| CMV-0049 | `git diff --check` | P1.7-docs | Production readiness checklist | COMPLETED_VALIDATED | docs/personal-production-readiness.md created | P1.7 committed 2b8ec83 | 2026-05-09 |
+| CMV-0050 | `npm test 145/145` / `npm run gate:mainline:strict` all green | P1.8-board | Phase 1 board closeout | COMPLETED_VALIDATED | All P1.0-P1.8 committed locally on codex/p1-vcp-memory-core-100-roadmap；not pushed | Phase 1 complete；await human acceptance | 2026-05-09 |

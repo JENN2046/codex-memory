@@ -9,7 +9,8 @@
 - 最新远端主线提交是 `1628381 docs: record claude flash acceptance`；最新独立推送后主线 gate 复核见 [phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)，最新 board-only 复核见 `.agent_board/VALIDATION_LOG.md` 的 `CMV-0039`，当前 health `200`、compare `39/39 matched`、rollback `39/39 rollback-ready`。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
-- `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
+- `Phase A` 与 `Phase B` 已进入”可用并可回归”的阶段。
+- **Phase 1（VCP Memory Core 80%→85%）已于 2026-05-09 完成**：P1.0 总计划落地、P1.1 scope acceptance CLI、P1.2 backfill dry-run、P1.3 query suite scaffold、P1.4 schema contract hardening、P1.5 query quality scaffold、P1.6 backfill policy、P1.7 production readiness checklist、P1.8 board closeout。全部 8 个 commit 在本地分支 `codex/p1-vcp-memory-core-100-roadmap`（未 push / 未 tag / 未 release）。`npm test` 145/145，`gate:mainline:strict` 全绿。
 - `Phase C` 已基本收口到“高 donor 兼容度”，现在具备全量重建、自动回填、增量同步，以及 `DeepMemo/TopicMemo` 的主要边界语义与展示语义兼容。
 - `Phase D` 的兼容与回滚层已经继续向前：除了 donor 风格 `DeepMemo/TopicMemo` 独立 CLI、只读 compare harness、active-memory 运维 CLI 外，现在还具备字段级 diff、批量 suite 对照、汇总级 diff 报告、只读 rollback readiness 报告，以及仓库内可复用的标准 active-memory suite 数据集。
 - `Phase D` 的标准 suite 过滤链又稳定了一层：`--expectation` 的多值 OR、顺序归一化、重复值去重都已经被 compare / rollback 回归固化。
