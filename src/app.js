@@ -1,4 +1,30 @@
 const { createConfig } = require('./config/createConfig');
+
+async function applyScopeFilter(results, scopeFilter, shadowStore) {
+  if (!results || !results.length) return results;
+  const ids = results.map(r => r.memoryId || r.memory_id).filter(Boolean);
+  if (!ids.length) return results;
+  const records = shadowStore.getRecordsByIds(ids);
+  if (!records || !records.length) return results;
+  const recordMap = {};
+  for (const r of records) { recordMap[r.memory_id] = r; }
+  return results.filter(r => {
+    const id = r.memoryId || r.memory_id;
+    const record = recordMap[id];
+    if (!record) return true; // no record = no filter
+    if (scopeFilter.project_id && record.project_id !== scopeFilter.project_id) return false;
+    if (scopeFilter.visibility) {
+      const allowed = Array.isArray(scopeFilter.visibility)
+        ? scopeFilter.visibility
+        : [scopeFilter.visibility];
+      if (!allowed.includes(record.visibility)) return false;
+    }
+    if (scopeFilter.workspace_id && record.workspace_id !== scopeFilter.workspace_id) return false;
+    if (scopeFilter.client_id && record.client_id !== scopeFilter.client_id) return false;
+    return true;
+  });
+}
+
 const { ExecutionContextResolver } = require('./core/ExecutionContextResolver');
 const { RecallEnhancer } = require('./core/RecallEnhancer');
 const { MemoryWriteService } = require('./core/MemoryWriteService');
@@ -210,6 +236,10 @@ function createCodexMemoryApplication(overrides = {}) {
           contextText: args.context_text || '',
           source: 'mcp'
         });
+        const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
+        if (scopeFilter && results.results) {
+          results.results = await applyScopeFilter(results.results, scopeFilter, shadowStore);
+        }
         return { results };
       }
 
