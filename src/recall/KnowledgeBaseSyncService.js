@@ -35,6 +35,12 @@ class KnowledgeBaseSyncService {
       const needsRefresh = force || this.shouldRefreshRecord(existing, record) || !hasCurrentFingerprintChunks;
 
       if (this.config.enableShadowWrites && needsRefresh) {
+        if (existing && (existing.projectId || existing.workspaceId || existing.clientId || existing.visibility)) {
+          record.projectId = existing.projectId;
+          record.workspaceId = existing.workspaceId;
+          record.clientId = existing.clientId;
+          record.visibility = existing.visibility;
+        }
         await this.shadowStore.upsertRecord(record);
         await this.shadowStore.clearReconcileTasks(record.memoryId, 'sqlite');
         sqliteWrites += 1;

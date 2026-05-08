@@ -63,6 +63,10 @@ class SqliteShadowStore {
       );
     `);
     this.ensureColumn('memory_chunks', 'embedding_fingerprint', 'TEXT');
+    this.ensureColumn('memory_records', 'project_id', 'TEXT');
+    this.ensureColumn('memory_records', 'workspace_id', 'TEXT');
+    this.ensureColumn('memory_records', 'client_id', 'TEXT');
+    this.ensureColumn('memory_records', 'visibility', 'TEXT');
   }
 
   ensureColumn(tableName, columnName, definition) {
@@ -76,10 +80,12 @@ class SqliteShadowStore {
     const statement = this.db.prepare(`
       INSERT INTO memory_records (
         memory_id, target, title, content, evidence, tags_json, validated, reusable, sensitivity,
-        file_path, relative_path, raw_text, created_at, updated_at
+        file_path, relative_path, raw_text, created_at, updated_at,
+        project_id, workspace_id, client_id, visibility
       ) VALUES (
         $memory_id, $target, $title, $content, $evidence, $tags_json, $validated, $reusable, $sensitivity,
-        $file_path, $relative_path, $raw_text, $created_at, $updated_at
+        $file_path, $relative_path, $raw_text, $created_at, $updated_at,
+        $project_id, $workspace_id, $client_id, $visibility
       )
       ON CONFLICT(memory_id) DO UPDATE SET
         target = excluded.target,
@@ -93,7 +99,11 @@ class SqliteShadowStore {
         file_path = excluded.file_path,
         relative_path = excluded.relative_path,
         raw_text = excluded.raw_text,
-        updated_at = excluded.updated_at
+        updated_at = excluded.updated_at,
+        project_id = excluded.project_id,
+        workspace_id = excluded.workspace_id,
+        client_id = excluded.client_id,
+        visibility = excluded.visibility
     `);
 
     statement.run({
@@ -110,7 +120,11 @@ class SqliteShadowStore {
       $relative_path: record.relativePath || null,
       $raw_text: record.rawText || null,
       $created_at: record.createdAt || new Date().toISOString(),
-      $updated_at: record.updatedAt || record.createdAt || new Date().toISOString()
+      $updated_at: record.updatedAt || record.createdAt || new Date().toISOString(),
+      $project_id: record.projectId || null,
+      $workspace_id: record.workspaceId || null,
+      $client_id: record.clientId || null,
+      $visibility: record.visibility || null
     });
   }
 
@@ -192,6 +206,29 @@ class SqliteShadowStore {
     `).all(...uniqueIds);
 
     return rows.map(row => this.mapRow(row));
+  }
+
+  async getRecordsScopeMap(memoryIds = []) {
+    await this.ensureReady();
+    const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
+    if (uniqueIds.length === 0) return new Map();
+
+    const placeholders = uniqueIds.map(() => '?').join(',');
+    const rows = this.db.prepare(`
+      SELECT memory_id, project_id, workspace_id, client_id, visibility
+      FROM memory_records WHERE memory_id IN (${placeholders})
+    `).all(...uniqueIds);
+
+    const result = new Map();
+    for (const row of rows) {
+      result.set(row.memory_id, {
+        projectId: row.project_id || null,
+        workspaceId: row.workspace_id || null,
+        clientId: row.client_id || null,
+        visibility: row.visibility || null
+      });
+    }
+    return result;
   }
 
   normalizePathFilters(raw) {
@@ -440,7 +477,11 @@ class SqliteShadowStore {
       relativePath: row.relative_path,
       rawText: row.raw_text,
       createdAt: row.created_at,
-      updatedAt: row.updated_at
+      updatedAt: row.updated_at,
+      projectId: row.project_id || null,
+      workspaceId: row.workspace_id || null,
+      clientId: row.client_id || null,
+      visibility: row.visibility || null
     };
   }
 

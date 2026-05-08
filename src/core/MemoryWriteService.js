@@ -160,7 +160,11 @@ class MemoryWriteService {
       createdAt,
       updatedAt: createdAt,
       visibilityPolicy: VisibilityPolicy.CODEX_ONLY,
-      namespace: target === 'knowledge' ? Namespace.KNOWLEDGE : Namespace.PROCESS
+      namespace: target === 'knowledge' ? Namespace.KNOWLEDGE : Namespace.PROCESS,
+      projectId: normalizeString(payload.project_id) || null,
+      workspaceId: normalizeString(payload.workspace_id) || null,
+      clientId: normalizeString(payload.client_id) || null,
+      visibility: normalizeString(payload.visibility) || null
     };
 
     const diaryWrite = await this.diaryStore.writeRecord(record);

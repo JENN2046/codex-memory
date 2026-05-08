@@ -202,6 +202,7 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'search_memory') {
+        const scope = args.scope || {};
         const results = await passiveRecallService.search({
           query: args.query,
           target: args.target || 'both',
@@ -210,6 +211,25 @@ function createCodexMemoryApplication(overrides = {}) {
           contextText: args.context_text || '',
           source: 'mcp'
         });
+
+        if (scope.strict && (scope.project_id || scope.workspace_id || scope.client_id || scope.visibility)) {
+          const memoryIds = results.map(r => r.memoryId || r.memory_id).filter(Boolean);
+          const scopeMap = memoryIds.length > 0
+            ? await shadowStore.getRecordsScopeMap(memoryIds)
+            : new Map();
+
+          const filtered = results.filter(r => {
+            const s = scopeMap.get(r.memoryId || r.memory_id) || {};
+            if (scope.project_id && s.projectId !== scope.project_id) return false;
+            if (scope.workspace_id && s.workspaceId !== scope.workspace_id) return false;
+            if (scope.client_id && s.clientId !== scope.client_id) return false;
+            if (scope.visibility && s.visibility !== scope.visibility) return false;
+            return true;
+          });
+
+          return { results: filtered };
+        }
+
         return { results };
       }
 
