@@ -53,19 +53,19 @@ async function runReport() {
     let missingClientId = 0;
     let missingWorkspaceId = 0;
     let missingVisibility = 0;
+    let wouldUpdate = 0;
 
     for (const record of records) {
-      if (record.projectId || record.workspaceId || record.clientId || record.visibility) {
+      const missingDefaultableField = !record.projectId || !record.clientId || !record.visibility;
+      if (record.projectId && record.workspaceId && record.clientId && record.visibility) {
         alreadyScoped += 1;
-        continue;
       }
       if (!record.projectId) missingProjectId += 1;
       if (!record.clientId) missingClientId += 1;
       if (!record.workspaceId) missingWorkspaceId += 1;
       if (!record.visibility) missingVisibility += 1;
+      if (missingDefaultableField) wouldUpdate += 1;
     }
-
-    const wouldUpdate = records.length - alreadyScoped;
 
     return {
       status: 'ok',
