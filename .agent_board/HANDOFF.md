@@ -2,20 +2,20 @@
 
 ## Goal
 
-Harden scoped recall compatibility, diary rebuild marker parsing, and scope backfill dry-run accounting while preserving `.agent_board` current state.
+Harden scoped recall compatibility, diary rebuild marker parsing, scope backfill dry-run accounting, and no-boundary marker stripping while preserving `.agent_board` current state.
 
 ## Safe State
 
 - Workspace: A:\codex-memory
 - Branch: codex/p1-vcp-memory-core-100-roadmap
-- HEAD: CM-0046 guarded local commit target
-- Worktree: CM-0046 source/test/board batch validated for local commit
+- HEAD: CM-0047 guarded local commit target
+- Worktree: CM-0047 source/test/board batch validated for local commit
 - Remote writes: not authorized
 
 ## Current Dirty Files
 
-- `src/cli/scope-backfill-dry-run.js`
-- `tests/scope-backfill-dry-run.test.js`
+- `src/storage/DiaryStore.js`
+- `tests/scope-filter.test.js`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
@@ -76,6 +76,11 @@ Harden scoped recall compatibility, diary rebuild marker parsing, and scope back
   - `npm test`: 179/179 passed.
   - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 179/179, compare 43/43, rollback 43/43.
   - `git diff --check`: passed.
+- CM-0047 no-boundary marker stripping safety:
+  - `node --test .\tests\scope-filter.test.js`: 18/18 passed.
+  - `npm test`: 179/179 passed.
+  - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 179/179, compare 43/43, rollback 43/43.
+  - `git diff --check`: passed.
 
 ## Runtime Notes
 
@@ -85,7 +90,7 @@ Harden scoped recall compatibility, diary rebuild marker parsing, and scope back
 ## Blockers
 
 - No hard blocker to the local autopilot control plane.
-- none for CM-0046 local guarded commit.
+- none for CM-0047 local guarded commit.
 
 ## Decisions
 
@@ -99,6 +104,7 @@ Harden scoped recall compatibility, diary rebuild marker parsing, and scope back
 - Parse diary scope metadata only from the header block before `Content:`; marker-like lines in user content remain content.
 - Parse rebuilt record tags only from the actual footer `Tag:` capture after `Evidence:`; marker-like body `Tag:` lines remain content.
 - Scope backfill dry-run treats partial scope records as incomplete and includes them in missing counters; `wouldUpdate` follows missing recommended-default fields.
+- `stripMemoryMarkers` only removes internal marker lines when a real `Content:` boundary proves diary structure.
 
 ## Next Safe Task
 

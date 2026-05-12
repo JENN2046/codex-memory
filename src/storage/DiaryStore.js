@@ -85,10 +85,7 @@ function stripMemoryMarkers(text) {
   const markerPattern = /^(?:Memory-ID|Project-ID|Workspace-ID|Client-ID|Task-ID|Conversation-ID|Visibility|Retention-Policy):\s*.*\r?\n?/gmi;
   const contentMatch = text.match(/\r?\nContent:\r?\n/);
   if (!contentMatch || contentMatch.index === undefined) {
-    if (!/^(?:Memory-ID|Record-Type):\s*.+$/mi.test(text)) {
-      return text.trim();
-    }
-    return text.replace(markerPattern, '').trim();
+    return text.trim();
   }
 
   const header = text.slice(0, contentMatch.index);

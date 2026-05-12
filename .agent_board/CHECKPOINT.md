@@ -2,22 +2,22 @@
 
 ## Current Goal
 
-CM-0046 fixes scope backfill dry-run partial-record accounting and refreshes `.agent_board` against current repository reality.
+CM-0047 fixes no-boundary marker stripping and refreshes `.agent_board` against current repository reality.
 
 ## Current Area
 
-P9-codex-claude-client-scope / P0-mainline-health / scope backfill dry-run accounting
+P9-codex-claude-client-scope / P0-mainline-health / no-boundary marker stripping safety
 
 ## Current Status
 
-Branch `codex/p1-vcp-memory-core-100-roadmap`, CM-0046 guarded local commit target.
+Branch `codex/p1-vcp-memory-core-100-roadmap`, CM-0047 guarded local commit target.
 
 Current worktree is dirty:
 
-- Source/test files: `src/cli/scope-backfill-dry-run.js`, `tests/scope-backfill-dry-run.test.js`
+- Source/test files: `src/storage/DiaryStore.js`, `tests/scope-filter.test.js`
 - Board files: `.agent_board/RUN_STATE.md`, `.agent_board/TASK_QUEUE.md`, `.agent_board/HANDOFF.md`, `.agent_board/CHECKPOINT.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/DECISIONS.md`
 
-CM-0046 addresses the review finding where `scope-backfill-dry-run` treated any one present scope field as fully scoped and undercounted missing backfill work.
+CM-0047 addresses the review finding where `stripMemoryMarkers` stripped ordinary text when it saw `Record-Type:` without a real diary `Content:` boundary.
 
 ## Current 4-Agent Roles
 
@@ -45,10 +45,11 @@ CM-0046 addresses the review finding where `scope-backfill-dry-run` treated any 
 - CM-0044: `node --test .\tests\scope-filter.test.js` 18/18; `npm test` 178/178; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 178/178, compare 43/43, rollback 43/43; `git diff --check` passed.
 - CM-0045: `node --test .\tests\scope-filter.test.js` 18/18; `npm test` 178/178; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 178/178, compare 43/43, rollback 43/43; `git diff --check` passed.
 - CM-0046: `node --test .\tests\scope-backfill-dry-run.test.js` 6/6; `npm test` 179/179; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 179/179, compare 43/43, rollback 43/43; `git diff --check` passed.
+- CM-0047: `node --test .\tests\scope-filter.test.js` 18/18; `npm test` 179/179; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 179/179, compare 43/43, rollback 43/43; `git diff --check` passed.
 
 ## Current Blockers
 
-- Local commit readiness is eligible after final status/diff inspection if staging exactly the validated CM-0046 batch.
+- Local commit readiness is eligible after final status/diff inspection if staging exactly the validated CM-0047 batch.
 - Push remains unauthorized.
 
 ## Completed Work

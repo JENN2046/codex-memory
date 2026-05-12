@@ -44,6 +44,10 @@ test('scope metadata stripper preserves ordinary content with marker-like labels
     stripMemoryMarkers('Visibility: this is user-authored content'),
     'Visibility: this is user-authored content'
   );
+  assert.equal(
+    stripMemoryMarkers('Record-Type: note\nProject-ID: keep-me\nVisibility: user-authored'),
+    'Record-Type: note\nProject-ID: keep-me\nVisibility: user-authored'
+  );
 
   const diaryText = [
     '[2026-05-12T00:00:00.000Z] - Codex',
