@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
-const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
+const { createConfig } = require('../config/createConfig');
 
 function parseArgs(argv = []) {
   const options = { json: false };
@@ -12,25 +12,46 @@ function parseArgs(argv = []) {
 }
 
 function getDbPath() {
-  return path.join(process.cwd(), 'data', 'codex-memory.sqlite');
+  return createConfig().dbPath;
 }
 
-function runQuery(db, sql) {
-  try { return db.prepare(sql).all(); }
+function runQuery(db, sql, params = []) {
+  try { return db.prepare(sql).all(...params); }
   catch { return []; }
 }
 
-function runQueryOne(db, sql) {
-  try { return db.prepare(sql).get(); }
+function runQueryOne(db, sql, params = []) {
+  try { return db.prepare(sql).get(...params); }
   catch { return null; }
+}
+
+function normalizeBucketKey(value) {
+  if (value === null || value === undefined) return '(unset)';
+  const text = String(value).trim();
+  return text || '(unset)';
+}
+
+function toDistribution(rows = [], keyField = 'key') {
+  return Object.fromEntries(rows.map(row => [normalizeBucketKey(row?.[keyField]), row?.cnt || 0]));
 }
 
 function collectReport() {
   const dbPath = getDbPath();
   if (!fs.existsSync(dbPath)) {
-    return { error: 'Database not found: ' + dbPath };
+    return {
+      mode: 'governance-report',
+      destructive: false,
+      summary: {
+        status: 'error',
+        message: `Database not found: ${dbPath}`
+      },
+      error: 'Database not found: ' + dbPath,
+      paths: {
+        dbPath
+      }
+    };
   }
-  const db = new DatabaseSync(dbPath);
+  const db = new DatabaseSync(dbPath, { readOnly: true });
 
   // Status distribution
   const statusDist = runQuery(db,
@@ -51,15 +72,16 @@ function collectReport() {
     'SELECT COUNT(*) as cnt FROM memory_records WHERE confidence >= 0.4 AND confidence < 0.8')?.cnt || 0;
   const confLow = runQueryOne(db,
     'SELECT COUNT(*) as cnt FROM memory_records WHERE confidence < 0.4')?.cnt || 0;
-  const totalRecords = confHigh + confMed + confLow;
+  const totalRecords = runQueryOne(db,
+    'SELECT COUNT(*) as cnt FROM memory_records')?.cnt || 0;
 
   // Stale indicators
   const now = new Date();
   const stale30d = runQueryOne(db,
-    `SELECT COUNT(*) as cnt FROM memory_records WHERE updated_at < ? AND status = 'active'`,
+    "SELECT COUNT(*) as cnt FROM memory_records WHERE updated_at < ? AND status = 'active'",
     [new Date(now - 30 * 86400000).toISOString()])?.cnt || 0;
   const stale90d = runQueryOne(db,
-    `SELECT COUNT(*) as cnt FROM memory_records WHERE updated_at < ? AND status = 'active'`,
+    "SELECT COUNT(*) as cnt FROM memory_records WHERE updated_at < ? AND status = 'active'",
     [new Date(now - 90 * 86400000).toISOString()])?.cnt || 0;
 
   // Supersession chains
@@ -92,13 +114,28 @@ function collectReport() {
   db.close();
 
   return {
+    mode: 'governance-report',
+    destructive: false,
     generatedAt: new Date().toISOString(),
+    summary: {
+      status: 'ok',
+      message: 'Read-only governance snapshot generated.',
+      totalRecords,
+      proposalCount,
+      tombstonedCount,
+      supersededCount,
+      stale30d,
+      stale90d
+    },
+    paths: {
+      dbPath
+    },
     totalRecords,
-    statusDistribution: Object.fromEntries(statusDist.map(r => [r.status, r.cnt])),
+    statusDistribution: toDistribution(statusDist, 'status'),
     scopeCoverage: {
-      project: Object.fromEntries(projectDist.map(r => [r.project_id, r.cnt])),
-      visibility: Object.fromEntries(visibilityDist.map(r => [r.visibility, r.cnt])),
-      client: Object.fromEntries(clientDist.map(r => [r.client_id, r.cnt])),
+      project: toDistribution(projectDist, 'project_id'),
+      visibility: toDistribution(visibilityDist, 'visibility'),
+      client: toDistribution(clientDist, 'client_id'),
       scopeFilledRecords: scopeFilledCount,
       scopeNullRecords: scopeNullCount,
       taskScopedRecords: taskScopedCount
@@ -127,6 +164,9 @@ function renderText(report) {
   const l = [];
   l.push(`Governance Report — ${report.generatedAt}`);
   l.push('─'.repeat(50));
+  l.push('');
+  l.push(`Status: ${report.summary.status}`);
+  l.push(report.summary.message);
   l.push('');
   l.push(`Total Records: ${report.totalRecords}`);
   l.push('');

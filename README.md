@@ -65,6 +65,7 @@
 - `src/cli/rollback-active-memory.js`：只读 rollback readiness 报告 CLI
 - `src/cli/mainline-gate.js`：默认主链持续门禁 CLI
 - `src/cli/http-observe.js`：HTTP MCP 运行态诊断 CLI
+- `src/cli/governance-report.js`：memory governance 只读汇总 CLI
 - `src/cli/mainline-rollback.js`：默认主链回滚预案 CLI
 - `src/cli/provider-smoke.js`：真实 provider 连通性检查
 - `src/cli/provider-benchmark.js`：真实 provider 召回基准对比
@@ -99,6 +100,7 @@ npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\stand
 npm run gate:mainline
 npm run gate:mainline:strict
 npm run observe:http -- --json
+npm run governance:report -- --json
 npm run rollback:mainline:plan -- --json
 npm run provider-smoke -- --json
 npm run provider-benchmark -- --json

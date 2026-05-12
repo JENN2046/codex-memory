@@ -2,7 +2,7 @@
 
 ## Current State
 
-治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、以及 R2 scoped recall aggregation `7bfd793` 已推送；当前本地工作是 P1 R3：为 `dashboard` / `http-observe` 增加 scoped recall 可见性，但不输出 workspace 明细。
+治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、R2 scoped recall aggregation `7bfd793`、以及 R3 observability surface `f37a91a` 已推送；当前本地工作是 P2：收口 `governance:report`，让 proposal / tombstone / supersession / stale metrics 成为受测试保护的只读 CLI。
 
 Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
 
@@ -19,7 +19,7 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 - compare: 43/43 matched, 0/0 core/extended
 - rollback: 43/43 rollback-ready, 0/0
-- npm test: 145/145
+- npm test: 148/148
 - gate:ci: 119/119 (fixture-only)
 - gate:mainline: ok (health 200)
 - gate:mainline:strict: ok (`health` + `contract` + `test` + `compare` + `rollback` 全绿)
@@ -40,7 +40,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - `SCOPE_RECALL_AUDIT_DESIGN.md` now serves as the boundary doc for R2/R3 follow-ups, not just a proposal for R1.
 - R2 is now implemented: `memory_overview.recall.summary.scope` aggregates scoped recall count, strict count, latest scoped hit, and low-risk `mode/dimension/project/client/visibility` breakdowns.
 - Current boundary remains intact: no workspace breakdown and no raw `workspace_id` exposure in overview summary.
-- R3 is now implemented and validated locally: `dashboard` / `http-observe` expose scoped recall summary counts plus `scopeMode` / `scopeDimensions` breakdowns, and tests were expanded without exposing raw `workspace_id`.
+- R3 is now implemented and pushed: `dashboard` / `http-observe` expose scoped recall summary counts plus `scopeMode` / `scopeDimensions` breakdowns, and tests were expanded without exposing raw `workspace_id`.
+- `governance:report` is now hardened locally: it resolves DB path through `createConfig`, opens SQLite read-only, correctly binds stale-threshold timestamps, and has dedicated CLI tests for governance metrics plus missing-DB behavior.
 - LightMemo CLI + compare harness support
 - gate:ci + dashboard tests
 - P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
@@ -51,9 +52,9 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 ## Next
 
-- P1: choose the next post-R3 line, likely governance-report CLI
+- P1: choose the next post-governance-report line, likely governance surface expansion or policy-layer scope design
 - P2: evaluate whether active-memory / policy-layer scope needs a separate design track
-- P3: Governance report CLI (proposal/tombstone/supersession/stale metrics)
+- P3: decide whether governance data should stay CLI-only or also surface in dashboard/http-observe
 
 ## Auth Required
 

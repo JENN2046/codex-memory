@@ -2,32 +2,29 @@
 
 ## Current Goal
 
-P9 R3 — Surface scoped recall summary in dashboard / `http-observe`。
+P2 — Harden `governance:report` as a tested, read-only governance snapshot CLI。
 
 ## Current Area
 
-P9-codex-claude-client-scope
+P8-memory-governance
 
 ## Current Status
 
-R3 已完成并验证：`dashboard` 与 `http-observe` 现已展示 scoped recall 低风险 summary，包括 scoped/strict 计数与 `scopeMode` / `scopeDimensions` breakdown；针对性 CLI 测试、`npm test`、`gate:mainline:strict` 均已通过，当前只差最终 commit/push 收口。
+`governance:report` 已完成并验证：CLI 现已按当前配置解析数据库路径、只读打开 SQLite、正确统计 stale/proposal/tombstone/supersession 指标，并有独立 CLI 回归保护。
 
 ## Completed Work
 
-- R1：recall audit 记录 `scopeApplied` / `scopeMode` / `scopeDimensions` / `scopeStrict` 与低风险 scope 字段，不写 raw `workspace_id`。
-- R2：`memory_overview.recall.summary.scope` 聚合 scoped recall 活跃度与 low-risk breakdown。
-- R3：`dashboard` 与 `http-observe` 现在展示 scoped recall 的低风险 summary。
-- `tests/dashboard-cli.test.js` 已补 scoped recall 字段存在性断言。
-- `tests/http-observe-cli.test.js` 已补 scoped recall summary 回归，并确认不会暴露 raw `workspace_id`。
+- `src/cli/governance-report.js` 现已复用 `createConfig().dbPath`，不再硬编码 `cwd/data/codex-memory.sqlite`。
+- staleness 查询现已正确绑定 30/90 天阈值，不再依赖未绑定参数的隐式行为。
+- CLI 现在以 SQLite read-only 模式打开数据库。
+- 新增 `tests/governance-report-cli.test.js`，覆盖 JSON 输出、文本输出、missing-DB 失败路径与真实 staleness/proposal/tombstone/supersession 聚合。
+- `README.md` 已把 `governance:report` 纳入 CLI 能力列表与常用命令清单。
 
 ## Changed Files
 
-- `src/cli/dashboard.js`
-- `src/cli/http-observe.js`
-- `tests/dashboard-cli.test.js`
-- `tests/http-observe-cli.test.js`
-- `docs/SCOPE_ACCEPTANCE.md`
-- `docs/SCOPE_RECALL_AUDIT_DESIGN.md`
+- `src/cli/governance-report.js`
+- `tests/governance-report-cli.test.js`
+- `README.md`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/HANDOFF.md`
@@ -36,11 +33,10 @@ R3 已完成并验证：`dashboard` 与 `http-observe` 现已展示 scoped recal
 
 ## Validation Run
 
-- `node --test tests\dashboard-cli.test.js` passed (`4/4`)
-- `node --test tests\http-observe-cli.test.js` passed (`2/2`)
-- `npm test` passed (`145/145`)
+- `node --test tests\governance-report-cli.test.js` passed (`3/3`)
+- `npm test` passed (`148/148`)
 - `npm run gate:mainline:strict` passed
-- `git diff --check` passed with LF normalization warnings only
+- `git diff --check` passed
 
 ## Validation Not Run
 
@@ -56,4 +52,4 @@ R3 已完成并验证：`dashboard` 与 `http-observe` 现已展示 scoped recal
 
 ## Next Safe Action
 
-Select the next post-R3 safe task; `governance-report` CLI is the current leading candidate.
+Select the next post-governance-report safe task; governance-surface expansion and policy-layer scope design are the current leading candidates.
