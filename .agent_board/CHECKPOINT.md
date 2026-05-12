@@ -2,28 +2,34 @@
 
 ## Current Goal
 
-P2 — Harden `governance:report` as a tested, read-only governance snapshot CLI。
+P10 + P8-lite — 将 `governance:report` 的只读治理快照接入 `dashboard` / `http-observe`，补状态分级与提示，不碰写路径或 MCP contract。
 
 ## Current Area
 
-P8-memory-governance
+P10-observability-admin
 
 ## Current Status
 
-`governance:report` 已完成并验证：CLI 现已按当前配置解析数据库路径、只读打开 SQLite、正确统计 stale/proposal/tombstone/supersession 指标，并有独立 CLI 回归保护。
+治理 summary observability batch 已完成本地实现：`dashboard` / `http-observe` 现已复用 `governance:report` 的只读快照，并输出 `status`、`reviewLevel`、counts、hints；当前仍停在只读治理面，没有改写 proposal / tombstone / supersession，也没有改 MCP contract。
 
 ## Completed Work
 
-- `src/cli/governance-report.js` 现已复用 `createConfig().dbPath`，不再硬编码 `cwd/data/codex-memory.sqlite`。
-- staleness 查询现已正确绑定 30/90 天阈值，不再依赖未绑定参数的隐式行为。
-- CLI 现在以 SQLite read-only 模式打开数据库。
-- 新增 `tests/governance-report-cli.test.js`，覆盖 JSON 输出、文本输出、missing-DB 失败路径与真实 staleness/proposal/tombstone/supersession 聚合。
-- `README.md` 已把 `governance:report` 纳入 CLI 能力列表与常用命令清单。
+- `src/cli/governance-report.js` 现在既能作为 CLI，也能作为 `dashboard` / `http-observe` 的只读数据源复用，并新增 governance surface helper。
+- governance snapshot 现在会把 `memory_records` 表缺失视为不可用，而不是把空壳 SQLite 误报成健康。
+- `src/cli/dashboard.js` 新增 `governance` section、governance checks、recommendations 和文本行。
+- `src/cli/http-observe.js` 新增 `governance` section，并把 proposal / stale / lifecycle 信号纳入 runtime hints。
+- `tests/dashboard-cli.test.js` / `tests/http-observe-cli.test.js` 已补 governance summary 回归，且继续守住 no raw `workspace_id` 边界。
+- `README.md` 与 `docs/MEMORY_DASHBOARD_REPORT_DESIGN.md` 已同步说明 governance summary 的只读范围与状态分级。
 
 ## Changed Files
 
 - `src/cli/governance-report.js`
+- `src/cli/dashboard.js`
+- `src/cli/http-observe.js`
+- `tests/dashboard-cli.test.js`
+- `tests/http-observe-cli.test.js`
 - `tests/governance-report-cli.test.js`
+- `docs/MEMORY_DASHBOARD_REPORT_DESIGN.md`
 - `README.md`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/RUN_STATE.md`
@@ -33,10 +39,12 @@ P8-memory-governance
 
 ## Validation Run
 
+- `node --test tests\dashboard-cli.test.js` passed (`4/4`)
+- `node --test tests\http-observe-cli.test.js` passed (`2/2`)
 - `node --test tests\governance-report-cli.test.js` passed (`3/3`)
 - `npm test` passed (`148/148`)
 - `npm run gate:mainline:strict` passed
-- `git diff --check` passed
+- `git diff --check` passed with repo-known LF normalization warnings only
 
 ## Validation Not Run
 
@@ -48,8 +56,8 @@ P8-memory-governance
 
 ## Remaining Risks
 
-- none beyond ordinary final diff inspection and commit/push bookkeeping
+- 无明显实现风险；仅剩 commit/push 账务收口
 
 ## Next Safe Action
 
-Select the next post-governance-report safe task; governance-surface expansion and policy-layer scope design are the current leading candidates.
+Inspect diff, then guarded commit/push this read-only governance-surface task.

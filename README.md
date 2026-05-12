@@ -99,6 +99,7 @@ npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standa
 npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json
 npm run gate:mainline
 npm run gate:mainline:strict
+npm run dashboard -- --json
 npm run observe:http -- --json
 npm run governance:report -- --json
 npm run rollback:mainline:plan -- --json
@@ -308,6 +309,10 @@ npm run observe:http -- --json
 - `audits.recall`
   - 最近 recall audit 数量
   - `recallType` 分布
+- `governance`
+  - proposal / tombstone / supersession / stale 的只读汇总
+  - `reviewLevel` 分级（`nominal / observe / needs-review / unavailable`）
+  - 只输出低风险 summary，不输出 raw `workspace_id`
 
 推荐排障顺序：
 
@@ -315,6 +320,29 @@ npm run observe:http -- --json
 2. 如果 `summary.status=error`，先执行 `npm run start:http:ensure`
 3. 如果是 `warn`，先看 `logs.watchdog` 和 `logs.http`
 4. 如果服务健康但工具表现异常，再看 `audits.write` / `audits.recall`
+
+现在 `dashboard` 与 `observe:http` 都会顺手带出 governance summary。它们只做只读提示与状态分级，不会修改 proposal / tombstone / supersession 状态，也不会扩展 MCP contract。
+
+## Governance 只读汇总
+
+`governance:report` 提供独立的只读治理快照；`dashboard` / `observe:http` 则复用这份快照做轻量 summary。
+
+基础用法：
+
+```powershell
+cd A:\codex-memory
+npm run governance:report -- --json
+```
+
+输出重点：
+
+- `summary.proposalCount`
+- `summary.tombstonedCount`
+- `summary.supersededCount`
+- `summary.stale30d`
+- `summary.stale90d`
+
+当前 observability surface 只显示低风险 count / hint，不做写路径操作，也不暴露 raw `workspace_id`。
 
 ## 默认主链回滚预案
 

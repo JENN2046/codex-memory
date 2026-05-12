@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const { createConfig } = require('../config/createConfig');
 const { AuditLogStore } = require('../storage/AuditLogStore');
+const { collectReport: collectGovernanceReport, buildGovernanceSurface } = require('./governance-report');
 
 function parseArgs(argv = []) {
   const options = {
@@ -255,7 +256,16 @@ function summarizeRecallAudit(entries = []) {
   };
 }
 
-function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit }) {
+function collectGovernance() {
+  const report = collectGovernanceReport();
+  return {
+    ...buildGovernanceSurface(report, { tolerateUnavailable: true }),
+    sourceStatus: report.error ? 'unavailable' : 'ok',
+    paths: report.paths || {}
+  };
+}
+
+function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, governance }) {
   const hints = [];
   let status = 'ok';
 
@@ -286,6 +296,29 @@ function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit })
     hints.push('最近没有 recall audit，若你在排查召回问题，优先核对 `search_memory` 或被动召回入口。');
   }
 
+  if (governance.counts.proposalCount > 0) {
+    if (status === 'ok') {
+      status = 'warn';
+    }
+    hints.push(`${governance.counts.proposalCount} 条 proposal 仍待审查，治理层面建议跟进 review。`);
+  }
+
+  if (governance.counts.stale90d > 0) {
+    if (status === 'ok') {
+      status = 'warn';
+    }
+    hints.push(`${governance.counts.stale90d} 条 active memory 超过 90 天未更新，建议安排治理复核。`);
+  } else if (governance.counts.stale30d > 0) {
+    if (status === 'ok') {
+      status = 'warn';
+    }
+    hints.push(`${governance.counts.stale30d} 条 active memory 超过 30 天未更新，可纳入常规治理观察。`);
+  }
+
+  if (governance.counts.tombstonedCount > 0 || governance.counts.supersededCount > 0 || governance.counts.supersessionInitiated > 0) {
+    hints.push('治理快照里存在 tombstone/supersession 留痕，可继续保持只读跟踪。');
+  }
+
   if (hints.length === 0) {
     hints.push('运行态没有看到明显异常信号。');
   }
@@ -307,6 +340,11 @@ function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit })
     recallRecentCount: recallAudit.recentCount,
     scopedRecallCount: recallAudit.scopedRecallCount,
     strictScopedRecallCount: recallAudit.strictScopedRecallCount,
+    governanceStatus: governance.status,
+    governanceReviewLevel: governance.reviewLevel,
+    governanceProposalCount: governance.counts.proposalCount,
+    governanceStale30d: governance.counts.stale30d,
+    governanceStale90d: governance.counts.stale90d,
     hints
   };
 }
@@ -359,6 +397,18 @@ function formatTextReport(report) {
   lines.push(`  scopeDimensionBreakdown: ${JSON.stringify(report.audits.recall.scopeDimensionBreakdown)}`);
   lines.push('');
 
+  lines.push('[governance]');
+  lines.push(`  status: ${report.governance.status}`);
+  lines.push(`  reviewLevel: ${report.governance.reviewLevel}`);
+  lines.push(`  sourceStatus: ${report.governance.sourceStatus}`);
+  lines.push(`  proposals: ${report.governance.counts.proposalCount}`);
+  lines.push(`  stale30d: ${report.governance.counts.stale30d}`);
+  lines.push(`  stale90d: ${report.governance.counts.stale90d}`);
+  lines.push(`  tombstoned: ${report.governance.counts.tombstonedCount}`);
+  lines.push(`  superseded: ${report.governance.counts.supersededCount}`);
+  lines.push(`  hints: ${JSON.stringify(report.governance.hints)}`);
+  lines.push('');
+
   lines.push('[hints]');
   for (const hint of report.summary.hints) {
     lines.push(`  - ${hint}`);
@@ -398,13 +448,15 @@ async function main() {
     lastModified: recallStats.lastModified,
     ...summarizeRecallAudit(recallEntries)
   };
+  const governance = collectGovernance();
 
   const summary = buildSummary({
     health,
     httpLog,
     watchdogLog,
     writeAudit,
-    recallAudit
+    recallAudit,
+    governance
   });
 
   const report = {
@@ -421,6 +473,7 @@ async function main() {
       http: httpLog,
       watchdog: watchdogLog
     },
+    governance,
     audits: {
       write: writeAudit,
       recall: recallAudit

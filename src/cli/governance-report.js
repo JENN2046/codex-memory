@@ -35,6 +35,98 @@ function toDistribution(rows = [], keyField = 'key') {
   return Object.fromEntries(rows.map(row => [normalizeBucketKey(row?.[keyField]), row?.cnt || 0]));
 }
 
+function buildGovernanceSurface(report, options = {}) {
+  const tolerateUnavailable = options.tolerateUnavailable !== false;
+  if (!report || report.error) {
+    return {
+      status: tolerateUnavailable ? 'warn' : 'error',
+      reviewLevel: 'unavailable',
+      message: report?.summary?.message || report?.error || 'Governance snapshot unavailable.',
+      counts: {
+        totalRecords: 0,
+        proposalCount: 0,
+        tombstonedCount: 0,
+        supersededCount: 0,
+        supersessionInitiated: 0,
+        stale30d: 0,
+        stale90d: 0
+      },
+      statusDistribution: {},
+      retention: {},
+      hints: [
+        '治理快照暂不可用，先核对 SQLite 路径与本地数据目录。'
+      ]
+    };
+  }
+
+  const counts = {
+    totalRecords: report.summary?.totalRecords || 0,
+    proposalCount: report.summary?.proposalCount || 0,
+    tombstonedCount: report.summary?.tombstonedCount || 0,
+    supersededCount: report.summary?.supersededCount || 0,
+    supersessionInitiated: report.supersession?.supersessionInitiated || 0,
+    stale30d: report.summary?.stale30d || 0,
+    stale90d: report.summary?.stale90d || 0
+  };
+  const hints = [];
+  let status = 'ok';
+  let reviewLevel = 'nominal';
+
+  if (counts.proposalCount > 0) {
+    status = 'warn';
+    reviewLevel = 'needs-review';
+    hints.push(`${counts.proposalCount} 条 proposal 仍待人工审查。`);
+  }
+
+  if (counts.stale90d > 0) {
+    status = 'warn';
+    reviewLevel = 'needs-review';
+    hints.push(`${counts.stale90d} 条 active memory 超过 90 天未更新，建议优先做治理复核。`);
+  } else if (counts.stale30d > 0) {
+    if (reviewLevel === 'nominal') {
+      reviewLevel = 'observe';
+    }
+    status = 'warn';
+    hints.push(`${counts.stale30d} 条 active memory 超过 30 天未更新，可安排例行复核。`);
+  }
+
+  if (counts.tombstonedCount > 0) {
+    if (reviewLevel === 'nominal') {
+      reviewLevel = 'observe';
+    }
+    hints.push(`${counts.tombstonedCount} 条 tombstoned 记录仍保留审计留痕。`);
+  }
+
+  if (counts.supersededCount > 0 || counts.supersessionInitiated > 0) {
+    if (reviewLevel === 'nominal') {
+      reviewLevel = 'observe';
+    }
+    hints.push(
+      `${counts.supersededCount} 条 superseded 记录、${counts.supersessionInitiated} 条 supersession 链接可用于后续 compact/review。`
+    );
+  }
+
+  if (hints.length === 0) {
+    hints.push('治理快照未见待处理信号。');
+  }
+
+  const message = status === 'ok'
+    ? 'Governance snapshot looks steady.'
+    : reviewLevel === 'needs-review'
+      ? 'Governance snapshot shows review-needed signals.'
+      : 'Governance snapshot shows low-risk follow-up signals.';
+
+  return {
+    status,
+    reviewLevel,
+    message,
+    counts,
+    statusDistribution: report.statusDistribution || {},
+    retention: report.retention || {},
+    hints
+  };
+}
+
 function collectReport() {
   const dbPath = getDbPath();
   if (!fs.existsSync(dbPath)) {
@@ -52,6 +144,25 @@ function collectReport() {
     };
   }
   const db = new DatabaseSync(dbPath, { readOnly: true });
+  const tableExists = runQueryOne(
+    db,
+    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'memory_records'"
+  );
+  if (!tableExists) {
+    db.close();
+    return {
+      mode: 'governance-report',
+      destructive: false,
+      summary: {
+        status: 'error',
+        message: `memory_records table not found: ${dbPath}`
+      },
+      error: `memory_records table not found: ${dbPath}`,
+      paths: {
+        dbPath
+      }
+    };
+  }
 
   // Status distribution
   const statusDist = runQuery(db,
@@ -225,4 +336,14 @@ function main() {
   if (report.error) process.exitCode = 1;
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  parseArgs,
+  getDbPath,
+  collectReport,
+  renderText,
+  buildGovernanceSurface
+};

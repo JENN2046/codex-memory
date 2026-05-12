@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
+const { collectReport: collectGovernanceReport, buildGovernanceSurface } = require('./governance-report');
 
 function parseArgs(argv = []) {
   const options = { json: false, summaryOnly: false, skipTests: true };
@@ -300,7 +301,18 @@ async function collectGate() {
   };
 }
 
-function buildChecks(service, store, profile, runtime, audits, gate) {
+function collectGovernance() {
+  const report = collectGovernanceReport();
+  const summary = buildGovernanceSurface(report, { tolerateUnavailable: true });
+  return {
+    ...summary,
+    sourceStatus: report.error ? 'unavailable' : 'ok',
+    paths: report.paths || {},
+    rawSummary: report.summary || null
+  };
+}
+
+function buildChecks(service, store, profile, runtime, audits, gate, governance) {
   const checks = [];
   checks.push({
     source: 'service', level: service.status,
@@ -372,10 +384,29 @@ function buildChecks(service, store, profile, runtime, audits, gate) {
       ? `rollback ${gate.rollback.readyCases}/${gate.rollback.totalCases} ready, ${gate.rollback.coreMismatch} core mismatch`
       : 'rollback unavailable'
   });
+  checks.push({
+    source: 'governance', level: governance.status,
+    code: 'governance-snapshot',
+    message: governance.message
+  });
+  checks.push({
+    source: 'governance',
+    level: governance.counts.proposalCount > 0 ? 'warn' : 'ok',
+    code: 'governance-proposals',
+    message: governance.counts.proposalCount > 0
+      ? `${governance.counts.proposalCount} proposals pending review`
+      : 'No governance proposals pending review'
+  });
+  checks.push({
+    source: 'governance',
+    level: (governance.counts.stale90d > 0 || governance.counts.stale30d > 0) ? 'warn' : 'ok',
+    code: 'governance-stale-active',
+    message: `${governance.counts.stale30d} active records stale >30d, ${governance.counts.stale90d} stale >90d`
+  });
   return checks;
 }
 
-function buildRecommendations(service, store, profile, runtime, audits, gate) {
+function buildRecommendations(service, store, profile, runtime, audits, gate, governance) {
   const recs = [];
   if (service.status !== 'ok') recs.push('Service health check failed — verify HTTP MCP is running');
   if (store.status !== 'ok') recs.push('Store is empty or unreachable — check SQLite integrity');
@@ -388,6 +419,14 @@ function buildRecommendations(service, store, profile, runtime, audits, gate) {
   if (audits.recall.recentCount === 0) recs.push('No recent recall entries — search may not be active');
   if (audits.recall.recentCount > 0 && audits.recall.scopedRecallCount === 0) recs.push('Recent recall activity is present, but none of it used scope filtering');
   if (gate.status !== 'ok') recs.push('Mainline gate not passing — run gate:mainline for details');
+  if (governance.counts.proposalCount > 0) recs.push(`${governance.counts.proposalCount} governance proposals are pending review`);
+  if (governance.counts.stale90d > 0) recs.push(`${governance.counts.stale90d} active memories are stale >90d — schedule governance review`);
+  else if (governance.counts.stale30d > 0) recs.push(`${governance.counts.stale30d} active memories are stale >30d — keep an eye on review backlog`);
+  if (governance.counts.supersededCount > 0 || governance.counts.supersessionInitiated > 0) {
+    recs.push('Supersession links are present — compact/review can stay read-only for now');
+  }
+  if (governance.counts.tombstonedCount > 0) recs.push('Tombstoned records are visible in governance summary — confirm retention policy remains intentional');
+  if (governance.sourceStatus !== 'ok') recs.push('Governance snapshot unavailable — verify local SQLite path before relying on governance totals');
   if (recs.length === 0) recs.push('All systems nominal');
   return recs;
 }
@@ -403,6 +442,7 @@ function renderText(report) {
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
   lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
+  lines.push(`Governance ${pad(report.governance.status)} ${report.governance.counts.proposalCount} proposals, ${report.governance.counts.stale90d} stale>90d, review ${report.governance.reviewLevel}`);
   lines.push(`Gate       ${pad(report.gate.status)} compare ${report.gate.compare ? report.gate.compare.matchedCases + '/' + report.gate.compare.totalCases : 'N/A'}, rollback ${report.gate.rollback ? report.gate.rollback.readyCases + '/' + report.gate.rollback.totalCases : 'N/A'}`);
   lines.push('');
   lines.push('Checks:');
@@ -434,12 +474,13 @@ async function main() {
     collectGate()
   ]);
   const runtime = collectRuntime();
+  const governance = collectGovernance();
 
-  const checks = buildChecks(service, store, profile, runtime, audits, gate);
-  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate);
+  const checks = buildChecks(service, store, profile, runtime, audits, gate, governance);
+  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance);
   const status = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
-    audits.bridge.status, audits.recall.status, gate.status
+    audits.bridge.status, audits.recall.status, governance.status, gate.status
   );
 
   const report = {
@@ -459,6 +500,13 @@ async function main() {
     profile: options.summaryOnly ? { status: profile.status, fingerprint: profile.fingerprint } : profile,
     runtime,
     audits,
+    governance: options.summaryOnly
+      ? {
+          status: governance.status,
+          reviewLevel: governance.reviewLevel,
+          counts: governance.counts
+        }
+      : governance,
     gate,
     checks: options.summaryOnly ? checks.filter(c => c.level !== 'ok') : checks,
     recommendations

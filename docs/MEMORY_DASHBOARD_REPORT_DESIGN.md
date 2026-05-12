@@ -1,6 +1,6 @@
 # Memory Dashboard — Report Design
 
-更新时间：2026-05-08
+更新时间：2026-05-12
 
 ## 目的
 
@@ -11,10 +11,11 @@
 - 运行态日志诊断
 - Bridge audit（写入审计）
 - Recall audit（检索审计）
+- Governance summary（proposal / tombstone / supersession / stale）
 - Profile 健康
 - 门禁状态（compare / rollback）
 
-不做实现，先做 schema。
+当前仓库已实现 dashboard / `http-observe` 的基础观测面；本文件保留 schema 作为当前实现与后续只读扩展的对照。
 
 ## 1. 输出模式
 
@@ -94,6 +95,33 @@
       "lastRecallAt": "<ISO 8601>"
     }
   },
+  "governance": {
+    "status": "ok | warn | error",
+    "reviewLevel": "nominal | observe | needs-review | unavailable",
+    "message": "<一句话摘要>",
+    "counts": {
+      "totalRecords": 428,
+      "proposalCount": 2,
+      "tombstonedCount": 8,
+      "supersededCount": 13,
+      "supersessionInitiated": 9,
+      "stale30d": 11,
+      "stale90d": 3
+    },
+    "statusDistribution": {
+      "active": 405,
+      "proposal": 2,
+      "tombstoned": 8
+    },
+    "retention": {
+      "retain": 420,
+      "review": 8
+    },
+    "hints": [
+      "2 条 proposal 仍待人工审查。",
+      "3 条 active memory 超过 90 天未更新，建议优先做治理复核。"
+    ]
+  },
   "gate": {
     "status": "ok | warn | error",
     "compare": {
@@ -148,6 +176,9 @@ error 至少一个数据源 error
 | runtime | `watchdog-stable` | recoveryCount = 0 | recoveryCount ≤ 5 | recoveryCount > 20 |
 | audits | `bridge-recent` | recentCount > 0 | — | lastAcceptedAt > 7d |
 | audits | `recall-recent` | recentCount > 0 | — | lastRecallAt > 7d |
+| governance | `governance-snapshot` | snapshot 可读，且无待处理信号 | snapshot 可读但有 review 信号 | snapshot 不可读 |
+| governance | `governance-proposals` | proposalCount = 0 | proposalCount > 0 | — |
+| governance | `governance-stale-active` | stale30d = 0 且 stale90d = 0 | stale30d > 0 或 stale90d > 0 | — |
 | gate | `compare-clean` | matchedAll=true, drift=0 | extendedMismatch > 0 | coreMismatch > 0 |
 | gate | `rollback-ready` | rollbackReady=true | — | coreMismatch > 0 |
 | gate | `tests-pass` | failed=0 | — | failed > 0 |
@@ -164,6 +195,7 @@ Profile    ok   bge-m3-local__1024__v1, 0 legacy
 Runtime    warn watchdog recovered 12 times, no HTTP errors
 Bridge     ok   5 recent, 3 accepted, 2 rejected
 Recall     ok   5 recent (all snippet)
+Governance warn 2 proposals, 3 stale>90d, review needs-review
 Gate       ok   compare 43/43, rollback 43/43, tests 123/123
 
 Checks:
@@ -173,6 +205,8 @@ Checks:
   ok   profile-ready           bge-m3-local fingerprint ready
   ok   http-log-clean          No HTTP errors in log
  warn  watchdog-stable         Watchdog recovered 12 times
+ warn  governance-proposals    2 proposals pending review
+ warn  governance-stale-active 11 active records stale >30d, 3 stale >90d
   ok   compare-clean           43/43 matched, 0 drift
   ok   rollback-ready          43/43 rollback-ready
   ok   tests-pass              123/123 passed
@@ -180,6 +214,8 @@ Checks:
 Recommendations:
   - Watchdog has recovered 12 times; consider investigating root cause of service instability
   - No new memory written in 24h; this may be expected during maintenance
+  - 2 governance proposals are pending review
+  - 3 active memories are stale >90d — schedule governance review
 ```
 
 ## 6. CLI 入口
@@ -202,8 +238,17 @@ npm run dashboard -- --json --summary-only  JSON 摘要
 | runtime logs | 读 `logs/codex-memory-http.log` + `logs/codex-memory-http-watchdog.log` |
 | bridge audit | 读 `logs/codex-memory-bridge.jsonl` 尾部 |
 | recall audit | 读 `logs/codex-memory-recall.jsonl` 尾部 |
+| governance | 复用 `governance:report` 的只读 SQLite 汇总 |
 | gate | `npm run gate:mainline -- --json` |
 | tests | `npm test` 结果（可选，昂贵操作） |
+
+## 7.1 当前治理边界
+
+- governance summary 只做只读聚合与提示分级
+- 不写 proposal / tombstone / supersession
+- 不扩展 MCP contract
+- 不输出 raw `workspace_id`
+- dashboard / `http-observe` 只暴露低风险 count / status / hint
 
 ## 8. 后续步骤
 

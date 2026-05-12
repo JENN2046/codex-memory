@@ -2,7 +2,7 @@
 
 ## Current State
 
-治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、R2 scoped recall aggregation `7bfd793`、以及 R3 observability surface `f37a91a` 已推送；当前本地工作是 P2：收口 `governance:report`，让 proposal / tombstone / supersession / stale metrics 成为受测试保护的只读 CLI。
+治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、R2 scoped recall aggregation `7bfd793`、R3 observability surface `f37a91a`、以及 `governance:report` 收口 `c592026` 已推送；当前本地工作是 P10 + P8-lite：把 governance summary 只读接到 `dashboard` / `http-observe`，并加上治理提示与状态分级。
 
 Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
 
@@ -25,6 +25,7 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - gate:mainline:strict: ok (`health` + `contract` + `test` + `compare` + `rollback` 全绿)
 - profile: bge-m3-local__1024__v1, vectors 205, ready
 - dashboard: npm run dashboard
+- governance snapshot: `dashboard` / `observe:http` 现在都会带 `governance.status`、`reviewLevel`、counts、hints
 
 ## Recent Work
 
@@ -41,7 +42,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - R2 is now implemented: `memory_overview.recall.summary.scope` aggregates scoped recall count, strict count, latest scoped hit, and low-risk `mode/dimension/project/client/visibility` breakdowns.
 - Current boundary remains intact: no workspace breakdown and no raw `workspace_id` exposure in overview summary.
 - R3 is now implemented and pushed: `dashboard` / `http-observe` expose scoped recall summary counts plus `scopeMode` / `scopeDimensions` breakdowns, and tests were expanded without exposing raw `workspace_id`.
-- `governance:report` is now hardened locally: it resolves DB path through `createConfig`, opens SQLite read-only, correctly binds stale-threshold timestamps, and has dedicated CLI tests for governance metrics plus missing-DB behavior.
+- `governance:report` is now hardened and pushed: it resolves DB path through `createConfig`, opens SQLite read-only, correctly binds stale-threshold timestamps, and has dedicated CLI tests for governance metrics plus missing-DB behavior.
+- Current local batch extends that snapshot into `dashboard` / `http-observe`, adds read-only governance checks/recommendations/hints, keeps the no-write / no raw `workspace_id` boundary intact, and has passed `dashboard 4/4`, `http-observe 2/2`, `governance-report 3/3`, `npm test 148/148`, and `gate:mainline:strict`.
 - LightMemo CLI + compare harness support
 - gate:ci + dashboard tests
 - P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
@@ -52,9 +54,9 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 ## Next
 
-- P1: choose the next post-governance-report line, likely governance surface expansion or policy-layer scope design
-- P2: evaluate whether active-memory / policy-layer scope needs a separate design track
-- P3: decide whether governance data should stay CLI-only or also surface in dashboard/http-observe
+- P1: run final batch validation (`npm test`, `npm run gate:mainline:strict`, `git diff --check`) and inspect diff
+- P2: guarded commit + push the governance-surface batch if validation stays green
+- P3: after push, decide whether to move into policy-layer proposal/scope design or keep expanding read-only observability
 
 ## Auth Required
 

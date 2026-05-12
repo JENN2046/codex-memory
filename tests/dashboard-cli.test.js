@@ -81,6 +81,15 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.ok(payload.gate.compare);
   assert.ok(payload.gate.rollback);
 
+  // Governance section
+  assert.ok(payload.governance, 'should have governance section');
+  assert.equal(typeof payload.governance.status, 'string');
+  assert.equal(typeof payload.governance.reviewLevel, 'string');
+  assert.equal(typeof payload.governance.counts.proposalCount, 'number');
+  assert.equal(typeof payload.governance.counts.stale30d, 'number');
+  assert.equal(typeof payload.governance.counts.stale90d, 'number');
+  assert.ok(Array.isArray(payload.governance.hints));
+
   // Checks and recommendations
   assert.ok(Array.isArray(payload.checks));
   assert.ok(Array.isArray(payload.recommendations));
@@ -100,6 +109,9 @@ test('dashboard CLI should support --json --summary-only', async () => {
     assert.equal(payload.store.status, 'warn', 'empty clean runner store should warn');
   }
   assert.ok(!payload.store.ageBreakdown, 'summary-only should omit age breakdown');
+  assert.ok(payload.governance, 'summary-only should keep governance compact section');
+  assert.equal(typeof payload.governance.counts.proposalCount, 'number');
+  assert.equal(payload.governance.hints, undefined);
 });
 
 test('dashboard CLI should emit text output by default', async () => {
@@ -111,6 +123,7 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Store'), 'should include Store section');
   assert.ok(text.includes('Profile'), 'should include Profile section');
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
+  assert.ok(text.includes('Governance'), 'should include Governance section');
   assert.ok(text.includes('Checks'), 'should include Checks section');
   assert.ok(text.includes('Recommendations'), 'should include Recommendations');
 });
@@ -135,6 +148,8 @@ test('dashboard CLI should tolerate clean CI runner warnings', async () => {
   assert.equal(payload.service.status, 'warn');
   assert.equal(payload.store.status, 'warn');
   assert.match(payload.store.message, /Database not found/);
+  assert.equal(typeof payload.governance.status, 'string');
+  assert.equal(typeof payload.governance.reviewLevel, 'string');
   assert.notEqual(payload.gate.status, 'error', formatFailure(result));
   assert.equal(typeof payload.audits.recall.scopedRecallCount, 'number');
 });
