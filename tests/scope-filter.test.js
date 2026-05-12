@@ -358,6 +358,188 @@ test('HTTP MCP tools/call end-to-end scope parameter verification', async () => 
   });
 });
 
+test('scope filter: workspace_id and client_id must both match in end-to-end search', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+
+    const correctRecord = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Workspace Client Match',
+          content: 'Type: checkpoint\nrisk: workspace and client scope match',
+          evidence: 'workspace-client-match',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'workspace', 'client'],
+          sensitivity: 'none',
+          project_id: 'scope-acceptance-project',
+          workspace_id: '/workspace/accepted',
+          client_id: 'codex',
+          visibility: 'shared'
+        }
+      }
+    }, requestContext);
+    assert.equal(correctRecord.response.result.structuredContent.decision, 'accepted');
+    const acceptedId = correctRecord.response.result.structuredContent.memoryId;
+
+    const wrongWorkspaceRecord = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Workspace Mismatch',
+          content: 'Type: checkpoint\nrisk: workspace mismatch',
+          evidence: 'workspace-mismatch',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'workspace', 'mismatch'],
+          sensitivity: 'none',
+          project_id: 'scope-acceptance-project',
+          workspace_id: '/workspace/rejected',
+          client_id: 'codex',
+          visibility: 'shared'
+        }
+      }
+    }, requestContext);
+    assert.equal(wrongWorkspaceRecord.response.result.structuredContent.decision, 'accepted');
+
+    const wrongClientRecord = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Client Mismatch',
+          content: 'Type: checkpoint\nrisk: client mismatch',
+          evidence: 'client-mismatch',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'client', 'mismatch'],
+          sensitivity: 'none',
+          project_id: 'scope-acceptance-project',
+          workspace_id: '/workspace/accepted',
+          client_id: 'claude',
+          visibility: 'shared'
+        }
+      }
+    }, requestContext);
+    assert.equal(wrongClientRecord.response.result.structuredContent.decision, 'accepted');
+
+    const searchResult = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 4,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'workspace client',
+          target: 'process',
+          limit: 10,
+          include_content: true,
+          scope: {
+            project_id: 'scope-acceptance-project',
+            workspace_id: '/workspace/accepted',
+            client_id: 'codex',
+            visibility: 'shared'
+          }
+        }
+      }
+    }, requestContext);
+
+    const results = searchResult.response.result.structuredContent.results || [];
+    assert.ok(results.length > 0, 'combined workspace/client filter should return a result');
+    const resultIds = results.map(r => r.memoryId);
+    assert.ok(resultIds.includes(acceptedId), 'combined workspace/client filter must include the matching record');
+    assert.equal(resultIds.length, 1, 'combined workspace/client filter must exclude workspace/client mismatches');
+  });
+});
+
+test('scope filter: wrong workspace_id or client_id returns 0 in strict mode', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+
+    const recordResult = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Strict Workspace Client Test',
+          content: 'Type: checkpoint\nrisk: strict workspace/client scope test',
+          evidence: 'strict-workspace-client',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'strict', 'workspace', 'client'],
+          sensitivity: 'none',
+          project_id: 'strict-scope-project',
+          workspace_id: '/workspace/strict',
+          client_id: 'codex',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(recordResult.response.result.structuredContent.decision, 'accepted');
+
+    const wrongWorkspaceSearch = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'strict workspace client',
+          target: 'process',
+          limit: 10,
+          include_content: true,
+          scope: {
+            project_id: 'strict-scope-project',
+            workspace_id: '/workspace/wrong',
+            client_id: 'codex',
+            strict: true
+          }
+        }
+      }
+    }, requestContext);
+    const wrongWorkspaceResults = wrongWorkspaceSearch.response.result.structuredContent.results || [];
+    assert.equal(wrongWorkspaceResults.length, 0, 'wrong workspace_id must return 0 in strict mode');
+
+    const wrongClientSearch = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'strict workspace client',
+          target: 'process',
+          limit: 10,
+          include_content: true,
+          scope: {
+            project_id: 'strict-scope-project',
+            workspace_id: '/workspace/strict',
+            client_id: 'claude',
+            strict: true
+          }
+        }
+      }
+    }, requestContext);
+    const wrongClientResults = wrongClientSearch.response.result.structuredContent.results || [];
+    assert.equal(wrongClientResults.length, 0, 'wrong client_id must return 0 in strict mode');
+  });
+});
+
 test('schema: record_memory and search_memory tool definitions cover scope fields', () => {
   const recordSchema = TOOL_DEFINITIONS.find(t => t.name === 'record_memory');
   const searchSchema = TOOL_DEFINITIONS.find(t => t.name === 'search_memory');

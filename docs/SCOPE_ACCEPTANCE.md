@@ -1,6 +1,6 @@
 # Codex/Claude Scope Acceptance
 
-更新时间：2026-05-08
+更新时间：2026-05-12
 
 ## 验证
 
@@ -13,7 +13,12 @@
 | 错误 project | `project_id: "other"` | 0 results | PASS |
 | 正确 visibility | `visibility: "project"` | 返回结果 | PASS |
 | 错误 visibility | `visibility: "private"` | 0 results | PASS |
+| 正确 workspace | `workspace_id: "/workspace/accepted"` | 返回结果 | PASS |
+| 错误 workspace | `workspace_id: "/workspace/wrong"` + `strict: true` | 0 results | PASS |
+| 正确 client | `client_id: "codex"` | 返回结果 | PASS |
+| 错误 client | `client_id: "claude"` + `strict: true` | 0 results | PASS |
 | 组合过滤 | `project_id + visibility` | 返回结果 | PASS |
+| 组合过滤扩展 | `project_id + workspace_id + client_id + visibility` | 仅返回完整匹配记录 | PASS |
 | 无记录 fallback | record 缺失 scope 字段 | 不过滤（安全兜底） | PASS |
 
 ## Scope Filter 参数

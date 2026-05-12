@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P0 / docs-governance: sync current facts after local governance rail commit |
-| Current area | P6-docs-drift |
-| Last action | 已完成本地治理轨道提交 `48d72f0`，当前分支相对 `origin/main` `ahead 1`；正在把 `48d72f0`、远端基线 `8c2836b`、Verifier rail 完成状态、`gate:ci` 已实现、profile `ready` 等事实同步到 STATUS / MAINTENANCE_BACKLOG / HANDOFF / RUN_STATE。 |
-| Last validation | 沿用已验证治理轨道基线：`git diff --check` passed；`powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed；Worker `worker-trial-status-drift` PASS；final read-only Verifier PASS。 |
-| Worktree summary | `git status -sb` shows `main...origin/main [ahead 1]`; local HEAD is `48d72f0`; remote baseline remains `8c2836b` / `v0.1.1-scope-boundary-20260508`. |
+| Current task | P1 / scope acceptance: workspace_id and client_id end-to-end coverage |
+| Current area | P9-codex-claude-client-scope |
+| Last action | 已完成 P0 事实源同步并推送到 `be7fb94`；随后补齐 `workspace_id` / `client_id` 的 scope acceptance：为 `tests/scope-filter.test.js` 新增正向与 strict 负向 e2e 覆盖，并同步 `docs/SCOPE_ACCEPTANCE.md`。 |
+| Last validation | `node --test tests\scope-filter.test.js` passed (`10/10`)；`npm test` passed (`142/142`)；`git diff --check` passed。 |
+| Worktree summary | current worktree carries scoped changes in `tests/scope-filter.test.js`, `docs/SCOPE_ACCEPTANCE.md`, and board files recording this validation batch. |
 | Mainline assumption | HTTP MCP 7605 is reachable |
 | Active-memory suite status | `43/43 matched`, `43/43 rollback-ready`, `extendedMismatchCountTotal=0` |
-| npm test | `140/140` |
+| npm test | `142/142` |
 | Profile health | `ready` — vectors 205, 822 embedding cache, 0 legacy |
-| Guarded auto-commit allowed | yes for docs-only fact sync after diff inspection and validation; push still requires explicit remote approval |
+| Guarded auto-commit allowed | yes for this scoped test/docs acceptance patch after diff inspection; push remains gated and is only eligible under the user's current explicit session approval |
 | Last checkpoint | [maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md) |
-| Next planned action | Finish current fact sync, then move to P1 scope acceptance as the next implementation candidate. |
+| Next planned action | Inspect final diff, commit/push this scope acceptance batch, then choose between broader scope enforcement or `governance:report`. |
 
 ## Notes
 

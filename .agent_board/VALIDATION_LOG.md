@@ -47,6 +47,8 @@
 
 | CMV-0049 | final read-only Verifier pass | P6-docs-drift | Governance rail calibration and Commander -> Worker -> Verifier trial | COMPLETED_VALIDATED | Verifier PASS: changed files stayed in allowed scope; no hard-stop, secret, dependency, runtime-data, or config changes; `FL-0002` released; RUN_STATE/HANDOFF current; guarded local commit eligible | no push without explicit approval | 2026-05-12 |
 
+| CMV-0050 | `node --test tests\scope-filter.test.js` ; `npm test` ; `git diff --check` | P9-codex-claude-client-scope | Scope acceptance workspace/client e2e coverage | COMPLETED_VALIDATED | targeted scope suite `10/10` passed with new workspace/client tests; `npm test` `142/142`; diff check passed; acceptance docs synced to current coverage | ready for guarded commit/push if diff stays scoped | 2026-05-12 |
+
 ## Batch Summary
 
 维护期入口文档已压缩，此节按日期批次聚合，不再分散到各入口文档。
