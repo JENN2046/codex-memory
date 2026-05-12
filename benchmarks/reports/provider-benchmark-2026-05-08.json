@@ -1,0 +1,766 @@
+{
+  "generatedAt": "2026-05-08T04:18:53.636Z",
+  "dataset": {
+    "path": "A:\\codex-memory\\benchmarks\\default-dataset.json",
+    "name": "codex-memory-provider-benchmark-v1",
+    "description": "Semantic retrieval benchmark for standalone codex-memory embedding providers.",
+    "documentCount": 8,
+    "queryCount": 8
+  },
+  "summary": {
+    "ok": false,
+    "complete": false,
+    "baseline": "local",
+    "message": "Benchmark is incomplete for: nvidia."
+  },
+  "baseline": "local",
+  "selectedProviders": [
+    "local",
+    "bge-m3-local",
+    "nvidia"
+  ],
+  "topK": 5,
+  "providers": {
+    "local": {
+      "status": "ok",
+      "provider": "local",
+      "model": "local-hash",
+      "endpoint": "local://hash-embedding",
+      "requestedDimensions": 1024,
+      "vectorDimensions": 1024,
+      "latency": {
+        "documentBatchMs": 2.4703,
+        "totalQueryLatencyMs": 0.5352,
+        "averageQueryLatencyMs": 0.0669,
+        "totalBenchmarkMs": 5.1579
+      },
+      "metrics": {
+        "topK": 5,
+        "top1Accuracy": 1,
+        "recallAt3": 1,
+        "recallAt5": 1,
+        "recallAtK": 1,
+        "mrr": 1,
+        "averageFirstRelevantRank": 1
+      },
+      "queries": [
+        {
+          "id": "q1",
+          "query": "How can I inspect audit logs and recall health for Codex memory?",
+          "relevant": [
+            "memory_overview"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "memory_overview",
+              "score": 0.471754,
+              "relevant": true
+            },
+            {
+              "id": "dual_write_shadow",
+              "score": 0.139682,
+              "relevant": false
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.133056,
+              "relevant": false
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.112436,
+              "relevant": false
+            },
+            {
+              "id": "diary_vectors",
+              "score": 0.106108,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 0.0721
+        },
+        {
+          "id": "q2",
+          "query": "What happens if the side index write fails after the diary entry is already saved?",
+          "relevant": [
+            "dual_write_shadow"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "dual_write_shadow",
+              "score": 0.567167,
+              "relevant": true
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.291094,
+              "relevant": false
+            },
+            {
+              "id": "diary_vectors",
+              "score": 0.209367,
+              "relevant": false
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.139808,
+              "relevant": false
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.110004,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 0.0738
+        },
+        {
+          "id": "q3",
+          "query": "Which component reuses ranked retrieval candidates until the knowledge base changes?",
+          "relevant": [
+            "candidate_cache"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "candidate_cache",
+              "score": 0.321762,
+              "relevant": true
+            },
+            {
+              "id": "dual_write_shadow",
+              "score": 0.227845,
+              "relevant": false
+            },
+            {
+              "id": "memory_overview",
+              "score": 0.139259,
+              "relevant": false
+            },
+            {
+              "id": "diary_vectors",
+              "score": 0.044854,
+              "relevant": false
+            },
+            {
+              "id": "context_vector",
+              "score": 0.032526,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 0.0513
+        },
+        {
+          "id": "q4",
+          "query": "How does retrieval inject recent conversation state into the query embedding?",
+          "relevant": [
+            "context_vector"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "context_vector",
+              "score": 0.443542,
+              "relevant": true
+            },
+            {
+              "id": "dual_write_shadow",
+              "score": 0.23906,
+              "relevant": false
+            },
+            {
+              "id": "memory_overview",
+              "score": 0.10523,
+              "relevant": false
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.064313,
+              "relevant": false
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.06248,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 0.0479
+        },
+        {
+          "id": "q5",
+          "query": "Which providers have dedicated reranking request formats in this project?",
+          "relevant": [
+            "rerank_providers"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "rerank_providers",
+              "score": 0.176756,
+              "relevant": true
+            },
+            {
+              "id": "embedding_providers",
+              "score": 0.152545,
+              "relevant": false
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.137959,
+              "relevant": false
+            },
+            {
+              "id": "dual_write_shadow",
+              "score": 0.059861,
+              "relevant": false
+            },
+            {
+              "id": "memory_overview",
+              "score": 0.045965,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 0.0449
+        },
+        {
+          "id": "q6",
+          "query": "Which remote services are supported for real embedding generation?",
+          "relevant": [
+            "embedding_providers"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "embedding_providers",
+              "score": 0.215378,
+              "relevant": true
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.176446,
+              "relevant": false
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.058673,
+              "relevant": false
+            },
+            {
+              "id": "dual_write_shadow",
+              "score": 0.040083,
+              "relevant": false
+            },
+            {
+              "id": "candidate_cache",
+              "score": -0.048982,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 0.1705
+        },
+        {
+          "id": "q7",
+          "query": "What adds notebook-level semantic bias during candidate generation?",
+          "relevant": [
+            "diary_vectors"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "diary_vectors",
+              "score": 0.408523,
+              "relevant": true
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.078325,
+              "relevant": false
+            },
+            {
+              "id": "embedding_providers",
+              "score": 0.078072,
+              "relevant": false
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.035556,
+              "relevant": false
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.021769,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 0.038
+        },
+        {
+          "id": "q8",
+          "query": "Which command checks remote provider connectivity and prints a report?",
+          "relevant": [
+            "provider_smoke"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "provider_smoke",
+              "score": 0.532182,
+              "relevant": true
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.288228,
+              "relevant": false
+            },
+            {
+              "id": "dual_write_shadow",
+              "score": 0.182416,
+              "relevant": false
+            },
+            {
+              "id": "diary_vectors",
+              "score": 0.15946,
+              "relevant": false
+            },
+            {
+              "id": "embedding_providers",
+              "score": 0.124562,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 0.0367
+        }
+      ]
+    },
+    "bge-m3-local": {
+      "status": "ok",
+      "provider": "bge-m3-local",
+      "model": "bge-m3-local",
+      "endpoint": "http://127.0.0.1:18081/v1/embeddings",
+      "requestedDimensions": null,
+      "vectorDimensions": 1024,
+      "latency": {
+        "documentBatchMs": 151.2947,
+        "totalQueryLatencyMs": 715.4984,
+        "averageQueryLatencyMs": 89.4373,
+        "totalBenchmarkMs": 867.0684
+      },
+      "metrics": {
+        "topK": 5,
+        "top1Accuracy": 1,
+        "recallAt3": 1,
+        "recallAt5": 1,
+        "recallAtK": 1,
+        "mrr": 1,
+        "averageFirstRelevantRank": 1
+      },
+      "queries": [
+        {
+          "id": "q1",
+          "query": "How can I inspect audit logs and recall health for Codex memory?",
+          "relevant": [
+            "memory_overview"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "memory_overview",
+              "score": 0.671278,
+              "relevant": true
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.455517,
+              "relevant": false
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.436015,
+              "relevant": false
+            },
+            {
+              "id": "dual_write_shadow",
+              "score": 0.406425,
+              "relevant": false
+            },
+            {
+              "id": "embedding_providers",
+              "score": 0.387231,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 91.4083
+        },
+        {
+          "id": "q2",
+          "query": "What happens if the side index write fails after the diary entry is already saved?",
+          "relevant": [
+            "dual_write_shadow"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "dual_write_shadow",
+              "score": 0.69564,
+              "relevant": true
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.507203,
+              "relevant": false
+            },
+            {
+              "id": "diary_vectors",
+              "score": 0.432998,
+              "relevant": false
+            },
+            {
+              "id": "embedding_providers",
+              "score": 0.366381,
+              "relevant": false
+            },
+            {
+              "id": "memory_overview",
+              "score": 0.33878,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 90.7278
+        },
+        {
+          "id": "q3",
+          "query": "Which component reuses ranked retrieval candidates until the knowledge base changes?",
+          "relevant": [
+            "candidate_cache"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "candidate_cache",
+              "score": 0.638684,
+              "relevant": true
+            },
+            {
+              "id": "context_vector",
+              "score": 0.491789,
+              "relevant": false
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.488938,
+              "relevant": false
+            },
+            {
+              "id": "diary_vectors",
+              "score": 0.45198,
+              "relevant": false
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.423678,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 91.3597
+        },
+        {
+          "id": "q4",
+          "query": "How does retrieval inject recent conversation state into the query embedding?",
+          "relevant": [
+            "context_vector"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "context_vector",
+              "score": 0.625528,
+              "relevant": true
+            },
+            {
+              "id": "diary_vectors",
+              "score": 0.469837,
+              "relevant": false
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.467597,
+              "relevant": false
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.456166,
+              "relevant": false
+            },
+            {
+              "id": "embedding_providers",
+              "score": 0.452375,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 96.9971
+        },
+        {
+          "id": "q5",
+          "query": "Which providers have dedicated reranking request formats in this project?",
+          "relevant": [
+            "rerank_providers"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "rerank_providers",
+              "score": 0.637045,
+              "relevant": true
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.467628,
+              "relevant": false
+            },
+            {
+              "id": "embedding_providers",
+              "score": 0.443243,
+              "relevant": false
+            },
+            {
+              "id": "diary_vectors",
+              "score": 0.417278,
+              "relevant": false
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.384181,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 88.6465
+        },
+        {
+          "id": "q6",
+          "query": "Which remote services are supported for real embedding generation?",
+          "relevant": [
+            "embedding_providers"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "embedding_providers",
+              "score": 0.617455,
+              "relevant": true
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.537918,
+              "relevant": false
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.458562,
+              "relevant": false
+            },
+            {
+              "id": "memory_overview",
+              "score": 0.350273,
+              "relevant": false
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.332823,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 87.2386
+        },
+        {
+          "id": "q7",
+          "query": "What adds notebook-level semantic bias during candidate generation?",
+          "relevant": [
+            "diary_vectors"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "diary_vectors",
+              "score": 0.660631,
+              "relevant": true
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.52779,
+              "relevant": false
+            },
+            {
+              "id": "context_vector",
+              "score": 0.480818,
+              "relevant": false
+            },
+            {
+              "id": "dual_write_shadow",
+              "score": 0.40505,
+              "relevant": false
+            },
+            {
+              "id": "provider_smoke",
+              "score": 0.395457,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 79.0404
+        },
+        {
+          "id": "q8",
+          "query": "Which command checks remote provider connectivity and prints a report?",
+          "relevant": [
+            "provider_smoke"
+          ],
+          "firstRelevantRank": 1,
+          "reciprocalRank": 1,
+          "topHitRelevant": true,
+          "recallAt3": true,
+          "recallAt5": true,
+          "recallAtK": true,
+          "topCandidates": [
+            {
+              "id": "provider_smoke",
+              "score": 0.641144,
+              "relevant": true
+            },
+            {
+              "id": "memory_overview",
+              "score": 0.455446,
+              "relevant": false
+            },
+            {
+              "id": "embedding_providers",
+              "score": 0.414288,
+              "relevant": false
+            },
+            {
+              "id": "rerank_providers",
+              "score": 0.407332,
+              "relevant": false
+            },
+            {
+              "id": "candidate_cache",
+              "score": 0.333684,
+              "relevant": false
+            }
+          ],
+          "queryLatencyMs": 90.08
+        }
+      ]
+    },
+    "nvidia": {
+      "status": "error",
+      "provider": "nvidia",
+      "model": "baai/bge-m3",
+      "endpoint": "https://integrate.api.nvidia.com/v1/embeddings",
+      "error": "External embedding failed for all configured endpoints: configured-primary: status 500"
+    }
+  },
+  "deltas": {
+    "bge-m3-local": {
+      "status": "ok",
+      "baseline": "local",
+      "top1AccuracyDelta": 0,
+      "recallAt3Delta": 0,
+      "recallAt5Delta": 0,
+      "recallAtKDelta": 0,
+      "mrrDelta": 0,
+      "averageFirstRelevantRankDelta": 0,
+      "improvedQueries": [],
+      "regressedQueries": [],
+      "sameQueries": [
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "q5",
+        "q6",
+        "q7",
+        "q8"
+      ]
+    },
+    "nvidia": {
+      "status": "skipped",
+      "reason": "External embedding failed for all configured endpoints: configured-primary: status 500"
+    }
+  }
+}

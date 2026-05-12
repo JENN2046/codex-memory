@@ -1,5 +1,13 @@
 # ROADMAP.md — codex-memory
 
+> **⚠ 本文档已归档。** 这是项目初期的规划文档（Phase 1/A/B 时期），其中 TypeScript 迁移、NestJS 架构等方案从未实施。当前实际架构和阶段进度以以下文档为准：
+> - 当前状态：[STATUS.md](/A:/codex-memory/STATUS.md)
+> - 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
+> - 下一阶段方向：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
+> - 项目收官：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
+>
+> 以下为原始内容，保留作为历史参考。
+
 ## 1. Roadmap Purpose
 
 This roadmap turns the `codex-memory` final goal into phased, executable milestones.

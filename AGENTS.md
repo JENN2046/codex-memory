@@ -854,6 +854,20 @@ Audit logs may contain sensitive operational metadata. Treat them carefully.
 
 ## 20. Multi-Worker Contributor Policy
 
+This repository recognizes a named compact operating pattern:
+
+- [docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md](/A:/codex-memory/docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md)
+
+That document defines the repository-level meaning of:
+
+- `Single-Window`
+- `4-Agent`
+- `Compact Autopilot`
+
+It is a naming and operating note layered on top of this `AGENTS.md`.
+
+It does not replace the hard-stop gates, validation matrix, or guarded commit rules in this file.
+
 If multiple Codex workers are used:
 
 - one session acts as commander/reviewer
@@ -862,6 +876,90 @@ If multiple Codex workers are used:
 - workers write checkpoints
 - final integration is serial
 - final validation is run once from the controlling state
+
+### 20.1 Commander Task Contract
+
+Before starting a temporary Worker, the Commander must write a small task contract.
+
+Required fields:
+
+```text
+Task ID:
+Objective:
+Role:
+Risk:
+Allowed files:
+Disallowed files:
+Validation:
+Stop conditions:
+Expected output:
+Handoff:
+```
+
+Rules:
+
+- one Worker gets one task contract
+- allowed files must be explicit paths or narrow globs
+- disallowed files must include secrets, `.env`, dependency manifests, runtime data, and unrelated modules
+- validation must name concrete commands or explicitly say docs/diff-only
+- stop conditions must include unexpected dirty worktree, user-owned changes, hard-stop gates, validation ambiguity, and scope expansion
+- the Worker must not broaden the task without Commander approval
+- the Worker must update only the files named in the contract, unless the contract explicitly allows `.agent_board` handoff updates
+- if the task needs a file already locked in `.agent_board/FILE_LOCKS.md`, the Worker must stop
+
+### 20.2 Read-Only Verifier Protocol
+
+A Verifier is read-only.
+
+The Verifier must not:
+
+- edit files
+- stage files
+- commit
+- push
+- tag
+- run destructive commands
+- run provider calls
+- change config
+- start long-running services
+- write outside the workspace
+
+The Verifier should inspect:
+
+```text
+git status --short
+git diff --stat
+git diff
+.agent_board/RUN_STATE.md
+.agent_board/TASK_QUEUE.md
+.agent_board/VALIDATION_LOG.md
+.agent_board/FILE_LOCKS.md
+.agent_board/RISK_REGISTER.md
+```
+
+Verifier checklist:
+
+- changed files are inside the task contract
+- no disallowed files changed
+- no `.env`, secret, dependency manifest, lockfile, generated durable data, or runtime config changed unless explicitly approved
+- validation evidence matches the risk level
+- hard-stop gates were respected
+- file locks were honored
+- `.agent_board` state is current enough for handoff
+- commit readiness is either `eligible`, `not eligible`, or `blocked`
+
+Verifier output:
+
+```text
+Result: PASS | NEEDS_FIX | BLOCKED
+Scope:
+Validation:
+Hard stops:
+Secrets/dependencies:
+Board state:
+Commit readiness:
+Required fixes:
+```
 
 For future Codex/Claude memory-governance work:
 

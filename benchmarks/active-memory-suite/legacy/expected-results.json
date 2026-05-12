@@ -186,5 +186,43 @@
       }
     },
     "exitCode": 1
+  },
+  "deepmemo:missing-keyword": {
+    "stream": "stderr",
+    "payload": {
+      "status": "error",
+      "error": "[DeepMemo] 请求中缺少 'keyword' 参数。",
+      "meta": {
+        "toolName": "DeepMemo",
+        "tool_name": "DeepMemo",
+        "code": "missing-keyword",
+        "command": "Search",
+        "maid": "Keke",
+        "maidName": "Keke",
+        "keyword": "",
+        "rawKeyword": "",
+        "raw_keyword": "",
+        "query": "",
+        "rawQuery": "",
+        "raw_query": ""
+      }
+    },
+    "exitCode": 1
+  },
+  "topicmemo:missing-topic-id": {
+    "stream": "stderr",
+    "payload": {
+      "status": "error",
+      "error": "[TopicMemo] 请求中缺少 'topic_id' 参数。",
+      "meta": {
+        "toolName": "TopicMemo",
+        "tool_name": "TopicMemo",
+        "code": "missing-topic-id",
+        "command": "GetTopicContent",
+        "maid": "Keke",
+        "topicId": ""
+      }
+    },
+    "exitCode": 1
   }
 }

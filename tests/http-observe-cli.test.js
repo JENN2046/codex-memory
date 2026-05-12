@@ -5,6 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
+const { DatabaseSync } = require('node:sqlite');
 
 async function startHealthServer() {
   const server = http.createServer((req, res) => {
@@ -41,7 +42,8 @@ async function startHealthServer() {
 async function seedRuntimeArtifacts(basePath) {
   const logsDir = path.join(basePath, 'logs');
   await fs.mkdir(logsDir, { recursive: true });
-  await fs.mkdir(path.join(basePath, 'data'), { recursive: true });
+  const dataDir = path.join(basePath, 'data');
+  await fs.mkdir(dataDir, { recursive: true });
 
   await fs.writeFile(
     path.join(logsDir, 'codex-memory-http.log'),
@@ -91,11 +93,54 @@ async function seedRuntimeArtifacts(basePath) {
         recallType: 'snippet',
         resultCount: 2,
         topMemoryId: 'memory-1',
-        topSourceFile: 'Codex/checkpoint one.txt'
+        topSourceFile: 'Codex/checkpoint one.txt',
+        scopeApplied: true,
+        scopeMode: 'sql-candidate+post-filter',
+        scopeDimensions: ['project_id', 'visibility'],
+        scopeStrict: true,
+        scopeProjectId: 'codex-memory',
+        scopeClientId: 'codex',
+        scopeVisibility: ['shared'],
+        scopeWorkspacePresent: true
       })
     ].join('\n'),
     'utf8'
   );
+
+  const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+  const db = new DatabaseSync(dbPath);
+  db.exec(`
+    CREATE TABLE memory_records (
+      id TEXT PRIMARY KEY,
+      status TEXT,
+      updated_at TEXT,
+      project_id TEXT,
+      visibility TEXT,
+      client_id TEXT,
+      task_id TEXT,
+      confidence REAL,
+      superseded_by TEXT,
+      supersedes TEXT,
+      retention_policy TEXT
+    );
+  `);
+  const now = new Date('2026-04-23T09:20:00.000Z');
+  const stale45d = new Date(now.getTime() - 45 * 86400000).toISOString();
+  const stale120d = new Date(now.getTime() - 120 * 86400000).toISOString();
+  const fresh = new Date(now.getTime() - 2 * 86400000).toISOString();
+  const insert = db.prepare(`
+    INSERT INTO memory_records (
+      id, status, updated_at, project_id, visibility, client_id, task_id,
+      confidence, superseded_by, supersedes, retention_policy
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+  insert.run('memory-active-stale-90', 'active', stale120d, 'codex-memory', 'shared', 'codex', 'task-1', 0.91, null, null, 'retain');
+  insert.run('memory-active-stale-30', 'active', stale45d, 'codex-memory', 'shared', 'codex', '', 0.72, null, null, 'retain');
+  insert.run('memory-proposal', 'proposal', fresh, 'codex-memory', 'shared', 'codex', 'task-2', 0.66, null, null, 'review');
+  insert.run('memory-tombstone', 'tombstoned', fresh, 'codex-memory', 'private', 'codex', 'task-3', 0.4, null, null, 'retain');
+  insert.run('memory-superseded', 'active', fresh, 'codex-memory', 'shared', 'codex', 'task-4', 0.88, 'memory-newer', null, 'retain');
+  insert.run('memory-newer', 'active', fresh, 'codex-memory', 'shared', 'codex', 'task-5', 0.93, null, 'memory-superseded', 'retain');
+  db.close();
 }
 
 function runCli({ args = [], env = {} }) {
@@ -156,6 +201,32 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     assert.deepEqual(payload.audits.recall.recallTypeBreakdown, {
       snippet: 1
     });
+    assert.equal(payload.summary.scopedRecallCount, 1);
+    assert.equal(payload.summary.strictScopedRecallCount, 1);
+    assert.equal(payload.summary.governanceStatus, 'warn');
+    assert.equal(payload.summary.governanceReviewLevel, 'needs-review');
+    assert.equal(payload.summary.governanceProposalCount, 1);
+    assert.equal(payload.summary.governanceStale30d, 2);
+    assert.equal(payload.summary.governanceStale90d, 1);
+    assert.equal(payload.audits.recall.scopedRecallCount, 1);
+    assert.equal(payload.audits.recall.strictScopedRecallCount, 1);
+    assert.deepEqual(payload.audits.recall.scopeModeBreakdown, {
+      'sql-candidate+post-filter': 1
+    });
+    assert.deepEqual(payload.audits.recall.scopeDimensionBreakdown, {
+      project_id: 1,
+      visibility: 1
+    });
+    assert.equal(payload.governance.status, 'warn');
+    assert.equal(payload.governance.reviewLevel, 'needs-review');
+    assert.equal(payload.governance.counts.proposalCount, 1);
+    assert.equal(payload.governance.counts.tombstonedCount, 1);
+    assert.equal(payload.governance.counts.supersededCount, 1);
+    assert.equal(payload.governance.counts.supersessionInitiated, 1);
+    assert.equal(payload.governance.counts.stale30d, 2);
+    assert.equal(payload.governance.counts.stale90d, 1);
+    assert.ok(Array.isArray(payload.governance.hints));
+    assert.equal(payload.audits.recall.rawWorkspaceId, undefined);
   } finally {
     await server.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });

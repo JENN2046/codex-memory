@@ -88,6 +88,23 @@
       }
     },
     {
+      "name": "deepmemo-missing-keyword",
+      "tool": "deepmemo",
+      "inputFile": "./inputs/deepmemo-missing-keyword.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-keyword"
+        ]
+      }
+    },
+    {
       "name": "deepmemo-basic-success",
       "tool": "deepmemo",
       "inputFile": "./inputs/deepmemo-basic-success.json",
@@ -655,6 +672,23 @@
       }
     },
     {
+      "name": "topicmemo-missing-topic-id",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-gettopiccontent-missing-topic-id.json",
+      "legacyScript": "./legacy/standard-legacy-runner.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-topic-id"
+        ]
+      }
+    },
+    {
       "name": "topicmemo-gettopiccontent-missing-topic",
       "tool": "topicmemo",
       "inputFile": "./inputs/topicmemo-gettopiccontent-missing-topic.json",
@@ -704,6 +738,42 @@
         "fixture": "vchat-fixture-history-read-error",
         "tags": [
           "history-read-error"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-missing-maid-listtopics",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-missing-maid-listtopics.json",
+      "legacyScript": "./legacy/topicmemo-missing-maid-listtopics-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-maid",
+          "listtopics"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-missing-maid-gettopiccontent",
+      "tool": "topicmemo",
+      "inputFile": "./inputs/topicmemo-missing-maid-gettopiccontent.json",
+      "legacyScript": "./legacy/topicmemo-missing-maid-gettopiccontent-legacy.js",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_MEMORY_ROOT": "./vchat-fixture"
+      },
+      "meta": {
+        "category": "input-validation",
+        "expectation": "error",
+        "fixture": "vchat-fixture",
+        "tags": [
+          "missing-maid",
+          "gettopiccontent"
         ]
       }
     }

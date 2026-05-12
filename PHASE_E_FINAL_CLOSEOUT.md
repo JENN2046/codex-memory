@@ -20,8 +20,8 @@
 - 最新已推送主线提交：`bcb2d84 docs: add maintenance backlog`
 - 最新独立 mainline gate 检查点：[phase-e-mainline-gate-checkpoint-19.md](/A:/codex-memory/logs/phase-e-mainline-gate-checkpoint-19.md)
 - 最新 board-only 推送后复核：`.agent_board/VALIDATION_LOG.md` 的 `CMV-0030`
-- 标准 suite：`39/39 matched`
-- rollback readiness：`39/39 rollback-ready`
+- 标准 suite：`43/43 matched （历史基线 39/39，当前 43/43）`
+- rollback readiness：`43/43 rollback-ready （历史基线 39/39，当前 43/43）`
 - HTTP health：`200`
 - 最新独立 checkpoint 仍停在 checkpoint-19；checkpoint-20 未创建
 
@@ -85,8 +85,8 @@ npm run gate:mainline:strict
   - 显示的是预期内的 final closeout 文档与 `.agent_board` 变更
 - `npm run gate:mainline`
   - health：`200`
-  - compare：`39/39 matched`
-  - rollback：`39/39 rollback-ready`
+  - compare：`43/43 matched （历史基线 39/39，当前 43/43）`
+  - rollback：`43/43 rollback-ready （历史基线 39/39，当前 43/43）`
 
 未运行：
 
