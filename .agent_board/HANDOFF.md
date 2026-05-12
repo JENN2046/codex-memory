@@ -2,14 +2,14 @@
 
 ## Goal
 
-Harden scoped recall compatibility, including diary rebuild header parsing, while preserving `.agent_board` current state.
+Harden scoped recall compatibility and diary rebuild marker parsing while preserving `.agent_board` current state.
 
 ## Safe State
 
 - Workspace: A:\codex-memory
 - Branch: codex/p1-vcp-memory-core-100-roadmap
-- HEAD: CM-0044 guarded local commit target; branch remains ahead of remote
-- Worktree: CM-0044 source/test/board batch validated for local commit
+- HEAD: CM-0045 guarded local commit target; branch remains ahead of remote
+- Worktree: CM-0045 source/test/board batch validated for local commit
 - Remote writes: not authorized
 
 ## Current Dirty Files
@@ -66,6 +66,11 @@ Harden scoped recall compatibility, including diary rebuild header parsing, whil
   - `npm test`: 178/178 passed.
   - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 178/178, compare 43/43, rollback 43/43.
   - `git diff --check`: passed.
+- CM-0045 diary body Tag marker parsing boundary:
+  - `node --test .\tests\scope-filter.test.js`: 18/18 passed.
+  - `npm test`: 178/178 passed.
+  - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 178/178, compare 43/43, rollback 43/43.
+  - `git diff --check`: passed.
 
 ## Runtime Notes
 
@@ -75,7 +80,7 @@ Harden scoped recall compatibility, including diary rebuild header parsing, whil
 ## Blockers
 
 - No hard blocker to the local autopilot control plane.
-- none for CM-0044 local guarded commit.
+- none for CM-0045 local guarded commit.
 
 ## Decisions
 
@@ -87,6 +92,7 @@ Harden scoped recall compatibility, including diary rebuild header parsing, whil
 - Keep `search_memory.scope.visibility` schema compatible with runtime support for a string or an array.
 - Treat recall result `text` as user-facing output and sanitize internal diary scope markers, including legacy raw chunk rows and cached candidates.
 - Parse diary scope metadata only from the header block before `Content:`; marker-like lines in user content remain content.
+- Parse rebuilt record tags only from the actual footer `Tag:` capture after `Evidence:`; marker-like body `Tag:` lines remain content.
 
 ## Next Safe Task
 

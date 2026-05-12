@@ -257,7 +257,7 @@ class DiaryStore {
     const retentionPolicy = this.matchSingleLine(headerBlock, /^Retention-Policy:\s*(.+)$/mi) || null;
     const contentMatch = withoutHeader.match(/\nContent:\n([\s\S]*?)\n\nEvidence:\n/);
     const evidenceMatch = withoutHeader.match(/\nEvidence:\n([\s\S]*?)(?:\n\nTag:\s*(.+))?$/);
-    const tagsLine = this.matchSingleLine(withoutHeader, /^Tag:\s*(.+)$/mi) || '';
+    const tagsLine = evidenceMatch?.[2] || '';
     const content = contentMatch ? contentMatch[1].trim() : '';
     const evidence = evidenceMatch ? evidenceMatch[1].trim() : '';
     const tags = normalizeTags(tagsLine);

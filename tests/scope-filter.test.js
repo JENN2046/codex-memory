@@ -1026,6 +1026,7 @@ test('scope rebuild ignores user-authored marker-like lines inside content', asy
         'Conversation-ID: user-authored-conversation',
         'Visibility: user-authored-visibility',
         'Retention-Policy: user-authored-retention',
+        'Tag: user-authored-tag',
         'risk: body marker lines must not become scope metadata'
       ].join('\n'),
       evidence: 'body marker scope drift regression',
@@ -1055,6 +1056,7 @@ test('scope rebuild ignores user-authored marker-like lines inside content', asy
     assert.equal(restored.conversationId, null);
     assert.equal(restored.visibility, null);
     assert.equal(restored.retentionPolicy, null);
+    assert.deepEqual(restored.tags.sort(), ['body-marker', 'scope']);
 
     const scopedSearch = await rebuiltApp.callTool('search_memory', {
       query: 'body marker lines must not become scope metadata',
@@ -1079,6 +1081,7 @@ test('scope rebuild ignores user-authored marker-like lines inside content', asy
     const matched = unscopedSearch.results.find(result => result.memoryId === memoryId);
     assert.ok(matched, 'unscoped search should still find user-authored marker content');
     assert.equal(matched.content.includes('Project-ID: user-authored-project'), true);
+    assert.equal(matched.content.includes('Tag: user-authored-tag'), true);
   } finally {
     await rebuiltApp.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });

@@ -2,22 +2,22 @@
 
 ## Current Goal
 
-CM-0044 hardens diary rebuild scope parsing against user-authored marker-like content and refreshes `.agent_board` against current repository reality.
+CM-0045 hardens diary rebuild marker parsing against user-authored body `Tag:` lines and refreshes `.agent_board` against current repository reality.
 
 ## Current Area
 
-P9-codex-claude-client-scope / P0-mainline-health / diary rebuild scope parsing hardening
+P9-codex-claude-client-scope / P0-mainline-health / diary rebuild marker parsing hardening
 
 ## Current Status
 
-Branch `codex/p1-vcp-memory-core-100-roadmap`, CM-0044 guarded local commit target; branch remains ahead of remote.
+Branch `codex/p1-vcp-memory-core-100-roadmap`, CM-0045 guarded local commit target; branch remains ahead of remote.
 
 Current worktree is dirty:
 
 - Source/test files: `src/storage/DiaryStore.js`, `tests/scope-filter.test.js`
 - Board files: `.agent_board/RUN_STATE.md`, `.agent_board/TASK_QUEUE.md`, `.agent_board/HANDOFF.md`, `.agent_board/CHECKPOINT.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/DECISIONS.md`
 
-CM-0044 addresses the review finding where `readRecord` scanned the full diary text for scope fields and could turn user-authored `Project-ID:` lines inside content into rebuilt scope metadata.
+CM-0045 addresses the remaining same-family risk where `readRecord` scanned the full diary text for `Tag:` and could turn user-authored body `Tag:` lines into rebuilt record tags.
 
 ## Current 4-Agent Roles
 
@@ -43,10 +43,11 @@ CM-0044 addresses the review finding where `readRecord` scanned the full diary t
 - CM-0042: `node --test .\tests\scope-filter.test.js` 16/16; `node --test .\tests\mcp-contract.test.js` 4/4; `npm test` 176/176; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 176/176, compare 43/43, rollback 43/43; `git diff --check` passed.
 - CM-0043: `node --test .\tests\scope-filter.test.js` 17/17; `npm test` 177/177; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 177/177, compare 43/43, rollback 43/43; `git diff --check` passed.
 - CM-0044: `node --test .\tests\scope-filter.test.js` 18/18; `npm test` 178/178; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 178/178, compare 43/43, rollback 43/43; `git diff --check` passed.
+- CM-0045: `node --test .\tests\scope-filter.test.js` 18/18; `npm test` 178/178; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 178/178, compare 43/43, rollback 43/43; `git diff --check` passed.
 
 ## Current Blockers
 
-- Local commit readiness is eligible after final status/diff inspection if staging exactly the validated CM-0044 batch.
+- Local commit readiness is eligible after final status/diff inspection if staging exactly the validated CM-0045 batch.
 - Push remains unauthorized.
 
 ## Completed Work
