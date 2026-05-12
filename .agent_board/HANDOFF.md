@@ -2,7 +2,7 @@
 
 ## Current State
 
-治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、以及 scope acceptance 扩展 `3baef74` 已推送；当前最新本地工作是 P1 scope enforcement：`search_memory` 的 scope 已前移到 chunk SQL 候选查询，并保留 post-filter 兜底。
+治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、以及 scope candidate pushdown `f8dac11` 已推送；当前最新本地工作是 P1 scope recall design：定义 scope 是否继续下推到 recall / audit 语义层的最小设计与风险边界。
 
 Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
 
@@ -36,6 +36,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - Scope acceptance now covers `workspace_id` / `client_id` end-to-end positive and strict negative cases.
 - Scope enforcement batch completed locally: candidate selection is narrowed by `project_id` / `workspace_id` / `client_id` / `visibility` before ranking, while post-filter remains as a fallback.
 - New regression coverage proves `limit=1` search still returns the in-scope record when higher-scoring off-scope records exceed the candidate pool.
+- Current design focus has been documented: recall audit still lacks explicit scope semantics; [SCOPE_RECALL_AUDIT_DESIGN.md](/A:/codex-memory/docs/SCOPE_RECALL_AUDIT_DESIGN.md) now defines the minimal design and risk boundary before any new runtime patch.
+- Current decision: this batch remains docs-only; next runtime candidate is R1 low-risk recall-audit annotation, not a broader overview/dashboard rewrite.
 - LightMemo CLI + compare harness support
 - gate:ci + dashboard tests
 - P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
@@ -46,8 +48,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 ## Next
 
-- P1: commit/push current scope enforcement batch if final diff stays scoped
-- P2: decide whether to extend scope deeper into recall policy/audit semantics
+- P1: commit/push current scope recall design note if final diff stays scoped
+- P2: implement or defer R1 recall-audit annotation based on this design note
 - P3: Governance report CLI (proposal/tombstone/supersession/stale metrics)
 
 ## Auth Required

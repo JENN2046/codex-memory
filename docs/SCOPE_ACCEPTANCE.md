@@ -48,3 +48,4 @@
 
 - 当前下推发生在 chunk SQL 候选层，active-memory 路径与更深层 recall 策略仍未引入独立 scope policy
 - 若未来引入更复杂的 scope policy（例如 proposal/approval 或 layered visibility），需要单独扩展查询与审计语义
+- recall / audit 语义层的最小设计见 [SCOPE_RECALL_AUDIT_DESIGN.md](/A:/codex-memory/docs/SCOPE_RECALL_AUDIT_DESIGN.md)
