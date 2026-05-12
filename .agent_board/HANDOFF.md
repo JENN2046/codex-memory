@@ -8,14 +8,13 @@ Start `Single-Window 4-Agent Compact Autopilot` for the current session and rest
 
 - Workspace: A:\codex-memory
 - Branch: codex/p1-vcp-memory-core-100-roadmap
-- HEAD: `b07358e` (`fix(scope): preserve scoped diary rebuilds`)
-- Worktree: dirty with validated CM-0041 follow-up; current uncommitted files are `src/core/constants.js`, `tests/scope-filter.test.js`, and board updates
+- HEAD: current local HEAD (latest work includes CM-0041 and board state sync)
+- Worktree: clean after local guarded commits through current local HEAD
 - Remote writes: not authorized
 
 ## Current Dirty Files
 
-- `src/core/constants.js`
-- `tests/scope-filter.test.js`
+- none
 
 ## 4-Agent Activation
 
@@ -64,7 +63,7 @@ Start `Single-Window 4-Agent Compact Autopilot` for the current session and rest
 
 ## Next Safe Task
 
-Run final diff check, then report CM-0041 result. Optional guarded local commit can follow if requested or if Commander chooses to apply the guarded commit rule. Do not push.
+Await explicit push approval or next local task. Do not push without approval.
 
 ## Warnings
 
