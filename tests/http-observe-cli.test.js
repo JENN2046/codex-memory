@@ -91,7 +91,15 @@ async function seedRuntimeArtifacts(basePath) {
         recallType: 'snippet',
         resultCount: 2,
         topMemoryId: 'memory-1',
-        topSourceFile: 'Codex/checkpoint one.txt'
+        topSourceFile: 'Codex/checkpoint one.txt',
+        scopeApplied: true,
+        scopeMode: 'sql-candidate+post-filter',
+        scopeDimensions: ['project_id', 'visibility'],
+        scopeStrict: true,
+        scopeProjectId: 'codex-memory',
+        scopeClientId: 'codex',
+        scopeVisibility: ['shared'],
+        scopeWorkspacePresent: true
       })
     ].join('\n'),
     'utf8'
@@ -156,6 +164,18 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     assert.deepEqual(payload.audits.recall.recallTypeBreakdown, {
       snippet: 1
     });
+    assert.equal(payload.summary.scopedRecallCount, 1);
+    assert.equal(payload.summary.strictScopedRecallCount, 1);
+    assert.equal(payload.audits.recall.scopedRecallCount, 1);
+    assert.equal(payload.audits.recall.strictScopedRecallCount, 1);
+    assert.deepEqual(payload.audits.recall.scopeModeBreakdown, {
+      'sql-candidate+post-filter': 1
+    });
+    assert.deepEqual(payload.audits.recall.scopeDimensionBreakdown, {
+      project_id: 1,
+      visibility: 1
+    });
+    assert.equal(payload.audits.recall.rawWorkspaceId, undefined);
   } finally {
     await server.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });

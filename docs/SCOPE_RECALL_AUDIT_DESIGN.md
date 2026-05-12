@@ -191,42 +191,31 @@ adapter-visible final response
 - 不显示原始 workspace 标识
 - 不在这一层重新定义 recall contract
 
+当前状态：
+
+- 已实现
+- `dashboard` 现在会输出最近 recall 总数、scoped recall 数、strict scoped recall 数
+- `http-observe` 现在会在 summary 和 recall-audit section 输出 scoped recall 计数及 `scopeMode` / `scopeDimensions` breakdown
+- 仍不输出 workspace breakdown，也不写 raw `workspace_id`
+
 ## 本轮决策
 
-R1 与 R2 已落地；本轮之后仍不继续推进 R3。
+R1、R2、R3 已按拆分顺序全部落地。
 
-原因：
+当前边界保持不变：
 
 1. recall audit 与 `memory_overview` 已经能表达“scope 发生过”和“最近 scoped recall 是否活跃”。
 2. `workspace_id` 的敏感度边界仍按 `presence-only` 处理，避免 raw path 落盘。
-3. dashboard / `http-observe` 仍会连带受影响，适合继续拆成单独的 R3 小批次。
+3. dashboard / `http-observe` 只展示低风险 summary，没有把 observability surface 扩展成新的 policy layer。
 
 ## 推荐下一步
 
-下一条最小 runtime 候选任务建议是：
+scope observability 这条线的下一条建议不再是继续下推 display，而是转回更高层治理或策略工作，例如：
 
 ```text
-R3 only:
-给 dashboard / http-observe 增加低风险 scoped recall 可见性，
-只展示 summary，
-不输出 raw workspace_id，
-不把 overview 扩展成新的 policy layer。
-```
-
-目标文件预计为：
-
-- `src/cli/dashboard.js`
-- `src/cli/http-observe.js`
-- `tests/dashboard-cli.test.js`
-- `tests/http-observe-cli.test.js`
-
-建议验证：
-
-```powershell
-node --test .\tests\dashboard-cli.test.js
-node --test .\tests\http-observe-cli.test.js
-npm test
-npm run gate:mainline:strict
+P8 / P10:
+推进 governance-report CLI，
+或单独评估 active-memory / policy-layer scope 是否需要独立设计。
 ```
 
 ## 明确不在本轮做

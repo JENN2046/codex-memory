@@ -183,9 +183,34 @@ function summarizeWriteAudit(entries = []) {
   };
 }
 
+function pickLaterTimestamp(current, candidate) {
+  if (!candidate) return current;
+  if (!current) return candidate;
+  const currentTime = new Date(current).getTime();
+  const candidateTime = new Date(candidate).getTime();
+  if (Number.isNaN(currentTime)) return candidate;
+  if (Number.isNaN(candidateTime)) return current;
+  return candidateTime > currentTime ? candidate : current;
+}
+
+function incrementBreakdown(map, key) {
+  if (!key) return;
+  map[key] = (map[key] || 0) + 1;
+}
+
 function summarizeRecallAudit(entries = []) {
   const recallTypeBreakdown = {};
   let lastRecallAt = null;
+  const scoped = {
+    scopedRecallCount: 0,
+    strictScopedRecallCount: 0,
+    latestScopedHitAt: null,
+    scopeModeBreakdown: {},
+    scopeDimensionBreakdown: {},
+    projectBreakdown: {},
+    clientBreakdown: {},
+    visibilityBreakdown: {}
+  };
 
   for (const entry of entries) {
     const recallType = String(entry?.recallType || 'unknown');
@@ -193,12 +218,32 @@ function summarizeRecallAudit(entries = []) {
     if (!lastRecallAt) {
       lastRecallAt = entry.timestamp || null;
     }
+
+    if (!entry?.scopeApplied) {
+      continue;
+    }
+
+    scoped.scopedRecallCount += 1;
+    scoped.latestScopedHitAt = pickLaterTimestamp(scoped.latestScopedHitAt, entry.timestamp || null);
+    if (entry.scopeStrict) {
+      scoped.strictScopedRecallCount += 1;
+    }
+    incrementBreakdown(scoped.scopeModeBreakdown, typeof entry.scopeMode === 'string' ? entry.scopeMode : 'unknown');
+    for (const dimension of Array.isArray(entry.scopeDimensions) ? entry.scopeDimensions : []) {
+      incrementBreakdown(scoped.scopeDimensionBreakdown, typeof dimension === 'string' ? dimension : null);
+    }
+    incrementBreakdown(scoped.projectBreakdown, typeof entry.scopeProjectId === 'string' ? entry.scopeProjectId : null);
+    incrementBreakdown(scoped.clientBreakdown, typeof entry.scopeClientId === 'string' ? entry.scopeClientId : null);
+    for (const visibility of Array.isArray(entry.scopeVisibility) ? entry.scopeVisibility : []) {
+      incrementBreakdown(scoped.visibilityBreakdown, typeof visibility === 'string' ? visibility : null);
+    }
   }
 
   return {
     recentCount: entries.length,
     recallTypeBreakdown,
     lastRecallAt,
+    ...scoped,
     recentEntries: entries.map(entry => ({
       timestamp: entry.timestamp || null,
       target: entry.target || null,
@@ -260,6 +305,8 @@ function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit })
     watchdogEnsureFailureCount: watchdogLog.ensureFailureCount,
     bridgeRecentCount: writeAudit.recentCount,
     recallRecentCount: recallAudit.recentCount,
+    scopedRecallCount: recallAudit.scopedRecallCount,
+    strictScopedRecallCount: recallAudit.strictScopedRecallCount,
     hints
   };
 }
@@ -305,7 +352,11 @@ function formatTextReport(report) {
   lines.push(`  lastModified: ${report.audits.recall.lastModified || 'n/a'}`);
   lines.push(`  recentCount: ${report.audits.recall.recentCount}`);
   lines.push(`  lastRecallAt: ${report.audits.recall.lastRecallAt || 'n/a'}`);
+  lines.push(`  scopedRecallCount: ${report.audits.recall.scopedRecallCount}`);
+  lines.push(`  strictScopedRecallCount: ${report.audits.recall.strictScopedRecallCount}`);
   lines.push(`  recallTypeBreakdown: ${JSON.stringify(report.audits.recall.recallTypeBreakdown)}`);
+  lines.push(`  scopeModeBreakdown: ${JSON.stringify(report.audits.recall.scopeModeBreakdown)}`);
+  lines.push(`  scopeDimensionBreakdown: ${JSON.stringify(report.audits.recall.scopeDimensionBreakdown)}`);
   lines.push('');
 
   lines.push('[hints]');

@@ -102,6 +102,56 @@ function classifyStatus(...levels) {
   return 'ok';
 }
 
+function pickLaterTimestamp(current, candidate) {
+  if (!candidate) return current;
+  if (!current) return candidate;
+  const currentTime = new Date(current).getTime();
+  const candidateTime = new Date(candidate).getTime();
+  if (Number.isNaN(currentTime)) return candidate;
+  if (Number.isNaN(candidateTime)) return current;
+  return candidateTime > currentTime ? candidate : current;
+}
+
+function incrementBreakdown(map, key) {
+  if (!key) return;
+  map[key] = (map[key] || 0) + 1;
+}
+
+function buildRecallScopeSummary(entries = []) {
+  const summary = {
+    scopedRecallCount: 0,
+    strictScopedRecallCount: 0,
+    latestScopedHitAt: null,
+    scopeModeBreakdown: {},
+    scopeDimensionBreakdown: {},
+    projectBreakdown: {},
+    clientBreakdown: {},
+    visibilityBreakdown: {}
+  };
+
+  for (const entry of entries) {
+    if (!entry?.scopeApplied) continue;
+
+    summary.scopedRecallCount += 1;
+    summary.latestScopedHitAt = pickLaterTimestamp(summary.latestScopedHitAt, entry.timestamp || null);
+    if (entry.scopeStrict) {
+      summary.strictScopedRecallCount += 1;
+    }
+
+    incrementBreakdown(summary.scopeModeBreakdown, typeof entry.scopeMode === 'string' ? entry.scopeMode : 'unknown');
+    for (const dimension of Array.isArray(entry.scopeDimensions) ? entry.scopeDimensions : []) {
+      incrementBreakdown(summary.scopeDimensionBreakdown, typeof dimension === 'string' ? dimension : null);
+    }
+    incrementBreakdown(summary.projectBreakdown, typeof entry.scopeProjectId === 'string' ? entry.scopeProjectId : null);
+    incrementBreakdown(summary.clientBreakdown, typeof entry.scopeClientId === 'string' ? entry.scopeClientId : null);
+    for (const visibility of Array.isArray(entry.scopeVisibility) ? entry.scopeVisibility : []) {
+      incrementBreakdown(summary.visibilityBreakdown, typeof visibility === 'string' ? visibility : null);
+    }
+  }
+
+  return summary;
+}
+
 async function collectService() {
   const url = resolveHealthUrl();
   const result = await httpGet(url);
@@ -203,6 +253,7 @@ function collectAudits() {
   const recallEntries = parseJsonLinesIfExists(recallPath, 5);
   const bridgeAccepted = bridgeEntries.filter(e => e.decision === 'accepted').length;
   const bridgeRejected = bridgeEntries.filter(e => e.decision === 'rejected').length;
+  const recallScopeSummary = buildRecallScopeSummary(recallEntries);
   return {
     bridge: {
       status: bridgeEntries.length > 0 ? 'ok' : 'warn',
@@ -219,7 +270,8 @@ function collectAudits() {
         acc[e.recallType] = (acc[e.recallType] || 0) + 1;
         return acc;
       }, {}),
-      lastRecallAt: recallEntries[0]?.timestamp || null
+      lastRecallAt: recallEntries[0]?.timestamp || null,
+      ...recallScopeSummary
     }
   };
 }
@@ -304,7 +356,7 @@ function buildChecks(service, store, profile, runtime, audits, gate) {
   checks.push({
     source: 'audits', level: audits.recall.status,
     code: 'recall-recent',
-    message: `${audits.recall.recentCount} recent recall entries`
+    message: `${audits.recall.recentCount} recent recall entries, ${audits.recall.scopedRecallCount} scoped`
   });
   checks.push({
     source: 'gate', level: gate.status,
@@ -334,6 +386,7 @@ function buildRecommendations(service, store, profile, runtime, audits, gate) {
   if (runtime.httpLogErrorCount > 0) recs.push(`${runtime.httpLogErrorCount} HTTP errors detected — review logs`);
   if (audits.bridge.recentCount === 0) recs.push('No recent bridge entries — memory may not be writing');
   if (audits.recall.recentCount === 0) recs.push('No recent recall entries — search may not be active');
+  if (audits.recall.recentCount > 0 && audits.recall.scopedRecallCount === 0) recs.push('Recent recall activity is present, but none of it used scope filtering');
   if (gate.status !== 'ok') recs.push('Mainline gate not passing — run gate:mainline for details');
   if (recs.length === 0) recs.push('All systems nominal');
   return recs;
@@ -349,7 +402,7 @@ function renderText(report) {
   lines.push(`Profile    ${pad(report.profile.status)} ${report.profile.fingerprint || 'N/A'}, ${report.profile.legacyChunks} legacy`);
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
-  lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent`);
+  lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
   lines.push(`Gate       ${pad(report.gate.status)} compare ${report.gate.compare ? report.gate.compare.matchedCases + '/' + report.gate.compare.totalCases : 'N/A'}, rollback ${report.gate.rollback ? report.gate.rollback.readyCases + '/' + report.gate.rollback.totalCases : 'N/A'}`);
   lines.push('');
   lines.push('Checks:');

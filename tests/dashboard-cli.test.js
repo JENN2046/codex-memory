@@ -70,6 +70,11 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.ok(payload.audits, 'should have audits section');
   assert.ok(payload.audits.bridge);
   assert.ok(payload.audits.recall);
+  assert.equal(typeof payload.audits.recall.scopedRecallCount, 'number');
+  assert.equal(typeof payload.audits.recall.strictScopedRecallCount, 'number');
+  assert.equal(typeof payload.audits.recall.scopeModeBreakdown, 'object');
+  assert.equal(typeof payload.audits.recall.scopeDimensionBreakdown, 'object');
+  assert.equal(payload.audits.recall.rawWorkspaceId, undefined);
 
   // Gate section
   assert.ok(payload.gate, 'should have gate section');
@@ -131,4 +136,5 @@ test('dashboard CLI should tolerate clean CI runner warnings', async () => {
   assert.equal(payload.store.status, 'warn');
   assert.match(payload.store.message, /Database not found/);
   assert.notEqual(payload.gate.status, 'error', formatFailure(result));
+  assert.equal(typeof payload.audits.recall.scopedRecallCount, 'number');
 });
