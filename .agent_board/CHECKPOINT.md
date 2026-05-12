@@ -2,22 +2,22 @@
 
 ## Current Goal
 
-CM-0038 is activating `Single-Window 4-Agent Compact Autopilot` and refreshing `.agent_board` against current repository reality.
+CM-0042 fixes PR review findings for scoped memory compatibility and refreshes `.agent_board` against current repository reality.
 
 ## Current Area
 
-P6-docs-drift / P0-mainline-health / autopilot control-plane refresh
+P9-codex-claude-client-scope / P0-mainline-health / PR review risk fix
 
 ## Current Status
 
-Branch `codex/p1-vcp-memory-core-100-roadmap`, HEAD `93163c0`.
+Branch `codex/p1-vcp-memory-core-100-roadmap`, CM-0042 guarded local commit target.
 
 Current worktree is dirty:
 
-- Board refresh files: `.agent_board/RUN_STATE.md`, `.agent_board/TASK_QUEUE.md`, `.agent_board/HANDOFF.md`, `.agent_board/CHECKPOINT.md`, `.agent_board/FILE_LOCKS.md`, `.agent_board/RISK_REGISTER.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/DECISIONS.md`
-- Validated dirty source batch: `src/app.js`, `src/core/MemoryWriteService.js`, `src/storage/DiaryStore.js`, `src/storage/SqliteShadowStore.js`, `src/recall/KnowledgeBaseSyncService.js`, `src/recall/ChunkIndexingService.js`, `src/cli/gate-ci.js`, `src/cli/mainline-gate.js`, `tests/scope-filter.test.js`
+- Source/test files: `src/storage/SqliteShadowStore.js`, `src/core/constants.js`, `tests/scope-filter.test.js`, `tests/mcp-contract.test.js`
+- Board files: `.agent_board/RUN_STATE.md`, `.agent_board/TASK_QUEUE.md`, `.agent_board/HANDOFF.md`, `.agent_board/CHECKPOINT.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/DECISIONS.md`
 
-CM-0038 activated the control plane. CM-0039 / CM-0040 then completed the source validation batch and code review follow-up. CM-0041 clarifies scope strict semantics after final code review.
+CM-0042 addresses two PR review findings: old upgraded SQLite databases with NOT NULL scoped columns keep their defaults on omitted scope writes, and schema-driven clients can still send multi-visibility search filters.
 
 ## Current 4-Agent Roles
 
@@ -40,10 +40,11 @@ CM-0038 activated the control plane. CM-0039 / CM-0040 then completed the source
 - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 174/174, compare 43/43, rollback 43/43.
 - `git diff --check`: passed.
 - CM-0041: `node --test .\tests\scope-filter.test.js` 15/15; `node --test .\tests\mcp-contract.test.js` 4/4; `npm test` 175/175; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 175/175, compare 43/43, rollback 43/43.
+- CM-0042: `node --test .\tests\scope-filter.test.js` 16/16; `node --test .\tests\mcp-contract.test.js` 4/4; `npm test` 176/176; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 176/176, compare 43/43, rollback 43/43; `git diff --check` passed.
 
 ## Current Blockers
 
-- Local commit readiness is eligible after final Verifier/diff inspection if staging exactly the validated batch.
+- Local commit readiness is eligible after final status/diff inspection if staging exactly the validated CM-0042 batch.
 - Push remains unauthorized.
 
 ## Completed Work

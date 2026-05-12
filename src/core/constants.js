@@ -67,7 +67,13 @@ const TOOL_DEFINITIONS = [
             project_id: { type: 'string', description: 'Restrict recall to records with this project_id.' },
             workspace_id: { type: 'string', description: 'Restrict recall to records with this workspace_id. The raw value is not written to recall audit summaries.' },
             client_id: { type: 'string', description: 'Restrict recall to records with this client_id.' },
-            visibility: { type: 'string', description: 'Restrict recall to records with this visibility value.' },
+            visibility: {
+              oneOf: [
+                { type: 'string' },
+                { type: 'array', items: { type: 'string' } }
+              ],
+              description: 'Restrict recall to one or more visibility values.'
+            },
             strict: { type: 'boolean', description: 'Audit/overview marker for hard-isolation intent; scope fields still filter when strict is false or omitted.' }
           }
         }

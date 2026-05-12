@@ -2,19 +2,27 @@
 
 ## Goal
 
-Start `Single-Window 4-Agent Compact Autopilot` for the current session and restore `.agent_board` to current repository reality.
+Fix PR review findings for scoped memory compatibility while preserving `.agent_board` current state.
 
 ## Safe State
 
 - Workspace: A:\codex-memory
 - Branch: codex/p1-vcp-memory-core-100-roadmap
-- HEAD: current local HEAD (latest work includes CM-0041 and board state sync)
-- Worktree: clean after local guarded commits through current local HEAD
+- HEAD: CM-0042 guarded local commit target
+- Worktree: CM-0042 source/test/board batch validated for local commit
 - Remote writes: not authorized
 
 ## Current Dirty Files
 
-- none
+- `src/storage/SqliteShadowStore.js`
+- `src/core/constants.js`
+- `tests/scope-filter.test.js`
+- `tests/mcp-contract.test.js`
+- `.agent_board/RUN_STATE.md`
+- `.agent_board/TASK_QUEUE.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/DECISIONS.md`
+- `.agent_board/HANDOFF.md`
 
 ## 4-Agent Activation
 
@@ -43,6 +51,12 @@ Start `Single-Window 4-Agent Compact Autopilot` for the current session and rest
   - `node --test .\tests\mcp-contract.test.js`: 4/4 passed.
   - `npm test`: 175/175 passed.
   - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 175/175, compare 43/43, rollback 43/43.
+- CM-0042 PR review fix validation:
+  - `node --test .\tests\scope-filter.test.js`: 16/16 passed.
+  - `node --test .\tests\mcp-contract.test.js`: 4/4 passed.
+  - `npm test`: 176/176 passed.
+  - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 176/176, compare 43/43, rollback 43/43.
+  - `git diff --check`: passed.
 
 ## Runtime Notes
 
@@ -52,7 +66,7 @@ Start `Single-Window 4-Agent Compact Autopilot` for the current session and rest
 ## Blockers
 
 - No hard blocker to the local autopilot control plane.
-- none for the validated local batch.
+- none for CM-0042 local guarded commit.
 
 ## Decisions
 
@@ -60,10 +74,12 @@ Start `Single-Window 4-Agent Compact Autopilot` for the current session and rest
 - Do not push, commit, start Phase 2, or touch source files as part of CM-0038.
 - Store scope metadata durably in diary headers, but strip internal scope headers before chunk indexing and external recall output.
 - Supplied search `scope` fields are always filters; `strict` is an audit/overview hard-isolation intent marker, not the switch that enables filtering.
+- Preserve old SQLite scoped-column defaults at write time only when the existing schema has NOT NULL defaults; keep new nullable schemas nullable.
+- Keep `search_memory.scope.visibility` schema compatible with runtime support for a string or an array.
 
 ## Next Safe Task
 
-Await explicit push approval or next local task. Do not push without approval.
+Stop before any push or PR metadata update unless explicitly authorized.
 
 ## Warnings
 

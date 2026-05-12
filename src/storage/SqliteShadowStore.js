@@ -6,6 +6,7 @@ class SqliteShadowStore {
   constructor(config) {
     this.config = config;
     this.db = null;
+    this.memoryRecordColumns = new Map();
   }
 
   async ensureReady() {
@@ -82,12 +83,40 @@ class SqliteShadowStore {
       CREATE INDEX IF NOT EXISTS idx_memory_records_visibility ON memory_records(visibility);
       CREATE INDEX IF NOT EXISTS idx_memory_records_client ON memory_records(client_id);
     `);
+    this.refreshMemoryRecordColumnInfo();
   }
 
   ensureColumn(tableName, columnName, definition) {
     const columns = this.db.prepare(`PRAGMA table_info(${tableName})`).all();
     if (columns.some(column => column.name === columnName)) return;
     this.db.exec(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definition}`);
+  }
+
+  refreshMemoryRecordColumnInfo() {
+    this.memoryRecordColumns = new Map(
+      this.db.prepare('PRAGMA table_info(memory_records)').all()
+        .map(column => [column.name, column])
+    );
+  }
+
+  getColumnDefaultValue(columnName) {
+    const column = this.memoryRecordColumns.get(columnName);
+    if (!column || !column.notnull || column.dflt_value === null || column.dflt_value === undefined) {
+      return null;
+    }
+
+    const rawDefault = String(column.dflt_value);
+    const quoted = rawDefault.match(/^'(.*)'$/);
+    return quoted ? quoted[1].replace(/''/g, "'") : rawDefault;
+  }
+
+  getScopeWriteValue(columnName, value) {
+    const normalized = typeof value === 'string' ? value.trim() : '';
+    if (normalized) {
+      return normalized;
+    }
+
+    return this.getColumnDefaultValue(columnName);
   }
 
   async upsertRecord(record) {
@@ -139,13 +168,13 @@ class SqliteShadowStore {
       $raw_text: record.rawText || null,
       $created_at: record.createdAt || new Date().toISOString(),
       $updated_at: record.updatedAt || record.createdAt || new Date().toISOString(),
-      $project_id: record.projectId || null,
-      $workspace_id: record.workspaceId || null,
-      $client_id: record.clientId || null,
+      $project_id: this.getScopeWriteValue('project_id', record.projectId),
+      $workspace_id: this.getScopeWriteValue('workspace_id', record.workspaceId),
+      $client_id: this.getScopeWriteValue('client_id', record.clientId),
       $task_id: record.taskId || null,
       $conversation_id: record.conversationId || null,
-      $visibility: record.visibility || null,
-      $retention_policy: record.retentionPolicy || null
+      $visibility: this.getScopeWriteValue('visibility', record.visibility),
+      $retention_policy: this.getScopeWriteValue('retention_policy', record.retentionPolicy)
     });
   }
 

@@ -3,11 +3,14 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+const { DatabaseSync } = require('node:sqlite');
 
 const { createCodexMemoryApplication } = require('../src/app');
 const { CodexMemoryMcpServer } = require('../src/adapters/codex-mcp/server');
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const { createConfig } = require('../src/config/createConfig');
 const { stripMemoryMarkers } = require('../src/storage/DiaryStore');
+const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 
 async function withApp(handler) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-scope-test-'));
@@ -409,6 +412,76 @@ test('mapRow does not fake project_id (legacyProjectIdFallback test)', async () 
     assert.equal(retrieved.projectId, 'explicit-project', 'mapRow should preserve actual project_id, not fake it');
     assert.notEqual(retrieved.projectId, 'codex-memory', 'mapRow should not default to codex-memory');
   });
+});
+
+test('legacy NOT NULL scope columns use compatible defaults on omitted scope writes', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-legacy-scope-db-'));
+  const config = createConfig({
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data')
+  });
+
+  await fs.mkdir(path.dirname(config.dbPath), { recursive: true });
+  const legacyDb = new DatabaseSync(config.dbPath);
+  legacyDb.exec(`
+    CREATE TABLE memory_records (
+      memory_id TEXT PRIMARY KEY,
+      target TEXT NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      evidence TEXT NOT NULL,
+      tags_json TEXT NOT NULL,
+      validated INTEGER NOT NULL,
+      reusable INTEGER NOT NULL,
+      sensitivity TEXT NOT NULL,
+      file_path TEXT,
+      relative_path TEXT,
+      raw_text TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      client_id TEXT NOT NULL DEFAULT 'codex',
+      workspace_id TEXT NOT NULL DEFAULT '',
+      project_id TEXT NOT NULL DEFAULT 'codex-memory',
+      task_id TEXT,
+      conversation_id TEXT,
+      visibility TEXT NOT NULL DEFAULT 'project',
+      retention_policy TEXT NOT NULL DEFAULT 'permanent'
+    );
+  `);
+  legacyDb.close();
+
+  const shadowStore = new SqliteShadowStore(config);
+  try {
+    await shadowStore.upsertRecord({
+      memoryId: 'codex-process-legacy-default-scope',
+      target: 'process',
+      title: 'Legacy Default Scope',
+      content: 'Type: checkpoint',
+      evidence: 'legacy default scope test',
+      tags: ['scope'],
+      sensitivity: 'none',
+      validated: true,
+      reusable: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+
+    const row = shadowStore.db.prepare(`
+      SELECT client_id, workspace_id, project_id, visibility, retention_policy
+      FROM memory_records
+      WHERE memory_id = ?
+    `).get('codex-process-legacy-default-scope');
+    assert.equal(row.client_id, 'codex');
+    assert.equal(row.workspace_id, '');
+    assert.equal(row.project_id, 'codex-memory');
+    assert.equal(row.visibility, 'project');
+    assert.equal(row.retention_policy, 'permanent');
+  } finally {
+    await shadowStore.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
 });
 
 test('HTTP MCP tools/call end-to-end scope parameter verification', async () => {
@@ -815,6 +888,10 @@ test('schema: record_memory and search_memory tool definitions cover scope field
   for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'strict']) {
     assert.ok(searchScopeProps.includes(field), `search_memory scope schema must include ${field}`);
   }
+  const visibilitySchema = searchSchema.inputSchema.properties.scope.properties.visibility;
+  assert.ok(Array.isArray(visibilitySchema.oneOf), 'search_memory scope visibility must support string or array');
+  assert.deepEqual(visibilitySchema.oneOf.map(option => option.type), ['string', 'array']);
+  assert.equal(visibilitySchema.oneOf[1].items.type, 'string');
   assert.ok(searchSchema.inputSchema.additionalProperties === false, 'search_memory must reject additional properties');
 });
 

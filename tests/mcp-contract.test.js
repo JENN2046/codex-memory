@@ -182,6 +182,9 @@ test('MCP schema contract should expose scope in search_memory', async () => {
     assert.ok(scopeSchema.properties.workspace_id);
     assert.ok(scopeSchema.properties.client_id);
     assert.ok(scopeSchema.properties.visibility);
+    assert.ok(Array.isArray(scopeSchema.properties.visibility.oneOf));
+    assert.deepEqual(scopeSchema.properties.visibility.oneOf.map(option => option.type), ['string', 'array']);
+    assert.equal(scopeSchema.properties.visibility.oneOf[1].items.type, 'string');
     assert.ok(scopeSchema.properties.strict);
   });
 });
