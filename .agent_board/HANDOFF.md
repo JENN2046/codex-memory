@@ -2,7 +2,7 @@
 
 ## Current State
 
-治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、R2 scoped recall aggregation `7bfd793`、R3 observability surface `f37a91a`、`governance:report` 收口 `c592026`、governance summary observability surface `fd3fd55`、以及 policy-layer boundary note `e908582` 已推送；当前本地工作是 `PL-2` fixture-backed soft read-policy preflight，结论是默认读路径仍然宽松，而假设中的 status + client-aware private visibility soft policy 会实质收窄召回集合。
+治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、R2 scoped recall aggregation `7bfd793`、R3 observability surface `f37a91a`、`governance:report` 收口 `c592026`、governance summary observability surface `fd3fd55`、policy-layer boundary note `e908582`、以及 `PL-2` preflight `6e5e236` 已推送；当前本地工作是 docs-only `P6`：把 `Single-Window 4-Agent Compact Autopilot` 正式收束成仓库内有名字、可引用、可迁移的能力说明。
 
 Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
 
@@ -28,6 +28,7 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - governance snapshot: `dashboard` / `observe:http` 现在都会带 `governance.status`、`reviewLevel`、counts、hints
 - policy-layer note: `docs/POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md`
 - soft read-policy preflight: `docs/SOFT_READ_POLICY_PREFLIGHT.md`
+- named autopilot note: `docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md`
 
 ## Recent Work
 
@@ -46,8 +47,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - R3 is now implemented and pushed: `dashboard` / `http-observe` expose scoped recall summary counts plus `scopeMode` / `scopeDimensions` breakdowns, and tests were expanded without exposing raw `workspace_id`.
 - `governance:report` is now hardened and pushed: it resolves DB path through `createConfig`, opens SQLite read-only, correctly binds stale-threshold timestamps, and has dedicated CLI tests for governance metrics plus missing-DB behavior.
 - Governance summary observability surface is now pushed as `fd3fd55`: `dashboard` / `http-observe` expose read-only governance counts, review level, and hints without changing write-path or MCP contract.
-- Current local `PL-2` batch adds `tests/policy-read-preflight.test.js` plus `docs/SOFT_READ_POLICY_PREFLIGHT.md`, proving with fixtures that the current default read path still returns mixed lifecycle/private records while a hypothetical status + client-aware private filter would narrow a `6`-record result set to `2`.
-- This batch remains non-invasive: no runtime behavior change, no MCP contract change, no config write, and no provider/profile action.
+- `PL-2` preflight is now pushed as `6e5e236`: the current default read path still returns mixed lifecycle/private records, while a hypothetical status + client-aware private filter would narrow a `6`-record result set to `2`.
+- Current local docs-only batch introduces a named capability note for `Single-Window 4-Agent Compact Autopilot`, wires it into `AGENTS.md` and `README.md`, makes clear which parts travel with the repo versus which parts stay machine-local, and has already passed local docs validation.
 - LightMemo CLI + compare harness support
 - gate:ci + dashboard tests
 - P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
@@ -58,9 +59,9 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 ## Next
 
-- P1: inspect final diff for the `PL-2` preflight batch
-- P2: guarded commit + push the scoped tests/docs batch
-- P3: decide whether to split future runtime exploration into `PL-2a status-only` and `PL-2b visibility-only` preflights before any default read-policy change
+- P1: inspect final diff for the named autopilot note batch
+- P2: guarded commit + push the docs-only naming batch
+- P3: then return to product-side next choice, likely `PL-2a status-only` preflight refinement
 
 ## Auth Required
 

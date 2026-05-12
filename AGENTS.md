@@ -854,6 +854,20 @@ Audit logs may contain sensitive operational metadata. Treat them carefully.
 
 ## 20. Multi-Worker Contributor Policy
 
+This repository recognizes a named compact operating pattern:
+
+- [docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md](/A:/codex-memory/docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md)
+
+That document defines the repository-level meaning of:
+
+- `Single-Window`
+- `4-Agent`
+- `Compact Autopilot`
+
+It is a naming and operating note layered on top of this `AGENTS.md`.
+
+It does not replace the hard-stop gates, validation matrix, or guarded commit rules in this file.
+
 If multiple Codex workers are used:
 
 - one session acts as commander/reviewer
