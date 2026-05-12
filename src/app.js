@@ -29,6 +29,88 @@ const { RecallAuditService } = require('./recall/RecallAuditService');
 const { KnowledgeBaseSyncService } = require('./recall/KnowledgeBaseSyncService');
 const { KnowledgeBaseRecallPipeline } = require('./recall/KnowledgeBaseRecallPipeline');
 
+function normalizeScopeVisibility(value) {
+  if (Array.isArray(value)) {
+    return [...new Set(value
+      .map(item => String(item || '').trim())
+      .filter(Boolean))];
+  }
+
+  const normalized = String(value || '').trim();
+  return normalized ? [normalized] : [];
+}
+
+function buildScopeCandidateFilters(scope) {
+  if (!scope || typeof scope !== 'object') {
+    return {};
+  }
+
+  const projectId = typeof scope.project_id === 'string' ? scope.project_id.trim() : '';
+  const workspaceId = typeof scope.workspace_id === 'string' ? scope.workspace_id.trim() : '';
+  const clientId = typeof scope.client_id === 'string' ? scope.client_id.trim() : '';
+  const visibility = normalizeScopeVisibility(scope.visibility);
+
+  return {
+    ...(projectId ? { projectId } : {}),
+    ...(workspaceId ? { workspaceId } : {}),
+    ...(clientId ? { clientId } : {}),
+    ...(visibility.length > 0 ? { visibility } : {})
+  };
+}
+
+function buildScopeAuditContext(scope) {
+  const filters = buildScopeCandidateFilters(scope);
+  const scopeDimensions = [
+    filters.projectId ? 'project_id' : null,
+    filters.workspaceId ? 'workspace_id' : null,
+    filters.clientId ? 'client_id' : null,
+    Array.isArray(filters.visibility) && filters.visibility.length > 0 ? 'visibility' : null
+  ].filter(Boolean);
+  const scopeApplied = scopeDimensions.length > 0;
+
+  return {
+    scopeApplied,
+    scopeMode: scopeApplied ? 'sql-candidate+post-filter' : 'none',
+    scopeDimensions,
+    scopeStrict: !!scope?.strict,
+    scopeProjectId: filters.projectId || null,
+    scopeClientId: filters.clientId || null,
+    scopeVisibility: filters.visibility || [],
+    scopeWorkspacePresent: !!filters.workspaceId
+  };
+}
+
+async function applyScopeFilter(results, scope, shadowStore) {
+  const filters = buildScopeCandidateFilters(scope);
+  const hasScope = !!(filters.projectId
+    || filters.workspaceId
+    || filters.clientId
+    || (Array.isArray(filters.visibility) && filters.visibility.length > 0));
+
+  if (!hasScope || !Array.isArray(results) || results.length === 0) {
+    return results;
+  }
+
+  const memoryIds = [...new Set(results.map(item => item.memoryId || item.memory_id).filter(Boolean))];
+  const scopeMap = memoryIds.length > 0
+    ? await shadowStore.getRecordsScopeMap(memoryIds)
+    : new Map();
+
+  return results.filter(item => {
+    const memoryId = item.memoryId || item.memory_id;
+    const recordScope = scopeMap.get(memoryId) || {};
+
+    if (filters.projectId && recordScope.projectId !== filters.projectId) return false;
+    if (filters.workspaceId && recordScope.workspaceId !== filters.workspaceId) return false;
+    if (filters.clientId && recordScope.clientId !== filters.clientId) return false;
+    if (Array.isArray(filters.visibility) && filters.visibility.length > 0 && !filters.visibility.includes(recordScope.visibility)) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
 function createCodexMemoryApplication(overrides = {}) {
   const config = createConfig(overrides);
   const diaryStore = new DiaryStore(config);
@@ -202,35 +284,23 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'search_memory') {
-        const scope = args.scope || {};
-        const results = await passiveRecallService.search({
+        const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
+        const searchResults = await passiveRecallService.search({
           query: args.query,
           target: args.target || 'both',
           limit: args.limit,
           includeContent: !!args.include_content,
           contextText: args.context_text || '',
-          source: 'mcp'
+          source: 'mcp',
+          candidateFilters: buildScopeCandidateFilters(scopeFilter),
+          auditContext: {
+            scope: buildScopeAuditContext(scopeFilter)
+          }
         });
-
-        if (scope.strict && (scope.project_id || scope.workspace_id || scope.client_id || scope.visibility)) {
-          const memoryIds = results.map(r => r.memoryId || r.memory_id).filter(Boolean);
-          const scopeMap = memoryIds.length > 0
-            ? await shadowStore.getRecordsScopeMap(memoryIds)
-            : new Map();
-
-          const filtered = results.filter(r => {
-            const s = scopeMap.get(r.memoryId || r.memory_id) || {};
-            if (scope.project_id && s.projectId !== scope.project_id) return false;
-            if (scope.workspace_id && s.workspaceId !== scope.workspace_id) return false;
-            if (scope.client_id && s.clientId !== scope.client_id) return false;
-            if (scope.visibility && s.visibility !== scope.visibility) return false;
-            return true;
-          });
-
-          return { results: filtered };
-        }
-
-        return { results };
+        const filtered = (scopeFilter && searchResults && searchResults.length)
+          ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)
+          : searchResults;
+        return { results: filtered };
       }
 
       if (toolName === 'memory_overview') {

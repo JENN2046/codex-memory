@@ -2,15 +2,48 @@
 
 ## Current Goal
 
-Phase 1 (80%→85%) completed on branch `codex/p1-vcp-memory-core-100-roadmap`. P1.0–P1.8 all landed as local commits. Next: human acceptance, then continue to Phase 2.
+CM-0038 is activating `Single-Window 4-Agent Compact Autopilot` and refreshing `.agent_board` against current repository reality.
 
 ## Current Area
 
-P1.8-board-closeout / Phase 1 complete
+P6-docs-drift / P0-mainline-health / autopilot control-plane refresh
 
 ## Current Status
 
-Branch `codex/p1-vcp-memory-core-100-roadmap` (local only, not pushed). All Phase 1 tasks P1.0–P1.8 committed. npm test 145/145 passing, gate:mainline:strict all green. No push, tag, or release.
+Branch `codex/p1-vcp-memory-core-100-roadmap`, HEAD `93163c0`.
+
+Current worktree is dirty:
+
+- Board refresh files: `.agent_board/RUN_STATE.md`, `.agent_board/TASK_QUEUE.md`, `.agent_board/HANDOFF.md`, `.agent_board/CHECKPOINT.md`, `.agent_board/FILE_LOCKS.md`, `.agent_board/RISK_REGISTER.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/DECISIONS.md`
+- Validated dirty source batch: `src/app.js`, `src/core/MemoryWriteService.js`, `src/storage/DiaryStore.js`, `src/storage/SqliteShadowStore.js`, `src/recall/KnowledgeBaseSyncService.js`, `src/recall/ChunkIndexingService.js`, `src/cli/gate-ci.js`, `src/cli/mainline-gate.js`, `tests/scope-filter.test.js`
+
+CM-0038 activated the control plane. CM-0039 / CM-0040 then completed the source validation batch and code review follow-up.
+
+## Current 4-Agent Roles
+
+- Commander: current session; serial board updates and final scope control
+- Worker Alpha: read-only dirty source diff classifier
+- Worker Beta: read-only board drift classifier
+- Read-Only Verifier: preflight reviewer for scope, hard stops, validation, and commit readiness
+
+## Current Validation
+
+- `git diff --check -- .agent_board\RUN_STATE.md .agent_board\TASK_QUEUE.md .agent_board\HANDOFF.md .agent_board\FILE_LOCKS.md .agent_board\RISK_REGISTER.md .agent_board\DECISIONS.md`: passed
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`: passed
+- Alpha / Beta / Verifier read-only reports: received.
+- Initial Verifier result was `NEEDS_FIX` due missing `DECISIONS.md` lock/target coverage; Commander corrected this.
+- Final Verifier result: PASS for CM-0038 board/control-plane activation.
+- `node --test .\tests\scope-filter.test.js`: 14/14 passed.
+- `node --test .\tests\mcp-contract.test.js`: 4/4 passed.
+- `node --test .\tests\mainline-gate-cli.test.js .\tests\gate-ci-cli.test.js`: 4/4 passed.
+- `npm test`: 174/174 passed.
+- `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 174/174, compare 43/43, rollback 43/43.
+- `git diff --check`: passed.
+
+## Current Blockers
+
+- Local commit readiness is eligible after final Verifier/diff inspection if staging exactly the validated batch.
+- Push remains unauthorized.
 
 ## Completed Work
 
@@ -274,4 +307,3 @@ Create a guarded local commit for the `1628381` baseline sync if final diff insp
 ## Last Local Commit
 
 - `1628381 docs: record claude flash acceptance` is on `origin/main`.
-

@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+const fs = require('node:fs/promises');
+const os = require('node:os');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 
@@ -91,42 +93,66 @@ function resolveCommandSpec(name, options) {
     return [process.execPath, '--test', '.\\tests\\mcp-contract.test.js', '.\\tests\\mcp-http.test.js'];
   }
   if (name === 'test') {
+    if (process.platform === 'win32') {
+      return [process.env.ComSpec || 'cmd.exe', '/d', '/s', '/c', 'npm test'];
+    }
     return [npmCommand, 'test'];
   }
 
   throw new Error(`Unknown command spec: ${name}`);
 }
 
-function runCommand(commandSpec, cwd) {
+async function runCommand(commandSpec, cwd, options = {}) {
+  const { captureMode = 'pipe' } = options;
+  const [file, ...args] = commandSpec;
+  const needsShell = process.platform === 'win32' && /\.(cmd|bat)$/i.test(String(file));
+  const tempDir = captureMode === 'file'
+    ? await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-gate-'))
+    : null;
+  const outputPath = tempDir ? path.join(tempDir, 'command.log') : null;
+  const outputHandle = outputPath ? await fs.open(outputPath, 'w') : null;
+
   return new Promise((resolve, reject) => {
-    const [file, ...args] = commandSpec;
-    const needsShell = process.platform === 'win32' && /\.(cmd|bat)$/i.test(String(file));
     const child = spawn(file, args, {
       cwd,
       env: process.env,
-      stdio: ['ignore', 'pipe', 'pipe'],
+      stdio: outputHandle
+        ? ['ignore', outputHandle.fd, outputHandle.fd]
+        : ['ignore', 'pipe', 'pipe'],
       shell: needsShell
     });
 
     let stdout = '';
     let stderr = '';
-    child.stdout.on('data', chunk => {
-      stdout += chunk.toString('utf8');
-    });
-    child.stderr.on('data', chunk => {
-      stderr += chunk.toString('utf8');
-    });
+    if (!outputHandle) {
+      child.stdout.on('data', chunk => {
+        stdout += chunk.toString('utf8');
+      });
+      child.stderr.on('data', chunk => {
+        stderr += chunk.toString('utf8');
+      });
+    }
     child.on('error', reject);
 
     const startedAt = Date.now();
-    child.on('close', code => {
-      resolve({
-        command: [file, ...args],
-        code,
-        stdout,
-        stderr,
-        durationMs: Date.now() - startedAt
-      });
+    child.on('close', async (code) => {
+      try {
+        if (outputHandle) {
+          await outputHandle.close();
+          stdout = await fs.readFile(outputPath, 'utf8');
+          stderr = '';
+          await fs.rm(tempDir, { recursive: true, force: true });
+        }
+        resolve({
+          command: [file, ...args],
+          code,
+          stdout,
+          stderr,
+          durationMs: Date.now() - startedAt
+        });
+      } catch (error) {
+        reject(error);
+      }
     });
   });
 }
@@ -182,9 +208,9 @@ function parseJsonPayload(output) {
 }
 
 function parseTestSummary(stdout = '') {
-  const passMatch = stdout.match(/# pass\s+(\d+)/);
-  const failMatch = stdout.match(/# fail\s+(\d+)/);
-  const testMatch = stdout.match(/# tests\s+(\d+)/);
+  const passMatch = stdout.match(/(?:#|ℹ)\s*pass\s+(\d+)/);
+  const failMatch = stdout.match(/(?:#|ℹ)\s*fail\s+(\d+)/);
+  const testMatch = stdout.match(/(?:#|ℹ)\s*tests\s+(\d+)/);
   return {
     tests: testMatch ? Number.parseInt(testMatch[1], 10) : null,
     pass: passMatch ? Number.parseInt(passMatch[1], 10) : null,
@@ -294,7 +320,7 @@ async function main() {
 
   if (options.withTest) {
     const testSpec = resolveCommandSpec('test', options);
-    results.test = buildCheckResult('test', await runCommand(testSpec, cwd));
+    results.test = buildCheckResult('test', await runCommand(testSpec, cwd, { captureMode: 'file' }));
   }
 
   results.compare = buildCheckResult('compare', await runCommand(resolveCommandSpec('compare', options), cwd));

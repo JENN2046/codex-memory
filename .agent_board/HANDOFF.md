@@ -2,80 +2,73 @@
 
 ## Goal
 
-Phase 1 (P1.0–P1.8) complete. All tasks committed locally on `codex/p1-vcp-memory-core-100-roadmap`. Ready for human acceptance. Next: Phase 2.
+Start `Single-Window 4-Agent Compact Autopilot` for the current session and restore `.agent_board` to current repository reality.
 
 ## Safe State
 
-All code changes are committed on branch `codex/p1-vcp-memory-core-100-roadmap` (local only, NOT pushed). Origin main at `1628381` is untouched.
-
-## Workspace / Branch
-
 - Workspace: A:\codex-memory
-- Branch: codex/p1-vcp-memory-core-100-roadmap (local only, not pushed)
-- Worktree: P1.0–P1.8 all committed
+- Branch: codex/p1-vcp-memory-core-100-roadmap
+- HEAD: `93163c0` (`Merge remote-tracking branch 'origin/main' into codex/p1-vcp-memory-core-100-roadmap`)
+- Worktree: dirty; current uncommitted source changes must be treated as user-owned/current-batch work until verified
+- Remote writes: not authorized
 
-## Queue Summary
+## Current Dirty Files
 
-- done: P1.0 plan landing, P1.1 scope acceptance CLI, P1.2 backfill dry-run, P1.3 query suite scaffold, P1.4 schema contract, P1.5 query quality scaffold, P1.6 backfill policy, P1.7 production readiness checklist, P1.8 board closeout
-- blocked: none
-- remaining: Phase 2 (P2.1–P2.5) — NOT started; requires human acceptance first
+- `src/app.js`
+- `src/cli/gate-ci.js`
+- `src/cli/mainline-gate.js`
+- `src/recall/ChunkIndexingService.js`
+- `src/core/MemoryWriteService.js`
+- `src/recall/KnowledgeBaseSyncService.js`
+- `src/storage/DiaryStore.js`
+- `src/storage/SqliteShadowStore.js`
+- `tests/scope-filter.test.js`
 
-## Changed Files
+## 4-Agent Activation
 
-- docs/VCP_MEMORY_CORE_100_PERCENT_IMPLEMENTATION_PLAN.md
-- docs/scope-backfill-policy.md
-- docs/personal-production-readiness.md
-- README.md
-- STATUS.md
-- package.json
-- src/app.js
-- src/core/constants.js
-- src/core/MemoryWriteService.js
-- src/storage/SqliteShadowStore.js
-- src/recall/KnowledgeBaseSyncService.js
-- src/cli/scope-acceptance.js
-- src/cli/scope-backfill-dry-run.js
-- src/cli/real-query-suite.js
-- src/cli/query-quality-report.js
-- tests/scope-acceptance-cli.test.js
-- tests/scope-backfill-dry-run.test.js
-- tests/real-query-suite.test.js
-- tests/query-quality-report.test.js
-- tests/mcp-contract.test.js
-- benchmarks/real-query-suite/v1.json
-- .agent_board/*.md
+- Commander: current session; owns serial integration and board updates
+- Worker Alpha: read-only diff classifier
+- Worker Beta: read-only board drift classifier
+- Read-Only Verifier: preflight reviewer for scope, hard stops, validation, and commit readiness
 
 ## Validation Evidence
 
-- npm test: 145/145 passed
-- gate:mainline:strict: health 200, contract ok, test ok, compare 39/39, rollback 39/39
-- scope:acceptance: status=ok, no leakage
-- scope:backfill:dry-run: mutated=false
-- real-query-suite: 5 cases, 0 invalid
-- query:quality: mutated=false, placeholderCount=5
+- CM-0038 board validation passed.
+- `git diff --check -- .agent_board/*.md`: passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`: passed.
+- Read-only Alpha classified the dirty source batch and recommended CM-0039 / CM-0040 validation.
+- Read-only Beta found board drift; Commander corrected checkpoint, validation log, source quarantine, and locks.
+- Final Read-Only Verifier result: PASS for board/control-plane activation.
+- CM-0039 / CM-0040 validation after code review follow-up:
+  - `node --test .\tests\scope-filter.test.js`: 14/14 passed.
+  - `node --test .\tests\mcp-contract.test.js`: 4/4 passed.
+  - `node --test .\tests\mainline-gate-cli.test.js .\tests\gate-ci-cli.test.js`: 4/4 passed.
+  - `npm test`: 174/174 passed.
+  - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 174/174, compare 43/43, rollback 43/43.
+  - `git diff --check`: passed.
 
 ## Runtime Notes
 
-- MCP mode: HTTP mainline at 127.0.0.1:7605
-- Scope fields now stored in SQLite shadow store and preserved across syncs
-- New npm scripts: scope:acceptance, scope:backfill:dry-run, real-query-suite, query:quality
+- MCP mode assumption remains HTTP mainline at `127.0.0.1:7605`.
+- Do not install watchdog, change startup tasks, change Codex/Claude config, or switch 7605/6005 without explicit approval.
 
 ## Blockers
 
-- none
+- No hard blocker to the local autopilot control plane.
+- none for the validated local batch.
 
 ## Decisions
 
-- Branch codex/p1-vcp-memory-core-100-roadmap is local only — do not push without explicit authorization
-- Phase 1 commits are independent and rebase-safe
-- Scope filtering is implemented as post-filter in app.callTool with scope metadata stored in SQLite
+- Treat `4-Agent` as logical roles; independent agents are read-only until explicit file locks and task contracts exist.
+- Do not push, commit, start Phase 2, or touch source files as part of CM-0038.
+- Store scope metadata durably in diary headers, but strip internal scope headers before chunk indexing and external recall output.
 
 ## Next Safe Task
 
-Await human acceptance of Phase 1. Do NOT start Phase 2 until acceptance is given. Do NOT push.
+Report code review result, then optionally run final read-only Verifier before any guarded local commit. Do not push.
 
 ## Warnings
 
 - Do not push without explicit approval.
 - Do not run real backfill/cleanup/migration without explicit approval.
-- Do not modify .env or secrets.
+- Do not modify `.env`, secrets, provider keys, Codex config, or Claude config.

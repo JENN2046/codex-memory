@@ -29,7 +29,14 @@ class SqliteShadowStore {
         relative_path TEXT,
         raw_text TEXT,
         created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
+        updated_at TEXT NOT NULL,
+        client_id TEXT,
+        workspace_id TEXT,
+        project_id TEXT,
+        task_id TEXT,
+        conversation_id TEXT,
+        visibility TEXT,
+        retention_policy TEXT
       );
       CREATE INDEX IF NOT EXISTS idx_memory_records_target ON memory_records(target);
       CREATE INDEX IF NOT EXISTS idx_memory_records_updated ON memory_records(updated_at);
@@ -66,7 +73,15 @@ class SqliteShadowStore {
     this.ensureColumn('memory_records', 'project_id', 'TEXT');
     this.ensureColumn('memory_records', 'workspace_id', 'TEXT');
     this.ensureColumn('memory_records', 'client_id', 'TEXT');
+    this.ensureColumn('memory_records', 'task_id', 'TEXT');
+    this.ensureColumn('memory_records', 'conversation_id', 'TEXT');
     this.ensureColumn('memory_records', 'visibility', 'TEXT');
+    this.ensureColumn('memory_records', 'retention_policy', 'TEXT');
+    this.db.exec(`
+      CREATE INDEX IF NOT EXISTS idx_memory_records_project ON memory_records(project_id);
+      CREATE INDEX IF NOT EXISTS idx_memory_records_visibility ON memory_records(visibility);
+      CREATE INDEX IF NOT EXISTS idx_memory_records_client ON memory_records(client_id);
+    `);
   }
 
   ensureColumn(tableName, columnName, definition) {
@@ -81,11 +96,11 @@ class SqliteShadowStore {
       INSERT INTO memory_records (
         memory_id, target, title, content, evidence, tags_json, validated, reusable, sensitivity,
         file_path, relative_path, raw_text, created_at, updated_at,
-        project_id, workspace_id, client_id, visibility
+        project_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy
       ) VALUES (
         $memory_id, $target, $title, $content, $evidence, $tags_json, $validated, $reusable, $sensitivity,
         $file_path, $relative_path, $raw_text, $created_at, $updated_at,
-        $project_id, $workspace_id, $client_id, $visibility
+        $project_id, $workspace_id, $client_id, $task_id, $conversation_id, $visibility, $retention_policy
       )
       ON CONFLICT(memory_id) DO UPDATE SET
         target = excluded.target,
@@ -103,7 +118,10 @@ class SqliteShadowStore {
         project_id = excluded.project_id,
         workspace_id = excluded.workspace_id,
         client_id = excluded.client_id,
-        visibility = excluded.visibility
+        task_id = excluded.task_id,
+        conversation_id = excluded.conversation_id,
+        visibility = excluded.visibility,
+        retention_policy = excluded.retention_policy
     `);
 
     statement.run({
@@ -124,7 +142,10 @@ class SqliteShadowStore {
       $project_id: record.projectId || null,
       $workspace_id: record.workspaceId || null,
       $client_id: record.clientId || null,
-      $visibility: record.visibility || null
+      $task_id: record.taskId || null,
+      $conversation_id: record.conversationId || null,
+      $visibility: record.visibility || null,
+      $retention_policy: record.retentionPolicy || null
     });
   }
 
@@ -339,6 +360,36 @@ class SqliteShadowStore {
       params.push(...excludedPathFilter.params);
     }
 
+    const recordScopeClauses = [];
+    const recordScopeParams = [];
+    if (filters.projectId) {
+      recordScopeClauses.push('mr.project_id = ?');
+      recordScopeParams.push(filters.projectId);
+    }
+    if (filters.workspaceId) {
+      recordScopeClauses.push('mr.workspace_id = ?');
+      recordScopeParams.push(filters.workspaceId);
+    }
+    if (filters.clientId) {
+      recordScopeClauses.push('mr.client_id = ?');
+      recordScopeParams.push(filters.clientId);
+    }
+    const visibilityValues = Array.isArray(filters.visibility)
+      ? filters.visibility.map(value => String(value || '').trim()).filter(Boolean)
+      : [];
+    if (visibilityValues.length > 0) {
+      recordScopeClauses.push(`mr.visibility IN (${visibilityValues.map(() => '?').join(',')})`);
+      recordScopeParams.push(...visibilityValues);
+    }
+    if (recordScopeClauses.length > 0) {
+      where.push(`EXISTS (
+        SELECT 1 FROM memory_records mr
+        WHERE mr.memory_id = memory_chunks.memory_id
+          AND ${recordScopeClauses.join(' AND ')}
+      )`);
+      params.push(...recordScopeParams);
+    }
+
     const sql = [
       'SELECT * FROM memory_chunks',
       where.length > 0 ? `WHERE ${where.join(' AND ')}` : '',
@@ -481,7 +532,10 @@ class SqliteShadowStore {
       projectId: row.project_id || null,
       workspaceId: row.workspace_id || null,
       clientId: row.client_id || null,
-      visibility: row.visibility || null
+      taskId: row.task_id || null,
+      conversationId: row.conversation_id || null,
+      visibility: row.visibility || null,
+      retentionPolicy: row.retention_policy || null
     };
   }
 

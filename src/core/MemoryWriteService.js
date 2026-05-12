@@ -164,7 +164,10 @@ class MemoryWriteService {
       projectId: normalizeString(payload.project_id) || null,
       workspaceId: normalizeString(payload.workspace_id) || null,
       clientId: normalizeString(payload.client_id) || null,
-      visibility: normalizeString(payload.visibility) || null
+      taskId: normalizeString(payload.task_id) || null,
+      conversationId: normalizeString(payload.conversation_id) || null,
+      visibility: normalizeString(payload.visibility) || null,
+      retentionPolicy: normalizeString(payload.retention_policy) || null
     };
 
     const diaryWrite = await this.diaryStore.writeRecord(record);
