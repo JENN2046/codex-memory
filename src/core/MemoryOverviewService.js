@@ -133,6 +133,51 @@ function buildRecallSummary(entries) {
   return summary;
 }
 
+function incrementBreakdown(map, key) {
+  if (!key) return;
+  map[key] = (map[key] || 0) + 1;
+}
+
+function buildRecallScopeSummary(entries) {
+  const summary = {
+    scopedRecallCount: 0,
+    strictScopedRecallCount: 0,
+    latestScopedHitAt: null,
+    modeBreakdown: {},
+    dimensionBreakdown: {},
+    projectBreakdown: {},
+    clientBreakdown: {},
+    visibilityBreakdown: {}
+  };
+
+  for (const entry of entries) {
+    if (!entry?.scopeApplied) continue;
+
+    const timestamp = typeof entry.timestamp === 'string' ? entry.timestamp : null;
+    summary.scopedRecallCount += 1;
+    summary.latestScopedHitAt = pickLaterTimestamp(summary.latestScopedHitAt, timestamp);
+
+    if (entry.scopeStrict) {
+      summary.strictScopedRecallCount += 1;
+    }
+
+    incrementBreakdown(summary.modeBreakdown, typeof entry.scopeMode === 'string' ? entry.scopeMode : 'unknown');
+
+    for (const dimension of Array.isArray(entry.scopeDimensions) ? entry.scopeDimensions : []) {
+      incrementBreakdown(summary.dimensionBreakdown, typeof dimension === 'string' ? dimension : null);
+    }
+
+    incrementBreakdown(summary.projectBreakdown, typeof entry.scopeProjectId === 'string' ? entry.scopeProjectId : null);
+    incrementBreakdown(summary.clientBreakdown, typeof entry.scopeClientId === 'string' ? entry.scopeClientId : null);
+
+    for (const visibility of Array.isArray(entry.scopeVisibility) ? entry.scopeVisibility : []) {
+      incrementBreakdown(summary.visibilityBreakdown, typeof visibility === 'string' ? visibility : null);
+    }
+  }
+
+  return summary;
+}
+
 function normalizeAuditEntries(entries, limit) {
   return [...entries]
     .sort((left, right) => new Date(right.timestamp || 0).getTime() - new Date(left.timestamp || 0).getTime())
@@ -342,6 +387,7 @@ class MemoryOverviewService {
     const writeEntries = await this.auditLogStore.readRecentWriteAudit(windowSize);
     const recallEntries = await this.auditLogStore.readRecentRecallAudit(windowSize);
     const recallSummary = buildRecallSummary(recallEntries);
+    recallSummary.scope = buildRecallScopeSummary(recallEntries);
     const shadowHealth = await this.shadowStore.getHealth();
     const vectorHealth = await this.vectorStore.getHealth();
     const candidateCacheHealth = this.candidateCacheStore

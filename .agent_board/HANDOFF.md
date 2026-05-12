@@ -2,7 +2,7 @@
 
 ## Current State
 
-治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、以及 scope recall design `42b9a11` 已推送；当前最新本地工作是 P1 R1 recall-audit annotation：为 scoped `search_memory` 记录低风险 scope metadata，但不写 raw `workspace_id`。
+治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、以及 R1 recall-audit annotation `d519a17` 已推送；当前最新本地工作是 P1 R2：为 `memory_overview` 增加 scoped recall 聚合，但不输出 workspace 明细。
 
 Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
 
@@ -38,6 +38,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - New regression coverage proves `limit=1` search still returns the in-scope record when higher-scoring off-scope records exceed the candidate pool.
 - R1 is now implemented: recall audit records `scopeApplied` / `scopeMode` / `scopeDimensions` / `scopeStrict` plus low-risk scope fields, while `workspace_id` remains presence-only.
 - `SCOPE_RECALL_AUDIT_DESIGN.md` now serves as the boundary doc for R2/R3 follow-ups, not just a proposal for R1.
+- R2 is now implemented: `memory_overview.recall.summary.scope` aggregates scoped recall count, strict count, latest scoped hit, and low-risk `mode/dimension/project/client/visibility` breakdowns.
+- Current boundary remains intact: no workspace breakdown and no raw `workspace_id` exposure in overview summary.
 - LightMemo CLI + compare harness support
 - gate:ci + dashboard tests
 - P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
@@ -48,8 +50,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 ## Next
 
-- P1: commit/push current R1 recall-audit annotation batch if final diff stays scoped
-- P2: decide whether to proceed to R2 `memory_overview` scoped recall aggregation
+- P1: commit/push current R2 scoped recall aggregation batch if final diff stays scoped
+- P2: decide whether to proceed to R3 dashboard / `http-observe` scoped recall visibility
 - P3: Governance report CLI (proposal/tombstone/supersession/stale metrics)
 
 ## Auth Required

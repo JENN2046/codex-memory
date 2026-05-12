@@ -161,6 +161,21 @@ adapter-visible final response
 - 不输出高基数 workspace 分布
 - 不把 scope summary 扩展成新的 policy engine
 
+当前状态：
+
+- 已实现
+- 当前聚合位于 `memory_overview.recall.summary.scope`
+- 当前字段包括：
+  - `scopedRecallCount`
+  - `strictScopedRecallCount`
+  - `latestScopedHitAt`
+  - `modeBreakdown`
+  - `dimensionBreakdown`
+  - `projectBreakdown`
+  - `clientBreakdown`
+  - `visibilityBreakdown`
+- 仍不输出 workspace breakdown，也不暴露 raw `workspace_id`
+
 ### R3. Dashboard / observe rendering
 
 目标：在 dashboard / `http-observe` 文本和 JSON 输出里补可解释性。
@@ -178,37 +193,38 @@ adapter-visible final response
 
 ## 本轮决策
 
-R1 已落地；本轮之后仍不继续推进 R2/R3。
+R1 与 R2 已落地；本轮之后仍不继续推进 R3。
 
 原因：
 
-1. recall audit 的 scope annotation 已经足够表达“scope 发生过”，无需立刻扩大到 overview / dashboard surface。
-2. `workspace_id` 的敏感度边界已先按 `presence-only` 处理，避免 raw path 落盘。
-3. `memory_overview` / dashboard / `http-observe` 仍会连带受影响，适合继续拆成单独的 R2/R3 小批次。
+1. recall audit 与 `memory_overview` 已经能表达“scope 发生过”和“最近 scoped recall 是否活跃”。
+2. `workspace_id` 的敏感度边界仍按 `presence-only` 处理，避免 raw path 落盘。
+3. dashboard / `http-observe` 仍会连带受影响，适合继续拆成单独的 R3 小批次。
 
 ## 推荐下一步
 
 下一条最小 runtime 候选任务建议是：
 
 ```text
-R2 only:
-只给 memory_overview 增加 scoped recall 聚合，
-不改 MCP tool contract，
-不输出高基数 workspace 明细，
-不扩大到 dashboard / http-observe 强展示。
+R3 only:
+给 dashboard / http-observe 增加低风险 scoped recall 可见性，
+只展示 summary，
+不输出 raw workspace_id，
+不把 overview 扩展成新的 policy layer。
 ```
 
 目标文件预计为：
 
-- `src/app.js`
-- `src/core/MemoryOverviewService.js`
-- `tests/phase-b-sync-cache-rerank.test.js`
-- 视情况补一条 dashboard JSON test
+- `src/cli/dashboard.js`
+- `src/cli/http-observe.js`
+- `tests/dashboard-cli.test.js`
+- `tests/http-observe-cli.test.js`
 
 建议验证：
 
 ```powershell
-node --test .\tests\phase-b-sync-cache-rerank.test.js
+node --test .\tests\dashboard-cli.test.js
+node --test .\tests\http-observe-cli.test.js
 npm test
 npm run gate:mainline:strict
 ```

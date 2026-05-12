@@ -535,6 +535,63 @@ test('rag params profile should apply by embedding fingerprint', async () => {
   });
 });
 
+test('memory_overview should summarize scoped recall activity without workspace detail', async () => {
+  await withApp(async ({ app }) => {
+    const ctx = codexRequestContext();
+
+    await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Scoped overview target',
+      content: 'checkpoint scoped overview aggregation',
+      evidence: 'overview scoped recall',
+      validated: true,
+      reusable: false,
+      tags: ['scope', 'overview'],
+      sensitivity: 'none',
+      project_id: 'overview-scope-project',
+      workspace_id: '/workspace/private-overview',
+      client_id: 'codex',
+      visibility: 'shared'
+    }, ctx);
+
+    const scopedSearch = await app.callTool('search_memory', {
+      query: 'scoped overview aggregation',
+      target: 'process',
+      limit: 5,
+      include_content: false,
+      scope: {
+        project_id: 'overview-scope-project',
+        workspace_id: '/workspace/private-overview',
+        client_id: 'codex',
+        visibility: 'shared',
+        strict: true
+      }
+    }, ctx);
+
+    assert.ok(scopedSearch.results.length >= 1);
+
+    const overview = await app.callTool('memory_overview', {
+      auditWindow: 50,
+      limit: 10
+    }, ctx);
+
+    const scopeSummary = overview.recall.summary.scope;
+    assert.equal(scopeSummary.scopedRecallCount, 1);
+    assert.equal(scopeSummary.strictScopedRecallCount, 1);
+    assert.equal(scopeSummary.modeBreakdown['sql-candidate+post-filter'], 1);
+    assert.equal(scopeSummary.dimensionBreakdown.project_id, 1);
+    assert.equal(scopeSummary.dimensionBreakdown.workspace_id, 1);
+    assert.equal(scopeSummary.dimensionBreakdown.client_id, 1);
+    assert.equal(scopeSummary.dimensionBreakdown.visibility, 1);
+    assert.equal(scopeSummary.projectBreakdown['overview-scope-project'], 1);
+    assert.equal(scopeSummary.clientBreakdown.codex, 1);
+    assert.equal(scopeSummary.visibilityBreakdown.shared, 1);
+    assert.ok(scopeSummary.latestScopedHitAt);
+    assert.equal('workspaceBreakdown' in scopeSummary, false, 'overview scope summary must not expose workspace breakdown');
+    assert.equal(JSON.stringify(scopeSummary).includes('/workspace/private-overview'), false, 'raw workspace_id must not appear in overview scope summary');
+  });
+});
+
 test('search sync should rebuild shadow chunks from a different embedding fingerprint', async () => {
   await withApp(async ({ app }) => {
     const record = await app.callTool('record_memory', {
