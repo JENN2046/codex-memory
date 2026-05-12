@@ -617,6 +617,75 @@ test('scope filter: SQL candidate pushdown preserves scoped result when higher-s
   });
 });
 
+test('scope filter: recall audit annotates scoped searches without raw workspace_id', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+
+    const recordResult = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Scope Audit Annotation',
+          content: 'Type: checkpoint\nrisk: scope audit annotation',
+          evidence: 'scope-audit-annotation',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'audit'],
+          sensitivity: 'none',
+          project_id: 'scope-audit-project',
+          workspace_id: '/workspace/private-path',
+          client_id: 'codex',
+          visibility: 'shared'
+        }
+      }
+    }, requestContext);
+    assert.equal(recordResult.response.result.structuredContent.decision, 'accepted');
+
+    const searchResult = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'scope audit annotation',
+          target: 'process',
+          limit: 5,
+          include_content: true,
+          scope: {
+            project_id: 'scope-audit-project',
+            workspace_id: '/workspace/private-path',
+            client_id: 'codex',
+            visibility: 'shared',
+            strict: true
+          }
+        }
+      }
+    }, requestContext);
+
+    const results = searchResult.response.result.structuredContent.results || [];
+    assert.ok(results.length >= 1, 'scoped search should return at least one result');
+
+    const entries = await app.stores.auditLogStore.readRecentRecallAudit(10);
+    const latest = entries.at(-1);
+    assert.equal(latest.scopeApplied, true);
+    assert.equal(latest.scopeMode, 'sql-candidate+post-filter');
+    assert.deepEqual(latest.scopeDimensions, ['project_id', 'workspace_id', 'client_id', 'visibility']);
+    assert.equal(latest.scopeStrict, true);
+    assert.equal(latest.scopeProjectId, 'scope-audit-project');
+    assert.equal(latest.scopeClientId, 'codex');
+    assert.deepEqual(latest.scopeVisibility, ['shared']);
+    assert.equal(latest.scopeWorkspacePresent, true);
+    assert.equal('scopeWorkspaceId' in latest, false, 'raw workspace_id must not be written to recall audit');
+    assert.equal('workspaceId' in latest, false, 'workspaceId must not appear in recall audit');
+    assert.equal(JSON.stringify(latest).includes('/workspace/private-path'), false, 'raw workspace path must not be serialized');
+  });
+});
+
 test('schema: record_memory and search_memory tool definitions cover scope fields', () => {
   const recordSchema = TOOL_DEFINITIONS.find(t => t.name === 'record_memory');
   const searchSchema = TOOL_DEFINITIONS.find(t => t.name === 'search_memory');

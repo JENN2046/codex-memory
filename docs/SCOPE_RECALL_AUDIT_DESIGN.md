@@ -21,6 +21,7 @@
 - chunk SQL 候选层已按 scope 收窄
 - 结果返回前保留 post-filter fallback
 - 已有回归证明：`limit=1` 且高分 off-scope 结果挤满候选池时，仍能返回 in-scope 结果
+- R1 已完成：recall audit 现在会记录低风险 scope annotation，但不写 raw `workspace_id`
 
 ### 当前缺口
 
@@ -131,6 +132,19 @@ adapter-visible final response
 - 不回填历史 recall logs
 - 不改变 MCP tool schema
 
+当前状态：
+
+- 已实现
+- 当前字段包括：
+  - `scopeApplied`
+  - `scopeMode`
+  - `scopeDimensions`
+  - `scopeStrict`
+  - `scopeProjectId`
+  - `scopeClientId`
+  - `scopeVisibility`
+  - `scopeWorkspacePresent`
+
 ### R2. Overview aggregation
 
 目标：`memory_overview` 能汇总“最近 scope recall 是否活跃”。
@@ -164,40 +178,37 @@ adapter-visible final response
 
 ## 本轮决策
 
-本轮先停在 docs 设计，不进入代码实现。
+R1 已落地；本轮之后仍不继续推进 R2/R3。
 
 原因：
 
-1. 当前需要先定清 recall audit 的语义源头：  
-   是记录 pipeline telemetry，还是记录 adapter-visible final response。
-2. `workspace_id` 一旦进入 recall log，需要先定敏感字段策略。
-3. `memory_overview` / dashboard / `http-observe` 都会连带受影响，适合拆成单独的 R1/R2/R3 小批次。
+1. recall audit 的 scope annotation 已经足够表达“scope 发生过”，无需立刻扩大到 overview / dashboard surface。
+2. `workspace_id` 的敏感度边界已先按 `presence-only` 处理，避免 raw path 落盘。
+3. `memory_overview` / dashboard / `http-observe` 仍会连带受影响，适合继续拆成单独的 R2/R3 小批次。
 
 ## 推荐下一步
 
 下一条最小 runtime 候选任务建议是：
 
 ```text
-R1 only:
-只给 recall audit 增加低风险 scope annotation，
-不改 dashboard / http-observe 文本，
-不暴露 raw workspace_id，
-不改变 MCP tool contract。
+R2 only:
+只给 memory_overview 增加 scoped recall 聚合，
+不改 MCP tool contract，
+不输出高基数 workspace 明细，
+不扩大到 dashboard / http-observe 强展示。
 ```
 
 目标文件预计为：
 
 - `src/app.js`
-- `src/recall/KnowledgeBaseRecallPipeline.js`
-- `src/recall/RecallAuditService.js`
-- `tests/phase-b-passive-recall.test.js`
-- 视情况补一条 `memory_overview` recent-entry test
+- `src/core/MemoryOverviewService.js`
+- `tests/phase-b-sync-cache-rerank.test.js`
+- 视情况补一条 dashboard JSON test
 
 建议验证：
 
 ```powershell
-node --test .\tests\phase-b-passive-recall.test.js
-node --test .\tests\scope-filter.test.js
+node --test .\tests\phase-b-sync-cache-rerank.test.js
 npm test
 npm run gate:mainline:strict
 ```

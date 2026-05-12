@@ -2,7 +2,7 @@
 
 ## Current State
 
-治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、以及 scope candidate pushdown `f8dac11` 已推送；当前最新本地工作是 P1 scope recall design：定义 scope 是否继续下推到 recall / audit 语义层的最小设计与风险边界。
+治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、以及 scope recall design `42b9a11` 已推送；当前最新本地工作是 P1 R1 recall-audit annotation：为 scoped `search_memory` 记录低风险 scope metadata，但不写 raw `workspace_id`。
 
 Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
 
@@ -36,8 +36,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - Scope acceptance now covers `workspace_id` / `client_id` end-to-end positive and strict negative cases.
 - Scope enforcement batch completed locally: candidate selection is narrowed by `project_id` / `workspace_id` / `client_id` / `visibility` before ranking, while post-filter remains as a fallback.
 - New regression coverage proves `limit=1` search still returns the in-scope record when higher-scoring off-scope records exceed the candidate pool.
-- Current design focus has been documented: recall audit still lacks explicit scope semantics; [SCOPE_RECALL_AUDIT_DESIGN.md](/A:/codex-memory/docs/SCOPE_RECALL_AUDIT_DESIGN.md) now defines the minimal design and risk boundary before any new runtime patch.
-- Current decision: this batch remains docs-only; next runtime candidate is R1 low-risk recall-audit annotation, not a broader overview/dashboard rewrite.
+- R1 is now implemented: recall audit records `scopeApplied` / `scopeMode` / `scopeDimensions` / `scopeStrict` plus low-risk scope fields, while `workspace_id` remains presence-only.
+- `SCOPE_RECALL_AUDIT_DESIGN.md` now serves as the boundary doc for R2/R3 follow-ups, not just a proposal for R1.
 - LightMemo CLI + compare harness support
 - gate:ci + dashboard tests
 - P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
@@ -48,8 +48,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 ## Next
 
-- P1: commit/push current scope recall design note if final diff stays scoped
-- P2: implement or defer R1 recall-audit annotation based on this design note
+- P1: commit/push current R1 recall-audit annotation batch if final diff stays scoped
+- P2: decide whether to proceed to R2 `memory_overview` scoped recall aggregation
 - P3: Governance report CLI (proposal/tombstone/supersession/stale metrics)
 
 ## Auth Required

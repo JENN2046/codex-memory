@@ -223,5 +223,10 @@ test('recall audit should include candidate, rerank, and query-axis details', as
     assert.ok(Array.isArray(latest.queryAxes));
     assert.ok(Number.isFinite(latest.metaThinkingScore));
     assert.equal(Array.isArray(latest.metaThinkingReasons), true);
+    assert.equal(latest.scopeApplied, false);
+    assert.equal(latest.scopeMode, 'none');
+    assert.deepEqual(latest.scopeDimensions, []);
+    assert.equal(latest.scopeStrict, false);
+    assert.equal(latest.scopeWorkspacePresent, false);
   });
 });

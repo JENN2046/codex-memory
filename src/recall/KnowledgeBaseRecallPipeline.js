@@ -44,7 +44,8 @@ class KnowledgeBaseRecallPipeline {
     compatibility = null,
     contextText = '',
     contextMessages = [],
-    candidateFilters = {}
+    candidateFilters = {},
+    auditContext = {}
   }) {
     if (typeof query !== 'string' || !query.trim()) {
       throw new Error('query must be a non-empty string');
@@ -112,7 +113,8 @@ class KnowledgeBaseRecallPipeline {
       candidateState,
       contextState,
       rerankMeta: rerankState.meta,
-      source
+      source,
+      auditContext
     });
 
     return finalResults;
@@ -242,7 +244,7 @@ class KnowledgeBaseRecallPipeline {
       .sort((left, right) => (right.score || 0) - (left.score || 0));
   }
 
-  async recordAudit({ target, finalResults, queryAnalysis, directives, candidateState, contextState, rerankMeta, source }) {
+  async recordAudit({ target, finalResults, queryAnalysis, directives, candidateState, contextState, rerankMeta, source, auditContext = {} }) {
     for (const dbName of getDiaryNamesForTarget(target)) {
       const currentTarget = getTargetForDiaryName(dbName);
       const targetResults = finalResults.filter(result => result.target === currentTarget);
@@ -262,7 +264,8 @@ class KnowledgeBaseRecallPipeline {
         rerankMeta,
         contextState,
         fromCache: !!candidateState.fromCache,
-        source
+        source,
+        scopeAudit: auditContext.scope || null
       });
     }
   }

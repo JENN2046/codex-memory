@@ -54,6 +54,36 @@ function buildScopeCandidateFilters(scopeFilter) {
   return Object.keys(filters).length > 0 ? { scope: filters } : {};
 }
 
+function buildScopeAuditContext(scopeFilter) {
+  if (!scopeFilter || typeof scopeFilter !== 'object') {
+    return { scopeApplied: false };
+  }
+
+  const visibility = Array.isArray(scopeFilter.visibility)
+    ? scopeFilter.visibility
+    : (scopeFilter.visibility ? [scopeFilter.visibility] : []);
+  const normalizedVisibility = [...new Set(visibility
+    .map(value => String(value || '').trim())
+    .filter(Boolean))];
+  const dimensions = [];
+
+  if (scopeFilter.project_id) dimensions.push('project_id');
+  if (scopeFilter.workspace_id) dimensions.push('workspace_id');
+  if (scopeFilter.client_id) dimensions.push('client_id');
+  if (normalizedVisibility.length > 0) dimensions.push('visibility');
+
+  return {
+    scopeApplied: dimensions.length > 0,
+    scopeMode: dimensions.length > 0 ? 'sql-candidate+post-filter' : 'none',
+    scopeDimensions: dimensions,
+    scopeStrict: !!scopeFilter.strict,
+    scopeProjectId: scopeFilter.project_id ? String(scopeFilter.project_id) : null,
+    scopeClientId: scopeFilter.client_id ? String(scopeFilter.client_id) : null,
+    scopeVisibility: normalizedVisibility,
+    scopeWorkspacePresent: !!scopeFilter.workspace_id
+  };
+}
+
 const { ExecutionContextResolver } = require('./core/ExecutionContextResolver');
 const { RecallEnhancer } = require('./core/RecallEnhancer');
 const { MemoryWriteService } = require('./core/MemoryWriteService');
@@ -265,7 +295,10 @@ function createCodexMemoryApplication(overrides = {}) {
           includeContent: !!args.include_content,
           contextText: args.context_text || '',
           source: 'mcp',
-          candidateFilters: buildScopeCandidateFilters(scopeFilter)
+          candidateFilters: buildScopeCandidateFilters(scopeFilter),
+          auditContext: {
+            scope: buildScopeAuditContext(scopeFilter)
+          }
         });
         const filtered = (scopeFilter && searchResults && searchResults.length)
           ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)

@@ -20,6 +20,7 @@
 | 组合过滤 | `project_id + visibility` | 返回结果 | PASS |
 | 组合过滤扩展 | `project_id + workspace_id + client_id + visibility` | 仅返回完整匹配记录 | PASS |
 | 候选下推 | `scope + limit=1` 且更高分 off-scope 记录超过候选池 | 仍返回 in-scope 结果 | PASS |
+| audit annotation | scoped search recall audit | 记录 `scopeApplied / scopeMode / scopeDimensions / strict / low-risk fields`，且不写 raw `workspace_id` | PASS |
 | 无记录 fallback | record 缺失 scope 字段 | 不过滤（安全兜底） | PASS |
 
 ## Scope Filter 参数
@@ -41,6 +42,7 @@
 
 - `search_memory` 会先把 `project_id` / `workspace_id` / `client_id` / `visibility` 下推到 chunk SQL 候选查询
 - 搜索结果返回后仍保留 post-filter，作为 legacy / record 缺失 / strict 模式下的 defense-in-depth 兜底
+- recall audit 现已记录低风险 scope annotation：`scopeApplied`、`scopeMode`、`scopeDimensions`、`scopeStrict` 以及 `project/client/visibility` 等低风险字段；`workspace_id` 只记录 presence，不落 raw 值
 - 依赖于 H-002c migration 中新增的 scope 列（project_id、visibility、workspace_id、client_id）
 - 若 memory record 缺少 scope 列，则该 record 不会被过滤（安全兜底）
 

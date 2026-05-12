@@ -6,6 +6,18 @@ function normalizeTagArray(tags) {
     .filter(Boolean))];
 }
 
+function normalizeScopeDimensions(dimensions) {
+  return [...new Set((Array.isArray(dimensions) ? dimensions : [])
+    .map(value => String(value || '').trim())
+    .filter(Boolean))];
+}
+
+function normalizeScopeVisibility(visibility) {
+  return [...new Set((Array.isArray(visibility) ? visibility : [])
+    .map(value => String(value || '').trim())
+    .filter(Boolean))];
+}
+
 class RecallAuditService {
   constructor({ auditLogStore, config = null }) {
     this.auditLogStore = auditLogStore;
@@ -30,7 +42,8 @@ class RecallAuditService {
       rerankMeta = {},
       source = 'mcp',
       fromCache = false,
-      contextState = null
+      contextState = null,
+      scopeAudit = null
     } = options;
 
     const safeResults = Array.isArray(results) ? results.filter(Boolean) : [];
@@ -48,6 +61,8 @@ class RecallAuditService {
     const queryAxes = Array.isArray(queryAnalysis.metrics?.dominantAxes)
       ? queryAnalysis.metrics.dominantAxes.slice(0, 4).map(axis => axis.label)
       : [];
+    const scopeApplied = !!scopeAudit?.scopeApplied;
+    const scopeVisibility = normalizeScopeVisibility(scopeAudit?.scopeVisibility);
 
     return {
       timestamp: new Date().toISOString(),
@@ -87,6 +102,14 @@ class RecallAuditService {
       contextLogicDepth: Number.isFinite(contextState?.logicDepth) ? contextState.logicDepth : null,
       contextSemanticWidth: Number.isFinite(contextState?.semanticWidth) ? contextState.semanticWidth : null,
       contextBlendWeight: Number.isFinite(contextState?.blendWeight) ? contextState.blendWeight : null,
+      scopeApplied,
+      scopeMode: scopeApplied ? (scopeAudit?.scopeMode || 'unknown') : 'none',
+      scopeDimensions: normalizeScopeDimensions(scopeAudit?.scopeDimensions),
+      scopeStrict: !!scopeAudit?.scopeStrict,
+      scopeProjectId: scopeApplied ? (scopeAudit?.scopeProjectId || null) : null,
+      scopeClientId: scopeApplied ? (scopeAudit?.scopeClientId || null) : null,
+      scopeVisibility,
+      scopeWorkspacePresent: !!scopeAudit?.scopeWorkspacePresent,
       fromCache: !!fromCache,
       source
     };
