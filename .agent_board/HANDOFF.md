@@ -8,20 +8,13 @@ Start `Single-Window 4-Agent Compact Autopilot` for the current session and rest
 
 - Workspace: A:\codex-memory
 - Branch: codex/p1-vcp-memory-core-100-roadmap
-- HEAD: `93163c0` (`Merge remote-tracking branch 'origin/main' into codex/p1-vcp-memory-core-100-roadmap`)
-- Worktree: dirty; current uncommitted source changes must be treated as user-owned/current-batch work until verified
+- HEAD: `b07358e` (`fix(scope): preserve scoped diary rebuilds`)
+- Worktree: dirty with validated CM-0041 follow-up; current uncommitted files are `src/core/constants.js`, `tests/scope-filter.test.js`, and board updates
 - Remote writes: not authorized
 
 ## Current Dirty Files
 
-- `src/app.js`
-- `src/cli/gate-ci.js`
-- `src/cli/mainline-gate.js`
-- `src/recall/ChunkIndexingService.js`
-- `src/core/MemoryWriteService.js`
-- `src/recall/KnowledgeBaseSyncService.js`
-- `src/storage/DiaryStore.js`
-- `src/storage/SqliteShadowStore.js`
+- `src/core/constants.js`
 - `tests/scope-filter.test.js`
 
 ## 4-Agent Activation
@@ -46,6 +39,11 @@ Start `Single-Window 4-Agent Compact Autopilot` for the current session and rest
   - `npm test`: 174/174 passed.
   - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 174/174, compare 43/43, rollback 43/43.
   - `git diff --check`: passed.
+- CM-0041 risk fix validation:
+  - `node --test .\tests\scope-filter.test.js`: 15/15 passed.
+  - `node --test .\tests\mcp-contract.test.js`: 4/4 passed.
+  - `npm test`: 175/175 passed.
+  - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 175/175, compare 43/43, rollback 43/43.
 
 ## Runtime Notes
 
@@ -62,10 +60,11 @@ Start `Single-Window 4-Agent Compact Autopilot` for the current session and rest
 - Treat `4-Agent` as logical roles; independent agents are read-only until explicit file locks and task contracts exist.
 - Do not push, commit, start Phase 2, or touch source files as part of CM-0038.
 - Store scope metadata durably in diary headers, but strip internal scope headers before chunk indexing and external recall output.
+- Supplied search `scope` fields are always filters; `strict` is an audit/overview hard-isolation intent marker, not the switch that enables filtering.
 
 ## Next Safe Task
 
-Report code review result, then optionally run final read-only Verifier before any guarded local commit. Do not push.
+Run final diff check, then report CM-0041 result. Optional guarded local commit can follow if requested or if Commander chooses to apply the guarded commit rule. Do not push.
 
 ## Warnings
 

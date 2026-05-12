@@ -49,7 +49,7 @@ const TOOL_DEFINITIONS = [
   {
     name: 'search_memory',
     title: 'Search Codex Memory',
-    description: 'Search over the Codex process and knowledge diaries with diary-compatible recall output.',
+    description: 'Search over the Codex process and knowledge diaries with diary-compatible recall output. When scope is supplied, scope fields are applied as recall filters; strict marks the scoped search as a hard isolation intent for audit/overview.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -61,13 +61,14 @@ const TOOL_DEFINITIONS = [
         context_text: { type: 'string' },
         scope: {
           type: 'object',
+          description: 'Optional recall scope filter. project_id, workspace_id, client_id, and visibility restrict candidates whenever they are supplied; strict only records hard-isolation intent.',
           additionalProperties: false,
           properties: {
-            project_id: { type: 'string' },
-            workspace_id: { type: 'string' },
-            client_id: { type: 'string' },
-            visibility: { type: 'string' },
-            strict: { type: 'boolean' }
+            project_id: { type: 'string', description: 'Restrict recall to records with this project_id.' },
+            workspace_id: { type: 'string', description: 'Restrict recall to records with this workspace_id. The raw value is not written to recall audit summaries.' },
+            client_id: { type: 'string', description: 'Restrict recall to records with this client_id.' },
+            visibility: { type: 'string', description: 'Restrict recall to records with this visibility value.' },
+            strict: { type: 'boolean', description: 'Audit/overview marker for hard-isolation intent; scope fields still filter when strict is false or omitted.' }
           }
         }
       },

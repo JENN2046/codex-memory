@@ -17,7 +17,7 @@ Current worktree is dirty:
 - Board refresh files: `.agent_board/RUN_STATE.md`, `.agent_board/TASK_QUEUE.md`, `.agent_board/HANDOFF.md`, `.agent_board/CHECKPOINT.md`, `.agent_board/FILE_LOCKS.md`, `.agent_board/RISK_REGISTER.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/DECISIONS.md`
 - Validated dirty source batch: `src/app.js`, `src/core/MemoryWriteService.js`, `src/storage/DiaryStore.js`, `src/storage/SqliteShadowStore.js`, `src/recall/KnowledgeBaseSyncService.js`, `src/recall/ChunkIndexingService.js`, `src/cli/gate-ci.js`, `src/cli/mainline-gate.js`, `tests/scope-filter.test.js`
 
-CM-0038 activated the control plane. CM-0039 / CM-0040 then completed the source validation batch and code review follow-up.
+CM-0038 activated the control plane. CM-0039 / CM-0040 then completed the source validation batch and code review follow-up. CM-0041 clarifies scope strict semantics after final code review.
 
 ## Current 4-Agent Roles
 
@@ -39,6 +39,7 @@ CM-0038 activated the control plane. CM-0039 / CM-0040 then completed the source
 - `npm test`: 174/174 passed.
 - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 174/174, compare 43/43, rollback 43/43.
 - `git diff --check`: passed.
+- CM-0041: `node --test .\tests\scope-filter.test.js` 15/15; `node --test .\tests\mcp-contract.test.js` 4/4; `npm test` 175/175; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 175/175, compare 43/43, rollback 43/43.
 
 ## Current Blockers
 

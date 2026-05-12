@@ -247,6 +247,88 @@ test('scope filter: search_memory with wrong project_id returns 0', async () => 
   });
 });
 
+test('scope filter: strict false still applies supplied scope fields', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+
+    const inScope = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Soft Scope Included',
+          content: 'Type: checkpoint\nrisk: soft scope filter included',
+          evidence: 'soft-scope-filter',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'soft'],
+          sensitivity: 'none',
+          project_id: 'soft-scope-project-a',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(inScope.response.result.structuredContent.decision, 'accepted');
+    const inScopeMemoryId = inScope.response.result.structuredContent.memoryId;
+
+    const outOfScope = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Soft Scope Excluded',
+          content: 'Type: checkpoint\nrisk: soft scope filter excluded',
+          evidence: 'soft-scope-filter',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'soft'],
+          sensitivity: 'none',
+          project_id: 'soft-scope-project-b',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(outOfScope.response.result.structuredContent.decision, 'accepted');
+    const outOfScopeMemoryId = outOfScope.response.result.structuredContent.memoryId;
+
+    const search = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'soft scope filter',
+          target: 'process',
+          limit: 10,
+          include_content: true,
+          scope: {
+            project_id: 'soft-scope-project-a',
+            strict: false
+          }
+        }
+      }
+    }, requestContext);
+
+    const results = search.response.result.structuredContent.results || [];
+    const memoryIds = results.map(result => result.memoryId);
+    assert.ok(memoryIds.includes(inScopeMemoryId), 'strict=false scope must include matching project records');
+    assert.equal(memoryIds.includes(outOfScopeMemoryId), false, 'strict=false scope must still filter non-matching project records');
+
+    const entries = await app.stores.auditLogStore.readRecentRecallAudit(10);
+    const latest = entries.at(-1);
+    assert.equal(latest.scopeApplied, true);
+    assert.equal(latest.scopeStrict, false);
+    assert.deepEqual(latest.scopeDimensions, ['project_id']);
+  });
+});
+
 test('scope filter: strict mode must NOT leak records from other projects', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
