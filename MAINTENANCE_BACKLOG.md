@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-08
+更新时间：2026-05-12
 
 这份文档承接 `Phase E` 收官之后的后续增量工作。
 
@@ -23,12 +23,14 @@
 
 ## 当前基线
 
-- 最新主线提交：`61b6279` / tag `v0.1.0-maint-20260508`
+- 当前本地 `HEAD`：`48d72f0`（治理轨道 / Verifier rail 补丁），分支相对 `origin/main` `ahead 1`
+- 当前远端基线：`8c2836b` / tag `v0.1.1-scope-boundary-20260508`
 - gate:ci：`119/119`（fixture-only）、gate:mainline：health `200`、compare `43/43`、rollback `43/43`
-- 标准 suite：`43/43 matched (0/0)`、npm test：`131/131`
-- profile health：`needs-attention`（vectors=0，需 rebuild-shadow）
+- 标准 suite：`43/43 matched (0/0)`、npm test：`140/140`
+- profile health：`ready`（vectors=205，embedding cache=822，legacy=0）
 - 维护期验收：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)
 - 全部 Phase A-J + 维护期 M-001~M-013 + 8-task batch 已完成
+- Verifier rail：已本地完成并形成 guarded local commit `48d72f0`；包含 Worker task contract、read-only Verifier protocol、file locks、risk register 与一次 Commander -> Worker -> Verifier 试跑
 
 ## 维护期队列（首批 M-001~M-013 已全部完成）
 
@@ -44,7 +46,7 @@
 | M-008 | next-phase | A1 | done | 准备 Phase F / Codex-Claude memory governance / client scope 的候选计划 | docs review / no runtime change | 已压缩为 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)；已推送 |
 | M-009 | claude-client | A1 | done | Claude MCP 接入最小验收 | HTTP health / `claude mcp get/list` / direct MCP `memory_overview` / `deepseek-ai/deepseek-v4-flash` model-mediated `memory_overview` / `gate:mainline` | config 已写入且 MCP connected；当前模型侧调用使用 `deepseek-ai/deepseek-v4-flash` 并已成功；仅交互式 `/mcp` 面板可后补 |
 | M-010 | docs-governance | A0 | done | 建立文档事实源分工规则 | `git diff --check` / link check / `npm run gate:mainline` | 新增 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)；已推送 |
-| M-011 | ci-gate | A1 | done | 设计 `gate:ci` fixture-only 边界 | docs review / no runtime change / `npm run gate:mainline` | 设计入口：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)；已本地提交 `3493480`，未推送；未改 `package.json` / `.github/workflows` |
+| M-011 | ci-gate | A1 | done | 设计 `gate:ci` fixture-only 边界 | docs review / no runtime change / `npm run gate:mainline` | 设计入口：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)；当前 `gate:ci` 已由 `G-001` 落地实现，M-011 保留为设计记录 |
 | M-012 | memory-governance | A1 | done | 起草 memory governance model | docs review / no runtime change | 已创建 [MEMORY_GOVERNANCE_MODEL.md](/A:/codex-memory/MEMORY_GOVERNANCE_MODEL.md)；定义治理分层、角色、lifecycle、scope、proposal、enforcement 模型 |
 | M-013 | client-scope | A1 | done | 起草 Codex / Claude client scope model | docs review / no runtime change | 已创建 [CLIENT_SCOPE_MODEL.md](/A:/codex-memory/CLIENT_SCOPE_MODEL.md)；定义 client_id、workspace_id、project_id、task_id、conversation_id、visibility、retention_policy 维度 |
 | H-002a | memory-governance | A0 | done | 设计 proposal / tombstone / supersession schema | docs review | 已创建 [PROPOSAL_TOMBSTONE_SUPERSESSION_SCHEMA.md](/A:/codex-memory/docs/PROPOSAL_TOMBSTONE_SUPERSESSION_SCHEMA.md) |
@@ -56,15 +58,14 @@
 | J-002 | observability | A1 | done | 实现 memory dashboard CLI | `npm run dashboard` / `npm run dashboard -- --json` + `npm run gate:mainline` | 已实现 `src/cli/dashboard.js`；gate 43/43 通过 |
 | J-003 | observability | A0 | done | 评估 local-only Web UI | docs review | 已创建 [LOCAL_WEB_UI_ASSESSMENT.md](/A:/codex-memory/docs/LOCAL_WEB_UI_ASSESSMENT.md)；结论：当前不建议实现 |
 | G-001 | ci-gate | A1 | done | 实现 gate:ci fixture-only CLI | `npm run gate:ci` | 已实现 `src/cli/gate-ci.js`；compare 43/43 + rollback 43/43 + tests 116/116 + docs check |
+| G-002 | docs-governance | A0 | done | 补齐 Verifier rail 与多 Worker 基础治理轨道 | `git diff --check` / `scripts/validate-local.ps1 -Area docs` / Worker 试跑 / read-only Verifier | 已本地提交 `48d72f0`；当前分支 `ahead 1`，未 push |
 
 ## 推荐执行顺序
 
-1. `M-006` 和 `M-007`：先保持维护期入口清爽，避免 Phase E 收官后继续堆噪音。
-2. `M-001`：挑一个用户真实可感知的 donor case，补进标准 suite。
-3. `M-004`：只有需要 provider 证据时，再在明确授权下跑真实 benchmark 并留档。
-4. `M-009`：明确授权后再执行 `claude mcp add`，完成 Claude Code 实机接入验收。
-5. `M-011`：先把 CI-safe gate 的 fixture-only 边界写清楚，再决定是否实现。
-6. `M-012` 和 `M-013`：只做治理 / scope 模型设计，不直接改 runtime。
+1. `G-002` 已完成：治理轨道已补齐，后续多 Worker 任务可以复用 Verifier rail。
+2. `P1`：做 Codex/Claude scope acceptance 的端到端验证，优先确认 `client_id / workspace_id / project_id / visibility` 查询边界。
+3. `P2`：做 `governance:report` 最小闭环，只读输出 proposal/tombstone/supersession/stale metrics。
+4. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

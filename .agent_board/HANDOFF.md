@@ -2,17 +2,18 @@
 
 ## Current State
 
-P0.5 dashboard 空 store 兼容修复已完成并推送；当前分支收口状态稳定。`01b46f7` 已有维护期 P0.5 tag，当前 `HEAD` / `origin/main` 已推进到 board 校准提交 `8c2836b`，并带有 tag `v0.1.1-scope-boundary-20260508`。
+治理轨道补丁已在本地提交为 `48d72f0`，当前分支相对 `origin/main` 为 `ahead 1`。远端仍停在 `8c2836b`，对应 tag `v0.1.1-scope-boundary-20260508`。
 
-Governance rail calibration completed locally: Worker task contracts and read-only Verifier protocol were added to `AGENTS.md`; `.agent_board/FILE_LOCKS.md` and `.agent_board/RISK_REGISTER.md` were created; board drift was corrected; a small Worker trial updated only `STATUS.md`; first Verifier review returned `NEEDS_FIX` for board cleanup only; cleanup was applied; final read-only Verifier returned `PASS`.
+Verifier rail 已完成本地落地：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: `8c2836b`
-- Tag: `v0.1.1-scope-boundary-20260508`
-- Remote: origin/main synced
+- HEAD: `48d72f0`
+- Remote baseline: `8c2836b`
+- Remote tag baseline: `v0.1.1-scope-boundary-20260508`
+- Remote status: local branch `ahead 1`
 
 ## Key Baseline
 
@@ -27,9 +28,10 @@ Governance rail calibration completed locally: Worker task contracts and read-on
 
 ## Recent Work
 
-- Governance rail patch: `AGENTS.md` now defines Commander task contracts and read-only Verifier protocol.
+- Governance rail patch committed locally as `48d72f0`.
+- `AGENTS.md` now defines Commander task contracts and read-only Verifier protocol.
 - `.agent_board/FILE_LOCKS.md` and `.agent_board/RISK_REGISTER.md` added.
-- Commander -> Worker -> Verifier trial: Worker changed only `STATUS.md`; Verifier found board cleanup gaps; fixes applied.
+- Commander -> Worker -> Verifier trial: Worker changed only `STATUS.md`; first Verifier found board cleanup gaps; final Verifier PASS.
 - LightMemo CLI + compare harness support
 - gate:ci + dashboard tests
 - P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
@@ -40,8 +42,8 @@ Governance rail calibration completed locally: Worker task contracts and read-on
 
 ## Next
 
-- P0: report governance rail completion; optional guarded local commit only, no push without explicit approval
-- P1: Codex/Claude scope acceptance (end-to-end verify scope filter)
+- P0: current facts synced into STATUS / backlog / board surfaces; next safe implementation target is scope acceptance
+- P1: Codex/Claude scope acceptance (end-to-end verify scope filter across `client_id / workspace_id / project_id / visibility`)
 - P2: Governance report CLI (proposal/tombstone/supersession/stale metrics)
 
 ## Auth Required
