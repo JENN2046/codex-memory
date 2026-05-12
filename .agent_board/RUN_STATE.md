@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P8 / policy-layer proposal-scope boundary note |
+| Current task | P8 / soft read-policy preflight |
 | Current area | P8-memory-governance |
-| Last action | 已新增 `POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md`，把 proposal lifecycle、scope retrieval、visibility policy 与 future enforcement 拆成 L0-L3 四层，并明确当前先停在 observability / classification，不进入 write-path 或 hard policy。 |
-| Last validation | `git diff --check` passed with repo-known LF normalization warnings only；`powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed。 |
-| Worktree summary | current worktree carries a docs-only governance/policy batch across design docs and `.agent_board`; validation is complete and there are still no runtime, MCP contract, test, or config changes. |
+| Last action | 已完成 fixture-backed `policy-read-preflight`：用 mixed governance/status/visibility records 证明当前默认读路径仍然宽松，并量化假设中的 status + private visibility soft policy 会收窄多少结果。 |
+| Last validation | `node --test tests\policy-read-preflight.test.js` `2/2`、`npm test` `150/150`、`git diff --check`、`validate-local.ps1 -Area docs` 全部通过；`TASK_QUEUE` / docs / checkpoint 已同步。 |
+| Worktree summary | current worktree carries a narrow preflight batch across tests, docs, and `.agent_board`; no runtime behavior, MCP contract, or config changes. |
 | Mainline assumption | HTTP MCP 7605 is reachable |
 | Active-memory suite status | `43/43 matched`, `43/43 rollback-ready`, `extendedMismatchCountTotal=0` |
-| npm test | `148/148` |
+| npm test | `150/150` |
 | Profile health | `ready` — vectors 205, 822 embedding cache, 0 legacy |
-| Guarded auto-commit allowed | yes for this docs-only governance/policy batch after final diff inspection; user session explicitly allows judged push after guarded commit |
+| Guarded auto-commit allowed | yes — validation passed, diff remains scoped to tests/docs/`.agent_board`, and this session explicitly allows judged push after guarded commit |
 | Last checkpoint | [maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md) |
-| Next planned action | Run docs validation, inspect diff, guarded commit/push this policy-boundary batch, then decide whether to keep docs-first via PL-1 or open a soft-policy preflight task. |
+| Next planned action | Inspect final diff, perform guarded commit, then push this scoped `PL-2` preflight batch under the current standing authorization. |
 
 ## Notes
 

@@ -243,6 +243,10 @@ status / visibility 默认过滤一旦改变，就是行为变化，不该伪装
 
 类型：test/design-first
 
+当前入口：
+
+- [SOFT_READ_POLICY_PREFLIGHT.md](/A:/codex-memory/docs/SOFT_READ_POLICY_PREFLIGHT.md)
+
 ### PL-3. Runtime candidate（需要单独批准）
 
 只在前两步清楚后，才考虑：
