@@ -43,6 +43,10 @@
 
 | CMV-0047 | `node --test tests/dashboard-cli.test.js` ; `npm test` ; `npm run gate:mainline:strict` | P0-mainline-health | P0.5 dashboard 空 store 兼容修复 | COMPLETED_VALIDATED | dashboard json 断言收口通过，empty store 下 status 要求 `warn`；`npm test` 140/140；`gate:mainline:strict` 全绿 | 无 | 2026-05-08 |
 
+| CMV-0048 | `git diff --check` ; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` ; Worker `worker-trial-status-drift` ; read-only Verifier first pass | P6-docs-drift | Governance rail calibration and Commander -> Worker -> Verifier trial | PARTIAL | diff check passed；docs validation passed；Worker changed only `STATUS.md` and reported PASS；Verifier first pass returned `NEEDS_FIX` because `FL-0002` was still active and RUN_STATE/HANDOFF had not yet recorded trial completion | released `FL-0002`, updated RUN_STATE/HANDOFF, rerun final Verifier | 2026-05-12 |
+
+| CMV-0049 | final read-only Verifier pass | P6-docs-drift | Governance rail calibration and Commander -> Worker -> Verifier trial | COMPLETED_VALIDATED | Verifier PASS: changed files stayed in allowed scope; no hard-stop, secret, dependency, runtime-data, or config changes; `FL-0002` released; RUN_STATE/HANDOFF current; guarded local commit eligible | no push without explicit approval | 2026-05-12 |
+
 ## Batch Summary
 
 维护期入口文档已压缩，此节按日期批次聚合，不再分散到各入口文档。
