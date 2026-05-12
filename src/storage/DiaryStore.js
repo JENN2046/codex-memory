@@ -238,19 +238,23 @@ class DiaryStore {
     }
 
     const withoutHeader = rawText.replace(/^\[[^\n]+\]\s*-\s*[^\n]*\r?\n/, '');
-    const title = this.matchSingleLine(withoutHeader, /^Title:\s*(.+)$/mi) || path.basename(filePath);
-    const memoryId = this.matchSingleLine(withoutHeader, /^Memory-ID:\s*([A-Za-z0-9-]+)$/mi) || null;
-    const recordType = this.matchSingleLine(withoutHeader, /^Record-Type:\s*(.+)$/mi) || fallbackTarget || 'process';
+    const contentMarker = withoutHeader.match(/\r?\nContent:\r?\n/);
+    const headerBlock = contentMarker && contentMarker.index !== undefined
+      ? withoutHeader.slice(0, contentMarker.index)
+      : withoutHeader;
+    const title = this.matchSingleLine(headerBlock, /^Title:\s*(.+)$/mi) || path.basename(filePath);
+    const memoryId = this.matchSingleLine(headerBlock, /^Memory-ID:\s*([A-Za-z0-9-]+)$/mi) || null;
+    const recordType = this.matchSingleLine(headerBlock, /^Record-Type:\s*(.+)$/mi) || fallbackTarget || 'process';
     const target = String(recordType).trim().toLowerCase() === 'knowledge' ? 'knowledge' : 'process';
-    const validated = parseBooleanFlag(this.matchSingleLine(withoutHeader, /^Validated:\s*(.+)$/mi));
-    const reusable = parseBooleanFlag(this.matchSingleLine(withoutHeader, /^Reusable:\s*(.+)$/mi));
-    const projectId = this.matchSingleLine(withoutHeader, /^Project-ID:\s*(.+)$/mi) || null;
-    const workspaceId = this.matchSingleLine(withoutHeader, /^Workspace-ID:\s*(.+)$/mi) || null;
-    const clientId = this.matchSingleLine(withoutHeader, /^Client-ID:\s*(.+)$/mi) || null;
-    const taskId = this.matchSingleLine(withoutHeader, /^Task-ID:\s*(.+)$/mi) || null;
-    const conversationId = this.matchSingleLine(withoutHeader, /^Conversation-ID:\s*(.+)$/mi) || null;
-    const visibility = this.matchSingleLine(withoutHeader, /^Visibility:\s*(.+)$/mi) || null;
-    const retentionPolicy = this.matchSingleLine(withoutHeader, /^Retention-Policy:\s*(.+)$/mi) || null;
+    const validated = parseBooleanFlag(this.matchSingleLine(headerBlock, /^Validated:\s*(.+)$/mi));
+    const reusable = parseBooleanFlag(this.matchSingleLine(headerBlock, /^Reusable:\s*(.+)$/mi));
+    const projectId = this.matchSingleLine(headerBlock, /^Project-ID:\s*(.+)$/mi) || null;
+    const workspaceId = this.matchSingleLine(headerBlock, /^Workspace-ID:\s*(.+)$/mi) || null;
+    const clientId = this.matchSingleLine(headerBlock, /^Client-ID:\s*(.+)$/mi) || null;
+    const taskId = this.matchSingleLine(headerBlock, /^Task-ID:\s*(.+)$/mi) || null;
+    const conversationId = this.matchSingleLine(headerBlock, /^Conversation-ID:\s*(.+)$/mi) || null;
+    const visibility = this.matchSingleLine(headerBlock, /^Visibility:\s*(.+)$/mi) || null;
+    const retentionPolicy = this.matchSingleLine(headerBlock, /^Retention-Policy:\s*(.+)$/mi) || null;
     const contentMatch = withoutHeader.match(/\nContent:\n([\s\S]*?)\n\nEvidence:\n/);
     const evidenceMatch = withoutHeader.match(/\nEvidence:\n([\s\S]*?)(?:\n\nTag:\s*(.+))?$/);
     const tagsLine = this.matchSingleLine(withoutHeader, /^Tag:\s*(.+)$/mi) || '';

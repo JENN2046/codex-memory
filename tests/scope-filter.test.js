@@ -1001,6 +1001,90 @@ test('scope durability: diary rebuild preserves scope metadata into fresh shadow
   }
 });
 
+test('scope rebuild ignores user-authored marker-like lines inside content', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-scope-body-marker-'));
+  const appOptions = {
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data')
+  };
+  const app = createCodexMemoryApplication(appOptions);
+  await app.initialize();
+
+  let memoryId;
+  try {
+    const record = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Body Marker Scope Drift',
+      content: [
+        'Type: checkpoint',
+        'Project-ID: user-authored-project',
+        'Workspace-ID: user-authored-workspace',
+        'Client-ID: user-authored-client',
+        'Task-ID: user-authored-task',
+        'Conversation-ID: user-authored-conversation',
+        'Visibility: user-authored-visibility',
+        'Retention-Policy: user-authored-retention',
+        'risk: body marker lines must not become scope metadata'
+      ].join('\n'),
+      evidence: 'body marker scope drift regression',
+      validated: true,
+      reusable: false,
+      tags: ['scope', 'body-marker'],
+      sensitivity: 'none'
+    }, requestContext);
+    assert.equal(record.decision, 'accepted');
+    memoryId = record.memoryId;
+  } finally {
+    await app.close();
+  }
+
+  await fs.rm(path.join(tempBasePath, 'data'), { recursive: true, force: true });
+
+  const rebuiltApp = createCodexMemoryApplication(appOptions);
+  await rebuiltApp.initialize();
+  try {
+    await rebuiltApp.rebuildShadowFromDiary({ target: 'process' });
+
+    const restored = await rebuiltApp.stores.shadowStore.getRecord(memoryId);
+    assert.equal(restored.projectId, null);
+    assert.equal(restored.workspaceId, null);
+    assert.equal(restored.clientId, null);
+    assert.equal(restored.taskId, null);
+    assert.equal(restored.conversationId, null);
+    assert.equal(restored.visibility, null);
+    assert.equal(restored.retentionPolicy, null);
+
+    const scopedSearch = await rebuiltApp.callTool('search_memory', {
+      query: 'body marker lines must not become scope metadata',
+      target: 'process',
+      limit: 10,
+      scope: {
+        project_id: 'user-authored-project'
+      }
+    }, requestContext);
+    assert.equal(
+      scopedSearch.results.some(result => result.memoryId === memoryId),
+      false,
+      'content Project-ID must not be treated as rebuilt scope metadata'
+    );
+
+    const unscopedSearch = await rebuiltApp.callTool('search_memory', {
+      query: 'body marker lines must not become scope metadata',
+      target: 'process',
+      limit: 10,
+      include_content: true
+    }, requestContext);
+    const matched = unscopedSearch.results.find(result => result.memoryId === memoryId);
+    assert.ok(matched, 'unscoped search should still find user-authored marker content');
+    assert.equal(matched.content.includes('Project-ID: user-authored-project'), true);
+  } finally {
+    await rebuiltApp.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
 test('scope filter: legacy raw chunk headers are stripped from recall text', async () => {
   await withApp(async ({ app }) => {
     const record = await app.callTool('record_memory', {

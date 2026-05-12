@@ -2,20 +2,19 @@
 
 ## Goal
 
-Harden scoped recall compatibility and prevent legacy raw chunk scope-header leakage while preserving `.agent_board` current state.
+Harden scoped recall compatibility, including diary rebuild header parsing, while preserving `.agent_board` current state.
 
 ## Safe State
 
 - Workspace: A:\codex-memory
 - Branch: codex/p1-vcp-memory-core-100-roadmap
-- HEAD: CM-0043 guarded local commit target; branch remains ahead of remote
-- Worktree: CM-0043 source/test/board batch validated for local commit
+- HEAD: CM-0044 guarded local commit target; branch remains ahead of remote
+- Worktree: CM-0044 source/test/board batch validated for local commit
 - Remote writes: not authorized
 
 ## Current Dirty Files
 
-- `src/recall/CandidateGenerator.js`
-- `src/recall/KnowledgeBaseRecallPipeline.js`
+- `src/storage/DiaryStore.js`
 - `tests/scope-filter.test.js`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/TASK_QUEUE.md`
@@ -62,6 +61,11 @@ Harden scoped recall compatibility and prevent legacy raw chunk scope-header lea
   - `npm test`: 177/177 passed.
   - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 177/177, compare 43/43, rollback 43/43.
   - `git diff --check`: passed.
+- CM-0044 diary scope header parsing boundary:
+  - `node --test .\tests\scope-filter.test.js`: 18/18 passed.
+  - `npm test`: 178/178 passed.
+  - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 178/178, compare 43/43, rollback 43/43.
+  - `git diff --check`: passed.
 
 ## Runtime Notes
 
@@ -71,7 +75,7 @@ Harden scoped recall compatibility and prevent legacy raw chunk scope-header lea
 ## Blockers
 
 - No hard blocker to the local autopilot control plane.
-- none for CM-0043 local guarded commit.
+- none for CM-0044 local guarded commit.
 
 ## Decisions
 
@@ -82,6 +86,7 @@ Harden scoped recall compatibility and prevent legacy raw chunk scope-header lea
 - Preserve old SQLite scoped-column defaults at write time only when the existing schema has NOT NULL defaults; keep new nullable schemas nullable.
 - Keep `search_memory.scope.visibility` schema compatible with runtime support for a string or an array.
 - Treat recall result `text` as user-facing output and sanitize internal diary scope markers, including legacy raw chunk rows and cached candidates.
+- Parse diary scope metadata only from the header block before `Content:`; marker-like lines in user content remain content.
 
 ## Next Safe Task
 
