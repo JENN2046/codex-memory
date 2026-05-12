@@ -292,13 +292,60 @@ SELECT * FROM memory_records WHERE memory_id IN (${placeholders})
     };
   }
 
+  normalizeScopeFilters(rawScope) {
+    if (!rawScope || typeof rawScope !== 'object') {
+      return null;
+    }
+
+    const visibility = Array.isArray(rawScope.visibility)
+      ? rawScope.visibility.map(value => String(value || '').trim()).filter(Boolean)
+      : (rawScope.visibility ? [String(rawScope.visibility).trim()] : []);
+
+    const scope = {
+      projectId: rawScope.projectId ? String(rawScope.projectId).trim() : '',
+      workspaceId: rawScope.workspaceId ? String(rawScope.workspaceId).trim() : '',
+      clientId: rawScope.clientId ? String(rawScope.clientId).trim() : '',
+      visibility: [...new Set(visibility)]
+    };
+
+    return scope.projectId || scope.workspaceId || scope.clientId || scope.visibility.length > 0
+      ? scope
+      : null;
+  }
+
   buildChunkQuery(target = 'both', filters = {}) {
-    const where = ['embedding_fingerprint = ?'];
+    const where = ['memory_chunks.embedding_fingerprint = ?'];
     const params = [this.config.embeddingFingerprint];
+    const joins = [];
 
     if (target !== 'both') {
-      where.push('target = ?');
+      where.push('memory_chunks.target = ?');
       params.push(target);
+    }
+
+    const scopeFilters = this.normalizeScopeFilters(filters.scope);
+    if (scopeFilters) {
+      joins.push('INNER JOIN memory_records ON memory_records.memory_id = memory_chunks.memory_id');
+
+      if (scopeFilters.projectId) {
+        where.push('memory_records.project_id = ?');
+        params.push(scopeFilters.projectId);
+      }
+
+      if (scopeFilters.workspaceId) {
+        where.push('memory_records.workspace_id = ?');
+        params.push(scopeFilters.workspaceId);
+      }
+
+      if (scopeFilters.clientId) {
+        where.push('memory_records.client_id = ?');
+        params.push(scopeFilters.clientId);
+      }
+
+      if (scopeFilters.visibility.length > 0) {
+        where.push(`memory_records.visibility IN (${scopeFilters.visibility.map(() => '?').join(',')})`);
+        params.push(...scopeFilters.visibility);
+      }
     }
 
     const groupedPathFilter = this.buildPathGroupClause(filters.relativePathGroups);
@@ -329,9 +376,10 @@ SELECT * FROM memory_records WHERE memory_id IN (${placeholders})
     }
 
     const sql = [
-      'SELECT * FROM memory_chunks',
+      'SELECT memory_chunks.* FROM memory_chunks',
+      ...joins,
       where.length > 0 ? `WHERE ${where.join(' AND ')}` : '',
-      'ORDER BY updated_at DESC, chunk_index ASC'
+      'ORDER BY memory_chunks.updated_at DESC, memory_chunks.chunk_index ASC'
     ].filter(Boolean).join(' ');
 
     return { sql, params };

@@ -540,6 +540,83 @@ test('scope filter: wrong workspace_id or client_id returns 0 in strict mode', a
   });
 });
 
+test('scope filter: SQL candidate pushdown preserves scoped result when higher-scoring off-scope records exceed pool', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+
+    for (let index = 0; index < 6; index += 1) {
+      const wrongScopeResult = await server.handleJsonRpc({
+        jsonrpc: '2.0',
+        id: index + 1,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: `Overflow Wrong ${index}`,
+            content: 'Type: checkpoint\noverflow signal checkpoint',
+            evidence: 'overflow-wrong-scope',
+            validated: true,
+            reusable: false,
+            tags: ['overflow', 'checkpoint', `wrong-${index}`],
+            sensitivity: 'none',
+            project_id: 'overflow-wrong-project',
+            visibility: 'project'
+          }
+        }
+      }, requestContext);
+      assert.equal(wrongScopeResult.response.result.structuredContent.decision, 'accepted');
+    }
+
+    const correctScopeResult = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 100,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Scoped Fallback Survivor',
+          content: 'Type: checkpoint\ncheckpoint only',
+          evidence: 'overflow-correct-scope',
+          validated: true,
+          reusable: false,
+          tags: ['checkpoint'],
+          sensitivity: 'none',
+          project_id: 'overflow-right-project',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(correctScopeResult.response.result.structuredContent.decision, 'accepted');
+    const correctScopeId = correctScopeResult.response.result.structuredContent.memoryId;
+
+    const searchResult = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 200,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'overflow checkpoint',
+          target: 'process',
+          limit: 1,
+          include_content: true,
+          scope: {
+            project_id: 'overflow-right-project',
+            visibility: 'project',
+            strict: true
+          }
+        }
+      }
+    }, requestContext);
+
+    const results = searchResult.response.result.structuredContent.results || [];
+    assert.equal(results.length, 1, 'scope pushdown should still return the matching scoped result at limit=1');
+    assert.equal(results[0].memoryId, correctScopeId, 'scope pushdown must preserve the in-scope record');
+  });
+});
+
 test('schema: record_memory and search_memory tool definitions cover scope fields', () => {
   const recordSchema = TOOL_DEFINITIONS.find(t => t.name === 'record_memory');
   const searchSchema = TOOL_DEFINITIONS.find(t => t.name === 'search_memory');

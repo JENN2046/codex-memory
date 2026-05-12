@@ -19,6 +19,7 @@
 | 错误 client | `client_id: "claude"` + `strict: true` | 0 results | PASS |
 | 组合过滤 | `project_id + visibility` | 返回结果 | PASS |
 | 组合过滤扩展 | `project_id + workspace_id + client_id + visibility` | 仅返回完整匹配记录 | PASS |
+| 候选下推 | `scope + limit=1` 且更高分 off-scope 记录超过候选池 | 仍返回 in-scope 结果 | PASS |
 | 无记录 fallback | record 缺失 scope 字段 | 不过滤（安全兜底） | PASS |
 
 ## Scope Filter 参数
@@ -38,12 +39,12 @@
 
 ## 实现说明
 
-- 采用 post-filter 方式（搜索结果返回后按 scope 字段过滤）
-- 不修改 recall pipeline
+- `search_memory` 会先把 `project_id` / `workspace_id` / `client_id` / `visibility` 下推到 chunk SQL 候选查询
+- 搜索结果返回后仍保留 post-filter，作为 legacy / record 缺失 / strict 模式下的 defense-in-depth 兜底
 - 依赖于 H-002c migration 中新增的 scope 列（project_id、visibility、workspace_id、client_id）
 - 若 memory record 缺少 scope 列，则该 record 不会被过滤（安全兜底）
 
 ## 已知限制
 
-- post-filter 方式下，如果 scope 过滤后结果不足 limit，不会补回更多结果
-- 未来可考虑在 recall pipeline 中直接下推 scope filter 到 SQL 查询以提升效率
+- 当前下推发生在 chunk SQL 候选层，active-memory 路径与更深层 recall 策略仍未引入独立 scope policy
+- 若未来引入更复杂的 scope policy（例如 proposal/approval 或 layered visibility），需要单独扩展查询与审计语义

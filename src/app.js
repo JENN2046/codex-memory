@@ -26,6 +26,34 @@ async function applyScopeFilter(results, scopeFilter, shadowStore) {
   });
 }
 
+function buildScopeCandidateFilters(scopeFilter) {
+  if (!scopeFilter || typeof scopeFilter !== 'object') {
+    return {};
+  }
+
+  const filters = {};
+
+  if (scopeFilter.project_id) {
+    filters.projectId = scopeFilter.project_id;
+  }
+
+  if (scopeFilter.workspace_id) {
+    filters.workspaceId = scopeFilter.workspace_id;
+  }
+
+  if (scopeFilter.client_id) {
+    filters.clientId = scopeFilter.client_id;
+  }
+
+  if (scopeFilter.visibility) {
+    filters.visibility = Array.isArray(scopeFilter.visibility)
+      ? scopeFilter.visibility
+      : [scopeFilter.visibility];
+  }
+
+  return Object.keys(filters).length > 0 ? { scope: filters } : {};
+}
+
 const { ExecutionContextResolver } = require('./core/ExecutionContextResolver');
 const { RecallEnhancer } = require('./core/RecallEnhancer');
 const { MemoryWriteService } = require('./core/MemoryWriteService');
@@ -229,15 +257,16 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'search_memory') {
+        const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
         const searchResults = await passiveRecallService.search({
           query: args.query,
           target: args.target || 'both',
           limit: args.limit,
           includeContent: !!args.include_content,
           contextText: args.context_text || '',
-          source: 'mcp'
+          source: 'mcp',
+          candidateFilters: buildScopeCandidateFilters(scopeFilter)
         });
-        const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
         const filtered = (scopeFilter && searchResults && searchResults.length)
           ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)
           : searchResults;

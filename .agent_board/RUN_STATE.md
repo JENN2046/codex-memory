@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P1 / scope acceptance: workspace_id and client_id end-to-end coverage |
+| Current task | P1 / scope enforcement: push search scope into chunk SQL candidate selection |
 | Current area | P9-codex-claude-client-scope |
-| Last action | 已完成 P0 事实源同步并推送到 `be7fb94`；随后补齐 `workspace_id` / `client_id` 的 scope acceptance：为 `tests/scope-filter.test.js` 新增正向与 strict 负向 e2e 覆盖，并同步 `docs/SCOPE_ACCEPTANCE.md`。 |
-| Last validation | `node --test tests\scope-filter.test.js` passed (`10/10`)；`npm test` passed (`142/142`)；`git diff --check` passed。 |
-| Worktree summary | current worktree carries scoped changes in `tests/scope-filter.test.js`, `docs/SCOPE_ACCEPTANCE.md`, and board files recording this validation batch. |
+| Last action | 已完成 `search_memory` scope SQL candidate pushdown：`project_id` / `workspace_id` / `client_id` / `visibility` 会先缩小 chunk 候选集，再由现有 post-filter 做 defense-in-depth 兜底。 |
+| Last validation | `node --test tests\scope-filter.test.js` passed (`11/11`)；`npm test` passed (`143/143`)；`npm run gate:mainline:strict` passed；`git diff --check` passed with repo-known LF normalization warnings only. |
+| Worktree summary | current worktree carries a scoped source/test/docs/board batch for SQL candidate pushdown and its regression coverage. |
 | Mainline assumption | HTTP MCP 7605 is reachable |
 | Active-memory suite status | `43/43 matched`, `43/43 rollback-ready`, `extendedMismatchCountTotal=0` |
-| npm test | `142/142` |
+| npm test | `143/143` |
 | Profile health | `ready` — vectors 205, 822 embedding cache, 0 legacy |
-| Guarded auto-commit allowed | yes for this scoped test/docs acceptance patch after diff inspection; push remains gated and is only eligible under the user's current explicit session approval |
+| Guarded auto-commit allowed | yes for this scoped source/test/docs batch after diff inspection and validation; push remains gated and is only eligible under the user's current explicit session approval |
 | Last checkpoint | [maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md) |
-| Next planned action | Inspect final diff, commit/push this scope acceptance batch, then choose between broader scope enforcement or `governance:report`. |
+| Next planned action | Inspect final diff, commit/push this batch if scope stays clean, then choose between deeper scope policy/audit semantics and `governance:report`. |
 
 ## Notes
 
