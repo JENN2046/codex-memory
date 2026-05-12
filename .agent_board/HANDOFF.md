@@ -2,27 +2,27 @@
 
 ## Goal
 
-Fix PR review findings for scoped memory compatibility while preserving `.agent_board` current state.
+Harden scoped recall compatibility and prevent legacy raw chunk scope-header leakage while preserving `.agent_board` current state.
 
 ## Safe State
 
 - Workspace: A:\codex-memory
 - Branch: codex/p1-vcp-memory-core-100-roadmap
-- HEAD: CM-0042 guarded local commit target
-- Worktree: CM-0042 source/test/board batch validated for local commit
+- HEAD: CM-0043 guarded local commit target; branch remains ahead of remote
+- Worktree: CM-0043 source/test/board batch validated for local commit
 - Remote writes: not authorized
 
 ## Current Dirty Files
 
-- `src/storage/SqliteShadowStore.js`
-- `src/core/constants.js`
+- `src/recall/CandidateGenerator.js`
+- `src/recall/KnowledgeBaseRecallPipeline.js`
 - `tests/scope-filter.test.js`
-- `tests/mcp-contract.test.js`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/DECISIONS.md`
 - `.agent_board/HANDOFF.md`
+- `.agent_board/CHECKPOINT.md`
 
 ## 4-Agent Activation
 
@@ -57,6 +57,11 @@ Fix PR review findings for scoped memory compatibility while preserving `.agent_
   - `npm test`: 176/176 passed.
   - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 176/176, compare 43/43, rollback 43/43.
   - `git diff --check`: passed.
+- CM-0043 legacy raw chunk recall output sanitization:
+  - `node --test .\tests\scope-filter.test.js`: 17/17 passed.
+  - `npm test`: 177/177 passed.
+  - `npm run gate:mainline:strict`: passed; health 200, contract 7/7, test 177/177, compare 43/43, rollback 43/43.
+  - `git diff --check`: passed.
 
 ## Runtime Notes
 
@@ -66,7 +71,7 @@ Fix PR review findings for scoped memory compatibility while preserving `.agent_
 ## Blockers
 
 - No hard blocker to the local autopilot control plane.
-- none for CM-0042 local guarded commit.
+- none for CM-0043 local guarded commit.
 
 ## Decisions
 
@@ -76,6 +81,7 @@ Fix PR review findings for scoped memory compatibility while preserving `.agent_
 - Supplied search `scope` fields are always filters; `strict` is an audit/overview hard-isolation intent marker, not the switch that enables filtering.
 - Preserve old SQLite scoped-column defaults at write time only when the existing schema has NOT NULL defaults; keep new nullable schemas nullable.
 - Keep `search_memory.scope.visibility` schema compatible with runtime support for a string or an array.
+- Treat recall result `text` as user-facing output and sanitize internal diary scope markers, including legacy raw chunk rows and cached candidates.
 
 ## Next Safe Task
 

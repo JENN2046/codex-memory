@@ -1,6 +1,7 @@
 const crypto = require('node:crypto');
 
 const { cosineSimilarity } = require('../storage/VectorIndexStore');
+const { stripMemoryMarkers } = require('../storage/DiaryStore');
 const { compactText, contentTokens, uniqueTokens } = require('./text');
 
 function clampLimit(limit, fallback, max) {
@@ -226,7 +227,7 @@ class CandidateGenerator {
       memoryId: chunk.memoryId,
       target: chunk.target,
       title: chunk.title,
-      text: compactText(chunk.text),
+      text: compactText(stripMemoryMarkers(chunk.text)),
       sourceFile: chunk.relativePath,
       fullPath: chunk.filePath || chunk.relativePath,
       createdAt: chunk.createdAt,

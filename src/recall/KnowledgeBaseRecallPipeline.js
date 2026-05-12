@@ -10,6 +10,18 @@ function sortByPrimaryScore(items) {
   });
 }
 
+function containsMemoryMarkers(text) {
+  return /(?:Memory-ID|Project-ID|Workspace-ID|Client-ID|Task-ID|Conversation-ID|Visibility|Retention-Policy):/i.test(String(text || ''));
+}
+
+function sanitizeRecallText(text, fallback = '') {
+  const stripped = stripMemoryMarkers(text);
+  if (containsMemoryMarkers(stripped) && fallback) {
+    return fallback;
+  }
+  return stripped;
+}
+
 class KnowledgeBaseRecallPipeline {
   constructor({
     compatibilitySyntaxAdapter,
@@ -215,6 +227,7 @@ class KnowledgeBaseRecallPipeline {
         const cleanContent = record
           ? stripMemoryMarkers(record.rawText || record.content || '')
           : stripMemoryMarkers(best.text || '');
+        const cleanText = sanitizeRecallText(best.text || cleanContent, cleanContent);
 
         return {
           target: best.target,
@@ -233,12 +246,12 @@ class KnowledgeBaseRecallPipeline {
           exactCoreTagCount: Math.max(...group.map(item => item.exactCoreTagCount || 0)),
           tagMemoSurfaceScore: Number(Math.max(...group.map(item => item.tagMemoSurfaceScore || 0)).toFixed(6)),
           dynamicCoreWeight: Number(Math.max(...group.map(item => item.dynamicCoreWeight || 0)).toFixed(6)),
-          snippet: this.toSnippet(stripMemoryMarkers(best.text || cleanContent)),
+          snippet: this.toSnippet(cleanText),
           ...(includeContent ? { content: cleanContent } : {}),
           createdAt: record?.createdAt || best.createdAt,
           updatedAt: record?.updatedAt || best.updatedAt,
           sourceKinds: [...new Set(group.map(item => item.source).filter(Boolean))],
-          text: best.text
+          text: cleanText
         };
       })
       .sort((left, right) => (right.score || 0) - (left.score || 0));

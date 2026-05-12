@@ -1000,3 +1000,58 @@ test('scope durability: diary rebuild preserves scope metadata into fresh shadow
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
 });
+
+test('scope filter: legacy raw chunk headers are stripped from recall text', async () => {
+  await withApp(async ({ app }) => {
+    const record = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Legacy Raw Chunk Headers',
+      content: 'Type: checkpoint\nrisk: legacy raw chunk output must be sanitized',
+      evidence: 'legacy raw chunk header regression',
+      validated: true,
+      reusable: false,
+      tags: ['scope', 'legacy-chunk'],
+      sensitivity: 'none',
+      project_id: 'legacy-chunk-project',
+      workspace_id: 'legacy-raw-workspace',
+      client_id: 'codex',
+      task_id: 'legacy-task',
+      conversation_id: 'legacy-conversation',
+      visibility: 'shared',
+      retention_policy: 'keep'
+    }, requestContext);
+    assert.equal(record.decision, 'accepted');
+
+    const diaryText = await fs.readFile(record.filePath, 'utf8');
+    app.stores.shadowStore.db.prepare(`
+      UPDATE memory_chunks
+      SET text = ?
+      WHERE memory_id = ?
+    `).run(diaryText, record.memoryId);
+
+    const search = await app.callTool('search_memory', {
+      query: 'legacy raw chunk output sanitized',
+      target: 'process',
+      limit: 10,
+      include_content: true,
+      scope: {
+        project_id: 'legacy-chunk-project',
+        workspace_id: 'legacy-raw-workspace',
+        client_id: 'codex',
+        visibility: 'shared'
+      }
+    }, requestContext);
+
+    const matched = search.results.find(result => result.memoryId === record.memoryId);
+    assert.ok(matched, 'scoped search must return the record backed by a legacy raw chunk');
+    const returnedText = JSON.stringify({
+      snippet: matched.snippet,
+      content: matched.content,
+      text: matched.text
+    });
+    assert.equal(returnedText.includes('Workspace-ID'), false, 'legacy raw chunk header label must not appear in recall output');
+    assert.equal(returnedText.includes('legacy-raw-workspace'), false, 'legacy raw workspace_id must not appear in recall output');
+    assert.equal(returnedText.includes('Task-ID'), false, 'legacy task header label must not appear in recall output');
+    assert.equal(returnedText.includes('Conversation-ID'), false, 'legacy conversation header label must not appear in recall output');
+  });
+});

@@ -2,22 +2,22 @@
 
 ## Current Goal
 
-CM-0042 fixes PR review findings for scoped memory compatibility and refreshes `.agent_board` against current repository reality.
+CM-0043 hardens scoped recall output against legacy raw chunk scope-header leakage and refreshes `.agent_board` against current repository reality.
 
 ## Current Area
 
-P9-codex-claude-client-scope / P0-mainline-health / PR review risk fix
+P9-codex-claude-client-scope / P0-mainline-health / recall output privacy hardening
 
 ## Current Status
 
-Branch `codex/p1-vcp-memory-core-100-roadmap`, CM-0042 guarded local commit target.
+Branch `codex/p1-vcp-memory-core-100-roadmap`, CM-0043 guarded local commit target; branch remains ahead of remote.
 
 Current worktree is dirty:
 
-- Source/test files: `src/storage/SqliteShadowStore.js`, `src/core/constants.js`, `tests/scope-filter.test.js`, `tests/mcp-contract.test.js`
+- Source/test files: `src/recall/CandidateGenerator.js`, `src/recall/KnowledgeBaseRecallPipeline.js`, `tests/scope-filter.test.js`
 - Board files: `.agent_board/RUN_STATE.md`, `.agent_board/TASK_QUEUE.md`, `.agent_board/HANDOFF.md`, `.agent_board/CHECKPOINT.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/DECISIONS.md`
 
-CM-0042 addresses two PR review findings: old upgraded SQLite databases with NOT NULL scoped columns keep their defaults on omitted scope writes, and schema-driven clients can still send multi-visibility search filters.
+CM-0043 addresses the remaining local review risk where legacy raw chunk rows or cached candidates could expose internal scope headers through recall result `text`.
 
 ## Current 4-Agent Roles
 
@@ -41,10 +41,11 @@ CM-0042 addresses two PR review findings: old upgraded SQLite databases with NOT
 - `git diff --check`: passed.
 - CM-0041: `node --test .\tests\scope-filter.test.js` 15/15; `node --test .\tests\mcp-contract.test.js` 4/4; `npm test` 175/175; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 175/175, compare 43/43, rollback 43/43.
 - CM-0042: `node --test .\tests\scope-filter.test.js` 16/16; `node --test .\tests\mcp-contract.test.js` 4/4; `npm test` 176/176; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 176/176, compare 43/43, rollback 43/43; `git diff --check` passed.
+- CM-0043: `node --test .\tests\scope-filter.test.js` 17/17; `npm test` 177/177; `npm run gate:mainline:strict` passed health 200, contract 7/7, test 177/177, compare 43/43, rollback 43/43; `git diff --check` passed.
 
 ## Current Blockers
 
-- Local commit readiness is eligible after final status/diff inspection if staging exactly the validated CM-0042 batch.
+- Local commit readiness is eligible after final status/diff inspection if staging exactly the validated CM-0043 batch.
 - Push remains unauthorized.
 
 ## Completed Work
