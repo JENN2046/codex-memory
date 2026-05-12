@@ -1,6 +1,6 @@
 # Personal Production Readiness Checklist
 
-更新时间：2026-05-09  
+更新时间：2026-05-09
 适用版本：`v0.1.1-scope-boundary-20260508`
 
 ## 1. 固定 Tag

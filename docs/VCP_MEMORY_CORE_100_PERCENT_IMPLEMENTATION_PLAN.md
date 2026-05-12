@@ -1,9 +1,9 @@
 # VCP Memory Core 100% Implementation Plan
 
-更新时间：2026-05-09  
-适用项目：`codex-memory`  
-当前稳定版本：`v0.1.1-scope-boundary-20260508`  
-当前封板提交：`8c2836b`  
+更新时间：2026-05-09
+适用项目：`codex-memory`
+当前稳定版本：`v0.1.1-scope-boundary-20260508`
+当前封板提交：`8c2836b`
 当前定位：个人本地生产可用版，继续向 VCP 记忆核心 100% 独立主链推进
 
 ---
