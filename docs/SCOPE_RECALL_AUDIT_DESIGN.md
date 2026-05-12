@@ -218,6 +218,10 @@ P8 / P10:
 或单独评估 active-memory / policy-layer scope 是否需要独立设计。
 ```
 
+当前独立设计入口：
+
+- [POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md](/A:/codex-memory/docs/POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md)
+
 ## 明确不在本轮做
 
 - active-memory scope policy

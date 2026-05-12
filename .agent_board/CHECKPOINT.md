@@ -2,35 +2,29 @@
 
 ## Current Goal
 
-P10 + P8-lite — 将 `governance:report` 的只读治理快照接入 `dashboard` / `http-observe`，补状态分级与提示，不碰写路径或 MCP contract。
+P8 — 定义 proposal / scope policy-layer integration 的最小设计与风险边界，在任何 runtime enforcement 之前先固定 decision shape。
 
 ## Current Area
 
-P10-observability-admin
+P8-memory-governance
 
 ## Current Status
 
-治理 summary observability batch 已完成本地实现：`dashboard` / `http-observe` 现已复用 `governance:report` 的只读快照，并输出 `status`、`reviewLevel`、counts、hints；当前仍停在只读治理面，没有改写 proposal / tombstone / supersession，也没有改 MCP contract。
+policy-layer 设计批次已完成本地起草：新文档把 proposal lifecycle、scope retrieval、visibility policy、future enforcement 拆成 L0-L3 四层，当前结论是继续停在 observability / classification 阶段，不直接改写路径，也不偷改默认 read policy。
 
 ## Completed Work
 
-- `src/cli/governance-report.js` 现在既能作为 CLI，也能作为 `dashboard` / `http-observe` 的只读数据源复用，并新增 governance surface helper。
-- governance snapshot 现在会把 `memory_records` 表缺失视为不可用，而不是把空壳 SQLite 误报成健康。
-- `src/cli/dashboard.js` 新增 `governance` section、governance checks、recommendations 和文本行。
-- `src/cli/http-observe.js` 新增 `governance` section，并把 proposal / stale / lifecycle 信号纳入 runtime hints。
-- `tests/dashboard-cli.test.js` / `tests/http-observe-cli.test.js` 已补 governance summary 回归，且继续守住 no raw `workspace_id` 边界。
-- `README.md` 与 `docs/MEMORY_DASHBOARD_REPORT_DESIGN.md` 已同步说明 governance summary 的只读范围与状态分级。
+- 新增 `docs/POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md`，明确 proposal/scope policy 的四层模型：L0 observability、L1 classification、L2 soft policy、L3 hard enforcement。
+- 文档明确 proposal 现阶段仍视为 lifecycle metadata，而不是 admission gate。
+- 文档明确 scope 现阶段仍以 retrieval + observability 为主，不自动升级为 visibility/client hard enforcement。
+- `docs/SCOPE_RECALL_AUDIT_DESIGN.md` 已挂接新的 policy-layer 设计入口。
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md` 已补这条设计入口与当前结论：先定 decision shape 和 soft boundary，不直接改 runtime。
 
 ## Changed Files
 
-- `src/cli/governance-report.js`
-- `src/cli/dashboard.js`
-- `src/cli/http-observe.js`
-- `tests/dashboard-cli.test.js`
-- `tests/http-observe-cli.test.js`
-- `tests/governance-report-cli.test.js`
-- `docs/MEMORY_DASHBOARD_REPORT_DESIGN.md`
-- `README.md`
+- `docs/POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md`
+- `docs/SCOPE_RECALL_AUDIT_DESIGN.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/HANDOFF.md`
@@ -39,12 +33,8 @@ P10-observability-admin
 
 ## Validation Run
 
-- `node --test tests\dashboard-cli.test.js` passed (`4/4`)
-- `node --test tests\http-observe-cli.test.js` passed (`2/2`)
-- `node --test tests\governance-report-cli.test.js` passed (`3/3`)
-- `npm test` passed (`148/148`)
-- `npm run gate:mainline:strict` passed
 - `git diff --check` passed with repo-known LF normalization warnings only
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed
 
 ## Validation Not Run
 
@@ -60,4 +50,4 @@ P10-observability-admin
 
 ## Next Safe Action
 
-Inspect diff, then guarded commit/push this read-only governance-surface task.
+Run docs validation, inspect diff, then guarded commit/push this docs-only policy-boundary task.

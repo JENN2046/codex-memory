@@ -2,7 +2,7 @@
 
 ## Current State
 
-治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、R2 scoped recall aggregation `7bfd793`、R3 observability surface `f37a91a`、以及 `governance:report` 收口 `c592026` 已推送；当前本地工作是 P10 + P8-lite：把 governance summary 只读接到 `dashboard` / `http-observe`，并加上治理提示与状态分级。
+治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、R2 scoped recall aggregation `7bfd793`、R3 observability surface `f37a91a`、`governance:report` 收口 `c592026`、以及 governance summary observability surface `fd3fd55` 已推送；当前本地工作是新的 docs-only P8：补 policy-layer proposal / scope integration 的最小边界设计。
 
 Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
 
@@ -26,6 +26,7 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - profile: bge-m3-local__1024__v1, vectors 205, ready
 - dashboard: npm run dashboard
 - governance snapshot: `dashboard` / `observe:http` 现在都会带 `governance.status`、`reviewLevel`、counts、hints
+- policy-layer note: `docs/POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md`
 
 ## Recent Work
 
@@ -43,7 +44,8 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - Current boundary remains intact: no workspace breakdown and no raw `workspace_id` exposure in overview summary.
 - R3 is now implemented and pushed: `dashboard` / `http-observe` expose scoped recall summary counts plus `scopeMode` / `scopeDimensions` breakdowns, and tests were expanded without exposing raw `workspace_id`.
 - `governance:report` is now hardened and pushed: it resolves DB path through `createConfig`, opens SQLite read-only, correctly binds stale-threshold timestamps, and has dedicated CLI tests for governance metrics plus missing-DB behavior.
-- Current local batch extends that snapshot into `dashboard` / `http-observe`, adds read-only governance checks/recommendations/hints, keeps the no-write / no raw `workspace_id` boundary intact, and has passed `dashboard 4/4`, `http-observe 2/2`, `governance-report 3/3`, `npm test 148/148`, and `gate:mainline:strict`.
+- Governance summary observability surface is now pushed as `fd3fd55`: `dashboard` / `http-observe` expose read-only governance counts, review level, and hints without changing write-path or MCP contract.
+- Current local docs-only batch adds `POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md`, which formalizes the L0-L3 policy split and explicitly defers soft/hard enforcement; `git diff --check` and `validate-local.ps1 -Area docs` both pass.
 - LightMemo CLI + compare harness support
 - gate:ci + dashboard tests
 - P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
@@ -54,9 +56,9 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 ## Next
 
-- P1: run final batch validation (`npm test`, `npm run gate:mainline:strict`, `git diff --check`) and inspect diff
-- P2: guarded commit + push the governance-surface batch if validation stays green
-- P3: after push, decide whether to move into policy-layer proposal/scope design or keep expanding read-only observability
+- P1: run docs validation and inspect diff for the policy-layer note batch
+- P2: guarded commit + push the docs-only batch if validation stays green
+- P3: decide whether to keep docs-first with PL-1 decision-shape refinement, or open PL-2 soft read-policy preflight
 
 ## Auth Required
 

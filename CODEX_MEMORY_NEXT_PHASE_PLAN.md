@@ -88,6 +88,12 @@ memory governance 先做设计文档，不直接改 runtime。
 
 短期不新增 MCP tool。治理能力先通过内部设计和 CLI 只读报告验证，稳定后再讨论 `propose_memory` / `review_memory` / `supersede_memory` 等新工具。
 
+当前补充边界设计入口：
+
+- [POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md](/A:/codex-memory/docs/POLICY_LAYER_PROPOSAL_SCOPE_INTEGRATION.md)
+- 用来回答 proposal lifecycle、scope retrieval、visibility policy、future enforcement 的分层关系
+- 当前结论仍是先定 decision shape 和 soft boundary，不直接改写路径
+
 ## Phase I 候选
 
 Codex / Claude scope 先建模型，不改 `record_memory` 外部 schema。
