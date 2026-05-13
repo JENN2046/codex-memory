@@ -4,13 +4,13 @@
 
 当前本地工作在 `P7` query quality / VCP parity hardening 线。远端 `main` 已同步到 `76b1513 docs: plan workspace scope backfill review`；PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次把 `real-query-suite` 从 placeholder-only 推进到 fixture-only baseline：5 条 case 全部来源于 `benchmarks/default-dataset.json`，`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
+最新本地批次把 `real-query-suite` 从 placeholder-only 推进到 fixture-only baseline：5 条 case 全部来源于 `benchmarks/default-dataset.json`，`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`。本地提交为 `c425764 feat: replace real query placeholders with fixtures`，尚未 push。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: verify with `git log --oneline --decorate -n 5`; `origin/main` was `76b1513` before the local query-suite batch
+- HEAD: local history includes `c425764 feat: replace real query placeholders with fixtures` plus this board-only cleanup; verify exact tip with `git log --oneline --decorate -n 5`
 - Remote baseline: current `origin/main` tip for this maintenance line
 - Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
@@ -46,10 +46,11 @@
 - `benchmarks/real-query-suite/v1.json` now uses sanitized fixture-only cases from `benchmarks/default-dataset.json` instead of placeholder notes.
 - `real-query-suite` / `query:quality` now report `fixtureOnlyCount` and `realCount`; default suite is `5` real fixture-only cases and `0` placeholders.
 - Targeted query tests passed `11/11`; full `npm test` passed `181/181`; `git diff --check` passed.
+- Read-only review found only stale board/handoff wording after `c425764`; this cleanup updates handoff state and removes duplicate changed-file noise.
 
 ## Next
 
-- P1: create guarded local commit for the query-suite fixture-only batch if not already present.
+- P1: push `c425764` plus the board cleanup commit only with explicit remote authorization.
 - P2: add a fixture assertion runner that checks `mustContain` / `mustNotContain` against the sanitized fixture text.
 - P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 

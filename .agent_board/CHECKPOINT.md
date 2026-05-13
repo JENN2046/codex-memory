@@ -10,7 +10,7 @@ P7-vcp-parity-hardening
 
 ## Current Status
 
-远端 `main` 当前同步到 `76b1513 docs: plan workspace scope backfill review`。本轮在本地把 `real-query-suite` 的 5 条 placeholder case 替换为基于 `benchmarks/default-dataset.json` 的脱敏 fixture-only case，并扩展 query CLI 报告 `fixtureOnlyCount` / `realCount`。当前不调用 provider，不读取/写入真实 memory DB。
+远端 `main` 当前同步到 `76b1513 docs: plan workspace scope backfill review`。本轮在本地把 `real-query-suite` 的 5 条 placeholder case 替换为基于 `benchmarks/default-dataset.json` 的脱敏 fixture-only case，并扩展 query CLI 报告 `fixtureOnlyCount` / `realCount`。本地提交已创建为 `c425764 feat: replace real query placeholders with fixtures`，尚未 push。当前不调用 provider，不读取/写入真实 memory DB。
 
 ## Completed Work
 
@@ -29,36 +29,18 @@ P7-vcp-parity-hardening
 - 将 `benchmarks/real-query-suite/v1.json` 替换为 5 条 fixture-only case，全部来源于 `benchmarks/default-dataset.json`。
 - 扩展 `real-query-suite` / `query:quality` CLI 输出 `fixtureOnlyCount` 和 `realCount`。
 - 测试锁住默认 suite：`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`，且每条 case 的 `mustContain` 非空。
+- 创建本地 guarded commit `c425764 feat: replace real query placeholders with fixtures`。
+- 复审后修正 `.agent_board` 的 stale handoff：不再提示重复创建 query-suite commit。
 
 ## Changed Files
 
-- `package.json`
 - `benchmarks/real-query-suite/v1.json`
-- `docs/scope-backfill-policy.md`
-- `docs/WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md`
-- `src/app.js`
-- `src/cli/gate-ci.js`
-- `src/cli/mainline-gate.js`
 - `src/cli/query-quality-report.js`
 - `src/cli/real-query-suite.js`
-- `src/cli/scope-acceptance.js`
-- `src/cli/scope-backfill-dry-run.js`
-- `src/core/MemoryWriteService.js`
-- `src/core/constants.js`
-- `src/recall/CandidateGenerator.js`
-- `src/recall/ChunkIndexingService.js`
-- `src/recall/KnowledgeBaseRecallPipeline.js`
-- `src/recall/KnowledgeBaseSyncService.js`
-- `src/storage/DiaryStore.js`
-- `src/storage/SqliteShadowStore.js`
-- `tests/mcp-contract.test.js`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
-- `tests/scope-acceptance-cli.test.js`
-- `tests/scope-backfill-dry-run.test.js`
-- `tests/scope-filter.test.js`
-- `tests/query-quality-report.test.js`
-- `tests/real-query-suite.test.js`
+- `STATUS.md`
+- `MAINTENANCE_BACKLOG.md`
 - `.agent_board/*`
 
 ## Validation Run
@@ -66,12 +48,13 @@ P7-vcp-parity-hardening
 - `git diff --check` -> passed
 - `node --test tests\mcp-contract.test.js tests\scope-filter.test.js tests\scope-acceptance-cli.test.js tests\scope-backfill-dry-run.test.js tests\real-query-suite.test.js tests\query-quality-report.test.js` -> 44/44 passed
 - `npm test` -> 181/181 passed
-- `npm run gate:mainline:strict` -> ok; health `200`; contract 7/7; test 180/180; compare 43/43 matched; rollback 43/43 rollback-ready
+- prior `npm run gate:mainline:strict` baseline -> ok; health `200`; contract 7/7; test 180/180; compare 43/43 matched; rollback 43/43 rollback-ready
 - `npm run scope:acceptance -- --json` -> ok; full scope dimensions present; Project A/B found; no cross-scope leak
 - `npm run scope:backfill:dry-run -- --json` -> ok; `450` total, `442` missing `workspace_id`, `mutated=false`
 - `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js` -> 11/11 passed
 - `npm run query:quality -- --json --dry-run` -> ok; 5 runnable, 0 placeholder, 5 fixture-only, 5 real, `mutated=false`
 - `npm run real-query-suite -- --json` -> ok; 5 valid, 0 placeholder, 5 fixture-only, 5 real
+- post-commit read-only review -> completed; only stale board/handoff wording found and fixed in this board-only cleanup
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
@@ -80,10 +63,10 @@ P7-vcp-parity-hardening
 - provider smoke / benchmark not run; this batch is fixture-only and must not call providers
 - no tag, release, deploy, branch deletion, or PR merge
 - no full remote branch merge; stale state docs intentionally not imported
+- no push after `c425764`; remote write still requires explicit approval
 
 ## Current Blockers
 
-- none for local validation
 - none for local validation
 
 ## Remaining Risks
@@ -95,4 +78,4 @@ P7-vcp-parity-hardening
 
 ## Next Safe Action
 
-Create a guarded local commit if final diff remains scoped and clean. Next safe implementation task is adding a fixture assertion runner for `mustContain` / `mustNotContain`; future push remains separately authorized.
+After this board-only cleanup is committed, wait for explicit authorization before pushing `c425764` plus the cleanup commit. Next safe implementation task is adding a fixture assertion runner for `mustContain` / `mustNotContain`.
