@@ -69,11 +69,12 @@
 - S-009 pushed to `origin/main`; current remote baseline is `bcaf440`.
 - S-010 documented dashboard/http-observe schema contract boundaries in README / VALIDATION.
 - Current S-010 docs validation passed: `git diff --check`; `scripts/validate-local.ps1 -Area docs`.
+- S-010 primary docs commit created: `e466b0e docs: summarize observability schema contract`.
 
 ## Next
 
-- P1: create guarded local docs commit.
-- P2: push only after explicit remote authorization.
+- P1: push local S-010 commits only after explicit remote authorization.
+- P2: otherwise stop at this stable docs checkpoint.
 - P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required

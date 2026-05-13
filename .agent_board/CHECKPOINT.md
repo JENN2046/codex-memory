@@ -145,4 +145,4 @@ P10-observability-admin
 
 ## Next Safe Action
 
-Create guarded local docs commit, then wait for explicit push authorization.
+S-010 primary docs commit is local at `e466b0e docs: summarize observability schema contract`; push remains separate explicit authorization.
