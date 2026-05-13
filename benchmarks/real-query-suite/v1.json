@@ -1,61 +1,97 @@
 {
   "version": "v1",
-  "description": "Real workflow query suite for codex-memory VCP Memory Core acceptance. Placeholder cases are not yet verified.",
+  "description": "Fixture-only workflow query suite for codex-memory VCP Memory Core acceptance. Cases are sanitized and do not call providers or mutate data.",
+  "fixture": "../default-dataset.json",
   "cases": [
     {
       "id": "rq-001",
-      "area": "scope",
-      "query": "checkpoint scope isolation",
-      "target": "process",
+      "area": "observability",
+      "query": "How can I inspect audit logs and recall health for Codex memory?",
+      "target": "memory_overview",
       "expected": {
-        "mustContain": [],
-        "mustNotContain": []
+        "mustContain": [
+          "memory overview",
+          "audit logs",
+          "recall activity"
+        ],
+        "mustNotContain": [
+          "provider smoke"
+        ]
       },
-      "notes": "placeholder — verify scope isolation with real project_id"
+      "source": "benchmarks/default-dataset.json#memory_overview",
+      "notes": "fixture-only query derived from sanitized benchmark document memory_overview"
     },
     {
       "id": "rq-002",
-      "area": "scope",
-      "query": "rollback readiness memory governance",
-      "target": "process",
+      "area": "storage",
+      "query": "What happens if the side index write fails after the diary entry is already saved?",
+      "target": "dual_write_shadow",
       "expected": {
-        "mustContain": [],
-        "mustNotContain": []
+        "mustContain": [
+          "dual-writes",
+          "SQLite shadow storage",
+          "reconcile task"
+        ],
+        "mustNotContain": [
+          "rejecting the diary entry"
+        ]
       },
-      "notes": "placeholder — verify memory governance query quality"
+      "source": "benchmarks/default-dataset.json#dual_write_shadow",
+      "notes": "fixture-only query derived from sanitized benchmark document dual_write_shadow"
     },
     {
       "id": "rq-003",
-      "area": "checkpoint",
-      "query": "checkpoint migration stable baseline",
-      "target": "process",
+      "area": "recall",
+      "query": "Which component reuses ranked retrieval candidates until the knowledge base changes?",
+      "target": "candidate_cache",
       "expected": {
-        "mustContain": [],
-        "mustNotContain": []
+        "mustContain": [
+          "candidate cache",
+          "ranked chunk candidates",
+          "knowledge base sync"
+        ],
+        "mustNotContain": [
+          "provider smoke"
+        ]
       },
-      "notes": "placeholder"
+      "source": "benchmarks/default-dataset.json#candidate_cache",
+      "notes": "fixture-only query derived from sanitized benchmark document candidate_cache"
     },
     {
       "id": "rq-004",
-      "area": "rollback",
-      "query": "rollback safe migration config",
-      "target": "knowledge",
+      "area": "recall",
+      "query": "How does retrieval inject recent conversation state into the query embedding?",
+      "target": "context_vector",
       "expected": {
-        "mustContain": [],
-        "mustNotContain": []
+        "mustContain": [
+          "context vectors",
+          "recent conversation history",
+          "search query representation"
+        ],
+        "mustNotContain": [
+          "cleanup legacy chunks"
+        ]
       },
-      "notes": "placeholder"
+      "source": "benchmarks/default-dataset.json#context_vector",
+      "notes": "fixture-only query derived from sanitized benchmark document context_vector"
     },
     {
       "id": "rq-005",
-      "area": "governance",
-      "query": "memory lifecycle proposal tombstone",
-      "target": "process",
+      "area": "provider-profile",
+      "query": "Which command checks remote provider connectivity and prints a report?",
+      "target": "provider_smoke",
       "expected": {
-        "mustContain": [],
-        "mustNotContain": []
+        "mustContain": [
+          "provider smoke CLI",
+          "remote embedding",
+          "JSON or text report"
+        ],
+        "mustNotContain": [
+          "memory overview"
+        ]
       },
-      "notes": "placeholder"
+      "source": "benchmarks/default-dataset.json#provider_smoke",
+      "notes": "fixture-only query derived from sanitized benchmark document provider_smoke; no provider call is made"
     }
   ]
 }

@@ -2,15 +2,15 @@
 
 ## Current State
 
-当前本地工作在 `P9` scope/governance 线：`e1883e6 feat: integrate scoped memory runtime tools` 与后续状态同步提交已推到 `origin/main`，当前本地/远端 `main` 为 `8b2d56b docs: sync post-pr close status`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+当前本地工作在 `P7` query quality / VCP parity hardening 线。远端 `main` 已同步到 `76b1513 docs: plan workspace scope backfill review`；PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新下一步是 docs-only：根据 `scope:backfill:dry-run` 的只读结果建立 `workspace_id` 人工审查计划。当前 dry-run 基线为 `450` records、`442` missing `workspace_id`、`wouldUpdate=442`、`mutated=false`。本轮不写真实 SQLite、不导出 broad memory、不自动生成 `workspace_id`。
+最新本地批次把 `real-query-suite` 从 placeholder-only 推进到 fixture-only baseline：5 条 case 全部来源于 `benchmarks/default-dataset.json`，`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: `8b2d56b docs: sync post-pr close status`; local `main` matches `origin/main`
+- HEAD: verify with `git log --oneline --decorate -n 5`; `origin/main` was `76b1513` before the local query-suite batch
 - Remote baseline: current `origin/main` tip for this maintenance line
 - Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
@@ -19,7 +19,7 @@
 
 - compare: 43/43 matched, 0/0 core/extended
 - rollback: 43/43 rollback-ready, 0/0
-- npm test: 180/180
+- npm test: 181/181
 - gate:ci: 119/119 (fixture-only)
 - gate:mainline:strict: ok (`health` + `contract` + `test` + `compare` + `rollback` 全绿)
 - scope acceptance: ok for `project_id` / `workspace_id` / `client_id` / `visibility`
@@ -43,11 +43,14 @@
 - `e1883e6`, `cf660d0`, and `8b2d56b` pushed to `origin/main`.
 - PR #2 closed as superseded; branch `codex/p1-vcp-memory-core-100-roadmap` retained.
 - `scope:backfill:dry-run` reports `442` records missing `workspace_id`; docs-only review plan added to avoid unsafe automatic backfill.
+- `benchmarks/real-query-suite/v1.json` now uses sanitized fixture-only cases from `benchmarks/default-dataset.json` instead of placeholder notes.
+- `real-query-suite` / `query:quality` now report `fixtureOnlyCount` and `realCount`; default suite is `5` real fixture-only cases and `0` placeholders.
+- Targeted query tests passed `11/11`; full `npm test` passed `181/181`; `git diff --check` passed.
 
 ## Next
 
-- P1: validate and optionally commit the docs-only `workspace_id` review-plan batch.
-- P2: start `real-query-suite` fixture replacement with sanitized, non-provider, fixture-only cases.
+- P1: create guarded local commit for the query-suite fixture-only batch if not already present.
+- P2: add a fixture assertion runner that checks `mustContain` / `mustNotContain` against the sanitized fixture text.
 - P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required

@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-P9 — 在不写真实 DB 的前提下，把 `workspace_id` 历史回填推进到人工审查计划阶段，并同步当前本地/远端 `main` 的事实源。
+P7 — 将 `real-query-suite` 从 placeholder-only 样本推进到脱敏 fixture-only baseline，并保留无 provider / 无真实数据写入边界。
 
 ## Current Area
 
-P9-codex-claude-client-scope
+P7-vcp-parity-hardening
 
 ## Current Status
 
-本地/远端 `main` 当前同步到 `8b2d56b docs: sync post-pr close status`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。最新只读 dry-run 显示 `450` records 中 `442` 条缺少 `workspace_id`，`mutated=false`；本轮只建立人工审查计划，不进行真实数据回填。
+远端 `main` 当前同步到 `76b1513 docs: plan workspace scope backfill review`。本轮在本地把 `real-query-suite` 的 5 条 placeholder case 替换为基于 `benchmarks/default-dataset.json` 的脱敏 fixture-only case，并扩展 query CLI 报告 `fixtureOnlyCount` / `realCount`。当前不调用 provider，不读取/写入真实 memory DB。
 
 ## Completed Work
 
@@ -26,6 +26,9 @@ P9-codex-claude-client-scope
 - 给 PR #2 留 superseded 说明并关闭 PR；未删除远端分支。
 - 运行 `scope:backfill:dry-run`，确认缺口集中在 `workspace_id`：`totalRecords=450`，`missingWorkspaceId=442`，`wouldUpdate=442`，`mutated=false`。
 - 新增 `docs/WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md`，明确 `workspace_id` 只能人工审查、脱敏 mapping proposal、小批量确认，不能自动猜测或批量写入。
+- 将 `benchmarks/real-query-suite/v1.json` 替换为 5 条 fixture-only case，全部来源于 `benchmarks/default-dataset.json`。
+- 扩展 `real-query-suite` / `query:quality` CLI 输出 `fixtureOnlyCount` 和 `realCount`。
+- 测试锁住默认 suite：`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`，且每条 case 的 `mustContain` 非空。
 
 ## Changed Files
 
@@ -54,38 +57,42 @@ P9-codex-claude-client-scope
 - `tests/scope-acceptance-cli.test.js`
 - `tests/scope-backfill-dry-run.test.js`
 - `tests/scope-filter.test.js`
+- `tests/query-quality-report.test.js`
+- `tests/real-query-suite.test.js`
 - `.agent_board/*`
 
 ## Validation Run
 
 - `git diff --check` -> passed
 - `node --test tests\mcp-contract.test.js tests\scope-filter.test.js tests\scope-acceptance-cli.test.js tests\scope-backfill-dry-run.test.js tests\real-query-suite.test.js tests\query-quality-report.test.js` -> 44/44 passed
-- `npm test` -> 180/180 passed
+- `npm test` -> 181/181 passed
 - `npm run gate:mainline:strict` -> ok; health `200`; contract 7/7; test 180/180; compare 43/43 matched; rollback 43/43 rollback-ready
 - `npm run scope:acceptance -- --json` -> ok; full scope dimensions present; Project A/B found; no cross-scope leak
 - `npm run scope:backfill:dry-run -- --json` -> ok; `450` total, `442` missing `workspace_id`, `mutated=false`
-- `npm run query:quality -- --json` -> ok; 5 placeholder cases, 0 invalid, no mutation
-- `npm run real-query-suite -- --json` -> ok; 5 placeholder cases, 5 valid, no mutation
+- `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js` -> 11/11 passed
+- `npm run query:quality -- --json --dry-run` -> ok; 5 runnable, 0 placeholder, 5 fixture-only, 5 real, `mutated=false`
+- `npm run real-query-suite -- --json` -> ok; 5 valid, 0 placeholder, 5 fixture-only, 5 real
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
 ## Validation Not Run
 
-- provider smoke / benchmark not run; not provider-related and may use external configured services
+- provider smoke / benchmark not run; this batch is fixture-only and must not call providers
 - no tag, release, deploy, branch deletion, or PR merge
 - no full remote branch merge; stale state docs intentionally not imported
 
 ## Current Blockers
 
 - none for local validation
-- current workspace_id review-plan docs batch is pending docs validation before any guarded local commit
+- none for local validation
 
 ## Remaining Risks
 
 - Future push remains separately authorized only.
 - Any true `workspace_id` backfill remains blocked until a reviewed mapping proposal and explicit data-write approval exist.
 - This batch intentionally leaves remote stale docs behind; if later merging that branch, exclude those files again.
+- The current query suite still validates metadata/counts only; actual `mustContain` / `mustNotContain` assertion execution is the next safe improvement.
 
 ## Next Safe Action
 
-Run docs-only validation, inspect diff, then create a guarded local commit only if the diff stays scoped and clean. Future push and any real data backfill are not authorized by default.
+Create a guarded local commit if final diff remains scoped and clean. Next safe implementation task is adding a fixture assertion runner for `mustContain` / `mustNotContain`; future push remains separately authorized.

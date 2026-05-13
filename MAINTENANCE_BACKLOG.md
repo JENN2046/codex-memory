@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前本地/远端 `main`：`8b2d56b`（`docs: sync post-pr close status`），工作区 clean
+- 当前远端 `main`：`76b1513`（`docs: plan workspace scope backfill review`）；本轮 query-suite fixture-only 改动为本地验证批次
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：`119/119`（fixture-only）、gate:mainline：health `200`、compare `43/43`、rollback `43/43`
 - 标准 suite：`43/43 matched (0/0)`、npm test：`180/180`、`scope:acceptance`：`ok`
@@ -60,11 +60,12 @@
 | G-001 | ci-gate | A1 | done | 实现 gate:ci fixture-only CLI | `npm run gate:ci` | 已实现 `src/cli/gate-ci.js`；compare 43/43 + rollback 43/43 + tests 116/116 + docs check |
 | G-002 | docs-governance | A0 | done | 补齐 Verifier rail 与多 Worker 基础治理轨道 | `git diff --check` / `scripts/validate-local.ps1 -Area docs` / Worker 试跑 / read-only Verifier | 已完成并进入 mainline 历史；后续状态以 `.agent_board` 与当前 `main` 为准 |
 | S-001 | client-scope | A0 | done | 建立 `workspace_id` 回填人工审查计划 | `scope:backfill:dry-run` baseline / docs validation | 已创建 [WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md](/A:/codex-memory/docs/WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md)；当前 `450` records 中 `442` 缺少 `workspace_id`，`mutated=false`，不自动写真实 DB |
+| S-002 | query-quality | A1 | done | 将 `real-query-suite` 从 placeholder-only 升级到 fixture-only baseline | `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js`; `npm run real-query-suite -- --json`; `npm run query:quality -- --json --dry-run`; `npm test`; `git diff --check` | 默认 suite 现在 `caseCount=5`、`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`；只用 `benchmarks/default-dataset.json`，无 provider 调用、无数据写入 |
 
 ## 推荐执行顺序
 
 1. `G-002` 已完成：治理轨道已补齐，后续多 Worker 任务可以复用 Verifier rail。
-2. `P1`：补真实 query suite 样本，优先把 placeholder case 替换成 fixture-only、可脱敏复跑的查询质量样本。
+2. `P1`：给 `real-query-suite` 增加 fixture assertion runner，让 `mustContain / mustNotContain` 能在脱敏 fixture 上真实验收。
 3. `P2`：做 `governance:report` 最小闭环，只读输出 proposal/tombstone/supersession/stale metrics。
 4. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 

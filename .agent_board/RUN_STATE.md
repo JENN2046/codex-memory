@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P9 / workspace_id backfill manual review plan |
-| Current area | P9-codex-claude-client-scope |
-| Last action | 根据 `scope:backfill:dry-run` 基线创建 `workspace_id` 人工审查计划，并把当前事实源同步到 `8b2d56b`。 |
-| Last validation | `git diff --check` passed; `scripts/validate-local.ps1 -Area docs` passed; trailing whitespace scan clean; current-baseline stale `cf660d0` scan clean for `STATUS.md`, `MAINTENANCE_BACKLOG.md`, `RUN_STATE.md`, and `TASK_QUEUE.md`. Prior runtime baseline: strict gate ok, `npm test 180/180`, compare/rollback `43/43`, `scope:acceptance ok`. |
-| Worktree summary | docs/board-only plan update; no runtime changes, no SQLite mutation, no remote action. |
+| Current task | P7 / real-query-suite fixture-only baseline |
+| Current area | P7-vcp-parity-hardening |
+| Last action | 将 `benchmarks/real-query-suite/v1.json` 从 placeholder-only 样本替换为基于 `benchmarks/default-dataset.json` 的 5 条脱敏 fixture-only 查询，并让 query CLIs 输出 `fixtureOnlyCount` / `realCount`。 |
+| Last validation | targeted query tests passed `11/11`; `npm run real-query-suite -- --json` reports `placeholderCount=0`, `fixtureOnlyCount=5`, `realCount=5`; `npm run query:quality -- --json --dry-run` reports the same and `mutated=false`; `npm test` passed `181/181`; `git diff --check` passed. |
+| Worktree summary | local source/test/benchmark/status/board update; no provider calls, no SQLite mutation, no remote action. |
 | Mainline assumption | HTTP MCP 7605 is reachable |
 | Active-memory suite status | strict gate compare `43/43 matched`, rollback `43/43 rollback-ready`, `coreMismatchCountTotal=0`, `extendedMismatchCountTotal=0` |
-| npm test | `180/180` |
+| npm test | `181/181` |
 | Profile health | `ready` — vectors 205, 822 embedding cache, 0 legacy |
-| Guarded auto-commit allowed | eligible after final diff review; push remains separate explicit authorization |
-| Last checkpoint | `.agent_board/CHECKPOINT.md` current workspace_id review-plan checkpoint |
-| Next planned action | Validate docs-only batch, inspect diff, then decide guarded local commit eligibility. Push still requires separate explicit authorization. |
+| Guarded auto-commit allowed | eligible after final diff/staged review; push remains separate explicit authorization |
+| Last checkpoint | `.agent_board/CHECKPOINT.md` current query-suite fixture-only checkpoint |
+| Next planned action | Create guarded local commit if final diff remains scoped; next implementation candidate is fixture assertion runner for `mustContain` / `mustNotContain`. |
 
 ## Notes
 

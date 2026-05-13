@@ -33,6 +33,12 @@ function validateCase(caseItem) {
   if (!caseItem.query) issues.push('missing query');
   if (!caseItem.target) issues.push('missing target');
   if (!caseItem.expected || typeof caseItem.expected !== 'object') issues.push('missing expected');
+  if (caseItem.expected && caseItem.expected.mustContain && !Array.isArray(caseItem.expected.mustContain)) {
+    issues.push('expected.mustContain must be an array');
+  }
+  if (caseItem.expected && caseItem.expected.mustNotContain && !Array.isArray(caseItem.expected.mustNotContain)) {
+    issues.push('expected.mustNotContain must be an array');
+  }
   return issues;
 }
 
@@ -53,6 +59,7 @@ function runReport(options) {
   const cases = Array.isArray(suite.cases) ? suite.cases : [];
   let invalidCount = 0;
   let placeholderCount = 0;
+  let fixtureOnlyCount = 0;
 
   for (const caseItem of cases) {
     const issues = validateCase(caseItem);
@@ -62,6 +69,9 @@ function runReport(options) {
     }
     if ((caseItem.notes || '').toLowerCase().includes('placeholder')) {
       placeholderCount += 1;
+    }
+    if ((caseItem.notes || '').toLowerCase().includes('fixture-only')) {
+      fixtureOnlyCount += 1;
     }
   }
 
@@ -73,6 +83,7 @@ function runReport(options) {
     caseCount: cases.length,
     runnableCount,
     placeholderCount,
+    fixtureOnlyCount,
     invalidCount,
     realCount: realCount > 0 ? realCount : 0,
     mutated: false
@@ -90,6 +101,8 @@ async function main() {
     process.stdout.write(`caseCount: ${report.caseCount}\n`);
     process.stdout.write(`runnableCount: ${report.runnableCount}\n`);
     process.stdout.write(`placeholderCount: ${report.placeholderCount}\n`);
+    process.stdout.write(`fixtureOnlyCount: ${report.fixtureOnlyCount}\n`);
+    process.stdout.write(`realCount: ${report.realCount}\n`);
     process.stdout.write(`invalidCount: ${report.invalidCount}\n`);
     process.stdout.write(`mutated: ${report.mutated}\n`);
   }

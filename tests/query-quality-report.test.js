@@ -25,7 +25,9 @@ test('query-quality-report CLI should read default suite', () => {
 test('query-quality-report CLI should expose placeholderCount', () => {
   const result = runCli(['--json', '--dry-run']);
   const report = JSON.parse(result.stdout);
-  assert.ok(typeof report.placeholderCount === 'number');
+  assert.equal(report.placeholderCount, 0);
+  assert.equal(report.realCount, report.caseCount);
+  assert.equal(report.fixtureOnlyCount, report.caseCount);
 });
 
 test('query-quality-report CLI should never write data', () => {

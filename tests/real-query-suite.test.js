@@ -21,7 +21,9 @@ test('real-query-suite CLI should load default suite', () => {
   const report = JSON.parse(result.stdout);
   assert.equal(report.status, 'ok');
   assert.ok(report.caseCount > 0);
-  assert.ok(typeof report.placeholderCount === 'number');
+  assert.equal(report.placeholderCount, 0);
+  assert.equal(report.realCount, report.caseCount);
+  assert.equal(report.fixtureOnlyCount, report.caseCount);
 });
 
 test('real-query-suite CLI should report invalid cases for a broken suite', () => {
@@ -47,7 +49,7 @@ test('real-query-suite CLI should report invalid cases for a broken suite', () =
 test('real-query-suite CLI should detect placeholder cases', () => {
   const result = runCli(['--json']);
   const report = JSON.parse(result.stdout);
-  assert.ok(report.placeholderCount >= 0);
+  assert.equal(report.placeholderCount, 0);
 });
 
 test('real-query-suite CLI should fail for missing suite file', () => {
@@ -60,4 +62,15 @@ test('real-query-suite CLI should fail for missing suite file', () => {
 test('real-query-suite CLI should not write any data', () => {
   const result = runCli(['--json']);
   assert.equal(result.status, 0);
+});
+
+test('real-query-suite default cases should use non-empty expectation arrays', () => {
+  const result = runCli(['--json']);
+  assert.equal(result.status, 0);
+  const suite = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'benchmarks', 'real-query-suite', 'v1.json'), 'utf8'));
+  for (const caseItem of suite.cases) {
+    assert.ok(Array.isArray(caseItem.expected.mustContain), `${caseItem.id} mustContain should be an array`);
+    assert.ok(caseItem.expected.mustContain.length > 0, `${caseItem.id} mustContain should not be empty`);
+    assert.ok(Array.isArray(caseItem.expected.mustNotContain), `${caseItem.id} mustNotContain should be an array`);
+  }
 });
