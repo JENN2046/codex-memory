@@ -2,51 +2,80 @@
 
 ## Current Goal
 
-P6 — 把 `Single-Window 4-Agent Compact Autopilot` 正式收束成一个命名明确的仓库能力说明，并挂接到稳定入口。
+P9 — 安排远端 `origin/codex/p1-vcp-memory-core-100-roadmap` 的可用实现：只集成 runtime / CLI / storage / recall / tests 中可验证的 scope/runtime/query 变更，避开陈旧状态文档和远端 `.agent_board`。
 
 ## Current Area
 
-P6-docs-drift
+P9-codex-claude-client-scope
 
 ## Current Status
 
-命名能力说明批次已完成本地起草：新增 `Single-Window 4-Agent Compact Autopilot` 文档，并把入口挂到 `AGENTS.md` 与 `README.md`，让这套 autopilot rail 可以被稳定引用，而不是只散落在历史补丁和 board 里。
+本地集成批次已完成实现、修复和验证，但尚未提交。策略是 selective integration：不整支合并远端分支，不带入陈旧 `README` / `STATUS` / `PHASE_NAVIGATION` / `MAINTENANCE_BACKLOG` / 远端 `.agent_board`，只保留已验证的代码、测试、CLI、benchmark fixture 和 narrow docs。
 
 ## Completed Work
 
-- 新增 `docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md`，正式定义这套命名能力。
-- `AGENTS.md` 已挂接这份文档，明确它是现有 hard-stop / validation / guarded-commit 规则之上的命名与操作说明。
-- `README.md` 已新增稳定入口，方便新机器和后续维护直接找到这套模式。
-- 文档内容明确区分了“仓库内可迁移能力”和“机器级仍需补齐的运行环境”。
+- 从远端分支选择性恢复 package scripts、scope/query CLIs、runtime scope plumbing、storage/recall changes、query benchmark fixture 和相关 tests。
+- 本地修复 `src/core/constants.js`：恢复 `client_id` / `visibility` schema enum 约束，避免 MCP contract 放宽。
+- 本地修复 `src/cli/scope-backfill-dry-run.js`：`wouldUpdate` 现在覆盖仅缺 `workspace_id` 的记录，并把 `workspace_id` 标为 manual review required。
+- 本地修复 `src/cli/scope-acceptance.js`：acceptance 现在覆盖 `project_id` / `workspace_id` / `client_id` / `visibility` 四维 strict isolation，并按 memory id 做 leak 检查。
+- 本地修复 `src/core/MemoryWriteService.js`：保留 snake_case scope 字段，同时兼容现有 camelCase 内部调用。
+- 扩展 MCP contract、scope backfill、scope acceptance 相关回归测试。
+- 更新 `docs/scope-backfill-policy.md`，明确 `workspace_id` 不能自动猜测，需要人工审核。
 
 ## Changed Files
 
-- `docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md`
-- `AGENTS.md`
-- `README.md`
-- `.agent_board/TASK_QUEUE.md`
-- `.agent_board/RUN_STATE.md`
-- `.agent_board/HANDOFF.md`
-- `.agent_board/VALIDATION_LOG.md`
-- `.agent_board/CHECKPOINT.md`
+- `package.json`
+- `benchmarks/real-query-suite/v1.json`
+- `docs/scope-backfill-policy.md`
+- `src/app.js`
+- `src/cli/gate-ci.js`
+- `src/cli/mainline-gate.js`
+- `src/cli/query-quality-report.js`
+- `src/cli/real-query-suite.js`
+- `src/cli/scope-acceptance.js`
+- `src/cli/scope-backfill-dry-run.js`
+- `src/core/MemoryWriteService.js`
+- `src/core/constants.js`
+- `src/recall/CandidateGenerator.js`
+- `src/recall/ChunkIndexingService.js`
+- `src/recall/KnowledgeBaseRecallPipeline.js`
+- `src/recall/KnowledgeBaseSyncService.js`
+- `src/storage/DiaryStore.js`
+- `src/storage/SqliteShadowStore.js`
+- `tests/mcp-contract.test.js`
+- `tests/query-quality-report.test.js`
+- `tests/real-query-suite.test.js`
+- `tests/scope-acceptance-cli.test.js`
+- `tests/scope-backfill-dry-run.test.js`
+- `tests/scope-filter.test.js`
+- `.agent_board/*`
 
 ## Validation Run
 
-- `git diff --check` -> passed with repo-known LF normalization warnings only
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` -> passed
+- `git diff --check` -> passed
+- `node --test tests\mcp-contract.test.js tests\scope-filter.test.js tests\scope-acceptance-cli.test.js tests\scope-backfill-dry-run.test.js tests\real-query-suite.test.js tests\query-quality-report.test.js` -> 44/44 passed
+- `npm test` -> 180/180 passed
+- `npm run gate:mainline:strict` -> ok; health `200`; contract 7/7; test 180/180; compare 43/43 matched; rollback 43/43 rollback-ready
+- `npm run scope:acceptance -- --json` -> ok; full scope dimensions present; Project A/B found; no cross-scope leak
+- final status/diff scope review -> completed
+- new-file trailing whitespace and high-risk token scans -> clean
 
 ## Validation Not Run
 
-- none
+- provider smoke / benchmark not run; not provider-related and may use external configured services
+- no push, PR, tag, release, deploy, or remote write
+- no full remote branch merge; stale state docs intentionally not imported
 
 ## Current Blockers
 
-- none
+- none for local validation
+- commit/push remains a hard-stop decision requiring explicit approval
 
 ## Remaining Risks
 
-- 无明显实现风险；仅剩 commit/push 收口
+- Local commit is not authorized yet; validation is green if the user chooses to commit.
+- This batch intentionally leaves remote stale docs behind; if later merging that branch, exclude those files again.
 
 ## Next Safe Action
 
-Inspect final diff, then guarded commit/push this naming/entry task.
+Await explicit instruction if a guarded local commit is desired. Push is not authorized.

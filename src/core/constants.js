@@ -13,6 +13,9 @@ const VECTOR_INDEX_FILE_NAME = 'memory-vectors.json';
 const CHAT_INDEX_FILE_NAME = 'chat-history-index.json';
 const CANDIDATE_CACHE_FILE_NAME = 'candidate-cache.json';
 
+const CLIENT_ID_VALUES = ['codex', 'claude', 'omc', 'manual'];
+const VISIBILITY_VALUES = ['private', 'workspace', 'project', 'shared'];
+
 const TOOL_DEFINITIONS = [
   {
     name: 'record_memory',
@@ -37,8 +40,8 @@ const TOOL_DEFINITIONS = [
         sensitivity: { type: 'string' },
         project_id: { type: 'string' },
         workspace_id: { type: 'string' },
-        client_id: { type: 'string', enum: ['codex', 'claude', 'omc', 'manual'] },
-        visibility: { type: 'string', enum: ['private', 'workspace', 'project', 'shared'] },
+        client_id: { type: 'string', enum: CLIENT_ID_VALUES },
+        visibility: { type: 'string', enum: VISIBILITY_VALUES },
         task_id: { type: 'string' },
         conversation_id: { type: 'string' },
         retention_policy: { type: 'string' }
@@ -49,7 +52,7 @@ const TOOL_DEFINITIONS = [
   {
     name: 'search_memory',
     title: 'Search Codex Memory',
-    description: 'Search over the Codex process and knowledge diaries with diary-compatible recall output.',
+    description: 'Search over the Codex process and knowledge diaries with diary-compatible recall output. When scope is supplied, scope fields are applied as recall filters; strict marks the scoped search as a hard isolation intent for audit/overview.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -61,18 +64,20 @@ const TOOL_DEFINITIONS = [
         context_text: { type: 'string' },
         scope: {
           type: 'object',
+          description: 'Optional recall scope filter. project_id, workspace_id, client_id, and visibility restrict candidates whenever they are supplied; strict only records hard-isolation intent.',
           additionalProperties: false,
           properties: {
-            project_id: { type: 'string' },
-            workspace_id: { type: 'string' },
-            client_id: { type: 'string', enum: ['codex', 'claude', 'omc', 'manual'] },
+            project_id: { type: 'string', description: 'Restrict recall to records with this project_id.' },
+            workspace_id: { type: 'string', description: 'Restrict recall to records with this workspace_id. The raw value is not written to recall audit summaries.' },
+            client_id: { type: 'string', enum: CLIENT_ID_VALUES, description: 'Restrict recall to records with this client_id.' },
             visibility: {
               oneOf: [
-                { type: 'string', enum: ['private', 'workspace', 'project', 'shared'] },
-                { type: 'array', items: { type: 'string', enum: ['private', 'workspace', 'project', 'shared'] } }
-              ]
+                { type: 'string', enum: VISIBILITY_VALUES },
+                { type: 'array', items: { type: 'string', enum: VISIBILITY_VALUES } }
+              ],
+              description: 'Restrict recall to one or more visibility values.'
             },
-            strict: { type: 'boolean' }
+            strict: { type: 'boolean', description: 'Audit/overview marker for hard-isolation intent; scope fields still filter when strict is false or omitted.' }
           }
         }
       },

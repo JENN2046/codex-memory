@@ -35,15 +35,14 @@ class KnowledgeBaseSyncService {
       const needsRefresh = force || this.shouldRefreshRecord(existing, record) || !hasCurrentFingerprintChunks;
 
       if (this.config.enableShadowWrites && needsRefresh) {
-        // Preserve scope fields from existing shadow record (diary lacks scope)
         if (existing) {
-          record.projectId = record.projectId || existing.projectId;
-          record.workspaceId = record.workspaceId || existing.workspaceId;
-          record.clientId = record.clientId || existing.clientId;
-          record.visibility = record.visibility || existing.visibility;
-          record.taskId = record.taskId ?? existing.taskId;
-          record.conversationId = record.conversationId ?? existing.conversationId;
-          record.retentionPolicy = record.retentionPolicy || existing.retentionPolicy;
+          record.projectId = record.projectId || existing.projectId || null;
+          record.workspaceId = record.workspaceId || existing.workspaceId || null;
+          record.clientId = record.clientId || existing.clientId || null;
+          record.taskId = record.taskId || existing.taskId || null;
+          record.conversationId = record.conversationId || existing.conversationId || null;
+          record.visibility = record.visibility || existing.visibility || null;
+          record.retentionPolicy = record.retentionPolicy || existing.retentionPolicy || null;
         }
         await this.shadowStore.upsertRecord(record);
         await this.shadowStore.clearReconcileTasks(record.memoryId, 'sqlite');

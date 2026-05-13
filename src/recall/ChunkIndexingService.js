@@ -1,5 +1,6 @@
 const crypto = require('node:crypto');
 
+const { stripMemoryMarkers } = require('../storage/DiaryStore');
 const { chunkText } = require('./chunkText');
 
 class ChunkIndexingService {
@@ -10,7 +11,7 @@ class ChunkIndexingService {
   }
 
   async indexRecord(record) {
-    const sourceText = String(record.rawText || '').trim()
+    const sourceText = stripMemoryMarkers(record.cleanedText || record.rawText || '')
       || [
         `Title: ${record.title}`,
         '',

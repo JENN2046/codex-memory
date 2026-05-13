@@ -115,11 +115,12 @@ async function runTests() {
     child.on('close', code => {
       // Parse TAP output for pass/fail counts
       const output = stdout + stderr;
-      const passMatch = output.match(/# pass (\d+)/);
-      const failMatch = output.match(/# fail (\d+)/);
+      const passMatch = output.match(/(?:#|ℹ)\s*pass\s+(\d+)/);
+      const failMatch = output.match(/(?:#|ℹ)\s*fail\s+(\d+)/);
+      const testMatch = output.match(/(?:#|ℹ)\s*tests\s+(\d+)/);
       const passed = passMatch ? Number(passMatch[1]) : 0;
       const failed = failMatch ? Number(failMatch[1]) : 0;
-      const total = passed + failed;
+      const total = testMatch ? Number(testMatch[1]) : (passed + failed);
       resolve({
         status: failed === 0 ? 'ok' : 'error',
         message: `${passed}/${total} passed, ${failed} failed (${ciSafeFiles.length} CI-safe test files)`,
@@ -186,12 +187,10 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const generatedAt = new Date().toISOString();
 
-  const [compare, rollback, tests, docs] = await Promise.all([
-    runCompare(),
-    runRollback(),
-    runTests(),
-    Promise.resolve(runDocsCheck())
-  ]);
+  const compare = await runCompare();
+  const rollback = await runRollback();
+  const tests = await runTests();
+  const docs = runDocsCheck();
 
   const checks = { compare, rollback, tests, docs };
   const failedChecks = Object.entries(checks)

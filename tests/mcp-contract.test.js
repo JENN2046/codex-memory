@@ -142,3 +142,54 @@ test('codex-memory MCP should expose tools and execute record/search/overview', 
     assert.equal(overview.response.result.structuredContent.shadowSync.available, true);
   });
 });
+
+test('MCP schema contract should expose scope fields in record_memory', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const list = await server.handleJsonRpc({
+      jsonrpc: '2.0', id: 1, method: 'tools/list', params: {}
+    });
+    const tools = list.response.result.tools;
+    const recordMemory = tools.find(t => t.name === 'record_memory');
+    assert.ok(recordMemory);
+    const schema = recordMemory.inputSchema;
+    assert.equal(schema.additionalProperties, false);
+    assert.ok(schema.properties.project_id);
+    assert.ok(schema.properties.workspace_id);
+    assert.ok(schema.properties.client_id);
+    assert.ok(schema.properties.visibility);
+    assert.deepEqual(schema.properties.client_id.enum, ['codex', 'claude', 'omc', 'manual']);
+    assert.deepEqual(schema.properties.visibility.enum, ['private', 'workspace', 'project', 'shared']);
+    assert.ok(schema.properties.task_id);
+    assert.ok(schema.properties.conversation_id);
+    assert.ok(schema.properties.retention_policy);
+  });
+});
+
+test('MCP schema contract should expose scope in search_memory', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const list = await server.handleJsonRpc({
+      jsonrpc: '2.0', id: 1, method: 'tools/list', params: {}
+    });
+    const tools = list.response.result.tools;
+    const searchMemory = tools.find(t => t.name === 'search_memory');
+    assert.ok(searchMemory);
+    const schema = searchMemory.inputSchema;
+    assert.equal(schema.additionalProperties, false);
+    assert.ok(schema.properties.scope);
+    const scopeSchema = schema.properties.scope;
+    assert.equal(scopeSchema.additionalProperties, false);
+    assert.ok(scopeSchema.properties.project_id);
+    assert.ok(scopeSchema.properties.workspace_id);
+    assert.ok(scopeSchema.properties.client_id);
+    assert.ok(scopeSchema.properties.visibility);
+    assert.ok(Array.isArray(scopeSchema.properties.visibility.oneOf));
+    assert.deepEqual(scopeSchema.properties.visibility.oneOf.map(option => option.type), ['string', 'array']);
+    assert.equal(scopeSchema.properties.visibility.oneOf[1].items.type, 'string');
+    assert.deepEqual(scopeSchema.properties.client_id.enum, ['codex', 'claude', 'omc', 'manual']);
+    assert.deepEqual(scopeSchema.properties.visibility.oneOf[0].enum, ['private', 'workspace', 'project', 'shared']);
+    assert.deepEqual(scopeSchema.properties.visibility.oneOf[1].items.enum, ['private', 'workspace', 'project', 'shared']);
+    assert.ok(scopeSchema.properties.strict);
+  });
+});

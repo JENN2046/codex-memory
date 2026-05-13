@@ -1,0 +1,61 @@
+{
+  "version": "v1",
+  "description": "Real workflow query suite for codex-memory VCP Memory Core acceptance. Placeholder cases are not yet verified.",
+  "cases": [
+    {
+      "id": "rq-001",
+      "area": "scope",
+      "query": "checkpoint scope isolation",
+      "target": "process",
+      "expected": {
+        "mustContain": [],
+        "mustNotContain": []
+      },
+      "notes": "placeholder — verify scope isolation with real project_id"
+    },
+    {
+      "id": "rq-002",
+      "area": "scope",
+      "query": "rollback readiness memory governance",
+      "target": "process",
+      "expected": {
+        "mustContain": [],
+        "mustNotContain": []
+      },
+      "notes": "placeholder — verify memory governance query quality"
+    },
+    {
+      "id": "rq-003",
+      "area": "checkpoint",
+      "query": "checkpoint migration stable baseline",
+      "target": "process",
+      "expected": {
+        "mustContain": [],
+        "mustNotContain": []
+      },
+      "notes": "placeholder"
+    },
+    {
+      "id": "rq-004",
+      "area": "rollback",
+      "query": "rollback safe migration config",
+      "target": "knowledge",
+      "expected": {
+        "mustContain": [],
+        "mustNotContain": []
+      },
+      "notes": "placeholder"
+    },
+    {
+      "id": "rq-005",
+      "area": "governance",
+      "query": "memory lifecycle proposal tombstone",
+      "target": "process",
+      "expected": {
+        "mustContain": [],
+        "mustNotContain": []
+      },
+      "notes": "placeholder"
+    }
+  ]
+}

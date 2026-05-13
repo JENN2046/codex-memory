@@ -2,9 +2,9 @@
 
 ## Current State
 
-治理轨道补丁 `48d72f0`、事实源同步 `be7fb94`、scope acceptance 扩展 `3baef74`、scope candidate pushdown `f8dac11`、scope recall design `42b9a11`、R1 recall-audit annotation `d519a17`、R2 scoped recall aggregation `7bfd793`、R3 observability surface `f37a91a`、`governance:report` 收口 `c592026`、governance summary observability surface `fd3fd55`、policy-layer boundary note `e908582`、以及 `PL-2` preflight `6e5e236` 已推送；当前本地工作是 docs-only `P6`：把 `Single-Window 4-Agent Compact Autopilot` 正式收束成仓库内有名字、可引用、可迁移的能力说明。
+当前本地工作是未提交的 `P9` selective integration：从 `origin/codex/p1-vcp-memory-core-100-roadmap` 只取 scope/runtime/query 相关实现、CLI、tests、benchmark fixture 和 `docs/scope-backfill-policy.md`，明确排除陈旧状态文档和远端 `.agent_board`。
 
-Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充 Worker task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑完成并通过最终 Verifier PASS。
+本批次已完成本地修复与验证：恢复 schema enum 约束，修正 `scope-backfill-dry-run` 对仅缺 `workspace_id` 的记录统计，增强 `scope-acceptance` 的四维 strict isolation 检查，并保留 `MemoryWriteService` 的 camelCase 兼容。
 
 ## Workspace / Branch
 
@@ -12,17 +12,17 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 - Branch: main
 - HEAD: current local `main` tip（use `git log --oneline --decorate -n 1` for the exact hash）
 - Remote baseline: current `origin/main` tip for this maintenance line
-- Remote tag baseline: `v0.1.1-scope-boundary-20260508`
+- Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
 
 ## Key Baseline
 
 - compare: 43/43 matched, 0/0 core/extended
 - rollback: 43/43 rollback-ready, 0/0
-- npm test: 150/150
+- npm test: 180/180
 - gate:ci: 119/119 (fixture-only)
-- gate:mainline: ok (health 200)
 - gate:mainline:strict: ok (`health` + `contract` + `test` + `compare` + `rollback` 全绿)
+- scope acceptance: ok for `project_id` / `workspace_id` / `client_id` / `visibility`
 - profile: bge-m3-local__1024__v1, vectors 205, ready
 - dashboard: npm run dashboard
 - governance snapshot: `dashboard` / `observe:http` 现在都会带 `governance.status`、`reviewLevel`、counts、hints
@@ -32,39 +32,23 @@ Verifier rail 已完成并已随治理轨道推上远端：`AGENTS.md` 已补充
 
 ## Recent Work
 
-- Governance rail patch committed locally as `48d72f0`.
-- Docs-governance fact sync pushed as `be7fb94`.
-- `AGENTS.md` now defines Commander task contracts and read-only Verifier protocol.
-- `.agent_board/FILE_LOCKS.md` and `.agent_board/RISK_REGISTER.md` added.
-- Commander -> Worker -> Verifier trial: Worker changed only `STATUS.md`; first Verifier found board cleanup gaps; final Verifier PASS.
-- Scope acceptance now covers `workspace_id` / `client_id` end-to-end positive and strict negative cases.
-- Scope enforcement batch completed locally: candidate selection is narrowed by `project_id` / `workspace_id` / `client_id` / `visibility` before ranking, while post-filter remains as a fallback.
-- New regression coverage proves `limit=1` search still returns the in-scope record when higher-scoring off-scope records exceed the candidate pool.
-- R1 is now implemented: recall audit records `scopeApplied` / `scopeMode` / `scopeDimensions` / `scopeStrict` plus low-risk scope fields, while `workspace_id` remains presence-only.
-- `SCOPE_RECALL_AUDIT_DESIGN.md` now serves as the boundary doc for R2/R3 follow-ups, not just a proposal for R1.
-- R2 is now implemented: `memory_overview.recall.summary.scope` aggregates scoped recall count, strict count, latest scoped hit, and low-risk `mode/dimension/project/client/visibility` breakdowns.
-- Current boundary remains intact: no workspace breakdown and no raw `workspace_id` exposure in overview summary.
-- R3 is now implemented and pushed: `dashboard` / `http-observe` expose scoped recall summary counts plus `scopeMode` / `scopeDimensions` breakdowns, and tests were expanded without exposing raw `workspace_id`.
-- `governance:report` is now hardened and pushed: it resolves DB path through `createConfig`, opens SQLite read-only, correctly binds stale-threshold timestamps, and has dedicated CLI tests for governance metrics plus missing-DB behavior.
-- Governance summary observability surface is now pushed as `fd3fd55`: `dashboard` / `http-observe` expose read-only governance counts, review level, and hints without changing write-path or MCP contract.
-- `PL-2` preflight is now pushed as `6e5e236`: the current default read path still returns mixed lifecycle/private records, while a hypothetical status + client-aware private filter would narrow a `6`-record result set to `2`.
-- Current local docs-only batch introduces a named capability note for `Single-Window 4-Agent Compact Autopilot`, wires it into `AGENTS.md` and `README.md`, makes clear which parts travel with the repo versus which parts stay machine-local, and has already passed local docs validation.
-- LightMemo CLI + compare harness support
-- gate:ci + dashboard tests
-- P0.5 dashboard 空库兼容测试修复（仅 `tests/dashboard-cli.test.js`）
-- search_memory scope filter (project_id, visibility, workspace_id, client_id)
-- 39→43 baseline sync across 8 docs
-- ROADMAP.md archived, checkpoint logs compressed
-- SQLite 28-column migration with governance + scope fields
+- Selected integration restored local changes in package scripts, `src/app.js`, mainline/gate/query/scope CLIs, core scope constants/write service, recall/storage services, scope/query tests, and `benchmarks/real-query-suite/v1.json`.
+- Stale remote docs were not imported: `README.md`, `STATUS.md`, `PHASE_NAVIGATION.md`, `MAINTENANCE_BACKLOG.md`, and remote `.agent_board` remain excluded.
+- `src/core/constants.js` now keeps strict enum values for `client_id` and `visibility` in MCP schemas.
+- `src/cli/scope-backfill-dry-run.js` now counts records missing only `workspace_id` and marks `workspace_id` as `<manual-review-required>`.
+- `src/cli/scope-acceptance.js` now validates four scope dimensions and detects leaks by memory id.
+- `src/core/MemoryWriteService.js` accepts existing camelCase scope aliases to avoid breaking internal call sites.
+- Targeted tests passed 44/44; full `npm test` passed 180/180; strict gate passed; scope acceptance passed.
 
 ## Next
 
-- P1: inspect final diff for the named autopilot note batch
-- P2: guarded commit + push the docs-only naming batch
-- P3: then return to product-side next choice, likely `PL-2a status-only` preflight refinement
+- P1: inspect final `git status --short`, `git diff --stat`, and relevant diff slices.
+- P1: user may explicitly approve a guarded local commit if desired.
+- P2: push remains separate explicit authorization and is not implied by commit approval.
 
 ## Auth Required
 
+- local commit, unless explicitly approved after final diff review
 - push to origin
 - provider benchmark / smoke
 - rebuild-profile --confirm

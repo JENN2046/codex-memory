@@ -3,10 +3,14 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+const { DatabaseSync } = require('node:sqlite');
 
 const { createCodexMemoryApplication } = require('../src/app');
 const { CodexMemoryMcpServer } = require('../src/adapters/codex-mcp/server');
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const { createConfig } = require('../src/config/createConfig');
+const { stripMemoryMarkers } = require('../src/storage/DiaryStore');
+const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 
 async function withApp(handler) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-scope-test-'));
@@ -34,6 +38,37 @@ const requestContext = {
     requestSource: 'codex-memory-scope-test'
   }
 };
+
+test('scope metadata stripper preserves ordinary content with marker-like labels', () => {
+  assert.equal(
+    stripMemoryMarkers('Visibility: this is user-authored content'),
+    'Visibility: this is user-authored content'
+  );
+  assert.equal(
+    stripMemoryMarkers('Record-Type: note\nProject-ID: keep-me\nVisibility: user-authored'),
+    'Record-Type: note\nProject-ID: keep-me\nVisibility: user-authored'
+  );
+
+  const diaryText = [
+    '[2026-05-12T00:00:00.000Z] - Codex',
+    'Memory-ID: mem-test',
+    'Record-Type: process',
+    'Project-ID: internal-project',
+    'Workspace-ID: internal-workspace',
+    '',
+    'Content:',
+    'Visibility: this line belongs to the user content',
+    '',
+    'Evidence:',
+    'unit test'
+  ].join('\n');
+
+  const stripped = stripMemoryMarkers(diaryText);
+  assert.equal(stripped.includes('Project-ID'), false);
+  assert.equal(stripped.includes('Workspace-ID'), false);
+  assert.equal(stripped.includes('internal-workspace'), false);
+  assert.equal(stripped.includes('Visibility: this line belongs to the user content'), true);
+});
 
 test('scope filter: record_memory writes scope metadata (project A / project B)', async () => {
   await withApp(async ({ app }) => {
@@ -219,6 +254,88 @@ test('scope filter: search_memory with wrong project_id returns 0', async () => 
   });
 });
 
+test('scope filter: strict false still applies supplied scope fields', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+
+    const inScope = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Soft Scope Included',
+          content: 'Type: checkpoint\nrisk: soft scope filter included',
+          evidence: 'soft-scope-filter',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'soft'],
+          sensitivity: 'none',
+          project_id: 'soft-scope-project-a',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(inScope.response.result.structuredContent.decision, 'accepted');
+    const inScopeMemoryId = inScope.response.result.structuredContent.memoryId;
+
+    const outOfScope = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Soft Scope Excluded',
+          content: 'Type: checkpoint\nrisk: soft scope filter excluded',
+          evidence: 'soft-scope-filter',
+          validated: true,
+          reusable: false,
+          tags: ['scope', 'soft'],
+          sensitivity: 'none',
+          project_id: 'soft-scope-project-b',
+          visibility: 'project'
+        }
+      }
+    }, requestContext);
+    assert.equal(outOfScope.response.result.structuredContent.decision, 'accepted');
+    const outOfScopeMemoryId = outOfScope.response.result.structuredContent.memoryId;
+
+    const search = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'soft scope filter',
+          target: 'process',
+          limit: 10,
+          include_content: true,
+          scope: {
+            project_id: 'soft-scope-project-a',
+            strict: false
+          }
+        }
+      }
+    }, requestContext);
+
+    const results = search.response.result.structuredContent.results || [];
+    const memoryIds = results.map(result => result.memoryId);
+    assert.ok(memoryIds.includes(inScopeMemoryId), 'strict=false scope must include matching project records');
+    assert.equal(memoryIds.includes(outOfScopeMemoryId), false, 'strict=false scope must still filter non-matching project records');
+
+    const entries = await app.stores.auditLogStore.readRecentRecallAudit(10);
+    const latest = entries.at(-1);
+    assert.equal(latest.scopeApplied, true);
+    assert.equal(latest.scopeStrict, false);
+    assert.deepEqual(latest.scopeDimensions, ['project_id']);
+  });
+});
+
 test('scope filter: strict mode must NOT leak records from other projects', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
@@ -299,6 +416,76 @@ test('mapRow does not fake project_id (legacyProjectIdFallback test)', async () 
     assert.equal(retrieved.projectId, 'explicit-project', 'mapRow should preserve actual project_id, not fake it');
     assert.notEqual(retrieved.projectId, 'codex-memory', 'mapRow should not default to codex-memory');
   });
+});
+
+test('legacy NOT NULL scope columns use compatible defaults on omitted scope writes', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-legacy-scope-db-'));
+  const config = createConfig({
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data')
+  });
+
+  await fs.mkdir(path.dirname(config.dbPath), { recursive: true });
+  const legacyDb = new DatabaseSync(config.dbPath);
+  legacyDb.exec(`
+    CREATE TABLE memory_records (
+      memory_id TEXT PRIMARY KEY,
+      target TEXT NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      evidence TEXT NOT NULL,
+      tags_json TEXT NOT NULL,
+      validated INTEGER NOT NULL,
+      reusable INTEGER NOT NULL,
+      sensitivity TEXT NOT NULL,
+      file_path TEXT,
+      relative_path TEXT,
+      raw_text TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      client_id TEXT NOT NULL DEFAULT 'codex',
+      workspace_id TEXT NOT NULL DEFAULT '',
+      project_id TEXT NOT NULL DEFAULT 'codex-memory',
+      task_id TEXT,
+      conversation_id TEXT,
+      visibility TEXT NOT NULL DEFAULT 'project',
+      retention_policy TEXT NOT NULL DEFAULT 'permanent'
+    );
+  `);
+  legacyDb.close();
+
+  const shadowStore = new SqliteShadowStore(config);
+  try {
+    await shadowStore.upsertRecord({
+      memoryId: 'codex-process-legacy-default-scope',
+      target: 'process',
+      title: 'Legacy Default Scope',
+      content: 'Type: checkpoint',
+      evidence: 'legacy default scope test',
+      tags: ['scope'],
+      sensitivity: 'none',
+      validated: true,
+      reusable: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+
+    const row = shadowStore.db.prepare(`
+      SELECT client_id, workspace_id, project_id, visibility, retention_policy
+      FROM memory_records
+      WHERE memory_id = ?
+    `).get('codex-process-legacy-default-scope');
+    assert.equal(row.client_id, 'codex');
+    assert.equal(row.workspace_id, '');
+    assert.equal(row.project_id, 'codex-memory');
+    assert.equal(row.visibility, 'project');
+    assert.equal(row.retention_policy, 'permanent');
+  } finally {
+    await shadowStore.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
 });
 
 test('HTTP MCP tools/call end-to-end scope parameter verification', async () => {
@@ -705,6 +892,10 @@ test('schema: record_memory and search_memory tool definitions cover scope field
   for (const field of ['project_id', 'workspace_id', 'client_id', 'visibility', 'strict']) {
     assert.ok(searchScopeProps.includes(field), `search_memory scope schema must include ${field}`);
   }
+  const visibilitySchema = searchSchema.inputSchema.properties.scope.properties.visibility;
+  assert.ok(Array.isArray(visibilitySchema.oneOf), 'search_memory scope visibility must support string or array');
+  assert.deepEqual(visibilitySchema.oneOf.map(option => option.type), ['string', 'array']);
+  assert.equal(visibilitySchema.oneOf[1].items.type, 'string');
   assert.ok(searchSchema.inputSchema.additionalProperties === false, 'search_memory must reject additional properties');
 });
 
@@ -721,5 +912,237 @@ test('old DB schema drift report: verify scope columns exist', async () => {
     for (const col of requiredScopeColumns) {
       assert.ok(columnNames.includes(col), `Schema should have ${col} column`);
     }
+  });
+});
+
+test('scope durability: diary rebuild preserves scope metadata into fresh shadow store', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-scope-durability-'));
+  const appOptions = {
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data')
+  };
+  const app = createCodexMemoryApplication(appOptions);
+  await app.initialize();
+
+  let memoryId;
+  try {
+    const record = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Durable Scope Metadata',
+      content: 'Type: checkpoint\nrisk: durable scope metadata survives diary rebuild',
+      evidence: 'scope durability test',
+      validated: true,
+      reusable: false,
+      tags: ['scope', 'durability'],
+      sensitivity: 'none',
+      project_id: 'durable-project',
+      workspace_id: 'durable-workspace',
+      client_id: 'codex',
+      task_id: 'task-123',
+      conversation_id: 'conversation-456',
+      visibility: 'shared',
+      retention_policy: 'keep'
+    }, requestContext);
+    assert.equal(record.decision, 'accepted');
+    memoryId = record.memoryId;
+
+    const diaryText = await fs.readFile(record.filePath, 'utf8');
+    assert.match(diaryText, /^Project-ID:\s*durable-project$/m);
+    assert.match(diaryText, /^Workspace-ID:\s*durable-workspace$/m);
+    assert.match(diaryText, /^Client-ID:\s*codex$/m);
+    assert.match(diaryText, /^Task-ID:\s*task-123$/m);
+    assert.match(diaryText, /^Conversation-ID:\s*conversation-456$/m);
+    assert.match(diaryText, /^Visibility:\s*shared$/m);
+    assert.match(diaryText, /^Retention-Policy:\s*keep$/m);
+  } finally {
+    await app.close();
+  }
+
+  await fs.rm(path.join(tempBasePath, 'data'), { recursive: true, force: true });
+
+  const rebuiltApp = createCodexMemoryApplication(appOptions);
+  await rebuiltApp.initialize();
+  try {
+    await rebuiltApp.rebuildShadowFromDiary({ target: 'process' });
+
+    const restored = await rebuiltApp.stores.shadowStore.getRecord(memoryId);
+    assert.equal(restored.projectId, 'durable-project');
+    assert.equal(restored.workspaceId, 'durable-workspace');
+    assert.equal(restored.clientId, 'codex');
+    assert.equal(restored.taskId, 'task-123');
+    assert.equal(restored.conversationId, 'conversation-456');
+    assert.equal(restored.visibility, 'shared');
+    assert.equal(restored.retentionPolicy, 'keep');
+
+    const search = await rebuiltApp.callTool('search_memory', {
+      query: 'durable scope metadata',
+      target: 'process',
+      limit: 10,
+      include_content: true,
+      scope: {
+        project_id: 'durable-project',
+        workspace_id: 'durable-workspace',
+        client_id: 'codex',
+        visibility: 'shared'
+      }
+    }, requestContext);
+    assert.ok(search.results.some(result => result.memoryId === memoryId), 'rebuilt scoped search must find restored record');
+    const matched = search.results.find(result => result.memoryId === memoryId);
+    const returnedText = JSON.stringify({
+      snippet: matched.snippet,
+      content: matched.content,
+      text: matched.text
+    });
+    assert.equal(returnedText.includes('Workspace-ID'), false, 'scope header label must not appear in recall output');
+    assert.equal(returnedText.includes('durable-workspace'), false, 'raw workspace_id must not appear in recall output');
+    assert.equal(returnedText.includes('Task-ID'), false, 'task header label must not appear in recall output');
+    assert.equal(returnedText.includes('Conversation-ID'), false, 'conversation header label must not appear in recall output');
+  } finally {
+    await rebuiltApp.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('scope rebuild ignores user-authored marker-like lines inside content', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-scope-body-marker-'));
+  const appOptions = {
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data')
+  };
+  const app = createCodexMemoryApplication(appOptions);
+  await app.initialize();
+
+  let memoryId;
+  try {
+    const record = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Body Marker Scope Drift',
+      content: [
+        'Type: checkpoint',
+        'Project-ID: user-authored-project',
+        'Workspace-ID: user-authored-workspace',
+        'Client-ID: user-authored-client',
+        'Task-ID: user-authored-task',
+        'Conversation-ID: user-authored-conversation',
+        'Visibility: user-authored-visibility',
+        'Retention-Policy: user-authored-retention',
+        'Tag: user-authored-tag',
+        'risk: body marker lines must not become scope metadata'
+      ].join('\n'),
+      evidence: 'body marker scope drift regression',
+      validated: true,
+      reusable: false,
+      tags: ['scope', 'body-marker'],
+      sensitivity: 'none'
+    }, requestContext);
+    assert.equal(record.decision, 'accepted');
+    memoryId = record.memoryId;
+  } finally {
+    await app.close();
+  }
+
+  await fs.rm(path.join(tempBasePath, 'data'), { recursive: true, force: true });
+
+  const rebuiltApp = createCodexMemoryApplication(appOptions);
+  await rebuiltApp.initialize();
+  try {
+    await rebuiltApp.rebuildShadowFromDiary({ target: 'process' });
+
+    const restored = await rebuiltApp.stores.shadowStore.getRecord(memoryId);
+    assert.equal(restored.projectId, null);
+    assert.equal(restored.workspaceId, null);
+    assert.equal(restored.clientId, null);
+    assert.equal(restored.taskId, null);
+    assert.equal(restored.conversationId, null);
+    assert.equal(restored.visibility, null);
+    assert.equal(restored.retentionPolicy, null);
+    assert.deepEqual(restored.tags.sort(), ['body-marker', 'scope']);
+
+    const scopedSearch = await rebuiltApp.callTool('search_memory', {
+      query: 'body marker lines must not become scope metadata',
+      target: 'process',
+      limit: 10,
+      scope: {
+        project_id: 'user-authored-project'
+      }
+    }, requestContext);
+    assert.equal(
+      scopedSearch.results.some(result => result.memoryId === memoryId),
+      false,
+      'content Project-ID must not be treated as rebuilt scope metadata'
+    );
+
+    const unscopedSearch = await rebuiltApp.callTool('search_memory', {
+      query: 'body marker lines must not become scope metadata',
+      target: 'process',
+      limit: 10,
+      include_content: true
+    }, requestContext);
+    const matched = unscopedSearch.results.find(result => result.memoryId === memoryId);
+    assert.ok(matched, 'unscoped search should still find user-authored marker content');
+    assert.equal(matched.content.includes('Project-ID: user-authored-project'), true);
+    assert.equal(matched.content.includes('Tag: user-authored-tag'), true);
+  } finally {
+    await rebuiltApp.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('scope filter: legacy raw chunk headers are stripped from recall text', async () => {
+  await withApp(async ({ app }) => {
+    const record = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Legacy Raw Chunk Headers',
+      content: 'Type: checkpoint\nrisk: legacy raw chunk output must be sanitized',
+      evidence: 'legacy raw chunk header regression',
+      validated: true,
+      reusable: false,
+      tags: ['scope', 'legacy-chunk'],
+      sensitivity: 'none',
+      project_id: 'legacy-chunk-project',
+      workspace_id: 'legacy-raw-workspace',
+      client_id: 'codex',
+      task_id: 'legacy-task',
+      conversation_id: 'legacy-conversation',
+      visibility: 'shared',
+      retention_policy: 'keep'
+    }, requestContext);
+    assert.equal(record.decision, 'accepted');
+
+    const diaryText = await fs.readFile(record.filePath, 'utf8');
+    app.stores.shadowStore.db.prepare(`
+      UPDATE memory_chunks
+      SET text = ?
+      WHERE memory_id = ?
+    `).run(diaryText, record.memoryId);
+
+    const search = await app.callTool('search_memory', {
+      query: 'legacy raw chunk output sanitized',
+      target: 'process',
+      limit: 10,
+      include_content: true,
+      scope: {
+        project_id: 'legacy-chunk-project',
+        workspace_id: 'legacy-raw-workspace',
+        client_id: 'codex',
+        visibility: 'shared'
+      }
+    }, requestContext);
+
+    const matched = search.results.find(result => result.memoryId === record.memoryId);
+    assert.ok(matched, 'scoped search must return the record backed by a legacy raw chunk');
+    const returnedText = JSON.stringify({
+      snippet: matched.snippet,
+      content: matched.content,
+      text: matched.text
+    });
+    assert.equal(returnedText.includes('Workspace-ID'), false, 'legacy raw chunk header label must not appear in recall output');
+    assert.equal(returnedText.includes('legacy-raw-workspace'), false, 'legacy raw workspace_id must not appear in recall output');
+    assert.equal(returnedText.includes('Task-ID'), false, 'legacy task header label must not appear in recall output');
+    assert.equal(returnedText.includes('Conversation-ID'), false, 'legacy conversation header label must not appear in recall output');
   });
 });
