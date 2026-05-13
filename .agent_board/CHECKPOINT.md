@@ -10,7 +10,7 @@ P9-codex-claude-client-scope
 
 ## Current Status
 
-本地集成批次已完成实现、修复和验证，但尚未提交。策略是 selective integration：不整支合并远端分支，不带入陈旧 `README` / `STATUS` / `PHASE_NAVIGATION` / `MAINTENANCE_BACKLOG` / 远端 `.agent_board`，只保留已验证的代码、测试、CLI、benchmark fixture 和 narrow docs。
+本地集成批次已完成实现、修复、验证，并提交为 `e1883e6 feat: integrate scoped memory runtime tools`。策略是 selective integration：不整支合并远端分支，不带入陈旧 `README` / `STATUS` / `PHASE_NAVIGATION` / `MAINTENANCE_BACKLOG` / 远端 `.agent_board`，只保留已验证的代码、测试、CLI、benchmark fixture 和 narrow docs。
 
 ## Completed Work
 
@@ -21,6 +21,7 @@ P9-codex-claude-client-scope
 - 本地修复 `src/core/MemoryWriteService.js`：保留 snake_case scope 字段，同时兼容现有 camelCase 内部调用。
 - 扩展 MCP contract、scope backfill、scope acceptance 相关回归测试。
 - 更新 `docs/scope-backfill-policy.md`，明确 `workspace_id` 不能自动猜测，需要人工审核。
+- 创建本地提交 `e1883e6 feat: integrate scoped memory runtime tools`；未 push。
 
 ## Changed Files
 
@@ -73,9 +74,9 @@ P9-codex-claude-client-scope
 
 ## Remaining Risks
 
-- Local commit is not authorized yet; validation is green if the user chooses to commit.
+- Push remains unauthorized.
 - This batch intentionally leaves remote stale docs behind; if later merging that branch, exclude those files again.
 
 ## Next Safe Action
 
-Await explicit instruction if a guarded local commit is desired. Push is not authorized.
+Await explicit instruction if push or further local work is desired. Push is not authorized.

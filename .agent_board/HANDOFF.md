@@ -2,15 +2,15 @@
 
 ## Current State
 
-当前本地工作是未提交的 `P9` selective integration：从 `origin/codex/p1-vcp-memory-core-100-roadmap` 只取 scope/runtime/query 相关实现、CLI、tests、benchmark fixture 和 `docs/scope-backfill-policy.md`，明确排除陈旧状态文档和远端 `.agent_board`。
+当前本地工作是已提交的 `P9` selective integration：`e1883e6 feat: integrate scoped memory runtime tools` 从 `origin/codex/p1-vcp-memory-core-100-roadmap` 只取 scope/runtime/query 相关实现、CLI、tests、benchmark fixture 和 `docs/scope-backfill-policy.md`，明确排除陈旧状态文档和远端 `.agent_board`。
 
-本批次已完成本地修复与验证：恢复 schema enum 约束，修正 `scope-backfill-dry-run` 对仅缺 `workspace_id` 的记录统计，增强 `scope-acceptance` 的四维 strict isolation 检查，并保留 `MemoryWriteService` 的 camelCase 兼容。
+本批次已完成本地修复、验证与本地提交：恢复 schema enum 约束，修正 `scope-backfill-dry-run` 对仅缺 `workspace_id` 的记录统计，增强 `scope-acceptance` 的四维 strict isolation 检查，并保留 `MemoryWriteService` 的 camelCase 兼容。未 push。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: current local `main` tip（use `git log --oneline --decorate -n 1` for the exact hash）
+- HEAD: current local `main` tip; integration commit is `e1883e6 feat: integrate scoped memory runtime tools`
 - Remote baseline: current `origin/main` tip for this maintenance line
 - Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
@@ -39,16 +39,14 @@
 - `src/cli/scope-acceptance.js` now validates four scope dimensions and detects leaks by memory id.
 - `src/core/MemoryWriteService.js` accepts existing camelCase scope aliases to avoid breaking internal call sites.
 - Targeted tests passed 44/44; full `npm test` passed 180/180; strict gate passed; scope acceptance passed.
+- Guarded local commit `e1883e6` created; push remains unauthorized.
 
 ## Next
 
-- P1: inspect final `git status --short`, `git diff --stat`, and relevant diff slices.
-- P1: user may explicitly approve a guarded local commit if desired.
-- P2: push remains separate explicit authorization and is not implied by commit approval.
+- P1: push remains separate explicit authorization and is not implied by local commit approval.
 
 ## Auth Required
 
-- local commit, unless explicitly approved after final diff review
 - push to origin
 - provider benchmark / smoke
 - rebuild-profile --confirm

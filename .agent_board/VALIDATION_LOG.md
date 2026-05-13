@@ -62,6 +62,7 @@
 | CMV-0062 | `npm test` | P9-codex-claude-client-scope | selected P1 VCP memory-core scope/runtime/query integration | COMPLETED_VALIDATED | full test suite passed 180/180; sandboxed first attempt hit `spawn EPERM`, escalated rerun passed | run strict mainline gate | 2026-05-13 |
 | CMV-0063 | `npm run gate:mainline:strict` | P9-codex-claude-client-scope | selected P1 VCP memory-core scope/runtime/query integration | COMPLETED_VALIDATED | strict gate ok: health 200, contract 7/7, test 180/180, compare 43/43 matched, rollback 43/43 rollback-ready | run scope acceptance CLI | 2026-05-13 |
 | CMV-0064 | `npm run scope:acceptance -- --json` ; `git diff --check` | P9-codex-claude-client-scope | four-dimensional strict scope acceptance | COMPLETED_VALIDATED | scope acceptance ok for `project_id`, `workspace_id`, `client_id`, and `visibility`; Project A/B found with no cross-scope leak; diff check passed | final diff review before any commit | 2026-05-13 |
+| CMV-0065 | `git status --short` ; `git diff --cached --stat` ; `git diff --cached --check` ; staged secret scan ; `git commit -m "feat: integrate scoped memory runtime tools"` | P9-codex-claude-client-scope | guarded local commit | COMPLETED_VALIDATED | staged 29 intended files, no dependency manifest/lockfile changes beyond package scripts, staged diff check passed, high-risk token scan clean, local commit `e1883e6` created | no push without explicit approval | 2026-05-13 |
 
 ## Batch Summary
 
