@@ -246,6 +246,8 @@ Candidate SQL pushdown remains a future optimization and is not required for P11
 
 ### P11.9 Gate-CI Lifecycle Policy Summary
 
+Status: implemented as CI-safe fixture/reporting summary.
+
 Goal:
 
 - Add fixture-only lifecycle policy summary to `gate:ci`.
@@ -253,6 +255,21 @@ Goal:
 - Do not call provider.
 - Do not write real memory.
 - Do not read `.env`.
+- Do not change `search_memory` runtime behavior.
+
+Current `gate:ci` JSON field:
+
+- `checks.lifecyclePolicy.status`
+- `checks.lifecyclePolicy.detail.fixtureOnly`
+- `checks.lifecyclePolicy.detail.mutated`
+- `checks.lifecyclePolicy.detail.noNetwork / noDaemon / noProvider`
+- `checks.lifecyclePolicy.detail.defaultEnabled`
+- `checks.lifecyclePolicy.detail.enabledIncludedStatuses`
+- `checks.lifecyclePolicy.detail.enabledExcludedStatuses`
+- `checks.lifecyclePolicy.detail.hiddenByLifecycleCount`
+- `checks.lifecyclePolicy.detail.staleResultCount`
+- `checks.lifecyclePolicy.detail.auditSummaryShapePresent`
+- `checks.lifecyclePolicy.detail.rawWorkspaceIdExposed`
 
 ### P12 Controlled Mutation Tools
 

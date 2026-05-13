@@ -2,9 +2,9 @@
 
 更新时间：2026-05-13
 
-本页记录 P10 runtime gate 的安全开关、默认行为、验证入口和 CI-safe policy preflight 边界。
+本页记录 runtime policy gate 的安全开关、默认行为、验证入口和 CI-safe policy summary 边界。
 
-长期路线图事实源仍是 [VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)。本页只描述当前 P10 runtime policy gate 的操作边界，不替代路线图，也不宣布 P11 lifecycle 已实现。
+长期路线图事实源仍是 [VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)。本页只描述当前 runtime policy gate 的操作边界，不替代路线图。
 
 ## 当前边界
 
@@ -126,14 +126,57 @@ JSON 重点字段：
 - `checks.policyPreflight.detail.lifecycleFilteredCount`
 - `checks.policyPreflight.detail.crossClientPrivateFilteredCount`
 
+## CI-Safe Lifecycle Policy Summary
+
+`gate:ci` 现在输出 `checks.lifecyclePolicy`，用
+[lifecycle-read-policy-runtime-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-read-policy-runtime-v1.json)
+生成 lifecycle read-policy runtime flag 的 fixture-only summary。
+
+边界：
+
+- fixture-only。
+- 不依赖真实 HTTP MCP daemon。
+- 不调用 provider。
+- 不写真实 memory。
+- 不读 `.env`。
+- `mutated=false`。
+- 不改变 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY=false` 默认值。
+- 不改变 `search_memory` runtime 行为。
+
+当前 fixture summary：
+
+- `defaultEnabled=false`
+- `enabledIncludedStatuses=["active","stale"]`
+- `enabledExcludedStatuses=["proposal","rejected","superseded","tombstoned"]`
+- `missingColumnBehavior=warn-or-fail-safe`
+- `hiddenByLifecycleCount=4`
+- `staleResultCount=1`
+- `auditSummaryShapePresent=true`
+- `rawWorkspaceIdExposed=false`
+
+JSON 重点字段：
+
+- `checks.lifecyclePolicy.status`
+- `checks.lifecyclePolicy.detail.fixtureOnly`
+- `checks.lifecyclePolicy.detail.noNetwork / noDaemon / noProvider`
+- `checks.lifecyclePolicy.detail.mutated`
+- `checks.lifecyclePolicy.detail.defaultEnabled`
+- `checks.lifecyclePolicy.detail.enabledIncludedStatuses`
+- `checks.lifecyclePolicy.detail.enabledExcludedStatuses`
+- `checks.lifecyclePolicy.detail.hiddenByLifecycleCount`
+- `checks.lifecyclePolicy.detail.staleResultCount`
+- `checks.lifecyclePolicy.detail.auditSummaryShapePresent`
+- `checks.lifecyclePolicy.detail.rawWorkspaceIdExposed`
+
 ## Recommended Validation
 
-P10.1 文档与 CI-safe policy preflight 变更建议验证：
+runtime policy gate 文档与 CI-safe summary 变更建议验证：
 
 ```powershell
 node --test tests\gate-ci-cli.test.js
-node --test tests\policy-read-preflight.test.js
+node --test tests\lifecycle-read-policy-runtime-fixture.test.js
 npm run gate:ci
+npm run gate:ci -- --json
 npm test
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs

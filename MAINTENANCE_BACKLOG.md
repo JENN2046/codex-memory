@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests、P11.4 / P11.5 / P11.6 / P11.7、P11.x stale branch quarantine 均已进入 `origin/main`；P11.8 lifecycle read-policy runtime flag implementation 为当前本地阶段
+- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests、P11.4 / P11.5 / P11.6 / P11.7、P11.x stale branch quarantine、P11.8 lifecycle read-policy runtime flag implementation 均已进入 `origin/main`；P11.9 lifecycle policy gate-ci summary 为当前本地阶段
 - 长期路线图事实源：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯。Stale branch quarantine 记录：[docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md)。该分支不可整体 merge、不可 rebase、不可作为开发基线，只允许选择性文档 salvage。
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
@@ -86,6 +86,7 @@
 | P11.6-lifecycle-read-policy-runtime-flag-implementation-planning | memory-governance | A1/A2 | done | Plan optional lifecycle read-policy runtime flag implementation before touching runtime | `git diff --check`; docs validation | Docs/board only; defines insertion points, missing-column behavior, audit summary, and future sequence; no runtime change |
 | P11.7-lifecycle-read-policy-runtime-fixture-tests | memory-governance | A1/A2 | done | Add runtime-oriented fixture tests before implementing lifecycle read-policy runtime flag | `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`; `npm test`; `git diff --check`; docs validation | Future tests only; proves default-off flags, enabled filtering, stale counts, private visibility, missing-column fail-safe, and audit summary shape before runtime implementation |
 | P11.8-lifecycle-read-policy-runtime-flag-implementation | memory-governance | A2/A3 | done | Implement optional lifecycle read-policy runtime flag while preserving default-off behavior | targeted runtime tests; `npm test`; `npm run gate:ci`; `npm run gate:mainline:strict`; `git diff --check` | `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY` defaults false; enabled mode filters lifecycle statuses; no MCP tool expansion and no SQLite migration |
+| P11.9-lifecycle-policy-gate-ci-summary | memory-governance / ci-gate | A1/A2 | done | Add fixture-only lifecycle read-policy summary to `gate:ci` | `node --test tests\gate-ci-cli.test.js`; `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`; `npm run gate:ci`; `npm run gate:ci -- --json`; `npm test`; `git diff --check`; docs validation | CI-safe summary only; no runtime behavior change, no MCP tool expansion, no SQLite migration |
 | P11.x-stale-branch-quarantine-and-doc-salvage | docs-governance | A1 | done | Quarantine `codex/p1-vcp-memory-core-100-roadmap` as superseded stale reference branch and salvage only rewritten docs | `git diff --check`; docs validation; manual stale-branch boundary review | Docs/board only; no merge/rebase/cherry-pick; no `src/`, tests, or package changes |
 
 ## 推荐执行顺序
@@ -111,8 +112,9 @@
 19. `P11.7`：已做 lifecycle read-policy runtime fixture tests，先证明 default-off、enabled filtering、missing-column 和 audit summary 契约。
 20. `P11.x`：已完成 stale branch quarantine and doc salvage；`codex/p1-vcp-memory-core-100-roadmap` 只能作为 read-only reference，不能作为开发基线。
 21. `P11.8`：已实现 optional lifecycle read-policy runtime flag；默认关闭，MCP public tools 不变，无 SQLite migration。
-22. `P11.9`：下一步建议将 lifecycle policy summary 纳入 `gate:ci` 的 fixture-only 可见面，不依赖真实 HTTP MCP、不调用 provider、不写真实 memory。
-23. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+22. `P11.9`：已将 lifecycle policy summary 纳入 `gate:ci` 的 fixture-only 可见面，不依赖真实 HTTP MCP、不调用 provider、不写真实 memory。
+23. `P11.10`：下一步可考虑 lifecycle read-policy observability/dashboard summary，继续保持只读 summary 边界。
+24. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

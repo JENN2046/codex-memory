@@ -39,6 +39,7 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
   assert.deepEqual(Object.keys(payload.checks).sort(), [
     'compare',
     'docs',
+    'lifecyclePolicy',
     'policyPreflight',
     'queries',
     'rollback',
@@ -100,6 +101,45 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
   assert.equal(payload.checks.policyPreflight.detail.lifecycleFilteredCount, 3);
   assert.equal(payload.checks.policyPreflight.detail.crossClientPrivateFilteredCount, 1);
 
+  assert.equal(payload.checks.lifecyclePolicy.status, 'ok');
+  assert.deepEqual(Object.keys(payload.checks.lifecyclePolicy.detail).sort(), [
+    'auditSummaryShapePresent',
+    'automaticMigrationAllowed',
+    'defaultEnabled',
+    'defaultLifecyclePolicyEnabled',
+    'enabledExcludedStatuses',
+    'enabledIncludedStatuses',
+    'fixtureOnly',
+    'hiddenByLifecycleCount',
+    'missingColumnBehavior',
+    'mustNotTreatUnknownAsActive',
+    'mutated',
+    'noDaemon',
+    'noNetwork',
+    'noProvider',
+    'rawWorkspaceIdExposed',
+    'staleResultCount'
+  ]);
+  assert.equal(payload.checks.lifecyclePolicy.detail.fixtureOnly, true);
+  assert.equal(payload.checks.lifecyclePolicy.detail.noNetwork, true);
+  assert.equal(payload.checks.lifecyclePolicy.detail.noDaemon, true);
+  assert.equal(payload.checks.lifecyclePolicy.detail.noProvider, true);
+  assert.equal(payload.checks.lifecyclePolicy.detail.mutated, false);
+  assert.equal(payload.checks.lifecyclePolicy.detail.defaultEnabled, false);
+  assert.equal(payload.checks.lifecyclePolicy.detail.defaultLifecyclePolicyEnabled, false);
+  assert.deepEqual(payload.checks.lifecyclePolicy.detail.enabledIncludedStatuses, ['active', 'stale']);
+  assert.deepEqual(payload.checks.lifecyclePolicy.detail.enabledExcludedStatuses, [
+    'proposal',
+    'rejected',
+    'superseded',
+    'tombstoned'
+  ]);
+  assert.equal(payload.checks.lifecyclePolicy.detail.hiddenByLifecycleCount, 4);
+  assert.equal(payload.checks.lifecyclePolicy.detail.staleResultCount, 1);
+  assert.equal(payload.checks.lifecyclePolicy.detail.auditSummaryShapePresent, true);
+  assert.equal(payload.checks.lifecyclePolicy.detail.rawWorkspaceIdExposed, false);
+  assert.equal(result.stdout.includes('workspace_id'), false);
+
   assert.ok(payload.checks.tests.status === 'ok' || payload.checks.tests.status === 'error',
     'tests check should have valid status');
   assert.ok(typeof payload.checks.tests.detail.total === 'number');
@@ -123,6 +163,9 @@ test('gate:ci CLI should emit text output by default', async () => {
   assert.ok(text.includes('8/8 query assertions passed'), 'should include query assertion counts');
   assert.ok(text.includes('policyPreflight'), 'should include policy preflight check');
   assert.ok(text.includes('3/7 records would remain'), 'should include policy preflight counts');
+  assert.ok(text.includes('lifecyclePolicy'), 'should include lifecycle policy check');
+  assert.ok(text.includes('default off'), 'should include lifecycle default-off summary');
+  assert.equal(text.includes('workspace_id'), false, 'should not include raw workspace_id');
   assert.ok(text.includes('tests'), 'should include tests check');
   assert.ok(text.includes('docs'), 'should include docs check');
   assert.ok(text.includes('PASS'), 'should show PASS result');

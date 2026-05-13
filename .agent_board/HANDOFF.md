@@ -2,82 +2,70 @@
 
 ## Goal
 
-Resume after `P11.8-lifecycle-read-policy-runtime-flag-implementation` in `A:\codex-memory`.
+Resume after `P11.9-lifecycle-policy-gate-ci-summary` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `63482b4`
+- Base: `origin/main` / `2080b12`
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-P11-memory-lifecycle-core / lifecycle-read-policy-runtime
+P11-memory-lifecycle-core / ci-gate
 
 ## Completed In Current Batch
 
-- Implemented `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`, default `false`.
-- Preserved `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` default behavior.
-- Added read-only `SqliteShadowStore.getRecordsLifecycleStatusMap(memoryIds)`.
-- Added runtime post-filter for ordinary `search_memory` when lifecycle policy is enabled.
-- Kept `active` / `stale`; filtered `proposal` / `rejected` / `superseded` / `tombstoned`.
-- Counted visible stale results and hidden lifecycle candidates.
-- Added missing lifecycle column fail-safe behavior for enabled mode.
-- Added low-risk read-policy audit summary without raw `workspace_id`.
-- Added runtime tests and updated docs/board.
+- Added fixture-only `checks.lifecyclePolicy` to `gate:ci`.
+- Kept lifecycle policy summary local to fixtures and reports.
+- Verified JSON output includes `fixtureOnly=true`, `mutated=false`, `noNetwork=true`, `noDaemon=true`, `noProvider=true`, and `defaultEnabled=false`.
+- Verified text output includes a lifecycle policy line and does not expose raw `workspace_id`.
+- Updated lifecycle policy docs and board state.
 
 ## Changed Files
 
-- `src/config/createConfig.js`
-- `src/app.js`
-- `src/storage/SqliteShadowStore.js`
-- `src/recall/RecallAuditService.js`
-- `tests/lifecycle-read-policy-runtime.test.js`
+- `src/cli/gate-ci.js`
+- `tests/gate-ci-cli.test.js`
+- `docs/runtime-policy-gates.md`
 - `docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md`
-- `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `node --test tests\lifecycle-read-policy-runtime.test.js`：passed `6/6`
+- `node --test tests\gate-ci-cli.test.js`：passed `2/2`
 - `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`：passed `10/10`
-- `node --test tests\mcp-contract.test.js`：passed `7/7`
-- `npm test`：passed `233/233` after `npm run start:http:ensure`
-- `npm run gate:ci`：passed
-- `npm run gate:mainline:strict`：passed
-- `npm run scope:acceptance -- --json`：passed
-- `npm run lifecycle:sqlite:dry-run -- --json`：passed, `mutated=false`
+- `npm run gate:ci`：PASS
+- `npm run gate:ci -- --json`：PASS, includes `checks.lifecyclePolicy.status=ok`
+- `npm test`：passed `233/233`
+- `git diff --check`：passed
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
 ## MCP Mode
 
 - Public MCP tools remain `record_memory` / `search_memory` / `memory_overview`.
-- No new MCP public tools were added.
+- No MCP public tool definitions were changed.
 
 ## Audit / Recall Impact
 
-- Default-off recall remains backward-compatible.
-- Enabled lifecycle policy adds ordinary recall filtering and a `read-policy` audit summary.
-- Audit summary includes low-risk policy fields and `scopeWorkspacePresent`.
-- Audit summary does not include raw `workspace_id`.
+- No `search_memory` runtime behavior changed.
+- This batch only reports fixture-level lifecycle policy expectations in `gate:ci`.
 
 ## Not Done
 
+- No runtime search path changes.
 - No SQLite migration or automatic `ALTER TABLE`.
-- No admin/audit mode.
-- No `include_superseded`.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No push / tag / release / deploy.
 
 ## Remaining Risks
 
-- Future lifecycle SQL pushdown and default-on policy are separate phases.
-- If HTTP health is down, strict gate can fail before implementation-specific checks; use `npm run start:http:ensure` before strict gate validation.
+- Future dashboard/http-observe lifecycle summary remains a separate phase.
 
 ## Next Safe Step
 
-Final diff/docs validation, then stop without push. Next recommended phase after commit/push authorization is
-`P11.9-lifecycle-policy-gate-ci-summary`.
+Stop without push. The next recommended phase is
+`P11.10-lifecycle-read-policy-observability-dashboard-summary` or P12 controlled write tools planning.

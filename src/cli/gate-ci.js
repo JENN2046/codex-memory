@@ -163,6 +163,99 @@ function runPolicyPreflight() {
   };
 }
 
+function loadLifecyclePolicyFixture() {
+  const fixturePath = path.join(process.cwd(), 'tests', 'fixtures', 'lifecycle-read-policy-runtime-v1.json');
+  return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+}
+
+function runLifecyclePolicySummary() {
+  try {
+    const fixture = loadLifecyclePolicyFixture();
+    const examples = Array.isArray(fixture.runtimeExamples) ? fixture.runtimeExamples : [];
+    const requiredFields = Array.isArray(fixture.auditSummary?.requiredFields)
+      ? fixture.auditSummary.requiredFields
+      : [];
+    const expectedAuditFields = [
+      'readPolicyApplied',
+      'lifecyclePolicyApplied',
+      'lifecycleIncludedStatuses',
+      'lifecycleExcludedStatuses',
+      'hiddenByLifecycleCount',
+      'staleResultCount',
+      'lifecycleColumnAvailable',
+      'scopeWorkspacePresent'
+    ];
+    const auditSummaryShapePresent = expectedAuditFields.every(field => requiredFields.includes(field));
+    const hiddenByLifecycleCount = examples
+      .filter(record => record.lifecyclePolicyEnabled && record.expectedHiddenByLifecycle === true)
+      .length;
+    const staleResultCount = examples
+      .filter(record => record.lifecyclePolicyEnabled && record.expectedStaleCounted === true)
+      .length;
+    const defaultEnabled = fixture.flags?.CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY === true;
+    const included = Array.isArray(fixture.enabledLifecyclePolicy?.include)
+      ? fixture.enabledLifecyclePolicy.include
+      : [];
+    const excluded = Array.isArray(fixture.enabledLifecyclePolicy?.exclude)
+      ? fixture.enabledLifecyclePolicy.exclude
+      : [];
+    const rawWorkspaceIdExposed = fixture.auditSummary?.rawWorkspaceIdAllowed === true
+      || requiredFields.includes('workspace_id')
+      || requiredFields.includes('workspaceId');
+    const missingColumnBehavior = fixture.missingColumnBehavior?.whenLifecyclePolicyEnabled || 'unknown';
+    const status = (
+      defaultEnabled === false
+      && included.includes('active')
+      && included.includes('stale')
+      && excluded.includes('proposal')
+      && excluded.includes('rejected')
+      && excluded.includes('superseded')
+      && excluded.includes('tombstoned')
+      && fixture.missingColumnBehavior?.mustNotTreatUnknownAsActive === true
+      && fixture.missingColumnBehavior?.automaticMigrationAllowed === false
+      && auditSummaryShapePresent
+      && rawWorkspaceIdExposed === false
+    ) ? 'ok' : 'error';
+
+    return {
+      status,
+      message: status === 'ok'
+        ? `default off, ${included.length}/${included.length + excluded.length} statuses included, ${hiddenByLifecycleCount} lifecycle-hidden`
+        : 'Lifecycle policy fixture summary failed',
+      detail: {
+        fixtureOnly: true,
+        noNetwork: true,
+        noDaemon: true,
+        noProvider: true,
+        mutated: false,
+        defaultEnabled,
+        defaultLifecyclePolicyEnabled: defaultEnabled,
+        enabledIncludedStatuses: included,
+        enabledExcludedStatuses: excluded,
+        missingColumnBehavior,
+        mustNotTreatUnknownAsActive: fixture.missingColumnBehavior?.mustNotTreatUnknownAsActive === true,
+        automaticMigrationAllowed: fixture.missingColumnBehavior?.automaticMigrationAllowed === true,
+        staleResultCount,
+        hiddenByLifecycleCount,
+        auditSummaryShapePresent,
+        rawWorkspaceIdExposed
+      }
+    };
+  } catch (error) {
+    return {
+      status: 'error',
+      message: `Lifecycle policy fixture summary failed: ${error.message}`,
+      detail: {
+        fixtureOnly: true,
+        noNetwork: true,
+        noDaemon: true,
+        noProvider: true,
+        mutated: false
+      }
+    };
+  }
+}
+
 async function runTests() {
   // CI-safe tests: exclude network-dependent test files
   const testsDir = path.join(process.cwd(), 'tests');
@@ -272,10 +365,11 @@ async function main() {
   const rollback = await runRollback();
   const queries = runQueries();
   const policyPreflight = runPolicyPreflight();
+  const lifecyclePolicy = runLifecyclePolicySummary();
   const tests = await runTests();
   const docs = runDocsCheck();
 
-  const checks = { compare, rollback, queries, policyPreflight, tests, docs };
+  const checks = { compare, rollback, queries, policyPreflight, lifecyclePolicy, tests, docs };
   const failedChecks = Object.entries(checks)
     .filter(([, v]) => v.status === 'error')
     .map(([k]) => k);
