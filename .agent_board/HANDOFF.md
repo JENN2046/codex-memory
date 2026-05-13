@@ -62,9 +62,9 @@
 
 ## Next
 
-- P1: run final diff/staged review and create guarded local S-007 commit if clean.
-- P2: push S-007 only after explicit remote authorization.
-- P3: next safe local candidate is a small governance output sample/troubleshooting note, unless a higher-priority task appears.
+- P1: push `7193faf` only after explicit remote authorization.
+- P2: next safe local candidate is a small governance output sample/troubleshooting note, unless a higher-priority task appears.
+- P3: after any push, run post-push `git status --short` and a suitable gate before marking remote baseline current.
 - P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
