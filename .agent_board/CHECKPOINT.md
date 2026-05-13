@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-P7 — S-005：把 query assertion runner 接入更高层 `gate:ci` fixture-only gate，让 `caseCount/assertedCount/failedCount` 成为常态门禁输出。
+P7 — S-006：补 README/VALIDATION 的 `gate:ci` JSON schema 说明，并加一个更明确的 schema snapshot 测试。
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P7-vcp-parity-hardening
 
 ## Current Status
 
-本轮 `S-005` 在本地把 `real-query-suite-core` 的 assertion report 接入 `gate:ci`。当前 `gate:ci -- --json` 输出 `checks.queries.detail.caseCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`，并继续保持 fixture-only、no daemon、no provider 边界。当前不调用 provider，不读取/写入真实 memory DB。
+本轮 `S-006` 在本地补齐 `gate:ci` fixture-only JSON contract 文档，并在 gate-ci CLI 测试里增加 schema snapshot 风格断言。当前 README / VALIDATION 会明确 `summary.fixtureOnly/noNetwork/noDaemon/noProvider`、compare/rollback/query/tests/docs 关键 detail 字段；测试锁住 top-level、summary、checks、queries.detail 字段集合。当前不调用 provider，不读取/写入真实 memory DB。
 
 ## Completed Work
 
@@ -40,6 +40,9 @@ P7-vcp-parity-hardening
 - `gate:ci` 新增 `queries` check，复用 `real-query-suite-core` 的 `runSuiteReport(DEFAULT_SUITE)`。
 - `gate:ci` JSON 输出现在包含 `checks.queries.detail.caseCount/assertedCount/passedCount/failedCount`。
 - `gate:ci` 文本输出现在包含 `queries` 行和 `8/8 query assertions passed`。
+- README 新增 `CI Fixture-Only Gate` 小节，记录 `gate:ci` / `gate:ci -- --json` 用法和 JSON 关键字段。
+- VALIDATION 新增 `Fixture-Only CI Gate` contract 小节，明确 fixture-only 边界与常态报告字段。
+- `tests/gate-ci-cli.test.js` 增加 schema snapshot 风格断言，锁住 `summary` / `checks` / `queries.detail` 字段集合。
 
 ## Changed Files
 
@@ -49,6 +52,8 @@ P7-vcp-parity-hardening
 - `src/cli/real-query-suite.js`
 - `src/cli/gate-ci.js`
 - `tests/gate-ci-cli.test.js`
+- `README.md`
+- `VALIDATION.md`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
 - `GATE_CI_FIXTURE_ONLY_DESIGN.md`
@@ -79,6 +84,9 @@ P7-vcp-parity-hardening
 - `node --test tests\gate-ci-cli.test.js` -> 2/2 passed
 - `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
 - `npm test` -> 184/184 passed
+- `node --test tests\gate-ci-cli.test.js` -> 2/2 passed with schema snapshot assertions
+- `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
+- `git diff --check` -> passed
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
@@ -102,4 +110,4 @@ P7-vcp-parity-hardening
 
 ## Next Safe Action
 
-Run final diff/staged review, create a guarded local S-005 commit, then wait for explicit push authorization. Next safe local task is documenting the `gate:ci` JSON schema in README/VALIDATION or adding a schema snapshot test if needed.
+Run final diff/staged review, create a guarded local S-006 commit, then wait for explicit push authorization. Next safe local task is `P4`: make `governance:report` a minimal read-only loop with proposal/tombstone/supersession/stale metrics, if still desired.

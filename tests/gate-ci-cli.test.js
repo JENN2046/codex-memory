@@ -26,6 +26,17 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
   const result = await runGateCi({ args: ['--json'] });
   assert.equal(result.code, 0, result.stderr || 'non-zero exit');
   const payload = parseJsonOutput(result.stdout);
+  assert.deepEqual(Object.keys(payload).sort(), ['checks', 'generatedAt', 'summary']);
+  assert.deepEqual(Object.keys(payload.summary).sort(), [
+    'failedChecks',
+    'fixtureOnly',
+    'mode',
+    'noDaemon',
+    'noNetwork',
+    'noProvider',
+    'ok'
+  ]);
+  assert.deepEqual(Object.keys(payload.checks).sort(), ['compare', 'docs', 'queries', 'rollback', 'tests']);
   assert.equal(payload.summary.ok, true);
   assert.equal(payload.summary.mode, 'ci');
   assert.equal(payload.summary.fixtureOnly, true);
@@ -41,6 +52,16 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
   assert.equal(payload.checks.rollback.detail.coreMismatchCountTotal, 0);
 
   assert.equal(payload.checks.queries.status, 'ok');
+  assert.deepEqual(Object.keys(payload.checks.queries.detail).sort(), [
+    'assertedCount',
+    'caseCount',
+    'failedCount',
+    'fixtureOnlyCount',
+    'passedCount',
+    'placeholderCount',
+    'realCount',
+    'validCount'
+  ]);
   assert.equal(payload.checks.queries.detail.caseCount, 8);
   assert.equal(payload.checks.queries.detail.assertedCount, 8);
   assert.equal(payload.checks.queries.detail.passedCount, 8);

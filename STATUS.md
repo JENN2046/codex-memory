@@ -68,6 +68,7 @@
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
 - `gate:ci` 现在包含 `queries` fixture-only check，JSON 输出会暴露 `caseCount/assertedCount/passedCount/failedCount`。
+- `gate:ci` JSON schema 已补进 README / VALIDATION，`tests/gate-ci-cli.test.js` 也用 schema snapshot 风格断言锁住 top-level、summary、checks、queries.detail 字段集合。
 - `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：

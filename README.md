@@ -98,6 +98,7 @@ npm run compare-active-memory -- --tool deepmemo --json
 npm run rollback-active-memory -- --tool deepmemo --json
 npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json
 npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json
+npm run gate:ci -- --json
 npm run gate:mainline
 npm run gate:mainline:strict
 npm run dashboard -- --json
@@ -265,6 +266,27 @@ npm run gate:mainline:strict -- --json
 - 日常改动后，至少跑一次 `npm run gate:mainline`
 - MCP / 主链 / compare / rollback 相关改动后，优先跑 `npm run gate:mainline:strict`
 - gate 失败时，先看 `health -> compare -> rollback`，再决定是否深入单独 CLI 排障
+
+## CI Fixture-Only Gate
+
+`gate:ci` 是不依赖本地 HTTP daemon、不调用 provider、不读写真实 memory DB 的 fixture-only 门禁。它适合做仓库内可重复回归，不替代 `gate:mainline` 的真实本地主线健康检查。
+
+```powershell
+cd A:\codex-memory
+npm run gate:ci
+npm run gate:ci -- --json
+```
+
+JSON 输出重点：
+
+- `summary.fixtureOnly / noNetwork / noDaemon / noProvider`
+- `checks.compare.detail.totalCaseCount / matchedCaseCount`
+- `checks.rollback.detail.totalCaseCount / readyCaseCount`
+- `checks.queries.detail.caseCount / assertedCount / passedCount / failedCount`
+- `checks.tests.detail.total / passed / failed / skipped`
+- `checks.docs.detail.scriptCount / missingCount`
+
+当前 query assertion baseline 为 `8/8`：`checks.queries.detail.caseCount=8`、`assertedCount=8`、`failedCount=0`。
 
 ## HTTP MCP 运行态诊断
 

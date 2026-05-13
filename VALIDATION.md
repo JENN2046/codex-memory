@@ -908,6 +908,45 @@ Not validated:
 - No test/typecheck/lint script was available.
 ```
 
+### 28.1 Fixture-Only CI Gate
+
+For repository-level fixture validation, use:
+
+```bash
+npm run gate:ci
+npm run gate:ci -- --json
+```
+
+`gate:ci` must remain fixture-only:
+
+- no HTTP MCP daemon dependency
+- no provider calls
+- no real memory DB mutation
+- no `.env` or user/global config writes
+
+The JSON output is part of the validation contract. At minimum, reports that cite `gate:ci` should preserve and summarize:
+
+- `summary.ok`
+- `summary.fixtureOnly`
+- `summary.noNetwork`
+- `summary.noDaemon`
+- `summary.noProvider`
+- `checks.compare.detail.totalCaseCount`
+- `checks.rollback.detail.totalCaseCount`
+- `checks.queries.detail.caseCount`
+- `checks.queries.detail.assertedCount`
+- `checks.queries.detail.failedCount`
+- `checks.tests.detail.total`
+- `checks.docs.detail.missingCount`
+
+Current query assertion baseline:
+
+```text
+caseCount=8
+assertedCount=8
+failedCount=0
+```
+
 ---
 
 ## 29. Failure Handling
