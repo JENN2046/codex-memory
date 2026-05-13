@@ -127,10 +127,19 @@ function buildGovernanceSurface(report, options = {}) {
   };
 }
 
+function attachReviewSurface(report, options = {}) {
+  return {
+    ...report,
+    review: buildGovernanceSurface(report, {
+      tolerateUnavailable: options.tolerateUnavailable
+    })
+  };
+}
+
 function collectReport() {
   const dbPath = getDbPath();
   if (!fs.existsSync(dbPath)) {
-    return {
+    return attachReviewSurface({
       mode: 'governance-report',
       destructive: false,
       summary: {
@@ -141,7 +150,7 @@ function collectReport() {
       paths: {
         dbPath
       }
-    };
+    }, { tolerateUnavailable: false });
   }
   const db = new DatabaseSync(dbPath, { readOnly: true });
   const tableExists = runQueryOne(
@@ -150,7 +159,7 @@ function collectReport() {
   );
   if (!tableExists) {
     db.close();
-    return {
+    return attachReviewSurface({
       mode: 'governance-report',
       destructive: false,
       summary: {
@@ -161,7 +170,7 @@ function collectReport() {
       paths: {
         dbPath
       }
-    };
+    }, { tolerateUnavailable: false });
   }
 
   // Status distribution
@@ -224,7 +233,7 @@ function collectReport() {
 
   db.close();
 
-  return {
+  const report = {
     mode: 'governance-report',
     destructive: false,
     generatedAt: new Date().toISOString(),
@@ -268,6 +277,8 @@ function collectReport() {
     proposals: proposalCount,
     retention: Object.fromEntries(retentionDist.map(r => [r.retention_policy, r.cnt]))
   };
+
+  return attachReviewSurface(report, { tolerateUnavailable: false });
 }
 
 function renderText(report) {
@@ -278,6 +289,14 @@ function renderText(report) {
   l.push('');
   l.push(`Status: ${report.summary.status}`);
   l.push(report.summary.message);
+  l.push('');
+  l.push('Review:');
+  l.push(`  status:      ${report.review.status}`);
+  l.push(`  level:       ${report.review.reviewLevel}`);
+  l.push(`  message:     ${report.review.message}`);
+  for (const hint of report.review.hints || []) {
+    l.push(`  hint:        ${hint}`);
+  }
   l.push('');
   l.push(`Total Records: ${report.totalRecords}`);
   l.push('');
@@ -345,5 +364,6 @@ module.exports = {
   getDbPath,
   collectReport,
   renderText,
-  buildGovernanceSurface
+  buildGovernanceSurface,
+  attachReviewSurface
 };

@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：S-006 `gate:ci` JSON schema docs / snapshot batch 已验证完成
+- 当前 `main`：S-007 `governance:report` read-only review surface batch 已验证完成
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
 - 标准 suite：`43/43 matched (0/0)`、npm test：`184/184`、`scope:acceptance`：`ok`
@@ -65,6 +65,7 @@
 | S-004 | query-quality | A1 | done | 补齐 q5/q6/q7 fixture cases，覆盖默认 dataset 全部 query | `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js`; `npm run real-query-suite -- --json`; `npm run query:quality -- --json --dry-run`; `npm test`; `git diff --check` | 默认 suite 现在 `caseCount=8`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`；无 provider 调用、无数据写入 |
 | S-005 | query-quality | A1 | done | 将 query assertion runner 接入 `gate:ci` fixture-only 门禁 | `node --test tests\gate-ci-cli.test.js`; `npm run gate:ci -- --json`; `npm test`; `git diff --check` | `gate:ci` JSON 现在包含 `checks.queries.detail.caseCount/assertedCount/failedCount`；当前 query assertions `8/8`；无 provider 调用、无数据写入 |
 | S-006 | ci-gate | A1 | done | 补 `gate:ci` JSON schema 说明并加 schema snapshot 测试 | `node --test tests\gate-ci-cli.test.js`; `npm run gate:ci -- --json`; `npm test`; `git diff --check` | README / VALIDATION 现在记录 `gate:ci` fixture-only JSON 关键字段；测试锁住 summary/checks/queries.detail 字段集合 |
+| S-007 | memory-governance | A1 | done | 做 `governance:report` 最小只读闭环 | `node --test tests\governance-report-cli.test.js`; `npm run governance:report -- --json`; `npm test`; `git diff --check` | `governance:report` JSON 现在带 `review.status/reviewLevel/counts/hints`；测试锁住 proposal/tombstone/supersession/stale metrics 和 review surface；无生命周期写入、无 provider 调用 |
 
 ## 推荐执行顺序
 
@@ -72,8 +73,9 @@
 2. `P1` 已完成：`real-query-suite` 现在会在脱敏 fixture 上真实验收 `mustContain / mustNotContain`。
 3. `P2` 已完成：query assertion runner 已接入 `gate:ci`，`caseCount/assertedCount/failedCount` 已成为常态门禁输出。
 4. `P3` 已完成：`gate:ci` JSON schema 已写入 README/VALIDATION，并用 schema snapshot 测试锁住。
-5. `P4`：做 `governance:report` 最小闭环，只读输出 proposal/tombstone/supersession/stale metrics。
-6. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+5. `P4` 已完成：`governance:report` 现在输出只读 `review` surface，覆盖 proposal/tombstone/supersession/stale metrics。
+6. `P5`：可补 `governance:report` 输出样例或 dashboard/http-observe 的更细 schema snapshot；若没有明确需求，先不扩大。
+7. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

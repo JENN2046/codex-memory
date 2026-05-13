@@ -947,6 +947,38 @@ assertedCount=8
 failedCount=0
 ```
 
+### 28.2 Governance Report Read-Only Loop
+
+For local governance review, use:
+
+```bash
+npm run governance:report
+npm run governance:report -- --json
+```
+
+`governance:report` must remain read-only:
+
+- no proposal approval or rejection
+- no tombstone creation or deletion
+- no supersession mutation
+- no stale-memory mutation
+- no real memory DB writes
+- no provider calls
+
+The JSON output should preserve the review surface:
+
+- `review.status`
+- `review.reviewLevel`
+- `review.counts.proposalCount`
+- `review.counts.tombstonedCount`
+- `review.counts.supersededCount`
+- `review.counts.supersessionInitiated`
+- `review.counts.stale30d`
+- `review.counts.stale90d`
+- `review.hints`
+
+The review surface is evidence for human follow-up. It does not authorize automatic lifecycle writes.
+
 ---
 
 ## 29. Failure Handling

@@ -80,6 +80,32 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
 
     assert.equal(result.code, 0, result.stderr || 'non-zero exit');
     const payload = JSON.parse(result.stdout);
+    assert.deepEqual(Object.keys(payload).sort(), [
+      'confidence',
+      'destructive',
+      'generatedAt',
+      'mode',
+      'paths',
+      'proposals',
+      'retention',
+      'review',
+      'scopeCoverage',
+      'staleness',
+      'statusDistribution',
+      'summary',
+      'supersession',
+      'tombstoned',
+      'totalRecords'
+    ]);
+    assert.deepEqual(Object.keys(payload.review).sort(), [
+      'counts',
+      'hints',
+      'message',
+      'retention',
+      'reviewLevel',
+      'status',
+      'statusDistribution'
+    ]);
     assert.equal(payload.mode, 'governance-report');
     assert.equal(payload.destructive, false);
     assert.equal(payload.summary.status, 'ok');
@@ -113,6 +139,16 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
     assert.equal(payload.retention['ttl:7d'], 1);
     assert.equal(payload.retention.session, 1);
     assert.equal(payload.retention['long-lived'], 1);
+    assert.equal(payload.review.status, 'warn');
+    assert.equal(payload.review.reviewLevel, 'needs-review');
+    assert.equal(payload.review.counts.totalRecords, 6);
+    assert.equal(payload.review.counts.proposalCount, 1);
+    assert.equal(payload.review.counts.tombstonedCount, 1);
+    assert.equal(payload.review.counts.supersededCount, 1);
+    assert.equal(payload.review.counts.supersessionInitiated, 1);
+    assert.equal(payload.review.counts.stale30d, 2);
+    assert.equal(payload.review.counts.stale90d, 1);
+    assert.ok(payload.review.hints.some(hint => hint.includes('proposal')));
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
@@ -134,6 +170,8 @@ test('governance-report CLI should emit readable text output by default', async 
     assert.equal(result.code, 0, result.stderr || 'non-zero exit');
     assert.match(result.stdout, /Governance Report/);
     assert.match(result.stdout, /Status: ok/);
+    assert.match(result.stdout, /Review:/);
+    assert.match(result.stdout, /level:\s+needs-review/);
     assert.match(result.stdout, /Staleness:/);
     assert.match(result.stdout, /proposals:\s+1/);
     assert.match(result.stdout, /tombstoned:\s+1/);
@@ -162,6 +200,9 @@ test('governance-report CLI should fail cleanly when the database is missing', a
     assert.equal(payload.summary.status, 'error');
     assert.match(payload.summary.message, /Database not found/);
     assert.equal(payload.paths.dbPath, dbPath);
+    assert.equal(payload.review.status, 'error');
+    assert.equal(payload.review.reviewLevel, 'unavailable');
+    assert.equal(payload.review.counts.totalRecords, 0);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }

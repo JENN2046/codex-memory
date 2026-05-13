@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-P7 — S-006：补 README/VALIDATION 的 `gate:ci` JSON schema 说明，并加一个更明确的 schema snapshot 测试。
+P8 — S-007：做 `governance:report` 最小只读闭环，把 proposal/tombstone/supersession/stale metrics 收成可复用 review surface。
 
 ## Current Area
 
-P7-vcp-parity-hardening
+P8-memory-governance
 
 ## Current Status
 
-本轮 `S-006` 在本地补齐 `gate:ci` fixture-only JSON contract 文档，并在 gate-ci CLI 测试里增加 schema snapshot 风格断言。当前 README / VALIDATION 会明确 `summary.fixtureOnly/noNetwork/noDaemon/noProvider`、compare/rollback/query/tests/docs 关键 detail 字段；测试锁住 top-level、summary、checks、queries.detail 字段集合。当前不调用 provider，不读取/写入真实 memory DB。
+本轮 `S-007` 在本地给 `governance:report` 增加只读 `review` surface：`review.status/reviewLevel/counts/hints`。它复用已有 proposal/tombstone/supersession/stale metrics，只做人工复核提示，不 approve/reject proposal，不创建 tombstone，不修改 supersession，也不写真实 memory DB。
 
 ## Completed Work
 
@@ -43,6 +43,10 @@ P7-vcp-parity-hardening
 - README 新增 `CI Fixture-Only Gate` 小节，记录 `gate:ci` / `gate:ci -- --json` 用法和 JSON 关键字段。
 - VALIDATION 新增 `Fixture-Only CI Gate` contract 小节，明确 fixture-only 边界与常态报告字段。
 - `tests/gate-ci-cli.test.js` 增加 schema snapshot 风格断言，锁住 `summary` / `checks` / `queries.detail` 字段集合。
+- `governance:report` JSON 新增 `review` surface，包含 `status`、`reviewLevel`、`counts`、`statusDistribution`、`retention`、`hints`。
+- `governance:report` 文本输出新增 `Review:` 小节，直接展示 review level 和 hints。
+- `tests/governance-report-cli.test.js` 锁住 JSON top-level / review key set，并校验 proposal/tombstone/supersession/stale count。
+- README / VALIDATION 补充 governance report 只读 review surface 说明。
 
 ## Changed Files
 
@@ -54,6 +58,8 @@ P7-vcp-parity-hardening
 - `tests/gate-ci-cli.test.js`
 - `README.md`
 - `VALIDATION.md`
+- `src/cli/governance-report.js`
+- `tests/governance-report-cli.test.js`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
 - `GATE_CI_FIXTURE_ONLY_DESIGN.md`
@@ -87,6 +93,11 @@ P7-vcp-parity-hardening
 - `node --test tests\gate-ci-cli.test.js` -> 2/2 passed with schema snapshot assertions
 - `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
 - `git diff --check` -> passed
+- `node --test tests\governance-report-cli.test.js` -> 3/3 passed
+- `npm run governance:report -- --json` -> ok; read-only report generated; local current review `status=ok`, `reviewLevel=nominal`
+- `node --test tests\dashboard-cli.test.js tests\http-observe-cli.test.js tests\governance-report-cli.test.js` -> 9/9 passed
+- `npm test` -> 184/184 passed
+- `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
@@ -110,4 +121,4 @@ P7-vcp-parity-hardening
 
 ## Next Safe Action
 
-S-006 implementation is committed locally as `eb1c53e test: lock ci gate schema`; push requires explicit authorization. Next safe local task is `P4`: make `governance:report` a minimal read-only loop with proposal/tombstone/supersession/stale metrics, if still desired.
+Run final diff/staged review and create a guarded local S-007 commit if clean. Push remains separate explicit authorization.

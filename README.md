@@ -359,13 +359,18 @@ npm run governance:report -- --json
 
 输出重点：
 
+- `review.status`
+- `review.reviewLevel`
+- `review.counts.proposalCount / tombstonedCount / supersededCount / supersessionInitiated`
+- `review.counts.stale30d / stale90d`
+- `review.hints`
 - `summary.proposalCount`
 - `summary.tombstonedCount`
 - `summary.supersededCount`
 - `summary.stale30d`
 - `summary.stale90d`
 
-当前 observability surface 只显示低风险 count / hint，不做写路径操作，也不暴露 raw `workspace_id`。
+当前 `governance:report` / observability surface 只显示低风险 count / hint，不做写路径操作，也不暴露 raw `workspace_id`。`review` 是给常态门禁/人工复核使用的只读审查面，不代表自动 approve / reject / tombstone / supersede。
 
 ## 默认主链回滚预案
 
