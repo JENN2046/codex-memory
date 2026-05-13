@@ -2,9 +2,9 @@
 
 ## Current State
 
-当前本地工作在 `P10-memory-policy-hardening-runtime-gate` 线。远端 `main` 已同步到 `6b075ac docs: record observability contract commit state`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+当前本地工作在 `P10-roadmap-source-registration` docs-governance 线。远端 `main` 已同步到 `6b075ac docs: record observability contract commit state`；本地另有 P10 runtime gate 提交尚未 push。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次 `P10` 完成 runtime gate hardening：secret-like 写入在 diary 前拒绝，MCP `tools/call` 参数校验启用，HTTP non-loopback empty-token fail-fast，soft read policy 以 feature flag 默认关闭，query suite 支持 fixture recall dry-run。本轮不扩大 public MCP tools，不改 `.env`，不新增依赖，不调用 provider，不 push。
+最新本地批次 `P10-roadmap-source-registration` 新增长期路线图事实源 `docs/VCP_MEMORY_PARITY_ROADMAP.md`。README / NEXT_PHASE / BACKLOG 只放链接或短摘要，不复制 P10-P23 全文。本轮不改 runtime，不改 tests，不改 package.json，不改 `.env`，不调用 provider，不 push。
 
 ## Workspace / Branch
 
@@ -77,12 +77,17 @@
 - P10-5 added `--fixture-recall-dry-run` to `real-query-suite` and `query:quality`.
 - Current P10 validation passed: `security-write-policy` 2/2; `mcp-contract` 7/7; `mcp-http` 5/5; `policy-read-preflight` 4/4; query tests 16/16; `npm test` 195/195; `gate:mainline:strict` ok; `scope:acceptance --json` ok; `git diff --check` passed.
 - P10 primary runtime gate commit created: `edef872 feat: harden memory policy runtime gates`.
+- Roadmap source registered in `docs/VCP_MEMORY_PARITY_ROADMAP.md`; current roadmap is P9 integrated -> VCP memory practical parity 100%, near-term P10 -> P11 -> P12.
+- README / `CODEX_MEMORY_NEXT_PHASE_PLAN.md` / `MAINTENANCE_BACKLOG.md` now link or summarize the roadmap source.
+- Backlog only registers current executable items: `P10.1-runtime-gate-docs-ci-policy-preflight` and `P11-memory-lifecycle-core-planning`.
+- Current roadmap docs validation passed: `git diff --check`; `scripts/validate-local.ps1 -Area docs`.
 
 ## Next
 
-- P1: do not push unless explicitly authorized.
-- P2: recommended next local task is docs/config note for runtime gate flags plus fixture-only `gate:ci` policy preflight output.
-- P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
+- P1: create guarded local docs commit.
+- P2: do not push unless explicitly authorized.
+- P3: recommended next local task is `P10.1-runtime-gate-docs-ci-policy-preflight`.
+- P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
 

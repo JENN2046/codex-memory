@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-P10 — memory-policy-hardening-runtime-gate：把 scoped memory runtime 推进到可信记忆内核的第一层本地门禁。
+P10-roadmap-source-registration：建立 VCP memory practical parity 100% 长期路线图事实源。
 
 ## Current Area
 
-P10-memory-policy-hardening-runtime-gate
+roadmap / docs-governance
 
 ## Current Status
 
-本轮 `P10` 是 A2/A3 runtime gate hardening：不扩大 public MCP tools，不新增依赖，不读写 `.env`，不调用 provider，不 push。已完成写入前 secret scanner、MCP `tools/call` runtime schema validation、HTTP auth hardening、默认关闭的 soft read policy flag、fixture recall dry-run。
+本轮是 A0 docs-only 路线图写入：新增 `docs/VCP_MEMORY_PARITY_ROADMAP.md` 作为 P10-P23 长期路线图事实源。README / NEXT_PHASE / BACKLOG 只保留链接或摘要，避免复制全文造成漂移。不改 runtime，不改 tests，不改 package.json，不改 `.env`，不调用 provider，不 push。
 
 ## Completed Work
 
@@ -59,6 +59,11 @@ P10-memory-policy-hardening-runtime-gate
 - HTTP MCP 对 non-loopback host + empty token fail-fast；loopback no-token 仍可本地开发，并通过 health/log warning 显式提示。
 - 新增 `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY=false` 默认关闭；开启后过滤 proposal/rejected/tombstoned 和 cross-client private。
 - `real-query-suite` / `query:quality` 支持 `--fixture-recall-dry-run`，只读 fixture，不触碰 durable memory，不调用 provider。
+- Roadmap source registration 新增 `docs/VCP_MEMORY_PARITY_ROADMAP.md`，完整记录 current、target、strategy、P10-P23、禁止提前跳 P16/P17/V8/UI/release。
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md` 只新增路线图事实源链接、近期优先级 P10 -> P11 -> P12、禁止提前跳转摘要。
+- `MAINTENANCE_BACKLOG.md` 只登记 `P10-roadmap-source-registration`、`P10.1-runtime-gate-docs-ci-policy-preflight`、`P11-memory-lifecycle-core-planning`，没有展开 P10-P23 全队列。
+- README 只新增 VCP memory parity roadmap 入口链接。
+- `.agent_board` 已同步当前 next phase：`P10.1` 或 `P11` 前置规划，不实现 runtime，不 push。
 
 ## Changed Files
 
@@ -99,6 +104,8 @@ P10-memory-policy-hardening-runtime-gate
 - `tests/policy-read-preflight.test.js`
 - `tests/real-query-suite.test.js`
 - `tests/query-quality-report.test.js`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
 - `GATE_CI_FIXTURE_ONLY_DESIGN.md`
@@ -156,6 +163,8 @@ P10-memory-policy-hardening-runtime-gate
 - P10 `npm run gate:mainline:strict` -> passed; health ok, contract 12/12, test 195/195, compare 43/43, rollback 43/43
 - P10 `npm run scope:acceptance -- --json` -> status `ok`
 - P10 `git diff --check` -> passed
+- Roadmap source registration `git diff --check` -> passed
+- Roadmap source registration `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` -> passed
 
 ## Validation Not Run
 
@@ -181,4 +190,4 @@ P10-memory-policy-hardening-runtime-gate
 
 ## Next Safe Action
 
-P10 runtime gate is committed locally at `edef872 feat: harden memory policy runtime gates`. Stop without push. Recommended next task: document runtime gate flags and add fixture-only `gate:ci` policy preflight output.
+Create guarded local docs commit, then stop without push. Recommended next task remains `P10.1-runtime-gate-docs-ci-policy-preflight`, followed by `P11-memory-lifecycle-core-planning`.

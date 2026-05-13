@@ -1,6 +1,6 @@
 # codex-memory Next Phase Plan
 
-更新时间：2026-05-08
+更新时间：2026-05-13
 
 ## 目的
 
@@ -13,6 +13,19 @@
 - 哪些边界不能自动越过
 
 详细任务仍以 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md) 为准。
+
+长期路线图事实源：
+
+- [docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
+
+当前路线图口径：
+
+- current: P9 scoped memory runtime integrated
+- target: VCP memory practical parity 100%
+- near-term priority: P10 -> P11 -> P12
+- do not jump early: P16 / P17 / V8 / UI / release candidate
+
+本文件只保留近期摘要。不要把 P10-P23 全文复制到这里，避免与路线图事实源漂移。
 
 ## 当前判断
 
