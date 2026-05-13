@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests 均已本地完成；不 push
+- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning 均已本地完成；不 push
 - 长期路线图事实源：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
@@ -79,6 +79,7 @@
 | P10.1-runtime-gate-docs-ci-policy-preflight | memory-policy-hardening | A0/A1 | done | 补 runtime gate flags 文档，并接入 fixture-only `gate:ci` policy preflight 输出 | `node --test tests\gate-ci-cli.test.js`; `node --test tests\policy-read-preflight.test.js`; `npm run gate:ci`; `npm test`; `git diff --check`; docs validation | `checks.policyPreflight` 现在输出 fixture-only soft read policy summary；不扩大 enforcement，不调用 provider，不改变 runtime 默认行为 |
 | P11-memory-lifecycle-core-planning | memory-governance | A0/A1 | done | P11 memory lifecycle core planning | `git diff --check`; `scripts/validate-local.ps1 -Area docs` | 新增 `docs/MEMORY_LIFECYCLE_CORE_PLAN.md`；已规划 lifecycle 状态、transition、audit shape、read policy relationship；不直接改 runtime |
 | P11.1-lifecycle-fixture-schema-tests | memory-governance | A1 | done | Fixture schema tests for lifecycle statuses, transitions, audit shape, and read-policy expectations | `node --test tests\lifecycle-schema.test.js`; `npm test`; `git diff --check`; docs validation | 已固化 `tests/fixtures/lifecycle-policy-v1.json` 与 `tests/lifecycle-schema.test.js`；不做 SQLite migration 或真实数据迁移 |
+| P11.2-sqlite-lifecycle-columns-dry-run-planning | memory-governance | A1/A2 | done | Plan lifecycle columns and dry-run report shape for SQLite shadow store | `git diff --check`; docs validation | 新增 `docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md`；只规划 dry-run，不做 SQLite migration 或真实数据迁移 |
 
 ## 推荐执行顺序
 
@@ -95,8 +96,9 @@
 11. `P10.1`：已完成 runtime gate 文档/配置说明与 `gate:ci` policy preflight 输出常态化，不直接扩大 enforcement。
 12. `P11`：已完成 memory lifecycle core planning；仍先规划，不直接改 runtime。
 13. `P11.1`：已完成 lifecycle fixture schema tests。
-14. `P11.2`：下一步建议做 SQLite lifecycle columns dry-run planning。
-15. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+14. `P11.2`：已完成 SQLite lifecycle columns dry-run planning。
+15. `P11.3`：下一步建议做 lifecycle SQLite dry-run CLI fixture tests。
+16. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

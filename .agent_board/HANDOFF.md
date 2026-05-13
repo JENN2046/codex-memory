@@ -2,30 +2,28 @@
 
 ## Goal
 
-Resume after P11.1-lifecycle-fixture-schema-tests in `A:\codex-memory`.
+Continue P11.2-sqlite-lifecycle-columns-dry-run-planning in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: main
 - Remote boundary: no push / tag / release / deploy without explicit authorization
-- Current local state: `main` is ahead of `origin/main`; P10, P10.1, P11, and P11.1 commits are local only. P11.1 primary commit is `540e073 test: lock lifecycle policy schema`.
+- Current local state: `main` is ahead of `origin/main`; P10, P10.1, P11, P11.1, and P11.2 commits are local only after guarded commit.
 
 ## Current Area
 
-memory-governance / lifecycle-fixture-tests
+memory-governance / lifecycle-sqlite-dry-run-planning
 
 ## Completed In Current Batch
 
-- Added lifecycle policy fixture: [tests/fixtures/lifecycle-policy-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-policy-v1.json).
-- Added schema test: [tests/lifecycle-schema.test.js](/A:/codex-memory/tests/lifecycle-schema.test.js).
-- Updated [docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md) with P11.1 test entry.
+- Added SQLite dry-run planning doc: [docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md).
+- Updated [docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md) with P11.2 link.
 - Updated backlog/status/board state.
 
 ## Changed Files
 
-- `tests/fixtures/lifecycle-policy-v1.json`
-- `tests/lifecycle-schema.test.js`
+- `docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md`
 - `docs/MEMORY_LIFECYCLE_CORE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -33,8 +31,6 @@ memory-governance / lifecycle-fixture-tests
 
 ## Validation
 
-- `node --test tests\lifecycle-schema.test.js`：passed `7/7`
-- `npm test`：passed `203/203`
 - `git diff --check`：passed with CRLF warnings only
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -45,20 +41,20 @@ memory-governance / lifecycle-fixture-tests
 
 ## HTTP Health
 
-- Not required for P11.1 fixture schema tests.
+- Not required for P11.2 docs-only dry-run planning.
 
 ## Audit / Recall Impact
 
 - No runtime audit or recall behavior changed.
-- The audit shape is locked only as fixture contract.
-- Default read policy remains fixture-only and is not active runtime enforcement.
+- The SQLite lifecycle audit shape is only planned.
+- No SQLite migration or real DB write occurred.
 
 ## Remaining Risks
 
-- Runtime lifecycle policy remains future P11.3 work.
-- SQLite lifecycle columns dry-run remains future P11.2 work.
+- Lifecycle SQLite dry-run CLI fixture tests remain future P11.3 work.
+- Optional read-policy runtime remains future P11.4 work.
 - Controlled mutation tools remain P12 future work and require separate approval.
 
 ## Next Safe Step
 
-Stop without push. Recommended next task: `P11.2-sqlite-lifecycle-columns-dry-run-planning`.
+After guarded local commit, stop without push. Recommended next task: `P11.3-lifecycle-sqlite-dry-run-cli-fixture-tests`.

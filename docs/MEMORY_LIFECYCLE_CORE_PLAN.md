@@ -208,6 +208,8 @@ node --test tests\lifecycle-schema.test.js
 
 ### P11.2 SQLite Lifecycle Columns Dry-Run
 
+Plan source: [MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md)
+
 目标：
 
 - 设计 lifecycle columns / indexes 的 dry-run migration plan。
