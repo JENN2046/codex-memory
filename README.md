@@ -32,6 +32,7 @@
 - 文档治理规则：[DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
 - Single-Window 4-Agent Compact Autopilot 能力说明：[docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md](/A:/codex-memory/docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md)
 - VCP memory parity roadmap：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
+- Runtime policy gates：[docs/runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)
 - 下一阶段薄版计划：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
 - `gate:ci` fixture-only 设计：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)
 - 当前阶段记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
@@ -284,10 +285,13 @@ JSON 输出重点：
 - `checks.compare.detail.totalCaseCount / matchedCaseCount`
 - `checks.rollback.detail.totalCaseCount / readyCaseCount`
 - `checks.queries.detail.caseCount / assertedCount / passedCount / failedCount`
+- `checks.policyPreflight.detail.inputCount / keptCount / filteredCount / lifecycleFilteredCount / crossClientPrivateFilteredCount`
+- `checks.policyPreflight.detail.fixtureOnly / defaultPolicyEnabled / mutated`
 - `checks.tests.detail.total / passed / failed / skipped`
 - `checks.docs.detail.scriptCount / missingCount`
 
 当前 query assertion baseline 为 `8/8`：`checks.queries.detail.caseCount=8`、`assertedCount=8`、`failedCount=0`。
+当前 policy preflight 是 CI-safe fixture summary，不依赖 HTTP daemon、不调用 provider、不读 `.env`、不写真实 memory；它只说明 soft read policy 开启后会如何过滤 fixture，默认运行时行为仍保持 `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY=false`。
 
 ## HTTP MCP 运行态诊断
 

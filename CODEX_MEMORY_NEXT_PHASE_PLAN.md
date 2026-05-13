@@ -27,6 +27,13 @@
 
 本文件只保留近期摘要。不要把 P10-P23 全文复制到这里，避免与路线图事实源漂移。
 
+当前 P10.1 本地收口：
+
+- 入口：[docs/runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)
+- 目标：把 P10 runtime gate 的安全开关、默认行为、验证入口和 CI-safe policy preflight 固化到文档与 `gate:ci` 可见面。
+- 边界：不进入 P11，不扩展 runtime enforcement，不新增 MCP tool，不调用 provider，不 push。
+- P11 memory lifecycle core planning 暂缓到 P10.1 closeout 之后。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：

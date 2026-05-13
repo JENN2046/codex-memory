@@ -36,7 +36,14 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
     'noProvider',
     'ok'
   ]);
-  assert.deepEqual(Object.keys(payload.checks).sort(), ['compare', 'docs', 'queries', 'rollback', 'tests']);
+  assert.deepEqual(Object.keys(payload.checks).sort(), [
+    'compare',
+    'docs',
+    'policyPreflight',
+    'queries',
+    'rollback',
+    'tests'
+  ]);
   assert.equal(payload.summary.ok, true);
   assert.equal(payload.summary.mode, 'ci');
   assert.equal(payload.summary.fixtureOnly, true);
@@ -67,6 +74,32 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
   assert.equal(payload.checks.queries.detail.passedCount, 8);
   assert.equal(payload.checks.queries.detail.failedCount, 0);
 
+  assert.equal(payload.checks.policyPreflight.status, 'ok');
+  assert.deepEqual(Object.keys(payload.checks.policyPreflight.detail).sort(), [
+    'crossClientPrivateFilteredCount',
+    'defaultPolicyEnabled',
+    'filteredCount',
+    'fixtureOnly',
+    'inputCount',
+    'keptCount',
+    'lifecycleFilteredCount',
+    'mutated',
+    'noDaemon',
+    'noNetwork',
+    'noProvider'
+  ]);
+  assert.equal(payload.checks.policyPreflight.detail.fixtureOnly, true);
+  assert.equal(payload.checks.policyPreflight.detail.noNetwork, true);
+  assert.equal(payload.checks.policyPreflight.detail.noDaemon, true);
+  assert.equal(payload.checks.policyPreflight.detail.noProvider, true);
+  assert.equal(payload.checks.policyPreflight.detail.mutated, false);
+  assert.equal(payload.checks.policyPreflight.detail.defaultPolicyEnabled, false);
+  assert.equal(payload.checks.policyPreflight.detail.inputCount, 7);
+  assert.equal(payload.checks.policyPreflight.detail.keptCount, 3);
+  assert.equal(payload.checks.policyPreflight.detail.filteredCount, 4);
+  assert.equal(payload.checks.policyPreflight.detail.lifecycleFilteredCount, 3);
+  assert.equal(payload.checks.policyPreflight.detail.crossClientPrivateFilteredCount, 1);
+
   assert.ok(payload.checks.tests.status === 'ok' || payload.checks.tests.status === 'error',
     'tests check should have valid status');
   assert.ok(typeof payload.checks.tests.detail.total === 'number');
@@ -88,6 +121,8 @@ test('gate:ci CLI should emit text output by default', async () => {
   assert.ok(text.includes('rollback'), 'should include rollback check');
   assert.ok(text.includes('queries'), 'should include queries check');
   assert.ok(text.includes('8/8 query assertions passed'), 'should include query assertion counts');
+  assert.ok(text.includes('policyPreflight'), 'should include policy preflight check');
+  assert.ok(text.includes('3/7 records would remain'), 'should include policy preflight counts');
   assert.ok(text.includes('tests'), 'should include tests check');
   assert.ok(text.includes('docs'), 'should include docs check');
   assert.ok(text.includes('PASS'), 'should show PASS result');

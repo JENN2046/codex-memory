@@ -327,3 +327,28 @@ test('soft read policy remains off by default', async () => {
     assert.equal(app.config.enableSoftReadPolicy, false);
   });
 });
+
+test('policy preflight fixture baseline documents CI-safe filtering counts', () => {
+  const fixtures = [
+    { title: 'Active Shared', status: 'active', visibility: 'shared', clientId: 'codex' },
+    { title: 'Stale Shared', status: 'stale', visibility: 'shared', clientId: 'codex' },
+    { title: 'Proposal Shared', status: 'proposal', visibility: 'shared', clientId: 'codex' },
+    { title: 'Rejected Shared', status: 'rejected', visibility: 'shared', clientId: 'codex' },
+    { title: 'Tombstoned Shared', status: 'tombstoned', visibility: 'shared', clientId: 'codex' },
+    { title: 'Private Claude', status: 'active', visibility: 'private', clientId: 'claude' },
+    { title: 'Private Codex', status: 'active', visibility: 'private', clientId: 'codex' }
+  ];
+
+  const kept = applyHypotheticalSoftReadPolicy(fixtures, { requestClientId: 'codex' });
+  const lifecycleFilteredCount = fixtures
+    .filter(record => !['active', 'stale'].includes(record.status))
+    .length;
+  const crossClientPrivateFilteredCount = fixtures
+    .filter(record => record.visibility === 'private' && record.clientId !== 'codex')
+    .length;
+
+  assert.equal(fixtures.length, 7);
+  assert.equal(kept.length, 3);
+  assert.equal(lifecycleFilteredCount, 3);
+  assert.equal(crossClientPrivateFilteredCount, 1);
+});

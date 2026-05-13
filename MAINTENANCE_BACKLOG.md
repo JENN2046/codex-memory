@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：P10 memory policy runtime gate 与 roadmap source registration 均已本地提交；不 push
+- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight 均已本地完成；不 push
 - 长期路线图事实源：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
@@ -76,7 +76,7 @@
 | P10-4 | memory-policy-hardening | A3 | done | soft read policy feature flag | `node --test tests\policy-read-preflight.test.js`; `npm test`; `npm run gate:mainline:strict` | `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` 默认 false；开启后过滤 proposal/rejected/tombstoned 与 cross-client private；默认行为保持不变 |
 | P10-5 | memory-policy-hardening | A2 | done | query suite fixture recall dry-run | `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js`; `npm test`; `npm run gate:mainline:strict` | `real-query-suite` / `query:quality` 支持 `--fixture-recall-dry-run`，只读 fixture，不碰 durable memory，不调用 provider |
 | P10-roadmap-source-registration | roadmap | A0 | done | 建立 VCP memory practical parity 长期路线图事实源 | `git diff --check`; `scripts/validate-local.ps1 -Area docs` | 新增 `docs/VCP_MEMORY_PARITY_ROADMAP.md`；README / NEXT_PHASE / BACKLOG 只保留链接或摘要，不复制全文 |
-| P10.1-runtime-gate-docs-ci-policy-preflight | memory-policy-hardening | A0/A1 | todo | 补 runtime gate flags 文档，并考虑 fixture-only `gate:ci` policy preflight 输出 | docs validation; targeted gate-ci tests if CLI output changes | 下一步可执行小任务；不扩大 enforcement，不调用 provider |
+| P10.1-runtime-gate-docs-ci-policy-preflight | memory-policy-hardening | A0/A1 | done | 补 runtime gate flags 文档，并接入 fixture-only `gate:ci` policy preflight 输出 | `node --test tests\gate-ci-cli.test.js`; `node --test tests\policy-read-preflight.test.js`; `npm run gate:ci`; `npm test`; `git diff --check`; docs validation | `checks.policyPreflight` 现在输出 fixture-only soft read policy summary；不扩大 enforcement，不调用 provider，不改变 runtime 默认行为 |
 | P11-memory-lifecycle-core-planning | memory-governance | A0 | todo | P11 memory lifecycle core planning | docs validation | 先规划 lifecycle 状态、transition、audit shape；不直接改 runtime |
 
 ## 推荐执行顺序
@@ -91,8 +91,8 @@
 8. `P7` 已完成：README / VALIDATION 已补 dashboard/http-observe schema contract 摘要。
 9. `P8` 已完成：P10 runtime gate 已把 scoped memory runtime 推进到可信记忆内核的第一层本地门禁。
 10. `P9`：长期路线图事实源已建立；近期仍按 P10 -> P11 -> P12 推进。
-11. `P10.1`：建议下一步做 runtime gate 文档/配置说明与 `gate:ci` policy preflight 输出常态化，不直接扩大 enforcement。
-12. `P11`：随后进入 memory lifecycle core planning。
+11. `P10.1`：已完成 runtime gate 文档/配置说明与 `gate:ci` policy preflight 输出常态化，不直接扩大 enforcement。
+12. `P11`：下一步进入 memory lifecycle core planning；仍先规划，不直接改 runtime。
 13. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
