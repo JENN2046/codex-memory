@@ -81,12 +81,13 @@
 - README / `CODEX_MEMORY_NEXT_PHASE_PLAN.md` / `MAINTENANCE_BACKLOG.md` now link or summarize the roadmap source.
 - Backlog only registers current executable items: `P10.1-runtime-gate-docs-ci-policy-preflight` and `P11-memory-lifecycle-core-planning`.
 - Current roadmap docs validation passed: `git diff --check`; `scripts/validate-local.ps1 -Area docs`.
+- Roadmap source registration commit created: `92ea7ea docs: register VCP memory parity roadmap`.
 
 ## Next
 
-- P1: create guarded local docs commit.
-- P2: do not push unless explicitly authorized.
-- P3: recommended next local task is `P10.1-runtime-gate-docs-ci-policy-preflight`.
+- P1: do not push unless explicitly authorized.
+- P2: recommended next local task is `P10.1-runtime-gate-docs-ci-policy-preflight`.
+- P3: after that, `P11-memory-lifecycle-core-planning`.
 - P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required

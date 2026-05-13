@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：P10 memory policy runtime gate 本地 batch 已提交；roadmap source registration 本地 docs-only batch 已验证，等待本地提交；不 push
+- 当前 `main`：P10 memory policy runtime gate 与 roadmap source registration 均已本地提交；不 push
 - 长期路线图事实源：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`

@@ -190,4 +190,4 @@ roadmap / docs-governance
 
 ## Next Safe Action
 
-Create guarded local docs commit, then stop without push. Recommended next task remains `P10.1-runtime-gate-docs-ci-policy-preflight`, followed by `P11-memory-lifecycle-core-planning`.
+Roadmap source registration is committed locally at `92ea7ea docs: register VCP memory parity roadmap`. Stop without push. Recommended next task remains `P10.1-runtime-gate-docs-ci-policy-preflight`, followed by `P11-memory-lifecycle-core-planning`.
