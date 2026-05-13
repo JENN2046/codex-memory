@@ -2,15 +2,15 @@
 
 ## Current State
 
-当前本地工作是已提交的 `P9` selective integration：`e1883e6 feat: integrate scoped memory runtime tools` 从 `origin/codex/p1-vcp-memory-core-100-roadmap` 只取 scope/runtime/query 相关实现、CLI、tests、benchmark fixture 和 `docs/scope-backfill-policy.md`，明确排除陈旧状态文档和远端 `.agent_board`。
+当前本地工作是已推送的 `P9` selective integration：`e1883e6 feat: integrate scoped memory runtime tools` 从 `origin/codex/p1-vcp-memory-core-100-roadmap` 只取 scope/runtime/query 相关实现、CLI、tests、benchmark fixture 和 `docs/scope-backfill-policy.md`，明确排除陈旧状态文档和远端 `.agent_board`。状态记录提交 `cf660d0 docs: record scoped memory commit state` 也已推到 `origin/main`。
 
-本批次已完成本地修复、验证与本地提交：恢复 schema enum 约束，修正 `scope-backfill-dry-run` 对仅缺 `workspace_id` 的记录统计，增强 `scope-acceptance` 的四维 strict isolation 检查，并保留 `MemoryWriteService` 的 camelCase 兼容。未 push。
+本批次已完成本地修复、验证、推送与 PR 收口：恢复 schema enum 约束，修正 `scope-backfill-dry-run` 对仅缺 `workspace_id` 的记录统计，增强 `scope-acceptance` 的四维 strict isolation 检查，并保留 `MemoryWriteService` 的 camelCase 兼容。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: current local `main` tip; integration commit is `e1883e6 feat: integrate scoped memory runtime tools`
+- HEAD: `cf660d0 docs: record scoped memory commit state`; local `main` matches `origin/main`
 - Remote baseline: current `origin/main` tip for this maintenance line
 - Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
@@ -40,10 +40,13 @@
 - `src/core/MemoryWriteService.js` accepts existing camelCase scope aliases to avoid breaking internal call sites.
 - Targeted tests passed 44/44; full `npm test` passed 180/180; strict gate passed; scope acceptance passed.
 - Guarded local commit `e1883e6` created; push remains unauthorized.
+- `e1883e6` and `cf660d0` pushed to `origin/main`.
+- PR #2 closed as superseded; branch `codex/p1-vcp-memory-core-100-roadmap` retained.
 
 ## Next
 
-- P1: push remains separate explicit authorization and is not implied by local commit approval.
+- P1: create guarded local docs/board sync commit if not already present in `git log`.
+- P2: future push remains separate explicit authorization and is not implied by local commit approval.
 
 ## Auth Required
 

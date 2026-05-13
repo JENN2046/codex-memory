@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P9 / selected P1 VCP memory-core scope/runtime/query integration |
-| Current area | P9-codex-claude-client-scope |
-| Last action | 从 `origin/codex/p1-vcp-memory-core-100-roadmap` 只集成可验证的 runtime / CLI / storage / recall / test 变更，排除陈旧状态文档与远端 `.agent_board`，本地修复 schema enum、scope backfill、scope acceptance 覆盖问题，并创建本地提交 `e1883e6`。 |
-| Last validation | targeted `node --test` 44/44；`npm test` 180/180；`npm run gate:mainline:strict` ok；`npm run scope:acceptance -- --json` ok；`git diff --check` passed；new-file whitespace/token scans clean。 |
-| Worktree summary | selected integration batch committed locally as `e1883e6`; this board record captures the post-commit state. |
+| Current task | P6 / post-PR close status docs drift sync |
+| Current area | P6-docs-drift |
+| Last action | 同步 `STATUS.md`、`MAINTENANCE_BACKLOG.md` 与 `.agent_board` 当前事实：`main` 已到 `cf660d0`，PR #2 已按 superseded 关闭且未合并，远端分支保留。 |
+| Last validation | `git diff --check` passed；`scripts/validate-local.ps1 -Area docs` passed；当前入口旧 `48d72f0` / `8c2836b` / `ahead 1` / `未 push` 表述扫描无命中。 |
+| Worktree summary | local docs/board drift sync across `STATUS.md`, `MAINTENANCE_BACKLOG.md`, and `.agent_board`; no runtime changes and no remote actions in this step. |
 | Mainline assumption | HTTP MCP 7605 is reachable |
 | Active-memory suite status | strict gate compare `43/43 matched`, rollback `43/43 rollback-ready`, `coreMismatchCountTotal=0`, `extendedMismatchCountTotal=0` |
 | npm test | `180/180` |
 | Profile health | `ready` — vectors 205, 822 embedding cache, 0 legacy |
-| Guarded auto-commit allowed | completed locally as `e1883e6`; push remains not authorized |
+| Guarded auto-commit allowed | authorized for this docs/board sync; push remains separate explicit authorization |
 | Last checkpoint | `.agent_board/CHECKPOINT.md` current local integration checkpoint |
-| Next planned action | Await explicit instruction if push or further local work is desired. Push remains separate explicit authorization. |
+| Next planned action | Create guarded local docs/board sync commit, then run post-commit status/log check. Push still requires separate explicit authorization. |
 
 ## Notes
 

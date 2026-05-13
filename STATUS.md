@@ -1,11 +1,11 @@
 ﻿# codex-memory Status
 
-更新时间：2026-05-12
+更新时间：2026-05-13
 
 ## 当前结论
 
 - `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
-- 当前本地 `HEAD` 为 `48d72f0`（`chore(board): add verifier rail and worker trial`），相对 `origin/main` `ahead 1`；远端当前仍停在 `8c2836b`，tag 为 `v0.1.1-scope-boundary-20260508`。最新已验证基线：health `200`、compare `43/43 matched (0/0)`、rollback `43/43 rollback-ready (0/0)`、`npm test` `140/140`、`gate:mainline:strict` `ok`、`gate:ci` 历史值为 `119/119`。维护期验收快照：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)。
+- 当前本地与远端 `main` 已同步到 `cf660d0`（`docs: record scoped memory commit state`）；PR #2 已按 superseded 说明关闭且未合并，远端分支 `codex/p1-vcp-memory-core-100-roadmap` 仍保留用于追溯。最新已验证基线：health `200`、compare `43/43 matched (0/0)`、rollback `43/43 rollback-ready (0/0)`、`npm test` `180/180`、`gate:mainline:strict` `ok`、`scope:acceptance` `ok`。维护期验收快照：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。

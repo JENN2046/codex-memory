@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-12
+更新时间：2026-05-13
 
 这份文档承接 `Phase E` 收官之后的后续增量工作。
 
@@ -23,14 +23,14 @@
 
 ## 当前基线
 
-- 当前本地 `HEAD`：`48d72f0`（治理轨道 / Verifier rail 补丁），分支相对 `origin/main` `ahead 1`
-- 当前远端基线：`8c2836b` / tag `v0.1.1-scope-boundary-20260508`
+- 当前本地/远端 `main`：`cf660d0`（`docs: record scoped memory commit state`），工作区 clean
+- PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：`119/119`（fixture-only）、gate:mainline：health `200`、compare `43/43`、rollback `43/43`
-- 标准 suite：`43/43 matched (0/0)`、npm test：`140/140`
+- 标准 suite：`43/43 matched (0/0)`、npm test：`180/180`、`scope:acceptance`：`ok`
 - profile health：`ready`（vectors=205，embedding cache=822，legacy=0）
 - 维护期验收：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)
 - 全部 Phase A-J + 维护期 M-001~M-013 + 8-task batch 已完成
-- Verifier rail：已本地完成并形成 guarded local commit `48d72f0`；包含 Worker task contract、read-only Verifier protocol、file locks、risk register 与一次 Commander -> Worker -> Verifier 试跑
+- Verifier rail：已完成并进入 mainline 历史；包含 Worker task contract、read-only Verifier protocol、file locks、risk register 与一次 Commander -> Worker -> Verifier 试跑
 
 ## 维护期队列（首批 M-001~M-013 已全部完成）
 
@@ -58,7 +58,7 @@
 | J-002 | observability | A1 | done | 实现 memory dashboard CLI | `npm run dashboard` / `npm run dashboard -- --json` + `npm run gate:mainline` | 已实现 `src/cli/dashboard.js`；gate 43/43 通过 |
 | J-003 | observability | A0 | done | 评估 local-only Web UI | docs review | 已创建 [LOCAL_WEB_UI_ASSESSMENT.md](/A:/codex-memory/docs/LOCAL_WEB_UI_ASSESSMENT.md)；结论：当前不建议实现 |
 | G-001 | ci-gate | A1 | done | 实现 gate:ci fixture-only CLI | `npm run gate:ci` | 已实现 `src/cli/gate-ci.js`；compare 43/43 + rollback 43/43 + tests 116/116 + docs check |
-| G-002 | docs-governance | A0 | done | 补齐 Verifier rail 与多 Worker 基础治理轨道 | `git diff --check` / `scripts/validate-local.ps1 -Area docs` / Worker 试跑 / read-only Verifier | 已本地提交 `48d72f0`；当前分支 `ahead 1`，未 push |
+| G-002 | docs-governance | A0 | done | 补齐 Verifier rail 与多 Worker 基础治理轨道 | `git diff --check` / `scripts/validate-local.ps1 -Area docs` / Worker 试跑 / read-only Verifier | 已完成并进入 mainline 历史；后续状态以 `.agent_board` 与当前 `main` 为准 |
 
 ## 推荐执行顺序
 
