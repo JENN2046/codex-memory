@@ -1,6 +1,6 @@
 ﻿# codex-memory Status
 
-更新时间：2026-05-13
+更新时间：2026-05-14
 
 ## 当前结论
 
@@ -9,6 +9,7 @@
 - Stale branch quarantine 已完成 docs/board-only 记录：[docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md)。`codex/p1-vcp-memory-core-100-roadmap` 已确认是 superseded stale reference branch：不可整体 merge、不可 rebase、不可作为开发基线，只允许人工抽取并更新少量文档内容。后续开发基线仍是 `origin/main`。
 - P11.8 lifecycle read-policy runtime flag 已本地实现：`CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY` 默认 `false`，关闭时 `search_memory` 保持 backward-compatible；开启时普通召回只保留 `active` / `stale`，过滤 `proposal` / `rejected` / `superseded` / `tombstoned`；缺 lifecycle status column 时 fail-safe 并记录 `lifecycleColumnAvailable=false`，不自动 migration，不新增 MCP public tools。
 - P11.9 lifecycle policy gate-ci summary 已本地实现：`gate:ci` 新增 `checks.lifecyclePolicy` fixture-only summary，展示 default-off、enabled include/exclude statuses、missing-column warn/fail-safe、`hiddenByLifecycleCount`、`staleResultCount`、audit summary shape 和 raw workspace id 不暴露；不改 `search_memory` runtime 行为，不新增 MCP tools，不做 SQLite migration。
+- P11.10 lifecycle read-policy observability summary 已本地实现：`dashboard`、`observe:http`、`governance:report` 输出只读 `readPolicy` summary，展示 lifecycle/soft flag、include/exclude status、recent hidden/stale counts、`lifecycleColumnAvailable` 和 `rawWorkspaceIdExposed=false`；不改 `search_memory` runtime 行为，不新增 MCP tools，不做 SQLite migration。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -89,6 +90,7 @@
 - P11.x stale branch quarantine and doc salvage 已 docs/board-only 完成：新增 stale branch review，并新增当前主线口径的 [PERSONAL_PRODUCTION_READINESS.md](/A:/codex-memory/docs/PERSONAL_PRODUCTION_READINESS.md)。本阶段不改 runtime/tests/package，不 merge/rebase/cherry-pick 旧分支，不 push；下一阶段仍回到 P11.8。
 - P11.8 lifecycle read-policy runtime flag implementation 已本地完成：新增默认关闭的 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`；flag 关闭时 proposal/rejected/superseded/tombstoned 仍保持既有可见性；flag 开启时普通 `search_memory` 按 lifecycle status 过滤，保留 active/stale 并统计 `hiddenByLifecycleCount` / `staleResultCount`；audit summary 记录低风险 policy 字段且不暴露 raw `workspace_id`；无 SQLite migration、无 MCP tool expansion、无 provider call。
 - P11.9 lifecycle policy gate-ci summary 已本地完成：`gate:ci` JSON/text 均包含 `lifecyclePolicy` fixture-only check；JSON detail 包含 `fixtureOnly=true`、`mutated=false`、`noNetwork/noDaemon/noProvider=true`、`defaultEnabled=false`、enabled include/exclude statuses、missing-column behavior、stale/hidden counts、audit summary shape 与 `rawWorkspaceIdExposed=false`。
+- P11.10 lifecycle read-policy observability/dashboard summary 已本地完成：`dashboard`、`observe:http`、`governance:report` 均展示低风险 `readPolicy` summary；JSON/text 不输出 raw `workspace_id`；仅读取 config flags 与 recent recall audit summary，不调用 provider、不写 memory、不 migration。
 - `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：

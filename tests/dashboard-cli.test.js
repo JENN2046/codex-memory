@@ -53,6 +53,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'governance',
     'mode',
     'profile',
+    'readPolicy',
     'recommendations',
     'runtime',
     'service',
@@ -88,7 +89,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
 
   // Audits section
   assert.ok(payload.audits, 'should have audits section');
-  assertKeySet(payload.audits, ['bridge', 'recall'], 'dashboard audits');
+  assertKeySet(payload.audits, ['bridge', 'readPolicy', 'recall'], 'dashboard audits');
   assert.ok(payload.audits.bridge);
   assert.ok(payload.audits.recall);
   assertKeySet(payload.audits.recall, [
@@ -111,6 +112,35 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(typeof payload.audits.recall.scopeDimensionBreakdown, 'object');
   assert.equal(payload.audits.recall.rawWorkspaceId, undefined);
 
+  assertKeySet(payload.readPolicy, [
+    'lifecycleColumnAvailable',
+    'lifecycleExcludedStatuses',
+    'lifecycleIncludedStatuses',
+    'lifecyclePolicyEnabled',
+    'migrationApplied',
+    'mutated',
+    'noProvider',
+    'rawWorkspaceIdExposed',
+    'recentHiddenByLifecycleCount',
+    'recentLifecyclePolicyAppliedCount',
+    'recentReadPolicyAppliedCount',
+    'recentReadPolicyAuditCount',
+    'recentStaleResultCount',
+    'scopeWorkspacePresent',
+    'softReadPolicyEnabled',
+    'source',
+    'status'
+  ], 'dashboard read policy');
+  assert.equal(typeof payload.readPolicy.lifecyclePolicyEnabled, 'boolean');
+  assert.equal(typeof payload.readPolicy.softReadPolicyEnabled, 'boolean');
+  assert.deepEqual(payload.readPolicy.lifecycleIncludedStatuses, ['active', 'stale']);
+  assert.deepEqual(payload.readPolicy.lifecycleExcludedStatuses, ['proposal', 'rejected', 'superseded', 'tombstoned']);
+  assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
+  assert.equal(payload.readPolicy.noProvider, true);
+  assert.equal(payload.readPolicy.mutated, false);
+  assert.equal(payload.readPolicy.migrationApplied, false);
+  assert.equal(JSON.stringify(payload).includes('workspace_id'), false);
+
   // Gate section
   assert.ok(payload.gate, 'should have gate section');
   assert.ok(payload.gate.compare);
@@ -124,6 +154,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'message',
     'paths',
     'rawSummary',
+    'readPolicy',
     'retention',
     'reviewLevel',
     'sourceStatus',
@@ -145,6 +176,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(typeof payload.governance.counts.stale30d, 'number');
   assert.equal(typeof payload.governance.counts.stale90d, 'number');
   assert.ok(Array.isArray(payload.governance.hints));
+  assert.equal(payload.governance.readPolicy.rawWorkspaceIdExposed, false);
 
   // Checks and recommendations
   assert.ok(Array.isArray(payload.checks));
@@ -166,6 +198,7 @@ test('dashboard CLI should support --json --summary-only', async () => {
     assert.equal(payload.store.status, 'warn', 'empty clean runner store should warn');
   }
   assert.ok(!payload.store.ageBreakdown, 'summary-only should omit age breakdown');
+  assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
   assert.ok(payload.governance, 'summary-only should keep governance compact section');
   assert.equal(typeof payload.governance.counts.proposalCount, 'number');
   assert.equal(payload.governance.hints, undefined);
@@ -180,9 +213,11 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Store'), 'should include Store section');
   assert.ok(text.includes('Profile'), 'should include Profile section');
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
+  assert.ok(text.includes('ReadPolicy'), 'should include ReadPolicy section');
   assert.ok(text.includes('Governance'), 'should include Governance section');
   assert.ok(text.includes('Checks'), 'should include Checks section');
   assert.ok(text.includes('Recommendations'), 'should include Recommendations');
+  assert.equal(text.includes('workspace_id'), false);
 });
 
 test('dashboard CLI should tolerate clean CI runner warnings', async () => {
@@ -209,4 +244,5 @@ test('dashboard CLI should tolerate clean CI runner warnings', async () => {
   assert.equal(typeof payload.governance.reviewLevel, 'string');
   assert.notEqual(payload.gate.status, 'error', formatFailure(result));
   assert.equal(typeof payload.audits.recall.scopedRecallCount, 'number');
+  assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
 });

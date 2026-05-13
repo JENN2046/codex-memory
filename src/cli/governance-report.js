@@ -3,6 +3,10 @@ const fs = require('node:fs');
 const { DatabaseSync } = require('node:sqlite');
 const { createConfig } = require('../config/createConfig');
 
+const LIFECYCLE_INCLUDED_STATUSES = ['active', 'stale'];
+const LIFECYCLE_EXCLUDED_STATUSES = ['proposal', 'rejected', 'superseded', 'tombstoned'];
+const READ_POLICY_AUDIT_TAIL = 20;
+
 function parseArgs(argv = []) {
   const options = { json: false };
   for (let i = 0; i < argv.length; i += 1) {
@@ -35,6 +39,89 @@ function toDistribution(rows = [], keyField = 'key') {
   return Object.fromEntries(rows.map(row => [normalizeBucketKey(row?.[keyField]), row?.cnt || 0]));
 }
 
+function readRecentJsonlEntriesSync(filePath, maxLines = READ_POLICY_AUDIT_TAIL, maxBytes = 1024 * 1024) {
+  try {
+    if (!filePath || !fs.existsSync(filePath)) return [];
+    const stats = fs.statSync(filePath);
+    const start = Math.max(0, stats.size - maxBytes);
+    const fd = fs.openSync(filePath, 'r');
+    try {
+      const buffer = Buffer.alloc(stats.size - start);
+      const bytesRead = fs.readSync(fd, buffer, 0, buffer.length, start);
+      let content = buffer.toString('utf8', 0, bytesRead);
+      if (start > 0) {
+        const firstNewline = content.indexOf('\n');
+        content = firstNewline >= 0 ? content.slice(firstNewline + 1) : '';
+      }
+      return content
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .slice(-maxLines)
+        .map(line => {
+          try { return JSON.parse(line); } catch { return null; }
+        })
+        .filter(Boolean);
+    } finally {
+      fs.closeSync(fd);
+    }
+  } catch {
+    return [];
+  }
+}
+
+function sumNumeric(entries, field) {
+  return entries.reduce((total, entry) => total + Number(entry?.[field] || 0), 0);
+}
+
+function buildReadPolicySurface({ config = null, recallEntries = [] } = {}) {
+  const effectiveConfig = config || createConfig();
+  const entries = Array.isArray(recallEntries) ? recallEntries.filter(Boolean) : [];
+  const policyEntries = entries.filter(entry => (
+    entry.recallType === 'read-policy'
+    || Object.prototype.hasOwnProperty.call(entry, 'readPolicyApplied')
+    || Object.prototype.hasOwnProperty.call(entry, 'lifecyclePolicyApplied')
+  ));
+  const lifecycleColumnSignals = policyEntries
+    .map(entry => entry.lifecycleColumnAvailable)
+    .filter(value => typeof value === 'boolean');
+  const scopeWorkspaceSignals = policyEntries
+    .map(entry => entry.scopeWorkspacePresent)
+    .filter(value => typeof value === 'boolean');
+
+  return {
+    status: policyEntries.length > 0 ? 'ok' : 'unavailable',
+    source: policyEntries.length > 0 ? 'recent-recall-audit' : 'config-only',
+    lifecyclePolicyEnabled: !!effectiveConfig.enableLifecycleReadPolicy,
+    softReadPolicyEnabled: !!effectiveConfig.enableSoftReadPolicy,
+    lifecycleIncludedStatuses: LIFECYCLE_INCLUDED_STATUSES,
+    lifecycleExcludedStatuses: LIFECYCLE_EXCLUDED_STATUSES,
+    recentReadPolicyAuditCount: policyEntries.length,
+    recentReadPolicyAppliedCount: policyEntries.filter(entry => entry.readPolicyApplied === true).length,
+    recentLifecyclePolicyAppliedCount: policyEntries.filter(entry => entry.lifecyclePolicyApplied === true).length,
+    recentHiddenByLifecycleCount: sumNumeric(policyEntries, 'hiddenByLifecycleCount'),
+    recentStaleResultCount: sumNumeric(policyEntries, 'staleResultCount'),
+    lifecycleColumnAvailable: lifecycleColumnSignals.length > 0
+      ? lifecycleColumnSignals.every(Boolean)
+      : null,
+    scopeWorkspacePresent: scopeWorkspaceSignals.length > 0
+      ? scopeWorkspaceSignals.some(Boolean)
+      : null,
+    rawWorkspaceIdExposed: false,
+    noProvider: true,
+    mutated: false,
+    migrationApplied: false
+  };
+}
+
+function collectReadPolicySurface() {
+  const config = createConfig();
+  return buildReadPolicySurface({
+    config,
+    recallEntries: readRecentJsonlEntriesSync(config.recallLogPath, READ_POLICY_AUDIT_TAIL)
+  });
+}
+
 function buildGovernanceSurface(report, options = {}) {
   const tolerateUnavailable = options.tolerateUnavailable !== false;
   if (!report || report.error) {
@@ -53,6 +140,7 @@ function buildGovernanceSurface(report, options = {}) {
       },
       statusDistribution: {},
       retention: {},
+      readPolicy: collectReadPolicySurface(),
       hints: [
         '治理快照暂不可用，先核对 SQLite 路径与本地数据目录。'
       ]
@@ -123,6 +211,7 @@ function buildGovernanceSurface(report, options = {}) {
     counts,
     statusDistribution: report.statusDistribution || {},
     retention: report.retention || {},
+    readPolicy: report.readPolicy || collectReadPolicySurface(),
     hints
   };
 }
@@ -142,6 +231,7 @@ function collectReport() {
     return attachReviewSurface({
       mode: 'governance-report',
       destructive: false,
+      readPolicy: collectReadPolicySurface(),
       summary: {
         status: 'error',
         message: `Database not found: ${dbPath}`
@@ -162,6 +252,7 @@ function collectReport() {
     return attachReviewSurface({
       mode: 'governance-report',
       destructive: false,
+      readPolicy: collectReadPolicySurface(),
       summary: {
         status: 'error',
         message: `memory_records table not found: ${dbPath}`
@@ -278,6 +369,8 @@ function collectReport() {
     retention: Object.fromEntries(retentionDist.map(r => [r.retention_policy, r.cnt]))
   };
 
+  report.readPolicy = collectReadPolicySurface();
+
   return attachReviewSurface(report, { tolerateUnavailable: false });
 }
 
@@ -294,6 +387,7 @@ function renderText(report) {
   l.push(`  status:      ${report.review.status}`);
   l.push(`  level:       ${report.review.reviewLevel}`);
   l.push(`  message:     ${report.review.message}`);
+  l.push(`  read-policy: lifecycle=${report.review.readPolicy.lifecyclePolicyEnabled}, soft=${report.review.readPolicy.softReadPolicyEnabled}, hidden=${report.review.readPolicy.recentHiddenByLifecycleCount}, stale=${report.review.readPolicy.recentStaleResultCount}, columns=${report.review.readPolicy.lifecycleColumnAvailable ?? 'unavailable'}`);
   for (const hint of report.review.hints || []) {
     l.push(`  hint:        ${hint}`);
   }
@@ -365,5 +459,7 @@ module.exports = {
   collectReport,
   renderText,
   buildGovernanceSurface,
-  attachReviewSurface
+  attachReviewSurface,
+  buildReadPolicySurface,
+  collectReadPolicySurface
 };

@@ -2,34 +2,39 @@
 
 ## Current Goal
 
-P11.9-lifecycle-policy-gate-ci-summary：把 lifecycle read-policy runtime flag 的 fixture-only
-summary 接入 `gate:ci`，让 CI-safe 输出能展示 default-off、enabled filtering、missing-column
-fail-safe/warn 和 audit summary shape。
+P11.10-lifecycle-read-policy-observability-dashboard-summary：把 lifecycle read-policy 状态同步到
+`dashboard`、`observe:http` 和 `governance:report` 的只读可观测面。
 
 ## Current Area
 
-P11-memory-lifecycle-core / ci-gate
+P11-memory-lifecycle-core / observability
 
 ## Current Status
 
-P11.9 本地实现已完成。当前基线为 `main` / `origin/main` / `2080b12`。
+P11.10 本地实现已完成。当前基线为 `main` / `origin/main` / `729b75a`。
 
-本阶段只改 CI-safe fixture/reporting、测试、文档和 board；不改 `search_memory` runtime 行为，
+本阶段只改 observability/reporting、测试、文档和 board；不改 `search_memory` runtime 行为，
 不新增 MCP public tools，不做 SQLite migration，不 push。
 
 ## Completed Work In This Batch
 
-- Added `checks.lifecyclePolicy` to `gate:ci`.
-- Loaded the existing runtime fixture `tests/fixtures/lifecycle-read-policy-runtime-v1.json`.
-- Reported lifecycle default-off state, included/excluded statuses, missing-column behavior, stale/hidden counts, audit summary shape, and raw workspace id exposure status.
-- Kept `gate:ci` lifecycle summary fixture-only with `mutated=false`, no network, no daemon, and no provider.
-- Updated `tests/gate-ci-cli.test.js` JSON/text assertions.
+- Added shared low-risk lifecycle/read-policy surface in `governance-report`.
+- Added `readPolicy` summary to dashboard JSON/text output.
+- Added `readPolicy` summary to `observe:http` JSON/text output.
+- Added `readPolicy` and `review.readPolicy` to `governance:report`.
+- Aggregated recent recall audit fields for hidden/stale counts and lifecycle column availability.
+- Kept raw `workspace_id` out of JSON/text output; only `scopeWorkspacePresent` boolean is exposed.
+- Updated dashboard / http-observe / governance-report tests.
 - Updated runtime policy docs, lifecycle implementation plan, status, backlog, and board state.
 
 ## Changed Files
 
-- `src/cli/gate-ci.js`
-- `tests/gate-ci-cli.test.js`
+- `src/cli/dashboard.js`
+- `src/cli/http-observe.js`
+- `src/cli/governance-report.js`
+- `tests/dashboard-cli.test.js`
+- `tests/http-observe-cli.test.js`
+- `tests/governance-report-cli.test.js`
 - `docs/runtime-policy-gates.md`
 - `docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -42,11 +47,14 @@ P11.9 本地实现已完成。当前基线为 `main` / `origin/main` / `2080b12`
 
 ## Validation Run
 
-- `node --test tests\gate-ci-cli.test.js`：passed `2/2`
-- `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`：passed `10/10`
-- `npm run gate:ci`：PASS
-- `npm run gate:ci -- --json`：PASS, includes `checks.lifecyclePolicy.status=ok`
+- `node --test tests\dashboard-cli.test.js`：passed `4/4`
+- `node --test tests\http-observe-cli.test.js`：passed `2/2`
+- `node --test tests\governance-report-cli.test.js`：passed `3/3`
+- `npm run dashboard -- --json`：passed, includes `readPolicy.status=unavailable` on current local empty audit state
+- `npm run observe:http -- --json`：passed, includes `readPolicy` and summary read-policy fields
+- `npm run governance:report -- --json`：passed, includes `readPolicy` and `review.readPolicy`
 - `npm test`：passed `233/233`
+- `npm run gate:ci`：PASS
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -67,8 +75,8 @@ P11.9 本地实现已完成。当前基线为 `main` / `origin/main` / `2080b12`
 
 ## Remaining Risks
 
-- `checks.lifecyclePolicy` is a fixture/reporting summary only; future observability/dashboard surfacing needs a separate phase.
+- `readPolicy.status=unavailable` can appear when no recent read-policy audit entry exists; this is a reporting state only.
 
 ## Next Safe Action
 
-Stop without push. Next recommended phase is `P11.10-lifecycle-read-policy-observability-dashboard-summary` or P12 controlled write tools planning.
+Stop without push. Next recommended step is P11.10 guarded local commit.

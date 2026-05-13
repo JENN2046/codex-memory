@@ -2,7 +2,12 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
-const { collectReport: collectGovernanceReport, buildGovernanceSurface } = require('./governance-report');
+const { createConfig } = require('../config/createConfig');
+const {
+  collectReport: collectGovernanceReport,
+  buildGovernanceSurface,
+  buildReadPolicySurface
+} = require('./governance-report');
 
 function parseArgs(argv = []) {
   const options = { json: false, summaryOnly: false, skipTests: true };
@@ -118,6 +123,10 @@ function incrementBreakdown(map, key) {
   map[key] = (map[key] || 0) + 1;
 }
 
+function isSafeScopeDimension(dimension) {
+  return typeof dimension === 'string' && dimension !== 'workspace_id';
+}
+
 function buildRecallScopeSummary(entries = []) {
   const summary = {
     scopedRecallCount: 0,
@@ -141,7 +150,7 @@ function buildRecallScopeSummary(entries = []) {
 
     incrementBreakdown(summary.scopeModeBreakdown, typeof entry.scopeMode === 'string' ? entry.scopeMode : 'unknown');
     for (const dimension of Array.isArray(entry.scopeDimensions) ? entry.scopeDimensions : []) {
-      incrementBreakdown(summary.scopeDimensionBreakdown, typeof dimension === 'string' ? dimension : null);
+      incrementBreakdown(summary.scopeDimensionBreakdown, isSafeScopeDimension(dimension) ? dimension : null);
     }
     incrementBreakdown(summary.projectBreakdown, typeof entry.scopeProjectId === 'string' ? entry.scopeProjectId : null);
     incrementBreakdown(summary.clientBreakdown, typeof entry.scopeClientId === 'string' ? entry.scopeClientId : null);
@@ -273,7 +282,11 @@ function collectAudits() {
       }, {}),
       lastRecallAt: recallEntries[0]?.timestamp || null,
       ...recallScopeSummary
-    }
+    },
+    readPolicy: buildReadPolicySurface({
+      config: createConfig(),
+      recallEntries
+    })
   };
 }
 
@@ -312,7 +325,7 @@ function collectGovernance() {
   };
 }
 
-function buildChecks(service, store, profile, runtime, audits, gate, governance) {
+function buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy) {
   const checks = [];
   checks.push({
     source: 'service', level: service.status,
@@ -371,6 +384,14 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance)
     message: `${audits.recall.recentCount} recent recall entries, ${audits.recall.scopedRecallCount} scoped`
   });
   checks.push({
+    source: 'read-policy',
+    level: readPolicy.status === 'ok' ? 'ok' : 'warn',
+    code: 'read-policy-summary',
+    message: readPolicy.status === 'ok'
+      ? `lifecycle=${readPolicy.lifecyclePolicyEnabled}, hidden=${readPolicy.recentHiddenByLifecycleCount}, stale=${readPolicy.recentStaleResultCount}`
+      : 'Lifecycle read-policy summary has no recent audit entries'
+  });
+  checks.push({
     source: 'gate', level: gate.status,
     code: 'compare-clean',
     message: gate.compare
@@ -406,7 +427,7 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance)
   return checks;
 }
 
-function buildRecommendations(service, store, profile, runtime, audits, gate, governance) {
+function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy) {
   const recs = [];
   if (service.status !== 'ok') recs.push('Service health check failed — verify HTTP MCP is running');
   if (store.status !== 'ok') recs.push('Store is empty or unreachable — check SQLite integrity');
@@ -418,6 +439,7 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   if (audits.bridge.recentCount === 0) recs.push('No recent bridge entries — memory may not be writing');
   if (audits.recall.recentCount === 0) recs.push('No recent recall entries — search may not be active');
   if (audits.recall.recentCount > 0 && audits.recall.scopedRecallCount === 0) recs.push('Recent recall activity is present, but none of it used scope filtering');
+  if (readPolicy.status !== 'ok') recs.push('No recent lifecycle read-policy audit summary is available yet');
   if (gate.status !== 'ok') recs.push('Mainline gate not passing — run gate:mainline for details');
   if (governance.counts.proposalCount > 0) recs.push(`${governance.counts.proposalCount} governance proposals are pending review`);
   if (governance.counts.stale90d > 0) recs.push(`${governance.counts.stale90d} active memories are stale >90d — schedule governance review`);
@@ -442,6 +464,7 @@ function renderText(report) {
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
   lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
+  lines.push(`ReadPolicy ${pad(report.readPolicy.status)} lifecycle=${report.readPolicy.lifecyclePolicyEnabled}, soft=${report.readPolicy.softReadPolicyEnabled}, hidden=${report.readPolicy.recentHiddenByLifecycleCount}, stale=${report.readPolicy.recentStaleResultCount}, columns=${report.readPolicy.lifecycleColumnAvailable ?? 'unavailable'}`);
   lines.push(`Governance ${pad(report.governance.status)} ${report.governance.counts.proposalCount} proposals, ${report.governance.counts.stale90d} stale>90d, review ${report.governance.reviewLevel}`);
   lines.push(`Gate       ${pad(report.gate.status)} compare ${report.gate.compare ? report.gate.compare.matchedCases + '/' + report.gate.compare.totalCases : 'N/A'}, rollback ${report.gate.rollback ? report.gate.rollback.readyCases + '/' + report.gate.rollback.totalCases : 'N/A'}`);
   lines.push('');
@@ -476,8 +499,9 @@ async function main() {
   const runtime = collectRuntime();
   const governance = collectGovernance();
 
-  const checks = buildChecks(service, store, profile, runtime, audits, gate, governance);
-  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance);
+  const readPolicy = audits.readPolicy;
+  const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy);
+  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy);
   const status = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
     audits.bridge.status, audits.recall.status, governance.status, gate.status
@@ -507,6 +531,7 @@ async function main() {
           counts: governance.counts
         }
       : governance,
+    readPolicy,
     gate,
     checks: options.summaryOnly ? checks.filter(c => c.level !== 'ok') : checks,
     recommendations

@@ -87,6 +87,7 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
       'mode',
       'paths',
       'proposals',
+      'readPolicy',
       'retention',
       'review',
       'scopeCoverage',
@@ -101,6 +102,7 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
       'counts',
       'hints',
       'message',
+      'readPolicy',
       'retention',
       'reviewLevel',
       'status',
@@ -109,6 +111,16 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
     assert.equal(payload.mode, 'governance-report');
     assert.equal(payload.destructive, false);
     assert.equal(payload.summary.status, 'ok');
+    assert.equal(payload.readPolicy.status, 'unavailable');
+    assert.equal(payload.readPolicy.lifecyclePolicyEnabled, false);
+    assert.equal(payload.readPolicy.softReadPolicyEnabled, false);
+    assert.deepEqual(payload.readPolicy.lifecycleIncludedStatuses, ['active', 'stale']);
+    assert.deepEqual(payload.readPolicy.lifecycleExcludedStatuses, ['proposal', 'rejected', 'superseded', 'tombstoned']);
+    assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
+    assert.equal(payload.readPolicy.noProvider, true);
+    assert.equal(payload.readPolicy.mutated, false);
+    assert.equal(payload.readPolicy.migrationApplied, false);
+    assert.equal(payload.review.readPolicy.rawWorkspaceIdExposed, false);
     assert.equal(payload.paths.dbPath, dbPath);
     assert.equal(payload.totalRecords, 6);
     assert.deepEqual(payload.statusDistribution, {
@@ -149,6 +161,7 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
     assert.equal(payload.review.counts.stale30d, 2);
     assert.equal(payload.review.counts.stale90d, 1);
     assert.ok(payload.review.hints.some(hint => hint.includes('proposal')));
+    assert.equal(JSON.stringify(payload).includes('workspace_id'), false);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
@@ -171,10 +184,12 @@ test('governance-report CLI should emit readable text output by default', async 
     assert.match(result.stdout, /Governance Report/);
     assert.match(result.stdout, /Status: ok/);
     assert.match(result.stdout, /Review:/);
+    assert.match(result.stdout, /read-policy:/);
     assert.match(result.stdout, /level:\s+needs-review/);
     assert.match(result.stdout, /Staleness:/);
     assert.match(result.stdout, /proposals:\s+1/);
     assert.match(result.stdout, /tombstoned:\s+1/);
+    assert.equal(result.stdout.includes('workspace_id'), false);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
@@ -200,9 +215,11 @@ test('governance-report CLI should fail cleanly when the database is missing', a
     assert.equal(payload.summary.status, 'error');
     assert.match(payload.summary.message, /Database not found/);
     assert.equal(payload.paths.dbPath, dbPath);
+    assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
     assert.equal(payload.review.status, 'error');
     assert.equal(payload.review.reviewLevel, 'unavailable');
     assert.equal(payload.review.counts.totalRecords, 0);
+    assert.equal(payload.review.readPolicy.rawWorkspaceIdExposed, false);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }

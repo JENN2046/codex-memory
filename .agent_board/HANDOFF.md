@@ -2,31 +2,36 @@
 
 ## Goal
 
-Resume after `P11.9-lifecycle-policy-gate-ci-summary` in `A:\codex-memory`.
+Resume after `P11.10-lifecycle-read-policy-observability-dashboard-summary` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `2080b12`
+- Base: `origin/main` / `729b75a`
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-P11-memory-lifecycle-core / ci-gate
+P11-memory-lifecycle-core / observability
 
 ## Completed In Current Batch
 
-- Added fixture-only `checks.lifecyclePolicy` to `gate:ci`.
-- Kept lifecycle policy summary local to fixtures and reports.
-- Verified JSON output includes `fixtureOnly=true`, `mutated=false`, `noNetwork=true`, `noDaemon=true`, `noProvider=true`, and `defaultEnabled=false`.
-- Verified text output includes a lifecycle policy line and does not expose raw `workspace_id`.
-- Updated lifecycle policy docs and board state.
+- Added lifecycle/read-policy summary to `dashboard`.
+- Added lifecycle/read-policy summary to `observe:http`.
+- Added lifecycle/read-policy summary to `governance:report`.
+- Exposed lifecycle and soft read flags, included/excluded statuses, recent lifecycle-hidden/stale counts, lifecycle column availability, and `scopeWorkspacePresent`.
+- Kept summaries reporting-only with `mutated=false`, `noProvider=true`, and `migrationApplied=false`.
+- Ensured JSON/text outputs do not expose raw `workspace_id`.
 
 ## Changed Files
 
-- `src/cli/gate-ci.js`
-- `tests/gate-ci-cli.test.js`
+- `src/cli/dashboard.js`
+- `src/cli/http-observe.js`
+- `src/cli/governance-report.js`
+- `tests/dashboard-cli.test.js`
+- `tests/http-observe-cli.test.js`
+- `tests/governance-report-cli.test.js`
 - `docs/runtime-policy-gates.md`
 - `docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -35,11 +40,14 @@ P11-memory-lifecycle-core / ci-gate
 
 ## Validation
 
-- `node --test tests\gate-ci-cli.test.js`：passed `2/2`
-- `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`：passed `10/10`
-- `npm run gate:ci`：PASS
-- `npm run gate:ci -- --json`：PASS, includes `checks.lifecyclePolicy.status=ok`
+- `node --test tests\dashboard-cli.test.js`：passed `4/4`
+- `node --test tests\http-observe-cli.test.js`：passed `2/2`
+- `node --test tests\governance-report-cli.test.js`：passed `3/3`
+- `npm run dashboard -- --json`：passed
+- `npm run observe:http -- --json`：passed
+- `npm run governance:report -- --json`：passed
 - `npm test`：passed `233/233`
+- `npm run gate:ci`：PASS
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -51,7 +59,8 @@ P11-memory-lifecycle-core / ci-gate
 ## Audit / Recall Impact
 
 - No `search_memory` runtime behavior changed.
-- This batch only reports fixture-level lifecycle policy expectations in `gate:ci`.
+- This batch only reads recent recall audit summary fields for observability.
+- Raw `workspace_id` is not emitted; only `scopeWorkspacePresent` boolean is surfaced.
 
 ## Not Done
 
@@ -63,9 +72,8 @@ P11-memory-lifecycle-core / ci-gate
 
 ## Remaining Risks
 
-- Future dashboard/http-observe lifecycle summary remains a separate phase.
+- No known validation gap for this phase.
 
 ## Next Safe Step
 
-Stop without push. The next recommended phase is
-`P11.10-lifecycle-read-policy-observability-dashboard-summary` or P12 controlled write tools planning.
+Stop without push. Recommended next step is `P11.10 guarded local commit`, followed by push readiness.

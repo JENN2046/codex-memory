@@ -101,7 +101,14 @@ async function seedRuntimeArtifacts(basePath) {
         scopeProjectId: 'codex-memory',
         scopeClientId: 'codex',
         scopeVisibility: ['shared'],
-        scopeWorkspacePresent: true
+        scopeWorkspacePresent: true,
+        readPolicyApplied: true,
+        lifecyclePolicyApplied: true,
+        lifecycleIncludedStatuses: ['active', 'stale'],
+        lifecycleExcludedStatuses: ['proposal', 'rejected', 'superseded', 'tombstoned'],
+        hiddenByLifecycleCount: 3,
+        staleResultCount: 1,
+        lifecycleColumnAvailable: true
       })
     ].join('\n'),
     'utf8'
@@ -201,6 +208,7 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       'governance',
       'health',
       'logs',
+      'readPolicy',
       'summary'
     ], 'http-observe top-level');
     assertKeySet(payload.summary, [
@@ -211,11 +219,19 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       'governanceStale90d',
       'governanceStatus',
       'healthStatus',
+      'hiddenByLifecycleCount',
       'hints',
       'httpLogErrorCount',
+      'lifecycleColumnAvailable',
+      'lifecyclePolicyAppliedCount',
+      'lifecyclePolicyEnabled',
       'message',
+      'rawWorkspaceIdExposed',
+      'readPolicyStatus',
       'recallRecentCount',
       'scopedRecallCount',
+      'softReadPolicyEnabled',
+      'staleResultCount',
       'status',
       'strictScopedRecallCount',
       'watchdogEnsureFailureCount',
@@ -318,6 +334,14 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     ], 'http-observe recall audit entry');
     assert.equal(payload.summary.scopedRecallCount, 1);
     assert.equal(payload.summary.strictScopedRecallCount, 1);
+    assert.equal(payload.summary.lifecyclePolicyEnabled, false);
+    assert.equal(payload.summary.softReadPolicyEnabled, false);
+    assert.equal(payload.summary.readPolicyStatus, 'ok');
+    assert.equal(payload.summary.lifecyclePolicyAppliedCount, 1);
+    assert.equal(payload.summary.hiddenByLifecycleCount, 3);
+    assert.equal(payload.summary.staleResultCount, 1);
+    assert.equal(payload.summary.lifecycleColumnAvailable, true);
+    assert.equal(payload.summary.rawWorkspaceIdExposed, false);
     assert.equal(payload.summary.governanceStatus, 'warn');
     assert.equal(payload.summary.governanceReviewLevel, 'needs-review');
     assert.equal(payload.summary.governanceProposalCount, 1);
@@ -332,12 +356,42 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       project_id: 1,
       visibility: 1
     });
+    assertKeySet(payload.readPolicy, [
+      'lifecycleColumnAvailable',
+      'lifecycleExcludedStatuses',
+      'lifecycleIncludedStatuses',
+      'lifecyclePolicyEnabled',
+      'migrationApplied',
+      'mutated',
+      'noProvider',
+      'rawWorkspaceIdExposed',
+      'recentHiddenByLifecycleCount',
+      'recentLifecyclePolicyAppliedCount',
+      'recentReadPolicyAppliedCount',
+      'recentReadPolicyAuditCount',
+      'recentStaleResultCount',
+      'scopeWorkspacePresent',
+      'softReadPolicyEnabled',
+      'source',
+      'status'
+    ], 'http-observe read policy');
+    assert.deepEqual(payload.readPolicy.lifecycleIncludedStatuses, ['active', 'stale']);
+    assert.deepEqual(payload.readPolicy.lifecycleExcludedStatuses, ['proposal', 'rejected', 'superseded', 'tombstoned']);
+    assert.equal(payload.readPolicy.recentHiddenByLifecycleCount, 3);
+    assert.equal(payload.readPolicy.recentStaleResultCount, 1);
+    assert.equal(payload.readPolicy.lifecycleColumnAvailable, true);
+    assert.equal(payload.readPolicy.scopeWorkspacePresent, true);
+    assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
+    assert.equal(payload.readPolicy.noProvider, true);
+    assert.equal(payload.readPolicy.mutated, false);
+    assert.equal(payload.readPolicy.migrationApplied, false);
     assert.equal(payload.governance.status, 'warn');
     assertKeySet(payload.governance, [
       'counts',
       'hints',
       'message',
       'paths',
+      'readPolicy',
       'retention',
       'reviewLevel',
       'sourceStatus',
@@ -354,6 +408,7 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       'totalRecords'
     ], 'http-observe governance counts');
     assert.equal(payload.governance.reviewLevel, 'needs-review');
+    assert.equal(payload.governance.readPolicy.rawWorkspaceIdExposed, false);
     assert.equal(payload.governance.counts.proposalCount, 1);
     assert.equal(payload.governance.counts.tombstonedCount, 1);
     assert.equal(payload.governance.counts.supersededCount, 1);
@@ -362,6 +417,7 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     assert.equal(payload.governance.counts.stale90d, 1);
     assert.ok(Array.isArray(payload.governance.hints));
     assert.equal(payload.audits.recall.rawWorkspaceId, undefined);
+    assert.equal(JSON.stringify(payload).includes('workspace_id'), false);
   } finally {
     await server.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });
@@ -389,6 +445,7 @@ test('http-observe CLI should fail when health is unavailable', async () => {
     assert.equal(payload.summary.status, 'error');
     assert.equal(payload.health.status, 'error');
     assert.match(payload.summary.hints[0], /start:http:ensure/);
+    assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }

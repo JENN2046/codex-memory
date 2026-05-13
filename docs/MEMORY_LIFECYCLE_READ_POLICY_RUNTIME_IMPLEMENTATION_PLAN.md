@@ -1,6 +1,6 @@
 # Memory Lifecycle Read Policy Runtime Implementation Plan
 
-更新时间：2026-05-13
+更新时间：2026-05-14
 
 本文最初是 `P11.6-lifecycle-read-policy-runtime-flag-implementation-planning` 的规划事实源。
 `P11.8-lifecycle-read-policy-runtime-flag-implementation` 已按该边界落地默认关闭的
@@ -270,6 +270,31 @@ Current `gate:ci` JSON field:
 - `checks.lifecyclePolicy.detail.staleResultCount`
 - `checks.lifecyclePolicy.detail.auditSummaryShapePresent`
 - `checks.lifecyclePolicy.detail.rawWorkspaceIdExposed`
+
+### P11.10 Observability Lifecycle Read-Policy Summary
+
+Status: implemented as reporting-only observability surface.
+
+Goal:
+
+- Surface lifecycle/read-policy state in `dashboard`, `observe:http`, and `governance:report`.
+- Read only config flags and recent recall audit summary fields.
+- Show enabled flags, include/exclude status sets, hidden/stale counts, lifecycle column availability, and workspace-scope presence as low-risk booleans/counts.
+- Keep `rawWorkspaceIdExposed=false`.
+- Do not change `search_memory` runtime behavior.
+- Do not add MCP public tools.
+- Do not run SQLite migration or `ALTER TABLE`.
+
+Current JSON surfaces:
+
+- `dashboard.readPolicy`
+- `dashboard.audits.readPolicy`
+- `observe:http.readPolicy`
+- `observe:http.summary.readPolicyStatus`
+- `governance:report.readPolicy`
+- `governance:report.review.readPolicy`
+
+If no recent read-policy audit exists, `status=unavailable` is a reporting state only and does not imply runtime failure.
 
 ### P12 Controlled Mutation Tools
 

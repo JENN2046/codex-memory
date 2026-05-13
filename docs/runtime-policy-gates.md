@@ -1,6 +1,6 @@
 # Runtime Policy Gates
 
-更新时间：2026-05-13
+更新时间：2026-05-14
 
 本页记录 runtime policy gate 的安全开关、默认行为、验证入口和 CI-safe policy summary 边界。
 
@@ -168,6 +168,34 @@ JSON 重点字段：
 - `checks.lifecyclePolicy.detail.auditSummaryShapePresent`
 - `checks.lifecyclePolicy.detail.rawWorkspaceIdExposed`
 
+## Observability Lifecycle Read-Policy Summary
+
+`dashboard`、`observe:http` 和 `governance:report` 现在也会输出 lifecycle/read-policy 低风险 summary。
+
+这些 observability surfaces 只读取 config flag 和 recent recall audit summary，不改变召回行为，不写 memory，不调用 provider，不执行 SQLite migration。
+
+当前 summary 字段：
+
+- `lifecyclePolicyEnabled`
+- `softReadPolicyEnabled`
+- `lifecycleIncludedStatuses=["active","stale"]`
+- `lifecycleExcludedStatuses=["proposal","rejected","superseded","tombstoned"]`
+- `recentHiddenByLifecycleCount`
+- `recentStaleResultCount`
+- `lifecycleColumnAvailable`
+- `scopeWorkspacePresent`
+- `rawWorkspaceIdExposed=false`
+- `noProvider=true`
+- `mutated=false`
+- `migrationApplied=false`
+
+边界：
+
+- `status=unavailable` 只表示最近 recall audit 中没有 read-policy summary，不触发 runtime fallback 或写入。
+- 输出不包含 raw `workspace_id`。
+- `scopeWorkspacePresent` 只表示是否出现 workspace scope signal，不暴露实际 workspace id。
+- `governance:report` 将该 summary 放在 `readPolicy` 与 `review.readPolicy`；`dashboard` / `observe:http` 会在 JSON 和 text 输出中显示。
+
 ## Recommended Validation
 
 runtime policy gate 文档与 CI-safe summary 变更建议验证：
@@ -175,8 +203,14 @@ runtime policy gate 文档与 CI-safe summary 变更建议验证：
 ```powershell
 node --test tests\gate-ci-cli.test.js
 node --test tests\lifecycle-read-policy-runtime-fixture.test.js
+node --test tests\dashboard-cli.test.js
+node --test tests\http-observe-cli.test.js
+node --test tests\governance-report-cli.test.js
 npm run gate:ci
 npm run gate:ci -- --json
+npm run dashboard -- --json
+npm run observe:http -- --json
+npm run governance:report -- --json
 npm test
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs

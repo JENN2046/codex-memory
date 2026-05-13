@@ -6,7 +6,11 @@ const path = require('node:path');
 
 const { createConfig } = require('../config/createConfig');
 const { AuditLogStore } = require('../storage/AuditLogStore');
-const { collectReport: collectGovernanceReport, buildGovernanceSurface } = require('./governance-report');
+const {
+  collectReport: collectGovernanceReport,
+  buildGovernanceSurface,
+  buildReadPolicySurface
+} = require('./governance-report');
 
 function parseArgs(argv = []) {
   const options = {
@@ -199,6 +203,10 @@ function incrementBreakdown(map, key) {
   map[key] = (map[key] || 0) + 1;
 }
 
+function isSafeScopeDimension(dimension) {
+  return typeof dimension === 'string' && dimension !== 'workspace_id';
+}
+
 function summarizeRecallAudit(entries = []) {
   const recallTypeBreakdown = {};
   let lastRecallAt = null;
@@ -231,7 +239,7 @@ function summarizeRecallAudit(entries = []) {
     }
     incrementBreakdown(scoped.scopeModeBreakdown, typeof entry.scopeMode === 'string' ? entry.scopeMode : 'unknown');
     for (const dimension of Array.isArray(entry.scopeDimensions) ? entry.scopeDimensions : []) {
-      incrementBreakdown(scoped.scopeDimensionBreakdown, typeof dimension === 'string' ? dimension : null);
+      incrementBreakdown(scoped.scopeDimensionBreakdown, isSafeScopeDimension(dimension) ? dimension : null);
     }
     incrementBreakdown(scoped.projectBreakdown, typeof entry.scopeProjectId === 'string' ? entry.scopeProjectId : null);
     incrementBreakdown(scoped.clientBreakdown, typeof entry.scopeClientId === 'string' ? entry.scopeClientId : null);
@@ -265,7 +273,7 @@ function collectGovernance() {
   };
 }
 
-function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, governance }) {
+function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, governance, readPolicy }) {
   const hints = [];
   let status = 'ok';
 
@@ -340,6 +348,14 @@ function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, g
     recallRecentCount: recallAudit.recentCount,
     scopedRecallCount: recallAudit.scopedRecallCount,
     strictScopedRecallCount: recallAudit.strictScopedRecallCount,
+    lifecyclePolicyEnabled: readPolicy.lifecyclePolicyEnabled,
+    softReadPolicyEnabled: readPolicy.softReadPolicyEnabled,
+    readPolicyStatus: readPolicy.status,
+    lifecyclePolicyAppliedCount: readPolicy.recentLifecyclePolicyAppliedCount,
+    hiddenByLifecycleCount: readPolicy.recentHiddenByLifecycleCount,
+    staleResultCount: readPolicy.recentStaleResultCount,
+    lifecycleColumnAvailable: readPolicy.lifecycleColumnAvailable,
+    rawWorkspaceIdExposed: readPolicy.rawWorkspaceIdExposed,
     governanceStatus: governance.status,
     governanceReviewLevel: governance.reviewLevel,
     governanceProposalCount: governance.counts.proposalCount,
@@ -397,6 +413,18 @@ function formatTextReport(report) {
   lines.push(`  scopeDimensionBreakdown: ${JSON.stringify(report.audits.recall.scopeDimensionBreakdown)}`);
   lines.push('');
 
+  lines.push('[read-policy]');
+  lines.push(`  status: ${report.readPolicy.status}`);
+  lines.push(`  lifecyclePolicyEnabled: ${report.readPolicy.lifecyclePolicyEnabled}`);
+  lines.push(`  softReadPolicyEnabled: ${report.readPolicy.softReadPolicyEnabled}`);
+  lines.push(`  lifecycleIncludedStatuses: ${JSON.stringify(report.readPolicy.lifecycleIncludedStatuses)}`);
+  lines.push(`  lifecycleExcludedStatuses: ${JSON.stringify(report.readPolicy.lifecycleExcludedStatuses)}`);
+  lines.push(`  recentHiddenByLifecycleCount: ${report.readPolicy.recentHiddenByLifecycleCount}`);
+  lines.push(`  recentStaleResultCount: ${report.readPolicy.recentStaleResultCount}`);
+  lines.push(`  lifecycleColumnAvailable: ${report.readPolicy.lifecycleColumnAvailable ?? 'unavailable'}`);
+  lines.push(`  rawWorkspaceIdExposed: ${report.readPolicy.rawWorkspaceIdExposed}`);
+  lines.push('');
+
   lines.push('[governance]');
   lines.push(`  status: ${report.governance.status}`);
   lines.push(`  reviewLevel: ${report.governance.reviewLevel}`);
@@ -449,6 +477,10 @@ async function main() {
     ...summarizeRecallAudit(recallEntries)
   };
   const governance = collectGovernance();
+  const readPolicy = buildReadPolicySurface({
+    config,
+    recallEntries
+  });
 
   const summary = buildSummary({
     health,
@@ -456,7 +488,8 @@ async function main() {
     watchdogLog,
     writeAudit,
     recallAudit,
-    governance
+    governance,
+    readPolicy
   });
 
   const report = {
@@ -474,6 +507,7 @@ async function main() {
       watchdog: watchdogLog
     },
     governance,
+    readPolicy,
     audits: {
       write: writeAudit,
       recall: recallAudit
