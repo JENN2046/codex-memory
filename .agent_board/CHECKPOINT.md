@@ -10,7 +10,7 @@ memory-governance / lifecycle-sqlite-dry-run-planning
 
 ## Current Status
 
-当前是 A1/A2 docs/tests-design only。P11.1 lifecycle fixture schema tests 已完成并本地提交，未 push。P11.2 本轮已新增 SQLite dry-run planning 文档和短入口同步，不改 runtime，不改 tests，不新增 MCP tools，不做 SQLite migration。
+当前是 A1/A2 docs/tests-design only。P11.1 lifecycle fixture schema tests 已完成并本地提交，未 push。P11.2 本轮已新增 SQLite dry-run planning 文档和短入口同步，并已创建本地提交 `2420010 docs: plan lifecycle sqlite dry run`；不改 runtime，不改 tests，不新增 MCP tools，不做 SQLite migration。
 
 ## Completed Work In This Batch
 
@@ -61,4 +61,4 @@ memory-governance / lifecycle-sqlite-dry-run-planning
 
 ## Next Safe Action
 
-Inspect final diff scope, create guarded local commit if clean, then stop without push. Next recommended task: `P11.3-lifecycle-sqlite-dry-run-cli-fixture-tests`.
+Commit this board-only closeout state, then stop without push. Next recommended task: `P11.3-lifecycle-sqlite-dry-run-cli-fixture-tests`.
