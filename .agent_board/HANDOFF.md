@@ -9,7 +9,7 @@ Continue P10.1-runtime-gate-docs-ci-policy-preflight in `A:\codex-memory`.
 - Workspace: A:\codex-memory
 - Branch: main
 - Remote boundary: no push / tag / release / deploy without explicit authorization
-- Current local state: `main` is ahead of `origin/main` with local P10 runtime gate, roadmap registration, and P10.1 changes
+- Current local state: `main` is ahead of `origin/main` with local P10 runtime gate, roadmap registration, and P10.1 primary commit `ce11fd4`.
 
 ## Current Area
 
@@ -67,4 +67,4 @@ memory-policy-hardening / docs-ci-preflight
 
 ## Next Safe Step
 
-Create a guarded local commit for P10.1 if final diff review remains scoped, then stop without push. Recommended next phase is `P11-memory-lifecycle-core-planning`.
+Commit this board-only closeout state, then stop without push. Recommended next phase is `P11-memory-lifecycle-core-planning`.

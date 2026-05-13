@@ -68,4 +68,4 @@ P10 runtime gate 已本地完成并提交，P10 roadmap source registration 也�
 
 ## Next Safe Action
 
-Inspect final diff for allowed-file scope, create a guarded local commit, then stop without push.
+Primary P10.1 commit created locally: `ce11fd4 docs: surface runtime policy gates in ci`. Commit this board-only closeout state, then stop without push.
