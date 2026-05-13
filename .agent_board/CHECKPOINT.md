@@ -110,4 +110,4 @@ P7-vcp-parity-hardening
 
 ## Next Safe Action
 
-Run final diff/staged review, create a guarded local S-006 commit, then wait for explicit push authorization. Next safe local task is `P4`: make `governance:report` a minimal read-only loop with proposal/tombstone/supersession/stale metrics, if still desired.
+S-006 implementation is committed locally as `eb1c53e test: lock ci gate schema`; push requires explicit authorization. Next safe local task is `P4`: make `governance:report` a minimal read-only loop with proposal/tombstone/supersession/stale metrics, if still desired.

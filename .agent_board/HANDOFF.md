@@ -59,9 +59,9 @@
 
 ## Next
 
-- P1: run final diff/staged review and create guarded local S-006 commit.
-- P2: push S-006 only after explicit remote authorization.
-- P3: next safe local candidate is `governance:report` minimal read-only loop for proposal/tombstone/supersession/stale metrics.
+- P1: push `eb1c53e` only after explicit remote authorization.
+- P2: next safe local candidate is `governance:report` minimal read-only loop for proposal/tombstone/supersession/stale metrics.
+- P3: if pushing, run post-push `git status --short` and a suitable gate before marking remote baseline current.
 - P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
