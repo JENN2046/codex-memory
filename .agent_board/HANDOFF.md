@@ -2,51 +2,43 @@
 
 ## Goal
 
-Resume after `P11.4-lifecycle-read-policy-runtime-flag-planning` in `A:\codex-memory`.
+Resume after `P11.5-lifecycle-read-policy-fixture-tests` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD before this planning batch: `720a852`
-- Remote state before this planning batch: local `main == origin/main == remote main`
+- Current local baseline before this batch: `7d914e2 docs: plan lifecycle read policy runtime flag`
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-memory-governance / lifecycle-read-policy-planning
+memory-governance / lifecycle-read-policy-fixture-tests
 
 ## Completed In Current Batch
 
-- Added [MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md).
-- Planned `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY=false` as default-off future flag.
-- Kept relationship with `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY=false` explicit.
-- Defined status visibility matrix:
-  - `active` and `stale` visible when policy is enabled.
-  - `proposal`, `rejected`, `superseded`, and `tombstoned` hidden by default.
-- Defined lifecycle policy ordering with project/workspace/client/visibility scope.
-- Defined future read audit fields:
-  - `readPolicyApplied`
-  - `lifecyclePolicyApplied`
-  - `lifecycleIncludedStatuses`
-  - `lifecycleExcludedStatuses`
-  - `hiddenByLifecycleCount`
-  - `staleResultCount`
-- Linked the new plan from lifecycle core and SQLite dry-run plans.
-- Updated backlog/status/board state.
+- Added [lifecycle-read-policy-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-read-policy-v1.json).
+- Added [lifecycle-read-policy-fixture.test.js](/A:/codex-memory/tests/lifecycle-read-policy-fixture.test.js).
+- Fixture locks `active/stale` as default include statuses.
+- Fixture locks `proposal/rejected/superseded/tombstoned` as default exclude statuses.
+- Fixture locks private visibility same-client / cross-client expectations.
+- Fixture locks read audit summary shape with `scopeWorkspacePresent`.
+- Test confirms raw `workspace_id` is not required in audit summary shape.
+- Updated lifecycle read-policy plan, backlog, status, and board state.
 
 ## Changed Files
 
+- `tests/fixtures/lifecycle-read-policy-v1.json`
+- `tests/lifecycle-read-policy-fixture.test.js`
 - `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`
-- `docs/MEMORY_LIFECYCLE_CORE_PLAN.md`
-- `docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
+- `node --test tests\lifecycle-read-policy-fixture.test.js`：passed `9/9`
+- `npm test`：passed `217/217`
 - `git diff --check`：passed with CRLF/LF normalization warning only for `.agent_board/TASK_QUEUE.md`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -55,22 +47,17 @@ memory-governance / lifecycle-read-policy-planning
 - Public MCP tools remain `record_memory` / `search_memory` / `memory_overview`.
 - This batch does not modify MCP tool definitions or add new tools.
 
-## HTTP Health
-
-- Not required for P11.4 docs/board-only planning.
-
 ## Audit / Recall Impact
 
 - No runtime audit or recall behavior changed.
 - `search_memory` default behavior is unchanged.
-- Lifecycle read policy is planning only; no filtering was implemented.
+- Lifecycle read policy remains fixture-only and is not connected to runtime.
 
 ## Remaining Risks
 
-- P11.5 fixture tests are needed before runtime implementation.
-- P11.6 optional runtime flag implementation must preserve default-off behavior.
-- Controlled mutation tools remain P12 future work and require separate approval.
+- P11.6 optional runtime flag implementation remains future work.
+- Runtime work must preserve default-off behavior and require targeted tests plus mainline validation.
 
 ## Next Safe Step
 
-Close out without push. Recommended next task: `P11.5-lifecycle-read-policy-fixture-tests`.
+Close out without push. Recommended next task: `P11.6-lifecycle-read-policy-runtime-flag-implementation-planning`.

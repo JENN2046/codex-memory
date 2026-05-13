@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "lifecycle-read-policy-v1",
+  "statuses": [
+    "active",
+    "stale",
+    "proposal",
+    "rejected",
+    "superseded",
+    "tombstoned"
+  ],
+  "defaultReadPolicy": {
+    "include": [
+      "active",
+      "stale"
+    ],
+    "exclude": [
+      "proposal",
+      "rejected",
+      "superseded",
+      "tombstoned"
+    ]
+  },
+  "visibilityRules": {
+    "private": {
+      "requiresSameClientId": true
+    }
+  },
+  "policyExamples": [
+    {
+      "id": "active-project-visible",
+      "status": "active",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "claude",
+      "expectedVisible": true
+    },
+    {
+      "id": "stale-project-visible",
+      "status": "stale",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "claude",
+      "expectedVisible": true
+    },
+    {
+      "id": "proposal-hidden",
+      "status": "proposal",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "codex",
+      "expectedVisible": false
+    },
+    {
+      "id": "private-cross-client-hidden",
+      "status": "active",
+      "visibility": "private",
+      "client_id": "claude",
+      "requestClientId": "codex",
+      "expectedVisible": false
+    },
+    {
+      "id": "private-same-client-visible",
+      "status": "active",
+      "visibility": "private",
+      "client_id": "codex",
+      "requestClientId": "codex",
+      "expectedVisible": true
+    }
+  ],
+  "auditSummary": {
+    "requiredFields": [
+      "readPolicyApplied",
+      "lifecyclePolicyApplied",
+      "lifecycleIncludedStatuses",
+      "lifecycleExcludedStatuses",
+      "hiddenByLifecycleCount",
+      "staleResultCount",
+      "scopeWorkspacePresent"
+    ],
+    "rawWorkspaceIdAllowed": false
+  }
+}

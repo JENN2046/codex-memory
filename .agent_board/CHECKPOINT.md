@@ -2,37 +2,36 @@
 
 ## Current Goal
 
-P11.4-lifecycle-read-policy-runtime-flag-planning：规划 lifecycle read policy runtime flag，明确默认关闭策略、status visibility、scope/visibility 关系、audit summary shape 和后续 P11.5/P11.6 验收路线。
+P11.5-lifecycle-read-policy-fixture-tests：用 fixture tests 锁住 lifecycle read-policy 的 include/exclude 规则、private visibility 规则和 audit summary shape。
 
 ## Current Area
 
-memory-governance / lifecycle-read-policy-planning
+memory-governance / lifecycle-read-policy-fixture-tests
 
 ## Current Status
 
-当前是 A1/A2 docs/tests-design planning。`main` 已 push 到 `origin/main`，local `main == origin/main == remote main`，HEAD 为 `720a852`。P11.3 lifecycle SQLite dry-run CLI 已进入远端主线。
+当前是 A1/A2 tests/docs only。P11.4 lifecycle read-policy runtime flag planning 已完成并本地提交 `7d914e2 docs: plan lifecycle read policy runtime flag`。`main...origin/main` 当前 ahead 1，push 未授权。
 
-本阶段只做 docs/board 规划，不改 runtime，不改 tests，不改 `package.json`，不新增 MCP public tools，不改 `search_memory` runtime 行为，不做 SQLite migration。
+本阶段只新增/更新测试、fixture、docs 和 board，不改 runtime，不改 `search_memory` 行为，不改 `package.json`，不新增 MCP public tools，不做 SQLite migration。
 
 ## Completed Work In This Batch
 
-- Added `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`.
-- Documented proposed flags:
-  - `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY`
-  - `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`
-- Recorded default-off policy for lifecycle read filtering.
-- Defined status visibility matrix for `active/stale/proposal/rejected/superseded/tombstoned`.
-- Defined lifecycle policy relationship with visibility/client scope.
-- Defined future read audit summary fields.
-- Updated lifecycle core and SQLite dry-run docs with links.
-- Updated next-phase plan, backlog, status, and board state.
+- Added `tests/fixtures/lifecycle-read-policy-v1.json`.
+- Added `tests/lifecycle-read-policy-fixture.test.js`.
+- Locked default include statuses: `active`, `stale`.
+- Locked default exclude statuses: `proposal`, `rejected`, `superseded`, `tombstoned`.
+- Locked private visibility behavior:
+  - cross-client private record is hidden.
+  - same-client private record remains visible.
+- Locked audit summary required fields, including `scopeWorkspacePresent`.
+- Asserted raw `workspace_id` is not part of audit summary required fields.
+- Updated `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`, `MAINTENANCE_BACKLOG.md`, `STATUS.md`, and board state.
 
 ## Changed Files
 
+- `tests/fixtures/lifecycle-read-policy-v1.json`
+- `tests/lifecycle-read-policy-fixture.test.js`
 - `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`
-- `docs/MEMORY_LIFECYCLE_CORE_PLAN.md`
-- `docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -43,12 +42,13 @@ memory-governance / lifecycle-read-policy-planning
 
 ## Validation Run
 
+- `node --test tests\lifecycle-read-policy-fixture.test.js`：passed `9/9`
+- `npm test`：passed `217/217`
 - `git diff --check`：passed with CRLF/LF normalization warning only for `.agent_board/TASK_QUEUE.md`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
 ## Validation Not Run
 
-- No `npm test`; this is docs/board-only planning.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
@@ -56,14 +56,14 @@ memory-governance / lifecycle-read-policy-planning
 
 ## Current Blockers
 
-- None for docs planning.
+- None for local fixture validation.
 
 ## Remaining Risks
 
-- Lifecycle read-policy runtime is not implemented yet.
-- P11.5 fixture tests are still needed before any runtime flag implementation.
-- P11.6 runtime implementation must prove default-off behavior before changing any read path.
+- Lifecycle read-policy runtime is still not implemented.
+- P11.6 should first plan optional runtime flag implementation before touching runtime.
+- Any future runtime implementation must prove default-off behavior and preserve MCP public tools.
 
 ## Next Safe Action
 
-Close out without push. Next recommended task: `P11.5-lifecycle-read-policy-fixture-tests`.
+Close out without push. Next recommended task: `P11.6-lifecycle-read-policy-runtime-flag-implementation-planning`.

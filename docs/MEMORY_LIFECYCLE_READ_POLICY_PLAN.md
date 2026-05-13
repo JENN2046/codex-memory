@@ -15,6 +15,11 @@
 - 不调用 provider。
 - 不 push / tag / release / deploy。
 
+P11.5 fixture test 入口：
+
+- Fixture: [tests/fixtures/lifecycle-read-policy-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-read-policy-v1.json)
+- Test: [tests/lifecycle-read-policy-fixture.test.js](/A:/codex-memory/tests/lifecycle-read-policy-fixture.test.js)
+
 ## Purpose
 
 Lifecycle read policy 的目标是让未来 `search_memory` 能够按 lifecycle status 过滤普通召回结果，避免 `proposal`、`rejected`、`superseded`、`tombstoned` 默认进入普通记忆召回。
@@ -141,7 +146,17 @@ Audit rules:
 - 覆盖 `active/stale` 默认可见。
 - 覆盖 `proposal/rejected/superseded/tombstoned` 默认隐藏。
 - 覆盖 stale result count 与 hidden-by-lifecycle count 的 expected shape。
+- 覆盖 private visibility same-client / cross-client 规则。
+- 覆盖 audit summary shape 必须包含 `scopeWorkspacePresent`，且不包含 raw `workspace_id`。
 - 不接入 runtime，不改 `search_memory`。
+
+验证命令：
+
+```powershell
+node --test tests\lifecycle-read-policy-fixture.test.js
+```
+
+该测试只读取 fixture，不接入 runtime，不读写真实 memory，不新增 MCP tools，不做 SQLite migration。
 
 ### P11.6 Optional Runtime Flag Implementation
 
