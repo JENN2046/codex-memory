@@ -9,7 +9,7 @@
 当前状态：
 
 - `gate:ci` 已实现：`npm run gate:ci`（`src/cli/gate-ci.js`）
-- compare 43/43 + rollback 43/43 + tests 116/116 + docs check
+- compare 43/43 + rollback 43/43 + query assertions 8/8 + CI-safe tests 171/171 + docs check
 - fixture-only，不依赖 HTTP MCP / provider / real config
 - 不修改 `.github/workflows`
 - 不替代 `gate:mainline`
@@ -71,6 +71,7 @@
 | MCP contract fixture tests | fixture-only | 不启动真实 HTTP daemon |
 | active-memory compare suite | standard suite fixture | 使用仓库内 suite，不访问外部服务 |
 | active-memory rollback suite | standard suite fixture | 只读 readiness |
+| query assertion suite | `benchmarks/real-query-suite/v1.json` | 检查 `caseCount/assertedCount/failedCount`，只读 fixture assertion |
 | docs command reference check | package script existence scan | 只检查已声明为当前命令的脚本 |
 
 暂不纳入默认第一版：
@@ -83,16 +84,16 @@
 | HTTP health | 依赖 daemon | 留给 `gate:mainline` |
 | provider smoke / benchmark | 可能访问外部 provider | 只能显式授权后本地运行 |
 
-## 未来命令形态
+## 当前命令形态
 
-未来可以新增：
+当前已实现：
 
 ```powershell
 npm run gate:ci
 npm run gate:ci -- --json
 ```
 
-注意：以上命令当前未实现。实现前不得把它写进 `.github/workflows`。
+注意：仍不得把它和 `.github/workflows` 修改混在同一批变更中。
 
 ## 输出草案
 
@@ -122,6 +123,13 @@ npm run gate:ci -- --json
       "status": "ok",
       "ready": 39,
       "total": 39
+    },
+    {
+      "name": "queries",
+      "status": "ok",
+      "caseCount": 8,
+      "assertedCount": 8,
+      "failedCount": 0
     }
   ]
 }
@@ -137,6 +145,7 @@ npm run gate:ci -- --json
 - JSON 输出 schema 固定
 - failure exit code 明确
 - README / VALIDATION 说明 `gate:ci` 和 `gate:mainline` 的区别
+- query assertion runner 必须继续保持 fixture-only，不生成伪 `hitRate` / `qualityScore`
 
 ## 禁止事项
 
@@ -166,10 +175,11 @@ npm run gate:ci -- --json
 - 文档明确第一版 fixture-only 边界
 - 文档明确 `gate:ci` 不能替代 `gate:mainline`
 
-未来实现完成时：
+当前实现完成时：
 
 - `npm run gate:ci` 本地可运行
 - `npm run gate:ci -- --json` 输出稳定 JSON
+- JSON 输出包含 `checks.queries.detail.caseCount/assertedCount/failedCount`
 - CI 可运行且不依赖 HTTP daemon
 - README / VALIDATION 已写清 gate 分工
 - `npm run gate:mainline` 仍作为真实本地主线 gate 保留

@@ -4,7 +4,7 @@
 
 当前本地工作在 `P7` query quality / VCP parity hardening 线。远端 `main` 已同步到 `055d749 docs: clean query suite handoff state`；PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次 `S-004` 把 `real-query-suite` 从 5 条 fixture assertion case 扩到 8 条，覆盖 `benchmarks/default-dataset.json` 的全部 query；当前 `placeholderCount=0`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
+最新本地批次 `S-005` 把 query assertion runner 接入 `gate:ci`：`gate:ci -- --json` 现在包含 `checks.queries.detail.caseCount/assertedCount/passedCount/failedCount`，当前 query assertions 为 `8/8`。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
 
 ## Workspace / Branch
 
@@ -20,7 +20,7 @@
 - compare: 43/43 matched, 0/0 core/extended
 - rollback: 43/43 rollback-ready, 0/0
 - npm test: 184/184
-- gate:ci: 119/119 (fixture-only)
+- gate:ci: compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171 (fixture-only)
 - gate:mainline:strict: ok (`health` + `contract` + `test` + `compare` + `rollback` 全绿)
 - scope acceptance: ok for `project_id` / `workspace_id` / `client_id` / `visibility`
 - profile: bge-m3-local__1024__v1, vectors 205, ready
@@ -52,12 +52,15 @@
 - Targeted query tests passed `13/13`; full `npm test` passed `183/183`.
 - S-004 added q5/q6/q7 fixture cases for `rerank_providers`, `embedding_providers`, and `diary_vectors`; provider smoke is now aligned as `rq-008`.
 - Default query suite now covers all 8 default dataset queries; targeted query tests passed `14/14`; full `npm test` passed `184/184`.
+- S-005 added `checks.queries` to `gate:ci`, reusing the same fixture assertion runner and exposing `caseCount/assertedCount/passedCount/failedCount` in JSON.
+- `node --test tests\gate-ci-cli.test.js` passed `2/2`; `npm run gate:ci -- --json` passed with query assertions `8/8` and CI-safe tests `171/171`; `npm test` passed `184/184`.
 
 ## Next
 
-- P1: commit and push S-004 to `origin/main` as explicitly authorized by the user.
-- P2: wire the query assertion runner into a broader fixture-only gate.
-- P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
+- P1: run final diff/staged review and create guarded local S-005 commit.
+- P2: push S-005 only after explicit remote authorization.
+- P3: document `gate:ci` JSON schema in README/VALIDATION or add a schema snapshot test if needed.
+- P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
 

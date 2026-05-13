@@ -5,7 +5,7 @@
 ## 当前结论
 
 - `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
-- 当前 `main` 最新已验证基线：health `200`、compare `43/43 matched (0/0)`、rollback `43/43 rollback-ready (0/0)`、`npm test` `184/184`、`gate:mainline:strict` `ok`、`scope:acceptance` `ok`。PR #2 已按 superseded 说明关闭且未合并，远端分支 `codex/p1-vcp-memory-core-100-roadmap` 仍保留用于追溯。`scope:backfill:dry-run` 当前显示 `450` 条记录中 `442` 条缺少 `workspace_id`，`mutated=false`，不自动回填；`real-query-suite` 已升级为完整默认 dataset fixture assertion baseline：`caseCount=8`、`placeholderCount=0`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`。维护期验收快照：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)。
+- 当前 `main` 最新已验证基线：health `200`、compare `43/43 matched (0/0)`、rollback `43/43 rollback-ready (0/0)`、`npm test` `184/184`、`gate:mainline:strict` `ok`、`scope:acceptance` `ok`、`gate:ci` fixture-only `ok`。PR #2 已按 superseded 说明关闭且未合并，远端分支 `codex/p1-vcp-memory-core-100-roadmap` 仍保留用于追溯。`scope:backfill:dry-run` 当前显示 `450` 条记录中 `442` 条缺少 `workspace_id`，`mutated=false`，不自动回填；`real-query-suite` 已升级为完整默认 dataset fixture assertion baseline：`caseCount=8`、`placeholderCount=0`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`，并已接入 `gate:ci` 的 `checks.queries.detail`。维护期验收快照：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -67,6 +67,7 @@
 
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
+- `gate:ci` 现在包含 `queries` fixture-only check，JSON 输出会暴露 `caseCount/assertedCount/passedCount/failedCount`。
 - `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：

@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawn, spawnSync } = require('node:child_process');
+const { DEFAULT_SUITE, runSuiteReport } = require('./real-query-suite-core');
 
 function parseArgs(argv = []) {
   const options = { json: false };
@@ -78,6 +79,27 @@ async function runRollback() {
       readyCaseCount: s.readyCaseCount || 0,
       coreMismatchCountTotal: s.coreMismatchCountTotal ?? -1,
       extendedMismatchCountTotal: s.extendedMismatchCountTotal ?? -1
+    }
+  };
+}
+
+function runQueries() {
+  const report = runSuiteReport(DEFAULT_SUITE);
+  const ok = report.status === 'ok' && report.failedCount === 0;
+  return {
+    status: ok ? 'ok' : 'error',
+    message: ok
+      ? `${report.passedCount}/${report.assertedCount} query assertions passed`
+      : `${report.failedCount || 0}/${report.assertedCount || report.caseCount || 0} query assertions failed`,
+    detail: {
+      caseCount: report.caseCount || 0,
+      validCount: report.validCount || 0,
+      placeholderCount: report.placeholderCount || 0,
+      fixtureOnlyCount: report.fixtureOnlyCount || 0,
+      realCount: report.realCount || 0,
+      assertedCount: report.assertedCount || 0,
+      passedCount: report.passedCount || 0,
+      failedCount: report.failedCount || 0
     }
   };
 }
@@ -189,10 +211,11 @@ async function main() {
 
   const compare = await runCompare();
   const rollback = await runRollback();
+  const queries = runQueries();
   const tests = await runTests();
   const docs = runDocsCheck();
 
-  const checks = { compare, rollback, tests, docs };
+  const checks = { compare, rollback, queries, tests, docs };
   const failedChecks = Object.entries(checks)
     .filter(([, v]) => v.status === 'error')
     .map(([k]) => k);

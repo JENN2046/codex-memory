@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-P7 — S-004：补齐 `real-query-suite` 的 q5/q6/q7 fixture cases，使默认 query suite 覆盖全部默认 dataset queries，并保留无 provider / 无真实数据写入边界。
+P7 — S-005：把 query assertion runner 接入更高层 `gate:ci` fixture-only gate，让 `caseCount/assertedCount/failedCount` 成为常态门禁输出。
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P7-vcp-parity-hardening
 
 ## Current Status
 
-本轮 `S-004` 在本地把 `real-query-suite` 从 5 条 fixture assertion case 扩到 8 条，覆盖 `benchmarks/default-dataset.json` 的全部 query。当前默认 suite 为 `caseCount=8`、`placeholderCount=0`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`。当前不调用 provider，不读取/写入真实 memory DB。
+本轮 `S-005` 在本地把 `real-query-suite-core` 的 assertion report 接入 `gate:ci`。当前 `gate:ci -- --json` 输出 `checks.queries.detail.caseCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`，并继续保持 fixture-only、no daemon、no provider 边界。当前不调用 provider，不读取/写入真实 memory DB。
 
 ## Completed Work
 
@@ -37,6 +37,9 @@ P7-vcp-parity-hardening
 - 创建本地 guarded commit `d06a3ca feat: assert real query fixture expectations`。
 - 补齐 q5/q6/q7 对应的 `rerank_providers` / `embedding_providers` / `diary_vectors` fixture cases，并把 provider smoke case 对齐为 `rq-008`。
 - 新增默认 suite 覆盖全部默认 dataset queries 的回归测试，避免后续漏 case。
+- `gate:ci` 新增 `queries` check，复用 `real-query-suite-core` 的 `runSuiteReport(DEFAULT_SUITE)`。
+- `gate:ci` JSON 输出现在包含 `checks.queries.detail.caseCount/assertedCount/passedCount/failedCount`。
+- `gate:ci` 文本输出现在包含 `queries` 行和 `8/8 query assertions passed`。
 
 ## Changed Files
 
@@ -44,8 +47,11 @@ P7-vcp-parity-hardening
 - `src/cli/real-query-suite-core.js`
 - `src/cli/query-quality-report.js`
 - `src/cli/real-query-suite.js`
+- `src/cli/gate-ci.js`
+- `tests/gate-ci-cli.test.js`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
+- `GATE_CI_FIXTURE_ONLY_DESIGN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
 - `.agent_board/*`
@@ -70,6 +76,9 @@ P7-vcp-parity-hardening
 - `npm run real-query-suite -- --json` -> ok; 8 valid, 0 placeholder, 8 fixture-only, 8 real, 8 asserted, 8 passed, 0 failed
 - `npm run query:quality -- --json --dry-run` -> ok; 8 runnable, 0 placeholder, 8 fixture-only, 8 real, 8 asserted, 8 passed, 0 failed, `mutated=false`
 - `npm test` -> 184/184 passed
+- `node --test tests\gate-ci-cli.test.js` -> 2/2 passed
+- `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
+- `npm test` -> 184/184 passed
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
@@ -78,7 +87,7 @@ P7-vcp-parity-hardening
 - provider smoke / benchmark not run; this batch is fixture-only and must not call providers
 - no tag, release, deploy, branch deletion, or PR merge
 - no full remote branch merge; stale state docs intentionally not imported
-- user explicitly authorized local commit and push for S-004; no provider/DB/production write authorized
+- no provider/DB/production write authorized
 
 ## Current Blockers
 
@@ -86,11 +95,11 @@ P7-vcp-parity-hardening
 
 ## Remaining Risks
 
-- This S-004 push is explicitly authorized by the user; future pushes remain separately authorized only.
+- Future push remains separately authorized only.
 - Any true `workspace_id` backfill remains blocked until a reviewed mapping proposal and explicit data-write approval exist.
 - This batch intentionally leaves remote stale docs behind; if later merging that branch, exclude those files again.
 - The current query suite is still fixture-only; true provider/retrieval quality scoring remains separate and must not be implied from fixture assertions.
 
 ## Next Safe Action
 
-Create a guarded local S-004 commit, push it to `origin/main`, run a post-push status/gate check, then plan the next safe local task: wiring the query assertion runner into a broader fixture-only gate.
+Run final diff/staged review, create a guarded local S-005 commit, then wait for explicit push authorization. Next safe local task is documenting the `gate:ci` JSON schema in README/VALIDATION or adding a schema snapshot test if needed.

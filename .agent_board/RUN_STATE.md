@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P7 / S-004 real-query-suite default dataset coverage |
+| Current task | P7 / S-005 query assertions in gate:ci |
 | Current area | P7-vcp-parity-hardening |
-| Last action | 已补齐 q5/q6/q7 fixture cases，并新增默认 suite 覆盖全部 `benchmarks/default-dataset.json` queries 的回归测试。 |
-| Last validation | targeted query tests passed `14/14`; `npm run real-query-suite -- --json` reports `caseCount=8`, `assertedCount=8`, `passedCount=8`, `failedCount=0`; `npm run query:quality -- --json --dry-run` reports the same and `mutated=false`; `npm test` passed `184/184`. |
-| Worktree summary | local S-004 source/test/docs/board changes pending guarded commit; no provider calls, no SQLite mutation. |
+| Last action | 已将 query assertion runner 接入 `gate:ci`，新增 `checks.queries.detail.caseCount/assertedCount/passedCount/failedCount` 输出，并更新 gate-ci 回归测试。 |
+| Last validation | `node --test tests\gate-ci-cli.test.js` passed `2/2`; `npm run gate:ci -- --json` passed with query assertions `8/8` and CI-safe tests `171/171`; `npm test` passed `184/184`. |
+| Worktree summary | local S-005 gate/test/docs/board changes pending final validation and guarded commit; no provider calls, no SQLite mutation. |
 | Mainline assumption | HTTP MCP 7605 is reachable |
 | Active-memory suite status | strict gate compare `43/43 matched`, rollback `43/43 rollback-ready`, `coreMismatchCountTotal=0`, `extendedMismatchCountTotal=0` |
 | npm test | `184/184` |
 | Profile health | `ready` — vectors 205, 822 embedding cache, 0 legacy |
-| Guarded auto-commit allowed | eligible after final diff/staged review; user explicitly authorized commit and push for S-004 |
-| Last checkpoint | `.agent_board/CHECKPOINT.md` current S-004 checkpoint |
-| Next planned action | Run final diff checks, create guarded local commit, push to `origin/main`, then run post-push status/gate check. |
+| Guarded auto-commit allowed | eligible after final diff/staged review |
+| Last checkpoint | `.agent_board/CHECKPOINT.md` current S-005 checkpoint |
+| Next planned action | Run `git diff --check`, staged review, then create guarded local commit. Push requires explicit authorization. |
 
 ## Notes
 
