@@ -4,13 +4,13 @@
 
 当前本地工作在 `P7` query quality / VCP parity hardening 线。远端 `main` 已同步到 `055d749 docs: clean query suite handoff state`；PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次把 `real-query-suite` 从 fixture-only baseline 推进到 fixture assertion baseline：5 条 case 全部来源于 `benchmarks/default-dataset.json`，`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`、`assertedCount=5`、`passedCount=5`、`failedCount=0`。本地提交为 `d06a3ca feat: assert real query fixture expectations`，尚未 push。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
+最新本地批次 `S-004` 把 `real-query-suite` 从 5 条 fixture assertion case 扩到 8 条，覆盖 `benchmarks/default-dataset.json` 的全部 query；当前 `placeholderCount=0`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: `d06a3ca feat: assert real query fixture expectations`; verify exact tip with `git log --oneline --decorate -n 5`
+- HEAD: verify exact tip with `git log --oneline --decorate -n 5`
 - Remote baseline: current `origin/main` tip for this maintenance line
 - Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
@@ -19,7 +19,7 @@
 
 - compare: 43/43 matched, 0/0 core/extended
 - rollback: 43/43 rollback-ready, 0/0
-- npm test: 183/183
+- npm test: 184/184
 - gate:ci: 119/119 (fixture-only)
 - gate:mainline:strict: ok (`health` + `contract` + `test` + `compare` + `rollback` 全绿)
 - scope acceptance: ok for `project_id` / `workspace_id` / `client_id` / `visibility`
@@ -50,11 +50,13 @@
 - Added shared fixture assertion runner for `mustContain` / `mustNotContain` and reused it from `real-query-suite` and `query:quality`.
 - Default query suite now reports `assertedCount=5`, `passedCount=5`, `failedCount=0`; synthetic drift tests confirm bad fixtures exit non-zero with `assertionFailures`.
 - Targeted query tests passed `13/13`; full `npm test` passed `183/183`.
+- S-004 added q5/q6/q7 fixture cases for `rerank_providers`, `embedding_providers`, and `diary_vectors`; provider smoke is now aligned as `rq-008`.
+- Default query suite now covers all 8 default dataset queries; targeted query tests passed `14/14`; full `npm test` passed `184/184`.
 
 ## Next
 
-- P1: push `d06a3ca` only with explicit remote authorization.
-- P2: expand query-quality fixture coverage to remaining default dataset queries, or wire assertion runner into a broader fixture-only gate.
+- P1: commit and push S-004 to `origin/main` as explicitly authorized by the user.
+- P2: wire the query assertion runner into a broader fixture-only gate.
 - P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required

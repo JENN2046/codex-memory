@@ -78,6 +78,60 @@
     {
       "id": "rq-005",
       "area": "provider-profile",
+      "query": "Which providers have dedicated reranking request formats in this project?",
+      "target": "rerank_providers",
+      "expected": {
+        "mustContain": [
+          "Provider-aware rerank adapters",
+          "Cohere",
+          "request payloads"
+        ],
+        "mustNotContain": [
+          "memory overview"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#rerank_providers",
+      "notes": "fixture-only query derived from sanitized benchmark document rerank_providers; no provider call is made"
+    },
+    {
+      "id": "rq-006",
+      "area": "provider-profile",
+      "query": "Which remote services are supported for real embedding generation?",
+      "target": "embedding_providers",
+      "expected": {
+        "mustContain": [
+          "External embedding adapters",
+          "Cohere",
+          "local hash embeddings"
+        ],
+        "mustNotContain": [
+          "memory overview"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#embedding_providers",
+      "notes": "fixture-only query derived from sanitized benchmark document embedding_providers; no provider call is made"
+    },
+    {
+      "id": "rq-007",
+      "area": "recall",
+      "query": "What adds notebook-level semantic bias during candidate generation?",
+      "target": "diary_vectors",
+      "expected": {
+        "mustContain": [
+          "Diary enhanced vectors",
+          "notebook-level semantic routing bias",
+          "candidate scoring"
+        ],
+        "mustNotContain": [
+          "provider smoke"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#diary_vectors",
+      "notes": "fixture-only query derived from sanitized benchmark document diary_vectors"
+    },
+    {
+      "id": "rq-008",
+      "area": "provider-profile",
       "query": "Which command checks remote provider connectivity and prints a report?",
       "target": "provider_smoke",
       "expected": {

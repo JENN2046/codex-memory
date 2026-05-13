@@ -120,3 +120,14 @@ test('real-query-suite default cases should use non-empty expectation arrays', (
     assert.ok(Array.isArray(caseItem.expected.mustNotContain), `${caseItem.id} mustNotContain should be an array`);
   }
 });
+
+test('real-query-suite default cases should cover every default dataset query', () => {
+  const suite = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'benchmarks', 'real-query-suite', 'v1.json'), 'utf8'));
+  const dataset = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'benchmarks', 'default-dataset.json'), 'utf8'));
+  const suiteQueries = new Set(suite.cases.map((caseItem) => caseItem.query));
+  const datasetQueries = dataset.queries.map((queryItem) => queryItem.query);
+  assert.equal(suite.cases.length, datasetQueries.length);
+  for (const query of datasetQueries) {
+    assert.ok(suiteQueries.has(query), `missing default dataset query: ${query}`);
+  }
+});

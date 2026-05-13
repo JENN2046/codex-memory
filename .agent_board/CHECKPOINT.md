@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-P7 — 将 `real-query-suite` 从 fixture-only baseline 推进到真实 fixture assertion baseline，并保留无 provider / 无真实数据写入边界。
+P7 — S-004：补齐 `real-query-suite` 的 q5/q6/q7 fixture cases，使默认 query suite 覆盖全部默认 dataset queries，并保留无 provider / 无真实数据写入边界。
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P7-vcp-parity-hardening
 
 ## Current Status
 
-远端 `main` 当前同步到 `055d749 docs: clean query suite handoff state`。本轮在本地实现共享 fixture assertion runner，让 `real-query-suite` 和 `query:quality` 基于 `benchmarks/default-dataset.json` 真实校验 `expected.mustContain` / `expected.mustNotContain`。当前默认 suite 为 5 条脱敏 fixture-only case，`assertedCount=5`、`passedCount=5`、`failedCount=0`。本地提交已创建为 `d06a3ca feat: assert real query fixture expectations`，尚未 push。当前不调用 provider，不读取/写入真实 memory DB。
+本轮 `S-004` 在本地把 `real-query-suite` 从 5 条 fixture assertion case 扩到 8 条，覆盖 `benchmarks/default-dataset.json` 的全部 query。当前默认 suite 为 `caseCount=8`、`placeholderCount=0`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`。当前不调用 provider，不读取/写入真实 memory DB。
 
 ## Completed Work
 
@@ -35,6 +35,8 @@ P7-vcp-parity-hardening
 - `real-query-suite` / `query:quality` 复用同一只读 runner，输出 `assertedCount` / `passedCount` / `failedCount`，fixture drift 时以 `status=failed` 非零退出。
 - 补充坏 fixture 回归测试，确认缺失 `mustContain` 和命中 `mustNotContain` 都会进入 `assertionFailures`。
 - 创建本地 guarded commit `d06a3ca feat: assert real query fixture expectations`。
+- 补齐 q5/q6/q7 对应的 `rerank_providers` / `embedding_providers` / `diary_vectors` fixture cases，并把 provider smoke case 对齐为 `rq-008`。
+- 新增默认 suite 覆盖全部默认 dataset queries 的回归测试，避免后续漏 case。
 
 ## Changed Files
 
@@ -64,6 +66,10 @@ P7-vcp-parity-hardening
 - `npm run real-query-suite -- --json` -> ok; 5 valid, 0 placeholder, 5 fixture-only, 5 real, 5 asserted, 5 passed, 0 failed
 - `npm run query:quality -- --json --dry-run` -> ok; 5 runnable, 0 placeholder, 5 fixture-only, 5 real, 5 asserted, 5 passed, 0 failed, `mutated=false`
 - `npm test` -> 183/183 passed
+- `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js` -> 14/14 passed
+- `npm run real-query-suite -- --json` -> ok; 8 valid, 0 placeholder, 8 fixture-only, 8 real, 8 asserted, 8 passed, 0 failed
+- `npm run query:quality -- --json --dry-run` -> ok; 8 runnable, 0 placeholder, 8 fixture-only, 8 real, 8 asserted, 8 passed, 0 failed, `mutated=false`
+- `npm test` -> 184/184 passed
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
@@ -72,7 +78,7 @@ P7-vcp-parity-hardening
 - provider smoke / benchmark not run; this batch is fixture-only and must not call providers
 - no tag, release, deploy, branch deletion, or PR merge
 - no full remote branch merge; stale state docs intentionally not imported
-- no push after local assertion-runner work; remote write still requires explicit approval
+- user explicitly authorized local commit and push for S-004; no provider/DB/production write authorized
 
 ## Current Blockers
 
@@ -80,11 +86,11 @@ P7-vcp-parity-hardening
 
 ## Remaining Risks
 
-- Future push remains separately authorized only.
+- This S-004 push is explicitly authorized by the user; future pushes remain separately authorized only.
 - Any true `workspace_id` backfill remains blocked until a reviewed mapping proposal and explicit data-write approval exist.
 - This batch intentionally leaves remote stale docs behind; if later merging that branch, exclude those files again.
-- The current query suite still uses 5 of 8 default dataset queries; remaining fixture expansion can be done as the next local improvement.
+- The current query suite is still fixture-only; true provider/retrieval quality scoring remains separate and must not be implied from fixture assertions.
 
 ## Next Safe Action
 
-Wait for explicit authorization before pushing `d06a3ca`. Next safe local implementation task is expanding fixture assertions to the remaining default dataset queries or wiring this runner into a broader fixture-only gate.
+Create a guarded local S-004 commit, push it to `origin/main`, run a post-push status/gate check, then plan the next safe local task: wiring the query assertion runner into a broader fixture-only gate.

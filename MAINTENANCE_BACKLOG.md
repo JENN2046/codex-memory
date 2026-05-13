@@ -23,10 +23,10 @@
 
 ## 当前基线
 
-- 当前远端 `main`：`055d749`（`docs: clean query suite handoff state`）；本地最新提交：`d06a3ca`（`feat: assert real query fixture expectations`），尚未 push
+- 当前 `main`：S-004 query-quality fixture coverage batch 已验证完成
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：`119/119`（fixture-only）、gate:mainline：health `200`、compare `43/43`、rollback `43/43`
-- 标准 suite：`43/43 matched (0/0)`、npm test：`183/183`、`scope:acceptance`：`ok`
+- 标准 suite：`43/43 matched (0/0)`、npm test：`184/184`、`scope:acceptance`：`ok`
 - profile health：`ready`（vectors=205，embedding cache=822，legacy=0）
 - 维护期验收：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)
 - 全部 Phase A-J + 维护期 M-001~M-013 + 8-task batch 已完成
@@ -62,12 +62,13 @@
 | S-001 | client-scope | A0 | done | 建立 `workspace_id` 回填人工审查计划 | `scope:backfill:dry-run` baseline / docs validation | 已创建 [WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md](/A:/codex-memory/docs/WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md)；当前 `450` records 中 `442` 缺少 `workspace_id`，`mutated=false`，不自动写真实 DB |
 | S-002 | query-quality | A1 | done | 将 `real-query-suite` 从 placeholder-only 升级到 fixture-only baseline | `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js`; `npm run real-query-suite -- --json`; `npm run query:quality -- --json --dry-run`; `npm test`; `git diff --check` | 默认 suite 现在 `caseCount=5`、`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`；只用 `benchmarks/default-dataset.json`，无 provider 调用、无数据写入 |
 | S-003 | query-quality | A1 | done | 增加 fixture assertion runner，真实校验 `mustContain` / `mustNotContain` | `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js`; `npm run real-query-suite -- --json`; `npm run query:quality -- --json --dry-run`; `npm test` | 默认 suite 现在 `assertedCount=5`、`passedCount=5`、`failedCount=0`；坏 fixture 会退出非零并输出 `assertionFailures`；无 provider 调用、无数据写入 |
+| S-004 | query-quality | A1 | done | 补齐 q5/q6/q7 fixture cases，覆盖默认 dataset 全部 query | `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js`; `npm run real-query-suite -- --json`; `npm run query:quality -- --json --dry-run`; `npm test`; `git diff --check` | 默认 suite 现在 `caseCount=8`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`；无 provider 调用、无数据写入 |
 
 ## 推荐执行顺序
 
 1. `G-002` 已完成：治理轨道已补齐，后续多 Worker 任务可以复用 Verifier rail。
 2. `P1` 已完成：`real-query-suite` 现在会在脱敏 fixture 上真实验收 `mustContain / mustNotContain`。
-3. `P2`：继续扩 query-quality fixture 覆盖到剩余默认 dataset 查询，或把 assertion runner 接入更高层 fixture-only gate。
+3. `P2`：把 query assertion runner 接入更高层 fixture-only gate，让 `caseCount/assertedCount/failedCount` 成为常态化门禁输出。
 4. `P3`：做 `governance:report` 最小闭环，只读输出 proposal/tombstone/supersession/stale metrics。
 5. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
