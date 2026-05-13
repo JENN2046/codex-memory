@@ -2,14 +2,14 @@
 
 ## Goal
 
-Continue P11.1-lifecycle-fixture-schema-tests in `A:\codex-memory`.
+Resume after P11.1-lifecycle-fixture-schema-tests in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: main
 - Remote boundary: no push / tag / release / deploy without explicit authorization
-- Current local state: `main` is ahead of `origin/main`; P10, P10.1, P11, and P11.1 commits are local only after guarded commit.
+- Current local state: `main` is ahead of `origin/main`; P10, P10.1, P11, and P11.1 commits are local only. P11.1 primary commit is `540e073 test: lock lifecycle policy schema`.
 
 ## Current Area
 
@@ -61,4 +61,4 @@ memory-governance / lifecycle-fixture-tests
 
 ## Next Safe Step
 
-After guarded local commit, stop without push. Recommended next task: `P11.2-sqlite-lifecycle-columns-dry-run-planning`.
+Stop without push. Recommended next task: `P11.2-sqlite-lifecycle-columns-dry-run-planning`.

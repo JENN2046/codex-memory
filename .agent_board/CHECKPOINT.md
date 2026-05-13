@@ -10,7 +10,7 @@ memory-governance / lifecycle-fixture-tests
 
 ## Current Status
 
-当前是 A1 tests/docs-only。P10 runtime gate、P10.1 runtime gate docs/CI surface、P11 lifecycle planning 均已本地完成并提交，未 push。P11.1 本轮已新增 fixture 和 schema test，不改 runtime，不新增 MCP tools，不做 SQLite migration。
+当前是 A1 tests/docs-only。P10 runtime gate、P10.1 runtime gate docs/CI surface、P11 lifecycle planning 均已本地完成并提交，未 push。P11.1 本轮已新增 fixture 和 schema test，并已创建本地提交 `540e073 test: lock lifecycle policy schema`；不改 runtime，不新增 MCP tools，不做 SQLite migration。
 
 ## Completed Work In This Batch
 
@@ -62,4 +62,4 @@ memory-governance / lifecycle-fixture-tests
 
 ## Next Safe Action
 
-Inspect final diff scope, create guarded local commit if clean, then stop without push. Next recommended task: `P11.2-sqlite-lifecycle-columns-dry-run-planning`.
+Commit this board-only closeout state, then stop without push. Next recommended task: `P11.2-sqlite-lifecycle-columns-dry-run-planning`.
