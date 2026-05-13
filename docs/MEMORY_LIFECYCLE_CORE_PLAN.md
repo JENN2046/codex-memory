@@ -193,6 +193,19 @@ P11 lifecycle 与 P10 soft read policy 的关系：
 - 无真实 memory 写入。
 - 可用 `node --test` 运行纯 fixture/schema tests。
 
+当前入口：
+
+- Fixture: [tests/fixtures/lifecycle-policy-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-policy-v1.json)
+- Test: [tests/lifecycle-schema.test.js](/A:/codex-memory/tests/lifecycle-schema.test.js)
+
+验证命令：
+
+```powershell
+node --test tests\lifecycle-schema.test.js
+```
+
+该测试只固化 P11 lifecycle v1 契约，不接入 runtime，不新增 MCP tool，不做 SQLite migration，不读写真实 memory。
+
 ### P11.2 SQLite Lifecycle Columns Dry-Run
 
 目标：

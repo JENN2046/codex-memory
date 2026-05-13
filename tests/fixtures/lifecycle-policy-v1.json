@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "lifecycle-policy-v1",
+  "statuses": [
+    "active",
+    "stale",
+    "proposal",
+    "rejected",
+    "superseded",
+    "tombstoned"
+  ],
+  "transitions": [
+    { "from": "proposal", "to": "active", "event_type": "lifecycle_transition" },
+    { "from": "proposal", "to": "rejected", "event_type": "lifecycle_transition" },
+    { "from": "proposal", "to": "tombstoned", "event_type": "lifecycle_transition" },
+    { "from": "active", "to": "stale", "event_type": "lifecycle_transition" },
+    { "from": "active", "to": "superseded", "event_type": "lifecycle_transition" },
+    { "from": "active", "to": "tombstoned", "event_type": "lifecycle_transition" },
+    { "from": "stale", "to": "active", "event_type": "lifecycle_transition" },
+    { "from": "stale", "to": "superseded", "event_type": "lifecycle_transition" },
+    { "from": "stale", "to": "tombstoned", "event_type": "lifecycle_transition" },
+    { "from": "superseded", "to": "tombstoned", "event_type": "lifecycle_transition" },
+    { "from": "rejected", "to": "tombstoned", "event_type": "lifecycle_transition" }
+  ],
+  "defaultReadPolicy": {
+    "include": ["active", "stale"],
+    "exclude": ["proposal", "rejected", "superseded", "tombstoned"]
+  },
+  "auditEvent": {
+    "requiredFields": [
+      "event_id",
+      "memory_id",
+      "event_type",
+      "from_status",
+      "to_status",
+      "reason",
+      "actor_client_id",
+      "request_source",
+      "evidence",
+      "created_at",
+      "reversible"
+    ],
+    "eventTypes": [
+      "lifecycle_transition"
+    ]
+  }
+}

@@ -2,42 +2,41 @@
 
 ## Goal
 
-Continue P11-memory-lifecycle-core-planning in `A:\codex-memory`.
+Continue P11.1-lifecycle-fixture-schema-tests in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: main
 - Remote boundary: no push / tag / release / deploy without explicit authorization
-- Current local state: `main` is ahead of `origin/main`; P10, P10 roadmap, P10.1, and P11 planning commits are local only.
+- Current local state: `main` is ahead of `origin/main`; P10, P10.1, P11, and P11.1 commits are local only after guarded commit.
 
 ## Current Area
 
-memory-governance / lifecycle-planning
+memory-governance / lifecycle-fixture-tests
 
 ## Completed In Current Batch
 
-- Added [docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md).
-- Defined lifecycle statuses and semantics.
-- Defined allowed status transitions and default non-recovery for tombstoned records.
-- Defined lifecycle audit event shape.
-- Documented read policy relationship with `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` / future lifecycle policy flags.
-- Planned P11.1, P11.2, P11.3, and P12 sequencing.
-- Updated README / NEXT_PHASE / BACKLOG / STATUS and `.agent_board`.
+- Added lifecycle policy fixture: [tests/fixtures/lifecycle-policy-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-policy-v1.json).
+- Added schema test: [tests/lifecycle-schema.test.js](/A:/codex-memory/tests/lifecycle-schema.test.js).
+- Updated [docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md) with P11.1 test entry.
+- Updated backlog/status/board state.
 
 ## Changed Files
 
+- `tests/fixtures/lifecycle-policy-v1.json`
+- `tests/lifecycle-schema.test.js`
 - `docs/MEMORY_LIFECYCLE_CORE_PLAN.md`
-- `README.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `git diff --check` -> passed with CRLF normalization warnings only.
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` -> VALIDATION PASSED.
+- `node --test tests\lifecycle-schema.test.js`：passed `7/7`
+- `npm test`：passed `203/203`
+- `git diff --check`：passed with CRLF warnings only
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
 ## MCP Mode
 
@@ -46,21 +45,20 @@ memory-governance / lifecycle-planning
 
 ## HTTP Health
 
-- Not required for P11 docs-only planning.
+- Not required for P11.1 fixture schema tests.
 
 ## Audit / Recall Impact
 
 - No runtime audit or recall behavior changed.
-- The lifecycle audit shape is a future contract only.
-- The read policy section is a planning relationship, not active enforcement.
+- The audit shape is locked only as fixture contract.
+- Default read policy remains fixture-only and is not active runtime enforcement.
 
 ## Remaining Risks
 
-- P11.1 fixture schema tests are not implemented yet.
-- SQLite lifecycle dry-run remains future P11.2 work.
-- Optional read-policy runtime remains future P11.3 work.
+- Runtime lifecycle policy remains future P11.3 work.
+- SQLite lifecycle columns dry-run remains future P11.2 work.
 - Controlled mutation tools remain P12 future work and require separate approval.
 
 ## Next Safe Step
 
-Commit this board-only closeout state, then stop without push. Recommended next task: `P11.1-lifecycle-fixture-schema-tests`.
+After guarded local commit, stop without push. Recommended next task: `P11.2-sqlite-lifecycle-columns-dry-run-planning`.
