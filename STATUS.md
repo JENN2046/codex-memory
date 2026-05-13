@@ -78,6 +78,7 @@
 - P11 memory lifecycle core planning 已 docs-only 完成：新增 [docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md)，定义 `active/stale/proposal/rejected/superseded/tombstoned`、allowed transitions、audit event shape、read policy relationship 和 P11.1 fixture schema tests；不改 runtime，不新增 MCP tools，不迁移真实数据。
 - P11.1 lifecycle fixture schema tests 已 tests/docs-only 完成：新增 `tests/fixtures/lifecycle-policy-v1.json` 与 `tests/lifecycle-schema.test.js`，固化 status enum、allowed transitions、default read policy、audit required fields 和 `lifecycle_transition` event type；不改 runtime，不做 SQLite migration。
 - P11.2 lifecycle SQLite dry-run planning 已 docs/tests-design only 完成：新增 [docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md)，规划 `memory_records` lifecycle columns、audit shape、default values、dry-run report shape 和 migration safety rules；不改 runtime，不改 tests，不执行 SQLite migration。
+- P11.3 lifecycle SQLite dry-run CLI fixture tests 已本地完成：新增 `lifecycle:sqlite:dry-run` 和 `src/cli/lifecycle-sqlite-dry-run.js`，CLI 只读报告 lifecycle column gap、`mutated=false`、风险等级和 SQLite backup rollback 要求，并拒绝 `--confirm/--apply`；不改 MCP tools，不改 `search_memory` 默认行为，不执行 SQLite migration。
 - `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：

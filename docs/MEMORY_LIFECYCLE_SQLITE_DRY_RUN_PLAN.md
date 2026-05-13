@@ -190,11 +190,52 @@ Future lifecycle SQLite work must follow these safety rules:
 
 ## Validation
 
-P11.2 validation remains docs-only:
+P11.3 adds the fixture-only CLI entrypoint:
+
+```powershell
+npm run lifecycle:sqlite:dry-run -- --json
+```
+
+CLI guarantees:
+
+- It opens SQLite with `readOnly: true`.
+- It does not create a missing database.
+- It does not execute `ALTER TABLE`.
+- It does not write records, audit events, or migration metadata.
+- It always reports `mutated=false`.
+- It rejects `--confirm` and `--apply`.
+
+The CLI JSON includes:
+
+- `status`
+- `mutated`
+- `dbPath`
+- `totalRecords`
+- `existingLifecycleColumns`
+- `missingLifecycleColumns`
+- `wouldAddColumns`
+- `wouldBackfillStatus`
+- `defaultStatus`
+- `mutationRequired`
+- `riskLevel`
+- `rollbackRequirement`
+- `nextStep`
+
+P11.3 validation:
+
+```powershell
+node --test tests\lifecycle-sqlite-dry-run-cli.test.js
+npm test
+npm run lifecycle:sqlite:dry-run -- --json
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
+P11.2 validation was docs-only:
 
 ```powershell
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
-No runtime, test, provider, SQLite, or migration command is required for this planning stage.
+No provider, SQLite migration, confirm/apply command, or real data migration is required for this dry-run stage.

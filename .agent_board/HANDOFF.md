@@ -2,35 +2,42 @@
 
 ## Goal
 
-Resume after P11.2-sqlite-lifecycle-columns-dry-run-planning in `A:\codex-memory`.
+Continue P11.3-lifecycle-sqlite-dry-run-cli-fixture-tests in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: main
 - Remote boundary: no push / tag / release / deploy without explicit authorization
-- Current local state: `main` is ahead of `origin/main`; P10, P10.1, P11, P11.1, and P11.2 commits are local only. P11.2 primary commit is `2420010 docs: plan lifecycle sqlite dry run`.
+- Current local state: `main` is ahead of `origin/main`; P10, P10.1, P11, P11.1, P11.2, and P11.3 commits are local only after guarded commit.
 
 ## Current Area
 
-memory-governance / lifecycle-sqlite-dry-run-planning
+memory-governance / lifecycle-sqlite-dry-run-cli
 
 ## Completed In Current Batch
 
-- Added SQLite dry-run planning doc: [docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md).
-- Updated [docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md) with P11.2 link.
+- Added lifecycle SQLite dry-run CLI: [lifecycle-sqlite-dry-run.js](/A:/codex-memory/src/cli/lifecycle-sqlite-dry-run.js).
+- Added fixture tests: [lifecycle-sqlite-dry-run-cli.test.js](/A:/codex-memory/tests/lifecycle-sqlite-dry-run-cli.test.js).
+- Added `lifecycle:sqlite:dry-run` npm script.
+- Updated [docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md) with CLI usage.
 - Updated backlog/status/board state.
 
 ## Changed Files
 
+- `package.json`
+- `src/cli/lifecycle-sqlite-dry-run.js`
+- `tests/lifecycle-sqlite-dry-run-cli.test.js`
 - `docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md`
-- `docs/MEMORY_LIFECYCLE_CORE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
+- `node --test tests\lifecycle-sqlite-dry-run-cli.test.js`：passed `5/5`
+- `npm test`：passed `208/208`
+- `npm run lifecycle:sqlite:dry-run -- --json`：passed; reported `mutated=false`, `totalRecords=455`, `missingLifecycleColumns=5`, `wouldBackfillStatus=0`
 - `git diff --check`：passed with CRLF warnings only
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -41,20 +48,19 @@ memory-governance / lifecycle-sqlite-dry-run-planning
 
 ## HTTP Health
 
-- Not required for P11.2 docs-only dry-run planning.
+- Not required for P11.3 lifecycle dry-run CLI tests.
 
 ## Audit / Recall Impact
 
 - No runtime audit or recall behavior changed.
-- The SQLite lifecycle audit shape is only planned.
+- `search_memory` default behavior is unchanged.
 - No SQLite migration or real DB write occurred.
 
 ## Remaining Risks
 
-- Lifecycle SQLite dry-run CLI fixture tests remain future P11.3 work.
 - Optional read-policy runtime remains future P11.4 work.
 - Controlled mutation tools remain P12 future work and require separate approval.
 
 ## Next Safe Step
 
-Stop without push. Recommended next task: `P11.3-lifecycle-sqlite-dry-run-cli-fixture-tests`.
+After guarded local commit, stop without push. Recommended next task: `P11.4-lifecycle-read-policy-runtime-flag-planning` or push readiness gate.
