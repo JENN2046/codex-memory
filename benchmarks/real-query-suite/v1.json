@@ -33,7 +33,7 @@
           "reconcile task"
         ],
         "mustNotContain": [
-          "rejecting the diary entry"
+          "provider smoke"
         ]
       },
       "source": "benchmarks/default-dataset.json#dual_write_shadow",

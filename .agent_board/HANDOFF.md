@@ -2,15 +2,15 @@
 
 ## Current State
 
-当前本地工作在 `P7` query quality / VCP parity hardening 线。远端 `main` 已同步到 `76b1513 docs: plan workspace scope backfill review`；PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+当前本地工作在 `P7` query quality / VCP parity hardening 线。远端 `main` 已同步到 `055d749 docs: clean query suite handoff state`；PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次把 `real-query-suite` 从 placeholder-only 推进到 fixture-only baseline：5 条 case 全部来源于 `benchmarks/default-dataset.json`，`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`。本地提交为 `c425764 feat: replace real query placeholders with fixtures`，尚未 push。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
+最新本地批次把 `real-query-suite` 从 fixture-only baseline 推进到 fixture assertion baseline：5 条 case 全部来源于 `benchmarks/default-dataset.json`，`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`、`assertedCount=5`、`passedCount=5`、`failedCount=0`。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: local history includes `c425764 feat: replace real query placeholders with fixtures` plus this board-only cleanup; verify exact tip with `git log --oneline --decorate -n 5`
+- HEAD: local history currently at `055d749` before the assertion-runner commit; verify exact tip with `git log --oneline --decorate -n 5`
 - Remote baseline: current `origin/main` tip for this maintenance line
 - Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
@@ -19,7 +19,7 @@
 
 - compare: 43/43 matched, 0/0 core/extended
 - rollback: 43/43 rollback-ready, 0/0
-- npm test: 181/181
+- npm test: 183/183
 - gate:ci: 119/119 (fixture-only)
 - gate:mainline:strict: ok (`health` + `contract` + `test` + `compare` + `rollback` 全绿)
 - scope acceptance: ok for `project_id` / `workspace_id` / `client_id` / `visibility`
@@ -45,14 +45,18 @@
 - `scope:backfill:dry-run` reports `442` records missing `workspace_id`; docs-only review plan added to avoid unsafe automatic backfill.
 - `benchmarks/real-query-suite/v1.json` now uses sanitized fixture-only cases from `benchmarks/default-dataset.json` instead of placeholder notes.
 - `real-query-suite` / `query:quality` now report `fixtureOnlyCount` and `realCount`; default suite is `5` real fixture-only cases and `0` placeholders.
-- Targeted query tests passed `11/11`; full `npm test` passed `181/181`; `git diff --check` passed.
+- Previous fixture-only baseline targeted query tests passed `11/11`; full `npm test` passed `181/181`; `git diff --check` passed.
 - Read-only review found only stale board/handoff wording after `c425764`; this cleanup updates handoff state and removes duplicate changed-file noise.
+- Added shared fixture assertion runner for `mustContain` / `mustNotContain` and reused it from `real-query-suite` and `query:quality`.
+- Default query suite now reports `assertedCount=5`, `passedCount=5`, `failedCount=0`; synthetic drift tests confirm bad fixtures exit non-zero with `assertionFailures`.
+- Targeted query tests passed `13/13`; full `npm test` passed `183/183`.
 
 ## Next
 
-- P1: push `c425764` plus the board cleanup commit only with explicit remote authorization.
-- P2: add a fixture assertion runner that checks `mustContain` / `mustNotContain` against the sanitized fixture text.
-- P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
+- P1: create a guarded local commit for the assertion-runner batch after final diff checks.
+- P2: push the new local commit only with explicit remote authorization.
+- P3: expand query-quality fixture coverage to remaining default dataset queries, or wire assertion runner into a broader fixture-only gate.
+- P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
 

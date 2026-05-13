@@ -24,6 +24,9 @@ test('real-query-suite CLI should load default suite', () => {
   assert.equal(report.placeholderCount, 0);
   assert.equal(report.realCount, report.caseCount);
   assert.equal(report.fixtureOnlyCount, report.caseCount);
+  assert.equal(report.assertedCount, report.caseCount);
+  assert.equal(report.passedCount, report.caseCount);
+  assert.equal(report.failedCount, 0);
 });
 
 test('real-query-suite CLI should report invalid cases for a broken suite', () => {
@@ -50,6 +53,49 @@ test('real-query-suite CLI should detect placeholder cases', () => {
   const result = runCli(['--json']);
   const report = JSON.parse(result.stdout);
   assert.equal(report.placeholderCount, 0);
+});
+
+test('real-query-suite CLI should fail when fixture expectations drift', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'real-query-suite-'));
+  const fixtureFile = path.join(tmpDir, 'fixture.json');
+  const suiteFile = path.join(tmpDir, 'suite.json');
+  fs.writeFileSync(fixtureFile, JSON.stringify({
+    documents: [
+      { id: 'doc-1', text: 'This document mentions durable local audit logs.' }
+    ]
+  }));
+  fs.writeFileSync(suiteFile, JSON.stringify({
+    version: 'test',
+    fixture: 'fixture.json',
+    cases: [
+      {
+        id: 'drift-1',
+        area: 'query-quality',
+        query: 'local audit',
+        target: 'doc-1',
+        expected: {
+          mustContain: ['provider smoke'],
+          mustNotContain: ['audit logs']
+        }
+      }
+    ]
+  }));
+  try {
+    const result = runCli(['--json', '--suite', suiteFile]);
+    assert.equal(result.status, 1);
+    const report = JSON.parse(result.stdout);
+    assert.equal(report.status, 'failed');
+    assert.equal(report.assertedCount, 1);
+    assert.equal(report.passedCount, 0);
+    assert.equal(report.failedCount, 1);
+    assert.equal(report.assertionFailures[0].id, 'drift-1');
+    assert.match(report.assertionFailures[0].issues.join('\n'), /missing expected phrase: provider smoke/);
+    assert.match(report.assertionFailures[0].issues.join('\n'), /found forbidden phrase: audit logs/);
+  } finally {
+    fs.unlinkSync(suiteFile);
+    fs.unlinkSync(fixtureFile);
+    fs.rmdirSync(tmpDir);
+  }
 });
 
 test('real-query-suite CLI should fail for missing suite file', () => {
