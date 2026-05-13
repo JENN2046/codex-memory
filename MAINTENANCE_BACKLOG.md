@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests 均已进入 `origin/main`；P11.4 lifecycle read-policy runtime flag planning 已本地提交；P11.5 lifecycle read-policy fixture tests 为当前本地阶段
+- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests 均已进入 `origin/main`；P11.4 / P11.5 已本地提交；P11.6 lifecycle read-policy runtime flag implementation planning 为当前本地阶段
 - 长期路线图事实源：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
@@ -83,7 +83,8 @@
 | P11.3-lifecycle-sqlite-dry-run-cli-fixture-tests | memory-governance | A2 | done | Implement fixture-only lifecycle SQLite dry-run CLI and tests | `node --test tests\lifecycle-sqlite-dry-run-cli.test.js`; `npm test`; `npm run lifecycle:sqlite:dry-run -- --json`; `git diff --check`; docs validation | CLI read-only reports lifecycle column gaps, `mutated=false`, rejects `--confirm/--apply`; no SQLite migration |
 | P11.4-lifecycle-read-policy-runtime-flag-planning | memory-governance | A1/A2 | done | Plan lifecycle read-policy runtime flag, status visibility, scope relationship, and audit summary shape | `git diff --check`; docs validation | Docs/board only; no runtime/tests/package changes; no `search_memory` behavior change |
 | P11.5-lifecycle-read-policy-fixture-tests | memory-governance | A1 | done | Lock lifecycle read-policy include/exclude, private visibility, and audit summary shape with fixture tests | `node --test tests\lifecycle-read-policy-fixture.test.js`; `npm test`; `git diff --check`; docs validation | Tests/fixture/docs only; no runtime behavior change |
-| P11.6-lifecycle-read-policy-runtime-flag-implementation-planning | memory-governance | A1/A2 | todo | Plan optional lifecycle read-policy runtime flag implementation before touching runtime | docs validation | Future planning stage; implementation requires default-off proof and targeted runtime tests |
+| P11.6-lifecycle-read-policy-runtime-flag-implementation-planning | memory-governance | A1/A2 | done | Plan optional lifecycle read-policy runtime flag implementation before touching runtime | `git diff --check`; docs validation | Docs/board only; defines insertion points, missing-column behavior, audit summary, and future sequence; no runtime change |
+| P11.7-lifecycle-read-policy-runtime-fixture-tests | memory-governance | A1/A2 | todo | Add runtime-oriented fixture tests before implementing lifecycle read-policy runtime flag | targeted `node --test`; `npm test`; `git diff --check` | Future tests only; must prove default-off behavior before runtime implementation |
 
 ## 推荐执行顺序
 
@@ -104,8 +105,9 @@
 15. `P11.3`：已完成 lifecycle SQLite dry-run CLI fixture tests。
 16. `P11.4`：已规划 lifecycle read-policy runtime flag；不改 runtime、不改 tests、不改 `package.json`。
 17. `P11.5`：已用 fixture tests 锁住 lifecycle read-policy include/exclude、private same-client/cross-client、audit summary shape；继续不改变 `search_memory` runtime 行为。
-18. `P11.6`：下一步建议先做 lifecycle read-policy runtime flag implementation planning，再决定是否进入 default-off runtime implementation。
-19. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+18. `P11.6`：已规划 lifecycle read-policy runtime flag implementation；不改 runtime、不改 tests、不改 `package.json`。
+19. `P11.7`：下一步建议做 lifecycle read-policy runtime fixture tests，先证明 default-off、enabled filtering、missing-column 和 audit summary 契约。
+20. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

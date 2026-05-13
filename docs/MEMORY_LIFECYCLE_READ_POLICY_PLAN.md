@@ -20,6 +20,10 @@ P11.5 fixture test 入口：
 - Fixture: [tests/fixtures/lifecycle-read-policy-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-read-policy-v1.json)
 - Test: [tests/lifecycle-read-policy-fixture.test.js](/A:/codex-memory/tests/lifecycle-read-policy-fixture.test.js)
 
+P11.6 runtime implementation planning 入口：
+
+- [MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md)
+
 ## Purpose
 
 Lifecycle read policy 的目标是让未来 `search_memory` 能够按 lifecycle status 过滤普通召回结果，避免 `proposal`、`rejected`、`superseded`、`tombstoned` 默认进入普通记忆召回。
@@ -158,7 +162,24 @@ node --test tests\lifecycle-read-policy-fixture.test.js
 
 该测试只读取 fixture，不接入 runtime，不读写真实 memory，不新增 MCP tools，不做 SQLite migration。
 
-### P11.6 Optional Runtime Flag Implementation
+### P11.6 Runtime Flag Implementation Planning
+
+目标：
+
+- 规划 runtime insertion points、missing-column behavior、audit summary shape 和后续实现顺序。
+- 不实现 runtime。
+- 不改 `search_memory`。
+- 不改 `src/`、`tests/`、`package.json`。
+- Plan source: [MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md)
+
+### P11.7 Lifecycle Read Policy Runtime Fixture Tests
+
+目标：
+
+- 在 runtime 实现前补 fixture/runtime-oriented tests。
+- 覆盖 default-off、enabled filtering、missing-column behavior 和 audit summary shape。
+
+### P11.8 Optional Runtime Flag Implementation
 
 目标：
 
@@ -168,7 +189,7 @@ node --test tests\lifecycle-read-policy-fixture.test.js
 - 保持默认行为不变。
 - 增加 runtime tests 和 strict gate。
 
-### P11.7 Lifecycle Policy Gate-CI Summary
+### P11.9 Lifecycle Policy Gate-CI Summary
 
 目标：
 

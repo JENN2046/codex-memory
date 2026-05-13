@@ -14,7 +14,7 @@
 - 不调用 provider。
 - 不 push / tag / release / deploy。
 
-长期路线图仍以 [VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md) 为准。P10 runtime gate 边界见 [runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)。P11.4 lifecycle read-policy runtime flag 规划见 [MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)。
+长期路线图仍以 [VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md) 为准。P10 runtime gate 边界见 [runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)。P11.4 lifecycle read-policy runtime flag 规划见 [MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)，P11.6 runtime implementation planning 见 [MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md)。
 
 ## Direction
 
@@ -240,6 +240,15 @@ Plan source: [MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MEM
 - 下一步进入 P11.5 fixture tests。
 
 Plan source: [MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)
+
+### P11.6 Lifecycle Read-Policy Runtime Implementation Planning
+
+Plan source: [MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md)
+
+目标：
+
+- 规划 future runtime insertion points、missing-column behavior 和 audit summary shape。
+- 不实现 runtime，不改变 `search_memory`。
 
 ### P12 Controlled Mutation Tools
 
