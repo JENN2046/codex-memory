@@ -10,7 +10,7 @@ memory-governance / lifecycle-sqlite-dry-run-cli
 
 ## Current Status
 
-当前是 A2 fixture-only CLI + tests。P11.2 lifecycle SQLite dry-run planning 已完成并本地提交，未 push。P11.3 本轮已新增只读 CLI、npm script、fixture tests 和文档入口；不新增 MCP tools，不提供 `--confirm/--apply`，不改 `search_memory` 默认行为，不做 SQLite migration。
+当前是 A2 fixture-only CLI + tests。P11.2 lifecycle SQLite dry-run planning 已完成并本地提交，未 push。P11.3 本轮已新增只读 CLI、npm script、fixture tests 和文档入口，并已创建本地提交 `3188b28 feat: add lifecycle sqlite dry run`；不新增 MCP tools，不提供 `--confirm/--apply`，不改 `search_memory` 默认行为，不做 SQLite migration。
 
 ## Completed Work In This Batch
 
@@ -64,4 +64,4 @@ memory-governance / lifecycle-sqlite-dry-run-cli
 
 ## Next Safe Action
 
-Inspect final diff scope, create guarded local commit if clean, then stop without push. Next recommended task: `P11.4-lifecycle-read-policy-runtime-flag-planning` or push readiness gate.
+Commit this board-only closeout state, then stop without push. Next recommended task: `P11.4-lifecycle-read-policy-runtime-flag-planning` or push readiness gate.
