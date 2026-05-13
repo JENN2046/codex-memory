@@ -65,11 +65,12 @@
 - S-008/S-007 pushed to `origin/main`; current remote baseline is `1db0317`.
 - S-009 added dashboard/http-observe detailed schema snapshots.
 - Current S-009 validation passed: `node --test tests\dashboard-cli.test.js tests\http-observe-cli.test.js` `6/6`; `npm test` `184/184`; `gate:ci --json` ok with compare/rollback `43/43` and query assertions `8/8`; `git diff --check` passed.
+- S-009 local commit created: `e41fc46 test: lock observability schemas`.
 
 ## Next
 
-- P1: run final diff/staged review and create guarded local S-009 commit if validation stays clean.
-- P2: push S-009 only after explicit remote authorization.
+- P1: push `e41fc46` only after explicit remote authorization.
+- P2: continue with README/VALIDATION schema contract summary for dashboard/http-observe, if desired.
 - P3: next safe local candidate is a README/VALIDATION schema contract summary for dashboard/http-observe, if desired.
 - P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 

@@ -135,4 +135,4 @@ P10-observability-admin
 
 ## Next Safe Action
 
-Run final diff/staged review and create a guarded local S-009 commit if clean. Push remains separate explicit authorization.
+S-009 test update is committed locally as `e41fc46 test: lock observability schemas`. Push remains separate explicit authorization.
