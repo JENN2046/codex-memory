@@ -127,4 +127,4 @@ P8-memory-governance
 
 ## Next Safe Action
 
-Run final diff/staged review and create a guarded local S-008 docs commit if clean. Push remains separate explicit authorization.
+S-008 docs-only update is committed locally as `26c919f docs: add governance report troubleshooting note`. Push remains separate explicit authorization.

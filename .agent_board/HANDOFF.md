@@ -61,11 +61,12 @@
 - Current S-007 validation passed: affected dashboard/http-observe/governance tests `9/9`; `npm run governance:report -- --json` ok with local `review.status=ok`, `reviewLevel=nominal`; `npm test` `184/184`; `gate:ci --json` ok with compare/rollback `43/43` and query assertions `8/8`; `git diff --check` passed.
 - S-008 added governance output sample and troubleshooting notes to README / VALIDATION.
 - Current S-008 docs validation passed: `git diff --check`; `scripts/validate-local.ps1 -Area docs`.
+- S-008 docs-only commit created: `26c919f docs: add governance report troubleshooting note`.
 
 ## Next
 
-- P1: run final diff/staged review and create guarded local S-008 docs commit if clean.
-- P2: push the S-007/S-008 local commits only after explicit remote authorization.
+- P1: push the S-007/S-008 local commits only after explicit remote authorization.
+- P2: continue with a new scoped local task if requested.
 - P3: after any push, run post-push `git status --short` and a suitable gate before marking remote baseline current.
 - P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
