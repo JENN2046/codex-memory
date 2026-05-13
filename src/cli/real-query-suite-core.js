@@ -4,10 +4,11 @@ const path = require('node:path');
 const DEFAULT_SUITE = path.join('benchmarks', 'real-query-suite', 'v1.json');
 
 function parseSuiteArgs(argv = [], defaults = {}) {
-  const options = { json: false, suiteFile: DEFAULT_SUITE, ...defaults };
+  const options = { json: false, suiteFile: DEFAULT_SUITE, fixtureRecallDryRun: false, ...defaults };
   for (let i = 0; i < argv.length; i += 1) {
     if (argv[i] === '--json') { options.json = true; continue; }
     if (argv[i] === '--dry-run') { options.dryRun = true; continue; }
+    if (argv[i] === '--fixture-recall-dry-run') { options.fixtureRecallDryRun = true; continue; }
     if (argv[i] === '--suite') { options.suiteFile = argv[i + 1] || options.suiteFile; i += 1; continue; }
   }
   return options;
@@ -53,6 +54,60 @@ function includesText(haystack, needle) {
   return haystack.toLowerCase().includes(String(needle).toLowerCase());
 }
 
+function tokenize(value) {
+  return String(value || '')
+    .toLowerCase()
+    .split(/[^a-z0-9\u4e00-\u9fff]+/u)
+    .map(item => item.trim())
+    .filter(item => item.length >= 2);
+}
+
+function runFixtureRecallCase(caseItem, documents = []) {
+  const queryTokens = new Set(tokenize(caseItem.query));
+  const ranked = documents.map(document => {
+    const documentTokens = new Set(tokenize(`${document.id || ''} ${document.text || ''}`));
+    let score = 0;
+    for (const token of queryTokens) {
+      if (documentTokens.has(token)) {
+        score += 1;
+      }
+    }
+    return {
+      id: document.id,
+      score
+    };
+  }).sort((left, right) => {
+    if (right.score !== left.score) return right.score - left.score;
+    return String(left.id || '').localeCompare(String(right.id || ''));
+  });
+
+  const top = ranked[0] || null;
+  return {
+    id: caseItem.id,
+    expectedTarget: caseItem.target,
+    topTarget: top?.id || null,
+    score: top?.score || 0,
+    passed: top?.id === caseItem.target
+  };
+}
+
+function buildFixtureRecallDryRun(cases, fixture) {
+  const documents = Array.isArray(fixture?.documents) ? fixture.documents : [];
+  const validCases = cases.filter(caseItem => validateCase(caseItem).length === 0);
+  const results = validCases.map(caseItem => runFixtureRecallCase(caseItem, documents));
+  const failures = results.filter(result => !result.passed);
+  return {
+    enabled: true,
+    mutated: false,
+    providerCalls: 0,
+    durableMemoryTouched: false,
+    caseCount: validCases.length,
+    passedCount: results.length - failures.length,
+    failedCount: failures.length,
+    ...(failures.length > 0 ? { failures } : {})
+  };
+}
+
 function assertCaseAgainstFixture(caseItem, documentMap) {
   const targetDocument = documentMap.get(caseItem.target);
   if (!targetDocument || typeof targetDocument.text !== 'string') {
@@ -78,7 +133,7 @@ function assertCaseAgainstFixture(caseItem, documentMap) {
     : null;
 }
 
-function runSuiteReport(suitePath) {
+function runSuiteReport(suitePath, options = {}) {
   const fullPath = path.resolve(suitePath);
   if (!fs.existsSync(fullPath)) {
     return {
@@ -124,6 +179,7 @@ function runSuiteReport(suitePath) {
   const assertionFailures = [];
   const fixturePath = resolveFixturePath(suite, fullPath);
   let documentMap = new Map();
+  let fixtureData = null;
   let fixtureError = null;
 
   if (fixturePath) {
@@ -133,7 +189,8 @@ function runSuiteReport(suitePath) {
     if (loadedFixture.error) {
       fixtureError = loadedFixture.error.message;
     } else {
-      documentMap = buildDocumentMap(loadedFixture.data);
+      fixtureData = loadedFixture.data;
+      documentMap = buildDocumentMap(fixtureData);
     }
   }
 
@@ -167,9 +224,13 @@ function runSuiteReport(suitePath) {
   const assertedCount = fixturePath ? validCount : 0;
   const failedCount = assertionFailures.length;
   const passedCount = Math.max(assertedCount - failedCount, 0);
+  const fixtureRecallDryRun = options.fixtureRecallDryRun && fixtureData && !fixtureError
+    ? buildFixtureRecallDryRun(cases, fixtureData)
+    : null;
+  const fixtureRecallFailed = fixtureRecallDryRun?.failedCount > 0;
 
   return {
-    status: failedCount > 0 ? 'failed' : 'ok',
+    status: failedCount > 0 || fixtureRecallFailed ? 'failed' : 'ok',
     suiteFile: suitePath,
     version: suite.version || 'unknown',
     caseCount: cases.length,
@@ -182,6 +243,7 @@ function runSuiteReport(suitePath) {
     passedCount,
     failedCount,
     ...(fixturePath ? { fixtureFile: path.relative(process.cwd(), fixturePath) } : {}),
+    ...(fixtureRecallDryRun ? { fixtureRecallDryRun } : {}),
     ...(invalidReasons.length > 0 ? { invalidReasons } : {}),
     ...(assertionFailures.length > 0 ? { assertionFailures } : {})
   };

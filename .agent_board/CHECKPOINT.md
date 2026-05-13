@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-P10 — S-010：补 README/VALIDATION 的 dashboard/http-observe schema contract 摘要，明确 observability 输出边界。
+P10 — memory-policy-hardening-runtime-gate：把 scoped memory runtime 推进到可信记忆内核的第一层本地门禁。
 
 ## Current Area
 
-P10-observability-admin
+P10-memory-policy-hardening-runtime-gate
 
 ## Current Status
 
-本轮 `S-010` 是 docs-only contract 摘要：README / VALIDATION 现在说明 dashboard/http-observe 的 `summary` / `governance` / `audits` / `scope` / `logs` 字段边界。当前不改运行时代码，不改 MCP contract，不写真实 memory DB，不调用 provider。
+本轮 `P10` 是 A2/A3 runtime gate hardening：不扩大 public MCP tools，不新增依赖，不读写 `.env`，不调用 provider，不 push。已完成写入前 secret scanner、MCP `tools/call` runtime schema validation、HTTP auth hardening、默认关闭的 soft read policy flag、fixture recall dry-run。
 
 ## Completed Work
 
@@ -54,6 +54,11 @@ P10-observability-admin
 - README 新增 dashboard/observe schema contract 摘要，明确 `summary` / `governance` / `audits` / `scope` / `logs` 只读边界。
 - VALIDATION 新增 `Dashboard / Observe Schema Contract` 小节，记录对应命令、只读限制、字段边界和 snapshot test 维护要求。
 - STATUS / MAINTENANCE_BACKLOG / `.agent_board` 已推进到 S-010。
+- 新增 `SecretScanner`，在 `MemoryWriteService` 写 diary 前扫描 `title/content/evidence/tags`，命中 secret-like 内容直接拒绝。
+- 新增 `ToolArgumentValidator`，在 MCP `tools/call` 入口拒绝 unknown field、enum mismatch 和 invalid scope，返回 `-32602`。
+- HTTP MCP 对 non-loopback host + empty token fail-fast；loopback no-token 仍可本地开发，并通过 health/log warning 显式提示。
+- 新增 `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY=false` 默认关闭；开启后过滤 proposal/rejected/tombstoned 和 cross-client private。
+- `real-query-suite` / `query:quality` 支持 `--fixture-recall-dry-run`，只读 fixture，不触碰 durable memory，不调用 provider。
 
 ## Changed Files
 
@@ -76,6 +81,24 @@ P10-observability-admin
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
 - `.agent_board/*`
+- `src/core/SecretScanner.js`
+- `src/core/ToolArgumentValidator.js`
+- `src/core/MemoryWriteService.js`
+- `src/adapters/codex-mcp/server.js`
+- `src/adapters/codex-mcp/http.js`
+- `src/http-index.js`
+- `src/config/createConfig.js`
+- `src/app.js`
+- `src/storage/SqliteShadowStore.js`
+- `src/cli/real-query-suite-core.js`
+- `src/cli/real-query-suite.js`
+- `src/cli/query-quality-report.js`
+- `tests/security-write-policy.test.js`
+- `tests/mcp-contract.test.js`
+- `tests/mcp-http.test.js`
+- `tests/policy-read-preflight.test.js`
+- `tests/real-query-suite.test.js`
+- `tests/query-quality-report.test.js`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
 - `GATE_CI_FIXTURE_ONLY_DESIGN.md`
@@ -124,6 +147,15 @@ P10-observability-admin
 - new-file trailing whitespace and high-risk token scans -> clean
 - S-010 `git diff --check` -> passed
 - S-010 `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` -> passed
+- P10 `node --test tests\security-write-policy.test.js` -> 2/2 passed
+- P10 `node --test tests\mcp-contract.test.js` -> 7/7 passed
+- P10 `node --test tests\mcp-http.test.js` -> 5/5 passed
+- P10 `node --test tests\policy-read-preflight.test.js` -> 4/4 passed
+- P10 `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js` -> 16/16 passed
+- P10 `npm test` -> 195/195 passed
+- P10 `npm run gate:mainline:strict` -> passed; health ok, contract 12/12, test 195/195, compare 43/43, rollback 43/43
+- P10 `npm run scope:acceptance -- --json` -> status `ok`
+- P10 `git diff --check` -> passed
 
 ## Validation Not Run
 
@@ -131,18 +163,22 @@ P10-observability-admin
 - no tag, release, deploy, branch deletion, or PR merge
 - no full remote branch merge; stale state docs intentionally not imported
 - no provider/DB/production write authorized
+- no `.env` / secret file edits
+- no dependency changes
+- no public MCP tool expansion
 
 ## Current Blockers
 
-- none for local validation
+- none for local validation; push remains forbidden without explicit authorization
 
 ## Remaining Risks
 
 - Future push remains separately authorized only.
 - Any true `workspace_id` backfill remains blocked until a reviewed mapping proposal and explicit data-write approval exist.
-- This batch intentionally leaves remote stale docs behind; if later merging that branch, exclude those files again.
-- The current query suite is still fixture-only; true provider/retrieval quality scoring remains separate and must not be implied from fixture assertions.
+- Soft read policy is intentionally default-off; enabling it in a real client is a behavior change and should be separately staged.
+- Secret scanning is pattern-based and conservative; future tuning may need allowlist/denylist review if false positives appear.
+- Fixture recall dry-run is not provider quality scoring; true provider/retrieval quality remains separate and must not be implied.
 
 ## Next Safe Action
 
-S-010 primary docs commit is local at `e466b0e docs: summarize observability schema contract`; push remains separate explicit authorization.
+Create guarded local commit for P10 runtime gate, then stop without push. Recommended next task: document runtime gate flags and add fixture-only `gate:ci` policy preflight output.

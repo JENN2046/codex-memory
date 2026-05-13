@@ -72,6 +72,8 @@ test('HTTP MCP should expose health and tools/list', async () => {
     const healthPayload = await health.json();
     assert.equal(health.status, 200);
     assert.equal(healthPayload.ok, true);
+    assert.equal(healthPayload.auth.required, false);
+    assert.match(healthPayload.auth.warning, /loopback host without a bearer token/);
 
     const tools = await fetch(address.url, {
       method: 'POST',
@@ -88,6 +90,53 @@ test('HTTP MCP should expose health and tools/list', async () => {
     const payload = await tools.json();
     assert.equal(payload.result.tools.length, 3);
   });
+});
+
+test('HTTP MCP should fail fast when non-loopback host has no bearer token', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-auth-'));
+  const app = createCodexMemoryApplication({
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data')
+  });
+
+  try {
+    assert.throws(() => createStreamableHttpServer({
+      app,
+      host: '0.0.0.0',
+      port: 0,
+      mcpPath: '/mcp/codex-memory',
+      bearerToken: ''
+    }), /CODEX_MEMORY_HTTP_TOKEN is required/);
+  } finally {
+    await app.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('HTTP MCP should allow non-loopback host when bearer token is configured', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-auth-'));
+  const app = createCodexMemoryApplication({
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data')
+  });
+
+  try {
+    const httpServer = createStreamableHttpServer({
+      app,
+      host: '0.0.0.0',
+      port: 0,
+      mcpPath: '/mcp/codex-memory',
+      bearerToken: 'test-token'
+    });
+    assert.equal(httpServer.authWarning, null);
+  } finally {
+    await app.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
 });
 
 test('HTTP MCP should execute record_memory through tools/call', async () => {

@@ -110,6 +110,10 @@ class SqliteShadowStore {
     return quoted ? quoted[1].replace(/''/g, "'") : rawDefault;
   }
 
+  hasMemoryRecordColumn(columnName) {
+    return this.memoryRecordColumns.has(columnName);
+  }
+
   getScopeWriteValue(columnName, value) {
     const normalized = typeof value === 'string' ? value.trim() : '';
     if (normalized) {
@@ -279,6 +283,31 @@ class SqliteShadowStore {
       });
     }
     return result;
+  }
+
+  async getRecordsPolicyMap(memoryIds = []) {
+    await this.ensureReady();
+    const uniqueIds = [...new Set(memoryIds.filter(Boolean))];
+    if (uniqueIds.length === 0) {
+      return new Map();
+    }
+
+    this.refreshMemoryRecordColumnInfo();
+    const hasStatus = this.hasMemoryRecordColumn('status');
+    const placeholders = uniqueIds.map(() => '?').join(',');
+    const rows = this.db.prepare(`
+      SELECT memory_id, client_id, visibility${hasStatus ? ', status' : ''}
+      FROM memory_records WHERE memory_id IN (${placeholders})
+    `).all(...uniqueIds);
+
+    return new Map(rows.map(row => [
+      row.memory_id,
+      {
+        status: hasStatus ? (row.status || 'active') : 'active',
+        clientId: row.client_id || null,
+        visibility: row.visibility || null
+      }
+    ]));
   }
 
   normalizePathFilters(raw) {
@@ -564,6 +593,7 @@ class SqliteShadowStore {
       taskId: row.task_id || null,
       conversationId: row.conversation_id || null,
       visibility: row.visibility || null,
+      status: Object.prototype.hasOwnProperty.call(row, 'status') ? (row.status || null) : null,
       retentionPolicy: row.retention_policy || null
     };
   }

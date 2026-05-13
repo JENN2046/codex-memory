@@ -26,6 +26,26 @@ async function withApp(handler) {
   }
 }
 
+async function withPolicyApp(handler) {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-policy-runtime-'));
+  const app = createCodexMemoryApplication({
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data'),
+    enableSoftReadPolicy: true
+  });
+
+  await app.initialize();
+
+  try {
+    await handler({ app, tempBasePath });
+  } finally {
+    await app.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+}
+
 const requestContext = {
   executionContext: {
     agentAlias: 'Codex',
@@ -208,7 +228,7 @@ test('policy preflight: hypothetical default status and visibility policy would 
         arguments: {
           query: 'soft read policy preflight signal',
           target: 'process',
-          limit: 20,
+          limit: 10,
           include_content: true
         }
       }
@@ -228,5 +248,82 @@ test('policy preflight: hypothetical default status and visibility policy would 
 
     const keptTitles = hypothetical.map(record => record.title).sort();
     assert.deepEqual(keptTitles, ['Active Shared', 'Private Codex']);
+  });
+});
+
+test('soft read policy runtime flag filters proposal, rejected, tombstoned, and cross-client private records', async () => {
+  await withPolicyApp(async ({ app }) => {
+    assert.equal(app.config.enableSoftReadPolicy, true);
+    const server = new CodexMemoryMcpServer({ app });
+    const { shadowStore } = app.stores;
+
+    const fixtures = [
+      { title: 'Runtime Active Shared', status: 'active', visibility: 'shared', clientId: 'codex' },
+      { title: 'Runtime Stale Shared', status: 'stale', visibility: 'shared', clientId: 'codex' },
+      { title: 'Runtime Proposal Shared', status: 'proposal', visibility: 'shared', clientId: 'codex' },
+      { title: 'Runtime Rejected Shared', status: 'rejected', visibility: 'shared', clientId: 'codex' },
+      { title: 'Runtime Tombstoned Shared', status: 'tombstoned', visibility: 'shared', clientId: 'codex' },
+      { title: 'Runtime Private Claude', status: 'active', visibility: 'private', clientId: 'claude' },
+      { title: 'Runtime Private Codex', status: 'active', visibility: 'private', clientId: 'codex' }
+    ];
+
+    for (let index = 0; index < fixtures.length; index += 1) {
+      const fixture = fixtures[index];
+      const record = await server.handleJsonRpc({
+        jsonrpc: '2.0',
+        id: index + 1,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: fixture.title,
+            content: `Type: checkpoint\nruntime soft policy signal\nfixture: ${fixture.title}`,
+            evidence: `runtime-soft-policy-${fixture.title}`,
+            validated: true,
+            reusable: false,
+            tags: ['policy', 'runtime', 'soft-read'],
+            sensitivity: 'none',
+            project_id: 'policy-runtime-project',
+            visibility: fixture.visibility,
+            client_id: fixture.clientId
+          }
+        }
+      }, requestContext);
+
+      assert.equal(record.response.result.structuredContent.decision, 'accepted');
+      await updatePolicyFields(shadowStore, record.response.result.structuredContent.memoryId, fixture);
+    }
+
+    const searchResult = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 300,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'runtime soft policy signal',
+          target: 'process',
+          limit: 10,
+          include_content: true
+        }
+      }
+    }, requestContext);
+
+    const titles = (searchResult.response.result.structuredContent.results || [])
+      .map(result => result.title)
+      .sort();
+
+    assert.deepEqual(titles, [
+      'Runtime Active Shared',
+      'Runtime Private Codex',
+      'Runtime Stale Shared'
+    ]);
+  });
+});
+
+test('soft read policy remains off by default', async () => {
+  await withApp(async ({ app }) => {
+    assert.equal(app.config.enableSoftReadPolicy, false);
   });
 });

@@ -111,6 +111,60 @@ async function applyScopeFilter(results, scope, shadowStore) {
   });
 }
 
+function inferRequestClientId(requestContext = {}, scope = null) {
+  const scopedClientId = typeof scope?.client_id === 'string' ? scope.client_id.trim().toLowerCase() : '';
+  if (scopedClientId) {
+    return scopedClientId;
+  }
+
+  const executionContext = requestContext.executionContext || {};
+  const candidates = [
+    executionContext.clientId,
+    executionContext.client_id,
+    executionContext.agentAlias,
+    executionContext.agentId
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = String(candidate || '').trim().toLowerCase();
+    if (normalized.startsWith('codex')) return 'codex';
+    if (normalized.startsWith('claude')) return 'claude';
+    if (normalized.startsWith('omc')) return 'omc';
+    if (normalized === 'manual') return 'manual';
+  }
+
+  return 'codex';
+}
+
+async function applySoftReadPolicy(results, { config, shadowStore, requestContext = {}, scope = null } = {}) {
+  if (!config?.enableSoftReadPolicy || !Array.isArray(results) || results.length === 0) {
+    return results;
+  }
+
+  const memoryIds = [...new Set(results.map(item => item.memoryId || item.memory_id).filter(Boolean))];
+  const policyMap = memoryIds.length > 0
+    ? await shadowStore.getRecordsPolicyMap(memoryIds)
+    : new Map();
+  const requestClientId = inferRequestClientId(requestContext, scope);
+
+  return results.filter(item => {
+    const memoryId = item.memoryId || item.memory_id;
+    const policy = policyMap.get(memoryId) || {};
+    const status = String(policy.status || 'active').toLowerCase();
+    if (['proposal', 'rejected', 'tombstoned'].includes(status)) {
+      return false;
+    }
+
+    const visibility = String(policy.visibility || '').toLowerCase();
+    const clientId = String(policy.clientId || '').toLowerCase();
+    if (visibility === 'private' && clientId && clientId !== requestClientId) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
 function createCodexMemoryApplication(overrides = {}) {
   const config = createConfig(overrides);
   const diaryStore = new DiaryStore(config);
@@ -300,7 +354,13 @@ function createCodexMemoryApplication(overrides = {}) {
         const filtered = (scopeFilter && searchResults && searchResults.length)
           ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)
           : searchResults;
-        return { results: filtered };
+        const policyFiltered = await applySoftReadPolicy(filtered, {
+          config,
+          shadowStore,
+          requestContext,
+          scope: scopeFilter
+        });
+        return { results: policyFiltered };
       }
 
       if (toolName === 'memory_overview') {
@@ -333,5 +393,7 @@ function createCodexMemoryApplication(overrides = {}) {
 }
 
 module.exports = {
+  applySoftReadPolicy,
+  inferRequestClientId,
   createCodexMemoryApplication
 };

@@ -131,3 +131,16 @@ test('real-query-suite default cases should cover every default dataset query', 
     assert.ok(suiteQueries.has(query), `missing default dataset query: ${query}`);
   }
 });
+
+test('real-query-suite supports fixture recall dry-run without durable memory', () => {
+  const result = runCli(['--json', '--fixture-recall-dry-run']);
+  assert.equal(result.status, 0);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.status, 'ok');
+  assert.equal(report.fixtureRecallDryRun.enabled, true);
+  assert.equal(report.fixtureRecallDryRun.mutated, false);
+  assert.equal(report.fixtureRecallDryRun.providerCalls, 0);
+  assert.equal(report.fixtureRecallDryRun.durableMemoryTouched, false);
+  assert.equal(report.fixtureRecallDryRun.caseCount, report.caseCount);
+  assert.equal(report.fixtureRecallDryRun.failedCount, 0);
+});

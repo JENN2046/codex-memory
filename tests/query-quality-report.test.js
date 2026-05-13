@@ -96,3 +96,16 @@ test('query-quality-report CLI should preserve dry-run behavior on fixture drift
     fs.rmdirSync(tmpDir);
   }
 });
+
+test('query-quality-report supports fixture recall dry-run without durable memory', () => {
+  const result = runCli(['--json', '--dry-run', '--fixture-recall-dry-run']);
+  assert.equal(result.status, 0);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.status, 'ok');
+  assert.equal(report.mutated, false);
+  assert.equal(report.fixtureRecallDryRun.enabled, true);
+  assert.equal(report.fixtureRecallDryRun.providerCalls, 0);
+  assert.equal(report.fixtureRecallDryRun.durableMemoryTouched, false);
+  assert.equal(report.fixtureRecallDryRun.caseCount, report.caseCount);
+  assert.equal(report.fixtureRecallDryRun.failedCount, 0);
+});

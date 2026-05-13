@@ -46,6 +46,9 @@ async function main() {
   });
 
   const address = await httpServer.listen();
+  if (httpServer.authWarning) {
+    logger.info(httpServer.authWarning);
+  }
   logger.info(`vcp_codex_memory HTTP MCP listening on ${address.url}`);
 
   let shuttingDown = false;

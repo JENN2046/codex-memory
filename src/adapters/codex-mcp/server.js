@@ -8,6 +8,10 @@ const {
   SUPPORTED_PROTOCOL_VERSIONS,
   TOOL_DEFINITIONS
 } = require('../../core/constants');
+const {
+  ToolArgumentValidationError,
+  validateToolArguments
+} = require('../../core/ToolArgumentValidator');
 
 function jsonRpcSuccess(id, result) {
   return { jsonrpc: '2.0', id, result };
@@ -137,13 +141,24 @@ class CodexMemoryMcpServer {
         return { response: jsonRpcError(id, -32602, 'Invalid params', 'tools/call requires a tool name') };
       }
 
+      const args = params.arguments || {};
+      if (!args || typeof args !== 'object' || Array.isArray(args)) {
+        return { response: jsonRpcError(id, -32602, 'Invalid params', 'tools/call arguments must be an object') };
+      }
+
       try {
-        const payload = await this.app.callTool(params.name, params.arguments || {}, requestContext);
+        validateToolArguments(params.name, args);
+        const payload = await this.app.callTool(params.name, args, requestContext);
         const isError = payload?.decision === 'rejected';
         return {
           response: jsonRpcSuccess(id, formatToolResult(payload, isError))
         };
       } catch (error) {
+        if (error instanceof ToolArgumentValidationError) {
+          return {
+            response: jsonRpcError(id, -32602, 'Invalid params', error.message)
+          };
+        }
         appendToolErrorLog(this.app, params.name, error);
         return {
           response: jsonRpcError(id, -32603, 'Internal error', error.message || 'Unknown tool execution error')

@@ -2,9 +2,9 @@
 
 ## Current State
 
-当前本地工作在 `P10` observability admin 线。远端 `main` 已同步到 `bcaf440 docs: record observability schema commit state`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+当前本地工作在 `P10-memory-policy-hardening-runtime-gate` 线。远端 `main` 已同步到 `6b075ac docs: record observability contract commit state`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次 `S-010` 给 README / VALIDATION 补 dashboard/http-observe schema contract 摘要：文档现在明确 `summary`、`governance`、`audits`、`scope`、`logs` 的只读观测边界。本轮不改运行时代码，不写真实 SQLite，不调用 provider。
+最新本地批次 `P10` 完成 runtime gate hardening：secret-like 写入在 diary 前拒绝，MCP `tools/call` 参数校验启用，HTTP non-loopback empty-token fail-fast，soft read policy 以 feature flag 默认关闭，query suite 支持 fixture recall dry-run。本轮不扩大 public MCP tools，不改 `.env`，不新增依赖，不调用 provider，不 push。
 
 ## Workspace / Branch
 
@@ -70,12 +70,19 @@
 - S-010 documented dashboard/http-observe schema contract boundaries in README / VALIDATION.
 - Current S-010 docs validation passed: `git diff --check`; `scripts/validate-local.ps1 -Area docs`.
 - S-010 primary docs commit created: `e466b0e docs: summarize observability schema contract`.
+- P10-1 added write-time secret scanner and security write policy tests.
+- P10-2 added MCP runtime schema validation for unknown fields, enum mismatch, and invalid scope with `-32602`.
+- P10-3 hardened HTTP auth: non-loopback + empty token fails fast; loopback no-token remains local-dev with warning.
+- P10-4 added `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY=false` default-off runtime filtering for proposal/rejected/tombstoned and cross-client private when enabled.
+- P10-5 added `--fixture-recall-dry-run` to `real-query-suite` and `query:quality`.
+- Current P10 validation passed: `security-write-policy` 2/2; `mcp-contract` 7/7; `mcp-http` 5/5; `policy-read-preflight` 4/4; query tests 16/16; `npm test` 195/195; `gate:mainline:strict` ok; `scope:acceptance --json` ok; `git diff --check` passed.
 
 ## Next
 
-- P1: push local S-010 commits only after explicit remote authorization.
-- P2: otherwise stop at this stable docs checkpoint.
-- P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
+- P1: create guarded local commit for P10 runtime gate.
+- P2: do not push unless explicitly authorized.
+- P3: recommended next local task is docs/config note for runtime gate flags plus fixture-only `gate:ci` policy preflight output.
+- P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
 

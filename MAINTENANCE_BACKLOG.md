@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：S-010 dashboard/http-observe schema contract docs batch 已验证完成
+- 当前 `main`：P10 memory policy runtime gate 本地 batch 已验证完成，等待本地提交；不 push
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
 - 标准 suite：`43/43 matched (0/0)`、npm test：`184/184`、`scope:acceptance`：`ok`
@@ -69,6 +69,11 @@
 | S-008 | memory-governance | A0 | done | 补 `governance:report` 输出样例与 troubleshooting note | `git diff --check`; docs review; `scripts/validate-local.ps1 -Area docs` | README / VALIDATION 现在给出最小 `review` JSON shape，并明确 unavailable/proposal/stale/tombstone/supersession 的只读处理建议 |
 | S-009 | observability-admin | A1 | done | 补 dashboard/http-observe 更细 schema snapshot | `node --test tests\dashboard-cli.test.js tests\http-observe-cli.test.js`; `npm test`; `npm run gate:ci -- --json`; `git diff --check` | dashboard/http-observe tests 现在锁住 top-level、summary、governance、audit/scope/logs 等关键 JSON 字段集合 |
 | S-010 | observability-admin | A0 | done | 补 dashboard/http-observe schema contract 摘要 | `git diff --check`; `scripts/validate-local.ps1 -Area docs` | README / VALIDATION 现在说明 `summary`、`governance`、`audits`、`scope`、`logs` 字段边界；只读观测不授权 backfill、migration、lifecycle write 或 MCP contract 扩展 |
+| P10-1 | memory-policy-hardening | A2 | done | 写入前 secret scanner | `node --test tests\security-write-policy.test.js`; `npm test`; `npm run gate:mainline:strict` | `MemoryWriteService` 写 diary 前扫描 title/content/evidence/tags；命中 secret-like 内容拒绝，audit 不记录原始 secret |
+| P10-2 | memory-policy-hardening | A2 | done | MCP `tools/call` runtime schema validation | `node --test tests\mcp-contract.test.js`; `npm test`; `npm run gate:mainline:strict` | unknown field / enum mismatch / invalid scope 返回 `-32602`；`TOOL_DEFINITIONS` 未放宽，public tools 仍为 3 个 |
+| P10-3 | memory-policy-hardening | A2 | done | HTTP auth hardening | `node --test tests\mcp-http.test.js`; `npm test`; `npm run gate:mainline:strict` | non-loopback host + empty token fail-fast；loopback no-token 保持可开发并在 health/log warning 中显式提示 |
+| P10-4 | memory-policy-hardening | A3 | done | soft read policy feature flag | `node --test tests\policy-read-preflight.test.js`; `npm test`; `npm run gate:mainline:strict` | `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` 默认 false；开启后过滤 proposal/rejected/tombstoned 与 cross-client private；默认行为保持不变 |
+| P10-5 | memory-policy-hardening | A2 | done | query suite fixture recall dry-run | `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js`; `npm test`; `npm run gate:mainline:strict` | `real-query-suite` / `query:quality` 支持 `--fixture-recall-dry-run`，只读 fixture，不碰 durable memory，不调用 provider |
 
 ## 推荐执行顺序
 
@@ -80,8 +85,9 @@
 6. `P5` 已完成：README / VALIDATION 已补 `governance:report` 输出样例和 troubleshooting note。
 7. `P6` 已完成：dashboard/http-observe 已补更细 JSON schema snapshot。
 8. `P7` 已完成：README / VALIDATION 已补 dashboard/http-observe schema contract 摘要。
-9. `P8`：本线可以先停在稳定点；若继续，小步优先考虑只读 observability/admin 文档或 snapshot，不主动扩到 runtime。
-10. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+9. `P8` 已完成：P10 runtime gate 已把 scoped memory runtime 推进到可信记忆内核的第一层本地门禁。
+10. `P9`：建议下一步做 runtime gate 文档/配置说明与 `gate:ci` policy preflight 输出常态化，不直接扩大 enforcement。
+11. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

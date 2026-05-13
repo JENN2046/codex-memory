@@ -374,6 +374,7 @@ function createConfig(overrides = {}) {
     rerankMaxTokensPerBatch: Number.parseInt(String(overrides.rerankMaxTokensPerBatch || process.env.CODEX_MEMORY_RERANK_MAX_TOKENS || '12000'), 10) || 12000,
     rerankTimeoutMs: Number.parseInt(String(overrides.rerankTimeoutMs || process.env.CODEX_MEMORY_RERANK_TIMEOUT_MS || '12000'), 10) || 12000,
     enableCandidateCache: toBoolean(overrides.enableCandidateCache ?? process.env.CODEX_MEMORY_ENABLE_CANDIDATE_CACHE, true),
+    enableSoftReadPolicy: toBoolean(overrides.enableSoftReadPolicy ?? process.env.CODEX_MEMORY_ENABLE_SOFT_READ_POLICY, false),
     candidateCacheTtlMs: Number.parseInt(String(overrides.candidateCacheTtlMs || process.env.CODEX_MEMORY_CANDIDATE_CACHE_TTL_MS || '3600000'), 10) || 3600000,
     candidateCacheMaxEntries: Number.parseInt(String(overrides.candidateCacheMaxEntries || process.env.CODEX_MEMORY_CANDIDATE_CACHE_MAX_ENTRIES || '200'), 10) || 200,
     lightMemoExcludedFolders: normalizeStringList(

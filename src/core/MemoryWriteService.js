@@ -1,6 +1,7 @@
 const crypto = require('node:crypto');
 
 const { VisibilityPolicy, Namespace, createShadowWriteStatus } = require('./types');
+const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
 
 const HIGH_RISK_SENSITIVITY_PATTERN = /\b(secret|unsafe|credential|credentials|password|passwd|token|api[-_ ]?key|access[-_ ]?key|private[-_ ]?key|secret[-_ ]?key)\b/i;
 
@@ -120,6 +121,18 @@ class MemoryWriteService {
 
     if (!title || !content || !evidence) {
       result = this.buildRejectedResult('title, content, and evidence are required.', executionContext, target);
+      await this.writeAudit(result);
+      return result;
+    }
+
+    const secretScan = scanMemoryWritePayload({
+      title,
+      content,
+      evidence,
+      tags
+    });
+    if (!secretScan.ok) {
+      result = this.buildRejectedResult(formatSecretRejectionReason(secretScan), executionContext, target);
       await this.writeAudit(result);
       return result;
     }

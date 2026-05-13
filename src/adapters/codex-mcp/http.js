@@ -45,6 +45,24 @@ function createUnauthorizedPayload() {
   };
 }
 
+function isLoopbackHost(host) {
+  const normalized = String(host || '').trim().toLowerCase();
+  return normalized === 'localhost'
+    || normalized === '127.0.0.1'
+    || normalized === '::1'
+    || normalized === '[::1]';
+}
+
+function getHttpAuthWarning({ host, bearerToken }) {
+  if (bearerToken) {
+    return null;
+  }
+  if (!isLoopbackHost(host)) {
+    throw new Error('CODEX_MEMORY_HTTP_TOKEN is required when CODEX_MEMORY_HTTP_HOST is not loopback.');
+  }
+  return 'HTTP MCP is bound to a loopback host without a bearer token; this is allowed for local development only.';
+}
+
 function parseRequestBody(req, maxBytes = 1024 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -91,6 +109,7 @@ function createStreamableHttpServer({
   bearerToken = '',
   baseRequestContext = {}
 }) {
+  const authWarning = getHttpAuthWarning({ host, bearerToken });
   const pathname = normalizePathname(mcpPath);
   const healthPathname = normalizePathname('/health');
   const mcpServer = new CodexMemoryMcpServer({ app });
@@ -147,7 +166,11 @@ function createStreamableHttpServer({
           name: app.config.serverVersion ? 'vcp_codex_memory' : 'codex-memory',
           version: app.config.serverVersion,
           protocol: 'streamable-http',
-          path: pathname
+          path: pathname,
+          auth: {
+            required: !!bearerToken,
+            warning: authWarning
+          }
         });
       }
 
@@ -253,6 +276,7 @@ function createStreamableHttpServer({
     host,
     port,
     pathname,
+    authWarning,
     async listen() {
       await new Promise((resolve, reject) => {
         server.once('error', reject);
@@ -286,5 +310,7 @@ function createStreamableHttpServer({
 module.exports = {
   SESSION_HEADER,
   createStreamableHttpServer,
+  getHttpAuthWarning,
+  isLoopbackHost,
   normalizePathname
 };

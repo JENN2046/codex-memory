@@ -3,7 +3,9 @@ const { parseSuiteArgs, runSuiteReport } = require('./real-query-suite-core');
 
 async function main() {
   const options = parseSuiteArgs(process.argv.slice(2));
-  const report = runSuiteReport(options.suiteFile);
+  const report = runSuiteReport(options.suiteFile, {
+    fixtureRecallDryRun: options.fixtureRecallDryRun
+  });
 
   if (options.json) {
     process.stdout.write(JSON.stringify(report, null, 2) + '\n');
@@ -19,6 +21,9 @@ async function main() {
     process.stdout.write(`assertedCount: ${report.assertedCount}\n`);
     process.stdout.write(`passedCount: ${report.passedCount}\n`);
     process.stdout.write(`failedCount: ${report.failedCount}\n`);
+    if (report.fixtureRecallDryRun) {
+      process.stdout.write(`fixtureRecallDryRun: ${report.fixtureRecallDryRun.passedCount}/${report.fixtureRecallDryRun.caseCount}\n`);
+    }
   }
 
   process.exitCode = report.status === 'error' || report.status === 'failed' ? 1 : 0;

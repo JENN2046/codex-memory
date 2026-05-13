@@ -150,6 +150,7 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
       jsonrpc: '2.0', id: 1, method: 'tools/list', params: {}
     });
     const tools = list.response.result.tools;
+    assert.deepEqual(tools.map(tool => tool.name).sort(), ['memory_overview', 'record_memory', 'search_memory']);
     const recordMemory = tools.find(t => t.name === 'record_memory');
     assert.ok(recordMemory);
     const schema = recordMemory.inputSchema;
@@ -163,6 +164,83 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
     assert.ok(schema.properties.task_id);
     assert.ok(schema.properties.conversation_id);
     assert.ok(schema.properties.retention_policy);
+  });
+});
+
+test('MCP runtime schema validation should reject unknown fields with -32602', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 10,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Checkpoint',
+          content: 'Type: checkpoint\nrisk: schema validation',
+          evidence: 'contract test',
+          validated: true,
+          reusable: false,
+          sensitivity: 'none',
+          unexpected_field: true
+        }
+      }
+    });
+
+    assert.equal(result.response.error.code, -32602);
+    assert.match(result.response.error.data, /unexpected_field/);
+  });
+});
+
+test('MCP runtime schema validation should reject enum mismatch with -32602', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 11,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Checkpoint',
+          content: 'Type: checkpoint\nrisk: schema validation',
+          evidence: 'contract test',
+          validated: true,
+          reusable: false,
+          sensitivity: 'none',
+          client_id: 'unknown-client'
+        }
+      }
+    });
+
+    assert.equal(result.response.error.code, -32602);
+    assert.match(result.response.error.data, /client_id/);
+  });
+});
+
+test('MCP runtime schema validation should reject invalid scope with -32602', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 12,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'checkpoint',
+          scope: {
+            visibility: ['private', 'invalid-visibility']
+          }
+        }
+      }
+    });
+
+    assert.equal(result.response.error.code, -32602);
+    assert.match(result.response.error.data, /visibility/);
   });
 });
 
