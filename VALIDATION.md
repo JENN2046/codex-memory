@@ -1006,6 +1006,46 @@ Troubleshooting notes:
 - `stale90d > 0`: schedule governance review; do not auto-mutate lifecycle state.
 - `tombstonedCount` or `supersededCount` > 0: treat as audit/traceability evidence, not as delete permission.
 
+### 28.3 Dashboard / Observe Schema Contract
+
+For local observability review, use:
+
+```bash
+npm run dashboard -- --json
+npm run dashboard -- --json --summary-only
+npm run observe:http -- --json
+```
+
+`dashboard` and `observe:http` JSON output must remain read-only:
+
+- no HTTP daemon config writes
+- no audit log mutation
+- no lifecycle mutation
+- no real memory DB writes
+- no provider calls
+- no raw secret, token, credential, or raw `workspace_id` output
+
+The contract summary should preserve these field boundaries:
+
+- `summary`: report status, message, and count rollups only; no raw memory content.
+- `governance`: `status`, `reviewLevel`, counts, and hints for human review only; no proposal, tombstone, or supersession writes.
+- `audits.write`: recent bridge audit counts, decision breakdown, and safe entry metadata only.
+- `audits.recall`: recent recall audit counts, `recallType` breakdown, scoped recall counters, and low-risk scope breakdowns only.
+- `scope`: project/client/visibility/scope-mode observability only; not backfill, migration, or write authorization.
+- `logs.http` / `logs.watchdog`: log metadata, tail, error/recovery counters, listening/ensure signals only; no secret values.
+
+Schema-sensitive changes should update the docs and the snapshot tests together:
+
+```bash
+node --test tests\dashboard-cli.test.js tests\http-observe-cli.test.js
+```
+
+Docs-only contract changes should still run docs validation:
+
+```bash
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
 ---
 
 ## 29. Failure Handling

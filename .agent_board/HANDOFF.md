@@ -2,9 +2,9 @@
 
 ## Current State
 
-当前本地工作在 `P10` observability admin 线。远端 `main` 已同步到 `1db0317 docs: record governance troubleshooting commit state`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+当前本地工作在 `P10` observability admin 线。远端 `main` 已同步到 `bcaf440 docs: record observability schema commit state`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次 `S-009` 给 dashboard/http-observe 增加更细 schema snapshot：测试现在锁住 top-level、summary、governance、audit/scope/logs 等关键 JSON 字段集合。本轮不改运行时代码，不写真实 SQLite，不调用 provider。
+最新本地批次 `S-010` 给 README / VALIDATION 补 dashboard/http-observe schema contract 摘要：文档现在明确 `summary`、`governance`、`audits`、`scope`、`logs` 的只读观测边界。本轮不改运行时代码，不写真实 SQLite，不调用 provider。
 
 ## Workspace / Branch
 
@@ -66,13 +66,15 @@
 - S-009 added dashboard/http-observe detailed schema snapshots.
 - Current S-009 validation passed: `node --test tests\dashboard-cli.test.js tests\http-observe-cli.test.js` `6/6`; `npm test` `184/184`; `gate:ci --json` ok with compare/rollback `43/43` and query assertions `8/8`; `git diff --check` passed.
 - S-009 local commit created: `e41fc46 test: lock observability schemas`.
+- S-009 pushed to `origin/main`; current remote baseline is `bcaf440`.
+- S-010 documented dashboard/http-observe schema contract boundaries in README / VALIDATION.
+- Current S-010 docs validation passed: `git diff --check`; `scripts/validate-local.ps1 -Area docs`.
 
 ## Next
 
-- P1: push `e41fc46` only after explicit remote authorization.
-- P2: continue with README/VALIDATION schema contract summary for dashboard/http-observe, if desired.
-- P3: next safe local candidate is a README/VALIDATION schema contract summary for dashboard/http-observe, if desired.
-- P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
+- P1: create guarded local docs commit.
+- P2: push only after explicit remote authorization.
+- P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
 

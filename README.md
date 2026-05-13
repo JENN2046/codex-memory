@@ -346,6 +346,19 @@ npm run observe:http -- --json
 
 现在 `dashboard` 与 `observe:http` 都会顺手带出 governance summary。它们只做只读提示与状态分级，不会修改 proposal / tombstone / supersession 状态，也不会扩展 MCP contract。
 
+### Dashboard / Observe Schema Contract
+
+`dashboard --json` 与 `observe:http -- --json` 是只读观测契约；对应 key-set snapshot 由 `tests/dashboard-cli.test.js` 和 `tests/http-observe-cli.test.js` 锁住。字段边界如下：
+
+- `summary`：只放状态、消息和 count rollup，用于快速判断报告是否可用；不承载原始 memory 内容。
+- `governance`：只放 `status`、`reviewLevel`、counts 和 hints 等人工复核线索；不批准 proposal、不写 tombstone、不推进 supersession。
+- `audits.write`：只汇总最近 bridge audit 的数量、decision breakdown 和低风险条目 metadata；不重放写入，也不修改 audit log。
+- `audits.recall`：只汇总最近 recall audit、`recallType`、scoped recall counts 和 scope breakdown；不输出 raw `workspace_id`。
+- `scope`：只表示 recall/report 里的 project/client/visibility/scope-mode 观测维度；不能被当作 backfill、migration 或写入授权。
+- `logs.http` / `logs.watchdog`：只展示日志文件状态、tail、error/recovery counters 和 listening/ensure 线索；不得输出 secret、token 或 credential 值。
+
+如果这些字段新增、重命名或语义收窄，应同步更新 README / VALIDATION 和 schema snapshot tests。文档说明的是观测边界，不是 MCP tool contract 扩展。
+
 ## Governance 只读汇总
 
 `governance:report` 提供独立的只读治理快照；`dashboard` / `observe:http` 则复用这份快照做轻量 summary。

@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-P10 — S-009：补 dashboard/http-observe 更细 JSON schema snapshot，保护 observability 输出面。
+P10 — S-010：补 README/VALIDATION 的 dashboard/http-observe schema contract 摘要，明确 observability 输出边界。
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P10-observability-admin
 
 ## Current Status
 
-本轮 `S-009` 是测试增强：dashboard/http-observe 现在用更细的 schema snapshot 锁住 top-level、summary、governance、audit/scope/logs 等关键 JSON 字段集合。当前不改运行时代码，不改 MCP contract，不写真实 memory DB。
+本轮 `S-010` 是 docs-only contract 摘要：README / VALIDATION 现在说明 dashboard/http-observe 的 `summary` / `governance` / `audits` / `scope` / `logs` 字段边界。当前不改运行时代码，不改 MCP contract，不写真实 memory DB，不调用 provider。
 
 ## Completed Work
 
@@ -51,6 +51,9 @@ P10-observability-admin
 - README / VALIDATION 补充 governance troubleshooting note，明确 unavailable/proposal/stale/tombstone/supersession 的只读处理方式。
 - `tests/dashboard-cli.test.js` 增加 top-level、summary、governance、governance counts、audits/recall 的 key-set snapshot。
 - `tests/http-observe-cli.test.js` 增加 top-level、summary、health、config、logs、audits/write、audits/recall、governance 的 key-set snapshot。
+- README 新增 dashboard/observe schema contract 摘要，明确 `summary` / `governance` / `audits` / `scope` / `logs` 只读边界。
+- VALIDATION 新增 `Dashboard / Observe Schema Contract` 小节，记录对应命令、只读限制、字段边界和 snapshot test 维护要求。
+- STATUS / MAINTENANCE_BACKLOG / `.agent_board` 已推进到 S-010。
 
 ## Changed Files
 
@@ -68,6 +71,11 @@ P10-observability-admin
 - `VALIDATION.md`
 - `tests/dashboard-cli.test.js`
 - `tests/http-observe-cli.test.js`
+- `README.md`
+- `VALIDATION.md`
+- `STATUS.md`
+- `MAINTENANCE_BACKLOG.md`
+- `.agent_board/*`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
 - `GATE_CI_FIXTURE_ONLY_DESIGN.md`
@@ -114,6 +122,8 @@ P10-observability-admin
 - `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
+- S-010 `git diff --check` -> passed
+- S-010 `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` -> passed
 
 ## Validation Not Run
 
@@ -135,4 +145,4 @@ P10-observability-admin
 
 ## Next Safe Action
 
-S-009 test update is committed locally as `e41fc46 test: lock observability schemas`. Push remains separate explicit authorization.
+Create guarded local docs commit, then wait for explicit push authorization.
