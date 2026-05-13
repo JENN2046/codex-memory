@@ -63,4 +63,4 @@ memory-governance / lifecycle-planning
 
 ## Next Safe Action
 
-Inspect final diff scope, create a guarded local docs commit if clean, then stop without push. Next recommended task: `P11.1-lifecycle-fixture-schema-tests`.
+Primary P11 planning commit created locally: `380c62b docs: plan memory lifecycle core`. Commit this board-only closeout state, then stop without push. Next recommended task: `P11.1-lifecycle-fixture-schema-tests`.

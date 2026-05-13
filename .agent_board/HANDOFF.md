@@ -9,7 +9,7 @@ Continue P11-memory-lifecycle-core-planning in `A:\codex-memory`.
 - Workspace: A:\codex-memory
 - Branch: main
 - Remote boundary: no push / tag / release / deploy without explicit authorization
-- Current local state: `main` is ahead of `origin/main`; P10, P10 roadmap, and P10.1 commits are local only.
+- Current local state: `main` is ahead of `origin/main`; P10, P10 roadmap, P10.1, and P11 planning commits are local only.
 
 ## Current Area
 
@@ -63,4 +63,4 @@ memory-governance / lifecycle-planning
 
 ## Next Safe Step
 
-Commit locally if final diff scope remains clean, and stop without push. Recommended next task: `P11.1-lifecycle-fixture-schema-tests`.
+Commit this board-only closeout state, then stop without push. Recommended next task: `P11.1-lifecycle-fixture-schema-tests`.
