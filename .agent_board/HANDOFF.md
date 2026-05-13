@@ -76,13 +76,13 @@
 - P10-4 added `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY=false` default-off runtime filtering for proposal/rejected/tombstoned and cross-client private when enabled.
 - P10-5 added `--fixture-recall-dry-run` to `real-query-suite` and `query:quality`.
 - Current P10 validation passed: `security-write-policy` 2/2; `mcp-contract` 7/7; `mcp-http` 5/5; `policy-read-preflight` 4/4; query tests 16/16; `npm test` 195/195; `gate:mainline:strict` ok; `scope:acceptance --json` ok; `git diff --check` passed.
+- P10 primary runtime gate commit created: `edef872 feat: harden memory policy runtime gates`.
 
 ## Next
 
-- P1: create guarded local commit for P10 runtime gate.
-- P2: do not push unless explicitly authorized.
-- P3: recommended next local task is docs/config note for runtime gate flags plus fixture-only `gate:ci` policy preflight output.
-- P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
+- P1: do not push unless explicitly authorized.
+- P2: recommended next local task is docs/config note for runtime gate flags plus fixture-only `gate:ci` policy preflight output.
+- P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
 

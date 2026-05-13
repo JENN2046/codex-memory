@@ -181,4 +181,4 @@ P10-memory-policy-hardening-runtime-gate
 
 ## Next Safe Action
 
-Create guarded local commit for P10 runtime gate, then stop without push. Recommended next task: document runtime gate flags and add fixture-only `gate:ci` policy preflight output.
+P10 runtime gate is committed locally at `edef872 feat: harden memory policy runtime gates`. Stop without push. Recommended next task: document runtime gate flags and add fixture-only `gate:ci` policy preflight output.
