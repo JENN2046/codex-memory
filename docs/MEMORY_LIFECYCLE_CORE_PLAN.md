@@ -14,7 +14,7 @@
 - 不调用 provider。
 - 不 push / tag / release / deploy。
 
-长期路线图仍以 [VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md) 为准。P10 runtime gate 边界见 [runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)。
+长期路线图仍以 [VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md) 为准。P10 runtime gate 边界见 [runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)。P11.4 lifecycle read-policy runtime flag 规划见 [MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)。
 
 ## Direction
 
@@ -168,6 +168,7 @@ P11 lifecycle 与 P10 soft read policy 的关系：
 - `visibility=private` 继续受 `client_id` 限制；cross-client private 不应进入默认候选。
 - 该策略未来可由 `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` 或后续 lifecycle policy flag 控制。
 - 默认行为切换必须单独 staged，不能由本文档自动授权。
+- Lifecycle read-policy runtime flag 的细化规划见 [MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)。
 
 当前 P10 状态：
 
@@ -222,20 +223,23 @@ Plan source: [MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MEM
 - 真实 DB 只读检查可选，但不得写入。
 - 不运行真实 migration。
 
-### P11.3 Optional Read-Policy Runtime
+### P11.4 Lifecycle Read-Policy Runtime Flag Planning
 
 目标：
 
-- 在 feature flag 下把 lifecycle read policy 接入 runtime。
-- 默认行为保持关闭或兼容。
-- 与 P10 soft read policy 关系明确，避免双 flag 冲突。
+- 先规划 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`，不直接接入 runtime。
+- 明确 `active/stale` 默认可见，`proposal/rejected/superseded/tombstoned` 默认隐藏的未来策略。
+- 明确 lifecycle policy 与 scope/visibility policy 的过滤顺序。
+- 明确 read audit summary 的低风险字段。
 
 建议验收：
 
-- targeted read-policy tests。
-- MCP contract 不扩展。
-- 默认 flag off regression。
-- `gate:mainline:strict` 仅在 runtime 实现阶段运行。
+- docs validation。
+- 不修改 `src/`、`tests/`、`package.json`。
+- 不改变 `search_memory` runtime 行为。
+- 下一步进入 P11.5 fixture tests。
+
+Plan source: [MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)
 
 ### P12 Controlled Mutation Tools
 

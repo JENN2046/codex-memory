@@ -176,9 +176,10 @@ Future lifecycle SQLite work must follow these safety rules:
 
 目标：
 
-- Add an optional runtime flag for lifecycle-aware read policy.
+- Plan the optional lifecycle-aware read policy flag before runtime implementation.
 - Keep default behavior compatible until explicitly changed.
 - Preserve MCP public tools unless a later P12 task explicitly authorizes expansion.
+- Planning source: [MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)
 
 ### P12 Controlled Mutation Tools
 

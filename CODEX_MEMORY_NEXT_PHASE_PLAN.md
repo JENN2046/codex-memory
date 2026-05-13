@@ -39,7 +39,14 @@
 - 入口：[docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md)
 - 目标：先定义 lifecycle statuses、transition rules、audit event shape、read policy relationship 和 future test acceptance。
 - 边界：docs/tests-design only；不改 runtime，不改 tests，不新增 MCP tool，不做 SQLite migration，不迁移真实数据。
-- 下一步建议：P11.1 lifecycle fixture schema tests。
+- 当前进度：P11.1 fixture schema tests、P11.2 SQLite lifecycle dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests 均已进入远端主线。
+
+当前 P11.4 planning：
+
+- 入口：[docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)
+- 目标：规划 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY` 的默认关闭策略、status visibility matrix、scope 关系和 read audit summary。
+- 边界：docs/tests-design only；不改 runtime，不改 tests，不改 `package.json`，不改变 `search_memory` 行为。
+- 下一步建议：P11.5 lifecycle read-policy fixture tests。
 
 ## 当前判断
 

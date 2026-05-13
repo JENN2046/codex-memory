@@ -2,32 +2,37 @@
 
 ## Current Goal
 
-P11.3-lifecycle-sqlite-dry-run-cli-fixture-tests：实现 lifecycle SQLite dry-run CLI 和 fixture tests；只读报告缺失 lifecycle columns、会回填多少 `status=active`、风险等级和 rollback 要求。
+P11.4-lifecycle-read-policy-runtime-flag-planning：规划 lifecycle read policy runtime flag，明确默认关闭策略、status visibility、scope/visibility 关系、audit summary shape 和后续 P11.5/P11.6 验收路线。
 
 ## Current Area
 
-memory-governance / lifecycle-sqlite-dry-run-cli
+memory-governance / lifecycle-read-policy-planning
 
 ## Current Status
 
-当前是 A2 fixture-only CLI + tests。P11.2 lifecycle SQLite dry-run planning 已完成并本地提交，未 push。P11.3 本轮已新增只读 CLI、npm script、fixture tests 和文档入口，并已创建本地提交 `3188b28 feat: add lifecycle sqlite dry run`；不新增 MCP tools，不提供 `--confirm/--apply`，不改 `search_memory` 默认行为，不做 SQLite migration。
+当前是 A1/A2 docs/tests-design planning。`main` 已 push 到 `origin/main`，local `main == origin/main == remote main`，HEAD 为 `720a852`。P11.3 lifecycle SQLite dry-run CLI 已进入远端主线。
+
+本阶段只做 docs/board 规划，不改 runtime，不改 tests，不改 `package.json`，不新增 MCP public tools，不改 `search_memory` runtime 行为，不做 SQLite migration。
 
 ## Completed Work In This Batch
 
-- Added `src/cli/lifecycle-sqlite-dry-run.js`.
-- Added `lifecycle:sqlite:dry-run` npm script.
-- Added `tests/lifecycle-sqlite-dry-run-cli.test.js`.
-- CLI opens SQLite read-only and reports lifecycle column state with `mutated=false`.
-- CLI rejects `--confirm` and `--apply`.
-- Updated `docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md` with CLI usage and validation commands.
-- Updated `MAINTENANCE_BACKLOG.md`, `STATUS.md`, and `.agent_board` to track P11.3 and next P11.4/push readiness.
+- Added `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`.
+- Documented proposed flags:
+  - `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY`
+  - `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`
+- Recorded default-off policy for lifecycle read filtering.
+- Defined status visibility matrix for `active/stale/proposal/rejected/superseded/tombstoned`.
+- Defined lifecycle policy relationship with visibility/client scope.
+- Defined future read audit summary fields.
+- Updated lifecycle core and SQLite dry-run docs with links.
+- Updated next-phase plan, backlog, status, and board state.
 
 ## Changed Files
 
-- `package.json`
-- `src/cli/lifecycle-sqlite-dry-run.js`
-- `tests/lifecycle-sqlite-dry-run-cli.test.js`
+- `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`
+- `docs/MEMORY_LIFECYCLE_CORE_PLAN.md`
 - `docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -38,14 +43,12 @@ memory-governance / lifecycle-sqlite-dry-run-cli
 
 ## Validation Run
 
-- `node --test tests\lifecycle-sqlite-dry-run-cli.test.js`：passed `5/5`
-- `npm test`：passed `208/208`
-- `npm run lifecycle:sqlite:dry-run -- --json`：passed; reported `mutated=false`, `totalRecords=455`, `missingLifecycleColumns=5`, `wouldBackfillStatus=0`
-- `git diff --check`：passed with CRLF warnings only for `.agent_board/TASK_QUEUE.md` and `.agent_board/VALIDATION_LOG.md`
+- `git diff --check`：passed with CRLF/LF normalization warning only for `.agent_board/TASK_QUEUE.md`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
 ## Validation Not Run
 
+- No `npm test`; this is docs/board-only planning.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
@@ -53,15 +56,14 @@ memory-governance / lifecycle-sqlite-dry-run-cli
 
 ## Current Blockers
 
-- None for local validation.
-- Push remains blocked until separately authorized.
+- None for docs planning.
 
 ## Remaining Risks
 
-- This is dry-run only; no lifecycle columns are added by this batch.
-- Runtime read-policy flag remains future P11.4 planning/work.
-- Real migration remains deferred to a later P11.x stage and requires explicit authorization plus SQLite backup.
+- Lifecycle read-policy runtime is not implemented yet.
+- P11.5 fixture tests are still needed before any runtime flag implementation.
+- P11.6 runtime implementation must prove default-off behavior before changing any read path.
 
 ## Next Safe Action
 
-Commit this board-only closeout state, then stop without push. Next recommended task: `P11.4-lifecycle-read-policy-runtime-flag-planning` or push readiness gate.
+Close out without push. Next recommended task: `P11.5-lifecycle-read-policy-fixture-tests`.
