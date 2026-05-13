@@ -479,3 +479,4 @@ P22 release candidate must be validated. Tag/release/deploy still require explic
 - Do not modify `.env`, secrets, global config, startup tasks, or real provider keys.
 - Do not run real migrations or cleanup apply without explicit approval.
 - Do not jump to P16, P17, V8, UI, release candidate, tag, or deploy before the prerequisite stages are done.
+- Superseded stale branches may only be used for selective documentation salvage; runtime, test, package, and board changes must not be merged or cherry-picked from stale branches.

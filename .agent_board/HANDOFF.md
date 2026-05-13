@@ -2,49 +2,43 @@
 
 ## Goal
 
-Resume after `P11.7-lifecycle-read-policy-runtime-fixture-tests` in `A:\codex-memory`.
+Resume after `P11.x-stale-branch-quarantine-and-doc-salvage` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
-- Branch: main
-- Current local baseline before this batch: `243dccf docs: plan lifecycle read policy runtime flag implementation`
+- Branch: `codex/p11x-stale-branch-quarantine-doc-salvage`
+- Base: `origin/main` / `180eec4`
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-memory-governance / lifecycle-read-policy-runtime-fixtures
+P6-docs-drift / stale-branch-quarantine
 
 ## Completed In Current Batch
 
-- Added [lifecycle-read-policy-runtime-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-read-policy-runtime-v1.json).
-- Added [lifecycle-read-policy-runtime-fixture.test.js](/A:/codex-memory/tests/lifecycle-read-policy-runtime-fixture.test.js).
-- Locked future runtime flag expectations before implementation:
-  - default flags remain `false`
-  - `active/stale` are included when lifecycle policy is enabled
-  - `proposal/rejected/superseded/tombstoned` are excluded when lifecycle policy is enabled
-  - stale visible records are counted via `staleResultCount`
-  - private visibility requires same `client_id` under soft read policy
-  - missing lifecycle columns require warn/fail-safe behavior
-  - audit summary includes `lifecycleColumnAvailable` and `scopeWorkspacePresent`, not raw `workspace_id`
-- Updated lifecycle docs, backlog, status, and board state.
+- Added [stale branch review](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md).
+- Recorded `codex/p1-vcp-memory-core-100-roadmap` as superseded stale reference branch.
+- Recorded compare facts: diverged, ahead 20, behind 38, merge base `7d634bb`.
+- Documented no-merge/no-rebase/no-development-base decision.
+- Added current-main [personal production readiness](/A:/codex-memory/docs/PERSONAL_PRODUCTION_READINESS.md).
+- Updated next-phase plan, parity roadmap, status, maintenance backlog, and board.
 
 ## Changed Files
 
-- `tests/fixtures/lifecycle-read-policy-runtime-v1.json`
-- `tests/lifecycle-read-policy-runtime-fixture.test.js`
-- `docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md`
-- `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`
+- `docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md`
+- `docs/PERSONAL_PRODUCTION_READINESS.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`：passed `10/10`
-- `npm test`：passed `227/227`
-- `git diff --check`：passed with CRLF/LF normalization warnings only for `.agent_board/TASK_QUEUE.md` and `.agent_board/VALIDATION_LOG.md`
+- `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
+- Manual check for `docs/PERSONAL_PRODUCTION_READINESS.md`：passed; no old tag as current fact, no stale-branch merge claim, no secret value example, no obsolete gate command, no conflict with parity roadmap boundary.
 
 ## MCP Mode
 
@@ -60,8 +54,9 @@ memory-governance / lifecycle-read-policy-runtime-fixtures
 ## Remaining Risks
 
 - P11.8 optional runtime implementation must preserve default-off behavior.
-- Gate/CI summary should wait for P11.9.
+- Future agents must not merge, rebase, or cherry-pick stale branch runtime/tests/package/board changes.
 
 ## Next Safe Step
 
-Close out without push. Recommended next task: `P11.8-lifecycle-read-policy-runtime-flag-implementation`.
+Validate docs, stop without push, then continue with
+`P11.8-lifecycle-read-policy-runtime-flag-implementation`.

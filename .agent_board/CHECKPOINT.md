@@ -2,38 +2,37 @@
 
 ## Current Goal
 
-P11.7-lifecycle-read-policy-runtime-fixture-tests：用 fixture tests 锁住 lifecycle read-policy runtime flag 的未来预期行为，不实现 runtime。
+P11.x-stale-branch-quarantine-and-doc-salvage：在 `origin/main` 基线上记录
+`codex/p1-vcp-memory-core-100-roadmap` 的 stale branch 审查结论，并只做文档/board
+层面的 salvage。
 
 ## Current Area
 
-memory-governance / lifecycle-read-policy-runtime-fixtures
+P6-docs-drift / stale-branch-quarantine
 
 ## Current Status
 
-当前是 A1/A2 tests/docs-only 阶段。P11.6 lifecycle read-policy runtime flag implementation planning 已完成并本地提交 `243dccf docs: plan lifecycle read policy runtime flag implementation`。`main...origin/main` 当前 ahead 3，push 未授权。
+当前是 A1 docs/board-only 阶段。基线为 `origin/main` / `180eec4`。旧分支
+`codex/p1-vcp-memory-core-100-roadmap` 已确认 diverged：ahead 20、behind 38、
+merge base `7d634bb`。
 
-本阶段只更新 fixture、tests、docs 和 board，不改 `src/`，不改 `package.json`，不改 `search_memory` runtime 行为，不新增 MCP public tools，不做 SQLite migration。
+本阶段不 merge、不 rebase、不 cherry-pick 旧分支；不改 `src/`、tests、
+`package.json`、`.env`、依赖、runtime、SQLite 或真实数据。
 
 ## Completed Work In This Batch
 
-- Added `tests/fixtures/lifecycle-read-policy-runtime-v1.json`.
-- Added `tests/lifecycle-read-policy-runtime-fixture.test.js`.
-- Locked default flags:
-  - `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY=false`
-  - `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY=false`
-- Locked future enabled-policy behavior for `active/stale/proposal/rejected/superseded/tombstoned`.
-- Locked stale visibility plus `staleResultCount`.
-- Locked soft read private same-client/cross-client fixture behavior.
-- Locked missing lifecycle-column warn/fail-safe expectation.
-- Locked audit summary fields including `lifecycleColumnAvailable` and `scopeWorkspacePresent`, with raw `workspace_id` excluded.
-- Updated lifecycle read-policy docs, backlog, status, and board state.
+- Added stale branch review for `codex/p1-vcp-memory-core-100-roadmap`.
+- Marked the old branch as superseded stale reference branch.
+- Recorded that future development base remains `origin/main`.
+- Added current-main personal production readiness guidance.
+- Updated next-phase, roadmap, status, maintenance backlog, and board state.
 
 ## Changed Files
 
-- `tests/fixtures/lifecycle-read-policy-runtime-v1.json`
-- `tests/lifecycle-read-policy-runtime-fixture.test.js`
-- `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`
-- `docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md`
+- `docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md`
+- `docs/PERSONAL_PRODUCTION_READINESS.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -44,28 +43,29 @@ memory-governance / lifecycle-read-policy-runtime-fixtures
 
 ## Validation Run
 
-- `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`：passed `10/10`
-- `npm test`：passed `227/227`
-- `git diff --check`：passed with CRLF/LF normalization warnings only for `.agent_board/TASK_QUEUE.md` and `.agent_board/VALIDATION_LOG.md`
+- `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
+- Manual check for `docs/PERSONAL_PRODUCTION_READINESS.md`：passed; no old tag as current fact, no stale-branch merge claim, no secret value example, no obsolete gate command, no conflict with parity roadmap boundary.
 
 ## Validation Not Run
 
+- No `npm test`; this batch does not touch runtime/tests/package.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
+- No merge / rebase / cherry-pick of the stale branch.
 - No push / tag / release / deploy.
 
 ## Current Blockers
 
-- None for docs planning.
+- None for docs/board quarantine.
 
 ## Remaining Risks
 
-- Runtime implementation is still future work.
-- P11.8 must preserve default-off behavior and must not add MCP tools.
-- Missing-column behavior is fixture-locked as warn/fail-safe, but runtime choice still belongs to P11.8 implementation.
+- P11.8 runtime implementation is still future work.
+- Stale branch content must stay read-only reference only; future agents must not reuse old runtime, test, package, or board changes.
 
 ## Next Safe Action
 
-Close out without push. Next recommended task: `P11.8-lifecycle-read-policy-runtime-flag-implementation`.
+Validate docs, stop without push, then return to
+`P11.8-lifecycle-read-policy-runtime-flag-implementation`.
