@@ -1,6 +1,6 @@
 # Scope Backfill Policy
 
-更新时间：2026-05-09
+更新时间：2026-05-13
 
 ## 1. 为什么不能直接回填真实数据
 
@@ -69,3 +69,24 @@
 - 输出 `wouldUpdate` 数量和建议默认值；其中 `workspace_id` 需要人工审查来源，不能自动猜测
 - `mutated` 永远为 `false`
 - 不提供 `--confirm`
+
+## 7. 当前 workspace_id 审查基线
+
+2026-05-13 已运行：
+
+```powershell
+npm run scope:backfill:dry-run -- --json
+```
+
+当前 dry-run 结果：
+
+- `totalRecords=450`
+- `alreadyScoped=8`
+- `missingProjectId=0`
+- `missingClientId=0`
+- `missingWorkspaceId=442`
+- `missingVisibility=0`
+- `wouldUpdate=442`
+- `mutated=false`
+
+这说明当前缺口主要是历史记录缺少 `workspace_id`。这些记录不能自动按当前仓库路径批量回填；下一步只允许按 [WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md](/A:/codex-memory/docs/WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md) 先做人工审查和脱敏 mapping proposal。

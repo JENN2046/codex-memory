@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-P9 — 安排远端 `origin/codex/p1-vcp-memory-core-100-roadmap` 的可用实现：只集成 runtime / CLI / storage / recall / tests 中可验证的 scope/runtime/query 变更，避开陈旧状态文档和远端 `.agent_board`。
+P9 — 在不写真实 DB 的前提下，把 `workspace_id` 历史回填推进到人工审查计划阶段，并同步当前本地/远端 `main` 的事实源。
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P9-codex-claude-client-scope
 
 ## Current Status
 
-本地集成批次已完成实现、修复、验证，并推送为 `e1883e6 feat: integrate scoped memory runtime tools` 与 `cf660d0 docs: record scoped memory commit state`。策略是 selective integration：不整支合并远端分支，不带入陈旧 `README` / `STATUS` / `PHASE_NAVIGATION` / `MAINTENANCE_BACKLOG` / 远端 `.agent_board`，只保留已验证的代码、测试、CLI、benchmark fixture 和 narrow docs。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+本地/远端 `main` 当前同步到 `8b2d56b docs: sync post-pr close status`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。最新只读 dry-run 显示 `450` records 中 `442` 条缺少 `workspace_id`，`mutated=false`；本轮只建立人工审查计划，不进行真实数据回填。
 
 ## Completed Work
 
@@ -22,13 +22,17 @@ P9-codex-claude-client-scope
 - 扩展 MCP contract、scope backfill、scope acceptance 相关回归测试。
 - 更新 `docs/scope-backfill-policy.md`，明确 `workspace_id` 不能自动猜测，需要人工审核。
 - 创建并推送 `e1883e6 feat: integrate scoped memory runtime tools` 与 `cf660d0 docs: record scoped memory commit state`。
+- 创建并推送 `8b2d56b docs: sync post-pr close status`。
 - 给 PR #2 留 superseded 说明并关闭 PR；未删除远端分支。
+- 运行 `scope:backfill:dry-run`，确认缺口集中在 `workspace_id`：`totalRecords=450`，`missingWorkspaceId=442`，`wouldUpdate=442`，`mutated=false`。
+- 新增 `docs/WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md`，明确 `workspace_id` 只能人工审查、脱敏 mapping proposal、小批量确认，不能自动猜测或批量写入。
 
 ## Changed Files
 
 - `package.json`
 - `benchmarks/real-query-suite/v1.json`
 - `docs/scope-backfill-policy.md`
+- `docs/WORKSPACE_ID_BACKFILL_REVIEW_PLAN.md`
 - `src/app.js`
 - `src/cli/gate-ci.js`
 - `src/cli/mainline-gate.js`
@@ -59,6 +63,9 @@ P9-codex-claude-client-scope
 - `npm test` -> 180/180 passed
 - `npm run gate:mainline:strict` -> ok; health `200`; contract 7/7; test 180/180; compare 43/43 matched; rollback 43/43 rollback-ready
 - `npm run scope:acceptance -- --json` -> ok; full scope dimensions present; Project A/B found; no cross-scope leak
+- `npm run scope:backfill:dry-run -- --json` -> ok; `450` total, `442` missing `workspace_id`, `mutated=false`
+- `npm run query:quality -- --json` -> ok; 5 placeholder cases, 0 invalid, no mutation
+- `npm run real-query-suite -- --json` -> ok; 5 placeholder cases, 5 valid, no mutation
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
@@ -71,13 +78,14 @@ P9-codex-claude-client-scope
 ## Current Blockers
 
 - none for local validation
-- current docs/board drift sync is validated and authorized for guarded local commit
+- current workspace_id review-plan docs batch is pending docs validation before any guarded local commit
 
 ## Remaining Risks
 
 - Future push remains separately authorized only.
+- Any true `workspace_id` backfill remains blocked until a reviewed mapping proposal and explicit data-write approval exist.
 - This batch intentionally leaves remote stale docs behind; if later merging that branch, exclude those files again.
 
 ## Next Safe Action
 
-Create guarded local docs/board sync commit, then run post-commit status/log check. Future push is not authorized by default.
+Run docs-only validation, inspect diff, then create a guarded local commit only if the diff stays scoped and clean. Future push and any real data backfill are not authorized by default.

@@ -2,15 +2,15 @@
 
 ## Current State
 
-当前本地工作是已推送的 `P9` selective integration：`e1883e6 feat: integrate scoped memory runtime tools` 从 `origin/codex/p1-vcp-memory-core-100-roadmap` 只取 scope/runtime/query 相关实现、CLI、tests、benchmark fixture 和 `docs/scope-backfill-policy.md`，明确排除陈旧状态文档和远端 `.agent_board`。状态记录提交 `cf660d0 docs: record scoped memory commit state` 也已推到 `origin/main`。
+当前本地工作在 `P9` scope/governance 线：`e1883e6 feat: integrate scoped memory runtime tools` 与后续状态同步提交已推到 `origin/main`，当前本地/远端 `main` 为 `8b2d56b docs: sync post-pr close status`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-本批次已完成本地修复、验证、推送与 PR 收口：恢复 schema enum 约束，修正 `scope-backfill-dry-run` 对仅缺 `workspace_id` 的记录统计，增强 `scope-acceptance` 的四维 strict isolation 检查，并保留 `MemoryWriteService` 的 camelCase 兼容。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+最新下一步是 docs-only：根据 `scope:backfill:dry-run` 的只读结果建立 `workspace_id` 人工审查计划。当前 dry-run 基线为 `450` records、`442` missing `workspace_id`、`wouldUpdate=442`、`mutated=false`。本轮不写真实 SQLite、不导出 broad memory、不自动生成 `workspace_id`。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: `cf660d0 docs: record scoped memory commit state`; local `main` matches `origin/main`
+- HEAD: `8b2d56b docs: sync post-pr close status`; local `main` matches `origin/main`
 - Remote baseline: current `origin/main` tip for this maintenance line
 - Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
@@ -40,13 +40,15 @@
 - `src/core/MemoryWriteService.js` accepts existing camelCase scope aliases to avoid breaking internal call sites.
 - Targeted tests passed 44/44; full `npm test` passed 180/180; strict gate passed; scope acceptance passed.
 - Guarded local commit `e1883e6` created; push remains unauthorized.
-- `e1883e6` and `cf660d0` pushed to `origin/main`.
+- `e1883e6`, `cf660d0`, and `8b2d56b` pushed to `origin/main`.
 - PR #2 closed as superseded; branch `codex/p1-vcp-memory-core-100-roadmap` retained.
+- `scope:backfill:dry-run` reports `442` records missing `workspace_id`; docs-only review plan added to avoid unsafe automatic backfill.
 
 ## Next
 
-- P1: create guarded local docs/board sync commit if not already present in `git log`.
-- P2: future push remains separate explicit authorization and is not implied by local commit approval.
+- P1: validate and optionally commit the docs-only `workspace_id` review-plan batch.
+- P2: start `real-query-suite` fixture replacement with sanitized, non-provider, fixture-only cases.
+- P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
 
@@ -55,3 +57,4 @@
 - rebuild-profile --confirm
 - cleanup apply / confirm
 - real SQLite migration (already done in H-002c)
+- real `workspace_id` backfill / SQL update / broad memory export
