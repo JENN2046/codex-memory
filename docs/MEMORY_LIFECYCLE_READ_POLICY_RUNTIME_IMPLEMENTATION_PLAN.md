@@ -29,6 +29,11 @@ P11.6 的目标是先规划 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY` 的 runt
 
 P11.6 不授权实现这些行为。实现应拆到后续阶段，并先通过 fixture/runtime tests 证明默认关闭行为不变。
 
+P11.7 runtime fixture test 入口：
+
+- Fixture: [tests/fixtures/lifecycle-read-policy-runtime-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-read-policy-runtime-v1.json)
+- Test: [tests/lifecycle-read-policy-runtime-fixture.test.js](/A:/codex-memory/tests/lifecycle-read-policy-runtime-fixture.test.js)
+
 ## Proposed Flags
 
 | Flag | Default | Runtime meaning |
@@ -188,6 +193,12 @@ Goal:
 - Cover missing-column behavior.
 - Cover audit summary shape.
 - Cover MCP public tools unchanged.
+
+Validation:
+
+```powershell
+node --test tests\lifecycle-read-policy-runtime-fixture.test.js
+```
 
 ### P11.8 Optional Runtime Flag Implementation
 

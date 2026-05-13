@@ -24,6 +24,11 @@ P11.6 runtime implementation planning 入口：
 
 - [MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md)
 
+P11.7 runtime fixture test 入口：
+
+- Fixture: [tests/fixtures/lifecycle-read-policy-runtime-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-read-policy-runtime-v1.json)
+- Test: [tests/lifecycle-read-policy-runtime-fixture.test.js](/A:/codex-memory/tests/lifecycle-read-policy-runtime-fixture.test.js)
+
 ## Purpose
 
 Lifecycle read policy 的目标是让未来 `search_memory` 能够按 lifecycle status 过滤普通召回结果，避免 `proposal`、`rejected`、`superseded`、`tombstoned` 默认进入普通记忆召回。
@@ -178,6 +183,7 @@ node --test tests\lifecycle-read-policy-fixture.test.js
 
 - 在 runtime 实现前补 fixture/runtime-oriented tests。
 - 覆盖 default-off、enabled filtering、missing-column behavior 和 audit summary shape。
+- 不接入 runtime，不改 `search_memory`，只锁定未来 runtime flag 行为契约。
 
 ### P11.8 Optional Runtime Flag Implementation
 

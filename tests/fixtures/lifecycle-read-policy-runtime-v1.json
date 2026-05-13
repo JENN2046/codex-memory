@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "lifecycle-read-policy-runtime-v1",
+  "flags": {
+    "CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY": false,
+    "CODEX_MEMORY_ENABLE_SOFT_READ_POLICY": false
+  },
+  "statuses": [
+    "active",
+    "stale",
+    "proposal",
+    "rejected",
+    "superseded",
+    "tombstoned"
+  ],
+  "enabledLifecyclePolicy": {
+    "include": [
+      "active",
+      "stale"
+    ],
+    "exclude": [
+      "proposal",
+      "rejected",
+      "superseded",
+      "tombstoned"
+    ]
+  },
+  "staleBehavior": {
+    "visible": true,
+    "countField": "staleResultCount"
+  },
+  "visibilityRules": {
+    "private": {
+      "requiresSameClientId": true
+    }
+  },
+  "missingColumnBehavior": {
+    "lifecycleColumnAvailable": false,
+    "whenLifecyclePolicyEnabled": "warn-or-fail-safe",
+    "mustNotTreatUnknownAsActive": true,
+    "automaticMigrationAllowed": false
+  },
+  "runtimeExamples": [
+    {
+      "id": "active-visible-when-enabled",
+      "status": "active",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "claude",
+      "lifecyclePolicyEnabled": true,
+      "softReadPolicyEnabled": false,
+      "expectedVisible": true,
+      "expectedHiddenByLifecycle": false,
+      "expectedStaleCounted": false
+    },
+    {
+      "id": "stale-visible-and-counted-when-enabled",
+      "status": "stale",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "claude",
+      "lifecyclePolicyEnabled": true,
+      "softReadPolicyEnabled": false,
+      "expectedVisible": true,
+      "expectedHiddenByLifecycle": false,
+      "expectedStaleCounted": true
+    },
+    {
+      "id": "proposal-hidden-when-enabled",
+      "status": "proposal",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "codex",
+      "lifecyclePolicyEnabled": true,
+      "softReadPolicyEnabled": false,
+      "expectedVisible": false,
+      "expectedHiddenByLifecycle": true,
+      "expectedStaleCounted": false
+    },
+    {
+      "id": "rejected-hidden-when-enabled",
+      "status": "rejected",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "codex",
+      "lifecyclePolicyEnabled": true,
+      "softReadPolicyEnabled": false,
+      "expectedVisible": false,
+      "expectedHiddenByLifecycle": true,
+      "expectedStaleCounted": false
+    },
+    {
+      "id": "superseded-hidden-when-enabled",
+      "status": "superseded",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "codex",
+      "lifecyclePolicyEnabled": true,
+      "softReadPolicyEnabled": false,
+      "expectedVisible": false,
+      "expectedHiddenByLifecycle": true,
+      "expectedStaleCounted": false
+    },
+    {
+      "id": "tombstoned-hidden-when-enabled",
+      "status": "tombstoned",
+      "visibility": "project",
+      "client_id": "codex",
+      "requestClientId": "codex",
+      "lifecyclePolicyEnabled": true,
+      "softReadPolicyEnabled": false,
+      "expectedVisible": false,
+      "expectedHiddenByLifecycle": true,
+      "expectedStaleCounted": false
+    },
+    {
+      "id": "private-same-client-visible-under-soft-policy",
+      "status": "active",
+      "visibility": "private",
+      "client_id": "codex",
+      "requestClientId": "codex",
+      "lifecyclePolicyEnabled": true,
+      "softReadPolicyEnabled": true,
+      "expectedVisible": true,
+      "expectedHiddenByLifecycle": false,
+      "expectedStaleCounted": false
+    },
+    {
+      "id": "private-cross-client-hidden-under-soft-policy",
+      "status": "active",
+      "visibility": "private",
+      "client_id": "claude",
+      "requestClientId": "codex",
+      "lifecyclePolicyEnabled": true,
+      "softReadPolicyEnabled": true,
+      "expectedVisible": false,
+      "expectedHiddenByLifecycle": false,
+      "expectedStaleCounted": false
+    }
+  ],
+  "auditSummary": {
+    "requiredFields": [
+      "readPolicyApplied",
+      "lifecyclePolicyApplied",
+      "lifecycleIncludedStatuses",
+      "lifecycleExcludedStatuses",
+      "hiddenByLifecycleCount",
+      "staleResultCount",
+      "lifecycleColumnAvailable",
+      "scopeWorkspacePresent"
+    ],
+    "rawWorkspaceIdAllowed": false
+  }
+}
