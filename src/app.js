@@ -165,6 +165,84 @@ async function applySoftReadPolicy(results, { config, shadowStore, requestContex
   });
 }
 
+const LIFECYCLE_INCLUDED_STATUSES = ['active', 'stale'];
+const LIFECYCLE_EXCLUDED_STATUSES = ['proposal', 'rejected', 'superseded', 'tombstoned'];
+
+async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
+  const baseAudit = {
+    readPolicyApplied: !!config?.enableLifecycleReadPolicy,
+    lifecyclePolicyApplied: !!config?.enableLifecycleReadPolicy,
+    lifecycleIncludedStatuses: LIFECYCLE_INCLUDED_STATUSES,
+    lifecycleExcludedStatuses: LIFECYCLE_EXCLUDED_STATUSES,
+    hiddenByLifecycleCount: 0,
+    staleResultCount: 0,
+    lifecycleColumnAvailable: false,
+    statusByMemoryId: new Map()
+  };
+
+  if (!config?.enableLifecycleReadPolicy || !Array.isArray(results)) {
+    return {
+      results,
+      audit: {
+        ...baseAudit,
+        readPolicyApplied: false,
+        lifecyclePolicyApplied: false
+      }
+    };
+  }
+
+  if (results.length === 0) {
+    return {
+      results,
+      audit: baseAudit
+    };
+  }
+
+  const memoryIds = [...new Set(results.map(item => item.memoryId || item.memory_id).filter(Boolean))];
+  const lifecycleMap = memoryIds.length > 0
+    ? await shadowStore.getRecordsLifecycleStatusMap(memoryIds)
+    : { lifecycleColumnAvailable: false, statuses: new Map() };
+
+  if (!lifecycleMap.lifecycleColumnAvailable) {
+    return {
+      results: [],
+      audit: {
+        ...baseAudit,
+        hiddenByLifecycleCount: results.length,
+        lifecycleColumnAvailable: false
+      }
+    };
+  }
+
+  const statusByMemoryId = lifecycleMap.statuses || new Map();
+  const kept = [];
+  let hiddenByLifecycleCount = 0;
+
+  for (const item of results) {
+    const memoryId = item.memoryId || item.memory_id;
+    const status = String(statusByMemoryId.get(memoryId) || '').trim().toLowerCase();
+    if (LIFECYCLE_INCLUDED_STATUSES.includes(status)) {
+      kept.push(item);
+    } else {
+      hiddenByLifecycleCount += 1;
+    }
+  }
+
+  return {
+    results: kept,
+    audit: {
+      ...baseAudit,
+      hiddenByLifecycleCount,
+      staleResultCount: kept.filter(item => {
+        const memoryId = item.memoryId || item.memory_id;
+        return String(statusByMemoryId.get(memoryId) || '').trim().toLowerCase() === 'stale';
+      }).length,
+      lifecycleColumnAvailable: true,
+      statusByMemoryId
+    }
+  };
+}
+
 function createCodexMemoryApplication(overrides = {}) {
   const config = createConfig(overrides);
   const diaryStore = new DiaryStore(config);
@@ -339,6 +417,7 @@ function createCodexMemoryApplication(overrides = {}) {
 
       if (toolName === 'search_memory') {
         const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
+        const scopeAudit = buildScopeAuditContext(scopeFilter);
         const searchResults = await passiveRecallService.search({
           query: args.query,
           target: args.target || 'both',
@@ -348,18 +427,41 @@ function createCodexMemoryApplication(overrides = {}) {
           source: 'mcp',
           candidateFilters: buildScopeCandidateFilters(scopeFilter),
           auditContext: {
-            scope: buildScopeAuditContext(scopeFilter)
+            scope: scopeAudit
           }
         });
         const filtered = (scopeFilter && searchResults && searchResults.length)
           ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)
           : searchResults;
-        const policyFiltered = await applySoftReadPolicy(filtered, {
+        const lifecycleFiltered = await applyLifecycleReadPolicy(filtered, {
+          config,
+          shadowStore
+        });
+        const policyFiltered = await applySoftReadPolicy(lifecycleFiltered.results, {
           config,
           shadowStore,
           requestContext,
           scope: scopeFilter
         });
+        if (config.enableLifecycleReadPolicy) {
+          const statusByMemoryId = lifecycleFiltered.audit.statusByMemoryId || new Map();
+          const policyAudit = {
+            ...lifecycleFiltered.audit,
+            staleResultCount: policyFiltered.filter(item => {
+              const memoryId = item.memoryId || item.memory_id;
+              return String(statusByMemoryId.get(memoryId) || '').trim().toLowerCase() === 'stale';
+            }).length
+          };
+          delete policyAudit.statusByMemoryId;
+          policyAudit.hiddenByLifecycleCount = Number(lifecycleFiltered.audit.hiddenByLifecycleCount || 0);
+          await recallAuditService.recordReadPolicySummary({
+            target: args.target || 'both',
+            results: policyFiltered,
+            source: 'mcp',
+            scopeAudit,
+            policyAudit
+          });
+        }
         return { results: policyFiltered };
       }
 
@@ -393,6 +495,7 @@ function createCodexMemoryApplication(overrides = {}) {
 }
 
 module.exports = {
+  applyLifecycleReadPolicy,
   applySoftReadPolicy,
   inferRequestClientId,
   createCodexMemoryApplication

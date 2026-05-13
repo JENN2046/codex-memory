@@ -2,16 +2,15 @@
 
 更新时间：2026-05-13
 
-本文是 `P11.4-lifecycle-read-policy-runtime-flag-planning` 的规划事实源，用来定义 lifecycle read policy runtime flag 的目标、默认关闭策略、status visibility、scope 关系、audit shape 和后续验收路线。
+本文最初是 `P11.4-lifecycle-read-policy-runtime-flag-planning` 的规划事实源，用来定义 lifecycle read policy runtime flag 的目标、默认关闭策略、status visibility、scope 关系、audit shape 和后续验收路线。
 
-本阶段是 docs/tests-design planning：
+P11.8 已在默认关闭边界下实现 optional runtime flag：
 
-- 不实现过滤。
-- 不修改 `search_memory` runtime 行为。
-- 不修改 `src/`、`tests/`、`package.json`。
+- `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY=false` 仍是默认值。
+- flag 关闭时不改变 `search_memory` runtime 行为。
+- flag 开启时普通召回只保留 `active` / `stale`，过滤 `proposal` / `rejected` / `superseded` / `tombstoned`。
 - 不新增 MCP public tools。
-- 不做 SQLite migration。
-- 不迁移真实数据。
+- 不做 SQLite migration，不自动 `ALTER TABLE`，不迁移真实数据。
 - 不调用 provider。
 - 不 push / tag / release / deploy。
 
@@ -28,6 +27,11 @@ P11.7 runtime fixture test 入口：
 
 - Fixture: [tests/fixtures/lifecycle-read-policy-runtime-v1.json](/A:/codex-memory/tests/fixtures/lifecycle-read-policy-runtime-v1.json)
 - Test: [tests/lifecycle-read-policy-runtime-fixture.test.js](/A:/codex-memory/tests/lifecycle-read-policy-runtime-fixture.test.js)
+
+P11.8 runtime implementation 入口：
+
+- Runtime tests: [tests/lifecycle-read-policy-runtime.test.js](/A:/codex-memory/tests/lifecycle-read-policy-runtime.test.js)
+- Implementation plan: [MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md)
 
 ## Purpose
 
@@ -134,16 +138,17 @@ Audit rules:
 - raw `workspace_id` 不进入 audit summary。
 - audit summary 不记录 secret、token、cookie、private key 或 `.env` 值。
 
-## Runtime Non-Goals For This Phase
+## Runtime Boundary
 
-- 本阶段不实现过滤。
-- 本阶段不改 `search_memory`。
-- 本阶段不新增 MCP tools。
-- 本阶段不迁移 SQLite。
-- 本阶段不新增 CLI。
-- 本阶段不更改 `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` 当前默认行为。
-- 本阶段不读取或修改 `.env` / secrets。
-- 本阶段不调用 provider。
+- 已实现默认关闭的 optional runtime filtering。
+- 默认关闭时 `search_memory` 保持 backward-compatible。
+- 开启时只影响普通 `search_memory` 结果，不提供 admin/audit mode。
+- 不新增 MCP tools。
+- 不迁移 SQLite，不自动 `ALTER TABLE`。
+- 不新增 CLI。
+- 不更改 `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` 当前默认行为。
+- 不读取或修改 `.env` / secrets。
+- 不调用 provider。
 
 ## Future Phases
 
@@ -186,6 +191,8 @@ node --test tests\lifecycle-read-policy-fixture.test.js
 - 不接入 runtime，不改 `search_memory`，只锁定未来 runtime flag 行为契约。
 
 ### P11.8 Optional Runtime Flag Implementation
+
+状态：已实现。
 
 目标：
 

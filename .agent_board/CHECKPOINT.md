@@ -2,37 +2,41 @@
 
 ## Current Goal
 
-P11.x-stale-branch-quarantine-and-doc-salvage：在 `origin/main` 基线上记录
-`codex/p1-vcp-memory-core-100-roadmap` 的 stale branch 审查结论，并只做文档/board
-层面的 salvage。
+P11.8-lifecycle-read-policy-runtime-flag-implementation：在 `origin/main` 基线上实现默认关闭的
+`CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`，让开启后的普通 `search_memory` 按 lifecycle
+status 过滤结果，同时保持默认关闭的 backward-compatible 行为。
 
 ## Current Area
 
-P6-docs-drift / stale-branch-quarantine
+P11-memory-lifecycle-core / lifecycle-read-policy-runtime
 
 ## Current Status
 
-当前是 A1 docs/board-only 阶段。基线为 `origin/main` / `180eec4`。旧分支
-`codex/p1-vcp-memory-core-100-roadmap` 已确认 diverged：ahead 20、behind 38、
-merge base `7d634bb`。
+P11.8 runtime implementation 已本地完成并验证。当前分支为 `main`，基线为
+`origin/main` / `63482b4`。
 
-本阶段不 merge、不 rebase、不 cherry-pick 旧分支；不改 `src/`、tests、
-`package.json`、`.env`、依赖、runtime、SQLite 或真实数据。
+本阶段没有 merge、rebase、cherry-pick `codex/p1-vcp-memory-core-100-roadmap`，没有 push/tag/release/deploy。
 
 ## Completed Work In This Batch
 
-- Added stale branch review for `codex/p1-vcp-memory-core-100-roadmap`.
-- Marked the old branch as superseded stale reference branch.
-- Recorded that future development base remains `origin/main`.
-- Added current-main personal production readiness guidance.
-- Updated next-phase, roadmap, status, maintenance backlog, and board state.
+- Added `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY` config flag with default `false`.
+- Added read-only lifecycle status lookup for candidate `memory_id` values.
+- Added post-filter runtime behavior for ordinary `search_memory` when the lifecycle flag is enabled.
+- Preserved default-off behavior so proposal/rejected/superseded/tombstoned remain visible when the flag is false.
+- Added fail-safe missing-column behavior when the flag is true.
+- Added read-policy audit summary fields without raw `workspace_id`.
+- Added runtime tests for enabled/disabled behavior, missing columns, audit shape, and MCP public tools.
+- Updated lifecycle read-policy docs, status, backlog, and board.
 
 ## Changed Files
 
-- `docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md`
-- `docs/PERSONAL_PRODUCTION_READINESS.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `src/config/createConfig.js`
+- `src/app.js`
+- `src/storage/SqliteShadowStore.js`
+- `src/recall/RecallAuditService.js`
+- `tests/lifecycle-read-policy-runtime.test.js`
+- `docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md`
+- `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -43,29 +47,31 @@ merge base `7d634bb`。
 
 ## Validation Run
 
-- `git diff --check`：passed
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
-- Manual check for `docs/PERSONAL_PRODUCTION_READINESS.md`：passed; no old tag as current fact, no stale-branch merge claim, no secret value example, no obsolete gate command, no conflict with parity roadmap boundary.
+- `node --test tests\lifecycle-read-policy-runtime.test.js`：passed `6/6`
+- `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`：passed `10/10`
+- `node --test tests\mcp-contract.test.js`：passed `7/7`
+- `npm test`：initial concurrent run exposed dashboard/gate transient drift while HTTP health was down; after `npm run start:http:ensure`, rerun passed `233/233`
+- `npm run gate:ci`：passed
+- `npm run gate:mainline:strict`：passed after HTTP ensure; health `200`, contract `12/12`, tests `233/233`, compare `43/43`, rollback `43/43`
+- `npm run scope:acceptance -- --json`：passed, `status=ok`
+- `npm run lifecycle:sqlite:dry-run -- --json`：passed, `mutated=false`
 
 ## Validation Not Run
 
-- No `npm test`; this batch does not touch runtime/tests/package.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
-- No merge / rebase / cherry-pick of the stale branch.
 - No push / tag / release / deploy.
 
 ## Current Blockers
 
-- None for docs/board quarantine.
+- None for local implementation.
 
 ## Remaining Risks
 
-- P11.8 runtime implementation is still future work.
-- Stale branch content must stay read-only reference only; future agents must not reuse old runtime, test, package, or board changes.
+- P11.8 adds runtime filtering only behind a default-off flag; any future default-on or admin/audit mode work needs a separate phase.
+- Future SQL pushdown for lifecycle status is still deferred and should not replace the post-filter safety net without tests.
 
 ## Next Safe Action
 
-Validate docs, stop without push, then return to
-`P11.8-lifecycle-read-policy-runtime-flag-implementation`.
+Run final diff/docs checks, then stop without push. If requested later, prepare a guarded local commit for the P11.8 batch.

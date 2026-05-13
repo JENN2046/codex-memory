@@ -310,6 +310,35 @@ class SqliteShadowStore {
     ]));
   }
 
+  async getRecordsLifecycleStatusMap(memoryIds = []) {
+    await this.ensureReady();
+    const uniqueIds = [...new Set(memoryIds.filter(Boolean))];
+    const result = {
+      lifecycleColumnAvailable: false,
+      statuses: new Map()
+    };
+    if (uniqueIds.length === 0) {
+      return result;
+    }
+
+    this.refreshMemoryRecordColumnInfo();
+    if (!this.hasMemoryRecordColumn('status')) {
+      return result;
+    }
+
+    result.lifecycleColumnAvailable = true;
+    const placeholders = uniqueIds.map(() => '?').join(',');
+    const rows = this.db.prepare(`
+      SELECT memory_id, status
+      FROM memory_records WHERE memory_id IN (${placeholders})
+    `).all(...uniqueIds);
+
+    for (const row of rows) {
+      result.statuses.set(row.memory_id, row.status || null);
+    }
+    return result;
+  }
+
   normalizePathFilters(raw) {
     const values = Array.isArray(raw) ? raw : [];
     return [...new Set(values

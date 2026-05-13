@@ -2,32 +2,32 @@
 
 更新时间：2026-05-13
 
-本文是 `P11.6-lifecycle-read-policy-runtime-flag-implementation-planning` 的规划事实源，用来设计 lifecycle read-policy runtime flag 的未来实现方案。
+本文最初是 `P11.6-lifecycle-read-policy-runtime-flag-implementation-planning` 的规划事实源。
+`P11.8-lifecycle-read-policy-runtime-flag-implementation` 已按该边界落地默认关闭的
+lifecycle read-policy runtime flag。
 
-本阶段只规划 runtime flag implementation，不实现 runtime：
+P11.8 实现边界：
 
-- 不修改 `src/`。
-- 不修改 `tests/`。
-- 不修改 `package.json`。
-- 不改变 `search_memory` runtime 行为。
+- 新增 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`，默认 `false`。
+- 支持 `createConfig({ enableLifecycleReadPolicy })` override。
+- `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` 默认行为不变。
+- flag 关闭时不改变 `search_memory` 默认召回行为。
+- flag 开启时只过滤普通 `search_memory` 结果，不新增 admin/audit mode。
 - 不新增 MCP public tools。
-- 不做 SQLite migration。
-- 不迁移真实数据。
+- 不做 SQLite migration，不自动 `ALTER TABLE`，不迁移真实数据。
 - 不调用 provider。
 - 不 push / tag / release / deploy。
 
 ## Purpose
 
-P11.6 的目标是先规划 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY` 的 runtime implementation 边界，避免后续直接在 read path 上动刀时扩大风险。
-
-未来目标是让 `search_memory` 在 feature flag 打开时，按 lifecycle status 过滤普通召回结果：
+目标是让 `search_memory` 在 feature flag 打开时，按 lifecycle status 过滤普通召回结果：
 
 - `active` / `stale` 可进入普通召回候选。
 - `proposal` / `rejected` / `superseded` / `tombstoned` 默认不进入普通召回。
 - private visibility 继续受 client scope 约束。
 - audit summary 记录 policy 是否生效，但不暴露 raw `workspace_id`。
 
-P11.6 不授权实现这些行为。实现应拆到后续阶段，并先通过 fixture/runtime tests 证明默认关闭行为不变。
+P11.8 已实现这些行为，并通过 runtime tests 验证默认关闭行为不变。
 
 P11.7 runtime fixture test 入口：
 
@@ -50,16 +50,45 @@ Planned relationship:
 - If both are enabled, either policy can hide a candidate.
 - Neither flag should broaden visibility or status access.
 
+## Implemented Runtime Behavior
+
+当前 P11.8 实现采用 post-filter fallback，而不是 SQL pushdown：
+
+- `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY=false` 或未设置时，`search_memory` 结果保持既有行为，`proposal` / `rejected` / `superseded` / `tombstoned` 不会被 lifecycle policy 过滤。
+- `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY=true` 时，普通 `search_memory` 只保留 `active` / `stale`。
+- `stale` 仍可见，并计入 `staleResultCount`。
+- `proposal` / `rejected` / `superseded` / `tombstoned` 从普通召回结果中过滤，并计入 `hiddenByLifecycleCount`。
+- 本阶段没有 `include_superseded`、admin mode 或 audit mode。
+- MCP public tools 仍为 `record_memory` / `search_memory` / `memory_overview`。
+
+缺 lifecycle status column 时：
+
+- flag 关闭：无影响。
+- flag 开启：fail-safe 隐藏候选结果，记录 `lifecycleColumnAvailable=false`，不得把未知或缺失 status 静默当作 `active`。
+
+Audit summary 通过 read-policy summary entry 记录低风险字段：
+
+- `readPolicyApplied`
+- `lifecyclePolicyApplied`
+- `lifecycleIncludedStatuses`
+- `lifecycleExcludedStatuses`
+- `hiddenByLifecycleCount`
+- `staleResultCount`
+- `lifecycleColumnAvailable`
+- `scopeWorkspacePresent`
+
+该 summary 不记录 raw `workspace_id`，也不记录 secret-like content。
+
 ## Runtime Insertion Points
 
 ### Candidate SQL Pushdown
 
-Potential insertion point:
+Deferred insertion point:
 
 - The SQL candidate selection layer can push lifecycle status filtering close to candidate generation when lifecycle columns are available.
 - This is useful for performance and avoids ranking hidden records.
 
-Planning questions:
+Open questions before any future SQL pushdown:
 
 - Can the candidate query reliably read `status` from `memory_records`?
 - How does the query behave when lifecycle columns are missing?
@@ -71,17 +100,17 @@ Constraint:
 
 ### Post-Filter Fallback
 
-Post-filtering should remain a safety net even if SQL pushdown exists:
+P11.8 implemented post-filtering as the runtime safety net:
 
 - It can filter any candidate that bypasses SQL pushdown.
 - It can handle mixed schema or cached candidates.
 - It can produce `hiddenByLifecycleCount` for audit summary.
 
-Post-filter should use the same status matrix as fixture tests, not a divergent hardcoded interpretation.
+The post-filter uses the same status matrix as fixture tests, not a divergent interpretation.
 
 ### Audit Context
 
-Read audit context should record whether policy was applied:
+Read audit context records whether policy was applied:
 
 - `readPolicyApplied`
 - `lifecyclePolicyApplied`
@@ -96,7 +125,7 @@ Audit summary must not include raw `workspace_id`.
 
 ### Overview And Observability
 
-`memory_overview`, `dashboard`, and `http-observe` should only show summary-level lifecycle read-policy information if this feature reaches runtime:
+Future `memory_overview`, `dashboard`, and `http-observe` work should only show summary-level lifecycle read-policy information:
 
 - counts
 - enabled/disabled flags
@@ -123,7 +152,7 @@ Future modes:
 
 - `include_superseded` is a future review/admin mode, not a default ordinary recall behavior.
 - `tombstoned` visibility must remain audit/admin only.
-- Admin/audit mode is explicitly out of scope for P11.6.
+- Admin/audit mode is explicitly out of scope for P11.8.
 
 ## Missing-Column Behavior
 
@@ -146,11 +175,11 @@ Suggested summary field:
 
 - `lifecycleColumnAvailable=false`
 
-Future implementation must decide whether enabled-with-missing-column is a hard fail or a warning with current behavior preserved. That decision belongs in P11.7/P11.8 tests before runtime code changes.
+P11.8 decision: enabled-with-missing-column is fail-safe for ordinary recall candidates and records `lifecycleColumnAvailable=false`.
 
 ## Audit Summary Shape
 
-Future runtime audit summary should be compatible with P11.5 fixture expectations and extend them with column availability:
+Runtime audit summary is compatible with P11.5 fixture expectations and extends them with column availability:
 
 ```json
 {
@@ -181,9 +210,11 @@ Rules:
 - `hiddenByLifecycleCount` should count records hidden due to lifecycle status.
 - `staleResultCount` should count stale records that remain visible in final or candidate results, depending on the future test contract.
 
-## Future Implementation Sequence
+## Implementation Sequence
 
 ### P11.7 Lifecycle Read-Policy Runtime Fixture Tests
+
+Status: done.
 
 Goal:
 
@@ -202,15 +233,16 @@ node --test tests\lifecycle-read-policy-runtime-fixture.test.js
 
 ### P11.8 Optional Runtime Flag Implementation
 
+Status: implemented in runtime.
+
 Goal:
 
 - Implement `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY=false` default-off behavior.
-- Add candidate SQL pushdown only if lifecycle columns are available.
 - Add post-filter fallback.
 - Add audit summary fields.
 - Preserve current `search_memory` behavior when flag is false.
 
-Required validation should include targeted runtime tests, `npm test`, and `gate:mainline:strict`.
+Candidate SQL pushdown remains a future optimization and is not required for P11.8.
 
 ### P11.9 Gate-CI Lifecycle Policy Summary
 
@@ -231,11 +263,11 @@ Goal:
 
 ## Non-Goals
 
-- 本阶段不实现 runtime。
-- 本阶段不改 `search_memory`。
 - 本阶段不新增 MCP tools。
 - 本阶段不迁移 SQLite。
+- 本阶段不自动 `ALTER TABLE`。
 - 本阶段不提供 admin/audit mode。
+- 本阶段不支持 `include_superseded`。
 - 本阶段不改 `.env` / secrets。
 - 本阶段不新增依赖。
 - 本阶段不做真实数据迁移。

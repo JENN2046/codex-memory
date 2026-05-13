@@ -18,6 +18,12 @@ function normalizeScopeVisibility(visibility) {
     .filter(Boolean))];
 }
 
+function normalizeStatusArray(statuses) {
+  return [...new Set((Array.isArray(statuses) ? statuses : [])
+    .map(value => String(value || '').trim().toLowerCase())
+    .filter(Boolean))];
+}
+
 class RecallAuditService {
   constructor({ auditLogStore, config = null }) {
     this.auditLogStore = auditLogStore;
@@ -29,6 +35,53 @@ class RecallAuditService {
     if (!entry) return null;
     await this.auditLogStore.appendRecallAudit(entry);
     return entry;
+  }
+
+  async recordReadPolicySummary(payload = {}) {
+    const entry = this.buildReadPolicyPayload(payload);
+    if (!entry) return null;
+    await this.auditLogStore.appendRecallAudit(entry);
+    return entry;
+  }
+
+  buildReadPolicyPayload(options = {}) {
+    const {
+      target = 'both',
+      results = [],
+      source = 'mcp',
+      scopeAudit = null,
+      policyAudit = {}
+    } = options;
+    const safeResults = Array.isArray(results) ? results.filter(Boolean) : [];
+    const scopeApplied = !!scopeAudit?.scopeApplied;
+    const scopeVisibility = normalizeScopeVisibility(scopeAudit?.scopeVisibility);
+
+    return {
+      timestamp: new Date().toISOString(),
+      embeddingFingerprint: this.config?.embeddingFingerprint || null,
+      dbName: getDiaryNameForTarget(target),
+      target: target === 'both' ? 'both' : getTargetForDiaryName(getDiaryNameForTarget(target)),
+      recallType: 'read-policy',
+      resultCount: safeResults.length,
+      topMemoryId: safeResults[0]?.memoryId || null,
+      memoryIds: [...new Set(safeResults.map(result => result.memoryId).filter(Boolean))],
+      scopeApplied,
+      scopeMode: scopeApplied ? (scopeAudit?.scopeMode || 'unknown') : 'none',
+      scopeDimensions: normalizeScopeDimensions(scopeAudit?.scopeDimensions),
+      scopeStrict: !!scopeAudit?.scopeStrict,
+      scopeProjectId: scopeApplied ? (scopeAudit?.scopeProjectId || null) : null,
+      scopeClientId: scopeApplied ? (scopeAudit?.scopeClientId || null) : null,
+      scopeVisibility,
+      scopeWorkspacePresent: !!scopeAudit?.scopeWorkspacePresent,
+      readPolicyApplied: !!policyAudit.readPolicyApplied,
+      lifecyclePolicyApplied: !!policyAudit.lifecyclePolicyApplied,
+      lifecycleIncludedStatuses: normalizeStatusArray(policyAudit.lifecycleIncludedStatuses),
+      lifecycleExcludedStatuses: normalizeStatusArray(policyAudit.lifecycleExcludedStatuses),
+      hiddenByLifecycleCount: Number(policyAudit.hiddenByLifecycleCount || 0),
+      staleResultCount: Number(policyAudit.staleResultCount || 0),
+      lifecycleColumnAvailable: !!policyAudit.lifecycleColumnAvailable,
+      source
+    };
   }
 
   buildPayload(options = {}) {

@@ -4,25 +4,27 @@
 |---|---|
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
-| Branch | codex/p11x-stale-branch-quarantine-doc-salvage |
+| Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P11.x-stale-branch-quarantine-and-doc-salvage |
-| Current area | P6-docs-drift / stale-branch-quarantine |
-| Last local commit | `180eec4 test: lock lifecycle read policy runtime fixture` |
-| Last pushed baseline | `180eec4` |
-| Last action | Documented stale branch quarantine for `codex/p1-vcp-memory-core-100-roadmap` and current personal production readiness boundaries. |
-| Last validation | `git diff --check` passed; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed; manual `PERSONAL_PRODUCTION_READINESS` review passed. |
-| Worktree summary | Docs/board-only changes; no `src/`, tests, `package.json`, `.env`, dependencies, migrations, merge, rebase, or cherry-pick. |
-| Mainline assumption | `origin/main` remains the development base; stale branch is read-only reference and selective doc salvage source only. |
-| Active-memory suite status | Last strict gate baseline compare `43/43 matched`, rollback `43/43 rollback-ready`, `coreMismatchCountTotal=0`, `extendedMismatchCountTotal=0`. |
-| npm test | Not run for this docs/board-only stale branch quarantine batch |
-| Profile health | ready — vectors 205, 822 embedding cache, 0 legacy |
-| Guarded auto-commit allowed | not evaluated in this batch |
-| Last checkpoint | P11.x stale branch quarantine docs completed and validated. |
-| Next planned action | Validate docs, stop without push, then return to P11.8 optional lifecycle read-policy runtime flag implementation. |
+| Current task | P11.8-lifecycle-read-policy-runtime-flag-implementation |
+| Current area | P11-memory-lifecycle-core / lifecycle-read-policy-runtime |
+| Last local commit | `63482b4 docs: quarantine stale p1 roadmap branch` |
+| Last pushed baseline | `63482b4` |
+| Last action | Implemented default-off lifecycle read-policy runtime flag for ordinary `search_memory`. |
+| Last validation | Targeted lifecycle/MCP tests passed; `npm test` passed after local HTTP ensure; `gate:ci`, `gate:mainline:strict`, `scope:acceptance`, and `lifecycle:sqlite:dry-run` passed. |
+| Worktree summary | Runtime/test/docs/board changes pending; no `package.json`, `.env`, dependency, migration, provider call, stale-branch merge/rebase/cherry-pick, push, tag, release, or deploy. |
+| Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
+| Active-memory suite status | Latest strict gate compare `43/43 matched`, rollback `43/43 rollback-ready`, `coreMismatchCountTotal=0`, `extendedMismatchCountTotal=0`. |
+| npm test | Passed: `233/233` after `npm run start:http:ensure` restored local HTTP health. |
+| Profile health | Not run in this batch. |
+| Guarded auto-commit allowed | not requested in this batch |
+| Last checkpoint | P11.8 runtime flag implemented and validated locally. |
+| Next planned action | Inspect final diff, stop without push, then prepare guarded local commit only if user requests. |
 
 ## Notes
 
-- P11.x stale branch quarantine is docs/board only.
-- No MCP public tool expansion, no `search_memory` behavior change, no `src/`, no tests, no `package.json`, no `.env`, secrets, dependencies, SQLite migration, provider call, release, deploy, tag, merge, rebase, cherry-pick, or push.
-- Next recommended task after this closeout: `P11.8-lifecycle-read-policy-runtime-flag-implementation`.
+- `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY` defaults to `false`.
+- Flag false preserves backward-compatible ordinary recall behavior.
+- Flag true keeps `active` / `stale`, filters `proposal` / `rejected` / `superseded` / `tombstoned`, and records low-risk audit summary fields.
+- Missing lifecycle status column with flag true fail-safe hides candidates and records `lifecycleColumnAvailable=false`.
+- P11.8 does not add MCP public tools, does not run SQLite migration, and does not write provider/profile state.

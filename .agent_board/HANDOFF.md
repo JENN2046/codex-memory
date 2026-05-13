@@ -2,61 +2,82 @@
 
 ## Goal
 
-Resume after `P11.x-stale-branch-quarantine-and-doc-salvage` in `A:\codex-memory`.
+Resume after `P11.8-lifecycle-read-policy-runtime-flag-implementation` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
-- Branch: `codex/p11x-stale-branch-quarantine-doc-salvage`
-- Base: `origin/main` / `180eec4`
+- Branch: `main`
+- Base: `origin/main` / `63482b4`
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-P6-docs-drift / stale-branch-quarantine
+P11-memory-lifecycle-core / lifecycle-read-policy-runtime
 
 ## Completed In Current Batch
 
-- Added [stale branch review](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md).
-- Recorded `codex/p1-vcp-memory-core-100-roadmap` as superseded stale reference branch.
-- Recorded compare facts: diverged, ahead 20, behind 38, merge base `7d634bb`.
-- Documented no-merge/no-rebase/no-development-base decision.
-- Added current-main [personal production readiness](/A:/codex-memory/docs/PERSONAL_PRODUCTION_READINESS.md).
-- Updated next-phase plan, parity roadmap, status, maintenance backlog, and board.
+- Implemented `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`, default `false`.
+- Preserved `CODEX_MEMORY_ENABLE_SOFT_READ_POLICY` default behavior.
+- Added read-only `SqliteShadowStore.getRecordsLifecycleStatusMap(memoryIds)`.
+- Added runtime post-filter for ordinary `search_memory` when lifecycle policy is enabled.
+- Kept `active` / `stale`; filtered `proposal` / `rejected` / `superseded` / `tombstoned`.
+- Counted visible stale results and hidden lifecycle candidates.
+- Added missing lifecycle column fail-safe behavior for enabled mode.
+- Added low-risk read-policy audit summary without raw `workspace_id`.
+- Added runtime tests and updated docs/board.
 
 ## Changed Files
 
-- `docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md`
-- `docs/PERSONAL_PRODUCTION_READINESS.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `src/config/createConfig.js`
+- `src/app.js`
+- `src/storage/SqliteShadowStore.js`
+- `src/recall/RecallAuditService.js`
+- `tests/lifecycle-read-policy-runtime.test.js`
+- `docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md`
+- `docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `git diff --check`：passed
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
-- Manual check for `docs/PERSONAL_PRODUCTION_READINESS.md`：passed; no old tag as current fact, no stale-branch merge claim, no secret value example, no obsolete gate command, no conflict with parity roadmap boundary.
+- `node --test tests\lifecycle-read-policy-runtime.test.js`：passed `6/6`
+- `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`：passed `10/10`
+- `node --test tests\mcp-contract.test.js`：passed `7/7`
+- `npm test`：passed `233/233` after `npm run start:http:ensure`
+- `npm run gate:ci`：passed
+- `npm run gate:mainline:strict`：passed
+- `npm run scope:acceptance -- --json`：passed
+- `npm run lifecycle:sqlite:dry-run -- --json`：passed, `mutated=false`
 
 ## MCP Mode
 
 - Public MCP tools remain `record_memory` / `search_memory` / `memory_overview`.
-- This batch does not modify MCP tool definitions or add new tools.
+- No new MCP public tools were added.
 
 ## Audit / Recall Impact
 
-- No runtime audit or recall behavior changed.
-- `search_memory` default behavior is unchanged.
-- Lifecycle read-policy runtime implementation has not started.
+- Default-off recall remains backward-compatible.
+- Enabled lifecycle policy adds ordinary recall filtering and a `read-policy` audit summary.
+- Audit summary includes low-risk policy fields and `scopeWorkspacePresent`.
+- Audit summary does not include raw `workspace_id`.
+
+## Not Done
+
+- No SQLite migration or automatic `ALTER TABLE`.
+- No admin/audit mode.
+- No `include_superseded`.
+- No provider smoke / benchmark.
+- No `rebuild-profile --confirm`.
+- No push / tag / release / deploy.
 
 ## Remaining Risks
 
-- P11.8 optional runtime implementation must preserve default-off behavior.
-- Future agents must not merge, rebase, or cherry-pick stale branch runtime/tests/package/board changes.
+- Future lifecycle SQL pushdown and default-on policy are separate phases.
+- If HTTP health is down, strict gate can fail before implementation-specific checks; use `npm run start:http:ensure` before strict gate validation.
 
 ## Next Safe Step
 
-Validate docs, stop without push, then continue with
-`P11.8-lifecycle-read-policy-runtime-flag-implementation`.
+Final diff/docs validation, then stop without push. Next recommended phase after commit/push authorization is
+`P11.9-lifecycle-policy-gate-ci-summary`.
