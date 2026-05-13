@@ -75,6 +75,7 @@
 - README / VALIDATION 已补 dashboard/http-observe schema contract 摘要，说明 `summary` / `governance` / `audits` / `scope` / `logs` 字段边界；这些输出只做只读观测，不授权 backfill、migration、lifecycle write 或 MCP contract 扩展。
 - P10 memory policy runtime gate 已完成本地硬化：写入前 secret scanner、MCP `tools/call` runtime schema validation、HTTP non-loopback empty-token fail-fast、默认关闭的 soft read policy flag、fixture recall dry-run 均已落地；public MCP tools 仍只有 `record_memory` / `search_memory` / `memory_overview`。
 - P10.1 已把 runtime policy gates 固化为文档与 CI-safe 可见面：新增 [docs/runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)，并让 `gate:ci` 输出 fixture-only `checks.policyPreflight` summary；不改变 runtime 默认行为，不进入 P11。
+- P11 memory lifecycle core planning 已 docs-only 完成：新增 [docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md)，定义 `active/stale/proposal/rejected/superseded/tombstoned`、allowed transitions、audit event shape、read policy relationship 和 P11.1 fixture schema tests；不改 runtime，不新增 MCP tools，不迁移真实数据。
 - `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：

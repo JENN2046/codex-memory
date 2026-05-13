@@ -34,6 +34,13 @@
 - 边界：不进入 P11，不扩展 runtime enforcement，不新增 MCP tool，不调用 provider，不 push。
 - P11 memory lifecycle core planning 暂缓到 P10.1 closeout 之后。
 
+当前 P11 planning：
+
+- 入口：[docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md)
+- 目标：先定义 lifecycle statuses、transition rules、audit event shape、read policy relationship 和 future test acceptance。
+- 边界：docs/tests-design only；不改 runtime，不改 tests，不新增 MCP tool，不做 SQLite migration，不迁移真实数据。
+- 下一步建议：P11.1 lifecycle fixture schema tests。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：

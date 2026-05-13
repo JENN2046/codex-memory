@@ -33,6 +33,7 @@
 - Single-Window 4-Agent Compact Autopilot 能力说明：[docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md](/A:/codex-memory/docs/SINGLE_WINDOW_4_AGENT_COMPACT_AUTOPILOT.md)
 - VCP memory parity roadmap：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - Runtime policy gates：[docs/runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)
+- Memory lifecycle core plan：[docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md)
 - 下一阶段薄版计划：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
 - `gate:ci` fixture-only 设计：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)
 - 当前阶段记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)

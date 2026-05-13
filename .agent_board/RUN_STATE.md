@@ -6,21 +6,21 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P10.1-runtime-gate-docs-ci-policy-preflight |
-| Current area | memory-policy-hardening / docs-ci-preflight |
-| Last action | Created local P10.1 commit `ce11fd4 docs: surface runtime policy gates in ci`. |
-| Last validation | `node --test tests\gate-ci-cli.test.js` 2/2; `node --test tests\policy-read-preflight.test.js` 5/5; `npm run gate:ci` PASS; `npm test` 196/196; `git diff --check` passed with CRLF warnings only; docs validation passed. |
-| Worktree summary | P10.1 primary commit is local only; `main` is ahead of `origin/main`; push remains unauthorized. |
-| Mainline assumption | HTTP MCP 7605 is the normal local mainline, but P10.1 `gate:ci` policy preflight does not require a live daemon. |
+| Current task | P11-memory-lifecycle-core-planning |
+| Current area | memory-governance / lifecycle-planning |
+| Last action | Completed P11 memory lifecycle core planning docs and linked them from project docs. |
+| Last validation | `git diff --check` passed with CRLF warnings only; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed. |
+| Worktree summary | P11 planning docs-only changes are local and eligible for guarded commit after final diff review; `main` remains ahead of `origin/main`; push remains unauthorized. |
+| Mainline assumption | P11 planning does not require HTTP MCP daemon or runtime validation. |
 | Active-memory suite status | Last strict gate baseline compare `43/43 matched`, rollback `43/43 rollback-ready`, `coreMismatchCountTotal=0`, `extendedMismatchCountTotal=0`. |
-| npm test | P10.1 `196/196` |
+| npm test | Last P10.1 `196/196`; P11 docs-only validation pending. |
 | Profile health | ready — vectors 205, 822 embedding cache, 0 legacy |
-| Guarded auto-commit allowed | completed for P10.1 primary commit `ce11fd4`; board-only commit-state sync pending |
-| Last checkpoint | P10.1 validated checkpoint |
-| Next planned action | Commit this board-only closeout state, then stop without push. |
+| Guarded auto-commit allowed | eligible after final diff/scope review |
+| Last checkpoint | P11 planning validated checkpoint |
+| Next planned action | Create guarded local docs commit, then stop without push. |
 
 ## Notes
 
-- P11 memory lifecycle core remains the next recommended phase after P10.1 commit closeout.
-- No runtime feature work is authorized in this P10.1 batch.
-- No provider smoke/benchmark, no `.env`, no migration, no release, no deploy, no tag, no push.
+- P11 is docs/tests-design only in this batch.
+- No `src/`, `tests/`, `package.json`, `.env`, secrets, dependencies, MCP tool expansion, SQLite migration, provider call, release, deploy, tag, or push.
+- Next recommended task after this closeout: `P11.1-lifecycle-fixture-schema-tests`.
