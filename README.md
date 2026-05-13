@@ -372,6 +372,41 @@ npm run governance:report -- --json
 
 当前 `governance:report` / observability surface 只显示低风险 count / hint，不做写路径操作，也不暴露 raw `workspace_id`。`review` 是给常态门禁/人工复核使用的只读审查面，不代表自动 approve / reject / tombstone / supersede。
 
+最小输出样例：
+
+```json
+{
+  "summary": {
+    "status": "ok",
+    "proposalCount": 0,
+    "tombstonedCount": 0,
+    "supersededCount": 0,
+    "stale30d": 0,
+    "stale90d": 0
+  },
+  "review": {
+    "status": "ok",
+    "reviewLevel": "nominal",
+    "counts": {
+      "proposalCount": 0,
+      "tombstonedCount": 0,
+      "supersededCount": 0,
+      "supersessionInitiated": 0,
+      "stale30d": 0,
+      "stale90d": 0
+    },
+    "hints": ["治理快照未见待处理信号。"]
+  }
+}
+```
+
+排障提示：
+
+- `reviewLevel=unavailable`：先确认 `paths.dbPath` 是否存在、SQLite 是否有 `memory_records` 表。
+- `proposalCount > 0`：只做人工 review；不要由报告自动 approve / reject。
+- `stale90d > 0`：优先安排治理复核，不要由报告自动改状态。
+- `tombstonedCount / supersededCount > 0`：这是审计/追溯信号，不代表需要立即删除或 compact。
+
 ## 默认主链回滚预案
 
 `Phase E / P0-3` 现在补了一条只读回滚预案 CLI，用来回答两件事：

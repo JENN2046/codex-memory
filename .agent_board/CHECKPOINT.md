@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-P8 — S-007：做 `governance:report` 最小只读闭环，把 proposal/tombstone/supersession/stale metrics 收成可复用 review surface。
+P8 — S-008：补 `governance:report` 输出样例 / troubleshooting note，帮助后续人工复核快速读懂 review surface。
 
 ## Current Area
 
@@ -10,7 +10,7 @@ P8-memory-governance
 
 ## Current Status
 
-本轮 `S-007` 在本地给 `governance:report` 增加只读 `review` surface：`review.status/reviewLevel/counts/hints`。它复用已有 proposal/tombstone/supersession/stale metrics，只做人工复核提示，不 approve/reject proposal，不创建 tombstone，不修改 supersession，也不写真实 memory DB。
+本轮 `S-008` 是 docs-only 小补丁：README / VALIDATION 现在展示最小 `review` JSON shape，并给出 `unavailable`、`proposalCount`、`stale90d`、`tombstonedCount/supersededCount` 的 troubleshooting note。所有提示都保持只读：只触发人工复核，不触发生命周期写入。
 
 ## Completed Work
 
@@ -47,6 +47,8 @@ P8-memory-governance
 - `governance:report` 文本输出新增 `Review:` 小节，直接展示 review level 和 hints。
 - `tests/governance-report-cli.test.js` 锁住 JSON top-level / review key set，并校验 proposal/tombstone/supersession/stale count。
 - README / VALIDATION 补充 governance report 只读 review surface 说明。
+- README / VALIDATION 补充最小 `review` JSON 输出样例。
+- README / VALIDATION 补充 governance troubleshooting note，明确 unavailable/proposal/stale/tombstone/supersession 的只读处理方式。
 
 ## Changed Files
 
@@ -60,6 +62,8 @@ P8-memory-governance
 - `VALIDATION.md`
 - `src/cli/governance-report.js`
 - `tests/governance-report-cli.test.js`
+- `README.md`
+- `VALIDATION.md`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
 - `GATE_CI_FIXTURE_ONLY_DESIGN.md`
@@ -98,6 +102,8 @@ P8-memory-governance
 - `node --test tests\dashboard-cli.test.js tests\http-observe-cli.test.js tests\governance-report-cli.test.js` -> 9/9 passed
 - `npm test` -> 184/184 passed
 - `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
+- `git diff --check` -> passed
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` -> passed
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
@@ -121,4 +127,4 @@ P8-memory-governance
 
 ## Next Safe Action
 
-S-007 implementation is committed locally as `7193faf feat: add governance review surface`; push remains separate explicit authorization. Next safe local candidate is a small governance output sample/troubleshooting note, unless a higher-priority task appears.
+Run final diff/staged review and create a guarded local S-008 docs commit if clean. Push remains separate explicit authorization.

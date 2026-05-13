@@ -2,9 +2,9 @@
 
 ## Current State
 
-当前本地工作在 `P8` memory governance 线。远端 `main` 已同步到 `2b50545 docs: record ci gate schema commit state`；PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+当前本地工作在 `P8` memory governance 线。远端 `main` 已同步到 `2b50545 docs: record ci gate schema commit state`；本地已有未 push 的 S-007 commits：`7193faf`、`91ad54e`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次 `S-007` 给 `governance:report` 增加只读 `review` surface：JSON 现在带 `review.status/reviewLevel/counts/hints`，并继续覆盖 proposal/tombstone/supersession/stale metrics。本轮不 approve/reject proposal，不创建 tombstone，不修改 supersession，不调用 provider，不写真实 SQLite。
+最新本地批次 `S-008` 是 docs-only：README / VALIDATION 补了 `governance:report` 最小 `review` JSON 样例和 troubleshooting note，说明 unavailable/proposal/stale/tombstone/supersession 信号只触发人工复核，不触发生命周期写入。
 
 ## Workspace / Branch
 
@@ -59,11 +59,13 @@
 - S-006 pushed to `origin/main` at `2b50545`.
 - S-007 added `review` to `governance:report` and updated README/VALIDATION/schema tests.
 - Current S-007 validation passed: affected dashboard/http-observe/governance tests `9/9`; `npm run governance:report -- --json` ok with local `review.status=ok`, `reviewLevel=nominal`; `npm test` `184/184`; `gate:ci --json` ok with compare/rollback `43/43` and query assertions `8/8`; `git diff --check` passed.
+- S-008 added governance output sample and troubleshooting notes to README / VALIDATION.
+- Current S-008 docs validation passed: `git diff --check`; `scripts/validate-local.ps1 -Area docs`.
 
 ## Next
 
-- P1: push `7193faf` only after explicit remote authorization.
-- P2: next safe local candidate is a small governance output sample/troubleshooting note, unless a higher-priority task appears.
+- P1: run final diff/staged review and create guarded local S-008 docs commit if clean.
+- P2: push the S-007/S-008 local commits only after explicit remote authorization.
 - P3: after any push, run post-push `git status --short` and a suitable gate before marking remote baseline current.
 - P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 

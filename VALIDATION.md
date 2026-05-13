@@ -979,6 +979,33 @@ The JSON output should preserve the review surface:
 
 The review surface is evidence for human follow-up. It does not authorize automatic lifecycle writes.
 
+Minimal JSON shape:
+
+```json
+{
+  "review": {
+    "status": "ok",
+    "reviewLevel": "nominal",
+    "counts": {
+      "proposalCount": 0,
+      "tombstonedCount": 0,
+      "supersededCount": 0,
+      "supersessionInitiated": 0,
+      "stale30d": 0,
+      "stale90d": 0
+    },
+    "hints": ["治理快照未见待处理信号。"]
+  }
+}
+```
+
+Troubleshooting notes:
+
+- `reviewLevel=unavailable`: verify `paths.dbPath` and the `memory_records` table.
+- `proposalCount > 0`: schedule human review; do not auto-approve or auto-reject from this report.
+- `stale90d > 0`: schedule governance review; do not auto-mutate lifecycle state.
+- `tombstonedCount` or `supersededCount` > 0: treat as audit/traceability evidence, not as delete permission.
+
 ---
 
 ## 29. Failure Handling

@@ -70,6 +70,7 @@
 - `gate:ci` 现在包含 `queries` fixture-only check，JSON 输出会暴露 `caseCount/assertedCount/passedCount/failedCount`。
 - `gate:ci` JSON schema 已补进 README / VALIDATION，`tests/gate-ci-cli.test.js` 也用 schema snapshot 风格断言锁住 top-level、summary、checks、queries.detail 字段集合。
 - `governance:report` 现在输出只读 `review` surface：`review.status/reviewLevel/counts/hints`，把 proposal / tombstone / supersession / stale metrics 收成可复用的人工复核闭环。
+- README / VALIDATION 已补 `governance:report` 最小 `review` JSON 样例和 troubleshooting note，明确 unavailable / proposal / stale / tombstone / supersession 都只触发人工复核，不触发生命周期写入。
 - `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：
