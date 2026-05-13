@@ -2,9 +2,9 @@
 
 ## Current State
 
-当前本地工作在 `P8` memory governance 线。远端 `main` 已同步到 `2b50545 docs: record ci gate schema commit state`；本地已有未 push 的 S-007 commits：`7193faf`、`91ad54e`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
+当前本地工作在 `P10` observability admin 线。远端 `main` 已同步到 `1db0317 docs: record governance troubleshooting commit state`。PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次 `S-008` 是 docs-only：README / VALIDATION 补了 `governance:report` 最小 `review` JSON 样例和 troubleshooting note，说明 unavailable/proposal/stale/tombstone/supersession 信号只触发人工复核，不触发生命周期写入。
+最新本地批次 `S-009` 给 dashboard/http-observe 增加更细 schema snapshot：测试现在锁住 top-level、summary、governance、audit/scope/logs 等关键 JSON 字段集合。本轮不改运行时代码，不写真实 SQLite，不调用 provider。
 
 ## Workspace / Branch
 
@@ -62,12 +62,15 @@
 - S-008 added governance output sample and troubleshooting notes to README / VALIDATION.
 - Current S-008 docs validation passed: `git diff --check`; `scripts/validate-local.ps1 -Area docs`.
 - S-008 docs-only commit created: `26c919f docs: add governance report troubleshooting note`.
+- S-008/S-007 pushed to `origin/main`; current remote baseline is `1db0317`.
+- S-009 added dashboard/http-observe detailed schema snapshots.
+- Current S-009 validation passed: `node --test tests\dashboard-cli.test.js tests\http-observe-cli.test.js` `6/6`; `npm test` `184/184`; `gate:ci --json` ok with compare/rollback `43/43` and query assertions `8/8`; `git diff --check` passed.
 
 ## Next
 
-- P1: push the S-007/S-008 local commits only after explicit remote authorization.
-- P2: continue with a new scoped local task if requested.
-- P3: after any push, run post-push `git status --short` and a suitable gate before marking remote baseline current.
+- P1: run final diff/staged review and create guarded local S-009 commit if validation stays clean.
+- P2: push S-009 only after explicit remote authorization.
+- P3: next safe local candidate is a README/VALIDATION schema contract summary for dashboard/http-observe, if desired.
 - P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required

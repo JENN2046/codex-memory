@@ -35,11 +35,31 @@ function formatFailure(result) {
   ].join('\n');
 }
 
+function assertKeySet(value, expected, label) {
+  assert.deepEqual(Object.keys(value).sort(), expected, `${label} keys`);
+}
+
 test('dashboard CLI should report all sections in json mode', async () => {
   const result = await runDashboard({ args: ['--json'] });
   assert.equal(result.code, 0, formatFailure(result));
   const payload = parseJsonOutput(result.stdout);
 
+  assertKeySet(payload, [
+    'audits',
+    'checks',
+    'destructive',
+    'gate',
+    'generatedAt',
+    'governance',
+    'mode',
+    'profile',
+    'recommendations',
+    'runtime',
+    'service',
+    'store',
+    'summary'
+  ], 'dashboard top-level');
+  assertKeySet(payload.summary, ['message', 'status'], 'dashboard summary');
   assert.equal(payload.mode, 'memory-dashboard');
   assert.equal(payload.destructive, false);
   assert.equal(typeof payload.summary.status, 'string');
@@ -68,8 +88,23 @@ test('dashboard CLI should report all sections in json mode', async () => {
 
   // Audits section
   assert.ok(payload.audits, 'should have audits section');
+  assertKeySet(payload.audits, ['bridge', 'recall'], 'dashboard audits');
   assert.ok(payload.audits.bridge);
   assert.ok(payload.audits.recall);
+  assertKeySet(payload.audits.recall, [
+    'clientBreakdown',
+    'lastRecallAt',
+    'latestScopedHitAt',
+    'projectBreakdown',
+    'recallTypeBreakdown',
+    'recentCount',
+    'scopeDimensionBreakdown',
+    'scopeModeBreakdown',
+    'scopedRecallCount',
+    'status',
+    'strictScopedRecallCount',
+    'visibilityBreakdown'
+  ], 'dashboard recall audit');
   assert.equal(typeof payload.audits.recall.scopedRecallCount, 'number');
   assert.equal(typeof payload.audits.recall.strictScopedRecallCount, 'number');
   assert.equal(typeof payload.audits.recall.scopeModeBreakdown, 'object');
@@ -83,6 +118,27 @@ test('dashboard CLI should report all sections in json mode', async () => {
 
   // Governance section
   assert.ok(payload.governance, 'should have governance section');
+  assertKeySet(payload.governance, [
+    'counts',
+    'hints',
+    'message',
+    'paths',
+    'rawSummary',
+    'retention',
+    'reviewLevel',
+    'sourceStatus',
+    'status',
+    'statusDistribution'
+  ], 'dashboard governance');
+  assertKeySet(payload.governance.counts, [
+    'proposalCount',
+    'stale30d',
+    'stale90d',
+    'supersededCount',
+    'supersessionInitiated',
+    'tombstonedCount',
+    'totalRecords'
+  ], 'dashboard governance counts');
   assert.equal(typeof payload.governance.status, 'string');
   assert.equal(typeof payload.governance.reviewLevel, 'string');
   assert.equal(typeof payload.governance.counts.proposalCount, 'number');
@@ -101,6 +157,7 @@ test('dashboard CLI should support --json --summary-only', async () => {
   const payload = parseJsonOutput(result.stdout);
 
   assert.equal(payload.mode, 'memory-dashboard');
+  assertKeySet(payload.governance, ['counts', 'reviewLevel', 'status'], 'dashboard summary-only governance');
   // Summary-only should have compact store/profile
   assert.equal(typeof payload.store.records, 'number');
   assert.ok(payload.store.records >= 0, 'records should be non-negative');

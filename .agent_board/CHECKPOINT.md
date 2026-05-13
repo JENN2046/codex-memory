@@ -2,15 +2,15 @@
 
 ## Current Goal
 
-P8 — S-008：补 `governance:report` 输出样例 / troubleshooting note，帮助后续人工复核快速读懂 review surface。
+P10 — S-009：补 dashboard/http-observe 更细 JSON schema snapshot，保护 observability 输出面。
 
 ## Current Area
 
-P8-memory-governance
+P10-observability-admin
 
 ## Current Status
 
-本轮 `S-008` 是 docs-only 小补丁：README / VALIDATION 现在展示最小 `review` JSON shape，并给出 `unavailable`、`proposalCount`、`stale90d`、`tombstonedCount/supersededCount` 的 troubleshooting note。所有提示都保持只读：只触发人工复核，不触发生命周期写入。
+本轮 `S-009` 是测试增强：dashboard/http-observe 现在用更细的 schema snapshot 锁住 top-level、summary、governance、audit/scope/logs 等关键 JSON 字段集合。当前不改运行时代码，不改 MCP contract，不写真实 memory DB。
 
 ## Completed Work
 
@@ -49,6 +49,8 @@ P8-memory-governance
 - README / VALIDATION 补充 governance report 只读 review surface 说明。
 - README / VALIDATION 补充最小 `review` JSON 输出样例。
 - README / VALIDATION 补充 governance troubleshooting note，明确 unavailable/proposal/stale/tombstone/supersession 的只读处理方式。
+- `tests/dashboard-cli.test.js` 增加 top-level、summary、governance、governance counts、audits/recall 的 key-set snapshot。
+- `tests/http-observe-cli.test.js` 增加 top-level、summary、health、config、logs、audits/write、audits/recall、governance 的 key-set snapshot。
 
 ## Changed Files
 
@@ -64,6 +66,8 @@ P8-memory-governance
 - `tests/governance-report-cli.test.js`
 - `README.md`
 - `VALIDATION.md`
+- `tests/dashboard-cli.test.js`
+- `tests/http-observe-cli.test.js`
 - `tests/query-quality-report.test.js`
 - `tests/real-query-suite.test.js`
 - `GATE_CI_FIXTURE_ONLY_DESIGN.md`
@@ -104,6 +108,10 @@ P8-memory-governance
 - `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
 - `git diff --check` -> passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` -> passed
+- `node --test tests\dashboard-cli.test.js tests\http-observe-cli.test.js` -> 6/6 passed
+- `git diff --check` -> passed
+- `npm test` -> 184/184 passed
+- `npm run gate:ci -- --json` -> ok; compare 43/43, rollback 43/43, query assertions 8/8, CI-safe tests 171/171, docs check ok
 - final status/diff scope review -> completed
 - new-file trailing whitespace and high-risk token scans -> clean
 
@@ -127,4 +135,4 @@ P8-memory-governance
 
 ## Next Safe Action
 
-S-008 docs-only update is committed locally as `26c919f docs: add governance report troubleshooting note`. Push remains separate explicit authorization.
+Run final diff/staged review and create a guarded local S-009 commit if clean. Push remains separate explicit authorization.

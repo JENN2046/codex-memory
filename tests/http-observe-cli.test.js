@@ -169,6 +169,10 @@ function runCli({ args = [], env = {} }) {
   });
 }
 
+function assertKeySet(value, expected, label) {
+  assert.deepEqual(Object.keys(value).sort(), expected, `${label} keys`);
+}
+
 test('http-observe CLI should summarize runtime health, logs, and audits in json mode', async () => {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-'));
   const server = await startHealthServer();
@@ -190,6 +194,72 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
 
     assert.equal(result.code, 0, result.stderr);
     const payload = JSON.parse(result.stdout);
+    assertKeySet(payload, [
+      'audits',
+      'config',
+      'generatedAt',
+      'governance',
+      'health',
+      'logs',
+      'summary'
+    ], 'http-observe top-level');
+    assertKeySet(payload.summary, [
+      'bridgeRecentCount',
+      'governanceProposalCount',
+      'governanceReviewLevel',
+      'governanceStale30d',
+      'governanceStale90d',
+      'governanceStatus',
+      'healthStatus',
+      'hints',
+      'httpLogErrorCount',
+      'message',
+      'recallRecentCount',
+      'scopedRecallCount',
+      'status',
+      'strictScopedRecallCount',
+      'watchdogEnsureFailureCount',
+      'watchdogRecoveryCount'
+    ], 'http-observe summary');
+    assertKeySet(payload.health, [
+      'durationMs',
+      'error',
+      'httpStatus',
+      'payload',
+      'status',
+      'url'
+    ], 'http-observe health');
+    assertKeySet(payload.config, [
+      'httpHost',
+      'httpMcpPath',
+      'httpPort',
+      'logsDir'
+    ], 'http-observe config');
+    assertKeySet(payload.logs, ['http', 'watchdog'], 'http-observe logs');
+    assertKeySet(payload.logs.http, [
+      'errorCount',
+      'exists',
+      'infoCount',
+      'lastLine',
+      'lastModified',
+      'lineCount',
+      'listening',
+      'path',
+      'size',
+      'tail'
+    ], 'http-observe http log');
+    assertKeySet(payload.logs.watchdog, [
+      'duplicateCount',
+      'ensureFailureCount',
+      'exists',
+      'lastLine',
+      'lastModified',
+      'lineCount',
+      'path',
+      'recoveryCount',
+      'size',
+      'tail'
+    ], 'http-observe watchdog log');
     assert.equal(payload.summary.status, 'warn');
     assert.equal(payload.health.status, 'ok');
     assert.equal(payload.logs.http.listening, true);
@@ -198,9 +268,54 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       accepted: 1,
       rejected: 1
     });
+    assertKeySet(payload.audits, ['recall', 'write'], 'http-observe audits');
+    assertKeySet(payload.audits.write, [
+      'decisionBreakdown',
+      'exists',
+      'lastAcceptedAt',
+      'lastModified',
+      'lastRejectedAt',
+      'path',
+      'recentCount',
+      'recentEntries',
+      'size'
+    ], 'http-observe write audit');
+    assertKeySet(payload.audits.write.recentEntries[0], [
+      'decision',
+      'memoryId',
+      'target',
+      'timestamp',
+      'title'
+    ], 'http-observe write audit entry');
     assert.deepEqual(payload.audits.recall.recallTypeBreakdown, {
       snippet: 1
     });
+    assertKeySet(payload.audits.recall, [
+      'clientBreakdown',
+      'exists',
+      'lastModified',
+      'lastRecallAt',
+      'latestScopedHitAt',
+      'path',
+      'projectBreakdown',
+      'recallTypeBreakdown',
+      'recentCount',
+      'recentEntries',
+      'scopeDimensionBreakdown',
+      'scopeModeBreakdown',
+      'scopedRecallCount',
+      'size',
+      'strictScopedRecallCount',
+      'visibilityBreakdown'
+    ], 'http-observe recall audit');
+    assertKeySet(payload.audits.recall.recentEntries[0], [
+      'recallType',
+      'resultCount',
+      'target',
+      'timestamp',
+      'topMemoryId',
+      'topSourceFile'
+    ], 'http-observe recall audit entry');
     assert.equal(payload.summary.scopedRecallCount, 1);
     assert.equal(payload.summary.strictScopedRecallCount, 1);
     assert.equal(payload.summary.governanceStatus, 'warn');
@@ -218,6 +333,26 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       visibility: 1
     });
     assert.equal(payload.governance.status, 'warn');
+    assertKeySet(payload.governance, [
+      'counts',
+      'hints',
+      'message',
+      'paths',
+      'retention',
+      'reviewLevel',
+      'sourceStatus',
+      'status',
+      'statusDistribution'
+    ], 'http-observe governance');
+    assertKeySet(payload.governance.counts, [
+      'proposalCount',
+      'stale30d',
+      'stale90d',
+      'supersededCount',
+      'supersessionInitiated',
+      'tombstonedCount',
+      'totalRecords'
+    ], 'http-observe governance counts');
     assert.equal(payload.governance.reviewLevel, 'needs-review');
     assert.equal(payload.governance.counts.proposalCount, 1);
     assert.equal(payload.governance.counts.tombstonedCount, 1);
