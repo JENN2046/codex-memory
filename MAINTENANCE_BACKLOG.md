@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前远端 `main`：`055d749`（`docs: clean query suite handoff state`）；本轮 query-suite fixture assertion runner 为本地验证批次
+- 当前远端 `main`：`055d749`（`docs: clean query suite handoff state`）；本地最新提交：`d06a3ca`（`feat: assert real query fixture expectations`），尚未 push
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯
 - gate:ci：`119/119`（fixture-only）、gate:mainline：health `200`、compare `43/43`、rollback `43/43`
 - 标准 suite：`43/43 matched (0/0)`、npm test：`183/183`、`scope:acceptance`：`ok`

@@ -10,7 +10,7 @@ P7-vcp-parity-hardening
 
 ## Current Status
 
-远端 `main` 当前同步到 `055d749 docs: clean query suite handoff state`。本轮在本地实现共享 fixture assertion runner，让 `real-query-suite` 和 `query:quality` 基于 `benchmarks/default-dataset.json` 真实校验 `expected.mustContain` / `expected.mustNotContain`。当前默认 suite 为 5 条脱敏 fixture-only case，`assertedCount=5`、`passedCount=5`、`failedCount=0`。当前不调用 provider，不读取/写入真实 memory DB。
+远端 `main` 当前同步到 `055d749 docs: clean query suite handoff state`。本轮在本地实现共享 fixture assertion runner，让 `real-query-suite` 和 `query:quality` 基于 `benchmarks/default-dataset.json` 真实校验 `expected.mustContain` / `expected.mustNotContain`。当前默认 suite 为 5 条脱敏 fixture-only case，`assertedCount=5`、`passedCount=5`、`failedCount=0`。本地提交已创建为 `d06a3ca feat: assert real query fixture expectations`，尚未 push。当前不调用 provider，不读取/写入真实 memory DB。
 
 ## Completed Work
 
@@ -34,6 +34,7 @@ P7-vcp-parity-hardening
 - 新增 `src/cli/real-query-suite-core.js`，集中处理 suite 参数解析、fixture 加载、case 校验、fixture assertion 和报告生成。
 - `real-query-suite` / `query:quality` 复用同一只读 runner，输出 `assertedCount` / `passedCount` / `failedCount`，fixture drift 时以 `status=failed` 非零退出。
 - 补充坏 fixture 回归测试，确认缺失 `mustContain` 和命中 `mustNotContain` 都会进入 `assertionFailures`。
+- 创建本地 guarded commit `d06a3ca feat: assert real query fixture expectations`。
 
 ## Changed Files
 
@@ -86,4 +87,4 @@ P7-vcp-parity-hardening
 
 ## Next Safe Action
 
-Run final diff checks, create a guarded local commit for the assertion-runner batch, then wait for explicit authorization before pushing. Next safe implementation task is expanding fixture assertions to the remaining default dataset queries or wiring this runner into a broader fixture-only gate.
+Wait for explicit authorization before pushing `d06a3ca`. Next safe local implementation task is expanding fixture assertions to the remaining default dataset queries or wiring this runner into a broader fixture-only gate.

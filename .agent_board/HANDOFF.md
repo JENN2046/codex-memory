@@ -4,13 +4,13 @@
 
 当前本地工作在 `P7` query quality / VCP parity hardening 线。远端 `main` 已同步到 `055d749 docs: clean query suite handoff state`；PR #2 已按 superseded 关闭且未合并，远端分支保留用于追溯。
 
-最新本地批次把 `real-query-suite` 从 fixture-only baseline 推进到 fixture assertion baseline：5 条 case 全部来源于 `benchmarks/default-dataset.json`，`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`、`assertedCount=5`、`passedCount=5`、`failedCount=0`。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
+最新本地批次把 `real-query-suite` 从 fixture-only baseline 推进到 fixture assertion baseline：5 条 case 全部来源于 `benchmarks/default-dataset.json`，`placeholderCount=0`、`fixtureOnlyCount=5`、`realCount=5`、`assertedCount=5`、`passedCount=5`、`failedCount=0`。本地提交为 `d06a3ca feat: assert real query fixture expectations`，尚未 push。本轮不调用 provider，不写真实 SQLite，不导出 broad memory。
 
 ## Workspace / Branch
 
 - Workspace: A:\codex-memory
 - Branch: main
-- HEAD: local history currently at `055d749` before the assertion-runner commit; verify exact tip with `git log --oneline --decorate -n 5`
+- HEAD: `d06a3ca feat: assert real query fixture expectations`; verify exact tip with `git log --oneline --decorate -n 5`
 - Remote baseline: current `origin/main` tip for this maintenance line
 - Remote source reviewed: `origin/codex/p1-vcp-memory-core-100-roadmap`
 - Remote status: verify with `git status -sb` before relying on the handoff
@@ -53,10 +53,9 @@
 
 ## Next
 
-- P1: create a guarded local commit for the assertion-runner batch after final diff checks.
-- P2: push the new local commit only with explicit remote authorization.
-- P3: expand query-quality fixture coverage to remaining default dataset queries, or wire assertion runner into a broader fixture-only gate.
-- P4: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
+- P1: push `d06a3ca` only with explicit remote authorization.
+- P2: expand query-quality fixture coverage to remaining default dataset queries, or wire assertion runner into a broader fixture-only gate.
+- P3: any true `workspace_id` backfill requires explicit approval after a reviewed mapping proposal.
 
 ## Auth Required
 
