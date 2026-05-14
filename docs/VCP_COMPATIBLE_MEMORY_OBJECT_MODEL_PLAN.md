@@ -395,8 +395,8 @@ P13 does not migrate data. The planned sequence is:
    - Completed as a fixture-safe read-only dry-run CLI after mapping fixture tests.
    - Rejects apply/confirm/migrate flags.
 6. `P13.6-import-export-safe-json-shape-tests`
-   - Define import/export-safe JSON shape and redaction expectations.
-   - Fixture-only tests first.
+   - Completed as fixture-only import/export-safe JSON shape tests.
+   - No import/export CLI or file generation.
 7. `P13.7-migration-readiness-report`
    - Produce readiness report with counts, missing fields, risks, and rollback requirements.
    - No real migration until separately approved.
@@ -539,6 +539,42 @@ This remains a dry-run reporting phase only:
 - no SQLite migration or `ALTER TABLE`
 - no real DB read, diary read, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
 
+## P13.6 Import / Export Safe JSON Shape Tests
+
+P13.6 locks the fixture-only import/export-safe JSON shape:
+
+- fixture: `tests/fixtures/vcp-memory-import-export-shape-v1.json`
+- test: `tests/vcp-memory-import-export-shape.test.js`
+
+The fixture defines:
+
+- `exportEnvelope`
+- `importEnvelope`
+- `schema_version`
+- `exported_at`
+- `source_project`
+- `source_client`
+- redacted/summarized `source_workspace`
+- records, chunks, tags, audit events, tombstones, proposals, and migration readiness notes
+- deterministic fixture checksum
+- redaction, scope-policy, and lifecycle-policy flags
+- `import_mode=dry-run-first`
+- `mutated=false`
+
+The tests prove records keep `memory_id`, chunks/tags keep refs, audit events keep `event_id`, tombstones remain hidden, proposals remain inactive, redaction is required, raw secrets are forbidden, raw `workspace_id` is forbidden in low-risk summaries, checksum generation is deterministic, import mode is dry-run-first, and no side effect happens.
+
+This remains a fixture/test phase only:
+
+- no `src/` change
+- no package change
+- no import/export CLI
+- no import/export file generation
+- no real memory import/export
+- no SQLite migration or `ALTER TABLE`
+- no DB/diary write
+- no MCP public tool expansion
+- no MCP schema change
+
 ## Risk Register
 
 | Risk | Why It Matters | P13 Mitigation |
@@ -608,6 +644,18 @@ git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
+P13.6 validation:
+
+```powershell
+node --test tests\vcp-memory-import-export-shape.test.js
+node --test tests\vcp-memory-object-model-fixture.test.js
+node --test tests\vcp-memory-object-round-trip.test.js
+node --test tests\vcp-memory-object-mapping-fixture.test.js
+npm test
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
 P13 planning validation was docs-only:
 
 ```powershell
@@ -630,6 +678,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.6-import-export-safe-JSON-shape-tests`
+`P13.7-migration-readiness-report`
 
-P13.6 should add fixture-only import/export-safe JSON shape tests. It must not implement an import/export CLI, generate files, read/write real memory, rewrite diary, mutate SQLite, or perform migration.
+P13.7 should add a read-only migration readiness report. It must keep `migrationBlocked=true`, report `mutated=false`, avoid real DB/diary writes, and avoid real migration.

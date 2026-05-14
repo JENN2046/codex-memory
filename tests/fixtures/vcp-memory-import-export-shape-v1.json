@@ -1,0 +1,137 @@
+{
+  "schemaVersion": "vcp-memory-import-export-shape-v1",
+  "phase": "P13.6-import-export-safe-JSON-shape-tests",
+  "fixtureOnly": true,
+  "fileGenerationImplemented": false,
+  "runtimeImportExportImplemented": false,
+  "mutated": false,
+  "exportEnvelope": {
+    "schema_version": "vNext-import-export-safe-json",
+    "exported_at": "2026-05-14T02:00:00.000Z",
+    "source_project": "JENN2046/codex-memory",
+    "source_client": "codex",
+    "source_workspace": {
+      "redacted": true,
+      "workspace_ref": "workspace-sha256:fixture-p13-ie",
+      "raw_workspace_id": null
+    },
+    "records": [
+      {
+        "memory_id": "mem-p13-ie-001",
+        "schema_version": "vNext",
+        "kind": "MemoryRecord",
+        "title": "P13 import export fixture memory",
+        "content_ref": "fixture://import-export/content/mem-p13-ie-001",
+        "content_hash": "fixture-content-hash-p13-ie-001",
+        "scope": {
+          "project_id": "JENN2046/codex-memory",
+          "client_id": "codex",
+          "workspace_ref": "workspace-sha256:fixture-p13-ie",
+          "visibility": "project"
+        },
+        "lifecycle_status": "active",
+        "chunk_refs": [
+          "chunk-p13-ie-001"
+        ],
+        "tag_refs": [
+          "tag-p13-ie-001"
+        ],
+        "audit_refs": [
+          "audit-p13-ie-001"
+        ]
+      }
+    ],
+    "chunks": [
+      {
+        "chunk_id": "chunk-p13-ie-001",
+        "memory_id": "mem-p13-ie-001",
+        "kind": "memo",
+        "chunk_hash": "fixture-chunk-hash-p13-ie-001"
+      }
+    ],
+    "tags": [
+      {
+        "tag_id": "tag-p13-ie-001",
+        "memory_id": "mem-p13-ie-001",
+        "tag": "import-export-shape",
+        "weight": 0.8
+      }
+    ],
+    "audit_events": [
+      {
+        "event_id": "audit-p13-ie-001",
+        "memory_id": "mem-p13-ie-001",
+        "event_type": "record_memory",
+        "redaction_applied": true,
+        "scope_policy_applied": true,
+        "lifecycle_policy_applied": true
+      }
+    ],
+    "tombstones": [
+      {
+        "tombstone_id": "tomb-p13-ie-001",
+        "memory_id": "mem-p13-ie-tombstone",
+        "hidden": true,
+        "hard_delete": false
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "proposal-p13-ie-001",
+        "memory_id": "mem-p13-ie-proposal",
+        "active": false,
+        "requires_review": true
+      }
+    ],
+    "migrations": [
+      {
+        "migration_id": "migration-p13-ie-readiness-only",
+        "status": "not-approved",
+        "mutated": false,
+        "requires_explicit_approval": true
+      }
+    ],
+    "checksum": {
+      "algorithm": "fixture-sha256",
+      "value": "fixture-sha256:d2c2505013c01e47edfd726c95bf89734bd014a4f26c4b656502b214a58e80cb"
+    },
+    "redaction_applied": true,
+    "scope_policy_applied": true,
+    "lifecycle_policy_applied": true,
+    "import_mode": "dry-run-first",
+    "mutated": false,
+    "lowRiskSummary": {
+      "record_count": 1,
+      "chunk_count": 1,
+      "tag_count": 1,
+      "audit_event_count": 1,
+      "tombstone_count": 1,
+      "proposal_count": 1,
+      "source_workspace_ref": "workspace-sha256:fixture-p13-ie",
+      "rawWorkspaceIdExposed": false,
+      "rawSecretExposed": false,
+      "mutated": false
+    }
+  },
+  "importEnvelope": {
+    "schema_version": "vNext-import-export-safe-json",
+    "import_mode": "dry-run-first",
+    "mutated": false,
+    "apply_supported": false,
+    "requires_explicit_approval": true,
+    "accepted_object_families": [
+      "MemoryRecord",
+      "MemoChunk",
+      "KnowledgeChunk",
+      "Tag",
+      "AuditEvent",
+      "Tombstone",
+      "MemoryProposal"
+    ],
+    "redaction_applied": true,
+    "scope_policy_applied": true,
+    "lifecycle_policy_applied": true,
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false
+  }
+}
