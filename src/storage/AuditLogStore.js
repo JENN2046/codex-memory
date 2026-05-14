@@ -36,6 +36,12 @@ class AuditLogStore {
     await fs.appendFile(this.config.auditLogPath, `${JSON.stringify(entry)}\n`, 'utf8');
   }
 
+  async ensureWriteAuditWritable() {
+    await this.ensureReady();
+    const handle = await fs.open(this.config.auditLogPath, 'a');
+    await handle.close();
+  }
+
   async appendRecallAudit(entry) {
     await this.ensureReady();
     await fs.appendFile(this.config.recallLogPath, `${JSON.stringify(entry)}\n`, 'utf8');

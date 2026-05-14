@@ -94,6 +94,15 @@ function getRecordRow(dbPath, memoryId) {
   }
 }
 
+function updateRecordField(dbPath, memoryId, fieldName, value) {
+  const db = new DatabaseSync(dbPath);
+  try {
+    db.prepare(`UPDATE memory_records SET ${fieldName} = ? WHERE memory_id = ?`).run(value, memoryId);
+  } finally {
+    db.close();
+  }
+}
+
 async function readAuditEntries(auditLogPath) {
   try {
     const text = await fs.readFile(auditLogPath, 'utf8');
@@ -188,6 +197,77 @@ test('validate_memory applies proposal to active with audit when confirmed', asy
     assert.equal(auditEntries[0].mutationAuditEvent.lifecycle_policy_applied, true);
     assert.equal(auditEntries[0].mutationAuditEvent.scope_policy_applied, true);
     assert.equal(JSON.stringify(auditEntries[0]).includes('workspace-a'), false);
+  });
+});
+
+test('validate_memory audit preflight failure prevents lifecycle mutation', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'proposal' }]
+  }, async ({ config, auditLogStore, service }) => {
+    auditLogStore.ensureWriteAuditWritable = async () => {
+      throw new Error('audit path unavailable');
+    };
+    auditLogStore.appendWriteAudit = async () => {
+      throw new Error('append should not be reached');
+    };
+
+    const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
+    const row = getRecordRow(config.dbPath, 'mem-1');
+    const auditEntries = await readAuditEntries(config.auditLogPath);
+
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.mutated, false);
+    assert.match(result.reason, /write audit path is unavailable/);
+    assert.equal(row.status, 'proposal');
+    assert.deepEqual(auditEntries, []);
+  });
+});
+
+test('validate_memory rejects mutation if client_id changes after policy read', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'proposal', clientId: 'codex', visibility: 'project' }]
+  }, async ({ config, shadowStore, service }) => {
+    const readPolicy = shadowStore.getRecordValidationPolicy.bind(shadowStore);
+    shadowStore.getRecordValidationPolicy = async memoryId => {
+      const policy = await readPolicy(memoryId);
+      updateRecordField(config.dbPath, memoryId, 'client_id', 'claude');
+      return policy;
+    };
+
+    const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
+    const row = getRecordRow(config.dbPath, 'mem-1');
+    const auditEntries = await readAuditEntries(config.auditLogPath);
+
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.mutated, false);
+    assert.match(result.reason, /policy guard changed/);
+    assert.equal(row.status, 'proposal');
+    assert.equal(row.client_id, 'claude');
+    assert.deepEqual(auditEntries, []);
+  });
+});
+
+test('validate_memory rejects mutation if visibility changes after policy read', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'proposal', clientId: 'codex', visibility: 'project' }]
+  }, async ({ config, shadowStore, service }) => {
+    const readPolicy = shadowStore.getRecordValidationPolicy.bind(shadowStore);
+    shadowStore.getRecordValidationPolicy = async memoryId => {
+      const policy = await readPolicy(memoryId);
+      updateRecordField(config.dbPath, memoryId, 'visibility', 'private');
+      return policy;
+    };
+
+    const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
+    const row = getRecordRow(config.dbPath, 'mem-1');
+    const auditEntries = await readAuditEntries(config.auditLogPath);
+
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.mutated, false);
+    assert.match(result.reason, /policy guard changed/);
+    assert.equal(row.status, 'proposal');
+    assert.equal(row.visibility, 'private');
+    assert.deepEqual(auditEntries, []);
   });
 });
 

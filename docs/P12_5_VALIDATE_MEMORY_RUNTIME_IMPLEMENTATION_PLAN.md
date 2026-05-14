@@ -6,7 +6,7 @@ Updated: 2026-05-14
 
 This document freezes the implementation and test design for the narrow internal `validate_memory` runtime path.
 
-Repository reality: the internal implementation has already landed in `origin/main` at `29c7ad8`. This phase is docs/tests-design only and does not change `src/`. It records the plan shape, test matrix, audit contract, and rollback story before any further runtime changes, public MCP proposal, or broader mutation work.
+Repository reality: the internal implementation has already landed in `origin/main` at `29c7ad8`. A later internal safety review found two runtime hardening gaps: confirmed apply needed an audit write-path preflight before lifecycle mutation, and the lifecycle update guard needed to include the policy fields read for scope decisions. This document now records the patched plan shape, test matrix, audit contract, and rollback story before any further runtime changes, public MCP proposal, or broader mutation work.
 
 ## Scope
 
@@ -62,7 +62,8 @@ Responsibilities:
 - Reject forbidden lifecycle states.
 - Reject cross-client private mutations.
 - Build a `memory_validate` audit event before applying.
-- Apply the lifecycle update only through a status-checked store helper.
+- Preflight the write-audit path before confirmed mutation.
+- Apply the lifecycle update only through a status-checked and policy-guarded store helper.
 - Append audit only after the lifecycle update succeeds.
 
 Non-responsibilities:
@@ -78,14 +79,15 @@ Non-responsibilities:
 `SqliteShadowStore` provides two narrow helpers:
 
 - `getRecordValidationPolicy(memoryId)`
-- `updateLifecycleStatus({ memoryId, fromStatus, toStatus, updatedAt, actorClientId, reason })`
+- `updateLifecycleStatus({ memoryId, fromStatus, toStatus, updatedAt, actorClientId, reason, expectedClientId, expectedVisibility })`
 
 Design rules:
 
 - The helpers must use the existing `memory_records` table only.
 - The helpers must check whether lifecycle columns already exist.
 - Missing lifecycle status support must fail safe.
-- Apply must update by `memory_id` and previous `status`, so stale reads cannot silently overwrite a concurrent transition.
+- Apply must update by `memory_id`, previous `status`, expected `client_id`, and expected `visibility`, so stale reads cannot silently overwrite a concurrent transition or a changed scope decision.
+- Null or empty policy guard values must be explicit and must not silently match arbitrary non-empty values.
 - Optional lifecycle metadata columns may be populated only if already present.
 - The helpers must not create columns, indexes, tables, or migrations.
 
@@ -126,6 +128,7 @@ Audit rules:
 
 - Dry-run returns an audit preview and writes no audit.
 - Rejected requests write no audit.
+- Confirmed mutation first verifies that the write-audit path is available; if this preflight fails, `validate_memory` rejects with `mutated=false`.
 - Confirmed successful mutation writes audit after the lifecycle update succeeds.
 - Audit output must not expose raw secrets.
 - Low-risk summaries must not expose raw `workspace_id`.
@@ -139,6 +142,9 @@ Targeted runtime tests:
 | default invocation with no `dry_run=false` | `decision=dry-run`, `mutated=false`, no status update, no audit append |
 | `proposal -> active` with `dry_run=false` and `confirm=true` | status becomes `active`, audit event appended |
 | `stale -> active` with `dry_run=false` and `confirm=true` | status becomes `active`, audit event appended |
+| audit write-path preflight failure before confirmed apply | rejected, `mutated=false`, no status update, no audit append |
+| `client_id` changes between policy read and update | rejected, `mutated=false`, no status update, no audit append |
+| `visibility` changes between policy read and update | rejected, `mutated=false`, no status update, no audit append |
 | `rejected -> active` | rejected, no mutation |
 | `tombstoned -> active` | rejected, no mutation |
 | `superseded -> active` | rejected, no mutation |
@@ -189,6 +195,8 @@ Confirmed apply behavior:
 - requires `--apply`
 - requires `--confirm`
 - still depends on `ValidateMemoryService` for `ToolArgumentValidator`, `SecretScanner`, lifecycle policy, scope policy, status checks, audit write ordering, and cross-client private mutation rejection
+- rejects if the audit write path is not writable before confirmed mutation
+- rejects if `client_id` or `visibility` no longer matches the policy snapshot at update time
 - allows only `proposal/stale -> active`
 - rejects `rejected/tombstoned/superseded -> active`
 

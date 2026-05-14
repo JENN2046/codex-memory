@@ -367,33 +367,60 @@ class SqliteShadowStore {
     };
   }
 
-  async updateLifecycleStatus({ memoryId, fromStatus, toStatus, updatedAt, actorClientId = null, reason = null }) {
+  async updateLifecycleStatus({
+    memoryId,
+    fromStatus,
+    toStatus,
+    updatedAt,
+    actorClientId = null,
+    reason = null,
+    expectedClientId = null,
+    expectedVisibility = null
+  }) {
     await this.ensureReady();
     this.refreshMemoryRecordColumnInfo();
     if (!this.hasMemoryRecordColumn('status')) {
       return { updated: false, reason: 'missing_status_column' };
     }
+    if (!this.hasMemoryRecordColumn('client_id') || !this.hasMemoryRecordColumn('visibility')) {
+      return { updated: false, reason: 'missing_policy_guard_column' };
+    }
 
     const assignments = ['status = ?', 'updated_at = ?'];
-    const params = [toStatus, updatedAt, memoryId, fromStatus];
+    const setParams = [toStatus, updatedAt];
     if (this.hasMemoryRecordColumn('lifecycle_updated_at')) {
       assignments.splice(2, 0, 'lifecycle_updated_at = ?');
-      params.splice(2, 0, updatedAt);
+      setParams.splice(2, 0, updatedAt);
     }
     if (this.hasMemoryRecordColumn('lifecycle_actor_client_id')) {
       assignments.splice(assignments.length, 0, 'lifecycle_actor_client_id = ?');
-      params.splice(params.length - 2, 0, actorClientId);
+      setParams.push(actorClientId);
     }
     if (this.hasMemoryRecordColumn('status_reason')) {
       assignments.splice(assignments.length, 0, 'status_reason = ?');
-      params.splice(params.length - 2, 0, reason);
+      setParams.push(reason);
     }
+
+    const whereClauses = ['memory_id = ?', 'status = ?'];
+    const whereParams = [memoryId, fromStatus];
+    const addExpectedGuard = (columnName, expectedValue) => {
+      const normalized = typeof expectedValue === 'string' ? expectedValue.trim() : '';
+      if (!normalized) {
+        whereClauses.push(`(${columnName} IS NULL OR ${columnName} = '')`);
+        return;
+      }
+      whereClauses.push(`${columnName} = ?`);
+      whereParams.push(normalized);
+    };
+
+    addExpectedGuard('client_id', expectedClientId);
+    addExpectedGuard('visibility', expectedVisibility);
 
     const result = this.db.prepare(`
       UPDATE memory_records
       SET ${assignments.join(', ')}
-      WHERE memory_id = ? AND status = ?
-    `).run(...params);
+      WHERE ${whereClauses.join(' AND ')}
+    `).run(...setParams, ...whereParams);
 
     return {
       updated: result.changes === 1,

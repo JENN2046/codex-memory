@@ -250,18 +250,36 @@ class ValidateMemoryService {
       });
     }
 
+    try {
+      if (typeof this.auditLogStore.ensureWriteAuditWritable === 'function') {
+        await this.auditLogStore.ensureWriteAuditWritable();
+      } else if (typeof this.auditLogStore.ensureReady === 'function') {
+        await this.auditLogStore.ensureReady();
+      }
+    } catch {
+      return this.buildRejectedResult({
+        reason: 'write audit path is unavailable; validate_memory did not mutate.',
+        payload: normalizedPayload,
+        memoryId: record.memoryId,
+        fromStatus,
+        dryRun: false
+      });
+    }
+
     const updateResult = await this.shadowStore.updateLifecycleStatus({
       memoryId: record.memoryId,
       fromStatus,
       toStatus: 'active',
       updatedAt: createdAt,
       actorClientId: actorClientId || null,
-      reason: normalizedPayload.reason
+      reason: normalizedPayload.reason,
+      expectedClientId: policy.clientId,
+      expectedVisibility: policy.visibility
     });
 
     if (!updateResult.updated) {
       return this.buildRejectedResult({
-        reason: 'lifecycle status changed before validate_memory could apply.',
+        reason: 'lifecycle status or policy guard changed before validate_memory could apply.',
         payload: normalizedPayload,
         memoryId: record.memoryId,
         fromStatus,

@@ -34,6 +34,13 @@ Current internal runtime implementation:
 
 The service implementation itself is internal-only. It does not add a public MCP tool, does not change MCP schema, and does not run SQLite migration. The public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 
+Current safety patch:
+
+- Confirmed `validate_memory` now preflights the write-audit path before lifecycle mutation.
+- If the write-audit path is unavailable, the service rejects with `mutated=false`.
+- Lifecycle updates are guarded by the policy snapshot fields `client_id` and `visibility`, in addition to `memory_id` and previous `status`.
+- If `client_id` or `visibility` changes between policy read and update, the mutation is rejected instead of applying a stale scope decision.
+
 Current internal CLI wrapper:
 
 - CLI: [validate-memory.js](/A:/codex-memory/src/cli/validate-memory.js)
@@ -103,6 +110,8 @@ Before any runtime mutation patch, the implementation plan must prove:
 - no raw secret can enter audit output
 - no raw `workspace_id` appears in low-risk summaries
 - previous state is recoverable or the mutation is explicitly reversible
+- audit write-path preflight runs before confirmed mutation
+- lifecycle update uses expected `client_id` and `visibility` guards
 - failure before durable write leaves no partial mutation
 
 ## Validation After Approval

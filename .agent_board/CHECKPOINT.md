@@ -2,30 +2,39 @@
 
 ## Current Goal
 
-P15-real-query-quality-gate-planning: plan a fixture-first real query quality standing gate without changing runtime behavior.
+P12.5-validate-memory-atomicity-and-policy-guard-fix: harden the internal `validate_memory` confirmed mutation path so audit availability and scope-policy guards are checked before applying lifecycle mutation.
 
 ## Current Area
 
-P15-query-quality / planning
+P12-controlled-write-tools / validate-memory safety
 
 ## Current Status
 
-P14.6 donor parity standing gate summary has landed on `origin/main` as `aa6afe9 docs: summarize p14 donor parity gates`.
+The current patch addresses two review findings:
 
-P15 planning adds docs/board evidence only. It does not change query runtime behavior, provider configuration, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
+- audit write-path availability must be checked before confirmed lifecycle mutation
+- `client_id` and `visibility` must be part of the update guard so a stale policy decision cannot apply after scope fields change
+
+The patch keeps `validate_memory` internal-only. It does not add public MCP tools, change MCP schema, run SQLite migration, or change package/dependencies.
 
 ## Completed Work In This Batch
 
-- Added `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`.
-- Recorded current fixture-only query baseline for `real-query-suite` and `query:quality`.
-- Planned P15 gate categories for relevance, precision, scope/lifecycle/privacy safety, report stability, and provider isolation.
-- Documented future P15.1-P15.6 sequence and non-goals.
-- Updated next phase plan, backlog, status, and board pointers.
+- Added `AuditLogStore.ensureWriteAuditWritable()` as a no-event write-path preflight.
+- Updated `ValidateMemoryService` to run audit preflight before confirmed mutation.
+- Updated `ValidateMemoryService` to pass expected `client_id` and `visibility` into lifecycle update.
+- Updated `SqliteShadowStore.updateLifecycleStatus()` to guard by `memory_id`, previous `status`, expected `client_id`, and expected `visibility`.
+- Added runtime regressions for audit preflight failure, stale `client_id`, stale `visibility`, successful audit append, and dry-run no-write behavior.
+- Updated P12.5 docs/status/board to record the safety patch.
 
 ## Changed Files
 
-- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `src/core/ValidateMemoryService.js`
+- `src/storage/AuditLogStore.js`
+- `src/storage/SqliteShadowStore.js`
+- `tests/validate-memory-runtime.test.js`
+- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
+- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
+- `docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -36,35 +45,30 @@ P15 planning adds docs/board evidence only. It does not change query runtime beh
 
 ## Validation Run
 
-- `npm run real-query-suite -- --json --fixture-recall-dry-run` passed with `caseCount=8`, `passedCount=8`, `failedCount=0`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
-- `npm run query:quality -- --json --dry-run --fixture-recall-dry-run` passed with `caseCount=8`, `passedCount=8`, `failedCount=0`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
+- `node --test tests\validate-memory-runtime.test.js` passed `12/12`.
+- `node --test tests\validate-memory-cli.test.js` passed `12/12`.
+- `node --test tests\validate-memory-runtime-fixture.test.js` passed `11/11`.
+- `node --test tests\mcp-contract.test.js` passed `7/7`.
+- `npm test` passed `412/412`.
+- `npm run validate-memory -- --json --memory-id dry-run-example --reason "manual review" --evidence "manual evidence" --actor-client-id codex --request-source cli` returned dry-run rejected with `mutated=false`.
+- `npm run gate:ci` passed.
+- `npm run gate:mainline:strict` passed: health ok, contract ok, test `412/412`, compare `43/43`, rollback `43/43`.
+- `npm run lifecycle:sqlite:dry-run -- --json` passed with `mutated=false`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
-## Validation Not Run
+## Validation Pending
 
-- `npm test` not required for docs-only P15 planning; latest P14.5 full suite passed `409/409`.
-- No provider smoke / benchmark.
-- No `rebuild-profile --confirm`.
-- No SQLite migration or real data migration.
-- No import/export runtime.
-- No query runtime behavior change.
-- No real DB/memory write.
-- No real DB/diary write.
-- No P16/P17/V8/UI.
+- None for this patch.
 
 ## Current Blockers
 
 - None currently.
-- Provider-backed query quality remains blocked until an explicit provider-call phase approves it.
-- Public MCP tool expansion remains blocked until explicit proposal approval.
 
 ## Remaining Risks
 
-- The current query suite is still fixture-only and small.
-- Fixture recall dry-run is not a proof of real provider retrieval quality.
-- Scope/lifecycle/privacy query quality gaps still require P15.1 inventory before any tests or runtime changes.
+- Push requires guarded commit, readiness review, and explicit remote action under the current phase.
 
 ## Next Safe Action
 
-Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next phase after P15 planning is `P15.1-real-query-quality-fixture-inventory`.
+Create a guarded local commit, perform safe-push readiness, then push only if readiness passes.

@@ -4,11 +4,16 @@ Updated: 2026-05-14
 
 ## Review Result
 
-Result: PASS
+Result: PASS after safety patch
 
-The internal `validate_memory` runtime implementation matches the approved narrow runtime scope, the runtime fixture intent, the P12.5 approval gate, the implementation plan, and the targeted runtime tests.
+The internal `validate_memory` runtime implementation now matches the approved narrow runtime scope, the runtime fixture intent, the P12.5 approval gate, the implementation plan, and the targeted runtime tests.
 
-No runtime bug was found in this review.
+A follow-up safety review found two defects in the earlier runtime:
+
+- confirmed apply performed lifecycle update before proving the audit append path was available
+- lifecycle update guarded only by `memory_id` and previous `status`, while the scope decision also depended on `client_id` and `visibility`
+
+Both defects are fixed in the current patch.
 
 ## Files Inspected
 
@@ -34,7 +39,10 @@ No runtime bug was found in this review.
 | Arguments pass through `ToolArgumentValidator` | PASS |
 | Cross-client private mutation rejected | PASS |
 | Missing lifecycle status column fails safe | PASS |
-| Audit event written only after lifecycle update succeeds | PASS |
+| Audit write-path preflight runs before confirmed mutation | PASS |
+| Audit event written after successful lifecycle update | PASS |
+| Lifecycle update guarded by expected `client_id` | PASS |
+| Lifecycle update guarded by expected `visibility` | PASS |
 | Audit event avoids raw `workspace_id` and secret-like output | PASS |
 | Public MCP tools remain frozen | PASS |
 | No SQLite schema change | PASS |
@@ -59,10 +67,22 @@ Audit behavior matches the implementation plan:
 - Dry-run returns an audit preview and writes no audit.
 - Rejected requests write no audit.
 - Confirmed mutation builds a `memory_validate` audit event.
+- Confirmed mutation rejects before lifecycle update if the write-audit path is not writable.
 - Audit append happens only after `updateLifecycleStatus` reports a successful lifecycle update.
 - The audit event includes `previous_snapshot_ref`.
 - Targeted tests verify the audit payload does not include raw `workspace_id`.
 - Secret-like evidence is rejected before mutation and no audit entry is written.
+
+## Policy Guard Behavior
+
+`SqliteShadowStore.updateLifecycleStatus` now guards confirmed updates by:
+
+- `memory_id`
+- previous `status`
+- expected `client_id`
+- expected `visibility`
+
+If `client_id` or `visibility` changes after policy read but before the update, the update returns `updated=false` and `ValidateMemoryService` rejects with `mutated=false`.
 
 ## Public MCP Boundary
 
@@ -99,9 +119,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 Observed results:
 
 - fixture test: `11/11`
-- runtime test: `9/9`
+- runtime test: `12/12`
+- CLI test: `12/12`
 - MCP contract test: `7/7`
-- full suite: `300/300`
+- full suite: `412/412`
 - `gate:ci`: PASS
 - `gate:mainline:strict`: PASS
 - lifecycle SQLite dry-run: `mutated=false`
