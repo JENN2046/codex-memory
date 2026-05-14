@@ -6,22 +6,22 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 tests/fixtures/docs |
-| Current task | CM-0130 / P18.4-backup-rollback-safety-review |
-| Current area | P18 backup / rollback safety review |
-| Last local commit | P18.3 dry-run evidence gate committed and safe-pushed at `85a3899` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `85a389926d129ecfd4a462a5ecaf91778e2d2cc2` |
+| Current task | CM-0131 / P18.x-closeout-review |
+| Current area | P18 import/export/migration safety closeout |
+| Last local commit | P18.4 backup rollback review committed and safe-pushed at `0faba92` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `0faba9272b3828e58a142bc4988329201ea67f2c` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P18.4 backup / rollback safety review. |
-| Last validation | P18.4 docs validation passed: `git diff --check`; docs validation. |
-| Worktree summary | P18.4 docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, or unapproved mutation. |
+| Last action | Added P18.x import/export/migration safety closeout review. |
+| Last validation | P18.x docs validation passed: `git diff --check`; docs validation. |
+| Worktree summary | P18.x docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
 | P16 status | Planning through P16.x completed and pushed. |
 | P17 status | Planning through P17.x completed and pushed. |
-| P18 status | Planning through P18.3 completed and pushed; P18.4 safety review drafted locally. |
+| P18 status | Planning through P18.4 completed and pushed; P18.x closeout drafted locally. |
 | Guarded auto-commit allowed | eligible after final scope review |
-| Safe-push readiness | pending final review for P18.4 |
+| Safe-push readiness | pending final review for P18.x |
 | Next planned action | Run final diff/scope review, guarded commit, and safe-push readiness. |
 
 ## Notes
@@ -49,4 +49,5 @@
 - Decision: P18.2 may add synthetic fixture/test/docs only; import/export runtime, export file generation, migration, real memory preview, provider calls, and MCP expansion remain blocked.
 - Decision: P18.3 may summarize existing fixture-only dry-run/readiness CLI evidence, but `status=blocked` remains the apply/migration stance until explicit A5 approval.
 - Decision: P18.4 may define backup/rollback and A5 approval requirements only; backup creation, restore, apply, migration, and real memory operations remain blocked.
+- Decision: P18.x may close P18 as dry-run-safety-backed and blocked for apply; P19 may start planning/inventory only.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.

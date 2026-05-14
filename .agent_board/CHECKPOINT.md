@@ -2,18 +2,18 @@
 
 ## Current Goal
 
-P18.4-backup-rollback-safety-review: define backup, rollback, and A5 approval requirements before any apply/migration.
+P18.x-closeout-review: close P18 import/export/migration safety chain and hand off to P19 planning.
 
 ## Current Area
 
-P18 backup / rollback safety review
+P18 import/export/migration safety closeout
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `85a389926d129ecfd4a462a5ecaf91778e2d2cc2`
+- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `0faba9272b3828e58a142bc4988329201ea67f2c`
 - P16.1 inventory and P16.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.3 targeted semantic fixtures have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.4 semantic ranking evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
@@ -30,23 +30,24 @@ Repository state:
 - P18.1 inventory has been validated, committed, safe-pushed, and post-push hash-verified
 - P18.2 export envelope fixture expansion has been validated, committed, safe-pushed, and post-push hash-verified
 - P18.3 import mapping dry-run evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
+- P18.4 backup rollback safety review has been validated, committed, safe-pushed, and post-push hash-verified
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P18.4 safety decisions:
+P18.x closeout decisions:
 
-- P18.4 is docs/status/board only.
-- Future apply/migration requires backup requirement, rollback story, validation matrix, and explicit A5 approval packet.
-- Backup creation and restore can touch real durable state and therefore remain blocked without explicit A5 approval.
+- P18.x is docs/status/board only.
+- P18 can close as `DRY_RUN_SAFETY_BACKED_AND_BLOCKED_FOR_APPLY`.
+- P19 should start with observability/admin review surface planning and inventory only.
 - P18 must remain dry-run-first until an explicit A5 approval packet authorizes apply/migration.
 - Runtime ranking behavior is not tuned in this phase.
 - Provider benchmark, real memory preview, MCP expansion, migration, and V8 implementation remain deferred.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
-- P18.4 docs validation passed locally.
+- P18.x docs validation passed locally.
 
 ## Changed Files
 
-- `docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md`
+- `docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -67,4 +68,4 @@ P18.4 safety decisions:
 
 ## Next Safe Action
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P18.x-closeout-review`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P19-observability-admin-review-surface-planning`.

@@ -219,9 +219,17 @@
 
 - 入口：[docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md](/A:/codex-memory/docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md)
 - 目标：定义 future apply/migration 前必须具备的 backup requirement、rollback story、A5 approval packet 和 validation matrix。
-- 当前状态：P18.4 review 已本地通过 `git diff --check` 和 docs validation，等待 guarded commit / safe-push。
-- 下一步建议：完成 guarded commit / safe-push，并进入 `P18.x-closeout-review`。
+- 当前状态：P18.4 review 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `0faba9272b3828e58a142bc4988329201ea67f2c`。
+- 下一步建议：继续 `P18.x-closeout-review`。
 - 边界：docs-only；不创建 backup、不 restore、不执行 import/export apply、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
+
+当前 P18.x closeout：
+
+- 入口：[docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md)
+- 目标：关闭 P18 import/export/migration safety chain，记录 evidence、boundary、known gaps 和 P19 planning handoff。
+- 当前状态：P18.x closeout 已本地通过 `git diff --check` 和 docs validation，等待 guarded commit / safe-push。
+- 下一步建议：完成 guarded commit / safe-push，并进入 `P19-observability-admin-review-surface-planning`。
+- 边界：docs/status/board only；不执行 import/export apply、不创建 backup、不 restore、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
 
 ## 当前判断
 

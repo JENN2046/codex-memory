@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P18.4 backup / rollback safety review without changing runtime behavior.
+Run P18.x import/export/migration safety closeout without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P18.4 docs/status/board edits are local, validated, and uncommitted.
+P18.x docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P18 backup / rollback safety review
+P18 import/export/migration safety closeout
 
 ## Findings
 
@@ -75,12 +75,15 @@ P18 backup / rollback safety review
 - P18.3 guarded commit and safe-push completed at `85a389926d129ecfd4a462a5ecaf91778e2d2cc2`.
 - P18.4 backup/rollback safety review is drafted as docs/status/board only.
 - Future backup creation, restore, apply, migration, and real memory operations remain A5 hard stops.
+- P18.4 guarded commit and safe-push completed at `0faba9272b3828e58a142bc4988329201ea67f2c`.
+- P18.x closeout is drafted with result `DRY_RUN_SAFETY_BACKED_AND_BLOCKED_FOR_APPLY`.
+- P19 should begin with planning/inventory only.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md`
+- `docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -107,4 +110,4 @@ P18 backup / rollback safety review
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P18.x-closeout-review`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P19-observability-admin-review-surface-planning`.
