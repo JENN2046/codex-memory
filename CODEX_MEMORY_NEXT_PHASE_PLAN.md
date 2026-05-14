@@ -227,9 +227,17 @@
 
 - 入口：[docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md)
 - 目标：关闭 P18 import/export/migration safety chain，记录 evidence、boundary、known gaps 和 P19 planning handoff。
-- 当前状态：P18.x closeout 已本地通过 `git diff --check` 和 docs validation，等待 guarded commit / safe-push。
-- 下一步建议：完成 guarded commit / safe-push，并进入 `P19-observability-admin-review-surface-planning`。
+- 当前状态：P18.x closeout 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `2d5ce90ecbfcdb0a9dd6ca26b00f5fbff5483528`。
+- 下一步建议：继续 `P19-observability-admin-review-surface-planning`。
 - 边界：docs/status/board only；不执行 import/export apply、不创建 backup、不 restore、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
+
+当前 P19 planning：
+
+- 入口：[docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md)
+- 目标：规划 dashboard / `observe:http` / `governance:report` / `gate:ci` / `gate:mainline` 的只读 admin review surface，先定义 review questions、shape、subphase order 和 safety boundaries。
+- 当前状态：P19 planning 已起草，等待 docs validation、guarded commit 和 safe-push readiness。
+- 下一步建议：完成 P19 planning validation / guarded commit / safe-push 后进入 `P19.1-observability-admin-review-surface-inventory`。
+- 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile。
 
 ## 当前判断
 

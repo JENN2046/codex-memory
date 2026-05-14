@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P18.x import/export/migration safety closeout without changing runtime behavior.
+Run P19 observability/admin review surface planning without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P18.x docs/status/board edits are local, validated, and uncommitted.
+P19 planning docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P18 import/export/migration safety closeout
+P19 observability/admin review surface planning
 
 ## Findings
 
@@ -77,13 +77,16 @@ P18 import/export/migration safety closeout
 - Future backup creation, restore, apply, migration, and real memory operations remain A5 hard stops.
 - P18.4 guarded commit and safe-push completed at `0faba9272b3828e58a142bc4988329201ea67f2c`.
 - P18.x closeout is drafted with result `DRY_RUN_SAFETY_BACKED_AND_BLOCKED_FOR_APPLY`.
-- P19 should begin with planning/inventory only.
+- P18.x guarded commit and safe-push completed at `2d5ce90ecbfcdb0a9dd6ca26b00f5fbff5483528`.
+- P19 planning has added a read-only admin review surface plan.
+- P19 planning docs validation passed locally.
+- P19 should continue to inventory only after planning is validated and pushed.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md`
+- `docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -110,4 +113,4 @@ P18 import/export/migration safety closeout
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P19-observability-admin-review-surface-planning`.
+Run guarded commit, safe-push, and continue to `P19.1-observability-admin-review-surface-inventory`.
