@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P13.7-migration-readiness-report` in `A:\codex-memory`.
+Continue `P13.x-closeout-review` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `dc03d4c`
+- Base: `origin/main` / `ee3759a`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P13-object-model / migration-readiness
+P13-object-model / closeout-review
 
 ## Completed Before This Batch
 
@@ -32,24 +32,23 @@ P13-object-model / migration-readiness
 - P13 VCP-compatible memory object model planning landed.
 - P13.1 object model fixture schemas landed.
 - P13.2 object model round-trip fixture tests landed.
+- P13.3 SQLite/diary mapping dry-run planning landed.
+- P13.4 object mapping fixture tests landed.
+- P13.5 SQLite/diary mapping dry-run CLI landed.
+- P13.6 import/export-safe JSON shape tests landed.
+- P13.7 migration readiness report landed.
 - Decision after P12.6: keep `validate_memory` internal-only and skip public `validate_memory` MCP proposal review.
 
 ## Completed In Current Batch
 
-- Added `src/cli/vcp-memory-migration-readiness.js`.
-- Added `tests/fixtures/vcp-memory-migration-readiness-v1.json`.
-- Added `tests/vcp-memory-migration-readiness-cli.test.js`.
-- Added npm script `vcp-memory:migration-readiness`.
-- Readiness report keeps `migrationBlocked=true`, `mutated=false`, and rejects apply/migrate/confirm.
-- Updated P13 mapping plan, object model plan, next phase plan, status, backlog, and board state.
+- Added `docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md`.
+- Recorded P13 scope completion, evidence summary, boundary confirmation, remaining risks, and P14 readiness judgment.
+- Confirmed P13 readiness output remains `migrationBlocked=true` and `mutated=false`.
+- Updated P13 object model plan, next phase plan, backlog, status, and board state.
 
 ## Changed Files
 
-- `src/cli/vcp-memory-migration-readiness.js`
-- `tests/fixtures/vcp-memory-migration-readiness-v1.json`
-- `tests/vcp-memory-migration-readiness-cli.test.js`
-- `package.json`
-- `docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md`
+- `docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md`
 - `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -58,9 +57,6 @@ P13-object-model / migration-readiness
 
 ## Validation
 
-- `node --test tests\vcp-memory-migration-readiness-cli.test.js` passed `11/11`.
-- `npm run vcp-memory:migration-readiness -- --json` passed.
-- `npm test` passed `401/401`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -73,7 +69,7 @@ P13-object-model / migration-readiness
 
 ## Audit / Recall Impact
 
-- P13.7 readiness report does not change audit/runtime/recall behavior.
+- P13.x closeout review does not change audit/runtime/recall behavior.
 - Future mapping must preserve audit, lifecycle, scope, and import/export boundaries.
 - Recall path is unchanged.
 
@@ -81,9 +77,9 @@ P13-object-model / migration-readiness
 
 - No public MCP `validate_memory`.
 - No MCP schema change.
-- No runtime source changes beyond the read-only readiness CLI.
-- Tests changes are fixture-backed and limited to P13.7 readiness CLI tests.
-- Package change is limited to npm script `vcp-memory:migration-readiness`; no dependency/lockfile change.
+- No `src/` changes.
+- No tests changes.
+- No package or lockfile changes.
 - No SQLite migration or automatic `ALTER TABLE`.
 - No import/export CLI.
 - No import/export file generation.
@@ -91,6 +87,7 @@ P13-object-model / migration-readiness
 - No real data scan.
 - No real DB read.
 - No real diary read.
+- No P14 implementation.
 - No hard delete.
 - No real DB/memory write.
 - No provider smoke / benchmark.
@@ -101,7 +98,8 @@ P13-object-model / migration-readiness
 
 - Public MCP tool expansion remains explicitly approval-gated.
 - Real migration remains separately approval-gated.
+- P14 must start with planning / fixture / gate design only.
 
 ## Next Safe Step
 
-Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. After P13.7, stop for P13 closeout review before P14.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next recommended phase is `P14-donor-behavior-parity-gate-planning`.

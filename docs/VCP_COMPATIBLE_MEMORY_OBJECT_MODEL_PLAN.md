@@ -496,6 +496,19 @@ P13.7 remains a readiness-report phase only:
 - no SQLite migration or `ALTER TABLE`
 - no diary, vector, audit-log, DB, or durable memory write
 
+## P13 Closeout Review
+
+P13 closeout is recorded in [P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md).
+
+Closeout judgment:
+
+- P13 planning through P13.7 are complete.
+- The object model is fixture/dry-run ready, not migrated.
+- `validate_memory` remains internal-only.
+- Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+- Migration remains blocked until a future explicit approval, backup plan, rollback plan, and validation gate are approved.
+- P14 may begin only as donor behavior parity gate planning.
+
 ## P13.3 SQLite / Diary Mapping Dry-Run Planning
 
 P13.3 records the planning contract for future SQLite / diary mapping dry-run work:
@@ -729,6 +742,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.x-closeout-review`
+`P14-donor-behavior-parity-gate-planning`
 
-P13 should stop for closeout review before P14. A future P14 planning task may be `P14-donor-behavior-parity-gate-planning`; no P14 implementation is started by P13.
+P13 is closed. P14 should start as planning / fixture / gate design only; no P14 runtime implementation is started by this closeout.

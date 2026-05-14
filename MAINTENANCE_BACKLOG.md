@@ -109,7 +109,8 @@
 | P13.5-SQLite-diary-mapping-dry-run-CLI | memory-governance / object-model | A2 | done | Add read-only SQLite/diary mapping dry-run CLI after fixture tests | `node --test tests\vcp-memory-object-mapping-dry-run-cli.test.js`; mapping and round-trip regressions; CLI JSON smoke; `npm test`; diff/docs validation | Reports `mutated=false`; fixture mode only; no SQLite write, diary rewrite, import/export runtime, runtime mapper, real migration, or MCP expansion |
 | P13.6-import-export-safe-JSON-shape-tests | memory-governance / object-model | A1/A2 | done | Add fixture-only tests for import/export-safe JSON envelope shape | `node --test tests\vcp-memory-import-export-shape.test.js`; object-model regressions; `npm test`; diff/docs validation | No `src/`, package change, import/export CLI, file generation, real memory import/export, DB/diary write, migration, or MCP expansion |
 | P13.7-migration-readiness-report | memory-governance / object-model | A2 | done | Add read-only migration readiness report surface | `node --test tests\vcp-memory-migration-readiness-cli.test.js`; readiness JSON smoke; `npm test`; diff/docs validation | Reports `migrationBlocked=true` and `mutated=false`; no migration, DB/diary write, import/export apply, or MCP expansion |
-| P13.x-closeout-review | memory-governance / object-model | A1 | todo | Review P13 completion, remaining risks, and P14 readiness | docs/board review; optional targeted P13 checks | Stop point before P14; no P14 implementation without new explicit phase |
+| P13.x-closeout-review | memory-governance / object-model | A1 | done | Review P13 completion, remaining risks, and P14 readiness | `git diff --check`; docs validation | Closeout review added; P13 is fixture/dry-run ready, migration remains blocked, and next phase may be P14 planning only |
+| P14-donor-behavior-parity-gate-planning | donor-compatibility / gate-design | A1/A2 | todo | Plan donor behavior parity gates before any P14 implementation | future docs/tests-design validation | Start with planning / fixture / gate design only; do not jump to P16/P17/V8/UI or runtime implementation |
 
 ## 推荐执行顺序
 
@@ -157,8 +158,9 @@
 42. `P13.5`：SQLite / diary mapping dry-run CLI 已新增 `src/cli/vcp-memory-object-mapping-dry-run.js`、fixture、CLI test 和 `vcp-memory:mapping:dry-run` npm script；默认 fixture mode，`mutated=false`，拒绝 `--confirm/--apply/--migrate`，不读取真实 DB/diary，不生成 import/export 文件。
 43. `P13.6`：import/export-safe JSON shape fixture tests 已新增 `tests/fixtures/vcp-memory-import-export-shape-v1.json` 与 `tests/vcp-memory-import-export-shape.test.js`，验证 export/import envelope、refs、policy flags、checksum、dry-run-first、`mutated=false` 和 no-side-effect。
 44. `P13.7`：migration readiness report 已新增 `src/cli/vcp-memory-migration-readiness.js`、fixture、CLI test 和 `vcp-memory:migration-readiness` npm script；报告 P13 fixture/CLI readiness，保持 `migrationBlocked=true`、`mutated=false`，拒绝 apply/migrate/confirm。
-45. 下一步建议：P13.x closeout review；之后再评估 P14 donor behavior parity gate planning。
-46. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+45. `P13.x`：closeout review 已新增 [docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md)，确认 P13 scope/evidence/boundaries/risks，并判断可进入 P14 donor behavior parity gate planning。
+46. 下一步建议：P14 donor behavior parity gate planning；必须从 planning / fixture / gate design 开始，不进入 P14 implementation。
+47. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

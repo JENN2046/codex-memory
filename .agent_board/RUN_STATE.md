@@ -6,26 +6,26 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Safe Project Operator Rail |
-| Current task | CM-0091 / P13.7-migration-readiness-report |
-| Current area | P13-object-model / migration-readiness |
-| Last local commit | `dc03d4c test: lock vcp memory import export shape` |
-| Last pushed baseline | `dc03d4c` |
-| Last action | Added P13.7 read-only migration readiness CLI, fixture, test, and npm script. |
-| Last validation | P13.7 validation passed: readiness CLI test `11/11`, readiness JSON smoke, `npm test` `401/401`, `git diff --check`, and docs validation. |
-| Worktree summary | P13.7 read-only readiness CLI/docs/board only. No MCP schema/tool expansion, SQLite migration, import/export apply, provider call, hard delete, `.env`, dependency, real DB/diary write, or durable memory write. |
+| Current task | CM-0092 / P13.x-closeout-review |
+| Current area | P13-object-model / closeout-review |
+| Last local commit | `ee3759a feat: add vcp memory migration readiness` |
+| Last pushed baseline | `ee3759a` |
+| Last action | Added P13 closeout review and P14 planning readiness judgment. |
+| Last validation | P13.x closeout docs validation passed: `git diff --check`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`. |
+| Worktree summary | P13.x docs/board closeout only. No `src/`, tests, package, MCP schema/tool expansion, SQLite migration, import/export apply, provider call, hard delete, `.env`, dependency, real DB/diary read/write, or durable memory write. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | Active-memory suite status | Latest pushed strict gate baseline compare `43/43 matched`, rollback `43/43 rollback-ready`. |
-| npm test | Passed for P13.7: `401/401` |
+| npm test | Last full P13.7 suite passed `401/401`; not rerun for docs-only closeout |
 | Profile health | Not run in this batch |
 | Guarded auto-commit allowed | eligible after final diff/file-scope inspection |
-| Last checkpoint | P13.7 migration readiness report validated locally. |
-| Next planned action | Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean; after P13.7, stop for P13 closeout review before P14. |
+| Last checkpoint | P13.x closeout review validated locally. |
+| Next planned action | Inspect final diff/file scope, then guarded commit and safe-push readiness if clean. |
 
 ## Notes
 
-- Current phase is `P13.7-migration-readiness-report`, validated locally and ready for guarded commit/safe-push readiness.
-- Previous phase `P13.6-import-export-safe-JSON-shape-tests` is on `origin/main`.
+- Current phase is `P13.x-closeout-review`, validated locally and ready for guarded commit/safe-push readiness.
+- Previous phase `P13.7-migration-readiness-report` is on `origin/main`.
 - Current decision: keep `validate_memory` internal-only; do not enter public `validate_memory` MCP proposal review.
-- Next recommended phase is `P13.x-closeout-review`.
+- Next recommended phase is `P14-donor-behavior-parity-gate-planning`.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
-- This batch may add only P13.7 readiness CLI/fixture/test/docs/status/board updates and the `vcp-memory:migration-readiness` npm script. It must not modify MCP schema/tools, SQLite schema, durable memory, import/export apply, real DB/diary data, or public MCP behavior.
+- This batch may add only P13.x closeout docs/status/board updates. It must not modify `src/`, tests, package files, MCP schema/tools, SQLite schema, durable memory, import/export apply, real DB/diary data, or public MCP behavior.
