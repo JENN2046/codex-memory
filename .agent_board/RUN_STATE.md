@@ -6,24 +6,24 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 tests/fixtures/docs |
-| Current task | CM-0132 / P19-observability-admin-review-surface-planning |
-| Current area | P19 observability/admin review surface planning |
-| Last local commit | P18.x import/export/migration safety closeout committed and safe-pushed at `2d5ce90` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `2d5ce90ecbfcdb0a9dd6ca26b00f5fbff5483528` |
+| Current task | CM-0133 / P19.1-observability-admin-review-surface-inventory |
+| Current area | P19 observability/admin review surface inventory |
+| Last local commit | P19 planning committed and safe-pushed at `5571788` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `5571788e926f2842916eb791b91b709bce078fc2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Started P19 observability/admin review surface planning. |
-| Last validation | P19 planning docs validation passed: `git diff --check`; docs validation. |
-| Worktree summary | P19 planning docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, or unapproved mutation. |
+| Last action | Started P19.1 observability/admin review surface inventory. |
+| Last validation | P19.1 inventory docs validation passed: `git diff --check`; docs validation. |
+| Worktree summary | P19.1 inventory docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
 | P16 status | Planning through P16.x completed and pushed. |
 | P17 status | Planning through P17.x completed and pushed. |
 | P18 status | Planning through P18.x completed and pushed. |
-| P19 status | Planning completed locally; guarded commit / safe-push pending. |
+| P19 status | Planning completed and pushed; P19.1 inventory completed locally. |
 | Guarded auto-commit allowed | eligible after final scope review |
-| Safe-push readiness | pending guarded commit for P19 planning |
-| Next planned action | Guarded commit, safe-push, then continue to P19.1 inventory. |
+| Safe-push readiness | pending guarded commit for P19.1 inventory |
+| Next planned action | Guarded commit, safe-push, then continue to P19.2 shape tests. |
 
 ## Notes
 
@@ -52,4 +52,5 @@
 - Decision: P18.4 may define backup/rollback and A5 approval requirements only; backup creation, restore, apply, migration, and real memory operations remain blocked.
 - Decision: P18.x may close P18 as dry-run-safety-backed and blocked for apply; P19 may start planning/inventory only.
 - Decision: P19 planning defines read-only admin review surface boundaries only; no UI, provider call, real memory preview, MCP expansion, migration/import-export apply, package change, release, tag, or deploy.
+- Decision: P19.1 inventories existing review surfaces only; P19.2 may add synthetic shape fixtures before any runtime aggregation.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.

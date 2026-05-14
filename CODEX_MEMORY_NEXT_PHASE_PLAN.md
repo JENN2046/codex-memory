@@ -235,8 +235,16 @@
 
 - 入口：[docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md)
 - 目标：规划 dashboard / `observe:http` / `governance:report` / `gate:ci` / `gate:mainline` 的只读 admin review surface，先定义 review questions、shape、subphase order 和 safety boundaries。
-- 当前状态：P19 planning 已起草，等待 docs validation、guarded commit 和 safe-push readiness。
-- 下一步建议：完成 P19 planning validation / guarded commit / safe-push 后进入 `P19.1-observability-admin-review-surface-inventory`。
+- 当前状态：P19 planning 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `5571788e926f2842916eb791b91b709bce078fc2`。
+- 下一步建议：继续 `P19.1-observability-admin-review-surface-inventory`。
+- 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile。
+
+当前 P19.1 inventory：
+
+- 入口：[docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md)
+- 目标：盘点 dashboard / `observe:http` / `governance:report` / `gate:ci` / `gate:mainline` 现有 review surface、schema tests、safety flags 和缺口。
+- 当前状态：P19.1 inventory 已起草，等待 docs validation、guarded commit 和 safe-push readiness。
+- 下一步建议：完成 P19.1 validation / guarded commit / safe-push 后进入 `P19.2-admin-review-surface-shape-tests`。
 - 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile。
 
 ## 当前判断

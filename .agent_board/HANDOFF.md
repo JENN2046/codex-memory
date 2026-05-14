@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P19 observability/admin review surface planning without changing runtime behavior.
+Run P19.1 observability/admin review surface inventory without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P19 planning docs/status/board edits are local, validated, and uncommitted.
+P19.1 inventory docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P19 observability/admin review surface planning
+P19 observability/admin review surface inventory
 
 ## Findings
 
@@ -79,14 +79,16 @@ P19 observability/admin review surface planning
 - P18.x closeout is drafted with result `DRY_RUN_SAFETY_BACKED_AND_BLOCKED_FOR_APPLY`.
 - P18.x guarded commit and safe-push completed at `2d5ce90ecbfcdb0a9dd6ca26b00f5fbff5483528`.
 - P19 planning has added a read-only admin review surface plan.
-- P19 planning docs validation passed locally.
-- P19 should continue to inventory only after planning is validated and pushed.
+- P19 planning docs validation, guarded commit, safe-push, and post-push hash verification passed at `5571788e926f2842916eb791b91b709bce078fc2`.
+- P19.1 inventory has been drafted to capture existing dashboard / observe / governance / gate surfaces and gaps.
+- P19.1 inventory docs validation passed locally.
+- P19.2 should add synthetic admin-review surface shape tests before any runtime aggregation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md`
+- `docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -113,4 +115,4 @@ P19 observability/admin review surface planning
 
 ## Next Safe Step
 
-Run guarded commit, safe-push, and continue to `P19.1-observability-admin-review-surface-inventory`.
+Run guarded commit, safe-push, and continue to `P19.2-admin-review-surface-shape-tests`.
