@@ -125,7 +125,8 @@
 | P15.3-query-quality-report-shape-tests | query-quality / report-shape | A1/A2 | done | Lock query quality JSON fields for CI/dashboard consumers after fixture expansion | targeted query tests; fixture recall dry-run; `npm test`; `gate:ci`; diff/docs validation | Tests/docs only; locked report top-level keys, fixture recall dry-run keys, assertion failure shape, and no fake scores |
 | P15.4-fixture-recall-dry-run-standing-gate | query-quality / standing-gate | A1/A2 | done | Document and gate fixture recall dry-run as a standing CI-safe signal | `node --test tests\gate-ci-cli.test.js`; query fixture dry-runs; `npm run gate:ci`; `npm run gate:ci -- --json`; `npm test`; diff/docs validation | `gate:ci` now includes `checks.queries.detail.fixtureRecallDryRun` with `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`; no runtime ranking, providers, public MCP tools, SQLite schema, or durable memory changes |
 | P15.5-real-memory-query-dry-run-planning | query-quality / planning | A1/A2 | done | Plan a read-only, redacted, opt-in real local memory query dry-run surface | `git diff --check`; docs validation | Planning doc added; no real memory read preview, provider call, durable write, migration, import/export apply, MCP expansion, or `validate_memory` surface expansion |
-| P15.6-query-quality-closeout-review | query-quality / closeout | A1 | todo | Summarize P15.1-P15.5 evidence, remaining risks, and readiness for P16 planning | future docs/diff validation | Closeout only; do not start P16 implementation, provider benchmark, V8, UI, migration/import-export apply, or release candidate |
+| P15.6-query-quality-closeout-review | query-quality / closeout | A1 | done | Summarize P15.1-P15.5 evidence, remaining risks, and readiness for P16 planning | `git diff --check`; docs validation | Closeout review added and docs validation passed; do not start P16 implementation, provider benchmark, V8, UI, migration/import-export apply, or release candidate |
+| P16-TagMemo-semantic-association-parity-planning | tagmemo / semantic-association / planning | A1/A2 | todo | Plan TagMemo and semantic association parity after P15 closeout | future docs/diff validation | Planning only; no runtime implementation, provider benchmark, V8, UI, migration/import-export apply, public MCP expansion, or release candidate |
 
 ## 推荐执行顺序
 
@@ -189,8 +190,9 @@
 58. `P15.3`：query quality report shape tests 已锁住 `real-query-suite` / `query:quality` top-level JSON keys、`fixtureRecallDryRun` keys、assertion failure shape，并继续禁止 `hitRate` / `qualityScore` fake metrics。
 59. `P15.4`：fixture recall dry-run standing gate 已将 `checks.queries.detail.fixtureRecallDryRun` 接入 `gate:ci`，当前 standing signal 为 `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`；仍不得跳到 P16/P17/V8/UI，不主动跑真实 provider 命令，不扩大 `validate_memory` mutation surface，不开放 public `validate_memory` MCP tool。
 60. `P15.5`：real-memory query dry-run planning 已新增 [docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md)，只规划未来 redacted / opt-in / read-only 边界；本阶段不执行真实 memory read preview，不做 migration/import-export apply，不调用 provider。
-61. 下一步建议进入 `P15.6-query-quality-closeout-review`，先总结 P15.1-P15.5 证据和剩余风险，再决定是否进入 P16 planning。
-57. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+61. `P15.6`：query quality closeout review 已新增 [docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md)，总结 P15.1-P15.5 证据、剩余风险、边界确认和 P16 planning readiness；不启动 P16 implementation。
+62. 下一步建议进入 `P16-TagMemo-semantic-association-parity-planning`，只做 planning / fixture inventory；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply 或 release candidate。
+63. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

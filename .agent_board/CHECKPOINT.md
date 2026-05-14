@@ -2,32 +2,31 @@
 
 ## Current Goal
 
-P15.5-real-memory-query-dry-run-planning: define the future real-memory query dry-run boundary without implementing it.
+P15.6-query-quality-closeout-review: summarize P15.1-P15.5 evidence, remaining risks, boundary confirmations, and readiness for P16 planning.
 
 ## Current Area
 
-P15 real-memory query dry-run planning
+P15 query quality closeout
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- current main: `4aa0356 feat: gate fixture recall dry run in ci`
+- current main: `17335c2 docs: plan p15 real memory query dry run`
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P15.5 planning decisions:
+P15.6 closeout decisions:
 
-- future real-memory query dry-run must be explicit opt-in, redacted, read-only, local-only, and no-provider.
-- P15.5 does not implement a CLI.
-- P15.5 does not read real memory or audit logs.
-- P15.5 does not write durable memory.
-- P15.5 does not change query runtime ranking.
-- P15.5 does not expand MCP tools or `validate_memory`.
+- P15 is closeout-ready.
+- P15 fixture recall dry-run standing signal remains `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
+- A future real-memory query dry-run remains planning-only and still requires explicit approval before any real local memory preview.
+- P16 may start with planning / fixture inventory only.
+- P15.6 does not implement P16 runtime behavior.
 
 ## Changed Files
 
-- `docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md`
+- `docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md`
 - `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
@@ -36,12 +35,12 @@ P15.5 planning decisions:
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/TASK_QUEUE.md`
-- `.agent_board/VALIDATION_LOG.md`
 
 ## Validation
 
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `Select-String -Path docs\P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md -Pattern '[ \t]$'` returned no matches.
 
 ## Current Blockers
 
@@ -49,4 +48,4 @@ P15.5 planning decisions:
 
 ## Next Safe Action
 
-Create a guarded local commit if final file scope remains docs/board only. Do not push without readiness.
+Inspect final diff and decide guarded local commit/readiness. Do not push unless safe-push readiness is explicit and all boundaries pass.

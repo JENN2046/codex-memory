@@ -122,6 +122,7 @@ Recommended P15 sequence:
    - Status: completed in [P15.5 Real Memory Query Dry-Run Plan](./P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md).
 6. `P15.6-query-quality-closeout-review`
    - Summarize evidence, remaining risk, and readiness for P16 planning.
+   - Status: completed in [P15.6 Query Quality Closeout Review](./P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md).
 
 No P15 step should jump directly to provider benchmarks, runtime ranking changes, migration, import/export apply, P16, P17, V8, or UI.
 
@@ -161,6 +162,6 @@ Provider validation is explicitly out of scope unless a later phase receives exp
 
 ## Next Recommended Phase
 
-`P15.6-query-quality-closeout-review`
+`P16-TagMemo-semantic-association-parity-planning`
 
-P15.6 should summarize P15.1-P15.5 evidence, validation, remaining risks, and readiness for P16 planning. It should not start P16 implementation.
+P16 should start with planning and fixture inventory only. It should not start P16 implementation, provider benchmarks, V8 diagnostics, UI, migration apply, import/export apply, release candidate, tag, or deploy.
