@@ -397,6 +397,24 @@ P13 does not migrate data. The planned sequence is:
 
 No real migration, SQLite schema change, `ALTER TABLE`, diary rewrite, vector rebuild, import, export, or durable memory mutation is approved by P13.
 
+## P13.1 Fixture Schema
+
+P13.1 locks the object-model shape with fixture-backed tests:
+
+- fixture: `tests/fixtures/vcp-memory-object-model-v1.json`
+- test: `tests/vcp-memory-object-model-fixture.test.js`
+
+The fixture defines the minimum object families, `MemoryRecord` vNext required fields, privacy boundaries, lifecycle boundaries, audit boundaries, import/export safety flags, and backward-compatibility rules.
+
+This remains a schema fixture phase only:
+
+- no runtime change
+- no MCP public tool expansion
+- no MCP schema change
+- no SQLite migration or `ALTER TABLE`
+- no diary, vector, audit-log, or durable memory write
+- `validate_memory` remains internal-only
+
 ## Risk Register
 
 | Risk | Why It Matters | P13 Mitigation |
@@ -448,6 +466,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.1-object-model-fixture-schemas`
+`P13.2-object-model-round-trip-fixture-tests`
 
-That phase should add fixture schemas and schema tests for the object families above, still without runtime changes or migration.
+That phase should add fixture-only round-trip tests for object envelopes, still without runtime changes, SQLite migration, import/export implementation, or durable memory mutation.

@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P13-VCP-compatible-memory-object-model-planning` in `A:\codex-memory`.
+Continue `P13.1-object-model-fixture-schemas` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `caa8186`
+- Base: `origin/main` / `0286b79`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P13-object-model / docs-planning
+P13-object-model / fixture-schemas
 
 ## Completed Before This Batch
 
@@ -29,19 +29,21 @@ P13-object-model / docs-planning
 - P12.5 validate_memory implementation plan / rollback story landed.
 - P12.5 validate_memory internal runtime review landed with PASS.
 - P12.6 validate_memory internal CLI wrapper landed.
+- P13 VCP-compatible memory object model planning landed.
 - Decision after P12.6: keep `validate_memory` internal-only and skip public `validate_memory` MCP proposal review.
 
 ## Completed In Current Batch
 
-- Added P13 object-model planning doc.
-- Defined object families, `MemoryRecord` vNext fields, backward compatibility, mapping plan, migration strategy, risk register, validation plan, and non-goals.
-- Updated roadmap, next phase plan, controlled-write plan, status, backlog, and board state.
+- Added `tests/fixtures/vcp-memory-object-model-v1.json`.
+- Added `tests/vcp-memory-object-model-fixture.test.js`.
+- Locked object family completeness, unique object names, `schema_version`, `MemoryRecord` vNext required fields, lifecycle/audit/privacy/import-export boundaries, inactive proposals, hidden tombstones, no raw secret output, and no low-risk raw `workspace_id`.
+- Updated P13 plan, next phase plan, status, backlog, and board state.
 
 ## Changed Files
 
+- `tests/fixtures/vcp-memory-object-model-v1.json`
+- `tests/vcp-memory-object-model-fixture.test.js`
 - `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
-- `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -49,6 +51,8 @@ P13-object-model / docs-planning
 
 ## Validation
 
+- `node --test tests\vcp-memory-object-model-fixture.test.js` passed `13/13`.
+- `npm test` passed `325/325`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -61,7 +65,7 @@ P13-object-model / docs-planning
 
 ## Audit / Recall Impact
 
-- P13 planning does not change audit/runtime/recall behavior.
+- P13.1 fixture tests do not change audit/runtime/recall behavior.
 - Future object mapping must preserve audit, lifecycle, and scope boundaries.
 - Recall path is unchanged.
 
@@ -70,7 +74,6 @@ P13-object-model / docs-planning
 - No public MCP `validate_memory`.
 - No MCP schema change.
 - No `src/` changes.
-- No tests changes.
 - No package or lockfile changes.
 - No SQLite migration or automatic `ALTER TABLE`.
 - No hard delete.
@@ -82,9 +85,9 @@ P13-object-model / docs-planning
 ## Remaining Risks
 
 - Public MCP tool expansion remains explicitly approval-gated.
-- Object-model fixtures and dry-run mapping remain future phases.
+- Object-model round-trip fixture tests and dry-run mapping remain future phases.
 - Real migration remains separately approval-gated.
 
 ## Next Safe Step
 
-Inspect diff boundaries, then guarded local commit and safe-push readiness if clean.
+Run full validation, then guarded local commit and safe-push readiness if clean.

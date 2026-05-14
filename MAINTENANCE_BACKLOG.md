@@ -102,7 +102,8 @@
 | P12.5-validate-memory-internal-runtime-review | memory-governance | A1/A2 | done | Review internal `validate_memory` runtime against fixture, approval gate, implementation plan, and targeted tests | fixture `11/11`; runtime `9/9`; MCP contract `7/7`; full suite `300/300`; `gate:ci` PASS; strict gate PASS; lifecycle dry-run `mutated=false`; diff/docs validation | Review PASS; no blocking drift, no MCP expansion, no SQLite migration, no hard delete |
 | P12.6-validate-memory-internal-cli-wrapper | memory-governance | A2 | done | Add a local internal CLI wrapper for manual dry-run and explicitly confirmed `validate_memory` apply through `ValidateMemoryService` | CLI `12/12`; runtime `9/9`; fixture `11/11`; MCP contract `7/7`; full suite `312/312`; `gate:ci` PASS; strict gate PASS; lifecycle dry-run `mutated=false`; diff/docs validation | Internal CLI only; no MCP public tool expansion, no MCP schema change, no SQLite migration, no broader mutation tools |
 | P13-VCP-compatible-memory-object-model-planning | memory-governance / object-model | A2/A3 | done | Plan VCP-compatible practical object model before fixtures, mapping, import/export, or migration work | `git diff --check`; docs validation | Planning only; validate_memory remains internal-only; no `src/`, tests, package, MCP schema/tool, SQLite migration, or durable memory write |
-| P13.1-object-model-fixture-schemas | memory-governance / object-model | A1/A2 | todo | Add fixture schemas and tests for MemoryRecord vNext and object families | future object-model fixture tests; `npm test`; diff/docs validation | Next recommended phase; no runtime or migration |
+| P13.1-object-model-fixture-schemas | memory-governance / object-model | A1/A2 | done | Add fixture schemas and tests for MemoryRecord vNext and object families | `node --test tests\vcp-memory-object-model-fixture.test.js`; `npm test`; diff/docs validation | Fixture/schema only; no runtime or migration |
+| P13.2-object-model-round-trip-fixture-tests | memory-governance / object-model | A1/A2 | todo | Add fixture-only round-trip tests for object envelopes | future round-trip fixture tests; `npm test`; diff/docs validation | Next recommended phase; no runtime, import/export implementation, or migration |
 
 ## 推荐执行顺序
 
@@ -143,8 +144,9 @@
 35. `P12.6`：validate_memory internal CLI wrapper 已完成本地验证；默认 dry-run，confirmed apply 必须 `--json --apply --confirm`，仍不开放 MCP。
 36. 决策：保持 `validate_memory` internal-only，不进入 public `validate_memory` MCP proposal review。
 37. `P13`：VCP-compatible memory object model planning 已完成本地验证，入口为 [docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md)。
-38. 下一步建议：P13.1 object model fixture schemas。
-39. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+38. `P13.1`：object model fixture schemas 已新增 `tests/fixtures/vcp-memory-object-model-v1.json` 与 `tests/vcp-memory-object-model-fixture.test.js`，锁住对象族、`MemoryRecord` vNext 字段、privacy/lifecycle/audit/import-export/backward-compatibility 边界。
+39. 下一步建议：P13.2 object model round-trip fixture tests。
+40. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

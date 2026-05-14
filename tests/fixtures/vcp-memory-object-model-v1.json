@@ -1,0 +1,682 @@
+{
+  "schemaVersion": "vcp-memory-object-model-v1",
+  "version": "v1",
+  "phase": "P13.1-object-model-fixture-schemas",
+  "model": "vcp-compatible-memory-object-model",
+  "runtimeMutationImplemented": false,
+  "sqliteMigrationImplemented": false,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "policy": {
+    "validateMemoryInternalOnly": true,
+    "rawSecretOutputAllowed": false,
+    "lowRiskSummaryAllowsRawWorkspaceId": false,
+    "missingVNextFields": "safe-null-or-unknown",
+    "silentInferenceAllowed": false,
+    "migrationDryRunFirst": true
+  },
+  "rules": {
+    "objectNamesUnique": true,
+    "schemaVersionsRequired": true,
+    "requiredFieldsRequired": true,
+    "privacyBoundaryRequired": true,
+    "auditBoundaryRequired": true,
+    "memoryRecordRequiresLifecycleScopeAuditRefs": true,
+    "tombstoneImportExportAmbiguousAllowed": false,
+    "memoryProposalActiveByDefaultAllowed": false,
+    "auditEventRawSecretsAllowed": false,
+    "lowRiskSummaryRawWorkspaceIdAllowed": false,
+    "importExportSafeObjectsRequireSourceOrProvenance": true,
+    "missingVNextFields": "safe-null-or-unknown"
+  },
+  "objectFamilies": [
+    {
+      "object_name": "MemoryRecord",
+      "schema_version": "v1",
+      "required_fields": [
+        "memory_id",
+        "schema_version",
+        "kind",
+        "title",
+        "content_ref",
+        "content_hash",
+        "source",
+        "provenance",
+        "created_at",
+        "updated_at",
+        "project_id",
+        "workspace_id",
+        "client_id",
+        "agent_id",
+        "task_id",
+        "visibility",
+        "lifecycle_status",
+        "supersedes_memory_id",
+        "superseded_by_memory_id",
+        "retention_policy",
+        "audit_refs",
+        "tag_refs",
+        "chunk_refs"
+      ],
+      "optional_fields": [
+        "conversation_id",
+        "previous_snapshot_ref",
+        "proposal_ref",
+        "tombstone_ref"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "field": "lifecycle_status",
+        "allowed_statuses": [
+          "proposal",
+          "active",
+          "stale",
+          "rejected",
+          "superseded",
+          "tombstoned"
+        ],
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_diary_readable": true,
+        "existing_sqlite_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "MemoChunk",
+      "schema_version": "v1",
+      "required_fields": [
+        "chunk_id",
+        "memory_id",
+        "content_hash",
+        "text_ref",
+        "offset_start",
+        "offset_end",
+        "created_at",
+        "embedding_ref",
+        "scope_ref",
+        "lifecycle_status",
+        "source"
+      ],
+      "optional_fields": [
+        "provenance",
+        "updated_at",
+        "audit_refs"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "field": "lifecycle_status",
+        "inherits_from_memory_record": true,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "parent_memory_audit_refs_required": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_chunk_indexes_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "KnowledgeChunk",
+      "schema_version": "v1",
+      "required_fields": [
+        "chunk_id",
+        "knowledge_source_id",
+        "memory_id",
+        "path_ref",
+        "content_hash",
+        "section_ref",
+        "embedding_ref",
+        "tags",
+        "scope_ref",
+        "created_at",
+        "updated_at",
+        "source"
+      ],
+      "optional_fields": [
+        "provenance",
+        "audit_refs",
+        "lifecycle_status"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "inherits_from_memory_record": true,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "source_audit_refs_required_when_imported": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_vector_indexes_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "Tag",
+      "schema_version": "v1",
+      "required_fields": [
+        "tag_id",
+        "name",
+        "normalized_name",
+        "source",
+        "confidence",
+        "created_at",
+        "memory_refs",
+        "chunk_refs"
+      ],
+      "optional_fields": [
+        "provenance",
+        "audit_refs"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": false,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": false
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "inherits_from_referenced_memory": true,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required_when_generated": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_tag_fields_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "AgentProfile",
+      "schema_version": "v1",
+      "required_fields": [
+        "agent_id",
+        "client_id",
+        "display_name",
+        "source",
+        "visibility_defaults",
+        "created_at",
+        "updated_at",
+        "profile_ref"
+      ],
+      "optional_fields": [
+        "provenance",
+        "audit_refs"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "field": "profile_status",
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required_when_changed": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_client_scope_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "ProjectContext",
+      "schema_version": "v1",
+      "required_fields": [
+        "project_id",
+        "workspace_ref",
+        "name",
+        "source",
+        "created_at",
+        "updated_at",
+        "visibility_defaults",
+        "retention_policy"
+      ],
+      "optional_fields": [
+        "provenance",
+        "audit_refs"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "field": "project_status",
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required_when_changed": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_project_scope_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "TaskContext",
+      "schema_version": "v1",
+      "required_fields": [
+        "task_id",
+        "project_id",
+        "client_id",
+        "agent_id",
+        "title",
+        "status",
+        "created_at",
+        "updated_at",
+        "conversation_ref",
+        "memory_refs",
+        "source"
+      ],
+      "optional_fields": [
+        "provenance",
+        "audit_refs"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "field": "status",
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required_when_changed": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_task_scope_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "Checkpoint",
+      "schema_version": "v1",
+      "required_fields": [
+        "checkpoint_id",
+        "memory_id",
+        "task_id",
+        "project_id",
+        "summary_ref",
+        "evidence_refs",
+        "created_at",
+        "actor_client_id",
+        "audit_refs",
+        "source"
+      ],
+      "optional_fields": [
+        "provenance",
+        "scope_ref"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "inherits_from_memory_record": true,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required": true,
+        "requires_evidence": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_checkpoint_notes_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "Handoff",
+      "schema_version": "v1",
+      "required_fields": [
+        "handoff_id",
+        "memory_id",
+        "task_id",
+        "from_client_id",
+        "to_client_id",
+        "summary_ref",
+        "evidence_refs",
+        "created_at",
+        "audit_refs",
+        "source"
+      ],
+      "optional_fields": [
+        "provenance",
+        "scope_ref"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "inherits_from_memory_record": true,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required": true,
+        "requires_evidence": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_handoff_notes_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "AuditEvent",
+      "schema_version": "v1",
+      "required_fields": [
+        "event_id",
+        "memory_id",
+        "event_type",
+        "tool_name",
+        "actor_client_id",
+        "request_source",
+        "from_status",
+        "to_status",
+        "reason",
+        "evidence",
+        "created_at",
+        "reversible",
+        "previous_snapshot_ref",
+        "diff_summary",
+        "redaction_applied",
+        "lifecycle_policy_applied",
+        "scope_policy_applied"
+      ],
+      "optional_fields": [
+        "provenance",
+        "audit_chain_ref"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "tracks_from_to_status": true,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "append_only": true,
+        "raw_secret_output_allowed": false,
+        "raw_workspace_id_low_risk_summary_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_audit_logs_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "Tombstone",
+      "schema_version": "v1",
+      "required_fields": [
+        "tombstone_id",
+        "memory_id",
+        "reason",
+        "actor_client_id",
+        "created_at",
+        "previous_snapshot_ref",
+        "audit_event_id",
+        "retention_policy",
+        "source"
+      ],
+      "optional_fields": [
+        "provenance",
+        "expires_at"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "status": "tombstoned",
+        "visible_by_default": false,
+        "hard_delete_allowed": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_event_id_required": true,
+        "requires_reason": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false,
+        "requires_reason": true
+      },
+      "backward_compatibility": {
+        "existing_tombstoned_records_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "MemoryProposal",
+      "schema_version": "v1",
+      "required_fields": [
+        "proposal_id",
+        "memory_id",
+        "proposal_type",
+        "proposed_by_client_id",
+        "source",
+        "reason",
+        "evidence",
+        "created_at",
+        "status",
+        "scope_ref",
+        "audit_refs"
+      ],
+      "optional_fields": [
+        "provenance",
+        "reviewed_at",
+        "reviewed_by_client_id"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "default_status": "proposal",
+        "treated_as_active_by_default": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required": true,
+        "requires_reason": true,
+        "requires_evidence": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_proposal_records_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    },
+    {
+      "object_name": "MemoryMigration",
+      "schema_version": "v1",
+      "required_fields": [
+        "migration_id",
+        "source_schema_version",
+        "target_schema_version",
+        "started_at",
+        "completed_at",
+        "dry_run",
+        "mutated",
+        "record_counts",
+        "risk_summary",
+        "rollback_ref",
+        "audit_refs",
+        "source"
+      ],
+      "optional_fields": [
+        "provenance",
+        "mapping_report_ref",
+        "missing_field_summary"
+      ],
+      "privacy_boundary": {
+        "scope_sensitive": true,
+        "raw_secret_output_allowed": false,
+        "low_risk_summary_raw_workspace_id_allowed": false,
+        "requires_redaction_flag": true
+      },
+      "lifecycle_boundary": {
+        "required": true,
+        "dry_run_first": true,
+        "mutated_must_default_false": true,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      },
+      "audit_boundary": {
+        "required": true,
+        "audit_refs_required": true,
+        "raw_secret_output_allowed": false
+      },
+      "import_export_safe": {
+        "safe": true,
+        "requires_source_or_provenance": true,
+        "ambiguous": false
+      },
+      "backward_compatibility": {
+        "existing_records_remain_readable": true,
+        "immediate_migration_required": false,
+        "missing_vnext_fields": "safe-null-or-unknown"
+      }
+    }
+  ]
+}
