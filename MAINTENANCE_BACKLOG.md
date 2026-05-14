@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests、P11.4 / P11.5 / P11.6 / P11.7、P11.x stale branch quarantine、P11.8 lifecycle read-policy runtime flag implementation、P11.9 lifecycle policy gate-ci summary、P11.10 lifecycle read-policy observability/dashboard summary、P12 planning、P12.1 controlled write fixture schemas、P12.2 mutation audit shape tests、P12.3 controlled write dry-run CLI prototypes、P12.4 MCP tool proposal review 均已进入 `origin/main`；A4.8 Safe Project Operator Rail 当前为本地 docs/board/policy 工作
+- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests、P11.4 / P11.5 / P11.6 / P11.7、P11.x stale branch quarantine、P11.8 lifecycle read-policy runtime flag implementation、P11.9 lifecycle policy gate-ci summary、P11.10 lifecycle read-policy observability/dashboard summary、P12 planning、P12.1 controlled write fixture schemas、P12.2 mutation audit shape tests、P12.3 controlled write dry-run CLI prototypes、P12.4 MCP tool proposal review、A4.8 Safe Project Operator Rail 均已进入 `origin/main`
 - 长期路线图事实源：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯。Stale branch quarantine 记录：[docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md)。该分支不可整体 merge、不可 rebase、不可作为开发基线，只允许选择性文档 salvage。
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
@@ -95,6 +95,7 @@
 | P12.3-controlled-write-dry-run-cli-prototypes | memory-governance | A2 | done | Add fixture-driven controlled write dry-run CLI prototype | `node --test tests\controlled-write-dry-run-cli.test.js`; `node --test tests\controlled-write-tools-fixture.test.js`; `node --test tests\mutation-audit-shape.test.js`; `npm run controlled-write:dry-run -- --json`; `npm test`; `git diff --check`; docs validation | Dry-run only; `audit_memory` read-only; `mutated=false`, no DB/diary/vector/audit-log/memory write, no MCP public tool expansion, no SQLite migration |
 | P12.4-MCP-tool-proposal-review | memory-governance | A1/A2 | done | Review controlled write dry-run outputs and candidate tool boundaries before any public MCP tool proposal | `node --test tests\controlled-write-proposal-review.test.js`; `npm test`; `git diff --check`; docs validation | Docs/tests-design only; targeted `10/10`, full suite `280/280`; no runtime mutation, no MCP public tool expansion, no MCP schema change |
 | A4.8-safe-project-operator-rail | docs-governance | A0/A1 | done | Install A4.8 governance rail, safe-push policy, validation selection, failure recovery, and board phase/closeout schemas | `git diff --check`; docs validation | Docs/board/policy only; no runtime/tests/package/MCP/schema/SQLite changes |
+| P12.5-first-runtime-mutation-tool-planning-approval-gate | memory-governance | A1/A2 | done | Define the explicit approval gate for the first runtime mutation candidate before any runtime write path | `git diff --check`; docs validation | Docs/board only; `validate_memory` remains candidate only; runtime mutation, MCP expansion, SQLite migration, and real DB/memory write remain A5 hard stops |
 
 ## 推荐执行顺序
 
@@ -125,10 +126,11 @@
 25. `P12.1`：controlled write fixture schemas 已进入主线，锁住候选工具 schema、mutation boundary、audit shape 和 dry-run-first 规则。
 26. `P12.2`：mutation audit shape tests 已进入主线，锁住 update/supersede/forget/validate/checkpoint/handoff 的 audit event shape、policy flags、redaction boundary 和 raw workspace/secret 禁止规则。
 27. `P12.3`：controlled write dry-run CLI prototypes 已本地完成，新增 fixture-driven CLI，覆盖 update/supersede/forget/validate/checkpoint/handoff 和 read-only audit_memory，输出 would-plan / audit preview / safety flags，拒绝 confirm/apply/write/mutate，且始终 `mutated=false`。
-28. `P12.4`：MCP tool proposal review 已本地完成，锁住 public tools frozen、proposal/defer 决策、P12.5 显式批准前不得 runtime mutation。
-29. `A4.8`：Safe Project Operator Rail 已本地完成；只更新 docs/board/policy，不改变 runtime。
-30. 下一步建议：P12.5 first runtime mutation tool planning/approval gate；runtime mutation 仍需显式批准。
-31. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+28. `P12.4`：MCP tool proposal review 已进入远端主线，锁住 public tools frozen、proposal/defer 决策、P12.5 显式批准前不得 runtime mutation。
+29. `A4.8`：Safe Project Operator Rail 已进入远端主线；只更新 docs/board/policy，不改变 runtime。
+30. `P12.5`：first runtime mutation tool planning/approval gate 已完成；runtime mutation 仍需显式批准。
+31. 下一步建议：显式批准 narrow `validate_memory` runtime implementation，或继续 P12.5 fixture/test design。
+32. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

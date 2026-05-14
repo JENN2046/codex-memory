@@ -2,36 +2,28 @@
 
 ## Current Goal
 
-A4.8-safe-project-operator-rail：安装 Safe Project Operator Rail、safe-push policy、validation selection matrix、failure recovery，以及 `.agent_board` phase/closeout schema。
+P12.5-first-runtime-mutation-tool-planning-approval-gate: define the approval gate for the first controlled runtime mutation candidate without implementing runtime mutation.
 
 ## Current Area
 
-docs-governance / operator-rail
+P12-controlled-write-tools / approval-gate
 
 ## Current Status
 
-A4.8 docs/board/policy work is in progress locally. Current branch is `main`, base is `origin/main` / `4ecb78f`.
+A4.8 Safe Project Operator Rail has landed on `origin/main` at `2ba7ec0`.
 
-This batch adds governance rail docs and board protocol files only. It does not modify `src/`, tests, package files, MCP schema/tools, SQLite schema, or durable DB/memory state.
+Current P12.5 work is docs/board only and complete. It defines the approval packet, stop conditions, candidate scope, and validation expectations for a future `validate_memory` runtime mutation phase. It does not modify `src/`, tests, package files, MCP schema/tools, SQLite schema, or durable DB/memory state.
 
 ## Completed Work In This Batch
 
-- Added A4.8 operator rail docs.
-- Added safe-push policy.
-- Added validation selection matrix.
-- Added autopilot failure recovery policy.
-- Added `.agent_board` phase protocol and closeout schema.
-- Linked A4.8 docs from `AGENTS.md`.
+- Added P12.5 runtime mutation approval gate doc.
+- Linked P12.5 gate from controlled write plan and next-phase plan.
+- Updated status/backlog/board state from stale A4.8 local wording to current P12.5 gate wording.
 
 ## Changed Files
 
-- `docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md`
-- `docs/SAFE_PUSH_POLICY.md`
-- `docs/VALIDATION_SELECTION_MATRIX.md`
-- `docs/AUTOPILOT_FAILURE_RECOVERY.md`
-- `.agent_board/PHASE_PROTOCOL.md`
-- `.agent_board/CLOSEOUT_SCHEMA.md`
-- `AGENTS.md`
+- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
+- `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -51,17 +43,17 @@ This batch adds governance rail docs and board protocol files only. It does not 
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
-- No push / tag / release / deploy.
+- No runtime tests required before docs validation.
 
 ## Current Blockers
 
-- None.
+- Runtime mutation implementation is blocked until explicit approval.
 
 ## Remaining Risks
 
-- P12.4 proposal review must happen before any MCP public tool expansion.
-- P12.5 first runtime mutation remains explicitly approval-gated.
-- Current CLI is fixture-driven and must remain non-mutating.
+- `validate_memory` is only a recommended candidate, not an implemented or approved runtime tool.
+- Public MCP tools remain frozen unless a future approved phase explicitly expands them.
+- Any SQLite migration or real DB/memory write remains an A5 hard stop.
 
 ## Next Safe Action
 

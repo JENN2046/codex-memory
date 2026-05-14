@@ -158,6 +158,19 @@ Review conclusions:
 - `checkpoint_memory` and `handoff_memory` remain deferred until client-scoped evidence and retention policy are locked.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
+## P12.5 Runtime Mutation Approval Gate
+
+P12.5 is currently an approval gate, not a runtime implementation phase:
+
+- Gate doc: [P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)
+
+Current P12.5 conclusion:
+
+- `validate_memory` remains the recommended first runtime mutation candidate.
+- Runtime mutation is still blocked until explicit approval names the target, allowed files, lifecycle transitions, audit requirements, rollback expectation, validation commands, and safe-push behavior.
+- Public MCP tools remain frozen unless a dedicated approved phase explicitly authorizes expansion.
+- A4.8 may continue only with docs, fixtures, tests, dry-run CLIs, and board state before approval.
+
 ## First-Batch Boundary
 
 第一批不要全开。
@@ -315,7 +328,7 @@ No operation should jump directly from design to durable mutation.
 | P12.2 | mutation audit shape tests |
 | P12.3 | dry-run CLI tests |
 | P12.4 | MCP schema proposal review only |
-| P12.5 | first runtime tool only after explicit approval |
+| P12.5 | approval gate first; runtime tool only after explicit approval |
 
 Additional future gates before any durable mutation:
 

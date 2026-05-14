@@ -1,0 +1,128 @@
+# P12.5 Runtime Mutation Approval Gate
+
+Updated: 2026-05-14
+
+## Purpose
+
+P12.5 is an approval gate for the first controlled runtime mutation tool. It is not implementation approval by itself.
+
+The recommended first candidate is `validate_memory`, because it has the narrowest mutation shape: promote an existing `proposal` or `stale` memory to `active` only when evidence is present.
+
+## Current State
+
+Completed prerequisites:
+
+- P12 controlled write planning
+- P12.1 controlled write fixture schemas
+- P12.2 mutation audit shape tests
+- P12.3 controlled write dry-run CLI prototypes
+- P12.4 MCP tool proposal review
+- A4.8 Safe Project Operator Rail
+
+Still blocked:
+
+- runtime mutation implementation
+- MCP public tool expansion
+- MCP schema change
+- SQLite migration
+- real DB/memory write
+
+Those remain A5 hard stops until explicit approval names the target and allowed write surface.
+
+## Candidate Scope
+
+Candidate: `validate_memory`
+
+Allowed transition after approval:
+
+- `proposal -> active` with evidence
+- `stale -> active` with evidence
+
+Forbidden by default:
+
+- `rejected -> active`
+- `tombstoned -> active`
+- validation without evidence
+- validation without reason
+- silent lifecycle change
+- hard delete
+- mutation from `search_memory`
+- mutation from `memory_overview`
+- automatic mutation from dashboard, observe, governance report, DreamWorker, or reflection proposal
+
+## Approval Packet Required Before Runtime Work
+
+Explicit approval must state:
+
+- target tool candidate
+- whether it is internal-only CLI/runtime or public MCP
+- allowed files
+- forbidden files
+- permitted lifecycle transitions
+- audit event shape
+- rollback expectation
+- validation commands
+- safe-push behavior
+
+Without that packet, A4.8 may only update docs, fixtures, tests, dry-run CLIs, or board state.
+
+## Runtime Implementation Preconditions
+
+Before any runtime mutation patch, the implementation plan must prove:
+
+- `mutated=false` dry-run path already exists
+- audit event will include reason and evidence
+- SecretScanner boundary remains before any durable write
+- ToolArgumentValidator boundary is not weakened
+- lifecycle policy is applied
+- scope policy is applied
+- no raw secret can enter audit output
+- no raw `workspace_id` appears in low-risk summaries
+- previous state is recoverable or the mutation is explicitly reversible
+- failure before durable write leaves no partial mutation
+
+## Validation After Approval
+
+Minimum validation after an approved runtime mutation patch:
+
+```powershell
+node --test <targeted-runtime-mutation-test>
+node --test tests\controlled-write-tools-fixture.test.js
+node --test tests\mutation-audit-shape.test.js
+node --test tests\controlled-write-proposal-review.test.js
+npm test
+npm run gate:ci
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
+If public MCP surface is approved, also run:
+
+```powershell
+node --test tests\mcp-contract.test.js
+npm run gate:mainline:strict
+```
+
+If SQLite schema or real data migration is approved, use a separate migration phase with backup, restore, dry-run evidence, and explicit approval.
+
+## A4.8 Stop Point
+
+A4.8 may prepare this approval gate and future test design.
+
+A4.8 must stop before:
+
+- adding runtime mutation code
+- adding or exposing a public MCP tool
+- changing MCP schema
+- writing durable memory
+- writing SQLite
+- running SQLite migration
+- changing dependencies
+- editing secrets or `.env`
+- running provider calls
+
+## Next Decision
+
+The next decision is whether to explicitly approve a narrow P12.5 implementation phase for `validate_memory`.
+
+If approved, the safest first implementation should be internal and guarded before any public MCP expansion is considered.

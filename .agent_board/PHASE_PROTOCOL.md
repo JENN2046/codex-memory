@@ -89,4 +89,4 @@ closeout_required: true
 
 ## Current Reality Note
 
-As of 2026-05-14, P12.3 and P12.4 have landed on `origin/main`. The next product phase is P12.5 planning/approval gate, but runtime mutation remains an A5 hard stop until explicitly approved.
+As of 2026-05-14, P12.3, P12.4, and A4.8 have landed on `origin/main`. The current product phase is P12.5 planning/approval gate, but runtime mutation remains an A5 hard stop until explicitly approved.

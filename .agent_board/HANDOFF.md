@@ -2,53 +2,38 @@
 
 ## Goal
 
-Resume `A4.8-safe-project-operator-rail` in `A:\codex-memory`.
+Continue `P12.5-first-runtime-mutation-tool-planning-approval-gate` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `4ecb78f`
-- Local ahead commit: none at startup
-- Remote boundary: no push / tag / release / deploy without explicit authorization
+- Base: `origin/main` / `2ba7ec0`
+- Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-docs-governance / operator-rail
+P12-controlled-write-tools / approval-gate
 
 ## Completed Before This Batch
 
-- Added controlled write fixture `tests/fixtures/controlled-write-tools-v1.json`.
-- Added targeted schema test `tests/controlled-write-tools-fixture.test.js`.
-- Fixture locks `publicToolsFrozen=true`, `dryRunFirst=true`, `mutationDefault=false`, and `hardDeleteAllowed=false`.
-- Candidate tools remain proposals only: `update_memory`, `supersede_memory`, `forget_memory`, `audit_memory`, `validate_memory`, `checkpoint_memory`, `handoff_memory`.
-- Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
-- No runtime mutation path was added.
-
-## Completed Before This Batch
-
-- Added mutation audit shape fixture and targeted test.
-- Updated controlled write docs, backlog, status, and board.
-- Validation passed and `b950bf3` is now on `origin/main`.
-- P12.3 controlled write dry-run CLI prototypes passed validation and landed in `origin/main` at `2dd03dd`.
-- P12.4 MCP tool proposal review passed validation and landed in `origin/main` at `4ecb78f`.
+- P12 controlled write planning landed.
+- P12.1 fixture schemas landed.
+- P12.2 mutation audit shape tests landed.
+- P12.3 controlled write dry-run CLI prototypes landed.
+- P12.4 MCP tool proposal review landed.
+- A4.8 Safe Project Operator Rail landed at `2ba7ec0`.
 
 ## Completed In Current Batch
 
-- Added A4.8 operator rail docs.
-- Added safe-push policy, validation selection matrix, and failure recovery docs.
-- Added `.agent_board` phase protocol and closeout schema.
-- Linked A4.8 docs from `AGENTS.md`.
+- Added P12.5 approval gate doc for the first runtime mutation candidate.
+- Kept `validate_memory` as candidate-only until explicit approval.
+- Updated controlled write docs, next-phase plan, backlog, status, and board state.
 
 ## Changed Files
 
-- `docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md`
-- `docs/SAFE_PUSH_POLICY.md`
-- `docs/VALIDATION_SELECTION_MATRIX.md`
-- `docs/AUTOPILOT_FAILURE_RECOVERY.md`
-- `.agent_board/PHASE_PROTOCOL.md`
-- `.agent_board/CLOSEOUT_SCHEMA.md`
-- `AGENTS.md`
+- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
+- `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -62,31 +47,31 @@ docs-governance / operator-rail
 ## MCP Mode
 
 - Public MCP tools remain `record_memory` / `search_memory` / `memory_overview`.
-- No MCP public tool definitions were changed.
-- No MCP schema was changed.
+- No MCP public tool definitions are changed.
+- No MCP schema is changed.
 
 ## Audit / Recall Impact
 
 - No runtime audit path changed.
 - No recall path changed.
-- This batch only locks future mutation audit shape in fixture/tests.
+- The new P12.5 doc only defines future approval and validation expectations.
 - No raw `workspace_id` or secret material is added to low-risk summaries.
 
 ## Not Done
 
 - No `src/` changes.
+- No tests changes.
 - No `package.json` or lockfile changes.
 - No runtime mutation tool.
 - No SQLite migration or automatic `ALTER TABLE`.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
-- No push / tag / release / deploy.
+- No durable DB/memory write.
 
 ## Remaining Risks
 
-- P12.4 proposal review must complete before any MCP public tool expansion.
-- P12.5 first runtime mutation remains explicitly approval-gated.
-- Next recommended phase is `P12.4-MCP-tool-proposal-review`.
+- P12.5 runtime mutation remains explicitly approval-gated.
+- Public MCP tool expansion remains explicitly approval-gated.
 
 ## Next Safe Step
 

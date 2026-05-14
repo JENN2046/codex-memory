@@ -60,8 +60,8 @@
 - 目标：规划未来 `update_memory` / `supersede_memory` / `forget_memory` / `audit_memory` / `validate_memory` / `checkpoint_memory` / `handoff_memory` 等受控写入能力。
 - 边界：planning only；不实现 runtime mutation，不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不写真实 memory。
 - 当前进度：P12.1 fixture schemas、P12.2 mutation audit shape tests、P12.3 dry-run CLI prototypes、P12.4 MCP tool proposal review 均已进入远端主线。
-- 当前治理任务：A4.8 Safe Project Operator Rail 已本地完成，入口为 [docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)。
-- 下一产品阶段建议：P12.5 first runtime mutation tool planning/approval gate；runtime mutation 仍需显式批准。
+- 当前治理任务：A4.8 Safe Project Operator Rail 已进入远端主线，入口为 [docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)。
+- 当前产品阶段：P12.5 first runtime mutation tool planning/approval gate 已完成，入口为 [docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)；runtime mutation 仍需显式批准。
 
 ## 当前判断
 
@@ -76,7 +76,7 @@
 
 下一阶段不应该用“大迁移”或“大重构”推进，而应该进入小步、可验证、可回滚的维护与治理建设。
 
-当前 A4.8 governance rail 已本地完成。该 rail 允许安全低风险工作自动 planning / validation / guarded commit / readiness / safe-push，但不会越过 A5 hard stops。
+当前 A4.8 governance rail 已进入远端主线。该 rail 允许安全低风险工作自动 planning / validation / guarded commit / readiness / safe-push，但不会越过 A5 hard stops。
 
 ## 阶段顺序
 
@@ -178,7 +178,7 @@ audit / overview / search scope filter 属于后续实现任务。
 
 ## 禁止自动执行
 
-- push / PR / release / deploy / tag
+- push outside explicit user authorization or the A4.8 safe-push policy / PR / release / deploy / tag
 - 改 `.env` / secrets / provider key
 - 改 `C:\Users\617\.codex\config.toml`
 - 改 Claude / Codex 真实配置
@@ -204,7 +204,7 @@ audit / overview / search scope filter 属于后续实现任务。
 - 不包含 secrets / `.env` / dependency manifest 变更
 - `.agent_board` 已更新
 
-push 永远需要单独明确授权。
+push 只能在显式授权或 A4.8 safe-push policy 通过 readiness 时执行。
 
 ## 验证
 
