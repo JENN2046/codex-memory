@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P18 import/export/migration safety planning without changing runtime behavior.
+Run P18.1 import/export fixture inventory without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P18 planning docs/status/board edits are local, validated, and uncommitted.
+P18.1 inventory docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P18 import/export/migration safety planning
+P18 import/export fixture inventory
 
 ## Findings
 
@@ -63,12 +63,15 @@ P18 import/export/migration safety planning
 - P18 must begin with planning/dry-run safety, not migration/apply.
 - P17.x guarded commit and safe-push completed at `2777a0413b5f51035443766192ed54ab1fb93168`.
 - P18 planning is drafted as docs/status/board only.
+- P18 planning guarded commit and safe-push completed at `650bca0feed4f39a6cf23d7ad5af65ac58213001`.
+- P18.1 inventory is drafted as docs/status/board only.
+- P18.2 should add synthetic export envelope fixture tests before any import/export dry-run evidence gate.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md`
+- `docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -95,4 +98,4 @@ P18 import/export/migration safety planning
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P18.1-import-export-fixture-inventory`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P18.2-export-envelope-fixture-expansion`.

@@ -2,18 +2,18 @@
 
 ## Current Goal
 
-P18-import-export-migration-safety-planning: define dry-run-first import/export/migration safety route.
+P18.1-import-export-fixture-inventory: inventory P13 import/export/mapping/readiness fixture evidence and P18 gaps.
 
 ## Current Area
 
-P18 import/export/migration safety planning
+P18 import/export fixture inventory
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `2777a0413b5f51035443766192ed54ab1fb93168`
+- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `650bca0feed4f39a6cf23d7ad5af65ac58213001`
 - P16.1 inventory and P16.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.3 targeted semantic fixtures have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.4 semantic ranking evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
@@ -26,21 +26,24 @@ Repository state:
 - P17.4 query-family fixture tests have been validated, committed, safe-pushed, and post-push hash-verified
 - P17.5 evidence summary has been validated, committed, safe-pushed, and post-push hash-verified
 - P17.x closeout review has been validated, committed, safe-pushed, and post-push hash-verified
+- P18 planning has been validated, committed, safe-pushed, and post-push hash-verified
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P18 planning decisions:
+P18.1 inventory decisions:
 
-- P18 planning is docs/status/board only.
+- P18.1 inventory is docs/status/board only.
+- Existing P13 object model, round-trip, mapping, mapping dry-run, import/export shape, and migration readiness evidence are sufficient as inventory baseline.
+- P18.2 should add synthetic export envelope fixture tests before any dry-run evidence gate.
 - P18 must remain dry-run-first until an explicit A5 approval packet authorizes apply/migration.
 - Runtime ranking behavior is not tuned in this phase.
 - Provider benchmark, real memory preview, MCP expansion, migration, and V8 implementation remain deferred.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
-- P18 planning docs validation passed locally.
+- P18.1 inventory docs validation passed locally.
 
 ## Changed Files
 
-- `docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md`
+- `docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -61,4 +64,4 @@ P18 planning decisions:
 
 ## Next Safe Action
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P18.1-import-export-fixture-inventory`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P18.2-export-envelope-fixture-expansion`.

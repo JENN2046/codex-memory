@@ -187,8 +187,16 @@
 
 - 入口：[docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md)
 - 目标：定义 dry-run-first import/export/migration safety route，复用 P13 object/import/export/mapping/migration-readiness evidence，并明确 backup/rollback/A5 approval boundary。
-- 当前状态：P18 planning 已本地通过 `git diff --check` 和 docs validation，等待 guarded commit / safe-push。
-- 下一步建议：完成 guarded commit / safe-push，并进入 `P18.1-import-export-fixture-inventory`。
+- 当前状态：P18 planning 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `650bca0feed4f39a6cf23d7ad5af65ac58213001`。
+- 下一步建议：继续 `P18.1-import-export-fixture-inventory`。
+- 边界：docs/status/board only；不改 `src/`、不新增 tests、不执行 import/export apply、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
+
+当前 P18.1 inventory：
+
+- 入口：[docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md)
+- 目标：盘点 P13 import/export/mapping/migration-readiness fixture 和 dry-run evidence，明确 P18.2 fixture expansion 缺口。
+- 当前状态：P18.1 inventory 已本地通过 `git diff --check` 和 docs validation，等待 guarded commit / safe-push。
+- 下一步建议：完成 guarded commit / safe-push，并进入 `P18.2-export-envelope-fixture-expansion`。
 - 边界：docs/status/board only；不改 `src/`、不新增 tests、不执行 import/export apply、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
 
 ## 当前判断

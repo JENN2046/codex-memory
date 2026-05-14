@@ -6,22 +6,22 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 tests/fixtures/docs |
-| Current task | CM-0126 / P18-import-export-migration-safety-planning |
-| Current area | P18 import/export/migration safety planning |
-| Last local commit | P17.x closeout committed and safe-pushed at `2777a04` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `2777a0413b5f51035443766192ed54ab1fb93168` |
+| Current task | CM-0127 / P18.1-import-export-fixture-inventory |
+| Current area | P18 import/export fixture inventory |
+| Last local commit | P18 planning committed and safe-pushed at `650bca0` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `650bca0feed4f39a6cf23d7ad5af65ac58213001` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P18 import/export/migration safety planning. |
-| Last validation | P18 planning docs validation passed: `git diff --check`; docs validation. |
-| Worktree summary | P18 planning docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, provider call, real memory read preview, `.env`, tag, release, deploy, or unapproved mutation. |
+| Last action | Added P18.1 import/export fixture inventory. |
+| Last validation | P18.1 docs validation passed: `git diff --check`; docs validation. |
+| Worktree summary | P18.1 inventory docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, provider call, real memory read preview, `.env`, tag, release, deploy, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
 | P16 status | Planning through P16.x completed and pushed. |
 | P17 status | Planning through P17.x completed and pushed. |
-| P18 status | Planning drafted locally. |
+| P18 status | Planning completed and pushed; P18.1 inventory drafted locally. |
 | Guarded auto-commit allowed | eligible after final scope review |
-| Safe-push readiness | pending final review for P18 planning |
+| Safe-push readiness | pending final review for P18.1 |
 | Next planned action | Run final diff/scope review, guarded commit, and safe-push readiness. |
 
 ## Notes
@@ -45,4 +45,5 @@
 - Decision: P17.5 summary may mark P17 evidence fixture-backed, but it must not authorize V8 implementation, runtime tuning, provider benchmark, real memory preview, MCP expansion, or migration/import-export apply.
 - Decision: P17.x may close P17 as diagnostic-evidence-backed, but P18 must begin with planning/dry-run safety and must not apply import/export or migration without A5 approval.
 - Decision: P18 planning may define import/export/migration safety route, but apply/migration/real memory operations remain A5 hard stops.
+- Decision: P18.1 inventories fixture/dry-run evidence only; P18.2 may add synthetic export-envelope fixture tests but still must not implement apply, migration, real memory preview, provider calls, or MCP expansion.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
