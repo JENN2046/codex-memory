@@ -1,6 +1,6 @@
 # Memory Lifecycle Core Plan
 
-更新时间：2026-05-13
+更新时间：2026-05-14
 
 本文是 P11-memory-lifecycle-core-planning 的设计事实源，用来定义 `codex-memory` 后续 lifecycle core 的状态、迁移规则、audit event shape、read policy 关系和未来验收边界。
 
@@ -254,20 +254,27 @@ Plan source: [MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/c
 
 目标：
 
-- 讨论 controlled mutation tool surface。
+- 规划 controlled write tool surface。
 - 只有在 P11 schema、dry-run、read policy 都稳定后，才评估是否新增工具。
+- P12 当前只做 planning，不实现 runtime mutation。
+
+计划入口：[CONTROLLED_WRITE_TOOLS_PLAN.md](/A:/codex-memory/docs/CONTROLLED_WRITE_TOOLS_PLAN.md)
 
 候选能力：
 
-- proposal accept / reject。
-- supersede。
-- tombstone / forget。
-- lifecycle overview / audit review。
+- `update_memory`
+- `supersede_memory`
+- `forget_memory`
+- `audit_memory`
+- `validate_memory`
+- `checkpoint_memory`
+- `handoff_memory`
 
 边界：
 
-- P12 才讨论 MCP public tool 扩展。
-- P11 不新增 public MCP tools。
+- Public MCP tools remain frozen until explicit approval。
+- 第一批只做 fixture schemas、audit event shape、dry-run CLI，不做 durable mutation。
+- 不从 superseded stale branch 合入 runtime/tests/package changes。
 
 ## Future Test Acceptance
 

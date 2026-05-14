@@ -1,6 +1,6 @@
 # codex-memory Next Phase Plan
 
-更新时间：2026-05-13
+更新时间：2026-05-14
 
 ## 目的
 
@@ -53,6 +53,13 @@
 - 审查记录：[docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md)
 - `codex/p1-vcp-memory-core-100-roadmap` 是 superseded stale reference branch，不作为后续开发基线。
 - Next development base remains `origin/main`; only selective, rewritten documentation salvage is allowed.
+
+当前 P12 planning：
+
+- 入口：[docs/CONTROLLED_WRITE_TOOLS_PLAN.md](/A:/codex-memory/docs/CONTROLLED_WRITE_TOOLS_PLAN.md)
+- 目标：规划未来 `update_memory` / `supersede_memory` / `forget_memory` / `audit_memory` / `validate_memory` / `checkpoint_memory` / `handoff_memory` 等受控写入能力。
+- 边界：planning only；不实现 runtime mutation，不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不写真实 memory。
+- 下一步建议：P12.1 controlled write fixture schemas。
 
 ## 当前判断
 

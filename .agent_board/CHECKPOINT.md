@@ -2,41 +2,35 @@
 
 ## Current Goal
 
-P11.10-lifecycle-read-policy-observability-dashboard-summary：把 lifecycle read-policy 状态同步到
-`dashboard`、`observe:http` 和 `governance:report` 的只读可观测面。
+P12-controlled-write-tools-planning：规划未来受控写入能力，包括 update、supersede、forget、audit、validate、checkpoint、handoff，但本阶段不实现 runtime mutation。
 
 ## Current Area
 
-P11-memory-lifecycle-core / observability
+P12-controlled-write-tools / docs-planning
 
 ## Current Status
 
-P11.10 本地实现已完成。当前基线为 `main` / `origin/main` / `729b75a`。
+P11 lifecycle read-policy loop 已完成并推送到 `origin/main`，当前基线为 `main` / `origin/main` / `e32a95b`。
 
-本阶段只改 observability/reporting、测试、文档和 board；不改 `search_memory` runtime 行为，
-不新增 MCP public tools，不做 SQLite migration，不 push。
+本阶段只改 docs/board；不改 `src/`、`tests/`、`package.json`，不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不写真实 DB，不 push。
 
 ## Completed Work In This Batch
 
-- Added shared low-risk lifecycle/read-policy surface in `governance-report`.
-- Added `readPolicy` summary to dashboard JSON/text output.
-- Added `readPolicy` summary to `observe:http` JSON/text output.
-- Added `readPolicy` and `review.readPolicy` to `governance:report`.
-- Aggregated recent recall audit fields for hidden/stale counts and lifecycle column availability.
-- Kept raw `workspace_id` out of JSON/text output; only `scopeWorkspacePresent` boolean is exposed.
-- Updated dashboard / http-observe / governance-report tests.
-- Updated runtime policy docs, lifecycle implementation plan, status, backlog, and board state.
+- Added P12 controlled write tools planning source.
+- Defined candidate tool names as proposals only.
+- Defined recommended sequence from fixture schemas to explicit-approval runtime tool.
+- Defined first-batch boundary: fixture schemas, audit event shape, dry-run CLI, no durable mutation, no MCP public tool expansion.
+- Defined mutation rules for update / supersede / forget / audit / validate / checkpoint / handoff.
+- Reused P11 lifecycle transition mapping.
+- Defined mutation audit event shape and low-risk redaction boundaries.
+- Updated next-phase, lifecycle, backlog, status, and board summaries.
 
 ## Changed Files
 
-- `src/cli/dashboard.js`
-- `src/cli/http-observe.js`
-- `src/cli/governance-report.js`
-- `tests/dashboard-cli.test.js`
-- `tests/http-observe-cli.test.js`
-- `tests/governance-report-cli.test.js`
-- `docs/runtime-policy-gates.md`
+- `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
+- `docs/MEMORY_LIFECYCLE_CORE_PLAN.md`
 - `docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -47,23 +41,12 @@ P11.10 本地实现已完成。当前基线为 `main` / `origin/main` / `729b75a
 
 ## Validation Run
 
-- `node --test tests\dashboard-cli.test.js`：passed `4/4`
-- `node --test tests\http-observe-cli.test.js`：passed `2/2`
-- `node --test tests\governance-report-cli.test.js`：passed `3/3`
-- `npm run dashboard -- --json`：passed, includes `readPolicy.status=unavailable` on current local empty audit state
-- `npm run observe:http -- --json`：passed, includes `readPolicy` and summary read-policy fields
-- `npm run governance:report -- --json`：passed, includes `readPolicy` and `review.readPolicy`
-- `npm test`：passed `233/233`
-- `npm run gate:ci`：PASS
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
-## Validation Pending
-
-- None for this phase.
-
 ## Validation Not Run
 
+- No runtime tests required for docs/board planning.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
@@ -75,8 +58,8 @@ P11.10 本地实现已完成。当前基线为 `main` / `origin/main` / `729b75a
 
 ## Remaining Risks
 
-- `readPolicy.status=unavailable` can appear when no recent read-policy audit entry exists; this is a reporting state only.
+- Future P12.1+ phases can touch tests/fixtures and later runtime/MCP proposal surfaces; those must remain staged and validated before any mutation work.
 
 ## Next Safe Action
 
-Stop without push. Next recommended step is P11.10 guarded local commit.
+Prepare guarded local commit readiness without push.

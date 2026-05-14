@@ -6,24 +6,25 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4-Sustained Local Autopilot |
-| Current task | P11.10-lifecycle-read-policy-observability-dashboard-summary |
-| Current area | P11-memory-lifecycle-core / observability |
-| Last local commit | `729b75a feat: surface lifecycle policy in gate ci` |
-| Last pushed baseline | `729b75a` |
-| Last action | Added reporting-only lifecycle/read-policy summary to dashboard, observe:http, and governance report. |
-| Last validation | P11.10 targeted tests, dashboard/observe/governance JSON, `npm test 233/233`, `gate:ci`, `git diff --check`, and docs validation passed. |
-| Worktree summary | Observability/reporting/tests/docs/board changes pending; no runtime search path changes, no MCP public tools, no `package.json`, no `.env`, no dependency change, no SQLite migration, no provider call, no push. |
+| Current task | P12-controlled-write-tools-planning |
+| Current area | P12-controlled-write-tools / docs-planning |
+| Last local commit | `e32a95b feat: surface lifecycle read policy observability` |
+| Last pushed baseline | `e32a95b` |
+| Last action | Planned controlled write tool candidates and mutation boundaries in docs/board only. |
+| Last validation | `git diff --check` passed; docs validation passed. |
+| Worktree summary | Docs/board planning changes only; no `src/`, no `tests/`, no `package.json`, no `.env`, no dependency change, no MCP schema/tool change, no SQLite migration, no provider call, no push. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | Active-memory suite status | Latest pushed strict gate baseline compare `43/43 matched`, rollback `43/43 rollback-ready`. |
-| npm test | Passed `233/233` for P11.10 |
+| npm test | Not run for this docs/board planning batch |
 | Profile health | Not run in this batch |
-| Guarded auto-commit allowed | not requested in this batch |
-| Last checkpoint | P11.10 observability summary implemented locally. |
-| Next planned action | Stop without push; next recommended step is P11.10 guarded local commit. |
+| Guarded auto-commit allowed | eligible for guarded local commit readiness; push remains separately authorized |
+| Last checkpoint | P11.10 observability summary pushed to `origin/main`. |
+| Next planned action | Prepare guarded local commit readiness without push. |
 
 ## Notes
 
-- `dashboard`, `observe:http`, and `governance:report` now expose `readPolicy` summary.
-- The read-policy summary is reporting-only, `mutated=false`, no provider, and no migration.
-- This batch does not change `search_memory` runtime behavior.
-- This batch does not add MCP public tools and does not run SQLite migration.
+- Current phase is `P12-controlled-write-tools-planning`.
+- Next phase is `P12.1-controlled-write-fixture-schemas`.
+- P12 candidates are planning-only: `update_memory`, `supersede_memory`, `forget_memory`, `audit_memory`, `validate_memory`, `checkpoint_memory`, `handoff_memory`.
+- Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
+- This batch must not implement runtime mutation or write durable memory.

@@ -298,10 +298,14 @@ If no recent read-policy audit exists, `status=unavailable` is a reporting state
 
 ### P12 Controlled Mutation Tools
 
+Plan source: [CONTROLLED_WRITE_TOOLS_PLAN.md](/A:/codex-memory/docs/CONTROLLED_WRITE_TOOLS_PLAN.md)
+
 Goal:
 
 - Evaluate controlled mutation tools only after read policy, lifecycle schema, and dry-run migration paths are stable.
 - Any MCP public tool expansion requires explicit approval.
+- Current P12 scope is planning only: no runtime mutation, no MCP schema change, no SQLite migration, and no real memory write.
+- Recommended next phase is P12.1 controlled write fixture schemas.
 
 ## Non-Goals
 
