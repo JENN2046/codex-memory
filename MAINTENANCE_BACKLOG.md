@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests、P11.4 / P11.5 / P11.6 / P11.7、P11.x stale branch quarantine、P11.8 lifecycle read-policy runtime flag implementation、P11.9 lifecycle policy gate-ci summary、P11.10 lifecycle read-policy observability/dashboard summary、P12 planning、P12.1 controlled write fixture schemas、P12.2 mutation audit shape tests、P12.3 controlled write dry-run CLI prototypes、P12.4 MCP tool proposal review、A4.8 Safe Project Operator Rail 均已进入 `origin/main`
+- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests、P11.4 / P11.5 / P11.6 / P11.7、P11.x stale branch quarantine、P11.8 lifecycle read-policy runtime flag implementation、P11.9 lifecycle policy gate-ci summary、P11.10 lifecycle read-policy observability/dashboard summary、P12 planning、P12.1 controlled write fixture schemas、P12.2 mutation audit shape tests、P12.3 controlled write dry-run CLI prototypes、P12.4 MCP tool proposal review、A4.8 Safe Project Operator Rail、P12.5 runtime approval gate / fixture tests / internal service / plan / review 均已进入 `origin/main`
 - 长期路线图事实源：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯。Stale branch quarantine 记录：[docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md)。该分支不可整体 merge、不可 rebase、不可作为开发基线，只允许选择性文档 salvage。
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
@@ -100,6 +100,7 @@
 | P12.5-validate-memory-internal-runtime-implementation | memory-governance | A2/A3 | done | Implement narrow internal `validate_memory` runtime service for `proposal/stale -> active` with audit, SecretScanner, ToolArgumentValidator, scope and lifecycle policy gates | targeted runtime test `9/9`; fixture test `11/11`; `npm test` `300/300`; `gate:ci` PASS; `gate:mainline:strict` PASS; lifecycle SQLite dry-run `mutated=false`; diff/docs validation | Internal service only; no MCP public tool expansion, no MCP schema change, no SQLite migration, no hard delete, no provider call |
 | P12.5-validate-memory-runtime-implementation-plan | memory-governance | A0/A1 | done | Record ValidateMemoryService, SqliteShadowStore, app wiring, audit write, test matrix, and rollback story before any further runtime/MCP work | `git diff --check`; docs validation | Docs/tests-design only; no `src/`, package, MCP schema/tool, SQLite migration, hard delete, provider call, or durable memory write |
 | P12.5-validate-memory-internal-runtime-review | memory-governance | A1/A2 | done | Review internal `validate_memory` runtime against fixture, approval gate, implementation plan, and targeted tests | fixture `11/11`; runtime `9/9`; MCP contract `7/7`; full suite `300/300`; `gate:ci` PASS; strict gate PASS; lifecycle dry-run `mutated=false`; diff/docs validation | Review PASS; no blocking drift, no MCP expansion, no SQLite migration, no hard delete |
+| P12.6-validate-memory-internal-cli-wrapper | memory-governance | A2 | done | Add a local internal CLI wrapper for manual dry-run and explicitly confirmed `validate_memory` apply through `ValidateMemoryService` | CLI `12/12`; runtime `9/9`; fixture `11/11`; MCP contract `7/7`; full suite `312/312`; `gate:ci` PASS; strict gate PASS; lifecycle dry-run `mutated=false`; diff/docs validation | Internal CLI only; no MCP public tool expansion, no MCP schema change, no SQLite migration, no broader mutation tools |
 
 ## 推荐执行顺序
 
@@ -137,8 +138,9 @@
 32. `P12.5`：narrow internal `validate_memory` runtime implementation 已完成本地验证；public MCP expansion 仍需单独批准。
 33. `P12.5`：validate_memory runtime implementation plan / test matrix / rollback story 已补齐；docs/tests-design only。
 34. `P12.5`：validate_memory internal runtime review 已完成，结论 PASS。
-35. 下一步建议：decide whether to keep internal-only, add internal CLI wrapper, or run public MCP proposal review.
-36. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+35. `P12.6`：validate_memory internal CLI wrapper 已完成本地验证；默认 dry-run，confirmed apply 必须 `--json --apply --confirm`，仍不开放 MCP。
+36. 下一步建议：P12.7 public validate_memory MCP proposal review，或保持 internal-only 并进入 P13。
+37. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

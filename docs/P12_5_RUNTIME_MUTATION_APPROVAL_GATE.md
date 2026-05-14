@@ -32,7 +32,15 @@ Current internal runtime implementation:
 - Targeted test: [validate-memory-runtime.test.js](/A:/codex-memory/tests/validate-memory-runtime.test.js)
 - Implementation plan and rollback story: [P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md)
 
-This is an internal service implementation only. It does not add a public MCP tool, does not change MCP schema, does not add a package script, and does not run SQLite migration. The public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+The service implementation itself is internal-only. It does not add a public MCP tool, does not change MCP schema, and does not run SQLite migration. The public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+
+Current internal CLI wrapper:
+
+- CLI: [validate-memory.js](/A:/codex-memory/src/cli/validate-memory.js)
+- Targeted test: [validate-memory-cli.test.js](/A:/codex-memory/tests/validate-memory-cli.test.js)
+- Script: `npm run validate-memory -- --json --memory-id <id> --reason <reason> --evidence <evidence> --actor-client-id <client> --request-source <source>`
+
+The CLI is a local wrapper around `ValidateMemoryService`, not a public MCP surface. It defaults to dry-run, returns `mutated=false`, and writes no audit event unless the caller supplies `--json --apply --confirm` and the internal service approves the transition. It rejects asymmetric apply/confirm flags, missing required arguments, unknown tool/mode flags, raw `workspace_id` attempts, secret-like reason/evidence, forbidden lifecycle states, cross-client private mutation, and missing lifecycle status support.
 
 Still blocked:
 
@@ -139,6 +147,6 @@ A4.8 must stop before:
 
 ## Next Decision
 
-The next decision is whether to explicitly approve a public MCP proposal for `validate_memory`, keep it internal-only, or add an internal CLI wrapper.
+The next decision is whether to explicitly approve a public MCP proposal review for `validate_memory` or keep the capability internal-only while moving to P13.
 
 Public MCP expansion remains a separate approval gate.

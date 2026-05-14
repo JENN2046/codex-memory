@@ -44,6 +44,8 @@ P12 必须在这些边界上继续推进，不能绕过它们。
 3. `P12.3-controlled-write-dry-run-cli-prototypes`
 4. `P12.4-MCP-tool-proposal-review`
 5. `P12.5-first-runtime-mutation-tool-behind-explicit-approval`
+6. `P12.6-validate-memory-internal-cli-wrapper`
+7. `P12.7-public-validate-memory-MCP-proposal-review-or-internal-only-decision`
 
 ## P12.1 Fixture Schema Tests
 
@@ -167,9 +169,11 @@ P12.5 is currently an approval gate, not a runtime implementation phase:
 Current P12.5 conclusion:
 
 - `validate_memory` has a narrow internal service implementation only.
+- P12.6 adds a local internal CLI wrapper, `npm run validate-memory`, for manual dry-run and explicitly confirmed apply through the same internal service.
 - The runtime fixture/test gate is [validate-memory-runtime-v1.json](/A:/codex-memory/tests/fixtures/validate-memory-runtime-v1.json) and [validate-memory-runtime-fixture.test.js](/A:/codex-memory/tests/validate-memory-runtime-fixture.test.js).
 - The implementation and rollback story are recorded in [P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md).
 - Runtime mutation is limited to internal `ValidateMemoryService` and the approved `proposal/stale -> active` transition.
+- The CLI remains internal-only, defaults to dry-run, requires `--json --apply --confirm` for confirmed apply, and does not expose `validate_memory` through MCP.
 - Public MCP tools remain frozen unless a dedicated approved phase explicitly authorizes expansion.
 - A4.8 must stop before public MCP tool expansion, SQLite migration, dependency changes, or broader mutation tools.
 
@@ -331,6 +335,8 @@ No operation should jump directly from design to durable mutation.
 | P12.3 | dry-run CLI tests |
 | P12.4 | MCP schema proposal review only |
 | P12.5 | validate_memory runtime fixture tests; runtime tool only after explicit approval |
+| P12.6 | internal validate-memory CLI tests; no MCP expansion |
+| P12.7 | public validate_memory MCP proposal review, or internal-only decision |
 
 Additional future gates before any durable mutation:
 

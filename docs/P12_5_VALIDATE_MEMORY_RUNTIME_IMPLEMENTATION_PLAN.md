@@ -154,13 +154,45 @@ Regression gates:
 ```powershell
 node --test tests\validate-memory-runtime-fixture.test.js
 node --test tests\validate-memory-runtime.test.js
+node --test tests\validate-memory-cli.test.js
 npm test
 npm run gate:ci
 npm run gate:mainline:strict
+npm run validate-memory -- --json --memory-id dry-run-example --reason "manual review" --evidence "manual evidence" --actor-client-id codex --request-source cli
 npm run lifecycle:sqlite:dry-run -- --json
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
+
+## P12.6 Internal CLI Wrapper
+
+P12.6 adds a local CLI wrapper for the internal service:
+
+```powershell
+npm run validate-memory -- --json --memory-id <id> --reason <reason> --evidence <evidence> --actor-client-id <client> --request-source <source>
+```
+
+The wrapper is intentionally internal-only. It calls `services.validateMemoryService.validate(...)` and does not add a public MCP tool or change MCP schema.
+
+Default behavior:
+
+- `dryRun=true`
+- `mutated=false`
+- no lifecycle status update
+- no audit append
+- JSON output includes an `auditPreview` summary
+- low-risk output sets `rawWorkspaceIdExposed=false`
+
+Confirmed apply behavior:
+
+- requires `--json`
+- requires `--apply`
+- requires `--confirm`
+- still depends on `ValidateMemoryService` for `ToolArgumentValidator`, `SecretScanner`, lifecycle policy, scope policy, status checks, audit write ordering, and cross-client private mutation rejection
+- allows only `proposal/stale -> active`
+- rejects `rejected/tombstoned/superseded -> active`
+
+The CLI rejects asymmetric confirmation flags, missing required arguments, unknown `--tool` / `--mode` values, and attempts to pass raw `workspace_id` into the low-risk summary surface.
 
 ## Rollback Story
 
@@ -168,6 +200,7 @@ Code rollback:
 
 - Revert the implementation commit if needed.
 - Removing the internal service wiring restores the previous state because no public MCP tool depends on it.
+- Removing the `validate-memory` npm script and `src/cli/validate-memory.js` removes the local wrapper without changing the internal service or public MCP contract.
 - Existing public MCP clients remain compatible because public tools are unchanged.
 
 Data rollback:
@@ -189,7 +222,7 @@ Migration rollback:
 Next safe decisions:
 
 - Keep `validate_memory` internal-only.
-- Add an internal CLI wrapper that calls the service, still without MCP expansion.
+- Review the internal CLI wrapper and decide whether it remains internal-only.
 - Open a public MCP proposal review for `validate_memory`.
 
 Public MCP expansion, schema changes, SQLite migration, or broader mutation tools remain separate approval gates.

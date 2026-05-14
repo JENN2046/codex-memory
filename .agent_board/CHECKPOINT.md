@@ -2,28 +2,34 @@
 
 ## Current Goal
 
-P12.5-validate-memory-internal-runtime-review: review internal `validate_memory` runtime against fixture, approval gate, implementation plan, and targeted tests.
+P12.6-validate-memory-internal-cli-wrapper: add a local CLI wrapper for internal `ValidateMemoryService` while keeping MCP public tools frozen.
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory-runtime-review
+P12-controlled-write-tools / validate-memory-internal-cli
 
 ## Current Status
 
-The `validate_memory` implementation plan has landed on `origin/main` at `d01d2dd`.
+The `validate_memory` internal runtime review has landed on `origin/main` at `6332d30`.
 
-Current review result is PASS. No blocking drift was found between fixture, plan, runtime, and tests. This batch records review findings only and does not modify runtime, tests, package files, MCP schema, or SQLite schema.
+Current P12.6 implementation adds a local `validate-memory` CLI wrapper and targeted tests. The CLI defaults to dry-run, returns `mutated=false`, and only allows confirmed apply when `--json --apply --confirm` is present and `ValidateMemoryService` approves the request. Full validation passed.
 
 ## Completed Work In This Batch
 
-- Inspected internal runtime, store helpers, app wiring, fixture, tests, and P12.5 docs.
-- Ran required validation.
-- Added P12.5 internal runtime review doc.
-- Updated status/backlog/board pointers.
+- Added `src/cli/validate-memory.js`.
+- Added `tests/validate-memory-cli.test.js`.
+- Added `validate-memory` npm script.
+- Updated P12.5/P12.6 docs, status, backlog, and board pointers.
+- Ran targeted CLI validation and sample dry-run smoke.
 
 ## Changed Files
 
-- `docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md`
+- `src/cli/validate-memory.js`
+- `tests/validate-memory-cli.test.js`
+- `package.json`
+- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
+- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
+- `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -34,10 +40,12 @@ Current review result is PASS. No blocking drift was found between fixture, plan
 
 ## Validation Run
 
-- `node --test tests\validate-memory-runtime-fixture.test.js`：passed `11/11`
+- `node --test tests\validate-memory-cli.test.js`：passed `12/12`
 - `node --test tests\validate-memory-runtime.test.js`：passed `9/9`
+- `node --test tests\validate-memory-runtime-fixture.test.js`：passed `11/11`
 - `node --test tests\mcp-contract.test.js`：passed `7/7`
-- `npm test`：passed `300/300`
+- `npm test`：passed `312/312`
+- `npm run validate-memory -- --json --memory-id dry-run-example --reason "manual review" --evidence "manual evidence" --actor-client-id codex --request-source cli`：passed, returned `dryRun=true`, `mutated=false`, and `auditPreview`
 - `npm run gate:ci`：PASS
 - `npm run gate:mainline:strict`：PASS
 - `npm run lifecycle:sqlite:dry-run -- --json`：passed with `mutated=false`
@@ -52,12 +60,12 @@ Current review result is PASS. No blocking drift was found between fixture, plan
 
 ## Current Blockers
 
-- None for the review scope.
+- None currently.
 - Public MCP tool expansion remains blocked until explicit proposal approval.
 
 ## Remaining Risks
 
-- Current implementation remains internal-only; no MCP public access exists.
+- CLI is internal-only; no MCP public access exists.
 - Any public MCP `validate_memory` tool requires a separate proposal/review phase.
 - SQLite lifecycle status columns must already exist; this phase does not migrate schemas.
 
