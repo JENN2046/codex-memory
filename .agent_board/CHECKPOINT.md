@@ -2,29 +2,30 @@
 
 ## Current Goal
 
-P12.5-first-runtime-mutation-tool-planning-approval-gate: define the approval gate for the first controlled runtime mutation candidate without implementing runtime mutation.
+P12.5-validate-memory-runtime-fixture-tests: lock `validate_memory` runtime contract before any runtime mutation implementation is approved.
 
 ## Current Area
 
-P12-controlled-write-tools / approval-gate
+P12-controlled-write-tools / validate-memory-fixture-tests
 
 ## Current Status
 
-A4.8 Safe Project Operator Rail has landed on `origin/main` at `2ba7ec0`.
+P12.5 approval gate has landed on `origin/main` at `21f3e03`.
 
-Current P12.5 work is docs/board only and complete. It defines the approval packet, stop conditions, candidate scope, and validation expectations for a future `validate_memory` runtime mutation phase. It does not modify `src/`, tests, package files, MCP schema/tools, SQLite schema, or durable DB/memory state.
+Current P12.5 fixture/test work is complete. It adds fixture-backed tests for `validate_memory` input requirements, allowed/forbidden lifecycle transitions, audit event shape, dry-run behavior, redaction, SecretScanner / ToolArgumentValidator, and scope/lifecycle policy boundaries. It does not modify runtime implementation.
 
 ## Completed Work In This Batch
 
-- Added P12.5 runtime mutation approval gate doc.
-- Linked P12.5 gate from controlled write plan and next-phase plan.
-- Updated status/backlog/board state from stale A4.8 local wording to current P12.5 gate wording.
+- Added `validate_memory` runtime fixture.
+- Added targeted fixture test.
+- Updated P12.5 docs/status/backlog/board pointers.
 
 ## Changed Files
 
+- `tests/fixtures/validate-memory-runtime-v1.json`
+- `tests/validate-memory-runtime-fixture.test.js`
 - `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -35,6 +36,8 @@ Current P12.5 work is docs/board only and complete. It defines the approval pack
 
 ## Validation Run
 
+- `node --test tests\validate-memory-runtime-fixture.test.js`：passed `11/11`
+- `npm test`：passed `291/291`
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -43,7 +46,6 @@ Current P12.5 work is docs/board only and complete. It defines the approval pack
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
-- No runtime tests required before docs validation.
 
 ## Current Blockers
 
@@ -51,7 +53,7 @@ Current P12.5 work is docs/board only and complete. It defines the approval pack
 
 ## Remaining Risks
 
-- `validate_memory` is only a recommended candidate, not an implemented or approved runtime tool.
+- `validate_memory` is only a candidate; runtime mutation is not implemented in this batch.
 - Public MCP tools remain frozen unless a future approved phase explicitly expands them.
 - Any SQLite migration or real DB/memory write remains an A5 hard stop.
 

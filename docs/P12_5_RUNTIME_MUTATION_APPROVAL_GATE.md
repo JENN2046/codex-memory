@@ -19,6 +19,13 @@ Completed prerequisites:
 - P12.4 MCP tool proposal review
 - A4.8 Safe Project Operator Rail
 
+Current fixture/test gate:
+
+- Fixture: [validate-memory-runtime-v1.json](/A:/codex-memory/tests/fixtures/validate-memory-runtime-v1.json)
+- Test: [validate-memory-runtime-fixture.test.js](/A:/codex-memory/tests/validate-memory-runtime-fixture.test.js)
+
+This fixture/test phase still does not approve runtime mutation. It locks input requirements, allowed and forbidden lifecycle transitions, audit shape, dry-run behavior, redaction boundary, SecretScanner / ToolArgumentValidator boundaries, and scope/lifecycle policy requirements before any runtime patch.
+
 Still blocked:
 
 - runtime mutation implementation
@@ -71,6 +78,7 @@ Without that packet, A4.8 may only update docs, fixtures, tests, dry-run CLIs, o
 Before any runtime mutation patch, the implementation plan must prove:
 
 - `mutated=false` dry-run path already exists
+- `tests/fixtures/validate-memory-runtime-v1.json` is satisfied
 - audit event will include reason and evidence
 - SecretScanner boundary remains before any durable write
 - ToolArgumentValidator boundary is not weakened

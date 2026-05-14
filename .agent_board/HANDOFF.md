@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P12.5-first-runtime-mutation-tool-planning-approval-gate` in `A:\codex-memory`.
+Continue `P12.5-validate-memory-runtime-fixture-tests` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `2ba7ec0`
+- Base: `origin/main` / `21f3e03`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P12-controlled-write-tools / approval-gate
+P12-controlled-write-tools / validate-memory-fixture-tests
 
 ## Completed Before This Batch
 
@@ -22,25 +22,29 @@ P12-controlled-write-tools / approval-gate
 - P12.2 mutation audit shape tests landed.
 - P12.3 controlled write dry-run CLI prototypes landed.
 - P12.4 MCP tool proposal review landed.
-- A4.8 Safe Project Operator Rail landed at `2ba7ec0`.
+- A4.8 Safe Project Operator Rail landed.
+- P12.5 runtime mutation approval gate landed.
 
 ## Completed In Current Batch
 
-- Added P12.5 approval gate doc for the first runtime mutation candidate.
-- Kept `validate_memory` as candidate-only until explicit approval.
-- Updated controlled write docs, next-phase plan, backlog, status, and board state.
+- Added `validate_memory` runtime fixture.
+- Added targeted fixture test.
+- Updated P12.5 docs, backlog, status, and board state.
 
 ## Changed Files
 
+- `tests/fixtures/validate-memory-runtime-v1.json`
+- `tests/validate-memory-runtime-fixture.test.js`
 - `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
+- `node --test tests\validate-memory-runtime-fixture.test.js` passed `11/11`.
+- `npm test` passed `291/291`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -54,13 +58,12 @@ P12-controlled-write-tools / approval-gate
 
 - No runtime audit path changed.
 - No recall path changed.
-- The new P12.5 doc only defines future approval and validation expectations.
+- The fixture only defines future `memory_validate` audit expectations.
 - No raw `workspace_id` or secret material is added to low-risk summaries.
 
 ## Not Done
 
 - No `src/` changes.
-- No tests changes.
 - No `package.json` or lockfile changes.
 - No runtime mutation tool.
 - No SQLite migration or automatic `ALTER TABLE`.

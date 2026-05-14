@@ -18,6 +18,7 @@
 - P12.4 MCP tool proposal review 已进入远端主线：新增 proposal review fixture/test 设计，明确 P12.4 不批准 public MCP expansion；`audit_memory` 只可进入未来 read-only public-tool proposal review，`validate_memory` 是 P12.5 显式批准后的推荐首个 runtime mutation 候选，update/supersede/forget/checkpoint/handoff 继续 defer。
 - A4.8 Safe Project Operator Rail 已进入远端主线：新增 safe project operator rail、safe-push policy、validation selection matrix、failure recovery、phase protocol 和 closeout schema；该批只做 docs/board/policy，不改 runtime、不改 tests、不改 package、不新增 MCP tools。
 - P12.5 first runtime mutation tool planning/approval gate 已完成：新增 approval gate 入口 [docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)，明确 `validate_memory` 仍只是首个候选；runtime mutation、MCP public tool expansion、MCP schema change、SQLite migration 和真实 DB/memory write 均保持 A5 hard stop，直到显式批准。
+- P12.5 validate_memory runtime fixture tests 已完成：新增 `tests/fixtures/validate-memory-runtime-v1.json` 与 `tests/validate-memory-runtime-fixture.test.js`，锁定 `validate_memory` runtime 前置 schema、`proposal/stale -> active` 允许流转、`rejected/tombstoned/superseded -> active` 禁止流转、audit required fields、dry-run-first、redaction、scope/lifecycle policy、SecretScanner / ToolArgumentValidator boundary；不实现 runtime mutation。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -106,6 +107,7 @@
 - P12.4 MCP tool proposal review 已进入远端主线：新增 `tests/fixtures/controlled-write-proposal-review-v1.json` 与 `tests/controlled-write-proposal-review.test.js`，锁住 public tools frozen、docs/tests-only、no runtime mutation、no DB/diary/vector/audit-log write，以及候选工具后续 proposal/defer 结论。
 - A4.8 governance rail 已进入远端主线：新增 [docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)、safe-push / validation / failure-recovery docs，以及 `.agent_board` phase/closeout schema。
 - P12.5 approval gate 已开始：新增 [docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)，只定义显式批准包、候选范围、运行时前置条件和验证门槛；不实现 runtime mutation。
+- P12.5 validate_memory runtime fixture tests 已完成：新增 fixture/test 锁住 runtime 批准前契约；targeted `11/11`、full suite `291/291` 通过；不改 `src/`，不新增 MCP tools，不写真实 DB/memory。
 - `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：

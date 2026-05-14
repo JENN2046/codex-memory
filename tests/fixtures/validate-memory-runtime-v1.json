@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "validate-memory-runtime-v1",
+  "version": "v1",
+  "phase": "P12.5-validate-memory-runtime-fixture-tests",
+  "toolCandidate": "validate_memory",
+  "defaultMutates": false,
+  "runtimeApprovalRequired": true,
+  "noRuntimeMutation": true,
+  "noMcpPublicToolExpansion": true,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "dryRunBehavior": {
+    "dryRunFirst": true,
+    "mutated": false,
+    "wouldRequireAuditEvent": true,
+    "wouldRequireReason": true,
+    "wouldRequireEvidence": true,
+    "wouldRequireLifecycleTransition": true,
+    "wouldRequireScopePolicy": true,
+    "redactionRequired": true
+  },
+  "allowedTransitions": [
+    { "from": "proposal", "to": "active", "requiresEvidence": true },
+    { "from": "stale", "to": "active", "requiresEvidence": true }
+  ],
+  "forbiddenTransitions": [
+    { "from": "rejected", "to": "active" },
+    { "from": "tombstoned", "to": "active" },
+    { "from": "superseded", "to": "active" }
+  ],
+  "requires": [
+    "memory_id",
+    "reason",
+    "evidence",
+    "actor_client_id",
+    "request_source",
+    "lifecycle_policy_applied",
+    "scope_policy_applied",
+    "redaction_applied",
+    "audit_event"
+  ],
+  "mustNot": [
+    "bypass SecretScanner",
+    "bypass ToolArgumentValidator",
+    "expose raw secrets",
+    "expose raw workspace_id",
+    "mutate without audit",
+    "mutate without previous status check",
+    "mutate cross-client private memory",
+    "revive rejected/tombstoned memory by default"
+  ],
+  "auditEvent": {
+    "event_type": "memory_validate",
+    "tool_name": "validate_memory",
+    "requiredFields": [
+      "event_id",
+      "memory_id",
+      "event_type",
+      "tool_name",
+      "actor_client_id",
+      "request_source",
+      "from_status",
+      "to_status",
+      "reason",
+      "evidence",
+      "created_at",
+      "reversible",
+      "previous_snapshot_ref",
+      "redaction_applied",
+      "lifecycle_policy_applied",
+      "scope_policy_applied"
+    ]
+  },
+  "policyRequirements": {
+    "secretScannerRequired": true,
+    "toolArgumentValidatorRequired": true,
+    "lifecyclePolicyRequired": true,
+    "scopePolicyRequired": true,
+    "redactionRequired": true,
+    "previousStatusCheckRequired": true,
+    "crossClientPrivateMutationAllowedByDefault": false,
+    "permitsRawSecretOutput": false,
+    "lowRiskSummaryAllowsRawWorkspaceId": false
+  }
+}
