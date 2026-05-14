@@ -509,6 +509,8 @@ Closeout judgment:
 - Migration remains blocked until a future explicit approval, backup plan, rollback plan, and validation gate are approved.
 - P14 may begin only as donor behavior parity gate planning.
 
+P14 planning is recorded in [DONOR_BEHAVIOR_PARITY_GATE_PLAN.md](/A:/codex-memory/docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md). If P14 donor parity exposes object-model drift, the relevant P13 fixtures and readiness docs must be updated before runtime behavior changes.
+
 ## P13.3 SQLite / Diary Mapping Dry-Run Planning
 
 P13.3 records the planning contract for future SQLite / diary mapping dry-run work:

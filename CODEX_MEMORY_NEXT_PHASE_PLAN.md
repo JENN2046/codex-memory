@@ -77,6 +77,13 @@
 - P13.x closeout review 已新增 [docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md)，结论是 P13 fixture/dry-run ready、migration 仍 blocked、可进入 P14 planning。
 - 下一步建议：`P14-donor-behavior-parity-gate-planning`；P14 必须从 planning / fixture / gate design 开始，不自动开始 P14 implementation。
 
+当前 P14 planning：
+
+- 入口：[docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md](/A:/codex-memory/docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md)
+- 目标：把 DeepMemo / TopicMemo / passive memory query / donor error semantics / ranking tie-breakers / compare-rollback suite expansion 规划成可度量 standing gate。
+- 边界：planning / docs / board only；不改 runtime，不改 donor behavior，不改 public MCP tools，不改 import/export 或 migration，不进入 P15/P16/P17/V8/UI。
+- 下一步建议：`P14.1-donor-parity-fixture-inventory`。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：

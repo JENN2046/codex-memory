@@ -117,4 +117,6 @@ P14 must not jump directly to:
 
 `P14-donor-behavior-parity-gate-planning`
 
-The first P14 task should remain docs/tests-design planning. Runtime implementation requires a separate explicit phase and validation plan.
+P14 planning is recorded in [DONOR_BEHAVIOR_PARITY_GATE_PLAN.md](/A:/codex-memory/docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md).
+
+The next concrete phase is `P14.1-donor-parity-fixture-inventory`. Runtime implementation requires a separate explicit phase and validation plan.

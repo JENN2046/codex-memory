@@ -2,30 +2,30 @@
 
 ## Current Goal
 
-P13.x-closeout-review: close P13 VCP-compatible memory object model work and decide whether P14 donor behavior parity gate planning can begin.
+P14-donor-behavior-parity-gate-planning: plan a standing donor behavior parity gate without changing runtime behavior.
 
 ## Current Area
 
-P13-object-model / closeout-review
+P14-donor-compatibility / gate-planning
 
 ## Current Status
 
-P13 planning through P13.7 migration readiness report have all landed on `origin/main`. Current HEAD/base before this batch is `ee3759a`.
+P13 through P13.x closeout review have landed on `origin/main`. Current HEAD/base before this batch is `fe2ee18`.
 
-Current decision: keep `validate_memory` internal-only and do not enter public `validate_memory` MCP proposal review. P13.x is docs/board closeout only. It does not enter P14 implementation, migration, DB/diary reads or writes, import/export apply, MCP expansion, or durable memory writes.
+Current decision: keep `validate_memory` internal-only and do not enter public `validate_memory` MCP proposal review. P14 planning is docs/board only. It does not change DeepMemo, TopicMemo, passive memory query behavior, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
 
 ## Completed Work In This Batch
 
-- Added `docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md`.
-- Summarized P13 planning through P13.7 scope completion.
-- Recorded targeted tests, full-suite counts, mapping dry-run CLI smoke, and migration readiness CLI smoke.
-- Confirmed `migrationBlocked=true` and `mutated=false` readiness output.
-- Confirmed P13 boundaries: `validate_memory` internal-only, public tools frozen, no migration, no import/export runtime, no runtime mapper, no real DB/diary write, and no tag/release/deploy.
-- Judged that P14 donor behavior parity gate planning can begin as planning / fixture / gate design only.
-- Updated object model plan, next phase plan, backlog, status, and board pointers.
+- Added `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`.
+- Planned donor surfaces: DeepMemo, TopicMemo, passive query behavior, compare harness, rollback readiness, error envelope, meta placement, ranking/tie-breakers, blocked keywords, and empty/missing history behavior.
+- Planned gate categories: payload shape, error semantics, ranking, scope/filter, lifecycle/read-policy interaction, object-model drift, compare/rollback parity, and known intentional differences.
+- Recorded object-model boundary: P14 may expose drift, but P13 fixtures must be updated before runtime rewrites.
+- Recorded future sequence P14.1 through P14.6.
+- Updated P13 object model plan, P13 closeout, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
+- `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
 - `docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md`
 - `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -49,6 +49,7 @@ Current decision: keep `validate_memory` internal-only and do not enter public `
 - No SQLite migration or real data migration.
 - No import/export runtime.
 - No runtime mapper.
+- No donor runtime behavior change.
 - No real DB/memory write.
 - No real DB/diary read.
 - No P14 implementation.
@@ -60,10 +61,9 @@ Current decision: keep `validate_memory` internal-only and do not enter public `
 
 ## Remaining Risks
 
-- Object model is fixture/dry-run ready, not migrated.
-- Real SQLite/diary mapping, import/export apply, runtime mapper, and migration remain out of scope until separately approved.
-- P14 must start as planning / fixture / gate design only.
+- Donor behavior parity may expose object-model drift.
+- Runtime changes remain out of scope until fixture/gate evidence exists and a later phase explicitly approves implementation.
 
 ## Next Safe Action
 
-Inspect the final diff and file scope, then guarded local commit and safe-push readiness if clean. Next phase after closeout is `P14-donor-behavior-parity-gate-planning`, not P14 implementation.
+Inspect the final diff and file scope, then guarded local commit and safe-push readiness if clean. Next phase is `P14.1-donor-parity-fixture-inventory`.

@@ -110,7 +110,8 @@
 | P13.6-import-export-safe-JSON-shape-tests | memory-governance / object-model | A1/A2 | done | Add fixture-only tests for import/export-safe JSON envelope shape | `node --test tests\vcp-memory-import-export-shape.test.js`; object-model regressions; `npm test`; diff/docs validation | No `src/`, package change, import/export CLI, file generation, real memory import/export, DB/diary write, migration, or MCP expansion |
 | P13.7-migration-readiness-report | memory-governance / object-model | A2 | done | Add read-only migration readiness report surface | `node --test tests\vcp-memory-migration-readiness-cli.test.js`; readiness JSON smoke; `npm test`; diff/docs validation | Reports `migrationBlocked=true` and `mutated=false`; no migration, DB/diary write, import/export apply, or MCP expansion |
 | P13.x-closeout-review | memory-governance / object-model | A1 | done | Review P13 completion, remaining risks, and P14 readiness | `git diff --check`; docs validation | Closeout review added; P13 is fixture/dry-run ready, migration remains blocked, and next phase may be P14 planning only |
-| P14-donor-behavior-parity-gate-planning | donor-compatibility / gate-design | A1/A2 | todo | Plan donor behavior parity gates before any P14 implementation | future docs/tests-design validation | Start with planning / fixture / gate design only; do not jump to P16/P17/V8/UI or runtime implementation |
+| P14-donor-behavior-parity-gate-planning | donor-compatibility / gate-design | A1/A2 | done | Plan donor behavior parity gates before any P14 implementation | `git diff --check`; docs validation | Planning doc added; start with planning / fixture / gate design only; do not jump to P16/P17/V8/UI or runtime implementation |
+| P14.1-donor-parity-fixture-inventory | donor-compatibility / fixture-inventory | A1/A2 | todo | Inventory current donor parity fixtures and standard suite gaps | future docs/tests-design validation | No runtime behavior changes; inventory first |
 
 ## 推荐执行顺序
 
@@ -159,8 +160,9 @@
 43. `P13.6`：import/export-safe JSON shape fixture tests 已新增 `tests/fixtures/vcp-memory-import-export-shape-v1.json` 与 `tests/vcp-memory-import-export-shape.test.js`，验证 export/import envelope、refs、policy flags、checksum、dry-run-first、`mutated=false` 和 no-side-effect。
 44. `P13.7`：migration readiness report 已新增 `src/cli/vcp-memory-migration-readiness.js`、fixture、CLI test 和 `vcp-memory:migration-readiness` npm script；报告 P13 fixture/CLI readiness，保持 `migrationBlocked=true`、`mutated=false`，拒绝 apply/migrate/confirm。
 45. `P13.x`：closeout review 已新增 [docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md)，确认 P13 scope/evidence/boundaries/risks，并判断可进入 P14 donor behavior parity gate planning。
-46. 下一步建议：P14 donor behavior parity gate planning；必须从 planning / fixture / gate design 开始，不进入 P14 implementation。
-47. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+46. `P14`：donor behavior parity gate planning 已新增 [docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md](/A:/codex-memory/docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md)，规划 donor surfaces、gate categories、object-model drift boundary、validation strategy 和 P14.1-P14.6 顺序。
+47. 下一步建议：P14.1 donor parity fixture inventory；仍必须 fixture inventory / tests-design first，不进入 runtime implementation。
+48. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
