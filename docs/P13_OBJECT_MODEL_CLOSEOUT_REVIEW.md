@@ -87,9 +87,9 @@ Confirmed at P13 closeout:
 
 ## Remaining Risks
 
-- The object model is fixture/dry-run ready, not migrated.
+- The object model is fixture/dry-run/readiness ready, not migrated.
 - Real SQLite / diary mapping still requires explicit approval.
-- Import/export apply remains absent.
+- Import/export apply is absent.
 - Migration requires approved backup and rollback procedure before any real data action.
 - Donor behavior parity may expose object-model drift.
 - Real workspace scope gaps remain review material; low-risk reports must not expose raw `workspace_id`.
