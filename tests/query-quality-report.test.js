@@ -15,6 +15,31 @@ function runCli(args = []) {
   });
 }
 
+const QUERY_QUALITY_REPORT_KEYS = [
+  'assertedCount',
+  'caseCount',
+  'failedCount',
+  'fixtureOnlyCount',
+  'fixtureRecallDryRun',
+  'invalidCount',
+  'mutated',
+  'passedCount',
+  'placeholderCount',
+  'realCount',
+  'runnableCount',
+  'status'
+];
+
+const FIXTURE_RECALL_DRY_RUN_KEYS = [
+  'caseCount',
+  'durableMemoryTouched',
+  'enabled',
+  'failedCount',
+  'mutated',
+  'passedCount',
+  'providerCalls'
+];
+
 test('query-quality-report CLI should read default suite', () => {
   const result = runCli(['--json', '--dry-run']);
   assert.equal(result.status, 0);
@@ -22,6 +47,26 @@ test('query-quality-report CLI should read default suite', () => {
   assert.equal(report.status, 'ok');
   assert.ok(report.caseCount > 0);
   assert.equal(report.mutated, false);
+});
+
+test('query-quality-report JSON shape should stay stable for P15 consumers', () => {
+  const result = runCli(['--json', '--dry-run', '--fixture-recall-dry-run']);
+  assert.equal(result.status, 0);
+  const report = JSON.parse(result.stdout);
+  assert.deepEqual(Object.keys(report).sort(), QUERY_QUALITY_REPORT_KEYS);
+  assert.deepEqual(Object.keys(report.fixtureRecallDryRun).sort(), FIXTURE_RECALL_DRY_RUN_KEYS);
+  assert.equal(report.status, 'ok');
+  assert.equal(report.caseCount, 14);
+  assert.equal(report.runnableCount, 14);
+  assert.equal(report.assertedCount, 14);
+  assert.equal(report.passedCount, 14);
+  assert.equal(report.failedCount, 0);
+  assert.equal(report.mutated, false);
+  assert.equal(report.fixtureRecallDryRun.mutated, false);
+  assert.equal(report.fixtureRecallDryRun.providerCalls, 0);
+  assert.equal(report.fixtureRecallDryRun.durableMemoryTouched, false);
+  assert.equal(report.hitRate, undefined);
+  assert.equal(report.qualityScore, undefined);
 });
 
 test('query-quality-report CLI should expose placeholderCount', () => {
@@ -86,6 +131,8 @@ test('query-quality-report CLI should preserve dry-run behavior on fixture drift
     assert.equal(result.status, 1);
     const report = JSON.parse(result.stdout);
     assert.equal(report.status, 'failed');
+    assert.ok(Array.isArray(report.assertionFailures));
+    assert.deepEqual(Object.keys(report.assertionFailures[0]).sort(), ['id', 'issues', 'target']);
     assert.equal(report.mutated, false);
     assert.equal(report.assertedCount, 1);
     assert.equal(report.passedCount, 0);

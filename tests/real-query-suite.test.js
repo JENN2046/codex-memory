@@ -15,6 +15,33 @@ function runCli(args = []) {
   });
 }
 
+const REAL_QUERY_SUITE_REPORT_KEYS = [
+  'assertedCount',
+  'caseCount',
+  'failedCount',
+  'fixtureFile',
+  'fixtureOnlyCount',
+  'fixtureRecallDryRun',
+  'invalidCount',
+  'passedCount',
+  'placeholderCount',
+  'realCount',
+  'status',
+  'suiteFile',
+  'validCount',
+  'version'
+];
+
+const FIXTURE_RECALL_DRY_RUN_KEYS = [
+  'caseCount',
+  'durableMemoryTouched',
+  'enabled',
+  'failedCount',
+  'mutated',
+  'passedCount',
+  'providerCalls'
+];
+
 test('real-query-suite CLI should load default suite', () => {
   const result = runCli(['--json']);
   assert.equal(result.status, 0);
@@ -27,6 +54,26 @@ test('real-query-suite CLI should load default suite', () => {
   assert.equal(report.assertedCount, report.caseCount);
   assert.equal(report.passedCount, report.caseCount);
   assert.equal(report.failedCount, 0);
+});
+
+test('real-query-suite JSON report shape should stay stable for P15 consumers', () => {
+  const result = runCli(['--json', '--fixture-recall-dry-run']);
+  assert.equal(result.status, 0);
+  const report = JSON.parse(result.stdout);
+  assert.deepEqual(Object.keys(report).sort(), REAL_QUERY_SUITE_REPORT_KEYS);
+  assert.deepEqual(Object.keys(report.fixtureRecallDryRun).sort(), FIXTURE_RECALL_DRY_RUN_KEYS);
+  assert.equal(report.caseCount, 14);
+  assert.equal(report.assertedCount, 14);
+  assert.equal(report.passedCount, 14);
+  assert.equal(report.failedCount, 0);
+  assert.equal(report.fixtureRecallDryRun.caseCount, 14);
+  assert.equal(report.fixtureRecallDryRun.passedCount, 14);
+  assert.equal(report.fixtureRecallDryRun.failedCount, 0);
+  assert.equal(report.fixtureRecallDryRun.mutated, false);
+  assert.equal(report.fixtureRecallDryRun.providerCalls, 0);
+  assert.equal(report.fixtureRecallDryRun.durableMemoryTouched, false);
+  assert.equal(report.hitRate, undefined);
+  assert.equal(report.qualityScore, undefined);
 });
 
 test('real-query-suite CLI should report invalid cases for a broken suite', () => {
@@ -85,6 +132,7 @@ test('real-query-suite CLI should fail when fixture expectations drift', () => {
     assert.equal(result.status, 1);
     const report = JSON.parse(result.stdout);
     assert.equal(report.status, 'failed');
+    assert.deepEqual(Object.keys(report.assertionFailures[0]).sort(), ['id', 'issues', 'target']);
     assert.equal(report.assertedCount, 1);
     assert.equal(report.passedCount, 0);
     assert.equal(report.failedCount, 1);

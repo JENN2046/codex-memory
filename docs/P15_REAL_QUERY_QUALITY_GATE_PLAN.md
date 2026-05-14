@@ -113,6 +113,7 @@ Recommended P15 sequence:
    - Status: completed in [P15.2 Real Query Quality Fixture Expansion](./P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md).
 3. `P15.3-query-quality-report-shape-tests`
    - Lock JSON shape for CI, dashboard, and future standing gate consumers.
+   - Status: completed in [P15.3 Query Quality Report Shape Tests](./P15_QUERY_QUALITY_REPORT_SHAPE_TESTS.md).
 4. `P15.4-fixture-recall-dry-run-standing-gate`
    - Promote fixture recall dry-run summary into a documented standing gate.
 5. `P15.5-real-memory-query-dry-run-planning`

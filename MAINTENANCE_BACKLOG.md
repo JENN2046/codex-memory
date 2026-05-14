@@ -122,7 +122,8 @@
 | P15-real-query-quality-gate-planning | query-quality / planning | A1/A2 | done | Plan real query quality gate after P14 donor parity standing gate summary | fixture-only query baseline; docs/diff validation | Planning doc added; current fixture recall dry-run baseline is `8/8`, `mutated=false`, `providerCalls=0`; no runtime, MCP, package, migration, import/export, provider, or real data write changes |
 | P15.1-real-query-quality-fixture-inventory | query-quality / fixture-inventory | A1/A2 | done | Inventory current query fixture coverage, missing dimensions, negative assertions, and quality gate gaps | fixture-only query baseline; docs/diff validation | Added inventory doc; current suite is healthy at `8/8`, but scope/lifecycle/privacy/precision/report-shape gaps remain; no runtime behavior or provider calls |
 | P15.2-real-query-quality-fixture-expansion | query-quality / fixture-expansion | A1/A2 | done | Add targeted sanitized fixture cases for scope, lifecycle, privacy, precision, and report-shape gaps | targeted query tests; fixture recall dry-run; `npm test`; diff/docs validation | Expanded default suite to `14/14` with no provider calls or durable memory writes; no runtime ranking, public MCP, SQLite schema, or durable memory changes |
-| P15.3-query-quality-report-shape-tests | query-quality / report-shape | A1/A2 | todo | Lock query quality JSON fields for CI/dashboard consumers after fixture expansion | future report shape tests; fixture recall dry-run; `npm test`; diff/docs validation | Tests only; do not add synthetic quality scores or change runtime behavior |
+| P15.3-query-quality-report-shape-tests | query-quality / report-shape | A1/A2 | done | Lock query quality JSON fields for CI/dashboard consumers after fixture expansion | targeted query tests; fixture recall dry-run; `npm test`; `gate:ci`; diff/docs validation | Tests/docs only; locked report top-level keys, fixture recall dry-run keys, assertion failure shape, and no fake scores |
+| P15.4-fixture-recall-dry-run-standing-gate | query-quality / standing-gate | A1/A2 | todo | Document and gate fixture recall dry-run as a standing CI-safe signal | future gate/docs validation; fixture recall dry-run; `npm test` | Do not change runtime ranking, providers, public MCP tools, SQLite schema, or durable memory |
 
 ## 推荐执行顺序
 
@@ -183,7 +184,8 @@
 55. `P12.5` two-phase audit protocol 是最新 runtime safety baseline：`41a5630` 已进入 `origin/main`；当前 `main` 后续仅追加 docs/board 状态校正。
 56. P14.2-P14.6 与 P15 planning 已确认均在 `origin/main`；P15.1 fixture inventory 已记录当前 `8/8` baseline 与 scope/lifecycle/privacy/precision/report-shape gaps。
 57. `P15.2`：real query quality fixture expansion 已把默认 query suite 扩到 `14/14`，新增 scope/lifecycle/privacy/workspace-boundary/precision/report-shape cases，仍为 fixture-only、`mutated=false`、`providerCalls=0`。
-58. 下一步建议进入 `P15.3-query-quality-report-shape-tests`，仍不得跳到 P16/P17/V8/UI，不主动跑真实 provider 命令，不扩大 `validate_memory` mutation surface，不开放 public `validate_memory` MCP tool。
+58. `P15.3`：query quality report shape tests 已锁住 `real-query-suite` / `query:quality` top-level JSON keys、`fixtureRecallDryRun` keys、assertion failure shape，并继续禁止 `hitRate` / `qualityScore` fake metrics。
+59. 下一步建议进入 `P15.4-fixture-recall-dry-run-standing-gate`，仍不得跳到 P16/P17/V8/UI，不主动跑真实 provider 命令，不扩大 `validate_memory` mutation surface，不开放 public `validate_memory` MCP tool。
 57. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
