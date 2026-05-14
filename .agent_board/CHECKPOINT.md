@@ -2,82 +2,58 @@
 
 ## Current Goal
 
-P12.5-validate-memory-two-phase-audit-protocol: remove the remaining validate_memory mutation/audit integrity risk by requiring durable pending audit intent before any confirmed lifecycle mutation.
+P14/P15-state-reconciliation-after-P12.5-safety-patch: confirm whether P14.2-P14.6 and P15 planning are already on `origin/main`, then decide whether to continue P15.1 or first correct state drift.
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory audit integrity
+P14/P15 state reconciliation
 
 ## Current Status
 
-The previous audit write-path preflight was only a mitigation. JSONL audit append and SQLite lifecycle update are not one physical transaction, so a committed audit append failure after update could still leave `status=active` without committed audit.
+Repository state:
 
-The current patch changes confirmed `validate_memory` to:
+- branch: `main`
+- local `HEAD`: `41a56300e0f5b8ae30e2b1bfec58f4b456bd825a`
+- local `origin/main`: `41a56300e0f5b8ae30e2b1bfec58f4b456bd825a`
+- remote `refs/heads/main`: `41a56300e0f5b8ae30e2b1bfec58f4b456bd825a`
 
-- build one stable `event_id`
-- append `audit_phase=pending` before lifecycle update
-- call `updateLifecycleStatus` only after pending audit succeeds
-- append `audit_phase=committed` after successful lifecycle update
-- append `audit_phase=cancelled` if lifecycle update fails after pending audit
-- return `validated-with-warning` with `auditCommitStatus=failed_after_mutation` if committed audit append fails after update, while preserving durable pending audit intent
+Confirmed on `origin/main`:
 
-The `client_id` / `visibility` update guard remains in place.
+- P14.2 DeepMemo targeted parity fixtures
+- P14.3 TopicMemo targeted parity fixtures
+- P14.4 error/meta parity tests
+- P14.5 ranking/tie-breaker parity tests
+- P14.6 compare/rollback standing gate summary
+- P15 real query quality gate planning
+- P12.5 validate_memory two-phase audit safety patch
 
-## Completed Work In This Batch
+Decision:
 
-- Updated `ValidateMemoryService` to implement the pending/committed/cancelled audit protocol.
-- Updated runtime tests for:
-  - pending audit written before update
-  - update failure after pending audit creates cancelled audit
-  - committed audit append failure after update leaves pending audit and warning result
-  - successful confirmed mutation writes pending and committed audit entries
-  - dry-run no audit/no DB write
-  - stale `client_id` / `visibility` guard regressions
-- Updated CLI test expectation for successful apply to see pending plus committed audit entries.
-- Updated P12.5 docs/status/board to record the two-phase audit protocol.
+- No P14/P15 implementation gap was found.
+- State wording drift existed in STATUS / backlog / board.
+- Correct docs/board drift first, then proceed to P15.1.
 
 ## Changed Files
 
-- `src/core/ValidateMemoryService.js`
-- `tests/validate-memory-runtime.test.js`
-- `tests/validate-memory-cli.test.js`
-- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
-- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
-- `docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md`
-- `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
+- `MAINTENANCE_BACKLOG.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
 
-## Validation Run
+## Validation
 
-- `node --test tests\validate-memory-runtime.test.js` passed `15/15`.
-- `node --test tests\validate-memory-cli.test.js` passed `12/12`.
-- `node --test tests\validate-memory-runtime-fixture.test.js` passed `11/11`.
-- `node --test tests\mcp-contract.test.js` passed `7/7`.
-- `npm test` passed `415/415`.
-- `npm run validate-memory -- --json --memory-id dry-run-example --reason "manual review" --evidence "manual evidence" --actor-client-id codex --request-source cli` returned dry-run rejected with `mutated=false`.
-- `npm run gate:ci` passed.
-- `npm run gate:mainline:strict` passed: health ok, contract ok, test `415/415`, compare `43/43`, rollback `43/43`.
-- `npm run lifecycle:sqlite:dry-run -- --json` passed with `mutated=false`.
+- `git status -sb` confirmed only docs/board correction files are modified.
+- `git diff --stat` confirmed docs/board-only scope.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
-## Validation Pending
-
-- None for this patch.
-
 ## Current Blockers
 
-- None currently.
-
-## Remaining Risks
-
-- Push requires guarded commit, readiness review, and safe-push check.
+- None.
 
 ## Next Safe Action
 
-Create a guarded local commit, perform safe-push readiness, then push if ready.
+Create a guarded local commit for the docs/board correction if file scope remains docs/board only. Do not push without explicit authorization.

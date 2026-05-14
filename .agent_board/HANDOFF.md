@@ -2,7 +2,7 @@
 
 ## Goal
 
-Implement a two-phase audit protocol for internal `validate_memory` so confirmed lifecycle mutation cannot happen without prior durable audit intent.
+Confirm P14.2-P14.6 and P15 planning state after the P12.5 two-phase audit safety patch, then decide whether to continue P15.1 or correct state drift first.
 
 ## Workspace
 
@@ -14,77 +14,44 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty with current P12.5 two-phase audit patch until guarded commit.
+Dirty with docs/board correction only until guarded commit.
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory audit integrity
+P14/P15 state reconciliation
+
+## Findings
+
+- local `HEAD`, local `origin/main`, and remote `refs/heads/main` all equal `41a56300e0f5b8ae30e2b1bfec58f4b456bd825a`.
+- P14.2-P14.6 artifacts are tracked on `origin/main`.
+- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md` is tracked on `origin/main`.
+- P15.1 remains the next todo in backlog/task queue.
+- No runtime/test/package gap was found.
+- STATUS/backlog/board had stale wording that still described P12.5 as needing commit/push.
 
 ## Changed Files
 
-- `src/core/ValidateMemoryService.js`
-- `tests/validate-memory-runtime.test.js`
-- `tests/validate-memory-cli.test.js`
-- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
-- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
-- `docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md`
-- `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
+- `MAINTENANCE_BACKLOG.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `node --test tests\validate-memory-runtime.test.js` passed `15/15`.
-- `node --test tests\validate-memory-cli.test.js` passed `12/12`.
-- `node --test tests\validate-memory-runtime-fixture.test.js` passed `11/11`.
-- `node --test tests\mcp-contract.test.js` passed `7/7`.
-- `npm test` passed `415/415`.
-- `validate-memory` dry-run smoke returned `mutated=false`.
-- `npm run gate:ci` passed.
-- `npm run gate:mainline:strict` passed.
-- lifecycle SQLite dry-run passed with `mutated=false`.
-- diff check passed.
-- docs validation passed.
+- `git status -sb` confirmed only docs/board correction files are modified.
+- `git diff --stat` confirmed docs/board-only scope.
+- `git diff --check` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
-## Not Validated Yet
+## Not Done
 
-- Nothing required for this patch.
-
-## MCP Mode
-
-- Public MCP tools remain `record_memory` / `search_memory` / `memory_overview`.
-- No MCP public tool definitions are changed.
-- No MCP schema is changed.
-- `validate_memory` remains internal-only.
-
-## HTTP Health
-
-Strict gate health check passed.
-
-## Compare
-
-Strict gate compare passed `43/43 matched`.
-
-## Rollback
-
-Strict gate rollback passed `43/43 rollback-ready`.
-
-## Profile Gate
-
-Not run; not in scope.
-
-## Audit Impact
-
-Confirmed `validate_memory` now writes `audit_phase=pending` before lifecycle mutation, then writes `audit_phase=committed` on success or `audit_phase=cancelled` on update failure. If committed append fails after update, the service returns `validated-with-warning` and keeps the pending audit intent durable.
-
-## Recall Impact
-
-No recall behavior change.
-
-## Remaining Risks
-
-- Remote push requires readiness and safe-push check.
+- No runtime changes.
+- No tests changed.
+- No package or lockfile changes.
+- No MCP schema/tool changes.
+- No SQLite migration.
+- No provider command.
+- No push yet for this docs/board correction.
 
 ## Next Safe Step
 
-Do guarded commit, safe-push readiness, then push if ready.
+Create a guarded local commit for the docs/board correction. After that, P15.1 can start from `origin/main`; push still requires explicit authorization.
