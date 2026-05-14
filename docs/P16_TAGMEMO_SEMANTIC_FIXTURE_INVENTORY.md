@@ -117,3 +117,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 ## Boundary Confirmation
 
 P16.1 is docs/inventory only. It does not modify runtime, tests, fixtures, package scripts, MCP contracts, providers, durable memory, SQLite schema, import/export behavior, or V8 implementation.
+
+## P16.3 Follow-up
+
+`P16.3-TagMemo-targeted-semantic-fixtures` adds targeted synthetic temp-workspace cases after the P16.2 shape test. The current P16.3 fixture is `tests/fixtures/tagmemo-targeted-semantic-v1.json`, with test coverage in `tests/tagmemo-targeted-semantic-fixture.test.js`; targeted `3/3`, full suite `429/429`, diff check, and docs validation passed locally.
+
+P16.3 remains fixture/test only. It does not modify runtime ranking, recall implementation, providers, public MCP tools, SQLite schema, import/export behavior, durable memory, or V8 implementation.

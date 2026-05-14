@@ -129,7 +129,8 @@
 | P16-TagMemo-semantic-association-parity-planning | tagmemo / semantic-association / planning | A1/A2 | done | Plan TagMemo and semantic association parity after P15 closeout | `git diff --check`; docs validation | Planning doc added and docs validation passed; no runtime implementation, provider benchmark, V8, UI, migration/import-export apply, public MCP expansion, or release candidate |
 | P16.1-TagMemo-semantic-fixture-inventory | tagmemo / semantic-association / fixture-inventory | A1/A2 | done | Inventory current TagMemo, semantic grouping, EPA, ResidualPyramid, LightMemo, and query-quality fixture coverage | `git diff --check`; docs validation | Fixture inventory doc added and validation passed; no runtime tuning, provider, V8 implementation, public MCP expansion, migration, or real memory preview |
 | P16.2-TagMemo-semantic-fixture-shape-tests | tagmemo / semantic-association / fixture-tests | A1/A2 | done | Add synthetic TagMemo semantic fixture shape tests after inventory | `node --test tests\tagmemo-semantic-fixture-shape.test.js`; `npm test`; diff/docs validation | Synthetic fixture/test added; targeted `6/6`, full suite `426/426`; no runtime tuning, provider, V8 implementation, public MCP expansion, migration, or real memory preview |
-| P16.3-TagMemo-targeted-semantic-fixtures | tagmemo / semantic-association / targeted-fixtures | A1/A2 | todo | Add targeted sanitized TagMemo semantic association fixture cases after shape tests | future targeted fixture tests; `npm test`; diff/docs validation | Fixture/test only unless a later phase explicitly approves runtime work |
+| P16.3-TagMemo-targeted-semantic-fixtures | tagmemo / semantic-association / targeted-fixtures | A1/A2 | done | Add targeted sanitized TagMemo semantic association fixture cases after shape tests | targeted fixture test; `npm test`; diff/docs validation | Added temp-workspace fixture cases for TagMemo ordering, Group(tag) interleaving, and recall audit telemetry; targeted `3/3`, full suite `429/429`; no runtime tuning |
+| P16.4-semantic-ranking-evidence-gate | tagmemo / semantic-association / evidence-gate | A1/A2 | todo | Summarize P16.2-P16.3 semantic ranking evidence and decide if runtime tuning is still deferred | future docs/test gate validation | Evidence/summary first; no runtime tuning unless a later approved phase explicitly permits it |
 
 ## 推荐执行顺序
 
@@ -197,8 +198,9 @@
 62. `P16`：TagMemo semantic association parity planning 已完成，入口为 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md)；本阶段只做 planning / docs / board，不改 runtime、不改 tests、不调 provider、不进入 V8。
 63. `P16.1`：TagMemo semantic fixture inventory 已完成，入口为 [docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md)；本阶段只盘点 source/test/fixture gaps，docs-only 验证通过，不改 runtime、不新增 tests、不调 provider、不进入 V8。
 64. `P16.2`：TagMemo semantic fixture shape tests 已新增 `tests/fixtures/tagmemo-semantic-fixture-shape-v1.json` 与 `tests/tagmemo-semantic-fixture-shape.test.js`；targeted test `6/6`、full suite `426/426`、diff/docs validation 均通过；本阶段只锁 directive / scoring / telemetry / LightMemo mapping / no-side-effect shape，不改 runtime、不新增 provider/MCP/V8。
-65. 下一步建议进入 `P16.3-TagMemo-targeted-semantic-fixtures`，继续 fixture-first；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply 或 release candidate。
-66. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+65. `P16.3`：TagMemo targeted semantic fixtures 已新增 `tests/fixtures/tagmemo-targeted-semantic-v1.json` 与 `tests/tagmemo-targeted-semantic-fixture.test.js`；targeted test `3/3`、full suite `429/429`、diff/docs validation 均通过；本阶段使用 synthetic temp workspace，覆盖 TagMemo ordering、`::Group(tag)` semantic bucket interleaving 和 recall audit telemetry，不改 runtime、不新增 provider/MCP/V8。
+66. 下一步建议在 P16.3 guarded commit / safe-push 后进入 `P16.4-semantic-ranking-evidence-gate`，先总结证据；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply 或 release candidate。
+67. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

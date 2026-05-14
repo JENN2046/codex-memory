@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "tagmemo-targeted-semantic-v1",
+  "version": "v1",
+  "phase": "P16.3-TagMemo-targeted-semantic-fixtures",
+  "source": {
+    "kind": "fixture-only",
+    "synthetic": true,
+    "path": "tests/fixtures/tagmemo-targeted-semantic-v1.json"
+  },
+  "safety": {
+    "mutated": false,
+    "providerCalls": 0,
+    "durableMemoryTouched": false,
+    "runtimeTuning": false,
+    "publicMcpTools": [
+      "record_memory",
+      "search_memory",
+      "memory_overview"
+    ],
+    "validateMemoryPublicTool": false
+  },
+  "cases": [
+    {
+      "id": "tag-title-body-evidence-order",
+      "description": "TagMemo plus rerank should prefer tag+title matches over title-only, body-only, and evidence-only records.",
+      "target": "process",
+      "query": "[[orm migration checkpoint]] ::TagMemo+1.8 ::Rerank+0.6",
+      "limit": 4,
+      "records": [
+        {
+          "date": "2026-04-19T09:00:00.000Z",
+          "title": "ORM migration lens",
+          "memoryId": "p16-tag-title",
+          "content": "adapter notes with rollback details",
+          "evidence": "tag and title weighted hit",
+          "tags": [
+            "orm",
+            "migration"
+          ]
+        },
+        {
+          "date": "2026-04-19T09:05:00.000Z",
+          "title": "ORM migration headline",
+          "memoryId": "p16-title-only",
+          "content": "refactor notes without explicit tags",
+          "evidence": "title weighted hit",
+          "tags": []
+        },
+        {
+          "date": "2026-04-19T09:10:00.000Z",
+          "title": "General notebook",
+          "memoryId": "p16-body-only",
+          "content": "orm migration checkpoint appears only inside body text",
+          "evidence": "body weighted hit",
+          "tags": []
+        },
+        {
+          "date": "2026-04-19T09:15:00.000Z",
+          "title": "Evidence notebook",
+          "memoryId": "p16-evidence-only",
+          "content": "adapter notes",
+          "evidence": "orm migration checkpoint appears only in evidence text",
+          "tags": []
+        }
+      ],
+      "expected": {
+        "memoryIds": [
+          "p16-tag-title",
+          "p16-title-only",
+          "p16-body-only",
+          "p16-evidence-only"
+        ],
+        "matchedTagsByMemoryId": {
+          "p16-tag-title": [
+            "orm",
+            "migration"
+          ],
+          "p16-title-only": [],
+          "p16-body-only": [],
+          "p16-evidence-only": []
+        },
+        "audit": {
+          "target": "process",
+          "candidateCount": 4,
+          "semanticCandidateCount": 4,
+          "topMemoryId": "p16-tag-title",
+          "matchedTags": [
+            "orm",
+            "migration"
+          ],
+          "useRerank": true,
+          "useGeodesicRerank": true,
+          "useRerankPlus": true,
+          "rrfAlpha": 0.6,
+          "rerankMode": "local-rrf-geodesic",
+          "source": "vcp-passive-adapter",
+          "scopeApplied": false,
+          "scopeWorkspacePresent": false
+        }
+      }
+    },
+    {
+      "id": "group-tag-interleaves-semantic-buckets",
+      "description": "TagMemo with Group(tag) should interleave semantic tag buckets before exhausting one dominant tag.",
+      "target": "process",
+      "query": "[[alpha beta checkpoint]] ::TagMemo+1.2 ::Group(tag) ::Rerank",
+      "limit": 3,
+      "records": [
+        {
+          "date": "2026-04-20T09:00:00.000Z",
+          "title": "Alpha checkpoint A",
+          "memoryId": "p16-alpha-a",
+          "content": "checkpoint alpha rollout",
+          "evidence": "alpha evidence",
+          "tags": [
+            "alpha"
+          ]
+        },
+        {
+          "date": "2026-04-20T09:01:00.000Z",
+          "title": "Alpha checkpoint B",
+          "memoryId": "p16-alpha-b",
+          "content": "checkpoint alpha fallback",
+          "evidence": "alpha fallback evidence",
+          "tags": [
+            "alpha"
+          ]
+        },
+        {
+          "date": "2026-04-20T09:02:00.000Z",
+          "title": "Beta checkpoint",
+          "memoryId": "p16-beta",
+          "content": "checkpoint beta rollout",
+          "evidence": "beta evidence",
+          "tags": [
+            "beta"
+          ]
+        }
+      ],
+      "expected": {
+        "memoryIds": [
+          "p16-alpha-b",
+          "p16-beta",
+          "p16-alpha-a"
+        ],
+        "matchedTagsByMemoryId": {
+          "p16-alpha-b": [
+            "alpha"
+          ],
+          "p16-beta": [
+            "beta"
+          ],
+          "p16-alpha-a": [
+            "alpha"
+          ]
+        },
+        "firstTwoMatchedTagsMustDiffer": true,
+        "audit": {
+          "target": "process",
+          "candidateCount": 3,
+          "semanticCandidateCount": 3,
+          "topMemoryId": "p16-alpha-b",
+          "matchedTags": [
+            "alpha",
+            "beta"
+          ],
+          "useGroup": true,
+          "useRerank": true,
+          "useGeodesicRerank": true,
+          "useRerankPlus": false,
+          "rrfAlpha": null,
+          "rerankMode": "local-geodesic",
+          "source": "vcp-passive-adapter",
+          "scopeApplied": false,
+          "scopeWorkspacePresent": false
+        }
+      }
+    }
+  ],
+  "forbiddenAuditKeys": [
+    "rawWorkspaceId",
+    "providerLatencyMs",
+    "providerApiKey",
+    "secret"
+  ]
+}

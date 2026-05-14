@@ -106,4 +106,4 @@ Compare / rollback gates should be added only when a P16 slice touches donor-fac
 
 ## Result
 
-P16 planning and P16.1 inventory are complete. P16.2 adds fixture shape tests only; it does not tune runtime ranking or start V8.
+P16 planning, P16.1 inventory, P16.2 fixture shape tests, and P16.3 targeted semantic fixtures are complete locally. P16.3 passed targeted `3/3`, full suite `429/429`, diff check, and docs validation; it does not tune runtime ranking or start V8.
