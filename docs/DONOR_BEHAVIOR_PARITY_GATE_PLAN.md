@@ -101,7 +101,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 P14 should proceed in small phases:
 
 1. `P14.1-donor-parity-fixture-inventory`
-   - Inventory current standard suite and donor parity fixture gaps.
+   - Completed in [DONOR_PARITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/DONOR_PARITY_FIXTURE_INVENTORY.md).
+   - Inventories current standard suite and donor parity fixture gaps.
 2. `P14.2-DeepMemo-targeted-parity-fixtures`
    - Add DeepMemo fixture cases for payload, blocked keyword, query syntax, and ranking boundaries.
 3. `P14.3-TopicMemo-targeted-parity-fixtures`
@@ -131,6 +132,6 @@ No runtime behavior changes should happen until fixture and gate evidence exists
 
 ## Next Recommended Phase
 
-`P14.1-donor-parity-fixture-inventory`
+`P14.2-DeepMemo-targeted-parity-fixtures`
 
-P14.1 should remain fixture inventory and test-design work. It should not alter runtime behavior.
+P14.2 may add DeepMemo-targeted fixture/test coverage. It should not alter runtime behavior unless a later phase explicitly approves implementation.

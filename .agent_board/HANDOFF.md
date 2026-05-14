@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P14-donor-behavior-parity-gate-planning` in `A:\codex-memory`.
+Continue `P14.1-donor-parity-fixture-inventory` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `fe2ee18`
+- Base: `origin/main` / `af30991`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P14-donor-compatibility / gate-planning
+P14-donor-compatibility / fixture-inventory
 
 ## Completed Before This Batch
 
@@ -38,19 +38,20 @@ P14-donor-compatibility / gate-planning
 - P13.6 import/export-safe JSON shape tests landed.
 - P13.7 migration readiness report landed.
 - P13.x closeout review landed.
+- P14 donor behavior parity gate planning landed.
 - Decision after P12.6: keep `validate_memory` internal-only and skip public `validate_memory` MCP proposal review.
 
 ## Completed In Current Batch
 
-- Added `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`.
-- Planned donor behavior parity surfaces, gate categories, validation strategy, object-model drift boundary, and future P14.1-P14.6 sequence.
-- Updated P13 closeout, P13 object model plan, next phase plan, backlog, status, and board state.
+- Added `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`.
+- Inventoried current standard suite counts by tool, category, expectation, and fixture root.
+- Recorded covered donor surfaces, inventory findings, gap register, and next fixture priorities.
+- Updated P14 plan, next phase plan, backlog, status, and board state.
 
 ## Changed Files
 
+- `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`
 - `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
-- `docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md`
-- `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -70,7 +71,7 @@ P14-donor-compatibility / gate-planning
 
 ## Audit / Recall Impact
 
-- P14 planning does not change audit/runtime/recall behavior.
+- P14.1 inventory does not change audit/runtime/recall behavior.
 - Future mapping must preserve audit, lifecycle, scope, and import/export boundaries.
 - Recall path is unchanged.
 
@@ -80,6 +81,7 @@ P14-donor-compatibility / gate-planning
 - No MCP schema change.
 - No `src/` changes.
 - No tests changes.
+- No new fixtures.
 - No package or lockfile changes.
 - No DeepMemo runtime behavior change.
 - No TopicMemo runtime behavior change.
@@ -103,8 +105,8 @@ P14-donor-compatibility / gate-planning
 
 - Public MCP tool expansion remains explicitly approval-gated.
 - Real migration remains separately approval-gated.
-- P14.1 must start with fixture inventory before tests or runtime changes.
+- P14.2 may add DeepMemo fixture/test evidence, but must not alter runtime behavior without later explicit approval.
 
 ## Next Safe Step
 
-Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next recommended phase is `P14.1-donor-parity-fixture-inventory`.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next recommended phase is `P14.2-DeepMemo-targeted-parity-fixtures`.

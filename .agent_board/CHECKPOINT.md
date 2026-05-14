@@ -2,32 +2,31 @@
 
 ## Current Goal
 
-P14-donor-behavior-parity-gate-planning: plan a standing donor behavior parity gate without changing runtime behavior.
+P14.1-donor-parity-fixture-inventory: inventory current donor parity fixtures and standard suite gaps without changing runtime behavior.
 
 ## Current Area
 
-P14-donor-compatibility / gate-planning
+P14-donor-compatibility / fixture-inventory
 
 ## Current Status
 
-P13 through P13.x closeout review have landed on `origin/main`. Current HEAD/base before this batch is `fe2ee18`.
+P14 donor behavior parity gate planning has landed on `origin/main`. Current HEAD/base before this batch is `af30991`.
 
-Current decision: keep `validate_memory` internal-only and do not enter public `validate_memory` MCP proposal review. P14 planning is docs/board only. It does not change DeepMemo, TopicMemo, passive memory query behavior, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
+Current decision: keep `validate_memory` internal-only and do not enter public `validate_memory` MCP proposal review. P14.1 inventory is docs/board only. It does not change DeepMemo, TopicMemo, passive memory query behavior, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
 
 ## Completed Work In This Batch
 
-- Added `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`.
-- Planned donor surfaces: DeepMemo, TopicMemo, passive query behavior, compare harness, rollback readiness, error envelope, meta placement, ranking/tie-breakers, blocked keywords, and empty/missing history behavior.
-- Planned gate categories: payload shape, error semantics, ranking, scope/filter, lifecycle/read-policy interaction, object-model drift, compare/rollback parity, and known intentional differences.
-- Recorded object-model boundary: P14 may expose drift, but P13 fixtures must be updated before runtime rewrites.
-- Recorded future sequence P14.1 through P14.6.
-- Updated P13 object model plan, P13 closeout, next phase plan, backlog, status, and board pointers.
+- Added `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`.
+- Inventoried the current standard suite: `43` cases, DeepMemo `24`, TopicMemo `19`, success `24`, error `19`.
+- Recorded category distribution across agent-selection, fallback, filtering, input-validation, ordering, query-semantics, topic-navigation, and topic-state.
+- Recorded fixture distribution across `7` fixture roots.
+- Logged gap register for passive query parity, known intentional differences, object-model drift markers, TopicMemo ordering, DeepMemo payload snapshots, error/meta matrix, and README suite count drift.
+- Updated P14 plan, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
+- `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`
 - `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
-- `docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md`
-- `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -50,6 +49,7 @@ Current decision: keep `validate_memory` internal-only and do not enter public `
 - No import/export runtime.
 - No runtime mapper.
 - No donor runtime behavior change.
+- No tests or fixtures added in P14.1.
 - No real DB/memory write.
 - No real DB/diary read.
 - No P14 implementation.
@@ -61,9 +61,9 @@ Current decision: keep `validate_memory` internal-only and do not enter public `
 
 ## Remaining Risks
 
-- Donor behavior parity may expose object-model drift.
+- README suite count drift remains documented but not fixed in this phase.
 - Runtime changes remain out of scope until fixture/gate evidence exists and a later phase explicitly approves implementation.
 
 ## Next Safe Action
 
-Inspect the final diff and file scope, then guarded local commit and safe-push readiness if clean. Next phase is `P14.1-donor-parity-fixture-inventory`.
+Inspect the final diff and file scope, then guarded local commit and safe-push readiness if clean. Next phase is `P14.2-DeepMemo-targeted-parity-fixtures`.

@@ -111,7 +111,8 @@
 | P13.7-migration-readiness-report | memory-governance / object-model | A2 | done | Add read-only migration readiness report surface | `node --test tests\vcp-memory-migration-readiness-cli.test.js`; readiness JSON smoke; `npm test`; diff/docs validation | Reports `migrationBlocked=true` and `mutated=false`; no migration, DB/diary write, import/export apply, or MCP expansion |
 | P13.x-closeout-review | memory-governance / object-model | A1 | done | Review P13 completion, remaining risks, and P14 readiness | `git diff --check`; docs validation | Closeout review added; P13 is fixture/dry-run ready, migration remains blocked, and next phase may be P14 planning only |
 | P14-donor-behavior-parity-gate-planning | donor-compatibility / gate-design | A1/A2 | done | Plan donor behavior parity gates before any P14 implementation | `git diff --check`; docs validation | Planning doc added; start with planning / fixture / gate design only; do not jump to P16/P17/V8/UI or runtime implementation |
-| P14.1-donor-parity-fixture-inventory | donor-compatibility / fixture-inventory | A1/A2 | todo | Inventory current donor parity fixtures and standard suite gaps | future docs/tests-design validation | No runtime behavior changes; inventory first |
+| P14.1-donor-parity-fixture-inventory | donor-compatibility / fixture-inventory | A1/A2 | done | Inventory current donor parity fixtures and standard suite gaps | `git diff --check`; docs validation | Inventory doc added; observed standard suite has `43` cases across `8` categories and `7` fixture roots; no runtime/tests/package changes |
+| P14.2-DeepMemo-targeted-parity-fixtures | donor-compatibility / fixtures | A1/A2 | todo | Add DeepMemo targeted parity fixtures for payload, blocked keyword meta, advanced syntax, and ranking snapshots | future targeted tests; compare/rollback category gates; `npm test` | No runtime behavior changes without explicit later approval |
 
 ## 推荐执行顺序
 
@@ -161,8 +162,9 @@
 44. `P13.7`：migration readiness report 已新增 `src/cli/vcp-memory-migration-readiness.js`、fixture、CLI test 和 `vcp-memory:migration-readiness` npm script；报告 P13 fixture/CLI readiness，保持 `migrationBlocked=true`、`mutated=false`，拒绝 apply/migrate/confirm。
 45. `P13.x`：closeout review 已新增 [docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md)，确认 P13 scope/evidence/boundaries/risks，并判断可进入 P14 donor behavior parity gate planning。
 46. `P14`：donor behavior parity gate planning 已新增 [docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md](/A:/codex-memory/docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md)，规划 donor surfaces、gate categories、object-model drift boundary、validation strategy 和 P14.1-P14.6 顺序。
-47. 下一步建议：P14.1 donor parity fixture inventory；仍必须 fixture inventory / tests-design first，不进入 runtime implementation。
-48. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+47. `P14.1`：donor parity fixture inventory 已新增 [docs/DONOR_PARITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/DONOR_PARITY_FIXTURE_INVENTORY.md)，记录 DeepMemo/TopicMemo 当前 case、category、fixture 分布、覆盖面、gap register 和下一步 fixture priorities。
+48. 下一步建议：P14.2 DeepMemo targeted parity fixtures；仍不得改 runtime，先补 fixture/test 证据。
+49. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
