@@ -1,0 +1,149 @@
+{
+  "schemaVersion": "v8-query-family-v1",
+  "phase": "P17.4-v8-query-family-fixture-tests",
+  "source": {
+    "kind": "fixture-only",
+    "synthetic": true,
+    "realMemoryPreview": false
+  },
+  "safety": {
+    "mutated": false,
+    "providerCalls": 0,
+    "durableMemoryTouched": false,
+    "realMemoryPreview": false,
+    "redactionApplied": true,
+    "runtimeTuning": false,
+    "publicMcpTools": [
+      "record_memory",
+      "search_memory",
+      "memory_overview"
+    ],
+    "validateMemoryPublicTool": false
+  },
+  "families": [
+    {
+      "id": "technical-migration-geodesic",
+      "category": "technical",
+      "query": "checkpoint vector schema migration rollback ::TagMemo+1.5 ::Rerank+0.4 ::GeodesicRerank",
+      "expected": {
+        "normalized": "checkpoint vector schema migration rollback",
+        "tagMemoMode": "explicit",
+        "geodesicRequested": true,
+        "geodesicWillUse": true,
+        "requiredCoreTags": [
+          "checkpoint",
+          "vector",
+          "schema",
+          "migration"
+        ],
+        "allowedPrimaryAxes": [
+          "anchored",
+          "technical",
+          "procedural"
+        ]
+      }
+    },
+    {
+      "id": "governance-lifecycle-policy",
+      "category": "governance",
+      "query": "governed memory lifecycle scope policy supersede forget audit",
+      "expected": {
+        "normalized": "governed memory lifecycle scope policy supersede forget audit",
+        "tagMemoMode": "auto",
+        "geodesicRequested": false,
+        "geodesicWillUse": false,
+        "requiredCoreTags": [
+          "governed",
+          "memory",
+          "lifecycle",
+          "policy"
+        ],
+        "allowedPrimaryAxes": [
+          "procedural",
+          "knowledge",
+          "anchored",
+          "technical"
+        ]
+      }
+    },
+    {
+      "id": "recall-quality-ranking",
+      "category": "quality",
+      "query": "recall ranking evidence compare rollback precision drift ::Rerank+0.6",
+      "expected": {
+        "normalized": "recall ranking evidence compare rollback precision drift",
+        "tagMemoMode": "auto",
+        "geodesicRequested": false,
+        "geodesicWillUse": true,
+        "requiredCoreTags": [
+          "recall",
+          "ranking",
+          "evidence",
+          "compare"
+        ],
+        "allowedPrimaryAxes": [
+          "procedural",
+          "anchored",
+          "technical",
+          "knowledge"
+        ]
+      }
+    },
+    {
+      "id": "semantic-association",
+      "category": "semantic",
+      "query": "semantic association TagMemo cluster topic bridge residual pyramid",
+      "expected": {
+        "normalized": "semantic association TagMemo cluster topic bridge residual pyramid",
+        "tagMemoMode": "auto",
+        "geodesicRequested": false,
+        "geodesicWillUse": false,
+        "requiredCoreTags": [
+          "semantic",
+          "association",
+          "tagmemo",
+          "cluster"
+        ],
+        "allowedPrimaryAxes": [
+          "knowledge",
+          "technical",
+          "procedural",
+          "anchored"
+        ]
+      }
+    },
+    {
+      "id": "privacy-safety-redaction",
+      "category": "safety",
+      "query": "privacy redaction audit scoped source reversible traceable memory",
+      "expected": {
+        "normalized": "privacy redaction audit scoped source reversible traceable memory",
+        "tagMemoMode": "auto",
+        "geodesicRequested": false,
+        "geodesicWillUse": false,
+        "requiredCoreTags": [
+          "privacy",
+          "redaction",
+          "reversible",
+          "scoped"
+        ],
+        "allowedPrimaryAxes": [
+          "knowledge",
+          "procedural",
+          "anchored",
+          "technical"
+        ]
+      }
+    }
+  ],
+  "forbiddenOutputKeys": [
+    "hitRate",
+    "qualityScore",
+    "providerLatencyMs",
+    "providerApiKey",
+    "authorization",
+    "cookie",
+    "workspace_id",
+    "productionSnippet"
+  ]
+}

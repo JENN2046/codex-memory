@@ -137,6 +137,7 @@
 | P17.1-v8-diagnostic-surface-inventory | v8 / diagnostics / inventory | A1/A2 | done | Inventory existing v8-diagnose, EPA, ResidualPyramid, geodesic, and meta-thinking surfaces | `git diff --check`; docs validation | Inventory only; no runtime tuning, provider call, real memory preview, MCP expansion, or migration |
 | P17.2-v8-diagnostic-fixture-shape-tests | v8 / diagnostics / fixture-tests | A1/A2 | done | Add synthetic fixture shape tests for v8-diagnose report shape and forbidden fields | targeted fixture tests; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 | P17.3-v8-diagnostic-cli-shape-gate | v8 / diagnostics / CLI-gate | A1/A2 | done | Lock v8-diagnose CLI JSON/text/error shell with synthetic fixture gate | targeted CLI gate; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
+| P17.4-v8-query-family-fixture-tests | v8 / diagnostics / query-family-fixtures | A1/A2 | done | Expand synthetic diagnostic query families across technical, governance, quality, semantic, and safety categories | targeted query-family tests; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 
 ## 推荐执行顺序
 
@@ -212,8 +213,9 @@
 70. `P17.1`：V8 diagnostic surface inventory 已新增 [docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md)，盘点 `v8-diagnose`、TagMemoEngine、EPA、ResidualPyramid、geodesic rerank、CandidateGenerator、existing tests、future diagnostic fields 和 query families；docs validation 已通过。
 71. `P17.2`：已新增 synthetic V8 diagnostic fixture shape test，覆盖 `mode`、`destructive=false`、`embeddingProfile`、`query`、`terrain`、`residualPyramid`、`tagMemo`、`metaThinking`、`geodesic`、safety flags、forbidden fields 与 missing-query safe error shape；targeted fixture test `5/5`、full suite `434/434`、diff check、docs validation 均已通过。
 72. `P17.3`：已新增 synthetic V8 diagnostic CLI shape gate，覆盖 `--json` output、text labels、missing-query error shell、forbidden unsafe/fake quality fields；targeted CLI gate `5/5`、full suite `439/439` 已通过。
-73. 下一步建议完成 P17.3 diff/docs validation、guarded commit / safe-push 后进入 `P17.4-v8-query-family-fixture-tests`；不得直接进入 V8 implementation、runtime tuning、provider benchmark、UI、migration/import-export apply 或 release candidate。
-74. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+73. `P17.4`：已新增 synthetic V8 query-family fixture tests，覆盖 technical、governance、quality、semantic、safety categories，验证 normalized query、TagMemo mode、geodesic flags、core tags、terrain axes、residual pyramid、meta-thinking shape 与 forbidden fake/unsafe fields；targeted `4/4`、full suite `443/443` 已通过。
+74. 下一步建议完成 P17.4 diff/docs validation、guarded commit / safe-push 后进入 `P17.5-v8-evidence-gate-summary`；不得直接进入 V8 implementation、runtime tuning、provider benchmark、UI、migration/import-export apply 或 release candidate。
+75. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

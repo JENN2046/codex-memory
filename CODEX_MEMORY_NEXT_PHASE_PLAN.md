@@ -153,8 +153,18 @@
 - Fixture：`tests/fixtures/v8-diagnostic-cli-gate-v1.json`
 - Test：`tests/v8-diagnostic-cli-shape-gate.test.js`
 - 目标：锁定 `v8-diagnose` CLI JSON/text/error shell，确认 forbidden unsafe/fake quality fields 不出现在 output 中。
-- 当前状态：P17.3 targeted CLI gate `5/5`、full suite `439/439` 已通过，等待 diff/docs validation、guarded commit / safe-push。
-- 下一步建议：完成 `git diff --check` 和 docs validation；若通过则 guarded commit / safe-push，并进入 `P17.4-v8-query-family-fixture-tests`。
+- 当前状态：P17.3 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `6afea7601fddadcfa845bf6d93eccef91aede7fe`。
+- 下一步建议：继续 `P17.4-v8-query-family-fixture-tests`。
+- 边界：tests/fixtures/docs/status/board only；不改 `src/`、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
+
+当前 P17.4 query-family fixture tests：
+
+- 入口：[docs/P17_V8_QUERY_FAMILY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P17_V8_QUERY_FAMILY_FIXTURE_TESTS.md)
+- Fixture：`tests/fixtures/v8-query-family-v1.json`
+- Test：`tests/v8-query-family-fixture.test.js`
+- 目标：覆盖 technical / governance / quality / semantic / safety synthetic diagnostic families，锁住 normalized query、TagMemo mode、geodesic flags、core tags、terrain axes、residual pyramid、meta-thinking shape 和 forbidden fake/unsafe fields。
+- 当前状态：P17.4 targeted query-family test `4/4`、full suite `443/443` 已通过，等待 diff/docs validation、guarded commit / safe-push。
+- 下一步建议：完成 `git diff --check` 和 docs validation；若通过则 guarded commit / safe-push，并进入 `P17.5-v8-evidence-gate-summary`。
 - 边界：tests/fixtures/docs/status/board only；不改 `src/`、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
 
 ## 当前判断

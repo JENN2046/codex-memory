@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P17.3 V8 diagnostic CLI shape gate without changing runtime behavior.
+Run P17.4 V8 query-family fixture tests without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P17.3 fixture/test/docs/status/board edits are local, validated, and uncommitted.
+P17.4 fixture/test/docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P17 V8 diagnostic CLI shape gate
+P17 V8 query-family fixture tests
 
 ## Findings
 
@@ -50,16 +50,18 @@ P17 V8 diagnostic CLI shape gate
 - P17.2 guarded commit and safe-push completed at `3b7fa68197abc1f75d7fed775da2b569e1ea0d47`.
 - P17.3 CLI shape gate has been drafted for synthetic `v8-diagnose` JSON/text/error shell.
 - P17.3 targeted CLI gate `5/5`, full suite `439/439`, diff check, and docs validation passed locally.
-- `v8-diagnose` is now under CLI-shape evidence in P17.3; this is not authorization for V8 runtime implementation.
+- P17.3 guarded commit and safe-push completed at `6afea7601fddadcfa845bf6d93eccef91aede7fe`.
+- P17.4 query-family fixtures have been drafted for technical, governance, quality, semantic, and safety diagnostic families.
+- P17.4 targeted query-family test `4/4`, full suite `443/443`, diff check, and docs validation passed locally.
+- `v8-diagnose` is now under query-family evidence in P17.4; this is not authorization for V8 runtime implementation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `tests/fixtures/v8-diagnostic-cli-gate-v1.json`
-- `tests/v8-diagnostic-cli-shape-gate.test.js`
-- `docs/P17_V8_DIAGNOSTIC_CLI_SHAPE_GATE.md`
-- `docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md`
+- `tests/fixtures/v8-query-family-v1.json`
+- `tests/v8-query-family-fixture.test.js`
+- `docs/P17_V8_QUERY_FAMILY_FIXTURE_TESTS.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -67,8 +69,8 @@ P17 V8 diagnostic CLI shape gate
 
 ## Validation
 
-- `node --test tests\v8-diagnostic-cli-shape-gate.test.js` (`5/5`)
-- `npm test` (`439/439`)
+- `node --test tests\v8-query-family-fixture.test.js` (`4/4`)
+- `npm test` (`443/443`)
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -88,4 +90,4 @@ P17 V8 diagnostic CLI shape gate
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P17.4-v8-query-family-fixture-tests`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P17.5-v8-evidence-gate-summary`.
