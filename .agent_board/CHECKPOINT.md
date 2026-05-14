@@ -2,32 +2,33 @@
 
 ## Current Goal
 
-P15.6-query-quality-closeout-review: summarize P15.1-P15.5 evidence, remaining risks, boundary confirmations, and readiness for P16 planning.
+P16-TagMemo-semantic-association-parity-planning: define the fixture-first TagMemo / semantic association parity path after P15 closeout.
 
 ## Current Area
 
-P15 query quality closeout
+P16 TagMemo semantic association parity planning
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- current main: P15.6 closeout safe-push completed; exact hash is verified in closeout
+- phase start baseline: local `main` and `origin/main` matched at `c8ffe68`
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P15.6 closeout decisions:
+P16 planning decisions:
 
-- P15 is closeout-ready.
-- P15 fixture recall dry-run standing signal remains `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
-- A future real-memory query dry-run remains planning-only and still requires explicit approval before any real local memory preview.
-- P16 may start with planning / fixture inventory only.
-- P15.6 does not implement P16 runtime behavior.
+- P16 starts with planning only.
+- Existing TagMemo / EPA / ResidualPyramid / semantic grouping surfaces are recorded as protected evidence targets.
+- P16 fixture work must come before runtime tuning.
+- P16 planning does not implement V8, provider benchmark, public MCP expansion, migration, import/export apply, or real memory preview.
+- Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+- `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md`
-- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
+- `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -40,10 +41,7 @@ P15.6 closeout decisions:
 
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
-- `Select-String -Path docs\P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md -Pattern '[ \t]$'` returned no matches.
-- `git diff --cached --check` passed before guarded commit.
-- Safe-push readiness passed before the board-only readiness note: file scope was docs/board only, remote `refs/heads/main` was `17335c2d148df565411253e8b1bf5011e09ff1ba`, and sensitive scan found only policy words.
-- Post-push verification passed: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched.
+- `Select-String -Path docs\P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md -Pattern '[ \t]$'` returned no matches.
 
 ## Current Blockers
 
@@ -51,4 +49,4 @@ P15.6 closeout decisions:
 
 ## Next Safe Action
 
-Begin `P16-TagMemo-semantic-association-parity-planning` only. Do not start P16 runtime implementation, provider benchmark, V8, UI, migration/import-export apply, release candidate, tag, or deploy.
+Perform final diff/scope review, then guarded commit and safe-push readiness. Next recommended phase is `P16.1-TagMemo-semantic-fixture-inventory`.

@@ -20,10 +20,10 @@
 
 当前路线图口径：
 
-- current: P9 scoped memory runtime integrated
+- current: P16 TagMemo / semantic association parity planning
 - target: VCP memory practical parity 100%
-- near-term priority: P10 -> P11 -> P12
-- do not jump early: P16 / P17 / V8 / UI / release candidate
+- near-term priority: P16 planning -> P16.1 fixture inventory
+- do not jump early: P17 / V8 / UI / release candidate
 
 本文件只保留近期摘要。不要把 P10-P23 全文复制到这里，避免与路线图事实源漂移。
 
@@ -102,7 +102,17 @@
 - 当前基线：`real-query-suite` 与 `query:quality` fixture recall dry-run 均为 `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。
 - 边界：tests/docs/board only；不改 runtime，不调用 provider，不改 package，不改 MCP，不做 migration/import-export apply。
 - 当前 P15.6：P15 query-quality sequence is closeout-ready after docs validation; future real-memory dry-run remains planning-only and still requires explicit approval before any real local memory preview.
-- 下一步建议：`P16-TagMemo-semantic-association-parity-planning`；只做 planning / fixture inventory，不进入 P16 runtime implementation、provider benchmark、V8、UI、migration/import-export apply、release candidate。
+- P15 closeout result：可进入 `P16-TagMemo-semantic-association-parity-planning`；仍不得进入 P16 runtime implementation、provider benchmark、V8、UI、migration/import-export apply、release candidate。
+
+当前 P16 planning：
+
+- 入口：[docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md)
+- 目标：把 TagMemo association、semantic grouping、EPA / ResidualPyramid telemetry、ordering feel 和 query-quality interaction 规划成 fixture-first parity evidence。
+- 当前基线：P14 compare `43/43 matched`、rollback `43/43 rollback-ready`；P15 fixture recall dry-run `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。
+- 保护面：`TagMemoEngine`、`EPAModule`、`ResidualPyramid`、`SemanticGroupManager`、passive `::TagMemo` / `::Rerank` syntax、LightMemo `tag_boost` / `core_tags` compatibility。
+- 边界：planning / docs / board only；不改 runtime、不改 tests、不改 package、不新增 MCP public tools、不改 MCP schema、不做 provider call、不做 SQLite migration、不读取或写入真实 memory、不进入 P17/V8/UI。
+- 当前状态：planning doc 已添加，docs-only validation 已通过。
+- 下一步建议：`P16.1-TagMemo-semantic-fixture-inventory`。
 
 ## 当前判断
 

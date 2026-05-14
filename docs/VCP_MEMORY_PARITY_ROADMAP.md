@@ -8,7 +8,7 @@ This document is the single long-form roadmap for `codex-memory` after P9 scoped
 ## Route
 
 ```text
-current: P9 scoped memory runtime integrated
+current: P16 TagMemo / semantic association parity planning
 target: VCP memory practical parity 100%
 ```
 
@@ -24,7 +24,7 @@ Strategy:
 Near-term priority:
 
 ```text
-P13
+P16
 ```
 
 Current status note:
@@ -34,15 +34,18 @@ Current status note:
 - P12 controlled write tools reached internal `validate_memory` service + internal CLI wrapper.
 - `validate_memory` remains internal-only.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
-- P13 is planning the VCP-compatible memory object model in [VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md).
+- P13 object-model fixture / dry-run sequence is complete through migration-readiness reporting.
+- P14 donor behavior parity standing gate is complete with compare `43/43 matched` and rollback `43/43 rollback-ready`.
+- P15 query-quality gate is complete through fixture recall dry-run standing signal `14/14`.
+- P16 is planning TagMemo / semantic association parity in [P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md).
 
 Do not jump early to:
 
 ```text
-P16 / P17 / V8 / UI
+P17 / V8 / UI
 ```
 
-Those stages require stronger policy, lifecycle, object-model, and quality gates first.
+Those stages require P16 fixture-backed evidence first.
 
 ---
 

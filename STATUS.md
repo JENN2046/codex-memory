@@ -121,6 +121,7 @@
 - P15.4 fixture recall dry-run standing gate：新增 [docs/P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md](/A:/codex-memory/docs/P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md)，并让 `gate:ci` 的 `checks.queries.detail.fixtureRecallDryRun` 成为 CI-safe standing signal；当前为 `enabled=true`、`14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。本阶段不改 query runtime ranking、不调用 provider、不改 fixture data、不扩大 `validate_memory` mutation surface、不开放 public `validate_memory` MCP tool、不进入 migration/import-export apply。
 - P15.5 real-memory query dry-run planning：新增 [docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md)，只规划未来 redacted / opt-in / read-only local dry-run 的边界和 approval packet；本阶段不实现 CLI、不读取真实 memory、不调用 provider、不写 durable memory、不做 migration/import-export apply、不改 MCP schema/tools、不扩大 `validate_memory` mutation surface。
 - P15.6 query quality closeout review：新增 [docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md)，总结 P15.1-P15.5 证据、`14/14` fixture recall standing signal、remaining risks、boundary confirmations 和 P16 planning readiness；不启动 P16 implementation、不跑 provider、不读取真实 memory、不改 runtime。
+- P16 TagMemo semantic association parity planning：新增 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md)，记录现有 `TagMemoEngine` / EPA / ResidualPyramid / SemanticGroupManager / passive `::TagMemo` surfaces、P16 gate categories、P16.1-P16.5 顺序和 hard boundaries；本阶段只做 planning，不改 runtime、不改 tests、不调 provider、不进入 V8。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -486,7 +487,7 @@
 
 ## 下一步建议
 
-- 下一阶段建议进入 `P16-TagMemo-semantic-association-parity-planning`。只做 planning / fixture inventory；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply、release candidate、tag 或 deploy。
+- 下一阶段建议进入 `P16.1-TagMemo-semantic-fixture-inventory`。只做 fixture inventory；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply、release candidate、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 
