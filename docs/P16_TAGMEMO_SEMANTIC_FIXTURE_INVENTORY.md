@@ -135,3 +135,9 @@ The current gate result is `PASS_AS_FIXTURE_BACKED_EVIDENCE`: enough to continue
 `P16.5-compare-rollback-semantic-gate` summarizes the applicable compare / rollback evidence in [P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md](/A:/codex-memory/docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md).
 
 The current gate result is `PASS_WITH_SCOPE_LIMITS`: targeted TagMemo fixtures passed `9/9`, donor ordering compare passed `4/4 matched`, and donor ordering rollback passed `4/4 rollback-ready`. The donor ordering gate is useful compatibility evidence, but it is not passive TagMemo live-quality proof.
+
+## P16 Closeout
+
+`P16.x-closeout-review` is recorded in [P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md).
+
+P16 closes as `FIXTURE_BACKED_AND_GATE_CHECKED`: ready for P17 planning / evidence only, not V8 implementation or runtime tuning.

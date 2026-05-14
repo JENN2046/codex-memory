@@ -54,7 +54,7 @@ P16 should turn the following into fixture-backed evidence, in order:
 4. `P16.3-TagMemo-targeted-semantic-fixtures`: add targeted sanitized semantic association cases after shape tests are stable.
 5. `P16.4-semantic-ranking-evidence-gate`: summarize ranking evidence and compare/query-quality interactions. Current evidence doc: [P16_SEMANTIC_RANKING_EVIDENCE_GATE.md](/A:/codex-memory/docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md).
 6. `P16.5-compare-rollback-semantic-gate`: run standing compare/rollback evidence where applicable. Current evidence doc: [P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md](/A:/codex-memory/docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md).
-7. `P16.x-closeout-review`: confirm evidence, gaps, and readiness for P17 planning only.
+7. `P16.x-closeout-review`: confirm evidence, gaps, and readiness for P17 planning only. Current closeout: [P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md).
 
 ## Current Phase Boundary
 
@@ -106,4 +106,4 @@ Compare / rollback gates should be added only when a P16 slice touches donor-fac
 
 ## Result
 
-P16 planning, P16.1 inventory, P16.2 fixture shape tests, P16.3 targeted semantic fixtures, P16.4 evidence gate, and P16.5 compare/rollback semantic gate are complete locally. P16.5 passed targeted TagMemo fixtures, ordering compare, and ordering rollback evidence with scope limits. Runtime tuning remains deferred until a later explicitly approved phase.
+P16 planning, P16.1 inventory, P16.2 fixture shape tests, P16.3 targeted semantic fixtures, P16.4 evidence gate, P16.5 compare/rollback semantic gate, and P16.x closeout are complete locally. P16 is fixture-backed and gate-checked, with runtime tuning deferred until a later explicitly approved phase.

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P16.5 compare/rollback semantic gate without changing runtime behavior.
+Run P16.x TagMemo semantic association closeout without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P16.5 docs/status/board edits are local and uncommitted.
+P16.x docs/status/board edits are local and uncommitted.
 
 ## Current Area
 
-P16 TagMemo compare/rollback semantic evidence gate
+P16 TagMemo semantic association closeout
 
 ## Findings
 
@@ -38,13 +38,15 @@ P16 TagMemo compare/rollback semantic evidence gate
 - P16.4 guarded commit and safe-push completed at `afd2a7845892a7aae892ec73440ed15b172af0ba`.
 - P16.5 targeted TagMemo tests passed `9/9`; ordering compare passed `4/4 matched`; ordering rollback passed `4/4 rollback-ready`.
 - P16.5 full suite (`429/429`), diff check, and docs validation passed.
+- P16.5 guarded commit and safe-push completed at `effd73edba04abd5b26c0a4a59dca073db655d2a`.
+- P16.x closeout review is drafted as docs/status/board only; docs validation passed.
 - `v8-diagnose` is a later read-only evidence surface, not a P16 planning authorization for P17 / V8 implementation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md`
+- `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md`
 - `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md`
 - `docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -54,13 +56,6 @@ P16 TagMemo compare/rollback semantic evidence gate
 
 ## Validation
 
-Passed:
-
-- `node --test tests\tagmemo-semantic-fixture-shape.test.js tests\tagmemo-targeted-semantic-fixture.test.js`
-- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category ordering --json --require-match`
-- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category ordering --json --require-ready`
-
-- `npm test`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -80,4 +75,4 @@ Passed:
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P16.x-closeout-review`.
+Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P17-advanced-memory-intelligence-v8-evidence-gate-planning`.
