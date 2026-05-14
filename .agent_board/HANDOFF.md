@@ -2,19 +2,19 @@
 
 ## Goal
 
-Resume `P12.4-MCP-tool-proposal-review` in `A:\codex-memory`.
+Resume `A4.8-safe-project-operator-rail` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `2dd03dd`
+- Base: `origin/main` / `4ecb78f`
 - Local ahead commit: none at startup
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-P12-controlled-write-tools / proposal-review
+docs-governance / operator-rail
 
 ## Completed Before This Batch
 
@@ -31,27 +31,31 @@ P12-controlled-write-tools / proposal-review
 - Updated controlled write docs, backlog, status, and board.
 - Validation passed and `b950bf3` is now on `origin/main`.
 - P12.3 controlled write dry-run CLI prototypes passed validation and landed in `origin/main` at `2dd03dd`.
+- P12.4 MCP tool proposal review passed validation and landed in `origin/main` at `4ecb78f`.
 
 ## Completed In Current Batch
 
-- Added P12.4 proposal review fixture and targeted test.
-- Locked docs/tests-only review boundary with public MCP tools frozen.
-- Recorded `audit_memory` as future read-only proposal review only.
-- Recorded `validate_memory` as P12.5 first runtime mutation candidate only after explicit approval.
+- Added A4.8 operator rail docs.
+- Added safe-push policy, validation selection matrix, and failure recovery docs.
+- Added `.agent_board` phase protocol and closeout schema.
+- Linked A4.8 docs from `AGENTS.md`.
 
 ## Changed Files
 
-- `tests/fixtures/controlled-write-proposal-review-v1.json`
-- `tests/controlled-write-proposal-review.test.js`
-- `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
+- `docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md`
+- `docs/SAFE_PUSH_POLICY.md`
+- `docs/VALIDATION_SELECTION_MATRIX.md`
+- `docs/AUTOPILOT_FAILURE_RECOVERY.md`
+- `.agent_board/PHASE_PROTOCOL.md`
+- `.agent_board/CLOSEOUT_SCHEMA.md`
+- `AGENTS.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `node --test tests\controlled-write-proposal-review.test.js` passed `10/10`.
-- `npm test` passed `280/280`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -86,4 +90,4 @@ P12-controlled-write-tools / proposal-review
 
 ## Next Safe Step
 
-Guarded local commit, safe-push readiness, then stop before P12.5 runtime mutation unless explicit approval is provided.
+Inspect final diff boundaries, then guarded local commit if clean.

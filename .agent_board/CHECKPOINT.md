@@ -2,32 +2,37 @@
 
 ## Current Goal
 
-P12.4-MCP-tool-proposal-review：在不新增 MCP public tools、不实现 runtime mutation、不改 MCP schema 的前提下，评审 controlled write dry-run 输出和候选工具边界。
+A4.8-safe-project-operator-rail：安装 Safe Project Operator Rail、safe-push policy、validation selection matrix、failure recovery，以及 `.agent_board` phase/closeout schema。
 
 ## Current Area
 
-P12-controlled-write-tools / proposal-review
+docs-governance / operator-rail
 
 ## Current Status
 
-P12.4 proposal review fixture/tests-design completed locally. Current branch is `main`, base is `origin/main` / `2dd03dd`.
+A4.8 docs/board/policy work is in progress locally. Current branch is `main`, base is `origin/main` / `4ecb78f`.
 
-This batch adds proposal review fixture/tests-design and docs/board notes only. It does not add MCP public tools, does not change MCP schema, does not perform SQLite migration, and does not write durable DB/memory state.
+This batch adds governance rail docs and board protocol files only. It does not modify `src/`, tests, package files, MCP schema/tools, SQLite schema, or durable DB/memory state.
 
 ## Completed Work In This Batch
 
-- Added `tests/fixtures/controlled-write-proposal-review-v1.json`.
-- Added `tests/controlled-write-proposal-review.test.js`.
-- Locked P12.4 as docs/tests-only proposal review with public MCP tools frozen.
-- Recorded `audit_memory` as a future read-only public-tool proposal review candidate, not approved now.
-- Recorded `validate_memory` as the recommended first runtime mutation candidate for P12.5 only after explicit approval.
-- Deferred update/supersede/forget/checkpoint/handoff until their safety prerequisites are met.
+- Added A4.8 operator rail docs.
+- Added safe-push policy.
+- Added validation selection matrix.
+- Added autopilot failure recovery policy.
+- Added `.agent_board` phase protocol and closeout schema.
+- Linked A4.8 docs from `AGENTS.md`.
 
 ## Changed Files
 
-- `tests/fixtures/controlled-write-proposal-review-v1.json`
-- `tests/controlled-write-proposal-review.test.js`
-- `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
+- `docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md`
+- `docs/SAFE_PUSH_POLICY.md`
+- `docs/VALIDATION_SELECTION_MATRIX.md`
+- `docs/AUTOPILOT_FAILURE_RECOVERY.md`
+- `.agent_board/PHASE_PROTOCOL.md`
+- `.agent_board/CLOSEOUT_SCHEMA.md`
+- `AGENTS.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -38,8 +43,6 @@ This batch adds proposal review fixture/tests-design and docs/board notes only. 
 
 ## Validation Run
 
-- `node --test tests\controlled-write-proposal-review.test.js`：passed `10/10`
-- `npm test`：passed `280/280`
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -62,4 +65,4 @@ This batch adds proposal review fixture/tests-design and docs/board notes only. 
 
 ## Next Safe Action
 
-Guarded local commit, safe-push readiness, then stop before P12.5 runtime mutation unless explicit approval is provided.
+Inspect final diff boundaries, then guarded local commit if clean.

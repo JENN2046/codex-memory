@@ -59,7 +59,9 @@
 - 入口：[docs/CONTROLLED_WRITE_TOOLS_PLAN.md](/A:/codex-memory/docs/CONTROLLED_WRITE_TOOLS_PLAN.md)
 - 目标：规划未来 `update_memory` / `supersede_memory` / `forget_memory` / `audit_memory` / `validate_memory` / `checkpoint_memory` / `handoff_memory` 等受控写入能力。
 - 边界：planning only；不实现 runtime mutation，不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不写真实 memory。
-- 下一步建议：P12.1 controlled write fixture schemas。
+- 当前进度：P12.1 fixture schemas、P12.2 mutation audit shape tests、P12.3 dry-run CLI prototypes、P12.4 MCP tool proposal review 均已进入远端主线。
+- 当前治理任务：A4.8 Safe Project Operator Rail 已本地完成，入口为 [docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)。
+- 下一产品阶段建议：P12.5 first runtime mutation tool planning/approval gate；runtime mutation 仍需显式批准。
 
 ## 当前判断
 
@@ -73,6 +75,8 @@
 - 当前模型侧 Claude 验收使用 `deepseek-ai/deepseek-v4-flash`
 
 下一阶段不应该用“大迁移”或“大重构”推进，而应该进入小步、可验证、可回滚的维护与治理建设。
+
+当前 A4.8 governance rail 已本地完成。该 rail 允许安全低风险工作自动 planning / validation / guarded commit / readiness / safe-push，但不会越过 A5 hard stops。
 
 ## 阶段顺序
 

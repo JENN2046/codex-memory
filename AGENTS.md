@@ -34,7 +34,7 @@ Do not redraw the four-layer architecture without evidence.
 
 Do not bypass the gates.
 
-Do not push.
+Do not push unless the user explicitly authorizes it or the A4.8 safe-push policy applies and readiness is ready.
 
 ---
 
@@ -307,6 +307,19 @@ Codex may perform long-running local work when the goal is clear and the work re
 Codex should not stop for ordinary implementation details.
 
 Codex should stop only for hard stops, unsafe state, unclear goal that cannot be safely narrowed, or validation/design failure requiring human decision.
+
+### 7.1 A4.8 Safe Project Operator Rail
+
+When explicitly activated, `A4.8 Safe Project Operator Rail` lets Codex select the next safe local phase from the roadmap/backlog/board, split work into planning / fixture / dry-run / runtime / gate / observability subphases, run validation selection automatically, create guarded commits, run push readiness, and safe-push only when the safe-push policy passes.
+
+Reference docs:
+
+- [A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)
+- [SAFE_PUSH_POLICY.md](/A:/codex-memory/docs/SAFE_PUSH_POLICY.md)
+- [VALIDATION_SELECTION_MATRIX.md](/A:/codex-memory/docs/VALIDATION_SELECTION_MATRIX.md)
+- [AUTOPILOT_FAILURE_RECOVERY.md](/A:/codex-memory/docs/AUTOPILOT_FAILURE_RECOVERY.md)
+
+A4.8 is not unlimited permission. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview` unless a dedicated approved phase explicitly authorizes expansion. A5 hard stops remain manual, including real DB/memory mutation, SQLite migration, MCP public tool/schema expansion, provider calls, dependency changes, secrets/env edits, release/tag/deploy, destructive commands, and stale branch merge/rebase/cherry-pick.
 
 ---
 
@@ -1110,7 +1123,7 @@ Move in small verified steps.
 
 Commit locally only when guarded.
 
-Never push without the user.
+Never push outside explicit user authorization or the A4.8 safe-push policy.
 
 The goal is not more motion.
 
