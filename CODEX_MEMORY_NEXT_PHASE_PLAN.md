@@ -111,12 +111,13 @@
 - P16.2 fixture shape tests：`tests/fixtures/tagmemo-semantic-fixture-shape-v1.json` + `tests/tagmemo-semantic-fixture-shape.test.js`
 - P16.3 targeted semantic fixtures：`tests/fixtures/tagmemo-targeted-semantic-v1.json` + `tests/tagmemo-targeted-semantic-fixture.test.js`
 - P16.4 evidence gate：[docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md](/A:/codex-memory/docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md)
+- P16.5 compare/rollback semantic gate：[docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md](/A:/codex-memory/docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md)
 - 目标：把 TagMemo association、semantic grouping、EPA / ResidualPyramid telemetry、ordering feel 和 query-quality interaction 规划成 fixture-first parity evidence。
 - 当前基线：P14 compare `43/43 matched`、rollback `43/43 rollback-ready`；P15 fixture recall dry-run `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。
 - 保护面：`TagMemoEngine`、`EPAModule`、`ResidualPyramid`、`SemanticGroupManager`、passive `::TagMemo` / `::Rerank` syntax、LightMemo `tag_boost` / `core_tags` compatibility。
 - 边界：planning / docs / board only；不改 runtime、不改 tests、不改 package、不新增 MCP public tools、不改 MCP schema、不做 provider call、不做 SQLite migration、不读取或写入真实 memory、不进入 P17/V8/UI。
-- 当前状态：P16 planning、P16.1 fixture inventory、P16.2 fixture shape tests、P16.3 targeted semantic fixtures 均已完成并推送；P16.4 evidence gate 已完成本地 docs validation，等待 guarded commit / safe-push readiness。
-- 下一步建议：收口 `P16.4-semantic-ranking-evidence-gate` 的 commit / safe-push，然后进入 `P16.5-compare-rollback-semantic-gate`。
+- 当前状态：P16 planning、P16.1 fixture inventory、P16.2 fixture shape tests、P16.3 targeted semantic fixtures、P16.4 evidence gate 均已完成并推送；P16.5 compare/rollback semantic gate 已完成本地验证，等待 guarded commit / safe-push readiness。
+- 下一步建议：收口 `P16.5-compare-rollback-semantic-gate` 的 commit / safe-push，然后进入 `P16.x-closeout-review`。
 
 ## 当前判断
 

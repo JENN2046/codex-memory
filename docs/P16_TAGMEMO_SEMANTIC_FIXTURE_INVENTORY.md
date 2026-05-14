@@ -129,3 +129,9 @@ P16.3 remains fixture/test only. It does not modify runtime ranking, recall impl
 `P16.4-semantic-ranking-evidence-gate` summarizes P16.2 and P16.3 evidence in [P16_SEMANTIC_RANKING_EVIDENCE_GATE.md](/A:/codex-memory/docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md).
 
 The current gate result is `PASS_AS_FIXTURE_BACKED_EVIDENCE`: enough to continue to P16.5 compare/rollback semantic evidence, not enough to authorize runtime tuning, provider benchmark, V8 implementation, public MCP expansion, migration, or real memory mutation.
+
+## P16.5 Compare / Rollback Gate
+
+`P16.5-compare-rollback-semantic-gate` summarizes the applicable compare / rollback evidence in [P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md](/A:/codex-memory/docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md).
+
+The current gate result is `PASS_WITH_SCOPE_LIMITS`: targeted TagMemo fixtures passed `9/9`, donor ordering compare passed `4/4 matched`, and donor ordering rollback passed `4/4 rollback-ready`. The donor ordering gate is useful compatibility evidence, but it is not passive TagMemo live-quality proof.
