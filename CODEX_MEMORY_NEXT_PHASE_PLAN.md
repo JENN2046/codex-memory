@@ -84,7 +84,8 @@
 - 边界：planning / docs / board only；不改 runtime，不改 donor behavior，不改 public MCP tools，不改 import/export 或 migration，不进入 P15/P16/P17/V8/UI。
 - P14.1 fixture inventory 已新增 [docs/DONOR_PARITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/DONOR_PARITY_FIXTURE_INVENTORY.md)，记录当前 standard suite `43` cases、category/fixture 分布、覆盖面和缺口。
 - P14.2 DeepMemo targeted parity fixtures 已新增 `tests/fixtures/deepmemo-donor-parity-v1.json` 与 `tests/deepmemo-donor-parity-fixture.test.js`，锁住 payload shape、blocked keyword meta placement、advanced syntax payload stability 和 ranking order snapshot。
-- 下一步建议：`P14.3-TopicMemo-targeted-parity-fixtures`。
+- P14.3 TopicMemo targeted parity fixtures 已新增 `tests/fixtures/topicmemo-donor-parity-v1.json` 与 `tests/topicmemo-donor-parity-fixture.test.js`，锁住 ListTopics / GetTopicContent payload shape、missing topic/history error envelope、agentId alias boundary 和 locked-topic display。
+- 下一步建议：`P14.4-error-meta-parity-tests`。
 
 ## 当前判断
 

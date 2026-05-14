@@ -1,0 +1,166 @@
+{
+  "phase": "P14.3-TopicMemo-targeted-parity-fixtures",
+  "schema_version": 1,
+  "mutated": false,
+  "source": {
+    "kind": "fixture-only",
+    "suite_root": "benchmarks/active-memory-suite",
+    "note": "TopicMemo donor parity fixture evidence only; runtime behavior is not changed."
+  },
+  "cases": [
+    {
+      "name": "topicmemo-listtopics-payload-shape-and-locked-topic",
+      "purpose": "Lock TopicMemo ListTopics compact success shape and locked topic display.",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/topicmemo-listtopics-basic.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "error",
+          "meta"
+        ],
+        "orderedResultIncludes": [
+          "## Keke 的话题列表",
+          "1. **System Plan** 🔒",
+          "2. **Delivery Schedule**",
+          "3. **Quiet Topic**",
+          "4. **Missing History**"
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-gettopiccontent-payload-shape",
+      "purpose": "Lock TopicMemo GetTopicContent compact success shape.",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/topicmemo-gettopiccontent-basic.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "error",
+          "meta"
+        ],
+        "resultIncludes": [
+          "## 话题：System Plan",
+          "消息数量：2 条",
+          "**Master**: We should discuss the codex-memory system plan.",
+          "**Keke**: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+        ]
+      }
+    },
+    {
+      "name": "topicmemo-missing-topic-error-envelope",
+      "purpose": "Lock missing topic error envelope and meta placement.",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/topicmemo-gettopiccontent-missing-topic.json",
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "[TopicMemo] 未找到 ID 为 \"topic_unknown\" 的话题"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "toolName",
+          "tool_name",
+          "code",
+          "historyStatus",
+          "topicId"
+        ],
+        "meta": {
+          "code": "topic-not-found",
+          "command": "GetTopicContent",
+          "maid": "Keke",
+          "topicId": "topic_unknown",
+          "historyStatus": "topic-not-found",
+          "toolName": "TopicMemo",
+          "tool_name": "TopicMemo"
+        }
+      }
+    },
+    {
+      "name": "topicmemo-missing-history-error-envelope",
+      "purpose": "Lock missing history error envelope and meta placement.",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/topicmemo-gettopiccontent-missing-history.json",
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "[TopicMemo] 话题 \"Missing History\" 的聊天记录文件不存在。"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "toolName",
+          "tool_name",
+          "code",
+          "historyStatus",
+          "topicId"
+        ],
+        "meta": {
+          "code": "missing-history",
+          "command": "GetTopicContent",
+          "maid": "Keke",
+          "topicId": "topic_missing_history",
+          "historyStatus": "missing-history",
+          "toolName": "TopicMemo",
+          "tool_name": "TopicMemo"
+        }
+      }
+    },
+    {
+      "name": "topicmemo-agentid-alias-listtopics-boundary",
+      "purpose": "Lock TopicMemo agentId alias selection without leaking the other agent topic list.",
+      "activeMemoryRoot": "vchat-fixture-multi-agent",
+      "inputFile": "inputs/topicmemo-listtopics-mika-agentid-alias.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "error",
+          "meta"
+        ],
+        "orderedResultIncludes": [
+          "## Mi 的话题列表",
+          "1. **Rollback Review** 🔒",
+          "2. **Compare Notes**"
+        ],
+        "forbiddenResultIncludes": [
+          "System Plan",
+          "Delivery Schedule"
+        ]
+      }
+    }
+  ],
+  "non_goals": [
+    "no runtime change",
+    "no public MCP tool expansion",
+    "no MCP schema change",
+    "no import/export or migration behavior change",
+    "no SQLite migration",
+    "no real DB or memory write"
+  ]
+}

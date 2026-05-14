@@ -105,10 +105,11 @@ P14.2 DeepMemo targeted parity fixtures should prioritize:
 
 P14.3 TopicMemo targeted parity fixtures should prioritize:
 
-- ListTopics payload shape parity
-- GetTopicContent payload shape parity
-- missing topic/history error envelope details
-- topic ordering and locked-topic display expectations
+- ListTopics payload shape parity: covered by `topicmemo-listtopics-payload-shape-and-locked-topic`
+- GetTopicContent payload shape parity: covered by `topicmemo-gettopiccontent-payload-shape`
+- missing topic/history error envelope details: covered by `topicmemo-missing-topic-error-envelope` and `topicmemo-missing-history-error-envelope`
+- topic ordering and locked-topic display expectations: covered by `topicmemo-listtopics-payload-shape-and-locked-topic`
+- agentId alias boundary: covered by `topicmemo-agentid-alias-listtopics-boundary`
 
 P14.4 error/meta parity tests should prioritize:
 
@@ -151,6 +152,6 @@ git diff --check
 
 ## Next Recommended Phase
 
-`P14.3-TopicMemo-targeted-parity-fixtures`
+`P14.4-error-meta-parity-tests`
 
-P14.3 may add TopicMemo fixture/test coverage, but it should still avoid runtime behavior changes unless a later phase explicitly approves them.
+P14.4 may consolidate shared donor error envelope and `meta` placement coverage. It should still avoid runtime behavior changes unless a later phase explicitly approves them.

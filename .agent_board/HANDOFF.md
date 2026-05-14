@@ -2,50 +2,54 @@
 
 ## Goal
 
-Continue `P14.2-state-reconciliation` in `A:\codex-memory`.
+Continue `P14.3-TopicMemo-targeted-parity-fixtures` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `4251a27`
-- Remote policy: no P14.2 push is needed; local HEAD, local `origin/main`, and remote `refs/heads/main` already match.
+- Base: `origin/main` / `829817c`
+- Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P14-donor-compatibility / state reconciliation
+P14-donor-compatibility / TopicMemo fixtures
 
 ## Completed Before This Batch
 
 - P14 donor behavior parity gate planning landed.
 - P14.1 donor parity fixture inventory landed.
-- P14.2 DeepMemo targeted parity fixtures landed as `4251a27 test: add p14 deepmemo parity fixtures`.
+- P14.2 DeepMemo targeted parity fixtures landed.
+- P14.2 state reconciliation landed as `829817c`.
 - Decision after P12.6 remains: keep `validate_memory` internal-only and skip public `validate_memory` MCP proposal review.
 
 ## Completed In Current Batch
 
-- Confirmed P14.2 DeepMemo fixture/test files are tracked.
-- Confirmed P14.2 commit is local HEAD, local `origin/main`, and remote `refs/heads/main`.
-- Confirmed no P14.2 push is needed.
-- Corrected board wording that still treated P14.2 as waiting for guarded commit/safe-push.
-- Stopped P14.3 work during reconciliation.
+- Added `tests/fixtures/topicmemo-donor-parity-v1.json`.
+- Added `tests/topicmemo-donor-parity-fixture.test.js`.
+- Locked TopicMemo payload shape, missing topic/history error envelopes, agentId alias boundary, and locked-topic display.
+- Verified targeted fixture runs do not mutate the referenced active-memory fixture files.
+- Updated P14 plan, inventory, next phase plan, backlog, status, and board state.
 
 ## Changed Files
 
-- `.agent_board/CHECKPOINT.md`
-- `.agent_board/HANDOFF.md`
-- `.agent_board/RUN_STATE.md`
-- `.agent_board/TASK_QUEUE.md`
-- `.agent_board/VALIDATION_LOG.md`
-- `STATUS.md`
+- `tests/fixtures/topicmemo-donor-parity-v1.json`
+- `tests/topicmemo-donor-parity-fixture.test.js`
+- `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
+- `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
+- `STATUS.md`
+- `.agent_board/*`
 
 ## Validation
 
-- Required reconciliation checks found P14.2 at `4251a27ef484c795e929c1d53a93365c78b72cce`.
-- `git ls-files` confirms the DeepMemo donor parity fixture/test are tracked.
-- P14.2 historical validation from commit `4251a27`: targeted `2/2`, DeepMemo compare `15/15 matched`, DeepMemo rollback `15/15 rollback-safe`, `npm test` `403/403`, diff/docs validation.
-- Reconciliation `git diff --check` and docs validation passed after board correction.
+- `node --test tests\topicmemo-donor-parity-fixture.test.js` passed `2/2`.
+- TopicMemo compare category gate passed `13/13 matched`.
+- TopicMemo rollback category gate passed `13/13 rollback-safe`.
+- `npm test` passed `405/405`.
+- `git diff --check` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
 ## MCP Mode
 
@@ -56,7 +60,7 @@ P14-donor-compatibility / state reconciliation
 
 ## Audit / Recall Impact
 
-- Reconciliation is docs/board/status only.
+- P14.3 fixture tests exercise TopicMemo CLI against fixture roots only.
 - Runtime recall behavior is unchanged.
 - Audit write paths are unchanged.
 
@@ -75,7 +79,6 @@ P14-donor-compatibility / state reconciliation
 - No runtime mapper.
 - No real DB write.
 - No real diary write.
-- No P14.3 continuation.
 - No P15/P16/P17/V8/UI.
 - No hard delete.
 - No real DB/memory write.
@@ -85,10 +88,10 @@ P14-donor-compatibility / state reconciliation
 
 ## Remaining Risks
 
-- P14.3 untracked files currently exist in the worktree. They are outside this reconciliation and were not continued.
 - Public MCP tool expansion remains explicitly approval-gated.
 - Real migration remains separately approval-gated.
+- P14.4 may add shared error/meta fixture/test evidence, but must not alter runtime behavior without later explicit approval.
 
 ## Next Safe Step
 
-Inspect final reconciliation diff and decide whether to guarded-commit only the docs/board correction. No P14.2 push is needed because `4251a27` is already on remote `main`.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next recommended phase is `P14.4-error-meta-parity-tests`.

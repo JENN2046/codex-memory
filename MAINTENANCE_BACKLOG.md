@@ -113,7 +113,8 @@
 | P14-donor-behavior-parity-gate-planning | donor-compatibility / gate-design | A1/A2 | done | Plan donor behavior parity gates before any P14 implementation | `git diff --check`; docs validation | Planning doc added; start with planning / fixture / gate design only; do not jump to P16/P17/V8/UI or runtime implementation |
 | P14.1-donor-parity-fixture-inventory | donor-compatibility / fixture-inventory | A1/A2 | done | Inventory current donor parity fixtures and standard suite gaps | `git diff --check`; docs validation | Inventory doc added; observed standard suite has `43` cases across `8` categories and `7` fixture roots; no runtime/tests/package changes |
 | P14.2-DeepMemo-targeted-parity-fixtures | donor-compatibility / fixtures | A1/A2 | done | Add DeepMemo targeted parity fixtures for payload, blocked keyword meta, advanced syntax, and ranking snapshots | `node --test tests\deepmemo-donor-parity-fixture.test.js`; DeepMemo compare/rollback category gates; `npm test`; `git diff --check`; docs validation | Fixture/test evidence added in `4251a27` and confirmed on remote `main`; no runtime, MCP, package, import/export, migration, or real data write changes |
-| P14.3-TopicMemo-targeted-parity-fixtures | donor-compatibility / fixtures | A1/A2 | todo | Add TopicMemo targeted parity fixtures for list/content payload shape, missing topic/history errors, and alias boundaries | future targeted tests; `npm test`; diff/docs validation | No runtime behavior changes without explicit later approval |
+| P14.3-TopicMemo-targeted-parity-fixtures | donor-compatibility / fixtures | A1/A2 | done | Add TopicMemo targeted parity fixtures for list/content payload shape, missing topic/history errors, and alias boundaries | `node --test tests\topicmemo-donor-parity-fixture.test.js`; TopicMemo compare/rollback category gates; `npm test`; diff/docs validation | Fixture/test evidence added; no runtime, MCP, package, import/export, migration, or real data write changes |
+| P14.4-error-meta-parity-tests | donor-compatibility / fixtures | A1/A2 | todo | Consolidate shared donor error envelope and `meta` placement parity tests | future targeted tests; `npm test`; diff/docs validation | No runtime behavior changes without explicit later approval |
 
 ## 推荐执行顺序
 
@@ -165,9 +166,10 @@
 46. `P14`：donor behavior parity gate planning 已新增 [docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md](/A:/codex-memory/docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md)，规划 donor surfaces、gate categories、object-model drift boundary、validation strategy 和 P14.1-P14.6 顺序。
 47. `P14.1`：donor parity fixture inventory 已新增 [docs/DONOR_PARITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/DONOR_PARITY_FIXTURE_INVENTORY.md)，记录 DeepMemo/TopicMemo 当前 case、category、fixture 分布、覆盖面、gap register 和下一步 fixture priorities。
 48. `P14.2`：DeepMemo targeted parity fixtures 已新增 `tests/fixtures/deepmemo-donor-parity-v1.json` 与 `tests/deepmemo-donor-parity-fixture.test.js`，锁住 payload shape、blocked keyword meta、advanced syntax payload 和 ranking snapshot；state reconciliation 已确认 commit `4251a27` 位于本地 HEAD、local `origin/main` 与 remote `refs/heads/main`。
-49. P14.2 state reconciliation：校准 STATUS / backlog / board 的 P14.2 远端状态；当前 P14.3 untracked files 存在但本阶段不继续。
-50. 下一步建议：等待用户明确是否恢复 P14.3 TopicMemo targeted parity fixtures；仍不得改 runtime，先补 fixture/test 证据。
-51. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+49. P14.2 state reconciliation：校准 STATUS / backlog / board 的 P14.2 远端状态；commit `829817c` 已推送到 `origin/main`。
+50. `P14.3`：TopicMemo targeted parity fixtures 已新增 `tests/fixtures/topicmemo-donor-parity-v1.json` 与 `tests/topicmemo-donor-parity-fixture.test.js`，锁住 ListTopics / GetTopicContent payload shape、missing topic/history error envelope、agentId alias boundary 和 locked-topic display。
+51. 下一步建议：P14.4 error/meta parity tests；仍不得改 runtime，先补共享 error envelope / `meta` placement fixture/test 证据。
+52. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

@@ -107,7 +107,8 @@ P14 should proceed in small phases:
    - Completed by `tests/fixtures/deepmemo-donor-parity-v1.json` and `tests/deepmemo-donor-parity-fixture.test.js`.
    - Locks DeepMemo payload shape, blocked keyword meta placement, advanced syntax payload stability, and three-window ranking order without runtime changes.
 3. `P14.3-TopicMemo-targeted-parity-fixtures`
-   - Add TopicMemo fixture cases for topic listing, topic content, missing topic/history, and agent alias boundaries.
+   - Completed by `tests/fixtures/topicmemo-donor-parity-v1.json` and `tests/topicmemo-donor-parity-fixture.test.js`.
+   - Locks TopicMemo ListTopics payload shape, GetTopicContent payload shape, missing topic/history error envelope placement, agentId alias boundaries, and locked-topic display without runtime changes.
 4. `P14.4-error-meta-parity-tests`
    - Lock error envelope and `meta` placement behavior.
 5. `P14.5-ranking-tie-breaker-parity-tests`
@@ -133,6 +134,6 @@ No runtime behavior changes should happen until fixture and gate evidence exists
 
 ## Next Recommended Phase
 
-`P14.3-TopicMemo-targeted-parity-fixtures`
+`P14.4-error-meta-parity-tests`
 
-P14.3 may add TopicMemo-targeted fixture/test coverage. It should not alter runtime behavior unless a later phase explicitly approves implementation.
+P14.4 may consolidate shared error envelope and `meta` placement parity across DeepMemo and TopicMemo. It should not alter runtime behavior unless a later phase explicitly approves implementation.

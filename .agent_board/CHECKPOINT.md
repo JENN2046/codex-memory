@@ -2,65 +2,55 @@
 
 ## Current Goal
 
-P14.2-state-reconciliation: confirm whether P14.2 DeepMemo targeted parity fixtures are truly landed, pushed, or only documented early.
+P14.3-TopicMemo-targeted-parity-fixtures: add TopicMemo targeted fixture/test evidence without changing runtime behavior.
 
 ## Current Area
 
-P14-donor-compatibility / state reconciliation
+P14-donor-compatibility / TopicMemo fixtures
 
 ## Current Status
 
-P14.2 true state is reconciled:
+P14.2 state reconciliation has landed on `origin/main` as `829817c docs: reconcile p14 deepmemo parity state`.
 
-- local `HEAD`: `4251a27ef484c795e929c1d53a93365c78b72cce`
-- local `origin/main`: `4251a27ef484c795e929c1d53a93365c78b72cce`
-- remote `refs/heads/main`: `4251a27ef484c795e929c1d53a93365c78b72cce`
-- commit subject: `test: add p14 deepmemo parity fixtures`
-
-The current worktree is dirty because P14.3 TopicMemo untracked files exist:
-
-- `tests/fixtures/topicmemo-donor-parity-v1.json`
-- `tests/topicmemo-donor-parity-fixture.test.js`
-
-Those files are outside this reconciliation phase. P14.3 was not continued.
+P14.3 adds fixture/test evidence only. It does not change TopicMemo runtime behavior, DeepMemo behavior, passive memory query behavior, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
 
 ## Completed Work In This Batch
 
-- Ran the required P14.2 reconciliation checks.
-- Confirmed `tests/fixtures/deepmemo-donor-parity-v1.json` and `tests/deepmemo-donor-parity-fixture.test.js` are tracked files.
-- Confirmed P14.2 is already pushed to remote `main`.
-- Corrected board state that still described P14.2 as ready for commit/push.
+- Added `tests/fixtures/topicmemo-donor-parity-v1.json`.
+- Added `tests/topicmemo-donor-parity-fixture.test.js`.
+- Locked TopicMemo ListTopics compact success payload shape and locked-topic display.
+- Locked TopicMemo GetTopicContent compact success payload shape.
+- Locked missing topic and missing history error envelopes with donor-style `meta` placement.
+- Locked agentId alias selection without leaking the other agent topic list.
+- Verified the targeted test does not mutate active-memory fixture files by hashing relevant fixture files before and after CLI runs.
+- Updated P14 plan, fixture inventory, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
+- `tests/fixtures/topicmemo-donor-parity-v1.json`
+- `tests/topicmemo-donor-parity-fixture.test.js`
+- `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
+- `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `MAINTENANCE_BACKLOG.md`
+- `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
-- `STATUS.md`
-- `MAINTENANCE_BACKLOG.md`
 
 ## Validation Run
 
-- `git status -sb` showed `main...origin/main` plus two untracked P14.3 files.
-- `git log --oneline -10` showed `4251a27 test: add p14 deepmemo parity fixtures` at HEAD.
-- `git ls-files | findstr /i "deepmemo donor parity"` showed tracked DeepMemo parity files.
-- `git ls-files | findstr /i "deepmemo-donor"` showed `tests/deepmemo-donor-parity-fixture.test.js` and `tests/fixtures/deepmemo-donor-parity-v1.json`.
-- `git log --oneline --all --grep="DeepMemo"` returned no rows because the commit subject uses lowercase `deepmemo`.
-- `git log --oneline --all --grep="P14.2"` returned no rows.
-- `git log --oneline --all --grep="donor parity"` returned P14 planning/inventory commits.
-- `git rev-parse HEAD`, `git rev-parse origin/main`, and `git ls-remote origin refs/heads/main` all returned `4251a27ef484c795e929c1d53a93365c78b72cce`.
-- P14.2 historical validation from commit `4251a27`: targeted DeepMemo fixture `2/2`; DeepMemo compare `15/15 matched`; DeepMemo rollback `15/15 rollback-safe`; `npm test` `403/403`; diff/docs validation.
-
-## Reconciliation Validation
-
+- `node --test tests\topicmemo-donor-parity-fixture.test.js` passed `2/2`.
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category topic-navigation,topic-state,agent-selection --tool topicmemo --json --require-match` passed `13/13 matched`.
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category topic-navigation,topic-state,agent-selection --tool topicmemo --json --require-ready` passed `13/13 rollback-safe`.
+- `npm test` passed `405/405`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
 ## Validation Not Run
 
-- No new runtime tests for reconciliation.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
@@ -69,19 +59,19 @@ Those files are outside this reconciliation phase. P14.3 was not continued.
 - No donor runtime behavior change.
 - No real DB/memory write.
 - No real DB/diary write.
-- No P14.3 continuation.
+- No P15/P16/P17/V8/UI.
 
 ## Current Blockers
 
-- Worktree is not clean because P14.3 untracked files exist.
+- None currently.
 - Public MCP tool expansion remains blocked until explicit proposal approval.
 
 ## Remaining Risks
 
-- P14.3 untracked files must be either explicitly resumed later or otherwise handled by user direction.
+- Shared error/meta parity matrix remains for P14.4.
 - Passive memory query donor parity fixtures remain future work.
 - Runtime changes remain out of scope until fixture/gate evidence exists and a later phase explicitly approves implementation.
 
 ## Next Safe Action
 
-Inspect final reconciliation diff and decide whether to guarded-commit only the docs/board correction. No P14.2 push is needed because commit `4251a27` is already on remote `main`.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next phase is `P14.4-error-meta-parity-tests`.

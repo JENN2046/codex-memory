@@ -36,6 +36,7 @@
 - P14 donor behavior parity gate planning 已完成本地规划：新增 [docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md](/A:/codex-memory/docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md)，规划 DeepMemo / TopicMemo / passive query / compare-rollback / error envelope / meta placement / ranking tie-breaker 等 donor surfaces 的 standing gate；本阶段只做 docs/board planning，不改 runtime、不改 tests、不改 package、不改 MCP、不改 import/export 或 migration。
 - P14.1 donor parity fixture inventory 已完成本地规划：新增 [docs/DONOR_PARITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/DONOR_PARITY_FIXTURE_INVENTORY.md)，记录当前 standard suite 实测 `43` cases、DeepMemo `24`、TopicMemo `19`、success `24`、error `19`、`8` 个 category 和 `7` 个 fixture root，并列出 passive query、known intentional differences、object-model drift marker、error/meta matrix 等 gap；不改 runtime、不新增 tests/fixtures。
 - P14.2 DeepMemo targeted parity fixtures 已进入 `origin/main`：commit `4251a27 test: add p14 deepmemo parity fixtures` 新增 `tests/fixtures/deepmemo-donor-parity-v1.json` 与 `tests/deepmemo-donor-parity-fixture.test.js`，锁住 success payload shape、blocked keyword `meta` placement、advanced syntax payload stability、three-window ranking order snapshot，并验证 active-memory fixture 文件 hash 前后不变；不改 runtime、不改 MCP、不写真实 DB/memory。
+- P14.3 TopicMemo targeted parity fixtures 已完成本地验证：新增 `tests/fixtures/topicmemo-donor-parity-v1.json` 与 `tests/topicmemo-donor-parity-fixture.test.js`，锁住 ListTopics / GetTopicContent payload shape、missing topic/history error envelope、agentId alias boundary 和 locked-topic display，并验证 active-memory fixture 文件 hash 前后不变；不改 runtime、不改 MCP、不写真实 DB/memory。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -108,6 +109,7 @@
 - P14 donor behavior parity gate planning：新增 donor parity standing gate 规划，后续先做 `P14.1-donor-parity-fixture-inventory`，不直接改 DeepMemo / TopicMemo / passive query runtime。
 - P14.1 donor parity fixture inventory：新增当前 suite 覆盖盘点，下一步建议 `P14.2-DeepMemo-targeted-parity-fixtures`。
 - P14.2 DeepMemo targeted parity fixtures：新增 targeted fixture/test 证据并已进入 `origin/main` at `4251a27`；P14.2 state reconciliation 已确认本地 HEAD、local `origin/main`、remote `refs/heads/main` 三者一致。
+- P14.3 TopicMemo targeted parity fixtures：新增 targeted fixture/test 证据，下一步建议 `P14.4-error-meta-parity-tests`。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
 - `gate:ci` 现在包含 `queries` fixture-only check，JSON 输出会暴露 `caseCount/assertedCount/passedCount/failedCount`。
