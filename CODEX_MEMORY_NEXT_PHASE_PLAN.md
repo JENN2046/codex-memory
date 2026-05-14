@@ -88,7 +88,14 @@
 - P14.4 error/meta parity tests 已新增 `tests/fixtures/donor-error-meta-parity-v1.json` 与 `tests/donor-error-meta-parity-fixture.test.js`，锁住 DeepMemo / TopicMemo 共享 error envelope、`meta` placement、full diagnostic success meta 和 known intentional differences allowlist。
 - P14.5 ranking/tie-breaker parity tests 已新增 `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json` 与 `tests/donor-ranking-tie-breaker-parity-fixture.test.js`，锁住当前 standard-suite 全部 `ordering` cases 的显式顺序快照。
 - P14.6 compare/rollback standing gate summary 已新增 [docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md)，记录 standard-suite compare `43/43 matched`、rollback `43/43 rollback-ready`、category matrix、targeted fixture evidence、边界和剩余风险。
-- 下一步建议：`P15-real-query-quality-gate-planning`。
+
+当前 P15 planning：
+
+- 入口：[docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md)
+- 目标：把 real query quality 从 donor parity 中拆出来，规划 fixture-first standing gate，覆盖 relevance、precision、scope/lifecycle/privacy safety、failure reporting 和 JSON report stability。
+- 当前基线：`real-query-suite` 与 `query:quality` fixture recall dry-run 均为 `8/8`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。
+- 边界：planning/docs/board only；不改 runtime，不新增 tests/fixtures，不调用 provider，不改 package，不改 MCP，不做 migration/import/export。
+- 下一步建议：`P15.1-real-query-quality-fixture-inventory`。
 
 ## 当前判断
 

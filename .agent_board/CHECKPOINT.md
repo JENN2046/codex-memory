@@ -2,32 +2,29 @@
 
 ## Current Goal
 
-P14.6-compare-rollback-standing-gate-summary: summarize donor parity standing gate evidence and readiness checks without changing runtime behavior.
+P15-real-query-quality-gate-planning: plan a fixture-first real query quality standing gate without changing runtime behavior.
 
 ## Current Area
 
-P14-donor-compatibility / standing gate summary
+P15-query-quality / planning
 
 ## Current Status
 
-P14.5 ranking/tie-breaker parity fixtures have landed on `origin/main` as `3afc9c7 test: add p14 ranking parity fixtures`.
+P14.6 donor parity standing gate summary has landed on `origin/main` as `aa6afe9 docs: summarize p14 donor parity gates`.
 
-P14.6 adds docs/board evidence only. It does not change DeepMemo runtime behavior, TopicMemo runtime behavior, passive memory query behavior, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
+P15 planning adds docs/board evidence only. It does not change query runtime behavior, provider configuration, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
 
 ## Completed Work In This Batch
 
-- Added `docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md`.
-- Recorded standard-suite compare `43/43 matched`.
-- Recorded standard-suite rollback `43/43 rollback-ready`.
-- Summarized P14.1-P14.5 targeted fixture evidence.
-- Documented category matrix, boundary confirmations, remaining risks, and next P15 planning boundary.
-- Updated P14 plan, fixture inventory, next phase plan, backlog, status, and board pointers.
+- Added `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`.
+- Recorded current fixture-only query baseline for `real-query-suite` and `query:quality`.
+- Planned P15 gate categories for relevance, precision, scope/lifecycle/privacy safety, report stability, and provider isolation.
+- Documented future P15.1-P15.6 sequence and non-goals.
+- Updated next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
-- `docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md`
-- `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
-- `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`
+- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -39,20 +36,19 @@ P14.6 adds docs/board evidence only. It does not change DeepMemo runtime behavio
 
 ## Validation Run
 
-- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match` passed `43/43 matched`.
-- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready` passed `43/43 rollback-ready`.
+- `npm run real-query-suite -- --json --fixture-recall-dry-run` passed with `caseCount=8`, `passedCount=8`, `failedCount=0`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
+- `npm run query:quality -- --json --dry-run --fixture-recall-dry-run` passed with `caseCount=8`, `passedCount=8`, `failedCount=0`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
 ## Validation Not Run
 
-- `npm test` not required for docs-only P14.6; latest P14.5 full suite passed `409/409`.
+- `npm test` not required for docs-only P15 planning; latest P14.5 full suite passed `409/409`.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
 - No import/export runtime.
-- No runtime mapper.
-- No donor runtime behavior change.
+- No query runtime behavior change.
 - No real DB/memory write.
 - No real DB/diary write.
 - No P16/P17/V8/UI.
@@ -60,14 +56,15 @@ P14.6 adds docs/board evidence only. It does not change DeepMemo runtime behavio
 ## Current Blockers
 
 - None currently.
+- Provider-backed query quality remains blocked until an explicit provider-call phase approves it.
 - Public MCP tool expansion remains blocked until explicit proposal approval.
 
 ## Remaining Risks
 
-- P15 real query quality is not proven by donor parity and must start as planning / fixture / gate design.
-- Passive memory query donor parity remains a later explicit planning target.
-- Runtime changes remain out of scope until fixture/gate evidence exists and a later phase explicitly approves implementation.
+- The current query suite is still fixture-only and small.
+- Fixture recall dry-run is not a proof of real provider retrieval quality.
+- Scope/lifecycle/privacy query quality gaps still require P15.1 inventory before any tests or runtime changes.
 
 ## Next Safe Action
 
-Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next phase after P14.6 is `P15-real-query-quality-gate-planning`.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next phase after P15 planning is `P15.1-real-query-quality-fixture-inventory`.

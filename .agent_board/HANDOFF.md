@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P14.6-compare-rollback-standing-gate-summary` in `A:\codex-memory`.
+Continue `P15-real-query-quality-gate-planning` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `3afc9c7`
+- Base: `origin/main` / `aa6afe9`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P14-donor-compatibility / standing gate summary
+P15-query-quality / planning
 
 ## Completed Before This Batch
 
@@ -24,20 +24,19 @@ P14-donor-compatibility / standing gate summary
 - P14.3 TopicMemo targeted parity fixtures landed as `3c7d51b`.
 - P14.4 error/meta parity fixtures landed as `d913b71`.
 - P14.5 ranking/tie-breaker parity fixtures landed as `3afc9c7`.
+- P14.6 donor parity standing gate summary landed as `aa6afe9`.
 - Decision after P12.6 remains: keep `validate_memory` internal-only and skip public `validate_memory` MCP proposal review.
 
 ## Completed In Current Batch
 
-- Added `docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md`.
-- Summarized standard-suite compare/rollback standing gate evidence.
-- Recorded P14 targeted fixture evidence and boundaries.
-- Updated P14 plan, inventory, next phase plan, backlog, status, and board state.
+- Added `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`.
+- Summarized current fixture-only query baseline.
+- Planned P15 quality gate categories, safety rules, future sequence, and non-goals.
+- Updated next phase plan, backlog, status, and board state.
 
 ## Changed Files
 
-- `docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md`
-- `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
-- `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`
+- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -45,8 +44,8 @@ P14-donor-compatibility / standing gate summary
 
 ## Validation
 
-- Standard-suite compare gate passed `43/43 matched`.
-- Standard-suite rollback gate passed `43/43 rollback-ready`.
+- `real-query-suite` fixture recall dry-run passed `8/8`, `mutated=false`, `providerCalls=0`.
+- `query:quality` fixture recall dry-run passed `8/8`, `mutated=false`, `providerCalls=0`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -59,7 +58,7 @@ P14-donor-compatibility / standing gate summary
 
 ## Audit / Recall Impact
 
-- P14.6 ran fixture-backed compare/rollback standing gates.
+- P15 planning ran fixture-only query quality commands.
 - Runtime recall behavior is unchanged.
 - Audit write paths are unchanged.
 
@@ -68,10 +67,10 @@ P14-donor-compatibility / standing gate summary
 - No public MCP `validate_memory`.
 - No MCP schema change.
 - No `src/` changes.
+- No tests or fixtures added.
 - No package or lockfile changes.
-- No DeepMemo runtime behavior change.
-- No TopicMemo runtime behavior change.
-- No passive memory query behavior change.
+- No query runtime behavior change.
+- No provider smoke / benchmark.
 - No SQLite migration or automatic `ALTER TABLE`.
 - No import/export CLI.
 - No import/export file generation.
@@ -81,7 +80,6 @@ P14-donor-compatibility / standing gate summary
 - No P16/P17/V8/UI.
 - No hard delete.
 - No real DB/memory write.
-- No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No other mutation tools.
 
@@ -89,8 +87,9 @@ P14-donor-compatibility / standing gate summary
 
 - Public MCP tool expansion remains explicitly approval-gated.
 - Real migration remains separately approval-gated.
-- P15 real query quality must start as planning / fixture / gate design and must not infer quality from donor parity alone.
+- Provider-backed query quality remains out of scope until explicitly approved.
+- P15.1 should inventory fixture coverage and gaps before adding tests or changing runtime behavior.
 
 ## Next Safe Step
 
-Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next recommended phase is `P15-real-query-quality-gate-planning`.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next recommended phase is `P15.1-real-query-quality-fixture-inventory`.
