@@ -2,21 +2,21 @@
 
 ## Goal
 
-Resume after `P12.1-controlled-write-fixture-schemas` in `A:\codex-memory`.
+Resume after `P12.2-mutation-audit-shape-tests` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `e32a95b`
-- Local ahead commit: `6357aae docs: plan controlled write tools`
+- Base: `origin/main` / `bf98a9a`
+- Local ahead commit: none at startup
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-P12-controlled-write-tools / fixture-schemas
+P12-controlled-write-tools / audit-shape-tests
 
-## Completed In Current Batch
+## Completed Before This Batch
 
 - Added controlled write fixture `tests/fixtures/controlled-write-tools-v1.json`.
 - Added targeted schema test `tests/controlled-write-tools-fixture.test.js`.
@@ -25,10 +25,20 @@ P12-controlled-write-tools / fixture-schemas
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
 - No runtime mutation path was added.
 
+## Completed In Current Batch
+
+- Synced remote state before today and confirmed `main...origin/main`.
+- Verified startup worktree was clean before board prep.
+- Resolved stale board language that still described P12.1 as unpushed.
+- Marked CM-0074 / P12.2 as the active local task.
+- Added mutation audit shape fixture and targeted test.
+- Updated controlled write docs, backlog, status, and board.
+- Validation passed; final file-scope inspection remains before guarded local commit.
+
 ## Changed Files
 
-- `tests/fixtures/controlled-write-tools-v1.json`
-- `tests/controlled-write-tools-fixture.test.js`
+- `tests/fixtures/mutation-audit-shape-v1.json`
+- `tests/mutation-audit-shape.test.js`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -36,10 +46,10 @@ P12-controlled-write-tools / fixture-schemas
 
 ## Validation
 
-- `node --test tests\controlled-write-tools-fixture.test.js`：passed `13/13`
-- `npm test`：passed `246/246`
-- `git diff --check`：passed
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
+- `node --test tests\mutation-audit-shape.test.js` passed `15/15`.
+- `npm test` passed `261/261`.
+- `git diff --check` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
 ## MCP Mode
 
@@ -68,7 +78,8 @@ P12-controlled-write-tools / fixture-schemas
 
 - P12.2 should test mutation audit shapes before any dry-run CLI prototype.
 - Future MCP tool expansion requires explicit approval and a separate proposal review.
+- Next recommended phase is `P12.3-controlled-write-dry-run-cli-prototypes`.
 
 ## Next Safe Step
 
-Prepare guarded local commit readiness; push remains separately authorized.
+After guarded local commit, continue to `P12.3-controlled-write-dry-run-cli-prototypes`; push requires explicit approval.

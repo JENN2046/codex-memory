@@ -1,0 +1,131 @@
+{
+  "schemaVersion": "mutation-audit-shape-v1",
+  "version": "v1",
+  "permitsRawSecretOutput": false,
+  "lowRiskAuditSummaryAllowsRawWorkspaceId": false,
+  "eventTypes": [
+    "memory_update",
+    "memory_supersede",
+    "memory_forget",
+    "memory_validate",
+    "memory_checkpoint",
+    "memory_handoff"
+  ],
+  "requiredFields": [
+    "event_id",
+    "memory_id",
+    "event_type",
+    "tool_name",
+    "actor_client_id",
+    "request_source",
+    "from_status",
+    "to_status",
+    "reason",
+    "evidence",
+    "created_at",
+    "reversible",
+    "diff_summary",
+    "previous_snapshot_ref",
+    "redaction_applied",
+    "lifecycle_policy_applied",
+    "scope_policy_applied"
+  ],
+  "eventRules": {
+    "memory_update": {
+      "tool_name": "update_memory",
+      "mutationEvent": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresRedactionApplied": true,
+      "requiresLifecyclePolicyApplied": true,
+      "requiresScopePolicyApplied": true,
+      "requiresDiffSummary": true,
+      "requiresPreviousSnapshotRef": true,
+      "noSilentOverwrite": true,
+      "permitsRawSecretOutput": false,
+      "lowRiskAuditSummaryAllowsRawWorkspaceId": false
+    },
+    "memory_supersede": {
+      "tool_name": "supersede_memory",
+      "mutationEvent": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresRedactionApplied": true,
+      "requiresLifecyclePolicyApplied": true,
+      "requiresScopePolicyApplied": true,
+      "requiresSupersedesMemoryId": true,
+      "requiresSupersededByMemoryId": true,
+      "bidirectionalReferenceFields": [
+        "supersedes_memory_id",
+        "superseded_by_memory_id"
+      ],
+      "allowedFromStatuses": [
+        "active",
+        "stale"
+      ],
+      "to_status": "superseded",
+      "permitsRawSecretOutput": false,
+      "lowRiskAuditSummaryAllowsRawWorkspaceId": false
+    },
+    "memory_forget": {
+      "tool_name": "forget_memory",
+      "mutationEvent": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresRedactionApplied": true,
+      "requiresLifecyclePolicyApplied": true,
+      "requiresScopePolicyApplied": true,
+      "defaultAction": "tombstone",
+      "hardDeleteAllowed": false,
+      "requiresTombstoneReason": true,
+      "to_status": "tombstoned",
+      "permitsRawSecretOutput": false,
+      "lowRiskAuditSummaryAllowsRawWorkspaceId": false
+    },
+    "memory_validate": {
+      "tool_name": "validate_memory",
+      "mutationEvent": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresRedactionApplied": true,
+      "requiresLifecyclePolicyApplied": true,
+      "requiresScopePolicyApplied": true,
+      "allowedTransitions": [
+        { "from": "proposal", "to": "active", "requiresEvidence": true },
+        { "from": "stale", "to": "active", "requiresEvidence": true }
+      ],
+      "forbiddenDefaultTransitions": [
+        { "from": "rejected", "to": "active" },
+        { "from": "tombstoned", "to": "active" }
+      ],
+      "permitsRawSecretOutput": false,
+      "lowRiskAuditSummaryAllowsRawWorkspaceId": false
+    },
+    "memory_checkpoint": {
+      "tool_name": "checkpoint_memory",
+      "mutationEvent": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresRedactionApplied": true,
+      "requiresLifecyclePolicyApplied": true,
+      "requiresScopePolicyApplied": true,
+      "requiresScopePolicy": true,
+      "mustPassSecretScanner": true,
+      "permitsRawSecretOutput": false,
+      "lowRiskAuditSummaryAllowsRawWorkspaceId": false
+    },
+    "memory_handoff": {
+      "tool_name": "handoff_memory",
+      "mutationEvent": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresRedactionApplied": true,
+      "requiresLifecyclePolicyApplied": true,
+      "requiresScopePolicyApplied": true,
+      "requiresScopePolicy": true,
+      "mustPassSecretScanner": true,
+      "permitsRawSecretOutput": false,
+      "lowRiskAuditSummaryAllowsRawWorkspaceId": false
+    }
+  }
+}

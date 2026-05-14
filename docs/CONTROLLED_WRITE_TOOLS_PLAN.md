@@ -70,6 +70,26 @@ The fixture records:
 - checkpoint/handoff candidates cannot bypass SecretScanner, ToolArgumentValidator, or lifecycle policy
 - no candidate permits raw secret output or raw `workspace_id` in low-risk summaries
 
+## P12.2 Mutation Audit Shape Tests
+
+P12.2 adds fixture-backed tests for the future mutation audit event shape:
+
+- Fixture: [mutation-audit-shape-v1.json](/A:/codex-memory/tests/fixtures/mutation-audit-shape-v1.json)
+- Test: [mutation-audit-shape.test.js](/A:/codex-memory/tests/mutation-audit-shape.test.js)
+
+This phase only locks fixture/test expectations for audit event shape. It does not implement runtime mutation, does not add MCP public tools, does not change MCP schema, does not write real memory, and does not perform SQLite migration.
+
+The fixture records:
+
+- event types: `memory_update`, `memory_supersede`, `memory_forget`, `memory_validate`, `memory_checkpoint`, `memory_handoff`
+- required audit fields, including actor, source, lifecycle status, reason/evidence, redaction, lifecycle policy, and scope policy flags
+- `memory_update` requires `diff_summary`, `previous_snapshot_ref`, and no silent overwrite
+- `memory_supersede` requires bidirectional references and only allows `active/stale -> superseded`
+- `memory_forget` defaults to tombstone and forbids hard delete
+- `memory_validate` allows `proposal/stale -> active` with evidence, while `rejected/tombstoned -> active` remains forbidden by default
+- `memory_checkpoint` and `memory_handoff` require evidence, scope policy, and SecretScanner boundaries
+- no event permits raw secret output or raw `workspace_id` in low-risk audit summaries
+
 ## First-Batch Boundary
 
 第一批不要全开。
@@ -251,7 +271,7 @@ Additional future gates before any durable mutation:
 - 本阶段不进入 P16 / P17 / V8 / UI。
 - 本阶段不做 release candidate。
 - 本阶段不改 `src/`。
-- 本阶段不改 `tests/`。
+- 除 P12.1 / P12.2 / P12.3 明确列出的 fixture / dry-run tests 外，本阶段不改无关 tests 或 runtime tests。
 - 本阶段不改 `package.json` 或 lockfile。
 - 本阶段不新增依赖。
 - 本阶段不 push / tag / release / deploy。

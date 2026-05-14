@@ -2,33 +2,32 @@
 
 ## Current Goal
 
-P12.1-controlled-write-fixture-schemas：把 P12 controlled write tool candidates 固化成 fixture-backed schema tests。
+P12.2-mutation-audit-shape-tests：在不实现 runtime mutation、不新增 MCP public tools、不写真实 DB 的前提下，先用 tests/docs 锁住 controlled write 候选的 mutation audit shape。
 
 ## Current Area
 
-P12-controlled-write-tools / fixture-schemas
+P12-controlled-write-tools / audit-shape-tests
 
 ## Current Status
 
-P12 planning 已完成并本地提交为 `6357aae`，当前分支 `main...origin/main [ahead 1]`。
+P12.2 tests/docs-only implementation completed locally. Current branch is `main`, base is `origin/main` / `bf98a9a`.
 
-本阶段只改 tests/fixtures、targeted fixture test、docs 和 board；不改 `src/`、`package.json` / lockfile，不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不写真实 DB / memory，不 push。
+This batch adds mutation audit shape fixture/tests and docs/board notes only. It does not modify `src/`, `package.json` / lockfile, `.env`, MCP schema/tool definitions, SQLite schema, durable DB/memory state, or provider configuration.
 
 ## Completed Work In This Batch
 
-- Added `tests/fixtures/controlled-write-tools-v1.json`.
-- Added `tests/controlled-write-tools-fixture.test.js`.
-- Locked candidate tools: update / supersede / forget / audit / validate / checkpoint / handoff.
-- Locked public tools frozen, dry-run-first, mutation default false, hard delete disabled.
-- Locked mutation-capable candidates requiring audit event, reason, and evidence.
-- Locked update no-silent-overwrite, supersede bidirectional links, forget tombstone-only, audit read-only, validate no default rejected/tombstoned revival.
-- Locked no raw secret output and no raw `workspace_id` in low-risk summaries.
-- Updated P12 plan, backlog, status, and board state.
+- Added `tests/fixtures/mutation-audit-shape-v1.json`.
+- Added `tests/mutation-audit-shape.test.js`.
+- Locked mutation audit event types: update / supersede / forget / validate / checkpoint / handoff.
+- Locked required audit fields, including reason/evidence, diff/previous snapshot, redaction, lifecycle policy, and scope policy flags.
+- Locked update/supersede/forget/validate/checkpoint/handoff event-specific audit boundaries.
+- Locked no raw secret output and no raw `workspace_id` in low-risk audit summaries.
+- Updated controlled write docs, maintenance backlog, status, and board state.
 
 ## Changed Files
 
-- `tests/fixtures/controlled-write-tools-v1.json`
-- `tests/controlled-write-tools-fixture.test.js`
+- `tests/fixtures/mutation-audit-shape-v1.json`
+- `tests/mutation-audit-shape.test.js`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -40,8 +39,8 @@ P12 planning 已完成并本地提交为 `6357aae`，当前分支 `main...origin
 
 ## Validation Run
 
-- `node --test tests\controlled-write-tools-fixture.test.js`：passed `13/13`
-- `npm test`：passed `246/246`
+- `node --test tests\mutation-audit-shape.test.js`：passed `15/15` after sandbox `spawn EPERM` rerun with approved escalation
+- `npm test`：passed `261/261` after sandbox `spawn EPERM` rerun with approved escalation
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -58,8 +57,10 @@ P12 planning 已完成并本地提交为 `6357aae`，当前分支 `main...origin
 
 ## Remaining Risks
 
-- P12.2 should remain mutation audit shape tests only before any dry-run CLI or runtime work.
+- P12.2 should remain mutation audit shape tests only before any dry-run CLI or runtime mutation.
+- Future MCP tool expansion requires explicit approval and a separate proposal review.
+- P12.3 will be higher risk because dry-run CLI prototypes may require new code; keep it non-mutating and stop before runtime MCP expansion.
 
 ## Next Safe Action
 
-Prepare guarded local commit readiness without push.
+After guarded local commit, continue to `P12.3-controlled-write-dry-run-cli-prototypes`; push requires explicit approval.

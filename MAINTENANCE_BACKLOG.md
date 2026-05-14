@@ -23,7 +23,7 @@
 
 ## 当前基线
 
-- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests、P11.4 / P11.5 / P11.6 / P11.7、P11.x stale branch quarantine、P11.8 lifecycle read-policy runtime flag implementation、P11.9 lifecycle policy gate-ci summary、P11.10 lifecycle read-policy observability/dashboard summary 均已进入 `origin/main`；P12 planning 已本地提交，P12.1 controlled write fixture schemas 已本地完成待提交
+- 当前 `main`：P10 memory policy runtime gate、roadmap source registration、P10.1 runtime gate docs / `gate:ci` policy preflight、P11 memory lifecycle core planning、P11.1 lifecycle fixture schema tests、P11.2 lifecycle SQLite dry-run planning、P11.3 lifecycle SQLite dry-run CLI fixture tests、P11.4 / P11.5 / P11.6 / P11.7、P11.x stale branch quarantine、P11.8 lifecycle read-policy runtime flag implementation、P11.9 lifecycle policy gate-ci summary、P11.10 lifecycle read-policy observability/dashboard summary、P12 planning、P12.1 controlled write fixture schemas 均已进入 `origin/main`；P12.2 mutation audit shape tests 当前为本地 tests/docs-only 工作
 - 长期路线图事实源：[docs/VCP_MEMORY_PARITY_ROADMAP.md](/A:/codex-memory/docs/VCP_MEMORY_PARITY_ROADMAP.md)
 - PR #2：已按 superseded 关闭，未合并；远端分支 `codex/p1-vcp-memory-core-100-roadmap` 保留用于追溯。Stale branch quarantine 记录：[docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md)。该分支不可整体 merge、不可 rebase、不可作为开发基线，只允许选择性文档 salvage。
 - gate:ci：compare `43/43`、rollback `43/43`、query assertions `8/8`、CI-safe tests `171/171`（fixture-only）；gate:mainline：health `200`、compare `43/43`、rollback `43/43`
@@ -89,8 +89,9 @@
 | P11.9-lifecycle-policy-gate-ci-summary | memory-governance / ci-gate | A1/A2 | done | Add fixture-only lifecycle read-policy summary to `gate:ci` | `node --test tests\gate-ci-cli.test.js`; `node --test tests\lifecycle-read-policy-runtime-fixture.test.js`; `npm run gate:ci`; `npm run gate:ci -- --json`; `npm test`; `git diff --check`; docs validation | CI-safe summary only; no runtime behavior change, no MCP tool expansion, no SQLite migration |
 | P11.10-lifecycle-read-policy-observability-dashboard-summary | observability / memory-governance | A1/A2 | done | Surface lifecycle read-policy summary in dashboard, observe:http, and governance report | `node --test tests\dashboard-cli.test.js`; `node --test tests\http-observe-cli.test.js`; `node --test tests\governance-report-cli.test.js`; dashboard/observe/governance JSON; `npm test`; `npm run gate:ci`; docs validation | Reporting only; no `search_memory` behavior change, no MCP tool expansion, no SQLite migration |
 | P11.x-stale-branch-quarantine-and-doc-salvage | docs-governance | A1 | done | Quarantine `codex/p1-vcp-memory-core-100-roadmap` as superseded stale reference branch and salvage only rewritten docs | `git diff --check`; docs validation; manual stale-branch boundary review | Docs/board only; no merge/rebase/cherry-pick; no `src/`, tests, or package changes |
-| P12-controlled-write-tools-planning | memory-governance | A2/A3 | done | Plan controlled write tool candidates and mutation boundaries without implementing runtime mutation | `git diff --check`; docs validation | Docs/board only; no MCP public tool expansion, no runtime mutation, no SQLite migration; local commit `6357aae` |
+| P12-controlled-write-tools-planning | memory-governance | A2/A3 | done | Plan controlled write tool candidates and mutation boundaries without implementing runtime mutation | `git diff --check`; docs validation | Docs/board only; no MCP public tool expansion, no runtime mutation, no SQLite migration; entered mainline before P12.1 |
 | P12.1-controlled-write-fixture-schemas | memory-governance | A1/A2 | done | Add controlled write fixture schemas before any runtime mutation | `node --test tests\controlled-write-tools-fixture.test.js`; `npm test`; `git diff --check`; docs validation | Fixture/schema phase only; no durable mutation and no MCP public tool expansion |
+| P12.2-mutation-audit-shape-tests | memory-governance | A1/A2 | done | Add mutation audit event shape fixture and tests before dry-run CLI or runtime mutation | `node --test tests\mutation-audit-shape.test.js`; `npm test`; `git diff --check`; docs validation | Fixture/test/docs only; no durable mutation, no MCP public tool expansion, no SQLite migration |
 
 ## 推荐执行顺序
 
@@ -118,9 +119,10 @@
 22. `P11.9`：已将 lifecycle policy summary 纳入 `gate:ci` 的 fixture-only 可见面，不依赖真实 HTTP MCP、不调用 provider、不写真实 memory。
 23. `P11.10`：已将 lifecycle read-policy summary 接入 dashboard / observe:http / governance report，继续保持只读 summary 边界。
 24. `P12`：controlled write tools planning 已本地提交，入口为 [docs/CONTROLLED_WRITE_TOOLS_PLAN.md](/A:/codex-memory/docs/CONTROLLED_WRITE_TOOLS_PLAN.md)；不实现 runtime mutation，不新增 MCP public tools，不做 SQLite migration。
-25. `P12.1`：controlled write fixture schemas 已本地完成，锁住候选工具 schema、mutation boundary、audit shape 和 dry-run-first 规则。
-26. 下一步建议：P12.2 mutation audit shape tests。
-27. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+25. `P12.1`：controlled write fixture schemas 已进入主线，锁住候选工具 schema、mutation boundary、audit shape 和 dry-run-first 规则。
+26. `P12.2`：mutation audit shape tests 已本地完成，锁住 update/supersede/forget/validate/checkpoint/handoff 的 audit event shape、policy flags、redaction boundary 和 raw workspace/secret 禁止规则。
+27. 下一步建议：P12.3 controlled write dry-run CLI prototypes。
+28. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
