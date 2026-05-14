@@ -14,7 +14,7 @@ A:\codex-memory
 
 ## Worktree
 
-P15.6 closeout commits are prepared locally; final readiness must be rerun on final HEAD before safe-push.
+Clean after P15.6 safe-push; exact post-push hash is verified in closeout.
 
 ## Current Area
 
@@ -22,13 +22,14 @@ P15 query quality closeout
 
 ## Findings
 
-- current main has local P15.6 closeout commits ahead of pre-push `origin/main`.
+- current main has P15.6 closeout docs/board changes safe-pushed to `origin/main`.
 - latest runtime safety baseline is `41a5630`.
 - P15.5 is complete; local `origin/main` was `17335c2` before the P15.6 closeout commits.
 - `.agent_board/RUN_STATE.md` previously carried stale P15.5 "create commit" state; Git reality superseded it.
 - `gate:ci` fixture recall dry-run standing signal remains `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
-- guarded local P15.6 closeout commit was created.
-- safe-push readiness before the board-only readiness note was ready: docs/board-only diff, clean worktree except ahead commit, remote main pre-push hash `17335c2d148df565411253e8b1bf5011e09ff1ba`.
+- guarded local P15.6 closeout commits were created and safe-pushed.
+- safe-push readiness passed: docs/board-only diff, clean worktree before push, remote main pre-push hash `17335c2d148df565411253e8b1bf5011e09ff1ba`.
+- post-push local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched.
 - `validate_memory` remains internal-only.
 - public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -47,7 +48,7 @@ P15 query quality closeout
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 - `Select-String -Path docs\P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md -Pattern '[ \t]$'` returned no matches.
 - `git diff --cached --check` passed before guarded commit.
-- Safe-push readiness checks passed before the board-only readiness note; rerun required on final HEAD before push.
+- Safe-push readiness checks passed and post-push verification matched.
 
 ## Not Done
 
@@ -62,8 +63,8 @@ P15 query quality closeout
 - No real memory read preview.
 - No provider smoke or provider benchmark.
 - No P16 implementation.
-- No push yet for this phase.
+- No tag, release, deploy, provider call, migration, import/export apply, or real memory preview.
 
 ## Next Safe Step
 
-Rerun readiness on final HEAD, safe-push if still ready, then verify hashes and clean worktree.
+Begin `P16-TagMemo-semantic-association-parity-planning` only. Do not start P16 runtime implementation, provider benchmark, V8, UI, migration/import-export apply, release candidate, tag, or deploy.
