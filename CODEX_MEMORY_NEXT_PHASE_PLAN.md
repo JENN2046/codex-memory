@@ -243,9 +243,19 @@
 
 - 入口：[docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md)
 - 目标：盘点 dashboard / `observe:http` / `governance:report` / `gate:ci` / `gate:mainline` 现有 review surface、schema tests、safety flags 和缺口。
-- 当前状态：P19.1 inventory 已起草，等待 docs validation、guarded commit 和 safe-push readiness。
-- 下一步建议：完成 P19.1 validation / guarded commit / safe-push 后进入 `P19.2-admin-review-surface-shape-tests`。
+- 当前状态：P19.1 inventory 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `4004fca6538fd47e2c6dd15836a512db62ff602a`。
+- 下一步建议：继续 `P19.2-admin-review-surface-shape-tests`。
 - 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile。
+
+当前 P19.2 shape tests：
+
+- 入口：[docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md](/A:/codex-memory/docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md)
+- Fixture：`tests/fixtures/admin-review-surface-v1.json`
+- Test：`tests/admin-review-surface-shape.test.js`
+- 目标：锁住 synthetic admin-review top-level/source/signal/safety/unavailable-source shape，并禁止 fake quality/provider claims、raw secrets 和 raw workspace identifiers。
+- 当前状态：P19.2 fixture/test/docs 已起草，等待 targeted test、full suite、diff/docs validation、guarded commit 和 safe-push readiness。
+- 下一步建议：完成 P19.2 validation / guarded commit / safe-push 后进入 `P19.3-admin-review-schema-snapshot-gate`。
+- 边界：fixture/test/docs/status/board only；不实现 UI、不改 `src/`、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile。
 
 ## 当前判断
 

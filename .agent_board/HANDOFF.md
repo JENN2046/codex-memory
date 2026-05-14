@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P19.1 observability/admin review surface inventory without changing runtime behavior.
+Run P19.2 admin review surface shape tests without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P19.1 inventory docs/status/board edits are local, validated, and uncommitted.
+P19.2 fixture/test/docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P19 observability/admin review surface inventory
+P19 admin review surface shape tests
 
 ## Findings
 
@@ -81,14 +81,18 @@ P19 observability/admin review surface inventory
 - P19 planning has added a read-only admin review surface plan.
 - P19 planning docs validation, guarded commit, safe-push, and post-push hash verification passed at `5571788e926f2842916eb791b91b709bce078fc2`.
 - P19.1 inventory has been drafted to capture existing dashboard / observe / governance / gate surfaces and gaps.
-- P19.1 inventory docs validation passed locally.
-- P19.2 should add synthetic admin-review surface shape tests before any runtime aggregation.
+- P19.1 inventory docs validation, guarded commit, safe-push, and post-push hash verification passed at `4004fca6538fd47e2c6dd15836a512db62ff602a`.
+- P19.2 has added synthetic admin-review fixture/test/docs to lock the combined shape before runtime aggregation.
+- P19.2 targeted test passed `5/5`; full suite passed `459/459`; diff/docs validation passed.
+- P19.3 should focus on targeted schema snapshot gate only after P19.2 validation and push.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md`
+- `tests/fixtures/admin-review-surface-v1.json`
+- `tests/admin-review-surface-shape.test.js`
+- `docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -96,6 +100,8 @@ P19 observability/admin review surface inventory
 
 ## Validation
 
+- `node --test tests\admin-review-surface-shape.test.js` -> `5/5`
+- `npm test` -> `459/459`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -115,4 +121,4 @@ P19 observability/admin review surface inventory
 
 ## Next Safe Step
 
-Run guarded commit, safe-push, and continue to `P19.2-admin-review-surface-shape-tests`.
+Run guarded commit, safe-push, and continue to `P19.3-admin-review-schema-snapshot-gate`.

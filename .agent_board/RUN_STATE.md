@@ -6,24 +6,24 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 tests/fixtures/docs |
-| Current task | CM-0133 / P19.1-observability-admin-review-surface-inventory |
-| Current area | P19 observability/admin review surface inventory |
-| Last local commit | P19 planning committed and safe-pushed at `5571788` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `5571788e926f2842916eb791b91b709bce078fc2` |
+| Current task | CM-0134 / P19.2-admin-review-surface-shape-tests |
+| Current area | P19 admin review surface shape tests |
+| Last local commit | P19.1 inventory committed and safe-pushed at `4004fca` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `4004fca6538fd47e2c6dd15836a512db62ff602a` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Started P19.1 observability/admin review surface inventory. |
-| Last validation | P19.1 inventory docs validation passed: `git diff --check`; docs validation. |
-| Worktree summary | P19.1 inventory docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, or unapproved mutation. |
+| Last action | Added P19.2 synthetic admin review surface fixture/test/docs. |
+| Last validation | P19.2 validation passed: targeted `5/5`; `npm test` `459/459`; diff/docs validation. |
+| Worktree summary | P19.2 fixture/test/docs/status/board edits only. No `src/`, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
 | P16 status | Planning through P16.x completed and pushed. |
 | P17 status | Planning through P17.x completed and pushed. |
 | P18 status | Planning through P18.x completed and pushed. |
-| P19 status | Planning completed and pushed; P19.1 inventory completed locally. |
+| P19 status | Planning and P19.1 inventory completed and pushed; P19.2 fixture/test/docs validated locally. |
 | Guarded auto-commit allowed | eligible after final scope review |
-| Safe-push readiness | pending guarded commit for P19.1 inventory |
-| Next planned action | Guarded commit, safe-push, then continue to P19.2 shape tests. |
+| Safe-push readiness | pending guarded commit for P19.2 |
+| Next planned action | Final diff/scope review, guarded commit, safe-push, then continue to P19.3 schema snapshot gate. |
 
 ## Notes
 
@@ -53,4 +53,5 @@
 - Decision: P18.x may close P18 as dry-run-safety-backed and blocked for apply; P19 may start planning/inventory only.
 - Decision: P19 planning defines read-only admin review surface boundaries only; no UI, provider call, real memory preview, MCP expansion, migration/import-export apply, package change, release, tag, or deploy.
 - Decision: P19.1 inventories existing review surfaces only; P19.2 may add synthetic shape fixtures before any runtime aggregation.
+- Decision: P19.2 locks synthetic admin-review shape only; no runtime aggregation, UI, provider, real memory preview, MCP expansion, or migration/import-export apply.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.

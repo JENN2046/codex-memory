@@ -1,0 +1,169 @@
+{
+  "schemaVersion": "admin-review-surface.v1",
+  "mode": "admin-review",
+  "generatedAt": "2026-05-15T00:00:00.000Z",
+  "destructive": false,
+  "mutated": false,
+  "providerCalls": 0,
+  "durableMemoryTouched": false,
+  "realMemoryPreview": false,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "sources": {
+    "dashboard": {
+      "command": "npm run dashboard -- --json",
+      "mode": "memory-dashboard",
+      "requiredSections": [
+        "summary",
+        "service",
+        "store",
+        "audits",
+        "governance",
+        "readPolicy",
+        "gate",
+        "checks",
+        "recommendations"
+      ]
+    },
+    "httpObserve": {
+      "command": "npm run observe:http -- --json",
+      "requiredSections": [
+        "summary",
+        "health",
+        "logs",
+        "audits",
+        "governance",
+        "readPolicy"
+      ]
+    },
+    "governanceReport": {
+      "command": "npm run governance:report -- --json",
+      "mode": "governance-report",
+      "requiredSections": [
+        "summary",
+        "review",
+        "readPolicy",
+        "scopeCoverage"
+      ]
+    },
+    "ciGate": {
+      "command": "npm run gate:ci -- --json",
+      "mode": "ci",
+      "fixtureOnly": true,
+      "requiredChecks": [
+        "compare",
+        "rollback",
+        "queries",
+        "policyPreflight",
+        "lifecyclePolicy",
+        "tests",
+        "docs"
+      ]
+    },
+    "mainlineGate": {
+      "command": "npm run gate:mainline",
+      "requiredSignals": [
+        "health",
+        "compare",
+        "rollback"
+      ]
+    }
+  },
+  "review": {
+    "status": "warn",
+    "level": "needs-review",
+    "signals": {
+      "service": {
+        "status": "ok",
+        "httpReachable": true,
+        "protocol": "streamable-http"
+      },
+      "store": {
+        "status": "ok",
+        "recordCountVisible": true,
+        "contentPreviewIncluded": false
+      },
+      "governance": {
+        "status": "warn",
+        "proposalCount": 2,
+        "tombstonedCount": 1,
+        "supersededCount": 1,
+        "stale30d": 3,
+        "stale90d": 1,
+        "hintsVisible": true
+      },
+      "audit": {
+        "status": "ok",
+        "writeAuditVisible": true,
+        "recallAuditVisible": true,
+        "rawPayloadIncluded": false
+      },
+      "lifecycle": {
+        "status": "ok",
+        "includedStatuses": [
+          "active",
+          "stale"
+        ],
+        "excludedStatuses": [
+          "proposal",
+          "rejected",
+          "superseded",
+          "tombstoned"
+        ],
+        "hiddenByLifecycleCountVisible": true
+      },
+      "scope": {
+        "status": "ok",
+        "scopeAppliedVisible": true,
+        "scopeWorkspacePresenceOnly": true,
+        "rawWorkspaceIdExposed": false
+      },
+      "importExportMigration": {
+        "status": "blocked",
+        "applyBlocked": true,
+        "migrationBlocked": true,
+        "backupRequired": true,
+        "rollbackRequired": true,
+        "a5ApprovalRequired": true
+      }
+    },
+    "hints": [
+      "Review governance proposals before any controlled write expansion.",
+      "Import/export apply remains blocked until a dedicated A5 approval packet exists.",
+      "Use fixture shape evidence before runtime aggregation."
+    ]
+  },
+  "unavailableSourceShape": {
+    "source": "governanceReport",
+    "status": "unavailable",
+    "reviewLevel": "unavailable",
+    "message": "Source unavailable; keep admin review read-only and avoid inferred mutation.",
+    "safeNextStep": "Inspect local configuration and rerun the read-only source command.",
+    "mutated": false,
+    "providerCalls": 0
+  },
+  "safety": {
+    "redactionApplied": true,
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false,
+    "authorizationHeaderExposed": false,
+    "cookieExposed": false,
+    "envValueExposed": false,
+    "mcpSchemaChanged": false,
+    "publicMcpExpanded": false,
+    "migrationApplied": false,
+    "importExportApplied": false,
+    "dependencyChanged": false,
+    "releaseAction": false
+  },
+  "forbiddenClaims": {
+    "qualityScorePresent": false,
+    "hitRatePresent": false,
+    "providerLatencyPresent": false,
+    "productionMemorySnippetPresent": false
+  },
+  "nextRecommendedPhase": "P19.3-admin-review-schema-snapshot-gate"
+}
