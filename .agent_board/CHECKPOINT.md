@@ -20,7 +20,8 @@ This batch adds a fixture-driven dry-run CLI, fixture, tests, npm script, and do
 - Added `src/cli/controlled-write-dry-run.js`.
 - Added `tests/controlled-write-dry-run-cli.test.js`.
 - Added `npm run controlled-write:dry-run`.
-- CLI reports `mutated=false`, `fixtureOnly=true`, `noDatabase=true`, `noDurableMemoryWrite=true`, `noMcpPublicToolExpansion=true`, and `publicToolsFrozen=true`.
+- CLI reports `mutated=false`, `fixtureOnly=true`, `noDatabase=true`, `noDiaryWrite=true`, `noVectorWrite=true`, `noAuditLogWrite=true`, `noDurableMemoryWrite=true`, `noMcpPublicToolExpansion=true`, and `publicToolsFrozen=true`.
+- CLI covers update/supersede/forget/validate/checkpoint/handoff and read-only `audit_memory`.
 - CLI rejects `--confirm`, `--apply`, `--write`, and `--mutate`.
 - CLI supports `--tool <candidate>` filtering and emits audit event previews.
 
@@ -41,10 +42,12 @@ This batch adds a fixture-driven dry-run CLI, fixture, tests, npm script, and do
 
 ## Validation Run
 
-- `node --test tests\controlled-write-dry-run-cli.test.js`：passed `7/7`
+- `node --test tests\controlled-write-dry-run-cli.test.js`：passed `9/9`
+- `node --test tests\controlled-write-tools-fixture.test.js`：passed `13/13`
+- `node --test tests\mutation-audit-shape.test.js`：passed `15/15`
 - `npm run controlled-write:dry-run -- --json`：passed
 - `npm run controlled-write:dry-run -- --json --tool forget_memory`：passed
-- `npm test`：passed `268/268`
+- `npm test`：passed `270/270`
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 

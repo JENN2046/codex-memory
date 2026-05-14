@@ -36,6 +36,7 @@ P12-controlled-write-tools / dry-run-cli
 - Added fixture-driven controlled write dry-run CLI prototype.
 - Added controlled write dry-run fixture and CLI tests.
 - Added `controlled-write:dry-run` npm script.
+- Added read-only `audit_memory` dry-run coverage and no diary/vector/audit-log write flags.
 - Targeted dry-run CLI tests and CLI JSON smoke passed.
 - Full P12.3 validation passed.
 
@@ -52,10 +53,12 @@ P12-controlled-write-tools / dry-run-cli
 
 ## Validation
 
-- `node --test tests\controlled-write-dry-run-cli.test.js` passed `7/7`.
+- `node --test tests\controlled-write-dry-run-cli.test.js` passed `9/9`.
+- `node --test tests\controlled-write-tools-fixture.test.js` passed `13/13`.
+- `node --test tests\mutation-audit-shape.test.js` passed `15/15`.
 - `npm run controlled-write:dry-run -- --json` passed.
 - `npm run controlled-write:dry-run -- --json --tool forget_memory` passed.
-- `npm test` passed `268/268`.
+- `npm test` passed `270/270`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 

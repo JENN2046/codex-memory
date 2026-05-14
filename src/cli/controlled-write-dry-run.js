@@ -71,25 +71,55 @@ function buildAuditPreview(operation, requiredFields) {
 }
 
 function buildOperationPlan(operation, fixture) {
+  const requiresAuditEvent = operation.requiresAuditEvent !== false;
+  const allowedTransitions = operation.allowedLifecycleTransitions || [];
+  const forbiddenActions = operation.forbiddenActions || [];
+
   return {
+    operation: operation.eventType,
+    toolCandidate: operation.toolName,
+    dryRun: true,
+    mutated: false,
     toolName: operation.toolName,
     eventType: operation.eventType,
     riskLevel: operation.riskLevel,
     mutationCapable: operation.mutationCapable,
     wouldMutate: false,
+    wouldRequireAuditEvent: requiresAuditEvent,
+    wouldRequireReason: operation.requiresReason === true,
+    wouldRequireEvidence: operation.requiresEvidence === true,
+    wouldRequirePreviousSnapshot: operation.requiresPreviousSnapshotRef === true,
+    wouldRequireDiffSummary: operation.requiresDiffSummary === true,
+    wouldRequireLifecycleTransition: allowedTransitions.length > 0,
+    wouldRequireScopePolicy: operation.requiresScopePolicy === true,
+    redactionRequired: true,
+    allowedTransitions,
+    forbiddenActions,
+    nextStep: operation.readOnly === true
+      ? 'Review scoped audit output only; no mutation path is available.'
+      : 'Review dry-run output and require explicit approval before any future mutation.',
     requiresExplicitApproval: operation.requiresExplicitApproval === true,
     requiresDryRunFirst: operation.requiresDryRunFirst === true,
     requiresReason: operation.requiresReason === true,
     requiresEvidence: operation.requiresEvidence === true,
-    allowedLifecycleTransitions: operation.allowedLifecycleTransitions || [],
+    noSilentOverwrite: operation.noSilentOverwrite === true,
+    requiresBidirectionalLinks: operation.requiresBidirectionalLinks === true,
+    defaultAction: operation.defaultAction || null,
+    hardDeleteAllowed: operation.hardDeleteAllowed === true,
+    readOnly: operation.readOnly === true,
+    allowedLifecycleTransitions: allowedTransitions,
     forbiddenLifecycleTransitions: operation.forbiddenLifecycleTransitions || [],
-    forbiddenActions: operation.forbiddenActions || [],
+    forbiddenActions,
     requiredAuditFields: fixture.requiredAuditFields,
-    auditEventPreview: buildAuditPreview(operation, fixture.requiredAuditFields),
+    auditEventPreview: requiresAuditEvent ? buildAuditPreview(operation, fixture.requiredAuditFields) : null,
     safety: {
       fixtureOnly: fixture.fixtureOnly === true,
+      dryRun: true,
       mutated: false,
       noDatabase: fixture.noDatabase === true,
+      noDiaryWrite: fixture.noDiaryWrite === true,
+      noVectorWrite: fixture.noVectorWrite === true,
+      noAuditLogWrite: fixture.noAuditLogWrite === true,
       noDurableMemoryWrite: fixture.noDurableMemoryWrite === true,
       noMcpPublicToolExpansion: fixture.noMcpPublicToolExpansion === true,
       publicToolsFrozen: fixture.publicToolsFrozen === true,
@@ -137,6 +167,9 @@ function buildReport({ fixture, toolName = null, rejectedFlag = null } = {}) {
     mutated: false,
     fixtureOnly: fixture.fixtureOnly === true,
     noDatabase: fixture.noDatabase === true,
+    noDiaryWrite: fixture.noDiaryWrite === true,
+    noVectorWrite: fixture.noVectorWrite === true,
+    noAuditLogWrite: fixture.noAuditLogWrite === true,
     noDurableMemoryWrite: fixture.noDurableMemoryWrite === true,
     noMcpPublicToolExpansion: fixture.noMcpPublicToolExpansion === true,
     publicToolsFrozen: fixture.publicToolsFrozen === true,
@@ -164,13 +197,16 @@ function renderText(report) {
   }
 
   lines.push(`noDatabase: ${report.noDatabase}`);
+  lines.push(`noDiaryWrite: ${report.noDiaryWrite}`);
+  lines.push(`noVectorWrite: ${report.noVectorWrite}`);
+  lines.push(`noAuditLogWrite: ${report.noAuditLogWrite}`);
   lines.push(`noDurableMemoryWrite: ${report.noDurableMemoryWrite}`);
   lines.push(`noMcpPublicToolExpansion: ${report.noMcpPublicToolExpansion}`);
   lines.push(`publicToolsFrozen: ${report.publicToolsFrozen}`);
   lines.push(`operationCount: ${report.operationCount}`);
   for (const operation of report.operations) {
     lines.push(
-      `operation: ${operation.toolName} eventType=${operation.eventType} wouldMutate=${operation.wouldMutate} risk=${operation.riskLevel}`
+      `operation: ${operation.toolCandidate} eventType=${operation.operation} dryRun=${operation.dryRun} mutated=${operation.mutated} risk=${operation.riskLevel}`
     );
   }
   lines.push(`nextStep: ${report.nextStep}`);

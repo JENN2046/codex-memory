@@ -103,14 +103,35 @@ This phase still does not implement runtime mutation, does not add MCP public to
 
 The dry-run output records:
 
+- `status`
+- `operation`
+- `toolCandidate`
+- `dryRun=true`
 - `mutated=false`
 - `fixtureOnly=true`
 - `noDatabase=true`
+- `noDiaryWrite=true`
+- `noVectorWrite=true`
+- `noAuditLogWrite=true`
 - `noDurableMemoryWrite=true`
 - `noMcpPublicToolExpansion=true`
 - `publicToolsFrozen=true`
+- `wouldRequireAuditEvent`
+- `wouldRequireReason`
+- `wouldRequireEvidence`
+- `wouldRequirePreviousSnapshot`
+- `wouldRequireDiffSummary`
+- `wouldRequireLifecycleTransition`
+- `wouldRequireScopePolicy`
+- `redactionRequired`
+- `allowedTransitions`
+- `forbiddenActions`
+- `riskLevel`
+- `nextStep`
 - selected operation plans and audit event previews
 - rejected `--confirm` / `--apply` / `--write` / `--mutate` flags
+
+Supported dry-run candidates are `update_memory`, `supersede_memory`, `forget_memory`, `validate_memory`, `checkpoint_memory`, `handoff_memory`, and read-only `audit_memory`.
 
 The CLI can filter a candidate with `--tool <candidate>`, for example:
 
@@ -300,8 +321,8 @@ Additional future gates before any durable mutation:
 - 本阶段不实现 DreamWorker。
 - 本阶段不进入 P16 / P17 / V8 / UI。
 - 本阶段不做 release candidate。
-- 本阶段不改 `src/`。
+- 本阶段除 `src/cli/controlled-write-dry-run.js` 外不改 `src/`。
 - 除 P12.1 / P12.2 / P12.3 明确列出的 fixture / dry-run tests 外，本阶段不改无关 tests 或 runtime tests。
-- 本阶段不改 `package.json` 或 lockfile。
+- 本阶段除新增 `controlled-write:dry-run` npm script 外不改 `package.json` 或 lockfile。
 - 本阶段不新增依赖。
 - 本阶段不 push / tag / release / deploy。
