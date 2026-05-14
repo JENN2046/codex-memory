@@ -392,8 +392,8 @@ P13 does not migrate data. The planned sequence is:
    - Add fixture tests for SQLite/diary mapping preview behavior.
    - Completed as fixture-only tests; no real data scan.
 5. `P13.5-SQLite-diary-mapping-dry-run-CLI`
-   - Add a read-only dry-run CLI only after mapping fixture tests exist.
-   - Must reject apply/write/confirm migration flags.
+   - Completed as a fixture-safe read-only dry-run CLI after mapping fixture tests.
+   - Rejects apply/confirm/migrate flags.
 6. `P13.6-import-export-safe-json-shape-tests`
    - Define import/export-safe JSON shape and redaction expectations.
    - Fixture-only tests first.
@@ -517,6 +517,28 @@ This remains a fixture/test phase only:
 - no SQLite migration or `ALTER TABLE`
 - no real DB read, diary read, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
 
+## P13.5 SQLite / Diary Mapping Dry-Run CLI
+
+P13.5 adds the first local dry-run report surface for VCP object-model mapping:
+
+- CLI: `src/cli/vcp-memory-object-mapping-dry-run.js`
+- fixture: `tests/fixtures/vcp-memory-object-mapping-dry-run-v1.json`
+- test: `tests/vcp-memory-object-mapping-dry-run-cli.test.js`
+- script: `npm run vcp-memory:mapping:dry-run -- --json`
+
+The CLI runs in fixture mode by default. It reports `mutated=false`, rejects `--confirm`, `--apply`, and `--migrate`, and does not read the real SQLite DB or real diary.
+
+The report includes scanned/mapped/unmapped counts, missing required/optional/unknown field counts, lifecycle/scope/audit/chunk/tag coverage, import/export safety count, risk level, rollback requirement, and next step. Low-risk summaries do not expose raw `workspace_id`, and raw secret sentinels are not emitted.
+
+This remains a dry-run reporting phase only:
+
+- no runtime mapper
+- no import/export implementation or file generation
+- no MCP public tool expansion
+- no MCP schema change
+- no SQLite migration or `ALTER TABLE`
+- no real DB read, diary read, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
+
 ## Risk Register
 
 | Risk | Why It Matters | P13 Mitigation |
@@ -574,6 +596,18 @@ git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
+P13.5 validation:
+
+```powershell
+node --test tests\vcp-memory-object-mapping-dry-run-cli.test.js
+node --test tests\vcp-memory-object-mapping-fixture.test.js
+node --test tests\vcp-memory-object-round-trip.test.js
+npm run vcp-memory:mapping:dry-run -- --json
+npm test
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
 P13 planning validation was docs-only:
 
 ```powershell
@@ -596,6 +630,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.5-SQLite-diary-mapping-dry-run-CLI`
+`P13.6-import-export-safe-JSON-shape-tests`
 
-P13.5 may add a read-only SQLite / diary mapping dry-run CLI only after P13.4 fixture tests pass. It must not write SQLite, rewrite diary, generate import/export files, implement a runtime mapper, or perform migration.
+P13.6 should add fixture-only import/export-safe JSON shape tests. It must not implement an import/export CLI, generate files, read/write real memory, rewrite diary, mutate SQLite, or perform migration.

@@ -106,7 +106,8 @@
 | P13.2-object-model-round-trip-fixture-tests | memory-governance / object-model | A1/A2 | done | Add fixture-only round-trip tests for object envelopes | `node --test tests\vcp-memory-object-round-trip.test.js`; `node --test tests\vcp-memory-object-model-fixture.test.js`; `npm test`; diff/docs validation | Fixture/test/docs only; no runtime, import/export implementation, or migration |
 | P13.3-SQLite-diary-mapping-dry-run-planning | memory-governance / object-model | A1/A2 | done | Plan SQLite/diary mapping dry-run report before any mapper or migration | `git diff --check`; docs validation | Docs/board planning only; no SQLite migration, `ALTER TABLE`, import/export runtime, runtime mapper, tests, or real DB/memory write |
 | P13.4-object-mapping-fixture-tests | memory-governance / object-model | A1/A2 | done | Add fixture tests for SQLite/diary object mapping preview behavior | `node --test tests\vcp-memory-object-mapping-fixture.test.js`; object model and round-trip regressions; `npm test`; diff/docs validation | Fixture/test/docs only; no real data scan, runtime mapper, import/export runtime, or migration |
-| P13.5-SQLite-diary-mapping-dry-run-CLI | memory-governance / object-model | A2 | todo | Add read-only SQLite/diary mapping dry-run CLI after fixture tests | future dry-run CLI tests; object mapping fixture tests; `npm test`; diff/docs validation | Must report `mutated=false`; no SQLite write, diary rewrite, import/export runtime, runtime mapper, real migration, or MCP expansion |
+| P13.5-SQLite-diary-mapping-dry-run-CLI | memory-governance / object-model | A2 | done | Add read-only SQLite/diary mapping dry-run CLI after fixture tests | `node --test tests\vcp-memory-object-mapping-dry-run-cli.test.js`; mapping and round-trip regressions; CLI JSON smoke; `npm test`; diff/docs validation | Reports `mutated=false`; fixture mode only; no SQLite write, diary rewrite, import/export runtime, runtime mapper, real migration, or MCP expansion |
+| P13.6-import-export-safe-JSON-shape-tests | memory-governance / object-model | A1/A2 | todo | Add fixture-only tests for import/export-safe JSON envelope shape | future import/export shape tests; object-model regressions; `npm test`; diff/docs validation | No `src/`, package change, import/export CLI, file generation, real memory import/export, DB/diary write, migration, or MCP expansion |
 
 ## 推荐执行顺序
 
@@ -151,8 +152,9 @@
 39. `P13.2`：object model round-trip fixture tests 已新增 `tests/fixtures/vcp-memory-object-round-trip-v1.json` 与 `tests/vcp-memory-object-round-trip.test.js`，证明 source fixture -> normalized object -> export-safe JSON -> reloaded object 不丢失 identity/scope/lifecycle/audit/provenance/privacy/import-export boundaries。
 40. `P13.3`：SQLite/diary mapping dry-run planning 已新增 [docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md](/A:/codex-memory/docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md)，规划未来只读 mapping preview、missing field report、risk report 和 rollback story。
 41. `P13.4`：object mapping fixture tests 已新增 `tests/fixtures/vcp-memory-object-mapping-v1.json` 与 `tests/vcp-memory-object-mapping-fixture.test.js`，验证 synthetic SQLite / diary / audit / chunk / tag metadata 可以形成 mapping preview，并锁住 missing field policy、low-risk workspace summary、proposal/tombstone defaults、raw secret 禁止、`mutated=false` 和 no-side-effect。
-42. 下一步建议：P13.5 SQLite / diary mapping dry-run CLI。
-43. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+42. `P13.5`：SQLite / diary mapping dry-run CLI 已新增 `src/cli/vcp-memory-object-mapping-dry-run.js`、fixture、CLI test 和 `vcp-memory:mapping:dry-run` npm script；默认 fixture mode，`mutated=false`，拒绝 `--confirm/--apply/--migrate`，不读取真实 DB/diary，不生成 import/export 文件。
+43. 下一步建议：P13.6 import/export-safe JSON shape fixture tests。
+44. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

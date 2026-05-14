@@ -53,6 +53,7 @@
     "scope:acceptance": "node ./src/cli/scope-acceptance.js",
     "scope:backfill:dry-run": "node ./src/cli/scope-backfill-dry-run.js",
     "lifecycle:sqlite:dry-run": "node ./src/cli/lifecycle-sqlite-dry-run.js",
+    "vcp-memory:mapping:dry-run": "node ./src/cli/vcp-memory-object-mapping-dry-run.js",
     "controlled-write:dry-run": "node ./src/cli/controlled-write-dry-run.js",
     "validate-memory": "node ./src/cli/validate-memory.js",
     "real-query-suite": "node ./src/cli/real-query-suite.js",

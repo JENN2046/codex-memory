@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "vcp-memory-object-mapping-dry-run-v1",
+  "phase": "P13.5-SQLite-diary-mapping-dry-run-CLI",
+  "fixtureOnly": true,
+  "mutated": false,
+  "sourceMode": "fixture",
+  "trueDatabaseRead": false,
+  "trueDiaryRead": false,
+  "noSQLiteWrite": true,
+  "noDiaryWrite": true,
+  "noAuditLogWrite": true,
+  "noVectorWrite": true,
+  "noChunkWrite": true,
+  "noImportExportFileGeneration": true,
+  "noMigration": true,
+  "noMcpPublicToolExpansion": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "records": [
+    {
+      "case_id": "mapped-complete-record",
+      "sourceKind": "sqlite+diary+audit+chunk+tag-fixture",
+      "sqliteRecord": {
+        "memory_id": "mem-p13-dry-001",
+        "title": "P13.5 mapped fixture memory",
+        "content": "Synthetic SQLite content for dry-run mapping preview.",
+        "project_id": "JENN2046/codex-memory",
+        "workspace_id": "workspace-p13-dry-raw",
+        "client_id": "codex",
+        "visibility": "project",
+        "lifecycle_status": "active",
+        "created_at": "2026-05-14T01:00:00.000Z",
+        "updated_at": "2026-05-14T01:05:00.000Z"
+      },
+      "diaryRecord": {
+        "title": "P13.5 mapped diary fixture",
+        "content": "Synthetic diary content with fixture-dry-run-secret-should-not-emit sentinel.",
+        "evidence": "Fixture evidence for mapping dry-run.",
+        "tags": [
+          "p13",
+          "mapping-dry-run"
+        ],
+        "created_at": "2026-05-14T01:01:00.000Z",
+        "source_path": "fixture://diary/2026-05-14/p13-mapping-dry-run.md",
+        "relative_path": "diary/2026-05-14/p13-mapping-dry-run.md"
+      },
+      "auditLogs": [
+        {
+          "event_id": "audit-p13-dry-001",
+          "memory_id": "mem-p13-dry-001",
+          "event_type": "record_memory",
+          "created_at": "2026-05-14T01:02:00.000Z",
+          "redaction_applied": true,
+          "scope_policy_applied": true,
+          "lifecycle_policy_applied": true
+        }
+      ],
+      "chunkMetadata": [
+        {
+          "chunk_id": "chunk-p13-dry-001",
+          "memory_id": "mem-p13-dry-001",
+          "chunk_hash": "fixture-chunk-hash-p13-dry-001",
+          "kind": "memo",
+          "created_at": "2026-05-14T01:03:00.000Z"
+        }
+      ],
+      "tagMetadata": [
+        {
+          "tag_id": "tag-p13-dry-001",
+          "tag": "mapping-dry-run",
+          "memory_id": "mem-p13-dry-001",
+          "weight": 0.9
+        }
+      ]
+    },
+    {
+      "case_id": "unmapped-missing-required",
+      "sourceKind": "sqlite+diary-fixture",
+      "sqliteRecord": {
+        "title": "P13.5 missing required memory id",
+        "content": "Synthetic content with memory_id intentionally omitted.",
+        "project_id": "JENN2046/codex-memory",
+        "workspace_id": "workspace-p13-dry-raw",
+        "client_id": "codex",
+        "visibility": "project",
+        "lifecycle_status": "active",
+        "created_at": "2026-05-14T01:10:00.000Z",
+        "updated_at": "2026-05-14T01:15:00.000Z"
+      },
+      "diaryRecord": {
+        "title": "P13.5 missing required diary fixture",
+        "content": "Synthetic diary content for missing-required report.",
+        "evidence": "Fixture evidence for missing-required report.",
+        "tags": [
+          "p13",
+          "missing-required"
+        ],
+        "created_at": "2026-05-14T01:11:00.000Z",
+        "source_path": "fixture://diary/2026-05-14/p13-missing-required.md",
+        "relative_path": "diary/2026-05-14/p13-missing-required.md"
+      },
+      "auditLogs": [],
+      "chunkMetadata": [],
+      "tagMetadata": []
+    },
+    {
+      "case_id": "mapped-unknown-lifecycle",
+      "sourceKind": "sqlite+diary+audit-fixture",
+      "sqliteRecord": {
+        "memory_id": "mem-p13-dry-unknown-lifecycle",
+        "title": "P13.5 unknown lifecycle fixture memory",
+        "content": "Synthetic SQLite content with lifecycle omitted.",
+        "project_id": "JENN2046/codex-memory",
+        "workspace_id": "workspace-p13-dry-raw",
+        "client_id": "codex",
+        "visibility": "project",
+        "created_at": "2026-05-14T01:20:00.000Z",
+        "updated_at": "2026-05-14T01:25:00.000Z"
+      },
+      "diaryRecord": {
+        "title": "P13.5 unknown lifecycle diary fixture",
+        "content": "Synthetic diary content for lifecycle unknown report.",
+        "evidence": "Fixture evidence for lifecycle unknown report.",
+        "tags": [
+          "p13",
+          "unknown-lifecycle"
+        ],
+        "created_at": "2026-05-14T01:21:00.000Z",
+        "source_path": "fixture://diary/2026-05-14/p13-unknown-lifecycle.md",
+        "relative_path": "diary/2026-05-14/p13-unknown-lifecycle.md"
+      },
+      "auditLogs": [
+        {
+          "event_id": "audit-p13-dry-unknown-lifecycle",
+          "memory_id": "mem-p13-dry-unknown-lifecycle",
+          "event_type": "record_memory",
+          "created_at": "2026-05-14T01:22:00.000Z",
+          "redaction_applied": true,
+          "scope_policy_applied": true,
+          "lifecycle_policy_applied": true
+        }
+      ],
+      "chunkMetadata": [],
+      "tagMetadata": []
+    }
+  ]
+}

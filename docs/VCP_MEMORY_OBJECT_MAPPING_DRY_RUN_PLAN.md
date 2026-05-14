@@ -165,9 +165,9 @@ Detailed record previews should be separate from low-risk summaries. If future p
    - Completed as fixture-only tests for mapping SQLite-like rows, diary-like records, audit refs, chunks, tags, scope, and lifecycle into object mapping previews.
    - Fixture-only; no real data scan, runtime mapper, import/export runtime, or migration.
 2. `P13.5-SQLite-diary-mapping-dry-run-CLI`
-   - Add a local read-only dry-run CLI after fixture tests exist.
-   - Must report `mutated=false`.
-   - Must reject `--confirm`, `--apply`, `--write`, and migration-like flags.
+   - Completed as a fixture-safe local dry-run CLI after P13.4 mapping fixture tests.
+   - Reports `mutated=false`.
+   - Rejects `--confirm`, `--apply`, and `--migrate`.
 3. `P13.6-import-export-safe-JSON-shape-tests`
    - Define import/export-safe JSON shapes and redaction expectations with fixtures first.
    - No broad export of real memory.
@@ -216,6 +216,61 @@ This remains a fixture/test phase only:
 - no SQLite migration or `ALTER TABLE`
 - no real DB read, diary read, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
 
+## P13.5 SQLite / Diary Mapping Dry-Run CLI
+
+P13.5 adds a fixture-safe local dry-run CLI:
+
+```powershell
+npm run vcp-memory:mapping:dry-run -- --json
+```
+
+Implementation files:
+
+- CLI: `src/cli/vcp-memory-object-mapping-dry-run.js`
+- fixture: `tests/fixtures/vcp-memory-object-mapping-dry-run-v1.json`
+- test: `tests/vcp-memory-object-mapping-dry-run-cli.test.js`
+- npm script: `vcp-memory:mapping:dry-run`
+
+The CLI default source mode is `fixture`. It does not read the real SQLite DB or real diary, and it does not generate import/export files.
+
+The dry-run report includes:
+
+- `status`
+- `mutated=false`
+- `sourceMode`
+- `scannedRecordCount`
+- `mappedRecordCount`
+- `unmappedRecordCount`
+- `missingRequiredFieldCounts`
+- `missingOptionalFieldCounts`
+- `unknownFieldCounts`
+- `lifecycleStatusCoverage`
+- `scopeCoverage`
+- `auditRefCoverage`
+- `chunkRefCoverage`
+- `tagRefCoverage`
+- `importExportSafeCount`
+- `rawWorkspaceIdExposed=false`
+- `rawSecretExposed=false`
+- `riskLevel`
+- `rollbackRequirement`
+- `nextStep`
+
+The CLI rejects:
+
+- `--confirm`
+- `--apply`
+- `--migrate`
+
+This remains a dry-run CLI phase only:
+
+- no runtime mapper
+- no import/export CLI or file generation
+- no MCP public tool expansion
+- no MCP schema change
+- no SQLite migration or `ALTER TABLE`
+- no real DB read, diary read, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
+
 ## Validation Plan
 
 Future implementation should use:
@@ -236,6 +291,18 @@ P13.4 validation:
 node --test tests\vcp-memory-object-mapping-fixture.test.js
 node --test tests\vcp-memory-object-model-fixture.test.js
 node --test tests\vcp-memory-object-round-trip.test.js
+npm test
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
+P13.5 validation:
+
+```powershell
+node --test tests\vcp-memory-object-mapping-dry-run-cli.test.js
+node --test tests\vcp-memory-object-mapping-fixture.test.js
+node --test tests\vcp-memory-object-round-trip.test.js
+npm run vcp-memory:mapping:dry-run -- --json
 npm test
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
@@ -263,4 +330,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.5-SQLite-diary-mapping-dry-run-CLI`
+`P13.6-import-export-safe-JSON-shape-tests`
