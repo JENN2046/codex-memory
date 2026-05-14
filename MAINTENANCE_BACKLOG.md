@@ -127,7 +127,8 @@
 | P15.5-real-memory-query-dry-run-planning | query-quality / planning | A1/A2 | done | Plan a read-only, redacted, opt-in real local memory query dry-run surface | `git diff --check`; docs validation | Planning doc added; no real memory read preview, provider call, durable write, migration, import/export apply, MCP expansion, or `validate_memory` surface expansion |
 | P15.6-query-quality-closeout-review | query-quality / closeout | A1 | done | Summarize P15.1-P15.5 evidence, remaining risks, and readiness for P16 planning | `git diff --check`; docs validation | Closeout review added and docs validation passed; do not start P16 implementation, provider benchmark, V8, UI, migration/import-export apply, or release candidate |
 | P16-TagMemo-semantic-association-parity-planning | tagmemo / semantic-association / planning | A1/A2 | done | Plan TagMemo and semantic association parity after P15 closeout | `git diff --check`; docs validation | Planning doc added and docs validation passed; no runtime implementation, provider benchmark, V8, UI, migration/import-export apply, public MCP expansion, or release candidate |
-| P16.1-TagMemo-semantic-fixture-inventory | tagmemo / semantic-association / fixture-inventory | A1/A2 | todo | Inventory current TagMemo, semantic grouping, EPA, ResidualPyramid, LightMemo, and query-quality fixture coverage | future docs/diff validation; optional targeted test inventory only | Fixture inventory only; no runtime tuning, provider, V8 implementation, public MCP expansion, migration, or real memory preview |
+| P16.1-TagMemo-semantic-fixture-inventory | tagmemo / semantic-association / fixture-inventory | A1/A2 | done | Inventory current TagMemo, semantic grouping, EPA, ResidualPyramid, LightMemo, and query-quality fixture coverage | `git diff --check`; docs validation | Fixture inventory doc added and validation passed; no runtime tuning, provider, V8 implementation, public MCP expansion, migration, or real memory preview |
+| P16.2-TagMemo-semantic-fixture-shape-tests | tagmemo / semantic-association / fixture-tests | A1/A2 | todo | Add synthetic TagMemo semantic fixture shape tests after inventory | future targeted fixture test; `npm test`; diff/docs validation | Fixture/test only; no runtime tuning, provider, V8 implementation, public MCP expansion, migration, or real memory preview |
 
 ## 推荐执行顺序
 
@@ -192,9 +193,10 @@
 59. `P15.4`：fixture recall dry-run standing gate 已将 `checks.queries.detail.fixtureRecallDryRun` 接入 `gate:ci`，当前 standing signal 为 `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`；仍不得跳到 P16/P17/V8/UI，不主动跑真实 provider 命令，不扩大 `validate_memory` mutation surface，不开放 public `validate_memory` MCP tool。
 60. `P15.5`：real-memory query dry-run planning 已新增 [docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md)，只规划未来 redacted / opt-in / read-only 边界；本阶段不执行真实 memory read preview，不做 migration/import-export apply，不调用 provider。
 61. `P15.6`：query quality closeout review 已新增 [docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md)，总结 P15.1-P15.5 证据、剩余风险、边界确认和 P16 planning readiness；不启动 P16 implementation。
-62. `P16`：TagMemo semantic association parity planning 已开始，入口为 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md)；本阶段只做 planning / docs / board，不改 runtime、不改 tests、不调 provider、不进入 V8。
-63. 下一步建议进入 `P16.1-TagMemo-semantic-fixture-inventory`，只做 fixture inventory；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply 或 release candidate。
-64. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+62. `P16`：TagMemo semantic association parity planning 已完成，入口为 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md)；本阶段只做 planning / docs / board，不改 runtime、不改 tests、不调 provider、不进入 V8。
+63. `P16.1`：TagMemo semantic fixture inventory 已完成，入口为 [docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md)；本阶段只盘点 source/test/fixture gaps，docs-only 验证通过，不改 runtime、不新增 tests、不调 provider、不进入 V8。
+64. 下一步建议进入 `P16.2-TagMemo-semantic-fixture-shape-tests`，先加 synthetic fixture/test；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply 或 release candidate。
+65. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

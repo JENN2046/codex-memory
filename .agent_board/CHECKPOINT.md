@@ -2,49 +2,47 @@
 
 ## Current Goal
 
-P16-TagMemo-semantic-association-parity-planning: define the fixture-first TagMemo / semantic association parity path after P15 closeout.
+P16.1-TagMemo-semantic-fixture-inventory: completed inventory of current TagMemo / semantic association source, test, fixture, and gap coverage before adding P16 fixtures.
 
 ## Current Area
 
-P16 TagMemo semantic association parity planning
+P16 TagMemo semantic fixture inventory
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- phase start baseline: local `main` and `origin/main` matched at `c8ffe68`
-- P16 planning has been validated, committed, safe-pushed, and post-push hash-verified
+- phase start baseline: local `main` and `origin/main` matched at `3b7aee6`
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P16 planning decisions:
+P16.1 inventory decisions:
 
-- P16 starts with planning only.
-- Existing TagMemo / EPA / ResidualPyramid / semantic grouping surfaces are recorded as protected evidence targets.
-- P16 fixture work must come before runtime tuning.
-- P16 planning does not implement V8, provider benchmark, public MCP expansion, migration, import/export apply, or real memory preview.
+- P16.1 is docs/inventory only.
+- Existing TagMemo behavior is spread across source, runtime tests, LightMemo tests, v8 diagnostics, and profile/query suites.
+- There is no dedicated P16 `tests/fixtures/tagmemo-*` asset yet.
+- P16.2 may add synthetic fixture tests, but P16.1 does not add tests or fixtures.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
+- P16.1 docs-only validation passed locally.
 
 ## Changed Files
 
-- `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
 - `.agent_board/CHECKPOINT.md`
-- `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/TASK_QUEUE.md`
 
 ## Validation
 
-- `git diff --check` passed.
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
-- `Select-String -Path docs\P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md -Pattern '[ \t]$'` returned no matches.
-- Safe-push readiness passed: ahead commits were docs/board only, `git diff --check origin/main..HEAD` passed, remote main was unchanged before push, and sensitive scan only matched boundary words.
-- Post-push verification passed: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched.
+Passed:
+
+- `git diff --check`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+- `Select-String -Path docs\P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md -Pattern '[ \t]$'`
 
 ## Current Blockers
 
@@ -52,4 +50,4 @@ P16 planning decisions:
 
 ## Next Safe Action
 
-Begin `P16.1-TagMemo-semantic-fixture-inventory` only. Do not start runtime implementation, provider benchmark, V8, UI, migration/import-export apply, release candidate, tag, or deploy.
+Run final diff/scope review, then guarded commit/readiness if clean. Next recommended phase is `P16.2-TagMemo-semantic-fixture-shape-tests`.

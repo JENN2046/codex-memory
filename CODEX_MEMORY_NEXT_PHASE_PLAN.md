@@ -104,15 +104,16 @@
 - 当前 P15.6：P15 query-quality sequence is closeout-ready after docs validation; future real-memory dry-run remains planning-only and still requires explicit approval before any real local memory preview.
 - P15 closeout result：可进入 `P16-TagMemo-semantic-association-parity-planning`；仍不得进入 P16 runtime implementation、provider benchmark、V8、UI、migration/import-export apply、release candidate。
 
-当前 P16 planning：
+当前 P16 planning / inventory：
 
 - 入口：[docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md)
+- P16.1 inventory：[docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md)
 - 目标：把 TagMemo association、semantic grouping、EPA / ResidualPyramid telemetry、ordering feel 和 query-quality interaction 规划成 fixture-first parity evidence。
 - 当前基线：P14 compare `43/43 matched`、rollback `43/43 rollback-ready`；P15 fixture recall dry-run `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。
 - 保护面：`TagMemoEngine`、`EPAModule`、`ResidualPyramid`、`SemanticGroupManager`、passive `::TagMemo` / `::Rerank` syntax、LightMemo `tag_boost` / `core_tags` compatibility。
 - 边界：planning / docs / board only；不改 runtime、不改 tests、不改 package、不新增 MCP public tools、不改 MCP schema、不做 provider call、不做 SQLite migration、不读取或写入真实 memory、不进入 P17/V8/UI。
-- 当前状态：planning doc 已添加，docs-only validation 已通过。
-- 下一步建议：`P16.1-TagMemo-semantic-fixture-inventory`。
+- 当前状态：P16 planning 已完成；P16.1 fixture inventory 已完成本地 docs-only 验证。
+- 下一步建议：`P16.2-TagMemo-semantic-fixture-shape-tests`。
 
 ## 当前判断
 
