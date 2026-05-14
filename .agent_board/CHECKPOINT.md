@@ -13,7 +13,7 @@ P15 query quality closeout
 Repository state:
 
 - branch: `main`
-- current main: `fedbe4d docs: close p15 query quality gate`
+- current main: P15.6 closeout commits are prepared locally; exact HEAD is verified by `git log`
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
 P15.6 closeout decisions:
@@ -42,7 +42,7 @@ P15.6 closeout decisions:
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 - `Select-String -Path docs\P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md -Pattern '[ \t]$'` returned no matches.
 - `git diff --cached --check` passed before guarded commit.
-- Safe-push readiness passed before this board-only note: ahead commit was `fedbe4d`, file scope was docs/board only, remote `refs/heads/main` was `17335c2d148df565411253e8b1bf5011e09ff1ba`, and sensitive scan found only policy words.
+- Safe-push readiness passed before the board-only readiness note: file scope was docs/board only, remote `refs/heads/main` was `17335c2d148df565411253e8b1bf5011e09ff1ba`, and sensitive scan found only policy words.
 
 ## Current Blockers
 
@@ -50,4 +50,4 @@ P15.6 closeout decisions:
 
 ## Next Safe Action
 
-Commit this board-only readiness note, rerun readiness, safe-push if still ready, then verify local `HEAD`, local `origin/main`, remote `refs/heads/main`, and clean worktree.
+Rerun readiness on final HEAD, safe-push if still ready, then verify local `HEAD`, local `origin/main`, remote `refs/heads/main`, and clean worktree.
