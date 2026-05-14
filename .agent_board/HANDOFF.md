@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P18.1 import/export fixture inventory without changing runtime behavior.
+Run P18.2 export envelope fixture expansion without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P18.1 inventory docs/status/board edits are local, validated, and uncommitted.
+P18.2 fixture/test/docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P18 import/export fixture inventory
+P18 export envelope fixture expansion
 
 ## Findings
 
@@ -66,12 +66,16 @@ P18 import/export fixture inventory
 - P18 planning guarded commit and safe-push completed at `650bca0feed4f39a6cf23d7ad5af65ac58213001`.
 - P18.1 inventory is drafted as docs/status/board only.
 - P18.2 should add synthetic export envelope fixture tests before any import/export dry-run evidence gate.
+- P18.1 guarded commit and safe-push completed at `322f8dce7d46fcf2c3564024d3da8e243c147c86`.
+- P18.2 synthetic export envelope fixture/test/docs are drafted locally.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md`
+- `tests/fixtures/p18-export-envelope-v1.json`
+- `tests/p18-export-envelope-fixture.test.js`
+- `docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -79,6 +83,8 @@ P18 import/export fixture inventory
 
 ## Validation
 
+- `node --test tests\p18-export-envelope-fixture.test.js` -> `11/11`
+- `npm test` -> `454/454`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -98,4 +104,4 @@ P18 import/export fixture inventory
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P18.2-export-envelope-fixture-expansion`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P18.3-import-mapping-dry-run-evidence-gate`.

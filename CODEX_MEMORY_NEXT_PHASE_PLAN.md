@@ -195,9 +195,17 @@
 
 - 入口：[docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md)
 - 目标：盘点 P13 import/export/mapping/migration-readiness fixture 和 dry-run evidence，明确 P18.2 fixture expansion 缺口。
-- 当前状态：P18.1 inventory 已本地通过 `git diff --check` 和 docs validation，等待 guarded commit / safe-push。
-- 下一步建议：完成 guarded commit / safe-push，并进入 `P18.2-export-envelope-fixture-expansion`。
+- 当前状态：P18.1 inventory 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `322f8dce7d46fcf2c3564024d3da8e243c147c86`。
+- 下一步建议：继续 `P18.2-export-envelope-fixture-expansion`。
 - 边界：docs/status/board only；不改 `src/`、不新增 tests、不执行 import/export apply、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
+
+当前 P18.2 fixture expansion：
+
+- 入口：[docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md](/A:/codex-memory/docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md)
+- 目标：新增 synthetic export envelope fixture/test，锁住 multi-record、lifecycle variants、supersession refs、conflict preview、backup/rollback requirements 和 no-side-effect flags。
+- 当前状态：P18.2 fixture/test/docs 已本地通过 targeted test、`npm test`、diff/docs validation，等待 guarded commit / safe-push。
+- 下一步建议：完成 guarded commit / safe-push，并进入 `P18.3-import-mapping-dry-run-evidence-gate`。
+- 边界：fixture/test/docs only；不改 `src/`、不执行 import/export apply、不生成 export file、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
 
 ## 当前判断
 

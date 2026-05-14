@@ -1,0 +1,403 @@
+{
+  "schemaVersion": "p18-export-envelope-v1",
+  "phase": "P18.2-export-envelope-fixture-expansion",
+  "fixtureOnly": true,
+  "runtimeImportExportImplemented": false,
+  "fileGenerationImplemented": false,
+  "mutated": false,
+  "providerCalls": 0,
+  "durableMemoryTouched": false,
+  "realMemoryPreview": false,
+  "redactionApplied": true,
+  "rawWorkspaceIdExposed": false,
+  "rawSecretExposed": false,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "exportEnvelope": {
+    "schema_version": "vNext-export-envelope-p18",
+    "exported_at": "2026-05-15T00:00:00.000Z",
+    "mode": "synthetic-fixture",
+    "source": {
+      "project_id": "JENN2046/codex-memory",
+      "client_id": "codex",
+      "workspace": {
+        "redacted": true,
+        "workspace_ref": "workspace-sha256:p18-export-fixture",
+        "raw_workspace_id": null
+      }
+    },
+    "ordering": {
+      "stableBy": [
+        "memory_id"
+      ],
+      "deterministic": true
+    },
+    "records": [
+      {
+        "memory_id": "mem-p18-export-001",
+        "schema_version": "vNext",
+        "kind": "MemoryRecord",
+        "title": "P18 active export fixture",
+        "content_ref": "fixture://p18-export/content/mem-p18-export-001",
+        "content_hash": "fixture-content-hash-p18-export-001",
+        "scope": {
+          "project_id": "JENN2046/codex-memory",
+          "client_id": "codex",
+          "workspace_ref": "workspace-sha256:p18-export-fixture",
+          "visibility": "project"
+        },
+        "source": {
+          "type": "synthetic-fixture",
+          "provenance_ref": "fixture://p18-export/source/active"
+        },
+        "lifecycle_status": "active",
+        "supersedes": [],
+        "superseded_by": null,
+        "audit_refs": [
+          "audit-p18-export-001"
+        ],
+        "chunk_refs": [
+          "chunk-p18-export-001"
+        ],
+        "tag_refs": [
+          "tag-p18-export-001"
+        ]
+      },
+      {
+        "memory_id": "mem-p18-export-002",
+        "schema_version": "vNext",
+        "kind": "MemoryRecord",
+        "title": "P18 stale export fixture",
+        "content_ref": "fixture://p18-export/content/mem-p18-export-002",
+        "content_hash": "fixture-content-hash-p18-export-002",
+        "scope": {
+          "project_id": "JENN2046/codex-memory",
+          "client_id": "codex",
+          "workspace_ref": "workspace-sha256:p18-export-fixture",
+          "visibility": "project"
+        },
+        "source": {
+          "type": "synthetic-fixture",
+          "provenance_ref": "fixture://p18-export/source/stale"
+        },
+        "lifecycle_status": "stale",
+        "supersedes": [],
+        "superseded_by": null,
+        "audit_refs": [
+          "audit-p18-export-002"
+        ],
+        "chunk_refs": [
+          "chunk-p18-export-002"
+        ],
+        "tag_refs": [
+          "tag-p18-export-002"
+        ]
+      },
+      {
+        "memory_id": "mem-p18-export-003",
+        "schema_version": "vNext",
+        "kind": "MemoryRecord",
+        "title": "P18 proposal export fixture",
+        "content_ref": "fixture://p18-export/content/mem-p18-export-003",
+        "content_hash": "fixture-content-hash-p18-export-003",
+        "scope": {
+          "project_id": "JENN2046/codex-memory",
+          "client_id": "codex",
+          "workspace_ref": "workspace-sha256:p18-export-fixture",
+          "visibility": "project"
+        },
+        "source": {
+          "type": "synthetic-fixture",
+          "provenance_ref": "fixture://p18-export/source/proposal"
+        },
+        "lifecycle_status": "proposal",
+        "supersedes": [],
+        "superseded_by": null,
+        "audit_refs": [
+          "audit-p18-export-003"
+        ],
+        "chunk_refs": [
+          "chunk-p18-export-003"
+        ],
+        "tag_refs": [
+          "tag-p18-export-003"
+        ]
+      },
+      {
+        "memory_id": "mem-p18-export-004",
+        "schema_version": "vNext",
+        "kind": "MemoryRecord",
+        "title": "P18 superseded export fixture",
+        "content_ref": "fixture://p18-export/content/mem-p18-export-004",
+        "content_hash": "fixture-content-hash-p18-export-004",
+        "scope": {
+          "project_id": "JENN2046/codex-memory",
+          "client_id": "codex",
+          "workspace_ref": "workspace-sha256:p18-export-fixture",
+          "visibility": "project"
+        },
+        "source": {
+          "type": "synthetic-fixture",
+          "provenance_ref": "fixture://p18-export/source/superseded"
+        },
+        "lifecycle_status": "superseded",
+        "supersedes": [],
+        "superseded_by": "mem-p18-export-005",
+        "audit_refs": [
+          "audit-p18-export-004"
+        ],
+        "chunk_refs": [
+          "chunk-p18-export-004"
+        ],
+        "tag_refs": [
+          "tag-p18-export-004"
+        ]
+      },
+      {
+        "memory_id": "mem-p18-export-005",
+        "schema_version": "vNext",
+        "kind": "MemoryRecord",
+        "title": "P18 replacement export fixture",
+        "content_ref": "fixture://p18-export/content/mem-p18-export-005",
+        "content_hash": "fixture-content-hash-p18-export-005",
+        "scope": {
+          "project_id": "JENN2046/codex-memory",
+          "client_id": "codex",
+          "workspace_ref": "workspace-sha256:p18-export-fixture",
+          "visibility": "project"
+        },
+        "source": {
+          "type": "synthetic-fixture",
+          "provenance_ref": "fixture://p18-export/source/replacement"
+        },
+        "lifecycle_status": "active",
+        "supersedes": [
+          "mem-p18-export-004"
+        ],
+        "superseded_by": null,
+        "audit_refs": [
+          "audit-p18-export-005"
+        ],
+        "chunk_refs": [
+          "chunk-p18-export-005"
+        ],
+        "tag_refs": [
+          "tag-p18-export-005"
+        ]
+      },
+      {
+        "memory_id": "mem-p18-export-006",
+        "schema_version": "vNext",
+        "kind": "MemoryRecord",
+        "title": "P18 tombstoned export fixture",
+        "content_ref": "fixture://p18-export/content/mem-p18-export-006",
+        "content_hash": "fixture-content-hash-p18-export-006",
+        "scope": {
+          "project_id": "JENN2046/codex-memory",
+          "client_id": "codex",
+          "workspace_ref": "workspace-sha256:p18-export-fixture",
+          "visibility": "project"
+        },
+        "source": {
+          "type": "synthetic-fixture",
+          "provenance_ref": "fixture://p18-export/source/tombstoned"
+        },
+        "lifecycle_status": "tombstoned",
+        "supersedes": [],
+        "superseded_by": null,
+        "audit_refs": [
+          "audit-p18-export-006"
+        ],
+        "chunk_refs": [
+          "chunk-p18-export-006"
+        ],
+        "tag_refs": [
+          "tag-p18-export-006"
+        ]
+      },
+      {
+        "memory_id": "mem-p18-export-007",
+        "schema_version": "vNext",
+        "kind": "MemoryRecord",
+        "title": "P18 rejected export fixture",
+        "content_ref": "fixture://p18-export/content/mem-p18-export-007",
+        "content_hash": "fixture-content-hash-p18-export-007",
+        "scope": {
+          "project_id": "JENN2046/codex-memory",
+          "client_id": "codex",
+          "workspace_ref": "workspace-sha256:p18-export-fixture",
+          "visibility": "project"
+        },
+        "source": {
+          "type": "synthetic-fixture",
+          "provenance_ref": "fixture://p18-export/source/rejected"
+        },
+        "lifecycle_status": "rejected",
+        "supersedes": [],
+        "superseded_by": null,
+        "audit_refs": [
+          "audit-p18-export-007"
+        ],
+        "chunk_refs": [
+          "chunk-p18-export-007"
+        ],
+        "tag_refs": [
+          "tag-p18-export-007"
+        ]
+      }
+    ],
+    "chunks": [
+      {
+        "chunk_id": "chunk-p18-export-001",
+        "memory_id": "mem-p18-export-001",
+        "kind": "memo",
+        "chunk_hash": "fixture-chunk-hash-p18-export-001"
+      },
+      {
+        "chunk_id": "chunk-p18-export-002",
+        "memory_id": "mem-p18-export-002",
+        "kind": "memo",
+        "chunk_hash": "fixture-chunk-hash-p18-export-002"
+      }
+    ],
+    "tags": [
+      {
+        "tag_id": "tag-p18-export-001",
+        "memory_id": "mem-p18-export-001",
+        "tag": "p18-export",
+        "weight": 0.9
+      },
+      {
+        "tag_id": "tag-p18-export-002",
+        "memory_id": "mem-p18-export-005",
+        "tag": "supersession",
+        "weight": 0.8
+      }
+    ],
+    "audit_events": [
+      {
+        "event_id": "audit-p18-export-001",
+        "memory_id": "mem-p18-export-001",
+        "event_type": "record_memory",
+        "redaction_applied": true,
+        "scope_policy_applied": true,
+        "lifecycle_policy_applied": true
+      },
+      {
+        "event_id": "audit-p18-export-004",
+        "memory_id": "mem-p18-export-004",
+        "event_type": "memory_supersede",
+        "redaction_applied": true,
+        "scope_policy_applied": true,
+        "lifecycle_policy_applied": true
+      },
+      {
+        "event_id": "audit-p18-export-005",
+        "memory_id": "mem-p18-export-005",
+        "event_type": "memory_supersede",
+        "redaction_applied": true,
+        "scope_policy_applied": true,
+        "lifecycle_policy_applied": true
+      },
+      {
+        "event_id": "audit-p18-export-006",
+        "memory_id": "mem-p18-export-006",
+        "event_type": "memory_forget",
+        "redaction_applied": true,
+        "scope_policy_applied": true,
+        "lifecycle_policy_applied": true
+      }
+    ],
+    "tombstones": [
+      {
+        "tombstone_id": "tomb-p18-export-006",
+        "memory_id": "mem-p18-export-006",
+        "hidden": true,
+        "hard_delete": false
+      }
+    ],
+    "proposals": [
+      {
+        "proposal_id": "proposal-p18-export-003",
+        "memory_id": "mem-p18-export-003",
+        "active": false,
+        "requires_review": true
+      }
+    ],
+    "supersessionRefs": [
+      {
+        "from": "mem-p18-export-004",
+        "to": "mem-p18-export-005",
+        "type": "superseded_by"
+      }
+    ],
+    "checksum": {
+      "algorithm": "fixture-sha256",
+      "value": "fixture-sha256:813cfbecddd8ef9bf22da7aee2aaabe85bcb6e77472bf8921330dd382e147d38"
+    },
+    "lowRiskSummary": {
+      "record_count": 7,
+      "lifecycle_statuses": [
+        "active",
+        "proposal",
+        "rejected",
+        "stale",
+        "superseded",
+        "tombstoned"
+      ],
+      "supersession_ref_count": 1,
+      "conflict_preview_count": 4,
+      "source_workspace_ref": "workspace-sha256:p18-export-fixture",
+      "rawWorkspaceIdExposed": false,
+      "rawSecretExposed": false,
+      "mutated": false
+    }
+  },
+  "importPreview": {
+    "mode": "dry-run-first",
+    "mutated": false,
+    "apply_supported": false,
+    "providerCalls": 0,
+    "durableMemoryTouched": false,
+    "realMemoryPreview": false,
+    "conflictPreviews": [
+      {
+        "case_id": "duplicate-memory-id",
+        "status": "blocked",
+        "code": "duplicate_memory_id",
+        "safeMessage": "duplicate memory id requires manual review",
+        "mutated": false
+      },
+      {
+        "case_id": "unsupported-schema-version",
+        "status": "blocked",
+        "code": "unsupported_schema_version",
+        "safeMessage": "unsupported schema version requires migration approval",
+        "mutated": false
+      },
+      {
+        "case_id": "missing-source-provenance",
+        "status": "blocked",
+        "code": "missing_source_provenance",
+        "safeMessage": "missing source provenance blocks import apply",
+        "mutated": false
+      },
+      {
+        "case_id": "missing-audit-refs",
+        "status": "warn",
+        "code": "missing_audit_refs",
+        "safeMessage": "missing audit refs must be reported before apply",
+        "mutated": false
+      }
+    ]
+  },
+  "backupRollbackPreview": {
+    "backupRequiredBeforeApply": true,
+    "rollbackManifestRequired": true,
+    "generated": false,
+    "mutated": false
+  }
+}
