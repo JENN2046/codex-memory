@@ -116,7 +116,8 @@ P14 should proceed in small phases:
    - Completed by `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json` and `tests/donor-ranking-tie-breaker-parity-fixture.test.js`.
    - Locks all current standard-suite `ordering` cases as explicit ranking/tie-breaker snapshots without runtime changes.
 6. `P14.6-compare-rollback-standing-gate-summary`
-   - Summarize standing compare/rollback category gates and readiness checks.
+   - Completed by [DONOR_PARITY_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md).
+   - Summarizes standard-suite compare `43/43 matched`, rollback `43/43 rollback-ready`, targeted fixture evidence, boundaries, and readiness checks.
 
 No runtime behavior changes should happen until fixture and gate evidence exists.
 
@@ -136,6 +137,6 @@ No runtime behavior changes should happen until fixture and gate evidence exists
 
 ## Next Recommended Phase
 
-`P14.6-compare-rollback-standing-gate-summary`
+`P15-real-query-quality-gate-planning`
 
-P14.6 may summarize compare/rollback standing gate evidence and readiness checks. It should remain a docs/gate-summary phase unless a later phase explicitly approves implementation.
+P15 should start as planning / fixture / gate design for real query quality. It should not jump to P16/P17/V8/UI, provider benchmarks, migration apply, or public MCP expansion.

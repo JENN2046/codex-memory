@@ -160,6 +160,6 @@ git diff --check
 
 ## Next Recommended Phase
 
-`P14.6-compare-rollback-standing-gate-summary`
+`P15-real-query-quality-gate-planning`
 
-P14.6 may summarize standing compare/rollback gate evidence and readiness checks. It should still avoid runtime behavior changes unless a later phase explicitly approves them.
+P14.6 standing gate summary is now captured in [DONOR_PARITY_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md). P15 should start as planning / fixture / gate design for real query quality, without jumping to P16/P17/V8/UI or runtime/migration work.

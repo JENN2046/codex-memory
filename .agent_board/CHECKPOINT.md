@@ -2,32 +2,30 @@
 
 ## Current Goal
 
-P14.5-ranking-tie-breaker-parity-tests: add donor ranking/tie-breaker fixture/test evidence without changing runtime behavior.
+P14.6-compare-rollback-standing-gate-summary: summarize donor parity standing gate evidence and readiness checks without changing runtime behavior.
 
 ## Current Area
 
-P14-donor-compatibility / ranking fixtures
+P14-donor-compatibility / standing gate summary
 
 ## Current Status
 
-P14.4 error/meta parity fixtures have landed on `origin/main` as `d913b71 test: add p14 error meta parity fixtures`.
+P14.5 ranking/tie-breaker parity fixtures have landed on `origin/main` as `3afc9c7 test: add p14 ranking parity fixtures`.
 
-P14.5 adds fixture/test evidence only. It does not change DeepMemo runtime behavior, TopicMemo runtime behavior, passive memory query behavior, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
+P14.6 adds docs/board evidence only. It does not change DeepMemo runtime behavior, TopicMemo runtime behavior, passive memory query behavior, import/export, migration, MCP schema/tools, DB/diary data, or durable memory.
 
 ## Completed Work In This Batch
 
-- Added `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`.
-- Added `tests/donor-ranking-tie-breaker-parity-fixture.test.js`.
-- Locked all current standard-suite `ordering` cases as explicit order snapshots.
-- Covered cross-topic, single-topic window, three-window, and large multi-topic ordering cases.
-- Verified fixture metadata mirrors the standard-suite `ordering` category.
-- Verified the targeted test does not mutate active-memory fixture files by hashing referenced fixture roots before and after CLI runs.
+- Added `docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md`.
+- Recorded standard-suite compare `43/43 matched`.
+- Recorded standard-suite rollback `43/43 rollback-ready`.
+- Summarized P14.1-P14.5 targeted fixture evidence.
+- Documented category matrix, boundary confirmations, remaining risks, and next P15 planning boundary.
 - Updated P14 plan, fixture inventory, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
-- `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`
-- `tests/donor-ranking-tie-breaker-parity-fixture.test.js`
+- `docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md`
 - `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
 - `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -41,15 +39,14 @@ P14.5 adds fixture/test evidence only. It does not change DeepMemo runtime behav
 
 ## Validation Run
 
-- `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js` passed `2/2`.
-- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category ordering --tool deepmemo --json --require-match` passed `4/4 matched`.
-- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --category ordering --tool deepmemo --json --require-ready` passed `4/4 rollback-safe`.
-- `npm test` passed `409/409`.
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match` passed `43/43 matched`.
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready` passed `43/43 rollback-ready`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
 ## Validation Not Run
 
+- `npm test` not required for docs-only P14.6; latest P14.5 full suite passed `409/409`.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
@@ -58,7 +55,7 @@ P14.5 adds fixture/test evidence only. It does not change DeepMemo runtime behav
 - No donor runtime behavior change.
 - No real DB/memory write.
 - No real DB/diary write.
-- No P15/P16/P17/V8/UI.
+- No P16/P17/V8/UI.
 
 ## Current Blockers
 
@@ -67,10 +64,10 @@ P14.5 adds fixture/test evidence only. It does not change DeepMemo runtime behav
 
 ## Remaining Risks
 
-- Standing compare/rollback gate summary remains for P14.6.
-- Passive memory query donor parity fixtures remain future work.
+- P15 real query quality is not proven by donor parity and must start as planning / fixture / gate design.
+- Passive memory query donor parity remains a later explicit planning target.
 - Runtime changes remain out of scope until fixture/gate evidence exists and a later phase explicitly approves implementation.
 
 ## Next Safe Action
 
-Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next phase after P14.5 is `P14.6-compare-rollback-standing-gate-summary`.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next phase after P14.6 is `P15-real-query-quality-gate-planning`.
