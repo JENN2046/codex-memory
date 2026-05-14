@@ -109,3 +109,19 @@ test('query-quality-report supports fixture recall dry-run without durable memor
   assert.equal(report.fixtureRecallDryRun.caseCount, report.caseCount);
   assert.equal(report.fixtureRecallDryRun.failedCount, 0);
 });
+
+test('query-quality-report should include expanded P15.2 fixture coverage without mutation', () => {
+  const result = runCli(['--json', '--dry-run', '--fixture-recall-dry-run']);
+  assert.equal(result.status, 0);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.caseCount, 14);
+  assert.equal(report.runnableCount, 14);
+  assert.equal(report.fixtureOnlyCount, 14);
+  assert.equal(report.assertedCount, 14);
+  assert.equal(report.passedCount, 14);
+  assert.equal(report.failedCount, 0);
+  assert.equal(report.mutated, false);
+  assert.equal(report.fixtureRecallDryRun.mutated, false);
+  assert.equal(report.fixtureRecallDryRun.providerCalls, 0);
+  assert.equal(report.fixtureRecallDryRun.durableMemoryTouched, false);
+});

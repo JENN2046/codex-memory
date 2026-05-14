@@ -159,4 +159,4 @@ P15.1 and the recommended P15.2 follow-up must not:
 
 ## Decision
 
-P15.1 finds the current query fixture baseline healthy but incomplete. The right next step is `P15.2-real-query-quality-fixture-expansion`, focused on sanitized scope, lifecycle, privacy, precision, and report-shape fixtures.
+P15.1 found the query fixture baseline healthy but incomplete. P15.2 has since added sanitized scope, lifecycle, privacy, precision, and report-shape fixtures in [P15.2 Real Query Quality Fixture Expansion](./P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md).

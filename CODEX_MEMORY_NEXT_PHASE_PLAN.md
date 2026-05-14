@@ -93,10 +93,11 @@
 
 - 入口：[docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md)
 - P15.1 inventory：[docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md)
+- P15.2 expansion：[docs/P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md)
 - 目标：把 real query quality 从 donor parity 中拆出来，规划 fixture-first standing gate，覆盖 relevance、precision、scope/lifecycle/privacy safety、failure reporting 和 JSON report stability。
-- 当前基线：`real-query-suite` 与 `query:quality` fixture recall dry-run 均为 `8/8`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。
-- 边界：planning/docs/board only；不改 runtime，不新增 tests/fixtures，不调用 provider，不改 package，不改 MCP，不做 migration/import/export。
-- 下一步建议：`P15.2-real-query-quality-fixture-expansion`。
+- 当前基线：`real-query-suite` 与 `query:quality` fixture recall dry-run 均为 `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。
+- 边界：fixture/tests/docs/board only；不改 runtime，不调用 provider，不改 package，不改 MCP，不做 migration/import-export apply。
+- 下一步建议：`P15.3-query-quality-report-shape-tests`。
 
 ## 当前判断
 

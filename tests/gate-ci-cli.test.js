@@ -70,9 +70,9 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
     'realCount',
     'validCount'
   ]);
-  assert.equal(payload.checks.queries.detail.caseCount, 8);
-  assert.equal(payload.checks.queries.detail.assertedCount, 8);
-  assert.equal(payload.checks.queries.detail.passedCount, 8);
+  assert.equal(payload.checks.queries.detail.caseCount, 14);
+  assert.equal(payload.checks.queries.detail.assertedCount, 14);
+  assert.equal(payload.checks.queries.detail.passedCount, 14);
   assert.equal(payload.checks.queries.detail.failedCount, 0);
 
   assert.equal(payload.checks.policyPreflight.status, 'ok');
@@ -160,7 +160,7 @@ test('gate:ci CLI should emit text output by default', async () => {
   assert.ok(text.includes('compare'), 'should include compare check');
   assert.ok(text.includes('rollback'), 'should include rollback check');
   assert.ok(text.includes('queries'), 'should include queries check');
-  assert.ok(text.includes('8/8 query assertions passed'), 'should include query assertion counts');
+  assert.ok(text.includes('14/14 query assertions passed'), 'should include query assertion counts');
   assert.ok(text.includes('policyPreflight'), 'should include policy preflight check');
   assert.ok(text.includes('3/7 records would remain'), 'should include policy preflight counts');
   assert.ok(text.includes('lifecyclePolicy'), 'should include lifecycle policy check');

@@ -2,42 +2,48 @@
 
 ## Current Goal
 
-P15.1-real-query-quality-fixture-inventory: inventory current query fixture coverage, missing dimensions, negative assertions, and quality gate gaps without changing runtime behavior.
+P15.2-real-query-quality-fixture-expansion: add targeted sanitized fixture cases for scope, lifecycle, privacy, precision, and report-shape gaps without changing runtime behavior.
 
 ## Current Area
 
-P15 query quality fixture inventory
+P15 query quality fixture expansion
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- current main: `514bd6f docs: reconcile p14 p15 state after safety patch`
+- current main: `d41d9db docs: inventory p15 query quality fixtures`
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-Confirmed P15.1 inventory:
+Confirmed P15.2 expansion:
 
 - default suite file: `benchmarks/real-query-suite/v1.json`
 - default dataset file: `benchmarks/default-dataset.json`
-- current baseline: `8` cases, `8` sanitized documents, `24` positive assertions, `8` negative assertions
-- `real-query-suite` fixture recall dry-run: `8/8`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`
-- `query:quality` fixture recall dry-run: `8/8`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`
+- new baseline: `14` cases, `15` sanitized documents
+- added areas: scope-safety, lifecycle-safety, privacy-safety, precision, report-shape
+- `real-query-suite` fixture recall dry-run: `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`
+- `query:quality` fixture recall dry-run: `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`
 
 Decision:
 
-- P15.1 remains docs/board inventory only.
+- P15.2 remains tests/fixtures/docs only.
 - Do not expand `validate_memory` mutation surface.
 - Do not expose public `validate_memory` MCP tool.
-- Next phase should be P15.2 fixture expansion, not runtime/provider work.
+- Next phase should be P15.3 report shape tests, not runtime/provider work.
 
 ## Changed Files
 
+- `benchmarks/default-dataset.json`
+- `benchmarks/real-query-suite/v1.json`
+- `tests/real-query-suite.test.js`
+- `tests/query-quality-report.test.js`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
 - `docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md`
+- `docs/P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
@@ -46,10 +52,15 @@ Decision:
 
 ## Validation
 
-- `npm run real-query-suite -- --json --fixture-recall-dry-run` passed.
-- `npm run query:quality -- --json --dry-run --fixture-recall-dry-run` passed.
+- `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js` passed `19/19`.
+- `npm run real-query-suite -- --json --fixture-recall-dry-run` passed `14/14`.
+- `npm run query:quality -- --json --dry-run --fixture-recall-dry-run` passed `14/14`.
+- First broad `npm test` exposed stale `gate-ci` test expectations that still asserted `8/8`; test expectations were updated to `14/14`.
+- `node --test tests\gate-ci-cli.test.js` passed `2/2`.
+- `npm run gate:ci` passed and reports `14/14 query assertions passed`.
+- `npm test` passed `418/418`.
 - `git diff --check` passed.
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- docs validation passed.
 
 ## Current Blockers
 
@@ -57,4 +68,4 @@ Decision:
 
 ## Next Safe Action
 
-Create a guarded local commit if file scope remains docs/board only. Do not push without explicit authorization.
+Create a guarded local commit if file scope remains tests/fixtures/docs/board only. Do not push without explicit authorization.

@@ -110,6 +110,7 @@ Recommended P15 sequence:
    - Status: completed in [P15.1 Real Query Quality Fixture Inventory](./P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md).
 2. `P15.2-real-query-quality-fixture-expansion`
    - Add targeted sanitized fixture cases for scope, lifecycle, privacy, and failure reporting gaps.
+   - Status: completed in [P15.2 Real Query Quality Fixture Expansion](./P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md).
 3. `P15.3-query-quality-report-shape-tests`
    - Lock JSON shape for CI, dashboard, and future standing gate consumers.
 4. `P15.4-fixture-recall-dry-run-standing-gate`

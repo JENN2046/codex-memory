@@ -132,6 +132,39 @@ test('real-query-suite default cases should cover every default dataset query', 
   }
 });
 
+test('real-query-suite default cases should cover P15.2 quality dimensions', () => {
+  const suite = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'benchmarks', 'real-query-suite', 'v1.json'), 'utf8'));
+  const areas = new Set(suite.cases.map((caseItem) => caseItem.area));
+  for (const area of ['scope-safety', 'lifecycle-safety', 'privacy-safety', 'precision', 'report-shape']) {
+    assert.ok(areas.has(area), `missing P15.2 area: ${area}`);
+  }
+
+  const targetIds = new Set(suite.cases.map((caseItem) => caseItem.target));
+  for (const targetId of [
+    'scope_private_boundary',
+    'lifecycle_visibility_policy',
+    'privacy_redaction_boundary',
+    'workspace_summary_boundary',
+    'precision_false_positive_target',
+    'query_quality_report_shape'
+  ]) {
+    assert.ok(targetIds.has(targetId), `missing P15.2 target: ${targetId}`);
+  }
+});
+
+test('real-query-suite P15.2 fixtures should stay sanitized and dry-run oriented', () => {
+  const suite = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'benchmarks', 'real-query-suite', 'v1.json'), 'utf8'));
+  const dataset = JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'benchmarks', 'default-dataset.json'), 'utf8'));
+  const datasetText = dataset.documents.map((document) => document.text).join('\n').toLowerCase();
+  const suiteText = JSON.stringify(suite).toLowerCase();
+
+  assert.equal(datasetText.includes('workspace-alpha-raw'), false);
+  assert.equal(datasetText.includes('provider credential value'), false);
+  assert.equal(datasetText.includes('public validate_memory mcp tool'), false);
+  assert.equal(suiteText.includes('alter table'), false);
+  assert.equal(suiteText.includes('import/export apply'), false);
+});
+
 test('real-query-suite supports fixture recall dry-run without durable memory', () => {
   const result = runCli(['--json', '--fixture-recall-dry-run']);
   assert.equal(result.status, 0);

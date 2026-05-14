@@ -146,6 +146,114 @@
       },
       "source": "benchmarks/default-dataset.json#provider_smoke",
       "notes": "fixture-only query derived from sanitized benchmark document provider_smoke; no provider call is made"
+    },
+    {
+      "id": "rq-009",
+      "area": "scope-safety",
+      "query": "Which fixture verifies private client memory stays out of cross-client recall?",
+      "target": "scope_private_boundary",
+      "expected": {
+        "mustContain": [
+          "Scope safety fixtures",
+          "private client memory",
+          "cross-client recall"
+        ],
+        "mustNotContain": [
+          "public MCP tool"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#scope_private_boundary",
+      "notes": "fixture-only scope safety case; no real workspace id is used"
+    },
+    {
+      "id": "rq-010",
+      "area": "lifecycle-safety",
+      "query": "Which fixture excludes proposal rejected superseded and tombstoned records when policy is enabled?",
+      "target": "lifecycle_visibility_policy",
+      "expected": {
+        "mustContain": [
+          "Lifecycle visibility fixtures",
+          "active and stale",
+          "proposal, rejected, superseded, and tombstoned"
+        ],
+        "mustNotContain": [
+          "SQLite migration"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#lifecycle_visibility_policy",
+      "notes": "fixture-only lifecycle safety case; does not change runtime policy behavior"
+    },
+    {
+      "id": "rq-011",
+      "area": "privacy-safety",
+      "query": "Which fixture prevents raw secret material from appearing in query output?",
+      "target": "privacy_redaction_boundary",
+      "expected": {
+        "mustContain": [
+          "Privacy fixtures",
+          "redacted summaries",
+          "raw secret material"
+        ],
+        "mustNotContain": [
+          "provider credential value"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#privacy_redaction_boundary",
+      "notes": "fixture-only privacy safety case; contains no real secret values"
+    },
+    {
+      "id": "rq-012",
+      "area": "privacy-safety",
+      "query": "Which fixture prevents raw workspace identifiers from appearing in low-risk query summaries?",
+      "target": "workspace_summary_boundary",
+      "expected": {
+        "mustContain": [
+          "Workspace summary fixtures",
+          "low-risk workspace summaries",
+          "raw workspace identifiers"
+        ],
+        "mustNotContain": [
+          "workspace-alpha-raw"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#workspace_summary_boundary",
+      "notes": "fixture-only workspace summary boundary case; no raw workspace_id value is used"
+    },
+    {
+      "id": "rq-013",
+      "area": "precision",
+      "query": "Which fixture uses approval gates to catch near-neighbor false positives?",
+      "target": "precision_false_positive_target",
+      "expected": {
+        "mustContain": [
+          "Precision fixtures",
+          "approval gates",
+          "near-neighbor false positives"
+        ],
+        "mustNotContain": [
+          "provider smoke"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#precision_false_positive_target",
+      "notes": "fixture-only precision case with a near-neighbor distractor document"
+    },
+    {
+      "id": "rq-014",
+      "area": "report-shape",
+      "query": "Which fixture requires stable query quality report fields without fake scores?",
+      "target": "query_quality_report_shape",
+      "expected": {
+        "mustContain": [
+          "Report shape fixtures",
+          "caseCount",
+          "fixtureRecallDryRun"
+        ],
+        "mustNotContain": [
+          "synthetic quality score"
+        ]
+      },
+      "source": "benchmarks/default-dataset.json#query_quality_report_shape",
+      "notes": "fixture-only report shape case; does not add hitRate or qualityScore"
     }
   ]
 }

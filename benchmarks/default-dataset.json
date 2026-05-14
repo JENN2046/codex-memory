@@ -33,6 +33,34 @@
     {
       "id": "provider_smoke",
       "text": "The provider smoke CLI verifies remote embedding and rerank connectivity from environment variables and prints a JSON or text report."
+    },
+    {
+      "id": "scope_private_boundary",
+      "text": "Scope safety fixtures verify that private client memory is only recalled for the same actor client and that cross-client recall stays excluded from ordinary query results."
+    },
+    {
+      "id": "lifecycle_visibility_policy",
+      "text": "Lifecycle visibility fixtures keep active and stale records visible while proposal, rejected, superseded, and tombstoned records are excluded when the lifecycle read policy is enabled."
+    },
+    {
+      "id": "privacy_redaction_boundary",
+      "text": "Privacy fixtures require redacted summaries and prevent raw secret material from appearing in query quality output or low-risk reports."
+    },
+    {
+      "id": "workspace_summary_boundary",
+      "text": "Workspace summary fixtures require low-risk workspace summaries and prevent raw workspace identifiers from being exposed in query quality reports."
+    },
+    {
+      "id": "precision_false_positive_target",
+      "text": "Precision fixtures use approval gates to catch near-neighbor false positives with a dedicated target document so similar memory vocabulary does not satisfy the query."
+    },
+    {
+      "id": "precision_false_positive_neighbor",
+      "text": "Neighbor fixture content mentions memory vocabulary and audit reports but avoids approval gate language and is not the intended precision target."
+    },
+    {
+      "id": "query_quality_report_shape",
+      "text": "Report shape fixtures require stable query quality fields such as caseCount, assertedCount, passedCount, failedCount, mutated, and fixtureRecallDryRun without inventing hitRate or qualityScore."
     }
   ],
   "queries": [
@@ -75,6 +103,36 @@
       "id": "q8",
       "query": "Which command checks remote provider connectivity and prints a report?",
       "relevant": ["provider_smoke"]
+    },
+    {
+      "id": "q9",
+      "query": "Which fixture verifies private client memory stays out of cross-client recall?",
+      "relevant": ["scope_private_boundary"]
+    },
+    {
+      "id": "q10",
+      "query": "Which fixture excludes proposal rejected superseded and tombstoned records when policy is enabled?",
+      "relevant": ["lifecycle_visibility_policy"]
+    },
+    {
+      "id": "q11",
+      "query": "Which fixture prevents raw secret material from appearing in query output?",
+      "relevant": ["privacy_redaction_boundary"]
+    },
+    {
+      "id": "q12",
+      "query": "Which fixture prevents raw workspace identifiers from appearing in low-risk query summaries?",
+      "relevant": ["workspace_summary_boundary"]
+    },
+    {
+      "id": "q13",
+      "query": "Which fixture uses approval gates to catch near-neighbor false positives?",
+      "relevant": ["precision_false_positive_target"]
+    },
+    {
+      "id": "q14",
+      "query": "Which fixture requires stable query quality report fields without fake scores?",
+      "relevant": ["query_quality_report_shape"]
     }
   ]
 }
