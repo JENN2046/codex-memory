@@ -2,36 +2,45 @@
 
 ## Current Goal
 
-P12.5-validate-memory-atomicity-and-policy-guard-fix: harden the internal `validate_memory` confirmed mutation path so audit availability and scope-policy guards are checked before applying lifecycle mutation.
+P12.5-validate-memory-two-phase-audit-protocol: remove the remaining validate_memory mutation/audit integrity risk by requiring durable pending audit intent before any confirmed lifecycle mutation.
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory safety
+P12-controlled-write-tools / validate-memory audit integrity
 
 ## Current Status
 
-The current patch addresses two review findings:
+The previous audit write-path preflight was only a mitigation. JSONL audit append and SQLite lifecycle update are not one physical transaction, so a committed audit append failure after update could still leave `status=active` without committed audit.
 
-- audit write-path availability must be checked before confirmed lifecycle mutation
-- `client_id` and `visibility` must be part of the update guard so a stale policy decision cannot apply after scope fields change
+The current patch changes confirmed `validate_memory` to:
 
-The patch keeps `validate_memory` internal-only. It does not add public MCP tools, change MCP schema, run SQLite migration, or change package/dependencies.
+- build one stable `event_id`
+- append `audit_phase=pending` before lifecycle update
+- call `updateLifecycleStatus` only after pending audit succeeds
+- append `audit_phase=committed` after successful lifecycle update
+- append `audit_phase=cancelled` if lifecycle update fails after pending audit
+- return `validated-with-warning` with `auditCommitStatus=failed_after_mutation` if committed audit append fails after update, while preserving durable pending audit intent
+
+The `client_id` / `visibility` update guard remains in place.
 
 ## Completed Work In This Batch
 
-- Added `AuditLogStore.ensureWriteAuditWritable()` as a no-event write-path preflight.
-- Updated `ValidateMemoryService` to run audit preflight before confirmed mutation.
-- Updated `ValidateMemoryService` to pass expected `client_id` and `visibility` into lifecycle update.
-- Updated `SqliteShadowStore.updateLifecycleStatus()` to guard by `memory_id`, previous `status`, expected `client_id`, and expected `visibility`.
-- Added runtime regressions for audit preflight failure, stale `client_id`, stale `visibility`, successful audit append, and dry-run no-write behavior.
-- Updated P12.5 docs/status/board to record the safety patch.
+- Updated `ValidateMemoryService` to implement the pending/committed/cancelled audit protocol.
+- Updated runtime tests for:
+  - pending audit written before update
+  - update failure after pending audit creates cancelled audit
+  - committed audit append failure after update leaves pending audit and warning result
+  - successful confirmed mutation writes pending and committed audit entries
+  - dry-run no audit/no DB write
+  - stale `client_id` / `visibility` guard regressions
+- Updated CLI test expectation for successful apply to see pending plus committed audit entries.
+- Updated P12.5 docs/status/board to record the two-phase audit protocol.
 
 ## Changed Files
 
 - `src/core/ValidateMemoryService.js`
-- `src/storage/AuditLogStore.js`
-- `src/storage/SqliteShadowStore.js`
 - `tests/validate-memory-runtime.test.js`
+- `tests/validate-memory-cli.test.js`
 - `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
 - `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
 - `docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md`
@@ -45,14 +54,14 @@ The patch keeps `validate_memory` internal-only. It does not add public MCP tool
 
 ## Validation Run
 
-- `node --test tests\validate-memory-runtime.test.js` passed `12/12`.
+- `node --test tests\validate-memory-runtime.test.js` passed `15/15`.
 - `node --test tests\validate-memory-cli.test.js` passed `12/12`.
 - `node --test tests\validate-memory-runtime-fixture.test.js` passed `11/11`.
 - `node --test tests\mcp-contract.test.js` passed `7/7`.
-- `npm test` passed `412/412`.
+- `npm test` passed `415/415`.
 - `npm run validate-memory -- --json --memory-id dry-run-example --reason "manual review" --evidence "manual evidence" --actor-client-id codex --request-source cli` returned dry-run rejected with `mutated=false`.
 - `npm run gate:ci` passed.
-- `npm run gate:mainline:strict` passed: health ok, contract ok, test `412/412`, compare `43/43`, rollback `43/43`.
+- `npm run gate:mainline:strict` passed: health ok, contract ok, test `415/415`, compare `43/43`, rollback `43/43`.
 - `npm run lifecycle:sqlite:dry-run -- --json` passed with `mutated=false`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
@@ -67,8 +76,8 @@ The patch keeps `validate_memory` internal-only. It does not add public MCP tool
 
 ## Remaining Risks
 
-- Push requires guarded commit, readiness review, and explicit remote action under the current phase.
+- Push requires guarded commit, readiness review, and safe-push check.
 
 ## Next Safe Action
 
-Create a guarded local commit, perform safe-push readiness, then push only if readiness passes.
+Create a guarded local commit, perform safe-push readiness, then push if ready.

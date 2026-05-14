@@ -6,7 +6,7 @@ Updated: 2026-05-14
 
 This document freezes the implementation and test design for the narrow internal `validate_memory` runtime path.
 
-Repository reality: the internal implementation has already landed in `origin/main` at `29c7ad8`. A later internal safety review found two runtime hardening gaps: confirmed apply needed an audit write-path preflight before lifecycle mutation, and the lifecycle update guard needed to include the policy fields read for scope decisions. This document now records the patched plan shape, test matrix, audit contract, and rollback story before any further runtime changes, public MCP proposal, or broader mutation work.
+Repository reality: the internal implementation has already landed in `origin/main` at `29c7ad8`. Later internal safety reviews found two hardening gaps and one residual risk. The first patch added audit write-path preflight and policy-field guards. That preflight was a mitigation, not full mutation/audit atomicity. The current protocol writes a durable pending audit intent before lifecycle mutation, then appends a committed or cancelled follow-up. This document records the patched plan shape, test matrix, audit contract, and rollback story before any further runtime changes, public MCP proposal, or broader mutation work.
 
 ## Scope
 
@@ -62,9 +62,11 @@ Responsibilities:
 - Reject forbidden lifecycle states.
 - Reject cross-client private mutations.
 - Build a `memory_validate` audit event before applying.
-- Preflight the write-audit path before confirmed mutation.
+- Append a durable `audit_phase=pending` audit intent before confirmed mutation.
 - Apply the lifecycle update only through a status-checked and policy-guarded store helper.
-- Append audit only after the lifecycle update succeeds.
+- Append `audit_phase=committed` after lifecycle update succeeds.
+- Append `audit_phase=cancelled` after pending audit when lifecycle update fails.
+- Return `validated-with-warning` with `auditCommitStatus=failed_after_mutation` if committed audit append fails after update; the durable pending audit intent remains the audit evidence.
 
 Non-responsibilities:
 
@@ -103,13 +105,14 @@ Boundary:
 
 ### Audit Write
 
-Confirmed mutation must write a `memory_validate` audit event.
+Confirmed mutation must use a two-phase `memory_validate` audit protocol.
 
-Required event fields:
+Pending intent fields:
 
 - `event_id`
 - `memory_id`
 - `event_type`
+- `audit_phase`
 - `tool_name`
 - `actor_client_id`
 - `request_source`
@@ -124,12 +127,33 @@ Required event fields:
 - `lifecycle_policy_applied`
 - `scope_policy_applied`
 
+Committed event fields:
+
+- same `event_id` or `correlation_id`
+- `audit_phase=committed`
+- `mutation_applied=true`
+- `memory_id`
+- `from_status`
+- `to_status`
+- `committed_at`
+
+Cancelled event fields:
+
+- same `event_id` or `correlation_id`
+- `audit_phase=cancelled`
+- `mutation_applied=false`
+- `cancel_reason`
+
 Audit rules:
 
 - Dry-run returns an audit preview and writes no audit.
-- Rejected requests write no audit.
-- Confirmed mutation first verifies that the write-audit path is available; if this preflight fails, `validate_memory` rejects with `mutated=false`.
-- Confirmed successful mutation writes audit after the lifecycle update succeeds.
+- Rejected requests before confirmed apply write no audit.
+- Confirmed mutation first appends a durable pending audit intent; if this append fails, `validate_memory` rejects with `mutated=false`.
+- Confirmed successful mutation writes committed audit after the lifecycle update succeeds.
+- If lifecycle update fails after pending audit, `validate_memory` appends a cancelled audit follow-up when possible and returns `mutated=false`.
+- If committed audit append fails after lifecycle update, `validate_memory` returns `validated-with-warning` and `auditCommitStatus=failed_after_mutation`; the pending audit intent must already be durable.
+- JSONL audit and SQLite lifecycle update are still not one physical transaction.
+- True single-transaction audit would require a future SQLite-backed audit table or migration, which remains unapproved.
 - Audit output must not expose raw secrets.
 - Low-risk summaries must not expose raw `workspace_id`.
 
@@ -140,11 +164,14 @@ Targeted runtime tests:
 | Case | Expected Result |
 |---|---|
 | default invocation with no `dry_run=false` | `decision=dry-run`, `mutated=false`, no status update, no audit append |
-| `proposal -> active` with `dry_run=false` and `confirm=true` | status becomes `active`, audit event appended |
-| `stale -> active` with `dry_run=false` and `confirm=true` | status becomes `active`, audit event appended |
-| audit write-path preflight failure before confirmed apply | rejected, `mutated=false`, no status update, no audit append |
-| `client_id` changes between policy read and update | rejected, `mutated=false`, no status update, no audit append |
-| `visibility` changes between policy read and update | rejected, `mutated=false`, no status update, no audit append |
+| pending audit before update | pending audit exists before `updateLifecycleStatus` is called |
+| `proposal -> active` with `dry_run=false` and `confirm=true` | status becomes `active`, pending and committed audit entries appended |
+| `stale -> active` with `dry_run=false` and `confirm=true` | status becomes `active`, pending and committed audit entries appended |
+| pending audit append failure before confirmed apply | rejected, `mutated=false`, no status update, no audit append |
+| update failure after pending audit | rejected, `mutated=false`, status unchanged, pending and cancelled audit entries appended if possible |
+| committed audit append failure after update | status becomes `active`, pending audit remains durable, result reports `auditCommitStatus=failed_after_mutation` |
+| `client_id` changes between policy read and update | rejected, `mutated=false`, no status update, pending and cancelled audit entries appended |
+| `visibility` changes between policy read and update | rejected, `mutated=false`, no status update, pending and cancelled audit entries appended |
 | `rejected -> active` | rejected, no mutation |
 | `tombstoned -> active` | rejected, no mutation |
 | `superseded -> active` | rejected, no mutation |
@@ -195,7 +222,9 @@ Confirmed apply behavior:
 - requires `--apply`
 - requires `--confirm`
 - still depends on `ValidateMemoryService` for `ToolArgumentValidator`, `SecretScanner`, lifecycle policy, scope policy, status checks, audit write ordering, and cross-client private mutation rejection
-- rejects if the audit write path is not writable before confirmed mutation
+- appends pending audit intent before confirmed mutation
+- appends committed audit after successful lifecycle update
+- appends cancelled audit when lifecycle update fails after pending audit
 - rejects if `client_id` or `visibility` no longer matches the policy snapshot at update time
 - allows only `proposal/stale -> active`
 - rejects `rejected/tombstoned/superseded -> active`

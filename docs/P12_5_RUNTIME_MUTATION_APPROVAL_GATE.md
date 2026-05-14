@@ -36,10 +36,14 @@ The service implementation itself is internal-only. It does not add a public MCP
 
 Current safety patch:
 
-- Confirmed `validate_memory` now preflights the write-audit path before lifecycle mutation.
-- If the write-audit path is unavailable, the service rejects with `mutated=false`.
+- The earlier audit write-path preflight was a mitigation, not full atomicity.
+- Confirmed `validate_memory` now appends a durable `audit_phase=pending` audit intent before lifecycle mutation.
+- If pending audit append fails, the service rejects with `mutated=false`.
+- If lifecycle update fails after pending audit, the service appends `audit_phase=cancelled` when possible and returns `mutated=false`.
+- If committed audit append fails after lifecycle update, the service reports `auditCommitStatus=failed_after_mutation`; durable pending audit evidence already exists.
 - Lifecycle updates are guarded by the policy snapshot fields `client_id` and `visibility`, in addition to `memory_id` and previous `status`.
 - If `client_id` or `visibility` changes between policy read and update, the mutation is rejected instead of applying a stale scope decision.
+- JSONL audit and SQLite update are still not one physical transaction. A true single-transaction audit table would require a future SQLite migration and separate approval.
 
 Current internal CLI wrapper:
 
@@ -110,7 +114,8 @@ Before any runtime mutation patch, the implementation plan must prove:
 - no raw secret can enter audit output
 - no raw `workspace_id` appears in low-risk summaries
 - previous state is recoverable or the mutation is explicitly reversible
-- audit write-path preflight runs before confirmed mutation
+- durable pending audit intent is appended before confirmed mutation
+- committed/cancelled follow-up audit records are appended after update outcome when possible
 - lifecycle update uses expected `client_id` and `visibility` guards
 - failure before durable write leaves no partial mutation
 

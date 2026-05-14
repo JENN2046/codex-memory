@@ -117,6 +117,10 @@ async function readAuditEntries(auditLogPath) {
   }
 }
 
+function mutationAuditEvents(auditEntries) {
+  return auditEntries.map(entry => entry.mutationAuditEvent);
+}
+
 async function withService({ withStatus = true, records = [] } = {}, handler) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-validate-runtime-'));
   const config = createConfig({
@@ -173,42 +177,69 @@ test('validate_memory dry-run is default and does not mutate or audit', async ()
   });
 });
 
-test('validate_memory applies proposal to active with audit when confirmed', async () => {
+test('validate_memory writes pending audit before lifecycle mutation', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'proposal' }]
+  }, async ({ config, shadowStore, service }) => {
+    const updateLifecycleStatus = shadowStore.updateLifecycleStatus.bind(shadowStore);
+    let sawPendingBeforeUpdate = false;
+    shadowStore.updateLifecycleStatus = async options => {
+      const auditEvents = mutationAuditEvents(await readAuditEntries(config.auditLogPath));
+      sawPendingBeforeUpdate = auditEvents.length === 1
+        && auditEvents[0].audit_phase === 'pending'
+        && auditEvents[0].mutation_applied === false;
+      return updateLifecycleStatus(options);
+    };
+
+    const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
+
+    assert.equal(result.decision, 'validated');
+    assert.equal(sawPendingBeforeUpdate, true);
+  });
+});
+
+test('validate_memory applies proposal to active with pending and committed audit when confirmed', async () => {
   await withService({
     records: [{ memoryId: 'mem-1', status: 'proposal' }]
   }, async ({ config, service }) => {
     const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
     const row = getRecordRow(config.dbPath, 'mem-1');
     const auditEntries = await readAuditEntries(config.auditLogPath);
+    const auditEvents = mutationAuditEvents(auditEntries);
 
     assert.equal(result.decision, 'validated');
     assert.equal(result.mutated, true);
+    assert.equal(result.auditIntentStatus, 'appended');
+    assert.equal(result.auditCommitStatus, 'appended');
     assert.equal(result.fromStatus, 'proposal');
     assert.equal(result.toStatus, 'active');
     assert.equal(row.status, 'active');
     assert.equal(row.lifecycle_actor_client_id, 'codex');
     assert.equal(row.status_reason, 'human reviewed proposal evidence');
-    assert.equal(auditEntries.length, 1);
-    assert.equal(auditEntries[0].mutationAuditEvent.event_type, 'memory_validate');
-    assert.equal(auditEntries[0].mutationAuditEvent.tool_name, 'validate_memory');
-    assert.equal(auditEntries[0].mutationAuditEvent.from_status, 'proposal');
-    assert.equal(auditEntries[0].mutationAuditEvent.to_status, 'active');
-    assert.equal(auditEntries[0].mutationAuditEvent.redaction_applied, true);
-    assert.equal(auditEntries[0].mutationAuditEvent.lifecycle_policy_applied, true);
-    assert.equal(auditEntries[0].mutationAuditEvent.scope_policy_applied, true);
+    assert.equal(auditEntries.length, 2);
+    assert.equal(auditEvents[0].audit_phase, 'pending');
+    assert.equal(auditEvents[0].mutation_applied, false);
+    assert.equal(auditEvents[1].audit_phase, 'committed');
+    assert.equal(auditEvents[1].mutation_applied, true);
+    assert.equal(auditEvents[1].event_id, auditEvents[0].event_id);
+    assert.equal(auditEvents[1].correlation_id, auditEvents[0].event_id);
+    assert.equal(auditEvents[1].event_type, 'memory_validate');
+    assert.equal(auditEvents[1].tool_name, 'validate_memory');
+    assert.equal(auditEvents[1].from_status, 'proposal');
+    assert.equal(auditEvents[1].to_status, 'active');
+    assert.equal(auditEvents[1].redaction_applied, true);
+    assert.equal(auditEvents[1].lifecycle_policy_applied, true);
+    assert.equal(auditEvents[1].scope_policy_applied, true);
     assert.equal(JSON.stringify(auditEntries[0]).includes('workspace-a'), false);
   });
 });
 
-test('validate_memory audit preflight failure prevents lifecycle mutation', async () => {
+test('validate_memory audit intent append failure prevents lifecycle mutation', async () => {
   await withService({
     records: [{ memoryId: 'mem-1', status: 'proposal' }]
   }, async ({ config, auditLogStore, service }) => {
-    auditLogStore.ensureWriteAuditWritable = async () => {
-      throw new Error('audit path unavailable');
-    };
     auditLogStore.appendWriteAudit = async () => {
-      throw new Error('append should not be reached');
+      throw new Error('audit intent unavailable');
     };
 
     const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
@@ -217,9 +248,64 @@ test('validate_memory audit preflight failure prevents lifecycle mutation', asyn
 
     assert.equal(result.decision, 'rejected');
     assert.equal(result.mutated, false);
-    assert.match(result.reason, /write audit path is unavailable/);
+    assert.equal(result.auditIntentStatus, 'failed_before_mutation');
+    assert.match(result.reason, /audit intent append failed/);
     assert.equal(row.status, 'proposal');
     assert.deepEqual(auditEntries, []);
+  });
+});
+
+test('validate_memory update failure after pending audit creates cancelled audit', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'proposal' }]
+  }, async ({ config, shadowStore, service }) => {
+    shadowStore.updateLifecycleStatus = async () => ({ updated: false });
+
+    const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
+    const row = getRecordRow(config.dbPath, 'mem-1');
+    const auditEvents = mutationAuditEvents(await readAuditEntries(config.auditLogPath));
+
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.mutated, false);
+    assert.equal(result.auditIntentStatus, 'appended');
+    assert.equal(result.auditCancelStatus, 'appended');
+    assert.equal(row.status, 'proposal');
+    assert.equal(auditEvents.length, 2);
+    assert.equal(auditEvents[0].audit_phase, 'pending');
+    assert.equal(auditEvents[1].audit_phase, 'cancelled');
+    assert.equal(auditEvents[1].mutation_applied, false);
+    assert.equal(auditEvents[1].correlation_id, auditEvents[0].event_id);
+    assert.equal(auditEvents.some(event => event.audit_phase === 'committed'), false);
+  });
+});
+
+test('validate_memory committed audit append failure leaves durable pending audit', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'proposal' }]
+  }, async ({ config, auditLogStore, service }) => {
+    const appendWriteAudit = auditLogStore.appendWriteAudit.bind(auditLogStore);
+    let appendCount = 0;
+    auditLogStore.appendWriteAudit = async entry => {
+      appendCount += 1;
+      if (appendCount === 2) {
+        throw new Error('committed audit unavailable');
+      }
+      return appendWriteAudit(entry);
+    };
+
+    const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
+    const row = getRecordRow(config.dbPath, 'mem-1');
+    const auditEvents = mutationAuditEvents(await readAuditEntries(config.auditLogPath));
+
+    assert.equal(result.decision, 'validated-with-warning');
+    assert.equal(result.mutated, true);
+    assert.equal(result.auditIntentStatus, 'appended');
+    assert.equal(result.auditCommitStatus, 'failed_after_mutation');
+    assert.match(result.reason, /committed audit append failed/);
+    assert.equal(row.status, 'active');
+    assert.equal(auditEvents.length, 1);
+    assert.equal(auditEvents[0].audit_phase, 'pending');
+    assert.equal(auditEvents[0].mutation_applied, false);
   });
 });
 
@@ -236,14 +322,18 @@ test('validate_memory rejects mutation if client_id changes after policy read', 
 
     const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
     const row = getRecordRow(config.dbPath, 'mem-1');
-    const auditEntries = await readAuditEntries(config.auditLogPath);
+    const auditEvents = mutationAuditEvents(await readAuditEntries(config.auditLogPath));
 
     assert.equal(result.decision, 'rejected');
     assert.equal(result.mutated, false);
+    assert.equal(result.auditIntentStatus, 'appended');
+    assert.equal(result.auditCancelStatus, 'appended');
     assert.match(result.reason, /policy guard changed/);
     assert.equal(row.status, 'proposal');
     assert.equal(row.client_id, 'claude');
-    assert.deepEqual(auditEntries, []);
+    assert.equal(auditEvents.length, 2);
+    assert.equal(auditEvents[0].audit_phase, 'pending');
+    assert.equal(auditEvents[1].audit_phase, 'cancelled');
   });
 });
 
@@ -260,14 +350,18 @@ test('validate_memory rejects mutation if visibility changes after policy read',
 
     const result = await service.validate(validatePayload({ dry_run: false, confirm: true }));
     const row = getRecordRow(config.dbPath, 'mem-1');
-    const auditEntries = await readAuditEntries(config.auditLogPath);
+    const auditEvents = mutationAuditEvents(await readAuditEntries(config.auditLogPath));
 
     assert.equal(result.decision, 'rejected');
     assert.equal(result.mutated, false);
+    assert.equal(result.auditIntentStatus, 'appended');
+    assert.equal(result.auditCancelStatus, 'appended');
     assert.match(result.reason, /policy guard changed/);
     assert.equal(row.status, 'proposal');
     assert.equal(row.visibility, 'private');
-    assert.deepEqual(auditEntries, []);
+    assert.equal(auditEvents.length, 2);
+    assert.equal(auditEvents[0].audit_phase, 'pending');
+    assert.equal(auditEvents[1].audit_phase, 'cancelled');
   });
 });
 

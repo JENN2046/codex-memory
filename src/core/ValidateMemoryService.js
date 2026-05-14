@@ -69,7 +69,18 @@ class ValidateMemoryService {
     this.auditLogStore = auditLogStore;
   }
 
-  buildRejectedResult({ reason, payload = {}, memoryId = null, fromStatus = null, dryRun = true }) {
+  buildRejectedResult({
+    reason,
+    payload = {},
+    memoryId = null,
+    fromStatus = null,
+    dryRun = true,
+    auditEventIntent = null,
+    auditCancelEvent = null,
+    auditIntentStatus = 'not_appended',
+    auditCancelStatus = 'not_applicable',
+    auditCommitStatus = 'not_applicable'
+  }) {
     return {
       success: false,
       decision: 'rejected',
@@ -81,6 +92,11 @@ class ValidateMemoryService {
       toStatus: 'active',
       reason,
       auditEvent: null,
+      auditEventIntent,
+      auditCancelEvent,
+      auditIntentStatus,
+      auditCancelStatus,
+      auditCommitStatus,
       policy: {
         lifecycle_policy_applied: true,
         scope_policy_applied: true,
@@ -108,6 +124,68 @@ class ValidateMemoryService {
       lifecycle_policy_applied: true,
       scope_policy_applied: true
     };
+  }
+
+  buildPendingAuditEvent(auditEvent) {
+    return {
+      ...auditEvent,
+      audit_phase: 'pending',
+      mutation_applied: false
+    };
+  }
+
+  buildCommittedAuditEvent(auditEvent, committedAt) {
+    return {
+      event_id: auditEvent.event_id,
+      correlation_id: auditEvent.event_id,
+      event_type: auditEvent.event_type,
+      audit_phase: 'committed',
+      tool_name: auditEvent.tool_name,
+      memory_id: auditEvent.memory_id,
+      actor_client_id: auditEvent.actor_client_id,
+      request_source: auditEvent.request_source,
+      from_status: auditEvent.from_status,
+      to_status: auditEvent.to_status,
+      mutation_applied: true,
+      committed_at: committedAt,
+      redaction_applied: true,
+      lifecycle_policy_applied: true,
+      scope_policy_applied: true
+    };
+  }
+
+  buildCancelledAuditEvent(auditEvent, cancelReason, cancelledAt) {
+    return {
+      event_id: auditEvent.event_id,
+      correlation_id: auditEvent.event_id,
+      event_type: auditEvent.event_type,
+      audit_phase: 'cancelled',
+      tool_name: auditEvent.tool_name,
+      memory_id: auditEvent.memory_id,
+      actor_client_id: auditEvent.actor_client_id,
+      request_source: auditEvent.request_source,
+      from_status: auditEvent.from_status,
+      to_status: auditEvent.to_status,
+      mutation_applied: false,
+      cancel_reason: cancelReason,
+      cancelled_at: cancelledAt,
+      redaction_applied: true,
+      lifecycle_policy_applied: true,
+      scope_policy_applied: true
+    };
+  }
+
+  async appendMutationAudit({ auditEvent, timestamp, decision, record, reason, requestSource }) {
+    await this.auditLogStore.appendWriteAudit({
+      timestamp,
+      decision,
+      target: record.target || null,
+      title: record.title || null,
+      memoryId: record.memoryId,
+      reason,
+      requestSource: requestSource || this.config.defaultRequestSource,
+      mutationAuditEvent: auditEvent
+    });
   }
 
   async validate(payload = {}) {
@@ -250,19 +328,24 @@ class ValidateMemoryService {
       });
     }
 
+    const pendingAuditEvent = this.buildPendingAuditEvent(auditEvent);
     try {
-      if (typeof this.auditLogStore.ensureWriteAuditWritable === 'function') {
-        await this.auditLogStore.ensureWriteAuditWritable();
-      } else if (typeof this.auditLogStore.ensureReady === 'function') {
-        await this.auditLogStore.ensureReady();
-      }
+      await this.appendMutationAudit({
+        auditEvent: pendingAuditEvent,
+        timestamp: createdAt,
+        decision: 'pending',
+        record,
+        reason: 'validate_memory pending intent before lifecycle mutation.',
+        requestSource: normalizedPayload.request_source
+      });
     } catch {
       return this.buildRejectedResult({
-        reason: 'write audit path is unavailable; validate_memory did not mutate.',
+        reason: 'write audit intent append failed; validate_memory did not mutate.',
         payload: normalizedPayload,
         memoryId: record.memoryId,
         fromStatus,
-        dryRun: false
+        dryRun: false,
+        auditIntentStatus: 'failed_before_mutation'
       });
     }
 
@@ -278,25 +361,68 @@ class ValidateMemoryService {
     });
 
     if (!updateResult.updated) {
+      const cancelReason = 'lifecycle status or policy guard changed before validate_memory could apply.';
+      const cancelledAuditEvent = this.buildCancelledAuditEvent(auditEvent, cancelReason, new Date().toISOString());
+      let auditCancelStatus = 'appended';
+      try {
+        await this.appendMutationAudit({
+          auditEvent: cancelledAuditEvent,
+          timestamp: cancelledAuditEvent.cancelled_at,
+          decision: 'cancelled',
+          record,
+          reason: cancelReason,
+          requestSource: normalizedPayload.request_source
+        });
+      } catch {
+        auditCancelStatus = 'failed_after_pending';
+      }
+
       return this.buildRejectedResult({
-        reason: 'lifecycle status or policy guard changed before validate_memory could apply.',
+        reason: cancelReason,
         payload: normalizedPayload,
         memoryId: record.memoryId,
         fromStatus,
-        dryRun: false
+        dryRun: false,
+        auditEventIntent: pendingAuditEvent,
+        auditCancelEvent: auditCancelStatus === 'appended' ? cancelledAuditEvent : null,
+        auditIntentStatus: 'appended',
+        auditCancelStatus
       });
     }
 
-    await this.auditLogStore.appendWriteAudit({
-      timestamp: createdAt,
-      decision: 'validated',
-      target: record.target || null,
-      title: record.title || null,
-      memoryId: record.memoryId,
-      reason: 'validate_memory promoted memory to active.',
-      requestSource: normalizedPayload.request_source || this.config.defaultRequestSource,
-      mutationAuditEvent: auditEvent
-    });
+    const committedAt = new Date().toISOString();
+    const committedAuditEvent = this.buildCommittedAuditEvent(auditEvent, committedAt);
+    try {
+      await this.appendMutationAudit({
+        auditEvent: committedAuditEvent,
+        timestamp: committedAt,
+        decision: 'validated',
+        record,
+        reason: 'validate_memory promoted memory to active.',
+        requestSource: normalizedPayload.request_source
+      });
+    } catch {
+      return {
+        success: true,
+        decision: 'validated-with-warning',
+        toolCandidate: 'validate_memory',
+        dryRun: false,
+        mutated: true,
+        memoryId: record.memoryId,
+        fromStatus,
+        toStatus: 'active',
+        reason: 'committed audit append failed after lifecycle mutation; durable pending audit intent exists.',
+        auditEvent: committedAuditEvent,
+        auditEventIntent: pendingAuditEvent,
+        auditIntentStatus: 'appended',
+        auditCommitStatus: 'failed_after_mutation',
+        policy: {
+          lifecycle_policy_applied: true,
+          scope_policy_applied: true,
+          redaction_applied: true
+        }
+      };
+    }
 
     return {
       success: true,
@@ -307,7 +433,10 @@ class ValidateMemoryService {
       memoryId: record.memoryId,
       fromStatus,
       toStatus: 'active',
-      auditEvent,
+      auditEvent: committedAuditEvent,
+      auditEventIntent: pendingAuditEvent,
+      auditIntentStatus: 'appended',
+      auditCommitStatus: 'appended',
       policy: {
         lifecycle_policy_applied: true,
         scope_policy_applied: true,

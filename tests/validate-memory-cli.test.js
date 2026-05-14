@@ -261,7 +261,13 @@ test('validate-memory CLI applies proposal to active in temp fixture DB', () => 
     assert.equal(report.mutated, true);
     assert.equal(report.fromStatus, 'proposal');
     assert.equal(row.status, 'active');
-    assert.equal(auditEntries.length, 1);
+    assert.equal(auditEntries.length, 2);
+    assert.equal(auditEntries[0].mutationAuditEvent.audit_phase, 'pending');
+    assert.equal(auditEntries[1].mutationAuditEvent.audit_phase, 'committed');
+    assert.equal(
+      auditEntries[1].mutationAuditEvent.correlation_id,
+      auditEntries[0].mutationAuditEvent.event_id
+    );
     assert.equal(report.auditEvent.event_type, 'memory_validate');
     assert.equal(report.rawWorkspaceIdExposed, false);
     assert.equal(JSON.stringify(report).includes('workspace-a'), false);
