@@ -112,7 +112,12 @@ function validateToolArguments(toolName, args = {}) {
   validateValue(args, schema, 'arguments');
 }
 
+function validateArgumentsAgainstSchema(schema, args = {}, path = 'arguments') {
+  validateValue(args, schema, path);
+}
+
 module.exports = {
   ToolArgumentValidationError,
+  validateArgumentsAgainstSchema,
   validateToolArguments
 };

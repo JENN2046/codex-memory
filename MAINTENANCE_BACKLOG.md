@@ -97,6 +97,7 @@
 | A4.8-safe-project-operator-rail | docs-governance | A0/A1 | done | Install A4.8 governance rail, safe-push policy, validation selection, failure recovery, and board phase/closeout schemas | `git diff --check`; docs validation | Docs/board/policy only; no runtime/tests/package/MCP/schema/SQLite changes |
 | P12.5-first-runtime-mutation-tool-planning-approval-gate | memory-governance | A1/A2 | done | Define the explicit approval gate for the first runtime mutation candidate before any runtime write path | `git diff --check`; docs validation | Docs/board only; `validate_memory` remains candidate only; runtime mutation, MCP expansion, SQLite migration, and real DB/memory write remain A5 hard stops |
 | P12.5-validate-memory-runtime-fixture-tests | memory-governance | A1/A2 | done | Lock `validate_memory` runtime input schema, transitions, audit shape, dry-run behavior, redaction, and policy boundaries before runtime approval | `node --test tests\validate-memory-runtime-fixture.test.js`; `npm test`; `git diff --check`; docs validation | Fixture/tests/docs only; targeted `11/11`, full suite `291/291`; no runtime mutation, MCP tool/schema change, SQLite migration, or durable memory write |
+| P12.5-validate-memory-internal-runtime-implementation | memory-governance | A2/A3 | done | Implement narrow internal `validate_memory` runtime service for `proposal/stale -> active` with audit, SecretScanner, ToolArgumentValidator, scope and lifecycle policy gates | targeted runtime test `9/9`; fixture test `11/11`; `npm test` `300/300`; `gate:ci` PASS; `gate:mainline:strict` PASS; lifecycle SQLite dry-run `mutated=false`; diff/docs validation | Internal service only; no MCP public tool expansion, no MCP schema change, no SQLite migration, no hard delete, no provider call |
 
 ## 推荐执行顺序
 
@@ -130,9 +131,10 @@
 28. `P12.4`：MCP tool proposal review 已进入远端主线，锁住 public tools frozen、proposal/defer 决策、P12.5 显式批准前不得 runtime mutation。
 29. `A4.8`：Safe Project Operator Rail 已进入远端主线；只更新 docs/board/policy，不改变 runtime。
 30. `P12.5`：first runtime mutation tool planning/approval gate 已完成；runtime mutation 仍需显式批准。
-31. `P12.5`：`validate_memory` runtime fixture tests 已完成；runtime mutation 仍需显式批准。
-32. 下一步建议：显式批准 narrow `validate_memory` runtime implementation。
-33. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+31. `P12.5`：`validate_memory` runtime fixture tests 已完成。
+32. `P12.5`：narrow internal `validate_memory` runtime implementation 已完成本地验证；public MCP expansion 仍需单独批准。
+33. 下一步建议：review internal `validate_memory` runtime result, then decide whether to keep internal-only, add internal CLI, or run public MCP proposal review.
+34. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

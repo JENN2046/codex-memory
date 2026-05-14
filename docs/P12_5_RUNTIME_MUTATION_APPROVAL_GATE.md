@@ -4,7 +4,7 @@ Updated: 2026-05-14
 
 ## Purpose
 
-P12.5 is an approval gate for the first controlled runtime mutation tool. It is not implementation approval by itself.
+P12.5 began as an approval gate for the first controlled runtime mutation tool. It now records both the explicit approval boundary and the narrow internal implementation result.
 
 The recommended first candidate is `validate_memory`, because it has the narrowest mutation shape: promote an existing `proposal` or `stale` memory to `active` only when evidence is present.
 
@@ -26,13 +26,20 @@ Current fixture/test gate:
 
 This fixture/test phase still does not approve runtime mutation. It locks input requirements, allowed and forbidden lifecycle transitions, audit shape, dry-run behavior, redaction boundary, SecretScanner / ToolArgumentValidator boundaries, and scope/lifecycle policy requirements before any runtime patch.
 
+Current internal runtime implementation:
+
+- Service: [ValidateMemoryService.js](/A:/codex-memory/src/core/ValidateMemoryService.js)
+- Targeted test: [validate-memory-runtime.test.js](/A:/codex-memory/tests/validate-memory-runtime.test.js)
+
+This is an internal service implementation only. It does not add a public MCP tool, does not change MCP schema, does not add a package script, and does not run SQLite migration. The public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+
 Still blocked:
 
-- runtime mutation implementation
 - MCP public tool expansion
 - MCP schema change
 - SQLite migration
-- real DB/memory write
+- runtime implementation for update/supersede/forget/checkpoint/handoff
+- broad or automatic real DB/memory writes outside the explicitly approved internal `validate_memory` service path
 
 Those remain A5 hard stops until explicit approval names the target and allowed write surface.
 
@@ -131,6 +138,6 @@ A4.8 must stop before:
 
 ## Next Decision
 
-The next decision is whether to explicitly approve a narrow P12.5 implementation phase for `validate_memory`.
+The next decision is whether to explicitly approve a public MCP proposal for `validate_memory`, keep it internal-only, or add an internal CLI wrapper.
 
-If approved, the safest first implementation should be internal and guarded before any public MCP expansion is considered.
+Public MCP expansion remains a separate approval gate.

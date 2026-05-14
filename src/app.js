@@ -2,6 +2,7 @@ const { createConfig } = require('./config/createConfig');
 const { ExecutionContextResolver } = require('./core/ExecutionContextResolver');
 const { RecallEnhancer } = require('./core/RecallEnhancer');
 const { MemoryWriteService } = require('./core/MemoryWriteService');
+const { ValidateMemoryService } = require('./core/ValidateMemoryService');
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
@@ -319,6 +320,11 @@ function createCodexMemoryApplication(overrides = {}) {
     executionContextResolver,
     chunkIndexingService
   });
+  const validateMemoryService = new ValidateMemoryService({
+    config,
+    shadowStore,
+    auditLogStore
+  });
 
   const passiveRecallService = new PassiveRecallService({
     pipeline: recallPipeline
@@ -367,6 +373,7 @@ function createCodexMemoryApplication(overrides = {}) {
     },
     services: {
       writeService,
+      validateMemoryService,
       passiveRecallService,
       activeRecallService,
       overviewService

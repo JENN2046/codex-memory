@@ -339,6 +339,68 @@ class SqliteShadowStore {
     return result;
   }
 
+  async getRecordValidationPolicy(memoryId) {
+    await this.ensureReady();
+    this.refreshMemoryRecordColumnInfo();
+    const hasStatus = this.hasMemoryRecordColumn('status');
+    const row = this.db.prepare(`
+      SELECT memory_id, client_id, visibility${hasStatus ? ', status' : ''}
+      FROM memory_records WHERE memory_id = ?
+    `).get(memoryId);
+
+    if (!row) {
+      return {
+        exists: false,
+        lifecycleColumnAvailable: hasStatus,
+        status: null,
+        clientId: null,
+        visibility: null
+      };
+    }
+
+    return {
+      exists: true,
+      lifecycleColumnAvailable: hasStatus,
+      status: hasStatus ? (row.status || null) : null,
+      clientId: row.client_id || null,
+      visibility: row.visibility || null
+    };
+  }
+
+  async updateLifecycleStatus({ memoryId, fromStatus, toStatus, updatedAt, actorClientId = null, reason = null }) {
+    await this.ensureReady();
+    this.refreshMemoryRecordColumnInfo();
+    if (!this.hasMemoryRecordColumn('status')) {
+      return { updated: false, reason: 'missing_status_column' };
+    }
+
+    const assignments = ['status = ?', 'updated_at = ?'];
+    const params = [toStatus, updatedAt, memoryId, fromStatus];
+    if (this.hasMemoryRecordColumn('lifecycle_updated_at')) {
+      assignments.splice(2, 0, 'lifecycle_updated_at = ?');
+      params.splice(2, 0, updatedAt);
+    }
+    if (this.hasMemoryRecordColumn('lifecycle_actor_client_id')) {
+      assignments.splice(assignments.length, 0, 'lifecycle_actor_client_id = ?');
+      params.splice(params.length - 2, 0, actorClientId);
+    }
+    if (this.hasMemoryRecordColumn('status_reason')) {
+      assignments.splice(assignments.length, 0, 'status_reason = ?');
+      params.splice(params.length - 2, 0, reason);
+    }
+
+    const result = this.db.prepare(`
+      UPDATE memory_records
+      SET ${assignments.join(', ')}
+      WHERE memory_id = ? AND status = ?
+    `).run(...params);
+
+    return {
+      updated: result.changes === 1,
+      changes: result.changes
+    };
+  }
+
   normalizePathFilters(raw) {
     const values = Array.isArray(raw) ? raw : [];
     return [...new Set(values

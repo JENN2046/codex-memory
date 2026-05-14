@@ -6,25 +6,25 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Safe Project Operator Rail |
-| Current task | CM-0079 / P12.5-validate-memory-runtime-fixture-tests |
-| Current area | P12-controlled-write-tools / validate-memory-fixture-tests |
-| Last local commit | `21f3e03 docs: add P12.5 mutation approval gate` |
-| Last pushed baseline | `21f3e03` |
-| Last action | Completed validate_memory runtime fixture tests before runtime implementation approval. |
-| Last validation | Targeted `validate-memory-runtime-fixture` passed `11/11`; `npm test` passed `291/291`; diff check passed; docs validation passed. |
-| Worktree summary | validate_memory fixture/tests/docs scope complete; no `src/`, package, `.env`, dependency, MCP schema/tool, SQLite migration, provider call, or durable memory write. |
+| Current task | CM-0080 / P12.5-validate-memory-internal-runtime-implementation |
+| Current area | P12-controlled-write-tools / validate-memory-internal-runtime |
+| Last local commit | `cd6b1c4 test: lock validate_memory runtime fixture` |
+| Last pushed baseline | `cd6b1c4` |
+| Last action | Completed narrow internal ValidateMemoryService implementation and required validation. |
+| Last validation | Targeted runtime test passed `9/9`; fixture test passed `11/11`; `npm test` passed `300/300`; `gate:ci` PASS; `gate:mainline:strict` PASS; lifecycle SQLite dry-run `mutated=false`. |
+| Worktree summary | internal validate_memory runtime implementation complete pending guarded commit; no package, `.env`, dependency, MCP schema/tool, SQLite migration, provider call, hard delete, or public tool expansion. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | Active-memory suite status | Latest pushed strict gate baseline compare `43/43 matched`, rollback `43/43 rollback-ready`. |
-| npm test | required for current fixture/test batch |
+| npm test | passed `300/300` for current internal runtime batch |
 | Profile health | Not run in this batch |
-| Guarded auto-commit allowed | eligible after docs validation and final diff/file-scope inspection; safe push allowed if readiness is ready |
-| Last checkpoint | P12.5 approval gate landed in `origin/main` at `21f3e03`. |
-| Next planned action | Guarded commit, push readiness, and safe-push if ready. |
+| Guarded auto-commit allowed | eligible after final diff/file-scope inspection; safe push allowed if readiness is ready |
+| Last checkpoint | validate_memory fixture tests landed in `origin/main` at `cd6b1c4`. |
+| Next planned action | Final diff/file-scope inspection, guarded commit, push readiness, and safe-push if ready. |
 
 ## Notes
 
-- Current phase is `P12.5-validate-memory-runtime-fixture-tests`.
-- Previous phase `P12.5-first-runtime-mutation-tool-planning-approval-gate` is on `origin/main`.
-- Next recommended phase is explicit approval for a narrow `validate_memory` runtime implementation.
+- Current phase is `P12.5-validate-memory-internal-runtime-implementation`.
+- Previous phase `P12.5-validate-memory-runtime-fixture-tests` is on `origin/main`.
+- Next recommended phase is review/approval decision for internal CLI or public MCP proposal.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
-- This batch must not implement runtime mutation or write durable memory.
+- This batch must not expand MCP tools, alter SQLite schema, hard delete, or implement other mutation tools.
