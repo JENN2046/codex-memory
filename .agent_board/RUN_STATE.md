@@ -6,22 +6,22 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 tests/fixtures/docs |
-| Current task | CM-0129 / P18.3-import-mapping-dry-run-evidence-gate |
-| Current area | P18 import mapping dry-run evidence gate |
-| Last local commit | P18.2 export envelope fixtures committed and safe-pushed at `8b7a197` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `8b7a1973f2807df1de1506f892e64a5e004dc904` |
+| Current task | CM-0130 / P18.4-backup-rollback-safety-review |
+| Current area | P18 backup / rollback safety review |
+| Last local commit | P18.3 dry-run evidence gate committed and safe-pushed at `85a3899` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `85a389926d129ecfd4a462a5ecaf91778e2d2cc2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P18.3 import mapping dry-run evidence gate. |
-| Last validation | P18.3 validation passed: targeted CLI tests `11/11` + `11/11`; mapping/readiness CLI JSON; `npm test` `454/454`; `git diff --check`; docs validation. |
-| Worktree summary | P18.3 docs/status/board edits only plus read-only fixture CLI evidence. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, or unapproved mutation. |
+| Last action | Added P18.4 backup / rollback safety review. |
+| Last validation | P18.4 docs validation passed: `git diff --check`; docs validation. |
+| Worktree summary | P18.4 docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
 | P16 status | Planning through P16.x completed and pushed. |
 | P17 status | Planning through P17.x completed and pushed. |
-| P18 status | Planning through P18.2 completed and pushed; P18.3 evidence gate drafted locally. |
+| P18 status | Planning through P18.3 completed and pushed; P18.4 safety review drafted locally. |
 | Guarded auto-commit allowed | eligible after final scope review |
-| Safe-push readiness | pending final review for P18.3 |
+| Safe-push readiness | pending final review for P18.4 |
 | Next planned action | Run final diff/scope review, guarded commit, and safe-push readiness. |
 
 ## Notes
@@ -48,4 +48,5 @@
 - Decision: P18.1 inventories fixture/dry-run evidence only; P18.2 may add synthetic export-envelope fixture tests but still must not implement apply, migration, real memory preview, provider calls, or MCP expansion.
 - Decision: P18.2 may add synthetic fixture/test/docs only; import/export runtime, export file generation, migration, real memory preview, provider calls, and MCP expansion remain blocked.
 - Decision: P18.3 may summarize existing fixture-only dry-run/readiness CLI evidence, but `status=blocked` remains the apply/migration stance until explicit A5 approval.
+- Decision: P18.4 may define backup/rollback and A5 approval requirements only; backup creation, restore, apply, migration, and real memory operations remain blocked.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.

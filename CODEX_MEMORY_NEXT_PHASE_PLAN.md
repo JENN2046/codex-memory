@@ -211,9 +211,17 @@
 
 - 入口：[docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md](/A:/codex-memory/docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md)
 - 目标：汇总现有 fixture-only mapping dry-run CLI 与 migration readiness CLI 证据，判断是否可进入 backup/rollback safety review。
-- 当前状态：P18.3 evidence doc 已本地通过 targeted CLI tests、CLI `--json`、`npm test`、diff/docs validation，等待 guarded commit / safe-push。
-- 下一步建议：完成 guarded commit / safe-push，并进入 `P18.4-backup-rollback-safety-review`。
+- 当前状态：P18.3 evidence doc 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `85a389926d129ecfd4a462a5ecaf91778e2d2cc2`。
+- 下一步建议：继续 `P18.4-backup-rollback-safety-review`。
 - 边界：docs/evidence only；不改 `src/`、不执行 import/export apply、不生成 export file、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
+
+当前 P18.4 backup / rollback safety review：
+
+- 入口：[docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md](/A:/codex-memory/docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md)
+- 目标：定义 future apply/migration 前必须具备的 backup requirement、rollback story、A5 approval packet 和 validation matrix。
+- 当前状态：P18.4 review 已本地通过 `git diff --check` 和 docs validation，等待 guarded commit / safe-push。
+- 下一步建议：完成 guarded commit / safe-push，并进入 `P18.x-closeout-review`。
+- 边界：docs-only；不创建 backup、不 restore、不执行 import/export apply、不跑 migration、不读取 real memory、不改 MCP、不做 provider call。
 
 ## 当前判断
 

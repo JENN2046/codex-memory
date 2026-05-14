@@ -139,6 +139,7 @@
 - P18.1 import/export fixture inventory：新增 [docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md)，盘点 P13 object model、round-trip、mapping、mapping dry-run、import/export shape、migration readiness、lifecycle dry-run、controlled-write dry-run 和 internal validate_memory guard 证据；结论是 P18.2 应补 multi-record export envelope、lifecycle variants、supersession refs、conflict preview、backup/rollback manifest shape 等 synthetic fixture/test，不授权 apply、migration、real memory preview 或 MCP expansion。
 - P18.2 export envelope fixture expansion：新增 `tests/fixtures/p18-export-envelope-v1.json`、`tests/p18-export-envelope-fixture.test.js` 与 [docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md](/A:/codex-memory/docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md)，锁住 multi-record envelope、deterministic ordering/checksum、lifecycle variants、supersession refs、import conflict preview、backup/rollback requirements、redaction flags、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`、`realMemoryPreview=false`；不实现 import/export runtime，不生成文件，不读取真实 memory，不改 MCP。
 - P18.3 import mapping dry-run evidence gate：新增 [docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md](/A:/codex-memory/docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md)，汇总现有 mapping dry-run CLI 与 migration readiness CLI 证据；mapping dry-run 为 fixture-only、`mutated=false`、scanned `3` / mapped `2` / unmapped `1`、no file generation / no migration / no real DB or diary read；migration readiness 为 `status=blocked`、`migrationBlocked=true`、required approvals 未满足。结论 `DRY_RUN_EVIDENCE_READY_BLOCKED_FOR_APPLY`，只能进入 P18.4 backup/rollback safety review。
+- P18.4 backup / rollback safety review：新增 [docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md](/A:/codex-memory/docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md)，定义未来 import/export apply 或 migration 之前必须具备的 backup requirement、rollback story、A5 approval packet 和 validation matrix；结论 `BACKUP_ROLLBACK_REVIEW_READY_BLOCKED_FOR_APPLY`，不执行备份、不恢复、不迁移、不读取/写入真实 memory。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -504,7 +505,7 @@
 
 ## 下一步建议
 
-- 下一阶段建议完成 `P18.3-import-mapping-dry-run-evidence-gate` 的 CLI/test/docs validation、guarded commit / safe-push，然后进入 `P18.4-backup-rollback-safety-review`。P18 必须保持 planning / fixture / dry-run 顺序，不得直接 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、release candidate、tag 或 deploy。
+- 下一阶段建议完成 `P18.4-backup-rollback-safety-review` 的 docs validation、guarded commit / safe-push，然后进入 `P18.x-closeout-review`。P18 必须保持 planning / fixture / dry-run 顺序，不得直接 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、release candidate、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 
