@@ -2,29 +2,28 @@
 
 ## Current Goal
 
-P12.5-validate-memory-runtime-implementation-plan: record ValidateMemoryService, SqliteShadowStore, app wiring, audit, test matrix, and rollback story as docs/tests-design.
+P12.5-validate-memory-internal-runtime-review: review internal `validate_memory` runtime against fixture, approval gate, implementation plan, and targeted tests.
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory-runtime-plan
+P12-controlled-write-tools / validate-memory-runtime-review
 
 ## Current Status
 
-The internal `validate_memory` runtime service has landed on `origin/main` at `29c7ad8`.
+The `validate_memory` implementation plan has landed on `origin/main` at `d01d2dd`.
 
-Current docs/tests-design work records the implementation plan and rollback story before any further runtime, public MCP, or migration work. It does not modify `src/`, tests, package files, MCP schema, or SQLite schema.
+Current review result is PASS. No blocking drift was found between fixture, plan, runtime, and tests. This batch records review findings only and does not modify runtime, tests, package files, MCP schema, or SQLite schema.
 
 ## Completed Work In This Batch
 
-- Added P12.5 implementation plan and rollback story doc.
-- Linked the plan from controlled-write and approval-gate docs.
-- Updated P12.5 status/backlog/board pointers.
+- Inspected internal runtime, store helpers, app wiring, fixture, tests, and P12.5 docs.
+- Ran required validation.
+- Added P12.5 internal runtime review doc.
+- Updated status/backlog/board pointers.
 
 ## Changed Files
 
-- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
-- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
-- `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
+- `docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -35,19 +34,25 @@ Current docs/tests-design work records the implementation plan and rollback stor
 
 ## Validation Run
 
+- `node --test tests\validate-memory-runtime-fixture.test.js`：passed `11/11`
+- `node --test tests\validate-memory-runtime.test.js`：passed `9/9`
+- `node --test tests\mcp-contract.test.js`：passed `7/7`
+- `npm test`：passed `300/300`
+- `npm run gate:ci`：PASS
+- `npm run gate:mainline:strict`：PASS
+- `npm run lifecycle:sqlite:dry-run -- --json`：passed with `mutated=false`
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
 ## Validation Not Run
 
-- No runtime tests required for this docs/tests-design batch unless docs validation exposes drift.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
 
 ## Current Blockers
 
-- None for the docs/tests-design scope.
+- None for the review scope.
 - Public MCP tool expansion remains blocked until explicit proposal approval.
 
 ## Remaining Risks

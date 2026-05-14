@@ -99,6 +99,7 @@
 | P12.5-validate-memory-runtime-fixture-tests | memory-governance | A1/A2 | done | Lock `validate_memory` runtime input schema, transitions, audit shape, dry-run behavior, redaction, and policy boundaries before runtime approval | `node --test tests\validate-memory-runtime-fixture.test.js`; `npm test`; `git diff --check`; docs validation | Fixture/tests/docs only; targeted `11/11`, full suite `291/291`; no runtime mutation, MCP tool/schema change, SQLite migration, or durable memory write |
 | P12.5-validate-memory-internal-runtime-implementation | memory-governance | A2/A3 | done | Implement narrow internal `validate_memory` runtime service for `proposal/stale -> active` with audit, SecretScanner, ToolArgumentValidator, scope and lifecycle policy gates | targeted runtime test `9/9`; fixture test `11/11`; `npm test` `300/300`; `gate:ci` PASS; `gate:mainline:strict` PASS; lifecycle SQLite dry-run `mutated=false`; diff/docs validation | Internal service only; no MCP public tool expansion, no MCP schema change, no SQLite migration, no hard delete, no provider call |
 | P12.5-validate-memory-runtime-implementation-plan | memory-governance | A0/A1 | done | Record ValidateMemoryService, SqliteShadowStore, app wiring, audit write, test matrix, and rollback story before any further runtime/MCP work | `git diff --check`; docs validation | Docs/tests-design only; no `src/`, package, MCP schema/tool, SQLite migration, hard delete, provider call, or durable memory write |
+| P12.5-validate-memory-internal-runtime-review | memory-governance | A1/A2 | done | Review internal `validate_memory` runtime against fixture, approval gate, implementation plan, and targeted tests | fixture `11/11`; runtime `9/9`; MCP contract `7/7`; full suite `300/300`; `gate:ci` PASS; strict gate PASS; lifecycle dry-run `mutated=false`; diff/docs validation | Review PASS; no blocking drift, no MCP expansion, no SQLite migration, no hard delete |
 
 ## 推荐执行顺序
 
@@ -135,8 +136,9 @@
 31. `P12.5`：`validate_memory` runtime fixture tests 已完成。
 32. `P12.5`：narrow internal `validate_memory` runtime implementation 已完成本地验证；public MCP expansion 仍需单独批准。
 33. `P12.5`：validate_memory runtime implementation plan / test matrix / rollback story 已补齐；docs/tests-design only。
-34. 下一步建议：review internal `validate_memory` runtime result, then decide whether to keep internal-only, add internal CLI, or run public MCP proposal review.
-35. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+34. `P12.5`：validate_memory internal runtime review 已完成，结论 PASS。
+35. 下一步建议：decide whether to keep internal-only, add internal CLI wrapper, or run public MCP proposal review.
+36. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
