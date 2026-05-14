@@ -1,0 +1,128 @@
+{
+  "phase": "P14.2-DeepMemo-targeted-parity-fixtures",
+  "schema_version": 1,
+  "mutated": false,
+  "source": {
+    "kind": "fixture-only",
+    "suite_root": "benchmarks/active-memory-suite",
+    "note": "DeepMemo donor parity fixture evidence only; runtime behavior is not changed."
+  },
+  "cases": [
+    {
+      "name": "deepmemo-payload-shape-basic-success",
+      "purpose": "Lock the donor-style DeepMemo success payload shape.",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/deepmemo-basic-success.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "error",
+          "meta"
+        ],
+        "resultIncludes": [
+          "[回忆片段1]",
+          "Master: We should discuss the codex-memory system plan.",
+          "Keke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-blocked-keyword-meta-placement",
+      "purpose": "Lock blocked keyword diagnostics under meta instead of top-level fields.",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/deepmemo-all-keywords-blocked.json",
+      "env": {
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "system plan"
+      },
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "关键词均被屏蔽"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "blockedKeywords",
+          "blockedKeywordCount",
+          "effectiveKeywords",
+          "effectiveKeywordText"
+        ],
+        "meta": {
+          "code": "all-keywords-blocked",
+          "toolName": "DeepMemo",
+          "tool_name": "DeepMemo",
+          "blockedKeywords": [
+            "system plan"
+          ],
+          "blockedKeywordCount": 1,
+          "blocked_keyword_count": 1,
+          "effectiveKeywords": [],
+          "effectiveKeywordCount": 0,
+          "effective_keyword_count": 0,
+          "effectiveKeywordText": "",
+          "effective_keyword_text": ""
+        }
+      }
+    },
+    {
+      "name": "deepmemo-advanced-syntax-payload-stability",
+      "purpose": "Lock advanced query syntax success payload stability.",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/deepmemo-advanced-syntax-success.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "error",
+          "meta"
+        ],
+        "resultIncludes": [
+          "[回忆片段1]",
+          "codex-memory system plan",
+          "TopicMemo and Phase C recall audit"
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-ranking-three-window-order-snapshot",
+      "purpose": "Lock a three-window ranking order snapshot for DeepMemo tie-breaker parity.",
+      "activeMemoryRoot": "vchat-fixture-ranking-extended",
+      "inputFile": "inputs/deepmemo-ranking-three-window-order-success.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "orderedResultIncludes": [
+          "[回忆片段1]:\nKeke: Noted for the backlog.\nArchitect: Phase D rollback compare migration must be checked now.\nKeke: This strongest checkpoint should gate the cutover.",
+          "[回忆片段2]:\nKeke: Saved for the suite.\nArchitect: Phase D compare should be reviewed next.\nKeke: Migration can wait until rollback is stable.",
+          "[回忆片段3]:\nKeke: Later we can trim the backlog.\nArchitect: Compare migration can resume after docs review.\nKeke: No rollback sign-off is needed for that later step."
+        ]
+      }
+    }
+  ],
+  "non_goals": [
+    "no runtime change",
+    "no public MCP tool expansion",
+    "no MCP schema change",
+    "no import/export or migration behavior change",
+    "no SQLite migration",
+    "no real DB or memory write"
+  ]
+}

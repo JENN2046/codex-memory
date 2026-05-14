@@ -104,7 +104,8 @@ P14 should proceed in small phases:
    - Completed in [DONOR_PARITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/DONOR_PARITY_FIXTURE_INVENTORY.md).
    - Inventories current standard suite and donor parity fixture gaps.
 2. `P14.2-DeepMemo-targeted-parity-fixtures`
-   - Add DeepMemo fixture cases for payload, blocked keyword, query syntax, and ranking boundaries.
+   - Completed by `tests/fixtures/deepmemo-donor-parity-v1.json` and `tests/deepmemo-donor-parity-fixture.test.js`.
+   - Locks DeepMemo payload shape, blocked keyword meta placement, advanced syntax payload stability, and three-window ranking order without runtime changes.
 3. `P14.3-TopicMemo-targeted-parity-fixtures`
    - Add TopicMemo fixture cases for topic listing, topic content, missing topic/history, and agent alias boundaries.
 4. `P14.4-error-meta-parity-tests`
@@ -132,6 +133,6 @@ No runtime behavior changes should happen until fixture and gate evidence exists
 
 ## Next Recommended Phase
 
-`P14.2-DeepMemo-targeted-parity-fixtures`
+`P14.3-TopicMemo-targeted-parity-fixtures`
 
-P14.2 may add DeepMemo-targeted fixture/test coverage. It should not alter runtime behavior unless a later phase explicitly approves implementation.
+P14.3 may add TopicMemo-targeted fixture/test coverage. It should not alter runtime behavior unless a later phase explicitly approves implementation.

@@ -98,10 +98,10 @@ Current standard suite coverage includes:
 
 P14.2 DeepMemo targeted parity fixtures should prioritize:
 
-- payload shape parity for success envelopes
-- blocked keyword `meta` placement
-- advanced syntax payload stability
-- ranking/tie-breaker expected order snapshots
+- payload shape parity for success envelopes: covered by `deepmemo-payload-shape-basic-success`
+- blocked keyword `meta` placement: covered by `deepmemo-blocked-keyword-meta-placement`
+- advanced syntax payload stability: covered by `deepmemo-advanced-syntax-payload-stability`
+- ranking/tie-breaker expected order snapshots: covered by `deepmemo-ranking-three-window-order-snapshot`
 
 P14.3 TopicMemo targeted parity fixtures should prioritize:
 
@@ -151,6 +151,6 @@ git diff --check
 
 ## Next Recommended Phase
 
-`P14.2-DeepMemo-targeted-parity-fixtures`
+`P14.3-TopicMemo-targeted-parity-fixtures`
 
-P14.2 may add fixture/test coverage, but it should still avoid runtime behavior changes unless a later phase explicitly approves them.
+P14.3 may add TopicMemo fixture/test coverage, but it should still avoid runtime behavior changes unless a later phase explicitly approves them.
