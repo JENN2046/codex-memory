@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P17.4 V8 query-family fixture tests without changing runtime behavior.
+Run P17.5 V8 evidence gate summary without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P17.4 fixture/test/docs/status/board edits are local, validated, and uncommitted.
+P17.5 docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P17 V8 query-family fixture tests
+P17 V8 evidence gate summary
 
 ## Findings
 
@@ -53,15 +53,16 @@ P17 V8 query-family fixture tests
 - P17.3 guarded commit and safe-push completed at `6afea7601fddadcfa845bf6d93eccef91aede7fe`.
 - P17.4 query-family fixtures have been drafted for technical, governance, quality, semantic, and safety diagnostic families.
 - P17.4 targeted query-family test `4/4`, full suite `443/443`, diff check, and docs validation passed locally.
-- `v8-diagnose` is now under query-family evidence in P17.4; this is not authorization for V8 runtime implementation.
+- P17.4 guarded commit and safe-push completed at `faf80c5f0368cad8ac1c0edc82c90538ef4505c6`.
+- P17.5 evidence summary is drafted with result `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`.
+- P17.5 diff check and docs validation passed locally.
+- P17.5 is not authorization for V8 runtime implementation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `tests/fixtures/v8-query-family-v1.json`
-- `tests/v8-query-family-fixture.test.js`
-- `docs/P17_V8_QUERY_FAMILY_FIXTURE_TESTS.md`
+- `docs/P17_V8_EVIDENCE_GATE_SUMMARY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -69,8 +70,6 @@ P17 V8 query-family fixture tests
 
 ## Validation
 
-- `node --test tests\v8-query-family-fixture.test.js` (`4/4`)
-- `npm test` (`443/443`)
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -90,4 +89,4 @@ P17 V8 query-family fixture tests
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P17.5-v8-evidence-gate-summary`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P17.x-closeout-review`.

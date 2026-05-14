@@ -138,6 +138,7 @@
 | P17.2-v8-diagnostic-fixture-shape-tests | v8 / diagnostics / fixture-tests | A1/A2 | done | Add synthetic fixture shape tests for v8-diagnose report shape and forbidden fields | targeted fixture tests; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 | P17.3-v8-diagnostic-cli-shape-gate | v8 / diagnostics / CLI-gate | A1/A2 | done | Lock v8-diagnose CLI JSON/text/error shell with synthetic fixture gate | targeted CLI gate; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 | P17.4-v8-query-family-fixture-tests | v8 / diagnostics / query-family-fixtures | A1/A2 | done | Expand synthetic diagnostic query families across technical, governance, quality, semantic, and safety categories | targeted query-family tests; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
+| P17.5-v8-evidence-gate-summary | v8 / diagnostics / evidence-summary | A1 | done | Summarize P17 diagnostic evidence and decide closeout readiness | `git diff --check`; docs validation | Evidence summary only; no runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 
 ## 推荐执行顺序
 
@@ -214,8 +215,9 @@
 71. `P17.2`：已新增 synthetic V8 diagnostic fixture shape test，覆盖 `mode`、`destructive=false`、`embeddingProfile`、`query`、`terrain`、`residualPyramid`、`tagMemo`、`metaThinking`、`geodesic`、safety flags、forbidden fields 与 missing-query safe error shape；targeted fixture test `5/5`、full suite `434/434`、diff check、docs validation 均已通过。
 72. `P17.3`：已新增 synthetic V8 diagnostic CLI shape gate，覆盖 `--json` output、text labels、missing-query error shell、forbidden unsafe/fake quality fields；targeted CLI gate `5/5`、full suite `439/439` 已通过。
 73. `P17.4`：已新增 synthetic V8 query-family fixture tests，覆盖 technical、governance、quality、semantic、safety categories，验证 normalized query、TagMemo mode、geodesic flags、core tags、terrain axes、residual pyramid、meta-thinking shape 与 forbidden fake/unsafe fields；targeted `4/4`、full suite `443/443` 已通过。
-74. 下一步建议完成 P17.4 diff/docs validation、guarded commit / safe-push 后进入 `P17.5-v8-evidence-gate-summary`；不得直接进入 V8 implementation、runtime tuning、provider benchmark、UI、migration/import-export apply 或 release candidate。
-75. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+74. `P17.5`：V8 evidence gate summary 已新增 [docs/P17_V8_EVIDENCE_GATE_SUMMARY.md](/A:/codex-memory/docs/P17_V8_EVIDENCE_GATE_SUMMARY.md)，结论为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`；足以进入 P17.x closeout，不足以授权 runtime implementation、provider benchmark、real memory preview、MCP expansion 或 migration/import-export apply。
+75. 下一步建议完成 P17.5 docs validation、guarded commit / safe-push 后进入 `P17.x-closeout-review`；不得直接进入 V8 implementation、runtime tuning、provider benchmark、UI、migration/import-export apply 或 release candidate。
+76. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

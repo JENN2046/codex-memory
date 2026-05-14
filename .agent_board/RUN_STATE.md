@@ -6,21 +6,21 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 tests/fixtures/docs |
-| Current task | CM-0123 / P17.4-v8-query-family-fixture-tests |
-| Current area | P17 V8 query-family fixture tests |
-| Last local commit | P17.3 CLI shape gate committed and safe-pushed at `6afea76` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `6afea7601fddadcfa845bf6d93eccef91aede7fe` |
+| Current task | CM-0124 / P17.5-v8-evidence-gate-summary |
+| Current area | P17 V8 evidence gate summary |
+| Last local commit | P17.4 query-family fixtures committed and safe-pushed at `faf80c5` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `faf80c5f0368cad8ac1c0edc82c90538ef4505c6` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P17.4 V8 query-family fixture tests and ran targeted/full validation. |
-| Last validation | P17.4 validation passed: targeted query-family test `4/4`; full suite `443/443`; `git diff --check`; docs validation. |
-| Worktree summary | P17.4 tests/fixtures/docs/status/board edits only. No `src/`, package, MCP schema/tool, SQLite migration, import/export apply, provider call, real memory read preview, `.env`, tag, release, deploy, or unapproved mutation. |
+| Last action | Added P17.5 V8 evidence gate summary. |
+| Last validation | P17.5 docs validation passed: `git diff --check`; docs validation. |
+| Worktree summary | P17.5 docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, provider call, real memory read preview, `.env`, tag, release, deploy, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
 | P16 status | Planning through P16.x completed and pushed. |
-| P17 status | Planning through P17.3 completed and pushed; P17.4 validated locally. |
+| P17 status | Planning through P17.4 completed and pushed; P17.5 validated locally. |
 | Guarded auto-commit allowed | eligible after final diff/scope review |
-| Safe-push readiness | pending for P17.4 |
+| Safe-push readiness | pending for P17.5 |
 | Next planned action | Run final diff/scope review, guarded commit, and safe-push readiness. |
 
 ## Notes
@@ -41,4 +41,5 @@
 - Decision: P17.2 may call `buildV8Diagnosis` with synthetic queries inside tests to lock shape, but must not change `src/`, call providers, read real memory, tune runtime ranking, expand MCP, or implement V8.
 - Decision: P17.3 may run `src/cli/v8-diagnose.js` with synthetic temp env in tests to lock CLI output shape, but must not change `src/`, call providers, read real memory, tune runtime ranking, expand MCP, or implement V8.
 - Decision: P17.4 may call `buildV8Diagnosis` with synthetic query families to lock diagnostic category signals, but must not change `src/`, call providers, read real memory, tune runtime ranking, expand MCP, or implement V8.
+- Decision: P17.5 summary may mark P17 evidence fixture-backed, but it must not authorize V8 implementation, runtime tuning, provider benchmark, real memory preview, MCP expansion, or migration/import-export apply.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.

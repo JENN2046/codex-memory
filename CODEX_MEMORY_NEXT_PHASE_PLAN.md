@@ -163,9 +163,17 @@
 - Fixture：`tests/fixtures/v8-query-family-v1.json`
 - Test：`tests/v8-query-family-fixture.test.js`
 - 目标：覆盖 technical / governance / quality / semantic / safety synthetic diagnostic families，锁住 normalized query、TagMemo mode、geodesic flags、core tags、terrain axes、residual pyramid、meta-thinking shape 和 forbidden fake/unsafe fields。
-- 当前状态：P17.4 targeted query-family test `4/4`、full suite `443/443` 已通过，等待 diff/docs validation、guarded commit / safe-push。
-- 下一步建议：完成 `git diff --check` 和 docs validation；若通过则 guarded commit / safe-push，并进入 `P17.5-v8-evidence-gate-summary`。
+- 当前状态：P17.4 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `faf80c5f0368cad8ac1c0edc82c90538ef4505c6`。
+- 下一步建议：继续 `P17.5-v8-evidence-gate-summary`。
 - 边界：tests/fixtures/docs/status/board only；不改 `src/`、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
+
+当前 P17.5 evidence gate summary：
+
+- 入口：[docs/P17_V8_EVIDENCE_GATE_SUMMARY.md](/A:/codex-memory/docs/P17_V8_EVIDENCE_GATE_SUMMARY.md)
+- 目标：汇总 P17 planning / inventory / report shape / CLI gate / query-family evidence。
+- 当前状态：P17.5 summary 已完成本地草案，结论为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`，等待 docs validation、guarded commit / safe-push。
+- 下一步建议：完成 `git diff --check` 和 docs validation；若通过则 guarded commit / safe-push，并进入 `P17.x-closeout-review`。
+- 边界：docs/status/board only；不改 `src/`、不新增 tests、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
 
 ## 当前判断
 
