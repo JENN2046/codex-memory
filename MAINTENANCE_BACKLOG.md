@@ -120,7 +120,8 @@
 | P14.5-ranking-tie-breaker-parity-tests | donor-compatibility / fixtures | A1/A2 | done | Expand ranking and tie-breaker parity fixture coverage before runtime changes | `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js`; compare/rollback ordering gates; `npm test`; diff/docs validation | Fixture/test evidence added; no runtime, MCP, package, import/export, migration, or real data write changes |
 | P14.6-compare-rollback-standing-gate-summary | donor-compatibility / gate-summary | A1/A2 | done | Summarize standing compare/rollback category gates and readiness checks | full standard-suite compare/rollback smoke; `git diff --check`; docs validation | Summary doc added; compare `43/43 matched`; rollback `43/43 rollback-ready`; no runtime, MCP, package, import/export, migration, or real data write changes |
 | P15-real-query-quality-gate-planning | query-quality / planning | A1/A2 | done | Plan real query quality gate after P14 donor parity standing gate summary | fixture-only query baseline; docs/diff validation | Planning doc added; current fixture recall dry-run baseline is `8/8`, `mutated=false`, `providerCalls=0`; no runtime, MCP, package, migration, import/export, provider, or real data write changes |
-| P15.1-real-query-quality-fixture-inventory | query-quality / fixture-inventory | A1/A2 | todo | Inventory current query fixture coverage, missing dimensions, negative assertions, and quality gate gaps | future docs/diff validation; optional fixture-only query baseline | Inventory only; do not add runtime behavior or call providers |
+| P15.1-real-query-quality-fixture-inventory | query-quality / fixture-inventory | A1/A2 | done | Inventory current query fixture coverage, missing dimensions, negative assertions, and quality gate gaps | fixture-only query baseline; docs/diff validation | Added inventory doc; current suite is healthy at `8/8`, but scope/lifecycle/privacy/precision/report-shape gaps remain; no runtime behavior or provider calls |
+| P15.2-real-query-quality-fixture-expansion | query-quality / fixture-expansion | A1/A2 | todo | Add targeted sanitized fixture cases for scope, lifecycle, privacy, precision, and report-shape gaps | future targeted query tests; fixture recall dry-run; `npm test`; diff/docs validation | Fixture/tests only; do not change runtime ranking, providers, public MCP tools, SQLite schema, or durable memory |
 
 ## 推荐执行顺序
 
@@ -178,8 +179,9 @@
 52. `P14.5`：ranking/tie-breaker parity tests 已新增 `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json` 与 `tests/donor-ranking-tie-breaker-parity-fixture.test.js`，锁住 standard-suite 当前全部 `ordering` cases 的显式顺序快照。
 53. `P14.6`：compare/rollback standing gate summary 已新增 [docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/DONOR_PARITY_STANDING_GATE_SUMMARY.md)，记录 standard-suite compare `43/43 matched`、rollback `43/43 rollback-ready`、targeted fixture evidence、边界和剩余风险。
 54. `P15`：real query quality gate planning 已新增 [docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md)，记录 fixture-first gate categories、current `8/8` query baseline、安全边界和 P15.1-P15.6 future sequence。
-55. `P12.5` two-phase audit protocol 已进入 `origin/main`：本地 `HEAD`、local `origin/main`、remote `refs/heads/main` 均为 `41a5630`。
-56. P14.2-P14.6 与 P15 planning 已确认均在 `origin/main`；下一步建议进入 `P15.1-real-query-quality-fixture-inventory`，仍不得跳到 P16/P17/V8/UI，不主动跑真实 provider 命令。
+55. `P12.5` two-phase audit protocol 是最新 runtime safety baseline：`41a5630` 已进入 `origin/main`；当前 `main` 后续仅追加 docs/board 状态校正。
+56. P14.2-P14.6 与 P15 planning 已确认均在 `origin/main`；P15.1 fixture inventory 已记录当前 `8/8` baseline 与 scope/lifecycle/privacy/precision/report-shape gaps。
+57. 下一步建议进入 `P15.2-real-query-quality-fixture-expansion`，仍不得跳到 P16/P17/V8/UI，不主动跑真实 provider 命令，不扩大 `validate_memory` mutation surface，不开放 public `validate_memory` MCP tool。
 57. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界

@@ -2,41 +2,42 @@
 
 ## Current Goal
 
-P14/P15-state-reconciliation-after-P12.5-safety-patch: confirm whether P14.2-P14.6 and P15 planning are already on `origin/main`, then decide whether to continue P15.1 or first correct state drift.
+P15.1-real-query-quality-fixture-inventory: inventory current query fixture coverage, missing dimensions, negative assertions, and quality gate gaps without changing runtime behavior.
 
 ## Current Area
 
-P14/P15 state reconciliation
+P15 query quality fixture inventory
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- local `HEAD`: `41a56300e0f5b8ae30e2b1bfec58f4b456bd825a`
-- local `origin/main`: `41a56300e0f5b8ae30e2b1bfec58f4b456bd825a`
-- remote `refs/heads/main`: `41a56300e0f5b8ae30e2b1bfec58f4b456bd825a`
+- current main: `514bd6f docs: reconcile p14 p15 state after safety patch`
+- latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-Confirmed on `origin/main`:
+Confirmed P15.1 inventory:
 
-- P14.2 DeepMemo targeted parity fixtures
-- P14.3 TopicMemo targeted parity fixtures
-- P14.4 error/meta parity tests
-- P14.5 ranking/tie-breaker parity tests
-- P14.6 compare/rollback standing gate summary
-- P15 real query quality gate planning
-- P12.5 validate_memory two-phase audit safety patch
+- default suite file: `benchmarks/real-query-suite/v1.json`
+- default dataset file: `benchmarks/default-dataset.json`
+- current baseline: `8` cases, `8` sanitized documents, `24` positive assertions, `8` negative assertions
+- `real-query-suite` fixture recall dry-run: `8/8`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`
+- `query:quality` fixture recall dry-run: `8/8`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`
 
 Decision:
 
-- No P14/P15 implementation gap was found.
-- State wording drift existed in STATUS / backlog / board.
-- Correct docs/board drift first, then proceed to P15.1.
+- P15.1 remains docs/board inventory only.
+- Do not expand `validate_memory` mutation surface.
+- Do not expose public `validate_memory` MCP tool.
+- Next phase should be P15.2 fixture expansion, not runtime/provider work.
 
 ## Changed Files
 
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
+- `docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
@@ -45,8 +46,8 @@ Decision:
 
 ## Validation
 
-- `git status -sb` confirmed only docs/board correction files are modified.
-- `git diff --stat` confirmed docs/board-only scope.
+- `npm run real-query-suite -- --json --fixture-recall-dry-run` passed.
+- `npm run query:quality -- --json --dry-run --fixture-recall-dry-run` passed.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -56,4 +57,4 @@ Decision:
 
 ## Next Safe Action
 
-Create a guarded local commit for the docs/board correction if file scope remains docs/board only. Do not push without explicit authorization.
+Create a guarded local commit if file scope remains docs/board only. Do not push without explicit authorization.

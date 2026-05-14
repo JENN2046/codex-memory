@@ -107,6 +107,7 @@ Recommended P15 sequence:
 
 1. `P15.1-real-query-quality-fixture-inventory`
    - Inventory current query fixture coverage, areas, negative assertions, and missing quality dimensions.
+   - Status: completed in [P15.1 Real Query Quality Fixture Inventory](./P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md).
 2. `P15.2-real-query-quality-fixture-expansion`
    - Add targeted sanitized fixture cases for scope, lifecycle, privacy, and failure reporting gaps.
 3. `P15.3-query-quality-report-shape-tests`

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Confirm P14.2-P14.6 and P15 planning state after the P12.5 two-phase audit safety patch, then decide whether to continue P15.1 or correct state drift first.
+Inventory the current real-query fixture coverage for P15.1 and record gaps before adding P15.2 fixture cases.
 
 ## Workspace
 
@@ -14,31 +14,33 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty with docs/board correction only until guarded commit.
+Dirty with docs/board inventory only until guarded commit.
 
 ## Current Area
 
-P14/P15 state reconciliation
+P15 query quality fixture inventory
 
 ## Findings
 
-- local `HEAD`, local `origin/main`, and remote `refs/heads/main` all equal `41a56300e0f5b8ae30e2b1bfec58f4b456bd825a`.
-- P14.2-P14.6 artifacts are tracked on `origin/main`.
-- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md` is tracked on `origin/main`.
-- P15.1 remains the next todo in backlog/task queue.
-- No runtime/test/package gap was found.
-- STATUS/backlog/board had stale wording that still described P12.5 as needing commit/push.
+- current main is `514bd6f`.
+- latest runtime safety baseline is `41a5630`.
+- `validate_memory` remains internal-only.
+- public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+- P15.1 inventory doc records current `8/8` query fixture baseline and missing scope/lifecycle/privacy/precision/report-shape dimensions.
 
 ## Changed Files
 
+- `docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md`
+- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `git status -sb` confirmed only docs/board correction files are modified.
-- `git diff --stat` confirmed docs/board-only scope.
+- `npm run real-query-suite -- --json --fixture-recall-dry-run` passed.
+- `npm run query:quality -- --json --dry-run --fixture-recall-dry-run` passed.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -49,9 +51,9 @@ P14/P15 state reconciliation
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
-- No provider command.
-- No push yet for this docs/board correction.
+- No provider smoke or provider benchmark.
+- No push yet for this docs/board inventory.
 
 ## Next Safe Step
 
-Create a guarded local commit for the docs/board correction. After that, P15.1 can start from `origin/main`; push still requires explicit authorization.
+Create a guarded local commit. After that, P15.2 fixture expansion can start; push still requires explicit authorization.
