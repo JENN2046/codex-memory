@@ -144,6 +144,7 @@
 - P19 observability/admin review surface planning：新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md)，规划 dashboard / `observe:http` / `governance:report` / gates 的只读 admin review surface；P19 从 planning / inventory / fixture shape 开始，不直接做 UI、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply。
 - P19.1 observability/admin review surface inventory：新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md)，盘点 dashboard / `observe:http` / `governance:report` / `gate:ci` / `gate:mainline` 的现有 schema coverage 与缺口；下一步建议 P19.2 synthetic admin-review surface shape tests。
 - P19.2 admin review surface shape tests：新增 `tests/fixtures/admin-review-surface-v1.json`、`tests/admin-review-surface-shape.test.js` 和 [docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md](/A:/codex-memory/docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md)，锁住 synthetic admin-review top-level/source/signal/safety/error shape；本阶段不实现 runtime aggregation、不做 UI、不读取 real memory、不改 MCP、不做 provider/migration/import-export apply。
+- P19.3 admin review schema snapshot gate：新增 `tests/fixtures/admin-review-schema-snapshot-v1.json`、`tests/admin-review-schema-snapshot-gate.test.js` 和 [docs/P19_ADMIN_REVIEW_SCHEMA_SNAPSHOT_GATE.md](/A:/codex-memory/docs/P19_ADMIN_REVIEW_SCHEMA_SNAPSHOT_GATE.md)，锁住 dashboard / `observe:http` / `governance:report` / `gate:ci` / planned admin-review 的 key-set snapshot；本阶段仍不实现 runtime aggregation 或 UI。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -509,7 +510,7 @@
 
 ## 下一步建议
 
-- 下一阶段建议完成 `P19.2-admin-review-surface-shape-tests` 的 targeted/full-suite/docs validation、guarded commit / safe-push，然后进入 `P19.3-admin-review-schema-snapshot-gate`。P19.3 只能做 targeted schema snapshot gate，不得直接 UI、provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate、tag 或 deploy。
+- 下一阶段建议完成 `P19.3-admin-review-schema-snapshot-gate` 的 targeted/full-suite/docs validation、guarded commit / safe-push，然后进入 `P19.4-operator-troubleshooting-notes`。P19.4 只做 operator notes / docs，不得直接 UI、provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P19.2 admin review surface shape tests without changing runtime behavior.
+Run P19.3 admin review schema snapshot gate without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P19.2 fixture/test/docs/status/board edits are local, validated, and uncommitted.
+P19.3 fixture/test/docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P19 admin review surface shape tests
+P19 admin review schema snapshot gate
 
 ## Findings
 
@@ -83,16 +83,18 @@ P19 admin review surface shape tests
 - P19.1 inventory has been drafted to capture existing dashboard / observe / governance / gate surfaces and gaps.
 - P19.1 inventory docs validation, guarded commit, safe-push, and post-push hash verification passed at `4004fca6538fd47e2c6dd15836a512db62ff602a`.
 - P19.2 has added synthetic admin-review fixture/test/docs to lock the combined shape before runtime aggregation.
-- P19.2 targeted test passed `5/5`; full suite passed `459/459`; diff/docs validation passed.
-- P19.3 should focus on targeted schema snapshot gate only after P19.2 validation and push.
+- P19.2 targeted test, full suite, docs validation, guarded commit, safe-push, and post-push hash verification passed at `c49fdf928f26e3bf75f191753d2220de9d4369bb`.
+- P19.3 has added synthetic schema snapshot fixture/test/docs for planned admin-review and existing review source key sets.
+- P19.3 targeted test passed `5/5`; full suite passed `464/464`; diff/docs validation passed.
+- P19.4 should focus on operator troubleshooting notes only after P19.3 validation and push.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `tests/fixtures/admin-review-surface-v1.json`
-- `tests/admin-review-surface-shape.test.js`
-- `docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md`
+- `tests/fixtures/admin-review-schema-snapshot-v1.json`
+- `tests/admin-review-schema-snapshot-gate.test.js`
+- `docs/P19_ADMIN_REVIEW_SCHEMA_SNAPSHOT_GATE.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -100,8 +102,8 @@ P19 admin review surface shape tests
 
 ## Validation
 
-- `node --test tests\admin-review-surface-shape.test.js` -> `5/5`
-- `npm test` -> `459/459`
+- `node --test tests\admin-review-schema-snapshot-gate.test.js` -> `5/5`
+- `npm test` -> `464/464`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -121,4 +123,4 @@ P19 admin review surface shape tests
 
 ## Next Safe Step
 
-Run guarded commit, safe-push, and continue to `P19.3-admin-review-schema-snapshot-gate`.
+Run guarded commit, safe-push, and continue to `P19.4-operator-troubleshooting-notes`.

@@ -2,18 +2,18 @@
 
 ## Current Goal
 
-P19.2-admin-review-surface-shape-tests: add synthetic admin-review surface shape fixture/tests before runtime aggregation or UI work.
+P19.3-admin-review-schema-snapshot-gate: add synthetic schema snapshot gate before runtime aggregation or UI work.
 
 ## Current Area
 
-P19 admin review surface shape tests
+P19 admin review schema snapshot gate
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `4004fca6538fd47e2c6dd15836a512db62ff602a`
+- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `c49fdf928f26e3bf75f191753d2220de9d4369bb`
 - P16.1 inventory and P16.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.3 targeted semantic fixtures have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.4 semantic ranking evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
@@ -34,24 +34,25 @@ Repository state:
 - P18.x closeout review has been validated, committed, safe-pushed, and post-push hash-verified
 - P19 planning has been validated, committed, safe-pushed, and post-push hash-verified
 - P19.1 inventory has been validated, committed, safe-pushed, and post-push hash-verified
+- P19.2 shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P19.2 shape-test decisions:
+P19.3 schema snapshot decisions:
 
-- P19.2 is synthetic fixture/test/docs only.
-- The fixture combines dashboard / observe / governance / gate review concepts without implementing runtime aggregation.
-- The test locks public MCP tools, safety flags, blocked import/export/migration status, unavailable source shape, and forbidden fake quality/provider claims.
+- P19.3 is synthetic fixture/test/docs only.
+- The fixture locks planned admin-review, dashboard, observe, governance-report, and gate-ci key sets.
+- The test locks deterministic key ordering, visible safety fields, and forbidden fake quality/provider/unsafe fields.
 - Runtime ranking behavior is not tuned in this phase.
 - UI implementation, provider calls, real memory preview, MCP expansion, migration, import/export apply, package changes, release, tag, and deploy remain deferred.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
-- P19.2 validation passed locally.
+- P19.3 validation passed locally.
 
 ## Changed Files
 
-- `tests/fixtures/admin-review-surface-v1.json`
-- `tests/admin-review-surface-shape.test.js`
-- `docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md`
+- `tests/fixtures/admin-review-schema-snapshot-v1.json`
+- `tests/admin-review-schema-snapshot-gate.test.js`
+- `docs/P19_ADMIN_REVIEW_SCHEMA_SNAPSHOT_GATE.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -63,8 +64,8 @@ P19.2 shape-test decisions:
 
 ## Validation
 
-- `node --test tests\admin-review-surface-shape.test.js` -> `5/5`
-- `npm test` -> `459/459`
+- `node --test tests\admin-review-schema-snapshot-gate.test.js` -> `5/5`
+- `npm test` -> `464/464`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -74,4 +75,4 @@ P19.2 shape-test decisions:
 
 ## Next Safe Action
 
-Run guarded commit, safe-push, and continue to `P19.3-admin-review-schema-snapshot-gate`.
+Run guarded commit, safe-push, and continue to `P19.4-operator-troubleshooting-notes`.

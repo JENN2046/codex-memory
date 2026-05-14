@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "admin-review-schema-snapshot.v1",
+  "mode": "admin-review-schema-snapshot",
+  "generatedAt": "2026-05-15T00:00:00.000Z",
+  "destructive": false,
+  "mutated": false,
+  "providerCalls": 0,
+  "durableMemoryTouched": false,
+  "realMemoryPreview": false,
+  "snapshots": {
+    "adminReview": {
+      "topLevelKeys": [
+        "schemaVersion",
+        "mode",
+        "generatedAt",
+        "destructive",
+        "mutated",
+        "providerCalls",
+        "durableMemoryTouched",
+        "realMemoryPreview",
+        "publicMcpTools",
+        "sources",
+        "review",
+        "unavailableSourceShape",
+        "safety",
+        "forbiddenClaims",
+        "nextRecommendedPhase"
+      ],
+      "reviewSignalKeys": [
+        "service",
+        "store",
+        "governance",
+        "audit",
+        "lifecycle",
+        "scope",
+        "importExportMigration"
+      ]
+    },
+    "dashboard": {
+      "topLevelKeys": [
+        "audits",
+        "checks",
+        "destructive",
+        "gate",
+        "generatedAt",
+        "governance",
+        "mode",
+        "profile",
+        "readPolicy",
+        "recommendations",
+        "runtime",
+        "service",
+        "store",
+        "summary"
+      ],
+      "readPolicyKeys": [
+        "lifecycleColumnAvailable",
+        "lifecycleExcludedStatuses",
+        "lifecycleIncludedStatuses",
+        "lifecyclePolicyEnabled",
+        "migrationApplied",
+        "mutated",
+        "noProvider",
+        "rawWorkspaceIdExposed",
+        "recentHiddenByLifecycleCount",
+        "recentLifecyclePolicyAppliedCount",
+        "recentReadPolicyAppliedCount",
+        "recentReadPolicyAuditCount",
+        "recentStaleResultCount",
+        "scopeWorkspacePresent",
+        "softReadPolicyEnabled",
+        "source",
+        "status"
+      ],
+      "governanceCountKeys": [
+        "proposalCount",
+        "stale30d",
+        "stale90d",
+        "supersededCount",
+        "supersessionInitiated",
+        "tombstonedCount",
+        "totalRecords"
+      ]
+    },
+    "httpObserve": {
+      "topLevelKeys": [
+        "audits",
+        "config",
+        "generatedAt",
+        "governance",
+        "health",
+        "logs",
+        "readPolicy",
+        "summary"
+      ],
+      "summaryKeys": [
+        "governanceProposalCount",
+        "governanceReviewLevel",
+        "governanceStale30d",
+        "governanceStale90d",
+        "governanceStatus",
+        "hiddenByLifecycleCount",
+        "lifecycleColumnAvailable",
+        "lifecyclePolicyAppliedCount",
+        "lifecyclePolicyEnabled",
+        "rawWorkspaceIdExposed",
+        "readPolicyStatus",
+        "scopedRecallCount",
+        "softReadPolicyEnabled",
+        "status",
+        "strictScopedRecallCount"
+      ],
+      "auditKeys": [
+        "recall",
+        "write"
+      ]
+    },
+    "governanceReport": {
+      "topLevelKeys": [
+        "generatedAt",
+        "mode",
+        "paths",
+        "readPolicy",
+        "retention",
+        "review",
+        "scopeCoverage",
+        "statusDistribution",
+        "summary",
+        "supersession",
+        "tombstones"
+      ],
+      "reviewKeys": [
+        "counts",
+        "hints",
+        "message",
+        "readPolicy",
+        "retention",
+        "reviewLevel",
+        "status",
+        "statusDistribution"
+      ]
+    },
+    "gateCi": {
+      "topLevelKeys": [
+        "checks",
+        "generatedAt",
+        "summary"
+      ],
+      "summaryKeys": [
+        "failedChecks",
+        "fixtureOnly",
+        "mode",
+        "noDaemon",
+        "noNetwork",
+        "noProvider",
+        "ok"
+      ],
+      "checkKeys": [
+        "compare",
+        "docs",
+        "lifecyclePolicy",
+        "policyPreflight",
+        "queries",
+        "rollback",
+        "tests"
+      ]
+    }
+  },
+  "safety": {
+    "redactionApplied": true,
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false,
+    "mcpSchemaChanged": false,
+    "publicMcpExpanded": false,
+    "migrationApplied": false,
+    "importExportApplied": false,
+    "dependencyChanged": false
+  },
+  "forbiddenSnapshotKeys": [
+    "hitRate",
+    "qualityScore",
+    "providerLatency",
+    "productionMemorySnippet",
+    "rawWorkspaceId",
+    "rawSecret"
+  ],
+  "nextRecommendedPhase": "P19.4-operator-troubleshooting-notes"
+}

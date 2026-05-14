@@ -149,6 +149,7 @@
 | P19-observability-admin-review-surface-planning | observability / admin-review / planning | A1/A2 | done | Plan local read-only admin review surfaces before fixture shape or UI work | `git diff --check`; docs validation | Planning only; no UI, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release, tag, or deploy |
 | P19.1-observability-admin-review-surface-inventory | observability / admin-review / inventory | A1/A2 | done | Inventory existing dashboard/observe/governance/gate review surfaces and schema coverage before shape fixtures | `git diff --check`; docs validation | Inventory only; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release, tag, or deploy |
 | P19.2-admin-review-surface-shape-tests | observability / admin-review / fixture-shape | A1/A2 | done | Add synthetic admin-review surface fixture shape tests before runtime aggregation | targeted fixture test; `npm test`; `git diff --check`; docs validation | Fixture/test/docs only; targeted `5/5`, full suite `459/459`; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release, tag, or deploy |
+| P19.3-admin-review-schema-snapshot-gate | observability / admin-review / schema-snapshot | A1/A2 | done | Add synthetic schema snapshot gate for admin review source key sets before runtime aggregation | targeted fixture test; `npm test`; `git diff --check`; docs validation | Fixture/test/docs only; targeted `5/5`, full suite `464/464`; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release, tag, or deploy |
 
 ## 推荐执行顺序
 
@@ -236,8 +237,9 @@
 82. `P19 planning`：observability/admin review surface planning 已新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md)，规划 dashboard / `observe:http` / `governance:report` / gates 的只读 review surface，不授权 UI、provider、real memory preview、MCP expansion 或 migration/import-export apply。
 83. `P19.1 inventory`：observability/admin review surface inventory 已新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md)，确认现有 dashboard/http-observe/governance/gate-ci shape coverage，并标出 unified admin-review fixture 与 import/export/migration blocked status review slot 仍是缺口。
 84. `P19.2 shape tests`：admin review surface fixture/test/docs 已新增，锁住 synthetic combined review shape、source refs、governance/audit/lifecycle/scope/import-export-migration signals、unavailable source shape 和 no-side-effect flags。
-85. 下一步建议完成 P19.2 targeted/full-suite/docs validation、guarded commit / safe-push 后进入 `P19.3-admin-review-schema-snapshot-gate`；不得直接进入 UI、provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
-86. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+85. `P19.3 schema snapshot gate`：admin review schema snapshot fixture/test/docs 已新增，锁住 planned admin-review、dashboard、http-observe、governance-report、gate-ci key-set snapshot。
+86. 下一步建议完成 P19.3 targeted/full-suite/docs validation、guarded commit / safe-push 后进入 `P19.4-operator-troubleshooting-notes`；不得直接进入 UI、provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
+87. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
