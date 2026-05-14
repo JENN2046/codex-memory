@@ -177,6 +177,13 @@ Current P12.5 conclusion:
 - Public MCP tools remain frozen unless a dedicated approved phase explicitly authorizes expansion.
 - A4.8 must stop before public MCP tool expansion, SQLite migration, dependency changes, or broader mutation tools.
 
+Current decision after P12:
+
+- `validate_memory` remains internal-only.
+- No public `validate_memory` MCP proposal review is active.
+- Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+- The next active roadmap phase is P13 object-model planning: [VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md).
+
 ## First-Batch Boundary
 
 第一批不要全开。

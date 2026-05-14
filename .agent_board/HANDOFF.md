@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P12.6-validate-memory-internal-cli-wrapper` in `A:\codex-memory`.
+Continue `P13-VCP-compatible-memory-object-model-planning` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `6332d30`
+- Base: `origin/main` / `caa8186`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory-internal-cli
+P13-object-model / docs-planning
 
 ## Completed Before This Batch
 
@@ -28,37 +28,27 @@ P12-controlled-write-tools / validate-memory-internal-cli
 - P12.5 internal validate_memory runtime service landed.
 - P12.5 validate_memory implementation plan / rollback story landed.
 - P12.5 validate_memory internal runtime review landed with PASS.
+- P12.6 validate_memory internal CLI wrapper landed.
+- Decision after P12.6: keep `validate_memory` internal-only and skip public `validate_memory` MCP proposal review.
 
 ## Completed In Current Batch
 
-- Added local internal `validate-memory` CLI wrapper.
-- Added targeted CLI tests for dry-run, confirmed apply, forbidden states, secret-like evidence, missing lifecycle column, raw `workspace_id`, unknown tool/mode, and MCP public tools frozen.
-- Added `validate-memory` npm script.
-- Updated P12.5/P12.6 docs, status, backlog, and board state.
+- Added P13 object-model planning doc.
+- Defined object families, `MemoryRecord` vNext fields, backward compatibility, mapping plan, migration strategy, risk register, validation plan, and non-goals.
+- Updated roadmap, next phase plan, controlled-write plan, status, backlog, and board state.
 
 ## Changed Files
 
-- `src/cli/validate-memory.js`
-- `tests/validate-memory-cli.test.js`
-- `package.json`
-- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
-- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
+- `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `node --test tests\validate-memory-cli.test.js` passed `12/12`.
-- `node --test tests\validate-memory-runtime.test.js` passed `9/9`.
-- `node --test tests\validate-memory-runtime-fixture.test.js` passed `11/11`.
-- `node --test tests\mcp-contract.test.js` passed `7/7`.
-- `npm test` passed `312/312`.
-- `npm run validate-memory -- --json --memory-id dry-run-example --reason "manual review" --evidence "manual evidence" --actor-client-id codex --request-source cli` passed with `dryRun=true`, `mutated=false`, and audit preview.
-- `npm run gate:ci` passed.
-- `npm run gate:mainline:strict` passed.
-- `npm run lifecycle:sqlite:dry-run -- --json` passed with `mutated=false`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -67,20 +57,24 @@ P12-controlled-write-tools / validate-memory-internal-cli
 - Public MCP tools remain `record_memory` / `search_memory` / `memory_overview`.
 - No MCP public tool definitions are changed.
 - No MCP schema is changed.
+- `validate_memory` remains internal-only.
 
 ## Audit / Recall Impact
 
-- CLI dry-run emits audit preview only and does not append audit.
-- Confirmed apply is delegated to `ValidateMemoryService`, which writes audit only after approved lifecycle update succeeds.
+- P13 planning does not change audit/runtime/recall behavior.
+- Future object mapping must preserve audit, lifecycle, and scope boundaries.
 - Recall path is unchanged.
 
 ## Not Done
 
 - No public MCP `validate_memory`.
 - No MCP schema change.
-- No lockfile/dependency change.
+- No `src/` changes.
+- No tests changes.
+- No package or lockfile changes.
 - No SQLite migration or automatic `ALTER TABLE`.
 - No hard delete.
+- No real DB/memory write.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No other mutation tools.
@@ -88,7 +82,8 @@ P12-controlled-write-tools / validate-memory-internal-cli
 ## Remaining Risks
 
 - Public MCP tool expansion remains explicitly approval-gated.
-- Existing DBs without lifecycle status columns will reject validation instead of migrating.
+- Object-model fixtures and dry-run mapping remain future phases.
+- Real migration remains separately approval-gated.
 
 ## Next Safe Step
 

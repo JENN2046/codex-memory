@@ -2,34 +2,30 @@
 
 ## Current Goal
 
-P12.6-validate-memory-internal-cli-wrapper: add a local CLI wrapper for internal `ValidateMemoryService` while keeping MCP public tools frozen.
+P13-VCP-compatible-memory-object-model-planning: define the practical object model before fixtures, mapping, import/export, or migration work.
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory-internal-cli
+P13-object-model / docs-planning
 
 ## Current Status
 
-The `validate_memory` internal runtime review has landed on `origin/main` at `6332d30`.
+P12.6 `validate_memory` internal CLI landed on `origin/main` at `caa8186`.
 
-Current P12.6 implementation adds a local `validate-memory` CLI wrapper and targeted tests. The CLI defaults to dry-run, returns `mutated=false`, and only allows confirmed apply when `--json --apply --confirm` is present and `ValidateMemoryService` approves the request. Full validation passed.
+Current decision: keep `validate_memory` internal-only and do not enter public `validate_memory` MCP proposal review. P13 is a docs/tests-design planning phase only. It defines a VCP-compatible practical memory object model while preserving current diary, SQLite, audit, vector, chunk, and MCP behavior.
 
 ## Completed Work In This Batch
 
-- Added `src/cli/validate-memory.js`.
-- Added `tests/validate-memory-cli.test.js`.
-- Added `validate-memory` npm script.
-- Updated P12.5/P12.6 docs, status, backlog, and board pointers.
-- Ran targeted CLI validation and sample dry-run smoke.
+- Added `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`.
+- Recorded object families, `MemoryRecord` vNext fields, backward compatibility, mapping plan, migration sequence, risk register, validation plan, and non-goals.
+- Updated roadmap, next phase plan, controlled-write plan, status, backlog, and board pointers.
 
 ## Changed Files
 
-- `src/cli/validate-memory.js`
-- `tests/validate-memory-cli.test.js`
-- `package.json`
-- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
-- `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
+- `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
@@ -40,15 +36,6 @@ Current P12.6 implementation adds a local `validate-memory` CLI wrapper and targ
 
 ## Validation Run
 
-- `node --test tests\validate-memory-cli.test.js`：passed `12/12`
-- `node --test tests\validate-memory-runtime.test.js`：passed `9/9`
-- `node --test tests\validate-memory-runtime-fixture.test.js`：passed `11/11`
-- `node --test tests\mcp-contract.test.js`：passed `7/7`
-- `npm test`：passed `312/312`
-- `npm run validate-memory -- --json --memory-id dry-run-example --reason "manual review" --evidence "manual evidence" --actor-client-id codex --request-source cli`：passed, returned `dryRun=true`, `mutated=false`, and `auditPreview`
-- `npm run gate:ci`：PASS
-- `npm run gate:mainline:strict`：PASS
-- `npm run lifecycle:sqlite:dry-run -- --json`：passed with `mutated=false`
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -57,6 +44,7 @@ Current P12.6 implementation adds a local `validate-memory` CLI wrapper and targ
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
+- No runtime tests required for docs-only P13 planning unless scope changes.
 
 ## Current Blockers
 
@@ -65,9 +53,9 @@ Current P12.6 implementation adds a local `validate-memory` CLI wrapper and targ
 
 ## Remaining Risks
 
-- CLI is internal-only; no MCP public access exists.
-- Any public MCP `validate_memory` tool requires a separate proposal/review phase.
-- SQLite lifecycle status columns must already exist; this phase does not migrate schemas.
+- Object-model planning can drift if future fixture schemas do not use one canonical field list.
+- Any public MCP `validate_memory` tool remains out of scope.
+- Any SQLite schema or data migration remains out of scope.
 
 ## Next Safe Action
 

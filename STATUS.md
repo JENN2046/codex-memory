@@ -23,6 +23,8 @@
 - P12.5 validate_memory runtime implementation plan 已完成：新增 [docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md)，记录 `ValidateMemoryService`、`SqliteShadowStore`、`app.js` wiring、audit 写入、测试矩阵和 rollback story；本阶段 docs/tests-design only，不改 `src/`。
 - P12.5 validate_memory internal runtime review 已完成：新增 [docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md)，结论 PASS；fixture / plan / runtime / tests 无 blocking drift，public MCP tools 仍冻结为三工具，无 SQLite migration / hard delete。
 - P12.6 validate_memory internal CLI wrapper 已完成本地验证：新增 `src/cli/validate-memory.js`、`tests/validate-memory-cli.test.js` 和 `validate-memory` npm script；CLI 默认 dry-run、`mutated=false`、输出 audit preview，confirmed apply 必须 `--json --apply --confirm` 并继续走 `ValidateMemoryService` 的 SecretScanner / ToolArgumentValidator / lifecycle / scope / audit 边界；不新增 public MCP tool，不改 MCP schema，不做 SQLite migration。
+- 当前决策：保持 `validate_memory` internal-only，不进入 public `validate_memory` MCP proposal review；public MCP tools 仍为 `record_memory` / `search_memory` / `memory_overview`。
+- P13 VCP-compatible memory object model planning 已完成本地验证：新增计划入口 [docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md)，规划 `MemoryRecord` vNext、chunk、tag、scope/context、checkpoint/handoff、audit、tombstone、proposal、migration 对象族；本阶段只做 planning，不改 runtime，不改 tests，不迁移数据。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -83,6 +85,7 @@
 ## 今天新增完成
 
 - P12.6 validate_memory internal CLI wrapper：新增本地 `npm run validate-memory` 入口，覆盖默认 dry-run、confirmed apply、forbidden lifecycle、secret evidence、missing lifecycle column、unknown tool/mode、raw `workspace_id` 拒绝和 MCP public tools frozen 回归；当前仍是 internal-only，不开放 MCP。
+- P13 VCP-compatible memory object model planning：新增对象模型计划文档，明确 P13 只做 docs/tests-design planning，`validate_memory` 保持 internal-only，不新增 MCP tools，不做 migration。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
 - `gate:ci` 现在包含 `queries` fixture-only check，JSON 输出会暴露 `caseCount/assertedCount/passedCount/failedCount`。

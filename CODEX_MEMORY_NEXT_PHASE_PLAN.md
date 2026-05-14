@@ -63,6 +63,14 @@
 - 当前治理任务：A4.8 Safe Project Operator Rail 已进入远端主线，入口为 [docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)。
 - 当前产品阶段：P12.5 first runtime mutation tool planning/approval gate 已完成，入口为 [docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)；runtime mutation 仍需显式批准。
 
+当前 P13 planning：
+
+- 入口：[docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md)
+- 决策：保持 `validate_memory` internal-only，不进入 public `validate_memory` MCP proposal review。
+- 目标：规划 VCP-compatible practical object model，包括 `MemoryRecord` vNext、chunk、tag、scope/context、checkpoint/handoff、audit、tombstone、proposal 和 migration 对象族。
+- 边界：docs/tests-design planning only；不改 runtime，不改 tests，不改 `package.json`，不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不写真实 memory。
+- 下一步建议：P13.1 object model fixture schemas。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：

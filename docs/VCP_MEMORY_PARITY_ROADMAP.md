@@ -1,7 +1,7 @@
 # VCP Memory Practical Parity Roadmap
 
 Status: source of truth for long-term post-P9 roadmap.
-Last updated: 2026-05-13.
+Last updated: 2026-05-14.
 
 This document is the single long-form roadmap for `codex-memory` after P9 scoped memory runtime integration. Other docs should link here or summarize the current priority only. Do not copy the whole roadmap into README, backlog, or `.agent_board`.
 
@@ -24,8 +24,17 @@ Strategy:
 Near-term priority:
 
 ```text
-P10 -> P11 -> P12
+P13
 ```
+
+Current status note:
+
+- P10 safety/runtime policy gates are complete.
+- P11 lifecycle read-policy loop is complete.
+- P12 controlled write tools reached internal `validate_memory` service + internal CLI wrapper.
+- `validate_memory` remains internal-only.
+- Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+- P13 is planning the VCP-compatible memory object model in [VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md).
 
 Do not jump early to:
 
