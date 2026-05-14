@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P18.2 export envelope fixture expansion without changing runtime behavior.
+Run P18.3 import mapping dry-run evidence gate without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P18.2 fixture/test/docs/status/board edits are local, validated, and uncommitted.
+P18.3 docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P18 export envelope fixture expansion
+P18 import mapping dry-run evidence gate
 
 ## Findings
 
@@ -68,14 +68,16 @@ P18 export envelope fixture expansion
 - P18.2 should add synthetic export envelope fixture tests before any import/export dry-run evidence gate.
 - P18.1 guarded commit and safe-push completed at `322f8dce7d46fcf2c3564024d3da8e243c147c86`.
 - P18.2 synthetic export envelope fixture/test/docs are drafted locally.
+- P18.2 guarded commit and safe-push completed at `8b7a1973f2807df1de1506f892e64a5e004dc904`.
+- P18.3 evidence gate is drafted from existing fixture-only dry-run/readiness CLI outputs.
+- Mapping dry-run CLI reports `mutated=false`, fixture-only source, no file generation, no migration, and no real DB/diary read.
+- Migration readiness CLI reports `status=blocked`, `migrationBlocked=true`, and required approvals missing.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `tests/fixtures/p18-export-envelope-v1.json`
-- `tests/p18-export-envelope-fixture.test.js`
-- `docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md`
+- `docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -83,7 +85,10 @@ P18 export envelope fixture expansion
 
 ## Validation
 
-- `node --test tests\p18-export-envelope-fixture.test.js` -> `11/11`
+- `node --test tests\vcp-memory-object-mapping-dry-run-cli.test.js` -> `11/11`
+- `node --test tests\vcp-memory-migration-readiness-cli.test.js` -> `11/11`
+- `npm run vcp-memory:mapping:dry-run -- --json`
+- `npm run vcp-memory:migration-readiness -- --json`
 - `npm test` -> `454/454`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -104,4 +109,4 @@ P18 export envelope fixture expansion
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P18.3-import-mapping-dry-run-evidence-gate`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P18.4-backup-rollback-safety-review`.

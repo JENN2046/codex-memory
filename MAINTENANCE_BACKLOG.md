@@ -143,6 +143,7 @@
 | P18-import-export-migration-safety-planning | import-export / migration-safety / planning | A1/A2 | done | Plan dry-run-first import/export/migration safety route after P17 closeout | `git diff --check`; docs validation | Planning only; no import/export apply, SQLite migration, real memory read, durable write, MCP expansion, provider call, release, tag, or deploy |
 | P18.1-import-export-fixture-inventory | import-export / migration-safety / fixture-inventory | A1/A2 | done | Inventory existing P13 import/export/mapping/readiness fixture evidence and gaps before fixture expansion | `git diff --check`; docs validation | Inventory only; no import/export apply, SQLite migration, real memory read, durable write, MCP expansion, provider call, release, tag, or deploy |
 | P18.2-export-envelope-fixture-expansion | import-export / migration-safety / fixture-tests | A1/A2 | done | Add synthetic export envelope fixture tests for multi-record lifecycle/supersession/conflict preview shape | targeted fixture test; `npm test`; diff/docs validation | Fixture/test/docs only; no import/export runtime, file generation, migration, real memory read, durable write, MCP expansion, provider call, release, tag, or deploy |
+| P18.3-import-mapping-dry-run-evidence-gate | import-export / migration-safety / dry-run-evidence | A1/A2 | done | Summarize existing fixture-only mapping dry-run and migration readiness evidence before backup/rollback review | targeted CLI tests; CLI `--json`; `npm test`; diff/docs validation | Evidence/docs only; no import/export apply, SQLite migration, real memory read, durable write, MCP expansion, provider call, release, tag, or deploy |
 
 ## 推荐执行顺序
 
@@ -224,8 +225,9 @@
 76. `P18`：import/export/migration safety planning 已新增 [docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md)，定义 dry-run-first、redaction-first、backup/rollback/A5 approval-first 路线；不实现 apply、不迁移、不读取真实 memory。
 77. `P18.1`：import/export fixture inventory 已新增 [docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md)，确认 P13 object model / round-trip / mapping / mapping dry-run / import-export shape / migration readiness 可作为 P18 dry-run safety 基线；缺口集中在 multi-record envelope、lifecycle variants、supersession refs、conflict preview、backup/rollback manifest 和 partial failure report shape。
 78. `P18.2`：export envelope fixture expansion 已新增 `tests/fixtures/p18-export-envelope-v1.json`、`tests/p18-export-envelope-fixture.test.js` 与 [docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md](/A:/codex-memory/docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md)，覆盖 multi-record envelope、lifecycle variants、supersession refs、conflict preview、backup/rollback manifest requirements 和 no-side-effect flags。
-79. 下一步建议完成 P18.2 targeted/full validation、guarded commit / safe-push 后进入 `P18.3-import-mapping-dry-run-evidence-gate`；不得直接进入 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、release candidate。
-80. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+79. `P18.3`：import mapping dry-run evidence gate 已新增 [docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md](/A:/codex-memory/docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md)，结论为 `DRY_RUN_EVIDENCE_READY_BLOCKED_FOR_APPLY`；mapping dry-run 和 migration readiness 均保持 fixture-only / no mutation，migration readiness 明确 `status=blocked`。
+80. 下一步建议完成 P18.3 CLI/test/docs validation、guarded commit / safe-push 后进入 `P18.4-backup-rollback-safety-review`；不得直接进入 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、release candidate。
+81. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
