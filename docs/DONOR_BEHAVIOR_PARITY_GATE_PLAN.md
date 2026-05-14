@@ -110,7 +110,8 @@ P14 should proceed in small phases:
    - Completed by `tests/fixtures/topicmemo-donor-parity-v1.json` and `tests/topicmemo-donor-parity-fixture.test.js`.
    - Locks TopicMemo ListTopics payload shape, GetTopicContent payload shape, missing topic/history error envelope placement, agentId alias boundaries, and locked-topic display without runtime changes.
 4. `P14.4-error-meta-parity-tests`
-   - Lock error envelope and `meta` placement behavior.
+   - Completed by `tests/fixtures/donor-error-meta-parity-v1.json` and `tests/donor-error-meta-parity-fixture.test.js`.
+   - Locks shared DeepMemo / TopicMemo error envelope placement, `meta` diagnostics, success diagnostic placement where full output exposes it, and the known intentional differences allowlist without runtime changes.
 5. `P14.5-ranking-tie-breaker-parity-tests`
    - Expand ranking and tie-breaker cases before runtime changes.
 6. `P14.6-compare-rollback-standing-gate-summary`
@@ -134,6 +135,6 @@ No runtime behavior changes should happen until fixture and gate evidence exists
 
 ## Next Recommended Phase
 
-`P14.4-error-meta-parity-tests`
+`P14.5-ranking-tie-breaker-parity-tests`
 
-P14.4 may consolidate shared error envelope and `meta` placement parity across DeepMemo and TopicMemo. It should not alter runtime behavior unless a later phase explicitly approves implementation.
+P14.5 may expand ranking and tie-breaker parity fixture coverage before any donor runtime behavior change. It should not alter runtime behavior unless a later phase explicitly approves implementation.

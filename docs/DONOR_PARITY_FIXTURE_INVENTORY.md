@@ -113,10 +113,10 @@ P14.3 TopicMemo targeted parity fixtures should prioritize:
 
 P14.4 error/meta parity tests should prioritize:
 
-- shared donor error envelope fields
-- error `meta` placement
-- success `meta` placement where donor exposes diagnostics
-- known intentional differences allowlist
+- shared donor error envelope fields: covered by `donor-error-meta-parity-v1.json`
+- error `meta` placement: covered for DeepMemo invalid JSON / agent-not-found and TopicMemo invalid JSON / agent-not-found / topic-not-found / history-read-error
+- success `meta` placement where donor exposes diagnostics: covered by the DeepMemo blocked/effective keyword `--full` diagnostic case
+- known intentional differences allowlist: covered by `knownIntentionalDifferences`
 
 ## Validation Plan
 
@@ -152,6 +152,6 @@ git diff --check
 
 ## Next Recommended Phase
 
-`P14.4-error-meta-parity-tests`
+`P14.5-ranking-tie-breaker-parity-tests`
 
-P14.4 may consolidate shared donor error envelope and `meta` placement coverage. It should still avoid runtime behavior changes unless a later phase explicitly approves them.
+P14.5 may expand ranking and tie-breaker parity fixture coverage. It should still avoid runtime behavior changes unless a later phase explicitly approves them.

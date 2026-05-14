@@ -1,0 +1,315 @@
+{
+  "phase": "P14.4-error-meta-parity-tests",
+  "schema_version": 1,
+  "mutated": false,
+  "source": {
+    "kind": "fixture-only",
+    "suite_root": "benchmarks/active-memory-suite",
+    "note": "Shared donor error envelope and meta placement fixture evidence only; runtime behavior is not changed."
+  },
+  "cases": [
+    {
+      "name": "deepmemo-invalid-json-error-meta",
+      "purpose": "Lock DeepMemo invalid JSON donor-style error envelope and meta placement.",
+      "tool": "deepmemo",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/deepmemo-invalid-json.txt",
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "[DeepMemo]"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "toolName",
+          "tool_name",
+          "code",
+          "inputSource",
+          "rawInputPreview"
+        ],
+        "meta": {
+          "toolName": "DeepMemo",
+          "code": "invalid-json",
+          "inputSource": "stdin"
+        },
+        "metaIncludes": {
+          "rawInputPreview": "{not-json}"
+        }
+      }
+    },
+    {
+      "name": "topicmemo-invalid-json-error-meta",
+      "purpose": "Lock TopicMemo invalid JSON donor-style error envelope and meta placement.",
+      "tool": "topicmemo",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/topicmemo-invalid-json.txt",
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "[TopicMemo]"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "toolName",
+          "tool_name",
+          "code",
+          "inputSource",
+          "rawInputPreview"
+        ],
+        "meta": {
+          "toolName": "TopicMemo",
+          "code": "invalid-json",
+          "inputSource": "stdin"
+        },
+        "metaIncludes": {
+          "rawInputPreview": "{not-json}"
+        }
+      }
+    },
+    {
+      "name": "deepmemo-agent-not-found-error-meta",
+      "purpose": "Lock DeepMemo agent lookup diagnostics under meta.",
+      "tool": "deepmemo",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/deepmemo-agent-not-found.json",
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "[DeepMemo]",
+          "MissingMaid"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "toolName",
+          "tool_name",
+          "code",
+          "command",
+          "maid",
+          "keyword",
+          "rawKeyword",
+          "query"
+        ],
+        "meta": {
+          "command": "Search",
+          "maid": "MissingMaid",
+          "maidName": "MissingMaid",
+          "keyword": "Phase C",
+          "rawKeyword": "Phase C",
+          "raw_keyword": "Phase C",
+          "query": "Phase C",
+          "rawQuery": "Phase C",
+          "raw_query": "Phase C",
+          "toolName": "DeepMemo",
+          "tool_name": "DeepMemo",
+          "code": "agent-not-found"
+        }
+      }
+    },
+    {
+      "name": "deepmemo-success-diagnostics-meta-placement",
+      "purpose": "Lock success diagnostic placement for DeepMemo blocked/effective keywords when full output exposes meta.",
+      "tool": "deepmemo",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/deepmemo-blocked-filtered-success-multi.json",
+      "args": [
+        "--full"
+      ],
+      "env": {
+        "CODEX_MEMORY_ACTIVE_BLOCKED_KEYWORDS": "deepmemo,audit"
+      },
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelMustInclude": [
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "blockedKeywords",
+          "blocked_keyword_count",
+          "blockedKeywordCount",
+          "effectiveKeywords",
+          "effective_keyword_count",
+          "effectiveKeywordCount",
+          "effectiveKeywordText",
+          "effective_keyword_text"
+        ],
+        "meta": {
+          "toolName": "DeepMemo",
+          "tool_name": "DeepMemo",
+          "blockedKeywords": [
+            "deepmemo",
+            "audit"
+          ],
+          "blocked_keyword_count": 2,
+          "effectiveKeywords": [
+            "topicmemo",
+            "recall"
+          ],
+          "effective_keyword_count": 2,
+          "effectiveKeywordText": "topicmemo, recall",
+          "effective_keyword_text": "topicmemo, recall"
+        }
+      }
+    },
+    {
+      "name": "topicmemo-agent-not-found-error-meta",
+      "purpose": "Lock TopicMemo agent lookup diagnostics under meta.",
+      "tool": "topicmemo",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/topicmemo-agent-not-found.json",
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "[TopicMemo]",
+          "MissingMaid"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "toolName",
+          "tool_name",
+          "code",
+          "command",
+          "maid",
+          "topicId"
+        ],
+        "meta": {
+          "command": "ListTopics",
+          "maid": "MissingMaid",
+          "topicId": "",
+          "toolName": "TopicMemo",
+          "tool_name": "TopicMemo",
+          "code": "agent-not-found"
+        }
+      }
+    },
+    {
+      "name": "topicmemo-topic-not-found-error-meta",
+      "purpose": "Lock TopicMemo missing topic diagnostics under meta.",
+      "tool": "topicmemo",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/topicmemo-gettopiccontent-missing-topic.json",
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "[TopicMemo]",
+          "topic_unknown"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "toolName",
+          "tool_name",
+          "code",
+          "command",
+          "maid",
+          "topicId",
+          "historyStatus"
+        ],
+        "meta": {
+          "code": "topic-not-found",
+          "command": "GetTopicContent",
+          "maid": "Keke",
+          "topicId": "topic_unknown",
+          "historyStatus": "topic-not-found",
+          "toolName": "TopicMemo",
+          "tool_name": "TopicMemo"
+        }
+      }
+    },
+    {
+      "name": "topicmemo-history-read-error-meta",
+      "purpose": "Lock TopicMemo history read error diagnostics under meta.",
+      "tool": "topicmemo",
+      "activeMemoryRoot": "vchat-fixture-history-read-error",
+      "inputFile": "inputs/topicmemo-gettopiccontent-history-read-error.json",
+      "expected": {
+        "exitCode": 1,
+        "status": "error",
+        "errorIncludes": [
+          "[TopicMemo]",
+          "History Read Error"
+        ],
+        "topLevelKeys": [
+          "error",
+          "meta",
+          "result",
+          "status"
+        ],
+        "forbiddenTopLevelKeys": [
+          "toolName",
+          "tool_name",
+          "code",
+          "command",
+          "maid",
+          "topicId",
+          "historyStatus"
+        ],
+        "meta": {
+          "code": "history-read-error",
+          "command": "GetTopicContent",
+          "maid": "Keke",
+          "topicId": "topic_history_read_error",
+          "historyStatus": "history-read-error",
+          "toolName": "TopicMemo",
+          "tool_name": "TopicMemo"
+        }
+      }
+    }
+  ],
+  "knownIntentionalDifferences": [
+    {
+      "name": "error-result-null",
+      "reason": "Current donor-compatible CLI errors include result:null in the normalized envelope; the parity guard only requires diagnostics to stay under meta and out of top-level fields.",
+      "validation": "All error cases assert top-level keys and forbidden top-level diagnostic fields."
+    },
+    {
+      "name": "sqlite-experimental-warning",
+      "reason": "Node may emit an ExperimentalWarning before or after JSON output on some runtimes.",
+      "validation": "The fixture parser scans JSON lines and ignores warning text."
+    },
+    {
+      "name": "success-meta-only-for-full-diagnostics",
+      "reason": "Compact success payloads remain donor-style result/status only; success meta is asserted only when full diagnostic output is intentionally requested.",
+      "validation": "The DeepMemo success diagnostic case uses --full and checks blocked/effective keyword diagnostics under meta."
+    }
+  ],
+  "non_goals": [
+    "no runtime change",
+    "no public MCP tool expansion",
+    "no MCP schema change",
+    "no import/export or migration behavior change",
+    "no SQLite migration",
+    "no real DB or memory write"
+  ]
+}

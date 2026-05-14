@@ -110,6 +110,7 @@
 - P14.1 donor parity fixture inventory：新增当前 suite 覆盖盘点，下一步建议 `P14.2-DeepMemo-targeted-parity-fixtures`。
 - P14.2 DeepMemo targeted parity fixtures：新增 targeted fixture/test 证据并已进入 `origin/main` at `4251a27`；P14.2 state reconciliation 已确认本地 HEAD、local `origin/main`、remote `refs/heads/main` 三者一致。
 - P14.3 TopicMemo targeted parity fixtures：新增 targeted fixture/test 证据，下一步建议 `P14.4-error-meta-parity-tests`。
+- P14.4 error/meta parity tests：新增 shared donor error/meta fixture/test 证据，锁住 DeepMemo / TopicMemo error envelope、diagnostic `meta` 下沉、DeepMemo full success diagnostics placement 和 known intentional differences allowlist；下一步建议 `P14.5-ranking-tie-breaker-parity-tests`。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
 - `gate:ci` 现在包含 `queries` fixture-only check，JSON 输出会暴露 `caseCount/assertedCount/passedCount/failedCount`。
