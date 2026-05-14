@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P16.x TagMemo semantic association closeout without changing runtime behavior.
+Run P17 advanced memory intelligence / V8 evidence gate planning without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P16.x docs/status/board edits are local and uncommitted.
+P17 planning docs/status/board edits are local and uncommitted.
 
 ## Current Area
 
-P16 TagMemo semantic association closeout
+P17 advanced memory intelligence / V8 evidence gate planning
 
 ## Findings
 
@@ -40,15 +40,15 @@ P16 TagMemo semantic association closeout
 - P16.5 full suite (`429/429`), diff check, and docs validation passed.
 - P16.5 guarded commit and safe-push completed at `effd73edba04abd5b26c0a4a59dca073db655d2a`.
 - P16.x closeout review is drafted as docs/status/board only; docs validation passed.
+- P16.x guarded commit and safe-push completed at `dcc15247edd1e1781eeca991e0948734edfea6ee`.
+- P17 planning is drafted as docs/status/board only; docs validation passed.
 - `v8-diagnose` is a later read-only evidence surface, not a P16 planning authorization for P17 / V8 implementation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md`
-- `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md`
-- `docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md`
+- `docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -75,4 +75,4 @@ P16 TagMemo semantic association closeout
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P17-advanced-memory-intelligence-v8-evidence-gate-planning`.
+Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P17.1-v8-diagnostic-surface-inventory`.

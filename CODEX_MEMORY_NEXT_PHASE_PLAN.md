@@ -120,6 +120,14 @@
 - 当前状态：P16 planning through P16.5 均已完成并推送；P16.x closeout 已完成本地 docs validation，等待 guarded commit / safe-push readiness。
 - 下一步建议：收口 `P16.x-closeout-review` 的 commit / safe-push，然后进入 `P17-advanced-memory-intelligence-v8-evidence-gate-planning`。
 
+当前 P17 planning：
+
+- 入口：[docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md](/A:/codex-memory/docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md)
+- 目标：把 V8 / advanced-memory intelligence 从“已有诊断能力”拆成 evidence-first gate，先锁 read-only diagnostic shape、forbidden fields、query-quality interaction 和 policy/lifecycle compatibility。
+- 当前状态：P16 已关闭为 `FIXTURE_BACKED_AND_GATE_CHECKED`；P17 planning 已完成本地 docs validation，等待 guarded commit / safe-push readiness。
+- 下一步建议：收口 `P17-advanced-memory-intelligence-v8-evidence-gate-planning` 的 commit / safe-push，然后进入 `P17.1-v8-diagnostic-surface-inventory`。
+- 边界：planning / docs / board only；不改 runtime、不新增 tests、不跑 provider、不做 real memory preview、不改 MCP、不做 migration/import-export apply、不进入 V8 implementation。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：
