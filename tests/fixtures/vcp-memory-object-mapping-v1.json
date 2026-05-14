@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "vcp-memory-object-mapping-v1",
+  "phase": "P13.4-object-mapping-fixture-tests",
+  "fixtureOnly": true,
+  "runtimeMapperImplemented": false,
+  "trueDatabaseRead": false,
+  "trueDiaryRead": false,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "sqliteRecordFixture": {
+    "memory_id": "mem-p13-map-001",
+    "title": "P13 object mapping fixture memory",
+    "content": "Synthetic SQLite fixture content for mapping preview only.",
+    "project_id": "JENN2046/codex-memory",
+    "workspace_id": "workspace-p13-map-raw",
+    "client_id": "codex",
+    "visibility": "project",
+    "lifecycle_status": "active",
+    "created_at": "2026-05-14T00:00:00.000Z",
+    "updated_at": "2026-05-14T00:10:00.000Z"
+  },
+  "diaryRecordFixture": {
+    "title": "P13 diary mapping fixture entry",
+    "content": "Synthetic diary fixture body. Raw sentinel fixture-raw-secret-should-not-emit must stay out of previews.",
+    "evidence": "Fixture evidence for diary-compatible mapping preview.",
+    "tags": [
+      "object-model",
+      "mapping-preview",
+      "p13"
+    ],
+    "created_at": "2026-05-14T00:02:00.000Z",
+    "source_path": "fixture://diary/2026-05-14/p13-object-mapping.md",
+    "relative_path": "diary/2026-05-14/p13-object-mapping.md"
+  },
+  "auditLogFixture": {
+    "event_id": "audit-p13-map-001",
+    "memory_id": "mem-p13-map-001",
+    "event_type": "record_memory",
+    "created_at": "2026-05-14T00:03:00.000Z",
+    "redaction_applied": true,
+    "scope_policy_applied": true,
+    "lifecycle_policy_applied": true
+  },
+  "chunkMetadataFixture": {
+    "chunk_id": "chunk-p13-map-001",
+    "memory_id": "mem-p13-map-001",
+    "chunk_hash": "fixture-chunk-hash-p13-map-001",
+    "kind": "memo",
+    "created_at": "2026-05-14T00:04:00.000Z"
+  },
+  "tagMetadataFixture": {
+    "tag_id": "tag-p13-map-001",
+    "tag": "mapping-preview",
+    "memory_id": "mem-p13-map-001",
+    "weight": 0.75
+  },
+  "edgeCases": {
+    "missingLifecycleStatusFixture": {
+      "memory_id": "mem-p13-map-missing-lifecycle",
+      "title": "Missing lifecycle fixture",
+      "content": "Synthetic content with lifecycle omitted.",
+      "project_id": "JENN2046/codex-memory",
+      "workspace_id": "workspace-p13-map-raw",
+      "client_id": "codex",
+      "visibility": "project",
+      "created_at": "2026-05-14T00:05:00.000Z",
+      "updated_at": "2026-05-14T00:06:00.000Z"
+    },
+    "missingRequiredFieldsFixture": {
+      "title": "Missing required fields fixture",
+      "content": "Synthetic content with memory_id omitted.",
+      "project_id": "JENN2046/codex-memory",
+      "workspace_id": "workspace-p13-map-raw",
+      "client_id": "codex",
+      "visibility": "project",
+      "lifecycle_status": "active",
+      "created_at": "2026-05-14T00:07:00.000Z",
+      "updated_at": "2026-05-14T00:08:00.000Z"
+    },
+    "missingOptionalFieldsFixture": {
+      "memory_id": "mem-p13-map-missing-optional",
+      "title": "Missing optional fields fixture",
+      "content": "Synthetic content with optional vNext fields omitted.",
+      "project_id": "JENN2046/codex-memory",
+      "workspace_id": "workspace-p13-map-raw",
+      "visibility": "project",
+      "lifecycle_status": "active",
+      "created_at": "2026-05-14T00:09:00.000Z",
+      "updated_at": "2026-05-14T00:10:00.000Z"
+    },
+    "missingSourceProvenanceFixture": {
+      "memory_id": "mem-p13-map-missing-source",
+      "title": "Missing provenance fixture",
+      "content": "Synthetic content without diary source/provenance.",
+      "project_id": "JENN2046/codex-memory",
+      "workspace_id": "workspace-p13-map-raw",
+      "client_id": "codex",
+      "visibility": "project",
+      "lifecycle_status": "active",
+      "created_at": "2026-05-14T00:11:00.000Z",
+      "updated_at": "2026-05-14T00:12:00.000Z"
+    },
+    "proposalFixture": {
+      "memory_id": "mem-p13-map-proposal",
+      "title": "Proposal default fixture",
+      "content": "Synthetic proposal content.",
+      "project_id": "JENN2046/codex-memory",
+      "workspace_id": "workspace-p13-map-raw",
+      "client_id": "codex",
+      "visibility": "project",
+      "lifecycle_status": "proposal",
+      "created_at": "2026-05-14T00:13:00.000Z",
+      "updated_at": "2026-05-14T00:14:00.000Z"
+    },
+    "tombstoneFixture": {
+      "memory_id": "mem-p13-map-tombstone",
+      "title": "Tombstone default fixture",
+      "content": "Synthetic tombstone content.",
+      "project_id": "JENN2046/codex-memory",
+      "workspace_id": "workspace-p13-map-raw",
+      "client_id": "codex",
+      "visibility": "project",
+      "lifecycle_status": "tombstoned",
+      "created_at": "2026-05-14T00:15:00.000Z",
+      "updated_at": "2026-05-14T00:16:00.000Z"
+    }
+  },
+  "expectedMappingPreview": {
+    "status": "ok",
+    "mutated": false,
+    "sourceKind": "sqlite+diary+audit+chunk+tag-fixture",
+    "memoryRecordVNext": {
+      "memory_id": "mem-p13-map-001",
+      "schema_version": "vNext",
+      "kind": "MemoryRecord",
+      "title": "P13 object mapping fixture memory",
+      "project_id": "JENN2046/codex-memory",
+      "workspace_id": "workspace-p13-map-raw",
+      "client_id": "codex",
+      "visibility": "project",
+      "lifecycle_status": "active",
+      "audit_refs": [
+        "audit-p13-map-001"
+      ],
+      "chunk_refs": [
+        "chunk-p13-map-001"
+      ],
+      "tag_refs": [
+        "tag-p13-map-001"
+      ],
+      "proposal": {
+        "active": false
+      },
+      "tombstone": {
+        "hidden": true
+      }
+    },
+    "missingRequiredFields": [],
+    "missingOptionalFields": [],
+    "unknownFields": [],
+    "lifecycleStatusCoverage": {
+      "known": 1,
+      "unknown": 0
+    },
+    "scopeCoverage": {
+      "project_id": true,
+      "workspace_id": true,
+      "client_id": true,
+      "visibility": true
+    },
+    "auditRefCoverage": {
+      "count": 1
+    },
+    "chunkRefCoverage": {
+      "count": 1
+    },
+    "tagRefCoverage": {
+      "count": 1
+    },
+    "importExportSafe": true,
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false
+  }
+}

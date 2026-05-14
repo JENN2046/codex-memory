@@ -162,8 +162,8 @@ Detailed record previews should be separate from low-risk summaries. If future p
 ## Future Implementation Sequence
 
 1. `P13.4-object-mapping-fixture-tests`
-   - Add fixture tests for mapping SQLite-like rows, diary-like records, audit refs, chunks, tags, scope, and lifecycle into object envelopes.
-   - Fixture-only; no real data scan.
+   - Completed as fixture-only tests for mapping SQLite-like rows, diary-like records, audit refs, chunks, tags, scope, and lifecycle into object mapping previews.
+   - Fixture-only; no real data scan, runtime mapper, import/export runtime, or migration.
 2. `P13.5-SQLite-diary-mapping-dry-run-CLI`
    - Add a local read-only dry-run CLI after fixture tests exist.
    - Must report `mutated=false`.
@@ -176,6 +176,45 @@ Detailed record previews should be separate from low-risk summaries. If future p
    - No real migration until explicit approval.
 
 No real migration, SQLite schema change, `ALTER TABLE`, diary rewrite, import/export runtime, or durable memory mutation is approved by this sequence.
+
+## P13.4 Object Mapping Fixture Tests
+
+P13.4 adds the first fixture-only object mapping preview tests:
+
+- fixture: `tests/fixtures/vcp-memory-object-mapping-v1.json`
+- test: `tests/vcp-memory-object-mapping-fixture.test.js`
+
+The fixture models synthetic SQLite, diary, audit, chunk, and tag metadata. It does not read real SQLite records, real diary markdown, provider data, or durable memory.
+
+The test-local helpers are intentionally limited to the test file:
+
+- `buildMappingPreview()`
+- `normalizeMissingFields()`
+- `buildLowRiskSummary()`
+
+The tests prove that a future mapping preview can preserve:
+
+- `memory_id`, title, `schema_version`, and object kind
+- internal scope fields: `project_id`, `workspace_id`, `client_id`, and `visibility`
+- lifecycle status, including missing lifecycle status as `unknown`, not silently `active`
+- audit refs, chunk refs, and tag refs
+- deterministic fixture-only `content_hash`
+- fixture-only `content_ref`
+- required-field missing reports without inference
+- optional-field fallback to `null` / `unknown`
+- `importExportSafe=false` when source/provenance is missing
+- inactive proposal default and hidden tombstone default
+- no raw secret or raw `workspace_id` in low-risk output
+- `mutated=false` and no side effects
+
+This remains a fixture/test phase only:
+
+- no runtime mapper
+- no import/export CLI
+- no MCP public tool expansion
+- no MCP schema change
+- no SQLite migration or `ALTER TABLE`
+- no real DB read, diary read, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
 
 ## Validation Plan
 
@@ -190,6 +229,17 @@ Future implementation should use:
 - `npm run lifecycle:sqlite:dry-run -- --json`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+P13.4 validation:
+
+```powershell
+node --test tests\vcp-memory-object-mapping-fixture.test.js
+node --test tests\vcp-memory-object-model-fixture.test.js
+node --test tests\vcp-memory-object-round-trip.test.js
+npm test
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
 
 Current P13.3 validation is docs-only:
 
@@ -213,4 +263,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.4-object-mapping-fixture-tests`
+`P13.5-SQLite-diary-mapping-dry-run-CLI`

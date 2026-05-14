@@ -390,7 +390,7 @@ P13 does not migrate data. The planned sequence is:
    - Must report `mutated=false` when implemented later.
 4. `P13.4-object-mapping-fixture-tests`
    - Add fixture tests for SQLite/diary mapping preview behavior.
-   - No real data scan.
+   - Completed as fixture-only tests; no real data scan.
 5. `P13.5-SQLite-diary-mapping-dry-run-CLI`
    - Add a read-only dry-run CLI only after mapping fixture tests exist.
    - Must reject apply/write/confirm migration flags.
@@ -480,6 +480,43 @@ This remains a docs/board planning phase only:
 - no SQLite migration or `ALTER TABLE`
 - no real data scan, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
 
+## P13.4 Object Mapping Fixture Tests
+
+P13.4 locks the first fixture-only SQLite / diary object mapping preview:
+
+- fixture: `tests/fixtures/vcp-memory-object-mapping-v1.json`
+- test: `tests/vcp-memory-object-mapping-fixture.test.js`
+
+The test fixture models synthetic SQLite record fields, diary metadata, audit log refs, chunk metadata, and tag metadata. The test-local helpers are intentionally scoped to the test file:
+
+- `buildMappingPreview()`
+- `normalizeMissingFields()`
+- `buildLowRiskSummary()`
+
+The tests prove that a future mapping preview can keep `memory_id`, title, `kind`, `schema_version`, internal scope fields, lifecycle status, audit refs, chunk refs, tag refs, deterministic fixture-only `content_hash`, and fixture-only `content_ref`.
+
+The tests also lock the safety boundary:
+
+- missing required fields are reported, not inferred
+- missing optional fields normalize to `null` / `unknown`
+- missing lifecycle status becomes `unknown`, not silently `active`
+- `importExportSafe=false` when source/provenance is missing
+- proposals remain inactive by default
+- tombstones remain hidden by default
+- low-risk summaries do not expose raw `workspace_id`
+- raw secret sentinels are not emitted
+- mapping reports keep `mutated=false`
+- no side effect happens
+
+This remains a fixture/test phase only:
+
+- no runtime mapper
+- no import/export CLI
+- no MCP public tool expansion
+- no MCP schema change
+- no SQLite migration or `ALTER TABLE`
+- no real DB read, diary read, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
+
 ## Risk Register
 
 | Risk | Why It Matters | P13 Mitigation |
@@ -491,7 +528,7 @@ This remains a docs/board planning phase only:
 | Scope leakage | Raw workspace/client/project fields can leak in summaries | No raw `workspace_id` in low-risk summaries; scope-aware mapping |
 | Lifecycle mismatch | Legacy `status` and vNext lifecycle may diverge | Map existing `status` to `lifecycle_status`; unknown/null fallback |
 | Audit mismatch | Mutation and lifecycle history could be incomplete or overclaimed | Audit refs are derived only when evidence exists |
-| Import/export data loss | Future JSON movement may drop scope, lifecycle, or audit evidence | P13.2 locks fixture-only envelope round-trip; broader import/export shape remains deferred to P13.4 fixture tests |
+| Import/export data loss | Future JSON movement may drop scope, lifecycle, or audit evidence | P13.2 locks fixture-only envelope round-trip; P13.4 locks mapping preview refs and safety summaries before dry-run CLI work |
 
 ## Validation Plan
 
@@ -526,6 +563,17 @@ git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
+P13.4 validation:
+
+```powershell
+node --test tests\vcp-memory-object-mapping-fixture.test.js
+node --test tests\vcp-memory-object-model-fixture.test.js
+node --test tests\vcp-memory-object-round-trip.test.js
+npm test
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
 P13 planning validation was docs-only:
 
 ```powershell
@@ -548,6 +596,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.4-object-mapping-fixture-tests`
+`P13.5-SQLite-diary-mapping-dry-run-CLI`
 
-P13.4 should add fixture-only object mapping tests before any real SQLite/diary scan, runtime mapper, import/export implementation, or migration.
+P13.5 may add a read-only SQLite / diary mapping dry-run CLI only after P13.4 fixture tests pass. It must not write SQLite, rewrite diary, generate import/export files, implement a runtime mapper, or perform migration.

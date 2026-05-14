@@ -105,7 +105,8 @@
 | P13.1-object-model-fixture-schemas | memory-governance / object-model | A1/A2 | done | Add fixture schemas and tests for MemoryRecord vNext and object families | `node --test tests\vcp-memory-object-model-fixture.test.js`; `npm test`; diff/docs validation | Fixture/schema only; no runtime or migration |
 | P13.2-object-model-round-trip-fixture-tests | memory-governance / object-model | A1/A2 | done | Add fixture-only round-trip tests for object envelopes | `node --test tests\vcp-memory-object-round-trip.test.js`; `node --test tests\vcp-memory-object-model-fixture.test.js`; `npm test`; diff/docs validation | Fixture/test/docs only; no runtime, import/export implementation, or migration |
 | P13.3-SQLite-diary-mapping-dry-run-planning | memory-governance / object-model | A1/A2 | done | Plan SQLite/diary mapping dry-run report before any mapper or migration | `git diff --check`; docs validation | Docs/board planning only; no SQLite migration, `ALTER TABLE`, import/export runtime, runtime mapper, tests, or real DB/memory write |
-| P13.4-object-mapping-fixture-tests | memory-governance / object-model | A1/A2 | todo | Add fixture tests for SQLite/diary object mapping preview behavior | future mapping fixture tests; `npm test`; diff/docs validation | Next recommended phase; no real data scan, runtime mapper, import/export runtime, or migration |
+| P13.4-object-mapping-fixture-tests | memory-governance / object-model | A1/A2 | done | Add fixture tests for SQLite/diary object mapping preview behavior | `node --test tests\vcp-memory-object-mapping-fixture.test.js`; object model and round-trip regressions; `npm test`; diff/docs validation | Fixture/test/docs only; no real data scan, runtime mapper, import/export runtime, or migration |
+| P13.5-SQLite-diary-mapping-dry-run-CLI | memory-governance / object-model | A2 | todo | Add read-only SQLite/diary mapping dry-run CLI after fixture tests | future dry-run CLI tests; object mapping fixture tests; `npm test`; diff/docs validation | Must report `mutated=false`; no SQLite write, diary rewrite, import/export runtime, runtime mapper, real migration, or MCP expansion |
 
 ## 推荐执行顺序
 
@@ -149,8 +150,9 @@
 38. `P13.1`：object model fixture schemas 已新增 `tests/fixtures/vcp-memory-object-model-v1.json` 与 `tests/vcp-memory-object-model-fixture.test.js`，锁住对象族、`MemoryRecord` vNext 字段、privacy/lifecycle/audit/import-export/backward-compatibility 边界。
 39. `P13.2`：object model round-trip fixture tests 已新增 `tests/fixtures/vcp-memory-object-round-trip-v1.json` 与 `tests/vcp-memory-object-round-trip.test.js`，证明 source fixture -> normalized object -> export-safe JSON -> reloaded object 不丢失 identity/scope/lifecycle/audit/provenance/privacy/import-export boundaries。
 40. `P13.3`：SQLite/diary mapping dry-run planning 已新增 [docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md](/A:/codex-memory/docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md)，规划未来只读 mapping preview、missing field report、risk report 和 rollback story。
-41. 下一步建议：P13.4 object mapping fixture tests。
-42. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+41. `P13.4`：object mapping fixture tests 已新增 `tests/fixtures/vcp-memory-object-mapping-v1.json` 与 `tests/vcp-memory-object-mapping-fixture.test.js`，验证 synthetic SQLite / diary / audit / chunk / tag metadata 可以形成 mapping preview，并锁住 missing field policy、low-risk workspace summary、proposal/tombstone defaults、raw secret 禁止、`mutated=false` 和 no-side-effect。
+42. 下一步建议：P13.5 SQLite / diary mapping dry-run CLI。
+43. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

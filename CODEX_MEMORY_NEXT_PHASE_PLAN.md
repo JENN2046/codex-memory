@@ -70,7 +70,8 @@
 - 目标：规划 VCP-compatible practical object model，包括 `MemoryRecord` vNext、chunk、tag、scope/context、checkpoint/handoff、audit、tombstone、proposal 和 migration 对象族。
 - 当前进度：P13 planning 已完成；P13.1 object model fixture schemas 已新增 `tests/fixtures/vcp-memory-object-model-v1.json` 与 `tests/vcp-memory-object-model-fixture.test.js`；P13.2 object model round-trip fixture tests 已新增 `tests/fixtures/vcp-memory-object-round-trip-v1.json` 与 `tests/vcp-memory-object-round-trip.test.js`；P13.3 SQLite/diary mapping dry-run planning 已新增 [docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md](/A:/codex-memory/docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md)。
 - 边界：fixture/tests/docs only；不改 runtime，不改 `package.json`，不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不写真实 memory。
-- 下一步建议：P13.4 object mapping fixture tests。
+- P13.4 object mapping fixture tests 已新增 synthetic SQLite / diary / audit / chunk / tag mapping fixture 与测试，锁住 mapping preview、missing field policy、low-risk summary、proposal/tombstone defaults、`mutated=false` 和 no-side-effect 边界。
+- 下一步建议：P13.5 SQLite / diary mapping dry-run CLI planning/implementation gate；仍必须 read-only、`mutated=false`，不做真实 DB/diary 写入、不做 migration。
 
 ## 当前判断
 
