@@ -8,7 +8,7 @@ This document closes `P13` for the VCP-compatible memory object model chain.
 
 P13 moved the project from object-model planning to fixture and dry-run readiness. It did not migrate real data, apply import/export, expand public MCP tools, or rewrite runtime recall behavior.
 
-## P13 Scope Completed
+## P13 Completed Scope
 
 | Phase | Status | Result |
 |---|---|---|
@@ -32,7 +32,7 @@ Targeted tests and checks run across P13:
 | P13.2 | `node --test tests\vcp-memory-object-round-trip.test.js` -> `18/18`; object model regression `13/13` |
 | P13.3 | `git diff --check`; docs validation |
 | P13.4 | `node --test tests\vcp-memory-object-mapping-fixture.test.js` -> `20/20`; object model and round-trip regressions |
-| P13.5 | `node --test tests\vcp-memory-object-mapping-dry-run-cli.test.js` -> `11/11`; mapping fixture `20/20`; round-trip `18/18` |
+| P13.5 | dry-run CLI validation: `node --test tests\vcp-memory-object-mapping-dry-run-cli.test.js` -> `11/11`; `npm run vcp-memory:mapping:dry-run -- --json`; mapping fixture `20/20`; round-trip `18/18` |
 | P13.6 | `node --test tests\vcp-memory-import-export-shape.test.js` -> `16/16`; object model `13/13`; round-trip `18/18`; mapping fixture `20/20` |
 | P13.7 | `node --test tests\vcp-memory-migration-readiness-cli.test.js` -> `11/11`; readiness JSON smoke |
 
@@ -44,6 +44,7 @@ Full-suite evidence:
 - P13.5: `npm test` -> `374/374`
 - P13.6: `npm test` -> `390/390`
 - P13.7: `npm test` -> `401/401`
+- Latest full suite: `npm test` -> `401/401`
 
 CLI smoke outputs:
 
@@ -76,8 +77,7 @@ Confirmed at P13 closeout:
 - No `ALTER TABLE` was executed.
 - No import/export runtime was implemented.
 - No import/export apply or file generation was performed.
-- No real DB/diary write was performed.
-- No real DB/diary read was introduced for P13 fixture/dry-run tests.
+- No real DB/diary read or write was performed.
 - No runtime mapper was implemented.
 - No public MCP tool expansion happened.
 - No MCP schema change happened.
@@ -91,6 +91,7 @@ Confirmed at P13 closeout:
 - Real SQLite / diary mapping still requires explicit approval.
 - Import/export apply remains absent.
 - Migration requires approved backup and rollback procedure before any real data action.
+- Donor behavior parity may expose object-model drift.
 - Real workspace scope gaps remain review material; low-risk reports must not expose raw `workspace_id`.
 - P14 donor parity work must not rewrite the P13 object model silently. Any object-model drift must update fixtures, round-trip tests, mapping tests, and readiness docs.
 
@@ -109,6 +110,8 @@ P14 must not jump directly to:
 - real migration
 - import/export apply
 - public MCP tool expansion
+- altering public MCP tools
+- altering import/export or migration behavior
 
 ## Next Recommended Phase
 
