@@ -130,6 +130,7 @@
 - P16.x TagMemo semantic association closeout review：新增 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md)，总结 P16 planning / inventory / fixture / evidence / compare-rollback gate，结论为 `FIXTURE_BACKED_AND_GATE_CHECKED`；P17 只能从 planning / evidence 开始，不授权 V8 implementation、runtime tuning、provider benchmark、migration、MCP expansion 或 real memory mutation。
 - P17 advanced memory intelligence / V8 evidence gate planning：新增 [docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md](/A:/codex-memory/docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md)，把现有 `v8-diagnose`、TagMemo analysis、EPA、ResidualPyramid、geodesic rerank 和 meta-thinking surfaces 拆成 evidence-first gate categories；本阶段只做 planning/docs/board，不实现 V8、不调 runtime、不跑 provider、不改 MCP、不做 migration。
 - P17.1 V8 diagnostic surface inventory：新增 [docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md)，盘点 `v8-diagnose`、TagMemoEngine、EPA、ResidualPyramid、RerankService、CandidateGenerator、existing tests、future report fields、forbidden fields 和 synthetic query families；本阶段 inventory/docs/board only，不运行 `v8-diagnose`、不新增 tests、不改 runtime。
+- P17.2 V8 diagnostic fixture shape tests：新增 `tests/fixtures/v8-diagnostic-shape-v1.json`、`tests/v8-diagnostic-shape.test.js` 与 [docs/P17_V8_DIAGNOSTIC_FIXTURE_SHAPE_TESTS.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_FIXTURE_SHAPE_TESTS.md)，锁定 `v8-diagnose` synthetic report shape、安全 flags、forbidden fields 与 missing-query safe error shape；targeted fixture test `5/5`、full suite `434/434`、diff check、docs validation 均通过；本阶段 tests/fixtures/docs only，不改 `src/`、不做 runtime tuning、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -495,7 +496,7 @@
 
 ## 下一步建议
 
-- 下一阶段建议完成 `P17.1-v8-diagnostic-surface-inventory` 的 guarded commit / safe-push，然后进入 `P17.2-v8-diagnostic-fixture-shape-tests`。不得直接进入 runtime implementation、provider benchmark、V8 implementation、UI、migration/import-export apply、release candidate、tag 或 deploy。
+- 下一阶段建议完成 `P17.2-v8-diagnostic-fixture-shape-tests` 的 validation / guarded commit / safe-push，然后进入 `P17.3-v8-diagnostic-cli-shape-gate`。不得直接进入 runtime implementation、provider benchmark、V8 implementation、UI、migration/import-export apply、release candidate、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

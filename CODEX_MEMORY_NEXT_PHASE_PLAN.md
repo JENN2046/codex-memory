@@ -132,9 +132,19 @@
 
 - 入口：[docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md)
 - 目标：盘点 `v8-diagnose`、`TagMemoEngine`、`EPAModule`、`ResidualPyramid`、`RerankService`、`CandidateGenerator`、existing tests 和 future fixture query families。
-- 当前状态：P17.1 inventory 已完成本地 docs validation，等待 guarded commit / safe-push readiness。
-- 下一步建议：收口 `P17.1-v8-diagnostic-surface-inventory` 的 commit / safe-push，然后进入 `P17.2-v8-diagnostic-fixture-shape-tests`。
+- 当前状态：P17.1 inventory 已完成 validation、guarded commit、safe-push 和 post-push hash verification。
+- 下一步建议：继续 `P17.2-v8-diagnostic-fixture-shape-tests`。
 - 边界：inventory / docs / board only；不改 runtime、不新增 tests、不运行 `v8-diagnose`、不跑 provider、不做 real memory preview、不改 MCP、不做 migration/import-export apply。
+
+当前 P17.2 fixture shape tests：
+
+- 入口：[docs/P17_V8_DIAGNOSTIC_FIXTURE_SHAPE_TESTS.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_FIXTURE_SHAPE_TESTS.md)
+- Fixture：`tests/fixtures/v8-diagnostic-shape-v1.json`
+- Test：`tests/v8-diagnostic-shape.test.js`
+- 目标：锁定 synthetic `v8-diagnose` report shape、安全 flags、forbidden fields 与 missing-query safe error shape。
+- 当前状态：P17.2 fixture/test/docs 已完成本地 validation：targeted fixture test `5/5`、full suite `434/434`、diff check、docs validation 均通过。
+- 下一步建议：完成 guarded commit / safe-push，并进入 `P17.3-v8-diagnostic-cli-shape-gate`。
+- 边界：tests/fixtures/docs/status/board only；不改 `src/`、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
 
 ## 当前判断
 

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P17.1 V8 diagnostic surface inventory without changing runtime behavior.
+Run P17.2 V8 diagnostic fixture shape tests without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P17.1 inventory docs/status/board edits are local and uncommitted.
+P17.2 fixture/test/docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P17 V8 diagnostic surface inventory
+P17 V8 diagnostic fixture shape tests
 
 ## Findings
 
@@ -44,13 +44,18 @@ P17 V8 diagnostic surface inventory
 - P17 planning is drafted as docs/status/board only; docs validation passed.
 - P17 planning guarded commit and safe-push completed at `a1cdacc57de7f77252d35079184a02de0ab2f07f`.
 - P17.1 inventory is drafted as docs/status/board only; docs validation passed.
-- `v8-diagnose` is a later read-only evidence surface, not a P16 planning authorization for P17 / V8 implementation.
+- P17.1 guarded commit and safe-push completed at `c77e4734d5ca9023be252d1add5d2e1179e5c097`.
+- P17.2 fixture shape tests have been drafted for synthetic `v8-diagnose` report shape.
+- P17.2 targeted fixture test `5/5`, full suite `434/434`, diff check, and docs validation passed locally.
+- `v8-diagnose` is now under fixture-shape evidence in P17.2; this is not authorization for V8 runtime implementation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md`
+- `tests/fixtures/v8-diagnostic-shape-v1.json`
+- `tests/v8-diagnostic-shape.test.js`
+- `docs/P17_V8_DIAGNOSTIC_FIXTURE_SHAPE_TESTS.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -58,6 +63,8 @@ P17 V8 diagnostic surface inventory
 
 ## Validation
 
+- `node --test tests\v8-diagnostic-shape.test.js` (`5/5`)
+- `npm test` (`434/434`)
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -77,4 +84,4 @@ P17 V8 diagnostic surface inventory
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P17.2-v8-diagnostic-fixture-shape-tests`.
+Run final diff/scope review, guarded commit, and safe-push readiness. If clean, safe-push P17.2 and continue to `P17.3-v8-diagnostic-cli-shape-gate`.

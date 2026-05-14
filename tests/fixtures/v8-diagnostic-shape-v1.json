@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "v8-diagnostic-shape-v1",
+  "phase": "P17.2-v8-diagnostic-fixture-shape-tests",
+  "source": {
+    "kind": "fixture-only",
+    "synthetic": true,
+    "realMemoryPreview": false
+  },
+  "safety": {
+    "mode": "dry-run-shape-test",
+    "mutated": false,
+    "providerCalls": 0,
+    "durableMemoryTouched": false,
+    "realMemoryPreview": false,
+    "redactionApplied": true,
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false,
+    "runtimeTuning": false,
+    "publicMcpTools": [
+      "record_memory",
+      "search_memory",
+      "memory_overview"
+    ],
+    "validateMemoryPublicTool": false
+  },
+  "reportShape": {
+    "requiredTopLevelFields": [
+      "mode",
+      "destructive",
+      "embeddingProfile",
+      "query",
+      "terrain",
+      "residualPyramid",
+      "tagMemo",
+      "metaThinking",
+      "geodesic"
+    ],
+    "embeddingProfileKeys": [
+      "fingerprint",
+      "version",
+      "model",
+      "dimensions",
+      "ragProfile"
+    ],
+    "queryKeys": [
+      "raw",
+      "normalized",
+      "passiveBlocks",
+      "activeBlocks",
+      "directives",
+      "timeRanges"
+    ],
+    "terrainKeys": [
+      "dominantAxes",
+      "terrainBasis",
+      "energySignature",
+      "logicDepth",
+      "resonance",
+      "semanticWidth",
+      "entropy"
+    ],
+    "residualPyramidKeys": [
+      "levels",
+      "totalExplainedEnergy",
+      "features"
+    ],
+    "residualLevelKeys": [
+      "level",
+      "tags",
+      "energyExplained",
+      "residualEnergyRatio"
+    ],
+    "residualTagKeys": [
+      "id",
+      "name",
+      "similarity",
+      "contribution"
+    ],
+    "tagMemoKeys": [
+      "coreTags",
+      "mode",
+      "dynamicTagWeight",
+      "dynamicCoreWeight"
+    ],
+    "metaThinkingKeys": [
+      "score",
+      "threshold",
+      "auto",
+      "reasons"
+    ],
+    "geodesicKeys": [
+      "requested",
+      "alpha",
+      "minGeoSamples",
+      "willUse"
+    ],
+    "forbiddenKeys": [
+      "hitRate",
+      "qualityScore",
+      "providerLatencyMs",
+      "providerApiKey",
+      "authorization",
+      "cookie",
+      "workspace_id",
+      "envValue",
+      "productionSnippet"
+    ]
+  },
+  "cases": [
+    {
+      "id": "technical-migration-checkpoint",
+      "query": "checkpoint migration audit ::TagMemo+1.5 ::Rerank+0.4 ::GeodesicRerank",
+      "expected": {
+        "mode": "v8-diagnose",
+        "destructive": false,
+        "normalized": "checkpoint migration audit",
+        "geodesicRequested": true,
+        "geodesicWillUse": true,
+        "tagMemoMode": "explicit",
+        "minCoreTagCount": 3,
+        "minResidualLevelCount": 1
+      }
+    },
+    {
+      "id": "governance-policy-lifecycle",
+      "query": "governed memory lifecycle scope policy supersede forget audit",
+      "expected": {
+        "mode": "v8-diagnose",
+        "destructive": false,
+        "normalized": "governed memory lifecycle scope policy supersede forget audit",
+        "geodesicRequested": false,
+        "geodesicWillUse": false,
+        "tagMemoMode": "auto",
+        "minCoreTagCount": 4,
+        "minResidualLevelCount": 1
+      }
+    }
+  ],
+  "safeErrorCases": [
+    {
+      "id": "missing-query",
+      "query": "",
+      "expected": {
+        "ok": false,
+        "code": "QUERY_REQUIRED",
+        "message": "v8-diagnose requires --query <text>",
+        "destructive": false,
+        "mutated": false,
+        "providerCalls": 0,
+        "durableMemoryTouched": false,
+        "realMemoryPreview": false,
+        "redactionApplied": true
+      }
+    }
+  ],
+  "forbiddenOutputClaims": [
+    "raw secrets",
+    "raw workspace identifiers",
+    "provider keys",
+    "authorization headers",
+    "cookies",
+    ".env values",
+    "live provider latency claims when providerCalls is 0",
+    "fake hitRate",
+    "fake qualityScore",
+    "production memory snippets"
+  ]
+}
