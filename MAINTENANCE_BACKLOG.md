@@ -134,7 +134,8 @@
 | P16.5-compare-rollback-semantic-gate | tagmemo / semantic-association / compare-rollback | A1/A2 | done | Run or summarize compare/rollback semantic evidence before P16 closeout | targeted TagMemo `9/9`; ordering compare `4/4 matched`; ordering rollback `4/4 rollback-ready`; `npm test`; diff/docs validation | Full suite `429/429`; must not force misleading compare category if semantic surface is not covered; no runtime tuning unless later approved |
 | P16.x-closeout-review | tagmemo / semantic-association / closeout | A1 | done | Summarize P16 evidence, boundaries, remaining gaps, and readiness for P17 planning only | `git diff --check`; docs validation | P16 result `FIXTURE_BACKED_AND_GATE_CHECKED`; must not start P17 implementation, provider benchmark, V8, runtime tuning, migration, or public MCP expansion |
 | P17-advanced-memory-intelligence-v8-evidence-gate-planning | v8 / advanced-memory-intelligence / planning | A1/A2 | done | Plan V8 / advanced memory intelligence evidence gates after P16 closeout | `git diff --check`; docs validation | Planning/evidence only; no V8 runtime implementation, provider benchmark, migration, MCP expansion, or real memory mutation |
-| P17.1-v8-diagnostic-surface-inventory | v8 / diagnostics / inventory | A1/A2 | todo | Inventory existing v8-diagnose, EPA, ResidualPyramid, geodesic, and meta-thinking surfaces | docs validation after source/test inventory | Inventory only; no runtime tuning, provider call, real memory preview, MCP expansion, or migration |
+| P17.1-v8-diagnostic-surface-inventory | v8 / diagnostics / inventory | A1/A2 | done | Inventory existing v8-diagnose, EPA, ResidualPyramid, geodesic, and meta-thinking surfaces | `git diff --check`; docs validation | Inventory only; no runtime tuning, provider call, real memory preview, MCP expansion, or migration |
+| P17.2-v8-diagnostic-fixture-shape-tests | v8 / diagnostics / fixture-tests | A1/A2 | todo | Add synthetic fixture shape tests for v8-diagnose report shape and forbidden fields | targeted fixture tests; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 
 ## 推荐执行顺序
 
@@ -207,7 +208,8 @@
 67. `P16.5`：compare/rollback semantic gate 已新增 [docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md](/A:/codex-memory/docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md)，targeted TagMemo `9/9`、ordering compare `4/4 matched`、ordering rollback `4/4 rollback-ready`、full suite `429/429`、diff/docs validation 均通过。
 68. `P16.x`：TagMemo semantic association closeout review 已新增 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md)，结论为 `FIXTURE_BACKED_AND_GATE_CHECKED`；docs validation 已通过。
 69. `P17`：advanced memory intelligence / V8 evidence gate planning 已新增 [docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md](/A:/codex-memory/docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md)，规划 diagnostic shape、read-only evidence safety、semantic signal fixtures、query-quality interaction 和 policy/lifecycle compatibility；docs validation 已通过。
-70. 下一步建议在 P17 planning guarded commit / safe-push 后进入 `P17.1-v8-diagnostic-surface-inventory`；不得直接进入 V8 implementation、runtime tuning、provider benchmark、UI、migration/import-export apply 或 release candidate。
+70. `P17.1`：V8 diagnostic surface inventory 已新增 [docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md)，盘点 `v8-diagnose`、TagMemoEngine、EPA、ResidualPyramid、geodesic rerank、CandidateGenerator、existing tests、future diagnostic fields 和 query families；docs validation 已通过。
+71. 下一步建议在 P17.1 guarded commit / safe-push 后进入 `P17.2-v8-diagnostic-fixture-shape-tests`；不得直接进入 V8 implementation、runtime tuning、provider benchmark、UI、migration/import-export apply 或 release candidate。
 67. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界

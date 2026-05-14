@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P17 advanced memory intelligence / V8 evidence gate planning without changing runtime behavior.
+Run P17.1 V8 diagnostic surface inventory without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P17 planning docs/status/board edits are local and uncommitted.
+P17.1 inventory docs/status/board edits are local and uncommitted.
 
 ## Current Area
 
-P17 advanced memory intelligence / V8 evidence gate planning
+P17 V8 diagnostic surface inventory
 
 ## Findings
 
@@ -42,13 +42,15 @@ P17 advanced memory intelligence / V8 evidence gate planning
 - P16.x closeout review is drafted as docs/status/board only; docs validation passed.
 - P16.x guarded commit and safe-push completed at `dcc15247edd1e1781eeca991e0948734edfea6ee`.
 - P17 planning is drafted as docs/status/board only; docs validation passed.
+- P17 planning guarded commit and safe-push completed at `a1cdacc57de7f77252d35079184a02de0ab2f07f`.
+- P17.1 inventory is drafted as docs/status/board only; docs validation passed.
 - `v8-diagnose` is a later read-only evidence surface, not a P16 planning authorization for P17 / V8 implementation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md`
+- `docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -75,4 +77,4 @@ P17 advanced memory intelligence / V8 evidence gate planning
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P17.1-v8-diagnostic-surface-inventory`.
+Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P17.2-v8-diagnostic-fixture-shape-tests`.

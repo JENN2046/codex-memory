@@ -128,6 +128,14 @@
 - 下一步建议：收口 `P17-advanced-memory-intelligence-v8-evidence-gate-planning` 的 commit / safe-push，然后进入 `P17.1-v8-diagnostic-surface-inventory`。
 - 边界：planning / docs / board only；不改 runtime、不新增 tests、不跑 provider、不做 real memory preview、不改 MCP、不做 migration/import-export apply、不进入 V8 implementation。
 
+当前 P17.1 inventory：
+
+- 入口：[docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md)
+- 目标：盘点 `v8-diagnose`、`TagMemoEngine`、`EPAModule`、`ResidualPyramid`、`RerankService`、`CandidateGenerator`、existing tests 和 future fixture query families。
+- 当前状态：P17.1 inventory 已完成本地 docs validation，等待 guarded commit / safe-push readiness。
+- 下一步建议：收口 `P17.1-v8-diagnostic-surface-inventory` 的 commit / safe-push，然后进入 `P17.2-v8-diagnostic-fixture-shape-tests`。
+- 边界：inventory / docs / board only；不改 runtime、不新增 tests、不运行 `v8-diagnose`、不跑 provider、不做 real memory preview、不改 MCP、不做 migration/import-export apply。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：
