@@ -45,6 +45,31 @@ P12 必须在这些边界上继续推进，不能绕过它们。
 4. `P12.4-MCP-tool-proposal-review`
 5. `P12.5-first-runtime-mutation-tool-behind-explicit-approval`
 
+## P12.1 Fixture Schema Tests
+
+P12.1 adds fixture-backed schema tests for the controlled write candidates:
+
+- Fixture: [controlled-write-tools-v1.json](/A:/codex-memory/tests/fixtures/controlled-write-tools-v1.json)
+- Test: [controlled-write-tools-fixture.test.js](/A:/codex-memory/tests/controlled-write-tools-fixture.test.js)
+
+This phase only locks schema and policy boundaries. It does not implement runtime mutation, does not add MCP public tools, does not change MCP schema, does not write real memory, and does not perform SQLite migration.
+
+The fixture records:
+
+- public tools remain frozen
+- dry-run-first is required
+- default mutation is false
+- hard delete is not allowed
+- candidate tool names are unique
+- mutation-capable candidates require audit event, reason, and evidence
+- `update_memory` forbids silent overwrite
+- `supersede_memory` requires bidirectional links
+- `forget_memory` defaults to tombstone
+- `audit_memory` is read-only
+- `validate_memory` cannot revive rejected/tombstoned by default
+- checkpoint/handoff candidates cannot bypass SecretScanner, ToolArgumentValidator, or lifecycle policy
+- no candidate permits raw secret output or raw `workspace_id` in low-risk summaries
+
 ## First-Batch Boundary
 
 第一批不要全开。
