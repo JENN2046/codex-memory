@@ -50,10 +50,11 @@ P16 should turn the following into fixture-backed evidence, in order:
 
 1. `P16-TagMemo-semantic-association-parity-planning`: this document and board/status alignment only.
 2. `P16.1-TagMemo-semantic-fixture-inventory`: inventory current tests, fixtures, query forms, and missing dimensions.
-3. `P16.2-TagMemo-semantic-fixture-expansion`: add sanitized fixture cases and targeted tests without runtime tuning.
-4. `P16.3-TagMemo-report-shape-schema-lock`: lock JSON/report fields for TagMemo, semantic grouping, and telemetry summaries.
-5. `P16.4-TagMemo-standing-gate-summary`: summarize targeted tests plus compare/rollback/query-quality gate evidence.
-6. `P16.5-TagMemo-closeout-review`: confirm evidence, gaps, and readiness for P17 planning only.
+3. `P16.2-TagMemo-semantic-fixture-shape-tests`: add synthetic fixture shape tests for directive parsing, scoring contribution, telemetry keys, LightMemo mapping, and no-side-effect policy without runtime tuning.
+4. `P16.3-TagMemo-targeted-semantic-fixtures`: add targeted sanitized semantic association cases after shape tests are stable.
+5. `P16.4-semantic-ranking-evidence-gate`: summarize ranking evidence and compare/query-quality interactions.
+6. `P16.5-compare-rollback-semantic-gate`: run standing compare/rollback evidence where applicable.
+7. `P16.x-closeout-review`: confirm evidence, gaps, and readiness for P17 planning only.
 
 ## Current Phase Boundary
 
@@ -105,4 +106,4 @@ Compare / rollback gates should be added only when a P16 slice touches donor-fac
 
 ## Result
 
-P16 planning defines a fixture-first path. The next safe phase is `P16.1-TagMemo-semantic-fixture-inventory`.
+P16 planning and P16.1 inventory are complete. P16.2 adds fixture shape tests only; it does not tune runtime ranking or start V8.

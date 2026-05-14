@@ -1,0 +1,357 @@
+{
+  "schemaVersion": "tagmemo-semantic-fixture-shape-v1",
+  "version": "v1",
+  "phase": "P16.2-TagMemo-semantic-fixture-shape-tests",
+  "source": {
+    "kind": "fixture-only",
+    "synthetic": true,
+    "path": "tests/fixtures/tagmemo-semantic-fixture-shape-v1.json"
+  },
+  "safety": {
+    "mutated": false,
+    "providerCalls": 0,
+    "durableMemoryTouched": false,
+    "runtimeTuning": false,
+    "publicMcpTools": [
+      "record_memory",
+      "search_memory",
+      "memory_overview"
+    ],
+    "validateMemoryPublicTool": false
+  },
+  "engineConfig": {
+    "tagMemoDynamicWeightRange": [
+      0.05,
+      0.45
+    ],
+    "tagMemoCoreBoostRange": [
+      1.2,
+      1.4
+    ],
+    "metaThinkingAutoThreshold": 0.45
+  },
+  "directiveCases": [
+    {
+      "id": "tagmemo-plus-rerank-group",
+      "query": "[[orm migration checkpoint]] ::TagMemo+1.8 ::Rerank+0.6 ::Group(tag)",
+      "expected": {
+        "query": "orm migration checkpoint",
+        "passiveBlocks": [
+          "orm migration checkpoint"
+        ],
+        "directives": {
+          "tagmemo": 1.8,
+          "geodesicrerank": true,
+          "rerank": true,
+          "rerankplus": 0.6,
+          "group": "tag"
+        },
+        "modifiers": [
+          "tagmemo",
+          "geodesicrerank",
+          "rerank",
+          "rerankplus",
+          "group"
+        ],
+        "analysis": {
+          "queryText": "orm migration checkpoint",
+          "coreTags": [
+            "checkpoint",
+            "migration",
+            "orm"
+          ],
+          "tagMemoMode": "explicit",
+          "dynamicTagWeight": 0.45,
+          "dynamicCoreWeight": 1.240564,
+          "primaryAxis": "anchored",
+          "metaThinkingAuto": true,
+          "metaThinkingReasons": [
+            "axis-resonance",
+            "geodesic-directive"
+          ],
+          "residualLevelCount": 1,
+          "residualCoverage": 1
+        }
+      }
+    },
+    {
+      "id": "tagmemo-non-plus-rerank-group",
+      "query": "[[orm migration checkpoint]] ::TagMemo(1.8) ::Rerank+0.6 ::Group(tag)",
+      "expected": {
+        "query": "orm migration checkpoint",
+        "directives": {
+          "tagmemo": "1.8",
+          "rerank": true,
+          "rerankplus": 0.6,
+          "group": "tag"
+        },
+        "geodesicRerank": false,
+        "analysis": {
+          "tagMemoMode": "explicit",
+          "dynamicTagWeight": 0.45,
+          "dynamicCoreWeight": 1.240564,
+          "primaryAxis": "anchored",
+          "metaThinkingAuto": true,
+          "metaThinkingReasons": [
+            "axis-resonance"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tagmemo-bare",
+      "query": "[[orm migration checkpoint]] ::TagMemo ::Rerank",
+      "expected": {
+        "query": "orm migration checkpoint",
+        "directives": {
+          "tagmemo": true,
+          "rerank": true
+        },
+        "geodesicRerank": false,
+        "analysis": {
+          "tagMemoMode": "explicit",
+          "dynamicTagWeight": 0.350421,
+          "dynamicCoreWeight": 1.240564,
+          "primaryAxis": "anchored",
+          "metaThinkingAuto": false,
+          "metaThinkingReasons": [
+            "axis-resonance"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tagmemo-plus-clamped",
+      "query": "[[orm migration checkpoint]] ::TagMemo+9.0 ::Rerank",
+      "expected": {
+        "query": "orm migration checkpoint",
+        "directives": {
+          "tagmemo": 9,
+          "geodesicrerank": true,
+          "rerank": true
+        },
+        "analysis": {
+          "tagMemoMode": "explicit",
+          "dynamicTagWeight": 0.45,
+          "dynamicCoreWeight": 1.240564,
+          "primaryAxis": "anchored",
+          "metaThinkingAuto": true,
+          "metaThinkingReasons": [
+            "axis-resonance",
+            "geodesic-directive"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tagmemo-malformed-weight",
+      "query": "[[orm migration checkpoint]] ::TagMemo=abc",
+      "expected": {
+        "query": "orm migration checkpoint",
+        "directives": {
+          "tagmemo": "abc"
+        },
+        "geodesicRerank": false,
+        "analysis": {
+          "tagMemoMode": "explicit",
+          "dynamicTagWeight": 0.350588,
+          "dynamicCoreWeight": 1.240564,
+          "primaryAxis": "procedural",
+          "metaThinkingAuto": false,
+          "metaThinkingReasons": [
+            "axis-resonance"
+          ]
+        }
+      }
+    }
+  ],
+  "scoringCase": {
+    "sourceDirectiveCaseId": "tagmemo-plus-rerank-group",
+    "expectedOrdering": [
+      "tag-title",
+      "title-only",
+      "body-only",
+      "evidence-only"
+    ],
+    "records": [
+      {
+        "id": "tag-title",
+        "title": "ORM migration checkpoint",
+        "content": "adapter notes with rollback details",
+        "evidence": "tag and title weighted hit",
+        "tags": [
+          "orm",
+          "migration"
+        ],
+        "expectedScore": {
+          "boost": 0.233935,
+          "normalizedScore": 1.29964,
+          "surfaceScore": 0.18,
+          "matchedTags": [
+            "migration",
+            "orm"
+          ],
+          "matchedCoreTags": [
+            "checkpoint",
+            "migration",
+            "orm"
+          ],
+          "tagHitCount": 2,
+          "titleHitCount": 1,
+          "contentHitCount": 0,
+          "evidenceHitCount": 0,
+          "exactCoreTagCount": 2
+        }
+      },
+      {
+        "id": "title-only",
+        "title": "ORM migration checkpoint",
+        "content": "adapter notes without explicit tags",
+        "evidence": "title weighted hit",
+        "tags": [],
+        "expectedScore": {
+          "boost": 0.165882,
+          "normalizedScore": 0.921568,
+          "surfaceScore": 0.105,
+          "matchedTags": [],
+          "matchedCoreTags": [
+            "checkpoint",
+            "migration",
+            "orm"
+          ],
+          "tagHitCount": 0,
+          "titleHitCount": 3,
+          "contentHitCount": 0,
+          "evidenceHitCount": 0,
+          "exactCoreTagCount": 0
+        }
+      },
+      {
+        "id": "body-only",
+        "title": "General notebook",
+        "content": "orm migration checkpoint appears only in body",
+        "evidence": "body weighted hit",
+        "tags": [],
+        "expectedScore": {
+          "boost": 0.103287,
+          "normalizedScore": 0.573816,
+          "surfaceScore": 0.06,
+          "matchedTags": [],
+          "matchedCoreTags": [
+            "checkpoint",
+            "migration",
+            "orm"
+          ],
+          "tagHitCount": 0,
+          "titleHitCount": 0,
+          "contentHitCount": 3,
+          "evidenceHitCount": 0,
+          "exactCoreTagCount": 0
+        }
+      },
+      {
+        "id": "evidence-only",
+        "title": "General notebook",
+        "content": "adapter notes",
+        "evidence": "orm migration checkpoint appears only in evidence",
+        "tags": [],
+        "expectedScore": {
+          "boost": 0.063,
+          "normalizedScore": 0.35,
+          "surfaceScore": 0.03,
+          "matchedTags": [],
+          "matchedCoreTags": [
+            "checkpoint",
+            "migration",
+            "orm"
+          ],
+          "tagHitCount": 0,
+          "titleHitCount": 0,
+          "contentHitCount": 0,
+          "evidenceHitCount": 3,
+          "exactCoreTagCount": 0
+        }
+      }
+    ]
+  },
+  "telemetryShape": {
+    "requiredKeys": [
+      "query",
+      "directives",
+      "coreTags",
+      "matchedTags",
+      "matchedCoreTags",
+      "tagHitCount",
+      "titleHitCount",
+      "contentHitCount",
+      "evidenceHitCount",
+      "queryAxes",
+      "terrainPrimaryAxis",
+      "residualLevelCount",
+      "metaThinkingScore",
+      "metaThinkingAuto",
+      "metaThinkingReasons",
+      "rerankMode",
+      "semanticCandidateCount"
+    ],
+    "forbiddenKeys": [
+      "hitRate",
+      "qualityScore",
+      "rawWorkspaceId",
+      "providerLatencyMs"
+    ]
+  },
+  "lightMemoCases": [
+    {
+      "id": "tag-boost-non-geodesic",
+      "input": {
+        "query": "orm migration checkpoint",
+        "k": 3,
+        "rerank": "rrf0.6",
+        "tag_boost": "1.2",
+        "core_tags": [
+          "orm",
+          "migration"
+        ]
+      },
+      "expected": {
+        "target": "knowledge",
+        "limit": 3,
+        "compatibilityQuery": "[[orm migration checkpoint orm migration]] ::Rerank+0.6 ::TagMemo(1.2)"
+      }
+    },
+    {
+      "id": "tag-boost-geodesic-plus",
+      "input": {
+        "query": "orm migration checkpoint",
+        "k": 3,
+        "rerank": "rrf0.6",
+        "tag_boost": "1.2+",
+        "core_tags": [
+          "orm",
+          "migration"
+        ]
+      },
+      "expected": {
+        "target": "knowledge",
+        "limit": 3,
+        "compatibilityQuery": "[[orm migration checkpoint orm migration]] ::Rerank+0.6 ::TagMemo+1.2"
+      }
+    },
+    {
+      "id": "time-window-search-all",
+      "input": {
+        "query": "[2026-04-01~2026-04-30] checkpoint",
+        "k": 5,
+        "tag_boost": true,
+        "core_tags": "checkpoint migration",
+        "search_all_knowledge_bases": true
+      },
+      "expected": {
+        "target": "both",
+        "limit": 5,
+        "compatibilityQuery": "[[checkpoint checkpoint migration]] ::Time(2026-04-01~2026-04-30) ::TagMemo(1)"
+      }
+    }
+  ]
+}

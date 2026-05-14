@@ -2,7 +2,7 @@
 
 ## Goal
 
-Complete P16.1 TagMemo / semantic association fixture gap inventory without changing runtime behavior.
+Run P16.2 TagMemo / semantic association fixture shape tests without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Clean after P16.1 inventory safe-push; exact final hashes are reported in closeout.
+P16.2 tests/fixtures/docs/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P16 TagMemo semantic fixture inventory
+P16 TagMemo semantic fixture shape tests
 
 ## Findings
 
@@ -29,13 +29,17 @@ P16 TagMemo semantic fixture inventory
 - There is no dedicated P16 `tests/fixtures/tagmemo-*` asset yet.
 - Existing protected surfaces include `TagMemoEngine`, `EPAModule`, `ResidualPyramid`, `SemanticGroupManager`, passive `::TagMemo` / `::Rerank` syntax, and LightMemo `tag_boost` / `core_tags` compatibility.
 - Existing coverage lives mainly in `tests/phase-b-passive-recall.test.js`, `tests/phase-b-sync-cache-rerank.test.js`, and `tests/phase-c-lightmemo-boundary.test.js`.
-- P16.2 should add synthetic fixture tests before any runtime tuning.
+- P16.2 has added synthetic fixture shape tests before runtime tuning.
+- P16.2 targeted test (`6/6`), full suite (`426/426`), diff check, and docs validation passed locally.
 - `v8-diagnose` is a later read-only evidence surface, not a P16 planning authorization for P17 / V8 implementation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
+- `tests/fixtures/tagmemo-semantic-fixture-shape-v1.json`
+- `tests/tagmemo-semantic-fixture-shape.test.js`
+- `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md`
 - `docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
@@ -46,15 +50,19 @@ P16 TagMemo semantic fixture inventory
 
 Passed:
 
+- `node --test tests\tagmemo-semantic-fixture-shape.test.js`
+- `npm test`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
-- `Select-String -Path docs\P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md -Pattern '[ \t]$'`
+
+Pending:
+
+- none
 
 ## Not Done
 
 - No `src/` changes.
-- No tests changed.
-- No fixture data changed.
+- No runtime code changed.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
@@ -67,4 +75,4 @@ Passed:
 
 ## Next Safe Step
 
-Begin `P16.2-TagMemo-semantic-fixture-shape-tests` only. Do not start runtime implementation, provider benchmark, V8, UI, migration/import-export apply, release candidate, tag, or deploy.
+Run final diff/scope review, then guarded commit/readiness if clean. Next safe phase is `P16.3-TagMemo-targeted-semantic-fixtures`.

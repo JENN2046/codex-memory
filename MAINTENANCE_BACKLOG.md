@@ -128,7 +128,8 @@
 | P15.6-query-quality-closeout-review | query-quality / closeout | A1 | done | Summarize P15.1-P15.5 evidence, remaining risks, and readiness for P16 planning | `git diff --check`; docs validation | Closeout review added and docs validation passed; do not start P16 implementation, provider benchmark, V8, UI, migration/import-export apply, or release candidate |
 | P16-TagMemo-semantic-association-parity-planning | tagmemo / semantic-association / planning | A1/A2 | done | Plan TagMemo and semantic association parity after P15 closeout | `git diff --check`; docs validation | Planning doc added and docs validation passed; no runtime implementation, provider benchmark, V8, UI, migration/import-export apply, public MCP expansion, or release candidate |
 | P16.1-TagMemo-semantic-fixture-inventory | tagmemo / semantic-association / fixture-inventory | A1/A2 | done | Inventory current TagMemo, semantic grouping, EPA, ResidualPyramid, LightMemo, and query-quality fixture coverage | `git diff --check`; docs validation | Fixture inventory doc added and validation passed; no runtime tuning, provider, V8 implementation, public MCP expansion, migration, or real memory preview |
-| P16.2-TagMemo-semantic-fixture-shape-tests | tagmemo / semantic-association / fixture-tests | A1/A2 | todo | Add synthetic TagMemo semantic fixture shape tests after inventory | future targeted fixture test; `npm test`; diff/docs validation | Fixture/test only; no runtime tuning, provider, V8 implementation, public MCP expansion, migration, or real memory preview |
+| P16.2-TagMemo-semantic-fixture-shape-tests | tagmemo / semantic-association / fixture-tests | A1/A2 | done | Add synthetic TagMemo semantic fixture shape tests after inventory | `node --test tests\tagmemo-semantic-fixture-shape.test.js`; `npm test`; diff/docs validation | Synthetic fixture/test added; targeted `6/6`, full suite `426/426`; no runtime tuning, provider, V8 implementation, public MCP expansion, migration, or real memory preview |
+| P16.3-TagMemo-targeted-semantic-fixtures | tagmemo / semantic-association / targeted-fixtures | A1/A2 | todo | Add targeted sanitized TagMemo semantic association fixture cases after shape tests | future targeted fixture tests; `npm test`; diff/docs validation | Fixture/test only unless a later phase explicitly approves runtime work |
 
 ## 推荐执行顺序
 
@@ -195,8 +196,9 @@
 61. `P15.6`：query quality closeout review 已新增 [docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md)，总结 P15.1-P15.5 证据、剩余风险、边界确认和 P16 planning readiness；不启动 P16 implementation。
 62. `P16`：TagMemo semantic association parity planning 已完成，入口为 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md)；本阶段只做 planning / docs / board，不改 runtime、不改 tests、不调 provider、不进入 V8。
 63. `P16.1`：TagMemo semantic fixture inventory 已完成，入口为 [docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md)；本阶段只盘点 source/test/fixture gaps，docs-only 验证通过，不改 runtime、不新增 tests、不调 provider、不进入 V8。
-64. 下一步建议进入 `P16.2-TagMemo-semantic-fixture-shape-tests`，先加 synthetic fixture/test；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply 或 release candidate。
-65. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+64. `P16.2`：TagMemo semantic fixture shape tests 已新增 `tests/fixtures/tagmemo-semantic-fixture-shape-v1.json` 与 `tests/tagmemo-semantic-fixture-shape.test.js`；targeted test `6/6`、full suite `426/426`、diff/docs validation 均通过；本阶段只锁 directive / scoring / telemetry / LightMemo mapping / no-side-effect shape，不改 runtime、不新增 provider/MCP/V8。
+65. 下一步建议进入 `P16.3-TagMemo-targeted-semantic-fixtures`，继续 fixture-first；不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply 或 release candidate。
+66. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

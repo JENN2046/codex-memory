@@ -80,12 +80,12 @@ Recommended next phase:
 
 `P16.2-TagMemo-semantic-fixture-shape-tests`
 
-Allowed:
+Completed P16.2 shape-test scope:
 
-- Add `tests/fixtures/tagmemo-semantic-parity-v1.json`.
-- Add a targeted fixture test that reads only synthetic fixture data.
-- Lock directive parsing, scoring-shape expectations, telemetry keys, and no-side-effect policy.
-- Update P16 docs / status / board.
+- Added `tests/fixtures/tagmemo-semantic-fixture-shape-v1.json`.
+- Added `tests/tagmemo-semantic-fixture-shape.test.js`.
+- Locked directive parsing, tag/title/body/evidence scoring contribution shape, telemetry keys, LightMemo option-to-TagMemo mapping, and no-side-effect policy.
+- Kept runtime ranking, recall implementation, providers, MCP tools, and durable memory untouched.
 
 Forbidden:
 
@@ -105,11 +105,10 @@ git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
-For future P16.2 fixture tests:
+For P16.2 fixture tests:
 
 ```powershell
-node --test tests\tagmemo-semantic-parity-fixture.test.js
-node --test tests\phase-a-services.test.js tests\phase-b-passive-recall.test.js tests\phase-c-lightmemo-boundary.test.js
+node --test tests\tagmemo-semantic-fixture-shape.test.js
 npm test
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs

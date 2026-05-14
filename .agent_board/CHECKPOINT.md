@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P16.1-TagMemo-semantic-fixture-inventory: completed inventory of current TagMemo / semantic association source, test, fixture, and gap coverage before adding P16 fixtures.
+P16.2-TagMemo-semantic-fixture-shape-tests: add synthetic fixture shape tests for TagMemo semantic association before runtime tuning.
 
 ## Current Area
 
-P16 TagMemo semantic fixture inventory
+P16 TagMemo semantic fixture shape tests
 
 ## Current Status
 
@@ -17,18 +17,20 @@ Repository state:
 - P16.1 inventory has been validated, committed, safe-pushed, and post-push hash-verified
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P16.1 inventory decisions:
+P16.2 fixture shape decisions:
 
-- P16.1 is docs/inventory only.
-- Existing TagMemo behavior is spread across source, runtime tests, LightMemo tests, v8 diagnostics, and profile/query suites.
-- There is no dedicated P16 `tests/fixtures/tagmemo-*` asset yet.
-- P16.2 may add synthetic fixture tests, but P16.1 does not add tests or fixtures.
+- P16.2 is tests/fixtures/docs only.
+- Synthetic fixture shape tests lock directive parsing, score contribution shape, telemetry keys, LightMemo mapping, and no-side-effect policy.
+- Runtime ranking behavior is not tuned in this phase.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
-- P16.1 docs-only validation passed locally.
+- P16.2 full validation has passed locally.
 
 ## Changed Files
 
+- `tests/fixtures/tagmemo-semantic-fixture-shape-v1.json`
+- `tests/tagmemo-semantic-fixture-shape.test.js`
+- `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md`
 - `docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
@@ -41,9 +43,14 @@ P16.1 inventory decisions:
 
 Passed:
 
+- `node --test tests\tagmemo-semantic-fixture-shape.test.js`
+- `npm test`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
-- `Select-String -Path docs\P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md -Pattern '[ \t]$'`
+
+Pending:
+
+- none
 
 ## Current Blockers
 
@@ -51,4 +58,4 @@ Passed:
 
 ## Next Safe Action
 
-Begin `P16.2-TagMemo-semantic-fixture-shape-tests` only. Do not start runtime implementation, provider benchmark, V8, UI, migration/import-export apply, release candidate, tag, or deploy.
+Run final diff/scope review, then guarded commit/readiness if clean. Next recommended phase is `P16.3-TagMemo-targeted-semantic-fixtures`.
