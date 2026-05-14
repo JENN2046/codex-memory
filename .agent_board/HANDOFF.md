@@ -2,19 +2,19 @@
 
 ## Goal
 
-Resume after `P12.2-mutation-audit-shape-tests` in `A:\codex-memory`.
+Resume `P12.3-controlled-write-dry-run-cli-prototypes` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `bf98a9a`
+- Base: `origin/main` / `b950bf3`
 - Local ahead commit: none at startup
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-P12-controlled-write-tools / audit-shape-tests
+P12-controlled-write-tools / dry-run-cli
 
 ## Completed Before This Batch
 
@@ -25,20 +25,26 @@ P12-controlled-write-tools / audit-shape-tests
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
 - No runtime mutation path was added.
 
-## Completed In Current Batch
+## Completed Before This Batch
 
-- Synced remote state before today and confirmed `main...origin/main`.
-- Verified startup worktree was clean before board prep.
-- Resolved stale board language that still described P12.1 as unpushed.
-- Marked CM-0074 / P12.2 as the active local task.
 - Added mutation audit shape fixture and targeted test.
 - Updated controlled write docs, backlog, status, and board.
-- Validation passed; final file-scope inspection remains before guarded local commit.
+- Validation passed and `b950bf3` is now on `origin/main`.
+
+## Completed In Current Batch
+
+- Added fixture-driven controlled write dry-run CLI prototype.
+- Added controlled write dry-run fixture and CLI tests.
+- Added `controlled-write:dry-run` npm script.
+- Targeted dry-run CLI tests and CLI JSON smoke passed.
+- Full P12.3 validation passed.
 
 ## Changed Files
 
-- `tests/fixtures/mutation-audit-shape-v1.json`
-- `tests/mutation-audit-shape.test.js`
+- `tests/fixtures/controlled-write-dry-run-v1.json`
+- `src/cli/controlled-write-dry-run.js`
+- `tests/controlled-write-dry-run-cli.test.js`
+- `package.json`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -46,8 +52,10 @@ P12-controlled-write-tools / audit-shape-tests
 
 ## Validation
 
-- `node --test tests\mutation-audit-shape.test.js` passed `15/15`.
-- `npm test` passed `261/261`.
+- `node --test tests\controlled-write-dry-run-cli.test.js` passed `7/7`.
+- `npm run controlled-write:dry-run -- --json` passed.
+- `npm run controlled-write:dry-run -- --json --tool forget_memory` passed.
+- `npm test` passed `268/268`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -76,10 +84,10 @@ P12-controlled-write-tools / audit-shape-tests
 
 ## Remaining Risks
 
-- P12.2 should test mutation audit shapes before any dry-run CLI prototype.
-- Future MCP tool expansion requires explicit approval and a separate proposal review.
-- Next recommended phase is `P12.3-controlled-write-dry-run-cli-prototypes`.
+- P12.4 proposal review must happen before any MCP public tool expansion.
+- P12.5 first runtime mutation remains explicitly approval-gated.
+- Next recommended phase is `P12.4-MCP-tool-proposal-review`.
 
 ## Next Safe Step
 
-After guarded local commit, continue to `P12.3-controlled-write-dry-run-cli-prototypes`; push requires explicit approval.
+Continue to `P12.4-MCP-tool-proposal-review`; push requires explicit authorization.

@@ -90,6 +90,36 @@ The fixture records:
 - `memory_checkpoint` and `memory_handoff` require evidence, scope policy, and SecretScanner boundaries
 - no event permits raw secret output or raw `workspace_id` in low-risk audit summaries
 
+## P12.3 Controlled Write Dry-Run CLI Prototypes
+
+P12.3 adds a fixture-driven dry-run CLI prototype for controlled write candidates:
+
+- Fixture: [controlled-write-dry-run-v1.json](/A:/codex-memory/tests/fixtures/controlled-write-dry-run-v1.json)
+- CLI: [controlled-write-dry-run.js](/A:/codex-memory/src/cli/controlled-write-dry-run.js)
+- Test: [controlled-write-dry-run-cli.test.js](/A:/codex-memory/tests/controlled-write-dry-run-cli.test.js)
+- Script: `npm run controlled-write:dry-run -- --json`
+
+This phase still does not implement runtime mutation, does not add MCP public tools, does not change MCP schema, does not write real memory, and does not perform SQLite migration. The CLI only reads a repository fixture and emits dry-run plans.
+
+The dry-run output records:
+
+- `mutated=false`
+- `fixtureOnly=true`
+- `noDatabase=true`
+- `noDurableMemoryWrite=true`
+- `noMcpPublicToolExpansion=true`
+- `publicToolsFrozen=true`
+- selected operation plans and audit event previews
+- rejected `--confirm` / `--apply` / `--write` / `--mutate` flags
+
+The CLI can filter a candidate with `--tool <candidate>`, for example:
+
+```powershell
+npm run controlled-write:dry-run -- --json --tool forget_memory
+```
+
+P12.4 is still required before any MCP public tool proposal can move forward.
+
 ## First-Batch Boundary
 
 第一批不要全开。

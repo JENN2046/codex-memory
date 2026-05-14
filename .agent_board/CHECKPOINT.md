@@ -2,32 +2,34 @@
 
 ## Current Goal
 
-P12.2-mutation-audit-shape-tests：在不实现 runtime mutation、不新增 MCP public tools、不写真实 DB 的前提下，先用 tests/docs 锁住 controlled write 候选的 mutation audit shape。
+P12.3-controlled-write-dry-run-cli-prototypes：在不实现 runtime mutation、不新增 MCP public tools、不写真实 DB 的前提下，新增 fixture-driven controlled write dry-run CLI prototype。
 
 ## Current Area
 
-P12-controlled-write-tools / audit-shape-tests
+P12-controlled-write-tools / dry-run-cli
 
 ## Current Status
 
-P12.2 tests/docs-only implementation completed locally. Current branch is `main`, base is `origin/main` / `bf98a9a`.
+P12.3 dry-run CLI prototype implementation completed locally. Current branch is `main`, base is `origin/main` / `b950bf3`.
 
-This batch adds mutation audit shape fixture/tests and docs/board notes only. It does not modify `src/`, `package.json` / lockfile, `.env`, MCP schema/tool definitions, SQLite schema, durable DB/memory state, or provider configuration.
+This batch adds a fixture-driven dry-run CLI, fixture, tests, npm script, and docs/board notes only. It does not add MCP public tools, does not change MCP schema, does not perform SQLite migration, and does not write durable DB/memory state.
 
 ## Completed Work In This Batch
 
-- Added `tests/fixtures/mutation-audit-shape-v1.json`.
-- Added `tests/mutation-audit-shape.test.js`.
-- Locked mutation audit event types: update / supersede / forget / validate / checkpoint / handoff.
-- Locked required audit fields, including reason/evidence, diff/previous snapshot, redaction, lifecycle policy, and scope policy flags.
-- Locked update/supersede/forget/validate/checkpoint/handoff event-specific audit boundaries.
-- Locked no raw secret output and no raw `workspace_id` in low-risk audit summaries.
-- Updated controlled write docs, maintenance backlog, status, and board state.
+- Added `tests/fixtures/controlled-write-dry-run-v1.json`.
+- Added `src/cli/controlled-write-dry-run.js`.
+- Added `tests/controlled-write-dry-run-cli.test.js`.
+- Added `npm run controlled-write:dry-run`.
+- CLI reports `mutated=false`, `fixtureOnly=true`, `noDatabase=true`, `noDurableMemoryWrite=true`, `noMcpPublicToolExpansion=true`, and `publicToolsFrozen=true`.
+- CLI rejects `--confirm`, `--apply`, `--write`, and `--mutate`.
+- CLI supports `--tool <candidate>` filtering and emits audit event previews.
 
 ## Changed Files
 
-- `tests/fixtures/mutation-audit-shape-v1.json`
-- `tests/mutation-audit-shape.test.js`
+- `tests/fixtures/controlled-write-dry-run-v1.json`
+- `src/cli/controlled-write-dry-run.js`
+- `tests/controlled-write-dry-run-cli.test.js`
+- `package.json`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -39,8 +41,10 @@ This batch adds mutation audit shape fixture/tests and docs/board notes only. It
 
 ## Validation Run
 
-- `node --test tests\mutation-audit-shape.test.js`：passed `15/15` after sandbox `spawn EPERM` rerun with approved escalation
-- `npm test`：passed `261/261` after sandbox `spawn EPERM` rerun with approved escalation
+- `node --test tests\controlled-write-dry-run-cli.test.js`：passed `7/7`
+- `npm run controlled-write:dry-run -- --json`：passed
+- `npm run controlled-write:dry-run -- --json --tool forget_memory`：passed
+- `npm test`：passed `268/268`
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
@@ -57,10 +61,10 @@ This batch adds mutation audit shape fixture/tests and docs/board notes only. It
 
 ## Remaining Risks
 
-- P12.2 should remain mutation audit shape tests only before any dry-run CLI or runtime mutation.
-- Future MCP tool expansion requires explicit approval and a separate proposal review.
-- P12.3 will be higher risk because dry-run CLI prototypes may require new code; keep it non-mutating and stop before runtime MCP expansion.
+- P12.4 proposal review must happen before any MCP public tool expansion.
+- P12.5 first runtime mutation remains explicitly approval-gated.
+- Current CLI is fixture-driven and must remain non-mutating.
 
 ## Next Safe Action
 
-After guarded local commit, continue to `P12.3-controlled-write-dry-run-cli-prototypes`; push requires explicit approval.
+Continue to `P12.4-MCP-tool-proposal-review`; push requires explicit authorization.

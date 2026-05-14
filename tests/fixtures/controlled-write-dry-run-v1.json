@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "controlled-write-dry-run-v1",
+  "version": "v1",
+  "phase": "P12.3-controlled-write-dry-run-cli-prototypes",
+  "fixtureOnly": true,
+  "mutated": false,
+  "noDatabase": true,
+  "noDurableMemoryWrite": true,
+  "noMcpPublicToolExpansion": true,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "requiredAuditFields": [
+    "event_id",
+    "memory_id",
+    "event_type",
+    "tool_name",
+    "actor_client_id",
+    "request_source",
+    "from_status",
+    "to_status",
+    "reason",
+    "evidence",
+    "created_at",
+    "reversible",
+    "diff_summary",
+    "previous_snapshot_ref",
+    "redaction_applied",
+    "lifecycle_policy_applied",
+    "scope_policy_applied"
+  ],
+  "operations": [
+    {
+      "toolName": "update_memory",
+      "eventType": "memory_update",
+      "riskLevel": "A3",
+      "mutationCapable": true,
+      "wouldMutate": false,
+      "requiresExplicitApproval": true,
+      "requiresDryRunFirst": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresDiffSummary": true,
+      "requiresPreviousSnapshotRef": true,
+      "noSilentOverwrite": true,
+      "defaultAction": "proposal_only",
+      "allowedLifecycleTransitions": [],
+      "forbiddenActions": [
+        "direct_content_overwrite_without_snapshot",
+        "bypass_secret_scanner",
+        "bypass_tool_argument_validator",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolName": "supersede_memory",
+      "eventType": "memory_supersede",
+      "riskLevel": "A3",
+      "mutationCapable": true,
+      "wouldMutate": false,
+      "requiresExplicitApproval": true,
+      "requiresDryRunFirst": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresSupersedesMemoryId": true,
+      "requiresSupersededByMemoryId": true,
+      "requiresBidirectionalLinks": true,
+      "allowedLifecycleTransitions": [
+        { "from": "active", "to": "superseded" },
+        { "from": "stale", "to": "superseded" }
+      ],
+      "forbiddenActions": [
+        "missing_supersedes_link",
+        "missing_superseded_by_link",
+        "bypass_secret_scanner",
+        "bypass_tool_argument_validator",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolName": "forget_memory",
+      "eventType": "memory_forget",
+      "riskLevel": "A3",
+      "mutationCapable": true,
+      "wouldMutate": false,
+      "requiresExplicitApproval": true,
+      "requiresDryRunFirst": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "defaultAction": "tombstone",
+      "hardDeleteAllowed": false,
+      "requiresTombstoneReason": true,
+      "allowedLifecycleTransitions": [
+        { "from": "proposal", "to": "tombstoned" },
+        { "from": "active", "to": "tombstoned" },
+        { "from": "stale", "to": "tombstoned" },
+        { "from": "superseded", "to": "tombstoned" },
+        { "from": "rejected", "to": "tombstoned" }
+      ],
+      "forbiddenActions": [
+        "hard_delete_by_default",
+        "missing_tombstone_reason",
+        "bypass_secret_scanner",
+        "bypass_tool_argument_validator",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolName": "validate_memory",
+      "eventType": "memory_validate",
+      "riskLevel": "A3",
+      "mutationCapable": true,
+      "wouldMutate": false,
+      "requiresExplicitApproval": true,
+      "requiresDryRunFirst": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "allowedLifecycleTransitions": [
+        { "from": "proposal", "to": "active", "requiresEvidence": true },
+        { "from": "stale", "to": "active", "requiresEvidence": true }
+      ],
+      "forbiddenLifecycleTransitions": [
+        { "from": "rejected", "to": "active" },
+        { "from": "tombstoned", "to": "active" }
+      ],
+      "forbiddenActions": [
+        "auto_promote_without_evidence",
+        "revive_rejected_by_default",
+        "revive_tombstoned_by_default",
+        "bypass_secret_scanner",
+        "bypass_tool_argument_validator",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolName": "checkpoint_memory",
+      "eventType": "memory_checkpoint",
+      "riskLevel": "A2",
+      "mutationCapable": true,
+      "wouldMutate": false,
+      "requiresExplicitApproval": true,
+      "requiresDryRunFirst": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresScopePolicy": true,
+      "mustPassSecretScanner": true,
+      "mustPassToolArgumentValidator": true,
+      "allowedLifecycleTransitions": [],
+      "forbiddenActions": [
+        "bypass_secret_scanner",
+        "bypass_tool_argument_validator",
+        "bypass_lifecycle_policy",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolName": "handoff_memory",
+      "eventType": "memory_handoff",
+      "riskLevel": "A2",
+      "mutationCapable": true,
+      "wouldMutate": false,
+      "requiresExplicitApproval": true,
+      "requiresDryRunFirst": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresScopePolicy": true,
+      "mustPassSecretScanner": true,
+      "mustPassToolArgumentValidator": true,
+      "allowedLifecycleTransitions": [],
+      "forbiddenActions": [
+        "bypass_secret_scanner",
+        "bypass_tool_argument_validator",
+        "bypass_lifecycle_policy",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    }
+  ]
+}
