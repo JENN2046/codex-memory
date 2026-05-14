@@ -124,7 +124,8 @@
 | P15.2-real-query-quality-fixture-expansion | query-quality / fixture-expansion | A1/A2 | done | Add targeted sanitized fixture cases for scope, lifecycle, privacy, precision, and report-shape gaps | targeted query tests; fixture recall dry-run; `npm test`; diff/docs validation | Expanded default suite to `14/14` with no provider calls or durable memory writes; no runtime ranking, public MCP, SQLite schema, or durable memory changes |
 | P15.3-query-quality-report-shape-tests | query-quality / report-shape | A1/A2 | done | Lock query quality JSON fields for CI/dashboard consumers after fixture expansion | targeted query tests; fixture recall dry-run; `npm test`; `gate:ci`; diff/docs validation | Tests/docs only; locked report top-level keys, fixture recall dry-run keys, assertion failure shape, and no fake scores |
 | P15.4-fixture-recall-dry-run-standing-gate | query-quality / standing-gate | A1/A2 | done | Document and gate fixture recall dry-run as a standing CI-safe signal | `node --test tests\gate-ci-cli.test.js`; query fixture dry-runs; `npm run gate:ci`; `npm run gate:ci -- --json`; `npm test`; diff/docs validation | `gate:ci` now includes `checks.queries.detail.fixtureRecallDryRun` with `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`; no runtime ranking, providers, public MCP tools, SQLite schema, or durable memory changes |
-| P15.5-real-memory-query-dry-run-planning | query-quality / planning | A1/A2 | todo | Plan a read-only, redacted, opt-in real local memory query dry-run surface | future docs/diff validation only unless separately approved | Planning only; no real memory read preview, provider call, durable write, migration, import/export apply, MCP expansion, or `validate_memory` surface expansion |
+| P15.5-real-memory-query-dry-run-planning | query-quality / planning | A1/A2 | done | Plan a read-only, redacted, opt-in real local memory query dry-run surface | `git diff --check`; docs validation | Planning doc added; no real memory read preview, provider call, durable write, migration, import/export apply, MCP expansion, or `validate_memory` surface expansion |
+| P15.6-query-quality-closeout-review | query-quality / closeout | A1 | todo | Summarize P15.1-P15.5 evidence, remaining risks, and readiness for P16 planning | future docs/diff validation | Closeout only; do not start P16 implementation, provider benchmark, V8, UI, migration/import-export apply, or release candidate |
 
 ## 推荐执行顺序
 
@@ -187,7 +188,8 @@
 57. `P15.2`：real query quality fixture expansion 已把默认 query suite 扩到 `14/14`，新增 scope/lifecycle/privacy/workspace-boundary/precision/report-shape cases，仍为 fixture-only、`mutated=false`、`providerCalls=0`。
 58. `P15.3`：query quality report shape tests 已锁住 `real-query-suite` / `query:quality` top-level JSON keys、`fixtureRecallDryRun` keys、assertion failure shape，并继续禁止 `hitRate` / `qualityScore` fake metrics。
 59. `P15.4`：fixture recall dry-run standing gate 已将 `checks.queries.detail.fixtureRecallDryRun` 接入 `gate:ci`，当前 standing signal 为 `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`；仍不得跳到 P16/P17/V8/UI，不主动跑真实 provider 命令，不扩大 `validate_memory` mutation surface，不开放 public `validate_memory` MCP tool。
-60. 下一步建议进入 `P15.5-real-memory-query-dry-run-planning`，先规划 redacted / opt-in / read-only 边界，不执行真实 memory read preview，不做 migration/import-export apply。
+60. `P15.5`：real-memory query dry-run planning 已新增 [docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md)，只规划未来 redacted / opt-in / read-only 边界；本阶段不执行真实 memory read preview，不做 migration/import-export apply，不调用 provider。
+61. 下一步建议进入 `P15.6-query-quality-closeout-review`，先总结 P15.1-P15.5 证据和剩余风险，再决定是否进入 P16 planning。
 57. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界

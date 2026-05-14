@@ -2,46 +2,36 @@
 
 ## Current Goal
 
-P15.4-fixture-recall-dry-run-standing-gate: promote query fixture recall dry-run into a CI-safe standing gate without changing query runtime behavior.
+P15.5-real-memory-query-dry-run-planning: define the future real-memory query dry-run boundary without implementing it.
 
 ## Current Area
 
-P15 query quality standing gate
+P15 real-memory query dry-run planning
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- current main: `a60144f test: lock p15 query quality report shape`
+- current main: `4aa0356 feat: gate fixture recall dry run in ci`
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P15.4 changes in progress:
+P15.5 planning decisions:
 
-- `gate:ci` now runs query report with `fixtureRecallDryRun=true`.
-- `checks.queries.detail.fixtureRecallDryRun` exposes the standing signal.
-- Text output includes `fixture recall 14/14`.
-- P15.4 documentation records the standing gate, safety boundaries, and validation.
-
-Decision:
-
-- P15.4 may touch `src/cli/gate-ci.js` only for CI-safe reporting.
-- Do not change query runtime ranking.
-- Do not change fixture data.
-- Do not expand `validate_memory` mutation surface.
-- Do not expose public `validate_memory` MCP tool.
-- Next phase should be P15.5 planning, not runtime/provider work.
+- future real-memory query dry-run must be explicit opt-in, redacted, read-only, local-only, and no-provider.
+- P15.5 does not implement a CLI.
+- P15.5 does not read real memory or audit logs.
+- P15.5 does not write durable memory.
+- P15.5 does not change query runtime ranking.
+- P15.5 does not expand MCP tools or `validate_memory`.
 
 ## Changed Files
 
-- `src/cli/gate-ci.js`
-- `tests/gate-ci-cli.test.js`
+- `docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md`
+- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `docs/runtime-policy-gates.md`
-- `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
-- `docs/P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
@@ -50,13 +40,6 @@ Decision:
 
 ## Validation
 
-- `node --test tests\gate-ci-cli.test.js` passed `2/2`.
-- `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js` passed `21/21`.
-- `npm run real-query-suite -- --json --fixture-recall-dry-run` passed `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
-- `npm run query:quality -- --json --dry-run --fixture-recall-dry-run` passed `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
-- `npm run gate:ci` passed with `fixture recall 14/14`.
-- `npm run gate:ci -- --json` passed after isolated rerun; the earlier concurrent text/json run caused one transient inner tests failure.
-- `npm test` passed `420/420`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -66,4 +49,4 @@ Decision:
 
 ## Next Safe Action
 
-Create a guarded local commit if final file scope remains CI-safe gate/docs/board only. Do not push without readiness.
+Create a guarded local commit if final file scope remains docs/board only. Do not push without readiness.

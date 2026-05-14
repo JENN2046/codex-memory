@@ -119,6 +119,7 @@ Recommended P15 sequence:
    - Status: completed in [P15.4 Fixture Recall Dry-Run Standing Gate](./P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md).
 5. `P15.5-real-memory-query-dry-run-planning`
    - Plan a read-only, redacted, opt-in dry-run against real local memory without provider calls or writes.
+   - Status: completed in [P15.5 Real Memory Query Dry-Run Plan](./P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md).
 6. `P15.6-query-quality-closeout-review`
    - Summarize evidence, remaining risk, and readiness for P16 planning.
 
@@ -160,6 +161,6 @@ Provider validation is explicitly out of scope unless a later phase receives exp
 
 ## Next Recommended Phase
 
-`P15.5-real-memory-query-dry-run-planning`
+`P15.6-query-quality-closeout-review`
 
-P15.5 should stay planning-only unless a later explicit approval packet authorizes any real local memory read preview. It must not perform provider calls, migration, import/export apply, or durable memory writes.
+P15.6 should summarize P15.1-P15.5 evidence, validation, remaining risks, and readiness for P16 planning. It should not start P16 implementation.
