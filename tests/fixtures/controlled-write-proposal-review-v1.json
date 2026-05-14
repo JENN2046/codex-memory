@@ -1,0 +1,215 @@
+{
+  "schemaVersion": "controlled-write-proposal-review-v1",
+  "version": "v1",
+  "phase": "P12.4-MCP-tool-proposal-review",
+  "reviewOnly": true,
+  "docsAndTestsOnly": true,
+  "noRuntimeMutation": true,
+  "runtimeMutationAllowedNow": false,
+  "noDatabase": true,
+  "noDiaryWrite": true,
+  "noVectorWrite": true,
+  "noAuditLogWrite": true,
+  "noDurableMemoryWrite": true,
+  "noMcpPublicToolExpansion": true,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "reviewedArtifacts": [
+    "tests/fixtures/controlled-write-tools-v1.json",
+    "tests/fixtures/mutation-audit-shape-v1.json",
+    "tests/fixtures/controlled-write-dry-run-v1.json",
+    "src/cli/controlled-write-dry-run.js"
+  ],
+  "prerequisites": [
+    "P12.1-controlled-write-fixture-schemas",
+    "P12.2-mutation-audit-shape-tests",
+    "P12.3-controlled-write-dry-run-cli-prototypes"
+  ],
+  "requiredBeforePublicMcpProposal": [
+    "dedicated MCP schema proposal review",
+    "explicit approval for public tool expansion",
+    "MCP contract tests",
+    "secret scan",
+    "raw workspace_id low-risk summary check"
+  ],
+  "candidateDecisions": [
+    {
+      "toolCandidate": "update_memory",
+      "decision": "defer",
+      "mayEnterProposalPhase": false,
+      "runtimeMutationAllowedNow": false,
+      "approvedAsPublicMcpTool": false,
+      "reason": "content overwrite has the highest silent-corruption risk and must wait for snapshot and diff persistence design",
+      "requiredEvidence": [
+        "previous_snapshot_ref design",
+        "diff_summary persistence design",
+        "noSilentOverwrite runtime tests"
+      ],
+      "blockedUntil": [
+        "P12.5+ explicit runtime mutation approval",
+        "rollback semantics design"
+      ],
+      "forbiddenActions": [
+        "silent_overwrite",
+        "public_mcp_expansion_now",
+        "runtime_mutation_now",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolCandidate": "supersede_memory",
+      "decision": "defer",
+      "mayEnterProposalPhase": false,
+      "runtimeMutationAllowedNow": false,
+      "approvedAsPublicMcpTool": false,
+      "reason": "bidirectional supersession requires durable link integrity and rollback design before proposal",
+      "requiredEvidence": [
+        "supersedes_memory_id design",
+        "superseded_by_memory_id design",
+        "link integrity tests"
+      ],
+      "blockedUntil": [
+        "controlled object model",
+        "rollback semantics design"
+      ],
+      "forbiddenActions": [
+        "missing_bidirectional_link",
+        "public_mcp_expansion_now",
+        "runtime_mutation_now",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolCandidate": "forget_memory",
+      "decision": "defer",
+      "mayEnterProposalPhase": false,
+      "runtimeMutationAllowedNow": false,
+      "approvedAsPublicMcpTool": false,
+      "reason": "forget is privacy-sensitive and must wait for tombstone review, admin boundaries, and hard-delete non-goals to be locked",
+      "requiredEvidence": [
+        "tombstone reason policy",
+        "hard delete forbidden tests",
+        "read policy tombstone exclusion tests"
+      ],
+      "blockedUntil": [
+        "explicit privacy review",
+        "admin recovery policy"
+      ],
+      "forbiddenActions": [
+        "hard_delete_by_default",
+        "public_mcp_expansion_now",
+        "runtime_mutation_now",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolCandidate": "validate_memory",
+      "decision": "recommended_first_runtime_mutation_candidate_after_explicit_approval",
+      "mayEnterProposalPhase": true,
+      "runtimeMutationAllowedNow": false,
+      "approvedAsPublicMcpTool": false,
+      "recommendedFirstRuntimeMutationCandidate": true,
+      "reason": "proposal/stale to active is the narrowest lifecycle mutation candidate when evidence and scope policy are present",
+      "requiredEvidence": [
+        "proposal_to_active evidence requirement",
+        "stale_to_active evidence requirement",
+        "rejected_or_tombstoned_revive_forbidden tests"
+      ],
+      "blockedUntil": [
+        "P12.5 explicit approval",
+        "MCP schema proposal review"
+      ],
+      "forbiddenActions": [
+        "revive_rejected_by_default",
+        "revive_tombstoned_by_default",
+        "public_mcp_expansion_now",
+        "runtime_mutation_now",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolCandidate": "checkpoint_memory",
+      "decision": "defer",
+      "mayEnterProposalPhase": false,
+      "runtimeMutationAllowedNow": false,
+      "approvedAsPublicMcpTool": false,
+      "reason": "checkpoint convenience writes need client-scoped evidence policy before proposal",
+      "requiredEvidence": [
+        "scope policy tests",
+        "SecretScanner boundary tests",
+        "handoff/checkpoint evidence schema"
+      ],
+      "blockedUntil": [
+        "client-scoped evidence policy",
+        "checkpoint retention policy"
+      ],
+      "forbiddenActions": [
+        "bypass_secret_scanner",
+        "bypass_scope_policy",
+        "public_mcp_expansion_now",
+        "runtime_mutation_now",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolCandidate": "handoff_memory",
+      "decision": "defer",
+      "mayEnterProposalPhase": false,
+      "runtimeMutationAllowedNow": false,
+      "approvedAsPublicMcpTool": false,
+      "reason": "handoff convenience writes need client-scoped evidence and retention boundaries before proposal",
+      "requiredEvidence": [
+        "scope policy tests",
+        "SecretScanner boundary tests",
+        "handoff/checkpoint evidence schema"
+      ],
+      "blockedUntil": [
+        "client-scoped evidence policy",
+        "handoff retention policy"
+      ],
+      "forbiddenActions": [
+        "bypass_secret_scanner",
+        "bypass_scope_policy",
+        "public_mcp_expansion_now",
+        "runtime_mutation_now",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    },
+    {
+      "toolCandidate": "audit_memory",
+      "decision": "read_only_candidate_for_future_public_tool_proposal_review",
+      "mayEnterProposalPhase": true,
+      "runtimeMutationAllowedNow": false,
+      "approvedAsPublicMcpTool": false,
+      "readOnly": true,
+      "reason": "read-only audit inspection is lower risk but still expands public MCP surface and therefore needs explicit proposal approval",
+      "requiredEvidence": [
+        "audit redaction tests",
+        "raw workspace_id low-risk summary tests",
+        "MCP schema proposal review"
+      ],
+      "blockedUntil": [
+        "explicit public MCP tool expansion approval",
+        "MCP contract tests"
+      ],
+      "forbiddenActions": [
+        "mutate_from_audit_memory",
+        "public_mcp_expansion_now",
+        "runtime_mutation_now",
+        "emit_raw_secret",
+        "emit_raw_workspace_id_low_risk_summary"
+      ]
+    }
+  ],
+  "nextRecommendedPhase": "P12.5-first-runtime-mutation-tool-behind-explicit-approval"
+}

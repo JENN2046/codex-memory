@@ -2,19 +2,19 @@
 
 ## Goal
 
-Resume `P12.3-controlled-write-dry-run-cli-prototypes` in `A:\codex-memory`.
+Resume `P12.4-MCP-tool-proposal-review` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `b950bf3`
+- Base: `origin/main` / `2dd03dd`
 - Local ahead commit: none at startup
 - Remote boundary: no push / tag / release / deploy without explicit authorization
 
 ## Current Area
 
-P12-controlled-write-tools / dry-run-cli
+P12-controlled-write-tools / proposal-review
 
 ## Completed Before This Batch
 
@@ -30,22 +30,19 @@ P12-controlled-write-tools / dry-run-cli
 - Added mutation audit shape fixture and targeted test.
 - Updated controlled write docs, backlog, status, and board.
 - Validation passed and `b950bf3` is now on `origin/main`.
+- P12.3 controlled write dry-run CLI prototypes passed validation and landed in `origin/main` at `2dd03dd`.
 
 ## Completed In Current Batch
 
-- Added fixture-driven controlled write dry-run CLI prototype.
-- Added controlled write dry-run fixture and CLI tests.
-- Added `controlled-write:dry-run` npm script.
-- Added read-only `audit_memory` dry-run coverage and no diary/vector/audit-log write flags.
-- Targeted dry-run CLI tests and CLI JSON smoke passed.
-- Full P12.3 validation passed.
+- Added P12.4 proposal review fixture and targeted test.
+- Locked docs/tests-only review boundary with public MCP tools frozen.
+- Recorded `audit_memory` as future read-only proposal review only.
+- Recorded `validate_memory` as P12.5 first runtime mutation candidate only after explicit approval.
 
 ## Changed Files
 
-- `tests/fixtures/controlled-write-dry-run-v1.json`
-- `src/cli/controlled-write-dry-run.js`
-- `tests/controlled-write-dry-run-cli.test.js`
-- `package.json`
+- `tests/fixtures/controlled-write-proposal-review-v1.json`
+- `tests/controlled-write-proposal-review.test.js`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -53,12 +50,8 @@ P12-controlled-write-tools / dry-run-cli
 
 ## Validation
 
-- `node --test tests\controlled-write-dry-run-cli.test.js` passed `9/9`.
-- `node --test tests\controlled-write-tools-fixture.test.js` passed `13/13`.
-- `node --test tests\mutation-audit-shape.test.js` passed `15/15`.
-- `npm run controlled-write:dry-run -- --json` passed.
-- `npm run controlled-write:dry-run -- --json --tool forget_memory` passed.
-- `npm test` passed `270/270`.
+- `node --test tests\controlled-write-proposal-review.test.js` passed `10/10`.
+- `npm test` passed `280/280`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -87,10 +80,10 @@ P12-controlled-write-tools / dry-run-cli
 
 ## Remaining Risks
 
-- P12.4 proposal review must happen before any MCP public tool expansion.
+- P12.4 proposal review must complete before any MCP public tool expansion.
 - P12.5 first runtime mutation remains explicitly approval-gated.
 - Next recommended phase is `P12.4-MCP-tool-proposal-review`.
 
 ## Next Safe Step
 
-Continue to `P12.4-MCP-tool-proposal-review`; push requires explicit authorization.
+Guarded local commit, safe-push readiness, then stop before P12.5 runtime mutation unless explicit approval is provided.

@@ -141,6 +141,23 @@ npm run controlled-write:dry-run -- --json --tool forget_memory
 
 P12.4 is still required before any MCP public tool proposal can move forward.
 
+## P12.4 MCP Tool Proposal Review
+
+P12.4 reviews controlled write dry-run outputs and candidate boundaries without expanding the public MCP surface:
+
+- Fixture: [controlled-write-proposal-review-v1.json](/A:/codex-memory/tests/fixtures/controlled-write-proposal-review-v1.json)
+- Test: [controlled-write-proposal-review.test.js](/A:/codex-memory/tests/controlled-write-proposal-review.test.js)
+
+This phase is docs/tests-design only. It does not implement runtime mutation, does not add MCP public tools, does not change MCP schema, does not write real memory, and does not perform SQLite migration.
+
+Review conclusions:
+
+- `audit_memory` may enter a future read-only public-tool proposal review, but is not approved as a public MCP tool in P12.4.
+- `validate_memory` is the recommended first runtime mutation candidate for P12.5, only after explicit approval.
+- `update_memory`, `supersede_memory`, and `forget_memory` remain deferred because they require snapshot/diff persistence, bidirectional link integrity, tombstone review, and rollback semantics.
+- `checkpoint_memory` and `handoff_memory` remain deferred until client-scoped evidence and retention policy are locked.
+- Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
 ## First-Batch Boundary
 
 第一批不要全开。
