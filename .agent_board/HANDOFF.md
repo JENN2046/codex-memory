@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P16.3 TagMemo targeted semantic fixtures without changing runtime behavior.
+Run P16.4 semantic ranking evidence gate without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P16.3 tests/fixtures/docs/board edits are local, validated, and uncommitted.
+P16.4 docs/status/board edits are local and uncommitted.
 
 ## Current Area
 
-P16 TagMemo targeted semantic fixtures
+P16 TagMemo semantic ranking evidence gate
 
 ## Findings
 
@@ -33,14 +33,15 @@ P16 TagMemo targeted semantic fixtures
 - P16.2 targeted test (`6/6`), full suite (`426/426`), diff check, docs validation, guarded commit, safe-push, and post-push hash verification passed.
 - P16.3 has added targeted synthetic temp-workspace fixtures before runtime tuning.
 - P16.3 targeted test (`3/3`), full suite (`429/429`), diff check, and docs validation passed locally.
+- P16.3 guarded commit and safe-push completed at `9e26865deed6d91a9fca461659ac743253f59ec1`.
+- P16.4 evidence gate has been drafted as docs/status/board only; docs validation passed.
 - `v8-diagnose` is a later read-only evidence surface, not a P16 planning authorization for P17 / V8 implementation.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `tests/fixtures/tagmemo-targeted-semantic-v1.json`
-- `tests/tagmemo-targeted-semantic-fixture.test.js`
+- `docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md`
 - `docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md`
 - `docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -50,10 +51,6 @@ P16 TagMemo targeted semantic fixtures
 
 ## Validation
 
-Passed:
-
-- `node --test tests\tagmemo-targeted-semantic-fixture.test.js`
-- `npm test`
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -73,4 +70,4 @@ Passed:
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P16.4-semantic-ranking-evidence-gate`.
+Run final diff/scope review, guarded commit, and safe-push readiness. Next safe phase is `P16.5-compare-rollback-semantic-gate`.

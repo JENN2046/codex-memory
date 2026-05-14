@@ -125,6 +125,7 @@
 - P16.1 TagMemo semantic fixture inventory：新增 [docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md)，盘点 `TagMemoEngine`、EPA、ResidualPyramid、SemanticGroupManager、CandidateGenerator、RerankService、RecallAuditService、passive syntax、LightMemo、`v8-diagnose`、Phase A/B/C tests、profile migration suite、active-memory suite 和 real-query suite 的现有覆盖与缺口；docs-only 验证已通过，本阶段只做 inventory，不改 runtime、不新增 tests/fixtures、不调 provider、不进入 V8。
 - P16.2 TagMemo semantic fixture shape tests：新增 `tests/fixtures/tagmemo-semantic-fixture-shape-v1.json` 与 `tests/tagmemo-semantic-fixture-shape.test.js`，锁住 `::TagMemo` directive parsing、explicit / plus / malformed weight shape、tag/title/body/evidence scoring contribution、telemetry keys、LightMemo `tag_boost` / `core_tags` compatibility query mapping 和 no-side-effect policy；targeted test `6/6`、`npm test` `426/426`、diff/docs validation 均通过；不改 runtime、不调 provider、不扩 MCP、不进入 V8。
 - P16.3 TagMemo targeted semantic fixtures：新增 `tests/fixtures/tagmemo-targeted-semantic-v1.json` 与 `tests/tagmemo-targeted-semantic-fixture.test.js`，使用 synthetic temp workspace 锁住 TagMemo+Rerank ordering、`::Group(tag)` semantic bucket interleaving、recall audit telemetry 和 no-side-effect policy；targeted test `3/3`、full suite `429/429`、diff/docs validation 均通过；不改 runtime、不调 provider、不扩 MCP、不进入 V8。
+- P16.4 semantic ranking evidence gate：新增 [docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md](/A:/codex-memory/docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md)，汇总 P16.2/P16.3 fixture-backed ranking evidence，结论为 `PASS_AS_FIXTURE_BACKED_EVIDENCE`；可进入 P16.5 compare/rollback semantic gate，但 runtime tuning、provider benchmark、V8、public MCP expansion、migration 和 real memory mutation 仍全部 deferred。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -490,7 +491,7 @@
 
 ## 下一步建议
 
-- 下一阶段建议完成 `P16.3-TagMemo-targeted-semantic-fixtures` 的 guarded commit / safe-push，然后进入 `P16.4-semantic-ranking-evidence-gate`。不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply、release candidate、tag 或 deploy。
+- 下一阶段建议完成 `P16.4-semantic-ranking-evidence-gate` 的 guarded commit / safe-push，然后进入 `P16.5-compare-rollback-semantic-gate`。不得直接进入 runtime implementation、provider benchmark、V8、UI、migration/import-export apply、release candidate、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

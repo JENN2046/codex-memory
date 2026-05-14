@@ -123,3 +123,9 @@ P16.1 is docs/inventory only. It does not modify runtime, tests, fixtures, packa
 `P16.3-TagMemo-targeted-semantic-fixtures` adds targeted synthetic temp-workspace cases after the P16.2 shape test. The current P16.3 fixture is `tests/fixtures/tagmemo-targeted-semantic-v1.json`, with test coverage in `tests/tagmemo-targeted-semantic-fixture.test.js`; targeted `3/3`, full suite `429/429`, diff check, and docs validation passed locally.
 
 P16.3 remains fixture/test only. It does not modify runtime ranking, recall implementation, providers, public MCP tools, SQLite schema, import/export behavior, durable memory, or V8 implementation.
+
+## P16.4 Evidence Gate
+
+`P16.4-semantic-ranking-evidence-gate` summarizes P16.2 and P16.3 evidence in [P16_SEMANTIC_RANKING_EVIDENCE_GATE.md](/A:/codex-memory/docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md).
+
+The current gate result is `PASS_AS_FIXTURE_BACKED_EVIDENCE`: enough to continue to P16.5 compare/rollback semantic evidence, not enough to authorize runtime tuning, provider benchmark, V8 implementation, public MCP expansion, migration, or real memory mutation.
