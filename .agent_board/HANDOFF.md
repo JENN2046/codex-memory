@@ -14,7 +14,7 @@ A:\codex-memory
 
 ## Worktree
 
-P16.1 docs/board inventory edits are local, validated, and uncommitted.
+Clean after P16.1 inventory safe-push; exact final hashes are reported in closeout.
 
 ## Current Area
 
@@ -25,7 +25,7 @@ P16 TagMemo semantic fixture inventory
 - P15.6 closeout is safe-pushed to `origin/main` at `c8ffe68`.
 - P16 is the current true next phase from Git + STATUS + MAINTENANCE_BACKLOG + `.agent_board`.
 - P16 planning is validated, committed, safe-pushed, and post-push hash-verified.
-- P16.1 inventory is completed and validated locally.
+- P16.1 inventory is validated, committed, safe-pushed, and post-push hash-verified.
 - There is no dedicated P16 `tests/fixtures/tagmemo-*` asset yet.
 - Existing protected surfaces include `TagMemoEngine`, `EPAModule`, `ResidualPyramid`, `SemanticGroupManager`, passive `::TagMemo` / `::Rerank` syntax, and LightMemo `tag_boost` / `core_tags` compatibility.
 - Existing coverage lives mainly in `tests/phase-b-passive-recall.test.js`, `tests/phase-b-sync-cache-rerank.test.js`, and `tests/phase-c-lightmemo-boundary.test.js`.
@@ -67,4 +67,4 @@ Passed:
 
 ## Next Safe Step
 
-Run final diff/scope review, then guarded commit/readiness if clean. Next safe phase is `P16.2-TagMemo-semantic-fixture-shape-tests`.
+Begin `P16.2-TagMemo-semantic-fixture-shape-tests` only. Do not start runtime implementation, provider benchmark, V8, UI, migration/import-export apply, release candidate, tag, or deploy.

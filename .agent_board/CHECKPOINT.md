@@ -14,6 +14,7 @@ Repository state:
 
 - branch: `main`
 - phase start baseline: local `main` and `origin/main` matched at `3b7aee6`
+- P16.1 inventory has been validated, committed, safe-pushed, and post-push hash-verified
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
 P16.1 inventory decisions:
@@ -50,4 +51,4 @@ Passed:
 
 ## Next Safe Action
 
-Run final diff/scope review, then guarded commit/readiness if clean. Next recommended phase is `P16.2-TagMemo-semantic-fixture-shape-tests`.
+Begin `P16.2-TagMemo-semantic-fixture-shape-tests` only. Do not start runtime implementation, provider benchmark, V8, UI, migration/import-export apply, release candidate, tag, or deploy.
