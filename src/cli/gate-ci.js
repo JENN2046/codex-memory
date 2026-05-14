@@ -84,13 +84,28 @@ async function runRollback() {
 }
 
 function runQueries() {
-  const report = runSuiteReport(DEFAULT_SUITE);
-  const ok = report.status === 'ok' && report.failedCount === 0;
+  const report = runSuiteReport(DEFAULT_SUITE, { fixtureRecallDryRun: true });
+  const fixtureRecall = report.fixtureRecallDryRun || {
+    enabled: false,
+    mutated: false,
+    providerCalls: 0,
+    durableMemoryTouched: false,
+    caseCount: 0,
+    passedCount: 0,
+    failedCount: 0
+  };
+  const ok = report.status === 'ok'
+    && report.failedCount === 0
+    && fixtureRecall.enabled === true
+    && fixtureRecall.failedCount === 0
+    && fixtureRecall.mutated === false
+    && fixtureRecall.providerCalls === 0
+    && fixtureRecall.durableMemoryTouched === false;
   return {
     status: ok ? 'ok' : 'error',
     message: ok
-      ? `${report.passedCount}/${report.assertedCount} query assertions passed`
-      : `${report.failedCount || 0}/${report.assertedCount || report.caseCount || 0} query assertions failed`,
+      ? `${report.passedCount}/${report.assertedCount} query assertions passed; fixture recall ${fixtureRecall.passedCount}/${fixtureRecall.caseCount}`
+      : `${report.failedCount || 0}/${report.assertedCount || report.caseCount || 0} query assertions failed; fixture recall ${fixtureRecall.failedCount}/${fixtureRecall.caseCount} failed`,
     detail: {
       caseCount: report.caseCount || 0,
       validCount: report.validCount || 0,
@@ -99,7 +114,8 @@ function runQueries() {
       realCount: report.realCount || 0,
       assertedCount: report.assertedCount || 0,
       passedCount: report.passedCount || 0,
-      failedCount: report.failedCount || 0
+      failedCount: report.failedCount || 0,
+      fixtureRecallDryRun: fixtureRecall
     }
   };
 }

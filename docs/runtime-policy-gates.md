@@ -86,6 +86,29 @@ npm run real-query-suite -- --json --fixture-recall-dry-run
 npm run query:quality -- --json --dry-run --fixture-recall-dry-run
 ```
 
+## CI-Safe Query Fixture Recall Standing Gate
+
+`gate:ci` now includes the same fixture recall dry-run summary under `checks.queries.detail.fixtureRecallDryRun`.
+
+Boundary:
+
+- fixture-only.
+- no daemon.
+- no provider.
+- no durable memory write.
+- `mutated=false`.
+- no synthetic `hitRate` or `qualityScore`.
+
+Current standing gate:
+
+- `caseCount=14`
+- `passedCount=14`
+- `failedCount=0`
+- `providerCalls=0`
+- `durableMemoryTouched=false`
+
+The text output includes `fixture recall 14/14`, and JSON output exposes the exact `fixtureRecallDryRun` shape locked by the P15.3 report-shape tests.
+
 ## CI-Safe Policy Preflight
 
 `gate:ci` 现在输出 `checks.policyPreflight`，用固定 fixture 模拟 soft read policy 会保留和过滤多少记录。

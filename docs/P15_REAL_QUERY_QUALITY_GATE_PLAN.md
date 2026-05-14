@@ -17,12 +17,12 @@ The current local query-quality surface already has a fixture-only baseline:
 
 Observed baseline:
 
-- `caseCount=8`
+- `caseCount=14`
 - `placeholderCount=0`
-- `fixtureOnlyCount=8`
-- `realCount=8`
-- `assertedCount=8`
-- `passedCount=8`
+- `fixtureOnlyCount=14`
+- `realCount=14`
+- `assertedCount=14`
+- `passedCount=14`
 - `failedCount=0`
 - `fixtureRecallDryRun.mutated=false`
 - `fixtureRecallDryRun.providerCalls=0`
@@ -116,6 +116,7 @@ Recommended P15 sequence:
    - Status: completed in [P15.3 Query Quality Report Shape Tests](./P15_QUERY_QUALITY_REPORT_SHAPE_TESTS.md).
 4. `P15.4-fixture-recall-dry-run-standing-gate`
    - Promote fixture recall dry-run summary into a documented standing gate.
+   - Status: completed in [P15.4 Fixture Recall Dry-Run Standing Gate](./P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md).
 5. `P15.5-real-memory-query-dry-run-planning`
    - Plan a read-only, redacted, opt-in dry-run against real local memory without provider calls or writes.
 6. `P15.6-query-quality-closeout-review`
@@ -159,6 +160,6 @@ Provider validation is explicitly out of scope unless a later phase receives exp
 
 ## Next Recommended Phase
 
-`P15.1-real-query-quality-fixture-inventory`
+`P15.5-real-memory-query-dry-run-planning`
 
-P15.1 should stay docs/fixture-inventory focused and should not add runtime behavior or call providers.
+P15.5 should stay planning-only unless a later explicit approval packet authorizes any real local memory read preview. It must not perform provider calls, migration, import/export apply, or durable memory writes.

@@ -95,10 +95,12 @@
 - P15.1 inventory：[docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md)
 - P15.2 expansion：[docs/P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md)
 - P15.3 report shape：[docs/P15_QUERY_QUALITY_REPORT_SHAPE_TESTS.md](/A:/codex-memory/docs/P15_QUERY_QUALITY_REPORT_SHAPE_TESTS.md)
+- P15.4 standing gate：[docs/P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md](/A:/codex-memory/docs/P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md)
 - 目标：把 real query quality 从 donor parity 中拆出来，规划 fixture-first standing gate，覆盖 relevance、precision、scope/lifecycle/privacy safety、failure reporting 和 JSON report stability。
 - 当前基线：`real-query-suite` 与 `query:quality` fixture recall dry-run 均为 `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。
 - 边界：tests/docs/board only；不改 runtime，不调用 provider，不改 package，不改 MCP，不做 migration/import-export apply。
-- 下一步建议：`P15.4-fixture-recall-dry-run-standing-gate`。
+- 当前 P15.4：`gate:ci` now includes `checks.queries.detail.fixtureRecallDryRun` as a standing CI-safe signal with `14/14`, `mutated=false`, `providerCalls=0`, and `durableMemoryTouched=false`.
+- 下一步建议：`P15.5-real-memory-query-dry-run-planning`。
 
 ## 当前判断
 

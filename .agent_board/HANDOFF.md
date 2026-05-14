@@ -2,7 +2,7 @@
 
 ## Goal
 
-Lock query quality report JSON shapes for P15.3 after the P15.2 fixture expansion.
+Promote fixture recall dry-run into a standing `gate:ci` query-quality signal for P15.4.
 
 ## Workspace
 
@@ -14,26 +14,28 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty with validated tests/docs/board shape-test changes only until guarded commit.
+Dirty with validated P15.4 CI-safe gate/docs/board changes until guarded commit.
 
 ## Current Area
 
-P15 query quality report shape tests
+P15 query quality standing gate
 
 ## Findings
 
-- current main is `a3c9094`.
+- current main is `a60144f`.
 - latest runtime safety baseline is `41a5630`.
 - `validate_memory` remains internal-only.
 - public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
-- P15.3 locks `real-query-suite` and `query:quality` report keys, `fixtureRecallDryRun` keys, assertion failure shape, and no fake metrics.
+- P15.3 report shape has been pushed to `origin/main`.
+- P15.4 promotes `fixtureRecallDryRun` into `gate:ci` query detail without changing query runtime ranking.
 
 ## Changed Files
 
-- `tests/real-query-suite.test.js`
-- `tests/query-quality-report.test.js`
-- `docs/P15_QUERY_QUALITY_REPORT_SHAPE_TESTS.md`
+- `src/cli/gate-ci.js`
+- `tests/gate-ci-cli.test.js`
+- `docs/P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md`
 - `docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md`
+- `docs/runtime-policy-gates.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -41,24 +43,28 @@ P15 query quality report shape tests
 
 ## Validation
 
+- `node --test tests\gate-ci-cli.test.js` passed `2/2`.
 - `node --test tests\real-query-suite.test.js tests\query-quality-report.test.js` passed `21/21`.
 - `npm run real-query-suite -- --json --fixture-recall-dry-run` passed `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
 - `npm run query:quality -- --json --dry-run --fixture-recall-dry-run` passed `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
-- `npm test` passed `420/420`.
 - `npm run gate:ci` passed.
+- `npm run gate:ci -- --json` passed after isolated rerun.
+- `npm test` passed `420/420`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
 ## Not Done
 
-- No runtime changes.
-- Tests changed only for query report shape coverage.
+- No query runtime ranking change.
+- No fixture data changes.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
+- No import/export apply.
+- No real DB or durable memory write.
 - No provider smoke or provider benchmark.
-- No push yet for this report shape test phase.
+- No push yet for this phase.
 
 ## Next Safe Step
 
-Create a guarded local commit. After that, next phase should be P15.4 fixture recall dry-run standing gate; push still requires explicit authorization.
+Create a guarded local commit. After that, next phase should be P15.5 real-memory-query dry-run planning; push still requires readiness.

@@ -65,6 +65,7 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
     'caseCount',
     'failedCount',
     'fixtureOnlyCount',
+    'fixtureRecallDryRun',
     'passedCount',
     'placeholderCount',
     'realCount',
@@ -74,6 +75,22 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
   assert.equal(payload.checks.queries.detail.assertedCount, 14);
   assert.equal(payload.checks.queries.detail.passedCount, 14);
   assert.equal(payload.checks.queries.detail.failedCount, 0);
+  assert.deepEqual(Object.keys(payload.checks.queries.detail.fixtureRecallDryRun).sort(), [
+    'caseCount',
+    'durableMemoryTouched',
+    'enabled',
+    'failedCount',
+    'mutated',
+    'passedCount',
+    'providerCalls'
+  ]);
+  assert.equal(payload.checks.queries.detail.fixtureRecallDryRun.enabled, true);
+  assert.equal(payload.checks.queries.detail.fixtureRecallDryRun.caseCount, 14);
+  assert.equal(payload.checks.queries.detail.fixtureRecallDryRun.passedCount, 14);
+  assert.equal(payload.checks.queries.detail.fixtureRecallDryRun.failedCount, 0);
+  assert.equal(payload.checks.queries.detail.fixtureRecallDryRun.mutated, false);
+  assert.equal(payload.checks.queries.detail.fixtureRecallDryRun.providerCalls, 0);
+  assert.equal(payload.checks.queries.detail.fixtureRecallDryRun.durableMemoryTouched, false);
 
   assert.equal(payload.checks.policyPreflight.status, 'ok');
   assert.deepEqual(Object.keys(payload.checks.policyPreflight.detail).sort(), [
@@ -161,6 +178,7 @@ test('gate:ci CLI should emit text output by default', async () => {
   assert.ok(text.includes('rollback'), 'should include rollback check');
   assert.ok(text.includes('queries'), 'should include queries check');
   assert.ok(text.includes('14/14 query assertions passed'), 'should include query assertion counts');
+  assert.ok(text.includes('fixture recall 14/14'), 'should include fixture recall standing gate counts');
   assert.ok(text.includes('policyPreflight'), 'should include policy preflight check');
   assert.ok(text.includes('3/7 records would remain'), 'should include policy preflight counts');
   assert.ok(text.includes('lifecyclePolicy'), 'should include lifecycle policy check');
