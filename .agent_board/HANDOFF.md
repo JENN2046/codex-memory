@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P14.4-error-meta-parity-tests` in `A:\codex-memory`.
+Continue `P14.5-ranking-tie-breaker-parity-tests` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `3c7d51b`
+- Base: `origin/main` / `d913b71`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P14-donor-compatibility / error-meta fixtures
+P14-donor-compatibility / ranking fixtures
 
 ## Completed Before This Batch
 
@@ -22,22 +22,21 @@ P14-donor-compatibility / error-meta fixtures
 - P14.2 DeepMemo targeted parity fixtures landed.
 - P14.2 state reconciliation landed as `829817c`.
 - P14.3 TopicMemo targeted parity fixtures landed as `3c7d51b`.
+- P14.4 error/meta parity fixtures landed as `d913b71`.
 - Decision after P12.6 remains: keep `validate_memory` internal-only and skip public `validate_memory` MCP proposal review.
 
 ## Completed In Current Batch
 
-- Added `tests/fixtures/donor-error-meta-parity-v1.json`.
-- Added `tests/donor-error-meta-parity-fixture.test.js`.
-- Locked DeepMemo / TopicMemo shared error envelope and diagnostic `meta` placement.
-- Locked DeepMemo full success diagnostic placement for blocked/effective keywords.
-- Recorded known intentional differences allowlist for parity interpretation.
+- Added `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`.
+- Added `tests/donor-ranking-tie-breaker-parity-fixture.test.js`.
+- Locked all current standard-suite `ordering` cases as explicit ranking/tie-breaker snapshots.
 - Verified targeted fixture runs do not mutate the referenced active-memory fixture files.
 - Updated P14 plan, inventory, next phase plan, backlog, status, and board state.
 
 ## Changed Files
 
-- `tests/fixtures/donor-error-meta-parity-v1.json`
-- `tests/donor-error-meta-parity-fixture.test.js`
+- `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`
+- `tests/donor-ranking-tie-breaker-parity-fixture.test.js`
 - `docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md`
 - `docs/DONOR_PARITY_FIXTURE_INVENTORY.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -47,11 +46,10 @@ P14-donor-compatibility / error-meta fixtures
 
 ## Validation
 
-- `node --test tests\donor-error-meta-parity-fixture.test.js` passed `2/2`.
-- `node --test tests\vcp-active-memory-cli.test.js` passed `17/17`.
-- Shared error/meta compare category gate passed `31/31 matched`.
-- Shared error/meta rollback category gate passed `31/31 rollback-safe`.
-- `npm test` passed `407/407`.
+- `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js` passed `2/2`.
+- Ordering compare category gate passed `4/4 matched`.
+- Ordering rollback category gate passed `4/4 rollback-safe`.
+- `npm test` passed `409/409`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -64,7 +62,7 @@ P14-donor-compatibility / error-meta fixtures
 
 ## Audit / Recall Impact
 
-- P14.4 fixture tests exercise DeepMemo and TopicMemo CLI against fixture roots only.
+- P14.5 fixture tests exercise DeepMemo CLI against fixture roots only.
 - Runtime recall behavior is unchanged.
 - Audit write paths are unchanged.
 
@@ -94,8 +92,8 @@ P14-donor-compatibility / error-meta fixtures
 
 - Public MCP tool expansion remains explicitly approval-gated.
 - Real migration remains separately approval-gated.
-- P14.5 may add ranking/tie-breaker fixture/test evidence, but must not alter runtime behavior without later explicit approval.
+- P14.6 may summarize compare/rollback standing gate evidence, but must not alter runtime behavior without later explicit approval.
 
 ## Next Safe Step
 
-Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next recommended phase is `P14.5-ranking-tie-breaker-parity-tests`.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. Next recommended phase is `P14.6-compare-rollback-standing-gate-summary`.

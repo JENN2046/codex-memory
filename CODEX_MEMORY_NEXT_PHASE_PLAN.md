@@ -86,7 +86,8 @@
 - P14.2 DeepMemo targeted parity fixtures 已新增 `tests/fixtures/deepmemo-donor-parity-v1.json` 与 `tests/deepmemo-donor-parity-fixture.test.js`，锁住 payload shape、blocked keyword meta placement、advanced syntax payload stability 和 ranking order snapshot。
 - P14.3 TopicMemo targeted parity fixtures 已新增 `tests/fixtures/topicmemo-donor-parity-v1.json` 与 `tests/topicmemo-donor-parity-fixture.test.js`，锁住 ListTopics / GetTopicContent payload shape、missing topic/history error envelope、agentId alias boundary 和 locked-topic display。
 - P14.4 error/meta parity tests 已新增 `tests/fixtures/donor-error-meta-parity-v1.json` 与 `tests/donor-error-meta-parity-fixture.test.js`，锁住 DeepMemo / TopicMemo 共享 error envelope、`meta` placement、full diagnostic success meta 和 known intentional differences allowlist。
-- 下一步建议：`P14.5-ranking-tie-breaker-parity-tests`。
+- P14.5 ranking/tie-breaker parity tests 已新增 `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json` 与 `tests/donor-ranking-tie-breaker-parity-fixture.test.js`，锁住当前 standard-suite 全部 `ordering` cases 的显式顺序快照。
+- 下一步建议：`P14.6-compare-rollback-standing-gate-summary`。
 
 ## 当前判断
 

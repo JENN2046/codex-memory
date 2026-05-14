@@ -118,6 +118,14 @@ P14.4 error/meta parity tests should prioritize:
 - success `meta` placement where donor exposes diagnostics: covered by the DeepMemo blocked/effective keyword `--full` diagnostic case
 - known intentional differences allowlist: covered by `knownIntentionalDifferences`
 
+P14.5 ranking/tie-breaker parity tests should prioritize:
+
+- all current standard-suite `ordering` cases: covered by `donor-ranking-tie-breaker-parity-v1.json`
+- cross-topic order snapshots: covered by `deepmemo-multi-topic-order-tie-breaker-snapshot`
+- single-topic window order snapshots: covered by `deepmemo-single-topic-window-order-tie-breaker-snapshot`
+- three-window order snapshots: covered by `deepmemo-three-window-order-tie-breaker-snapshot`
+- large multi-topic order snapshots: covered by `deepmemo-large-multi-topic-order-tie-breaker-snapshot`
+
 ## Validation Plan
 
 P14.1 is docs-only:
@@ -152,6 +160,6 @@ git diff --check
 
 ## Next Recommended Phase
 
-`P14.5-ranking-tie-breaker-parity-tests`
+`P14.6-compare-rollback-standing-gate-summary`
 
-P14.5 may expand ranking and tie-breaker parity fixture coverage. It should still avoid runtime behavior changes unless a later phase explicitly approves them.
+P14.6 may summarize standing compare/rollback gate evidence and readiness checks. It should still avoid runtime behavior changes unless a later phase explicitly approves them.

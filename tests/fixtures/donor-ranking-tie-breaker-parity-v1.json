@@ -1,0 +1,120 @@
+{
+  "phase": "P14.5-ranking-tie-breaker-parity-tests",
+  "schema_version": 1,
+  "mutated": false,
+  "source": {
+    "kind": "fixture-only",
+    "suite_root": "benchmarks/active-memory-suite",
+    "standard_suite_category": "ordering",
+    "note": "Ranking and tie-breaker donor parity fixture evidence only; runtime behavior is not changed."
+  },
+  "cases": [
+    {
+      "name": "deepmemo-multi-topic-order-tie-breaker-snapshot",
+      "suiteCaseName": "deepmemo-multi-topic-order-success",
+      "purpose": "Lock cross-topic ordering where compactness and recency affect DeepMemo ranking.",
+      "tool": "deepmemo",
+      "activeMemoryRoot": "vchat-fixture",
+      "inputFile": "inputs/deepmemo-multi-topic-order-success.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "orderedResultIncludes": [
+          "[回忆片段1]:\nMaster: Delivery schedule also needs Phase C coverage and benchmark tracking.\nKeke: Benchmark review should finish before the schedule sign-off.",
+          "[回忆片段2]:\nMaster: We should discuss the codex-memory system plan.\nKeke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-single-topic-window-order-tie-breaker-snapshot",
+      "suiteCaseName": "deepmemo-ranking-window-order-success",
+      "purpose": "Lock single-topic window order where score and window position decide ranking.",
+      "tool": "deepmemo",
+      "activeMemoryRoot": "vchat-fixture-ranking",
+      "inputFile": "inputs/deepmemo-ranking-window-order-success.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "orderedResultIncludes": [
+          "[回忆片段1]:\nKeke: Old checklist only mentions docs.\nArchitect: Phase D rollback compare migration priority should be reviewed now.\nKeke: That should gate the cutover.",
+          "[回忆片段2]:\nKeke: Later we can refine compare dashboards.\nArchitect: Phase D compare migration can resume after docs review.\nKeke: Migration should wait until compare is green."
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-three-window-order-tie-breaker-snapshot",
+      "suiteCaseName": "deepmemo-ranking-three-window-order-success",
+      "purpose": "Lock three-window ordering across strongest, middle, and later checkpoint matches.",
+      "tool": "deepmemo",
+      "activeMemoryRoot": "vchat-fixture-ranking-extended",
+      "inputFile": "inputs/deepmemo-ranking-three-window-order-success.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "orderedResultIncludes": [
+          "[回忆片段1]:\nKeke: Noted for the backlog.\nArchitect: Phase D rollback compare migration must be checked now.\nKeke: This strongest checkpoint should gate the cutover.",
+          "[回忆片段2]:\nKeke: Saved for the suite.\nArchitect: Phase D compare should be reviewed next.\nKeke: Migration can wait until rollback is stable.",
+          "[回忆片段3]:\nKeke: Later we can trim the backlog.\nArchitect: Compare migration can resume after docs review.\nKeke: No rollback sign-off is needed for that later step."
+        ]
+      }
+    },
+    {
+      "name": "deepmemo-large-multi-topic-order-tie-breaker-snapshot",
+      "suiteCaseName": "deepmemo-large-multi-topic-order-success",
+      "purpose": "Lock large multi-topic ordering across gamma, beta, and alpha migration checkpoints.",
+      "tool": "deepmemo",
+      "activeMemoryRoot": "vchat-fixture-multi-topic-large",
+      "inputFile": "inputs/deepmemo-large-multi-topic-order-success.json",
+      "expected": {
+        "exitCode": 0,
+        "status": "success",
+        "topLevelKeys": [
+          "result",
+          "status"
+        ],
+        "orderedResultIncludes": [
+          "[回忆片段1]:\nPlanner: Phase D compare migration should be reviewed before launch in gamma.\nKeke: Gamma keeps the newest migration checkpoint.",
+          "[回忆片段2]:\nPlanner: Phase D compare migration needs a second beta checkpoint.\nKeke: Beta should remain the middle migration signal.",
+          "[回忆片段3]:\nPlanner: Phase D compare migration began in the earliest alpha checkpoint.\nKeke: Alpha keeps the oldest migration note."
+        ]
+      }
+    }
+  ],
+  "coverage": {
+    "standard_suite_category": "ordering",
+    "expectedOrderingCaseCount": 4,
+    "expectedFixtures": [
+      "vchat-fixture",
+      "vchat-fixture-ranking",
+      "vchat-fixture-ranking-extended",
+      "vchat-fixture-multi-topic-large"
+    ],
+    "expectedTags": [
+      "multi-topic-order",
+      "window-order",
+      "single-topic",
+      "three-window",
+      "large-fixture"
+    ]
+  },
+  "non_goals": [
+    "no runtime change",
+    "no public MCP tool expansion",
+    "no MCP schema change",
+    "no import/export or migration behavior change",
+    "no SQLite migration",
+    "no real DB or memory write"
+  ]
+}

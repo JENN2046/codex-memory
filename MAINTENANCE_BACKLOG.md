@@ -115,7 +115,8 @@
 | P14.2-DeepMemo-targeted-parity-fixtures | donor-compatibility / fixtures | A1/A2 | done | Add DeepMemo targeted parity fixtures for payload, blocked keyword meta, advanced syntax, and ranking snapshots | `node --test tests\deepmemo-donor-parity-fixture.test.js`; DeepMemo compare/rollback category gates; `npm test`; `git diff --check`; docs validation | Fixture/test evidence added in `4251a27` and confirmed on remote `main`; no runtime, MCP, package, import/export, migration, or real data write changes |
 | P14.3-TopicMemo-targeted-parity-fixtures | donor-compatibility / fixtures | A1/A2 | done | Add TopicMemo targeted parity fixtures for list/content payload shape, missing topic/history errors, and alias boundaries | `node --test tests\topicmemo-donor-parity-fixture.test.js`; TopicMemo compare/rollback category gates; `npm test`; diff/docs validation | Fixture/test evidence added; no runtime, MCP, package, import/export, migration, or real data write changes |
 | P14.4-error-meta-parity-tests | donor-compatibility / fixtures | A1/A2 | done | Consolidate shared donor error envelope and `meta` placement parity tests | `node --test tests\donor-error-meta-parity-fixture.test.js`; shared error/meta compare/rollback category gates; `npm test`; diff/docs validation | Fixture/test evidence added; no runtime, MCP, package, import/export, migration, or real data write changes |
-| P14.5-ranking-tie-breaker-parity-tests | donor-compatibility / fixtures | A1/A2 | todo | Expand ranking and tie-breaker parity fixture coverage before runtime changes | future targeted tests; compare/rollback ordering gates; `npm test`; diff/docs validation | No runtime behavior changes without explicit later approval |
+| P14.5-ranking-tie-breaker-parity-tests | donor-compatibility / fixtures | A1/A2 | done | Expand ranking and tie-breaker parity fixture coverage before runtime changes | `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js`; compare/rollback ordering gates; `npm test`; diff/docs validation | Fixture/test evidence added; no runtime, MCP, package, import/export, migration, or real data write changes |
+| P14.6-compare-rollback-standing-gate-summary | donor-compatibility / gate-summary | A1/A2 | todo | Summarize standing compare/rollback category gates and readiness checks | future docs/diff validation; optional compare/rollback smoke | No runtime behavior changes without explicit later approval |
 
 ## 推荐执行顺序
 
@@ -170,8 +171,9 @@
 49. P14.2 state reconciliation：校准 STATUS / backlog / board 的 P14.2 远端状态；commit `829817c` 已推送到 `origin/main`。
 50. `P14.3`：TopicMemo targeted parity fixtures 已新增 `tests/fixtures/topicmemo-donor-parity-v1.json` 与 `tests/topicmemo-donor-parity-fixture.test.js`，锁住 ListTopics / GetTopicContent payload shape、missing topic/history error envelope、agentId alias boundary 和 locked-topic display。
 51. `P14.4`：error/meta parity tests 已新增 `tests/fixtures/donor-error-meta-parity-v1.json` 与 `tests/donor-error-meta-parity-fixture.test.js`，锁住 DeepMemo / TopicMemo 共享 error envelope、diagnostic `meta` placement、DeepMemo full success diagnostics 和 known intentional differences allowlist。
-52. 下一步建议：P14.5 ranking tie-breaker parity tests；仍不得改 runtime，先补 ranking / tie-breaker fixture/test 证据。
-53. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+52. `P14.5`：ranking/tie-breaker parity tests 已新增 `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json` 与 `tests/donor-ranking-tie-breaker-parity-fixture.test.js`，锁住 standard-suite 当前全部 `ordering` cases 的显式顺序快照。
+53. 下一步建议：P14.6 compare/rollback standing gate summary；仍不得改 runtime，先汇总 standing gate 证据和 readiness checks。
+54. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

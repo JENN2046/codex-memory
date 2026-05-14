@@ -113,7 +113,8 @@ P14 should proceed in small phases:
    - Completed by `tests/fixtures/donor-error-meta-parity-v1.json` and `tests/donor-error-meta-parity-fixture.test.js`.
    - Locks shared DeepMemo / TopicMemo error envelope placement, `meta` diagnostics, success diagnostic placement where full output exposes it, and the known intentional differences allowlist without runtime changes.
 5. `P14.5-ranking-tie-breaker-parity-tests`
-   - Expand ranking and tie-breaker cases before runtime changes.
+   - Completed by `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json` and `tests/donor-ranking-tie-breaker-parity-fixture.test.js`.
+   - Locks all current standard-suite `ordering` cases as explicit ranking/tie-breaker snapshots without runtime changes.
 6. `P14.6-compare-rollback-standing-gate-summary`
    - Summarize standing compare/rollback category gates and readiness checks.
 
@@ -135,6 +136,6 @@ No runtime behavior changes should happen until fixture and gate evidence exists
 
 ## Next Recommended Phase
 
-`P14.5-ranking-tie-breaker-parity-tests`
+`P14.6-compare-rollback-standing-gate-summary`
 
-P14.5 may expand ranking and tie-breaker parity fixture coverage before any donor runtime behavior change. It should not alter runtime behavior unless a later phase explicitly approves implementation.
+P14.6 may summarize compare/rollback standing gate evidence and readiness checks. It should remain a docs/gate-summary phase unless a later phase explicitly approves implementation.
