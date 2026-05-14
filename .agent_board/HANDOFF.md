@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P17.x V8 closeout review without changing runtime behavior.
+Run P18 import/export/migration safety planning without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P17.x docs/status/board edits are local, validated, and uncommitted.
+P18 planning docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P17 advanced memory intelligence / V8 closeout review
+P18 import/export/migration safety planning
 
 ## Findings
 
@@ -61,12 +61,14 @@ P17 advanced memory intelligence / V8 closeout review
 - P17.x diff check and docs validation passed locally.
 - P17.x is not authorization for V8 runtime implementation.
 - P18 must begin with planning/dry-run safety, not migration/apply.
+- P17.x guarded commit and safe-push completed at `2777a0413b5f51035443766192ed54ab1fb93168`.
+- P18 planning is drafted as docs/status/board only.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md`
+- `docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -93,4 +95,4 @@ P17 advanced memory intelligence / V8 closeout review
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P18-import-export-migration-safety-planning`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P18.1-import-export-fixture-inventory`.

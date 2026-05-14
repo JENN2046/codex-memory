@@ -135,6 +135,7 @@
 - P17.4 V8 query-family fixture tests：新增 `tests/fixtures/v8-query-family-v1.json`、`tests/v8-query-family-fixture.test.js` 与 [docs/P17_V8_QUERY_FAMILY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P17_V8_QUERY_FAMILY_FIXTURE_TESTS.md)，覆盖 technical / governance / quality / semantic / safety synthetic diagnostic families；targeted query-family test `4/4`、full suite `443/443` 通过；不改 `src/`、不跑 provider、不读 real memory、不调 runtime、不改 MCP、不做 migration/import-export apply。
 - P17.5 V8 evidence gate summary：新增 [docs/P17_V8_EVIDENCE_GATE_SUMMARY.md](/A:/codex-memory/docs/P17_V8_EVIDENCE_GATE_SUMMARY.md)，汇总 P17 planning / inventory / fixture shape / CLI gate / query-family evidence，结论为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`；本阶段 docs/status/board only，不授权 V8 implementation、runtime tuning、provider benchmark、real memory preview、MCP expansion 或 migration/import-export apply。
 - P17.x advanced memory intelligence / V8 closeout review：新增 [docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md)，将 P17 关闭为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED_AND_CLOSED`；下一路线只能进入 P18 planning / dry-run safety，不授权 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、V8 implementation 或 release candidate。
+- P18 import/export/migration safety planning：新增 [docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md)，把 import/export/migration 路线限定为 dry-run-first、redaction-first、backup/rollback/A5-approval-first；本阶段 planning/docs/board only，不实现 apply、不迁移 SQLite、不读取真实 memory、不写 durable data、不改 MCP。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -500,7 +501,7 @@
 
 ## 下一步建议
 
-- 下一阶段建议完成 `P17.x-closeout-review` 的 docs validation、guarded commit / safe-push，然后进入 `P18-import-export-migration-safety-planning`。P18 必须从 planning / dry-run safety 开始，不得直接 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、release candidate、tag 或 deploy。
+- 下一阶段建议完成 `P18-import-export-migration-safety-planning` 的 guarded commit / safe-push，然后进入 `P18.1-import-export-fixture-inventory`。P18 必须保持 planning / fixture / dry-run 顺序，不得直接 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、release candidate、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 
