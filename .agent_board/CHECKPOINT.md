@@ -2,32 +2,30 @@
 
 ## Current Goal
 
-P13.2-object-model-round-trip-fixture-tests: prove the P13 object model envelope can round-trip from source fixture to normalized object to export-safe JSON to reloaded object without losing identity, scope, lifecycle, audit refs, provenance, privacy, or import/export boundaries.
+P13.3-SQLite-diary-mapping-dry-run-planning: plan how a future read-only dry-run can map existing SQLite / diary records into VCP-compatible `MemoryRecord` vNext envelopes, while producing mapping previews, missing-field reports, risk reports, and rollback requirements.
 
 ## Current Area
 
-P13-object-model / round-trip-fixtures
+P13-object-model / mapping-dry-run-planning
 
 ## Current Status
 
-P13 planning and P13.1 fixture schemas have both landed on `origin/main`. Current HEAD/base before this batch is `ce9a2a9`.
+P13 planning, P13.1 fixture schemas, and P13.2 round-trip fixture tests have all landed on `origin/main`. Current HEAD/base before this batch is `82a4463`.
 
-Current decision: keep `validate_memory` internal-only and do not enter public `validate_memory` MCP proposal review. P13.2 is a fixture/test/docs phase only. The round-trip helpers are test-local pure functions and do not create runtime mapping, import/export CLI, migration, or durable memory write paths.
+Current decision: keep `validate_memory` internal-only and do not enter public `validate_memory` MCP proposal review. P13.3 is a docs/board planning phase only. It does not implement a runtime mapper, import/export CLI, migration, real data scan, or durable memory write path.
 
 ## Completed Work In This Batch
 
-- Added `tests/fixtures/vcp-memory-object-round-trip-v1.json`.
-- Added `tests/vcp-memory-object-round-trip.test.js`.
-- Covered `MemoryRecord`, `MemoChunk`, `KnowledgeChunk`, `Tag`, `AuditEvent`, `MemoryProposal`, `Tombstone`, `Checkpoint`, and `Handoff`.
-- Added test-local pure helpers: `normalizeObjectEnvelope()`, `exportSafeJson()`, and `reloadExportedObject()`.
-- Locked round-trip preservation for `memory_id`, `schema_version`, `kind`, source/provenance, scope fields, lifecycle status, supersession refs, audit refs, tag refs, and chunk refs.
-- Locked inactive `MemoryProposal`, hidden `Tombstone`, redacted `AuditEvent`, low-risk summary raw `workspace_id` ban, missing vNext null/unknown fallback, JSON stringify/parse stability, and no-side-effect behavior.
+- Added `docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md`.
+- Planned future read-only mapping sources: SQLite `memory_records`, diary markdown / DailyNote-compatible records, audit logs, chunk/vector metadata, scope fields, lifecycle fields, and tag metadata when available.
+- Defined future dry-run output shape with `status`, `mutated=false`, scanned/mapped/unmapped counts, missing field counts, lifecycle/scope/ref coverage, import/export safety count, risk level, rollback requirement, and next step.
+- Defined mapping rules for preserving `memory_id`, scope, lifecycle, audit refs, proposal/tombstone defaults, and dry-run-only `content_ref` / `content_hash`.
+- Defined missing-field policy, safety rules, future P13.4-P13.7 implementation sequence, validation plan, and non-goals.
 - Updated P13 plan, next phase plan, status, backlog, and board pointers.
 
 ## Changed Files
 
-- `tests/fixtures/vcp-memory-object-round-trip-v1.json`
-- `tests/vcp-memory-object-round-trip.test.js`
+- `docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md`
 - `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -40,18 +38,19 @@ Current decision: keep `validate_memory` internal-only and do not enter public `
 
 ## Validation Run
 
-- `node --test tests\vcp-memory-object-round-trip.test.js`：passed `18/18`
-- `node --test tests\vcp-memory-object-model-fixture.test.js`：passed `13/13`
-- `npm test`：passed `343/343`
-- `git diff --check`：passed
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
+- `git diff --check`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Both passed.
 
 ## Validation Not Run
 
+- `npm test` not required for P13.3 docs/board planning.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
 - No import/export runtime.
+- No runtime mapper.
 - No real DB/memory write.
 
 ## Current Blockers
@@ -61,9 +60,9 @@ Current decision: keep `validate_memory` internal-only and do not enter public `
 
 ## Remaining Risks
 
-- SQLite/diary mapping is not planned or locked yet; P13.3 should stay dry-run planning first.
-- Any public MCP `validate_memory` tool remains out of scope.
-- Any SQLite schema, import/export runtime, or data migration remains out of scope.
+- Object mapping fixture tests are not added yet; P13.4 should add fixture-only tests before any real scan or CLI.
+- Any runtime mapper remains out of scope.
+- Any SQLite schema, import/export runtime, real data scan, or data migration remains out of scope.
 
 ## Next Safe Action
 

@@ -386,12 +386,18 @@ P13 does not migrate data. The planned sequence is:
    - Add fixture-only round-trip tests for object envelopes.
    - No diary/SQLite writes.
 3. `P13.3-sqlite-diary-mapping-dry-run`
-   - Add dry-run mapping report for diary and SQLite rows.
-   - Must report `mutated=false`.
-4. `P13.4-import-export-safe-json-shape`
+   - Plan a dry-run mapping report for diary and SQLite rows.
+   - Must report `mutated=false` when implemented later.
+4. `P13.4-object-mapping-fixture-tests`
+   - Add fixture tests for SQLite/diary mapping preview behavior.
+   - No real data scan.
+5. `P13.5-SQLite-diary-mapping-dry-run-CLI`
+   - Add a read-only dry-run CLI only after mapping fixture tests exist.
+   - Must reject apply/write/confirm migration flags.
+6. `P13.6-import-export-safe-json-shape-tests`
    - Define import/export-safe JSON shape and redaction expectations.
    - Fixture-only tests first.
-5. `P13.5-migration-readiness-report`
+7. `P13.7-migration-readiness-report`
    - Produce readiness report with counts, missing fields, risks, and rollback requirements.
    - No real migration until separately approved.
 
@@ -449,6 +455,31 @@ This remains a fixture/test phase only:
 - no SQLite migration or `ALTER TABLE`
 - no diary, vector, audit-log, DB, or durable memory write
 
+## P13.3 SQLite / Diary Mapping Dry-Run Planning
+
+P13.3 records the planning contract for future SQLite / diary mapping dry-run work:
+
+- plan: `docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md`
+
+The plan defines:
+
+- future read-only mapping sources, including SQLite `memory_records`, diary markdown, audit logs, chunk/vector metadata, scope fields, lifecycle fields, and tag metadata when available
+- proposed dry-run output fields such as `status`, `mutated=false`, scanned/mapped/unmapped counts, missing field counts, lifecycle/scope/ref coverage, `riskLevel`, `rollbackRequirement`, and `nextStep`
+- mapping rules for preserving `memory_id`, scope, lifecycle, audit refs, proposal/tombstone defaults, and dry-run-only `content_ref` / `content_hash`
+- missing field policy for required fields, optional fields, `workspace_id`, provenance, and lifecycle status
+- safety rules that forbid SQLite writes, diary rewrites, vector rebuilds, audit-log writes, import/export file generation, migration, MCP expansion, provider calls, and runtime mapper work
+- future sequence: P13.4 fixture tests, P13.5 dry-run CLI, P13.6 import/export-safe JSON shape tests, and P13.7 migration readiness report
+
+This remains a docs/board planning phase only:
+
+- no runtime mapper
+- no tests
+- no import/export CLI
+- no MCP public tool expansion
+- no MCP schema change
+- no SQLite migration or `ALTER TABLE`
+- no real data scan, DB write, diary rewrite, vector rebuild, audit-log write, or durable memory write
+
 ## Risk Register
 
 | Risk | Why It Matters | P13 Mitigation |
@@ -456,7 +487,7 @@ This remains a fixture/test phase only:
 | Schema drift | Multiple docs or mappers may define incompatible fields | Keep this plan as the P13 planning entry and add fixture schemas in P13.1 |
 | Breaking existing recall | Recall may depend on legacy row and chunk shapes | Planning only; future mappers must be read-only and fallback-safe |
 | Breaking diary compatibility | Diary markdown is the human-readable durable source | Existing diary records remain readable; no rewrite in P13 |
-| Accidental data migration | Object-model work could accidentally become schema work | No migration or `ALTER TABLE`; dry-run-first future phases |
+| Accidental data migration | Object-model work could accidentally become schema work | P13.3 keeps SQLite/diary mapping at planning only; no migration or `ALTER TABLE`; dry-run-first future phases |
 | Scope leakage | Raw workspace/client/project fields can leak in summaries | No raw `workspace_id` in low-risk summaries; scope-aware mapping |
 | Lifecycle mismatch | Legacy `status` and vNext lifecycle may diverge | Map existing `status` to `lifecycle_status`; unknown/null fallback |
 | Audit mismatch | Mutation and lifecycle history could be incomplete or overclaimed | Audit refs are derived only when evidence exists |
@@ -488,6 +519,13 @@ git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
+P13.3 validation:
+
+```powershell
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
 P13 planning validation was docs-only:
 
 ```powershell
@@ -510,8 +548,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.3-SQLite-diary-mapping-dry-run-planning`
+`P13.4-object-mapping-fixture-tests`
 
-P13.3 should stay planning/dry-run first: no real SQLite migration, no `ALTER TABLE`, no import/export runtime implementation, and no real DB/memory write.
-
-That phase should add fixture-only round-trip tests for object envelopes, still without runtime changes, SQLite migration, import/export implementation, or durable memory mutation.
+P13.4 should add fixture-only object mapping tests before any real SQLite/diary scan, runtime mapper, import/export implementation, or migration.
