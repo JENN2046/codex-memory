@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P13.6-import-export-safe-JSON-shape-tests` in `A:\codex-memory`.
+Continue `P13.7-migration-readiness-report` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `232b71a`
+- Base: `origin/main` / `dc03d4c`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P13-object-model / import-export-shape
+P13-object-model / migration-readiness
 
 ## Completed Before This Batch
 
@@ -36,15 +36,19 @@ P13-object-model / import-export-shape
 
 ## Completed In Current Batch
 
-- Added `tests/fixtures/vcp-memory-import-export-shape-v1.json`.
-- Added `tests/vcp-memory-import-export-shape.test.js`.
-- Fixture/test lock import/export-safe JSON envelope shape, refs, policy flags, deterministic checksum, dry-run-first import mode, `mutated=false`, and no-side-effect.
+- Added `src/cli/vcp-memory-migration-readiness.js`.
+- Added `tests/fixtures/vcp-memory-migration-readiness-v1.json`.
+- Added `tests/vcp-memory-migration-readiness-cli.test.js`.
+- Added npm script `vcp-memory:migration-readiness`.
+- Readiness report keeps `migrationBlocked=true`, `mutated=false`, and rejects apply/migrate/confirm.
 - Updated P13 mapping plan, object model plan, next phase plan, status, backlog, and board state.
 
 ## Changed Files
 
-- `tests/fixtures/vcp-memory-import-export-shape-v1.json`
-- `tests/vcp-memory-import-export-shape.test.js`
+- `src/cli/vcp-memory-migration-readiness.js`
+- `tests/fixtures/vcp-memory-migration-readiness-v1.json`
+- `tests/vcp-memory-migration-readiness-cli.test.js`
+- `package.json`
 - `docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md`
 - `docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -54,11 +58,9 @@ P13-object-model / import-export-shape
 
 ## Validation
 
-- `node --test tests\vcp-memory-import-export-shape.test.js` passed `16/16`.
-- `node --test tests\vcp-memory-object-model-fixture.test.js` passed `13/13`.
-- `node --test tests\vcp-memory-object-round-trip.test.js` passed `18/18`.
-- `node --test tests\vcp-memory-object-mapping-fixture.test.js` passed `20/20`.
-- `npm test` passed `390/390`.
+- `node --test tests\vcp-memory-migration-readiness-cli.test.js` passed `11/11`.
+- `npm run vcp-memory:migration-readiness -- --json` passed.
+- `npm test` passed `401/401`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -71,7 +73,7 @@ P13-object-model / import-export-shape
 
 ## Audit / Recall Impact
 
-- P13.6 fixture tests do not change audit/runtime/recall behavior.
+- P13.7 readiness report does not change audit/runtime/recall behavior.
 - Future mapping must preserve audit, lifecycle, scope, and import/export boundaries.
 - Recall path is unchanged.
 
@@ -79,9 +81,9 @@ P13-object-model / import-export-shape
 
 - No public MCP `validate_memory`.
 - No MCP schema change.
-- No `src/` changes.
-- Tests changes are fixture-only and limited to P13.6 import/export shape tests.
-- No package or lockfile changes.
+- No runtime source changes beyond the read-only readiness CLI.
+- Tests changes are fixture-backed and limited to P13.7 readiness CLI tests.
+- Package change is limited to npm script `vcp-memory:migration-readiness`; no dependency/lockfile change.
 - No SQLite migration or automatic `ALTER TABLE`.
 - No import/export CLI.
 - No import/export file generation.
@@ -98,9 +100,8 @@ P13-object-model / import-export-shape
 ## Remaining Risks
 
 - Public MCP tool expansion remains explicitly approval-gated.
-- No current blocker.
 - Real migration remains separately approval-gated.
 
 ## Next Safe Step
 
-Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean.
+Inspect final diff/file scope, then guarded local commit and safe-push readiness if clean. After P13.7, stop for P13 closeout review before P14.

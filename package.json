@@ -54,6 +54,7 @@
     "scope:backfill:dry-run": "node ./src/cli/scope-backfill-dry-run.js",
     "lifecycle:sqlite:dry-run": "node ./src/cli/lifecycle-sqlite-dry-run.js",
     "vcp-memory:mapping:dry-run": "node ./src/cli/vcp-memory-object-mapping-dry-run.js",
+    "vcp-memory:migration-readiness": "node ./src/cli/vcp-memory-migration-readiness.js",
     "controlled-write:dry-run": "node ./src/cli/controlled-write-dry-run.js",
     "validate-memory": "node ./src/cli/validate-memory.js",
     "real-query-suite": "node ./src/cli/real-query-suite.js",

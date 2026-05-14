@@ -172,8 +172,8 @@ Detailed record previews should be separate from low-risk summaries. If future p
    - Completed as fixture-only import/export-safe JSON shape tests.
    - No broad export of real memory, file generation, or import/export CLI.
 4. `P13.7-migration-readiness-report`
-   - Produce a readiness report with counts, missing fields, risks, backup requirements, and rollback requirements.
-   - No real migration until explicit approval.
+   - Completed as a read-only fixture-backed readiness report.
+   - Keeps `migrationBlocked=true`; no real migration until explicit approval.
 
 No real migration, SQLite schema change, `ALTER TABLE`, diary rewrite, import/export runtime, or durable memory mutation is approved by this sequence.
 
@@ -211,6 +211,40 @@ This remains a fixture/test phase only:
 
 - no runtime mapper
 - no import/export CLI
+- no MCP public tool expansion
+- no MCP schema change
+
+## P13.7 Migration Readiness Report
+
+P13.7 adds a read-only readiness report CLI:
+
+```powershell
+npm run vcp-memory:migration-readiness -- --json
+```
+
+The report is fixture-backed and summarizes:
+
+- `objectModelFixtureReady`
+- `roundTripFixtureReady`
+- `mappingFixtureReady`
+- `mappingDryRunCliReady`
+- `importExportShapeReady`
+- `missingPrerequisites`
+- `migrationBlocked=true`
+- `migrationBlockers`
+- `requiredApprovals`
+- `riskLevel`
+- `nextStep`
+
+The report is deliberately blocked for migration until a later explicit approval. It rejects `--apply`, `--migrate`, and `--confirm`.
+
+This remains a readiness-report phase only:
+
+- no migration
+- no SQLite write
+- no diary rewrite
+- no import/export apply
+- no real DB/memory write
 - no MCP public tool expansion
 - no MCP schema change
 - no SQLite migration or `ALTER TABLE`
@@ -356,6 +390,16 @@ git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
+P13.7 validation:
+
+```powershell
+node --test tests\vcp-memory-migration-readiness-cli.test.js
+npm run vcp-memory:migration-readiness -- --json
+npm test
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
 Current P13.3 validation is docs-only:
 
 ```powershell
@@ -378,4 +422,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.7-migration-readiness-report`
+`P13.x-closeout-review`

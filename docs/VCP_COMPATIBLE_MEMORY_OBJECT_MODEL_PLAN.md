@@ -398,8 +398,8 @@ P13 does not migrate data. The planned sequence is:
    - Completed as fixture-only import/export-safe JSON shape tests.
    - No import/export CLI or file generation.
 7. `P13.7-migration-readiness-report`
-   - Produce readiness report with counts, missing fields, risks, and rollback requirements.
-   - No real migration until separately approved.
+   - Completed as a read-only fixture-backed migration readiness report.
+   - Keeps `migrationBlocked=true` until separately approved.
 
 No real migration, SQLite schema change, `ALTER TABLE`, diary rewrite, vector rebuild, import, export, or durable memory mutation is approved by P13.
 
@@ -450,6 +450,47 @@ This remains a fixture/test phase only:
 
 - no runtime mapper
 - no import/export CLI
+- no MCP public tool expansion
+- no MCP schema change
+
+## P13.7 Migration Readiness Report
+
+P13.7 adds a read-only readiness report:
+
+```powershell
+npm run vcp-memory:migration-readiness -- --json
+```
+
+Implementation files:
+
+- CLI: `src/cli/vcp-memory-migration-readiness.js`
+- fixture: `tests/fixtures/vcp-memory-migration-readiness-v1.json`
+- test: `tests/vcp-memory-migration-readiness-cli.test.js`
+- npm script: `vcp-memory:migration-readiness`
+
+The report summarizes whether the P13 object-model chain is ready for future migration planning:
+
+- `objectModelFixtureReady`
+- `roundTripFixtureReady`
+- `mappingFixtureReady`
+- `mappingDryRunCliReady`
+- `importExportShapeReady`
+- `missingPrerequisites`
+- `migrationBlocked=true`
+- `migrationBlockers`
+- `requiredApprovals`
+- `riskLevel`
+- `nextStep`
+
+This is not a migration. The CLI reports `mutated=false`, rejects `--apply`, `--migrate`, and `--confirm`, and keeps public MCP tools frozen.
+
+P13.7 remains a readiness-report phase only:
+
+- no migration
+- no SQLite write
+- no diary rewrite
+- no import/export apply
+- no real DB/memory write
 - no MCP public tool expansion
 - no MCP schema change
 - no SQLite migration or `ALTER TABLE`
@@ -656,6 +697,16 @@ git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
 
+P13.7 validation:
+
+```powershell
+node --test tests\vcp-memory-migration-readiness-cli.test.js
+npm run vcp-memory:migration-readiness -- --json
+npm test
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
 P13 planning validation was docs-only:
 
 ```powershell
@@ -678,6 +729,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.7-migration-readiness-report`
+`P13.x-closeout-review`
 
-P13.7 should add a read-only migration readiness report. It must keep `migrationBlocked=true`, report `mutated=false`, avoid real DB/diary writes, and avoid real migration.
+P13 should stop for closeout review before P14. A future P14 planning task may be `P14-donor-behavior-parity-gate-planning`; no P14 implementation is started by P13.

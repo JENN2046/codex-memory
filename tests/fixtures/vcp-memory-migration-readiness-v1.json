@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "vcp-memory-migration-readiness-v1",
+  "phase": "P13.7-migration-readiness-report",
+  "fixtureOnly": true,
+  "mutated": false,
+  "noMigration": true,
+  "noSQLiteWrite": true,
+  "noDiaryWrite": true,
+  "noImportExportApply": true,
+  "noRealDbMemoryWrite": true,
+  "noMcpPublicToolExpansion": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "readiness": {
+    "objectModelFixtureReady": true,
+    "roundTripFixtureReady": true,
+    "mappingFixtureReady": true,
+    "mappingDryRunCliReady": true,
+    "importExportShapeReady": true
+  },
+  "missingPrerequisites": [],
+  "migrationBlocked": true,
+  "migrationBlockers": [
+    "explicit migration approval is required",
+    "real SQLite backup and restore plan is not approved",
+    "real diary rewrite is not approved",
+    "real import/export apply is not approved",
+    "real DB/memory write is not approved"
+  ],
+  "requiredApprovals": [
+    "approve real migration scope",
+    "approve SQLite backup and rollback procedure",
+    "approve diary rewrite policy if needed",
+    "approve import/export apply behavior if needed",
+    "approve post-migration validation gates"
+  ],
+  "riskLevel": "A2",
+  "nextStep": "Stop for P13 closeout review before any P14 planning or migration approval.",
+  "rawWorkspaceIdExposed": false,
+  "rawSecretExposed": false
+}

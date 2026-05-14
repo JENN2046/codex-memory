@@ -73,7 +73,8 @@
 - P13.4 object mapping fixture tests 已新增 synthetic SQLite / diary / audit / chunk / tag mapping fixture 与测试，锁住 mapping preview、missing field policy、low-risk summary、proposal/tombstone defaults、`mutated=false` 和 no-side-effect 边界。
 - P13.5 SQLite / diary mapping dry-run CLI 已新增 fixture-safe `npm run vcp-memory:mapping:dry-run -- --json`，默认 `sourceMode=fixture`、`mutated=false`，拒绝 `--confirm/--apply/--migrate`，不读取真实 DB/diary，不生成 import/export 文件，不做 migration。
 - P13.6 import/export-safe JSON shape fixture tests 已新增 export/import envelope fixture 与测试，锁住 schema、record/chunk/tag/audit refs、hidden tombstone、inactive proposal、redaction/policy flags、deterministic checksum、dry-run-first import mode、`mutated=false` 和 no-side-effect。
-- 下一步建议：P13.7 migration readiness report；仍必须 read-only、`migrationBlocked=true`、`mutated=false`，不做真实 migration。
+- P13.7 migration readiness report 已新增 `npm run vcp-memory:migration-readiness -- --json`，read-only fixture-backed，报告 P13 readiness，保持 `migrationBlocked=true` 与 `mutated=false`，拒绝 `--apply/--migrate/--confirm`。
+- 下一步建议：P13.x closeout review；之后才评估 `P14-donor-behavior-parity-gate-planning`，不自动开始 P14 implementation。
 
 ## 当前判断
 
