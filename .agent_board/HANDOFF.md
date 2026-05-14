@@ -14,7 +14,7 @@ A:\codex-memory
 
 ## Worktree
 
-P16 docs/board planning edits are local and uncommitted.
+Clean after guarded local P16 planning commit; local `main` is ahead of `origin/main` until safe-push readiness and push complete.
 
 ## Current Area
 
@@ -62,4 +62,4 @@ P16 TagMemo semantic association parity planning
 
 ## Next Safe Step
 
-Perform final diff/scope review, then guarded commit and safe-push readiness. Next safe phase is `P16.1-TagMemo-semantic-fixture-inventory`.
+Run safe-push readiness for the P16 planning commits. Next safe phase is `P16.1-TagMemo-semantic-fixture-inventory`.
