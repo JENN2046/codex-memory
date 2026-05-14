@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P17.5 V8 evidence gate summary without changing runtime behavior.
+Run P17.x V8 closeout review without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P17.5 docs/status/board edits are local, validated, and uncommitted.
+P17.x docs/status/board edits are local, validated, and uncommitted.
 
 ## Current Area
 
-P17 V8 evidence gate summary
+P17 advanced memory intelligence / V8 closeout review
 
 ## Findings
 
@@ -56,13 +56,17 @@ P17 V8 evidence gate summary
 - P17.4 guarded commit and safe-push completed at `faf80c5f0368cad8ac1c0edc82c90538ef4505c6`.
 - P17.5 evidence summary is drafted with result `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`.
 - P17.5 diff check and docs validation passed locally.
-- P17.5 is not authorization for V8 runtime implementation.
+- P17.5 guarded commit and safe-push completed at `087d1943e8805a30c47ff57e1b093a1ed0a3c08c`.
+- P17.x closeout is drafted with result `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED_AND_CLOSED`.
+- P17.x diff check and docs validation passed locally.
+- P17.x is not authorization for V8 runtime implementation.
+- P18 must begin with planning/dry-run safety, not migration/apply.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P17_V8_EVIDENCE_GATE_SUMMARY.md`
+- `docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -89,4 +93,4 @@ P17 V8 evidence gate summary
 
 ## Next Safe Step
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P17.x-closeout-review`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P18-import-export-migration-safety-planning`.

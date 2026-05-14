@@ -2,18 +2,18 @@
 
 ## Current Goal
 
-P17.5-v8-evidence-gate-summary: summarize P17 V8 diagnostic evidence before closeout.
+P17.x-closeout-review: close P17 V8 diagnostic evidence gate and prepare P18 planning route.
 
 ## Current Area
 
-P17 V8 evidence gate summary
+P17 advanced memory intelligence / V8 closeout review
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `faf80c5f0368cad8ac1c0edc82c90538ef4505c6`
+- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `087d1943e8805a30c47ff57e1b093a1ed0a3c08c`
 - P16.1 inventory and P16.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.3 targeted semantic fixtures have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.4 semantic ranking evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
@@ -24,21 +24,23 @@ Repository state:
 - P17.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - P17.3 CLI shape gate has been validated, committed, safe-pushed, and post-push hash-verified
 - P17.4 query-family fixture tests have been validated, committed, safe-pushed, and post-push hash-verified
+- P17.5 evidence summary has been validated, committed, safe-pushed, and post-push hash-verified
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P17.5 evidence summary decisions:
+P17.x closeout decisions:
 
-- P17.5 is docs/status/board only.
-- P17 evidence can be summarized as `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`.
+- P17.x is docs/status/board only.
+- P17 can be closed as `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED_AND_CLOSED`.
+- P18 must start with planning/dry-run safety.
 - Runtime ranking behavior is not tuned in this phase.
 - Provider benchmark, real memory preview, MCP expansion, migration, and V8 implementation remain deferred.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
-- P17.5 docs validation passed locally.
+- P17.x docs validation passed locally.
 
 ## Changed Files
 
-- `docs/P17_V8_EVIDENCE_GATE_SUMMARY.md`
+- `docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -59,4 +61,4 @@ P17.5 evidence summary decisions:
 
 ## Next Safe Action
 
-Run final diff/scope review, guarded commit, safe-push, and continue to `P17.x-closeout-review`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P18-import-export-migration-safety-planning`.

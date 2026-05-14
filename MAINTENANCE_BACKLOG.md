@@ -139,6 +139,7 @@
 | P17.3-v8-diagnostic-cli-shape-gate | v8 / diagnostics / CLI-gate | A1/A2 | done | Lock v8-diagnose CLI JSON/text/error shell with synthetic fixture gate | targeted CLI gate; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 | P17.4-v8-query-family-fixture-tests | v8 / diagnostics / query-family-fixtures | A1/A2 | done | Expand synthetic diagnostic query families across technical, governance, quality, semantic, and safety categories | targeted query-family tests; `npm test`; diff/docs validation | No runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 | P17.5-v8-evidence-gate-summary | v8 / diagnostics / evidence-summary | A1 | done | Summarize P17 diagnostic evidence and decide closeout readiness | `git diff --check`; docs validation | Evidence summary only; no runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
+| P17.x-closeout-review | v8 / diagnostics / closeout | A1 | done | Close P17 as fixture-backed diagnostic evidence and identify P18 planning route | `git diff --check`; docs validation | Closeout only; no runtime tuning, provider call, real memory preview, MCP expansion, migration, or V8 implementation |
 
 ## 推荐执行顺序
 
@@ -216,8 +217,9 @@
 72. `P17.3`：已新增 synthetic V8 diagnostic CLI shape gate，覆盖 `--json` output、text labels、missing-query error shell、forbidden unsafe/fake quality fields；targeted CLI gate `5/5`、full suite `439/439` 已通过。
 73. `P17.4`：已新增 synthetic V8 query-family fixture tests，覆盖 technical、governance、quality、semantic、safety categories，验证 normalized query、TagMemo mode、geodesic flags、core tags、terrain axes、residual pyramid、meta-thinking shape 与 forbidden fake/unsafe fields；targeted `4/4`、full suite `443/443` 已通过。
 74. `P17.5`：V8 evidence gate summary 已新增 [docs/P17_V8_EVIDENCE_GATE_SUMMARY.md](/A:/codex-memory/docs/P17_V8_EVIDENCE_GATE_SUMMARY.md)，结论为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`；足以进入 P17.x closeout，不足以授权 runtime implementation、provider benchmark、real memory preview、MCP expansion 或 migration/import-export apply。
-75. 下一步建议完成 P17.5 docs validation、guarded commit / safe-push 后进入 `P17.x-closeout-review`；不得直接进入 V8 implementation、runtime tuning、provider benchmark、UI、migration/import-export apply 或 release candidate。
-76. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+75. `P17.x`：advanced memory intelligence / V8 closeout review 已新增 [docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md)，结论为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED_AND_CLOSED`；P18 只能从 planning / dry-run safety 开始。
+76. 下一步建议完成 P17.x docs validation、guarded commit / safe-push 后进入 `P18-import-export-migration-safety-planning`；不得直接进入 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、release candidate。
+77. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

@@ -171,8 +171,16 @@
 
 - 入口：[docs/P17_V8_EVIDENCE_GATE_SUMMARY.md](/A:/codex-memory/docs/P17_V8_EVIDENCE_GATE_SUMMARY.md)
 - 目标：汇总 P17 planning / inventory / report shape / CLI gate / query-family evidence。
-- 当前状态：P17.5 summary 已完成本地草案，结论为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`，等待 docs validation、guarded commit / safe-push。
-- 下一步建议：完成 `git diff --check` 和 docs validation；若通过则 guarded commit / safe-push，并进入 `P17.x-closeout-review`。
+- 当前状态：P17.5 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `087d1943e8805a30c47ff57e1b093a1ed0a3c08c`。
+- 下一步建议：继续 `P17.x-closeout-review`。
+- 边界：docs/status/board only；不改 `src/`、不新增 tests、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
+
+当前 P17.x closeout review：
+
+- 入口：[docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md)
+- 目标：关闭 P17 advanced memory intelligence / V8 evidence gate，记录 evidence、boundary、known gaps 和 P18 入口。
+- 当前状态：P17.x closeout 草案已完成，结果为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED_AND_CLOSED`，等待 docs validation、guarded commit / safe-push。
+- 下一步建议：完成 `git diff --check` 和 docs validation；若通过则 guarded commit / safe-push，并进入 `P18-import-export-migration-safety-planning`。
 - 边界：docs/status/board only；不改 `src/`、不新增 tests、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
 
 ## 当前判断
