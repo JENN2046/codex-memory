@@ -168,6 +168,7 @@ Current P12.5 conclusion:
 
 - `validate_memory` has a narrow internal service implementation only.
 - The runtime fixture/test gate is [validate-memory-runtime-v1.json](/A:/codex-memory/tests/fixtures/validate-memory-runtime-v1.json) and [validate-memory-runtime-fixture.test.js](/A:/codex-memory/tests/validate-memory-runtime-fixture.test.js).
+- The implementation and rollback story are recorded in [P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md).
 - Runtime mutation is limited to internal `ValidateMemoryService` and the approved `proposal/stale -> active` transition.
 - Public MCP tools remain frozen unless a dedicated approved phase explicitly authorizes expansion.
 - A4.8 must stop before public MCP tool expansion, SQLite migration, dependency changes, or broader mutation tools.

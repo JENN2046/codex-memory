@@ -2,18 +2,18 @@
 
 ## Goal
 
-Continue `P12.5-validate-memory-internal-runtime-implementation` in `A:\codex-memory`.
+Continue `P12.5-validate-memory-runtime-implementation-plan` in `A:\codex-memory`.
 
 ## Workspace
 
 - Workspace: A:\codex-memory
 - Branch: `main`
-- Base: `origin/main` / `cd6b1c4`
+- Base: `origin/main` / `29c7ad8`
 - Remote policy: A4.8 safe-push is allowed only after readiness is ready
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory-internal-runtime
+P12-controlled-write-tools / validate-memory-runtime-plan
 
 ## Completed Before This Batch
 
@@ -25,21 +25,17 @@ P12-controlled-write-tools / validate-memory-internal-runtime
 - A4.8 Safe Project Operator Rail landed.
 - P12.5 runtime mutation approval gate landed.
 - P12.5 validate_memory runtime fixture tests landed.
+- P12.5 internal validate_memory runtime service landed.
 
 ## Completed In Current Batch
 
-- Added internal `ValidateMemoryService`.
-- Added targeted runtime tests for dry-run, apply, forbidden transitions, ToolArgumentValidator, SecretScanner, scope policy, lifecycle policy, missing status column, and MCP tools frozen.
-- Ran the full required validation chain.
-- Updated P12.5 docs, backlog, status, and board state.
+- Added docs/tests-design implementation plan and rollback story.
+- Linked it from P12.5 controlled-write and approval-gate docs.
+- Updated P12.5 backlog, status, and board state.
 
 ## Changed Files
 
-- `src/core/ValidateMemoryService.js`
-- `src/core/ToolArgumentValidator.js`
-- `src/storage/SqliteShadowStore.js`
-- `src/app.js`
-- `tests/validate-memory-runtime.test.js`
+- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
 - `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -48,12 +44,6 @@ P12-controlled-write-tools / validate-memory-internal-runtime
 
 ## Validation
 
-- `node --test tests\validate-memory-runtime.test.js` passed `9/9`.
-- `node --test tests\validate-memory-runtime-fixture.test.js` passed `11/11`.
-- `npm test` passed `300/300`.
-- `npm run gate:ci` passed.
-- `npm run gate:mainline:strict` passed.
-- `npm run lifecycle:sqlite:dry-run -- --json` passed with `mutated=false`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -65,14 +55,14 @@ P12-controlled-write-tools / validate-memory-internal-runtime
 
 ## Audit / Recall Impact
 
-- Internal `validate_memory` writes a `memory_validate` audit event only when confirmed mutation succeeds.
-- Dry-run returns an audit preview and does not write audit.
-- Audit event does not include raw `workspace_id`.
+- Current doc records the audit event contract and rollback story.
+- No audit/runtime/recall code changed in this docs/tests-design batch.
 - Recall path is unchanged.
 
 ## Not Done
 
 - No public MCP `validate_memory`.
+- No `src/` changes.
 - No `package.json` or lockfile changes.
 - No SQLite migration or automatic `ALTER TABLE`.
 - No hard delete.

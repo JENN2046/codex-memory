@@ -30,6 +30,7 @@ Current internal runtime implementation:
 
 - Service: [ValidateMemoryService.js](/A:/codex-memory/src/core/ValidateMemoryService.js)
 - Targeted test: [validate-memory-runtime.test.js](/A:/codex-memory/tests/validate-memory-runtime.test.js)
+- Implementation plan and rollback story: [P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md)
 
 This is an internal service implementation only. It does not add a public MCP tool, does not change MCP schema, does not add a package script, and does not run SQLite migration. The public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 

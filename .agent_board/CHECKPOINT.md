@@ -2,34 +2,27 @@
 
 ## Current Goal
 
-P12.5-validate-memory-internal-runtime-implementation: implement narrow internal `validate_memory` runtime service after explicit approval.
+P12.5-validate-memory-runtime-implementation-plan: record ValidateMemoryService, SqliteShadowStore, app wiring, audit, test matrix, and rollback story as docs/tests-design.
 
 ## Current Area
 
-P12-controlled-write-tools / validate-memory-internal-runtime
+P12-controlled-write-tools / validate-memory-runtime-plan
 
 ## Current Status
 
-`validate_memory` fixture tests have landed on `origin/main` at `cd6b1c4`.
+The internal `validate_memory` runtime service has landed on `origin/main` at `29c7ad8`.
 
-Current implementation is internal-only and validated. It adds `ValidateMemoryService`, a narrow SQLite shadow-store lifecycle status update helper, and targeted runtime tests. It does not add MCP public tools, does not change MCP schema, does not add dependencies, and does not run SQLite migration.
+Current docs/tests-design work records the implementation plan and rollback story before any further runtime, public MCP, or migration work. It does not modify `src/`, tests, package files, MCP schema, or SQLite schema.
 
 ## Completed Work In This Batch
 
-- Added internal `ValidateMemoryService`.
-- Reused `ToolArgumentValidator` for internal schema validation.
-- Reused `SecretScanner` for reason/evidence scanning.
-- Added narrow SQLite lifecycle status update helper without schema migration.
-- Added targeted runtime tests.
-- Updated P12.5 docs/status/backlog/board pointers.
+- Added P12.5 implementation plan and rollback story doc.
+- Linked the plan from controlled-write and approval-gate docs.
+- Updated P12.5 status/backlog/board pointers.
 
 ## Changed Files
 
-- `src/core/ValidateMemoryService.js`
-- `src/core/ToolArgumentValidator.js`
-- `src/storage/SqliteShadowStore.js`
-- `src/app.js`
-- `tests/validate-memory-runtime.test.js`
+- `docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md`
 - `docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md`
 - `docs/CONTROLLED_WRITE_TOOLS_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -42,29 +35,24 @@ Current implementation is internal-only and validated. It adds `ValidateMemorySe
 
 ## Validation Run
 
-- `node --test tests\validate-memory-runtime.test.js`：passed `9/9`
-- `node --test tests\validate-memory-runtime-fixture.test.js`：passed `11/11`
-- `npm test`：passed `300/300`
-- `npm run gate:ci`：PASS
-- `npm run gate:mainline:strict`：PASS
-- `npm run lifecycle:sqlite:dry-run -- --json`：passed with `mutated=false`
 - `git diff --check`：passed
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：passed
 
 ## Validation Not Run
 
+- No runtime tests required for this docs/tests-design batch unless docs validation exposes drift.
 - No provider smoke / benchmark.
 - No `rebuild-profile --confirm`.
 - No SQLite migration or real data migration.
 
 ## Current Blockers
 
-- None for the approved internal runtime scope.
+- None for the docs/tests-design scope.
 - Public MCP tool expansion remains blocked until explicit proposal approval.
 
 ## Remaining Risks
 
-- This is an internal service only; no MCP public access exists.
+- Current implementation remains internal-only; no MCP public access exists.
 - Any public MCP `validate_memory` tool requires a separate proposal/review phase.
 - SQLite lifecycle status columns must already exist; this phase does not migrate schemas.
 

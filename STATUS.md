@@ -20,6 +20,7 @@
 - P12.5 first runtime mutation tool planning/approval gate 已完成：新增 approval gate 入口 [docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)，明确 `validate_memory` 仍只是首个候选；runtime mutation、MCP public tool expansion、MCP schema change、SQLite migration 和真实 DB/memory write 均保持 A5 hard stop，直到显式批准。
 - P12.5 validate_memory runtime fixture tests 已完成：新增 `tests/fixtures/validate-memory-runtime-v1.json` 与 `tests/validate-memory-runtime-fixture.test.js`，锁定 `validate_memory` runtime 前置 schema、`proposal/stale -> active` 允许流转、`rejected/tombstoned/superseded -> active` 禁止流转、audit required fields、dry-run-first、redaction、scope/lifecycle policy、SecretScanner / ToolArgumentValidator boundary；不实现 runtime mutation。
 - P12.5 narrow validate_memory internal runtime implementation 已完成本地验证：新增 internal `ValidateMemoryService`，只允许 `proposal/stale -> active`，默认 dry-run，实际 mutation 需 `dry_run=false` + `confirm=true`，写 `memory_validate` audit event，并经过 SecretScanner、ToolArgumentValidator、scope policy、lifecycle policy；不新增 public MCP tool，不改 MCP schema，不做 SQLite migration。
+- P12.5 validate_memory runtime implementation plan 已完成：新增 [docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md)，记录 `ValidateMemoryService`、`SqliteShadowStore`、`app.js` wiring、audit 写入、测试矩阵和 rollback story；本阶段 docs/tests-design only，不改 `src/`。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -110,6 +111,7 @@
 - P12.5 approval gate 已开始：新增 [docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)，只定义显式批准包、候选范围、运行时前置条件和验证门槛；不实现 runtime mutation。
 - P12.5 validate_memory runtime fixture tests 已完成：新增 fixture/test 锁住 runtime 批准前契约；targeted `11/11`、full suite `291/291` 通过；不改 `src/`，不新增 MCP tools，不写真实 DB/memory。
 - P12.5 validate_memory internal runtime implementation 已完成本地验证：新增 targeted runtime test，覆盖 dry-run default、proposal/stale apply、rejected/tombstoned/superseded 禁止、reason/evidence、ToolArgumentValidator、SecretScanner、cross-client private 禁止、missing lifecycle column fail-safe、public MCP tools frozen；targeted `9/9`、fixture `11/11`、full suite `300/300`、`gate:ci`、`gate:mainline:strict`、lifecycle SQLite dry-run、diff/docs validation 均通过。
+- P12.5 validate_memory runtime implementation plan 已完成：补齐 docs/tests-design 计划文档，明确 component plan、audit fields、targeted/runtime gates、rollback story，以及 public MCP / SQLite migration / broader mutation tool 的后续审批边界。
 - `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
 - `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
 - `Phase C` 的 `DeepMemo` 高级查询语法继续收口：
