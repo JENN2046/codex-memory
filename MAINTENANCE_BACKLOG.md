@@ -103,7 +103,8 @@
 | P12.6-validate-memory-internal-cli-wrapper | memory-governance | A2 | done | Add a local internal CLI wrapper for manual dry-run and explicitly confirmed `validate_memory` apply through `ValidateMemoryService` | CLI `12/12`; runtime `9/9`; fixture `11/11`; MCP contract `7/7`; full suite `312/312`; `gate:ci` PASS; strict gate PASS; lifecycle dry-run `mutated=false`; diff/docs validation | Internal CLI only; no MCP public tool expansion, no MCP schema change, no SQLite migration, no broader mutation tools |
 | P13-VCP-compatible-memory-object-model-planning | memory-governance / object-model | A2/A3 | done | Plan VCP-compatible practical object model before fixtures, mapping, import/export, or migration work | `git diff --check`; docs validation | Planning only; validate_memory remains internal-only; no `src/`, tests, package, MCP schema/tool, SQLite migration, or durable memory write |
 | P13.1-object-model-fixture-schemas | memory-governance / object-model | A1/A2 | done | Add fixture schemas and tests for MemoryRecord vNext and object families | `node --test tests\vcp-memory-object-model-fixture.test.js`; `npm test`; diff/docs validation | Fixture/schema only; no runtime or migration |
-| P13.2-object-model-round-trip-fixture-tests | memory-governance / object-model | A1/A2 | todo | Add fixture-only round-trip tests for object envelopes | future round-trip fixture tests; `npm test`; diff/docs validation | Next recommended phase; no runtime, import/export implementation, or migration |
+| P13.2-object-model-round-trip-fixture-tests | memory-governance / object-model | A1/A2 | done | Add fixture-only round-trip tests for object envelopes | `node --test tests\vcp-memory-object-round-trip.test.js`; `node --test tests\vcp-memory-object-model-fixture.test.js`; `npm test`; diff/docs validation | Fixture/test/docs only; no runtime, import/export implementation, or migration |
+| P13.3-SQLite-diary-mapping-dry-run-planning | memory-governance / object-model | A1/A2 | todo | Plan SQLite/diary mapping dry-run report before any mapper or migration | docs validation; no runtime writes | Next recommended phase; no SQLite migration, `ALTER TABLE`, import/export runtime, or real DB/memory write |
 
 ## 推荐执行顺序
 
@@ -145,7 +146,8 @@
 36. 决策：保持 `validate_memory` internal-only，不进入 public `validate_memory` MCP proposal review。
 37. `P13`：VCP-compatible memory object model planning 已完成本地验证，入口为 [docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md)。
 38. `P13.1`：object model fixture schemas 已新增 `tests/fixtures/vcp-memory-object-model-v1.json` 与 `tests/vcp-memory-object-model-fixture.test.js`，锁住对象族、`MemoryRecord` vNext 字段、privacy/lifecycle/audit/import-export/backward-compatibility 边界。
-39. 下一步建议：P13.2 object model round-trip fixture tests。
+39. `P13.2`：object model round-trip fixture tests 已新增 `tests/fixtures/vcp-memory-object-round-trip-v1.json` 与 `tests/vcp-memory-object-round-trip.test.js`，证明 source fixture -> normalized object -> export-safe JSON -> reloaded object 不丢失 identity/scope/lifecycle/audit/provenance/privacy/import-export boundaries。
+40. 下一步建议：P13.3 SQLite/diary mapping dry-run planning。
 40. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界

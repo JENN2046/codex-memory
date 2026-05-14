@@ -26,6 +26,7 @@
 - 当前决策：保持 `validate_memory` internal-only，不进入 public `validate_memory` MCP proposal review；public MCP tools 仍为 `record_memory` / `search_memory` / `memory_overview`。
 - P13 VCP-compatible memory object model planning 已完成本地验证：新增计划入口 [docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md)，规划 `MemoryRecord` vNext、chunk、tag、scope/context、checkpoint/handoff、audit、tombstone、proposal、migration 对象族；本阶段只做 planning，不改 runtime，不改 tests，不迁移数据。
 - P13.1 object model fixture schemas 已完成本地验证：新增 `tests/fixtures/vcp-memory-object-model-v1.json` 与 `tests/vcp-memory-object-model-fixture.test.js`，锁住对象族、`MemoryRecord` vNext required fields、privacy/lifecycle/audit boundaries、import/export safety、backward compatibility、raw secret 禁止和 raw `workspace_id` low-risk summary 禁止；不改 runtime，不新增 MCP tools，不做 migration。
+- P13.2 object model round-trip fixture tests 已完成本地验证：新增 `tests/fixtures/vcp-memory-object-round-trip-v1.json` 与 `tests/vcp-memory-object-round-trip.test.js`，证明 source fixture -> normalized object -> export-safe JSON -> reloaded object 不丢失 identity、scope、lifecycle、audit refs、provenance、privacy/import-export boundaries；测试纯函数只存在测试文件内，不改 runtime，不实现 import/export CLI，不做 SQLite migration。
 - Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
 - Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
 - `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
@@ -88,6 +89,7 @@
 - P12.6 validate_memory internal CLI wrapper：新增本地 `npm run validate-memory` 入口，覆盖默认 dry-run、confirmed apply、forbidden lifecycle、secret evidence、missing lifecycle column、unknown tool/mode、raw `workspace_id` 拒绝和 MCP public tools frozen 回归；当前仍是 internal-only，不开放 MCP。
 - P13 VCP-compatible memory object model planning：新增对象模型计划文档，明确 P13 只做 docs/tests-design planning，`validate_memory` 保持 internal-only，不新增 MCP tools，不做 migration。
 - P13.1 object model fixture schemas：新增对象模型 fixture 与测试，覆盖 13 个对象族、`MemoryRecord` vNext required fields、schema version、privacy/audit/lifecycle boundaries、inactive proposal、默认不可见 tombstone、raw secret 禁止和 low-risk raw `workspace_id` 禁止。
+- P13.2 object model round-trip fixture tests：新增 fixture-only round-trip fixture/test，覆盖 `MemoryRecord`、`MemoChunk`、`KnowledgeChunk`、`Tag`、`AuditEvent`、`MemoryProposal`、`Tombstone`、`Checkpoint`、`Handoff`，并锁住 identity/scope/lifecycle/supersession/audit/tag/chunk refs、source/provenance、inactive proposal、hidden tombstone、secret redaction、low-risk summary 不暴露 raw `workspace_id`、missing vNext null/unknown fallback、JSON stringify/parse 稳定性和 no-side-effect。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
 - `gate:ci` 现在包含 `queries` fixture-only check，JSON 输出会暴露 `caseCount/assertedCount/passedCount/failedCount`。
@@ -276,6 +278,11 @@
 
 ## 当前已验证
 
+- `node --test tests\vcp-memory-object-round-trip.test.js`：`18/18` 通过
+- `node --test tests\vcp-memory-object-model-fixture.test.js`：`13/13` 通过
+- `npm test`：`343/343` 通过
+- `git diff --check`：通过
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：通过
 - `node --test tests/dashboard-cli.test.js`：`4/4` 通过
 - `npm run gate:mainline:strict`：`status: ok`（`health`、`contract`、`test`、`compare`、`rollback` 全绿）
 - `node --test .\tests\phase-c-active-recall.test.js`：`16/16` 通过

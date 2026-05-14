@@ -1,0 +1,349 @@
+{
+  "schemaVersion": "vcp-memory-object-round-trip-v1",
+  "version": "v1",
+  "phase": "P13.2-object-model-round-trip-fixture-tests",
+  "fixtureOnly": true,
+  "runtimeMutationImplemented": false,
+  "importExportRuntimeImplemented": false,
+  "sqliteMigrationImplemented": false,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "policy": {
+    "validateMemoryInternalOnly": true,
+    "rawSecretOutputAllowed": false,
+    "lowRiskSummaryAllowsRawWorkspaceId": false,
+    "missingVNextFields": "safe-null-or-unknown",
+    "silentInferenceAllowed": false,
+    "migrationDryRunFirst": true,
+    "mutated": false,
+    "runtimeMapperImplemented": false
+  },
+  "sourceFixture": {
+    "fixture_id": "p13-round-trip-source-fixture",
+    "source": {
+      "source_type": "fixture",
+      "source_id": "src-p13-round-trip-001",
+      "source_path": "tests/fixtures/vcp-memory-object-round-trip-v1.json"
+    },
+    "provenance": {
+      "producer": "codex-memory-tests",
+      "captured_at": "2026-05-14T00:00:00.000Z",
+      "input_contract": "P13-object-model-v1",
+      "evidence_refs": [
+        "audit-p13-rt-001"
+      ],
+      "redaction_applied": true
+    },
+    "envelopes": [
+      {
+        "object_name": "MemoryRecord",
+        "schema_version": "v1",
+        "kind": "memory_record",
+        "data": {
+          "memory_id": "mem-p13-rt-001",
+          "schema_version": "v1",
+          "kind": "memory",
+          "title": "P13 round-trip object-model boundary",
+          "content_ref": "fixture://p13-round-trip/memory/mem-p13-rt-001",
+          "content_hash": "sha256:p13-round-trip-memory",
+          "source": {
+            "source_type": "fixture",
+            "source_id": "src-p13-round-trip-001",
+            "source_path": "tests/fixtures/vcp-memory-object-round-trip-v1.json"
+          },
+          "provenance": {
+            "producer": "codex-memory-tests",
+            "input_contract": "P13-object-model-v1",
+            "evidence_refs": [
+              "audit-p13-rt-001"
+            ],
+            "redaction_applied": true
+          },
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "updated_at": "2026-05-14T00:00:00.000Z",
+          "project_id": "JENN2046/codex-memory",
+          "workspace_id": "workspace-p13-round-trip-raw",
+          "client_id": "codex",
+          "agent_id": "codex-agent-p13",
+          "task_id": "P13.2-object-model-round-trip-fixture-tests",
+          "visibility": "project",
+          "lifecycle_status": "superseded",
+          "supersedes_memory_id": "mem-p13-rt-000",
+          "superseded_by_memory_id": "mem-p13-rt-002",
+          "retention_policy": "project-default",
+          "audit_refs": [
+            "audit-p13-rt-001"
+          ],
+          "tag_refs": [
+            "tag-p13-object-model"
+          ],
+          "chunk_refs": [
+            "memo-chunk-p13-rt-001",
+            "knowledge-chunk-p13-rt-001"
+          ]
+        }
+      },
+      {
+        "object_name": "MemoChunk",
+        "schema_version": "v1",
+        "kind": "memo_chunk",
+        "data": {
+          "chunk_id": "memo-chunk-p13-rt-001",
+          "memory_id": "mem-p13-rt-001",
+          "content_hash": "sha256:p13-round-trip-memo-chunk",
+          "text_ref": "fixture://p13-round-trip/memory/mem-p13-rt-001#0-96",
+          "offset_start": 0,
+          "offset_end": 96,
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "embedding_ref": "embedding://fixture/p13/memo-chunk-p13-rt-001",
+          "scope_ref": "scope-p13-rt-001",
+          "lifecycle_status": "active",
+          "source": {
+            "source_type": "fixture",
+            "source_id": "src-p13-round-trip-001"
+          },
+          "provenance": {
+            "parent_memory_id": "mem-p13-rt-001",
+            "chunker": "fixture-only"
+          },
+          "audit_refs": [
+            "audit-p13-rt-001"
+          ]
+        }
+      },
+      {
+        "object_name": "KnowledgeChunk",
+        "schema_version": "v1",
+        "kind": "knowledge_chunk",
+        "data": {
+          "chunk_id": "knowledge-chunk-p13-rt-001",
+          "knowledge_source_id": "knowledge-source-p13-rt-001",
+          "memory_id": "mem-p13-rt-001",
+          "path_ref": "fixture://knowledge/p13/object-model-plan.md",
+          "content_hash": "sha256:p13-round-trip-knowledge-chunk",
+          "section_ref": "section://p13/object-model/round-trip",
+          "embedding_ref": "embedding://fixture/p13/knowledge-chunk-p13-rt-001",
+          "tags": [
+            "object-model",
+            "round-trip"
+          ],
+          "scope_ref": "scope-p13-rt-001",
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "updated_at": "2026-05-14T00:00:00.000Z",
+          "source": {
+            "source_type": "fixture",
+            "source_id": "src-p13-round-trip-001"
+          },
+          "provenance": {
+            "origin": "docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md",
+            "redaction_applied": true
+          },
+          "audit_refs": [
+            "audit-p13-rt-001"
+          ],
+          "lifecycle_status": "active"
+        }
+      },
+      {
+        "object_name": "Tag",
+        "schema_version": "v1",
+        "kind": "tag",
+        "data": {
+          "tag_id": "tag-p13-object-model",
+          "name": "Object Model",
+          "normalized_name": "object-model",
+          "source": {
+            "source_type": "fixture",
+            "source_id": "src-p13-round-trip-001"
+          },
+          "confidence": 1,
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "memory_refs": [
+            "mem-p13-rt-001"
+          ],
+          "chunk_refs": [
+            "memo-chunk-p13-rt-001",
+            "knowledge-chunk-p13-rt-001"
+          ],
+          "provenance": {
+            "generator": "fixture-only"
+          },
+          "audit_refs": [
+            "audit-p13-rt-001"
+          ]
+        }
+      },
+      {
+        "object_name": "AuditEvent",
+        "schema_version": "v1",
+        "kind": "audit_event",
+        "data": {
+          "event_id": "audit-p13-rt-001",
+          "memory_id": "mem-p13-rt-001",
+          "event_type": "fixture_round_trip",
+          "tool_name": "fixture-only",
+          "actor_client_id": "codex",
+          "request_source": "test-fixture",
+          "from_status": "active",
+          "to_status": "superseded",
+          "reason": "Prove object envelope round-trip preserves identity, scope, lifecycle, refs, and provenance.",
+          "evidence": "Redacted fixture evidence only: <REDACTED_SECRET>",
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "reversible": true,
+          "previous_snapshot_ref": "snapshot://fixture/p13/mem-p13-rt-000",
+          "diff_summary": {
+            "fields_preserved": [
+              "memory_id",
+              "scope",
+              "lifecycle_status",
+              "audit_refs",
+              "tag_refs",
+              "chunk_refs"
+            ],
+            "raw_secret_exposed": false,
+            "raw_workspace_id_in_low_risk_summary": false
+          },
+          "redaction_applied": true,
+          "lifecycle_policy_applied": true,
+          "scope_policy_applied": true,
+          "provenance": {
+            "audit_chain_ref": "audit-chain://fixture/p13/round-trip"
+          },
+          "audit_chain_ref": "audit-chain://fixture/p13/round-trip"
+        }
+      },
+      {
+        "object_name": "MemoryProposal",
+        "schema_version": "v1",
+        "kind": "memory_proposal",
+        "data": {
+          "proposal_id": "proposal-p13-rt-001",
+          "memory_id": "mem-p13-rt-001",
+          "proposal_type": "activate_memory_record",
+          "proposed_by_client_id": "codex",
+          "source": {
+            "source_type": "fixture",
+            "source_id": "src-p13-round-trip-001"
+          },
+          "reason": "Round-trip fixture proposal must remain inactive until explicit review.",
+          "evidence": "Fixture-only proposal evidence.",
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "status": "proposal",
+          "active_by_default": false,
+          "scope_ref": "scope-p13-rt-001",
+          "audit_refs": [
+            "audit-p13-rt-001"
+          ],
+          "provenance": {
+            "review_required": true
+          }
+        }
+      },
+      {
+        "object_name": "Tombstone",
+        "schema_version": "v1",
+        "kind": "tombstone",
+        "data": {
+          "tombstone_id": "tombstone-p13-rt-001",
+          "memory_id": "mem-p13-rt-003",
+          "reason": "Fixture tombstone must remain hidden from ordinary recall by default.",
+          "actor_client_id": "codex",
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "previous_snapshot_ref": "snapshot://fixture/p13/mem-p13-rt-003",
+          "audit_event_id": "audit-p13-rt-001",
+          "retention_policy": "tombstone-retain-audit",
+          "source": {
+            "source_type": "fixture",
+            "source_id": "src-p13-round-trip-001"
+          },
+          "visible_by_default": false,
+          "hard_delete_allowed": false,
+          "provenance": {
+            "hidden_boundary": "ordinary-recall"
+          }
+        }
+      },
+      {
+        "object_name": "Checkpoint",
+        "schema_version": "v1",
+        "kind": "checkpoint",
+        "data": {
+          "checkpoint_id": "checkpoint-p13-rt-001",
+          "memory_id": "mem-p13-rt-001",
+          "task_id": "P13.2-object-model-round-trip-fixture-tests",
+          "project_id": "JENN2046/codex-memory",
+          "summary_ref": "fixture://p13-round-trip/checkpoint/summary",
+          "evidence_refs": [
+            "audit-p13-rt-001"
+          ],
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "actor_client_id": "codex",
+          "audit_refs": [
+            "audit-p13-rt-001"
+          ],
+          "source": {
+            "source_type": "fixture",
+            "source_id": "src-p13-round-trip-001"
+          },
+          "provenance": {
+            "checkpoint_type": "test-fixture"
+          },
+          "scope_ref": "scope-p13-rt-001"
+        }
+      },
+      {
+        "object_name": "Handoff",
+        "schema_version": "v1",
+        "kind": "handoff",
+        "data": {
+          "handoff_id": "handoff-p13-rt-001",
+          "memory_id": "mem-p13-rt-001",
+          "task_id": "P13.2-object-model-round-trip-fixture-tests",
+          "from_client_id": "codex",
+          "to_client_id": "claude",
+          "summary_ref": "fixture://p13-round-trip/handoff/summary",
+          "evidence_refs": [
+            "audit-p13-rt-001"
+          ],
+          "created_at": "2026-05-14T00:00:00.000Z",
+          "audit_refs": [
+            "audit-p13-rt-001"
+          ],
+          "source": {
+            "source_type": "fixture",
+            "source_id": "src-p13-round-trip-001"
+          },
+          "provenance": {
+            "handoff_type": "test-fixture"
+          },
+          "scope_ref": "scope-p13-rt-001"
+        }
+      }
+    ],
+    "legacyOptionalMissingCase": {
+      "object_name": "MemoryRecord",
+      "schema_version": "v1",
+      "kind": "memory_record",
+      "data": {
+        "memory_id": "legacy-mem-p13-rt-001",
+        "title": "Legacy record with missing vNext optional fields",
+        "content_ref": "fixture://legacy/memory/legacy-mem-p13-rt-001",
+        "created_at": "2026-05-14T00:00:00.000Z",
+        "updated_at": "2026-05-14T00:00:00.000Z",
+        "client_id": "codex"
+      }
+    }
+  },
+  "sideEffectSentinel": {
+    "mutated": false,
+    "databaseWrite": false,
+    "diaryWrite": false,
+    "vectorWrite": false,
+    "auditLogWrite": false,
+    "durableMemoryWrite": false,
+    "runtimeMapperUsed": false
+  }
+}

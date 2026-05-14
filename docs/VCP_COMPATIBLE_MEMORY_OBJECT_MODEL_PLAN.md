@@ -415,6 +415,40 @@ This remains a schema fixture phase only:
 - no diary, vector, audit-log, or durable memory write
 - `validate_memory` remains internal-only
 
+## P13.2 Round-Trip Fixture Tests
+
+P13.2 locks the first fixture-only object envelope round-trip:
+
+- fixture: `tests/fixtures/vcp-memory-object-round-trip-v1.json`
+- test: `tests/vcp-memory-object-round-trip.test.js`
+
+The test-local helpers are intentionally limited to the test file:
+
+- `normalizeObjectEnvelope()`
+- `exportSafeJson()`
+- `reloadExportedObject()`
+
+The round-trip proves:
+
+- source fixture -> normalized object -> export-safe JSON -> reloaded object works without runtime code
+- identity, `schema_version`, `kind`, source/provenance, scope, lifecycle, supersession, audit refs, tag refs, and chunk refs survive JSON round-trip
+- `MemoryProposal` remains inactive by default
+- `Tombstone` remains hidden by default
+- `AuditEvent` does not expose raw secrets
+- low-risk export summary does not expose raw `workspace_id`
+- missing optional vNext fields normalize to `null` or `unknown`, not inferred values
+- exported JSON remains stable under `JSON.stringify` / `JSON.parse`
+- no mutation or side effect happens
+
+This remains a fixture/test phase only:
+
+- no runtime mapper
+- no import/export CLI
+- no MCP public tool expansion
+- no MCP schema change
+- no SQLite migration or `ALTER TABLE`
+- no diary, vector, audit-log, DB, or durable memory write
+
 ## Risk Register
 
 | Risk | Why It Matters | P13 Mitigation |
@@ -426,7 +460,7 @@ This remains a schema fixture phase only:
 | Scope leakage | Raw workspace/client/project fields can leak in summaries | No raw `workspace_id` in low-risk summaries; scope-aware mapping |
 | Lifecycle mismatch | Legacy `status` and vNext lifecycle may diverge | Map existing `status` to `lifecycle_status`; unknown/null fallback |
 | Audit mismatch | Mutation and lifecycle history could be incomplete or overclaimed | Audit refs are derived only when evidence exists |
-| Import/export data loss | Future JSON movement may drop scope, lifecycle, or audit evidence | Import/export shape is deferred to P13.4 fixture tests |
+| Import/export data loss | Future JSON movement may drop scope, lifecycle, or audit evidence | P13.2 locks fixture-only envelope round-trip; broader import/export shape remains deferred to P13.4 fixture tests |
 
 ## Validation Plan
 
@@ -444,7 +478,17 @@ Future validation should include:
 - `git diff --check`
 - docs validation
 
-Current P13 planning validation is docs-only:
+P13.2 validation:
+
+```powershell
+node --test tests\vcp-memory-object-round-trip.test.js
+node --test tests\vcp-memory-object-model-fixture.test.js
+npm test
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
+P13 planning validation was docs-only:
 
 ```powershell
 git diff --check
@@ -466,6 +510,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P13.2-object-model-round-trip-fixture-tests`
+`P13.3-SQLite-diary-mapping-dry-run-planning`
+
+P13.3 should stay planning/dry-run first: no real SQLite migration, no `ALTER TABLE`, no import/export runtime implementation, and no real DB/memory write.
 
 That phase should add fixture-only round-trip tests for object envelopes, still without runtime changes, SQLite migration, import/export implementation, or durable memory mutation.

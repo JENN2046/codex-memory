@@ -68,9 +68,9 @@
 - 入口：[docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md)
 - 决策：保持 `validate_memory` internal-only，不进入 public `validate_memory` MCP proposal review。
 - 目标：规划 VCP-compatible practical object model，包括 `MemoryRecord` vNext、chunk、tag、scope/context、checkpoint/handoff、audit、tombstone、proposal 和 migration 对象族。
-- 当前进度：P13 planning 已完成；P13.1 object model fixture schemas 已新增 `tests/fixtures/vcp-memory-object-model-v1.json` 与 `tests/vcp-memory-object-model-fixture.test.js`。
+- 当前进度：P13 planning 已完成；P13.1 object model fixture schemas 已新增 `tests/fixtures/vcp-memory-object-model-v1.json` 与 `tests/vcp-memory-object-model-fixture.test.js`；P13.2 object model round-trip fixture tests 已新增 `tests/fixtures/vcp-memory-object-round-trip-v1.json` 与 `tests/vcp-memory-object-round-trip.test.js`。
 - 边界：fixture/tests/docs only；不改 runtime，不改 `package.json`，不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不写真实 memory。
-- 下一步建议：P13.2 object model round-trip fixture tests。
+- 下一步建议：P13.3 SQLite/diary mapping dry-run planning。
 
 ## 当前判断
 
