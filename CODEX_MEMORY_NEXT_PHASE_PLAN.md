@@ -143,7 +143,18 @@
 - Test：`tests/v8-diagnostic-shape.test.js`
 - 目标：锁定 synthetic `v8-diagnose` report shape、安全 flags、forbidden fields 与 missing-query safe error shape。
 - 当前状态：P17.2 fixture/test/docs 已完成本地 validation：targeted fixture test `5/5`、full suite `434/434`、diff check、docs validation 均通过。
-- 下一步建议：完成 guarded commit / safe-push，并进入 `P17.3-v8-diagnostic-cli-shape-gate`。
+- 当前状态：P17.2 已完成 guarded commit、safe-push 和 post-push hash verification at `3b7fa68197abc1f75d7fed775da2b569e1ea0d47`。
+- 下一步建议：继续 `P17.3-v8-diagnostic-cli-shape-gate`。
+- 边界：tests/fixtures/docs/status/board only；不改 `src/`、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
+
+当前 P17.3 CLI shape gate：
+
+- 入口：[docs/P17_V8_DIAGNOSTIC_CLI_SHAPE_GATE.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_CLI_SHAPE_GATE.md)
+- Fixture：`tests/fixtures/v8-diagnostic-cli-gate-v1.json`
+- Test：`tests/v8-diagnostic-cli-shape-gate.test.js`
+- 目标：锁定 `v8-diagnose` CLI JSON/text/error shell，确认 forbidden unsafe/fake quality fields 不出现在 output 中。
+- 当前状态：P17.3 targeted CLI gate `5/5`、full suite `439/439` 已通过，等待 diff/docs validation、guarded commit / safe-push。
+- 下一步建议：完成 `git diff --check` 和 docs validation；若通过则 guarded commit / safe-push，并进入 `P17.4-v8-query-family-fixture-tests`。
 - 边界：tests/fixtures/docs/status/board only；不改 `src/`、不调 runtime ranking、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不实现 V8。
 
 ## 当前判断

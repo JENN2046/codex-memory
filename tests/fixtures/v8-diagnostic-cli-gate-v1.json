@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "v8-diagnostic-cli-gate-v1",
+  "phase": "P17.3-v8-diagnostic-cli-shape-gate",
+  "source": {
+    "kind": "fixture-only",
+    "synthetic": true,
+    "realMemoryPreview": false
+  },
+  "safety": {
+    "mutated": false,
+    "providerCalls": 0,
+    "durableMemoryTouched": false,
+    "realMemoryPreview": false,
+    "redactionApplied": true,
+    "runtimeTuning": false,
+    "publicMcpTools": [
+      "record_memory",
+      "search_memory",
+      "memory_overview"
+    ],
+    "validateMemoryPublicTool": false
+  },
+  "jsonCase": {
+    "id": "json-geodesic-tagmemo",
+    "query": "[[checkpoint vector schema migration]] ::TagMemo+1.5 ::Rerank+0.4 ::GeodesicRerank",
+    "embeddingProfileVersion": "p17-cli-json",
+    "expected": {
+      "mode": "v8-diagnose",
+      "destructive": false,
+      "fingerprint": "bge-m3-local__1024__p17-cli-json",
+      "normalized": "checkpoint vector schema migration",
+      "geodesicRequested": true,
+      "geodesicWillUse": true,
+      "tagMemoMode": "explicit"
+    }
+  },
+  "textCase": {
+    "id": "text-governance-policy",
+    "query": "governed memory lifecycle scope policy supersede audit",
+    "embeddingProfileVersion": "p17-cli-text",
+    "requiredLines": [
+      "codex-memory v8 diagnose",
+      "fingerprint: bge-m3-local__1024__p17-cli-text",
+      "query: governed memory lifecycle scope policy supersede audit",
+      "axes:",
+      "terrain activation:",
+      "residual levels:",
+      "core tags:",
+      "meta thinking:",
+      "geodesic:"
+    ]
+  },
+  "errorCase": {
+    "id": "missing-query",
+    "args": [
+      "--json"
+    ],
+    "expected": {
+      "code": 1,
+      "stderrIncludes": "v8-diagnose requires --query <text>",
+      "stdout": ""
+    }
+  },
+  "forbiddenOutputKeys": [
+    "hitRate",
+    "qualityScore",
+    "providerLatencyMs",
+    "providerApiKey",
+    "authorization",
+    "cookie",
+    "workspace_id",
+    "productionSnippet"
+  ]
+}

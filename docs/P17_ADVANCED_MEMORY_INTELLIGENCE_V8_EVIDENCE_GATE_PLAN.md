@@ -61,8 +61,8 @@ Observed local surfaces:
 1. `P17-advanced-memory-intelligence-v8-evidence-gate-planning`: this document and board/status alignment only.
 2. `P17.1-v8-diagnostic-surface-inventory`: inventory existing V8 / EPA / ResidualPyramid / geodesic / meta-thinking tests and output fields.
 3. `P17.2-v8-diagnostic-fixture-shape-tests`: add synthetic fixture shape tests for `v8-diagnose` and TagMemo analysis output without runtime tuning.
-4. `P17.3-v8-report-schema-gate`: lock JSON schema and forbidden fields for diagnostic reports.
-5. `P17.4-advanced-signal-query-quality-interaction`: summarize interaction with P15 fixture recall dry-run; no fake quality metrics.
+4. `P17.3-v8-diagnostic-cli-shape-gate`: lock CLI JSON/text/error shape and forbidden fields for diagnostic reports.
+5. `P17.4-v8-query-family-fixture-tests`: expand synthetic query-family fixtures across diagnostic categories.
 6. `P17.5-advanced-signal-standing-gate`: decide which diagnostic commands can become standing local gates.
 7. `P17.x-closeout-review`: confirm evidence, remaining gaps, and readiness for P18 planning only.
 

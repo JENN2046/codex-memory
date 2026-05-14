@@ -2,18 +2,18 @@
 
 ## Current Goal
 
-P17.2-v8-diagnostic-fixture-shape-tests: add synthetic fixture shape tests for the existing V8 diagnostic report surface.
+P17.3-v8-diagnostic-cli-shape-gate: lock the existing V8 diagnostic CLI JSON/text/error shell with synthetic fixtures.
 
 ## Current Area
 
-P17 V8 diagnostic fixture shape tests
+P17 V8 diagnostic CLI shape gate
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `c77e4734d5ca9023be252d1add5d2e1179e5c097`
+- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `3b7fa68197abc1f75d7fed775da2b569e1ea0d47`
 - P16.1 inventory and P16.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.3 targeted semantic fixtures have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.4 semantic ranking evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
@@ -21,24 +21,26 @@ Repository state:
 - P16.x closeout has been validated, committed, safe-pushed, and post-push hash-verified
 - P17 planning has been validated, committed, safe-pushed, and post-push hash-verified
 - P17.1 inventory has been validated, committed, safe-pushed, and post-push hash-verified
+- P17.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
-P17.2 fixture shape decisions:
+P17.3 CLI shape decisions:
 
-- P17.2 is tests/fixtures/docs/status/board only.
-- Synthetic tests may call `buildV8Diagnosis` with fixture queries to lock existing report shape.
-- Fixture shape covers `mode`, `destructive`, `embeddingProfile`, `query`, `terrain`, `residualPyramid`, `tagMemo`, `metaThinking`, `geodesic`, safety flags, forbidden fields, and missing-query safe error representation.
+- P17.3 is tests/fixtures/docs/status/board only.
+- Synthetic tests may run `src/cli/v8-diagnose.js` with temp env to lock CLI JSON/text/error shell.
+- CLI gate covers JSON output, text labels, missing-query failure, forbidden unsafe fields, and fake quality fields.
 - Runtime ranking behavior is not tuned in this phase.
 - Provider benchmark, real memory preview, MCP expansion, migration, and V8 implementation remain deferred.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
-- P17.2 validation passed locally.
+- P17.3 validation passed locally.
 
 ## Changed Files
 
-- `tests/fixtures/v8-diagnostic-shape-v1.json`
-- `tests/v8-diagnostic-shape.test.js`
-- `docs/P17_V8_DIAGNOSTIC_FIXTURE_SHAPE_TESTS.md`
+- `tests/fixtures/v8-diagnostic-cli-gate-v1.json`
+- `tests/v8-diagnostic-cli-shape-gate.test.js`
+- `docs/P17_V8_DIAGNOSTIC_CLI_SHAPE_GATE.md`
+- `docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -50,8 +52,8 @@ P17.2 fixture shape decisions:
 
 ## Validation
 
-- `node --test tests\v8-diagnostic-shape.test.js` (`5/5`)
-- `npm test` (`434/434`)
+- `node --test tests\v8-diagnostic-cli-shape-gate.test.js` (`5/5`)
+- `npm test` (`439/439`)
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 
@@ -61,4 +63,4 @@ P17.2 fixture shape decisions:
 
 ## Next Safe Action
 
-Run final diff/scope review, guarded commit, and safe-push readiness. If clean, safe-push P17.2 and continue to `P17.3-v8-diagnostic-cli-shape-gate`.
+Run final diff/scope review, guarded commit, safe-push, and continue to `P17.4-v8-query-family-fixture-tests`.
