@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P19.3 post-push state sync without changing runtime behavior.
+Run P19.4 operator troubleshooting notes without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P19.3 schema snapshot gate is pushed and hash-verified; post-push docs/board sync is local and validation has passed.
+P19.3 schema snapshot gate and post-push state sync are pushed and hash-verified; P19.4 operator notes are local and validation has passed.
 
 ## Current Area
 
-P19 admin review schema snapshot post-push state sync
+P19 operator troubleshooting notes
 
 ## Findings
 
@@ -88,12 +88,15 @@ P19 admin review schema snapshot post-push state sync
 - P19.3 targeted test passed `5/5`; full suite passed `464/464`; diff/docs validation passed.
 - P19.3 guarded commit and safe-push completed at `c5784fc082f08231eb326671ac510c52491f3f04`; local HEAD, local origin/main, and remote refs/heads/main matched that hash during post-push verification.
 - P19.3 post-push state sync updates STATUS / `.agent_board` from pending to pushed / verified.
-- P19.4 should focus on operator troubleshooting notes only after the state-sync commit / safe-push.
+- P19.3 post-push state sync was committed and pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`.
+- P19.4 operator troubleshooting notes are drafted to document review surfaces, review levels, common blocked/unavailable signals, and safe next actions.
+- P19.x should focus on closeout only after P19.4 commit / safe-push.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
+- `docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -103,7 +106,8 @@ P19 admin review schema snapshot post-push state sync
 
 - P19.3 prior validation: `node --test tests\admin-review-schema-snapshot-gate.test.js` -> `5/5`; `npm test` -> `464/464`; `git diff --check`; docs validation.
 - P19.3 post-push hash verification: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched `c5784fc082f08231eb326671ac510c52491f3f04`.
-- P19.3 state-sync validation: `git diff --check` passed; docs validation passed.
+- P19.3 state-sync validation: `git diff --check` passed; docs validation passed; committed and pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`.
+- P19.4 docs validation: `git diff --check` passed; docs validation passed.
 
 ## Not Done
 
@@ -121,4 +125,4 @@ P19 admin review schema snapshot post-push state sync
 
 ## Next Safe Step
 
-Run state-sync docs validation, guarded commit, safe-push if ready, and continue to `P19.4-operator-troubleshooting-notes`.
+Run P19.4 docs validation, guarded commit, safe-push if ready, and continue to `P19.x-observability-admin-review-surface-closeout`.

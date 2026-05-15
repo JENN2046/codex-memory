@@ -268,6 +268,14 @@
 - 下一步建议：进入 `P19.4-operator-troubleshooting-notes`。
 - 边界：fixture/test/docs/status/board only；不实现 UI、不改 `src/`、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile。
 
+当前 P19.4 operator troubleshooting notes：
+
+- 入口：[docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md](/A:/codex-memory/docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md)
+- 目标：整理 dashboard、`observe:http`、`governance:report`、`gate:ci`、`gate:mainline` 的 operator troubleshooting map、review levels、blocked/unavailable source handling 和 safe next actions。
+- 当前状态：P19.4 docs 已完成 diff/docs validation，等待 guarded commit 和 safe-push readiness。
+- 下一步建议：完成 P19.4 validation / guarded commit / safe-push 后进入 `P19.x-observability-admin-review-surface-closeout`。
+- 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：

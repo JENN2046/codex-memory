@@ -6,24 +6,24 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 docs/board only |
-| Current task | CM-0136 / P19.3-post-push-state-sync |
-| Current area | P19 admin review schema snapshot post-push state sync |
-| Last local commit | P19.3 admin review schema snapshot committed and safe-pushed at `c5784fc` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `c5784fc082f08231eb326671ac510c52491f3f04` |
+| Current task | CM-0137 / P19.4-operator-troubleshooting-notes |
+| Current area | P19 operator troubleshooting notes |
+| Last local commit | P19.3 post-push state sync committed and safe-pushed at `9c89da5` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Completed P19.3 post-push state sync after hash verification. |
-| Last validation | P19.3 post-push state sync passed `git diff --check` and docs validation. Prior P19.3 hash verification matched local HEAD, local origin/main, and remote refs/heads/main at `c5784fc082f08231eb326671ac510c52491f3f04`. |
-| Worktree summary | P19.3 post-push docs/board sync only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, or unapproved mutation. |
+| Last action | Completed P19.4 operator troubleshooting notes. |
+| Last validation | P19.4 docs validation passed: `git diff --check` and docs validation. P19.3 post-push state sync passed diff/docs validation and was pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`. |
+| Worktree summary | P19.4 docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
 | P16 status | Planning through P16.x completed and pushed. |
 | P17 status | Planning through P17.x completed and pushed. |
 | P18 status | Planning through P18.x completed and pushed. |
-| P19 status | Planning through P19.3 completed, pushed, hash-verified, and state-synced. |
+| P19 status | Planning through P19.3 completed, pushed, hash-verified, and state-synced; P19.4 operator notes completed and validated locally. |
 | Guarded auto-commit allowed | eligible after final scope review |
-| Safe-push readiness | pending guarded commit for P19.3 post-push state sync |
-| Next planned action | Final diff/scope review, guarded commit, safe-push if ready, then continue to P19.4 operator notes. |
+| Safe-push readiness | pending guarded commit for P19.4 |
+| Next planned action | Final diff/scope review, guarded commit, safe-push if ready, then continue to P19.x closeout. |
 
 ## Notes
 
@@ -56,4 +56,5 @@
 - Decision: P19.2 locks synthetic admin-review shape only; no runtime aggregation, UI, provider, real memory preview, MCP expansion, or migration/import-export apply.
 - Decision: P19.3 locks schema snapshots as synthetic fixture evidence only; no runtime aggregation, UI, provider, real memory preview, MCP expansion, or migration/import-export apply.
 - Decision: P19.3 post-push state sync is docs/board only and only records pushed / verified state at `c5784fc082f08231eb326671ac510c52491f3f04`.
+- Decision: P19.4 operator troubleshooting notes are docs-only; they do not authorize runtime aggregation, UI, provider calls, real memory preview, MCP expansion, or migration/import-export apply.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
