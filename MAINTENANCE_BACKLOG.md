@@ -303,8 +303,9 @@
 118. `P22.11 tag/release/deploy approval request`：已新增 [docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md)，将 tag、GitHub release、deploy 拆成三个独立 approval switches；默认均为 `NOT_APPROVED`，decision `BLOCKED_HARD_STOP`，未创建 tag/release/deploy。
 119. `P22.12 release publication boundary checklist`：已新增 [docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md](/A:/codex-memory/docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md)，确认 RC artifact exists does not equal released，且 tag/release/deploy approval 必须分离；未 tag/release/deploy。
 120. `P22.13 post-artifact operator handoff`：已新增 [docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md)，汇总 artifact、gate evidence、done/not-done、next approval options、rollback/troubleshooting 和 forbidden actions；未 tag/release/deploy。
-121. `P20.1 / CI failure reconciliation`：GitHub Actions `CI` 在 `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` 上失败，Linux `npm test` 为 `470/472`，失败点为 donor ranking tie-breaker fixture 与 TagMemo targeted semantic fixture。第一轮 fixture/test-only contract 收窄已推送为 `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`；第二轮 donor fixture narrowing 已推送为 `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`，GitHub Actions `CI` run `25899450529` 已通过。当前 `main == origin/main`。
-122. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+121. `P22.x RC artifact readiness closeout`：已新增 [docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md)，结论 `READY_TO_REQUEST_TAG_RELEASE_DEPLOY_APPROVAL`；未 tag/release/deploy，A5 approval 仍是 publication 前置条件。
+122. `P20.1 / CI failure reconciliation`：GitHub Actions `CI` 在 `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` 上失败，Linux `npm test` 为 `470/472`，失败点为 donor ranking tie-breaker fixture 与 TagMemo targeted semantic fixture。第一轮 fixture/test-only contract 收窄已推送为 `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`；第二轮 donor fixture narrowing 已推送为 `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`，GitHub Actions `CI` run `25899450529` 已通过。当前 `main == origin/main`。
+123. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
