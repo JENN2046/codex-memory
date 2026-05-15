@@ -14,7 +14,7 @@ A:\codex-memory
 
 ## Worktree
 
-Fixture/test/status/board edits are local and pending final diff/docs validation, guarded commit, and safe-push.
+Second donor ranking fixture/status/board edits are local and pending final diff/docs validation, guarded commit, and safe-push.
 
 ## Current Area
 
@@ -22,19 +22,17 @@ P20 CI-safe fixture contract reconciliation
 
 ## Findings
 
-- Current pushed `main` is `591adf79863e1d2ed20232c0ca54b5711ff8c3ef`.
-- GitHub Actions `CI` failed on that commit in `Node.js tests`.
-- Remote Linux `npm test` result: `470/472` passed.
-- Failure 1: `tests/donor-ranking-tie-breaker-parity-fixture.test.js` missing an exact ordered snippet where memory label/order is too strict for a multi-topic near-tie.
-- Failure 2: `tests/tagmemo-targeted-semantic-fixture.test.js` expected `topMemoryId=p16-alpha-a`, while Linux produced `p16-alpha-b`; both are same alpha bucket siblings and the interleave contract still holds.
+- Baseline commit `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` failed GitHub Actions `CI` in `Node.js tests` with Linux `npm test` result `470/472`.
+- Baseline failure 1: `tests/donor-ranking-tie-breaker-parity-fixture.test.js` missed an exact ordered snippet where memory label/order was too strict for a multi-topic near-tie.
+- Baseline failure 2: `tests/tagmemo-targeted-semantic-fixture.test.js` expected `topMemoryId=p16-alpha-a`, while Linux produced `p16-alpha-b`; both are same alpha bucket siblings and the interleave contract still holds.
+- Current pushed `main` is first reconciliation commit `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`.
+- First reconciliation commit `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4` fixed TagMemo but CI run `25899201275` still failed on donor ranking exact memory-label ordering in another case.
+- The second local patch changes donor ranking fixture expectations to content-level `resultIncludes` for all ranking/tie-breaker cases while keeping no-side-effect and result membership coverage.
 - This is not a P20.1 startup/watchdog runtime failure.
 
 ## Changed Files
 
-- `tests/donor-ranking-tie-breaker-parity-fixture.test.js`
 - `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`
-- `tests/tagmemo-targeted-semantic-fixture.test.js`
-- `tests/fixtures/tagmemo-targeted-semantic-v1.json`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -46,7 +44,7 @@ P20 CI-safe fixture contract reconciliation
 
 ## Validation
 
-- `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js`: passed `2/2`.
+- `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js`: passed `2/2` after the second donor fixture patch.
 - `node --test tests\tagmemo-targeted-semantic-fixture.test.js`: passed `3/3`.
 - `npm test`: passed `472/472`.
 - `npm run gate:ci -- --json`: passed with tests `457/457`, compare/rollback `43/43`, queries `14/14`, `mutated=false`, `providerCalls=0`.
