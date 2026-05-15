@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record the completed approved P22 release-candidate gate refresh PASS result without rerunning gates or creating a release candidate.
+Draft the P22.5 release-candidate artifact approval request without creating a release candidate artifact.
 
 ## Current Area
 
-P22 release-candidate gate refresh result record
+P22 release-candidate artifact approval request
 
 ## Current Status
 
@@ -15,25 +15,21 @@ P22 release-candidate gate refresh result record
 - P22 planning is closed.
 - Approved local non-provider RC gate refresh execution completed after the model commit.
 - Release state is `gate_refresh_passed_rc_not_created`.
-- Current work is only `P22-rc-gate-refresh-result-record` docs/board recording.
+- Current work is only `P22.5-release-candidate-artifact-approval-request` docs/board drafting.
 
 ## Completed Work In This Batch
 
-- Added [P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md).
-- Recorded `ec588d5` model commit review as `PASS`, with no gates executed and no worktree created by that commit.
-- Recorded approved gate refresh execution result as `PASS`.
-- Recorded `rc_target_commit=806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
-- Recorded `approval_request_commit=c1bb2984a948220376f3fb4265d64589bc0c94c2`.
-- Recorded `npm test` `472/472`, `gate:ci` tests `457/457`, compare `43/43`, rollback `43/43`, `providerCalls=0`, and `mutated=false` as prior execution evidence.
-- Recorded that the temporary worktree was removed and main remained clean at `ec588d564959212e47d046d4b323406c2fc62b58`.
-- Added result link to [P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md) without changing approval boundaries.
-- Explicitly excluded live HTTP MCP startup, provider commands, real memory preview, config mutation, migration/import-export apply, public MCP expansion, tag, release, and deploy.
-- Recorded project/governance conclusion: `project_health=strong`, `governance_health=strong`, `current_truth=P22 gate refresh passed`, `release_state=gate_refresh_passed_rc_not_created`.
+- Added [P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md).
+- Drafted exact future A5 approval sentence shape for creating an RC artifact.
+- Recorded target commit `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
+- Recorded gate refresh PASS evidence from [P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md).
+- Defined artifact scope, expected artifact content, rollback tier, stop conditions, and exclusions.
+- Kept approval status `NOT_APPROVED` and decision `BLOCKED_HARD_STOP`.
+- Explicitly confirmed no RC artifact, tag, release, deploy, provider call, config mutation, startup/watchdog operation, migration/import-export apply, or MCP expansion.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`
-- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md`
+- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -51,11 +47,11 @@ P22 release-candidate gate refresh result record
 ## Not Done
 
 - No RC gate executed.
-- No gates rerun in this result-record phase.
-- No `npm test` rerun in this result-record phase.
-- No `gate:ci` rerun in this result-record phase.
-- No compare / rollback gate rerun in this result-record phase.
-- No worktree created in this result-record phase.
+- No gates rerun in this phase.
+- No `npm test` rerun in this phase.
+- No `gate:ci` rerun in this phase.
+- No compare / rollback gate rerun in this phase.
+- No worktree created in this phase.
 - No live HTTP MCP startup.
 - No service start.
 - No watchdog start or install.
@@ -74,4 +70,4 @@ P22 release-candidate gate refresh result record
 
 ## Next Safe Action
 
-Guarded commit, safe-push if ready, and stop. Next recommended phase is `P22-release-candidate-artifact-approval-request` or docs-only maintenance; do not create RC artifacts, tag, release, or deploy without separate explicit approval.
+Guarded commit, safe-push if ready, then continue to `P22.6-release-candidate-artifact-manifest-shape`. Do not create RC artifacts, tag, release, or deploy without separate explicit approval.

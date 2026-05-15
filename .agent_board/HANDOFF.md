@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record the completed approved P22 release-candidate gate refresh PASS result. Do not rerun gates or create a release candidate.
+Draft the P22.5 release-candidate artifact approval request. Do not create a release candidate artifact.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Gate refresh result-record docs/status/board edits are local and docs-only validation has passed.
+P22.5 artifact approval request docs/status/board edits are local and docs-only validation has passed for this phase.
 
 ## Current Area
 
-P22 release-candidate gate refresh result record
+P22 release-candidate artifact approval request
 
 ## Findings
 
@@ -26,15 +26,14 @@ P22 release-candidate gate refresh result record
 - GitHub Actions `CI` run `25899450529` passed for `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
 - P22 planning is closed.
 - Release state is `gate_refresh_passed_rc_not_created`.
-- The worktree execution model remains: `rc_target_commit=806cc847cb37a3e428099b45871a4f1a13c4fa6f`; `approval_request_commit=c1bb2984a948220376f3fb4265d64589bc0c94c2`; `gate_execution_checkout` is a temporary worktree or detached checkout whose `HEAD` equals `rc_target_commit`.
-- Approved local non-provider gate refresh execution completed with result `PASS`: `npm test` `472/472`, `gate:ci` tests `457/457`, compare `43/43`, rollback `43/43`, `providerCalls=0`, `mutated=false`.
-- Temporary worktree was removed after execution, and main remained clean at `ec588d564959212e47d046d4b323406c2fc62b58`.
+- P22.5 artifact approval request is drafted with default approval status `NOT_APPROVED` and decision `BLOCKED_HARD_STOP`.
+- Target commit remains `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
+- Gate refresh PASS evidence remains recorded, but this phase did not rerun gates.
 - Release candidate artifact was not created.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`
-- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md`
+- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -51,11 +50,11 @@ P22 release-candidate gate refresh result record
 
 ## Not Done
 
-- No gates rerun in this result-record phase.
-- No `npm test` rerun in this result-record phase.
-- No `gate:ci` rerun in this result-record phase.
-- No compare / rollback gate rerun in this result-record phase.
-- No worktree created in this result-record phase.
+- No gates rerun in this phase.
+- No `npm test` rerun in this phase.
+- No `gate:ci` rerun in this phase.
+- No compare / rollback gate rerun in this phase.
+- No worktree created in this phase.
 - No live HTTP MCP startup.
 - No provider command.
 - No real memory preview.
@@ -67,4 +66,4 @@ P22 release-candidate gate refresh result record
 
 ## Next Safe Step
 
-Guarded commit and safe-push if ready. Next recommended phase is `P22-release-candidate-artifact-approval-request` or docs-only maintenance; RC artifact creation still requires separate explicit approval.
+Guarded commit, safe-push if ready, then continue to `P22.6-release-candidate-artifact-manifest-shape`. RC artifact creation still requires separate explicit approval.
