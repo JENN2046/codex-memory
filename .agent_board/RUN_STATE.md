@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 docs/board only |
-| Current task | CM-0166 / P22.7-release-candidate-notes-draft |
-| Current area | P22 release-candidate notes draft |
-| Last pushed baseline | `f93937c151d5c332ffeff70dc6fcd3cfb0a0af5c` on `origin/main` |
+| Current task | CM-0167 / P22.8-release-candidate-operator-handoff |
+| Current area | P22 release-candidate operator handoff |
+| Last pushed baseline | `de60749eeb08d5f0de504a0f46a1b5b568737ca2` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Drafting P22.7 release-candidate notes with candidate scope, passed evidence, blocked items, known gaps, non-goals, operator warnings, and rollback/support references; no release, tag, deploy, or RC artifact created. |
+| Last action | Drafting P22.8 pre-RC operator handoff checklist with preflight, approved gates, blockers, config/provider/migration/import-export boundaries, MCP public tool freeze, client caveats, rollback/support, and exact approval needed for RC artifact creation; no execution performed. |
 | Last validation | `git diff --check` passed; docs validation passed. |
-| Worktree summary | P22.7 docs/status/board edits only. No `src/`, tests, package, lockfile, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory preview, `.env`, tag, release, deploy, UI, live HTTP MCP start, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, gate rerun, or unapproved mutation. |
-| Mainline assumption | `origin/main` is the development base; current pushed HEAD and remote main are `f93937c151d5c332ffeff70dc6fcd3cfb0a0af5c`. |
+| Worktree summary | P22.8 docs/status/board edits only. No `src/`, tests, package, lockfile, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory preview, `.env`, tag, release, deploy, UI, live HTTP MCP start, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, gate rerun, or unapproved mutation. |
+| Mainline assumption | `origin/main` is the development base; current pushed HEAD and remote main are `de60749eeb08d5f0de504a0f46a1b5b568737ca2`. |
 | P22 status | P22 gate refresh passed; release candidate artifact has not been created. |
 | Guarded auto-commit allowed | eligible if user wants commit, but not required for this draft-only request |
 | Safe-push readiness | not requested; this phase drafts approval request only |
-| Next planned action | Guarded commit, safe-push if ready, then continue to P22.8. Do not run RC gates, create a worktree, checkout/reset/detach, start live HTTP MCP, call providers, preview real memory, mutate config, migrate/import-export apply, create RC artifacts, tag, release, or deploy. |
+| Next planned action | Guarded commit, safe-push if ready, then continue to P22.9. Do not run RC gates, create a worktree, checkout/reset/detach, start live HTTP MCP, call providers, preview real memory, mutate config, migrate/import-export apply, create RC artifacts, tag, release, or deploy. |
 
 ## Notes
 

@@ -179,6 +179,7 @@
 | P22.5-release-candidate-artifact-approval-request | release-candidate / artifact-approval | A1/A4 | done | Draft A5 approval request for future RC artifact creation without creating it | `git diff --check`; docs validation | Approval request only; default `NOT_APPROVED` / `BLOCKED_HARD_STOP`; no RC artifact creation, tag, release, deploy, provider/config/migration/import-export/public MCP expansion | yes |
 | P22.6-release-candidate-artifact-manifest-shape | release-candidate / artifact-manifest | A1/A2 | done | Define future RC artifact manifest JSON/Markdown shape without generating an artifact | `git diff --check`; docs validation | Shape docs only; no fixture/test added; no artifact creation, tag, release, deploy, provider/config/migration/import-export/public MCP expansion | no |
 | P22.7-release-candidate-notes-draft | release-candidate / notes-draft | A1/A2 | done | Draft release-candidate notes without publishing release notes or creating RC | `git diff --check`; docs validation | Notes draft only; not a release; no RC artifact creation, tag, release, deploy, provider/config/migration/import-export/public MCP expansion | no |
+| P22.8-release-candidate-operator-handoff | release-candidate / operator-handoff | A1/A2 | done | Add pre-RC operator handoff checklist for future artifact approval review | `git diff --check`; docs validation | Handoff checklist only; no execution, RC artifact creation, tag, release, deploy, provider/config/migration/import-export/public MCP expansion | no |
 
 ## 推荐执行顺序
 
@@ -294,8 +295,9 @@
 110. `P22.5 RC artifact approval request`：已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md)，定义未来创建 RC artifact 所需 A5 approval sentence、artifact scope、rollback story、stop conditions 和明确排除项；状态 `NOT_APPROVED`，decision `BLOCKED_HARD_STOP`，未创建 RC artifact。
 111. `P22.6 RC artifact manifest shape`：已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md)，定义 future RC artifact manifest JSON/Markdown shape；只做 shape docs，不生成真实 artifact、不新增 fixture/test。
 112. `P22.7 RC notes draft`：已新增 [docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md)，记录 candidate scope、passed evidence、blocked items、known gaps、non-goals、operator warnings 与 rollback/support references；这是 notes draft，不是 release，未 tag/release/deploy。
-113. `P20.1 / CI failure reconciliation`：GitHub Actions `CI` 在 `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` 上失败，Linux `npm test` 为 `470/472`，失败点为 donor ranking tie-breaker fixture 与 TagMemo targeted semantic fixture。第一轮 fixture/test-only contract 收窄已推送为 `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`；第二轮 donor fixture narrowing 已推送为 `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`，GitHub Actions `CI` run `25899450529` 已通过。当前 `main == origin/main`。
-114. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+113. `P22.8 RC operator handoff`：已新增 [docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md)，覆盖 preflight state、approved gates、remaining blockers、config/provider/migration/import-export boundaries、MCP public tool freeze、client caveats、rollback/support checklist 和 RC artifact creation 所需 exact approval。
+114. `P20.1 / CI failure reconciliation`：GitHub Actions `CI` 在 `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` 上失败，Linux `npm test` 为 `470/472`，失败点为 donor ranking tie-breaker fixture 与 TagMemo targeted semantic fixture。第一轮 fixture/test-only contract 收窄已推送为 `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`；第二轮 donor fixture narrowing 已推送为 `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`，GitHub Actions `CI` run `25899450529` 已通过。当前 `main == origin/main`。
+115. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
