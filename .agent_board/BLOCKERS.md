@@ -5,12 +5,14 @@
 | CMB-0001 | closed | template | none | none | Template row retired | none | 2026-05-05 |
 | CMB-0002 | closed | outside-workspace-write | P9-codex-claude-client-scope | CM-0025 | `claude mcp add` writes Claude local/user configuration outside `A:\codex-memory` | Authorized and completed; rollback is `claude mcp remove vcp_codex_memory -s local` | 2026-05-06 |
 | CMB-0003 | closed | model-api-connectivity | P9-codex-claude-client-scope | CM-0025 | `deepseek-v4-pro` model-mediated tool call previously failed before MCP tool execution with API `ConnectionRefused` | Rerun completed; `deepseek-v4-pro` model-mediated `memory_overview` succeeded | 2026-05-06 |
+| CMB-0004 | open | A5-approval-boundary | P22-release-candidate | CM-0161 | P22 planning is closed, but fresh RC gate refresh / implementation may run heavy gates, touch live/client/provider/config surfaces, or create release artifacts | User must explicitly approve an exact A5 RC gate refresh / implementation packet before any gate refresh, config/service/provider/migration/import-export, RC artifact, tag, release, or deploy action | 2026-05-15 |
 
 ## Project-Specific Hard Stops
 
 Stop before:
 
 - push / PR / release / deploy / tag
+- release-candidate gate refresh or implementation without an exact A5 approval packet
 - changing `C:\Users\617\.codex\config.toml`
 - switching 7605/6005 mainline in real config
 - installing/updating/removing watchdog scheduled task
