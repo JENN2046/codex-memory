@@ -5,27 +5,25 @@
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
 | Branch | main |
-| Mode | A4.8 docs/board only |
-| Current task | CM-0141 / P20.1-startup-watchdog-inventory |
-| Current area | P20 local production hardening startup/watchdog inventory |
-| Last local commit | P20 state reconciliation committed and safe-pushed at `d870c16` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `d870c168f834095dd86033285cd1091c0c39f5a0` |
+| Mode | A4.8 docs/evidence + board |
+| Current task | CM-0142 / P20.2-health-readiness-dry-run-evidence |
+| Current area | P20 local production hardening readiness evidence |
+| Last pushed baseline | P20.1 startup/watchdog inventory pushed and verified at `e56bc2a182302e86f9cf8c79f642e0e7badccc99` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P20.1 startup/watchdog inventory docs and board/status pointers. |
-| Last validation | P20.1 docs validation passed: `git diff --check`; docs validation. |
-| Worktree summary | P20.1 docs/inventory/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, or unapproved mutation. |
+| Last action | Captured P20.2 CI-safe readiness evidence and identified a P16.3 TagMemo semantic ordering drift blocking `gate:ci`. |
+| Last validation | `npm run gate:ci -- --json` failed with tests `448/449`; manual CI-safe test batch reproduced the same single failure; `git diff --check` and docs validation passed. |
+| Worktree summary | P20.2 docs/evidence/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base. |
-| P20 status | Planning committed and hash-verified; P20.1 inventory drafted locally. |
+| P20 status | P20.2 evidence captured; readiness is blocked until `gate:ci` is green or the blocker is explicitly accepted. |
 | Guarded auto-commit allowed | eligible after final diff/file-scope inspection |
-| Safe-push readiness | pending guarded commit for P20.1 inventory |
-| Next planned action | Validate and commit P20.1 inventory, then continue to P20.2 health/readiness dry-run evidence. |
+| Safe-push readiness | pending guarded commit |
+| Next planned action | Commit P20.2 evidence, then continue to `P20.2a-gate-ci-tagmemo-semantic-drift-review`. |
 
 ## Notes
 
-- P20.1 is inventory only.
-- `start:http:install-task` and `start:http:watchdog:install` write scheduled task or HKCU Run state and remain hard stops without explicit approval.
-- `start:http:ensure` may start a hidden HTTP MCP process and is not run in this inventory phase.
-- `start:http:watchdog:once` may start HTTP MCP and write watchdog logs and is not run in this inventory phase.
-- `start:http:watchdog:ensure` starts a long-running watchdog process and is not run in this inventory phase.
+- `gate:ci` compare, rollback, query, policy, lifecycle, and docs checks are green.
+- The red signal is `tests/tagmemo-targeted-semantic-fixture.test.js`, case `group-tag-interleaves-semantic-buckets`.
+- P20.2 did not run `observe:http` because live runtime/log/audit observation is deferred until readiness is green or explicitly scoped.
+- P20.2 did not run `rollback:mainline:plan` because external config / legacy target probing is deferred until readiness is green or explicitly scoped.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.
 - `validate_memory` remains internal-only.

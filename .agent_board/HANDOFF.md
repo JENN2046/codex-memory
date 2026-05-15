@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue P20.1 startup/watchdog inventory without runtime mutation.
+Continue P20 local production hardening without runtime mutation.
 
 ## Workspace
 
@@ -14,27 +14,28 @@ A:\codex-memory
 
 ## Worktree
 
-P20.1 inventory docs/status/board edits are validated locally and pending guarded commit.
+P20.2 docs/evidence/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P20 local production hardening startup/watchdog inventory
+P20 local production hardening readiness evidence
 
 ## Findings
 
-- P20 planning was committed and pushed at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
-- P20 state reconciliation was committed and pushed at `d870c168f834095dd86033285cd1091c0c39f5a0`.
-- P20.1 inventory identifies HTTP MCP startup and watchdog surfaces.
-- `ensure-codex-memory-http.ps1` checks health and may start a hidden Node HTTP MCP process.
-- `watch-codex-memory-http.ps1 -Once` may start HTTP MCP and writes watchdog logs.
-- `ensure-codex-memory-http-watchdog.ps1` may start a long-running hidden watchdog process.
-- `install-codex-memory-http-task.ps1` and `install-codex-memory-http-watchdog.ps1` write scheduled task or HKCU Run state and require explicit approval.
+- P20.1 startup/watchdog inventory was committed and pushed at `e56bc2a182302e86f9cf8c79f642e0e7badccc99`.
+- P20.2 added health/readiness dry-run evidence.
+- `npm run gate:ci -- --json` ran without network, daemon, or provider use, but failed because embedded tests reported `448/449`.
+- Compare remains `43/43 matched`.
+- Rollback remains `43/43 rollback-ready`.
+- Query fixture recall remains `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`.
+- The blocker is `tests/tagmemo-targeted-semantic-fixture.test.js`, case `group-tag-interleaves-semantic-buckets`.
+- P20.2 did not run `observe:http`, `rollback:mainline:plan`, startup, ensure, watchdog, install, provider, migration, import/export, or config mutation commands.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
-- `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`
+- `docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md`
 - `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -43,20 +44,21 @@ P20 local production hardening startup/watchdog inventory
 
 ## Validation
 
+- `npm run gate:ci -- --json` failed on one test.
+- Manual CI-safe test batch reproduced the same failure.
 - `git diff --check` passed.
 - Docs validation passed.
 
 ## Not Done
 
-- No `src/` changes.
 - No runtime code changed.
-- No tests or fixtures added.
+- No tests or fixtures changed.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
 - No import/export apply.
 - No real DB or durable memory write.
-- No real memory read preview.
+- No real memory content preview.
 - No provider smoke or provider benchmark.
 - No service start.
 - No watchdog start.
@@ -67,4 +69,4 @@ P20 local production hardening startup/watchdog inventory
 
 ## Next Safe Step
 
-Run diff/docs validation, guarded commit, safe-push if ready, then continue to `P20.2-health-readiness-dry-run-evidence`.
+Run final diff/file-scope inspection, guarded commit P20.2 evidence, then review `P20.2a-gate-ci-tagmemo-semantic-drift-review` before P20.3.

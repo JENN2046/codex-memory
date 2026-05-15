@@ -44,6 +44,7 @@ P20 should answer:
 | P20 planning | This plan and status/board handoff | docs/status/board only | `git diff --check`; docs validation |
 | P20.1 startup/watchdog inventory | Inventory existing startup and watchdog scripts, risks, and manual approval boundaries | docs/status/board only | `git diff --check`; docs validation |
 | P20.2 health/readiness dry-run evidence | Summarize safe read-only health/readiness commands and report shapes | docs/evidence only; optional read-only local gates if explicitly scoped | docs validation; optional `observe:http` / `rollback:mainline:plan` read-only commands |
+| P20.2a gate-ci TagMemo semantic drift review | Review the current CI-safe readiness blocker before deeper local production planning | tests/docs review only unless explicitly scoped | targeted TagMemo fixture test; `gate:ci`; docs validation if docs changed |
 | P20.3 rollback/backup operations plan | Define backup/restore/rollback requirements before any real operation | docs only | docs validation |
 | P20.4 local production safety checklist | Checklist for operator preflight, warning signals, and stop conditions | docs only | docs validation |
 | P20.x closeout | Summarize evidence and P21 readiness | docs/status/board only | docs validation |
@@ -108,4 +109,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 P20.1 startup/watchdog inventory is captured in [P20_STARTUP_WATCHDOG_INVENTORY.md](./P20_STARTUP_WATCHDOG_INVENTORY.md).
 
-`P20.2-health-readiness-dry-run-evidence`
+P20.2 health/readiness dry-run evidence is captured in [P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md](./P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md). Current readiness is blocked by an existing P16.3 TagMemo semantic ordering drift inside `gate:ci`.
+
+`P20.2a-gate-ci-tagmemo-semantic-drift-review`

@@ -2,29 +2,34 @@
 
 ## Current Goal
 
-P20.1-startup-watchdog-inventory: inventory startup and watchdog surfaces without runtime mutation.
+P20.2-health-readiness-dry-run-evidence: collect readiness evidence without runtime mutation.
 
 ## Current Area
 
-P20 local production hardening startup/watchdog inventory
+P20 local production hardening readiness evidence
 
 ## Current Status
 
-- P20 planning is on `origin/main` at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
-- P20 state reconciliation is on `origin/main` at `d870c168f834095dd86033285cd1091c0c39f5a0`.
-- P20.1 adds docs/status/board inventory only.
+- P20.1 is on `origin/main` at `e56bc2a182302e86f9cf8c79f642e0e7badccc99`.
+- P20.2 evidence doc has been added locally.
+- Current production-readiness evidence is blocked by a CI-safe test drift, not by startup/watchdog inventory.
 
 ## Completed Work In This Batch
 
-- Added `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`.
-- Inventoried `start:http`, `start:http:ensure`, `start:http:install-task`, `start:http:watchdog:once`, `start:http:watchdog:ensure`, and `start:http:watchdog:install`.
-- Recorded scheduled task and HKCU Run fallback as hard-stop mutation surfaces.
-- Recorded runtime/log side effects for ensure and watchdog commands.
+- Added `docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md`.
+- Ran `npm run gate:ci -- --json`.
+- Reproduced the embedded CI-safe test failure with the same exclusion set used by `gate:ci`.
+- Identified the blocker:
+  - `tests/tagmemo-targeted-semantic-fixture.test.js`
+  - `P16.3 targeted semantic fixtures lock TagMemo ordering and audit shape`
+  - case `group-tag-interleaves-semantic-buckets`
+  - expected `p16-alpha-b, p16-beta, p16-alpha-a`
+  - actual `p16-alpha-a, p16-beta, p16-alpha-b`
 - Updated P20 plan, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
-- `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`
+- `docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md`
 - `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -37,19 +42,21 @@ P20 local production hardening startup/watchdog inventory
 
 ## Validation
 
+- `npm run gate:ci -- --json` failed: tests `448/449`, one failure.
+- Manual CI-safe test batch failed: tests `448/449`, same failure.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
 ## Not Done
 
 - No `src/` changes.
-- No tests or fixtures added.
+- No tests or fixtures changed.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
 - No import/export apply.
 - No real DB or durable memory write.
-- No real memory read preview.
+- No real memory content preview.
 - No provider smoke or provider benchmark.
 - No service start.
 - No watchdog start.
@@ -60,4 +67,4 @@ P20 local production hardening startup/watchdog inventory
 
 ## Next Safe Action
 
-Run P20.1 diff/docs validation, guarded commit, safe-push if ready, and continue to `P20.2-health-readiness-dry-run-evidence`.
+Run final diff/file-scope inspection, guarded commit P20.2 evidence, then continue to `P20.2a-gate-ci-tagmemo-semantic-drift-review` before P20.3.

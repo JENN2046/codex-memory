@@ -149,6 +149,7 @@
 - P19.x observability/admin review surface closeout：新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md)，将 P19 关闭为 `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`；P20 只能从 planning / inventory 开始。
 - P20 local production hardening planning：新增 [docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md)，规划 startup/watchdog inventory、health/readiness dry-run evidence、rollback/backup operations plan、local production safety checklist 和 closeout 顺序；docs validation 已通过；本阶段 docs/planning only，不安装服务、不改配置、不跑 provider、不做 backup/restore/migration/import-export apply。
 - P20.1 startup/watchdog inventory：新增 [docs/P20_STARTUP_WATCHDOG_INVENTORY.md](/A:/codex-memory/docs/P20_STARTUP_WATCHDOG_INVENTORY.md)，盘点 HTTP MCP startup / ensure / watchdog / install scripts、scheduled task 与 HKCU Run fallback 风险、watchdog log writes、hard-stop approval requirements 和 P20.2 health/readiness evidence handoff；本阶段 docs/inventory only，未启动服务、未安装 watchdog/startup task、未改真实配置。
+- P20.2 health/readiness dry-run evidence：新增 [docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md)，记录 CI-safe readiness evidence；`gate:ci` 的 compare `43/43`、rollback `43/43`、queries `14/14`、policy/lifecycle/docs checks 均通过且 `mutated=false` / `providerCalls=0`，但 embedded tests 当前 `448/449`，阻塞于 `tests/tagmemo-targeted-semantic-fixture.test.js` 的 P16.3 TagMemo ordering drift；本阶段未启动服务、未运行 watchdog、未观察 live HTTP/audit、未改真实配置。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -514,8 +515,9 @@
 
 ## 下一步建议
 
-- P20 planning 已完成 guarded commit / safe-push 和 post-push hash verification，当前 local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`。
-- 下一阶段建议进入 `P20.2-health-readiness-dry-run-evidence`。P20.2 仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
+- P20.1 startup/watchdog inventory 已完成 guarded commit / safe-push 和 post-push hash verification，当前 local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `e56bc2a182302e86f9cf8c79f642e0e7badccc99`。
+- P20.2 health/readiness evidence 已捕获当前 blocker：`gate:ci` 被 P16.3 TagMemo semantic ordering drift 阻塞。
+- 下一阶段建议进入 `P20.2a-gate-ci-tagmemo-semantic-drift-review`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 
