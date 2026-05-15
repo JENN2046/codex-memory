@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record the completed fresh P22 gate refresh PASS result for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Request explicit approval to create the new P22 RC artifact for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Docs/board result-record edits are local until guarded commit / safe-push completes.
+Docs/board approval-request edits are local until guarded commit / safe-push completes.
 
 ## Current Area
 
-P22 security-fix fresh RC gate refresh result record
+P22 security-fix RC artifact creation approval request
 
 ## Findings
 
@@ -30,12 +30,13 @@ P22 security-fix fresh RC gate refresh result record
 - Recorded evidence includes `npm test 473/473`, `gate:ci` tests `458/458`, compare `43/43`, rollback `43/43`, `noProvider=true`, and `mutated=false`.
 - Current phase records evidence only and does not rerun gates.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
-- New RC artifact approval is the next required step.
+- New RC artifact approval request has been drafted and validated.
+- Proposed new artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
+- Suggested future tag after separate approval: `p22-rc-7fd17de`.
 
 ## Changed Files
 
-- `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md`
-- `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md`
+- `docs/P22_SECURITY_FIX_RC_ARTIFACT_CREATION_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -72,4 +73,4 @@ P22 security-fix fresh RC gate refresh result record
 
 ## Next Safe Step
 
-Validate docs, commit and safe-push if ready, then request approval for a new RC artifact targeting `7fd17de624c0da76751e863e97302bed0dbec905`.
+Validate docs, commit and safe-push if ready, then wait for explicit approval to create `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.

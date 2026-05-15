@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record the completed fresh P22 local non-provider RC gate refresh PASS result for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Request explicit approval to create the new P22 local Markdown RC artifact for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Current Area
 
-P22 security-fix fresh RC gate refresh result record
+P22 security-fix RC artifact creation approval request
 
 ## Current Status
 
@@ -14,14 +14,17 @@ P22 security-fix fresh RC gate refresh result record
 - `rc_target_commit`: `7fd17de624c0da76751e863e97302bed0dbec905`.
 - `approval_request_commit`: `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
 - Temporary gate execution checkout was created at `A:\codex-memory-gate-7fd17de`, verified at target HEAD, and removed.
-- Main workspace remains clean at `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
+- Main workspace remains clean and synced at the latest docs baseline after result recording.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
-- Current work is result recording only.
+- Current work is approval-request drafting only, now validated.
+- Proposed new artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
+- Suggested future tag after separate tag approval: `p22-rc-7fd17de`.
 
 ## Completed Work In This Batch
 
-- Added [P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md](/A:/codex-memory/docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md).
-- Added a result-record link to [P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md) without changing approval boundaries.
+- Added [P22_SECURITY_FIX_RC_ARTIFACT_CREATION_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_RC_ARTIFACT_CREATION_APPROVAL_REQUEST.md).
+- Recorded that the approval request is `NOT_APPROVED` and `BLOCKED_HARD_STOP`.
+- Recorded that the old `p22-rc-806cc847` candidate is superseded and must not be reused or moved.
 - Recorded gate evidence:
   - `git diff --check`: passed.
   - docs validation: passed.
@@ -33,8 +36,7 @@ P22 security-fix fresh RC gate refresh result record
 
 ## Changed Files
 
-- `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md`
-- `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md`
+- `docs/P22_SECURITY_FIX_RC_ARTIFACT_CREATION_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -74,4 +76,4 @@ P22 security-fix fresh RC gate refresh result record
 
 ## Next Safe Action
 
-Run docs validation, guarded commit, and safe-push if ready. Then request approval for a new RC artifact targeting `7fd17de624c0da76751e863e97302bed0dbec905`.
+Run docs validation, guarded commit, and safe-push if ready. Then wait for explicit approval to create `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
