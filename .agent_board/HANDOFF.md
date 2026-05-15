@@ -2,7 +2,7 @@
 
 ## Goal
 
-Close the P22 RC artifact readiness chain without performing tag, release, or deploy.
+Request P22 tag-only approval without creating or pushing a tag.
 
 ## Workspace
 
@@ -14,22 +14,24 @@ A:\codex-memory
 
 ## Worktree
 
-P22.x RC artifact readiness closeout edits are local. Docs validation has passed for this phase.
+P22 tag-only approval request edits are local. Docs validation has passed for this phase.
 
 ## Current Area
 
-P22 RC artifact readiness closeout
+P22 tag-only approval request
 
 ## Findings
 
-- Pre-P22.x pushed baseline was `f46198ec276daaed8a129db2fb3a009442770f00`.
+- Pre-P22 tag-only pushed baseline was `3d312882899ad82d91ef124443de300486f8654b`.
 - P22 planning is closed.
 - Release state is `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED`.
 - P22 approved local non-provider gate refresh result is recorded as `PASS`.
 - The local artifact exists at `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
-- P22.x RC artifact readiness closeout has been added.
-- The closeout result is `READY_TO_REQUEST_TAG_RELEASE_DEPLOY_APPROVAL`.
-- Tag, release, and deploy remain unperformed and require explicit A5 approval.
+- P22 approval request has been updated to tag-only request semantics.
+- The proposed tag is `p22-rc-806cc847`.
+- The proposed target commit is `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
+- The artifact path is `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
+- Tag remains uncreated and unpushed.
 - Tag approval, GitHub release approval, and deploy approval remain `NOT_APPROVED`.
 - Target commit remains `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
 - Gate refresh PASS evidence remains recorded, but this phase did not rerun gates.
@@ -37,7 +39,7 @@ P22 RC artifact readiness closeout
 
 ## Changed Files
 
-- `docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md`
+- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -73,4 +75,4 @@ P22 RC artifact readiness closeout
 
 ## Next Safe Step
 
-Run guarded commit, safe-push if ready, then stop at A5 hard stop. Any tag/release/deploy or other blocked action requires separate explicit approval.
+Run guarded commit, safe-push if ready, then wait for explicit tag-only approval. Any tag/release/deploy or other blocked action requires separate explicit approval.

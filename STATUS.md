@@ -551,7 +551,8 @@
 - P22.12 release publication boundary checklist 已新增 [docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md](/A:/codex-memory/docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md)，记录 artifact exists does not equal released、target commit frozen、public MCP tool freeze、`validate_memory` internal-only 和 tag/release/deploy approval separation。
 - P22.13 post-artifact operator handoff 已新增 [docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md)，记录 artifact path、gate evidence、已完成/未完成事项、next approval options、rollback path、troubleshooting notes、release warning 和 exact forbidden actions。
 - P22.x RC artifact readiness closeout review 已新增 [docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md)，关闭 post-artifact docs chain；结论 `READY_TO_REQUEST_TAG_RELEASE_DEPLOY_APPROVAL`，但 tag/release/deploy 仍未执行，A5 approval 仍是 publication 前置条件。
-- 当前结论：project_health strong；governance_health strong；current_truth `P22 RC artifact readiness closed`；release_state `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED`；recommended_action `P22-tag-release-deploy-approval-request`。tag、release、deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
+- P22 tag-only approval request 已更新 [docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md)：本阶段只请求 `p22-rc-806cc847` tag approval；tag approval 仍为 `NOT_APPROVED`，GitHub release approval 与 deploy approval 仍为 `NOT_APPROVED`；未创建或 push tag。
+- 当前结论：project_health strong；governance_health strong；current_truth `P22 tag-only approval requested but not approved`；release_state `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED`；recommended_action `wait for explicit tag-only approval`。tag、release、deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

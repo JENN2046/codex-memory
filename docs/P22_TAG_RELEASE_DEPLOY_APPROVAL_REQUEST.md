@@ -1,6 +1,6 @@
 # P22 Tag / Release / Deploy Approval Request
 
-Phase: `P22.11-tag-release-deploy-approval-request`
+Phase: `P22-tag-only-approval-request`
 
 Mode: `A5-approval-request-draft`
 
@@ -8,9 +8,11 @@ Decision: `BLOCKED_HARD_STOP`
 
 ## Purpose
 
-Draft the explicit A5 approval request required before any tag, GitHub release, or deployment action.
+Draft the explicit A5 approval request required before creating and pushing the P22 Git tag only.
 
-This document is not approval. It does not create a tag, create a GitHub release, deploy, call providers, mutate config, run migration/import-export apply, or expand public MCP tools.
+This document is not approval. It does not create a tag, push a tag, create a GitHub release, deploy, call providers, mutate config, run migration/import-export apply, or expand public MCP tools.
+
+This phase requests tag approval only. It does not request GitHub release approval and does not request deploy approval.
 
 ## Current State
 
@@ -24,6 +26,23 @@ This document is not approval. It does not create a tag, create a GitHub release
 | Gate refresh result | `PASS` |
 
 The local Markdown artifact exists. It is not a tag, not a GitHub release, and not a deploy.
+
+## Tag-Only Approval Request
+
+Requested switch: tag approval only.
+
+| Field | Value |
+|---|---|
+| Tag approval status | `NOT_APPROVED` |
+| GitHub release approval status | `NOT_APPROVED` |
+| Deploy approval status | `NOT_APPROVED` |
+| Proposed tag name | `p22-rc-806cc847` |
+| Proposed target commit | `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
+| Artifact path | `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md` |
+
+Tag approval remains `NOT_APPROVED` until an explicit tag-only approval sentence is provided.
+
+No tag is created in this phase. No tag is pushed in this phase. No GitHub release is created. No deploy is performed.
 
 ## Independent Approval Switches
 
@@ -47,7 +66,7 @@ Proposed tag target:
 806cc847cb37a3e428099b45871a4f1a13c4fa6f
 ```
 
-Tag action is not approved by this document.
+Tag action is not approved by this document. This document only requests future tag approval.
 
 ## Proposed GitHub Release
 
@@ -62,7 +81,7 @@ Proposed release source:
 - tag: `p22-rc-806cc847`
 - artifact: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`
 
-GitHub release action is not approved by this document.
+GitHub release action is not requested or approved by this document.
 
 ## Proposed Deploy
 
@@ -77,7 +96,7 @@ No deployment target is proposed in this document. Deploy remains blocked unless
 - validation plan
 - expected side effects
 
-Deploy action is not approved by this document.
+Deploy action is not requested or approved by this document.
 
 ## Expected Generated Or Changed Files
 
@@ -88,10 +107,9 @@ If a future approval only authorizes docs recording of a tag/release/deploy deci
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `.agent_board/*`
 
-If a future approval authorizes actual tag or GitHub release creation, expected remote objects must be named explicitly:
+If a future approval authorizes actual tag creation, expected remote objects must be named explicitly:
 
 - Git tag: `p22-rc-806cc847`
-- GitHub release: `P22 Release Candidate p22-rc-806cc847`
 
 No expected generated file or remote object is approved by this draft.
 
@@ -125,11 +143,10 @@ Tag rollback must be separately approved if the tag is pushed.
 Draft rollback levels:
 
 - docs-only request rollback: revert the docs commit
-- local tag rollback before push: delete local tag only
-- pushed tag rollback: delete local and remote tag with explicit approval
-- draft GitHub release rollback: delete or close draft release with explicit approval
-- published GitHub release rollback: unpublish/delete release with explicit approval and preserve audit note
-- deploy rollback: deployment-specific rollback plan required before approval
+- before push: delete local tag only
+- after push: delete remote tag only with separate explicit approval
+- no GitHub release rollback is included because release approval remains `NOT_APPROVED`
+- no deploy rollback is included because deploy approval remains `NOT_APPROVED`
 
 This document does not authorize any rollback command.
 
@@ -139,9 +156,11 @@ Stop before any tag/release/deploy action if:
 
 - the approval sentence does not name which switch is approved
 - the approval sentence does not name exact tag, release, or deploy target
+- the approval sentence also approves GitHub release or deploy
 - target commit differs from `806cc847cb37a3e428099b45871a4f1a13c4fa6f`
+- artifact is missing at `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`
 - artifact path differs from `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`
-- worktree is dirty with unrelated changes
+- worktree is dirty
 - remote main has drifted unexpectedly
 - the command would touch provider, config, startup/watchdog, real memory, durable data, migration/import-export, MCP schema/tools, package/lockfile, `.env`, or secrets
 - any output exposes secret-like content
@@ -179,4 +198,4 @@ Deploy approval: `NOT_APPROVED`
 
 Decision: `BLOCKED_HARD_STOP`
 
-Next safe action: continue docs-only release publication boundary checklist, or wait for explicit approval for exactly one or more switches.
+Next safe action: wait for explicit tag-only approval.

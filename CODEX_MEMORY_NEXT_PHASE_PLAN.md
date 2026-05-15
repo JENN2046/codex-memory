@@ -331,7 +331,8 @@
 - P22.12 release publication boundary checklist 已新增 [docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md](/A:/codex-memory/docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md)：确认 artifact exists does not equal released、target commit frozen、public MCP tools frozen、`validate_memory` internal-only、provider/config/migration/import-export/real memory/deploy 默认排除，以及 tag/release/deploy approval separation。
 - P22.13 post-artifact operator handoff 已新增 [docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md)：汇总 artifact path、gate evidence、done/not-done、next approval options、rollback path、troubleshooting notes、release warning 和 exact forbidden actions。
 - P22.x RC artifact readiness closeout review 已新增 [docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md)：关闭 post-artifact docs chain，结论 `READY_TO_REQUEST_TAG_RELEASE_DEPLOY_APPROVAL`；tag/release/deploy 仍未执行。
-- 下一步建议：`P22-tag-release-deploy-approval-request`；任何 tag / release / deploy / provider / config / migration-import-export / public MCP expansion 仍需单独显式批准。
+- P22 tag-only approval request 已更新 [docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md)：只请求 Git tag approval；proposed tag `p22-rc-806cc847`，target `806cc847cb37a3e428099b45871a4f1a13c4fa6f`，artifact path `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`；tag/release/deploy approval 均仍为 `NOT_APPROVED`。
+- 下一步建议：`wait for explicit tag-only approval`；任何 tag / release / deploy / provider / config / migration-import-export / public MCP expansion 仍需单独显式批准。
 - 边界：不改真实 Codex/Claude config、不启动 live HTTP MCP 或 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断
