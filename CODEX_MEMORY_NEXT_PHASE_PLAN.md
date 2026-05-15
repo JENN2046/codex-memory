@@ -276,6 +276,14 @@
 - 下一步建议：完成 P19.4 validation / guarded commit / safe-push 后进入 `P19.x-observability-admin-review-surface-closeout`。
 - 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile。
 
+当前 P19.x closeout：
+
+- 入口：[docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md)
+- 目标：关闭 P19 admin review surface evidence chain，记录 planning / inventory / shape fixture / schema snapshot / operator notes evidence、known gaps 和 P20 planning handoff。
+- 当前状态：P19.x closeout docs 已完成 diff/docs validation，等待 guarded commit 和 safe-push readiness。
+- 下一步建议：完成 P19.x validation / guarded commit / safe-push 后进入 `P20-local-production-hardening-planning`。
+- 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile、不进入 release candidate。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：

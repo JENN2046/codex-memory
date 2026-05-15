@@ -152,6 +152,7 @@
 | P19.3-admin-review-schema-snapshot-gate | observability / admin-review / schema-snapshot | A1/A2 | done | Add synthetic schema snapshot gate for admin review source key sets before runtime aggregation | targeted fixture test; `npm test`; `git diff --check`; docs validation | Fixture/test/docs only; targeted `5/5`, full suite `464/464`; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release, tag, or deploy |
 | P19.3-post-push-state-sync | observability / admin-review / state-sync | A1 | done | Sync P19.3 post-push state in STATUS and `.agent_board` before P19.4 | `git diff --check`; docs validation | Docs/board only; records P19.3 pushed/verified at `c5784fc082f08231eb326671ac510c52491f3f04`; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release, tag, or deploy |
 | P19.4-operator-troubleshooting-notes | observability / admin-review / operator-notes | A1 | done | Document operator review levels, blocked states, source unavailable handling, and safe next actions | `git diff --check`; docs validation | Docs-only; docs validation passed; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release, tag, or deploy |
+| P19.x-observability-admin-review-surface-closeout | observability / admin-review / closeout | A1 | done | Close P19 as fixture-backed and operator-noted, with P20 planning handoff | `git diff --check`; docs validation | Docs/status/board only; docs validation passed; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release candidate, tag, or deploy |
 
 ## 推荐执行顺序
 
@@ -242,8 +243,9 @@
 85. `P19.3 schema snapshot gate`：admin review schema snapshot fixture/test/docs 已新增，锁住 planned admin-review、dashboard、http-observe、governance-report、gate-ci key-set snapshot。
 86. `P19.3 post-push state sync`：P19.3 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `c5784fc082f08231eb326671ac510c52491f3f04`；本轮只同步 STATUS / `.agent_board` pushed / verified 状态。
 87. `P19.4 operator troubleshooting notes`：operator notes 已起草，整理 review surfaces、review levels、blocked/unavailable handling 和 safe next actions；docs validation 已通过，等待 guarded commit / safe-push。
-88. 下一步建议进入 `P19.x-observability-admin-review-surface-closeout`；不得直接进入 UI、provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
-89. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+88. `P19.x closeout`：admin review surface closeout 已起草，将 P19 关闭为 `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`；docs validation 已通过，等待 guarded commit / safe-push。
+89. 下一步建议进入 `P20-local-production-hardening-planning`；不得直接进入 UI、provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
+90. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
