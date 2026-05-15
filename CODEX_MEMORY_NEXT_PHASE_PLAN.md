@@ -509,3 +509,16 @@ npm run gate:mainline
 3. 压缩 README / PHASE_NAVIGATION 的历史记录入口，只保留索引链接
 4. 将 `gate:ci` 留在设计阶段，不立刻改 `.github/workflows`
 5. 将 memory governance 留在模型设计阶段，不立刻做 SQLite migration
+
+## Current P22 Local Deploy Closeout
+
+- Phase: `P22-local-deploy-result-record`
+- Closeout phase: `P22-local-deploy-closeout`
+- Status: completed / recorded / closed
+- Evidence: [docs/P22_LOCAL_DEPLOY_RESULT_RECORD.md](/A:/codex-memory/docs/P22_LOCAL_DEPLOY_RESULT_RECORD.md)
+- Closeout: [docs/P22_LOCAL_DEPLOY_CLOSEOUT.md](/A:/codex-memory/docs/P22_LOCAL_DEPLOY_CLOSEOUT.md)
+- Result: local HTTP MCP deploy/validation completed and evidence recorded.
+- Verified local surfaces: `/health ok`; live `initialize/tools/list ok`; public MCP tools remain exactly `record_memory`, `search_memory`, `memory_overview`; `observe:http status=ok`; MCP/HTTP tests `12/12`.
+- Interpretation: this is not production deploy, not startup hardening, not watchdog installation, not client integration switch, not memory migration, and not v1.0 release.
+- Next recommended phase: `P23-v1.0-memory-kernel-planning`.
+- Still A5-gated: watchdog/startup install, Codex/Claude config switching, formal production deploy, provider execution, durable memory write, migration/import-export apply.

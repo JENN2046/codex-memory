@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record approved GitHub release creation for tag `p22-rc-7fd17de`; deploy remains blocked.
+Close P22 local HTTP MCP deploy/validation evidence chain; production deploy remains blocked.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Docs/board GitHub-release-result edits are local until guarded commit / safe-push completes.
+Docs/board local-deploy-result and closeout edits are local; user explicitly requested no commit and no push.
 
 ## Current Area
 
-P22 GitHub release creation result record
+P22 local HTTP MCP deploy closeout
 
 ## Findings
 
@@ -34,11 +34,15 @@ P22 GitHub release creation result record
 - Target tag: `p22-rc-7fd17de`.
 - Local and remote tag both point to `7fd17de624c0da76751e863e97302bed0dbec905`.
 - GitHub prerelease was created: `https://github.com/JENN2046/codex-memory/releases/tag/p22-rc-7fd17de`.
-- Deploy remains not requested and blocked.
+- Local HTTP MCP deploy/validation completed: `/health ok`, live `initialize/tools/list ok`, public MCP tools exactly `record_memory/search_memory/memory_overview`, `observe:http status=ok`, MCP/HTTP tests `12/12`.
+- Production deploy remains blocked pending separate A5 authorization.
+- Closeout records that this is not production deploy, startup hardening, watchdog installation, Codex/Claude client switch, migration, durable memory activation, or v1.0 release.
 
 ## Changed Files
 
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md`
+- `docs/P22_LOCAL_DEPLOY_RESULT_RECORD.md`
+- `docs/P22_LOCAL_DEPLOY_CLOSEOUT.md`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -52,8 +56,9 @@ P22 GitHub release creation result record
 
 ## Validation
 
-- `git diff --check`: passed.
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`: passed.
+- Local deploy evidence already completed: `/health ok`; live `initialize/tools/list ok`; `observe:http status=ok`; MCP/HTTP tests `12/12`.
+- P22 local deploy result-record docs validation: `git diff --check` passed; docs validation passed.
+- P22 local deploy closeout docs validation: `git diff --check` passed; docs validation passed.
 
 ## Not Done
 
@@ -63,7 +68,7 @@ P22 GitHub release creation result record
 - No RC artifact created.
 - No tag created, moved, or pushed.
 - No GitHub release.
-- No deploy.
+- No production deploy.
 - No provider command.
 - No live HTTP MCP startup.
 - No real memory preview.
@@ -77,4 +82,4 @@ P22 GitHub release creation result record
 
 ## Next Safe Step
 
-Validate docs, commit and safe-push if ready. Stop unless explicit deploy approval is provided.
+Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23-v1.0-memory-kernel-planning`.

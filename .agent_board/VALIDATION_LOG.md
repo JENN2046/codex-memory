@@ -277,6 +277,8 @@ FAILED
 | CMV-0249 | P22-security-fix-tag-result-record | COMPLETED_VALIDATED | `git diff --check`; docs validation | Records tag `p22-rc-7fd17de` created and pushed; local/remote tag point to `7fd17de624c0da76751e863e97302bed0dbec905`; GitHub release and deploy remain not performed. |
 | CMV-0250 | P22-github-release-approval-request | COMPLETED_VALIDATED | `git diff --check`; docs validation | Drafts GitHub release approval request for tag `p22-rc-7fd17de`; GitHub release approval remains `NOT_APPROVED`, deploy remains `NOT_APPROVED` / still blocked; no GitHub release or deploy performed. |
 | CMV-0251 | P22-github-release-creation | COMPLETED_VALIDATED | `gh release view`; `git diff --check`; docs validation | Records GitHub prerelease `P22 Security-Fix Release Candidate p22-rc-7fd17de` created at `https://github.com/JENN2046/codex-memory/releases/tag/p22-rc-7fd17de`; deploy remains not performed. |
+| CMV-0252 | P22-local-deploy-result-record | COMPLETED_VALIDATED | `git diff --check`; docs validation | Records already-completed local HTTP MCP deploy/validation evidence: `/health ok`, live `initialize/tools/list ok`, public MCP tools exactly `record_memory/search_memory/memory_overview`, `observe:http status=ok`, MCP/HTTP tests `12/12`; docs validation passed; no `.env`/config/provider/migration/durable-memory/watchdog/startup changes. |
+| CMV-0253 | P22-local-deploy-closeout | COMPLETED_VALIDATED | `git diff --check`; docs validation | Closes P22 local HTTP MCP deploy/validation evidence chain and routes next to `P23-v1.0-memory-kernel-planning`; docs validation passed; docs/status/board only; no A5-gated action performed. |
 
 ## Common Validation Commands
 

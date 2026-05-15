@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record approved GitHub release creation for tag `p22-rc-7fd17de`; deploy remains blocked.
+Close P22 local HTTP MCP deploy/validation evidence chain; production deploy remains blocked.
 
 ## Current Area
 
-P22 GitHub release creation result record
+P22 local HTTP MCP deploy closeout
 
 ## Current Status
 
@@ -16,13 +16,19 @@ P22 GitHub release creation result record
 - Temporary gate execution checkout was created at `A:\codex-memory-gate-7fd17de`, verified at target HEAD, and removed.
 - Main workspace remains clean and synced at the latest docs baseline after result recording.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
-- Current work is release-result recording after approved release creation.
+- Current work closes the already-recorded local HTTP MCP deploy/validation evidence chain after approved release creation.
 - Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
 - Target tag: `p22-rc-7fd17de`.
+- Local HTTP MCP deploy/validation evidence: `/health ok`, live `initialize/tools/list ok`, public MCP tools exactly three, `observe:http status=ok`, MCP/HTTP tests `12/12`.
+- P22 local deploy closeout preserves that this is not production deploy, startup hardening, watchdog installation, Codex/Claude client switch, migration, durable memory activation, or v1.0 release.
 
 ## Completed Work In This Batch
 
 - Created GitHub prerelease `P22 Security-Fix Release Candidate p22-rc-7fd17de`.
+- Added [P22_LOCAL_DEPLOY_RESULT_RECORD.md](/A:/codex-memory/docs/P22_LOCAL_DEPLOY_RESULT_RECORD.md).
+- Recorded local HTTP MCP deploy/validation completion while keeping production deploy and startup/watchdog/client config changes A5-gated.
+- Added [P22_LOCAL_DEPLOY_CLOSEOUT.md](/A:/codex-memory/docs/P22_LOCAL_DEPLOY_CLOSEOUT.md).
+- Routed next recommended phase to `P23-v1.0-memory-kernel-planning`.
 - Added [P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md).
 - Recorded that deploy remains `NOT_APPROVED` / still blocked.
 - Recorded that the old `p22-rc-806cc847` candidate is superseded and must not be reused or moved.
@@ -38,6 +44,8 @@ P22 GitHub release creation result record
 ## Changed Files
 
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md`
+- `docs/P22_LOCAL_DEPLOY_RESULT_RECORD.md`
+- `docs/P22_LOCAL_DEPLOY_CLOSEOUT.md`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -51,8 +59,9 @@ P22 GitHub release creation result record
 
 ## Validation
 
-- `git diff --check`: passed.
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`: passed.
+- Local deploy evidence already completed: `/health ok`; live `initialize/tools/list ok`; `observe:http status=ok`; MCP/HTTP tests `12/12`.
+- P22 local deploy result-record docs validation: `git diff --check` passed; docs validation passed.
+- P22 local deploy closeout docs validation: `git diff --check` passed; docs validation passed.
 
 ## Not Done
 
@@ -62,7 +71,7 @@ P22 GitHub release creation result record
 - No `npm test` rerun in this result-record phase.
 - No `gate:ci` rerun in this result-record phase.
 - No compare / rollback rerun in this result-record phase.
-- No live HTTP MCP startup.
+- No new live HTTP MCP startup in this result-record phase.
 - No provider command.
 - No config mutation.
 - No startup/watchdog operation.
@@ -75,8 +84,8 @@ P22 GitHub release creation result record
 - No `.env` or secret change.
 - No release candidate artifact creation.
 - No tag created, moved, or pushed.
-- No release or deploy.
+- No production deploy.
 
 ## Next Safe Action
 
-Run docs validation, guarded commit, and safe-push if ready. Then stop unless explicit deploy approval is provided.
+Run docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P23-v1.0-memory-kernel-planning`.
