@@ -2,39 +2,30 @@
 
 ## Current Goal
 
-P22.x-release-candidate-planning-closeout-review: close the P22 planning chain and mark RC gate refresh / implementation as blocked for explicit A5 approval.
+P22 release-candidate gate refresh / implementation boundary: P22 planning is closed; further RC gate refresh / implementation is blocked for explicit A5 approval.
 
 ## Current Area
 
-P22 release candidate planning closeout
+P22 release candidate A5 approval boundary
 
 ## Current Status
 
-- P22.4 approval packet template is on `origin/main`.
-- P22.x closeout review is implemented locally as docs/status/board only.
+- P22.x closeout review is on `origin/main` at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`.
+- `main`, local `origin/main`, and remote `refs/heads/main` matched `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc` after push.
+- CM-0161 is blocked until the user explicitly approves an exact A5 RC gate refresh / implementation packet.
 - Release-candidate implementation, gate execution, startup/watchdog install, config mutation, provider calls, migration/import-export apply, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
-- Added `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`.
-- Linked P22 closeout from P22 planning, P22.4 approval packet template, and roadmap docs.
-- Summarized completed P22 scope, evidence freshness, boundary confirmations, remaining risks, readiness judgment, and A5 blocker.
-- Marked `P22-release-candidate-gate-refresh-approval-request` blocked pending explicit user approval.
+- Confirmed P22.x closeout is pushed and verified at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`.
+- Confirmed `.agent_board/TASK_QUEUE.md` has CM-0161 marked `blocked`.
+- Corrected board wording from pending local closeout to current A5 boundary state.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`
-- `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`
-- `docs/P22_RELEASE_CANDIDATE_PLAN.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `MAINTENANCE_BACKLOG.md`
-- `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
-- `.agent_board/TASK_QUEUE.md`
-- `.agent_board/VALIDATION_LOG.md`
 
 ## Validation
 
@@ -66,4 +57,4 @@ P22 release candidate planning closeout
 
 ## Next Safe Action
 
-Guarded commit and safe-push if ready. Stop before RC gate refresh / implementation unless explicit A5 approval is provided.
+Guarded commit / safe-push if ready. Stop before RC gate refresh / implementation unless explicit A5 approval is provided.

@@ -2,7 +2,7 @@
 
 ## Goal
 
-P22 planning closeout is ready for validation and commit. The next release-candidate gate refresh / implementation step is blocked for explicit A5 approval.
+P22 planning is closed and pushed. The next release-candidate gate refresh / implementation step is blocked for explicit A5 approval.
 
 ## Workspace
 
@@ -14,30 +14,25 @@ A:\codex-memory
 
 ## Worktree
 
-P22.x docs/status/board edits are local and pending validation.
+Worktree is clean after P22.x closeout push, except for this board-state sync if present.
 
 ## Current Area
 
-P22 release candidate planning closeout
+P22 release candidate A5 approval boundary
 
 ## Findings
 
-- P22.x adds `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`.
 - P22 planning chain is complete through planning, readiness inventory, gate matrix dry-run plan, rollback/support story, approval packet template, and closeout.
+- P22.x closeout is pushed and verified at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`.
 - P22 closeout result is `P22_RELEASE_CANDIDATE_PLANNING_CLOSED_BLOCKED_FOR_EXPLICIT_RC_APPROVAL`.
 - Fresh RC gate refresh / implementation requires a separate explicit A5 approval request.
 - Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate creation, tag, release, and deploy remain blocked without explicit A5 approval.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`
-- `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`
-- `docs/P22_RELEASE_CANDIDATE_PLAN.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `MAINTENANCE_BACKLOG.md`
-- `STATUS.md`
-- `.agent_board/*`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/HANDOFF.md`
+- `.agent_board/RUN_STATE.md`
 
 ## Validation
 
@@ -68,4 +63,4 @@ P22 release candidate planning closeout
 
 ## Next Safe Step
 
-Guarded commit and safe-push if ready. After that, stop at the A5 approval boundary unless the user explicitly approves the RC gate refresh / implementation packet.
+Guarded commit / safe-push if ready. After that, stop at the A5 approval boundary unless the user explicitly approves the RC gate refresh / implementation packet.

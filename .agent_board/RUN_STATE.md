@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 docs/status/board |
-| Current task | CM-0160 / P22.x-release-candidate-planning-closeout-review |
-| Current area | P22 release candidate planning closeout |
-| Last pushed baseline | P22.4 approval packet template pushed and verified at `5fcf95b4ed7a444901b4cdac2bd219a1a03be097` |
+| Current task | CM-0161 / P22-release-candidate-gate-refresh-approval-request |
+| Current area | P22 release candidate A5 approval boundary |
+| Last pushed baseline | P22.x closeout pushed and verified at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P22.x closeout review without executing gates or release-candidate operations. |
-| Last validation | `git diff --check` passed; docs validation passed for P22.x closeout. |
-| Worktree summary | P22.x docs/status/board edits only. No `src/`, tests, fixtures, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, or unapproved mutation. |
+| Last action | P22 planning chain closed and pushed; next RC gate refresh / implementation is blocked pending explicit A5 approval. |
+| Last validation | P22.x closeout validation passed before commit; post-push hash verification matched `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`. |
+| Worktree summary | Clean after P22.x closeout push. No `src/`, tests, fixtures, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base. |
 | P20 status | Closed as evidence-ready and blocked for apply. |
-| Guarded auto-commit allowed | eligible after final diff/file-scope inspection |
-| Safe-push readiness | pending guarded commit |
-| Next planned action | Guarded commit and safe-push if ready. Next RC gate refresh / implementation is blocked until explicit A5 approval. |
+| Guarded auto-commit allowed | not needed; worktree clean unless this board sync is committed |
+| Safe-push readiness | blocked for RC work without explicit A5 approval |
+| Next planned action | Stop at A5 boundary unless the user explicitly approves an exact RC gate refresh / implementation packet. |
 
 ## Notes
 
