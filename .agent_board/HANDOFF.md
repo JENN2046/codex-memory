@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P20 local production hardening closeout into P21 client integration planning.
+Continue from P21 client integration planning into P21.1 inventory.
 
 ## Workspace
 
@@ -14,23 +14,22 @@ A:\codex-memory
 
 ## Worktree
 
-P20.x docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
+P21 planning docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P20 local production hardening closeout
+P21 client integration hardening planning
 
 ## Findings
 
-- P20.4 local production safety checklist was committed and pushed at `5fb4081442d0a6e5814232c801e2c54c48f9e6c5`.
-- P20.x adds closeout review only.
-- Backup creation, restore, config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, and release work remain blocked without explicit A5 approval.
-- The closeout summarizes P20 evidence, boundaries, remaining risks, and P21 planning readiness.
+- P20.x closeout was committed and pushed at `f1f7a5ce80854016456569117555c9a467416e7a`.
+- P21 planning adds client integration hardening planning only.
+- Codex/Claude config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, and release work remain blocked without explicit A5 approval.
+- The plan defines client surfaces, gate categories, proposed subphases, validation strategy, safety rules, non-goals, and P21.1 inventory handoff.
 
 ## Changed Files
 
-- `docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md`
-- `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
+- `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -62,4 +61,4 @@ P20 local production hardening closeout
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21-Codex-Claude-client-integration-hardening-planning`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.1-client-integration-inventory`.

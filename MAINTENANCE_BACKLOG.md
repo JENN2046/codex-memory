@@ -161,7 +161,8 @@
 | P20.3-rollback-backup-operations-plan | local-production-hardening / rollback-backup | A1/A2 | done | Define backup/restore/rollback requirements before any real operation | `git diff --check`; docs validation | Docs-only; no real backup/restore, config mutation, service/watchdog start/install, provider call, real memory preview, durable mutation, migration, import/export apply, MCP expansion, package change, release, tag, or deploy |
 | P20.4-local-production-safety-checklist | local-production-hardening / safety-checklist | A1/A2 | done | Build local operator preflight, warning signals, and stop-condition checklist | `git diff --check`; docs validation | Docs-only; no real backup/restore, config mutation, service/watchdog start/install, provider call, real memory preview, durable mutation, migration, import/export apply, MCP expansion, package change, release, tag, or deploy | no |
 | P20.x-local-production-hardening-closeout-review | local-production-hardening / closeout | A1 | done | Close P20 evidence chain and judge P21 readiness | `git diff --check`; docs validation | Docs-only; no real backup/restore, config mutation, service/watchdog start/install, provider call, real memory preview, durable mutation, migration, import/export apply, MCP expansion, package change, release, tag, or deploy | no |
-| P21-Codex-Claude-client-integration-hardening-planning | client-integration / planning | A1/A2 | todo | Plan Codex / Claude client integration hardening without config mutation | `git diff --check`; docs validation | no real config mutation; no MCP public tool expansion; no provider call | no |
+| P21-Codex-Claude-client-integration-hardening-planning | client-integration / planning | A1/A2 | done | Plan Codex / Claude client integration hardening without config mutation | `git diff --check`; docs validation | Docs-only; no real config mutation, service/watchdog operation, MCP public tool/schema change, provider call, real memory preview, migration/import-export apply, package change, release, tag, or deploy | no |
+| P21.1-client-integration-inventory | client-integration / inventory | A1/A2 | todo | Inventory Codex / Claude client docs, commands, acceptance gaps, and hard-stop boundaries | `git diff --check`; docs validation | no real config mutation; no MCP public tool expansion; no provider call | no |
 
 ## 推荐执行顺序
 
@@ -262,8 +263,9 @@
 95. `P20.3 rollback/backup operations plan`：新增 [docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md](/A:/codex-memory/docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md)，定义 protected assets、future backup manifest shape、rollback story、A5 approval packet、validation matrix 和 hard stops；本阶段不创建 backup、不 restore、不改真实配置、不启动 service/watchdog、不读取 real memory。
 96. `P20.4 local production safety checklist`：新增 [docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md)，整理 operator preflight、startup/watchdog safety、config safety、durable memory safety、warning signals、approval packet 和 stop conditions；本阶段不启动 service/watchdog、不安装 startup task、不改真实配置、不创建 backup/restore、不读取 real memory。
 97. `P20.x local production hardening closeout`：新增 [docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md)，总结 P20 planning/state reconciliation/P20.1-P20.4 evidence、boundary、remaining risks 和 P21 readiness judgment；结论为 `LOCAL_PRODUCTION_HARDENING_EVIDENCE_READY_BLOCKED_FOR_APPLY`。
-98. 下一步建议进入 `P21-Codex-Claude-client-integration-hardening-planning`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
-99. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+98. `P21 Codex / Claude client integration hardening planning`：新增 [docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md](/A:/codex-memory/docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md)，规划 client identity、scope/visibility、acceptance docs、MCP config guidance、cross-client private leakage fixture path 和 public tool freeze。
+99. 下一步建议进入 `P21.1-client-integration-inventory`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
+100. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

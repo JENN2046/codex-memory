@@ -155,6 +155,7 @@
 - P20.3 rollback / backup operations plan：新增 [docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md](/A:/codex-memory/docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md)，定义未来 local production hardening 操作前必须具备的 protected assets、backup manifest shape、rollback story、A5 approval packet、validation matrix 和 hard stops；本阶段 docs-only，不创建 backup、不 restore、不改 Codex/Claude config、不安装或启动 service/watchdog、不读取真实 memory、不做 migration/import-export apply。
 - P20.4 local production safety checklist：新增 [docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md)，整理未来 local production 操作前的 operator preflight、startup/watchdog safety、config safety、durable memory safety、warning signals、approval packet 和 stop conditions；本阶段 docs-only，不启动服务、不安装 watchdog/startup task、不改真实配置、不创建 backup/restore、不读取真实 memory、不做 migration/import-export apply。
 - P20.x local production hardening closeout：新增 [docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md)，总结 P20 planning/state reconciliation/P20.1-P20.4 evidence、boundary confirmations、remaining risks 和 P21 readiness judgment；结论为 `LOCAL_PRODUCTION_HARDENING_EVIDENCE_READY_BLOCKED_FOR_APPLY`，可进入 P21 planning，但仍不得改真实 Codex/Claude config、启动或安装 service/watchdog、创建 backup/restore、做 migration/import-export apply 或 release candidate。
+- P21 Codex / Claude client integration hardening planning：新增 [docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md](/A:/codex-memory/docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md)，规划 client identity、scope/visibility、acceptance docs、MCP config guidance、cross-client private leakage fixture path 和 public tool freeze；本阶段 docs-only，不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不做 migration/import-export apply、不进入 P22 release candidate。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -522,7 +523,7 @@
 
 - P20.1 startup/watchdog inventory 已完成 guarded commit / safe-push 和 post-push hash verification，当前 local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `e56bc2a182302e86f9cf8c79f642e0e7badccc99`。
 - P20.2 health/readiness evidence 已捕获并关闭当前 blocker：P20.2b 后 `gate:ci` 已回绿。
-- 下一阶段建议进入 `P21-Codex-Claude-client-integration-hardening-planning`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
+- 下一阶段建议进入 `P21.1-client-integration-inventory`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 
