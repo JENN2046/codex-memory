@@ -2,30 +2,29 @@
 
 ## Current Goal
 
-P20.3-rollback-backup-operations-plan: define rollback and backup requirements before any real local production operation.
+P20.4-local-production-safety-checklist: define operator preflight, warning signals, approval packet, and stop conditions before any local production operation.
 
 ## Current Area
 
-P20 local production hardening rollback/backup planning
+P20 local production hardening safety checklist
 
 ## Current Status
 
-- P20.2b is on `origin/main` at `561cff790811f75cdcdf625d50050c841a308ea4`.
-- P20.3 rollback/backup operations plan is implemented locally.
+- P20.3 is on `origin/main` at `1d5b0a8f5bf689b6fde6e7124eda875c069e88d5`.
+- P20.4 local production safety checklist is implemented locally.
 
 ## Completed Work In This Batch
 
-- Added `docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md`.
-- Defined protected assets for future local production operations.
-- Defined future backup manifest shape.
-- Defined rollback story requirements.
-- Defined A5 approval packet requirements.
-- Defined minimum validation matrices for startup/watchdog, live HTTP runtime, config rollback planning, and durable memory / migration-adjacent operations.
+- Added `docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md`.
+- Defined local operator preflight requirements.
+- Defined startup/watchdog safety questions and blocked commands.
+- Defined config and durable-memory safety checklists.
+- Defined warning signals, approval packet requirements, and stop conditions.
 - Updated P20 plan, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
-- `docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md`
+- `docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md`
 - `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -63,4 +62,4 @@ P20 local production hardening rollback/backup planning
 
 ## Next Safe Action
 
-Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P20.4-local-production-safety-checklist`.
+Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P20.x-local-production-hardening-closeout-review`.

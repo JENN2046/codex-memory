@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue P20 local production hardening with docs-only safety planning.
+Continue P20 local production hardening with docs-only closeout review after the safety checklist.
 
 ## Workspace
 
@@ -14,22 +14,22 @@ A:\codex-memory
 
 ## Worktree
 
-P20.3 docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
+P20.4 docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P20 local production hardening rollback/backup planning
+P20 local production hardening safety checklist
 
 ## Findings
 
-- P20.2b fixture contract repair was committed and pushed at `561cff790811f75cdcdf625d50050c841a308ea4`.
-- P20.3 adds rollback/backup operations planning only.
+- P20.3 rollback/backup operations plan was committed and pushed at `1d5b0a8f5bf689b6fde6e7124eda875c069e88d5`.
+- P20.4 adds a local production safety checklist only.
 - Backup creation, restore, config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, and release work remain blocked without explicit A5 approval.
-- The plan defines protected assets, future backup manifest shape, rollback story requirements, approval packet contents, validation matrices, and hard stops.
+- The checklist defines operator preflight, startup/watchdog safety questions, config safety, durable-memory safety, warning signals, approval packet contents, and stop conditions.
 
 ## Changed Files
 
-- `docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md`
+- `docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md`
 - `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -62,4 +62,4 @@ P20 local production hardening rollback/backup planning
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P20.4-local-production-safety-checklist`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P20.x-local-production-hardening-closeout-review`.

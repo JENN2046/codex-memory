@@ -118,4 +118,6 @@ P20.2b TagMemo targeted fixture contract repair is captured in [P20_TAGMEMO_TARG
 
 P20.3 rollback / backup operations planning is captured in [P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md](./P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md).
 
-`P20.4-local-production-safety-checklist`
+P20.4 local production safety checklist is captured in [P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md](./P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md).
+
+`P20.x-local-production-hardening-closeout-review`
