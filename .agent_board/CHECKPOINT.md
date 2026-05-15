@@ -2,30 +2,31 @@
 
 ## Current Goal
 
-P22.3-release-candidate-rollback-support-story: define rollback, support, troubleshooting, and operator handoff expectations before any release-candidate implementation request.
+P22.4-release-candidate-approval-packet-template: prepare an explicit A5 approval packet template without executing or approving it.
 
 ## Current Area
 
-P22 release candidate rollback/support planning
+P22 release candidate approval packet template
 
 ## Current Status
 
-- P22.2 gate matrix dry-run plan is on `origin/main`.
-- P22.3 rollback/support story is implemented locally as docs/status/board only.
+- P22.3 rollback/support story is on `origin/main`.
+- P22.4 approval packet template is implemented locally as docs/status/board only.
 - Release-candidate implementation, gate execution, startup/watchdog install, config mutation, provider calls, migration/import-export apply, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
-- Added `docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md`.
-- Linked P22.3 from P22 planning, P22.2 gate matrix plan, and roadmap docs.
-- Defined protected assets, rollback tiers, troubleshooting map, operator handoff fields, and required evidence before RC implementation.
-- Updated next phase plan, status, backlog, and board pointers toward P22.4 approval packet template.
+- Added `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`.
+- Linked P22.4 from P22 planning, P22.3 rollback/support story, and roadmap docs.
+- Defined approval status, approval sentence shape, scope declaration, preflight requirements, mutation scope, command plan, rollback story, support handoff, redaction rules, and decision values.
+- Set the template default to `NOT_APPROVED_TEMPLATE_ONLY` / `BLOCKED_HARD_STOP`.
+- Updated next phase plan, status, backlog, and board pointers toward P22.x closeout review.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`
 - `docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md`
 - `docs/P22_RELEASE_CANDIDATE_PLAN.md`
-- `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`
 - `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`

@@ -147,4 +147,6 @@ P22.2 release-candidate gate matrix dry-run plan is captured in [P22_RELEASE_CAN
 
 P22.3 rollback/support story is captured in [P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md](./P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md).
 
-`P22.4-release-candidate-approval-packet-template`
+P22.4 approval packet template is captured in [P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md](./P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md).
+
+`P22.x-release-candidate-planning-closeout-review`

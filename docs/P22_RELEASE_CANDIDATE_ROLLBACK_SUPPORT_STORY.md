@@ -145,4 +145,6 @@ It is not sufficient to authorize RC implementation, gate execution, startup/wat
 
 ## Next Recommended Phase
 
-`P22.4-release-candidate-approval-packet-template`
+P22.4 approval packet template is captured in [P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md](./P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md).
+
+`P22.x-release-candidate-planning-closeout-review`

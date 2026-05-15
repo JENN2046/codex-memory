@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P22.3 rollback/support story into P22.4 RC approval packet template.
+Continue from P22.4 approval packet template into P22.x release-candidate planning closeout review.
 
 ## Workspace
 
@@ -14,25 +14,25 @@ A:\codex-memory
 
 ## Worktree
 
-P22.3 docs/status/board edits are local and pending validation.
+P22.4 docs/status/board edits are local and pending validation.
 
 ## Current Area
 
-P22 release candidate rollback/support planning
+P22 release candidate approval packet template
 
 ## Findings
 
-- P22.3 adds `docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md`.
-- P22.3 defines protected assets, rollback tiers, troubleshooting map, operator handoff fields, and required pre-RC evidence.
-- P22.3 does not run gates, create backups, restore backups, start services, mutate config, call providers, read real memory content, create release candidates, tag, release, or deploy.
-- P22.4 may prepare an explicit A5 approval packet template only; it must not execute the packet.
+- P22.4 adds `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`.
+- The template default is `NOT_APPROVED_TEMPLATE_ONLY`; it is not approval and does not authorize command execution.
+- P22.4 defines approval sentence shape, preflight evidence, mutation scope, command-plan fields, rollback story fields, support handoff fields, redaction rules, and decision values.
+- P22.x closeout may judge whether an RC implementation request can be prepared separately; it must not execute the approval packet.
 - Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate creation, tag, release, and deploy remain blocked without explicit A5 approval.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`
 - `docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md`
 - `docs/P22_RELEASE_CANDIDATE_PLAN.md`
-- `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`
 - `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -68,4 +68,4 @@ P22 release candidate rollback/support planning
 
 ## Next Safe Step
 
-Guarded commit and safe-push if ready. After that, the next recommended forward phase is `P22.4-release-candidate-approval-packet-template`.
+Guarded commit and safe-push if ready. After that, the next recommended forward phase is `P22.x-release-candidate-planning-closeout-review`.
