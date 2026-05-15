@@ -326,7 +326,8 @@
 - P22.9 post-gate-refresh closeout review 已新增 [docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md)：关闭 post-gate-refresh docs chain，结论 `READY_TO_REQUEST_RC_ARTIFACT_APPROVAL`；RC artifact 未创建，tag/release/deploy 未执行，A5 approval 仍是 artifact creation 前置条件。
 - P22 release-candidate artifact creation approval request 已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_CREATION_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_CREATION_APPROVAL_REQUEST.md)：请求显式批准创建单个本地 Markdown artifact `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`，并限定 STATUS / backlog / next-plan / board 同步、docs validation、guarded commit、safe-push；默认 `NOT_APPROVED` / `BLOCKED_HARD_STOP`。
 - P22 release-candidate artifact 已按显式批准创建：[docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md)；这是 local Markdown artifact only，未 tag、未 release、未 deploy，未 provider/config/migration/import-export/public MCP expansion。
-- 下一步建议：等待任何 tag / release / deploy / provider / config / migration-import-export / public MCP expansion 的单独显式批准，或继续 docs-only maintenance。
+- P22.10 RC artifact creation closeout review 已新增 [docs/P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md)：确认 artifact created docs-only，并关闭 artifact creation 阶段；tag/release/deploy 仍未执行。
+- 下一步建议：`P22.11-tag-release-deploy-approval-request`；任何 tag / release / deploy / provider / config / migration-import-export / public MCP expansion 仍需单独显式批准。
 - 边界：不改真实 Codex/Claude config、不启动 live HTTP MCP 或 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断
