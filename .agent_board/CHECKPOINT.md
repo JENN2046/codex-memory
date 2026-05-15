@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Draft the P22.5 release-candidate artifact approval request without creating a release candidate artifact.
+Define the P22.6 release-candidate artifact manifest shape without generating a real artifact.
 
 ## Current Area
 
-P22 release-candidate artifact approval request
+P22 release-candidate artifact manifest shape
 
 ## Current Status
 
@@ -15,21 +15,20 @@ P22 release-candidate artifact approval request
 - P22 planning is closed.
 - Approved local non-provider RC gate refresh execution completed after the model commit.
 - Release state is `gate_refresh_passed_rc_not_created`.
-- Current work is only `P22.5-release-candidate-artifact-approval-request` docs/board drafting.
+- Current work is only `P22.6-release-candidate-artifact-manifest-shape` docs/board drafting.
 
 ## Completed Work In This Batch
 
-- Added [P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md).
-- Drafted exact future A5 approval sentence shape for creating an RC artifact.
-- Recorded target commit `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
-- Recorded gate refresh PASS evidence from [P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md).
-- Defined artifact scope, expected artifact content, rollback tier, stop conditions, and exclusions.
-- Kept approval status `NOT_APPROVED` and decision `BLOCKED_HARD_STOP`.
-- Explicitly confirmed no RC artifact, tag, release, deploy, provider call, config mutation, startup/watchdog operation, migration/import-export apply, or MCP expansion.
+- Added [P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md).
+- Defined stable future RC artifact JSON envelope shape.
+- Defined Markdown companion section order.
+- Covered `rc_candidate_id`, `target_commit`, gate refresh result, gate evidence summary, public MCP tools, `validate_memory` internal-only status, mutation boundaries, known gaps, rollback story, support handoff, and approval status.
+- Chose docs-only shape; no fixture/test added for P22.6.
+- Explicitly confirmed no artifact generation, tag, release, deploy, provider call, config mutation, migration/import-export apply, or MCP expansion.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md`
+- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -70,4 +69,4 @@ P22 release-candidate artifact approval request
 
 ## Next Safe Action
 
-Guarded commit, safe-push if ready, then continue to `P22.6-release-candidate-artifact-manifest-shape`. Do not create RC artifacts, tag, release, or deploy without separate explicit approval.
+Guarded commit, safe-push if ready, then continue to `P22.7-release-candidate-notes-draft`. Do not create RC artifacts, tag, release, or deploy without separate explicit approval.
