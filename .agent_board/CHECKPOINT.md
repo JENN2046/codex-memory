@@ -2,32 +2,31 @@
 
 ## Current Goal
 
-Close the P22 RC artifact creation phase after the local Markdown artifact was created.
+Draft the P22 tag / release / deploy approval request without performing any of those actions.
 
 ## Current Area
 
-P22 RC artifact creation closeout
+P22 tag/release/deploy approval request
 
 ## Current Status
 
-- `main`, local `origin/main`, and remote `refs/heads/main` were at `ab9cfaf729d85c10ac06b96189965aea031f24e4` before this P22.10 closeout batch.
+- `main`, local `origin/main`, and remote `refs/heads/main` were at `11d90a6e9bf8443f9b07c3c3ef78addf9a9c6df4` before this P22.11 batch.
 - P22 planning is closed.
 - Approved local non-provider RC gate refresh execution completed and is recorded as `PASS`.
 - P22.5 artifact approval request, P22.6 manifest shape, P22.7 notes draft, and P22.8 operator handoff are complete.
 - Release state is now `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED`.
-- Current work is only `P22.10-rc-artifact-creation-closeout`.
+- Current work is only `P22.11-tag-release-deploy-approval-request`.
 
 ## Completed Work In This Batch
 
-- Added [P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md).
-- Linked the closeout from [P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md).
-- Recorded result `P22_RC_ARTIFACT_CREATED_DOCS_ONLY_CLOSED`.
+- Added [P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md).
+- Split tag, GitHub release, and deploy into independent approval switches.
+- Kept tag/release/deploy statuses `NOT_APPROVED` and decision `BLOCKED_HARD_STOP`.
 - Confirmed no tag, release, deploy, provider call, config mutation, startup/watchdog operation, live HTTP MCP startup, real memory preview, migration/import-export apply, public MCP expansion, package/lockfile change, `.env`/secret change, or durable DB/memory write.
 
 ## Changed Files
 
-- `docs/P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md`
-- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`
+- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -39,8 +38,8 @@ P22 RC artifact creation closeout
 
 ## Validation
 
-- `git diff --check`: passed
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`: passed
+- `git diff --check`: passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`: passed.
 
 ## Not Done
 
@@ -68,4 +67,4 @@ P22 RC artifact creation closeout
 
 ## Next Safe Action
 
-Guarded commit, safe-push if ready, then continue to `P22.11-tag-release-deploy-approval-request`. Do not tag, release, deploy, call providers, mutate config, start services, preview real memory, write durable memory, migrate/import-export apply, expand MCP, change package/lockfile, or edit `.env` / secrets without separate explicit approval.
+Run guarded commit, safe-push if ready, then continue to `P22.12-release-publication-boundary-checklist`. Do not tag, release, deploy, call providers, mutate config, start services, preview real memory, write durable memory, migrate/import-export apply, expand MCP, change package/lockfile, or edit `.env` / secrets without separate explicit approval.
