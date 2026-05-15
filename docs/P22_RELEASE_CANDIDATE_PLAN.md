@@ -145,4 +145,6 @@ P22.1 release-candidate readiness inventory is captured in [P22_RELEASE_CANDIDAT
 
 P22.2 release-candidate gate matrix dry-run plan is captured in [P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md](./P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md).
 
-`P22.3-release-candidate-rollback-support-story`
+P22.3 rollback/support story is captured in [P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md](./P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md).
+
+`P22.4-release-candidate-approval-packet-template`

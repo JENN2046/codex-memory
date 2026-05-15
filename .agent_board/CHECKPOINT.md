@@ -2,33 +2,38 @@
 
 ## Current Goal
 
-P20.1-startup-watchdog-inventory reconciliation: confirm the true state of the P20.1 startup/watchdog inventory after later P21/P22 work, and correct stale docs/board wording if needed.
+P22.3-release-candidate-rollback-support-story: define rollback, support, troubleshooting, and operator handoff expectations before any release-candidate implementation request.
 
 ## Current Area
 
-P20 local production hardening / startup-watchdog inventory
+P22 release candidate rollback/support planning
 
 ## Current Status
 
-- P20.1 startup/watchdog inventory exists at `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`.
-- P20.1 was committed as `e56bc2a182302e86f9cf8c79f642e0e7badccc99`.
-- Current `main`, local `origin/main`, and remote `refs/heads/main` are all `fb5284143de776a9f890cd329f015eb3914701eb`.
-- P20.1 remains closed as docs/status/board inventory only; no startup/watchdog command was run in this reconciliation.
+- P22.2 gate matrix dry-run plan is on `origin/main`.
+- P22.3 rollback/support story is implemented locally as docs/status/board only.
+- Release-candidate implementation, gate execution, startup/watchdog install, config mutation, provider calls, migration/import-export apply, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
-- Confirmed P20.1 inventory still lists the current `start:http:*` and watchdog scripts from `package.json`.
-- Confirmed checked-in startup/watchdog script files still exist under `scripts/`.
-- Corrected stale wording that described P20.1 or P22.2 historical commit state as the current repository state.
-- Preserved P20.1 boundaries: no service start, no watchdog start/install, no scheduled task or HKCU Run mutation, no config mutation.
+- Added `docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md`.
+- Linked P22.3 from P22 planning, P22.2 gate matrix plan, and roadmap docs.
+- Defined protected assets, rollback tiers, troubleshooting map, operator handoff fields, and required evidence before RC implementation.
+- Updated next phase plan, status, backlog, and board pointers toward P22.4 approval packet template.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md`
+- `docs/P22_RELEASE_CANDIDATE_PLAN.md`
+- `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
+- `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
 
 ## Validation
@@ -61,4 +66,4 @@ P20 local production hardening / startup-watchdog inventory
 
 ## Next Safe Action
 
-Guarded commit and safe-push if ready, then stop or continue only on explicit next-phase instruction.
+Guarded commit and safe-push if ready.

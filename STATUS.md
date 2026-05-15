@@ -532,7 +532,8 @@
 
 - P20.1 startup/watchdog inventory 已完成 guarded commit / safe-push 和 post-push hash verification，P20.1 对应提交为 `e56bc2a182302e86f9cf8c79f642e0e7badccc99`；当前 main 已继续推进到 P22.2，local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `fb5284143de776a9f890cd329f015eb3914701eb`。
 - P20.2 health/readiness evidence 已捕获并关闭当前 blocker：P20.2b 后 `gate:ci` 已回绿。
-- 下一阶段建议进入 `P22.3-release-candidate-rollback-support-story`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag/release/deploy；P22 implementation 仍需显式 A5 approval。
+- P22.3 release-candidate rollback/support story 已新增 [docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md)，定义 future RC rollback tiers、support/troubleshooting map、operator handoff fields 和 approval boundaries；本阶段未运行 gate matrix、未启动服务、未安装 watchdog/startup task、未改真实配置、未读写真实 memory、未创建 RC。
+- 下一阶段建议进入 `P22.4-release-candidate-approval-packet-template`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag/release/deploy；P22 implementation 仍需显式 A5 approval。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

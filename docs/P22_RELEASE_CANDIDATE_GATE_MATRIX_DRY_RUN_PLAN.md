@@ -134,4 +134,6 @@ It is not sufficient to authorize gate execution, RC implementation, startup/wat
 
 ## Next Recommended Phase
 
-`P22.3-release-candidate-rollback-support-story`
+P22.3 rollback/support story is captured in [P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md](./P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md).
+
+`P22.4-release-candidate-approval-packet-template`
