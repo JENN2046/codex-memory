@@ -2,28 +2,29 @@
 
 ## Current Goal
 
-P22.1-release-candidate-readiness-inventory: inventory RC gate evidence freshness, known gaps, and approval blockers.
+P22.2-release-candidate-gate-matrix-dry-run-plan: define RC gate matrix dry-run plan and expected report shape without executing heavy/live gates.
 
 ## Current Area
 
-P22 release candidate readiness inventory
+P22 release candidate gate matrix dry-run planning
 
 ## Current Status
 
-- P22 planning is on `origin/main` at `a05c2ce81be1fe2013eceef9472ad974cd7a4440`.
-- P22.1 readiness inventory is implemented locally as docs/status/board only.
+- P22.1 is on `origin/main` at `1358747cd097ec72e119b1ebc3535bab2e2ca5f1`.
+- P22.2 gate matrix dry-run plan is implemented locally as docs/status/board only.
 
 ## Completed Work In This Batch
 
-- Added `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`.
-- Linked P22.1 from `docs/P22_RELEASE_CANDIDATE_PLAN.md` and `docs/VCP_MEMORY_PARITY_ROADMAP.md`.
-- Inventoried current gate evidence for full suite, strict mainline, compare, rollback, `gate:ci`, client scope/privacy, local production safety, and docs validation.
-- Marked standing evidence separately from fresh RC implementation evidence.
-- Recorded known gaps and approval blockers before any RC implementation.
-- Updated next phase plan, status, backlog, and board pointers toward P22.2 gate matrix dry-run planning.
+- Added `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`.
+- Linked P22.2 from `docs/P22_RELEASE_CANDIDATE_PLAN.md`, `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`, and `docs/VCP_MEMORY_PARITY_ROADMAP.md`.
+- Defined future report shape, gate matrix, blocker semantics, and execution order.
+- Marked provider/live/config/startup/watchdog/migration/release gates as blocked without explicit A5 approval.
+- Confirmed P22.2 does not execute heavy/live gates, add CLI, add tests, create RC artifacts, or mutate runtime/config/data.
+- Updated next phase plan, status, backlog, and board pointers toward P22.3 rollback/support story.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`
 - `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`
 - `docs/P22_RELEASE_CANDIDATE_PLAN.md`
 - `docs/VCP_MEMORY_PARITY_ROADMAP.md`
@@ -66,4 +67,4 @@ P22 release candidate readiness inventory
 
 ## Next Safe Action
 
-Run final file-scope inspection, guarded commit, safe-push if ready, then continue to `P22.2-release-candidate-gate-matrix-dry-run-plan`.
+Run final file-scope inspection, guarded commit, safe-push if ready, then continue to `P22.3-release-candidate-rollback-support-story`.

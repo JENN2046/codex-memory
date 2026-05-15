@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P22.1 release-candidate readiness inventory into P22.2 gate matrix dry-run planning.
+Continue from P22.2 release-candidate gate matrix dry-run planning into P22.3 rollback/support story.
 
 ## Workspace
 
@@ -14,22 +14,23 @@ A:\codex-memory
 
 ## Worktree
 
-P22.1 docs/status/board edits are local and pending validation.
+P22.2 docs/status/board edits are local and pending validation.
 
 ## Current Area
 
-P22 release candidate readiness inventory
+P22 release candidate gate matrix dry-run planning
 
 ## Findings
 
-- P22 release-candidate planning was committed and pushed at `a05c2ce81be1fe2013eceef9472ad974cd7a4440`.
-- P22.1 inventories current gate evidence freshness and separates standing evidence from fresh RC implementation evidence.
-- P22.1 does not run heavy/live gates and does not authorize RC implementation.
-- P22.2 may define a gate matrix dry-run plan and expected report shape only.
+- P22.1 release-candidate readiness inventory was committed and pushed at `1358747cd097ec72e119b1ebc3535bab2e2ca5f1`.
+- P22.2 defines a future RC gate matrix dry-run report shape, gate list, blocker semantics, and execution order.
+- P22.2 does not run heavy/live gates and does not authorize RC implementation.
+- P22.3 may define rollback/support/troubleshooting/operator handoff only.
 - Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate creation, tag, release, and deploy remain blocked without explicit A5 approval.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`
 - `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`
 - `docs/P22_RELEASE_CANDIDATE_PLAN.md`
 - `docs/VCP_MEMORY_PARITY_ROADMAP.md`
@@ -67,4 +68,4 @@ P22 release candidate readiness inventory
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P22.2-release-candidate-gate-matrix-dry-run-plan`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P22.3-release-candidate-rollback-support-story`.

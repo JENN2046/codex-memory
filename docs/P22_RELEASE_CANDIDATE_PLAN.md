@@ -143,4 +143,6 @@ It is not sufficient to authorize RC implementation, startup/watchdog installati
 
 P22.1 release-candidate readiness inventory is captured in [P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md](./P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md).
 
-`P22.2-release-candidate-gate-matrix-dry-run-plan`
+P22.2 release-candidate gate matrix dry-run plan is captured in [P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md](./P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md).
+
+`P22.3-release-candidate-rollback-support-story`

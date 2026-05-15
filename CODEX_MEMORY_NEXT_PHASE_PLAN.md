@@ -312,7 +312,8 @@
 - P21.x client integration hardening closeout review 已新增 [docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md)，将 P21 关闭为 `P21_CLIENT_INTEGRATION_HARDENING_CLOSED_READY_FOR_P22_PLANNING`。
 - P22 release-candidate planning 已新增 [docs/P22_RELEASE_CANDIDATE_PLAN.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_PLAN.md)，定义 candidate contract freeze、required readiness gates、A5 approval packet、future P22 sequence 和 safety rules；结论 `P22_RELEASE_CANDIDATE_PLANNED_BLOCKED_FOR_IMPLEMENTATION_APPROVAL`。
 - P22.1 release-candidate readiness inventory 已新增 [docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md)，盘点 required gates 的最新证据、freshness、known gaps 和 approval blockers；结论 `P22_RELEASE_CANDIDATE_READINESS_INVENTORIED_BLOCKED_FOR_GATE_REFRESH`。
-- 下一步建议：进入 `P22.2-release-candidate-gate-matrix-dry-run-plan`。
+- P22.2 release-candidate gate matrix dry-run plan 已新增 [docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md)，定义未来 RC gate matrix 的 report shape、gate 列表、blocker semantics 和执行顺序；结论 `P22_GATE_MATRIX_DRY_RUN_PLANNED_BLOCKED_FOR_EXECUTION_APPROVAL`。
+- 下一步建议：进入 `P22.3-release-candidate-rollback-support-story`。
 - 边界：不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断

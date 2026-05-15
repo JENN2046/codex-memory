@@ -120,4 +120,6 @@ P22.1 does not:
 
 ## Next Recommended Phase
 
-`P22.2-release-candidate-gate-matrix-dry-run-plan`
+P22.2 release-candidate gate matrix dry-run plan is captured in [P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md](./P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md).
+
+`P22.3-release-candidate-rollback-support-story`
