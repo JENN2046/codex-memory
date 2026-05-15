@@ -16,7 +16,7 @@ This phase is docs/status/board only. It does not run `npm test`, `gate:ci`, com
 
 Requested operation: fresh local release-candidate gate refresh for target commit `<TARGET_COMMIT>`.
 
-Default target commit for this draft: `ef8670d4e940393b349bdb71b551d284b7602f0f`.
+Default target commit for this draft: `80d168dfb0bb4edf2540614c20775a5580177ddc`.
 
 Approval status: `NOT_APPROVED`.
 

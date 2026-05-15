@@ -26,6 +26,7 @@ P22 release candidate A5 approval boundary
 - P22.x closeout is pushed and verified at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`.
 - P22 closeout result is `P22_RELEASE_CANDIDATE_PLANNING_CLOSED_BLOCKED_FOR_EXPLICIT_RC_APPROVAL`.
 - P22 gate refresh approval request draft adds the exact proposed local non-provider gate commands and required approval sentence, but remains `DRAFT_NOT_APPROVED`.
+- The draft target commit has been corrected to current pushed HEAD `80d168dfb0bb4edf2540614c20775a5580177ddc`.
 - Fresh RC gate refresh / implementation still requires separate explicit A5 approval.
 - Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate creation, tag, release, and deploy remain blocked without explicit A5 approval.
 

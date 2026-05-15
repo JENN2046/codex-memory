@@ -19,6 +19,7 @@ P22 release candidate A5 approval boundary
 
 - Added `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`.
 - Drafted target commit, proposed local non-provider commands, mutation scope, expected report shape, stop conditions, rollback tier, and required approval sentence.
+- Corrected the draft target commit to current pushed HEAD `80d168dfb0bb4edf2540614c20775a5580177ddc`.
 - Kept decision `BLOCKED_HARD_STOP` and status `DRAFT_NOT_APPROVED`.
 
 ## Changed Files
