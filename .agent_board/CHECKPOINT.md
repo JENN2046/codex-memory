@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Define the P22.6 release-candidate artifact manifest shape without generating a real artifact.
+Draft the P22.7 release-candidate notes without publishing a release.
 
 ## Current Area
 
-P22 release-candidate artifact manifest shape
+P22 release-candidate notes draft
 
 ## Current Status
 
@@ -15,20 +15,18 @@ P22 release-candidate artifact manifest shape
 - P22 planning is closed.
 - Approved local non-provider RC gate refresh execution completed after the model commit.
 - Release state is `gate_refresh_passed_rc_not_created`.
-- Current work is only `P22.6-release-candidate-artifact-manifest-shape` docs/board drafting.
+- Current work is only `P22.7-release-candidate-notes-draft` docs/board drafting.
 
 ## Completed Work In This Batch
 
-- Added [P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md).
-- Defined stable future RC artifact JSON envelope shape.
-- Defined Markdown companion section order.
-- Covered `rc_candidate_id`, `target_commit`, gate refresh result, gate evidence summary, public MCP tools, `validate_memory` internal-only status, mutation boundaries, known gaps, rollback story, support handoff, and approval status.
-- Chose docs-only shape; no fixture/test added for P22.6.
-- Explicitly confirmed no artifact generation, tag, release, deploy, provider call, config mutation, migration/import-export apply, or MCP expansion.
+- Added [P22_RELEASE_CANDIDATE_NOTES_DRAFT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md).
+- Drafted release-candidate notes with candidate scope, passed evidence, blocked items, known gaps, non-goals, operator warnings, and rollback/support references.
+- Added explicit statement: `This is a release-candidate notes draft, not a release.`
+- Confirmed no RC artifact, tag, release, deploy, provider call, config mutation, migration/import-export apply, public MCP expansion, service startup, or real memory preview.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md`
+- `docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -69,4 +67,4 @@ P22 release-candidate artifact manifest shape
 
 ## Next Safe Action
 
-Guarded commit, safe-push if ready, then continue to `P22.7-release-candidate-notes-draft`. Do not create RC artifacts, tag, release, or deploy without separate explicit approval.
+Guarded commit, safe-push if ready, then continue to `P22.8-release-candidate-operator-handoff`. Do not create RC artifacts, tag, release, or deploy without separate explicit approval.

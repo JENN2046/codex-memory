@@ -2,7 +2,7 @@
 
 ## Goal
 
-Define the P22.6 release-candidate artifact manifest shape. Do not generate a release candidate artifact.
+Draft the P22.7 release-candidate notes. Do not publish a release.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P22.6 artifact manifest shape docs/status/board edits are local and docs-only validation has passed for this phase.
+P22.7 notes draft docs/status/board edits are local and docs-only validation has passed for this phase.
 
 ## Current Area
 
-P22 release-candidate artifact manifest shape
+P22 release-candidate notes draft
 
 ## Findings
 
@@ -28,13 +28,14 @@ P22 release-candidate artifact manifest shape
 - Release state is `gate_refresh_passed_rc_not_created`.
 - P22.5 artifact approval request is drafted with default approval status `NOT_APPROVED` and decision `BLOCKED_HARD_STOP`.
 - P22.6 artifact manifest shape is drafted as docs-only JSON/Markdown shape; no real artifact was generated.
+- P22.7 notes draft is drafted as release-candidate notes only; no release was published.
 - Target commit remains `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
 - Gate refresh PASS evidence remains recorded, but this phase did not rerun gates.
 - Release candidate artifact was not created.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md`
+- `docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -67,4 +68,4 @@ P22 release-candidate artifact manifest shape
 
 ## Next Safe Step
 
-Guarded commit, safe-push if ready, then continue to `P22.7-release-candidate-notes-draft`. RC artifact creation still requires separate explicit approval.
+Guarded commit, safe-push if ready, then continue to `P22.8-release-candidate-operator-handoff`. RC artifact creation still requires separate explicit approval.
