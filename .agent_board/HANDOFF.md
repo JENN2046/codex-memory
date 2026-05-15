@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create the explicitly approved new P22 RC artifact for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Request explicit tag-only approval for `p22-rc-7fd17de` on security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Docs/board artifact-creation edits are local until guarded commit / safe-push completes.
+Docs/board tag-approval-request edits are local until guarded commit / safe-push completes.
 
 ## Current Area
 
-P22 security-fix RC artifact docs-only creation
+P22 security-fix tag-only approval request
 
 ## Findings
 
@@ -30,13 +30,14 @@ P22 security-fix RC artifact docs-only creation
 - Recorded evidence includes `npm test 473/473`, `gate:ci` tests `458/458`, compare `43/43`, rollback `43/43`, `noProvider=true`, and `mutated=false`.
 - Current phase records evidence only and does not rerun gates.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
-- New RC artifact has been created as a local Markdown document.
 - Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
-- Suggested future tag after separate approval: `p22-rc-7fd17de`.
+- Proposed tag: `p22-rc-7fd17de`.
+- Tag approval request has been drafted and validated.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`
+- `docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md`
+- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -73,4 +74,4 @@ P22 security-fix RC artifact docs-only creation
 
 ## Next Safe Step
 
-Validate docs, commit and safe-push if ready, then request explicit tag-only approval for `p22-rc-7fd17de` if publication should continue.
+Validate docs, commit and safe-push if ready, then wait for explicit tag-only approval for `p22-rc-7fd17de`.

@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Create the explicitly approved new P22 local Markdown RC artifact for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Request explicit tag-only approval for proposed tag `p22-rc-7fd17de` on security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Current Area
 
-P22 security-fix RC artifact docs-only creation
+P22 security-fix tag-only approval request
 
 ## Current Status
 
@@ -16,14 +16,15 @@ P22 security-fix RC artifact docs-only creation
 - Temporary gate execution checkout was created at `A:\codex-memory-gate-7fd17de`, verified at target HEAD, and removed.
 - Main workspace remains clean and synced at the latest docs baseline after result recording.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
-- Current work is approved artifact creation only.
-- Proposed new artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
-- Suggested future tag after separate tag approval: `p22-rc-7fd17de`.
+- Current work is approval-request drafting only, now validated.
+- Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
+- Proposed tag: `p22-rc-7fd17de`.
 
 ## Completed Work In This Batch
 
-- Added [P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md).
-- Recorded that the artifact is local Markdown only.
+- Added [P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md).
+- Added superseded note to [P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md).
+- Recorded that tag approval remains `NOT_APPROVED`.
 - Recorded that the old `p22-rc-806cc847` candidate is superseded and must not be reused or moved.
 - Recorded gate evidence:
   - `git diff --check`: passed.
@@ -36,7 +37,8 @@ P22 security-fix RC artifact docs-only creation
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`
+- `docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md`
+- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -76,4 +78,4 @@ P22 security-fix RC artifact docs-only creation
 
 ## Next Safe Action
 
-Run docs validation, guarded commit, and safe-push if ready. Then request explicit tag-only approval for `p22-rc-7fd17de` if publication should continue.
+Run docs validation, guarded commit, and safe-push if ready. Then wait for explicit tag-only approval for `p22-rc-7fd17de`.

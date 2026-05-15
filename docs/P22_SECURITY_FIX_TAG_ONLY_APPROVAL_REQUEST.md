@@ -1,16 +1,16 @@
-# P22 Tag / Release / Deploy Approval Request
+# P22 Security-Fix Tag-Only Approval Request
 
-Phase: `P22-tag-only-approval-request`
+Phase: `P22-security-fix-tag-only-approval-request`
 
 Mode: `A5-approval-request-draft`
 
-Decision: `BLOCKED_HARD_STOP`
+Risk: `A4`
 
-Superseded note: this approval request targeted `p22-rc-806cc847`, which has been superseded by security fix target `7fd17de624c0da76751e863e97302bed0dbec905`. Do not reuse or move `p22-rc-806cc847`. The current tag-only approval request is [P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md).
+Decision: `BLOCKED_HARD_STOP`
 
 ## Purpose
 
-Draft the explicit A5 approval request required before creating and pushing the P22 Git tag only.
+Draft the explicit A5 approval request required before creating and pushing the P22 security-fix Git tag only.
 
 This document is not approval. It does not create a tag, push a tag, create a GitHub release, deploy, call providers, mutate config, run migration/import-export apply, or expand public MCP tools.
 
@@ -20,12 +20,12 @@ This phase requests tag approval only. It does not request GitHub release approv
 
 | Field | Value |
 |---|---|
-| Artifact id | `p22-rc-806cc847` |
-| Artifact path | `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md` |
-| Target commit | `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
+| Artifact id | `p22-rc-7fd17de` |
+| Artifact path | `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md` |
+| Target commit | `7fd17de624c0da76751e863e97302bed0dbec905` |
 | Artifact state | `CREATED_DOCS_ONLY` |
-| Release state | `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED` |
-| Gate refresh result | `PASS` |
+| Release state | `SECURITY_FIX_RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED` |
+| Fresh gate refresh result | `PASS` |
 
 The local Markdown artifact exists. It is not a tag, not a GitHub release, and not a deploy.
 
@@ -38,13 +38,28 @@ Requested switch: tag approval only.
 | Tag approval status | `NOT_APPROVED` |
 | GitHub release approval status | `NOT_APPROVED` |
 | Deploy approval status | `NOT_APPROVED` |
-| Proposed tag name | `p22-rc-806cc847` |
-| Proposed target commit | `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
-| Artifact path | `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md` |
+| Proposed tag name | `p22-rc-7fd17de` |
+| Proposed target commit | `7fd17de624c0da76751e863e97302bed0dbec905` |
+| Artifact path | `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md` |
 
 Tag approval remains `NOT_APPROVED` until an explicit tag-only approval sentence is provided.
 
 No tag is created in this phase. No tag is pushed in this phase. No GitHub release is created. No deploy is performed.
+
+## Superseded Candidate Boundary
+
+The previous candidate is superseded by the security fix:
+
+- superseded tag: `p22-rc-806cc847`
+- superseded artifact: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`
+- superseded target: `806cc847cb37a3e428099b45871a4f1a13c4fa6f`
+
+Required boundary:
+
+- do not reuse `p22-rc-806cc847`
+- do not move `p22-rc-806cc847`
+- do not delete `p22-rc-806cc847` without separate explicit approval
+- do not treat `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md` as the current final candidate
 
 ## Independent Approval Switches
 
@@ -60,28 +75,29 @@ Current decision: `BLOCKED_HARD_STOP`
 
 ## Proposed Tag
 
-Proposed tag name: `p22-rc-806cc847`
+Proposed tag name: `p22-rc-7fd17de`
 
 Proposed tag target:
 
 ```text
-806cc847cb37a3e428099b45871a4f1a13c4fa6f
+7fd17de624c0da76751e863e97302bed0dbec905
 ```
 
 Tag action is not approved by this document. This document only requests future tag approval.
 
 ## Proposed GitHub Release
 
-Proposed release title:
+GitHub release proposal status: `NOT_REQUESTED_BY_DEFAULT`
 
-```text
-P22 Release Candidate p22-rc-806cc847
-```
+No GitHub release title is proposed for execution in this document. GitHub release remains blocked unless a separate approval names:
 
-Proposed release source:
-
-- tag: `p22-rc-806cc847`
-- artifact: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`
+- exact release title
+- exact source tag
+- exact target commit
+- exact artifact path
+- rollback plan
+- validation plan
+- expected side effects
 
 GitHub release action is not requested or approved by this document.
 
@@ -100,25 +116,28 @@ No deployment target is proposed in this document. Deploy remains blocked unless
 
 Deploy action is not requested or approved by this document.
 
-## Expected Generated Or Changed Files
+## Expected Generated Or Changed Objects
 
-If a future approval only authorizes docs recording of a tag/release/deploy decision, expected local changed files may include:
+If a future approval authorizes actual tag creation, expected Git objects must be named explicitly:
+
+- Git tag: `p22-rc-7fd17de`
+- target commit: `7fd17de624c0da76751e863e97302bed0dbec905`
+
+No expected generated file, local tag, remote tag, release object, deploy object, or external object is approved by this draft.
+
+If a future approval only authorizes docs recording of a tag decision, expected local changed files may include:
 
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `.agent_board/*`
 
-If a future approval authorizes actual tag creation, expected remote objects must be named explicitly:
-
-- Git tag: `p22-rc-806cc847`
-
-No expected generated file or remote object is approved by this draft.
-
 ## Exclusions
 
 Unless separately approved in an explicit A5 sentence, the following remain excluded:
 
+- GitHub release
+- deploy
 - provider call
 - provider smoke
 - provider benchmark
@@ -156,39 +175,30 @@ This document does not authorize any rollback command.
 
 Stop before any tag/release/deploy action if:
 
-- the approval sentence does not name which switch is approved
-- the approval sentence does not name exact tag, release, or deploy target
+- the approval sentence does not name tag approval only
+- the approval sentence does not name exact tag `p22-rc-7fd17de`
+- the approval sentence does not name exact target commit `7fd17de624c0da76751e863e97302bed0dbec905`
+- the approval sentence does not reference `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`
 - the approval sentence also approves GitHub release or deploy
-- target commit differs from `806cc847cb37a3e428099b45871a4f1a13c4fa6f`
-- artifact is missing at `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`
-- artifact path differs from `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`
+- target commit differs from `7fd17de624c0da76751e863e97302bed0dbec905`
+- artifact is missing at `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`
+- artifact path differs from `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`
+- proposed tag already exists locally or remotely
 - worktree is dirty
 - remote main has drifted unexpectedly
 - the command would touch provider, config, startup/watchdog, real memory, durable data, migration/import-export, MCP schema/tools, package/lockfile, `.env`, or secrets
 - any output exposes secret-like content
 - validation fails
 
-## Approval Sentence Templates
+## Approval Sentence Template
 
 ### Tag Approval Template
 
 ```text
-I explicitly approve creating and pushing Git tag p22-rc-806cc847 for target commit 806cc847cb37a3e428099b45871a4f1a13c4fa6f, referencing docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md, with no GitHub release, no deploy, no provider call, no live HTTP MCP startup, no config mutation, no startup/watchdog operation, no real memory preview, no durable memory write, no migration/import-export apply, no public MCP expansion, no package/lockfile change, and no .env or secret change.
+I explicitly approve creating and pushing Git tag p22-rc-7fd17de for target commit 7fd17de624c0da76751e863e97302bed0dbec905, referencing docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md, with no GitHub release, no deploy, no provider call, no live HTTP MCP startup, no config mutation, no startup/watchdog operation, no real memory preview, no durable memory write, no migration/import-export apply, no public MCP expansion, no package/lockfile change, and no .env or secret change.
 ```
 
-### GitHub Release Approval Template
-
-```text
-I explicitly approve creating the GitHub release "P22 Release Candidate p22-rc-806cc847" from tag p22-rc-806cc847 for target commit 806cc847cb37a3e428099b45871a4f1a13c4fa6f, referencing docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md, with no deploy, no provider call, no live HTTP MCP startup, no config mutation, no startup/watchdog operation, no real memory preview, no durable memory write, no migration/import-export apply, no public MCP expansion, no package/lockfile change, and no .env or secret change.
-```
-
-### Deploy Approval Template
-
-```text
-I explicitly approve deploying <DEPLOYMENT_TARGET> for P22 release candidate p22-rc-806cc847 at target commit 806cc847cb37a3e428099b45871a4f1a13c4fa6f using <EXACT_COMMANDS>, with rollback via <ROLLBACK_STORY>, and with provider/config/migration/import-export/public MCP/package/env boundaries explicitly stated here.
-```
-
-The templates above are not approval while they appear in this document.
+The template above is not approval while it appears in this document.
 
 ## Current Decision
 
@@ -200,4 +210,4 @@ Deploy approval: `NOT_APPROVED`
 
 Decision: `BLOCKED_HARD_STOP`
 
-Next safe action: wait for explicit tag-only approval.
+Next safe action: wait for explicit tag-only approval for `p22-rc-7fd17de`.
