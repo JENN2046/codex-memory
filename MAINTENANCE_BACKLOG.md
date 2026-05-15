@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-14
+更新时间：2026-05-15
 
 这份文档承接 `Phase E` 收官之后的后续增量工作。
 
@@ -296,8 +296,9 @@
 111. `P22.6 RC artifact manifest shape`：已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md)，定义 future RC artifact manifest JSON/Markdown shape；只做 shape docs，不生成真实 artifact、不新增 fixture/test。
 112. `P22.7 RC notes draft`：已新增 [docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md)，记录 candidate scope、passed evidence、blocked items、known gaps、non-goals、operator warnings 与 rollback/support references；这是 notes draft，不是 release，未 tag/release/deploy。
 113. `P22.8 RC operator handoff`：已新增 [docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md)，覆盖 preflight state、approved gates、remaining blockers、config/provider/migration/import-export boundaries、MCP public tool freeze、client caveats、rollback/support checklist 和 RC artifact creation 所需 exact approval。
-114. `P20.1 / CI failure reconciliation`：GitHub Actions `CI` 在 `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` 上失败，Linux `npm test` 为 `470/472`，失败点为 donor ranking tie-breaker fixture 与 TagMemo targeted semantic fixture。第一轮 fixture/test-only contract 收窄已推送为 `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`；第二轮 donor fixture narrowing 已推送为 `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`，GitHub Actions `CI` run `25899450529` 已通过。当前 `main == origin/main`。
-115. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+114. `P22.9 post-gate-refresh closeout review`：已新增 [docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md)，关闭 P22 gate-refresh 后的 artifact approval docs chain；结论 `READY_TO_REQUEST_RC_ARTIFACT_APPROVAL`，但 RC artifact 未创建，tag/release/deploy 未执行，provider/config/migration/import-export/public MCP expansion 仍 blocked，下一步只能请求 artifact creation approval。
+115. `P20.1 / CI failure reconciliation`：GitHub Actions `CI` 在 `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` 上失败，Linux `npm test` 为 `470/472`，失败点为 donor ranking tie-breaker fixture 与 TagMemo targeted semantic fixture。第一轮 fixture/test-only contract 收窄已推送为 `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`；第二轮 donor fixture narrowing 已推送为 `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`，GitHub Actions `CI` run `25899450529` 已通过。当前 `main == origin/main`。
+116. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

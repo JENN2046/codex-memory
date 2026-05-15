@@ -1,6 +1,6 @@
 # codex-memory Next Phase Plan
 
-更新时间：2026-05-14
+更新时间：2026-05-15
 
 ## 目的
 
@@ -323,7 +323,8 @@
 - P22.6 release-candidate artifact manifest shape 已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md)：定义 future RC artifact JSON/Markdown manifest shape，覆盖 candidate id、target commit、gate evidence、MCP tool freeze、`validate_memory` internal-only、mutation boundaries、known gaps、rollback/support、approval status；不生成真实 artifact。
 - P22.7 release-candidate notes draft 已新增 [docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md)：这是 release-candidate notes draft，不是 release；覆盖 scope、passed evidence、blocked items、known gaps、non-goals、operator warnings 和 rollback/support references。
 - P22.8 release-candidate operator handoff 已新增 [docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md)：形成 future RC artifact approval 前的 operator checklist，覆盖 preflight state、approved gates、remaining blockers、boundaries、MCP public tool freeze、client integration caveats 和 rollback/support。
-- 下一步建议：`P22.9-post-gate-refresh-closeout-review`；创建 RC artifact、tag/release/deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
+- P22.9 post-gate-refresh closeout review 已新增 [docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md)：关闭 post-gate-refresh docs chain，结论 `READY_TO_REQUEST_RC_ARTIFACT_APPROVAL`；RC artifact 未创建，tag/release/deploy 未执行，A5 approval 仍是 artifact creation 前置条件。
+- 下一步建议：`P22-release-candidate-artifact-creation-approval-request`；创建 RC artifact、tag/release/deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
 - 边界：不改真实 Codex/Claude config、不启动 live HTTP MCP 或 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断

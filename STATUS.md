@@ -1,6 +1,6 @@
 ﻿# codex-memory Status
 
-更新时间：2026-05-14
+更新时间：2026-05-15
 
 ## 当前结论
 
@@ -543,7 +543,8 @@
 - P22.6 release-candidate artifact manifest shape 已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md)，定义 future RC artifact JSON/Markdown manifest shape；只做 shape docs，不生成真实 artifact，不新增 fixture/test。
 - P22.7 release-candidate notes draft 已新增 [docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md)，汇总 candidate scope、已通过 gate evidence、blocked items、known gaps、non-goals、operator warnings 和 rollback/support references；这是 notes draft，不是 release。
 - P22.8 release-candidate operator handoff 已新增 [docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md)，提供 future RC artifact approval 前的 operator checklist，覆盖 preflight、approved gates、remaining blockers、config/provider/migration boundaries、MCP freeze、client caveats 和 rollback/support。
-- 当前结论：project_health strong；governance_health strong；current_truth `P22 gate refresh passed`；release_state `gate_refresh_passed_rc_not_created`；recommended_action `post-gate-refresh closeout before requesting artifact creation`。RC artifact、tag、release、deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
+- P22.9 post-gate-refresh closeout review 已新增 [docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md)，关闭 P22 gate-refresh 后的文档准备链；结论 `READY_TO_REQUEST_RC_ARTIFACT_APPROVAL`，但 RC artifact 未创建，tag/release/deploy 未执行，A5 approval 仍是创建 artifact 前置条件。
+- 当前结论：project_health strong；governance_health strong；current_truth `P22 post-gate-refresh docs chain closed`；release_state `gate_refresh_passed_rc_not_created`；recommended_action `P22-release-candidate-artifact-creation-approval-request`。RC artifact、tag、release、deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 
