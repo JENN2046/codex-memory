@@ -5,19 +5,19 @@
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
 | Branch | main |
-| Mode | A4.8 docs/status/board |
-| Current task | CM-0153 / P21.5-client-integration-standing-gate-summary |
-| Current area | P21 client integration standing gate summary |
-| Last pushed baseline | P21.4 client privacy boundary fixture tests pushed and verified at `6c6e60c366c85eff72ac05c03cfa5fb470f19b56` |
+| Mode | A4.8 docs/board review |
+| Current task | CM-0154 / P21.x-client-integration-hardening-closeout-review |
+| Current area | P21 client integration hardening closeout |
+| Last pushed baseline | P21.5 client integration standing gate summary pushed and verified at `cddff6a223e2ff016f152e8a0059b049ab248810` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P21.5 standing gate summary for P21 planning / inventory / scope review / Claude refresh plan / privacy fixture evidence. |
-| Last validation | `git diff --check` passed; docs validation passed for P21.5. |
-| Worktree summary | P21.5 docs/status/board edits only. No `src/`, tests, fixtures, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, or unapproved mutation. |
+| Last action | Added P21.x closeout review and judged P22 release-candidate planning readiness. |
+| Last validation | `git diff --check` passed; docs validation passed for P21.x. |
+| Worktree summary | P21.x docs/status/board edits only. No `src/`, tests, fixtures, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base. |
 | P20 status | Closed as evidence-ready and blocked for apply. |
 | Guarded auto-commit allowed | eligible after final diff/file-scope inspection |
 | Safe-push readiness | pending guarded commit |
-| Next planned action | Validate and commit P21.5, then continue to `P21.x-client-integration-hardening-closeout-review`. |
+| Next planned action | Validate and commit P21.x, then continue to `P22-release-candidate-planning`. |
 
 ## Notes
 

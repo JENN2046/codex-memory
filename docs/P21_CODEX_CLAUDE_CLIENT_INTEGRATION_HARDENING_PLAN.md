@@ -155,4 +155,6 @@ P21.4 client privacy boundary fixture tests are captured in [P21_CLIENT_PRIVACY_
 
 P21.5 client integration standing gate summary is captured in [P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md](./P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md).
 
-`P21.x-client-integration-hardening-closeout-review`
+P21.x client integration hardening closeout review is captured in [P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md](./P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md).
+
+`P22-release-candidate-planning`

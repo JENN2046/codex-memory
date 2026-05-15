@@ -167,7 +167,8 @@
 | P21.3-Claude-acceptance-evidence-refresh-plan | client-integration / acceptance-planning | A1/A2 | done | Plan safe Claude acceptance evidence refresh without mutating config by default | `git diff --check`; docs validation | Docs-only; no `claude mcp` command, real config mutation, live HTTP observation, service/watchdog operation, provider/model call, real memory preview, migration/import-export apply, MCP expansion, package change, release, tag, or deploy | no |
 | P21.4-client-privacy-boundary-fixture-tests | client-integration / privacy-fixtures | A1/A2 | done | Add fixture-only cross-client private visibility and low-risk summary tests | targeted fixture test; `npm test`; `git diff --check`; docs validation | Fixture/test/docs only; no runtime behavior change, real config mutation, service/watchdog operation, provider call, real memory preview, migration/import-export apply, MCP expansion, package change, release, tag, or deploy | no |
 | P21.5-client-integration-standing-gate-summary | client-integration / gate-summary | A1 | done | Summarize P21 client integration evidence and remaining manual checks | `git diff --check`; docs validation | Docs/status/board only; no real config mutation, live Claude command, live HTTP observation, provider/model call, MCP public tool expansion, migration/import-export apply, release candidate, tag, or deploy | no |
-| P21.x-client-integration-hardening-closeout-review | client-integration / closeout | A1 | todo | Close P21 evidence chain and judge P22 readiness | `git diff --check`; docs validation | no real config mutation; no provider call; no MCP public tool expansion; no P22 implementation | no |
+| P21.x-client-integration-hardening-closeout-review | client-integration / closeout | A1 | done | Close P21 evidence chain and judge P22 readiness | `git diff --check`; docs validation | Docs/status/board only; no real config mutation, live Claude command, live HTTP observation, provider/model call, MCP public tool expansion, migration/import-export apply, P22 implementation, release candidate, tag, or deploy | no |
+| P22-release-candidate-planning | release-candidate / planning | A1/A2 | todo | Plan release-candidate readiness without implementation or live apply | `git diff --check`; docs validation | planning only; no service/watchdog install, real config mutation, provider call, migration/import-export apply, tag, release, or deploy | no |
 
 ## 推荐执行顺序
 
@@ -274,8 +275,9 @@
 101. `P21.3 Claude acceptance evidence refresh plan`：新增 [docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md](/A:/codex-memory/docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md)，规划 docs-only、read-only observation、config/model-mutating tiers；本阶段不运行 `claude mcp`、不改 config、不启动 HTTP、不调用 provider/model。
 102. `P21.4 client privacy boundary fixture tests`：新增 `tests/fixtures/p21-client-privacy-boundary-v1.json`、`tests/p21-client-privacy-boundary-fixture.test.js` 和 [docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md)，fixture-only 锁住 same-client/private、cross-client/private、project/workspace/shared、low-risk redaction 和 no-side-effect。
 103. `P21.5 client integration standing gate summary`：新增 [docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md)，汇总 P21 evidence chain、standing gate coverage、remaining manual/live gaps 和 hard boundaries；结论 `P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY_READY`。
-104. 下一步建议进入 `P21.x-client-integration-hardening-closeout-review`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
-105. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+104. `P21.x client integration hardening closeout review`：新增 [docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md)，总结 P21 完成范围、验证证据、边界、剩余风险和 P22 readiness；结论 `P21_CLIENT_INTEGRATION_HARDENING_CLOSED_READY_FOR_P22_PLANNING`。
+105. 下一步建议进入 `P22-release-candidate-planning`；不得直接进入 P22 implementation，不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、tag、release 或 deploy。
+106. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
