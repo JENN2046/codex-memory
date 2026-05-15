@@ -97,3 +97,41 @@ test('security write policy scans title, content, evidence, and tags without aud
     assert.doesNotMatch(auditText, /api_key=/);
   });
 });
+
+test('security write policy rejects secret-like scope metadata before persistence', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const secretLikeWorkspace = ['api_key', 'TEST_SCOPE_KEY_1234567890'].join('=');
+    const response = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'Checkpoint',
+          content: 'Type: checkpoint\nrisk: scope metadata should be scanned before persistence',
+          evidence: 'scope metadata scanner regression',
+          validated: true,
+          reusable: false,
+          tags: ['security', 'scope'],
+          sensitivity: 'none',
+          workspace_id: secretLikeWorkspace,
+          task_id: 'TASK-SECURITY-001'
+        }
+      }
+    }, requestContext);
+
+    const result = response.response.result.structuredContent;
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.filePath, null);
+    assert.match(result.reason, /secret-like content/);
+    assert.match(result.reason, /api_key/);
+
+    const auditText = await fs.readFile(app.config.auditLogPath, 'utf8');
+    assert.match(auditText, /rejected/);
+    assert.doesNotMatch(auditText, /TEST_SCOPE_KEY_1234567890/);
+    assert.doesNotMatch(auditText, /api_key=/);
+  });
+});

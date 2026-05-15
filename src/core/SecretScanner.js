@@ -32,11 +32,26 @@ function scanText(field, text) {
 }
 
 function scanMemoryWritePayload(payload = {}) {
+  const metadataFields = [
+    'project_id',
+    'projectId',
+    'workspace_id',
+    'workspaceId',
+    'client_id',
+    'clientId',
+    'task_id',
+    'taskId',
+    'conversation_id',
+    'conversationId',
+    'retention_policy',
+    'retentionPolicy'
+  ];
   const scanItems = [
     ...normalizeScanItem('title', payload.title),
     ...normalizeScanItem('content', payload.content),
     ...normalizeScanItem('evidence', payload.evidence),
-    ...normalizeScanItem('tags', payload.tags)
+    ...normalizeScanItem('tags', payload.tags),
+    ...metadataFields.flatMap(field => normalizeScanItem(field, payload[field]))
   ];
 
   const findings = [];

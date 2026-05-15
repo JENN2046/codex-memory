@@ -126,6 +126,7 @@ class MemoryWriteService {
     }
 
     const secretScan = scanMemoryWritePayload({
+      ...payload,
       title,
       content,
       evidence,
