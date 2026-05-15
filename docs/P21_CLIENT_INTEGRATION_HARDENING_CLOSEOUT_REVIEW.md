@@ -95,4 +95,6 @@ Result: `P21_CLIENT_INTEGRATION_HARDENING_CLOSED_READY_FOR_P22_PLANNING`
 
 ## Next Recommended Phase
 
-`P22-release-candidate-planning`
+P22 release-candidate planning is captured in [P22_RELEASE_CANDIDATE_PLAN.md](./P22_RELEASE_CANDIDATE_PLAN.md).
+
+`P22.1-release-candidate-readiness-inventory`

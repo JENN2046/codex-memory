@@ -310,8 +310,9 @@
 - P21.4 client privacy boundary fixture tests 已新增 `tests/fixtures/p21-client-privacy-boundary-v1.json`、`tests/p21-client-privacy-boundary-fixture.test.js` 和 [docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md)，锁住 same-client private、cross-client private hiding、project/workspace/shared visibility、low-risk redaction 和 no-side-effect。
 - P21.5 client integration standing gate summary 已新增 [docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md)，汇总 P21 planning / inventory / scope acceptance review / Claude refresh plan / privacy fixture evidence，并确认 live Claude、真实 config、runtime、provider、MCP expansion、migration/import-export apply 仍 blocked。
 - P21.x client integration hardening closeout review 已新增 [docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md)，将 P21 关闭为 `P21_CLIENT_INTEGRATION_HARDENING_CLOSED_READY_FOR_P22_PLANNING`。
-- 下一步建议：进入 `P22-release-candidate-planning`，且必须从 planning / readiness review / approval-packet design 开始。
-- 边界：不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不进入 P22 release candidate。
+- P22 release-candidate planning 已新增 [docs/P22_RELEASE_CANDIDATE_PLAN.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_PLAN.md)，定义 candidate contract freeze、required readiness gates、A5 approval packet、future P22 sequence 和 safety rules；结论 `P22_RELEASE_CANDIDATE_PLANNED_BLOCKED_FOR_IMPLEMENTATION_APPROVAL`。
+- 下一步建议：进入 `P22.1-release-candidate-readiness-inventory`。
+- 边界：不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断
 

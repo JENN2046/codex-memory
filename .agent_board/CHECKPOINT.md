@@ -2,31 +2,30 @@
 
 ## Current Goal
 
-P21.x-client-integration-hardening-closeout-review: close the P21 client integration hardening chain and judge P22 planning readiness.
+P22-release-candidate-planning: plan release-candidate readiness without implementation or live apply.
 
 ## Current Area
 
-P21 client integration hardening closeout
+P22 release candidate planning
 
 ## Current Status
 
-- P21.5 is on `origin/main` at `cddff6a223e2ff016f152e8a0059b049ab248810`.
-- P21.x closeout review is implemented locally as docs/status/board only.
+- P21.x is on `origin/main` at `e29e66605dd1401116f132cca589fc2ddb2a9c20`.
+- P22 release-candidate planning is implemented locally as docs/status/board only.
 
 ## Completed Work In This Batch
 
-- Added `docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md`.
-- Summarized P21 planning, P21.1 inventory, P21.2 scope acceptance review, P21.3 Claude acceptance refresh plan, P21.4 privacy boundary fixture tests, and P21.5 standing gate summary.
-- Captured targeted evidence: scope tests `18/18`, `5/5`, `7/7`; privacy boundary fixture targeted `8/8`; latest full suite `472/472`.
-- Confirmed public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
-- Confirmed `validate_memory` remains internal-only.
-- Judged P21 ready for P22 release-candidate planning, not P22 implementation.
-- Updated P21 plan, next phase plan, status, backlog, and board pointers toward P22 planning.
+- Added `docs/P22_RELEASE_CANDIDATE_PLAN.md`.
+- Linked P22 planning from `docs/VCP_MEMORY_PARITY_ROADMAP.md` and P21 closeout.
+- Defined candidate contract freeze, prerequisite evidence, required readiness gates, A5 approval packet requirements, future P22 sequence, safety rules, and non-goals.
+- Confirmed P22 planning does not create a release candidate, tag, release, deploy, mutate config, start services, install watchdog/startup tasks, call providers, migrate data, apply import/export, or expand public MCP tools.
+- Updated next phase plan, status, backlog, and board pointers toward P22.1 readiness inventory.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_PLAN.md`
 - `docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md`
-- `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -61,9 +60,9 @@ P21 client integration hardening closeout
 - No durable DB or memory write.
 - No SQLite migration.
 - No import/export apply.
-- No release candidate implementation.
+- No release candidate creation.
 - No tag, release, or deploy.
 
 ## Next Safe Action
 
-Run final file-scope inspection, guarded commit, safe-push if ready, then continue to `P22-release-candidate-planning`.
+Run final file-scope inspection, guarded commit, safe-push if ready, then continue to `P22.1-release-candidate-readiness-inventory`.

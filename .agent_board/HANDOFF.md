@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P21.x client integration hardening closeout into P22 release-candidate planning.
+Continue from P22 release-candidate planning into P22.1 readiness inventory.
 
 ## Workspace
 
@@ -14,24 +14,25 @@ A:\codex-memory
 
 ## Worktree
 
-P21.x docs/status/board edits are local and pending validation.
+P22 planning docs/status/board edits are local and pending validation.
 
 ## Current Area
 
-P21 client integration hardening closeout
+P22 release candidate planning
 
 ## Findings
 
-- P21.5 client integration standing gate summary was committed and pushed at `cddff6a223e2ff016f152e8a0059b049ab248810`.
-- P21.x adds a docs-only closeout review for P21 planning / inventory / scope acceptance review / Claude acceptance refresh planning / privacy boundary fixture tests / standing gate summary.
-- P21.x does not change runtime behavior, tests, fixtures, public MCP tools, or real client configuration.
-- P22 may begin as planning / readiness review / approval-packet design only.
-- Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate implementation, tag, release, and deploy remain blocked without explicit A5 approval.
+- P21.x client integration hardening closeout was committed and pushed at `e29e66605dd1401116f132cca589fc2ddb2a9c20`.
+- P22 planning adds a docs-only release-candidate plan for contract freeze, prerequisite evidence, readiness gates, approval packet requirements, safety rules, and future P22 sequence.
+- P22 planning does not create a release candidate and does not authorize implementation.
+- P22.1 may begin as readiness inventory only.
+- Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate creation, tag, release, and deploy remain blocked without explicit A5 approval.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_PLAN.md`
 - `docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md`
-- `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -61,9 +62,9 @@ P21 client integration hardening closeout
 - No HKCU Run edit.
 - No Codex / Claude config mutation.
 - No `claude mcp` command.
-- No release candidate implementation.
+- No release candidate creation.
 - No tag, release, deploy, destructive cleanup, or unapproved remote action.
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P22-release-candidate-planning`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P22.1-release-candidate-readiness-inventory`.

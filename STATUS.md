@@ -162,6 +162,7 @@
 - P21.4 client privacy boundary fixture tests：新增 `tests/fixtures/p21-client-privacy-boundary-v1.json`、`tests/p21-client-privacy-boundary-fixture.test.js` 和 [docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md)，fixture-only 覆盖 same-client private、cross-client private hiding、project/workspace/shared visibility、missing optional scope unknown/null、low-risk raw workspace/secret 禁止、public tools frozen 和 no-side-effect；不改 runtime、不读写真实 config、不调用 provider。
 - P21.5 client integration standing gate summary：新增 [docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md)，汇总 P21 planning / inventory / scope acceptance review / Claude refresh planning / privacy-boundary fixture evidence；当前结论为 `P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY_READY`，可进入 P21 closeout review，但不授权 live Claude、真实 config、runtime、provider、MCP expansion、migration/import-export apply 或 P22 release-candidate。
 - P21.x client integration hardening closeout review：新增 [docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md)，总结 P21 planning/P21.1-P21.5 完成范围、targeted evidence、boundary confirmations、remaining risks 和 P22 readiness judgment；结论为 `P21_CLIENT_INTEGRATION_HARDENING_CLOSED_READY_FOR_P22_PLANNING`，P22 必须从 planning / readiness review / approval-packet design 开始。
+- P22 release-candidate planning：新增 [docs/P22_RELEASE_CANDIDATE_PLAN.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_PLAN.md)，规划 candidate contract freeze、required readiness gates、approval packet、future P22 sequence 和 safety rules；结论为 `P22_RELEASE_CANDIDATE_PLANNED_BLOCKED_FOR_IMPLEMENTATION_APPROVAL`，不创建 release candidate、不 tag/release/deploy、不做 runtime/config/provider/migration/import-export apply。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -529,7 +530,7 @@
 
 - P20.1 startup/watchdog inventory 已完成 guarded commit / safe-push 和 post-push hash verification，当前 local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `e56bc2a182302e86f9cf8c79f642e0e7badccc99`。
 - P20.2 health/readiness evidence 已捕获并关闭当前 blocker：P20.2b 后 `gate:ci` 已回绿。
-- 下一阶段建议进入 `P22-release-candidate-planning`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy；P22 不得直接进入 implementation。
+- 下一阶段建议进入 `P22.1-release-candidate-readiness-inventory`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag/release/deploy；P22 implementation 仍需显式 A5 approval。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

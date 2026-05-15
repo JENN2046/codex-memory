@@ -425,6 +425,10 @@ P10 soft read policy and P11 lifecycle semantics should be stable.
 
 ## P22 — VCP Practical Parity Release Candidate
 
+Planning entry:
+
+- [P22_RELEASE_CANDIDATE_PLAN.md](./P22_RELEASE_CANDIDATE_PLAN.md)
+
 Direction / 方向:
 Freeze behavior for a practical parity release candidate.
 
