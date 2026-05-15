@@ -6,14 +6,14 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 docs/board only |
-| Current task | CM-0139 / P20-local-production-hardening-planning |
-| Current area | P20 local production hardening planning |
-| Last local commit | P19.x admin review surface closeout committed and safe-pushed at `f9baa27` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `f9baa27953b36e24474cd230df6d6134dad331cf` |
+| Current task | CM-0140 / P20-state-reconciliation |
+| Current area | P20 local production hardening state reconciliation |
+| Last local commit | P20 local production hardening planning committed and safe-pushed at `afaa64f` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Completed P20 local production hardening planning docs validation. |
-| Last validation | P20 planning docs validation passed: `git diff --check` and docs validation. P19.x closeout was pushed and hash-verified at `f9baa27953b36e24474cd230df6d6134dad331cf`. |
-| Worktree summary | P20 docs/planning/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, service install, watchdog install, config mutation, or unapproved mutation. |
+| Last action | Reconciled P20 planning state after remote fast-forward. |
+| Last validation | Fast-forward verification confirmed local `HEAD`, local `origin/main`, and remote `refs/heads/main` all at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`; state-reconciliation diff/docs validation pending. |
+| Worktree summary | P20 state reconciliation docs/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, service install, watchdog install, config mutation, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
@@ -21,10 +21,10 @@
 | P17 status | Planning through P17.x completed and pushed. |
 | P18 status | Planning through P18.x completed and pushed. |
 | P19 status | Planning through P19.x completed, pushed, hash-verified, and closed. |
-| P20 status | Planning drafted and validated locally. |
-| Guarded auto-commit allowed | eligible after final scope review |
-| Safe-push readiness | pending guarded commit for P20 planning |
-| Next planned action | Final diff/scope review, guarded commit, safe-push if ready, then continue to P20.1 startup/watchdog inventory. |
+| P20 status | Planning committed, safe-pushed, and hash-verified at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`. |
+| Guarded auto-commit allowed | eligible after state-reconciliation diff/docs validation |
+| Safe-push readiness | pending guarded commit for P20 state reconciliation |
+| Next planned action | Validate and commit P20 state reconciliation, then continue to P20.1 startup/watchdog inventory. |
 
 ## Notes
 

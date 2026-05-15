@@ -513,7 +513,8 @@
 
 ## 下一步建议
 
-- 下一阶段建议完成 `P20-local-production-hardening-planning` 的 guarded commit / safe-push，然后进入 `P20.1-startup-watchdog-inventory`。P20.1 仍只做 inventory/docs/board，不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
+- P20 planning 已完成 guarded commit / safe-push 和 post-push hash verification，当前 local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`。
+- 下一阶段建议进入 `P20.1-startup-watchdog-inventory`。P20.1 仍只做 inventory/docs/board，不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

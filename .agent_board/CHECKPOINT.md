@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P20-local-production-hardening-planning: plan local production hardening without runtime mutation.
+P20-state-reconciliation: reconcile P20 planning state after remote fast-forward.
 
 ## Current Area
 
-P20 local production hardening planning
+P20 local production hardening state reconciliation
 
 ## Current Status
 
@@ -39,6 +39,7 @@ Repository state:
 - P19.3 post-push state sync has been validated, committed, safe-pushed, and post-push hash-verified
 - P19.4 operator troubleshooting notes have been validated, committed, safe-pushed, and post-push hash-verified
 - P19.x closeout has been validated, committed, safe-pushed, and post-push hash-verified
+- P20 planning has been validated, committed, safe-pushed, and post-push hash-verified at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
 P19.3 schema snapshot decisions:
@@ -71,11 +72,14 @@ P20 planning decisions:
 - The plan defines startup/watchdog inventory, health/readiness dry-run evidence, rollback/backup operations plan, safety checklist, and closeout sequence.
 - Service install, watchdog install, startup entry changes, Codex/Claude real config mutation, provider calls, real memory preview, backup/restore, migration, import/export apply, release, tag, and deploy remain blocked.
 
+P20 state reconciliation decisions:
+
+- Repository reality is local `HEAD`, local `origin/main`, and remote `refs/heads/main` all matching `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
+- P20 planning is no longer local/pending; it is on `origin/main`.
+- Next phase is `P20.1-startup-watchdog-inventory`.
+
 ## Changed Files
 
-- `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
-- `docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md`
-- `docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -92,7 +96,8 @@ P20 planning decisions:
 - P19.3 state-sync validation: `git diff --check` passed; docs validation passed; committed and pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`.
 - P19.4 docs validation: `git diff --check` passed; docs validation passed; committed and pushed at `69dc681440f977ee7ba76704303ef58bb9002774`.
 - P19.x closeout validation: `git diff --check` passed; docs validation passed; committed and pushed at `f9baa27953b36e24474cd230df6d6134dad331cf`.
-- P20 planning validation: `git diff --check` passed; docs validation passed.
+- P20 planning validation: `git diff --check` passed; docs validation passed; committed and pushed at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
+- P20 fast-forward verification: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
 
 ## Current Blockers
 
@@ -100,4 +105,4 @@ P20 planning decisions:
 
 ## Next Safe Action
 
-Run final P20 planning diff/scope review, guarded commit, safe-push if ready, and continue to `P20.1-startup-watchdog-inventory`.
+Run P20 state reconciliation diff/docs validation, guarded commit, safe-push if ready, and continue to `P20.1-startup-watchdog-inventory`.

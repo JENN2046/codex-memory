@@ -243,11 +243,12 @@
 84. `P19.2 shape tests`：admin review surface fixture/test/docs 已新增，锁住 synthetic combined review shape、source refs、governance/audit/lifecycle/scope/import-export-migration signals、unavailable source shape 和 no-side-effect flags。
 85. `P19.3 schema snapshot gate`：admin review schema snapshot fixture/test/docs 已新增，锁住 planned admin-review、dashboard、http-observe、governance-report、gate-ci key-set snapshot。
 86. `P19.3 post-push state sync`：P19.3 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `c5784fc082f08231eb326671ac510c52491f3f04`；本轮只同步 STATUS / `.agent_board` pushed / verified 状态。
-87. `P19.4 operator troubleshooting notes`：operator notes 已起草，整理 review surfaces、review levels、blocked/unavailable handling 和 safe next actions；docs validation 已通过，等待 guarded commit / safe-push。
-88. `P19.x closeout`：admin review surface closeout 已起草，将 P19 关闭为 `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`；docs validation 已通过，等待 guarded commit / safe-push。
-89. `P20 planning`：local production hardening plan 已起草，规划 startup/watchdog inventory、health/readiness dry-run evidence、rollback/backup operations plan、safety checklist 和 closeout；docs validation 已通过，等待 guarded commit / safe-push。
-90. 下一步建议进入 `P20.1-startup-watchdog-inventory`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
-91. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+87. `P19.4 operator troubleshooting notes`：operator notes 已完成 validation、guarded commit 和 safe-push，记录 review surfaces、review levels、blocked/unavailable handling 和 safe next actions。
+88. `P19.x closeout`：admin review surface closeout 已完成 validation、guarded commit、safe-push 和 hash verification，将 P19 关闭为 `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`。
+89. `P20 planning`：local production hardening plan 已完成 validation、guarded commit、safe-push 和 post-push hash verification，commit `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2` 已在 `origin/main`。
+90. `P20-state-reconciliation`：已校准 P20 planning 的 remote reality；local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`。
+91. 下一步建议进入 `P20.1-startup-watchdog-inventory`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
+92. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

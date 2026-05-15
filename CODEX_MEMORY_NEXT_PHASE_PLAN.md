@@ -280,16 +280,16 @@
 
 - 入口：[docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md)
 - 目标：关闭 P19 admin review surface evidence chain，记录 planning / inventory / shape fixture / schema snapshot / operator notes evidence、known gaps 和 P20 planning handoff。
-- 当前状态：P19.x closeout docs 已完成 diff/docs validation，等待 guarded commit 和 safe-push readiness。
-- 下一步建议：完成 P19.x validation / guarded commit / safe-push 后进入 `P20-local-production-hardening-planning`。
+- 当前状态：P19.x closeout 已完成 validation、guarded commit、safe-push 和 hash verification，commit 为 `f9baa27953b36e24474cd230df6d6134dad331cf`。
+- 下一步已完成：`P20-local-production-hardening-planning` 已进入 `origin/main`。
 - 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile、不进入 release candidate。
 
 当前 P20 planning：
 
 - 入口：[docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md)
 - 目标：规划 local production hardening 的 startup/watchdog inventory、health/readiness dry-run evidence、rollback/backup operations plan、safety checklist 和 closeout 顺序。
-- 当前状态：P20 planning docs 已完成 diff/docs validation，等待 guarded commit 和 safe-push readiness。
-- 下一步建议：完成 P20 planning validation / guarded commit / safe-push 后进入 `P20.1-startup-watchdog-inventory`。
+- 当前状态：P20 planning 已完成 validation、guarded commit、safe-push 和 post-push hash verification，local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`。
+- 下一步建议：进入 `P20.1-startup-watchdog-inventory`。
 - 边界：docs/planning only；不安装服务或 watchdog、不改 Codex/Claude 真实配置、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile、不进入 release candidate。
 
 ## 当前判断
