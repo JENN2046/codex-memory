@@ -8,6 +8,8 @@ Risk: `A4`
 
 Decision: `BLOCKED_HARD_STOP`
 
+Result recorded: [P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md)
+
 ## Purpose
 
 Draft the explicit A5 approval request required before creating a GitHub release for the P22 security-fix release candidate.
@@ -45,7 +47,7 @@ Requested switch: GitHub release approval only.
 | Proposed target commit | `7fd17de624c0da76751e863e97302bed0dbec905` |
 | Artifact path | `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md` |
 
-GitHub release approval remains `NOT_APPROVED` until an explicit GitHub-release-only approval sentence is provided.
+GitHub release approval was later explicitly provided and the result is recorded in [P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md). Deploy approval remains `NOT_APPROVED`.
 
 No GitHub release is created in this phase. No deploy is performed in this phase.
 
