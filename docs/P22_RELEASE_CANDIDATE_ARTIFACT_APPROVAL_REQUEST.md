@@ -138,4 +138,6 @@ Decision: `BLOCKED_HARD_STOP`
 
 Release state: `gate_refresh_passed_rc_not_created`
 
-Next safe phase: define the release-candidate artifact manifest shape, then complete notes, handoff, and post-gate-refresh closeout before requesting artifact creation.
+Follow-up request: [P22_RELEASE_CANDIDATE_ARTIFACT_CREATION_APPROVAL_REQUEST.md](./P22_RELEASE_CANDIDATE_ARTIFACT_CREATION_APPROVAL_REQUEST.md)
+
+Next safe phase: wait for explicit artifact creation approval, or continue docs-only maintenance.

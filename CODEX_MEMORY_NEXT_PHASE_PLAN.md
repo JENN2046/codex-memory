@@ -324,7 +324,8 @@
 - P22.7 release-candidate notes draft 已新增 [docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md)：这是 release-candidate notes draft，不是 release；覆盖 scope、passed evidence、blocked items、known gaps、non-goals、operator warnings 和 rollback/support references。
 - P22.8 release-candidate operator handoff 已新增 [docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md)：形成 future RC artifact approval 前的 operator checklist，覆盖 preflight state、approved gates、remaining blockers、boundaries、MCP public tool freeze、client integration caveats 和 rollback/support。
 - P22.9 post-gate-refresh closeout review 已新增 [docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md)：关闭 post-gate-refresh docs chain，结论 `READY_TO_REQUEST_RC_ARTIFACT_APPROVAL`；RC artifact 未创建，tag/release/deploy 未执行，A5 approval 仍是 artifact creation 前置条件。
-- 下一步建议：`P22-release-candidate-artifact-creation-approval-request`；创建 RC artifact、tag/release/deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
+- P22 release-candidate artifact creation approval request 已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_CREATION_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_CREATION_APPROVAL_REQUEST.md)：请求显式批准创建单个本地 Markdown artifact `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`，并限定 STATUS / backlog / next-plan / board 同步、docs validation、guarded commit、safe-push；默认 `NOT_APPROVED` / `BLOCKED_HARD_STOP`。
+- 下一步建议：等待显式 RC artifact creation approval，或继续 docs-only maintenance；创建 RC artifact、tag/release/deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
 - 边界：不改真实 Codex/Claude config、不启动 live HTTP MCP 或 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断
