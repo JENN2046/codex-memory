@@ -8,6 +8,8 @@ Risk: `A4`
 
 Decision: `BLOCKED_HARD_STOP`
 
+Result recorded: [P22_SECURITY_FIX_TAG_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md)
+
 ## Purpose
 
 Draft the explicit A5 approval request required before creating and pushing the P22 security-fix Git tag only.
@@ -42,7 +44,7 @@ Requested switch: tag approval only.
 | Proposed target commit | `7fd17de624c0da76751e863e97302bed0dbec905` |
 | Artifact path | `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md` |
 
-Tag approval remains `NOT_APPROVED` until an explicit tag-only approval sentence is provided.
+Tag approval was later explicitly provided and the result is recorded in [P22_SECURITY_FIX_TAG_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md). GitHub release approval and deploy approval remain `NOT_APPROVED`.
 
 No tag is created in this phase. No tag is pushed in this phase. No GitHub release is created. No deploy is performed.
 

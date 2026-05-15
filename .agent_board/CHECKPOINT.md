@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Request explicit tag-only approval for proposed tag `p22-rc-7fd17de` on security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Record that tag `p22-rc-7fd17de` was created and pushed for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Current Area
 
-P22 security-fix tag-only approval request
+P22 security-fix tag result record
 
 ## Current Status
 
@@ -16,15 +16,15 @@ P22 security-fix tag-only approval request
 - Temporary gate execution checkout was created at `A:\codex-memory-gate-7fd17de`, verified at target HEAD, and removed.
 - Main workspace remains clean and synced at the latest docs baseline after result recording.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
-- Current work is approval-request drafting only, now validated.
+- Current work is tag-result recording only.
 - Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
-- Proposed tag: `p22-rc-7fd17de`.
+- Created tag: `p22-rc-7fd17de`.
 
 ## Completed Work In This Batch
 
-- Added [P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md).
-- Added superseded note to [P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md).
-- Recorded that tag approval remains `NOT_APPROVED`.
+- Added [P22_SECURITY_FIX_TAG_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md).
+- Recorded local and remote tag target `7fd17de624c0da76751e863e97302bed0dbec905`.
+- Recorded that GitHub release and deploy remain not performed.
 - Recorded that the old `p22-rc-806cc847` candidate is superseded and must not be reused or moved.
 - Recorded gate evidence:
   - `git diff --check`: passed.
@@ -37,8 +37,8 @@ P22 security-fix tag-only approval request
 
 ## Changed Files
 
+- `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md`
-- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -78,4 +78,4 @@ P22 security-fix tag-only approval request
 
 ## Next Safe Action
 
-Run docs validation, guarded commit, and safe-push if ready. Then wait for explicit tag-only approval for `p22-rc-7fd17de`.
+Run docs validation, guarded commit, and safe-push if ready. Then request explicit GitHub release approval for `p22-rc-7fd17de` if publication should continue.

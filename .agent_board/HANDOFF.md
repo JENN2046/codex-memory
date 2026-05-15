@@ -2,7 +2,7 @@
 
 ## Goal
 
-Request explicit tag-only approval for `p22-rc-7fd17de` on security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Record that tag `p22-rc-7fd17de` was created and pushed for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Docs/board tag-approval-request edits are local until guarded commit / safe-push completes.
+Docs/board tag-result-record edits are local until guarded commit / safe-push completes.
 
 ## Current Area
 
-P22 security-fix tag-only approval request
+P22 security-fix tag result record
 
 ## Findings
 
@@ -31,13 +31,14 @@ P22 security-fix tag-only approval request
 - Current phase records evidence only and does not rerun gates.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
 - Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
-- Proposed tag: `p22-rc-7fd17de`.
-- Tag approval request has been drafted and validated.
+- Created tag: `p22-rc-7fd17de`.
+- Local and remote tag both point to `7fd17de624c0da76751e863e97302bed0dbec905`.
+- GitHub release and deploy remain not performed.
 
 ## Changed Files
 
+- `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md`
-- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -74,4 +75,4 @@ P22 security-fix tag-only approval request
 
 ## Next Safe Step
 
-Validate docs, commit and safe-push if ready, then wait for explicit tag-only approval for `p22-rc-7fd17de`.
+Validate docs, commit and safe-push if ready, then request explicit GitHub release approval for `p22-rc-7fd17de` if publication should continue.
