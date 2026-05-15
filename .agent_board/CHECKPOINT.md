@@ -2,34 +2,30 @@
 
 ## Current Goal
 
-P20.1 startup/watchdog inventory state is being reconciled against the current remote CI failure before any P22 gate refresh or implementation work.
+Draft the P22 release-candidate gate refresh approval request without executing any RC gate or A5 action.
 
 ## Current Area
 
-P20 CI-safe fixture contract reconciliation
+P22 release-candidate approval request drafting
 
 ## Current Status
 
-- `main`, local `origin/main`, and remote `refs/heads/main` advanced from `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` to first reconciliation commit `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`.
-- GitHub Actions `CI` for `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` failed in `Node.js tests`.
-- Failure summary: Linux `npm test` reported `472` tests, `470` pass, `2` fail.
-- Failed files:
-  - `tests/donor-ranking-tie-breaker-parity-fixture.test.js`
-  - `tests/tagmemo-targeted-semantic-fixture.test.js`
-- First reconciliation commit `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4` fixed the TagMemo failure, but GitHub Actions `CI` run `25899201275` still failed on another donor ranking exact memory-label ordered snippet.
-- Local Windows targeted tests, `gate:ci`, and full suite passed before and after the second fixture-only donor ranking reconciliation.
+- `main`, local `origin/main`, and remote `refs/heads/main` are at `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+- P20.1 CI failure reconciliation is complete; GitHub Actions `CI` run `25899450529` passed for `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+- P22 planning is closed.
+- Release state remains `blocked_for_explicit_RC_approval`.
+- Current work is only `P22-release-candidate-gate-refresh-approval-request` draft update.
 
 ## Completed Work In This Batch
 
-- Confirmed the remote CI failure via `gh run list` / `gh run view`.
-- Confirmed the failures are fixture contract drift, not P20.1 startup/watchdog runtime behavior.
-- Narrowed donor ranking assertions so memory label numbers are not treated as a cross-platform contract across all ranking/tie-breaker fixture cases.
-- Narrowed TagMemo audit assertion so either same-bucket alpha sibling can be the top audit memory while preserving interleave and no-side-effect coverage.
-- Updated status/board notes to record the first pushed fix, second CI red state, and second local donor fixture reconciliation evidence.
+- Updated [P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md) to target commit `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+- Added explicit gate list and expected outputs for a future approved refresh.
+- Explicitly excluded live HTTP MCP startup, provider commands, real memory preview, config mutation, migration/import-export apply, public MCP expansion, tag, release, and deploy.
+- Recorded project/governance conclusion: `project_health=strong`, `governance_health=strong`, `current_truth=P22 planning closed`, `release_state=blocked_for_explicit_RC_approval`.
 
 ## Changed Files
 
-- `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`
+- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -41,39 +37,31 @@ P20 CI-safe fixture contract reconciliation
 
 ## Validation
 
-- `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js` passed `2/2` after the second donor fixture patch.
-- `node --test tests\tagmemo-targeted-semantic-fixture.test.js` passed `3/3` after the first pushed patch.
-- `npm test` passed `472/472`.
-- `npm run gate:ci -- --json` passed:
-  - tests `457/457`
-  - compare `43/43`
-  - rollback `43/43`
-  - queries `14/14`
-  - `mutated=false`
-  - `providerCalls=0`
+- `git diff --check`: passed
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`: passed
 
 ## Not Done
 
-- No `src/` changes.
-- No package or lockfile changes.
-- No MCP schema/tool changes.
-- No backup creation.
-- No restore.
-- No Codex / Claude config mutation.
-- No `claude mcp` command.
-- No live HTTP observation.
+- No RC gate executed.
+- No `npm test` run for this draft.
+- No `gate:ci` run for this draft.
+- No compare / rollback gate run for this draft.
+- No live HTTP MCP startup.
 - No service start.
-- No watchdog start.
+- No watchdog start or install.
 - No scheduled task install.
 - No HKCU Run edit.
+- No Codex / Claude config mutation.
 - No provider smoke or provider benchmark.
-- No real memory content preview.
+- No real memory preview.
 - No durable DB or memory write.
-- No SQLite migration.
+- No SQLite migration or `ALTER TABLE`.
 - No import/export apply.
+- No public MCP schema/tool change.
+- No package or lockfile change.
 - No release candidate creation.
 - No tag, release, or deploy.
 
 ## Next Safe Action
 
-Run `git diff --check` and docs validation, inspect the diff, then guarded commit and safe-push if ready. After push, verify GitHub Actions Linux CI for the second reconciliation commit before any P22 RC gate refresh is considered.
+Stop with the request still `DRAFT_NOT_APPROVED` unless the user explicitly asks for commit/push. Do not execute RC gates without an exact A5 approval sentence.

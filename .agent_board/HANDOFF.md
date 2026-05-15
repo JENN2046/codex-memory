@@ -2,7 +2,7 @@
 
 ## Goal
 
-Reconcile the current remote CI failure before continuing P20/P22 planning rails. P22 RC gate refresh remains blocked for explicit A5 approval.
+Draft the P22 release-candidate gate refresh approval request only. Do not execute the gate refresh.
 
 ## Workspace
 
@@ -14,25 +14,23 @@ A:\codex-memory
 
 ## Worktree
 
-Second donor ranking fixture/status/board edits are local and pending final diff/docs validation, guarded commit, and safe-push.
+Approval-request draft/status/board edits are local and docs-only validation has passed.
 
 ## Current Area
 
-P20 CI-safe fixture contract reconciliation
+P22 release-candidate approval request drafting
 
 ## Findings
 
-- Baseline commit `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` failed GitHub Actions `CI` in `Node.js tests` with Linux `npm test` result `470/472`.
-- Baseline failure 1: `tests/donor-ranking-tie-breaker-parity-fixture.test.js` missed an exact ordered snippet where memory label/order was too strict for a multi-topic near-tie.
-- Baseline failure 2: `tests/tagmemo-targeted-semantic-fixture.test.js` expected `topMemoryId=p16-alpha-a`, while Linux produced `p16-alpha-b`; both are same alpha bucket siblings and the interleave contract still holds.
-- Current pushed `main` is first reconciliation commit `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`.
-- First reconciliation commit `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4` fixed TagMemo but CI run `25899201275` still failed on donor ranking exact memory-label ordering in another case.
-- The second local patch changes donor ranking fixture expectations to content-level `resultIncludes` for all ranking/tie-breaker cases while keeping no-side-effect and result membership coverage.
-- This is not a P20.1 startup/watchdog runtime failure.
+- Current `main`, `origin/main`, and remote `refs/heads/main` are `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+- GitHub Actions `CI` run `25899450529` passed for `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+- P22 planning is closed.
+- Release state is `blocked_for_explicit_RC_approval`.
+- The current request is an approval request draft, not approval.
 
 ## Changed Files
 
-- `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`
+- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -44,32 +42,24 @@ P20 CI-safe fixture contract reconciliation
 
 ## Validation
 
-- `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js`: passed `2/2` after the second donor fixture patch.
-- `node --test tests\tagmemo-targeted-semantic-fixture.test.js`: passed `3/3`.
-- `npm test`: passed `472/472`.
-- `npm run gate:ci -- --json`: passed with tests `457/457`, compare/rollback `43/43`, queries `14/14`, `mutated=false`, `providerCalls=0`.
+- `git diff --check`: passed
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`: passed
 
 ## Not Done
 
-- No runtime code changed.
-- No package or lockfile changes.
-- No MCP schema/tool changes.
-- No SQLite migration.
-- No import/export apply.
-- No backup creation or restore.
-- No real DB or durable memory write.
-- No real memory content preview.
-- No provider smoke or provider benchmark.
-- No live HTTP observation.
-- No service start.
-- No watchdog start.
-- No scheduled task install.
-- No HKCU Run edit.
-- No Codex / Claude config mutation.
-- No `claude mcp` command.
+- No RC gate executed.
+- No `npm test` run for this draft.
+- No `gate:ci` run for this draft.
+- No compare / rollback gate run for this draft.
+- No live HTTP MCP startup.
+- No provider command.
+- No real memory preview.
+- No config mutation.
+- No migration/import-export apply.
+- No public MCP expansion.
 - No release candidate creation.
-- No tag, release, deploy, destructive cleanup, or unapproved remote action.
+- No tag, release, or deploy.
 
 ## Next Safe Step
 
-Run `git diff --check`, docs validation, and final diff inspection. If clean, create a guarded commit and safe-push so GitHub Actions can verify the Linux CI fix. Do not run P22 RC gate refresh / implementation without explicit A5 approval.
+Stop. Future gate execution still requires explicit A5 approval for target `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.

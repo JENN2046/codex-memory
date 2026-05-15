@@ -5,27 +5,29 @@
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
 | Branch | main |
-| Mode | A4.8 tests/docs/board |
-| Current task | CM-0162 / P20.1-startup-watchdog-inventory / CI failure reconciliation |
-| Current area | P20 CI-safe fixture contract reconciliation |
-| Last pushed baseline | `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4` on `origin/main` |
+| Mode | A5-approval-request-draft |
+| Current task | CM-0161 / P22-release-candidate-gate-refresh-approval-request |
+| Current area | P22 release-candidate approval request drafting |
+| Last pushed baseline | `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | First reconciliation commit `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4` fixed TagMemo but CI run `25899201275` still failed donor ranking exact memory-label ordering; second local patch narrowed donor ranking fixture expectations only. |
-| Last validation | Targeted donor ranking `2/2` passed after second patch; targeted TagMemo `3/3` passed; local `npm test` passed `472/472`; `npm run gate:ci -- --json` passed with CI-safe tests `457/457`, compare/rollback `43/43`, queries `14/14`. |
-| Worktree summary | Donor ranking fixture/status/board edits only after first pushed fix. No `src/`, package, lockfile, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, or unapproved mutation. |
-| Mainline assumption | `origin/main` remains the development base, but current pushed CI is red until this second fixture-only reconciliation is committed and pushed. |
-| P20 status | Startup/watchdog inventory remains complete; current work is CI failure reconciliation, not startup/watchdog implementation. |
-| Guarded auto-commit allowed | pending final diff/docs validation and scope check |
-| Safe-push readiness | pending guarded commit; push is needed to verify Linux CI, subject to A4.8 safe-push readiness |
-| Next planned action | Run `git diff --check`, docs validation, inspect diff, then guarded commit / safe-push if ready. Stop before RC gate refresh / implementation unless explicit A5 approval is provided. |
+| Last action | Updated P22 gate refresh approval request draft for current target `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`; no RC gates executed. |
+| Last validation | `git diff --check` passed; docs validation passed. |
+| Worktree summary | Approval-request draft/status/board edits only. No `src/`, tests, package, lockfile, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory preview, `.env`, tag, release, deploy, UI, live HTTP MCP start, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, or unapproved mutation. |
+| Mainline assumption | `origin/main` is the development base; current pushed HEAD and remote main are `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`. |
+| P22 status | P22 planning is closed; release state remains `blocked_for_explicit_RC_approval`. |
+| Guarded auto-commit allowed | eligible if user wants commit, but not required for this draft-only request |
+| Safe-push readiness | not requested; this phase drafts approval request only |
+| Next planned action | Stop and wait for explicit user direction. Do not run RC gates, start live HTTP MCP, call providers, preview real memory, mutate config, migrate/import-export apply, create RC artifacts, tag, release, or deploy. |
 
 ## Notes
 
-- The remote CI failure is not a startup/watchdog runtime failure.
-- Donor ranking fixture cases no longer treat memory label numbers as a cross-platform hard contract.
-- TagMemo audit now permits either same-bucket alpha sibling as `topMemoryId` while preserving result set, tag interleave, and safety boundaries.
+- Project health: strong.
+- Governance health: strong.
+- Current truth: P22 planning closed.
+- Release state: blocked for explicit RC approval.
+- Recommended action: draft RC gate refresh approval request only.
 - Backup creation and restore remain blocked.
-- Startup/watchdog installation and HKCU Run edits remain blocked.
+- Live HTTP MCP startup, startup/watchdog installation, and HKCU Run edits remain blocked.
 - Config mutation for Codex or Claude remains blocked.
 - Provider calls remain blocked unless explicitly approved.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.

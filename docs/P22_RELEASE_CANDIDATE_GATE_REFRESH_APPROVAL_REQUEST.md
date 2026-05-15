@@ -4,6 +4,10 @@ Phase: `P22-release-candidate-gate-refresh-approval-request`
 
 Status: `DRAFT_NOT_APPROVED`
 
+Mode: `A5-approval-request-draft`
+
+Risk: `A4`
+
 ## Purpose
 
 Draft the exact approval request needed before any fresh release-candidate gate refresh is run.
@@ -14,9 +18,9 @@ This phase is docs/status/board only. It does not run `npm test`, `gate:ci`, com
 
 ## Requested Operation
 
-Requested operation: fresh local release-candidate gate refresh for target commit `<TARGET_COMMIT>`.
+Requested operation: fresh local release-candidate gate refresh for target commit `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
 
-Default target commit for this draft: `80d168dfb0bb4edf2540614c20775a5580177ddc`.
+Exact target commit for this draft: `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
 
 Approval status: `NOT_APPROVED`.
 
@@ -27,7 +31,7 @@ Decision: `BLOCKED_HARD_STOP`.
 The user must explicitly approve with a sentence equivalent to:
 
 ```text
-I explicitly approve the P22 release-candidate gate refresh for target commit <TARGET_COMMIT>, limited to the local non-provider commands listed in docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md, with no release candidate creation, no config mutation, no startup/watchdog operation, no provider call, no migration/import-export apply, no tag, no release, and no deploy.
+I explicitly approve the P22 release-candidate gate refresh for target commit 1d566d3d4f0692a3685e6c74da38c78e7e8eec0b, limited to the local non-provider commands listed in docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md, with no live HTTP MCP startup, no release candidate creation, no config mutation, no startup/watchdog operation, no provider call, no real memory preview, no migration/import-export apply, no public MCP expansion, no tag, no release, and no deploy.
 ```
 
 Do not treat the sentence above as approval while it appears in this draft.
@@ -42,7 +46,6 @@ In scope after explicit approval:
 - run fixture-safe `gate:ci -- --json`
 - run compare standard suite
 - run rollback standard suite
-- decide separately whether strict mainline gate is safe to run
 - write a redacted gate refresh report
 
 Out of scope:
@@ -52,7 +55,7 @@ Out of scope:
 - provider smoke / benchmark
 - live Claude acceptance
 - Codex / Claude config mutation
-- HTTP MCP startup unless separately approved
+- live HTTP MCP startup
 - startup or watchdog install
 - HKCU Run edit
 - SQLite migration / `ALTER TABLE`
@@ -61,13 +64,28 @@ Out of scope:
 - MCP schema or public tool expansion
 - package / dependency changes
 
+## Exact Gates To Run
+
+These gates are proposed only. They must not be run until explicit approval is given.
+
+| Gate | Exact command | Expected output |
+|---|---|---|
+| target verification | `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git ls-remote origin refs/heads/main` | clean worktree; local HEAD, local `origin/main`, and remote `refs/heads/main` all equal `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b` |
+| diff hygiene | `git diff --check` | no whitespace errors |
+| docs validation | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` | `VALIDATION PASSED` |
+| full local suite | `npm test` | all local tests pass |
+| CI-safe fixture gate | `npm run gate:ci -- --json` | JSON summary `status=ok`, `mutated=false`, `providerCalls=0`, no durable memory touched |
+| compare standard suite | `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match` | all standard-suite cases matched |
+| rollback standard suite | `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready` | all standard-suite cases rollback-ready |
+
 ## Proposed Commands
 
-These commands are proposed only. They must not be run until explicit approval is given.
+These commands are the exact command list for the proposed gates. They must not be run until explicit approval is given.
 
 ```powershell
 git status --short --branch
 git rev-parse HEAD
+git rev-parse origin/main
 git ls-remote origin refs/heads/main
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
@@ -77,13 +95,20 @@ npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standa
 npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready
 ```
 
-Strict mainline gate remains a separate decision:
+Strict mainline gate is excluded from this request because this draft does not authorize live HTTP MCP startup or runtime observation.
 
-```powershell
-npm run gate:mainline:strict
-```
+## Explicit Exclusion Answers
 
-Run it only if the approval explicitly includes strict mainline gate execution and the operator accepts any local HTTP/runtime observation behavior it may perform.
+| Question | Answer |
+|---|---|
+| Exact target commit | `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b` |
+| May live HTTP MCP be started? | No. Live HTTP MCP startup is excluded. |
+| Are provider commands excluded? | Yes. `provider-smoke` and `provider-benchmark` are excluded. |
+| Is real memory preview excluded? | Yes. Real memory preview and broad durable memory reads are excluded. |
+| Are tag/release/deploy excluded? | Yes. Tag, release, and deploy are excluded. |
+| Is config mutation excluded? | Yes. Codex / Claude config mutation is excluded. |
+| Is migration/import-export apply excluded? | Yes. SQLite migration, `ALTER TABLE`, import apply, and export apply are excluded. |
+| Is public MCP expansion excluded? | Yes. MCP schema changes and public tool expansion are excluded. |
 
 ## Mutation Scope
 
@@ -93,6 +118,7 @@ Run it only if the approval explicitly includes strict mainline gate execution a
 | Release candidate creation | no |
 | Branch/tag/release/deploy | no |
 | Codex / Claude config mutation | no |
+| Live HTTP MCP startup | no |
 | Startup/watchdog operation | no |
 | Provider call | no |
 | Real memory preview | no |
@@ -111,11 +137,12 @@ Any future approved gate refresh should produce a redacted summary:
 ```json
 {
   "status": "pass|fail|blocked",
-  "targetCommit": "<TARGET_COMMIT>",
+  "targetCommit": "1d566d3d4f0692a3685e6c74da38c78e7e8eec0b",
   "mutated": false,
   "releaseCandidateCreated": false,
   "providerCalls": 0,
   "realConfigTouched": false,
+  "liveHttpMcpStarted": false,
   "startupOrWatchdogTouched": false,
   "migrationOrImportExportTouched": false,
   "durableMemoryTouched": false,
@@ -133,6 +160,7 @@ Stop immediately if:
 - local `HEAD`, `origin/main`, and remote `refs/heads/main` do not match the approved target commit
 - any command asks for provider credentials
 - any command attempts config mutation
+- any command attempts to start live HTTP MCP
 - any command starts or installs startup/watchdog behavior outside explicit scope
 - any command reads broad real memory content
 - any command writes durable DB / diary / memory
@@ -171,3 +199,14 @@ Result: `P22_GATE_REFRESH_APPROVAL_REQUEST_DRAFTED_NOT_APPROVED`
 The request is ready for human review.
 
 It is not approval and must not be executed automatically.
+
+## Current Conclusion
+
+| Field | Value |
+|---|---|
+| project_health | strong |
+| governance_health | strong |
+| current_truth | P22 planning closed |
+| release_state | blocked_for_explicit_RC_approval |
+| recommended_action | draft_RC_gate_refresh_approval_request_only |
+| do_not_do | tag; release; deploy; provider benchmark; config mutation; migration/import-export apply; public MCP expansion |
