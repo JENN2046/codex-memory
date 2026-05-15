@@ -2,7 +2,7 @@
 
 ## Goal
 
-Draft the P22 release publication boundary checklist without performing tag, release, or deploy.
+Draft the P22 post-artifact operator handoff without performing tag, release, or deploy.
 
 ## Workspace
 
@@ -14,21 +14,21 @@ A:\codex-memory
 
 ## Worktree
 
-P22.12 release publication boundary checklist edits are local. Docs validation has passed for this phase.
+P22.13 post-artifact operator handoff edits are local. Docs validation has passed for this phase.
 
 ## Current Area
 
-P22 release publication boundary checklist
+P22 post-artifact operator handoff
 
 ## Findings
 
-- Pre-P22.12 pushed baseline was `5b6859b6de4ee274cc6676e190ee457b87661c40`.
+- Pre-P22.13 pushed baseline was `6db7c540207f6b32a8ae9d84b413a72683b4fbd7`.
 - P22 planning is closed.
 - Release state is `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED`.
 - P22 approved local non-provider gate refresh result is recorded as `PASS`.
 - The local artifact exists at `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
-- P22.12 boundary checklist has been added.
-- The checklist records artifact exists does not equal released.
+- P22.13 post-artifact operator handoff has been added.
+- The handoff records artifact path, gate evidence, done/not-done, next approval options, rollback path, troubleshooting notes, release warning, and exact forbidden actions.
 - Tag approval, GitHub release approval, and deploy approval remain `NOT_APPROVED`.
 - Target commit remains `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
 - Gate refresh PASS evidence remains recorded, but this phase did not rerun gates.
@@ -36,7 +36,7 @@ P22 release publication boundary checklist
 
 ## Changed Files
 
-- `docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md`
+- `docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -72,4 +72,4 @@ P22 release publication boundary checklist
 
 ## Next Safe Step
 
-Run guarded commit, safe-push if ready, then continue to `P22.13-post-artifact-operator-handoff`. Any tag/release/deploy or other blocked action requires separate explicit approval.
+Run guarded commit, safe-push if ready, then continue to `P22.x-rc-artifact-readiness-closeout`. Any tag/release/deploy or other blocked action requires separate explicit approval.
