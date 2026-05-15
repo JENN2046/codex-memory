@@ -147,6 +147,7 @@
 - P19.3 admin review schema snapshot gate：新增 `tests/fixtures/admin-review-schema-snapshot-v1.json`、`tests/admin-review-schema-snapshot-gate.test.js` 和 [docs/P19_ADMIN_REVIEW_SCHEMA_SNAPSHOT_GATE.md](/A:/codex-memory/docs/P19_ADMIN_REVIEW_SCHEMA_SNAPSHOT_GATE.md)，锁住 dashboard / `observe:http` / `governance:report` / `gate:ci` / planned admin-review 的 key-set snapshot；本阶段仍不实现 runtime aggregation 或 UI。P19.3 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `c5784fc082f08231eb326671ac510c52491f3f04`。
 - P19.4 operator troubleshooting notes：新增 [docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md](/A:/codex-memory/docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md)，整理 dashboard / `observe:http` / `governance:report` / `gate:ci` / `gate:mainline` 的 operator troubleshooting map、review levels、blocked/unavailable 处理和 hard boundaries；本阶段 docs-only，不实现 runtime aggregation 或 UI。
 - P19.x observability/admin review surface closeout：新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md)，将 P19 关闭为 `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`；P20 只能从 planning / inventory 开始。
+- P20 local production hardening planning：新增 [docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md)，规划 startup/watchdog inventory、health/readiness dry-run evidence、rollback/backup operations plan、local production safety checklist 和 closeout 顺序；docs validation 已通过；本阶段 docs/planning only，不安装服务、不改配置、不跑 provider、不做 backup/restore/migration/import-export apply。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -512,7 +513,7 @@
 
 ## 下一步建议
 
-- 下一阶段建议完成 `P19.x-observability-admin-review-surface-closeout` 的 docs validation、guarded commit / safe-push，然后进入 `P20-local-production-hardening-planning`。P20 必须从 planning / inventory 开始，不得直接 release candidate、deploy、provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
+- 下一阶段建议完成 `P20-local-production-hardening-planning` 的 guarded commit / safe-push，然后进入 `P20.1-startup-watchdog-inventory`。P20.1 仍只做 inventory/docs/board，不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

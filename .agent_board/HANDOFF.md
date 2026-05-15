@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P19.x admin review surface closeout without changing runtime behavior.
+Run P20 local production hardening planning without changing runtime behavior.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P19.3 schema snapshot gate, P19.3 post-push state sync, and P19.4 operator notes are pushed and hash-verified; P19.x closeout is local and validation has passed.
+P19.3 schema snapshot gate, P19.3 post-push state sync, P19.4 operator notes, and P19.x closeout are pushed and hash-verified; P20 planning is local and docs validation has passed.
 
 ## Current Area
 
-P19 admin review surface closeout
+P20 local production hardening planning
 
 ## Findings
 
@@ -92,12 +92,15 @@ P19 admin review surface closeout
 - P19.4 operator troubleshooting notes are drafted to document review surfaces, review levels, common blocked/unavailable signals, and safe next actions.
 - P19.4 operator troubleshooting notes were committed and pushed at `69dc681440f977ee7ba76704303ef58bb9002774`.
 - P19.x closeout is drafted with result `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`.
-- P20 should begin with planning / inventory only after P19.x commit / safe-push.
+- P19.x closeout was committed and pushed at `f9baa27953b36e24474cd230df6d6134dad331cf`.
+- P20 local production hardening planning is drafted as docs/planning only.
+- P20.1 should inventory startup/watchdog surfaces only after P20 planning validation and push.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
+- `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md`
 - `docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -111,7 +114,8 @@ P19 admin review surface closeout
 - P19.3 post-push hash verification: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched `c5784fc082f08231eb326671ac510c52491f3f04`.
 - P19.3 state-sync validation: `git diff --check` passed; docs validation passed; committed and pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`.
 - P19.4 docs validation: `git diff --check` passed; docs validation passed; committed and pushed at `69dc681440f977ee7ba76704303ef58bb9002774`.
-- P19.x closeout validation: `git diff --check` passed; docs validation passed.
+- P19.x closeout validation: `git diff --check` passed; docs validation passed; committed and pushed at `f9baa27953b36e24474cd230df6d6134dad331cf`.
+- P20 planning validation: `git diff --check` passed; docs validation passed.
 
 ## Not Done
 
@@ -129,4 +133,4 @@ P19 admin review surface closeout
 
 ## Next Safe Step
 
-Run P19.x closeout docs validation, guarded commit, safe-push if ready, and continue to `P20-local-production-hardening-planning`.
+Run final P20 planning diff/scope review, guarded commit, safe-push if ready, and continue to `P20.1-startup-watchdog-inventory`.

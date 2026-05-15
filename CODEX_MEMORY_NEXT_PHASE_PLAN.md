@@ -284,6 +284,14 @@
 - 下一步建议：完成 P19.x validation / guarded commit / safe-push 后进入 `P20-local-production-hardening-planning`。
 - 边界：docs/status/board only；不实现 UI、不改 `src/`、不新增 tests、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile、不进入 release candidate。
 
+当前 P20 planning：
+
+- 入口：[docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md)
+- 目标：规划 local production hardening 的 startup/watchdog inventory、health/readiness dry-run evidence、rollback/backup operations plan、safety checklist 和 closeout 顺序。
+- 当前状态：P20 planning docs 已完成 diff/docs validation，等待 guarded commit 和 safe-push readiness。
+- 下一步建议：完成 P20 planning validation / guarded commit / safe-push 后进入 `P20.1-startup-watchdog-inventory`。
+- 边界：docs/planning only；不安装服务或 watchdog、不改 Codex/Claude 真实配置、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile、不进入 release candidate。
+
 ## 当前判断
 
 `codex-memory` 已经能作为 Codex / Claude 取向的本地 `vcp_codex_memory` 主线继续维护：

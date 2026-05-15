@@ -6,24 +6,25 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 docs/board only |
-| Current task | CM-0138 / P19.x-observability-admin-review-surface-closeout |
-| Current area | P19 admin review surface closeout |
-| Last local commit | P19.4 operator troubleshooting notes committed and safe-pushed at `69dc681` |
-| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `69dc681440f977ee7ba76704303ef58bb9002774` |
+| Current task | CM-0139 / P20-local-production-hardening-planning |
+| Current area | P20 local production hardening planning |
+| Last local commit | P19.x admin review surface closeout committed and safe-pushed at `f9baa27` |
+| Last pushed baseline | local `HEAD`, local `origin/main`, and remote `refs/heads/main` verified at `f9baa27953b36e24474cd230df6d6134dad331cf` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Completed P19.x admin review surface closeout. |
-| Last validation | P19.x docs validation passed: `git diff --check` and docs validation. P19.4 docs validation passed and was pushed at `69dc681440f977ee7ba76704303ef58bb9002774`. |
-| Worktree summary | P19.x docs/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, or unapproved mutation. |
+| Last action | Completed P20 local production hardening planning docs validation. |
+| Last validation | P20 planning docs validation passed: `git diff --check` and docs validation. P19.x closeout was pushed and hash-verified at `f9baa27953b36e24474cd230df6d6134dad331cf`. |
+| Worktree summary | P20 docs/planning/status/board edits only. No `src/`, tests, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider call, real memory read preview, export file generation, `.env`, tag, release, deploy, UI, service install, watchdog install, config mutation, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base; `codex/p1-vcp-memory-core-100-roadmap` is not used as a baseline. |
 | P14 status | P14.2-P14.6 are present on `origin/main`. |
 | P15 status | P15.6 closeout completed and pushed. |
 | P16 status | Planning through P16.x completed and pushed. |
 | P17 status | Planning through P17.x completed and pushed. |
 | P18 status | Planning through P18.x completed and pushed. |
-| P19 status | Planning through P19.4 completed and pushed; P19.x closeout completed and validated locally. |
+| P19 status | Planning through P19.x completed, pushed, hash-verified, and closed. |
+| P20 status | Planning drafted and validated locally. |
 | Guarded auto-commit allowed | eligible after final scope review |
-| Safe-push readiness | pending guarded commit for P19.x |
-| Next planned action | Final diff/scope review, guarded commit, safe-push if ready, then continue to P20 planning. |
+| Safe-push readiness | pending guarded commit for P20 planning |
+| Next planned action | Final diff/scope review, guarded commit, safe-push if ready, then continue to P20.1 startup/watchdog inventory. |
 
 ## Notes
 
@@ -58,4 +59,5 @@
 - Decision: P19.3 post-push state sync is docs/board only and only records pushed / verified state at `c5784fc082f08231eb326671ac510c52491f3f04`.
 - Decision: P19.4 operator troubleshooting notes are docs-only; they do not authorize runtime aggregation, UI, provider calls, real memory preview, MCP expansion, or migration/import-export apply.
 - Decision: P19.x closeout is docs-only; P20 may start planning/inventory only, not release candidate or production hardening implementation.
+- Decision: P20 planning is docs/planning only; service install, watchdog install, config mutation, provider calls, real memory preview, import/export apply, migration, release, tag, and deploy remain blocked.
 - Public MCP tools remain frozen at `record_memory` / `search_memory` / `memory_overview`.

@@ -2,18 +2,18 @@
 
 ## Current Goal
 
-P19.x-observability-admin-review-surface-closeout: close P19 before P20 planning.
+P20-local-production-hardening-planning: plan local production hardening without runtime mutation.
 
 ## Current Area
 
-P19 admin review surface closeout
+P20 local production hardening planning
 
 ## Current Status
 
 Repository state:
 
 - branch: `main`
-- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `69dc681440f977ee7ba76704303ef58bb9002774`
+- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `f9baa27953b36e24474cd230df6d6134dad331cf`
 - P16.1 inventory and P16.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.3 targeted semantic fixtures have been validated, committed, safe-pushed, and post-push hash-verified
 - P16.4 semantic ranking evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
@@ -38,6 +38,7 @@ Repository state:
 - P19.3 schema snapshot gate has been validated, committed, safe-pushed, and post-push hash-verified
 - P19.3 post-push state sync has been validated, committed, safe-pushed, and post-push hash-verified
 - P19.4 operator troubleshooting notes have been validated, committed, safe-pushed, and post-push hash-verified
+- P19.x closeout has been validated, committed, safe-pushed, and post-push hash-verified
 - latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
 
 P19.3 schema snapshot decisions:
@@ -64,8 +65,15 @@ P19.x closeout decisions:
 - P20 may start with planning / inventory only.
 - P19.x closeout does not authorize production hardening implementation, release candidate, deploy, provider benchmark, migration, import/export apply, or real memory preview.
 
+P20 planning decisions:
+
+- P20 planning is docs/planning only.
+- The plan defines startup/watchdog inventory, health/readiness dry-run evidence, rollback/backup operations plan, safety checklist, and closeout sequence.
+- Service install, watchdog install, startup entry changes, Codex/Claude real config mutation, provider calls, real memory preview, backup/restore, migration, import/export apply, release, tag, and deploy remain blocked.
+
 ## Changed Files
 
+- `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md`
 - `docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -83,7 +91,8 @@ P19.x closeout decisions:
 - P19.3 post-push hash verification: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched `c5784fc082f08231eb326671ac510c52491f3f04`.
 - P19.3 state-sync validation: `git diff --check` passed; docs validation passed; committed and pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`.
 - P19.4 docs validation: `git diff --check` passed; docs validation passed; committed and pushed at `69dc681440f977ee7ba76704303ef58bb9002774`.
-- P19.x closeout validation: `git diff --check` passed; docs validation passed.
+- P19.x closeout validation: `git diff --check` passed; docs validation passed; committed and pushed at `f9baa27953b36e24474cd230df6d6134dad331cf`.
+- P20 planning validation: `git diff --check` passed; docs validation passed.
 
 ## Current Blockers
 
@@ -91,4 +100,4 @@ P19.x closeout decisions:
 
 ## Next Safe Action
 
-Run P19.x closeout docs validation, guarded commit, safe-push if ready, and continue to `P20-local-production-hardening-planning`.
+Run final P20 planning diff/scope review, guarded commit, safe-push if ready, and continue to `P20.1-startup-watchdog-inventory`.
