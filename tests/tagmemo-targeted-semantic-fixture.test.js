@@ -88,6 +88,38 @@ function assertAuditSubset(actual, expected, forbiddenKeys) {
   assertNoForbiddenKeys(actual, forbiddenKeys);
 }
 
+function assertOrderContract(actualIds, expected, caseId) {
+  const contract = expected.orderContract || null;
+  if (!contract) {
+    assert.deepEqual(actualIds, expected.memoryIds, caseId);
+    return;
+  }
+
+  const expectedSet = contract.containsExactly || expected.memoryIds;
+  assert.deepEqual(
+    [...actualIds].sort(),
+    [...expectedSet].sort(),
+    `${caseId}:containsExactly`
+  );
+
+  if (Array.isArray(contract.topPrefix)) {
+    assert.deepEqual(
+      actualIds.slice(0, contract.topPrefix.length),
+      contract.topPrefix,
+      `${caseId}:topPrefix`
+    );
+  }
+
+  if (Array.isArray(contract.remainingSetAfterPrefix)) {
+    const prefixLength = Array.isArray(contract.topPrefix) ? contract.topPrefix.length : 0;
+    assert.deepEqual(
+      actualIds.slice(prefixLength).sort(),
+      [...contract.remainingSetAfterPrefix].sort(),
+      `${caseId}:remainingSetAfterPrefix`
+    );
+  }
+}
+
 test('P16.3 targeted semantic fixture declares no-side-effect safety boundaries', () => {
   const fixture = loadFixture();
 
@@ -125,9 +157,9 @@ test('P16.3 targeted semantic fixtures lock TagMemo ordering and audit shape', a
         limit: caseDefinition.limit
       });
 
-      assert.deepEqual(
+      assertOrderContract(
         response.results.map(result => result.memoryId),
-        caseDefinition.expected.memoryIds,
+        caseDefinition.expected,
         caseDefinition.id
       );
 

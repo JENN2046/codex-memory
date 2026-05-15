@@ -2,7 +2,7 @@
 
 Phase: `P20.2-health-readiness-dry-run-evidence`
 
-Status: evidence captured; readiness blocked by existing fixture gate drift
+Status: evidence captured; initial readiness blocker resolved by P20.2b
 
 ## Purpose
 
@@ -43,6 +43,8 @@ actual:   p16-alpha-a, p16-beta, p16-alpha-b
 ```
 
 P20 local production readiness should not proceed to install, watchdog, service, or release-candidate work while `gate:ci` is red.
+
+Follow-up: P20.2b repaired the P16.3 fixture contract without runtime changes, and `npm run gate:ci -- --json` later passed with tests `449/449`.
 
 ## Safe Report Shapes Reviewed From Source
 
@@ -138,13 +140,13 @@ Current status:
 startupInstallReady=false
 watchdogInstallReady=false
 runtimeObservationReady=false
-gateCiReady=false
+gateCiReady=false at initial P20.2 capture; resolved by P20.2b
 mutated=false
 providerCalls=0
 durableMemoryTouched=false
 ```
 
-The safe path is to fix or reconcile the P16.3 TagMemo ordering drift before continuing deeper P20 readiness work.
+The safe path was to fix or reconcile the P16.3 TagMemo ordering drift before continuing deeper P20 readiness work. P20.2b completed that repair and restored `gate:ci`.
 
 ## Boundary Confirmation
 
@@ -169,6 +171,6 @@ P20.2 did not:
 
 ## Next Recommended Phase
 
-`P20.2a-gate-ci-tagmemo-semantic-drift-review`
+`P20.3-rollback-backup-operations-plan`
 
-P20.3 rollback / backup operations planning should wait until the CI-safe readiness blocker is understood or explicitly accepted as a documented blocker.
+P20.3 rollback / backup operations planning may proceed as docs/planning only. It still must not install services, change startup/watchdog state, mutate config, call providers, read real memory content, apply import/export, or run migration.

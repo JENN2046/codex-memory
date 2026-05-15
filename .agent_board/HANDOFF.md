@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue P20 local production hardening by unblocking CI-safe readiness.
+Continue P20 local production hardening after restoring CI-safe readiness.
 
 ## Workspace
 
@@ -14,46 +14,41 @@ A:\codex-memory
 
 ## Worktree
 
-P20.2a docs/review/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
+P20.2b tests/fixtures/docs/status/board edits are local, validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P20 local production hardening readiness blocker review
+P20 local production hardening readiness blocker repair
 
 ## Findings
 
-- P20.2 health/readiness evidence was committed and pushed at `3ee33aa452bd6108ab472a42cd1a3c2cdd3ec0c3`.
-- `gate:ci` remains blocked by `tests/tagmemo-targeted-semantic-fixture.test.js`.
-- Standalone targeted test currently fails `2/3`.
-- Repeated targeted loop failed on `tag-title-body-evidence-order`.
-- Wider `gate:ci` previously surfaced `group-tag-interleaves-semantic-buckets`.
-- Read-only score inspection shows:
-  - `p16-evidence-only` edges `p16-body-only` by `0.000094`.
-  - `group(tag)` still interleaves `alpha` then `beta`, but the alpha sibling order differs from the fixture snapshot.
-- This points to fixture contract / tie-order brittleness or stale expected values, not to P20 startup/watchdog behavior.
-- P20.2a did not change runtime, tests, fixtures, package, MCP, config, or durable data.
+- P20.2a drift review was committed and pushed at `cbcbc3ec61a07c62dfa616a224244deadf109382`.
+- P20.2b repaired the P16.3 fixture/test contract without changing runtime scoring.
+- The repair keeps exact result-set checks and high-confidence prefix checks, while allowing low-margin tail records to be treated as a set.
+- Targeted P16.3 test now passes `3/3`.
+- `gate:ci` now passes with tests `449/449`, compare `43/43`, rollback `43/43`, queries `14/14`.
+- `npm test` now passes `464/464`.
+- No startup/watchdog/config/provider/migration/import-export operation was run.
 
 ## Changed Files
 
-- `docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md`
-- `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
-- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `MAINTENANCE_BACKLOG.md`
-- `STATUS.md`
+- `tests/tagmemo-targeted-semantic-fixture.test.js`
+- `tests/fixtures/tagmemo-targeted-semantic-v1.json`
+- `docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md`
+- P20 docs/status/board files
 - `.agent_board/*`
 
 ## Validation
 
-- `node --test tests\tagmemo-targeted-semantic-fixture.test.js` failed `2/3`.
-- Repeated targeted test loop failed all 3 runs.
-- Inline score inspection completed without file writes.
+- `node --test tests\tagmemo-targeted-semantic-fixture.test.js` passed `3/3`.
+- `npm run gate:ci -- --json` passed; tests `449/449`.
+- `npm test` passed `464/464`.
 - `git diff --check` passed.
 - Docs validation passed.
 
 ## Not Done
 
 - No runtime code changed.
-- No tests or fixtures changed.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
@@ -70,4 +65,4 @@ P20 local production hardening readiness blocker review
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P20.2b-tagmemo-targeted-fixture-contract-repair`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P20.3-rollback-backup-operations-plan`.

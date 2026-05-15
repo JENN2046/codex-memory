@@ -229,6 +229,7 @@ FAILED
 |---|---|---|---|---|
 | CMV-0202 | P20.2-health-readiness-dry-run-evidence | BLOCKED | `npm run gate:ci -- --json`; manual CI-safe test batch; `git diff --check`; docs validation | `gate:ci` compare `43/43`, rollback `43/43`, queries `14/14`, `mutated=false`, `providerCalls=0`; tests `448/449`, blocked by P16.3 TagMemo ordering drift in `tests/tagmemo-targeted-semantic-fixture.test.js`; diff/docs validation passed. |
 | CMV-0203 | P20.2a-gate-ci-tagmemo-semantic-drift-review | BLOCKED | `node --test tests\tagmemo-targeted-semantic-fixture.test.js`; repeated targeted loop; inline score inspection; `git diff --check`; docs validation | Standalone targeted test failed `2/3`; repeated loop failed all 3 runs; score inspection suggests low-margin exact ordering fixture drift; diff/docs validation passed. |
+| CMV-0204 | P20.2b-tagmemo-targeted-fixture-contract-repair | COMPLETED_VALIDATED | `node --test tests\tagmemo-targeted-semantic-fixture.test.js`; `npm run gate:ci -- --json`; `npm test`; `git diff --check`; docs validation | Targeted P16.3 fixture test passed `3/3`; `gate:ci` passed with tests `449/449`, compare `43/43`, rollback `43/43`, queries `14/14`, `mutated=false`, `providerCalls=0`, `durableMemoryTouched=false`; `npm test` passed `464/464`; diff/docs validation passed. |
 
 ## Common Validation Commands
 

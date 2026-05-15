@@ -114,4 +114,6 @@ P20.2 health/readiness dry-run evidence is captured in [P20_HEALTH_READINESS_DRY
 
 P20.2a drift review is captured in [P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md](./P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md).
 
-`P20.2b-tagmemo-targeted-fixture-contract-repair`
+P20.2b TagMemo targeted fixture contract repair is captured in [P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md](./P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md). The repair restored `gate:ci` with tests `449/449`.
+
+`P20.3-rollback-backup-operations-plan`

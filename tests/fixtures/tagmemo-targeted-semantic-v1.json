@@ -22,7 +22,7 @@
   "cases": [
     {
       "id": "tag-title-body-evidence-order",
-      "description": "TagMemo plus rerank should prefer tag+title matches over title-only, body-only, and evidence-only records.",
+      "description": "TagMemo plus rerank should prefer tag+title and title-only matches over lower-confidence body/evidence records without overfitting tiny tail-score deltas.",
       "target": "process",
       "query": "[[orm migration checkpoint]] ::TagMemo+1.8 ::Rerank+0.6",
       "limit": 4,
@@ -67,9 +67,25 @@
         "memoryIds": [
           "p16-tag-title",
           "p16-title-only",
-          "p16-body-only",
-          "p16-evidence-only"
+          "p16-evidence-only",
+          "p16-body-only"
         ],
+        "orderContract": {
+          "topPrefix": [
+            "p16-tag-title",
+            "p16-title-only"
+          ],
+          "remainingSetAfterPrefix": [
+            "p16-body-only",
+            "p16-evidence-only"
+          ],
+          "containsExactly": [
+            "p16-tag-title",
+            "p16-title-only",
+            "p16-body-only",
+            "p16-evidence-only"
+          ]
+        },
         "matchedTagsByMemoryId": {
           "p16-tag-title": [
             "orm",
@@ -101,7 +117,7 @@
     },
     {
       "id": "group-tag-interleaves-semantic-buckets",
-      "description": "TagMemo with Group(tag) should interleave semantic tag buckets before exhausting one dominant tag.",
+      "description": "TagMemo with Group(tag) should interleave semantic tag buckets before exhausting one dominant tag without overfitting same-tag sibling order.",
       "target": "process",
       "query": "[[alpha beta checkpoint]] ::TagMemo+1.2 ::Group(tag) ::Rerank",
       "limit": 3,
@@ -139,10 +155,17 @@
       ],
       "expected": {
         "memoryIds": [
-          "p16-alpha-b",
+          "p16-alpha-a",
           "p16-beta",
-          "p16-alpha-a"
+          "p16-alpha-b"
         ],
+        "orderContract": {
+          "containsExactly": [
+            "p16-alpha-a",
+            "p16-alpha-b",
+            "p16-beta"
+          ]
+        },
         "matchedTagsByMemoryId": {
           "p16-alpha-b": [
             "alpha"
@@ -159,7 +182,7 @@
           "target": "process",
           "candidateCount": 3,
           "semanticCandidateCount": 3,
-          "topMemoryId": "p16-alpha-b",
+          "topMemoryId": "p16-alpha-a",
           "matchedTags": [
             "alpha",
             "beta"

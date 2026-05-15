@@ -151,6 +151,7 @@
 - P20.1 startup/watchdog inventory：新增 [docs/P20_STARTUP_WATCHDOG_INVENTORY.md](/A:/codex-memory/docs/P20_STARTUP_WATCHDOG_INVENTORY.md)，盘点 HTTP MCP startup / ensure / watchdog / install scripts、scheduled task 与 HKCU Run fallback 风险、watchdog log writes、hard-stop approval requirements 和 P20.2 health/readiness evidence handoff；本阶段 docs/inventory only，未启动服务、未安装 watchdog/startup task、未改真实配置。
 - P20.2 health/readiness dry-run evidence：新增 [docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md)，记录 CI-safe readiness evidence；`gate:ci` 的 compare `43/43`、rollback `43/43`、queries `14/14`、policy/lifecycle/docs checks 均通过且 `mutated=false` / `providerCalls=0`，但 embedded tests 当前 `448/449`，阻塞于 `tests/tagmemo-targeted-semantic-fixture.test.js` 的 P16.3 TagMemo ordering drift；本阶段未启动服务、未运行 watchdog、未观察 live HTTP/audit、未改真实配置。
 - P20.2a gate-ci TagMemo semantic drift review：新增 [docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md](/A:/codex-memory/docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md)，只读复核 P16.3 blocker；standalone targeted test 当前 `2/3`，重复 targeted loop 均失败在 `tag-title-body-evidence-order`，score inspection 显示 tail records 仅差 `0.000094`，group(tag) case 仍保留 alpha/beta interleave 意图；下一步应先做 P20.2b fixture contract repair。
+- P20.2b TagMemo targeted fixture contract repair：新增 [docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md](/A:/codex-memory/docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md)，仅收窄 P16.3 fixture/test 的 exact ordering contract，不改 runtime scoring；targeted test `3/3`，`gate:ci` summary.ok=true、tests `449/449`、compare `43/43`、rollback `43/43`、queries `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`；`npm test` passed `464/464`。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -517,8 +518,8 @@
 ## 下一步建议
 
 - P20.1 startup/watchdog inventory 已完成 guarded commit / safe-push 和 post-push hash verification，当前 local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `e56bc2a182302e86f9cf8c79f642e0e7badccc99`。
-- P20.2 health/readiness evidence 已捕获当前 blocker：`gate:ci` 被 P16.3 TagMemo semantic ordering drift 阻塞；P20.2a 已只读复核并确认需要 fixture contract repair。
-- 下一阶段建议进入 `P20.2b-tagmemo-targeted-fixture-contract-repair`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
+- P20.2 health/readiness evidence 已捕获并关闭当前 blocker：P20.2b 后 `gate:ci` 已回绿。
+- 下一阶段建议进入 `P20.3-rollback-backup-operations-plan`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

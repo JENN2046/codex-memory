@@ -2,7 +2,7 @@
 
 Phase: `P20.2a-gate-ci-tagmemo-semantic-drift-review`
 
-Status: reviewed; repair required before P20.3
+Status: reviewed; repaired by P20.2b
 
 ## Purpose
 
@@ -72,6 +72,8 @@ Create a narrow follow-up phase:
 
 `P20.2b-tagmemo-targeted-fixture-contract-repair`
 
+Follow-up result: P20.2b repaired the fixture contract without changing runtime behavior; targeted P16.3 test passed `3/3` and `gate:ci` passed with tests `449/449`.
+
 Recommended scope:
 
 - inspect P16.3 fixture intent
@@ -107,6 +109,6 @@ P20.2a did not:
 
 ## Next Recommended Phase
 
-`P20.2b-tagmemo-targeted-fixture-contract-repair`
+`P20.3-rollback-backup-operations-plan`
 
-P20.3 rollback / backup operations planning should wait until `gate:ci` is green or the remaining blocker is explicitly accepted.
+P20.3 rollback / backup operations planning may proceed as docs/planning only now that `gate:ci` is green again.
