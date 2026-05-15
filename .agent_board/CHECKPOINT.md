@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record that tag `p22-rc-7fd17de` was created and pushed for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Request explicit GitHub release approval for tag `p22-rc-7fd17de`; deploy remains blocked.
 
 ## Current Area
 
-P22 security-fix tag result record
+P22 GitHub release approval request
 
 ## Current Status
 
@@ -16,15 +16,15 @@ P22 security-fix tag result record
 - Temporary gate execution checkout was created at `A:\codex-memory-gate-7fd17de`, verified at target HEAD, and removed.
 - Main workspace remains clean and synced at the latest docs baseline after result recording.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
-- Current work is tag-result recording only.
+- Current work is approval-request drafting only.
 - Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
-- Created tag: `p22-rc-7fd17de`.
+- Target tag: `p22-rc-7fd17de`.
 
 ## Completed Work In This Batch
 
-- Added [P22_SECURITY_FIX_TAG_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md).
-- Recorded local and remote tag target `7fd17de624c0da76751e863e97302bed0dbec905`.
-- Recorded that GitHub release and deploy remain not performed.
+- Added [P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md).
+- Linked the request from [P22_SECURITY_FIX_TAG_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md).
+- Recorded that GitHub release approval remains `NOT_APPROVED` and deploy remains `NOT_APPROVED`.
 - Recorded that the old `p22-rc-806cc847` candidate is superseded and must not be reused or moved.
 - Recorded gate evidence:
   - `git diff --check`: passed.
@@ -37,8 +37,8 @@ P22 security-fix tag result record
 
 ## Changed Files
 
+- `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
-- `docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -78,4 +78,4 @@ P22 security-fix tag result record
 
 ## Next Safe Action
 
-Run docs validation, guarded commit, and safe-push if ready. Then request explicit GitHub release approval for `p22-rc-7fd17de` if publication should continue.
+Run docs validation, guarded commit, and safe-push if ready. Then wait for explicit GitHub release approval for `p22-rc-7fd17de`.

@@ -275,6 +275,7 @@ FAILED
 | CMV-0247 | P22-security-fix-rc-artifact-docs-only-creation | COMPLETED_VALIDATED | `git diff --check`; docs validation | Creates approved local Markdown artifact `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md` for target `7fd17de624c0da76751e863e97302bed0dbec905`; no tag created/moved/pushed, no GitHub release, no deploy, no provider/config/startup/watchdog/real-memory/durable-write/migration/import-export/MCP/package/env change. |
 | CMV-0248 | P22-security-fix-tag-only-approval-request | COMPLETED_VALIDATED | `git diff --check`; docs validation | Drafts tag-only approval request for proposed tag `p22-rc-7fd17de` at target `7fd17de624c0da76751e863e97302bed0dbec905`; tag/release/deploy approval remains `NOT_APPROVED`; no tag created/moved/pushed, no GitHub release, no deploy. |
 | CMV-0249 | P22-security-fix-tag-result-record | COMPLETED_VALIDATED | `git diff --check`; docs validation | Records tag `p22-rc-7fd17de` created and pushed; local/remote tag point to `7fd17de624c0da76751e863e97302bed0dbec905`; GitHub release and deploy remain not performed. |
+| CMV-0250 | P22-github-release-approval-request | COMPLETED_VALIDATED | `git diff --check`; docs validation | Drafts GitHub release approval request for tag `p22-rc-7fd17de`; GitHub release approval remains `NOT_APPROVED`, deploy remains `NOT_APPROVED` / still blocked; no GitHub release or deploy performed. |
 
 ## Common Validation Commands
 

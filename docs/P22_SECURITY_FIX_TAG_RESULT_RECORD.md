@@ -100,3 +100,5 @@ Still not performed:
 If publication should continue, request explicit GitHub release approval for tag `p22-rc-7fd17de`.
 
 Deploy remains separately blocked and requires its own explicit approval.
+
+Release approval request: [P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md)
