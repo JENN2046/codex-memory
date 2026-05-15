@@ -2,7 +2,7 @@
 
 ## Goal
 
-Split the P22 release-candidate gate refresh approval request into `rc_target_commit` and `approval_request_commit`. Do not execute the gate refresh.
+Define the P22 release-candidate gate refresh temporary worktree execution model. Do not execute the gate refresh.
 
 ## Workspace
 
@@ -14,20 +14,21 @@ A:\codex-memory
 
 ## Worktree
 
-Two-field approval-request draft/status/board edits are local and docs-only validation has passed.
+Worktree execution model approval-request draft/status/board edits are local and docs-only validation has passed.
 
 ## Current Area
 
-P22 release-candidate approval request drafting
+P22 release-candidate approval request drafting / worktree execution model
 
 ## Findings
 
-- Current `main`, `origin/main`, and remote `refs/heads/main` are `289cb6cd9bf8d0f1479c14c2370def78a7388acf`.
+- Current `main`, `origin/main`, and remote `refs/heads/main` are `c1bb2984a948220376f3fb4265d64589bc0c94c2`.
 - GitHub Actions `CI` run `25899450529` passed for `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
 - P22 planning is closed.
 - Release state is `blocked_for_explicit_RC_approval`.
 - The current request is an approval request draft, not approval.
-- New target model: `rc_target_commit=806cc847cb37a3e428099b45871a4f1a13c4fa6f`; `approval_request_commit=289cb6cd9bf8d0f1479c14c2370def78a7388acf`.
+- Worktree execution model: `rc_target_commit=806cc847cb37a3e428099b45871a4f1a13c4fa6f`; `approval_request_commit=c1bb2984a948220376f3fb4265d64589bc0c94c2`; future `gate_execution_checkout` must be a temporary worktree or detached checkout whose `HEAD` equals `rc_target_commit`.
+- Current `main`, `origin/main`, and remote `refs/heads/main` may remain at approval docs state and do not need to equal `rc_target_commit`.
 
 ## Changed Files
 
@@ -63,4 +64,4 @@ P22 release-candidate approval request drafting
 
 ## Next Safe Step
 
-Commit, push if ready, and stop. Future gate execution still requires explicit A5 approval that names both `rc_target_commit` and `approval_request_commit`.
+Guarded commit and safe-push if ready. Future gate execution still requires explicit A5 approval that names `rc_target_commit`, `approval_request_commit`, and the temporary `gate_execution_checkout` model.

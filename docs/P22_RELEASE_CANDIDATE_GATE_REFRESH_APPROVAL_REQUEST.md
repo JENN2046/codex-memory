@@ -18,13 +18,19 @@ This phase is docs/status/board only. It does not run `npm test`, `gate:ci`, com
 
 ## Requested Operation
 
-Requested operation: fresh local release-candidate gate refresh using a two-field target model.
+Requested operation: fresh local release-candidate gate refresh using a two-field target model with a separate gate execution checkout.
 
 `rc_target_commit`: `806cc847cb37a3e428099b45871a4f1a13c4fa6f`
 
-`approval_request_commit`: `289cb6cd9bf8d0f1479c14c2370def78a7388acf`
+`approval_request_commit`: `c1bb2984a948220376f3fb4265d64589bc0c94c2`
 
 `rc_target_commit` is the code target that a future approved RC gate refresh must verify. `approval_request_commit` is the approval-request document version that defines the approved command and boundary model.
+
+`gate_execution_checkout` is the temporary worktree or detached checkout where the approved gate commands run. Its `HEAD` must equal `rc_target_commit`.
+
+The main workspace, `origin/main`, and remote `refs/heads/main` may remain at `approval_request_commit` or a later docs-only approval state. They do not need to equal `rc_target_commit`.
+
+Do not checkout, reset, or detach the main workspace to `rc_target_commit` unless a separate explicit approval authorizes that operation.
 
 Approval status: `NOT_APPROVED`.
 
@@ -35,7 +41,7 @@ Decision: `BLOCKED_HARD_STOP`.
 The user must explicitly approve with a sentence equivalent to:
 
 ```text
-I explicitly approve the P22 release-candidate gate refresh for rc_target_commit 806cc847cb37a3e428099b45871a4f1a13c4fa6f using approval_request_commit 289cb6cd9bf8d0f1479c14c2370def78a7388acf, limited to the local non-provider commands listed in docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md, with no live HTTP MCP startup, no release candidate creation, no config mutation, no startup/watchdog operation, no provider call, no real memory preview, no migration/import-export apply, no public MCP expansion, no tag, no release, and no deploy.
+I explicitly approve the P22 release-candidate gate refresh for rc_target_commit 806cc847cb37a3e428099b45871a4f1a13c4fa6f using approval_request_commit c1bb2984a948220376f3fb4265d64589bc0c94c2, executed in a temporary gate_execution_checkout whose HEAD equals rc_target_commit, limited to the local non-provider commands listed in docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md, with no live HTTP MCP startup, no release candidate creation, no config mutation, no startup/watchdog operation, no provider call, no real memory preview, no migration/import-export apply, no public MCP expansion, no tag, no release, and no deploy.
 ```
 
 Do not treat the sentence above as approval while it appears in this draft.
@@ -44,7 +50,9 @@ Do not treat the sentence above as approval while it appears in this draft.
 
 In scope after explicit approval:
 
-- verify clean worktree and `rc_target_commit`
+- verify clean main workspace and record current main / origin / remote refs
+- create or use a separately approved temporary `gate_execution_checkout` for `rc_target_commit`
+- verify `gate_execution_checkout` `HEAD` equals `rc_target_commit`
 - record `approval_request_commit` as the approved request version
 - run local docs validation
 - run local full test suite
@@ -75,7 +83,7 @@ These gates are proposed only. They must not be run until explicit approval is g
 
 | Gate | Exact command | Expected output |
 |---|---|---|
-| target verification | `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git ls-remote origin refs/heads/main` | clean worktree; active checkout `HEAD` equals `rc_target_commit`; `origin/main` and remote `refs/heads/main` are recorded separately and must not be mistaken for `rc_target_commit` after approval-request-only commits |
+| target verification | `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git ls-remote origin refs/heads/main` in the main workspace, then `git rev-parse HEAD` inside `gate_execution_checkout` | main workspace clean; main / `origin/main` / remote `refs/heads/main` may be `approval_request_commit` or later docs-only approval state; `gate_execution_checkout` `HEAD` equals `rc_target_commit` |
 | diff hygiene | `git diff --check` | no whitespace errors |
 | docs validation | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` | `VALIDATION PASSED` |
 | full local suite | `npm test` | all local tests pass |
@@ -86,6 +94,14 @@ These gates are proposed only. They must not be run until explicit approval is g
 ## Proposed Commands
 
 These commands are the exact command list for the proposed gates. They must not be run until explicit approval is given.
+
+Recommended future checkout setup, not executed in this draft phase:
+
+```powershell
+git worktree add <temp-path> 806cc847cb37a3e428099b45871a4f1a13c4fa6f
+```
+
+The gate commands should run from the temporary worktree or detached checkout after its `HEAD` is verified. Do not run `git checkout`, `git reset`, or detached-HEAD operations in the main workspace unless separately approved.
 
 ```powershell
 git status --short --branch
@@ -107,7 +123,8 @@ Strict mainline gate is excluded from this request because this draft does not a
 | Question | Answer |
 |---|---|
 | `rc_target_commit` | `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
-| `approval_request_commit` | `289cb6cd9bf8d0f1479c14c2370def78a7388acf` |
+| `approval_request_commit` | `c1bb2984a948220376f3fb4265d64589bc0c94c2` |
+| `gate_execution_checkout` model | Temporary worktree or detached checkout; its `HEAD` must equal `rc_target_commit`. |
 | May live HTTP MCP be started? | No. Live HTTP MCP startup is excluded. |
 | Are provider commands excluded? | Yes. `provider-smoke` and `provider-benchmark` are excluded. |
 | Is real memory preview excluded? | Yes. Real memory preview and broad durable memory reads are excluded. |
@@ -144,7 +161,8 @@ Any future approved gate refresh should produce a redacted summary:
 {
   "status": "pass|fail|blocked",
   "rc_target_commit": "806cc847cb37a3e428099b45871a4f1a13c4fa6f",
-  "approval_request_commit": "289cb6cd9bf8d0f1479c14c2370def78a7388acf",
+  "approval_request_commit": "c1bb2984a948220376f3fb4265d64589bc0c94c2",
+  "gateExecutionCheckoutHead": "806cc847cb37a3e428099b45871a4f1a13c4fa6f",
   "mutated": false,
   "releaseCandidateCreated": false,
   "providerCalls": 0,
@@ -163,8 +181,10 @@ Any future approved gate refresh should produce a redacted summary:
 
 Stop immediately if:
 
-- worktree is dirty before the gate run
-- active checkout `HEAD` does not match the approved `rc_target_commit`
+- main workspace is dirty before creating or using the gate execution checkout
+- `gate_execution_checkout` cannot be created or verified safely after explicit approval
+- `gate_execution_checkout` `HEAD` does not match the approved `rc_target_commit`
+- main workspace checkout/reset/detach would be required without separate explicit approval
 - the approval sentence omits either `rc_target_commit` or `approval_request_commit`
 - any command asks for provider credentials
 - any command attempts config mutation

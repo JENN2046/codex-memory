@@ -2,26 +2,29 @@
 
 ## Current Goal
 
-Split the P22 release-candidate gate refresh approval request into `rc_target_commit` and `approval_request_commit` without executing any RC gate or A5 action.
+Define the P22 release-candidate gate refresh temporary worktree execution model without executing any RC gate or A5 action.
 
 ## Current Area
 
-P22 release-candidate approval request drafting
+P22 release-candidate approval request drafting / worktree execution model
 
 ## Current Status
 
-- `main`, local `origin/main`, and remote `refs/heads/main` are at `289cb6cd9bf8d0f1479c14c2370def78a7388acf`.
+- `main`, local `origin/main`, and remote `refs/heads/main` are at `c1bb2984a948220376f3fb4265d64589bc0c94c2`.
 - P20.1 CI failure reconciliation is complete; GitHub Actions `CI` run `25899450529` passed for `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
 - P22 planning is closed.
 - Release state remains `blocked_for_explicit_RC_approval`.
-- Current work is only `P22-release-candidate-gate-refresh-approval-request` draft update.
+- Current work is only `P22-approval-request-worktree-execution-model` draft update.
 
 ## Completed Work In This Batch
 
-- Switched [P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md) to two-field target model.
+- Switched [P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md) to temporary worktree execution model.
 - Set `rc_target_commit=806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
-- Set `approval_request_commit=289cb6cd9bf8d0f1479c14c2370def78a7388acf`.
-- Added explicit gate list and expected outputs for a future approved refresh.
+- Set `approval_request_commit=c1bb2984a948220376f3fb4265d64589bc0c94c2`.
+- Defined `gate_execution_checkout` as a temporary worktree or detached checkout whose `HEAD` must equal `rc_target_commit`.
+- Clarified that current `main`, `origin/main`, and remote `refs/heads/main` may remain at approval docs state and do not need to equal `rc_target_commit`.
+- Added future recommended `git worktree add <temp-path> 806cc847cb37a3e428099b45871a4f1a13c4fa6f` setup text, but did not execute it.
+- Kept explicit gate list and expected outputs for a future approved refresh.
 - Explicitly excluded live HTTP MCP startup, provider commands, real memory preview, config mutation, migration/import-export apply, public MCP expansion, tag, release, and deploy.
 - Recorded project/governance conclusion: `project_health=strong`, `governance_health=strong`, `current_truth=P22 planning closed`, `release_state=blocked_for_explicit_RC_approval`.
 
@@ -66,4 +69,4 @@ P22 release-candidate approval request drafting
 
 ## Next Safe Action
 
-Guarded commit, safe-push if ready, and stop. Do not execute RC gates without a new exact two-field A5 approval sentence.
+Guarded commit, safe-push if ready, and stop. Do not execute RC gates or create a worktree without a new exact A5 approval sentence for temporary worktree gate refresh execution.
