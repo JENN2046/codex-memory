@@ -137,4 +137,6 @@ It is not sufficient to authorize config mutation, runtime behavior changes, MCP
 
 ## Next Recommended Phase
 
-`P21.2-client-scope-acceptance-fixture-review`
+P21.2 client scope acceptance fixture review is captured in [P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md](./P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md).
+
+`P21.3-Claude-acceptance-evidence-refresh-plan`

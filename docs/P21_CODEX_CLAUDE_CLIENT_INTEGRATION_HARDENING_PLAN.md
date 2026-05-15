@@ -147,4 +147,6 @@ It is not sufficient to authorize config edits, runtime changes, MCP public tool
 
 P21.1 client integration inventory is captured in [P21_CLIENT_INTEGRATION_INVENTORY.md](./P21_CLIENT_INTEGRATION_INVENTORY.md).
 
-`P21.2-client-scope-acceptance-fixture-review`
+P21.2 client scope acceptance fixture review is captured in [P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md](./P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md).
+
+`P21.3-Claude-acceptance-evidence-refresh-plan`

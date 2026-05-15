@@ -2,26 +2,28 @@
 
 ## Current Goal
 
-P21.1-client-integration-inventory: inventory Codex / Claude client docs, commands, acceptance evidence, gaps, and hard-stop boundaries.
+P21.2-client-scope-acceptance-fixture-review: map existing scope acceptance tests to P21 gate categories and identify fixture gaps.
 
 ## Current Area
 
-P21 client integration inventory
+P21 client scope acceptance fixture review
 
 ## Current Status
 
-- P21 planning is on `origin/main` at `f86c9d015463270350273a642e69b45953bdf553`.
-- P21.1 inventory is implemented locally.
+- P21.1 is on `origin/main` at `f09a63b4ba5e68c4655dec37719b685aeb11e69d`.
+- P21.2 fixture review is implemented locally.
 
 ## Completed Work In This Batch
 
-- Added `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`.
-- Inventoried client docs, command surfaces, public MCP tool boundary, current tests, acceptance evidence, gaps, and hard stops.
-- Identified P21.2/P21.4 fixture-review targets without adding tests or changing runtime.
+- Added `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`.
+- Ran existing targeted scope tests: `scope-filter` 18/18, `scope-acceptance-cli` 5/5, `scope-backfill-dry-run` 7/7.
+- Mapped existing scope coverage to P21 gate categories.
+- Identified follow-up gaps for Claude interactive acceptance and dedicated cross-client private fixture matrix.
 - Updated next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
+- `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`
 - `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
 - `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -60,4 +62,4 @@ P21 client integration inventory
 
 ## Next Safe Action
 
-Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.2-client-scope-acceptance-fixture-review`.
+Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.3-Claude-acceptance-evidence-refresh-plan`.

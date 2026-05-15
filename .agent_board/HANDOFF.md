@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P21.1 inventory into P21.2 client scope acceptance fixture review.
+Continue from P21.2 client scope acceptance fixture review into P21.3 Claude acceptance evidence refresh planning.
 
 ## Workspace
 
@@ -14,21 +14,23 @@ A:\codex-memory
 
 ## Worktree
 
-P21.1 inventory docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
+P21.2 docs/status/board edits are local, targeted-scope-tested, docs-validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P21 client integration inventory
+P21 client scope acceptance fixture review
 
 ## Findings
 
-- P21 planning was committed and pushed at `f86c9d015463270350273a642e69b45953bdf553`.
-- P21.1 adds client integration inventory only.
+- P21.1 inventory was committed and pushed at `f09a63b4ba5e68c4655dec37719b685aeb11e69d`.
+- P21.2 adds client scope acceptance fixture review only.
 - Codex/Claude config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, and release work remain blocked without explicit A5 approval.
-- The inventory covers client docs, command surfaces, public MCP tool boundary, current tests, acceptance evidence, gaps, and hard stops.
+- Existing targeted scope tests passed: `scope-filter` 18/18, `scope-acceptance-cli` 5/5, `scope-backfill-dry-run` 7/7.
+- The review maps existing scope coverage to P21 gate categories and identifies follow-up gaps.
 
 ## Changed Files
 
+- `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`
 - `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
 - `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -62,4 +64,4 @@ P21 client integration inventory
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.2-client-scope-acceptance-fixture-review`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.3-Claude-acceptance-evidence-refresh-plan`.
