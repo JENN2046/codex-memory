@@ -141,4 +141,6 @@ It is not sufficient to authorize RC implementation, startup/watchdog installati
 
 ## Next Recommended Phase
 
-`P22.1-release-candidate-readiness-inventory`
+P22.1 release-candidate readiness inventory is captured in [P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md](./P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md).
+
+`P22.2-release-candidate-gate-matrix-dry-run-plan`

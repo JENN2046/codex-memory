@@ -2,29 +2,30 @@
 
 ## Current Goal
 
-P22-release-candidate-planning: plan release-candidate readiness without implementation or live apply.
+P22.1-release-candidate-readiness-inventory: inventory RC gate evidence freshness, known gaps, and approval blockers.
 
 ## Current Area
 
-P22 release candidate planning
+P22 release candidate readiness inventory
 
 ## Current Status
 
-- P21.x is on `origin/main` at `e29e66605dd1401116f132cca589fc2ddb2a9c20`.
-- P22 release-candidate planning is implemented locally as docs/status/board only.
+- P22 planning is on `origin/main` at `a05c2ce81be1fe2013eceef9472ad974cd7a4440`.
+- P22.1 readiness inventory is implemented locally as docs/status/board only.
 
 ## Completed Work In This Batch
 
-- Added `docs/P22_RELEASE_CANDIDATE_PLAN.md`.
-- Linked P22 planning from `docs/VCP_MEMORY_PARITY_ROADMAP.md` and P21 closeout.
-- Defined candidate contract freeze, prerequisite evidence, required readiness gates, A5 approval packet requirements, future P22 sequence, safety rules, and non-goals.
-- Confirmed P22 planning does not create a release candidate, tag, release, deploy, mutate config, start services, install watchdog/startup tasks, call providers, migrate data, apply import/export, or expand public MCP tools.
-- Updated next phase plan, status, backlog, and board pointers toward P22.1 readiness inventory.
+- Added `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`.
+- Linked P22.1 from `docs/P22_RELEASE_CANDIDATE_PLAN.md` and `docs/VCP_MEMORY_PARITY_ROADMAP.md`.
+- Inventoried current gate evidence for full suite, strict mainline, compare, rollback, `gate:ci`, client scope/privacy, local production safety, and docs validation.
+- Marked standing evidence separately from fresh RC implementation evidence.
+- Recorded known gaps and approval blockers before any RC implementation.
+- Updated next phase plan, status, backlog, and board pointers toward P22.2 gate matrix dry-run planning.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`
 - `docs/P22_RELEASE_CANDIDATE_PLAN.md`
-- `docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md`
 - `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -65,4 +66,4 @@ P22 release candidate planning
 
 ## Next Safe Action
 
-Run final file-scope inspection, guarded commit, safe-push if ready, then continue to `P22.1-release-candidate-readiness-inventory`.
+Run final file-scope inspection, guarded commit, safe-push if ready, then continue to `P22.2-release-candidate-gate-matrix-dry-run-plan`.

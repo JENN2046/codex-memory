@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P22 release-candidate planning into P22.1 readiness inventory.
+Continue from P22.1 release-candidate readiness inventory into P22.2 gate matrix dry-run planning.
 
 ## Workspace
 
@@ -14,24 +14,24 @@ A:\codex-memory
 
 ## Worktree
 
-P22 planning docs/status/board edits are local and pending validation.
+P22.1 docs/status/board edits are local and pending validation.
 
 ## Current Area
 
-P22 release candidate planning
+P22 release candidate readiness inventory
 
 ## Findings
 
-- P21.x client integration hardening closeout was committed and pushed at `e29e66605dd1401116f132cca589fc2ddb2a9c20`.
-- P22 planning adds a docs-only release-candidate plan for contract freeze, prerequisite evidence, readiness gates, approval packet requirements, safety rules, and future P22 sequence.
-- P22 planning does not create a release candidate and does not authorize implementation.
-- P22.1 may begin as readiness inventory only.
+- P22 release-candidate planning was committed and pushed at `a05c2ce81be1fe2013eceef9472ad974cd7a4440`.
+- P22.1 inventories current gate evidence freshness and separates standing evidence from fresh RC implementation evidence.
+- P22.1 does not run heavy/live gates and does not authorize RC implementation.
+- P22.2 may define a gate matrix dry-run plan and expected report shape only.
 - Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate creation, tag, release, and deploy remain blocked without explicit A5 approval.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`
 - `docs/P22_RELEASE_CANDIDATE_PLAN.md`
-- `docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md`
 - `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -67,4 +67,4 @@ P22 release candidate planning
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P22.1-release-candidate-readiness-inventory`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P22.2-release-candidate-gate-matrix-dry-run-plan`.

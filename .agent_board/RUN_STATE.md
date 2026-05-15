@@ -6,18 +6,18 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 docs/planning |
-| Current task | CM-0155 / P22-release-candidate-planning |
-| Current area | P22 release candidate planning |
-| Last pushed baseline | P21.x client integration hardening closeout pushed and verified at `e29e66605dd1401116f132cca589fc2ddb2a9c20` |
+| Current task | CM-0156 / P22.1-release-candidate-readiness-inventory |
+| Current area | P22 release candidate readiness inventory |
+| Last pushed baseline | P22 release candidate planning pushed and verified at `a05c2ce81be1fe2013eceef9472ad974cd7a4440` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P22 release candidate planning without RC implementation or live apply. |
-| Last validation | `git diff --check` passed; docs validation passed for P22 planning. |
-| Worktree summary | P22 planning docs/status/board edits only. No `src/`, tests, fixtures, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, or unapproved mutation. |
+| Last action | Added P22.1 readiness inventory without running heavy/live gates or RC implementation. |
+| Last validation | `git diff --check` passed; docs validation passed for P22.1. |
+| Worktree summary | P22.1 docs/status/board edits only. No `src/`, tests, fixtures, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base. |
 | P20 status | Closed as evidence-ready and blocked for apply. |
 | Guarded auto-commit allowed | eligible after final diff/file-scope inspection |
 | Safe-push readiness | pending guarded commit |
-| Next planned action | Validate and commit P22 planning, then continue to `P22.1-release-candidate-readiness-inventory`. |
+| Next planned action | Validate and commit P22.1, then continue to `P22.2-release-candidate-gate-matrix-dry-run-plan`. |
 
 ## Notes
 
