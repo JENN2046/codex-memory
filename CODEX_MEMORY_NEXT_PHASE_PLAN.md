@@ -328,7 +328,8 @@
 - P22 release-candidate artifact 已按显式批准创建：[docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md)；这是 local Markdown artifact only，未 tag、未 release、未 deploy，未 provider/config/migration/import-export/public MCP expansion。
 - P22.10 RC artifact creation closeout review 已新增 [docs/P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md)：确认 artifact created docs-only，并关闭 artifact creation 阶段；tag/release/deploy 仍未执行。
 - P22.11 tag/release/deploy approval request 已新增 [docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md)：三个独立开关默认 `NOT_APPROVED`，draft tag name `p22-rc-806cc847`，draft release title `P22 Release Candidate p22-rc-806cc847`，deploy 默认不请求。
-- 下一步建议：`P22.12-release-publication-boundary-checklist`；任何 tag / release / deploy / provider / config / migration-import-export / public MCP expansion 仍需单独显式批准。
+- P22.12 release publication boundary checklist 已新增 [docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md](/A:/codex-memory/docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md)：确认 artifact exists does not equal released、target commit frozen、public MCP tools frozen、`validate_memory` internal-only、provider/config/migration/import-export/real memory/deploy 默认排除，以及 tag/release/deploy approval separation。
+- 下一步建议：`P22.13-post-artifact-operator-handoff`；任何 tag / release / deploy / provider / config / migration-import-export / public MCP expansion 仍需单独显式批准。
 - 边界：不改真实 Codex/Claude config、不启动 live HTTP MCP 或 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断

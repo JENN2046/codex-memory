@@ -2,7 +2,7 @@
 
 ## Goal
 
-Draft the P22 tag / release / deploy approval request without performing any of those actions.
+Draft the P22 release publication boundary checklist without performing tag, release, or deploy.
 
 ## Workspace
 
@@ -14,20 +14,21 @@ A:\codex-memory
 
 ## Worktree
 
-P22.11 tag/release/deploy approval request edits are local. Docs validation has passed for this phase.
+P22.12 release publication boundary checklist edits are local. Docs validation has passed for this phase.
 
 ## Current Area
 
-P22 tag/release/deploy approval request
+P22 release publication boundary checklist
 
 ## Findings
 
-- Pre-P22.11 pushed baseline was `11d90a6e9bf8443f9b07c3c3ef78addf9a9c6df4`.
+- Pre-P22.12 pushed baseline was `5b6859b6de4ee274cc6676e190ee457b87661c40`.
 - P22 planning is closed.
 - Release state is `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED`.
 - P22 approved local non-provider gate refresh result is recorded as `PASS`.
 - The local artifact exists at `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
-- P22.11 approval request has been added with independent tag, GitHub release, and deploy switches.
+- P22.12 boundary checklist has been added.
+- The checklist records artifact exists does not equal released.
 - Tag approval, GitHub release approval, and deploy approval remain `NOT_APPROVED`.
 - Target commit remains `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
 - Gate refresh PASS evidence remains recorded, but this phase did not rerun gates.
@@ -35,7 +36,7 @@ P22 tag/release/deploy approval request
 
 ## Changed Files
 
-- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
+- `docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -71,4 +72,4 @@ P22 tag/release/deploy approval request
 
 ## Next Safe Step
 
-Run guarded commit, safe-push if ready, then continue to `P22.12-release-publication-boundary-checklist`. Any tag/release/deploy or other blocked action requires separate explicit approval.
+Run guarded commit, safe-push if ready, then continue to `P22.13-post-artifact-operator-handoff`. Any tag/release/deploy or other blocked action requires separate explicit approval.

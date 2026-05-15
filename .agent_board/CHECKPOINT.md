@@ -2,31 +2,31 @@
 
 ## Current Goal
 
-Draft the P22 tag / release / deploy approval request without performing any of those actions.
+Draft the P22 release publication boundary checklist without performing tag, release, or deploy.
 
 ## Current Area
 
-P22 tag/release/deploy approval request
+P22 release publication boundary checklist
 
 ## Current Status
 
-- `main`, local `origin/main`, and remote `refs/heads/main` were at `11d90a6e9bf8443f9b07c3c3ef78addf9a9c6df4` before this P22.11 batch.
+- `main`, local `origin/main`, and remote `refs/heads/main` were at `5b6859b6de4ee274cc6676e190ee457b87661c40` before this P22.12 batch.
 - P22 planning is closed.
 - Approved local non-provider RC gate refresh execution completed and is recorded as `PASS`.
 - P22.5 artifact approval request, P22.6 manifest shape, P22.7 notes draft, and P22.8 operator handoff are complete.
 - Release state is now `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED`.
-- Current work is only `P22.11-tag-release-deploy-approval-request`.
+- Current work is only `P22.12-release-publication-boundary-checklist`.
 
 ## Completed Work In This Batch
 
-- Added [P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md).
-- Split tag, GitHub release, and deploy into independent approval switches.
-- Kept tag/release/deploy statuses `NOT_APPROVED` and decision `BLOCKED_HARD_STOP`.
+- Added [P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md](/A:/codex-memory/docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md).
+- Recorded that RC artifact exists does not equal released.
+- Reconfirmed target commit freeze, public MCP tool freeze, `validate_memory` internal-only, excluded actions, and tag/release/deploy approval separation.
 - Confirmed no tag, release, deploy, provider call, config mutation, startup/watchdog operation, live HTTP MCP startup, real memory preview, migration/import-export apply, public MCP expansion, package/lockfile change, `.env`/secret change, or durable DB/memory write.
 
 ## Changed Files
 
-- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
+- `docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -67,4 +67,4 @@ P22 tag/release/deploy approval request
 
 ## Next Safe Action
 
-Run guarded commit, safe-push if ready, then continue to `P22.12-release-publication-boundary-checklist`. Do not tag, release, deploy, call providers, mutate config, start services, preview real memory, write durable memory, migrate/import-export apply, expand MCP, change package/lockfile, or edit `.env` / secrets without separate explicit approval.
+Run guarded commit, safe-push if ready, then continue to `P22.13-post-artifact-operator-handoff`. Do not tag, release, deploy, call providers, mutate config, start services, preview real memory, write durable memory, migrate/import-export apply, expand MCP, change package/lockfile, or edit `.env` / secrets without separate explicit approval.
