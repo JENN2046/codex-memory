@@ -2,32 +2,33 @@
 
 ## Current Goal
 
-Request P22 tag-only approval without creating or pushing a tag.
+Draft a fresh P22 local non-provider RC gate refresh approval request for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Current Area
 
-P22 tag-only approval request
+P22 security-fix fresh RC gate refresh approval request
 
 ## Current Status
 
-- `main`, local `origin/main`, and remote `refs/heads/main` were at `3d312882899ad82d91ef124443de300486f8654b` before this P22 tag-only batch.
-- P22 planning is closed.
-- Approved local non-provider RC gate refresh execution completed and is recorded as `PASS`.
-- P22.5 artifact approval request, P22.6 manifest shape, P22.7 notes draft, and P22.8 operator handoff are complete.
-- Release state is now `RC_ARTIFACT_CREATED_TAG_RELEASE_DEPLOY_NOT_PERFORMED`.
-- Current work is only `P22-tag-only-approval-request`.
+- `main`, local `origin/main`, and remote `refs/heads/main` are at `7fd17de624c0da76751e863e97302bed0dbec905`.
+- Security fix `7fd17de` has been committed and pushed.
+- Existing tag `p22-rc-806cc847` is superseded by the security fix and must not be reused or moved.
+- Fresh RC gate refresh is required before any new RC artifact or tag.
+- Current work is approval-request drafting only.
+- Approval remains `NOT_APPROVED`.
+- Decision remains `BLOCKED_HARD_STOP`.
 
 ## Completed Work In This Batch
 
-- Updated [P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md) to tag-only request semantics.
-- Recorded proposed tag `p22-rc-806cc847`, target commit `806cc847cb37a3e428099b45871a4f1a13c4fa6f`, and artifact path `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
-- Reconfirmed tag approval, GitHub release approval, and deploy approval remain `NOT_APPROVED`.
-- Reconfirmed no tag created, no tag pushed, no GitHub release, and no deploy.
-- Confirmed no tag, release, deploy, provider call, config mutation, startup/watchdog operation, live HTTP MCP startup, real memory preview, migration/import-export apply, public MCP expansion, package/lockfile change, `.env`/secret change, or durable DB/memory write.
+- Added [P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md).
+- Recorded `rc_target_commit=7fd17de624c0da76751e863e97302bed0dbec905`.
+- Recorded prior candidate/tag supersession: `p22-rc-806cc847` is not final and must not be moved or reused.
+- Recorded suggested future tag: `p22-rc-7fd17de`.
+- Recorded required chain: approval request -> fresh gates if approved -> result record -> new RC artifact -> new tag approval -> new tag.
 
 ## Changed Files
 
-- `docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md`
+- `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -44,12 +45,12 @@ P22 tag-only approval request
 
 ## Not Done
 
-- No RC gate executed.
-- No gates rerun in this phase.
-- No `npm test` rerun in this phase.
-- No `gate:ci` rerun in this phase.
-- No compare / rollback gate rerun in this phase.
-- No worktree created in this phase.
+- No fresh RC gates executed.
+- No temporary worktree created.
+- No checkout/reset/detach.
+- No `npm test` rerun for this approval-request draft.
+- No `gate:ci` rerun for this approval-request draft.
+- No compare / rollback gate rerun for this approval-request draft.
 - No live HTTP MCP startup.
 - No service start.
 - No watchdog start or install.
@@ -68,4 +69,4 @@ P22 tag-only approval request
 
 ## Next Safe Action
 
-Run guarded commit, safe-push if ready, then wait for explicit tag-only approval. Do not create tag, push tag, release, deploy, call providers, mutate config, start services, preview real memory, write durable memory, migrate/import-export apply, expand MCP, change package/lockfile, or edit `.env` / secrets without separate explicit approval.
+Run docs validation, guarded commit, and safe-push if ready. Then wait for explicit fresh RC gate refresh approval for `7fd17de624c0da76751e863e97302bed0dbec905`.
