@@ -116,4 +116,6 @@ P20.2a drift review is captured in [P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md
 
 P20.2b TagMemo targeted fixture contract repair is captured in [P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md](./P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md). The repair restored `gate:ci` with tests `449/449`.
 
-`P20.3-rollback-backup-operations-plan`
+P20.3 rollback / backup operations planning is captured in [P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md](./P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md).
+
+`P20.4-local-production-safety-checklist`

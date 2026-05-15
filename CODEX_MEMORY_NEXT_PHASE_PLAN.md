@@ -293,7 +293,8 @@
 - P20.2 health/readiness dry-run evidence 已新增 [docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md)，记录 `gate:ci` fixture-only readiness evidence：compare `43/43`、rollback `43/43`、queries `14/14`、`mutated=false`、`providerCalls=0`，但 embedded tests 当前 `448/449`，阻塞于 P16.3 TagMemo semantic ordering fixture drift。
 - P20.2a gate-ci TagMemo semantic drift review 已新增 [docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md](/A:/codex-memory/docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md)，确认 standalone targeted test 也失败，当前 drift 更像 P16.3 fixture contract 过度精确或 stale，而不是 P20 startup/watchdog 问题。
 - P20.2b TagMemo targeted fixture contract repair 已新增 [docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md](/A:/codex-memory/docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md)，收窄 P16.3 exact ordering contract；targeted `3/3`、`gate:ci` tests `449/449`，CI-safe readiness 已回绿。
-- 下一步建议：进入 `P20.3-rollback-backup-operations-plan`。
+- P20.3 rollback / backup operations plan 已新增 [docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md](/A:/codex-memory/docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md)，定义 future backup manifest、rollback story、A5 approval packet、validation matrix 和 hard-stop 边界；不创建 backup、不 restore、不改配置、不启动服务。
+- 下一步建议：进入 `P20.4-local-production-safety-checklist`。
 - 边界：docs/planning only；不安装服务或 watchdog、不改 Codex/Claude 真实配置、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile、不进入 release candidate。
 
 ## 当前判断

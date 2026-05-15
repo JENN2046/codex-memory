@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue P20 local production hardening after restoring CI-safe readiness.
+Continue P20 local production hardening with docs-only safety planning.
 
 ## Workspace
 
@@ -14,45 +14,42 @@ A:\codex-memory
 
 ## Worktree
 
-P20.2b tests/fixtures/docs/status/board edits are local, validated, and pending final diff/file-scope inspection.
+P20.3 docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P20 local production hardening readiness blocker repair
+P20 local production hardening rollback/backup planning
 
 ## Findings
 
-- P20.2a drift review was committed and pushed at `cbcbc3ec61a07c62dfa616a224244deadf109382`.
-- P20.2b repaired the P16.3 fixture/test contract without changing runtime scoring.
-- The repair keeps exact result-set checks and high-confidence prefix checks, while allowing low-margin tail records to be treated as a set.
-- Targeted P16.3 test now passes `3/3`.
-- `gate:ci` now passes with tests `449/449`, compare `43/43`, rollback `43/43`, queries `14/14`.
-- `npm test` now passes `464/464`.
-- No startup/watchdog/config/provider/migration/import-export operation was run.
+- P20.2b fixture contract repair was committed and pushed at `561cff790811f75cdcdf625d50050c841a308ea4`.
+- P20.3 adds rollback/backup operations planning only.
+- Backup creation, restore, config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, and release work remain blocked without explicit A5 approval.
+- The plan defines protected assets, future backup manifest shape, rollback story requirements, approval packet contents, validation matrices, and hard stops.
 
 ## Changed Files
 
-- `tests/tagmemo-targeted-semantic-fixture.test.js`
-- `tests/fixtures/tagmemo-targeted-semantic-v1.json`
-- `docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md`
-- P20 docs/status/board files
+- `docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md`
+- `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `MAINTENANCE_BACKLOG.md`
+- `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
-- `node --test tests\tagmemo-targeted-semantic-fixture.test.js` passed `3/3`.
-- `npm run gate:ci -- --json` passed; tests `449/449`.
-- `npm test` passed `464/464`.
 - `git diff --check` passed.
 - Docs validation passed.
 
 ## Not Done
 
 - No runtime code changed.
+- No tests or fixtures changed.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
 - No import/export apply.
+- No backup creation or restore.
 - No real DB or durable memory write.
 - No real memory content preview.
 - No provider smoke or provider benchmark.
@@ -65,4 +62,4 @@ P20 local production hardening readiness blocker repair
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P20.3-rollback-backup-operations-plan`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P20.4-local-production-safety-checklist`.
