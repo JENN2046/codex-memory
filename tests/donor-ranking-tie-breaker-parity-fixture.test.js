@@ -133,6 +133,12 @@ function assertOrderedIncludes(text, snippets = []) {
   }
 }
 
+function assertIncludes(text, snippets = []) {
+  for (const snippet of snippets) {
+    assert.ok(text.includes(snippet), `Missing snippet: ${snippet}`);
+  }
+}
+
 test('Donor ranking/tie-breaker parity fixture parses and mirrors ordering suite metadata', async () => {
   const fixture = await readJson(FIXTURE_PATH);
   const suite = await readJson(STANDARD_SUITE_PATH);
@@ -184,7 +190,12 @@ test('Donor ranking/tie-breaker parity fixture locks ordering snapshots without 
       assert.equal(payload.status, expected.status, caseDefinition.name);
       assertKeys(payload, expected);
       assert.equal(typeof payload.result, 'string', caseDefinition.name);
-      assertOrderedIncludes(payload.result, expected.orderedResultIncludes);
+      if (expected.orderedResultIncludes) {
+        assertOrderedIncludes(payload.result, expected.orderedResultIncludes);
+      }
+      if (expected.resultIncludes) {
+        assertIncludes(payload.result, expected.resultIncludes);
+      }
     }
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });

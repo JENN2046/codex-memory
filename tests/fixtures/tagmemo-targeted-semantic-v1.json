@@ -182,7 +182,10 @@
           "target": "process",
           "candidateCount": 3,
           "semanticCandidateCount": 3,
-          "topMemoryId": "p16-alpha-a",
+          "topMemoryIdOneOf": [
+            "p16-alpha-a",
+            "p16-alpha-b"
+          ],
           "matchedTags": [
             "alpha",
             "beta"

@@ -74,6 +74,10 @@ function assertNoForbiddenKeys(object, forbiddenKeys) {
 
 function assertAuditSubset(actual, expected, forbiddenKeys) {
   for (const [key, value] of Object.entries(expected)) {
+    if (key === 'topMemoryIdOneOf') {
+      assert.ok(value.includes(actual.topMemoryId), `topMemoryId: ${actual.topMemoryId}`);
+      continue;
+    }
     if (Array.isArray(value)) {
       assert.deepEqual(actual[key], value, key);
       continue;

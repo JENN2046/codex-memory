@@ -286,7 +286,8 @@
 106. `P22.1 release candidate readiness inventory`：新增 [docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md)，盘点 full suite / strict mainline / compare / rollback / gate:ci / client privacy / local production safety 等证据 freshness、known gaps 和 approval blockers；结论 `P22_RELEASE_CANDIDATE_READINESS_INVENTORIED_BLOCKED_FOR_GATE_REFRESH`。
 107. `P22.2 release candidate gate matrix dry-run plan`：新增 [docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md)，定义未来 RC gate matrix 的 report shape、gate 列表、blocker semantics 和执行顺序；结论 `P22_GATE_MATRIX_DRY_RUN_PLANNED_BLOCKED_FOR_EXECUTION_APPROVAL`。
 108. P22.3 已新增 rollback/support story；P22.4 已新增 approval packet template，默认 `NOT_APPROVED_TEMPLATE_ONLY`；P22.x 已关闭 planning chain，结论 `P22_RELEASE_CANDIDATE_PLANNING_CLOSED_BLOCKED_FOR_EXPLICIT_RC_APPROVAL`；P22 gate refresh approval request draft 已新增且仍为 `DRAFT_NOT_APPROVED`；不得直接进入 P22 implementation，不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、创建 release candidate、tag、release 或 deploy。
-109. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+109. `P20.1 / CI failure reconciliation`：当前 GitHub Actions `CI` 在 `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` 上失败，Linux `npm test` 为 `470/472`，失败点为 donor ranking tie-breaker fixture 与 TagMemo targeted semantic fixture；本地已做 fixture/test-only contract 收窄，不改 runtime，targeted donor `2/2`、targeted TagMemo `3/3`、`npm test` `472/472`、`gate:ci` tests `457/457` 均通过。下一步是 guarded commit / safe-push 后确认 Linux CI 回绿。
+110. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

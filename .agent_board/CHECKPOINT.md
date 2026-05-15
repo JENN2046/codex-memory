@@ -2,32 +2,36 @@
 
 ## Current Goal
 
-P22 release-candidate gate refresh approval request draft: make the required A5 approval packet concrete without executing it.
+P20.1 startup/watchdog inventory state is being reconciled against the current remote CI failure before any P22 gate refresh or implementation work.
 
 ## Current Area
 
-P22 release candidate A5 approval boundary
+P20 CI-safe fixture contract reconciliation
 
 ## Current Status
 
-- P22.x closeout review is on `origin/main` at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`.
-- `main`, local `origin/main`, and remote `refs/heads/main` matched `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc` after push.
-- CM-0161 remains blocked until the user explicitly approves an exact A5 RC gate refresh / implementation packet.
-- Release-candidate implementation, gate execution, startup/watchdog install, config mutation, provider calls, migration/import-export apply, tag, release, and deploy remain blocked.
+- `main`, local `origin/main`, and remote `refs/heads/main` are at `591adf79863e1d2ed20232c0ca54b5711ff8c3ef`.
+- GitHub Actions `CI` for `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` failed in `Node.js tests`.
+- Failure summary: Linux `npm test` reported `472` tests, `470` pass, `2` fail.
+- Failed files:
+  - `tests/donor-ranking-tie-breaker-parity-fixture.test.js`
+  - `tests/tagmemo-targeted-semantic-fixture.test.js`
+- Local Windows targeted tests and full suite passed before and after the fixture-only reconciliation.
 
 ## Completed Work In This Batch
 
-- Added `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`.
-- Drafted target commit, proposed local non-provider commands, mutation scope, expected report shape, stop conditions, rollback tier, and required approval sentence.
-- Corrected the draft target commit to current pushed HEAD `80d168dfb0bb4edf2540614c20775a5580177ddc`.
-- Kept decision `BLOCKED_HARD_STOP` and status `DRAFT_NOT_APPROVED`.
+- Confirmed the remote CI failure via `gh run list` / `gh run view`.
+- Confirmed the failures are fixture contract drift, not P20.1 startup/watchdog runtime behavior.
+- Narrowed donor ranking multi-topic near-tie assertions so memory label numbers are not treated as a cross-platform contract.
+- Narrowed TagMemo audit assertion so either same-bucket alpha sibling can be the top audit memory while preserving interleave and no-side-effect coverage.
+- Updated status/board notes to record the current CI red state and local reconciliation evidence.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`
-- `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`
-- `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `tests/donor-ranking-tie-breaker-parity-fixture.test.js`
+- `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`
+- `tests/tagmemo-targeted-semantic-fixture.test.js`
+- `tests/fixtures/tagmemo-targeted-semantic-v1.json`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -39,13 +43,20 @@ P22 release candidate A5 approval boundary
 
 ## Validation
 
-- `git diff --check` passed.
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js` passed `2/2`.
+- `node --test tests\tagmemo-targeted-semantic-fixture.test.js` passed `3/3`.
+- `npm test` passed `472/472`.
+- `npm run gate:ci -- --json` passed:
+  - tests `457/457`
+  - compare `43/43`
+  - rollback `43/43`
+  - queries `14/14`
+  - `mutated=false`
+  - `providerCalls=0`
 
 ## Not Done
 
 - No `src/` changes.
-- No tests or fixtures changed.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No backup creation.
@@ -67,4 +78,4 @@ P22 release candidate A5 approval boundary
 
 ## Next Safe Action
 
-Guarded commit / safe-push if ready. Stop before RC gate refresh / implementation unless explicit A5 approval is provided.
+Run `git diff --check` and docs validation, inspect the diff, then guarded commit and safe-push if ready. After push, verify GitHub Actions Linux CI for the new commit before any P22 RC gate refresh is considered.

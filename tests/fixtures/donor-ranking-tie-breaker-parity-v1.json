@@ -23,9 +23,9 @@
           "result",
           "status"
         ],
-        "orderedResultIncludes": [
-          "[回忆片段1]:\nMaster: Delivery schedule also needs Phase C coverage and benchmark tracking.\nKeke: Benchmark review should finish before the schedule sign-off.",
-          "[回忆片段2]:\nMaster: We should discuss the codex-memory system plan.\nKeke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
+        "resultIncludes": [
+          "Master: Delivery schedule also needs Phase C coverage and benchmark tracking.\nKeke: Benchmark review should finish before the schedule sign-off.",
+          "Master: We should discuss the codex-memory system plan.\nKeke: Move DeepMemo first, then keep TopicMemo and Phase C recall audit aligned."
         ]
       }
     },

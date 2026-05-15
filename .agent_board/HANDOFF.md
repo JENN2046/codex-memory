@@ -2,7 +2,7 @@
 
 ## Goal
 
-P22 gate refresh approval request draft is ready for validation. The actual gate refresh / implementation step remains blocked for explicit A5 approval.
+Reconcile the current remote CI failure before continuing P20/P22 planning rails. P22 RC gate refresh remains blocked for explicit A5 approval.
 
 ## Workspace
 
@@ -14,28 +14,27 @@ A:\codex-memory
 
 ## Worktree
 
-Approval request draft docs/board edits are local and pending validation.
+Fixture/test/status/board edits are local and pending final diff/docs validation, guarded commit, and safe-push.
 
 ## Current Area
 
-P22 release candidate A5 approval boundary
+P20 CI-safe fixture contract reconciliation
 
 ## Findings
 
-- P22 planning chain is complete through planning, readiness inventory, gate matrix dry-run plan, rollback/support story, approval packet template, and closeout.
-- P22.x closeout is pushed and verified at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`.
-- P22 closeout result is `P22_RELEASE_CANDIDATE_PLANNING_CLOSED_BLOCKED_FOR_EXPLICIT_RC_APPROVAL`.
-- P22 gate refresh approval request draft adds the exact proposed local non-provider gate commands and required approval sentence, but remains `DRAFT_NOT_APPROVED`.
-- The draft target commit has been corrected to current pushed HEAD `80d168dfb0bb4edf2540614c20775a5580177ddc`.
-- Fresh RC gate refresh / implementation still requires separate explicit A5 approval.
-- Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate creation, tag, release, and deploy remain blocked without explicit A5 approval.
+- Current pushed `main` is `591adf79863e1d2ed20232c0ca54b5711ff8c3ef`.
+- GitHub Actions `CI` failed on that commit in `Node.js tests`.
+- Remote Linux `npm test` result: `470/472` passed.
+- Failure 1: `tests/donor-ranking-tie-breaker-parity-fixture.test.js` missing an exact ordered snippet where memory label/order is too strict for a multi-topic near-tie.
+- Failure 2: `tests/tagmemo-targeted-semantic-fixture.test.js` expected `topMemoryId=p16-alpha-a`, while Linux produced `p16-alpha-b`; both are same alpha bucket siblings and the interleave contract still holds.
+- This is not a P20.1 startup/watchdog runtime failure.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`
-- `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`
-- `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `tests/donor-ranking-tie-breaker-parity-fixture.test.js`
+- `tests/fixtures/donor-ranking-tie-breaker-parity-v1.json`
+- `tests/tagmemo-targeted-semantic-fixture.test.js`
+- `tests/fixtures/tagmemo-targeted-semantic-v1.json`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
@@ -47,13 +46,14 @@ P22 release candidate A5 approval boundary
 
 ## Validation
 
-- `git diff --check` passed.
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `node --test tests\donor-ranking-tie-breaker-parity-fixture.test.js`: passed `2/2`.
+- `node --test tests\tagmemo-targeted-semantic-fixture.test.js`: passed `3/3`.
+- `npm test`: passed `472/472`.
+- `npm run gate:ci -- --json`: passed with tests `457/457`, compare/rollback `43/43`, queries `14/14`, `mutated=false`, `providerCalls=0`.
 
 ## Not Done
 
 - No runtime code changed.
-- No tests or fixtures changed.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
@@ -74,4 +74,4 @@ P22 release candidate A5 approval boundary
 
 ## Next Safe Step
 
-Guarded commit / safe-push if ready. After that, stop at the A5 approval boundary unless the user explicitly approves the RC gate refresh / implementation packet.
+Run `git diff --check`, docs validation, and final diff inspection. If clean, create a guarded commit and safe-push so GitHub Actions can verify the Linux CI fix. Do not run P22 RC gate refresh / implementation without explicit A5 approval.
