@@ -318,7 +318,8 @@
 - P22.4 release-candidate approval packet template 已新增 [docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md)，提供 future A5 approval packet 模板；默认状态为 `NOT_APPROVED_TEMPLATE_ONLY`，不授权任何命令执行或 RC 创建。
 - P22.x release-candidate planning closeout review 已新增 [docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md)，关闭 P22 planning chain；结论 `P22_RELEASE_CANDIDATE_PLANNING_CLOSED_BLOCKED_FOR_EXPLICIT_RC_APPROVAL`。
 - P22 release-candidate gate refresh approval request draft 已切换为 temporary worktree execution model [docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md)：`rc_target_commit=806cc847cb37a3e428099b45871a4f1a13c4fa6f` 是未来被测 RC 代码目标，`approval_request_commit=c1bb2984a948220376f3fb4265d64589bc0c94c2` 是审批请求版本；未来 `gate_execution_checkout` / temporary worktree 的 `HEAD` 必须等于 `rc_target_commit`，当前 `main` 可停留在 approval docs state；不运行任何 gate、不创建 worktree。
-- 下一步建议：请求 explicit approval for temporary worktree gate refresh execution；否则停留在 docs-only maintenance / approval-request drafting。
+- P22 approved local non-provider RC gate refresh result 已记录在 [docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md)：result `PASS`；记录 `npm test` `472/472`、`gate:ci` tests `457/457`、compare `43/43`、rollback `43/43`、`providerCalls=0`、`mutated=false`；本记录阶段未重跑 gates，未创建 RC。
+- 下一步建议：`P22-release-candidate-artifact-approval-request` or docs-only maintenance；创建 RC artifact、tag/release/deploy、provider/config/migration/import-export/public MCP expansion 仍需单独显式批准。
 - 边界：不改真实 Codex/Claude config、不启动 live HTTP MCP 或 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断

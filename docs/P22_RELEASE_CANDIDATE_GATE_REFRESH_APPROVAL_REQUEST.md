@@ -16,6 +16,8 @@ This document is not approval. It does not authorize command execution. It does 
 
 This phase is docs/status/board only. It does not run `npm test`, `gate:ci`, compare / rollback suites, strict mainline gate, provider commands, live Claude commands, startup/watchdog commands, migration/import-export commands, release candidate creation, tag, release, or deploy.
 
+Result record: [P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md](./P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md) records the later approved local non-provider gate refresh result. The result record does not create a release candidate and does not change the approval boundaries in this request.
+
 ## Requested Operation
 
 Requested operation: fresh local release-candidate gate refresh using a two-field target model with a separate gate execution checkout.
