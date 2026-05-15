@@ -106,4 +106,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 ## Next Recommended Phase
 
-`P20.1-startup-watchdog-inventory`
+P20.1 startup/watchdog inventory is captured in [P20_STARTUP_WATCHDOG_INVENTORY.md](./P20_STARTUP_WATCHDOG_INVENTORY.md).
+
+`P20.2-health-readiness-dry-run-evidence`

@@ -289,7 +289,8 @@
 - 入口：[docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md)
 - 目标：规划 local production hardening 的 startup/watchdog inventory、health/readiness dry-run evidence、rollback/backup operations plan、safety checklist 和 closeout 顺序。
 - 当前状态：P20 planning 已完成 validation、guarded commit、safe-push 和 post-push hash verification，local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`。
-- 下一步建议：进入 `P20.1-startup-watchdog-inventory`。
+- P20.1 startup/watchdog inventory 已新增 [docs/P20_STARTUP_WATCHDOG_INVENTORY.md](/A:/codex-memory/docs/P20_STARTUP_WATCHDOG_INVENTORY.md)，盘点 `start:http:*` scripts、scheduled task / HKCU Run fallback、watchdog log、runtime entrypoint、风险和审批边界。
+- 下一步建议：进入 `P20.2-health-readiness-dry-run-evidence`。
 - 边界：docs/planning only；不安装服务或 watchdog、不改 Codex/Claude 真实配置、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply、不改 package/lockfile、不进入 release candidate。
 
 ## 当前判断

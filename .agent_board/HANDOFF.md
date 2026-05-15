@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run P20 state reconciliation after remote fast-forward without changing runtime behavior.
+Continue P20.1 startup/watchdog inventory without runtime mutation.
 
 ## Workspace
 
@@ -14,115 +14,43 @@ A:\codex-memory
 
 ## Worktree
 
-P19.3 schema snapshot gate, P19.3 post-push state sync, P19.4 operator notes, P19.x closeout, and P20 planning are pushed and hash-verified.
+P20.1 inventory docs/status/board edits are validated locally and pending guarded commit.
 
 ## Current Area
 
-P20 local production hardening state reconciliation
+P20 local production hardening startup/watchdog inventory
 
 ## Findings
 
-- P15.6 closeout is safe-pushed to `origin/main` at `c8ffe68`.
-- P16 is the current true next phase from Git + STATUS + MAINTENANCE_BACKLOG + `.agent_board`.
-- P16 planning is validated, committed, safe-pushed, and post-push hash-verified.
-- P16.1 inventory is validated, committed, safe-pushed, and post-push hash-verified.
-- Dedicated P16 TagMemo fixtures now exist for P16.2 shape tests and P16.3 targeted semantic cases.
-- Existing protected surfaces include `TagMemoEngine`, `EPAModule`, `ResidualPyramid`, `SemanticGroupManager`, passive `::TagMemo` / `::Rerank` syntax, and LightMemo `tag_boost` / `core_tags` compatibility.
-- Existing coverage lives mainly in `tests/phase-b-passive-recall.test.js`, `tests/phase-b-sync-cache-rerank.test.js`, and `tests/phase-c-lightmemo-boundary.test.js`.
-- P16.2 has added synthetic fixture shape tests before runtime tuning.
-- P16.2 targeted test (`6/6`), full suite (`426/426`), diff check, docs validation, guarded commit, safe-push, and post-push hash verification passed.
-- P16.3 has added targeted synthetic temp-workspace fixtures before runtime tuning.
-- P16.3 targeted test (`3/3`), full suite (`429/429`), diff check, and docs validation passed locally.
-- P16.3 guarded commit and safe-push completed at `9e26865deed6d91a9fca461659ac743253f59ec1`.
-- P16.4 evidence gate has been drafted as docs/status/board only; docs validation passed.
-- P16.4 guarded commit and safe-push completed at `afd2a7845892a7aae892ec73440ed15b172af0ba`.
-- P16.5 targeted TagMemo tests passed `9/9`; ordering compare passed `4/4 matched`; ordering rollback passed `4/4 rollback-ready`.
-- P16.5 full suite (`429/429`), diff check, and docs validation passed.
-- P16.5 guarded commit and safe-push completed at `effd73edba04abd5b26c0a4a59dca073db655d2a`.
-- P16.x closeout review is drafted as docs/status/board only; docs validation passed.
-- P16.x guarded commit and safe-push completed at `dcc15247edd1e1781eeca991e0948734edfea6ee`.
-- P17 planning is drafted as docs/status/board only; docs validation passed.
-- P17 planning guarded commit and safe-push completed at `a1cdacc57de7f77252d35079184a02de0ab2f07f`.
-- P17.1 inventory is drafted as docs/status/board only; docs validation passed.
-- P17.1 guarded commit and safe-push completed at `c77e4734d5ca9023be252d1add5d2e1179e5c097`.
-- P17.2 fixture shape tests have been drafted for synthetic `v8-diagnose` report shape.
-- P17.2 targeted fixture test `5/5`, full suite `434/434`, diff check, and docs validation passed locally.
-- P17.2 guarded commit and safe-push completed at `3b7fa68197abc1f75d7fed775da2b569e1ea0d47`.
-- P17.3 CLI shape gate has been drafted for synthetic `v8-diagnose` JSON/text/error shell.
-- P17.3 targeted CLI gate `5/5`, full suite `439/439`, diff check, and docs validation passed locally.
-- P17.3 guarded commit and safe-push completed at `6afea7601fddadcfa845bf6d93eccef91aede7fe`.
-- P17.4 query-family fixtures have been drafted for technical, governance, quality, semantic, and safety diagnostic families.
-- P17.4 targeted query-family test `4/4`, full suite `443/443`, diff check, and docs validation passed locally.
-- P17.4 guarded commit and safe-push completed at `faf80c5f0368cad8ac1c0edc82c90538ef4505c6`.
-- P17.5 evidence summary is drafted with result `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`.
-- P17.5 diff check and docs validation passed locally.
-- P17.5 guarded commit and safe-push completed at `087d1943e8805a30c47ff57e1b093a1ed0a3c08c`.
-- P17.x closeout is drafted with result `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED_AND_CLOSED`.
-- P17.x diff check and docs validation passed locally.
-- P17.x is not authorization for V8 runtime implementation.
-- P18 must begin with planning/dry-run safety, not migration/apply.
-- P17.x guarded commit and safe-push completed at `2777a0413b5f51035443766192ed54ab1fb93168`.
-- P18 planning is drafted as docs/status/board only.
-- P18 planning guarded commit and safe-push completed at `650bca0feed4f39a6cf23d7ad5af65ac58213001`.
-- P18.1 inventory is drafted as docs/status/board only.
-- P18.2 should add synthetic export envelope fixture tests before any import/export dry-run evidence gate.
-- P18.1 guarded commit and safe-push completed at `322f8dce7d46fcf2c3564024d3da8e243c147c86`.
-- P18.2 synthetic export envelope fixture/test/docs are drafted locally.
-- P18.2 guarded commit and safe-push completed at `8b7a1973f2807df1de1506f892e64a5e004dc904`.
-- P18.3 evidence gate is drafted from existing fixture-only dry-run/readiness CLI outputs.
-- Mapping dry-run CLI reports `mutated=false`, fixture-only source, no file generation, no migration, and no real DB/diary read.
-- Migration readiness CLI reports `status=blocked`, `migrationBlocked=true`, and required approvals missing.
-- P18.3 guarded commit and safe-push completed at `85a389926d129ecfd4a462a5ecaf91778e2d2cc2`.
-- P18.4 backup/rollback safety review is drafted as docs/status/board only.
-- Future backup creation, restore, apply, migration, and real memory operations remain A5 hard stops.
-- P18.4 guarded commit and safe-push completed at `0faba9272b3828e58a142bc4988329201ea67f2c`.
-- P18.x closeout is drafted with result `DRY_RUN_SAFETY_BACKED_AND_BLOCKED_FOR_APPLY`.
-- P18.x guarded commit and safe-push completed at `2d5ce90ecbfcdb0a9dd6ca26b00f5fbff5483528`.
-- P19 planning has added a read-only admin review surface plan.
-- P19 planning docs validation, guarded commit, safe-push, and post-push hash verification passed at `5571788e926f2842916eb791b91b709bce078fc2`.
-- P19.1 inventory has been drafted to capture existing dashboard / observe / governance / gate surfaces and gaps.
-- P19.1 inventory docs validation, guarded commit, safe-push, and post-push hash verification passed at `4004fca6538fd47e2c6dd15836a512db62ff602a`.
-- P19.2 has added synthetic admin-review fixture/test/docs to lock the combined shape before runtime aggregation.
-- P19.2 targeted test, full suite, docs validation, guarded commit, safe-push, and post-push hash verification passed at `c49fdf928f26e3bf75f191753d2220de9d4369bb`.
-- P19.3 has added synthetic schema snapshot fixture/test/docs for planned admin-review and existing review source key sets.
-- P19.3 targeted test passed `5/5`; full suite passed `464/464`; diff/docs validation passed.
-- P19.3 guarded commit and safe-push completed at `c5784fc082f08231eb326671ac510c52491f3f04`; local HEAD, local origin/main, and remote refs/heads/main matched that hash during post-push verification.
-- P19.3 post-push state sync updates STATUS / `.agent_board` from pending to pushed / verified.
-- P19.3 post-push state sync was committed and pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`.
-- P19.4 operator troubleshooting notes are drafted to document review surfaces, review levels, common blocked/unavailable signals, and safe next actions.
-- P19.4 operator troubleshooting notes were committed and pushed at `69dc681440f977ee7ba76704303ef58bb9002774`.
-- P19.x closeout is drafted with result `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`.
-- P19.x closeout was committed and pushed at `f9baa27953b36e24474cd230df6d6134dad331cf`.
-- P20 local production hardening planning was committed and pushed at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
-- P20 state reconciliation updates STATUS / next plan / backlog / board to record that P20 planning is already on `origin/main`.
-- P20.1 should inventory startup/watchdog surfaces only after P20 state reconciliation is validated and pushed.
+- P20 planning was committed and pushed at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
+- P20 state reconciliation was committed and pushed at `d870c168f834095dd86033285cd1091c0c39f5a0`.
+- P20.1 inventory identifies HTTP MCP startup and watchdog surfaces.
+- `ensure-codex-memory-http.ps1` checks health and may start a hidden Node HTTP MCP process.
+- `watch-codex-memory-http.ps1 -Once` may start HTTP MCP and writes watchdog logs.
+- `ensure-codex-memory-http-watchdog.ps1` may start a long-running hidden watchdog process.
+- `install-codex-memory-http-task.ps1` and `install-codex-memory-http-watchdog.ps1` write scheduled task or HKCU Run state and require explicit approval.
 - Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
 - `validate_memory` remains internal-only.
 
 ## Changed Files
 
+- `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`
 - `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
-- `docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md`
-- `docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
+- `STATUS.md`
 - `.agent_board/*`
 
 ## Validation
 
-- P19.3 prior validation: `node --test tests\admin-review-schema-snapshot-gate.test.js` -> `5/5`; `npm test` -> `464/464`; `git diff --check`; docs validation.
-- P19.3 post-push hash verification: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched `c5784fc082f08231eb326671ac510c52491f3f04`.
-- P19.3 state-sync validation: `git diff --check` passed; docs validation passed; committed and pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`.
-- P19.4 docs validation: `git diff --check` passed; docs validation passed; committed and pushed at `69dc681440f977ee7ba76704303ef58bb9002774`.
-- P19.x closeout validation: `git diff --check` passed; docs validation passed; committed and pushed at `f9baa27953b36e24474cd230df6d6134dad331cf`.
-- P20 planning validation: `git diff --check` passed; docs validation passed; committed and pushed at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
-- P20 fast-forward verification: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
+- `git diff --check` passed.
+- Docs validation passed.
 
 ## Not Done
 
 - No `src/` changes.
 - No runtime code changed.
+- No tests or fixtures added.
 - No package or lockfile changes.
 - No MCP schema/tool changes.
 - No SQLite migration.
@@ -130,9 +58,13 @@ P20 local production hardening state reconciliation
 - No real DB or durable memory write.
 - No real memory read preview.
 - No provider smoke or provider benchmark.
-- No V8 implementation.
+- No service start.
+- No watchdog start.
+- No scheduled task install.
+- No HKCU Run edit.
+- No Codex / Claude config mutation.
 - No tag, release, deploy, destructive cleanup, or unapproved remote action.
 
 ## Next Safe Step
 
-Run P20 state reconciliation diff/docs validation, guarded commit, safe-push if ready, and continue to `P20.1-startup-watchdog-inventory`.
+Run diff/docs validation, guarded commit, safe-push if ready, then continue to `P20.2-health-readiness-dry-run-evidence`.

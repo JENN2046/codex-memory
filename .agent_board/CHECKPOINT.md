@@ -2,87 +2,33 @@
 
 ## Current Goal
 
-P20-state-reconciliation: reconcile P20 planning state after remote fast-forward.
+P20.1-startup-watchdog-inventory: inventory startup and watchdog surfaces without runtime mutation.
 
 ## Current Area
 
-P20 local production hardening state reconciliation
+P20 local production hardening startup/watchdog inventory
 
 ## Current Status
 
-Repository state:
+- P20 planning is on `origin/main` at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
+- P20 state reconciliation is on `origin/main` at `d870c168f834095dd86033285cd1091c0c39f5a0`.
+- P20.1 adds docs/status/board inventory only.
 
-- branch: `main`
-- phase start baseline: local `main`, local `origin/main`, and remote `refs/heads/main` matched at `f9baa27953b36e24474cd230df6d6134dad331cf`
-- P16.1 inventory and P16.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
-- P16.3 targeted semantic fixtures have been validated, committed, safe-pushed, and post-push hash-verified
-- P16.4 semantic ranking evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
-- P16.5 compare/rollback semantic gate has been validated, committed, safe-pushed, and post-push hash-verified
-- P16.x closeout has been validated, committed, safe-pushed, and post-push hash-verified
-- P17 planning has been validated, committed, safe-pushed, and post-push hash-verified
-- P17.1 inventory has been validated, committed, safe-pushed, and post-push hash-verified
-- P17.2 fixture shape tests have been validated, committed, safe-pushed, and post-push hash-verified
-- P17.3 CLI shape gate has been validated, committed, safe-pushed, and post-push hash-verified
-- P17.4 query-family fixture tests have been validated, committed, safe-pushed, and post-push hash-verified
-- P17.5 evidence summary has been validated, committed, safe-pushed, and post-push hash-verified
-- P17.x closeout review has been validated, committed, safe-pushed, and post-push hash-verified
-- P18 planning has been validated, committed, safe-pushed, and post-push hash-verified
-- P18.1 inventory has been validated, committed, safe-pushed, and post-push hash-verified
-- P18.2 export envelope fixture expansion has been validated, committed, safe-pushed, and post-push hash-verified
-- P18.3 import mapping dry-run evidence gate has been validated, committed, safe-pushed, and post-push hash-verified
-- P18.4 backup rollback safety review has been validated, committed, safe-pushed, and post-push hash-verified
-- P18.x closeout review has been validated, committed, safe-pushed, and post-push hash-verified
-- P19 planning has been validated, committed, safe-pushed, and post-push hash-verified
-- P19.1 inventory has been validated, committed, safe-pushed, and post-push hash-verified
-- P19.2 shape tests have been validated, committed, safe-pushed, and post-push hash-verified
-- P19.3 schema snapshot gate has been validated, committed, safe-pushed, and post-push hash-verified
-- P19.3 post-push state sync has been validated, committed, safe-pushed, and post-push hash-verified
-- P19.4 operator troubleshooting notes have been validated, committed, safe-pushed, and post-push hash-verified
-- P19.x closeout has been validated, committed, safe-pushed, and post-push hash-verified
-- P20 planning has been validated, committed, safe-pushed, and post-push hash-verified at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`
-- latest runtime safety baseline: `41a5630 fix: add validate memory two phase audit`
+## Completed Work In This Batch
 
-P19.3 schema snapshot decisions:
-
-- P19.3 is synthetic fixture/test/docs only.
-- The fixture locks planned admin-review, dashboard, observe, governance-report, and gate-ci key sets.
-- The test locks deterministic key ordering, visible safety fields, and forbidden fake quality/provider/unsafe fields.
-- Runtime ranking behavior is not tuned in this phase.
-- UI implementation, provider calls, real memory preview, MCP expansion, migration, import/export apply, package changes, release, tag, and deploy remain deferred.
-- Public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
-- `validate_memory` remains internal-only.
-- P19.3 validation, guarded commit, safe-push, and post-push hash verification passed at `c5784fc082f08231eb326671ac510c52491f3f04`.
-- P19.3 post-push state sync is docs/board only and does not change fixture/test/runtime behavior.
-
-P19.4 operator notes decisions:
-
-- P19.4 is docs/status/board only.
-- The new operator notes document review surfaces, review levels, common blocked/unavailable signals, and safe next actions.
-- Runtime aggregation, UI, provider calls, real memory preview, MCP expansion, migration, import/export apply, package changes, release, tag, and deploy remain deferred.
-
-P19.x closeout decisions:
-
-- P19 closes as `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`.
-- P20 may start with planning / inventory only.
-- P19.x closeout does not authorize production hardening implementation, release candidate, deploy, provider benchmark, migration, import/export apply, or real memory preview.
-
-P20 planning decisions:
-
-- P20 planning is docs/planning only.
-- The plan defines startup/watchdog inventory, health/readiness dry-run evidence, rollback/backup operations plan, safety checklist, and closeout sequence.
-- Service install, watchdog install, startup entry changes, Codex/Claude real config mutation, provider calls, real memory preview, backup/restore, migration, import/export apply, release, tag, and deploy remain blocked.
-
-P20 state reconciliation decisions:
-
-- Repository reality is local `HEAD`, local `origin/main`, and remote `refs/heads/main` all matching `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
-- P20 planning is no longer local/pending; it is on `origin/main`.
-- Next phase is `P20.1-startup-watchdog-inventory`.
+- Added `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`.
+- Inventoried `start:http`, `start:http:ensure`, `start:http:install-task`, `start:http:watchdog:once`, `start:http:watchdog:ensure`, and `start:http:watchdog:install`.
+- Recorded scheduled task and HKCU Run fallback as hard-stop mutation surfaces.
+- Recorded runtime/log side effects for ensure and watchdog commands.
+- Updated P20 plan, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
+- `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`
+- `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `STATUS.md`
 - `MAINTENANCE_BACKLOG.md`
+- `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
@@ -91,18 +37,27 @@ P20 state reconciliation decisions:
 
 ## Validation
 
-- P19.3 prior validation: `node --test tests\admin-review-schema-snapshot-gate.test.js` -> `5/5`; `npm test` -> `464/464`; `git diff --check`; docs validation.
-- P19.3 post-push hash verification: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched `c5784fc082f08231eb326671ac510c52491f3f04`.
-- P19.3 state-sync validation: `git diff --check` passed; docs validation passed; committed and pushed at `9c89da5fc6fa4fb322bf0ae69a15f00e7805a8a8`.
-- P19.4 docs validation: `git diff --check` passed; docs validation passed; committed and pushed at `69dc681440f977ee7ba76704303ef58bb9002774`.
-- P19.x closeout validation: `git diff --check` passed; docs validation passed; committed and pushed at `f9baa27953b36e24474cd230df6d6134dad331cf`.
-- P20 planning validation: `git diff --check` passed; docs validation passed; committed and pushed at `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
-- P20 fast-forward verification: local `HEAD`, local `origin/main`, and remote `refs/heads/main` matched `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`.
+- `git diff --check` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
-## Current Blockers
+## Not Done
 
-- None.
+- No `src/` changes.
+- No tests or fixtures added.
+- No package or lockfile changes.
+- No MCP schema/tool changes.
+- No SQLite migration.
+- No import/export apply.
+- No real DB or durable memory write.
+- No real memory read preview.
+- No provider smoke or provider benchmark.
+- No service start.
+- No watchdog start.
+- No scheduled task install.
+- No HKCU Run edit.
+- No Codex / Claude config mutation.
+- No release candidate, tag, or deploy.
 
 ## Next Safe Action
 
-Run P20 state reconciliation diff/docs validation, guarded commit, safe-push if ready, and continue to `P20.1-startup-watchdog-inventory`.
+Run P20.1 diff/docs validation, guarded commit, safe-push if ready, and continue to `P20.2-health-readiness-dry-run-evidence`.

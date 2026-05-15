@@ -154,6 +154,7 @@
 | P19.4-operator-troubleshooting-notes | observability / admin-review / operator-notes | A1 | done | Document operator review levels, blocked states, source unavailable handling, and safe next actions | `git diff --check`; docs validation | Docs-only; docs validation passed; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release, tag, or deploy |
 | P19.x-observability-admin-review-surface-closeout | observability / admin-review / closeout | A1 | done | Close P19 as fixture-backed and operator-noted, with P20 planning handoff | `git diff --check`; docs validation | Docs/status/board only; docs validation passed; no UI, runtime aggregation change, provider call, real memory preview, durable mutation, MCP expansion, migration, import/export apply, package change, release candidate, tag, or deploy |
 | P20-local-production-hardening-planning | local-production-hardening / planning | A1/A2 | done | Plan startup/watchdog inventory, health/readiness evidence, rollback/backup operations, safety checklist, and closeout order | `git diff --check`; docs validation | Docs/planning only; docs validation passed; no service install, watchdog install, config mutation, provider call, real memory preview, durable mutation, migration, import/export apply, package change, release candidate, tag, or deploy |
+| P20.1-startup-watchdog-inventory | local-production-hardening / inventory | A1/A2 | done | Inventory startup/watchdog scripts, runtime entrypoints, install risks, and approval boundaries | `git diff --check`; docs validation | Docs/status/board only; no service start, watchdog start, scheduled task install, HKCU Run edit, config mutation, provider call, real memory preview, durable mutation, migration, import/export apply, package change, release candidate, tag, or deploy |
 
 ## 推荐执行顺序
 
@@ -247,8 +248,9 @@
 88. `P19.x closeout`：admin review surface closeout 已完成 validation、guarded commit、safe-push 和 hash verification，将 P19 关闭为 `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`。
 89. `P20 planning`：local production hardening plan 已完成 validation、guarded commit、safe-push 和 post-push hash verification，commit `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2` 已在 `origin/main`。
 90. `P20-state-reconciliation`：已校准 P20 planning 的 remote reality；local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`。
-91. 下一步建议进入 `P20.1-startup-watchdog-inventory`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
-92. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+91. `P20.1 startup/watchdog inventory`：新增 [docs/P20_STARTUP_WATCHDOG_INVENTORY.md](/A:/codex-memory/docs/P20_STARTUP_WATCHDOG_INVENTORY.md)，盘点 `start:http` / `start:http:ensure` / `start:http:install-task` / `start:http:watchdog:*`、HTTP runtime、scheduled task / HKCU Run fallback、log writes、risk register 和 approval requirements。
+92. 下一步建议进入 `P20.2-health-readiness-dry-run-evidence`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
+93. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 
