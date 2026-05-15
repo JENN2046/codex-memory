@@ -2,39 +2,33 @@
 
 ## Current Goal
 
-P22.2-release-candidate-gate-matrix-dry-run-plan: define RC gate matrix dry-run plan and expected report shape without executing heavy/live gates.
+P20.1-startup-watchdog-inventory reconciliation: confirm the true state of the P20.1 startup/watchdog inventory after later P21/P22 work, and correct stale docs/board wording if needed.
 
 ## Current Area
 
-P22 release candidate gate matrix dry-run planning
+P20 local production hardening / startup-watchdog inventory
 
 ## Current Status
 
-- P22.1 is on `origin/main` at `1358747cd097ec72e119b1ebc3535bab2e2ca5f1`.
-- P22.2 gate matrix dry-run plan is implemented locally as docs/status/board only.
+- P20.1 startup/watchdog inventory exists at `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`.
+- P20.1 was committed as `e56bc2a182302e86f9cf8c79f642e0e7badccc99`.
+- Current `main`, local `origin/main`, and remote `refs/heads/main` are all `fb5284143de776a9f890cd329f015eb3914701eb`.
+- P20.1 remains closed as docs/status/board inventory only; no startup/watchdog command was run in this reconciliation.
 
 ## Completed Work In This Batch
 
-- Added `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`.
-- Linked P22.2 from `docs/P22_RELEASE_CANDIDATE_PLAN.md`, `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`, and `docs/VCP_MEMORY_PARITY_ROADMAP.md`.
-- Defined future report shape, gate matrix, blocker semantics, and execution order.
-- Marked provider/live/config/startup/watchdog/migration/release gates as blocked without explicit A5 approval.
-- Confirmed P22.2 does not execute heavy/live gates, add CLI, add tests, create RC artifacts, or mutate runtime/config/data.
-- Updated next phase plan, status, backlog, and board pointers toward P22.3 rollback/support story.
+- Confirmed P20.1 inventory still lists the current `start:http:*` and watchdog scripts from `package.json`.
+- Confirmed checked-in startup/watchdog script files still exist under `scripts/`.
+- Corrected stale wording that described P20.1 or P22.2 historical commit state as the current repository state.
+- Preserved P20.1 boundaries: no service start, no watchdog start/install, no scheduled task or HKCU Run mutation, no config mutation.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`
-- `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`
-- `docs/P22_RELEASE_CANDIDATE_PLAN.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
-- `.agent_board/TASK_QUEUE.md`
 - `.agent_board/VALIDATION_LOG.md`
 
 ## Validation
@@ -67,4 +61,4 @@ P22 release candidate gate matrix dry-run planning
 
 ## Next Safe Action
 
-Run final file-scope inspection, guarded commit, safe-push if ready, then continue to `P22.3-release-candidate-rollback-support-story`.
+Guarded commit and safe-push if ready, then stop or continue only on explicit next-phase instruction.

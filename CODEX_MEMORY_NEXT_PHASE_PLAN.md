@@ -288,7 +288,7 @@
 
 - 入口：[docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md)
 - 目标：规划 local production hardening 的 startup/watchdog inventory、health/readiness dry-run evidence、rollback/backup operations plan、safety checklist 和 closeout 顺序。
-- 当前状态：P20 planning 已完成 validation、guarded commit、safe-push 和 post-push hash verification，local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`。
+- 当前状态：P20 planning 已完成 validation、guarded commit、safe-push 和 post-push hash verification，对应提交为 `afaa64fe991a3f9458468cf3e6891cd8b29ed9a2`；当前 main 已继续推进到 P22.2，local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `fb5284143de776a9f890cd329f015eb3914701eb`。
 - P20.1 startup/watchdog inventory 已新增 [docs/P20_STARTUP_WATCHDOG_INVENTORY.md](/A:/codex-memory/docs/P20_STARTUP_WATCHDOG_INVENTORY.md)，盘点 `start:http:*` scripts、scheduled task / HKCU Run fallback、watchdog log、runtime entrypoint、风险和审批边界。
 - P20.2 health/readiness dry-run evidence 已新增 [docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md)，记录 `gate:ci` fixture-only readiness evidence：compare `43/43`、rollback `43/43`、queries `14/14`、`mutated=false`、`providerCalls=0`，但 embedded tests 当前 `448/449`，阻塞于 P16.3 TagMemo semantic ordering fixture drift。
 - P20.2a gate-ci TagMemo semantic drift review 已新增 [docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md](/A:/codex-memory/docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md)，确认 standalone targeted test 也失败，当前 drift 更像 P16.3 fixture contract 过度精确或 stale，而不是 P20 startup/watchdog 问题。

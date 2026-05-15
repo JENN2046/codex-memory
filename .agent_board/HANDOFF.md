@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P22.2 release-candidate gate matrix dry-run planning into P22.3 rollback/support story.
+Finish P20.1 startup/watchdog inventory reconciliation after later P21/P22 work.
 
 ## Workspace
 
@@ -14,28 +14,24 @@ A:\codex-memory
 
 ## Worktree
 
-P22.2 docs/status/board edits are local and pending validation.
+Docs/board correction is local and pending validation.
 
 ## Current Area
 
-P22 release candidate gate matrix dry-run planning
+P20 local production hardening / startup-watchdog inventory
 
 ## Findings
 
-- P22.1 release-candidate readiness inventory was committed and pushed at `1358747cd097ec72e119b1ebc3535bab2e2ca5f1`.
-- P22.2 defines a future RC gate matrix dry-run report shape, gate list, blocker semantics, and execution order.
-- P22.2 does not run heavy/live gates and does not authorize RC implementation.
-- P22.3 may define rollback/support/troubleshooting/operator handoff only.
+- P20.1 startup/watchdog inventory is already present at `docs/P20_STARTUP_WATCHDOG_INVENTORY.md`.
+- P20.1 was committed and pushed as `e56bc2a182302e86f9cf8c79f642e0e7badccc99`.
+- Current `main`, local `origin/main`, and remote `refs/heads/main` are all `fb5284143de776a9f890cd329f015eb3914701eb`.
+- Current `package.json` still exposes the `start:http:*` scripts documented by P20.1, and the checked-in startup/watchdog scripts still exist.
+- This reconciliation corrects stale docs/board wording only; it does not reopen P20.1 implementation.
 - Codex/Claude config mutation, `claude mcp` live commands, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, release candidate creation, tag, release, and deploy remain blocked without explicit A5 approval.
 
 ## Changed Files
 
-- `docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md`
-- `docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md`
-- `docs/P22_RELEASE_CANDIDATE_PLAN.md`
-- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
-- `MAINTENANCE_BACKLOG.md`
 - `STATUS.md`
 - `.agent_board/*`
 
@@ -68,4 +64,4 @@ P22 release candidate gate matrix dry-run planning
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P22.3-release-candidate-rollback-support-story`.
+Guarded commit and safe-push if ready. After that, the next recommended forward phase remains `P22.3-release-candidate-rollback-support-story`.
