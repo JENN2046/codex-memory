@@ -45,6 +45,7 @@ P20 should answer:
 | P20.1 startup/watchdog inventory | Inventory existing startup and watchdog scripts, risks, and manual approval boundaries | docs/status/board only | `git diff --check`; docs validation |
 | P20.2 health/readiness dry-run evidence | Summarize safe read-only health/readiness commands and report shapes | docs/evidence only; optional read-only local gates if explicitly scoped | docs validation; optional `observe:http` / `rollback:mainline:plan` read-only commands |
 | P20.2a gate-ci TagMemo semantic drift review | Review the current CI-safe readiness blocker before deeper local production planning | tests/docs review only unless explicitly scoped | targeted TagMemo fixture test; `gate:ci`; docs validation if docs changed |
+| P20.2b TagMemo targeted fixture contract repair | Repair or narrow the P16.3 fixture contract so CI-safe readiness is deterministic again | tests/fixtures/docs only | targeted TagMemo fixture test; `gate:ci`; docs validation if docs changed |
 | P20.3 rollback/backup operations plan | Define backup/restore/rollback requirements before any real operation | docs only | docs validation |
 | P20.4 local production safety checklist | Checklist for operator preflight, warning signals, and stop conditions | docs only | docs validation |
 | P20.x closeout | Summarize evidence and P21 readiness | docs/status/board only | docs validation |
@@ -111,4 +112,6 @@ P20.1 startup/watchdog inventory is captured in [P20_STARTUP_WATCHDOG_INVENTORY.
 
 P20.2 health/readiness dry-run evidence is captured in [P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md](./P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md). Current readiness is blocked by an existing P16.3 TagMemo semantic ordering drift inside `gate:ci`.
 
-`P20.2a-gate-ci-tagmemo-semantic-drift-review`
+P20.2a drift review is captured in [P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md](./P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md).
+
+`P20.2b-tagmemo-targeted-fixture-contract-repair`

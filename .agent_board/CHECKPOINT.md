@@ -2,34 +2,30 @@
 
 ## Current Goal
 
-P20.2-health-readiness-dry-run-evidence: collect readiness evidence without runtime mutation.
+P20.2a-gate-ci-tagmemo-semantic-drift-review: review the CI-safe readiness blocker without runtime or fixture mutation.
 
 ## Current Area
 
-P20 local production hardening readiness evidence
+P20 local production hardening readiness blocker review
 
 ## Current Status
 
-- P20.1 is on `origin/main` at `e56bc2a182302e86f9cf8c79f642e0e7badccc99`.
-- P20.2 evidence doc has been added locally.
-- Current production-readiness evidence is blocked by a CI-safe test drift, not by startup/watchdog inventory.
+- P20.2 is on `origin/main` at `3ee33aa452bd6108ab472a42cd1a3c2cdd3ec0c3`.
+- P20.2a drift review has been added locally.
+- `gate:ci` remains blocked by P16.3 TagMemo targeted semantic fixture drift.
 
 ## Completed Work In This Batch
 
-- Added `docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md`.
-- Ran `npm run gate:ci -- --json`.
-- Reproduced the embedded CI-safe test failure with the same exclusion set used by `gate:ci`.
-- Identified the blocker:
-  - `tests/tagmemo-targeted-semantic-fixture.test.js`
-  - `P16.3 targeted semantic fixtures lock TagMemo ordering and audit shape`
-  - case `group-tag-interleaves-semantic-buckets`
-  - expected `p16-alpha-b, p16-beta, p16-alpha-a`
-  - actual `p16-alpha-a, p16-beta, p16-alpha-b`
+- Added `docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md`.
+- Ran `node --test tests\tagmemo-targeted-semantic-fixture.test.js`; result `2/3`, failed.
+- Repeated the targeted test loop 3 times; all runs failed the same top-level targeted semantic test.
+- Ran inline read-only score inspection for both P16.3 cases.
+- Recorded that current behavior preserves broad semantic intent but exact low-margin ordering snapshots need repair.
 - Updated P20 plan, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
-- `docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md`
+- `docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md`
 - `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -42,8 +38,9 @@ P20 local production hardening readiness evidence
 
 ## Validation
 
-- `npm run gate:ci -- --json` failed: tests `448/449`, one failure.
-- Manual CI-safe test batch failed: tests `448/449`, same failure.
+- `node --test tests\tagmemo-targeted-semantic-fixture.test.js` failed: `2/3`.
+- Repeated targeted test loop failed all 3 runs.
+- Inline score inspection completed without file writes.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 
@@ -67,4 +64,4 @@ P20 local production hardening readiness evidence
 
 ## Next Safe Action
 
-Run final diff/file-scope inspection, guarded commit P20.2 evidence, then continue to `P20.2a-gate-ci-tagmemo-semantic-drift-review` before P20.3.
+Run final diff/file-scope inspection, guarded commit P20.2a review, safe-push if ready, then continue to `P20.2b-tagmemo-targeted-fixture-contract-repair`.
