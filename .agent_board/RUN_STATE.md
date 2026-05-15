@@ -5,19 +5,19 @@
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
 | Branch | main |
-| Mode | A4.8 docs/planning |
-| Current task | CM-0152 / P21.4-client-privacy-boundary-fixture-tests |
-| Current area | P21 client privacy boundary fixture tests |
-| Last pushed baseline | P21.3 Claude acceptance evidence refresh plan pushed and verified at `977918759d19b1998a61317c2ec782a671fa50c7` |
+| Mode | A4.8 docs/status/board |
+| Current task | CM-0153 / P21.5-client-integration-standing-gate-summary |
+| Current area | P21 client integration standing gate summary |
+| Last pushed baseline | P21.4 client privacy boundary fixture tests pushed and verified at `6c6e60c366c85eff72ac05c03cfa5fb470f19b56` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P21.4 fixture-only client privacy boundary test without runtime changes, real config mutation, live HTTP observation, provider/model call, MCP expansion, or migration. |
-| Last validation | pending targeted fixture test, `npm test`, diff check, and docs validation. |
-| Worktree summary | P21.4 fixture/test/docs/status/board edits only. No `src/`, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, or unapproved mutation. |
+| Last action | Added P21.5 standing gate summary for P21 planning / inventory / scope review / Claude refresh plan / privacy fixture evidence. |
+| Last validation | `git diff --check` passed; docs validation passed for P21.5. |
+| Worktree summary | P21.5 docs/status/board edits only. No `src/`, tests, fixtures, package, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory content read, `.env`, tag, release, deploy, UI, service start, service install, watchdog start, watchdog install, config mutation, or unapproved mutation. |
 | Mainline assumption | `origin/main` remains the development base. |
 | P20 status | Closed as evidence-ready and blocked for apply. |
 | Guarded auto-commit allowed | eligible after final diff/file-scope inspection |
 | Safe-push readiness | pending guarded commit |
-| Next planned action | Validate and commit P21.4, then continue to `P21.5-client-integration-standing-gate-summary`. |
+| Next planned action | Validate and commit P21.5, then continue to `P21.x-client-integration-hardening-closeout-review`. |
 
 ## Notes
 

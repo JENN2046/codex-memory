@@ -308,7 +308,8 @@
 - P21.2 client scope acceptance fixture review 已新增 [docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md)，映射现有 scope tests 到 P21 gate categories；targeted scope tests `18/18`、scope acceptance CLI `5/5`、scope backfill dry-run `7/7` 均通过。
 - P21.3 Claude acceptance evidence refresh plan 已新增 [docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md](/A:/codex-memory/docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md)，将 future refresh 分为 docs-only、read-only observation、config/model-mutating tiers；本阶段不运行 `claude mcp`。
 - P21.4 client privacy boundary fixture tests 已新增 `tests/fixtures/p21-client-privacy-boundary-v1.json`、`tests/p21-client-privacy-boundary-fixture.test.js` 和 [docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md)，锁住 same-client private、cross-client private hiding、project/workspace/shared visibility、low-risk redaction 和 no-side-effect。
-- 下一步建议：进入 `P21.5-client-integration-standing-gate-summary`。
+- P21.5 client integration standing gate summary 已新增 [docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md)，汇总 P21 planning / inventory / scope acceptance review / Claude refresh plan / privacy fixture evidence，并确认 live Claude、真实 config、runtime、provider、MCP expansion、migration/import-export apply 仍 blocked。
+- 下一步建议：进入 `P21.x-client-integration-hardening-closeout-review`。
 - 边界：不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不进入 P22 release candidate。
 
 ## 当前判断

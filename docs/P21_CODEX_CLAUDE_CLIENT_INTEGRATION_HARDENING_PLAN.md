@@ -153,4 +153,6 @@ P21.3 Claude acceptance evidence refresh plan is captured in [P21_CLAUDE_ACCEPTA
 
 P21.4 client privacy boundary fixture tests are captured in [P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md](./P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md).
 
-`P21.5-client-integration-standing-gate-summary`
+P21.5 client integration standing gate summary is captured in [P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md](./P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md).
+
+`P21.x-client-integration-hardening-closeout-review`

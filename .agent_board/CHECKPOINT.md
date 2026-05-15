@@ -2,33 +2,29 @@
 
 ## Current Goal
 
-P21.4-client-privacy-boundary-fixture-tests: add fixture-only cross-client privacy boundary coverage.
+P21.5-client-integration-standing-gate-summary: summarize P21 client integration evidence and remaining manual / live boundaries.
 
 ## Current Area
 
-P21 client privacy boundary fixture tests
+P21 client integration standing gate summary
 
 ## Current Status
 
-- P21.3 is on `origin/main` at `977918759d19b1998a61317c2ec782a671fa50c7`.
-- P21.4 privacy boundary fixture tests are implemented locally.
+- P21.4 is on `origin/main` at `6c6e60c366c85eff72ac05c03cfa5fb470f19b56`.
+- P21.5 standing gate summary is implemented locally as docs/status/board only.
 
 ## Completed Work In This Batch
 
-- Added `tests/fixtures/p21-client-privacy-boundary-v1.json`.
-- Added `tests/p21-client-privacy-boundary-fixture.test.js`.
-- Added `docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md`.
-- Locked same-client private visibility, cross-client private hiding, project/workspace/shared visibility, low-risk summary redaction, missing optional scope fallback, public tool freeze, and no side effects.
-- Updated next phase plan, backlog, status, and board pointers.
+- Added `docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md`.
+- Summarized P21 planning, P21.1 inventory, P21.2 scope acceptance review, P21.3 Claude acceptance refresh plan, and P21.4 privacy boundary fixture evidence.
+- Captured targeted evidence: scope tests `18/18`, `5/5`, `7/7`; privacy boundary fixture targeted `8/8`; latest full suite `472/472`.
+- Confirmed public MCP tools remain `record_memory`, `search_memory`, and `memory_overview`.
+- Confirmed `validate_memory` remains internal-only.
+- Updated P21 plan, next phase plan, status, backlog, and board pointers toward P21.x closeout.
 
 ## Changed Files
 
-- `tests/fixtures/p21-client-privacy-boundary-v1.json`
-- `tests/p21-client-privacy-boundary-fixture.test.js`
-- `docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md`
-- `docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md`
-- `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`
-- `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
+- `docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md`
 - `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -53,6 +49,7 @@ P21 client privacy boundary fixture tests
 - No backup creation.
 - No restore.
 - No Codex / Claude config mutation.
+- No `claude mcp` command.
 - No service start.
 - No watchdog start.
 - No scheduled task install.
@@ -66,4 +63,4 @@ P21 client privacy boundary fixture tests
 
 ## Next Safe Action
 
-Run targeted fixture test, `npm test`, diff/docs validation, final file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.5-client-integration-standing-gate-summary`.
+Run final file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.x-client-integration-hardening-closeout-review`.
