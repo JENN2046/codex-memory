@@ -315,7 +315,8 @@
 - P22.2 release-candidate gate matrix dry-run plan 已新增 [docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md)，定义未来 RC gate matrix 的 report shape、gate 列表、blocker semantics 和执行顺序；结论 `P22_GATE_MATRIX_DRY_RUN_PLANNED_BLOCKED_FOR_EXECUTION_APPROVAL`。
 - P22.3 release-candidate rollback/support story 已新增 [docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md)，定义 future RC rollback tiers、support/troubleshooting map、operator handoff fields 和 approval boundaries；结论 `P22_ROLLBACK_SUPPORT_STORY_PLANNED_BLOCKED_FOR_APPROVAL_PACKET`。
 - P22.4 release-candidate approval packet template 已新增 [docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md)，提供 future A5 approval packet 模板；默认状态为 `NOT_APPROVED_TEMPLATE_ONLY`，不授权任何命令执行或 RC 创建。
-- 下一步建议：进入 `P22.x-release-candidate-planning-closeout-review`。
+- P22.x release-candidate planning closeout review 已新增 [docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md)，关闭 P22 planning chain；结论 `P22_RELEASE_CANDIDATE_PLANNING_CLOSED_BLOCKED_FOR_EXPLICIT_RC_APPROVAL`。
+- 下一步建议：只有在用户明确批准 A5 packet 后，才进入 `P22-release-candidate-gate-refresh-approval-request`；否则停留在 docs-only maintenance。
 - 边界：不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不创建 release candidate、不 tag/release/deploy。
 
 ## 当前判断

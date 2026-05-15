@@ -2,30 +2,29 @@
 
 ## Current Goal
 
-P22.4-release-candidate-approval-packet-template: prepare an explicit A5 approval packet template without executing or approving it.
+P22.x-release-candidate-planning-closeout-review: close the P22 planning chain and mark RC gate refresh / implementation as blocked for explicit A5 approval.
 
 ## Current Area
 
-P22 release candidate approval packet template
+P22 release candidate planning closeout
 
 ## Current Status
 
-- P22.3 rollback/support story is on `origin/main`.
-- P22.4 approval packet template is implemented locally as docs/status/board only.
+- P22.4 approval packet template is on `origin/main`.
+- P22.x closeout review is implemented locally as docs/status/board only.
 - Release-candidate implementation, gate execution, startup/watchdog install, config mutation, provider calls, migration/import-export apply, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
-- Added `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`.
-- Linked P22.4 from P22 planning, P22.3 rollback/support story, and roadmap docs.
-- Defined approval status, approval sentence shape, scope declaration, preflight requirements, mutation scope, command plan, rollback story, support handoff, redaction rules, and decision values.
-- Set the template default to `NOT_APPROVED_TEMPLATE_ONLY` / `BLOCKED_HARD_STOP`.
-- Updated next phase plan, status, backlog, and board pointers toward P22.x closeout review.
+- Added `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`.
+- Linked P22 closeout from P22 planning, P22.4 approval packet template, and roadmap docs.
+- Summarized completed P22 scope, evidence freshness, boundary confirmations, remaining risks, readiness judgment, and A5 blocker.
+- Marked `P22-release-candidate-gate-refresh-approval-request` blocked pending explicit user approval.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`
 - `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`
-- `docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md`
 - `docs/P22_RELEASE_CANDIDATE_PLAN.md`
 - `docs/VCP_MEMORY_PARITY_ROADMAP.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -67,4 +66,4 @@ P22 release candidate approval packet template
 
 ## Next Safe Action
 
-Guarded commit and safe-push if ready.
+Guarded commit and safe-push if ready. Stop before RC gate refresh / implementation unless explicit A5 approval is provided.

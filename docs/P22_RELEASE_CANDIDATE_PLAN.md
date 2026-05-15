@@ -149,4 +149,6 @@ P22.3 rollback/support story is captured in [P22_RELEASE_CANDIDATE_ROLLBACK_SUPP
 
 P22.4 approval packet template is captured in [P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md](./P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md).
 
-`P22.x-release-candidate-planning-closeout-review`
+P22 closeout review is captured in [P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md](./P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md).
+
+`P22-release-candidate-gate-refresh-approval-request`

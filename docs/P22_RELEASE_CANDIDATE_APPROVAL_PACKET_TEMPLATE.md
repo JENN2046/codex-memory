@@ -198,4 +198,6 @@ It is not sufficient to authorize RC implementation, gate execution, startup/wat
 
 ## Next Recommended Phase
 
-`P22.x-release-candidate-planning-closeout-review`
+P22 closeout review is captured in [P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md](./P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md).
+
+`P22-release-candidate-gate-refresh-approval-request`
