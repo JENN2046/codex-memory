@@ -18,9 +18,13 @@ This phase is docs/status/board only. It does not run `npm test`, `gate:ci`, com
 
 ## Requested Operation
 
-Requested operation: fresh local release-candidate gate refresh for target commit `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
+Requested operation: fresh local release-candidate gate refresh using a two-field target model.
 
-Exact target commit for this draft: `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
+`rc_target_commit`: `806cc847cb37a3e428099b45871a4f1a13c4fa6f`
+
+`approval_request_commit`: `289cb6cd9bf8d0f1479c14c2370def78a7388acf`
+
+`rc_target_commit` is the code target that a future approved RC gate refresh must verify. `approval_request_commit` is the approval-request document version that defines the approved command and boundary model.
 
 Approval status: `NOT_APPROVED`.
 
@@ -31,7 +35,7 @@ Decision: `BLOCKED_HARD_STOP`.
 The user must explicitly approve with a sentence equivalent to:
 
 ```text
-I explicitly approve the P22 release-candidate gate refresh for target commit 806cc847cb37a3e428099b45871a4f1a13c4fa6f, limited to the local non-provider commands listed in docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md, with no live HTTP MCP startup, no release candidate creation, no config mutation, no startup/watchdog operation, no provider call, no real memory preview, no migration/import-export apply, no public MCP expansion, no tag, no release, and no deploy.
+I explicitly approve the P22 release-candidate gate refresh for rc_target_commit 806cc847cb37a3e428099b45871a4f1a13c4fa6f using approval_request_commit 289cb6cd9bf8d0f1479c14c2370def78a7388acf, limited to the local non-provider commands listed in docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md, with no live HTTP MCP startup, no release candidate creation, no config mutation, no startup/watchdog operation, no provider call, no real memory preview, no migration/import-export apply, no public MCP expansion, no tag, no release, and no deploy.
 ```
 
 Do not treat the sentence above as approval while it appears in this draft.
@@ -40,7 +44,8 @@ Do not treat the sentence above as approval while it appears in this draft.
 
 In scope after explicit approval:
 
-- verify clean worktree and target commit
+- verify clean worktree and `rc_target_commit`
+- record `approval_request_commit` as the approved request version
 - run local docs validation
 - run local full test suite
 - run fixture-safe `gate:ci -- --json`
@@ -70,7 +75,7 @@ These gates are proposed only. They must not be run until explicit approval is g
 
 | Gate | Exact command | Expected output |
 |---|---|---|
-| target verification | `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git ls-remote origin refs/heads/main` | clean worktree; local HEAD, local `origin/main`, and remote `refs/heads/main` all equal `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
+| target verification | `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git ls-remote origin refs/heads/main` | clean worktree; active checkout `HEAD` equals `rc_target_commit`; `origin/main` and remote `refs/heads/main` are recorded separately and must not be mistaken for `rc_target_commit` after approval-request-only commits |
 | diff hygiene | `git diff --check` | no whitespace errors |
 | docs validation | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` | `VALIDATION PASSED` |
 | full local suite | `npm test` | all local tests pass |
@@ -101,7 +106,8 @@ Strict mainline gate is excluded from this request because this draft does not a
 
 | Question | Answer |
 |---|---|
-| Exact target commit | `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
+| `rc_target_commit` | `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
+| `approval_request_commit` | `289cb6cd9bf8d0f1479c14c2370def78a7388acf` |
 | May live HTTP MCP be started? | No. Live HTTP MCP startup is excluded. |
 | Are provider commands excluded? | Yes. `provider-smoke` and `provider-benchmark` are excluded. |
 | Is real memory preview excluded? | Yes. Real memory preview and broad durable memory reads are excluded. |
@@ -137,7 +143,8 @@ Any future approved gate refresh should produce a redacted summary:
 ```json
 {
   "status": "pass|fail|blocked",
-  "targetCommit": "806cc847cb37a3e428099b45871a4f1a13c4fa6f",
+  "rc_target_commit": "806cc847cb37a3e428099b45871a4f1a13c4fa6f",
+  "approval_request_commit": "289cb6cd9bf8d0f1479c14c2370def78a7388acf",
   "mutated": false,
   "releaseCandidateCreated": false,
   "providerCalls": 0,
@@ -157,7 +164,8 @@ Any future approved gate refresh should produce a redacted summary:
 Stop immediately if:
 
 - worktree is dirty before the gate run
-- local `HEAD`, `origin/main`, and remote `refs/heads/main` do not match the approved target commit
+- active checkout `HEAD` does not match the approved `rc_target_commit`
+- the approval sentence omits either `rc_target_commit` or `approval_request_commit`
 - any command asks for provider credentials
 - any command attempts config mutation
 - any command attempts to start live HTTP MCP
