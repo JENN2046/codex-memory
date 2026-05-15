@@ -8,12 +8,12 @@
 | Mode | A5-approval-request-draft |
 | Current task | CM-0161 / P22-release-candidate-gate-refresh-approval-request |
 | Current area | P22 release-candidate approval request drafting |
-| Last pushed baseline | `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b` on `origin/main` |
+| Last pushed baseline | `806cc847cb37a3e428099b45871a4f1a13c4fa6f` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Updated P22 gate refresh approval request draft for current target `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`; no RC gates executed. |
+| Last action | Clarified P22 gate refresh approval request target to current remote `main` HEAD `806cc847cb37a3e428099b45871a4f1a13c4fa6f`; no RC gates executed. |
 | Last validation | `git diff --check` passed; docs validation passed. |
 | Worktree summary | Approval-request draft/status/board edits only. No `src/`, tests, package, lockfile, MCP schema/tool, SQLite migration, import/export apply, backup creation, restore, provider/model call, real memory preview, `.env`, tag, release, deploy, UI, live HTTP MCP start, service start, service install, watchdog start, watchdog install, config mutation, release candidate creation, or unapproved mutation. |
-| Mainline assumption | `origin/main` is the development base; current pushed HEAD and remote main are `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`. |
+| Mainline assumption | `origin/main` is the development base; current pushed HEAD and remote main are `806cc847cb37a3e428099b45871a4f1a13c4fa6f`. |
 | P22 status | P22 planning is closed; release state remains `blocked_for_explicit_RC_approval`. |
 | Guarded auto-commit allowed | eligible if user wants commit, but not required for this draft-only request |
 | Safe-push readiness | not requested; this phase drafts approval request only |

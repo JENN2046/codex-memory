@@ -18,9 +18,9 @@ This phase is docs/status/board only. It does not run `npm test`, `gate:ci`, com
 
 ## Requested Operation
 
-Requested operation: fresh local release-candidate gate refresh for target commit `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+Requested operation: fresh local release-candidate gate refresh for target commit `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
 
-Exact target commit for this draft: `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+Exact target commit for this draft: `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
 
 Approval status: `NOT_APPROVED`.
 
@@ -31,7 +31,7 @@ Decision: `BLOCKED_HARD_STOP`.
 The user must explicitly approve with a sentence equivalent to:
 
 ```text
-I explicitly approve the P22 release-candidate gate refresh for target commit 1d566d3d4f0692a3685e6c74da38c78e7e8eec0b, limited to the local non-provider commands listed in docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md, with no live HTTP MCP startup, no release candidate creation, no config mutation, no startup/watchdog operation, no provider call, no real memory preview, no migration/import-export apply, no public MCP expansion, no tag, no release, and no deploy.
+I explicitly approve the P22 release-candidate gate refresh for target commit 806cc847cb37a3e428099b45871a4f1a13c4fa6f, limited to the local non-provider commands listed in docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md, with no live HTTP MCP startup, no release candidate creation, no config mutation, no startup/watchdog operation, no provider call, no real memory preview, no migration/import-export apply, no public MCP expansion, no tag, no release, and no deploy.
 ```
 
 Do not treat the sentence above as approval while it appears in this draft.
@@ -70,7 +70,7 @@ These gates are proposed only. They must not be run until explicit approval is g
 
 | Gate | Exact command | Expected output |
 |---|---|---|
-| target verification | `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git ls-remote origin refs/heads/main` | clean worktree; local HEAD, local `origin/main`, and remote `refs/heads/main` all equal `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b` |
+| target verification | `git status --short --branch`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git ls-remote origin refs/heads/main` | clean worktree; local HEAD, local `origin/main`, and remote `refs/heads/main` all equal `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
 | diff hygiene | `git diff --check` | no whitespace errors |
 | docs validation | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` | `VALIDATION PASSED` |
 | full local suite | `npm test` | all local tests pass |
@@ -101,7 +101,7 @@ Strict mainline gate is excluded from this request because this draft does not a
 
 | Question | Answer |
 |---|---|
-| Exact target commit | `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b` |
+| Exact target commit | `806cc847cb37a3e428099b45871a4f1a13c4fa6f` |
 | May live HTTP MCP be started? | No. Live HTTP MCP startup is excluded. |
 | Are provider commands excluded? | Yes. `provider-smoke` and `provider-benchmark` are excluded. |
 | Is real memory preview excluded? | Yes. Real memory preview and broad durable memory reads are excluded. |
@@ -137,7 +137,7 @@ Any future approved gate refresh should produce a redacted summary:
 ```json
 {
   "status": "pass|fail|blocked",
-  "targetCommit": "1d566d3d4f0692a3685e6c74da38c78e7e8eec0b",
+  "targetCommit": "806cc847cb37a3e428099b45871a4f1a13c4fa6f",
   "mutated": false,
   "releaseCandidateCreated": false,
   "providerCalls": 0,

@@ -22,7 +22,7 @@ P22 release-candidate approval request drafting
 
 ## Findings
 
-- Current `main`, `origin/main`, and remote `refs/heads/main` are `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+- Current `main`, `origin/main`, and remote `refs/heads/main` are `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
 - GitHub Actions `CI` run `25899450529` passed for `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
 - P22 planning is closed.
 - Release state is `blocked_for_explicit_RC_approval`.
@@ -62,4 +62,4 @@ P22 release-candidate approval request drafting
 
 ## Next Safe Step
 
-Stop. Future gate execution still requires explicit A5 approval for target `1d566d3d4f0692a3685e6c74da38c78e7e8eec0b`.
+Stop. Future gate execution still requires explicit A5 approval for target `806cc847cb37a3e428099b45871a4f1a13c4fa6f`.
