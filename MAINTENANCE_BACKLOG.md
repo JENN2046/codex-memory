@@ -160,7 +160,8 @@
 | P20.2b-tagmemo-targeted-fixture-contract-repair | local-production-hardening / readiness-blocker-repair | A1/A2 | done | Repair or narrow P16.3 TagMemo fixture contract so `gate:ci` can become deterministic again | targeted TagMemo fixture test `3/3`; `gate:ci` tests `449/449`; `npm test` `464/464`; `git diff --check`; docs validation | Tests/fixtures/docs only; no runtime scoring change, startup/watchdog operation, provider call, MCP expansion, migration/import-export apply |
 | P20.3-rollback-backup-operations-plan | local-production-hardening / rollback-backup | A1/A2 | done | Define backup/restore/rollback requirements before any real operation | `git diff --check`; docs validation | Docs-only; no real backup/restore, config mutation, service/watchdog start/install, provider call, real memory preview, durable mutation, migration, import/export apply, MCP expansion, package change, release, tag, or deploy |
 | P20.4-local-production-safety-checklist | local-production-hardening / safety-checklist | A1/A2 | done | Build local operator preflight, warning signals, and stop-condition checklist | `git diff --check`; docs validation | Docs-only; no real backup/restore, config mutation, service/watchdog start/install, provider call, real memory preview, durable mutation, migration, import/export apply, MCP expansion, package change, release, tag, or deploy | no |
-| P20.x-local-production-hardening-closeout-review | local-production-hardening / closeout | A1 | todo | Close P20 evidence chain and judge P21 readiness | `git diff --check`; docs validation | no real backup/restore; no config mutation; no service/watchdog operation | no |
+| P20.x-local-production-hardening-closeout-review | local-production-hardening / closeout | A1 | done | Close P20 evidence chain and judge P21 readiness | `git diff --check`; docs validation | Docs-only; no real backup/restore, config mutation, service/watchdog start/install, provider call, real memory preview, durable mutation, migration, import/export apply, MCP expansion, package change, release, tag, or deploy | no |
+| P21-Codex-Claude-client-integration-hardening-planning | client-integration / planning | A1/A2 | todo | Plan Codex / Claude client integration hardening without config mutation | `git diff --check`; docs validation | no real config mutation; no MCP public tool expansion; no provider call | no |
 
 ## 推荐执行顺序
 
@@ -260,8 +261,9 @@
 94. `P20.2b TagMemo targeted fixture contract repair`：新增 [docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md](/A:/codex-memory/docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md)，仅改 P16.3 fixture/test contract，不改 runtime；targeted `3/3`、`gate:ci` tests `449/449`，CI-safe readiness 已回绿。
 95. `P20.3 rollback/backup operations plan`：新增 [docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md](/A:/codex-memory/docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md)，定义 protected assets、future backup manifest shape、rollback story、A5 approval packet、validation matrix 和 hard stops；本阶段不创建 backup、不 restore、不改真实配置、不启动 service/watchdog、不读取 real memory。
 96. `P20.4 local production safety checklist`：新增 [docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md)，整理 operator preflight、startup/watchdog safety、config safety、durable memory safety、warning signals、approval packet 和 stop conditions；本阶段不启动 service/watchdog、不安装 startup task、不改真实配置、不创建 backup/restore、不读取 real memory。
-97. 下一步建议进入 `P20.x-local-production-hardening-closeout-review`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
-98. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
+97. `P20.x local production hardening closeout`：新增 [docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md)，总结 P20 planning/state reconciliation/P20.1-P20.4 evidence、boundary、remaining risks 和 P21 readiness judgment；结论为 `LOCAL_PRODUCTION_HARDENING_EVIDENCE_READY_BLOCKED_FOR_APPLY`。
+98. 下一步建议进入 `P21-Codex-Claude-client-integration-hardening-planning`；不得安装 watchdog/startup task、改真实配置、跑 provider call、public MCP expansion、real memory preview、import/export apply、migration、release candidate。
+99. provider/profile 相关动作继续保持按需触发，除非用户明确要求，不主动跑真实 provider 命令。
 
 ## 授权边界
 

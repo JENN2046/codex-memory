@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue P20 local production hardening with docs-only closeout review after the safety checklist.
+Continue from P20 local production hardening closeout into P21 client integration planning.
 
 ## Workspace
 
@@ -14,22 +14,22 @@ A:\codex-memory
 
 ## Worktree
 
-P20.4 docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
+P20.x docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P20 local production hardening safety checklist
+P20 local production hardening closeout
 
 ## Findings
 
-- P20.3 rollback/backup operations plan was committed and pushed at `1d5b0a8f5bf689b6fde6e7124eda875c069e88d5`.
-- P20.4 adds a local production safety checklist only.
+- P20.4 local production safety checklist was committed and pushed at `5fb4081442d0a6e5814232c801e2c54c48f9e6c5`.
+- P20.x adds closeout review only.
 - Backup creation, restore, config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, and release work remain blocked without explicit A5 approval.
-- The checklist defines operator preflight, startup/watchdog safety questions, config safety, durable-memory safety, warning signals, approval packet contents, and stop conditions.
+- The closeout summarizes P20 evidence, boundaries, remaining risks, and P21 planning readiness.
 
 ## Changed Files
 
-- `docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md`
+- `docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md`
 - `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -62,4 +62,4 @@ P20 local production hardening safety checklist
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P20.x-local-production-hardening-closeout-review`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21-Codex-Claude-client-integration-hardening-planning`.

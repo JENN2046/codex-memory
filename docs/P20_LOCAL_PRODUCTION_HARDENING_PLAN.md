@@ -120,4 +120,6 @@ P20.3 rollback / backup operations planning is captured in [P20_ROLLBACK_BACKUP_
 
 P20.4 local production safety checklist is captured in [P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md](./P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md).
 
-`P20.x-local-production-hardening-closeout-review`
+P20.x local production hardening closeout is captured in [P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md](./P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md).
+
+`P21-Codex-Claude-client-integration-hardening-planning`

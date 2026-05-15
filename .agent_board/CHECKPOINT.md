@@ -2,29 +2,29 @@
 
 ## Current Goal
 
-P20.4-local-production-safety-checklist: define operator preflight, warning signals, approval packet, and stop conditions before any local production operation.
+P20.x-local-production-hardening-closeout-review: close the P20 evidence chain and judge P21 planning readiness.
 
 ## Current Area
 
-P20 local production hardening safety checklist
+P20 local production hardening closeout
 
 ## Current Status
 
-- P20.3 is on `origin/main` at `1d5b0a8f5bf689b6fde6e7124eda875c069e88d5`.
-- P20.4 local production safety checklist is implemented locally.
+- P20.4 is on `origin/main` at `5fb4081442d0a6e5814232c801e2c54c48f9e6c5`.
+- P20.x local production hardening closeout is implemented locally.
 
 ## Completed Work In This Batch
 
-- Added `docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md`.
-- Defined local operator preflight requirements.
-- Defined startup/watchdog safety questions and blocked commands.
-- Defined config and durable-memory safety checklists.
-- Defined warning signals, approval packet requirements, and stop conditions.
+- Added `docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md`.
+- Summarized P20 planning, state reconciliation, P20.1, P20.2, P20.2a, P20.2b, P20.3, and P20.4 evidence.
+- Confirmed startup/watchdog/config/backup/migration/import-export/provider/release boundaries remain blocked.
+- Recorded remaining risks.
+- Judged P21 planning ready while blocking config mutation, public MCP expansion, provider calls, migration/import-export apply, and release work.
 - Updated P20 plan, next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
-- `docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md`
+- `docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md`
 - `docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -62,4 +62,4 @@ P20 local production hardening safety checklist
 
 ## Next Safe Action
 
-Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P20.x-local-production-hardening-closeout-review`.
+Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P21-Codex-Claude-client-integration-hardening-planning`.
