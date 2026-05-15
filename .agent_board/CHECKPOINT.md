@@ -2,32 +2,38 @@
 
 ## Current Goal
 
-Draft a fresh P22 local non-provider RC gate refresh approval request for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Record the completed fresh P22 local non-provider RC gate refresh PASS result for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Current Area
 
-P22 security-fix fresh RC gate refresh approval request
+P22 security-fix fresh RC gate refresh result record
 
 ## Current Status
 
-- `main`, local `origin/main`, and remote `refs/heads/main` are at `7fd17de624c0da76751e863e97302bed0dbec905`.
-- Security fix `7fd17de` has been committed and pushed.
-- Existing tag `p22-rc-806cc847` is superseded by the security fix and must not be reused or moved.
-- Fresh RC gate refresh is required before any new RC artifact or tag.
-- Current work is approval-request drafting only.
-- Approval remains `NOT_APPROVED`.
-- Decision remains `BLOCKED_HARD_STOP`.
+- Fresh RC gate refresh result: `PASS`.
+- `rc_target_commit`: `7fd17de624c0da76751e863e97302bed0dbec905`.
+- `approval_request_commit`: `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
+- Temporary gate execution checkout was created at `A:\codex-memory-gate-7fd17de`, verified at target HEAD, and removed.
+- Main workspace remains clean at `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
+- Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
+- Current work is result recording only.
 
 ## Completed Work In This Batch
 
-- Added [P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md).
-- Recorded `rc_target_commit=7fd17de624c0da76751e863e97302bed0dbec905`.
-- Recorded prior candidate/tag supersession: `p22-rc-806cc847` is not final and must not be moved or reused.
-- Recorded suggested future tag: `p22-rc-7fd17de`.
-- Recorded required chain: approval request -> fresh gates if approved -> result record -> new RC artifact -> new tag approval -> new tag.
+- Added [P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md](/A:/codex-memory/docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md).
+- Added a result-record link to [P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md) without changing approval boundaries.
+- Recorded gate evidence:
+  - `git diff --check`: passed.
+  - docs validation: passed.
+  - `node --test tests\security-write-policy.test.js`: `3/3` passed.
+  - `npm test`: `473/473` passed.
+  - `gate:ci`: tests `458/458`, compare `43/43`, rollback `43/43`, `noProvider=true`, `mutated=false`.
+  - standalone compare: `43/43` matched.
+  - standalone rollback: `43/43` rollback-ready.
 
 ## Changed Files
 
+- `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md`
 - `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -45,28 +51,27 @@ P22 security-fix fresh RC gate refresh approval request
 
 ## Not Done
 
-- No fresh RC gates executed.
-- No temporary worktree created.
+- No gates rerun in this result-record phase.
+- No temporary worktree created in this result-record phase.
 - No checkout/reset/detach.
-- No `npm test` rerun for this approval-request draft.
-- No `gate:ci` rerun for this approval-request draft.
-- No compare / rollback gate rerun for this approval-request draft.
+- No `npm test` rerun in this result-record phase.
+- No `gate:ci` rerun in this result-record phase.
+- No compare / rollback rerun in this result-record phase.
 - No live HTTP MCP startup.
-- No service start.
-- No watchdog start or install.
-- No scheduled task install.
-- No HKCU Run edit.
-- No Codex / Claude config mutation.
-- No provider smoke or provider benchmark.
+- No provider command.
+- No config mutation.
+- No startup/watchdog operation.
 - No real memory preview.
 - No durable DB or memory write.
 - No SQLite migration or `ALTER TABLE`.
 - No import/export apply.
 - No public MCP schema/tool change.
 - No package or lockfile change.
+- No `.env` or secret change.
 - No release candidate artifact creation.
-- No tag, release, or deploy.
+- No tag created, moved, or pushed.
+- No release or deploy.
 
 ## Next Safe Action
 
-Run docs validation, guarded commit, and safe-push if ready. Then wait for explicit fresh RC gate refresh approval for `7fd17de624c0da76751e863e97302bed0dbec905`.
+Run docs validation, guarded commit, and safe-push if ready. Then request approval for a new RC artifact targeting `7fd17de624c0da76751e863e97302bed0dbec905`.

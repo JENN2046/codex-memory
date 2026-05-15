@@ -18,6 +18,8 @@ Request explicit approval for a fresh local non-provider release-candidate gate 
 
 This document is not approval. It does not authorize gate execution. It does not create a release candidate artifact. It does not create or move a tag.
 
+Result record: [P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md](./P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md) records the later approved fresh local non-provider gate refresh result. The result record does not create a release candidate artifact and does not change the approval boundaries in this request.
+
 ## Target
 
 `rc_target_commit`: `7fd17de624c0da76751e863e97302bed0dbec905`

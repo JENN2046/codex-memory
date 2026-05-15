@@ -2,7 +2,7 @@
 
 ## Goal
 
-Draft a fresh P22 gate refresh approval request for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
+Record the completed fresh P22 gate refresh PASS result for security-fix target `7fd17de624c0da76751e863e97302bed0dbec905`.
 
 ## Workspace
 
@@ -14,26 +14,27 @@ A:\codex-memory
 
 ## Worktree
 
-Docs/board approval-request edits are local until guarded commit / safe-push completes.
+Docs/board result-record edits are local until guarded commit / safe-push completes.
 
 ## Current Area
 
-P22 security-fix fresh RC gate refresh approval request
+P22 security-fix fresh RC gate refresh result record
 
 ## Findings
 
-- Security fix commit: `7fd17de624c0da76751e863e97302bed0dbec905`.
-- The fix scans `record_memory` persisted scope metadata for secret-like content before diary / SQLite persistence.
-- Existing candidate tag `p22-rc-806cc847` is superseded by the security fix.
-- The existing pushed tag must not be moved or reused.
-- A fresh local non-provider gate refresh is required before any new RC artifact or tag.
-- Suggested future tag after fresh gates and separate tag approval: `p22-rc-7fd17de`.
-- Approval request is draft-only.
-- Approval remains `NOT_APPROVED`.
-- Decision remains `BLOCKED_HARD_STOP`.
+- Fresh RC gate refresh result: `PASS`.
+- `rc_target_commit`: `7fd17de624c0da76751e863e97302bed0dbec905`.
+- `approval_request_commit`: `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
+- Temporary worktree `A:\codex-memory-gate-7fd17de` was created, verified, and removed during the approved execution.
+- Main workspace remained clean at `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
+- Recorded evidence includes `npm test 473/473`, `gate:ci` tests `458/458`, compare `43/43`, rollback `43/43`, `noProvider=true`, and `mutated=false`.
+- Current phase records evidence only and does not rerun gates.
+- Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
+- New RC artifact approval is the next required step.
 
 ## Changed Files
 
+- `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md`
 - `docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -51,11 +52,11 @@ P22 security-fix fresh RC gate refresh approval request
 
 ## Not Done
 
-- No fresh gates executed.
-- No worktree created.
+- No gates rerun in this result-record phase.
+- No worktree created in this result-record phase.
 - No checkout/reset/detach.
 - No RC artifact created.
-- No tag created or pushed.
+- No tag created, moved, or pushed.
 - No GitHub release.
 - No deploy.
 - No provider command.
@@ -71,4 +72,4 @@ P22 security-fix fresh RC gate refresh approval request
 
 ## Next Safe Step
 
-Validate docs, commit and safe-push if ready, then wait for explicit approval to run the fresh gate refresh for `7fd17de624c0da76751e863e97302bed0dbec905`.
+Validate docs, commit and safe-push if ready, then request approval for a new RC artifact targeting `7fd17de624c0da76751e863e97302bed0dbec905`.
