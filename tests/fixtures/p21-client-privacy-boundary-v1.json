@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "p21-client-privacy-boundary-v1",
+  "fixtureOnly": true,
+  "runtimeBehaviorImplemented": false,
+  "mutated": false,
+  "providerCalls": 0,
+  "durableMemoryTouched": false,
+  "realMemoryPreview": false,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "records": [
+    {
+      "memory_id": "p21-codex-private",
+      "title": "Codex Private Boundary",
+      "client_id": "codex",
+      "project_id": "codex-memory",
+      "workspace_id": "workspace-alpha-private",
+      "visibility": "private",
+      "content_ref": "fixture-content-ref:codex-private",
+      "content_classification": "private-client-note",
+      "secret_sentinel": "SECRET_SENTINEL_DO_NOT_EMIT"
+    },
+    {
+      "memory_id": "p21-claude-private",
+      "title": "Claude Private Boundary",
+      "client_id": "claude",
+      "project_id": "codex-memory",
+      "workspace_id": "workspace-alpha-private",
+      "visibility": "private",
+      "content_ref": "fixture-content-ref:claude-private",
+      "content_classification": "private-client-note",
+      "secret_sentinel": "SECRET_SENTINEL_DO_NOT_EMIT"
+    },
+    {
+      "memory_id": "p21-shared-cross-client",
+      "title": "Shared Cross Client Boundary",
+      "client_id": "codex",
+      "project_id": "codex-memory",
+      "workspace_id": "workspace-alpha-shared",
+      "visibility": "shared",
+      "content_ref": "fixture-content-ref:shared",
+      "content_classification": "shared-fact",
+      "secret_sentinel": null
+    },
+    {
+      "memory_id": "p21-project-claude",
+      "title": "Project Claude Boundary",
+      "client_id": "claude",
+      "project_id": "codex-memory",
+      "workspace_id": "workspace-alpha-shared",
+      "visibility": "project",
+      "content_ref": "fixture-content-ref:project",
+      "content_classification": "project-fact",
+      "secret_sentinel": null
+    },
+    {
+      "memory_id": "p21-workspace-shared",
+      "title": "Workspace Shared Boundary",
+      "client_id": "manual",
+      "project_id": "other-project",
+      "workspace_id": "workspace-alpha-shared",
+      "visibility": "workspace",
+      "content_ref": "fixture-content-ref:workspace",
+      "content_classification": "workspace-fact",
+      "secret_sentinel": null
+    },
+    {
+      "memory_id": "p21-missing-optional-scope",
+      "title": "Missing Optional Scope Boundary",
+      "client_id": null,
+      "project_id": null,
+      "workspace_id": null,
+      "visibility": null,
+      "content_ref": "fixture-content-ref:missing",
+      "content_classification": "unknown",
+      "secret_sentinel": null
+    }
+  ],
+  "requests": [
+    {
+      "request_id": "codex-project-workspace",
+      "client_id": "codex",
+      "project_id": "codex-memory",
+      "workspace_id": "workspace-alpha-shared",
+      "expected_visible": [
+        "p21-codex-private",
+        "p21-shared-cross-client",
+        "p21-project-claude",
+        "p21-workspace-shared"
+      ],
+      "expected_hidden": [
+        "p21-claude-private",
+        "p21-missing-optional-scope"
+      ]
+    },
+    {
+      "request_id": "claude-project-workspace",
+      "client_id": "claude",
+      "project_id": "codex-memory",
+      "workspace_id": "workspace-alpha-shared",
+      "expected_visible": [
+        "p21-claude-private",
+        "p21-shared-cross-client",
+        "p21-project-claude",
+        "p21-workspace-shared"
+      ],
+      "expected_hidden": [
+        "p21-codex-private",
+        "p21-missing-optional-scope"
+      ]
+    }
+  ],
+  "expectedLowRiskSummary": {
+    "mutated": false,
+    "providerCalls": 0,
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false,
+    "workspaceIdMode": "hashed",
+    "privateBoundary": "same-client-only",
+    "missingOptionalScope": "unknown"
+  }
+}

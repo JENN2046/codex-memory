@@ -151,4 +151,6 @@ P21.2 client scope acceptance fixture review is captured in [P21_CLIENT_SCOPE_AC
 
 P21.3 Claude acceptance evidence refresh plan is captured in [P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md](./P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md).
 
-`P21.4-client-privacy-boundary-fixture-tests`
+P21.4 client privacy boundary fixture tests are captured in [P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md](./P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md).
+
+`P21.5-client-integration-standing-gate-summary`

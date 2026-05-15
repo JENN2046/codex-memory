@@ -2,26 +2,30 @@
 
 ## Current Goal
 
-P21.3-Claude-acceptance-evidence-refresh-plan: plan safe Claude acceptance refresh tiers without running live Claude commands.
+P21.4-client-privacy-boundary-fixture-tests: add fixture-only cross-client privacy boundary coverage.
 
 ## Current Area
 
-P21 Claude acceptance evidence refresh planning
+P21 client privacy boundary fixture tests
 
 ## Current Status
 
-- P21.2 is on `origin/main` at `843cf52203fd694ed0fd831d3776fb7e9c9536cd`.
-- P21.3 refresh plan is implemented locally.
+- P21.3 is on `origin/main` at `977918759d19b1998a61317c2ec782a671fa50c7`.
+- P21.4 privacy boundary fixture tests are implemented locally.
 
 ## Completed Work In This Batch
 
-- Added `docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md`.
-- Split future Claude acceptance refresh into docs-only, read-only observation, and config/model-mutating tiers.
-- Kept `claude mcp list/get/add/remove`, live HTTP observation, model/provider calls, and config mutation out of this phase.
+- Added `tests/fixtures/p21-client-privacy-boundary-v1.json`.
+- Added `tests/p21-client-privacy-boundary-fixture.test.js`.
+- Added `docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md`.
+- Locked same-client private visibility, cross-client private hiding, project/workspace/shared visibility, low-risk summary redaction, missing optional scope fallback, public tool freeze, and no side effects.
 - Updated next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
+- `tests/fixtures/p21-client-privacy-boundary-v1.json`
+- `tests/p21-client-privacy-boundary-fixture.test.js`
+- `docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md`
 - `docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md`
 - `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`
 - `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
@@ -62,4 +66,4 @@ P21 Claude acceptance evidence refresh planning
 
 ## Next Safe Action
 
-Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.4-client-privacy-boundary-fixture-tests`.
+Run targeted fixture test, `npm test`, diff/docs validation, final file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.5-client-integration-standing-gate-summary`.

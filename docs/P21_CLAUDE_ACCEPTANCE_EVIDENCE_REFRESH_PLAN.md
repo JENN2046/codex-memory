@@ -167,4 +167,6 @@ It is not sufficient to authorize Claude config mutation, live acceptance refres
 
 ## Next Recommended Phase
 
-`P21.4-client-privacy-boundary-fixture-tests`
+P21.4 client privacy boundary fixture tests are captured in [P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md](./P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md).
+
+`P21.5-client-integration-standing-gate-summary`

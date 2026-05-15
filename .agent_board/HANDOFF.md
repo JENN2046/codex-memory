@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P21.3 Claude acceptance evidence refresh planning into P21.4 client privacy boundary fixture tests.
+Continue from P21.4 client privacy boundary fixture tests into P21.5 standing gate summary.
 
 ## Workspace
 
@@ -14,22 +14,25 @@ A:\codex-memory
 
 ## Worktree
 
-P21.3 docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
+P21.4 fixture/test/docs/status/board edits are local and pending targeted/full validation.
 
 ## Current Area
 
-P21 Claude acceptance evidence refresh planning
+P21 client privacy boundary fixture tests
 
 ## Findings
 
-- P21.2 fixture review was committed and pushed at `843cf52203fd694ed0fd831d3776fb7e9c9536cd`.
-- P21.3 adds Claude acceptance evidence refresh planning only.
+- P21.3 Claude acceptance refresh plan was committed and pushed at `977918759d19b1998a61317c2ec782a671fa50c7`.
+- P21.4 adds fixture-only client privacy boundary coverage.
 - Codex/Claude config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, and release work remain blocked without explicit A5 approval.
-- P21.3 did not run `claude mcp` commands, live HTTP observation, model/provider calls, or config mutation.
-- The plan defines docs-only, read-only observation, and config/model-mutating tiers for future refresh.
+- P21.4 does not change runtime behavior or public MCP tools.
+- Required validation: targeted fixture test, `npm test`, `git diff --check`, docs validation.
 
 ## Changed Files
 
+- `tests/fixtures/p21-client-privacy-boundary-v1.json`
+- `tests/p21-client-privacy-boundary-fixture.test.js`
+- `docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md`
 - `docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md`
 - `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`
 - `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
@@ -65,4 +68,4 @@ P21 Claude acceptance evidence refresh planning
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.4-client-privacy-boundary-fixture-tests`.
+Run targeted/full validation, final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.5-client-integration-standing-gate-summary`.
