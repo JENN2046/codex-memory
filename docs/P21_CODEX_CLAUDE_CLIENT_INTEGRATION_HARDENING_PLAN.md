@@ -145,4 +145,6 @@ It is not sufficient to authorize config edits, runtime changes, MCP public tool
 
 ## Next Recommended Phase
 
-`P21.1-client-integration-inventory`
+P21.1 client integration inventory is captured in [P21_CLIENT_INTEGRATION_INVENTORY.md](./P21_CLIENT_INTEGRATION_INVENTORY.md).
+
+`P21.2-client-scope-acceptance-fixture-review`

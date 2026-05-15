@@ -304,7 +304,8 @@
 - 入口：[docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md](/A:/codex-memory/docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md)
 - 目标：规划 Codex / Claude client integration hardening，把 client identity、scope/visibility、acceptance docs、MCP config guidance 和 public tool freeze 变成可验证的 standing evidence。
 - 当前状态：P21 planning 已新增计划文档，仍为 docs/status/board only。
-- 下一步建议：进入 `P21.1-client-integration-inventory`。
+- P21.1 client integration inventory 已新增 [docs/P21_CLIENT_INTEGRATION_INVENTORY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_INVENTORY.md)，盘点 client docs、command surfaces、test coverage、acceptance evidence、gaps 和 hard-stop boundaries。
+- 下一步建议：进入 `P21.2-client-scope-acceptance-fixture-review`。
 - 边界：不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不进入 P22 release candidate。
 
 ## 当前判断

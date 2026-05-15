@@ -2,26 +2,27 @@
 
 ## Current Goal
 
-P21-Codex-Claude-client-integration-hardening-planning: plan Codex / Claude client integration hardening without config mutation.
+P21.1-client-integration-inventory: inventory Codex / Claude client docs, commands, acceptance evidence, gaps, and hard-stop boundaries.
 
 ## Current Area
 
-P21 client integration hardening planning
+P21 client integration inventory
 
 ## Current Status
 
-- P20.x is on `origin/main` at `f1f7a5ce80854016456569117555c9a467416e7a`.
-- P21 planning is implemented locally.
+- P21 planning is on `origin/main` at `f86c9d015463270350273a642e69b45953bdf553`.
+- P21.1 inventory is implemented locally.
 
 ## Completed Work In This Batch
 
-- Added `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`.
-- Planned Codex / Claude client integration hardening around identity, scope/visibility, acceptance docs, MCP config guidance, and public tool freeze.
-- Defined P21 gate categories, proposed subphases, validation strategy, safety rules, and non-goals.
+- Added `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`.
+- Inventoried client docs, command surfaces, public MCP tool boundary, current tests, acceptance evidence, gaps, and hard stops.
+- Identified P21.2/P21.4 fixture-review targets without adding tests or changing runtime.
 - Updated next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
+- `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
 - `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -59,4 +60,4 @@ P21 client integration hardening planning
 
 ## Next Safe Action
 
-Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.1-client-integration-inventory`.
+Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.2-client-scope-acceptance-fixture-review`.

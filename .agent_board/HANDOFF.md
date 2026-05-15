@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P21 client integration planning into P21.1 inventory.
+Continue from P21.1 inventory into P21.2 client scope acceptance fixture review.
 
 ## Workspace
 
@@ -14,21 +14,22 @@ A:\codex-memory
 
 ## Worktree
 
-P21 planning docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
+P21.1 inventory docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P21 client integration hardening planning
+P21 client integration inventory
 
 ## Findings
 
-- P20.x closeout was committed and pushed at `f1f7a5ce80854016456569117555c9a467416e7a`.
-- P21 planning adds client integration hardening planning only.
+- P21 planning was committed and pushed at `f86c9d015463270350273a642e69b45953bdf553`.
+- P21.1 adds client integration inventory only.
 - Codex/Claude config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, and release work remain blocked without explicit A5 approval.
-- The plan defines client surfaces, gate categories, proposed subphases, validation strategy, safety rules, non-goals, and P21.1 inventory handoff.
+- The inventory covers client docs, command surfaces, public MCP tool boundary, current tests, acceptance evidence, gaps, and hard stops.
 
 ## Changed Files
 
+- `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
 - `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
 - `MAINTENANCE_BACKLOG.md`
@@ -61,4 +62,4 @@ P21 client integration hardening planning
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.1-client-integration-inventory`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.2-client-scope-acceptance-fixture-review`.

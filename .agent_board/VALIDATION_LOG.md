@@ -234,6 +234,7 @@ FAILED
 | CMV-0206 | P20.4-local-production-safety-checklist | COMPLETED_VALIDATED | `git diff --check`; docs validation | Docs-only operator safety checklist added; no backup creation, restore, config mutation, service/watchdog operation, provider call, real memory preview, migration, import/export apply, MCP expansion, package change, release, tag, or deploy. |
 | CMV-0207 | P20.x-local-production-hardening-closeout-review | COMPLETED_VALIDATED | `git diff --check`; docs validation | Docs-only P20 closeout added; P21 planning readiness judged; no backup creation, restore, config mutation, service/watchdog operation, provider call, real memory preview, migration, import/export apply, MCP expansion, package change, release, tag, or deploy. |
 | CMV-0208 | P21-Codex-Claude-client-integration-hardening-planning | COMPLETED_VALIDATED | `git diff --check`; docs validation | Docs-only P21 planning added; no real Codex/Claude config mutation, service/watchdog operation, provider call, real memory preview, migration, import/export apply, MCP expansion, package change, release, tag, or deploy. |
+| CMV-0209 | P21.1-client-integration-inventory | COMPLETED_VALIDATED | `git diff --check`; docs validation | Docs-only P21.1 inventory added; no real Codex/Claude config mutation, live HTTP observation, service/watchdog operation, provider call, real memory preview, migration, import/export apply, MCP expansion, package change, release, tag, or deploy. |
 
 ## Common Validation Commands
 
