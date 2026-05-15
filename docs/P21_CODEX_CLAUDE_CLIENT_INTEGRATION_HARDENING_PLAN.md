@@ -149,4 +149,6 @@ P21.1 client integration inventory is captured in [P21_CLIENT_INTEGRATION_INVENT
 
 P21.2 client scope acceptance fixture review is captured in [P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md](./P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md).
 
-`P21.3-Claude-acceptance-evidence-refresh-plan`
+P21.3 Claude acceptance evidence refresh plan is captured in [P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md](./P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md).
+
+`P21.4-client-privacy-boundary-fixture-tests`

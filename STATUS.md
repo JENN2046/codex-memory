@@ -158,6 +158,7 @@
 - P21 Codex / Claude client integration hardening planning：新增 [docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md](/A:/codex-memory/docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md)，规划 client identity、scope/visibility、acceptance docs、MCP config guidance、cross-client private leakage fixture path 和 public tool freeze；本阶段 docs-only，不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不做 migration/import-export apply、不进入 P22 release candidate。
 - P21.1 client integration inventory：新增 [docs/P21_CLIENT_INTEGRATION_INVENTORY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_INVENTORY.md)，盘点 Codex/Claude client docs、`scope:acceptance` / scope tests / MCP tests / Claude CLI command surfaces、acceptance evidence、P21.2+ gaps 和 hard-stop boundaries；本阶段 docs-only，不读写真实 config、不运行 live HTTP observation、不新增 tests、不改 runtime。
 - P21.2 client scope acceptance fixture review：新增 [docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md)，将现有 scope tests 映射到 P21 gate categories；targeted `scope-filter` 18/18、`scope-acceptance-cli` 5/5、`scope-backfill-dry-run` 7/7 均通过；本阶段不新增 tests/fixtures、不改 runtime、不读写真实 config、不运行 live HTTP observation。
+- P21.3 Claude acceptance evidence refresh plan：新增 [docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md](/A:/codex-memory/docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md)，规划 Claude acceptance refresh 的 Tier 0 docs-only、Tier 1 read-only observation 和 Tier 2 config/model-mutating boundaries；本阶段不运行 `claude mcp list/get/add/remove`，不启动 HTTP MCP，不调用 provider/model，不改真实配置。
 - P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
 - `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
 - `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
@@ -525,7 +526,7 @@
 
 - P20.1 startup/watchdog inventory 已完成 guarded commit / safe-push 和 post-push hash verification，当前 local `HEAD`、local `origin/main` 与 remote `refs/heads/main` 均为 `e56bc2a182302e86f9cf8c79f642e0e7badccc99`。
 - P20.2 health/readiness evidence 已捕获并关闭当前 blocker：P20.2b 后 `gate:ci` 已回绿。
-- 下一阶段建议进入 `P21.3-Claude-acceptance-evidence-refresh-plan`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
+- 下一阶段建议进入 `P21.4-client-privacy-boundary-fixture-tests`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag 或 deploy。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

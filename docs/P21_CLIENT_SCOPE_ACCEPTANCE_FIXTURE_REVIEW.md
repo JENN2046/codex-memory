@@ -106,4 +106,6 @@ It is not sufficient to authorize config mutation, runtime behavior changes, MCP
 
 ## Next Recommended Phase
 
-`P21.3-Claude-acceptance-evidence-refresh-plan`
+P21.3 Claude acceptance evidence refresh plan is captured in [P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md](./P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md).
+
+`P21.4-client-privacy-boundary-fixture-tests`

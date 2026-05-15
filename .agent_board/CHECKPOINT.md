@@ -2,27 +2,27 @@
 
 ## Current Goal
 
-P21.2-client-scope-acceptance-fixture-review: map existing scope acceptance tests to P21 gate categories and identify fixture gaps.
+P21.3-Claude-acceptance-evidence-refresh-plan: plan safe Claude acceptance refresh tiers without running live Claude commands.
 
 ## Current Area
 
-P21 client scope acceptance fixture review
+P21 Claude acceptance evidence refresh planning
 
 ## Current Status
 
-- P21.1 is on `origin/main` at `f09a63b4ba5e68c4655dec37719b685aeb11e69d`.
-- P21.2 fixture review is implemented locally.
+- P21.2 is on `origin/main` at `843cf52203fd694ed0fd831d3776fb7e9c9536cd`.
+- P21.3 refresh plan is implemented locally.
 
 ## Completed Work In This Batch
 
-- Added `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`.
-- Ran existing targeted scope tests: `scope-filter` 18/18, `scope-acceptance-cli` 5/5, `scope-backfill-dry-run` 7/7.
-- Mapped existing scope coverage to P21 gate categories.
-- Identified follow-up gaps for Claude interactive acceptance and dedicated cross-client private fixture matrix.
+- Added `docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md`.
+- Split future Claude acceptance refresh into docs-only, read-only observation, and config/model-mutating tiers.
+- Kept `claude mcp list/get/add/remove`, live HTTP observation, model/provider calls, and config mutation out of this phase.
 - Updated next phase plan, backlog, status, and board pointers.
 
 ## Changed Files
 
+- `docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md`
 - `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`
 - `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
 - `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
@@ -62,4 +62,4 @@ P21 client scope acceptance fixture review
 
 ## Next Safe Action
 
-Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.3-Claude-acceptance-evidence-refresh-plan`.
+Run final diff/file-scope inspection, guarded commit, safe-push if ready, then continue to `P21.4-client-privacy-boundary-fixture-tests`.

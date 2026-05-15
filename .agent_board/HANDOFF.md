@@ -2,7 +2,7 @@
 
 ## Goal
 
-Continue from P21.2 client scope acceptance fixture review into P21.3 Claude acceptance evidence refresh planning.
+Continue from P21.3 Claude acceptance evidence refresh planning into P21.4 client privacy boundary fixture tests.
 
 ## Workspace
 
@@ -14,22 +14,23 @@ A:\codex-memory
 
 ## Worktree
 
-P21.2 docs/status/board edits are local, targeted-scope-tested, docs-validated, and pending final diff/file-scope inspection.
+P21.3 docs/status/board edits are local, docs-validated, and pending final diff/file-scope inspection.
 
 ## Current Area
 
-P21 client scope acceptance fixture review
+P21 Claude acceptance evidence refresh planning
 
 ## Findings
 
-- P21.1 inventory was committed and pushed at `f09a63b4ba5e68c4655dec37719b685aeb11e69d`.
-- P21.2 adds client scope acceptance fixture review only.
+- P21.2 fixture review was committed and pushed at `843cf52203fd694ed0fd831d3776fb7e9c9536cd`.
+- P21.3 adds Claude acceptance evidence refresh planning only.
 - Codex/Claude config mutation, startup/watchdog install, service start, real memory preview, migration, import/export apply, provider calls, public MCP expansion, and release work remain blocked without explicit A5 approval.
-- Existing targeted scope tests passed: `scope-filter` 18/18, `scope-acceptance-cli` 5/5, `scope-backfill-dry-run` 7/7.
-- The review maps existing scope coverage to P21 gate categories and identifies follow-up gaps.
+- P21.3 did not run `claude mcp` commands, live HTTP observation, model/provider calls, or config mutation.
+- The plan defines docs-only, read-only observation, and config/model-mutating tiers for future refresh.
 
 ## Changed Files
 
+- `docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md`
 - `docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md`
 - `docs/P21_CLIENT_INTEGRATION_INVENTORY.md`
 - `docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md`
@@ -64,4 +65,4 @@ P21 client scope acceptance fixture review
 
 ## Next Safe Step
 
-Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.3-Claude-acceptance-evidence-refresh-plan`.
+Run final diff/file-scope inspection, guarded commit / safe-push if ready, then proceed to `P21.4-client-privacy-boundary-fixture-tests`.

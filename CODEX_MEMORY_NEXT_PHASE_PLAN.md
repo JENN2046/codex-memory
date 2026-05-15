@@ -306,7 +306,8 @@
 - 当前状态：P21 planning 已新增计划文档，仍为 docs/status/board only。
 - P21.1 client integration inventory 已新增 [docs/P21_CLIENT_INTEGRATION_INVENTORY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_INVENTORY.md)，盘点 client docs、command surfaces、test coverage、acceptance evidence、gaps 和 hard-stop boundaries。
 - P21.2 client scope acceptance fixture review 已新增 [docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md)，映射现有 scope tests 到 P21 gate categories；targeted scope tests `18/18`、scope acceptance CLI `5/5`、scope backfill dry-run `7/7` 均通过。
-- 下一步建议：进入 `P21.3-Claude-acceptance-evidence-refresh-plan`。
+- P21.3 Claude acceptance evidence refresh plan 已新增 [docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md](/A:/codex-memory/docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md)，将 future refresh 分为 docs-only、read-only observation、config/model-mutating tiers；本阶段不运行 `claude mcp`。
+- 下一步建议：进入 `P21.4-client-privacy-boundary-fixture-tests`。
 - 边界：不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不读取 real memory、不做 migration/import-export apply、不进入 P22 release candidate。
 
 ## 当前判断
