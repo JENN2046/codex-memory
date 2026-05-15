@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-P22 release-candidate gate refresh / implementation boundary: P22 planning is closed; further RC gate refresh / implementation is blocked for explicit A5 approval.
+P22 release-candidate gate refresh approval request draft: make the required A5 approval packet concrete without executing it.
 
 ## Current Area
 
@@ -12,20 +12,29 @@ P22 release candidate A5 approval boundary
 
 - P22.x closeout review is on `origin/main` at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`.
 - `main`, local `origin/main`, and remote `refs/heads/main` matched `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc` after push.
-- CM-0161 is blocked until the user explicitly approves an exact A5 RC gate refresh / implementation packet.
+- CM-0161 remains blocked until the user explicitly approves an exact A5 RC gate refresh / implementation packet.
 - Release-candidate implementation, gate execution, startup/watchdog install, config mutation, provider calls, migration/import-export apply, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
-- Confirmed P22.x closeout is pushed and verified at `86c32f4d909e0d56aa84cbe723fbe4fd7dd13acc`.
-- Confirmed `.agent_board/TASK_QUEUE.md` has CM-0161 marked `blocked`.
-- Corrected board wording from pending local closeout to current A5 boundary state.
+- Added `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`.
+- Drafted target commit, proposed local non-provider commands, mutation scope, expected report shape, stop conditions, rollback tier, and required approval sentence.
+- Kept decision `BLOCKED_HARD_STOP` and status `DRAFT_NOT_APPROVED`.
 
 ## Changed Files
 
+- `docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md`
+- `docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md`
+- `docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md`
+- `docs/VCP_MEMORY_PARITY_ROADMAP.md`
+- `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
+- `MAINTENANCE_BACKLOG.md`
+- `STATUS.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/RUN_STATE.md`
+- `.agent_board/TASK_QUEUE.md`
+- `.agent_board/VALIDATION_LOG.md`
 
 ## Validation
 

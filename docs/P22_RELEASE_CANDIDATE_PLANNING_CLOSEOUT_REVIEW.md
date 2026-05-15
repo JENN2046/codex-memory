@@ -95,4 +95,6 @@ Without that approval, continue only with docs-only planning or maintenance.
 
 ## Next Recommended Phase
 
-`P22-release-candidate-gate-refresh-approval-request`
+P22 gate refresh approval request draft is captured in [P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](./P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md).
+
+`P22-release-candidate-gate-refresh-approval-request` remains blocked until explicitly approved.

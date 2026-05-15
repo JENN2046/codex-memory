@@ -535,7 +535,8 @@
 - P22.3 release-candidate rollback/support story 已新增 [docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md)，定义 future RC rollback tiers、support/troubleshooting map、operator handoff fields 和 approval boundaries；本阶段未运行 gate matrix、未启动服务、未安装 watchdog/startup task、未改真实配置、未读写真实 memory、未创建 RC。
 - P22.4 release-candidate approval packet template 已新增 [docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md)，提供 future A5 approval packet 模板；默认状态 `NOT_APPROVED_TEMPLATE_ONLY`，不授权任何命令执行或 RC 创建。
 - P22.x release-candidate planning closeout review 已新增 [docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md)，关闭 P22 planning chain；结论 `P22_RELEASE_CANDIDATE_PLANNING_CLOSED_BLOCKED_FOR_EXPLICIT_RC_APPROVAL`。
-- 下一阶段只有在用户明确批准 A5 packet 后，才进入 `P22-release-candidate-gate-refresh-approval-request`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag/release/deploy；P22 implementation 仍需显式 A5 approval。
+- P22 release-candidate gate refresh approval request draft 已新增 [docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md)，把 future gate refresh 的 target commit、proposed commands、mutation scope、stop conditions 和 approval sentence 写成 `DRAFT_NOT_APPROVED`；本阶段未运行任何 gate。
+- 下一阶段只有在用户明确批准 exact A5 packet 后，才执行 `P22-release-candidate-gate-refresh-approval-request`。仍不得安装 watchdog/startup task、改真实配置、跑 provider benchmark、real memory preview、import/export apply、migration、tag/release/deploy；P22 implementation 仍需显式 A5 approval。
 - `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
 ## Phase E 建议
 

@@ -200,4 +200,6 @@ It is not sufficient to authorize RC implementation, gate execution, startup/wat
 
 P22 closeout review is captured in [P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md](./P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md).
 
-`P22-release-candidate-gate-refresh-approval-request`
+P22 gate refresh approval request draft is captured in [P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](./P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md).
+
+`P22-release-candidate-gate-refresh-approval-request` remains blocked until explicitly approved.
