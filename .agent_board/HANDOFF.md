@@ -540,3 +540,27 @@ Validation: push succeeded `042c330..cfe7c20`; post-push `git status -sb` aligne
 Remaining risks: runtime schema/version enforcement remains unimplemented; full v1.0 RC remains blocked; no further push is authorized unless the user explicitly asks.
 
 Next safe step: finish this board-only record, then continue with the next Council-selected local task.
+
+## CM-0231 Commander Handoff - P26 Migration Import-Export Dry-Run Gate Plan
+
+Goal: add a docs-only v1.0 dry-run gate plan for migration/import-export before any fixture, source, apply, or real-memory work.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty with CM-0230 board-only record plus CM-0231 P26 docs/status/board edits.
+
+Current area: `P26-migration-import-export-dry-run-gate-plan`
+
+Changed files: `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation; P26 reference scan; read-only Verifier `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: already restored before this task; no new service action for P26.
+
+Remaining risks: migration/import-export apply, SQLite migration apply, backup/restore, broad real memory export, provider calls, public MCP expansion, tag/release/deploy, and any further push remain separately gated.
+
+Next safe step: guarded local commit if final status/diff review remains clean.

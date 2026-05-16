@@ -487,3 +487,17 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Runtime: local HTTP MCP was started only after explicit user request; PID `18104`; `/health` returned HTTP `200`.
 - Validation: `observe:http status=ok`; `npm run gate:mainline` passed health, compare `43/43`, rollback `43/43`.
 - A5 boundary: first push was explicitly authorized. No additional push is authorized yet; no tag, release, deploy, provider call, config mutation, migration/import-export apply, durable memory write, public MCP expansion, or startup/watchdog installation occurred.
+
+## CM-0231 - P26 Migration Import-Export Dry-Run Gate Plan
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: docs/status/board-only P26 dry-run gate planning.
+- Changed files: `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: P26 plan consolidates P13/P18/P23 migration/import-export safety evidence into a v1.0 dry-run gate contract, output shape, pass/warn/block semantics, hard stops, and P26.1-P26.x future phase split.
+- Domain Lead A: recommended P26 docs-only as the highest-value next safe task.
+- Domain Lead B: recommended no further P25 source/test slice now; P25 evidence is saturated.
+- Validation: `git diff --check`; docs validation; P26 reference scan; read-only Verifier `PASS`.
+- Commit readiness: `eligible`; required fixes none.
+- A5 boundary: no fixture/test/source/package/runtime change, no real memory scan, no import/export apply, no SQLite migration apply, no backup/restore, no durable write, no provider call, no public MCP expansion, no push/tag/release/deploy.
