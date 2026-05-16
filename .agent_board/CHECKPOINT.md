@@ -341,3 +341,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: syntax checks for changed JS files; `node --test tests\gate-ci-cli.test.js` `2/2`; `node --test tests\dashboard-cli.test.js` `4/4`; combined dashboard/gate-ci test `6/6`; `node --test tests\mainline-gate-cli.test.js` `2/2`; `npm test` `511/511`; `npm run gate:ci -- --json` passed; `git diff --check`; docs validation.
 - A5 boundary for this batch: no package/config/provider/service/migration/import-export/durable write/public MCP expansion/tag/release/deploy/push.
 - Next safe action: final diff review, read-only Verifier review, guarded local commit if eligible.
+
+## CM-0219 - P25.4 Schema Compatibility Dry-Run CLI Plan
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: docs/board-only P25.4 planning for a future schema compatibility dry-run CLI.
+- Changed files: `docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result: P25.4 now documents the future fixture-first CLI boundary, source modes, future allowed files, output contract candidate, flag policy, validation plan, hard stops, and rollback path.
+- Validation: `git diff --check`; docs validation; diff inspection.
+- A5 boundary for this batch: no CLI implementation, no package script, no runtime schema/version enforcement, no public MCP expansion, no real memory scan, no migration/import-export apply, no durable write, no service start, no provider call, no push, tag, release, or deploy.
+- Next safe action: `P25.5-schema-compatibility-dry-run-fixture-contract` as fixture/test planning or implementation only after a separate scoped task.

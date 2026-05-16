@@ -234,3 +234,39 @@ Recall impact: none expected; report/test/gate stability only.
 Remaining risks: runtime schema/version enforcement remains unimplemented; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
 
 Next safe step: final diff review, read-only Verifier review, guarded local commit if eligible, then continue to `P25.4-schema-compatibility-dry-run-cli-plan`.
+
+## CM-0219 Worker Handoff - P25.4 Schema Compatibility Dry-Run CLI Plan
+
+Goal: implement P25.4 as documentation/board only for a future schema compatibility dry-run CLI.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty with CM-0219 docs/board-only edits.
+
+Current area: `P25.4-schema-compatibility-dry-run-cli-plan`
+
+Changed files: `docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/RUN_STATE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: docs/diff only; `git diff --check`; docs validation; diff inspection.
+
+Not validated: source/runtime/test behavior; package script wiring; final RC matrix; live MCP/HTTP refresh; provider/profile; migration/import-export; durable write path; real memory scan.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: not checked by this Worker.
+
+Compare: not run by this Worker.
+
+Rollback: not run by this Worker.
+
+Profile gate: not run.
+
+Audit impact: none; docs/board only.
+
+Recall impact: none; docs/board only.
+
+Remaining risks: future CLI is not implemented; runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked.
+
+Next safe step: `P25.5-schema-compatibility-dry-run-fixture-contract` if explicitly selected as a separate scoped local task; do not implement CLI, package script, runtime enforcement, or real memory scan from this handoff alone.
