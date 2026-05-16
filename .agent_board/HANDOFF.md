@@ -1017,4 +1017,28 @@ HTTP health: no service action for CM-0250.
 
 Remaining risks: package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: guarded local commit if final status/diff review remains clean, then select P27.5 validation aggregator evidence shape as a separate scoped task if still appropriate.
+Commit: `d68e296 test: add p27 approval packet cli`.
+
+## CM-0251 Commander Handoff - Post-P27.4 Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `d68e296`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: board-only reconciliation after CM-0250 guarded local commit; expected clean after CM-0251 commit.
+
+Current area: `P27-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0251.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; P27.5 validation aggregator evidence shape, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: select P27.5 validation aggregator evidence shape as a separate scoped task if still appropriate.

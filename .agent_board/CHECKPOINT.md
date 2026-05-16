@@ -728,12 +728,23 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0250 - P27.4 Fixture-Only Approval Packet CLI
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: direct-node fixture-only approval-packet CLI implementation and targeted tests.
 - Changed files: `src/cli/migration-import-export-approval-packet.js`; `tests/migration-import-export-approval-packet-cli.test.js`; `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
 - Result so far: CLI reads only the committed P27.1 fixture, emits JSON/text, rejects unsafe flags fail-closed, preserves public MCP three-tool freeze, and adds no package script.
 - Validation: syntax checks passed; targeted CLI test `12/12`; targeted fixture test `13/13`; direct CLI `--json`, rejected `--json --apply`, and `--help` smokes passed; `npm test` `580/580`; `git diff --check` passed; docs validation passed; read-only Verifier `PASS`.
-- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
+- Commit: `d68e296 test: add p27 approval packet cli`.
 - A5 boundary: no package script, fixture mutation, real memory scan/export/import, SQLite migration apply, import/export apply, backup creation/restore, durable write, provider/model call, service startup, config/env/secret edit, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0251 - Post-P27.4 Board-State Reconciliation
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `d68e296`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board state records that CM-0250 is committed locally and no longer pending guarded commit.
+- Validation: `git diff --check`; docs validation.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, migration-import-export apply, service start, push, tag, release, or deploy.
