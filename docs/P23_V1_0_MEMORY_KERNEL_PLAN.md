@@ -332,3 +332,5 @@ P23.1 contract inventory is tracked in [P23_1_MCP_CONTRACT_INVENTORY.md](/A:/cod
 P23.2 schema/versioning planning is tracked in [P23_2_SCHEMA_VERSIONING_PLAN.md](/A:/codex-memory/docs/P23_2_SCHEMA_VERSIONING_PLAN.md).
 
 P23.3 validation matrix hardening is tracked in [P23_3_VALIDATION_MATRIX_HARDENING.md](/A:/codex-memory/docs/P23_3_VALIDATION_MATRIX_HARDENING.md).
+
+P23.4 local production hardening planning is tracked in [P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md).

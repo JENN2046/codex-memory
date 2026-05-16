@@ -352,3 +352,5 @@ Next recommended phase:
 `P23.4-local-production-hardening-plan`
 
 P23.4 should plan local production hardening requirements without installing startup/watchdog tasks, switching Codex/Claude configs, running provider commands, applying migrations/import-export, mutating durable memory, or performing production deploy.
+
+P23.4 local production hardening planning is tracked in [P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md).

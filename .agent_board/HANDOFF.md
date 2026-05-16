@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create P23.2 schema/versioning plan after P23.1 contract inventory.
+Create P23.4 local production hardening plan after the P23 planning bundle local commit.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P23 planning, P23.1, P23.2, and P23.3 docs/board edits are local on top of the unpushed P22 closeout commit; user explicitly requested no commit and no push.
+P23 planning, P23.1, P23.2, and P23.3 are locally committed in `a3b2d77`; P23.4 docs/board edits are local on top of unpushed commits `b3c6bd9` and `a3b2d77`. User did not authorize commit or push for P23.4.
 
 ## Current Area
 
-P23.3 validation matrix hardening
+P23.4 local production hardening plan
 
 ## Findings
 
@@ -41,6 +41,8 @@ P23.3 validation matrix hardening
 - P23.1 inventories current public tools, tool purposes, documentation-level input/output shapes, compatibility expectations, drift risks, post-v1.0 candidates, A5-gated changes, and validation expectations.
 - P23.2 defines current schema baseline, versioning goals, version identifier strategy, compatibility policy, migration/import-export boundary, rollback requirements, validation requirements, drift risks, and A5-gated schema actions.
 - P23.3 defines v1.0 validation matrix hardening across docs/status/board, MCP/HTTP, schema/versioning, security, migration/import-export dry-run, rollback, client boundary, local deployment, production deployment, startup/watchdog, and tag/release gates.
+- P23 planning through P23.3 were locally committed as `a3b2d77 docs: plan p23 v1 memory kernel baseline`.
+- P23.4 defines local production hardening planning across startup/watchdog requirements, health checks, port/session/log expectations, SQLite backup/restore, corruption recovery, restart semantics, operator runbook, and activation validation gates.
 
 ## Changed Files
 
@@ -51,6 +53,7 @@ P23.3 validation matrix hardening
 - `docs/P23_1_MCP_CONTRACT_INVENTORY.md`
 - `docs/P23_2_SCHEMA_VERSIONING_PLAN.md`
 - `docs/P23_3_VALIDATION_MATRIX_HARDENING.md`
+- `docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -71,6 +74,7 @@ P23.3 validation matrix hardening
 - P23.1 contract inventory docs validation: `git diff --check` passed; docs validation passed.
 - P23.2 schema/versioning docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 - P23.3 validation matrix docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
+- P23.4 local production hardening docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 
 ## Not Done
 
@@ -84,6 +88,7 @@ P23.3 validation matrix hardening
 - No provider command.
 - No live HTTP MCP startup.
 - No validator implementation.
+- No local production hardening implementation.
 - No real memory preview.
 - No config mutation.
 - No startup/watchdog operation.
@@ -95,4 +100,4 @@ P23.3 validation matrix hardening
 
 ## Next Safe Step
 
-Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.4-local-production-hardening-plan`.
+Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.5-client-integration-readiness-plan`.

@@ -283,6 +283,7 @@ FAILED
 | CMV-0255 | P23.1-contract-inventory | COMPLETED_VALIDATED | `git diff --check`; docs validation | Drafts v1.0 MCP public contract inventory; docs validation passed; docs/status/board only; no runtime/config/provider/migration/durable-memory/watchdog/startup/deploy action. |
 | CMV-0256 | P23.2-schema-versioning-plan | COMPLETED_VALIDATED | `git diff --check`; docs validation; P23 docs trailing whitespace check | Drafts v1.0 schema/versioning plan; docs validation and P23 trailing whitespace check passed; docs/status/board only; no schema implementation, SQLite migration apply, import/export apply, durable-memory write, runtime/config/provider/watchdog/startup/deploy action. |
 | CMV-0257 | P23.3-validation-matrix-hardening | COMPLETED_VALIDATED | `git diff --check`; docs validation; P23 docs trailing whitespace check | Drafts v1.0 validation matrix hardening plan; docs validation and P23 trailing whitespace check passed; docs/status/board only; no validator implementation, runtime/test/config/provider/migration/durable-memory/watchdog/startup/deploy action. |
+| CMV-0258 | P23.4-local-production-hardening-plan | COMPLETED_VALIDATED | `git diff --check`; docs validation; P23 docs trailing whitespace check | Drafts v1.0 local production hardening plan; docs validation and P23 trailing whitespace check passed; docs/status/board only; no runtime/config/provider/migration/durable-memory/watchdog/startup/deploy action. |
 
 ## Common Validation Commands
 
