@@ -332,3 +332,29 @@ HTTP health: not checked by this batch.
 Remaining risks: future CLI remains unimplemented; runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
 
 Next safe step: commit this board-only reconciliation if validation passes, then select the next safe local P25 task through Council review.
+
+## CM-0222 Commander Handoff - P25.x Schema Version Runtime Enforcement Closeout Review
+
+Goal: close P25 planning/fixture evidence and define a strict P25.6 fixture-only CLI contract before any CLI implementation.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty with CM-0222 docs/status/board-only edits pending guarded local commit after Verifier `PASS`.
+
+Current area: `P25-schema-version-runtime-enforcement-closeout-review`
+
+Changed files: `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation; local closeout/P25.6 reference search; read-only Verifier first pass `NEEDS_FIX` on stale board wording only, corrected; Verifier rerun `PASS`.
+
+Not validated: CLI behavior; runtime schema/version enforcement; full final RC matrix; live MCP/HTTP refresh; provider/profile; migration/import-export; durable write path; real memory scan.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: not checked by this batch.
+
+Remaining risks: future CLI remains unimplemented; runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
+
+Next safe step: guarded local commit if final status/diff review remains clean.

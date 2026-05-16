@@ -377,3 +377,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation.
 - A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
 - Next safe action: select the next safe local P25 task through Council review.
+
+## CM-0222 - P25.x Schema Version Runtime Enforcement Closeout Review
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: docs/status/board-only P25 closeout review and P25.6 go/no-go contract.
+- Changed files: `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result: P25 is closed as planning and fixture-backed evidence, not as runtime-enforced behavior; a later P25.6 direct-node fixture-only CLI skeleton is allowed only under the documented contract.
+- Validation: `git diff --check`; docs validation; local closeout/P25.6 reference search; read-only Verifier first pass `NEEDS_FIX` on stale board wording only, corrected; Verifier rerun `PASS`.
+- A5 boundary for this batch: no CLI implementation, package script, source/test/runtime/config/provider/data/public MCP expansion, durable write, real memory scan, migration/import-export apply, service start, push, tag, release, or deploy.
+- Next safe action: guarded local commit if final status/diff review remains clean.

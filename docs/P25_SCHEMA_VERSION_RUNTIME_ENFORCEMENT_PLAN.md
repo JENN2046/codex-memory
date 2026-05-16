@@ -2,7 +2,7 @@
 
 Phase: `P25-schema-version-runtime-enforcement-plan`
 
-Status: planning; P25.4 dry-run CLI plan documented
+Status: planning closed by P25.x closeout review
 
 ## 1. Purpose
 
@@ -158,6 +158,7 @@ Recommended next phases:
 4. `P25.4-schema-compatibility-dry-run-cli-plan`
 5. `P25.5-schema-compatibility-dry-run-fixture-contract`
 6. `P25.x-schema-version-runtime-enforcement-closeout-review`
+7. `P25.6-schema-compatibility-dry-run-cli-fixture-only`
 
 Implementation phases must define allowed files, forbidden files, rollback story, and validation commands before editing runtime code.
 
@@ -172,6 +173,8 @@ P25.3 does not implement runtime schema/version enforcement. The aggregator stil
 P25.4 schema compatibility dry-run CLI planning is documented in [P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md](./P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md). It defines a future fixture-first dry-run CLI boundary, candidate output contract, future allowed files, validation plan, hard stops, and rollback path. P25.4 is planning only: no CLI implementation, no package script, no runtime enforcement, no real memory scan, no migration/import-export apply, no durable write, no service start, no provider call, and no push/tag/release/deploy.
 
 P25.5 schema compatibility dry-run fixture contract is implemented in `tests/fixtures/schema-compatibility-dry-run-v1.json` and `tests/schema-compatibility-dry-run-fixture.test.js`. It locks the future dry-run output contract fields, accepted/missing/unknown policy counts, rejected apply-like and remote side-effect flags, public MCP three-tool freeze, no-side-effect safety flags, and no raw secret/workspace exposure. P25.5 still does not implement a CLI, add a package script, implement runtime enforcement, scan real memory, run migration/import-export apply, write durable state, start services, call providers, push, tag, release, or deploy.
+
+P25.x closeout review is captured in [P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md](./P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md). It closes P25 as planning and fixture-backed evidence, not as runtime-enforced behavior, and defines the go/no-go contract for a future direct-node fixture-only CLI.
 
 ## 10. Validation For This Planning Phase
 

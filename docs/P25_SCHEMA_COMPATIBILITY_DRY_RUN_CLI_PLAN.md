@@ -2,7 +2,7 @@
 
 Phase: `P25.4-schema-compatibility-dry-run-cli-plan`
 
-Status: planning documented; P25.5 fixture contract added
+Status: planning documented; P25.5 fixture contract added; P25.x closeout contract added
 
 ## 1. Purpose
 
@@ -33,6 +33,7 @@ Current P25 evidence:
 - P25.2 fixture policy tests define accepted, missing, and unknown schema-version behavior.
 - P25.3 validation aggregator report shape exposes P25.2 policy fixture evidence.
 - P25.5 fixture contract locks the planned dry-run report shape without implementing the CLI.
+- P25.x closeout defines the future P25.6 fixture-only CLI go/no-go contract.
 - runtime schema/version enforcement still reports as not implemented.
 - public MCP tools remain exactly `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -321,3 +322,11 @@ P25.5 adds:
 The fixture is synthetic and fixture-only. It locks the planned dry-run report contract fields, accepted/missing/unknown policy counts, fail-closed `DRY_RUN_BLOCKED` semantics when blockers are present, no-side-effect safety flags, public MCP three-tool freeze, rejected flag list, and no raw secret/workspace exposure boundary.
 
 P25.5 does not implement the CLI, add a package script, implement runtime schema/version enforcement, scan real memory, run migration/import-export apply, write durable state, start services, call providers, push, tag, release, or deploy.
+
+## 14. P25.x Closeout Result
+
+P25.x closeout is recorded in [P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md](./P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md).
+
+It closes P25 as planning and fixture-backed evidence, not as runtime-enforced behavior. The next safe implementation slice is `P25.6-schema-compatibility-dry-run-cli-fixture-only`, limited to a direct-node fixture-only CLI skeleton and targeted tests.
+
+P25.6 remains blocked from package script wiring, real memory scans, runtime enforcement, migration/import-export apply, durable writes, service startup, provider calls, public MCP expansion, push, tag, release, and deploy unless separately approved.
