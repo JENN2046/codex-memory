@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create P23.7 v1.0 release-candidate checklist after the P23.6 migration/import-export readiness local commit.
+Create P23.8 final v1.0 RC readiness review after the P23.7 v1.0 release-candidate checklist local commit.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 docs/board edits are local on top of unpushed commits `b3c6bd9`, `a3b2d77`, `0e3e25b`, `de64428`, and `9889378`. User did not authorize commit or push for P23.7.
+P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 is locally committed in `82fb28c`; P23.8 docs/board edits are local on top of unpushed commits `b3c6bd9`, `a3b2d77`, `0e3e25b`, `de64428`, `9889378`, and `82fb28c`. User did not authorize commit or push for P23.8.
 
 ## Current Area
 
-P23.7 v1.0 release-candidate checklist
+P23.8 final v1.0 RC readiness review
 
 ## Findings
 
@@ -49,6 +49,8 @@ P23.7 v1.0 release-candidate checklist
 - P23.6 defines migration/import-export readiness planning across dry-run-first behavior, manifests, checksum/integrity, scope isolation, audit expectations, backup/restore, partial failure, rollback semantics, and durable mutation boundaries.
 - P23.6 was locally committed as `9889378 docs: plan p23 migration import export readiness`.
 - P23.7 defines the v1.0 release-candidate checklist across planning chain coverage, MCP contract freeze, schema/versioning, validation matrix, local production hardening, client integration, migration/import-export, security, rollback, documentation consistency, A5-gated actions, known blockers, and decision table.
+- P23.7 was locally committed as `82fb28c docs: add p23 v1 rc checklist`.
+- P23.8 defines final v1.0 RC readiness review with decision `READY_FOR_DOCS_ONLY_RC_REVIEW`, not `READY_FOR_V1_0_RC`.
 
 ## Changed Files
 
@@ -63,6 +65,7 @@ P23.7 v1.0 release-candidate checklist
 - `docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md`
 - `docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md`
 - `docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md`
+- `docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -87,6 +90,7 @@ P23.7 v1.0 release-candidate checklist
 - P23.5 client integration readiness docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 - P23.6 migration/import-export readiness docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 - P23.7 release-candidate checklist docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
+- P23.8 final RC readiness review docs validation: `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed.
 
 ## Not Done
 
@@ -115,4 +119,4 @@ P23.7 v1.0 release-candidate checklist
 
 ## Next Safe Step
 
-Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.7-v1.0-rc-checklist-local-commit`.
+Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.8-v1.0-final-rc-readiness-review-local-commit`.
