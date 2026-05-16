@@ -249,3 +249,14 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Note: `validate-local.ps1` reported only the known user-level git ignore permission warning.
 - Not run: `gate:ci`; `gate:mainline`; live MCP/HTTP refresh; provider calls; migration/import-export apply.
 - A5 boundary: no service start, provider call, config mutation, package/lockfile change, durable memory write, migration/import-export apply, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0210 - Guarded Local Commit Checkpoint
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Commit: `d4f966d feat: harden validation aggregator rejected reports`
+- Scope: local commit for validated CM-0207 P24.6 rejected-flag report hardening, CM-0208 rejected report contract parity, and CM-0209 P24 docs sync.
+- Pre-commit evidence: `git status --short`; `git diff --stat`; `git diff`; targeted aggregator tests CLI `13/13`, implementation `6/6`, fixture shape `9/9`; `git diff --check`; docs validation; `npm test` `501/501`.
+- Post-commit evidence: `git status --short` clean before this board-only checkpoint update; `git log --oneline --decorate -n 3`; `git show --stat --oneline --decorate --no-renames HEAD`; commit message includes the required `Co-authored-by: Codex <noreply@openai.com>` trailer exactly once.
+- A5 boundary: no push, tag, release, deploy, provider call, service start, config mutation, package/lockfile change, durable memory write, migration/import-export apply, or public MCP expansion.

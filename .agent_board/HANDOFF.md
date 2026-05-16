@@ -161,4 +161,4 @@ P0 mainline health / multi-worker governance
 
 ## Next Safe Step
 
-CM-0207 P24.6 rejected-flag report contract hardening, CM-0208 P24.7 rejected report contract parity, and CM-0209 P24 docs sync are completed and revalidated locally, including targeted aggregator tests and `npm test` `501/501`. Next safe step is optional guarded local commit if requested, or continue with another local P24/P25 hardening slice. Stop before push/tag/release/deploy or any runtime/config/provider/data side effect.
+CM-0207 P24.6 rejected-flag report contract hardening, CM-0208 P24.7 rejected report contract parity, and CM-0209 P24 docs sync are committed locally at `d4f966d` after targeted aggregator tests and `npm test` `501/501`. Next safe step is validating and committing this board-only post-commit checkpoint, then continuing with another local P24/P25 hardening slice. Stop before push/tag/release/deploy or any runtime/config/provider/data side effect.
