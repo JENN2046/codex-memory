@@ -107,6 +107,7 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.ok(fixture.evidence_sources.decision);
   assert.match(fixture.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
   assert.equal(fixture.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
+  assert.equal(fixture.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
   assert.equal(fixture.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(fixture.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
   assert.equal(fixture.decision, 'NOT_READY_BLOCKED');
@@ -159,6 +160,9 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p23A4SafeSlice.liveMcpHttpEvidenceRefreshed, false);
   assert.equal(fixture.evidence.p24Aggregator.planned, true);
   assert.equal(fixture.evidence.p24Aggregator.implemented, false);
+  assert.equal(fixture.evidence.p25SchemaVersionPolicy.status, 'fixture_contract_added');
+  assert.equal(fixture.evidence.p25SchemaVersionPolicy.fixture, 'tests/fixtures/schema-version-policy-v1.json');
+  assert.equal(fixture.evidence.p25SchemaVersionPolicy.runtimeEnforcementImplemented, false);
 });
 
 test('check groups classify A4-safe, A5-gated, runtime-required, and conditional live work', () => {
@@ -170,6 +174,8 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
 
   assert.equal(fixture.checks.publicMcpTools.status, 'pass');
   assert.equal(fixture.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
+  assert.equal(fixture.checks.schemaVersionPolicyFixture.status, 'fixture_contract_added');
+  assert.equal(fixture.checks.schemaVersionPolicyFixture.a4Safe, true);
   assert.equal(fixture.checks.validationAggregatorExecutable.status, 'planned_not_implemented');
   assert.equal(fixture.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
 
@@ -186,6 +192,7 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   }
 
   assert.equal(fixture.a4_safe.includes('gitHygiene'), true);
+  assert.equal(fixture.a4_safe.includes('schemaVersionPolicyFixture'), true);
   assert.equal(fixture.a5_gated.includes('providerExecution'), true);
   assert.equal(fixture.runtime_required.includes('validationAggregatorExecutable'), true);
   assert.equal(fixture.conditional_live.includes('health'), true);

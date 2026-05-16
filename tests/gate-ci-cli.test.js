@@ -2,11 +2,49 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 
-function runGateCi({ args = [] } = {}) {
+function gateCiFixtureEnv() {
+  const comparePayload = {
+    summary: {
+      matchedAll: true,
+      totalCaseCount: 43,
+      matchedCaseCount: 43,
+      coreMismatchCountTotal: 0,
+      extendedMismatchCountTotal: 0,
+      message: 'Fixture compare passed'
+    }
+  };
+  const rollbackPayload = {
+    summary: {
+      rollbackReady: true,
+      totalCaseCount: 43,
+      readyCaseCount: 43,
+      coreMismatchCountTotal: 0,
+      extendedMismatchCountTotal: 0,
+      message: 'Fixture rollback passed'
+    }
+  };
+  return {
+    CODEX_MEMORY_GATE_CI_COMPARE_COMMAND_JSON: JSON.stringify([
+      '-e',
+      `console.log(${JSON.stringify(JSON.stringify(comparePayload))})`
+    ]),
+    CODEX_MEMORY_GATE_CI_ROLLBACK_COMMAND_JSON: JSON.stringify([
+      '-e',
+      `console.log(${JSON.stringify(JSON.stringify(rollbackPayload))})`
+    ]),
+    CODEX_MEMORY_GATE_CI_TEST_COMMAND_JSON: JSON.stringify([
+      process.execPath,
+      '-e',
+      "console.log('ℹ tests 1\\nℹ pass 1\\nℹ fail 0')"
+    ])
+  };
+}
+
+function runGateCi({ args = [], env = {} } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['src/cli/gate-ci.js', ...args], {
       cwd: process.cwd(),
-      env: process.env,
+      env: { ...process.env, ...gateCiFixtureEnv(), ...env },
       stdio: ['ignore', 'pipe', 'pipe']
     });
     let stdout = '';

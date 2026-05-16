@@ -81,10 +81,10 @@ function resolveCommandSpec(name, options) {
   const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
   if (name === 'compare') {
-    return [process.execPath, 'src/cli/compare-vcp-active-memory.js', '--suite', suiteFile, '--json', '--require-match'];
+    return [process.execPath, 'src/cli/compare-vcp-active-memory.js', '--suite', suiteFile, '--json', '--require-match', '--timeout-ms', '120000'];
   }
   if (name === 'rollback') {
-    return [process.execPath, 'src/cli/rollback-active-memory.js', '--suite', suiteFile, '--json', '--require-ready'];
+    return [process.execPath, 'src/cli/rollback-active-memory.js', '--suite', suiteFile, '--json', '--require-ready', '--timeout-ms', '120000'];
   }
   if (name === 'contract') {
     return [process.execPath, 'tests/mcp-contract.test.js', 'tests/mcp-http.test.js'];

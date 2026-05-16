@@ -316,3 +316,28 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Result: policy fixture locks known schema families, accepted current versions, missing legacy read fallback, missing/unknown new-write rejection, unknown read warning/skip, import envelope version requirement, public MCP three-tool freeze, and no-side-effect/no-exposure safety.
 - Validation: `node --check tests\schema-version-policy-fixture.test.js`; targeted P25.2 test `10/10`; `npm test` `511/511`; `git diff --check`; docs validation.
 - A5 boundary for this batch: no runtime enforcement, public MCP schema/tool change, package/config change, service start, provider call, migration/import-export apply, durable write, tag, release, deploy, or push.
+
+## CM-0217 - P25.3 Validation Aggregator Schema Status Report Shape
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: source/test/docs/board P25.3 aggregator report-shape evidence.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result: documented that validation aggregator report shape now includes P25.2 schema-version policy fixture evidence through `schemaVersionPolicyFixture`, `evidence.p25SchemaVersionPolicy`, and `evidence_sources.schema_version_policy_fixture`.
+- Validation: `node --test tests\v1-rc-validation-aggregator.test.js` `9/9`; `node --test tests\v1-rc-validation-aggregator-implementation.test.js` `6/6`; `node --test tests\v1-rc-validation-aggregator-cli.test.js` `13/13`; `node --test tests\schema-version-policy-fixture.test.js` `10/10`; `node --test tests\dashboard-cli.test.js` `4/4`; `node --test tests\gate-ci-cli.test.js` `2/2`; `git diff --check`; docs validation.
+- Not fully validated: initial broad `npm test` returned `509/511` because dashboard/gate checks failed while running in the full concurrent suite; both failing suites passed when rerun in isolation.
+- A5 boundary for this batch: no runtime schema/version enforcement, no public MCP expansion, no package/config/provider/service/migration/import-export/durable write/tag/release/deploy/push.
+- Next safe action: final diff review, read-only Verifier review, guarded local commit if eligible; next planning slice can be `P25.4-schema-compatibility-dry-run-cli-plan`.
+
+## CM-0218 - Dashboard / Gate:CI Validation Stability
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: narrow validation-stability fix found during P25.3 full-suite validation.
+- Changed files: `src/cli/gate-ci.js`; `src/cli/mainline-gate.js`; `tests/dashboard-cli.test.js`; `tests/gate-ci-cli.test.js`; `.agent_board/*`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`.
+- Result: `gate:ci` now supports fixture command overrides for its own CLI tests; dashboard CLI tests use existing mainline-gate command overrides; gate wrappers use a longer compare/rollback timeout. This prevents full `npm test` from recursively running heavy gates inside gate/dashboard tests while preserving real `npm run gate:ci -- --json` coverage.
+- Validation: syntax checks for changed JS files; `node --test tests\gate-ci-cli.test.js` `2/2`; `node --test tests\dashboard-cli.test.js` `4/4`; combined dashboard/gate-ci test `6/6`; `node --test tests\mainline-gate-cli.test.js` `2/2`; `npm test` `511/511`; `npm run gate:ci -- --json` passed; `git diff --check`; docs validation.
+- A5 boundary for this batch: no package/config/provider/service/migration/import-export/durable write/public MCP expansion/tag/release/deploy/push.
+- Next safe action: final diff review, read-only Verifier review, guarded local commit if eligible.

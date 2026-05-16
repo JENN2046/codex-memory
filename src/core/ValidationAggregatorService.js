@@ -37,6 +37,11 @@ const EVIDENCE_SOURCES = {
     source_ref: 'P25 pending',
     status: 'not_implemented'
   },
+  schema_version_policy_fixture: {
+    source_type: 'fixture_contract',
+    source_ref: 'tests/fixtures/schema-version-policy-v1.json',
+    status: 'fixture_contract_added'
+  },
   public_mcp_tools: {
     source_type: 'code_contract',
     source_ref: 'src/core/constants.js',
@@ -173,6 +178,13 @@ function buildV1RcValidationAggregatorReport({
         blocksV1Rc: true,
         runtimeRequired: true
       }),
+      schemaVersionPolicyFixture: createCheck({
+        status: 'fixture_contract_added',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P25.2 schema-version policy fixture covers accepted, missing, and unknown version behavior.'
+      }),
       validationAggregatorExecutable: createCheck({
         status: 'minimal_implemented',
         requiredBeforeV1Rc: true,
@@ -222,6 +234,7 @@ function buildV1RcValidationAggregatorReport({
       'p2DocsWhitespace',
       'docsStatusBoardConsistency',
       'schemaVersionDocsReview',
+      'schemaVersionPolicyFixture',
       'clientBoundaryDocsReview',
       'migrationImportExportBoundaryDocsReview',
       'rcChecklistAlignmentReview',
@@ -266,6 +279,12 @@ function buildV1RcValidationAggregatorReport({
         implemented: true,
         minimalImplementation: true,
         fullImplementation: false
+      },
+      p25SchemaVersionPolicy: {
+        status: 'fixture_contract_added',
+        fixture: 'tests/fixtures/schema-version-policy-v1.json',
+        test: 'tests/schema-version-policy-fixture.test.js',
+        runtimeEnforcementImplemented: false
       }
     },
     evidence_sources: EVIDENCE_SOURCES,

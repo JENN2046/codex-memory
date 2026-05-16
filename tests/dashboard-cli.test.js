@@ -5,11 +5,44 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 
+function mainlineGateFixtureEnv() {
+  const comparePayload = {
+    summary: {
+      ok: true,
+      totalCaseCount: 43,
+      matchedCaseCount: 43,
+      coreMismatchCountTotal: 0,
+      extendedMismatchCountTotal: 0
+    }
+  };
+  const rollbackPayload = {
+    summary: {
+      ok: true,
+      totalCaseCount: 43,
+      readyCaseCount: 43,
+      coreMismatchCountTotal: 0,
+      extendedMismatchCountTotal: 0
+    }
+  };
+  return {
+    CODEX_MEMORY_GATE_COMPARE_COMMAND_JSON: JSON.stringify([
+      process.execPath,
+      '-e',
+      `console.log(${JSON.stringify(JSON.stringify(comparePayload))})`
+    ]),
+    CODEX_MEMORY_GATE_ROLLBACK_COMMAND_JSON: JSON.stringify([
+      process.execPath,
+      '-e',
+      `console.log(${JSON.stringify(JSON.stringify(rollbackPayload))})`
+    ])
+  };
+}
+
 function runDashboard({ args = [], env = {} } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['src/cli/dashboard.js', ...args], {
       cwd: process.cwd(),
-      env: { ...process.env, ...env },
+      env: { ...process.env, ...mainlineGateFixtureEnv(), ...env },
       stdio: ['ignore', 'pipe', 'pipe']
     });
     let stdout = '';

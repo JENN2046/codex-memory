@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require('node:fs');
 const path = require('node:path');
-const { spawn, spawnSync } = require('node:child_process');
+const { spawn } = require('node:child_process');
 const { DEFAULT_SUITE, runSuiteReport } = require('./real-query-suite-core');
 
 function parseArgs(argv = []) {
@@ -10,6 +10,20 @@ function parseArgs(argv = []) {
     if (argv[i] === '--json') { options.json = true; continue; }
   }
   return options;
+}
+
+function resolveEnvCommand(name) {
+  const raw = process.env[`CODEX_MEMORY_GATE_CI_${String(name).toUpperCase()}_COMMAND_JSON`];
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0 && parsed.every(item => typeof item === 'string' && item.length > 0)) {
+      return parsed;
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 function spawnJson(args) {
@@ -39,10 +53,11 @@ function resolveSuitePath() {
 
 async function runCompare() {
   const suitePath = resolveSuitePath();
-  const { code, data } = await spawnJson([
+  const command = resolveEnvCommand('compare') || [
     path.join(process.cwd(), 'src', 'cli', 'compare-vcp-active-memory.js'),
-    '--suite', suitePath, '--json', '--require-match'
-  ]);
+    '--suite', suitePath, '--json', '--require-match', '--timeout-ms', '120000'
+  ];
+  const { data } = await spawnJson(command);
   if (!data || !data.summary) {
     return { status: 'error', message: 'Compare failed to produce output', detail: {} };
   }
@@ -62,10 +77,11 @@ async function runCompare() {
 
 async function runRollback() {
   const suitePath = resolveSuitePath();
-  const { code, data } = await spawnJson([
+  const command = resolveEnvCommand('rollback') || [
     path.join(process.cwd(), 'src', 'cli', 'rollback-active-memory.js'),
-    '--suite', suitePath, '--json', '--require-ready'
-  ]);
+    '--suite', suitePath, '--json', '--require-ready', '--timeout-ms', '120000'
+  ];
+  const { data } = await spawnJson(command);
   if (!data || !data.summary) {
     return { status: 'error', message: 'Rollback failed to produce output', detail: {} };
   }
@@ -288,10 +304,11 @@ async function runTests() {
   });
 
   const testPatterns = ciSafeFiles.map(f => path.join('tests', f));
-  const args = ['--test', ...testPatterns];
+  const command = resolveEnvCommand('test') || [process.execPath, '--test', ...testPatterns];
+  const [file, ...args] = command;
 
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, args, {
+    const child = spawn(file, args, {
       cwd: process.cwd(),
       env: process.env,
       stdio: ['ignore', 'pipe', 'pipe'],

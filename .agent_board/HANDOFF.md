@@ -162,3 +162,75 @@ P0 mainline health / multi-worker governance
 ## Next Safe Step
 
 CM-0207 P24.6 rejected-flag report contract hardening, CM-0208 P24.7 rejected report contract parity, and CM-0209 P24 docs sync are committed locally at `d4f966d`; CM-0210/CM-0211 board checkpoints are local-only. Current user authorization allows A5 mode today, except `push` is deferred to the final step. P25.2 schema-version policy fixture tests are in progress; no runtime enforcement, migration/import-export apply, provider call, config mutation, deploy, release, tag, or push has been executed in this batch.
+
+## CM-0217 Worker Handoff - P25.3 Aggregator Schema Status Report Shape
+
+Goal: update documentation and `.agent_board` state after main-thread P25.3 source/test changes added validation aggregator report-shape evidence for the P25.2 schema-version policy fixture.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty before this Worker began because main-thread changes already existed in `src/core/ValidationAggregatorService.js`, `tests/fixtures/v1-rc-validation-aggregator-v1.json`, `tests/v1-rc-validation-aggregator.test.js`, and `tests/v1-rc-validation-aggregator-implementation.test.js`. This Worker did not edit those files.
+
+Current area: `P25.3-validation-aggregator-schema-status-report-shape`
+
+Changed files: `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/RUN_STATE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: docs/diff only; `git diff --check`; diff inspection. No broad tests run by this Worker.
+
+Not validated: source/runtime/test behavior; final RC matrix; live MCP/HTTP refresh; provider/profile; migration/import-export; durable write path.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: not checked by this Worker.
+
+Compare: not run by this Worker.
+
+Rollback: not run by this Worker.
+
+Profile gate: not run by this Worker.
+
+Audit impact: none from this Worker; docs/board only.
+
+Recall impact: none from this Worker.
+
+Remaining risks: source/test changes remain owned by the main thread; runtime schema/version enforcement is still not implemented; full v1.0 RC remains blocked.
+
+Next safe step: main thread should own targeted source/test validation and any guarded commit decision; a future docs/planning slice can proceed to `P25.4-schema-compatibility-dry-run-cli-plan`.
+
+## CM-0218 Commander Handoff - Dashboard / Gate:CI Validation Stability
+
+Goal: close the validation failure found during P25.3 full-suite validation without broadening runtime behavior.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty with P25.3 aggregator report-shape edits plus CM-0218 dashboard/gate:ci validation-stability edits.
+
+Current area: `P0-mainline-health` / P25 validation support.
+
+Changed files: `src/core/ValidationAggregatorService.js`; `src/cli/gate-ci.js`; `src/cli/mainline-gate.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `tests/dashboard-cli.test.js`; `tests/gate-ci-cli.test.js`; P25/status docs; `.agent_board/*`.
+
+Validation: targeted P25.3 tests passed; dashboard/gate:ci/mainline-gate targeted tests passed; `npm test` passed `511/511`; `npm run gate:ci -- --json` passed; `git diff --check` passed; docs validation passed.
+
+Not validated: live MCP/HTTP refresh; provider/profile smoke; migration/import-export apply; durable memory write path; release/deploy/push.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: not started or refreshed in this batch.
+
+Compare: covered through `npm run gate:ci -- --json` as `43/43 matched`.
+
+Rollback: covered through `npm run gate:ci -- --json` as `43/43 rollback-ready`.
+
+Profile gate: not run.
+
+Audit impact: none expected; no durable memory mutation.
+
+Recall impact: none expected; report/test/gate stability only.
+
+Remaining risks: runtime schema/version enforcement remains unimplemented; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
+
+Next safe step: final diff review, read-only Verifier review, guarded local commit if eligible, then continue to `P25.4-schema-compatibility-dry-run-cli-plan`.

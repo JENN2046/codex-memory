@@ -2,7 +2,7 @@
 
 Phase: `P25-schema-version-runtime-enforcement-plan`
 
-Status: planning
+Status: planning; P25.3 report-shape status documented
 
 ## 1. Purpose
 
@@ -94,6 +94,7 @@ Before any runtime enforcement implementation, add or update focused tests for:
 - lifecycle and audit summary redaction flags.
 - validation aggregator reports enforcement status without claiming readiness.
 - no raw secret or raw workspace ID appears in low-risk summaries.
+- P25.2 schema-version policy fixture evidence appears in the validation aggregator report shape without claiming runtime schema/version enforcement.
 
 Suggested future targeted commands:
 
@@ -162,6 +163,10 @@ Implementation phases must define allowed files, forbidden files, rollback story
 P25.1 inventory is tracked in [P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md](./P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md). It confirms existing fixture/test coverage and identifies the missing fixture contract for accepted/missing/unknown schema-version behavior.
 
 P25.2 fixture policy tests are implemented in `tests/fixtures/schema-version-policy-v1.json` and `tests/schema-version-policy-fixture.test.js`. They lock known schema families, accepted current versions, missing-version fallback behavior, unknown-version rejection/warning policy, public MCP three-tool freeze, no-migration/no-mutation safety flags, and no raw secret/workspace exposure.
+
+P25.3 validation aggregator schema status report shape is represented by the current `src/core/ValidationAggregatorService.js` and `tests/fixtures/v1-rc-validation-aggregator-v1.json` changes from the main implementation thread. It adds report-shape evidence for the P25.2 schema-version policy fixture through `schemaVersionPolicyFixture`, `evidence.p25SchemaVersionPolicy`, and `evidence_sources.schema_version_policy_fixture`.
+
+P25.3 does not implement runtime schema/version enforcement. The aggregator still reports `runtimeEnforcementImplemented=false` for the P25 policy evidence and keeps schema/version runtime enforcement as a blocker. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
 ## 10. Validation For This Planning Phase
 
