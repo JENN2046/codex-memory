@@ -576,4 +576,16 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Result so far: aggregator summary/check/evidence/evidence_sources now include P26.3 fixture-only CLI evidence with CLI execution and real-memory/apply/package-script flags false.
 - Validation: syntax check; targeted aggregator tests `9/9`, `6/6`, and `13/13`; P26 CLI test `12/12`; `git diff --check`; docs validation; `npm test` `555/555`.
 - Read-only Verifier: `PASS`; commit readiness `eligible`; required fixes none.
+- Commit: `6ca6f76 test: surface p26 dry-run gate evidence`.
 - A5 boundary: no P26.3 CLI execution claim, no package script, no real memory scan/export/import, no SQLite migration apply, no import/export apply, no durable write, no provider/model call, no service startup, no config/env/secret edit, no public MCP expansion, no push/tag/release/deploy.
+
+## CM-0238 - Post-P26.4 Board-State Reconciliation
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `6ca6f76`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board state records that CM-0237 is committed locally and no longer pending guarded commit.
+- Validation pending: `git diff --check`; docs validation.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, migration-import-export apply, service start, push, tag, release, or deploy.

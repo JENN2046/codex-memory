@@ -675,7 +675,7 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty for CM-0237 source/test/fixture/docs/status/board edits.
+Worktree: CM-0237 committed locally at `6ca6f76`; dirty only for CM-0238 board-state reconciliation.
 
 Current area: `P26.4-migration-import-export-dry-run-gate-aggregator-evidence`
 
@@ -689,4 +689,22 @@ HTTP health: no new service action for CM-0237.
 
 Remaining risks: P26.3 CLI execution claims, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: create a guarded local commit for CM-0237 if final status/diff review remains clean.
+Commit: `6ca6f76 test: surface p26 dry-run gate evidence`.
+
+## CM-0238 Commander Handoff - Post-P26.4 Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `6ca6f76`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for this board-state reconciliation until committed.
+
+Current area: `P26-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation pending: `git diff --check`; docs validation.
+
+Next safe step: commit this board-only reconciliation if validation passes, then select the next safe P26 closeout/review task.
