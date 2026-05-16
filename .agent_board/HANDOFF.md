@@ -79,9 +79,11 @@ P24 validation aggregator implementation planning
 - `docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md`
 - `docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md`
 - `src/core/ValidationAggregatorService.js`
+- `src/cli/v1-rc-validation-aggregator.js`
 - `tests/fixtures/v1-rc-validation-aggregator-v1.json`
 - `tests/v1-rc-validation-aggregator.test.js`
 - `tests/v1-rc-validation-aggregator-implementation.test.js`
+- `tests/v1-rc-validation-aggregator-cli.test.js`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -114,12 +116,13 @@ P24 validation aggregator implementation planning
 - P24 validation aggregator implementation plan docs validation: `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed.
 - P24.1 validation aggregator fixture shape targeted validation: `node --check tests\v1-rc-validation-aggregator.test.js` passed; `node --test tests\v1-rc-validation-aggregator.test.js` passed `8/8`.
 - P24.2 validation aggregator minimal implementation targeted validation: syntax checks passed for `src\core\ValidationAggregatorService.js` and `tests\v1-rc-validation-aggregator-implementation.test.js`; targeted aggregator tests passed `13/13`; emitted decision remains `NOT_READY_BLOCKED`.
+- P24.3 validation aggregator CLI targeted validation: syntax checks passed for core/CLI/tests; fixture test passed `8/8`; implementation test passed `5/5`; CLI test passed `6/6`; direct CLI smoke emitted JSON decision `NOT_READY_BLOCKED`.
 
 ## Not Done
 
 - No final RC validation matrix execution.
-- No validation aggregator executable implementation.
-- No validation aggregator CLI/package script.
+- No full validation aggregator implementation.
+- No package script wiring for the minimal CLI.
 - No full final RC validation matrix execution.
 - No live MCP/HTTP refresh because service was not already reachable.
 - No worktree created in this result-record phase.
@@ -146,4 +149,4 @@ P24 validation aggregator implementation planning
 
 ## Next Safe Step
 
-Run final P24.2 diff/docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P24.2-validation-aggregator-minimal-implementation-local-commit`.
+Run final P24.3 diff/docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P24.3-validation-aggregator-cli-wiring-minimal-implementation-local-commit`.

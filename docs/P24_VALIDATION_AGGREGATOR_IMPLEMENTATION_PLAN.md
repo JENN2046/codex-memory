@@ -330,13 +330,15 @@ Suggested sequence:
 
 1. `P24.1-validation-aggregator-fixture-shape-tests`
 2. `P24.2-validation-aggregator-minimal-implementation`
-3. `P24.3-validation-aggregator-cli-plan`
+3. `P24.3-validation-aggregator-cli-wiring-minimal-implementation`
 4. `P24.4-validation-aggregator-report-shape-gate`
 5. `P24.5-validation-aggregator-closeout-review`
 
 Do not combine package script addition, runtime implementation, live MCP refresh, provider execution, migration apply, or release action into the same phase.
 
 P24.2 adds the minimal local core implementation in `src/core/ValidationAggregatorService.js` plus narrow implementation tests in `tests/v1-rc-validation-aggregator-implementation.test.js`. It does not add a CLI wrapper, package script, live evidence refresh, full final RC matrix execution, schema/version runtime enforcement, or A5-gated action.
+
+P24.3 adds direct-node CLI wiring in `src/cli/v1-rc-validation-aggregator.js` plus narrow CLI tests in `tests/v1-rc-validation-aggregator-cli.test.js`. It does not add a package script, start services, refresh live MCP/HTTP evidence, run providers, apply migrations/import-export, mutate durable memory, or change the `NOT_READY_BLOCKED` decision.
 
 ## 19. Stop Conditions
 
@@ -366,3 +368,5 @@ After this planning commit, the next implementation-safe phase should be `P24.1-
 P24.1 fixture/shape-test work is the next completed implementation-facing contract layer. The next safe phase after P24.1 is `P24.1-validation-aggregator-fixture-shape-tests-local-commit`, followed by a separate scoped CLI/service implementation phase.
 
 P24.2 minimal implementation is the next completed core skeleton layer. The next safe phase after P24.2 is `P24.2-validation-aggregator-minimal-implementation-local-commit`, followed by a separate CLI wrapper plan or implementation phase that still avoids package script changes unless explicitly authorized.
+
+P24.3 minimal CLI wiring is the next completed executable wrapper layer. The next safe phase after P24.3 is `P24.3-validation-aggregator-cli-wiring-minimal-implementation-local-commit`, followed by a report-shape gate or full matrix aggregation planning phase that still avoids package script changes unless explicitly authorized.
