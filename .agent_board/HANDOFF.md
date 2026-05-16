@@ -875,13 +875,13 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty only for CM-0245 board-state reconciliation.
+Worktree: CM-0245 committed locally at `2303887`; dirty only for CM-0246 board-state finalization.
 
 Current area: `P27-board-state-reconciliation`
 
 Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
 
 MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -889,4 +889,30 @@ HTTP health: no service action for CM-0245.
 
 Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: validate and commit this board-only reconciliation, then select the next safe local P27.2 planning slice.
+Commit: `2303887 docs: record p27 fixture checkpoint`.
+
+Next safe step: validate and commit CM-0246 board-only finalization, then select the next safe local P27.2 planning slice.
+
+## CM-0246 Commander Handoff - P27 Board-State Finalization
+
+Goal: clear stale CM-0245 dirty/in-progress wording before P27.2 planning.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for CM-0246 board-state finalization.
+
+Current area: `P27-board-state-finalization`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: pending `git diff --check`; docs validation.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0246.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: commit this board-only finalization if validation passes, then start P27.2 docs-only CLI plan.

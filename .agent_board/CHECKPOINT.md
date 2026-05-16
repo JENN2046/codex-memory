@@ -668,11 +668,23 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0245 - Post-P27.1 Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `8dcbeb0`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
-- Result so far: board state records that CM-0244 is committed locally and no longer pending guarded commit.
-- Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Result: board state records that CM-0244 is committed locally and no longer pending guarded commit.
+- Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Commit: `2303887 docs: record p27 fixture checkpoint`.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
+
+## CM-0246 - P27 Board-State Finalization
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only correction after CM-0245 checkpoint commit.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result so far: clears stale CM-0245 dirty/in-progress wording before P27.2 planning.
+- Validation: pending `git diff --check`; docs validation.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.

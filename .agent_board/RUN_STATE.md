@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0245 / post-P27.1 board-state reconciliation |
-| Current area | P27 board-state reconciliation |
+| Current task | CM-0246 / P27 board-state finalization |
+| Current area | P27 board-state finalization |
 | Last pushed baseline | `6c356eb` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Created guarded local commit `8dcbeb0` for CM-0244 P27.1 approval packet fixture shape. |
-| Last validation | CM-0244 validation passed: `node --check tests\migration-import-export-approval-packet-fixture.test.js`; targeted fixture test `13/13`; combined fixture tests `32/32`; `npm test` `568/568`; `git diff --check`; docs validation; read-only Verifier `PASS`; post-commit status/log/message checks passed. |
-| Worktree summary | Dirty only for CM-0245 board-state reconciliation after guarded local commit `8dcbeb0`. Local `main` is ahead of `origin/main` by two local commits: `b679a3a` and `8dcbeb0`. No further push is authorized by the current `continue` instruction. No package script, lockfile, `.github`, `.env`, runtime config, Codex/Claude config, public MCP schema/tool expansion, SQLite migration apply, import/export apply, backup creation, restore, provider/model call, real memory preview, tag movement, production deploy, UI, service install, watchdog install, startup task install, durable memory write, durable data rewrite, tag, release, deploy, or remote mutation occurred in this CM-0245 board record. |
+| Last action | Created board-only local commit `2303887` for CM-0245 post-P27.1 checkpoint, then started CM-0246 board-state finalization to clear stale dirty/in-progress wording. |
+| Last validation | CM-0245 validation passed: `git diff --check`; docs validation; post-commit status/log/message checks. CM-0244 validation remains `node --check`; targeted fixture `13/13`; combined fixture tests `32/32`; `npm test` `568/568`; read-only Verifier `PASS`. |
+| Worktree summary | Dirty only for CM-0246 board-state finalization. Local `main` is ahead of `origin/main` by three local commits: `b679a3a`, `8dcbeb0`, and `2303887`. No further push is authorized by the current `continue` instruction. No package script, lockfile, `.github`, `.env`, runtime config, Codex/Claude config, public MCP schema/tool expansion, SQLite migration apply, import/export apply, backup creation, restore, provider/model call, real memory preview, tag movement, production deploy, UI, service install, watchdog install, startup task install, durable memory write, durable data rewrite, tag, release, deploy, or remote mutation occurred in this CM-0246 board finalization. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
-| Guarded auto-commit allowed | yes for scoped CM-0245 board-only reconciliation if diff/docs validation passes |
+| Guarded auto-commit allowed | yes for scoped CM-0246 board-only finalization if diff/docs validation passes |
 | Safe-push readiness | second authorized push completed; no further push is authorized unless the user explicitly requests another push |
-| Next planned action | Validate and commit CM-0245 board-only reconciliation if final diff review remains scoped, then select the next safe local P27.2 planning slice. |
+| Next planned action | Validate and commit CM-0246 board-only finalization if final diff review remains scoped, then start P27.2 docs-only CLI planning. |
 
 ## Notes
 
