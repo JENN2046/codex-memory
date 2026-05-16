@@ -44,6 +44,12 @@ test('minimal validation aggregator CLI preserves honest blocked decision', () =
   assert.notEqual(report.decision, 'READY_FOR_V1_0_RC');
   assert.equal(report.summary.validationAggregatorImplemented, true);
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
+  assert.equal(report.summary.migrationImportExportDryRunGateCliImplemented, true);
+  assert.equal(report.summary.migrationImportExportDryRunGateCliFixtureOnly, true);
+  assert.equal(report.summary.migrationImportExportDryRunGateCliExecuted, false);
+  assert.equal(report.summary.migrationImportExportRealMemoryScanned, false);
+  assert.equal(report.summary.migrationImportExportApplyPerformed, false);
+  assert.equal(report.summary.migrationImportExportPackageScriptAdded, false);
 });
 
 test('minimal validation aggregator CLI preserves public MCP three-tool freeze', () => {
@@ -99,6 +105,7 @@ test('minimal validation aggregator CLI strict mode exits 1 for current blocked 
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
+  assert.equal(report.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
 });
 

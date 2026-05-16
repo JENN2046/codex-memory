@@ -61,6 +61,10 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
   assert.equal(report.summary.schemaCompatibilityDryRunCliExecuted, false);
   assert.equal(report.summary.schemaCompatibilityRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.migrationImportExportDryRunGateCliImplemented, true);
+  assert.equal(report.summary.migrationImportExportDryRunGateCliFixtureOnly, true);
+  assert.equal(report.summary.migrationImportExportDryRunGateCliExecuted, false);
+  assert.equal(report.summary.migrationImportExportRealMemoryScanned, false);
   assert.equal(report.evidence.p25SchemaVersionPolicy.status, 'fixture_contract_added');
   assert.equal(report.evidence.p25SchemaVersionPolicy.fixture, 'tests/fixtures/schema-version-policy-v1.json');
   assert.equal(report.evidence.p25SchemaVersionPolicy.runtimeEnforcementImplemented, false);
@@ -70,6 +74,19 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.realMemoryScanned, false);
   assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.runtimeEnforcementImplemented, false);
   assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.packageScriptAdded, false);
+  assert.equal(report.summary.migrationImportExportApplyPerformed, false);
+  assert.equal(report.summary.migrationImportExportPackageScriptAdded, false);
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.status, 'fixture_only_cli_added');
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.cli, 'src/cli/migration-import-export-dry-run-gate.js');
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.test, 'tests/migration-import-export-dry-run-gate-cli.test.js');
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.fixture, 'tests/fixtures/migration-import-export-dry-run-gate-v1.json');
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.outputSchema, 'codex-memory.migration-import-export-dry-run-gate.v1');
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.expectedDecision, 'NOT_READY_BLOCKED');
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.fixtureOnly, true);
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.cliExecuted, false);
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.realMemoryScanned, false);
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.importExportApplyPerformed, false);
+  assert.equal(report.evidence.p26MigrationImportExportDryRunGateCli.packageScriptAdded, false);
 });
 
 test('minimal implementation preserves public MCP three-tool freeze', () => {
@@ -92,6 +109,7 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
   assert.equal(report.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
   assert.equal(report.evidence_sources.schema_compatibility_dry_run_cli.status, 'fixture_only_cli_added_not_executed');
+  assert.equal(report.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
@@ -112,12 +130,16 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.checks.schemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
   assert.equal(report.checks.schemaCompatibilityDryRunCli.a4Safe, true);
   assert.equal(report.checks.schemaCompatibilityDryRunCli.blocksV1Rc, undefined);
+  assert.equal(report.checks.migrationImportExportDryRunGateCli.status, 'fixture_only_cli_added');
+  assert.equal(report.checks.migrationImportExportDryRunGateCli.a4Safe, true);
+  assert.equal(report.checks.migrationImportExportDryRunGateCli.blocksV1Rc, undefined);
   assert.equal(report.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
   assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), true);
   assert.equal(report.a5_gated.includes('providerExecution'), true);
   assert.equal(report.a4_safe.includes('gitHygiene'), true);
   assert.equal(report.a4_safe.includes('schemaVersionPolicyFixture'), true);
   assert.equal(report.a4_safe.includes('schemaCompatibilityDryRunCli'), true);
+  assert.equal(report.a4_safe.includes('migrationImportExportDryRunGateCli'), true);
   assert.equal(report.conditional_live.includes('health'), true);
 
   for (const key of [

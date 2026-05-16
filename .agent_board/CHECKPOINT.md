@@ -556,11 +556,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0236 - Post-P26.3 Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `6e39985`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 - Result: board state records that CM-0235 is committed locally and no longer pending guarded commit.
-- Validation pending: `git diff --check`; docs validation.
+- Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Commit: `8aa48a6 docs: record p26 cli checkpoint`.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, migration-import-export apply, service start, push, tag, release, or deploy.
+
+## CM-0237 - P26.4 Migration Import-Export Dry-Run Gate Aggregator Evidence
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: record P26.3 fixture-only CLI evidence in the validation aggregator report shape without executing the CLI.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `tests/v1-rc-validation-aggregator-cli.test.js`; `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: aggregator summary/check/evidence/evidence_sources now include P26.3 fixture-only CLI evidence with CLI execution and real-memory/apply/package-script flags false.
+- Validation: syntax check; targeted aggregator tests `9/9`, `6/6`, and `13/13`; P26 CLI test `12/12`; `git diff --check`; docs validation; `npm test` `555/555`.
+- Read-only Verifier: `PASS`; commit readiness `eligible`; required fixes none.
+- A5 boundary: no P26.3 CLI execution claim, no package script, no real memory scan/export/import, no SQLite migration apply, no import/export apply, no durable write, no provider/model call, no service startup, no config/env/secret edit, no public MCP expansion, no push/tag/release/deploy.

@@ -657,12 +657,36 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty only for this board-state reconciliation until committed.
+Worktree: board-state reconciliation committed locally at `8aa48a6`; currently dirty for CM-0237 validation aggregator evidence edits.
 
 Current area: `P26-board-state-reconciliation`
 
 Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation pending: `git diff --check`; docs validation.
+Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
 
-Next safe step: commit this board-only reconciliation if validation passes, then start CM-0237 P26.4 aggregator evidence shape as the next Council-approved task.
+Commit: `8aa48a6 docs: record p26 cli checkpoint`.
+
+## CM-0237 Commander Handoff - P26.4 Aggregator Evidence Shape
+
+Goal: record P26.3 fixture-only migration/import-export dry-run gate CLI evidence in the validation aggregator report shape without executing the CLI.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0237 source/test/fixture/docs/status/board edits.
+
+Current area: `P26.4-migration-import-export-dry-run-gate-aggregator-evidence`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `tests/v1-rc-validation-aggregator-cli.test.js`; `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: syntax check; targeted aggregator tests `9/9`, `6/6`, and `13/13`; P26 CLI test `12/12`; `git diff --check`; docs validation; `npm test` `555/555`; read-only Verifier `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no new service action for CM-0237.
+
+Remaining risks: P26.3 CLI execution claims, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: create a guarded local commit for CM-0237 if final status/diff review remains clean.

@@ -358,3 +358,24 @@ Rejected unsafe flags:
 P26.3 remains local and fixture-only. It does not scan real memory, export/import real memory, run SQLite migration apply, run import/export apply, create or restore backups, write durable state, call providers, expand public MCP tools, start services, change config/env/secrets, push, tag, release, or deploy.
 
 P26.3 decision: `P26_DRY_RUN_GATE_FIXTURE_ONLY_CLI_IMPLEMENTED`.
+
+## 14. P26.4 Validation Aggregator Evidence Result
+
+P26.4 records the P26.3 fixture-only CLI in the central validation aggregator report shape.
+
+Updated evidence fields:
+
+- `summary.migrationImportExportDryRunGateCliImplemented=true`
+- `summary.migrationImportExportDryRunGateCliFixtureOnly=true`
+- `summary.migrationImportExportDryRunGateCliExecuted=false`
+- `summary.migrationImportExportRealMemoryScanned=false`
+- `summary.migrationImportExportApplyPerformed=false`
+- `summary.migrationImportExportPackageScriptAdded=false`
+- `checks.migrationImportExportDryRunGateCli.status=fixture_only_cli_added`
+- `checks.migrationImportExportDryRunGateCli.a4Safe=true`
+- `evidence_sources.migration_import_export_dry_run_gate_cli`
+- `evidence.p26MigrationImportExportDryRunGateCli`
+
+This is report-shape evidence only. The validation aggregator does not execute the P26.3 CLI, scan real memory, run migration/import-export apply, add package scripts, call providers, expand public MCP tools, push, tag, release, or deploy.
+
+P26.4 decision: `P26_DRY_RUN_GATE_AGGREGATOR_EVIDENCE_RECORDED`.
