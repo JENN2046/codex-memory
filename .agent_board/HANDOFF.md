@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add P24.5 minimal validation aggregator evidence-source map after the P24.4 local commit.
+Close CM-0206 Single-Window 4-Agent read-only calibration after the P24.5 local commit.
 
 ## Workspace
 
@@ -18,7 +18,7 @@ P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally 
 
 ## Current Area
 
-P24 validation aggregator evidence-source map
+P0 mainline health / multi-worker governance
 
 ## Findings
 
@@ -61,6 +61,11 @@ P24 validation aggregator evidence-source map
 - P24.1 fixture shape tests, P24.2 minimal core report builder, and P24.3 direct-node CLI wiring are committed locally.
 - P24.4 adds default report exit `0`, strict blocked exit `1`, and help exit `0` semantics and is committed locally.
 - P24.5 adds a minimal `evidence_sources` map to the report and fixture contract; requested validation passed.
+- P24.5 is already locally committed at `ca6e3ee chore: add P24.5 validation aggregator evidence source map`.
+- CM-0206 started read-only Worker Alpha, Worker Beta, and Read-Only Verifier contracts. Commander remains this main session.
+- Worker Alpha completed and recommended `P24.6-validation-aggregator-report-shape-hardening-plan`.
+- Worker Beta completed and recommended narrow `P24.6 rejected-flag report contract hardening` for `src/cli/v1-rc-validation-aggregator.js` and `tests/v1-rc-validation-aggregator-cli.test.js`.
+- Read-Only Verifier completed with `PASS`: scope remained board-only; no hard stop crossed; no secret/dependency/runtime/source/test drift.
 
 ## Changed Files
 
@@ -125,6 +130,7 @@ P24 validation aggregator evidence-source map
 
 ## Not Done
 
+- No guarded commit for CM-0206.
 - No final RC validation matrix execution.
 - No full validation aggregator implementation.
 - No package script wiring for the minimal CLI.
@@ -155,4 +161,4 @@ P24 validation aggregator evidence-source map
 
 ## Next Safe Step
 
-Complete the authorized P24.5 local commit, report the result, and stop before any push.
+If continuing locally, start P24.6 rejected-flag report contract hardening as the narrowest source/test slice. Stop before push/tag/release/deploy or any runtime/config/provider/data side effect.

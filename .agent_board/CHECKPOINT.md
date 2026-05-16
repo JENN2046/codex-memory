@@ -183,4 +183,18 @@ P24 validation aggregator evidence-source map
 
 ## Next Safe Action
 
-Complete the authorized P24.5 local commit, report the result, and stop before any push.
+If continuing locally, start P24.6 rejected-flag report contract hardening as the narrowest source/test slice. Stop before push/tag/release/deploy or any runtime/config/provider/data side effect.
+
+## CM-0206 - 4-Agent Read-Only Calibration
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- HEAD: `ca6e3ee chore: add P24.5 validation aggregator evidence source map`
+- Worktree: board-only CM-0206 closeout edits; no source/runtime/test/package/config/provider/data changes.
+- Worker Alpha: completed; recommended P24.6 report-shape hardening focused on evidence freshness, blocker taxonomy, conditional live MCP status, full RC matrix status, and public MCP freeze.
+- Worker Beta: completed; recommended narrow P24.6 rejected-flag report contract hardening for `src/cli/v1-rc-validation-aggregator.js` and `tests/v1-rc-validation-aggregator-cli.test.js`.
+- Read-Only Verifier: `PASS`; scope stayed board-only; no hard stop, secret, dependency, runtime data, source/test drift, provider call, service start, push, tag, release, deploy, stage, or commit.
+- Validation: `git status -sb`; `git log --oneline --decorate -n 12`; `git diff --check`; `scripts/validate-local.ps1 -Area docs`; Verifier `PASS`.
+- Not run: source tests, `npm test`, `gate:ci`, `gate:mainline`, live MCP/HTTP refresh, provider calls, migration/import-export apply.
+- Next safe action: P24.6 rejected-flag report contract hardening, local source/test-only, no package script and no A5-gated action.
