@@ -42,6 +42,12 @@
     "migrationImportExportDryRunGateCliImplemented": true,
     "migrationImportExportDryRunGateCliFixtureOnly": true,
     "migrationImportExportDryRunGateCliExecuted": false,
+    "migrationImportExportApprovalPacketCliImplemented": true,
+    "migrationImportExportApprovalPacketCliFixtureOnly": true,
+    "migrationImportExportApprovalPacketCliExecuted": false,
+    "migrationImportExportApprovalPacketExecutionApproved": false,
+    "migrationImportExportApprovalPacketRealMemoryScanned": false,
+    "migrationImportExportApprovalPacketPackageScriptAdded": false,
     "migrationImportExportRealMemoryScanned": false,
     "productionDeployPerformed": false,
     "startupWatchdogInstalled": false,
@@ -109,6 +115,12 @@
       "a4Safe": true,
       "evidence": "P26.3 direct-node fixture-only CLI exists; P26.4 records report-shape evidence without executing the CLI."
     },
+    "migrationImportExportApprovalPacketCli": {
+      "status": "fixture_only_cli_added",
+      "requiredBeforeV1Rc": true,
+      "a4Safe": true,
+      "evidence": "P27.4 direct-node fixture-only CLI exists; P27.5 records report-shape evidence without executing the CLI."
+    },
     "validationAggregatorExecutable": {
       "status": "planned_not_implemented",
       "requiredBeforeV1Rc": true,
@@ -167,6 +179,7 @@
     "schemaVersionPolicyFixture",
     "schemaCompatibilityDryRunCli",
     "migrationImportExportDryRunGateCli",
+    "migrationImportExportApprovalPacketCli",
     "clientBoundaryDocsReview",
     "migrationImportExportBoundaryDocsReview",
     "rcChecklistAlignmentReview",
@@ -245,6 +258,23 @@
       "realMemoryScanned": false,
       "importExportApplyPerformed": false,
       "packageScriptAdded": false
+    },
+    "p27MigrationImportExportApprovalPacketCli": {
+      "status": "fixture_only_cli_added",
+      "cli": "src/cli/migration-import-export-approval-packet.js",
+      "test": "tests/migration-import-export-approval-packet-cli.test.js",
+      "fixture": "tests/fixtures/migration-import-export-approval-packet-v1.json",
+      "outputSchema": "codex-memory.migration-import-export-approval-packet.v1",
+      "expectedDecision": "NOT_READY_BLOCKED",
+      "expectedApprovalStatus": "BLOCKED_PENDING_APPROVAL",
+      "fixtureOnly": true,
+      "cliExecuted": false,
+      "realMemoryScanned": false,
+      "executionApproved": false,
+      "importExportApplyPerformed": false,
+      "backupRestorePerformed": false,
+      "durableReportWritten": false,
+      "packageScriptAdded": false
     }
   },
   "evidence_sources": {
@@ -286,6 +316,11 @@
     "migration_import_export_dry_run_gate_cli": {
       "source_type": "fixture_only_cli_contract",
       "source_ref": "src/cli/migration-import-export-dry-run-gate.js / tests/migration-import-export-dry-run-gate-cli.test.js / tests/fixtures/migration-import-export-dry-run-gate-v1.json",
+      "status": "fixture_only_cli_added_not_executed"
+    },
+    "migration_import_export_approval_packet_cli": {
+      "source_type": "fixture_only_cli_contract",
+      "source_ref": "src/cli/migration-import-export-approval-packet.js / tests/migration-import-export-approval-packet-cli.test.js / tests/fixtures/migration-import-export-approval-packet-v1.json",
       "status": "fixture_only_cli_added_not_executed"
     },
     "public_mcp_tools": {

@@ -740,11 +740,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0251 - Post-P27.4 Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `d68e296`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 - Result: board state records that CM-0250 is committed locally and no longer pending guarded commit.
 - Validation: `git diff --check`; docs validation.
+- Commit: `e0f9b07 docs: record p27 cli checkpoint`.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, migration-import-export apply, service start, push, tag, release, or deploy.
+
+## CM-0252 - P27.5 Approval Packet Aggregator Evidence Shape
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: record P27.4 fixture-only approval-packet CLI evidence in the validation aggregator report shape without executing the CLI.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `tests/v1-rc-validation-aggregator-cli.test.js`; `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: aggregator summary/check/evidence/evidence_sources now include P27.4 CLI evidence with `cliExecuted=false`, `executionApproved=false`, `realMemoryScanned=false`, `backupRestorePerformed=false`, `durableReportWritten=false`, and `packageScriptAdded=false`.
+- Validation: syntax check; targeted aggregator tests `9/9`, `6/6`, and `13/13`; P27 CLI test `12/12`; `npm test` `580/580`; `git diff --check` passed; docs validation passed; read-only Verifier `PASS`.
+- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
+- A5 boundary: no P27.4 CLI execution claim, no package script, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, durable write, provider/model call, service startup, config/env/secret edit, public MCP expansion, push, tag, release, or deploy.

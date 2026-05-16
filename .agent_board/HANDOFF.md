@@ -1041,4 +1041,28 @@ HTTP health: no service action for CM-0251.
 
 Remaining risks: no further push is authorized by the current `continue` instruction; P27.5 validation aggregator evidence shape, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: select P27.5 validation aggregator evidence shape as a separate scoped task if still appropriate.
+Commit: `e0f9b07 docs: record p27 cli checkpoint`.
+
+## CM-0252 Commander Handoff - P27.5 Approval Packet Aggregator Evidence Shape
+
+Goal: record P27.4 fixture-only approval-packet CLI evidence in the validation aggregator report shape without executing the CLI.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0252 aggregator evidence shape source/test/docs/board edits.
+
+Current area: `P27.5-approval-packet-aggregator-evidence-shape`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `tests/v1-rc-validation-aggregator-cli.test.js`; `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: syntax check; targeted aggregator tests `9/9`, `6/6`, and `13/13`; P27 CLI test `12/12`; `npm test` `580/580`; `git diff --check` passed; docs validation passed; read-only Verifier `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0252.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: guarded local commit if final status/diff review remains clean, then consider a short P27 closeout review before any new phase.

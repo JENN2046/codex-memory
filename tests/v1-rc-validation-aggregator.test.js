@@ -109,6 +109,7 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.equal(fixture.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
   assert.equal(fixture.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
   assert.equal(fixture.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
+  assert.equal(fixture.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(fixture.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(fixture.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
   assert.equal(fixture.decision, 'NOT_READY_BLOCKED');
@@ -155,6 +156,12 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.summary.migrationImportExportDryRunGateCliImplemented, true);
   assert.equal(fixture.summary.migrationImportExportDryRunGateCliFixtureOnly, true);
   assert.equal(fixture.summary.migrationImportExportDryRunGateCliExecuted, false);
+  assert.equal(fixture.summary.migrationImportExportApprovalPacketCliImplemented, true);
+  assert.equal(fixture.summary.migrationImportExportApprovalPacketCliFixtureOnly, true);
+  assert.equal(fixture.summary.migrationImportExportApprovalPacketCliExecuted, false);
+  assert.equal(fixture.summary.migrationImportExportApprovalPacketExecutionApproved, false);
+  assert.equal(fixture.summary.migrationImportExportApprovalPacketRealMemoryScanned, false);
+  assert.equal(fixture.summary.migrationImportExportApprovalPacketPackageScriptAdded, false);
   assert.equal(fixture.summary.migrationImportExportRealMemoryScanned, false);
   assert.equal(fixture.summary.productionDeployPerformed, false);
   assert.equal(fixture.summary.startupWatchdogInstalled, false);
@@ -191,6 +198,21 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p26MigrationImportExportDryRunGateCli.realMemoryScanned, false);
   assert.equal(fixture.evidence.p26MigrationImportExportDryRunGateCli.importExportApplyPerformed, false);
   assert.equal(fixture.evidence.p26MigrationImportExportDryRunGateCli.packageScriptAdded, false);
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.status, 'fixture_only_cli_added');
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.cli, 'src/cli/migration-import-export-approval-packet.js');
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.test, 'tests/migration-import-export-approval-packet-cli.test.js');
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.fixture, 'tests/fixtures/migration-import-export-approval-packet-v1.json');
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.outputSchema, 'codex-memory.migration-import-export-approval-packet.v1');
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.expectedDecision, 'NOT_READY_BLOCKED');
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.expectedApprovalStatus, 'BLOCKED_PENDING_APPROVAL');
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.fixtureOnly, true);
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.cliExecuted, false);
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.realMemoryScanned, false);
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.executionApproved, false);
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.importExportApplyPerformed, false);
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.backupRestorePerformed, false);
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.durableReportWritten, false);
+  assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.packageScriptAdded, false);
 });
 
 test('check groups classify A4-safe, A5-gated, runtime-required, and conditional live work', () => {
@@ -210,6 +232,9 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   assert.equal(fixture.checks.migrationImportExportDryRunGateCli.status, 'fixture_only_cli_added');
   assert.equal(fixture.checks.migrationImportExportDryRunGateCli.a4Safe, true);
   assert.equal(fixture.checks.migrationImportExportDryRunGateCli.blocksV1Rc, undefined);
+  assert.equal(fixture.checks.migrationImportExportApprovalPacketCli.status, 'fixture_only_cli_added');
+  assert.equal(fixture.checks.migrationImportExportApprovalPacketCli.a4Safe, true);
+  assert.equal(fixture.checks.migrationImportExportApprovalPacketCli.blocksV1Rc, undefined);
   assert.equal(fixture.checks.validationAggregatorExecutable.status, 'planned_not_implemented');
   assert.equal(fixture.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
 
@@ -229,6 +254,7 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   assert.equal(fixture.a4_safe.includes('schemaVersionPolicyFixture'), true);
   assert.equal(fixture.a4_safe.includes('schemaCompatibilityDryRunCli'), true);
   assert.equal(fixture.a4_safe.includes('migrationImportExportDryRunGateCli'), true);
+  assert.equal(fixture.a4_safe.includes('migrationImportExportApprovalPacketCli'), true);
   assert.equal(fixture.a5_gated.includes('providerExecution'), true);
   assert.equal(fixture.runtime_required.includes('validationAggregatorExecutable'), true);
   assert.equal(fixture.conditional_live.includes('health'), true);

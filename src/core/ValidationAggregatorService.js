@@ -52,6 +52,11 @@ const EVIDENCE_SOURCES = {
     source_ref: 'src/cli/migration-import-export-dry-run-gate.js / tests/migration-import-export-dry-run-gate-cli.test.js / tests/fixtures/migration-import-export-dry-run-gate-v1.json',
     status: 'fixture_only_cli_added_not_executed'
   },
+  migration_import_export_approval_packet_cli: {
+    source_type: 'fixture_only_cli_contract',
+    source_ref: 'src/cli/migration-import-export-approval-packet.js / tests/migration-import-export-approval-packet-cli.test.js / tests/fixtures/migration-import-export-approval-packet-v1.json',
+    status: 'fixture_only_cli_added_not_executed'
+  },
   public_mcp_tools: {
     source_type: 'code_contract',
     source_ref: 'src/core/constants.js',
@@ -149,6 +154,12 @@ function buildV1RcValidationAggregatorReport({
       migrationImportExportDryRunGateCliImplemented: true,
       migrationImportExportDryRunGateCliFixtureOnly: true,
       migrationImportExportDryRunGateCliExecuted: false,
+      migrationImportExportApprovalPacketCliImplemented: true,
+      migrationImportExportApprovalPacketCliFixtureOnly: true,
+      migrationImportExportApprovalPacketCliExecuted: false,
+      migrationImportExportApprovalPacketExecutionApproved: false,
+      migrationImportExportApprovalPacketRealMemoryScanned: false,
+      migrationImportExportApprovalPacketPackageScriptAdded: false,
       migrationImportExportRealMemoryScanned: false,
       productionDeployPerformed: false,
       startupWatchdogInstalled: false,
@@ -218,6 +229,13 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true,
         evidence: 'P26.3 direct-node fixture-only CLI exists; P26.4 records report-shape evidence without executing the CLI.'
       }),
+      migrationImportExportApprovalPacketCli: createCheck({
+        status: 'fixture_only_cli_added',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P27.4 direct-node fixture-only CLI exists; P27.5 records report-shape evidence without executing the CLI.'
+      }),
       validationAggregatorExecutable: createCheck({
         status: 'minimal_implemented',
         requiredBeforeV1Rc: true,
@@ -270,6 +288,7 @@ function buildV1RcValidationAggregatorReport({
       'schemaVersionPolicyFixture',
       'schemaCompatibilityDryRunCli',
       'migrationImportExportDryRunGateCli',
+      'migrationImportExportApprovalPacketCli',
       'clientBoundaryDocsReview',
       'migrationImportExportBoundaryDocsReview',
       'rcChecklistAlignmentReview',
@@ -345,6 +364,23 @@ function buildV1RcValidationAggregatorReport({
         cliExecuted: false,
         realMemoryScanned: false,
         importExportApplyPerformed: false,
+        packageScriptAdded: false
+      },
+      p27MigrationImportExportApprovalPacketCli: {
+        status: 'fixture_only_cli_added',
+        cli: 'src/cli/migration-import-export-approval-packet.js',
+        test: 'tests/migration-import-export-approval-packet-cli.test.js',
+        fixture: 'tests/fixtures/migration-import-export-approval-packet-v1.json',
+        outputSchema: 'codex-memory.migration-import-export-approval-packet.v1',
+        expectedDecision: 'NOT_READY_BLOCKED',
+        expectedApprovalStatus: 'BLOCKED_PENDING_APPROVAL',
+        fixtureOnly: true,
+        cliExecuted: false,
+        realMemoryScanned: false,
+        executionApproved: false,
+        importExportApplyPerformed: false,
+        backupRestorePerformed: false,
+        durableReportWritten: false,
         packageScriptAdded: false
       }
     },

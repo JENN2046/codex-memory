@@ -493,6 +493,44 @@ P27.4 remains local and fixture-only. It does not scan real memory, export/impor
 
 P27.4 decision: `P27_APPROVAL_PACKET_FIXTURE_ONLY_CLI_IMPLEMENTED`.
 
+## P27.5 Validation Aggregator Evidence Shape
+
+P27.5 records P27.4 fixture-only CLI evidence in the validation aggregator report shape without executing the CLI.
+
+Updated evidence surfaces:
+
+- `summary.migrationImportExportApprovalPacketCliImplemented=true`
+- `summary.migrationImportExportApprovalPacketCliFixtureOnly=true`
+- `summary.migrationImportExportApprovalPacketCliExecuted=false`
+- `summary.migrationImportExportApprovalPacketExecutionApproved=false`
+- `summary.migrationImportExportApprovalPacketRealMemoryScanned=false`
+- `summary.migrationImportExportApprovalPacketPackageScriptAdded=false`
+- `checks.migrationImportExportApprovalPacketCli`
+- `a4_safe[]` includes `migrationImportExportApprovalPacketCli`
+- `evidence.p27MigrationImportExportApprovalPacketCli`
+- `evidence_sources.migration_import_export_approval_packet_cli`
+
+The report-shape evidence records:
+
+- CLI path: `src/cli/migration-import-export-approval-packet.js`
+- test path: `tests/migration-import-export-approval-packet-cli.test.js`
+- fixture path: `tests/fixtures/migration-import-export-approval-packet-v1.json`
+- output schema: `codex-memory.migration-import-export-approval-packet.v1`
+- expected decision: `NOT_READY_BLOCKED`
+- expected approval status: `BLOCKED_PENDING_APPROVAL`
+- `fixtureOnly=true`
+- `cliExecuted=false`
+- `realMemoryScanned=false`
+- `executionApproved=false`
+- `importExportApplyPerformed=false`
+- `backupRestorePerformed=false`
+- `durableReportWritten=false`
+- `packageScriptAdded=false`
+
+P27.5 does not run the P27.4 CLI from the aggregator, scan real memory, approve execution, create backup/restore artifacts, write durable reports, apply migrations/import/export, add package scripts, call providers, start services, expand public MCP tools, push, tag, release, or deploy.
+
+P27.5 decision: `P27_APPROVAL_PACKET_AGGREGATOR_EVIDENCE_RECORDED`.
+
 ## Next Safe Action
 
-The next safe local action is targeted validation and a read-only Verifier review for P27.4. Do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.
+The next safe local action is a P27 closeout review or a separately scoped follow-up selected from the backlog. Do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.

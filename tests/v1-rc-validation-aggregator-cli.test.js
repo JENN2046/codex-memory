@@ -47,9 +47,16 @@ test('minimal validation aggregator CLI preserves honest blocked decision', () =
   assert.equal(report.summary.migrationImportExportDryRunGateCliImplemented, true);
   assert.equal(report.summary.migrationImportExportDryRunGateCliFixtureOnly, true);
   assert.equal(report.summary.migrationImportExportDryRunGateCliExecuted, false);
+  assert.equal(report.summary.migrationImportExportApprovalPacketCliImplemented, true);
+  assert.equal(report.summary.migrationImportExportApprovalPacketCliFixtureOnly, true);
+  assert.equal(report.summary.migrationImportExportApprovalPacketCliExecuted, false);
+  assert.equal(report.summary.migrationImportExportApprovalPacketExecutionApproved, false);
+  assert.equal(report.summary.migrationImportExportApprovalPacketRealMemoryScanned, false);
+  assert.equal(report.summary.migrationImportExportApprovalPacketPackageScriptAdded, false);
   assert.equal(report.summary.migrationImportExportRealMemoryScanned, false);
   assert.equal(report.summary.migrationImportExportApplyPerformed, false);
   assert.equal(report.summary.migrationImportExportPackageScriptAdded, false);
+  assert.equal(report.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
 });
 
 test('minimal validation aggregator CLI preserves public MCP three-tool freeze', () => {
