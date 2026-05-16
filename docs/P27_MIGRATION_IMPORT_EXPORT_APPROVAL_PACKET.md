@@ -375,6 +375,70 @@ Stop before implementation if the future CLI requires:
 
 P27.2 decision: `P27_APPROVAL_PACKET_CLI_PLANNED_NOT_IMPLEMENTED`.
 
+## P27.3 Fixture-Only CLI Implementation Review
+
+P27.3 reviews whether the future fixture-only CLI described by P27.2 is safe to implement as a later scoped source/test slice.
+
+P27.3 does not implement the CLI.
+
+### Candidate Implementation Scope
+
+Future candidate files remain:
+
+- `src/cli/migration-import-export-approval-packet.js`
+- `tests/migration-import-export-approval-packet-cli.test.js`
+
+Allowed future behavior:
+
+- read only `tests/fixtures/migration-import-export-approval-packet-v1.json`
+- support direct-node invocation only
+- emit JSON with the P27.1 fixture shape
+- reject unsafe flags with fail-closed JSON
+- keep `mutated=false`
+- keep `providerCalls=0`
+- keep `realMemoryScanned=false`
+- keep public MCP tools exactly `record_memory`, `search_memory`, and `memory_overview`
+
+Still disallowed:
+
+- package script wiring
+- alternate source modes beyond fixture
+- real memory preview or scan
+- real memory export or import
+- SQLite migration apply
+- import/export apply
+- backup creation or restore
+- durable report writes
+- provider/model calls
+- service startup
+- config/env/secret edits
+- public MCP expansion
+- push, tag, release, or deploy
+
+### Implementation Preconditions
+
+Before implementation starts, the Commander must create a fresh task contract with:
+
+- exact allowed files
+- rejected flags
+- expected JSON output shape
+- direct-node smoke commands
+- targeted tests
+- `npm test` requirement before guarded local commit
+- read-only Verifier requirement before commit
+
+Recommended future task id:
+
+```text
+P27.4-fixture-only-approval-packet-cli
+```
+
+### P27.3 Decision
+
+Decision: `P27_APPROVAL_PACKET_CLI_IMPLEMENTATION_REVIEW_READY_BLOCKED_FOR_SEPARATE_SOURCE_SLICE`.
+
+The future CLI appears safe as a narrow fixture-only source/test task, but P27.3 itself remains docs/status/board only. Do not implement the CLI in this phase.
+
 ## Next Safe Action
 
-The next safe local action is either a guarded local commit for P27.2 or a separately scoped P27.3 fixture-only CLI implementation plan/review. Do not implement the CLI from this planning text alone, and do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.
+The next safe local action is either a guarded local commit for P27.3 or a separately scoped P27.4 fixture-only CLI source/test task. Do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.

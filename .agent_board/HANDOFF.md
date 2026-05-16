@@ -953,13 +953,13 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty only for CM-0248 board-state reconciliation.
+Worktree: CM-0248 committed locally at `f9657ab`; dirty for CM-0249 docs/status/board-only implementation review edits.
 
 Current area: `P27-board-state-reconciliation`
 
 Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
 
 MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -967,4 +967,30 @@ HTTP health: no service action for CM-0248.
 
 Remaining risks: no further push is authorized by the current `continue` instruction; CLI implementation, tests, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: validate and commit this board-only reconciliation, then select the next safe local P27.3 planning/review slice.
+Commit: `f9657ab docs: record p27 cli plan checkpoint`.
+
+Next safe step: validate and commit CM-0249 docs-only implementation review if final status/diff review remains clean.
+
+## CM-0249 Commander Handoff - P27.3 Approval Packet CLI Implementation Review
+
+Goal: review a future P27.4 fixture-only approval-packet CLI source/test slice without implementing it.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0249 docs/status/board-only implementation review edits.
+
+Current area: `P27.3-approval-packet-cli-implementation-review`
+
+Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check` passed; docs validation passed; P27/P27.3 reference scan passed; read-only Verifier `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0249.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; actual CLI implementation, tests, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: guarded local commit if final diff review remains scoped, then move to P27.4 fixture-only CLI source/test implementation as the next useful local slice.

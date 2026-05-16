@@ -704,11 +704,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0248 - Post-P27.2 Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `f5733e0`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
-- Result so far: board state records that CM-0247 is committed locally and no longer pending guarded commit.
-- Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Result: board state records that CM-0247 is committed locally and no longer pending guarded commit.
+- Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Commit: `f9657ab docs: record p27 cli plan checkpoint`.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
+
+## CM-0249 - P27.3 Approval Packet CLI Implementation Review
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: docs/status/board-only review for a future P27.4 fixture-only approval-packet CLI implementation slice.
+- Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: P27.3 defines candidate implementation scope, allowed future behavior, still-disallowed actions, implementation preconditions, and a future task id without implementing the CLI.
+- Validation: `git diff --check` passed; docs validation passed; P27/P27.3 reference scan passed; read-only Verifier `PASS`.
+- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
