@@ -211,3 +211,5 @@ Separate authorization is still required for:
 `P23.11-final-rc-validation-matrix-execution-scope-review-local-commit`
 
 After that, the next safe execution phase should be an A4.8-only validation subset, not the full final RC validation matrix.
+
+P23.12 A4-safe validation slice execution is recorded in [P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md](/A:/codex-memory/docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md).

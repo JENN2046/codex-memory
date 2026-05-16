@@ -270,3 +270,5 @@ Next recommended phase:
 That phase should validate this docs/status/board-only plan, explicitly stage intended files, and create one local-only commit if authorized. It must not execute the final RC validation matrix, implement validators, modify runtime code, run providers, apply migrations/import-export, mutate durable memory, install watchdog/startup tasks, switch Codex/Claude config, push, tag, release, or deploy.
 
 P23.11 final RC validation matrix execution scope review is tracked in [P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md](/A:/codex-memory/docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md).
+
+P23.12 A4-safe validation slice execution is recorded in [P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md](/A:/codex-memory/docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md).
