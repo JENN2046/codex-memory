@@ -759,5 +759,17 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `tests/v1-rc-validation-aggregator-cli.test.js`; `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
 - Result so far: aggregator summary/check/evidence/evidence_sources now include P27.4 CLI evidence with `cliExecuted=false`, `executionApproved=false`, `realMemoryScanned=false`, `backupRestorePerformed=false`, `durableReportWritten=false`, and `packageScriptAdded=false`.
 - Validation: syntax check; targeted aggregator tests `9/9`, `6/6`, and `13/13`; P27 CLI test `12/12`; `npm test` `580/580`; `git diff --check` passed; docs validation passed; read-only Verifier `PASS`.
-- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
+- Commit: `9631b7e test: surface p27 approval packet evidence`.
 - A5 boundary: no P27.4 CLI execution claim, no package script, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, durable write, provider/model call, service startup, config/env/secret edit, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0253 - P27.x Approval Packet Closeout Review
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: docs/status/board-only closeout review for P27 approval-boundary documentation, fixture, fixture-only CLI, and aggregator evidence.
+- Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET_CLOSEOUT_REVIEW.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: P27 closeout result is `P27_APPROVAL_PACKET_FIXTURE_ONLY_CHAIN_CLOSED`; real migration/import-export approval and readiness remain explicitly blocked.
+- Validation: `git diff --check`; docs validation; P27 closeout reference scan; read-only Verifier `PASS`.
+- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.

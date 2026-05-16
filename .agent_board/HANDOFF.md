@@ -1065,4 +1065,28 @@ HTTP health: no service action for CM-0252.
 
 Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: guarded local commit if final status/diff review remains clean, then consider a short P27 closeout review before any new phase.
+Commit: `9631b7e test: surface p27 approval packet evidence`.
+
+## CM-0253 Commander Handoff - P27.x Approval Packet Closeout Review
+
+Goal: close the P27 fixture-only approval-packet chain and keep real migration/import-export approval blocked.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0253 docs/status/board-only closeout edits.
+
+Current area: `P27.x-approval-packet-closeout-review`
+
+Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET_CLOSEOUT_REVIEW.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation; P27 closeout reference scan; read-only Verifier `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0253.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: guarded local commit if final status/diff review remains clean, then pause before selecting any new phase because P27 is closed and push still requires explicit authorization.
