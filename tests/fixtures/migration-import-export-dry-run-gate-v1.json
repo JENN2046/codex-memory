@@ -1,0 +1,62 @@
+{
+  "schema": "codex-memory.migration-import-export-dry-run-gate.v1",
+  "phase": "P26.1-migration-import-export-dry-run-gate-fixture-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "mutated": false,
+  "providerCalls": 0,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "checks": {
+    "objectModelFixtures": "present",
+    "mappingDryRun": "fixture_only_ready",
+    "migrationReadiness": "blocked_pending_approval",
+    "importExportEnvelope": "fixture_shape_present",
+    "backupRollback": "plan_present_apply_blocked",
+    "scopeLifecycleAudit": "represented",
+    "secretWorkspaceExposure": "not_exposed"
+  },
+  "requiredApprovals": [
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_overwrite",
+    "broad_real_memory_export"
+  ],
+  "safetyFlags": {
+    "realMemoryScan": false,
+    "realMemoryExport": false,
+    "realMemoryImport": false,
+    "migrationApply": false,
+    "importExportApply": false,
+    "backupRestore": false,
+    "durableWrites": false,
+    "providerCalls": false,
+    "publicMcpExpansion": false,
+    "push": false,
+    "tag": false,
+    "release": false,
+    "deploy": false
+  },
+  "evidence": {
+    "objectModelFixtures": [
+      "P13 object model fixture evidence",
+      "P13 round-trip fixture evidence"
+    ],
+    "mappingDryRun": "fixture-only non-mutating dry-run evidence",
+    "migrationReadiness": "blocked until required approvals are explicit",
+    "importExportEnvelope": "fixture shape present",
+    "backupRollback": "plan present; overwrite and restore remain blocked",
+    "scopeLifecycleAudit": "scope, lifecycle, visibility, and audit boundaries represented",
+    "secretWorkspaceExposure": {
+      "rawSecretExposed": false,
+      "rawWorkspaceExposed": false,
+      "workspaceRef": "workspace-sha256:p26-synthetic-fixture"
+    }
+  },
+  "nextStep": "review-dry-run-evidence-before-apply-approval"
+}

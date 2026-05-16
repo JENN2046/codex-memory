@@ -549,7 +549,7 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty with CM-0230 board-only record plus CM-0231 P26 docs/status/board edits.
+Worktree: CM-0231 committed locally at `0e0ce27`; dirty only for CM-0232 board updates while Worker prepares fixture/test files.
 
 Current area: `P26-migration-import-export-dry-run-gate-plan`
 
@@ -562,5 +562,23 @@ MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, an
 HTTP health: already restored before this task; no new service action for P26.
 
 Remaining risks: migration/import-export apply, SQLite migration apply, backup/restore, broad real memory export, provider calls, public MCP expansion, tag/release/deploy, and any further push remain separately gated.
+
+Commit: `0e0ce27 docs: plan p26 migration dry-run gate`.
+
+## CM-0232 Commander Handoff - P26.1 Dry-Run Gate Fixture Contract
+
+Goal: add synthetic fixture/test coverage for the P26 migration/import-export dry-run gate report shape.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty with Commander board updates; Worker owns only new `tests/` fixture/test files.
+
+Current area: `P26.1-migration-import-export-dry-run-gate-fixture-contract`
+
+Allowed Worker files: `tests/fixtures/migration-import-export-dry-run-gate-v1.json`; `tests/migration-import-export-dry-run-gate-fixture.test.js`.
+
+Validation: syntax check passed; targeted fixture test `10/10`; `git diff --check`; docs validation; `npm test` `543/543`; read-only Verifier `PASS`.
 
 Next safe step: guarded local commit if final status/diff review remains clean.

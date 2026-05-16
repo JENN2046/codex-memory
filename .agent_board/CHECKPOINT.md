@@ -490,7 +490,7 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0231 - P26 Migration Import-Export Dry-Run Gate Plan
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: docs/status/board-only P26 dry-run gate planning.
@@ -501,3 +501,16 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation; P26 reference scan; read-only Verifier `PASS`.
 - Commit readiness: `eligible`; required fixes none.
 - A5 boundary: no fixture/test/source/package/runtime change, no real memory scan, no import/export apply, no SQLite migration apply, no backup/restore, no durable write, no provider call, no public MCP expansion, no push/tag/release/deploy.
+- Commit: `0e0ce27 docs: plan p26 migration dry-run gate`.
+
+## CM-0232 - P26.1 Migration Import-Export Dry-Run Gate Fixture Contract
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: synthetic fixture/test contract for the P26 dry-run gate output shape.
+- Worker ownership: `tests/fixtures/migration-import-export-dry-run-gate-v1.json`; `tests/migration-import-export-dry-run-gate-fixture.test.js`.
+- Commander ownership: `.agent_board/*`.
+- Validation: syntax check passed; targeted fixture test `10/10`; `git diff --check`; docs validation; `npm test` `543/543`; read-only Verifier `PASS`.
+- Commit readiness: `eligible`; required fixes none.
+- A5 boundary: no source/package/runtime change, no real memory scan/export/import, no import/export apply, no SQLite migration apply, no backup/restore, no durable write, no provider call, no public MCP expansion, no push/tag/release/deploy.
