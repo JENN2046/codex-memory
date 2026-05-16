@@ -631,11 +631,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0242 - Post-P27 Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `680fbcc`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
-- Result so far: board state records that CM-0241 is committed locally and no longer pending guarded commit.
-- Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Result: board state records that CM-0241 is committed locally and no longer pending guarded commit.
+- Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Commit: `6c356eb docs: record p27 approval checkpoint`.
+- Push: authorized push succeeded `cfe7c20..6c356eb main -> main`.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, tag, release, or deploy.
+
+## CM-0243 - Authorized Push Result Record
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only record after authorized push to `origin/main`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result so far: push succeeded `cfe7c20..6c356eb`; local `HEAD` and `origin/main` both point to `6c356eb5faa9c80ee7a9ee74e51f477ec78fd6a8`; ahead count is `0`.
+- Validation: pending `git diff --check`; docs validation.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.

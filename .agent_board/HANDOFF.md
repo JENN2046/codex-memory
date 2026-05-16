@@ -795,13 +795,13 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty only for CM-0242 board-state reconciliation.
+Worktree: CM-0242 committed and pushed at `6c356eb`; dirty only for CM-0243 board-state push result record.
 
 Current area: `P27-board-state-reconciliation`
 
 Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks; authorized push succeeded `cfe7c20..6c356eb`.
 
 MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -809,4 +809,32 @@ HTTP health: no new service action for CM-0242.
 
 Remaining risks: real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: commit this board-only reconciliation if validation passes, then select the next safe local task.
+Commit: `6c356eb docs: record p27 approval checkpoint`.
+
+Next safe step: validate and commit CM-0243 board-only push result record if final status/diff review remains clean.
+
+## CM-0243 Commander Handoff - Authorized Push Result Record
+
+Goal: record the authorized push through `6c356eb` and local/remote Git alignment.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for CM-0243 board-state push result record.
+
+Current area: `P0-mainline-health`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: pending `git diff --check`; docs validation.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0243.
+
+Push: authorized push succeeded `cfe7c20..6c356eb main -> main`; `HEAD` and `origin/main` both point to `6c356eb5faa9c80ee7a9ee74e51f477ec78fd6a8`.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: commit this board-only push result record if validation passes, then select the next safe local P27 review or fixture-only shape task.
