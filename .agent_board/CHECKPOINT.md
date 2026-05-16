@@ -401,3 +401,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation.
 - A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
 - Next safe action: select the next safe local P25 task through Council review.
+
+## CM-0224 - P25 Board-State Finalization
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only stable wording after CM-0223 reconciliation.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: `RUN_STATE.md` no longer depends on a specific just-created HEAD hash for clean-state wording.
+- Validation: `git diff --check`; docs validation.
+- A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
+- Next safe action: select the next safe local P25 task through Council review.

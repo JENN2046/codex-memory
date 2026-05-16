@@ -382,3 +382,21 @@ MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, an
 Remaining risks: future CLI remains unimplemented; runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
 
 Next safe step: commit this board-only reconciliation if validation passes, then select the next safe local P25 task through Council review.
+
+## CM-0224 Commander Handoff - P25 Board-State Finalization
+
+Goal: avoid hash-sensitive stale wording in `.agent_board/RUN_STATE.md` after board-only commits.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for this board-state finalization until committed.
+
+Current area: `P25-board-state-finalization`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation.
+
+Next safe step: commit this board-only finalization if validation passes, then select the next safe local P25 task through Council review.
