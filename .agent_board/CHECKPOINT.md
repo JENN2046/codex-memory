@@ -389,3 +389,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation; local closeout/P25.6 reference search; read-only Verifier first pass `NEEDS_FIX` on stale board wording only, corrected; Verifier rerun `PASS`.
 - A5 boundary for this batch: no CLI implementation, package script, source/test/runtime/config/provider/data/public MCP expansion, durable write, real memory scan, migration/import-export apply, service start, push, tag, release, or deploy.
 - Next safe action: guarded local commit if final status/diff review remains clean.
+
+## CM-0223 - Post-P25.x Closeout Board-State Reconciliation
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `520e5d6`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board state now records that P25.x closeout is committed locally and no longer pending guarded commit.
+- Validation: `git diff --check`; docs validation.
+- A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
+- Next safe action: select the next safe local P25 task through Council review.
