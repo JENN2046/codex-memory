@@ -57,9 +57,19 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.validationAggregatorImplemented, true);
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.schemaCompatibilityDryRunCliImplemented, true);
+  assert.equal(report.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
+  assert.equal(report.summary.schemaCompatibilityDryRunCliExecuted, false);
+  assert.equal(report.summary.schemaCompatibilityRuntimeEnforcementImplemented, false);
   assert.equal(report.evidence.p25SchemaVersionPolicy.status, 'fixture_contract_added');
   assert.equal(report.evidence.p25SchemaVersionPolicy.fixture, 'tests/fixtures/schema-version-policy-v1.json');
   assert.equal(report.evidence.p25SchemaVersionPolicy.runtimeEnforcementImplemented, false);
+  assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
+  assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.cli, 'src/cli/schema-compatibility-dry-run.js');
+  assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.cliExecuted, false);
+  assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.realMemoryScanned, false);
+  assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.runtimeEnforcementImplemented, false);
+  assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.packageScriptAdded, false);
 });
 
 test('minimal implementation preserves public MCP three-tool freeze', () => {
@@ -81,6 +91,7 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.match(report.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
   assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
   assert.equal(report.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
+  assert.equal(report.evidence_sources.schema_compatibility_dry_run_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
@@ -98,11 +109,15 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
   assert.equal(report.checks.schemaVersionPolicyFixture.status, 'fixture_contract_added');
   assert.equal(report.checks.schemaVersionPolicyFixture.a4Safe, true);
+  assert.equal(report.checks.schemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
+  assert.equal(report.checks.schemaCompatibilityDryRunCli.a4Safe, true);
+  assert.equal(report.checks.schemaCompatibilityDryRunCli.blocksV1Rc, undefined);
   assert.equal(report.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
   assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), true);
   assert.equal(report.a5_gated.includes('providerExecution'), true);
   assert.equal(report.a4_safe.includes('gitHygiene'), true);
   assert.equal(report.a4_safe.includes('schemaVersionPolicyFixture'), true);
+  assert.equal(report.a4_safe.includes('schemaCompatibilityDryRunCli'), true);
   assert.equal(report.conditional_live.includes('health'), true);
 
   for (const key of [

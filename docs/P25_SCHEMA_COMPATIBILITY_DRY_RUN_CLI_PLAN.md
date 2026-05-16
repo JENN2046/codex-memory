@@ -348,3 +348,30 @@ node .\src\cli\schema-compatibility-dry-run.js --json
 It loads only the committed synthetic fixture by default, keeps `source.mode=fixture`, preserves `runtimeEnforcementImplemented=false`, emits `DRY_RUN_BLOCKED` for the normal fixture-backed report, exits non-zero for `--strict` blocked reports, and returns `DRY_RUN_INVALID_INPUT` with `safety.mutated=false` for unsafe flags such as `--apply`, `--real-memory`, `--provider`, and `--push`.
 
 P25.6 still does not add a package script, scan real memory, implement runtime schema/version enforcement, run migration/import-export apply, write durable state, start services, call providers, expand public MCP tools/schema, push, tag, release, or deploy.
+
+## 16. P25.7 Validation Aggregator Evidence Shape
+
+P25.7 records the P25.6 fixture-only CLI as validation aggregator report-shape evidence.
+
+Affected report surfaces:
+
+- `src/core/ValidationAggregatorService.js`
+- `tests/fixtures/v1-rc-validation-aggregator-v1.json`
+- `tests/v1-rc-validation-aggregator.test.js`
+- `tests/v1-rc-validation-aggregator-implementation.test.js`
+
+The aggregator records:
+
+- `summary.schemaCompatibilityDryRunCliImplemented=true`
+- `summary.schemaCompatibilityDryRunCliFixtureOnly=true`
+- `summary.schemaCompatibilityDryRunCliExecuted=false`
+- `summary.schemaCompatibilityRuntimeEnforcementImplemented=false`
+- `evidence.p25SchemaCompatibilityDryRunCli.fixtureOnly=true`
+- `evidence.p25SchemaCompatibilityDryRunCli.cliExecuted=false`
+- `evidence.p25SchemaCompatibilityDryRunCli.realMemoryScanned=false`
+- `evidence.p25SchemaCompatibilityDryRunCli.runtimeEnforcementImplemented=false`
+- `evidence.p25SchemaCompatibilityDryRunCli.packageScriptAdded=false`
+
+P25.7 deliberately does not execute `src/cli/schema-compatibility-dry-run.js`. It only records the fixture-only CLI contract as A4-safe report evidence.
+
+P25.7 still does not add a package script, scan real memory, implement runtime schema/version enforcement, run migration/import-export apply, write durable state, start services, call providers, expand public MCP tools/schema, push, tag, release, or deploy.

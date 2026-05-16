@@ -462,3 +462,41 @@ Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agen
 Validation: `git diff --check`; docs validation.
 
 Next safe step: commit this board-only stable handoff if validation passes, then select the next safe local task through Council review.
+
+## CM-0228 Commander Handoff - P25.7 Aggregator Dry-Run CLI Evidence Shape
+
+Goal: record P25.6 fixture-only schema compatibility dry-run CLI evidence in the validation aggregator report shape without executing the CLI.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty with scoped P25.7 source/test/docs/board edits pending validation.
+
+Current area: `P25.7-validation-aggregator-schema-compatibility-dry-run-cli-evidence-shape`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; P25/status docs; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation so far: syntax checks for changed JS/test files; aggregator fixture test `9/9`; aggregator implementation test `6/6`; aggregator CLI report test `13/13`; `git diff --check`; docs validation; `npm test` `533/533`.
+
+Not yet validated: final diff review.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: not checked and no service was started for this batch.
+
+Compare: not run for this report-shape-only batch.
+
+Rollback: not run for this report-shape-only batch.
+
+Profile gate: not run.
+
+Audit impact: none expected; no durable memory mutation.
+
+Recall impact: none expected; validation aggregator report shape only.
+
+Remaining risks: runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain gated; full v1.0 RC remains blocked; `push` remains deferred to the final explicit step.
+
+Verifier: `PASS`; commit readiness `eligible`; required fixes none.
+
+Next safe step: guarded local commit if final status/diff review remains clean.

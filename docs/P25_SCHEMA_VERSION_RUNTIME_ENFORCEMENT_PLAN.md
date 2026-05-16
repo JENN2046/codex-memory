@@ -176,6 +176,8 @@ P25.5 schema compatibility dry-run fixture contract is implemented in `tests/fix
 
 P25.x closeout review is captured in [P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md](./P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md). It closes P25 as planning and fixture-backed evidence, not as runtime-enforced behavior, and defines the go/no-go contract for a future direct-node fixture-only CLI.
 
+P25.7 validation aggregator evidence shape is captured in `src/core/ValidationAggregatorService.js` and `tests/fixtures/v1-rc-validation-aggregator-v1.json`. It records the P25.6 fixture-only CLI as A4-safe report evidence with `cliExecuted=false`, `realMemoryScanned=false`, `runtimeEnforcementImplemented=false`, and `packageScriptAdded=false`. P25.7 does not execute the CLI, add a package script, scan real memory, implement runtime enforcement, run migration/import-export apply, write durable state, start services, call providers, push, tag, release, or deploy.
+
 ## 10. Validation For This Planning Phase
 
 Docs-only validation:

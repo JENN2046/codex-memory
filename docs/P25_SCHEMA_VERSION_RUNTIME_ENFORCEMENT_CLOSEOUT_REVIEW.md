@@ -160,3 +160,11 @@ The next phase may implement a direct-node fixture-only CLI skeleton if it uses 
 P25.6 implements the direct-node fixture-only CLI skeleton in `src/cli/schema-compatibility-dry-run.js` with targeted coverage in `tests/schema-compatibility-dry-run-cli.test.js`.
 
 The implementation stays inside this closeout contract: direct-node only, fixture-only by default, no package script, no real memory scan, no runtime enforcement, no migration/import-export apply, no durable write, no service start, no provider call, no public MCP expansion, no push, no tag, no release, and no deploy.
+
+## P25.7 Result
+
+P25.7 records the P25.6 CLI as validation aggregator report-shape evidence without executing the CLI.
+
+The aggregator now reports `schemaCompatibilityDryRunCliFixtureOnly=true`, `schemaCompatibilityDryRunCliExecuted=false`, `realMemoryScanned=false`, `runtimeEnforcementImplemented=false`, and `packageScriptAdded=false`.
+
+The closeout conclusion is unchanged: P25 remains planning, fixture, and report-shape evidence only. Runtime schema/version enforcement, real memory scans, migration/import-export apply, durable writes, service startup, provider calls, public MCP expansion, push, tag, release, and deploy remain outside this batch.

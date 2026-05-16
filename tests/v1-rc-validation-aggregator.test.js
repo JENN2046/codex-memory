@@ -147,6 +147,10 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.summary.liveMcpHttpEvidenceRefreshed, false);
   assert.equal(fixture.summary.validationAggregatorImplemented, false);
   assert.equal(fixture.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(fixture.summary.schemaCompatibilityDryRunCliImplemented, true);
+  assert.equal(fixture.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
+  assert.equal(fixture.summary.schemaCompatibilityDryRunCliExecuted, false);
+  assert.equal(fixture.summary.schemaCompatibilityRuntimeEnforcementImplemented, false);
   assert.equal(fixture.summary.productionDeployPerformed, false);
   assert.equal(fixture.summary.startupWatchdogInstalled, false);
   assert.equal(fixture.summary.codexClaudeConfigSwitched, false);
@@ -163,6 +167,13 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p25SchemaVersionPolicy.status, 'fixture_contract_added');
   assert.equal(fixture.evidence.p25SchemaVersionPolicy.fixture, 'tests/fixtures/schema-version-policy-v1.json');
   assert.equal(fixture.evidence.p25SchemaVersionPolicy.runtimeEnforcementImplemented, false);
+  assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
+  assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.cli, 'src/cli/schema-compatibility-dry-run.js');
+  assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.fixtureOnly, true);
+  assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.cliExecuted, false);
+  assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.realMemoryScanned, false);
+  assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.runtimeEnforcementImplemented, false);
+  assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.packageScriptAdded, false);
 });
 
 test('check groups classify A4-safe, A5-gated, runtime-required, and conditional live work', () => {
@@ -176,6 +187,9 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   assert.equal(fixture.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
   assert.equal(fixture.checks.schemaVersionPolicyFixture.status, 'fixture_contract_added');
   assert.equal(fixture.checks.schemaVersionPolicyFixture.a4Safe, true);
+  assert.equal(fixture.checks.schemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
+  assert.equal(fixture.checks.schemaCompatibilityDryRunCli.a4Safe, true);
+  assert.equal(fixture.checks.schemaCompatibilityDryRunCli.blocksV1Rc, undefined);
   assert.equal(fixture.checks.validationAggregatorExecutable.status, 'planned_not_implemented');
   assert.equal(fixture.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
 
@@ -193,6 +207,7 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
 
   assert.equal(fixture.a4_safe.includes('gitHygiene'), true);
   assert.equal(fixture.a4_safe.includes('schemaVersionPolicyFixture'), true);
+  assert.equal(fixture.a4_safe.includes('schemaCompatibilityDryRunCli'), true);
   assert.equal(fixture.a5_gated.includes('providerExecution'), true);
   assert.equal(fixture.runtime_required.includes('validationAggregatorExecutable'), true);
   assert.equal(fixture.conditional_live.includes('health'), true);

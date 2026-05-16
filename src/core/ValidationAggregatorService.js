@@ -42,6 +42,11 @@ const EVIDENCE_SOURCES = {
     source_ref: 'tests/fixtures/schema-version-policy-v1.json',
     status: 'fixture_contract_added'
   },
+  schema_compatibility_dry_run_cli: {
+    source_type: 'fixture_only_cli_contract',
+    source_ref: 'src/cli/schema-compatibility-dry-run.js / tests/schema-compatibility-dry-run-cli.test.js / tests/fixtures/schema-compatibility-dry-run-v1.json',
+    status: 'fixture_only_cli_added_not_executed'
+  },
   public_mcp_tools: {
     source_type: 'code_contract',
     source_ref: 'src/core/constants.js',
@@ -132,6 +137,10 @@ function buildV1RcValidationAggregatorReport({
       validationAggregatorImplemented: true,
       validationAggregatorFullImplementation: false,
       schemaVersionRuntimeEnforcementImplemented: false,
+      schemaCompatibilityDryRunCliImplemented: true,
+      schemaCompatibilityDryRunCliFixtureOnly: true,
+      schemaCompatibilityDryRunCliExecuted: false,
+      schemaCompatibilityRuntimeEnforcementImplemented: false,
       productionDeployPerformed: false,
       startupWatchdogInstalled: false,
       codexClaudeConfigSwitched: false,
@@ -185,6 +194,13 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true,
         evidence: 'P25.2 schema-version policy fixture covers accepted, missing, and unknown version behavior.'
       }),
+      schemaCompatibilityDryRunCli: createCheck({
+        status: 'fixture_only_cli_added',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P25.6 direct-node fixture-only CLI exists; P25.7 records report-shape evidence without executing the CLI.'
+      }),
       validationAggregatorExecutable: createCheck({
         status: 'minimal_implemented',
         requiredBeforeV1Rc: true,
@@ -235,6 +251,7 @@ function buildV1RcValidationAggregatorReport({
       'docsStatusBoardConsistency',
       'schemaVersionDocsReview',
       'schemaVersionPolicyFixture',
+      'schemaCompatibilityDryRunCli',
       'clientBoundaryDocsReview',
       'migrationImportExportBoundaryDocsReview',
       'rcChecklistAlignmentReview',
@@ -285,6 +302,19 @@ function buildV1RcValidationAggregatorReport({
         fixture: 'tests/fixtures/schema-version-policy-v1.json',
         test: 'tests/schema-version-policy-fixture.test.js',
         runtimeEnforcementImplemented: false
+      },
+      p25SchemaCompatibilityDryRunCli: {
+        status: 'fixture_only_cli_added',
+        cli: 'src/cli/schema-compatibility-dry-run.js',
+        test: 'tests/schema-compatibility-dry-run-cli.test.js',
+        fixture: 'tests/fixtures/schema-compatibility-dry-run-v1.json',
+        outputSchema: 'codex-memory.schema-compatibility-dry-run.v1',
+        expectedDecision: 'DRY_RUN_BLOCKED',
+        fixtureOnly: true,
+        cliExecuted: false,
+        realMemoryScanned: false,
+        runtimeEnforcementImplemented: false,
+        packageScriptAdded: false
       }
     },
     evidence_sources: EVIDENCE_SOURCES,

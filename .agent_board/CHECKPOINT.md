@@ -449,3 +449,16 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation.
 - A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
 - Next safe action: select the next safe local task through Council review.
+
+## CM-0228 - P25.7 Validation Aggregator Schema Compatibility Dry-Run CLI Evidence Shape
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: record the P25.6 fixture-only schema compatibility dry-run CLI as validation aggregator report-shape evidence without executing the CLI.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; P25/status docs; `.agent_board/*`.
+- Result so far: aggregator summary/check/evidence/evidence_sources now include `schemaCompatibilityDryRunCli` and `p25SchemaCompatibilityDryRunCli`, with `fixtureOnly=true`, `cliExecuted=false`, `realMemoryScanned=false`, `runtimeEnforcementImplemented=false`, and `packageScriptAdded=false`.
+- Validation so far: syntax checks for changed JS/test files; `node --test tests\v1-rc-validation-aggregator.test.js` `9/9`; `node --test tests\v1-rc-validation-aggregator-implementation.test.js` `6/6`; `node --test tests\v1-rc-validation-aggregator-cli.test.js` `13/13`; `git diff --check`; docs validation; `npm test` `533/533`.
+- Read-only Verifier: `PASS`; commit readiness `eligible`; required fixes none.
+- Still pending: guarded local commit decision.
+- A5 boundary for this batch: no P25.6 CLI execution, package script, runtime schema/version enforcement, public MCP expansion, real memory scan, migration/import-export apply, durable write, service start, provider call, push, tag, release, or deploy.
