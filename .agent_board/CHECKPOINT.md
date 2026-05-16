@@ -281,3 +281,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation.
 - Next safe action: choose a fresh local P24 report-shape planning slice or P25 schema/version runtime enforcement planning slice.
 - A5 boundary: no source/test/runtime/package/config/provider/data change, no durable write, no MCP expansion, no push, tag, release, or deploy.
+
+## CM-0214 - P25 Schema/Version Runtime Enforcement Planning
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: add P25 schema/version runtime enforcement planning and update status/navigation/board references.
+- Changed files: `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `README.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- User authorization: A5 mode is allowed today, except `push` is deferred to the final step.
+- Result: P25 now has a planning entry that defines enforcement surfaces, compatibility policy, future test plan, dry-run boundary, A5 hard stops, and proposed P25.1-P25.x phase split.
+- Validation: `git diff --check`; `scripts/validate-local.ps1 -Area docs`; P25 local link/reference check.
+- A5 boundary for this batch: authorization recorded, but no A5 action executed; no runtime enforcement, public MCP schema/tool change, package/config change, service start, provider call, migration/import-export apply, durable write, tag, release, deploy, or push.
