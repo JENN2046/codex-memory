@@ -227,6 +227,36 @@ Decision: `P27_APPROVAL_PACKET_DEFINED_EXECUTION_BLOCKED`.
 
 P27 defines the future approval packet boundary. It does not authorize non-fixture migration/import-export work.
 
+## P27.1 Fixture Shape Result
+
+P27.1 adds a synthetic fixture/test contract:
+
+- fixture: `tests/fixtures/migration-import-export-approval-packet-v1.json`
+- test: `tests/migration-import-export-approval-packet-fixture.test.js`
+
+The fixture locks:
+
+- schema `codex-memory.migration-import-export-approval-packet.v1`
+- phase `P27.1-migration-import-export-approval-packet-fixture-shape`
+- `fixtureOnly=true`
+- `mode=fixture-only`
+- `status=blocked`
+- `decision=NOT_READY_BLOCKED`
+- `approvalStatus=BLOCKED_PENDING_APPROVAL`
+- `executionApproved=false`
+- `mutated=false`
+- `providerCalls=0`
+- `realMemoryScanned=false`
+- public MCP tools exactly `record_memory`, `search_memory`, and `memory_overview`
+- approval packet sections for real-memory preview, export, import, SQLite migration apply, import/export apply, backup creation, restore overwrite, durable report write, package script wiring, public MCP expansion, provider/model call, service startup, and remote release action
+- required approvals for every P27 hard-stop action family
+- no-side-effect safety flags for real memory, apply, backup/restore, durable writes, provider calls, service startup, package/config/public MCP changes, push, tag, release, and deploy
+- required wording and forbidden claims so future docs do not overclaim readiness
+
+P27.1 remains fixture/test only. It does not scan real memory, export/import real memory, run SQLite migration apply, run import/export apply, create or restore backups, write durable state, call providers, expand public MCP tools, start services, change config/env/secrets, push, tag, release, or deploy.
+
+P27.1 decision: `P27_APPROVAL_PACKET_FIXTURE_SHAPE_LOCKED`.
+
 ## Next Safe Action
 
-The next safe local action is a docs-only review or fixture-only approval-packet shape test, if separately scoped. Do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.
+The next safe local action is a docs-only review or a direct-node fixture-only approval-packet CLI plan, if separately scoped. Do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.

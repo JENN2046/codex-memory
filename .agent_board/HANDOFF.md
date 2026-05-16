@@ -821,13 +821,13 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty only for CM-0243 board-state push result record.
+Worktree: CM-0243 committed locally at `b679a3a`; dirty for CM-0244 fixture/test/docs/board edits.
 
 Current area: `P0-mainline-health`
 
 Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation: pending `git diff --check`; docs validation.
+Validation: `git diff --check`; docs validation.
 
 MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -837,4 +837,30 @@ Push: authorized push succeeded `cfe7c20..6c356eb main -> main`; `HEAD` and `ori
 
 Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: commit this board-only push result record if validation passes, then select the next safe local P27 review or fixture-only shape task.
+Commit: `b679a3a docs: record authorized push checkpoint`.
+
+Next safe step: validate CM-0244 fixture/test/docs/board edits.
+
+## CM-0244 Commander Handoff - P27.1 Approval Packet Fixture Shape
+
+Goal: add a synthetic fixture/test contract for the P27 approval packet shape without executing non-fixture migration/import-export work.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0244 fixture/test/docs/board edits.
+
+Current area: `P27.1-migration-import-export-approval-packet-fixture-shape`
+
+Changed files: `tests/fixtures/migration-import-export-approval-packet-v1.json`; `tests/migration-import-export-approval-packet-fixture.test.js`; `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+
+Validation: `node --check tests\migration-import-export-approval-packet-fixture.test.js` passed; targeted fixture test `13/13`; combined fixture tests `32/32`; `npm test` `568/568`; `git diff --check` passed; docs validation passed; read-only Verifier `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0244.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: guarded local commit only if final diff review remains scoped, then record a board-only checkpoint if needed.

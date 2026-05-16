@@ -1,0 +1,238 @@
+{
+  "schema": "codex-memory.migration-import-export-approval-packet.v1",
+  "phase": "P27.1-migration-import-export-approval-packet-fixture-shape",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "mode": "fixture-only",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "approvalStatus": "BLOCKED_PENDING_APPROVAL",
+  "executionApproved": false,
+  "mutated": false,
+  "providerCalls": 0,
+  "realMemoryScanned": false,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "requiredApprovals": [
+    "real_memory_preview_or_scan",
+    "real_memory_export",
+    "real_memory_import",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_creation",
+    "restore_overwrite_live_state",
+    "durable_report_write",
+    "package_script_wiring",
+    "public_mcp_expansion",
+    "provider_model_call",
+    "service_startup",
+    "config_mutation",
+    "push_tag_release_deploy"
+  ],
+  "packets": {
+    "realMemoryPreview": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "readSurfaces",
+        "readScope",
+        "redactionRules",
+        "outputPath",
+        "validation",
+        "stopConditions"
+      ]
+    },
+    "export": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "exportEnvelopeVersion",
+        "sourceSchemaVersion",
+        "scopeSummary",
+        "redactionPolicy",
+        "manifest",
+        "checksum",
+        "destination",
+        "retention",
+        "rollbackOrDeletionPath"
+      ]
+    },
+    "import": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "sourceProvenance",
+        "sourceEnvelopeVersion",
+        "targetSchemaVersion",
+        "scopeMapping",
+        "conflictRules",
+        "checksumVerification",
+        "dryRunReport",
+        "backupRequirement",
+        "rollbackPlan"
+      ]
+    },
+    "sqliteMigrationApply": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "targetDbPath",
+        "migrationSql",
+        "backup",
+        "rollback",
+        "postApplyValidation"
+      ]
+    },
+    "importExportApply": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "manifest",
+        "checksums",
+        "dryRunEvidence",
+        "backup",
+        "rollback",
+        "auditPlan"
+      ]
+    },
+    "backupCreation": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "exactFiles",
+        "outputDirectory",
+        "manifest",
+        "checksumPolicy",
+        "metadataRedaction",
+        "retention"
+      ]
+    },
+    "restoreOverwrite": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "restoreTargets",
+        "serviceIsolation",
+        "backupManifestVerification",
+        "overwriteConfirmation",
+        "postRestoreHealth",
+        "failureEvidenceRetention"
+      ]
+    },
+    "durableReportWrite": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "reportPath",
+        "contentPolicy",
+        "secretRedaction",
+        "workspaceRedaction"
+      ]
+    },
+    "packageScriptWiring": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "scriptName",
+        "command",
+        "safetyContract",
+        "tests"
+      ]
+    },
+    "publicMcpExpansion": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "toolSchemaProposal",
+        "compatibilityReview",
+        "strictGate"
+      ]
+    },
+    "providerModelCall": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "provider",
+        "purpose",
+        "secretHandling",
+        "costRateExpectations"
+      ]
+    },
+    "serviceStartup": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "command",
+        "port",
+        "healthCheck",
+        "shutdownCleanup"
+      ]
+    },
+    "remoteReleaseAction": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "remoteAction",
+        "targetRef",
+        "rollbackCleanupPath"
+      ]
+    }
+  },
+  "approvalPackets": {
+    "realMemoryPreview": "packets.realMemoryPreview",
+    "export": "packets.export",
+    "import": "packets.import",
+    "backupRestore": [
+      "packets.backupCreation",
+      "packets.restoreOverwrite"
+    ],
+    "rollbackPartialFailure": "packet defined by rollback and partial failure requirements in P27 docs"
+  },
+  "safetyFlags": {
+    "realMemoryPreview": false,
+    "realMemoryScan": false,
+    "realMemoryExport": false,
+    "realMemoryImport": false,
+    "sqliteMigrationApply": false,
+    "importExportApply": false,
+    "backupCreated": false,
+    "restorePerformed": false,
+    "restoreOverwrite": false,
+    "durableWrites": false,
+    "providerCalls": false,
+    "serviceStarted": false,
+    "packageChanged": false,
+    "configChanged": false,
+    "publicMcpExpanded": false,
+    "push": false,
+    "pushed": false,
+    "tag": false,
+    "release": false,
+    "deploy": false,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false
+  },
+  "requiredWording": [
+    "P27 is an approval packet, not an execution phase.",
+    "P26 evidence is fixture-only and does not prove real durable-memory readiness.",
+    "Apply, backup/restore, real-memory preview, provider calls, and service/runtime actions remain blocked pending explicit approval.",
+    "Expected decision remains NOT_READY_BLOCKED / BLOCKED_PENDING_APPROVAL until approved non-fixture evidence exists."
+  ],
+  "forbiddenClaims": [
+    "real migration/import-export readiness is validated",
+    "backup/restore is verified",
+    "real memory preview is complete",
+    "the project is ready for apply",
+    "v1.0 RC readiness is unblocked",
+    "provider validation passed"
+  ],
+  "evidenceSources": [
+    "docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md",
+    "docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_CLOSEOUT_REVIEW.md",
+    "docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md"
+  ],
+  "nextStep": "review-approval-packet-before-any-non-fixture-action"
+}
