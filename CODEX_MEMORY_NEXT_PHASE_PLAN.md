@@ -551,4 +551,6 @@ npm run gate:mainline
 - P23.8 result: final v1.0 RC readiness review is documented with decision `READY_FOR_DOCS_ONLY_RC_REVIEW`; full v1.0 RC remains blocked by validation, runtime/schema, A5, and release/deploy gates.
 - P23.9 result: v1.0 blocker burn-down plan is documented; blockers are classified by A4.8/A5, runtime implementation, validation evidence, and RC/release impact.
 - P23.10 result: final RC validation matrix execution plan is documented; matrix execution is planned but not run, and no validator/runtime/provider/migration/config/release action occurred.
-- Next recommended phase: `P23.10-final-rc-validation-matrix-execution-plan-local-commit`.
+- Final RC validation matrix execution scope review: [docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md](/A:/codex-memory/docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md)
+- P23.11 result: final RC validation matrix execution scope review is documented; validation items are classified as A4.8-safe, A5-gated, runtime-implementation-required, or blocked. Matrix execution is scoped but not run, and no service/runtime/provider/migration/config/release action occurred.
+- Next recommended phase: `P23.11-final-rc-validation-matrix-execution-scope-review-local-commit`.

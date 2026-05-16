@@ -324,6 +324,7 @@ Suggested P23 sequence:
 - `P23.5-client-integration-readiness-plan`
 - `P23.6-migration-import-export-readiness-plan`
 - `P23.7-v1.0-release-candidate-checklist`
+- `P23.11-final-rc-validation-matrix-execution-scope-review`
 
 Each phase should remain evidence-first and scoped. Runtime changes, config switches, migration apply, provider execution, production deploy, tag, release, and durable mutation expansion remain blocked unless explicitly authorized.
 
@@ -344,5 +345,7 @@ P23.7 v1.0 release-candidate checklist is tracked in [P23_7_V1_0_RELEASE_CANDIDA
 P23.8 final v1.0 RC readiness review is tracked in [P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md](/A:/codex-memory/docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md).
 
 P23.9 blocker burn-down planning is tracked in [P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md](/A:/codex-memory/docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md).
+
+P23.11 final RC validation matrix execution scope review is tracked in [P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md](/A:/codex-memory/docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md).
 
 P23.10 final RC validation matrix execution planning is tracked in [P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md](/A:/codex-memory/docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md).

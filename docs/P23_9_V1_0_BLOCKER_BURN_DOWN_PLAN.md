@@ -189,3 +189,5 @@ Next recommended phase:
 That phase should validate this docs/status/board-only burn-down plan, explicitly stage only the intended files, and create one local-only commit if authorized. It must not push, tag, release, deploy, modify runtime code, modify tests, modify package files, modify `.env`, modify runtime config, switch Codex/Claude config, implement validator aggregators, implement schema/version runtime enforcement, install watchdog/startup tasks, run providers, run SQLite migration apply, run import/export apply, perform durable memory writes, alter public MCP tools, or execute destructive rollback.
 
 P23.10 final RC validation matrix execution planning is tracked in [P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md](/A:/codex-memory/docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md).
+
+P23.11 final RC validation matrix execution scope review is tracked in [P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md](/A:/codex-memory/docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md).

@@ -362,3 +362,5 @@ P23.6 migration/import-export readiness planning is tracked in [P23_6_MIGRATION_
 P23.7 v1.0 release-candidate checklist is tracked in [P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md](/A:/codex-memory/docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md). It consolidates RC gate readiness and remaining blockers without creating a tag, release, deploy, or push.
 
 P23.10 final RC validation matrix execution planning is tracked in [P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md](/A:/codex-memory/docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md). It plans final matrix execution without executing the matrix or implementing validators.
+
+P23.11 final RC validation matrix execution scope review is tracked in [P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md](/A:/codex-memory/docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md). It classifies matrix items by A4.8-safe, A5-gated, runtime-implementation-required, and blocked execution boundaries.

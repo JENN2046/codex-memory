@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Create P23.10 final RC validation matrix execution plan after the P23.9 blocker burn-down plan local commit.
+Create P23.11 final RC validation matrix execution scope review after the P23.10 final RC validation matrix execution plan local commit.
 
 ## Current Area
 
-P23.10 final RC validation matrix execution plan
+P23.11 final RC validation matrix execution scope review
 
 ## Current Status
 
@@ -25,7 +25,7 @@ P23.10 final RC validation matrix execution plan
 - P23.1 inventories current public tools, tool purposes, documentation-level input/output shapes, compatibility expectations, drift risks, post-v1.0 candidates, A5-gated changes, and validation expectations.
 - P23.2 defines current schema baseline, versioning goals, version identifier strategy, compatibility policy, migration/import-export boundary, rollback requirements, validation requirements, drift risks, and A5-gated schema actions.
 - P23.3 defines the v1.0 validation matrix across docs/status/board, MCP/HTTP, schema/versioning, security, migration/import-export dry-run, rollback, client boundary, local deploy, production deploy, startup/watchdog, and tag/release gates.
-- P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 is locally committed in `82fb28c`; P23.8 is locally committed in `d5f70b7`; P23.9 is locally committed in `0aa02fa`; local main is ahead of origin/main by 8 with `b3c6bd9`, `a3b2d77`, `0e3e25b`, `de64428`, `9889378`, `82fb28c`, `d5f70b7`, and `0aa02fa`.
+- P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 is locally committed in `82fb28c`; P23.8 is locally committed in `d5f70b7`; P23.9 is locally committed in `0aa02fa`; P23.10 is locally committed in `56bc568`; local main is ahead of origin/main by 9.
 - P23.4 defines local production hardening planning for startup/watchdog requirements, health checks, port/session/log expectations, SQLite backup/restore, corruption recovery, restart semantics, operator runbook, and activation validation gates.
 - P23.5 defines client integration readiness planning for Codex/Claude identity, private/shared/project visibility, proposal-first cross-client writes, read/write policy, audit requirements, conflict/drift handling, and config switch readiness.
 - P23.6 defines migration/import-export readiness planning for dry-run-first behavior, manifests, checksum/integrity, scope isolation, audit expectations, backup/restore, partial failure, rollback semantics, and durable mutation boundaries.
@@ -33,6 +33,7 @@ P23.10 final RC validation matrix execution plan
 - P23.8 defines final v1.0 RC readiness review with decision `READY_FOR_DOCS_ONLY_RC_REVIEW`, preserving remaining blockers and avoiding full v1.0 RC readiness claims.
 - P23.9 defines blocker burn-down planning, classifying blockers by A4.8/A5, runtime implementation need, validation evidence need, and v1.0 RC/release impact.
 - P23.10 defines final RC validation matrix execution planning, including validation groups, evidence sources, pass/fail semantics, execution order, evidence capture, stop conditions, and A4.8/A5 split.
+- P23.11 scopes final RC validation matrix execution, classifying validation items as A4.8-safe, A5-gated, runtime-implementation-required, or blocked before any matrix execution.
 
 ## Completed Work In This Batch
 
@@ -63,6 +64,8 @@ P23.10 final RC validation matrix execution plan
 - Routed next recommended phase to `P23.9-v1.0-blocker-burn-down-plan-local-commit`.
 - Added [P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md](/A:/codex-memory/docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md).
 - Routed next recommended phase to `P23.10-final-rc-validation-matrix-execution-plan-local-commit`.
+- Added [P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md](/A:/codex-memory/docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md).
+- Routed next recommended phase to `P23.11-final-rc-validation-matrix-execution-scope-review-local-commit`.
 - Added [P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md).
 - Recorded that deploy remains `NOT_APPROVED` / still blocked.
 - Recorded that the old `p22-rc-806cc847` candidate is superseded and must not be reused or moved.
@@ -91,6 +94,7 @@ P23.10 final RC validation matrix execution plan
 - `docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md`
 - `docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md`
 - `docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md`
+- `docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -118,10 +122,12 @@ P23.10 final RC validation matrix execution plan
 - P23.8 final RC readiness review docs validation: `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed.
 - P23.9 blocker burn-down plan docs validation: `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed.
 - P23.10 final RC validation matrix execution plan docs validation: `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed.
+- P23.11 final RC validation matrix execution scope review docs validation: `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed.
 
 ## Not Done
 
-- No gates rerun in this result-record phase.
+- No final RC validation matrix execution.
+- No gates rerun in this scope-review phase.
 - No temporary worktree created in this result-record phase.
 - No checkout/reset/detach.
 - No `npm test` rerun in this result-record phase.
@@ -149,4 +155,4 @@ P23.10 final RC validation matrix execution plan
 
 ## Next Safe Action
 
-Run docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.10-final-rc-validation-matrix-execution-plan-local-commit`.
+Run docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.11-final-rc-validation-matrix-execution-scope-review-local-commit`.
