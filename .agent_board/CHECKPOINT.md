@@ -538,4 +538,17 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Result so far: P26.2 now defines future CLI source mode boundaries, output contract reuse from the P26.1 fixture, rejected unsafe flags, future validation matrix, and stop conditions. It explicitly does not implement CLI/source/tests/package scripts.
 - Validation: `git diff --check`; docs validation; P26/P26.2 reference scan; read-only Verifier `PASS`.
 - Commit readiness: `eligible`; required fixes none.
+- Commit: `24b302e docs: plan p26 dry-run gate cli`.
 - A5 boundary: no CLI implementation, no package script, no source/runtime/test change, no real memory scan/export/import, no SQLite migration apply, no import/export apply, no backup/restore touching live state, no durable write, no provider/model call, no public MCP expansion, no service startup, no push/tag/release/deploy.
+
+## CM-0235 - P26.3 Migration Import-Export Dry-Run Gate Fixture-Only CLI
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: direct-node fixture-only CLI implementation and targeted tests for the P26 migration/import-export dry-run gate.
+- Changed files: `src/cli/migration-import-export-dry-run-gate.js`; `tests/migration-import-export-dry-run-gate-cli.test.js`; `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Worker result: targeted code/test slice completed with syntax checks, CLI test `12/12`, fixture test `10/10`, JSON smoke, and rejected `--apply` JSON smoke.
+- Validation: syntax checks; targeted CLI test `12/12`; targeted fixture test `10/10`; direct CLI `--json` smoke; rejected `--json --apply` smoke exited `1` with valid fail-closed JSON; `git diff --check`; docs validation; `npm test` `555/555`; read-only Verifier first pass `NEEDS_FIX` only on stale board validation wording.
+- Commit readiness: pending Verifier rerun after this board wording correction.
+- A5 boundary: no package script, fixture mutation, real memory scan/export/import, SQLite migration apply, import/export apply, backup creation/restore, durable write, provider/model call, service startup, config/env/secret edit, public MCP expansion, push/tag/release/deploy.

@@ -623,4 +623,28 @@ HTTP health: no new service action for CM-0234.
 
 Remaining risks: actual CLI implementation, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: create a guarded local commit for CM-0234, then continue with the next Council-selected P26 task.
+Commit: `24b302e docs: plan p26 dry-run gate cli`.
+
+## CM-0235 Commander Handoff - P26.3 Dry-Run Gate Fixture-Only CLI
+
+Goal: add the direct-node fixture-only migration/import-export dry-run gate CLI after P26.1 fixture and P26.2 plan.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0235 source/test/docs/status/board edits.
+
+Current area: `P26.3-migration-import-export-dry-run-gate-cli-fixture-only`
+
+Changed files: `src/cli/migration-import-export-dry-run-gate.js`; `tests/migration-import-export-dry-run-gate-cli.test.js`; `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: syntax checks; targeted CLI test `12/12`; targeted fixture test `10/10`; direct CLI `--json` smoke; rejected `--json --apply` smoke exited `1` with valid fail-closed JSON; `git diff --check`; docs validation; `npm test` `555/555`; read-only Verifier first pass `NEEDS_FIX` only on stale board validation wording.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no new service action for CM-0235.
+
+Remaining risks: package script wiring, validation aggregator evidence shape, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: rerun read-only Verifier after board wording correction, then create a guarded local commit if eligible.

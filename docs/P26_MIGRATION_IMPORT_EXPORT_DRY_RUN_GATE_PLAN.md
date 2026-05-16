@@ -308,3 +308,53 @@ Stop before implementation if the future CLI requires:
 P26.2 decision: `P26_DRY_RUN_GATE_CLI_PLANNED_NOT_IMPLEMENTED`.
 
 Next safe action after P26.2 is either a guarded local commit or a separately scoped `P26.3` implementation plan/review. Do not implement the CLI from this planning text alone.
+
+## 13. P26.3 Fixture-Only CLI Result
+
+P26.3 adds a direct-node fixture-only CLI and targeted tests:
+
+- CLI: `src/cli/migration-import-export-dry-run-gate.js`
+- test: `tests/migration-import-export-dry-run-gate-cli.test.js`
+
+The CLI reads only:
+
+```text
+tests/fixtures/migration-import-export-dry-run-gate-v1.json
+```
+
+It does not add an npm package script.
+
+The CLI locks:
+
+- `--json` fixture report output;
+- `status=blocked`;
+- `decision=NOT_READY_BLOCKED` for the normal fixture report;
+- `mutated=false`;
+- `providerCalls=0`;
+- public MCP tools exactly `record_memory`, `search_memory`, and `memory_overview`;
+- non-mutating safety flags for real memory scan/export/import, migration apply, import/export apply, backup restore, durable writes, provider calls, public MCP expansion, push, tag, release, and deploy;
+- fail-closed JSON output for unsafe flags;
+- non-fixture source modes rejected as invalid input;
+- no raw secret, raw workspace id, or raw local path exposure in normal output.
+
+Rejected unsafe flags:
+
+```text
+--apply
+--confirm
+--migrate
+--import
+--export
+--backup
+--restore
+--real-memory
+--provider
+--push
+--tag
+--release
+--deploy
+```
+
+P26.3 remains local and fixture-only. It does not scan real memory, export/import real memory, run SQLite migration apply, run import/export apply, create or restore backups, write durable state, call providers, expand public MCP tools, start services, change config/env/secrets, push, tag, release, or deploy.
+
+P26.3 decision: `P26_DRY_RUN_GATE_FIXTURE_ONLY_CLI_IMPLEMENTED`.
