@@ -606,11 +606,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0240 - Post-P26.x Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `3692532`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
-- Result so far: board state records that CM-0239 is committed locally and no longer pending guarded commit.
-- Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Result: board state records that CM-0239 is committed locally and no longer pending guarded commit.
+- Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Commit: `75f12d3 docs: record p26 closeout checkpoint`.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
+
+## CM-0241 - P27 Migration Import-Export Approval Packet
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: docs/status/board-only approval packet for future non-fixture migration/import-export work.
+- Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: P27 defines future approval packet boundaries for real-memory preview, export/import, backup/restore, SQLite migration apply, import/export apply, rollback evidence, validation, and stop conditions.
+- Validation: `git diff --check`; docs validation; P27 reference scan.
+- Read-only Verifier: first pass `NEEDS_FIX` only because board validation wording still said pending; second pass `NEEDS_FIX` only because `CMV-0315` still used `PARTIAL`.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
