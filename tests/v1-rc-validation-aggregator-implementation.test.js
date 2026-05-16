@@ -1,0 +1,120 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const {
+  buildV1RcValidationAggregatorReport
+} = require('../src/core/ValidationAggregatorService');
+
+const fixturePath = path.join(__dirname, 'fixtures', 'v1-rc-validation-aggregator-v1.json');
+
+function loadFixture() {
+  return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+}
+
+function hasNestedKey(value, key) {
+  if (!value || typeof value !== 'object') return false;
+  if (Object.hasOwn(value, key)) return true;
+  if (Array.isArray(value)) return value.some(item => hasNestedKey(item, key));
+  return Object.values(value).some(child => hasNestedKey(child, key));
+}
+
+function assertNoSensitiveSurface(report) {
+  const {
+    forbiddenFragments,
+    forbiddenTopLevelKeys,
+    ...scannedReport
+  } = report;
+  const encoded = JSON.stringify(scannedReport).toLowerCase();
+  for (const fragment of report.forbiddenFragments) {
+    assert.equal(encoded.includes(fragment), false, fragment);
+  }
+}
+
+test('minimal implementation emits the P24.1 top-level contract shape', () => {
+  const fixture = loadFixture();
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-16T00:00:00.000Z'
+  });
+
+  assert.deepEqual(Object.keys(report).sort(), Object.keys(fixture).sort());
+  assert.equal(report.schemaVersion, fixture.schemaVersion);
+  assert.equal(report.version, fixture.version);
+  assert.equal(report.mode, 'read-only');
+  assert.equal(report.generated_at, '2026-05-16T00:00:00.000Z');
+});
+
+test('minimal implementation reports honest blocked state without claiming v1 RC readiness', () => {
+  const report = buildV1RcValidationAggregatorReport();
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.notEqual(report.decision, 'READY_FOR_V1_0_RC');
+  assert.equal(report.decisionContract.currentMustNotBe.includes('READY_FOR_V1_0_RC'), true);
+  assert.equal(report.summary.a4SafeSlice, 'A4_SAFE_SLICE_PASSED');
+  assert.equal(report.summary.fullFinalRcMatrixExecuted, false);
+  assert.equal(report.summary.liveMcpHttpEvidenceRefreshed, false);
+  assert.equal(report.summary.validationAggregatorImplemented, true);
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
+  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+});
+
+test('minimal implementation preserves public MCP three-tool freeze', () => {
+  const report = buildV1RcValidationAggregatorReport();
+
+  assert.deepEqual(report.public_mcp_tools, [
+    'record_memory',
+    'search_memory',
+    'memory_overview'
+  ]);
+});
+
+test('minimal implementation classifies A4, A5, runtime-required, and conditional live items', () => {
+  const report = buildV1RcValidationAggregatorReport();
+
+  assert.equal(report.checks.validationAggregatorExecutable.status, 'minimal_implemented');
+  assert.equal(report.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
+  assert.equal(report.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
+  assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), true);
+  assert.equal(report.a5_gated.includes('providerExecution'), true);
+  assert.equal(report.a4_safe.includes('gitHygiene'), true);
+  assert.equal(report.conditional_live.includes('health'), true);
+
+  for (const key of [
+    'migrationImportExportApply',
+    'providerExecution',
+    'startupWatchdog',
+    'clientConfigSwitch',
+    'productionDeploy',
+    'pushTagReleaseDeploy'
+  ]) {
+    assert.equal(report.checks[key].status, 'blocked_pending_a5', key);
+    assert.equal(report.checks[key].a5Gated, true, key);
+  }
+});
+
+test('minimal implementation reports no side effects and no sensitive surfaces', () => {
+  const report = buildV1RcValidationAggregatorReport();
+
+  assert.equal(report.safety.mutated, false);
+  assert.equal(report.safety.providerCalls, 0);
+  assert.equal(report.safety.serviceStarted, false);
+  assert.equal(report.safety.durableMemoryTouched, false);
+  assert.equal(report.safety.realMemoryPreview, false);
+  assert.equal(report.safety.packageChanged, false);
+  assert.equal(report.safety.configChanged, false);
+  assert.equal(report.safety.migrationApplied, false);
+  assert.equal(report.safety.importExportApplied, false);
+  assert.equal(report.safety.watchdogStartupInstalled, false);
+  assert.equal(report.safety.pushed, false);
+  assert.equal(report.safety.tagged, false);
+  assert.equal(report.safety.released, false);
+  assert.equal(report.safety.deployed, false);
+
+  for (const key of report.forbiddenTopLevelKeys) {
+    assert.equal(Object.hasOwn(report, key), false, key);
+    assert.equal(hasNestedKey(report, key), false, key);
+  }
+
+  assertNoSensitiveSurface(report);
+});
