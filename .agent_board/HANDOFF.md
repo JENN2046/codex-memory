@@ -717,7 +717,7 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty for CM-0239 docs/status/board edits.
+Worktree: CM-0239 committed locally at `3692532`; dirty only for CM-0240 board-state reconciliation.
 
 Current area: `P26.x-migration-import-export-dry-run-gate-closeout-review`
 
@@ -731,4 +731,30 @@ HTTP health: no new service action for CM-0239.
 
 Remaining risks: real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: create a guarded local commit for CM-0239 if final status/diff review remains clean.
+Commit: `3692532 docs: close p26 dry-run gate chain`.
+
+Next safe step: validate and commit CM-0240 board-only reconciliation if final status/diff review remains clean.
+
+## CM-0240 Commander Handoff - Post-P26.x Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `3692532`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for CM-0240 board-state reconciliation.
+
+Current area: `P26-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no new service action for CM-0240.
+
+Remaining risks: real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: commit this board-only reconciliation if validation passes, then start P27 docs-only approval packet planning.
