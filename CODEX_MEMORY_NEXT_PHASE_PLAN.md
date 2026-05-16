@@ -537,6 +537,7 @@ npm run gate:mainline
 - Release-candidate checklist: [docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md](/A:/codex-memory/docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md)
 - Final RC readiness review: [docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md](/A:/codex-memory/docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md)
 - Blocker burn-down plan: [docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md](/A:/codex-memory/docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md)
+- Final RC validation matrix execution plan: [docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md](/A:/codex-memory/docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md)
 - Scope: planning/docs/status/board only.
 - v1.0 blockers: public MCP contract drift, schema/versioning gaps, failing security or CI gates, missing rollback story, unresolved migration/import-export boundary, unclear Codex/Claude client boundary, raw secret/workspace exposure, and unapproved A5 actions.
 - Still A5-gated: production deploy, startup/watchdog install, Codex/Claude config switch, provider execution, durable memory mutation expansion, SQLite migration, import/export apply, tag/release/deploy.
@@ -549,4 +550,5 @@ npm run gate:mainline
 - P23.7 result: v1.0 release-candidate checklist is documented; no push, tag, release, deploy, runtime/config/provider/migration/import-export/durable-memory/watchdog/startup action occurred.
 - P23.8 result: final v1.0 RC readiness review is documented with decision `READY_FOR_DOCS_ONLY_RC_REVIEW`; full v1.0 RC remains blocked by validation, runtime/schema, A5, and release/deploy gates.
 - P23.9 result: v1.0 blocker burn-down plan is documented; blockers are classified by A4.8/A5, runtime implementation, validation evidence, and RC/release impact.
-- Next recommended phase: `P23.9-v1.0-blocker-burn-down-plan-local-commit`.
+- P23.10 result: final RC validation matrix execution plan is documented; matrix execution is planned but not run, and no validator/runtime/provider/migration/config/release action occurred.
+- Next recommended phase: `P23.10-final-rc-validation-matrix-execution-plan-local-commit`.

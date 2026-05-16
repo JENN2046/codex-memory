@@ -360,3 +360,5 @@ P23.5 client integration readiness planning is tracked in [P23_5_CLIENT_INTEGRAT
 P23.6 migration/import-export readiness planning is tracked in [P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md](/A:/codex-memory/docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md). It expands the migration dry-run, import/export dry-run, manifest, checksum, backup, rollback, and durable mutation validation expectations before any apply action.
 
 P23.7 v1.0 release-candidate checklist is tracked in [P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md](/A:/codex-memory/docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md). It consolidates RC gate readiness and remaining blockers without creating a tag, release, deploy, or push.
+
+P23.10 final RC validation matrix execution planning is tracked in [P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md](/A:/codex-memory/docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md). It plans final matrix execution without executing the matrix or implementing validators.
