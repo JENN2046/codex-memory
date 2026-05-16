@@ -425,3 +425,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: syntax checks; combined fixture/CLI tests `22/22`; CLI `--json` smoke; rejected `--apply` smoke exited `1` with valid JSON; `npm test` `533/533`; `git diff --check`; docs validation; Verifier first pass `NEEDS_FIX` on stale auto-commit wording only, corrected; Verifier rerun `PASS`.
 - A5 boundary for this batch: no package script, runtime schema/version enforcement, public MCP expansion, real memory scan, migration/import-export apply, durable write, service start, provider call, push, tag, release, or deploy.
 - Next safe action: guarded local commit if final status/diff review remains clean.
+
+## CM-0226 - Post-P25.6 Board-State Finalization
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only stable wording after P25.6 guarded local commit.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board state now records P25.6 as committed locally and routes next work to separate Council-scoped task selection.
+- Validation: `git diff --check`; docs validation.
+- A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
+- Next safe action: select the next safe local task through Council review.
