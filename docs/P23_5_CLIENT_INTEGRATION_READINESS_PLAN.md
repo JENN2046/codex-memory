@@ -340,3 +340,5 @@ Next recommended phase:
 `P23.6-migration-import-export-readiness-plan`
 
 P23.6 should plan migration/import-export readiness while preserving dry-run-first behavior and keeping SQLite migration apply, import/export apply, durable data rewrite, provider execution, config switching, startup/watchdog installation, public MCP expansion, tag, release, deploy, and destructive rollback execution separately approved.
+
+P23.6 migration/import-export readiness planning is tracked in [P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md](/A:/codex-memory/docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md). It preserves Codex/Claude private/shared/project visibility boundaries during migration and import/export planning.

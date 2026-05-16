@@ -356,3 +356,5 @@ P23.4 should plan local production hardening requirements without installing sta
 P23.4 local production hardening planning is tracked in [P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md).
 
 P23.5 client integration readiness planning is tracked in [P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md](/A:/codex-memory/docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md). It expands the client boundary validation expectations before any real Codex or Claude config switch.
+
+P23.6 migration/import-export readiness planning is tracked in [P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md](/A:/codex-memory/docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md). It expands the migration dry-run, import/export dry-run, manifest, checksum, backup, rollback, and durable mutation validation expectations before any apply action.

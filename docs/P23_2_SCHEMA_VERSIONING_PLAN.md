@@ -283,3 +283,5 @@ Next recommended phase:
 P23.3 should convert the P23 planning and P23.1/P23.2 inventories into a concrete v1.0 validation matrix. It should remain docs/fixtures/gate-planning first and must not run A5-gated provider, migration, import/export apply, production deploy, startup/watchdog install, or client config switch actions without explicit authorization.
 
 P23.3 validation matrix hardening is tracked in [P23_3_VALIDATION_MATRIX_HARDENING.md](/A:/codex-memory/docs/P23_3_VALIDATION_MATRIX_HARDENING.md).
+
+P23.6 migration/import-export readiness planning is tracked in [P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md](/A:/codex-memory/docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md). It expands the migration/import-export boundary, manifest, checksum, backup, rollback, and durable mutation requirements before any apply action.

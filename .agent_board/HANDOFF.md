@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create P23.5 client integration readiness plan after the P23.4 local production hardening local commit.
+Create P23.6 migration/import-export readiness plan after the P23.5 client integration readiness local commit.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 docs/board edits are local on top of unpushed commits `b3c6bd9`, `a3b2d77`, and `0e3e25b`. User did not authorize commit or push for P23.5.
+P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 docs/board edits are local on top of unpushed commits `b3c6bd9`, `a3b2d77`, `0e3e25b`, and `de64428`. User did not authorize commit or push for P23.6.
 
 ## Current Area
 
-P23.5 client integration readiness plan
+P23.6 migration/import-export readiness plan
 
 ## Findings
 
@@ -45,6 +45,8 @@ P23.5 client integration readiness plan
 - P23.4 defines local production hardening planning across startup/watchdog requirements, health checks, port/session/log expectations, SQLite backup/restore, corruption recovery, restart semantics, operator runbook, and activation validation gates.
 - P23.4 was locally committed as `0e3e25b docs: plan p23 local production hardening`.
 - P23.5 defines client integration readiness planning across Codex/Claude identity, private/shared/project visibility, proposal-first cross-client writes, read/write policy, audit requirements, conflict/drift handling, and config switch readiness.
+- P23.5 was locally committed as `de64428 docs: plan p23 client integration readiness`.
+- P23.6 defines migration/import-export readiness planning across dry-run-first behavior, manifests, checksum/integrity, scope isolation, audit expectations, backup/restore, partial failure, rollback semantics, and durable mutation boundaries.
 
 ## Changed Files
 
@@ -57,6 +59,7 @@ P23.5 client integration readiness plan
 - `docs/P23_3_VALIDATION_MATRIX_HARDENING.md`
 - `docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md`
 - `docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md`
+- `docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -79,6 +82,7 @@ P23.5 client integration readiness plan
 - P23.3 validation matrix docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 - P23.4 local production hardening docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 - P23.5 client integration readiness docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
+- P23.6 migration/import-export readiness docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 
 ## Not Done
 
@@ -94,6 +98,8 @@ P23.5 client integration readiness plan
 - No validator implementation.
 - No local production hardening implementation.
 - No client integration config switch.
+- No migration/import-export apply.
+- No durable data rewrite.
 - No real memory preview.
 - No config mutation.
 - No startup/watchdog operation.
@@ -105,4 +111,4 @@ P23.5 client integration readiness plan
 
 ## Next Safe Step
 
-Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.6-migration-import-export-readiness-plan`.
+Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.7-v1.0-release-candidate-checklist`.
