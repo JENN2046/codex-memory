@@ -11,6 +11,54 @@ const DECISION_LABELS = [
 
 const PUBLIC_MCP_TOOLS = TOOL_DEFINITIONS.map(tool => tool.name);
 
+const EVIDENCE_SOURCES = {
+  decision: {
+    source_type: 'aggregator',
+    source_ref: 'ValidationAggregatorService',
+    reason: 'decision derived from unresolved blockers'
+  },
+  blockers: {
+    source_type: 'aggregator',
+    source_ref: 'ValidationAggregatorService blockers[]',
+    reason: 'blockers derived from unresolved validation, runtime, and A5-gated items'
+  },
+  a4_safe_slice: {
+    source_type: 'doc',
+    source_ref: 'docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md',
+    status: 'A4_SAFE_SLICE_PASSED'
+  },
+  full_final_rc_matrix: {
+    source_type: 'doc',
+    source_ref: 'docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md',
+    status: 'not_executed'
+  },
+  schema_version_runtime_enforcement: {
+    source_type: 'runtime_gap',
+    source_ref: 'P25 pending',
+    status: 'not_implemented'
+  },
+  public_mcp_tools: {
+    source_type: 'code_contract',
+    source_ref: 'src/core/constants.js',
+    status: 'frozen_three_tool_contract'
+  },
+  a5_gated_actions: {
+    source_type: 'governance',
+    source_ref: 'STATUS.md / CODEX_MEMORY_NEXT_PHASE_PLAN.md',
+    status: 'blocked_pending_a5'
+  },
+  conditional_live_mcp_http: {
+    source_type: 'runtime_condition',
+    source_ref: 'P23.12 conditional live MCP/HTTP validation notes',
+    status: 'not_executed_service_not_running'
+  },
+  validation_aggregator_full_implementation: {
+    source_type: 'runtime_gap',
+    source_ref: 'docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md',
+    status: 'minimal_only'
+  }
+};
+
 function createCheck({
   status,
   requiredBeforeV1Rc = false,
@@ -220,6 +268,7 @@ function buildV1RcValidationAggregatorReport({
         fullImplementation: false
       }
     },
+    evidence_sources: EVIDENCE_SOURCES,
     blockers: [
       buildBlocker('full-final-rc-matrix-not-executed', {
         status: 'blocked',

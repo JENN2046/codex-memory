@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add P24.4 minimal validation aggregator CLI decision and exit-code semantics after the P24.3 local commit.
+Add P24.5 minimal validation aggregator evidence-source map after the P24.4 local commit.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 is locally committed in `82fb28c`; P23.8 is locally committed in `d5f70b7`; P23.9 is locally committed in `0aa02fa`; P23.10 is locally committed in `56bc568`; P23.11 is locally committed in `e9971b8`; P23.12 is locally committed in `54586b8`; P24 planning through P24.3 are locally committed through `220ffa6`. P24.4 local commit is explicitly authorized in this phase. Push is not authorized.
+P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 is locally committed in `82fb28c`; P23.8 is locally committed in `d5f70b7`; P23.9 is locally committed in `0aa02fa`; P23.10 is locally committed in `56bc568`; P23.11 is locally committed in `e9971b8`; P23.12 is locally committed in `54586b8`; P24 planning through P24.4 are locally committed through `dc6196d`. P24.5 local commit is explicitly authorized for this phase. Push is not authorized.
 
 ## Current Area
 
-P24 validation aggregator CLI decision/exit-code semantics
+P24 validation aggregator evidence-source map
 
 ## Findings
 
@@ -59,7 +59,8 @@ P24 validation aggregator CLI decision/exit-code semantics
 - P23.12 executes A4-safe validation only; decision `A4_SAFE_SLICE_PASSED`. Conditional live MCP/HTTP evidence was skipped because service was not already reachable.
 - P24 plans a validation aggregator implementation.
 - P24.1 fixture shape tests, P24.2 minimal core report builder, and P24.3 direct-node CLI wiring are committed locally.
-- P24.4 adds default report exit `0`, strict blocked exit `1`, and help exit `0` semantics locally; requested validation passed.
+- P24.4 adds default report exit `0`, strict blocked exit `1`, and help exit `0` semantics and is committed locally.
+- P24.5 adds a minimal `evidence_sources` map to the report and fixture contract; requested validation passed.
 
 ## Changed Files
 
@@ -120,13 +121,14 @@ P24 validation aggregator CLI decision/exit-code semantics
 - P24.2 validation aggregator minimal implementation targeted validation: syntax checks passed for `src\core\ValidationAggregatorService.js` and `tests\v1-rc-validation-aggregator-implementation.test.js`; targeted aggregator tests passed `13/13`; emitted decision remains `NOT_READY_BLOCKED`.
 - P24.3 validation aggregator CLI targeted validation: syntax checks passed for core/CLI/tests; fixture test passed `8/8`; implementation test passed `5/5`; CLI test passed `6/6`; direct CLI smoke emitted JSON decision `NOT_READY_BLOCKED`.
 - P24.4 validation: syntax checks passed for core/CLI/tests; fixture test passed `8/8`; implementation test passed `5/5`; CLI test passed `12/12`; default CLI smoke emitted JSON decision `NOT_READY_BLOCKED` and exit `0`; strict CLI smoke emitted JSON decision `NOT_READY_BLOCKED` and exit `1`; diff/docs/P2 whitespace validation passed.
+- P24.5 validation: syntax checks passed for core/CLI/tests; fixture test passed `9/9`; implementation test passed `6/6`; CLI test passed `12/12`; default CLI smoke emitted JSON decision `NOT_READY_BLOCKED` and exit `0`; strict CLI smoke emitted valid JSON decision `NOT_READY_BLOCKED` and exit `1`; diff/docs/P2 whitespace validation passed.
 
 ## Not Done
 
 - No final RC validation matrix execution.
 - No full validation aggregator implementation.
 - No package script wiring for the minimal CLI.
-- No P24.5 evidence-source-map work yet.
+- No push.
 - No full final RC validation matrix execution.
 - No live MCP/HTTP refresh because service was not already reachable.
 - No worktree created in this result-record phase.
@@ -153,4 +155,4 @@ P24 validation aggregator CLI decision/exit-code semantics
 
 ## Next Safe Step
 
-Complete the authorized P24.4 local commit and stop before any push. Next recommended phase is `P24.5-validation-aggregator-evidence-source-map`.
+Complete the authorized P24.5 local commit, report the result, and stop before any push.

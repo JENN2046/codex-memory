@@ -69,6 +69,24 @@ test('minimal implementation preserves public MCP three-tool freeze', () => {
   ]);
 });
 
+test('minimal implementation maps current conclusions to documented evidence sources', () => {
+  const report = buildV1RcValidationAggregatorReport();
+
+  assert.ok(report.evidence_sources);
+  assert.ok(report.evidence_sources.decision);
+  assert.equal(report.evidence_sources.decision.source_ref, 'ValidationAggregatorService');
+  assert.match(report.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
+  assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
+  assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
+  assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.deepEqual(report.public_mcp_tools, [
+    'record_memory',
+    'search_memory',
+    'memory_overview'
+  ]);
+});
+
 test('minimal implementation classifies A4, A5, runtime-required, and conditional live items', () => {
   const report = buildV1RcValidationAggregatorReport();
 

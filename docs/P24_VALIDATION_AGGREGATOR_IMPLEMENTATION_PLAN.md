@@ -350,6 +350,8 @@ P24.3 adds direct-node CLI wiring in `src/cli/v1-rc-validation-aggregator.js` pl
 
 P24.4 adds minimal CLI decision and exit-code semantics: default report mode preserves JSON output and exits `0`; `--strict` preserves the same JSON output but exits `1` for the current `NOT_READY_BLOCKED` report; `--help` prints short usage text without running live checks. It does not add a package script, implement the full aggregator, implement schema/version runtime enforcement, start services, refresh live MCP/HTTP evidence, run providers, apply migrations/import-export, mutate durable memory, or change public MCP tools.
 
+P24.5 adds a minimal `evidence_sources` map to the core validation aggregator report and fixture contract. The map traces the current decision, blockers, A4-safe slice, full final RC matrix status, schema/version runtime enforcement gap, public MCP tool freeze, A5-gated actions, conditional live MCP/HTTP status, and full-aggregator implementation gap to documented code, docs, or governance sources. The fixture contract changes only because the report top-level shape now includes `evidence_sources`; this phase still does not add a package script, implement the full aggregator, implement schema/version runtime enforcement, start services, refresh live MCP/HTTP evidence, run providers, apply migrations/import-export, mutate durable memory, or change public MCP tools.
+
 ## 19. Stop Conditions
 
 Stop if the next action requires:
@@ -381,4 +383,6 @@ P24.2 minimal implementation is the next completed core skeleton layer. The next
 
 P24.3 minimal CLI wiring is the next completed executable wrapper layer. The next safe phase after P24.3 is `P24.3-validation-aggregator-cli-wiring-minimal-implementation-local-commit`, followed by a report-shape gate or full matrix aggregation planning phase that still avoids package script changes unless explicitly authorized.
 
-P24.4 decision/exit-code semantics is the next completed CLI gate-semantics layer. The next safe phase after P24.4 is `P24.5-validation-aggregator-evidence-source-map`, focused on mapping each report field/check to its source without package script changes, live refresh, provider calls, migrations, or release actions unless explicitly authorized.
+P24.4 decision/exit-code semantics is the completed CLI gate-semantics layer.
+
+P24.5 evidence-source mapping is the next completed provenance layer. The next safe phase after P24.5 is `P24.5-validation-aggregator-evidence-source-map-local-commit`, followed by further report-shape hardening or full matrix aggregation planning that still avoids package script changes unless explicitly authorized.

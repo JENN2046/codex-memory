@@ -33,6 +33,8 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.mode, 'read-only');
   assert.equal(report.evidence.p24Aggregator.minimalCliWiring, true);
   assert.equal(report.evidence.p24Aggregator.decisionExitCodeSemantics, true);
+  assert.ok(report.evidence_sources.decision);
+  assert.match(report.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
 });
 
 test('minimal validation aggregator CLI preserves honest blocked decision', () => {
@@ -95,6 +97,9 @@ test('minimal validation aggregator CLI strict mode exits 1 for current blocked 
   assert.equal(report.generated_at, '2026-05-16T00:00:00.000Z');
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
+  assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
+  assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
 });
 
 test('minimal validation aggregator CLI strict mode does not execute A5-gated checks', () => {

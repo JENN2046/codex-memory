@@ -72,6 +72,7 @@ test('v1 RC validation aggregator fixture locks required top-level shape', () =>
     'decision',
     'decisionContract',
     'evidence',
+    'evidence_sources',
     'forbiddenFragments',
     'forbiddenTopLevelKeys',
     'generated_at',
@@ -97,6 +98,23 @@ test('v1 RC validation aggregator fixture locks required top-level shape', () =>
   assert.equal(Array.isArray(fixture.runtime_required), true);
   assert.equal(Array.isArray(fixture.conditional_live), true);
   assert.equal(Array.isArray(fixture.evidence.p24Aggregator ? fixture.recommendations : []), true);
+});
+
+test('fixture maps current conclusions to documented evidence sources', () => {
+  const fixture = loadFixture();
+
+  assert.ok(fixture.evidence_sources);
+  assert.ok(fixture.evidence_sources.decision);
+  assert.match(fixture.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
+  assert.equal(fixture.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
+  assert.equal(fixture.evidence_sources.full_final_rc_matrix.status, 'not_executed');
+  assert.equal(fixture.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
+  assert.equal(fixture.decision, 'NOT_READY_BLOCKED');
+  assert.deepEqual(fixture.public_mcp_tools, [
+    'record_memory',
+    'search_memory',
+    'memory_overview'
+  ]);
 });
 
 test('decision contract includes blocked, partial, and ready labels without overclaiming readiness', () => {
