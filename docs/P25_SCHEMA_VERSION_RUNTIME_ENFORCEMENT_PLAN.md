@@ -161,6 +161,8 @@ Implementation phases must define allowed files, forbidden files, rollback story
 
 P25.1 inventory is tracked in [P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md](./P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md). It confirms existing fixture/test coverage and identifies the missing fixture contract for accepted/missing/unknown schema-version behavior.
 
+P25.2 fixture policy tests are implemented in `tests/fixtures/schema-version-policy-v1.json` and `tests/schema-version-policy-fixture.test.js`. They lock known schema families, accepted current versions, missing-version fallback behavior, unknown-version rejection/warning policy, public MCP three-tool freeze, no-migration/no-mutation safety flags, and no raw secret/workspace exposure.
+
 ## 10. Validation For This Planning Phase
 
 Docs-only validation:

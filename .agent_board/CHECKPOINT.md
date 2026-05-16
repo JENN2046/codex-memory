@@ -305,3 +305,14 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Next: `P25.2-schema-version-policy-fixture-tests`.
 - Validation: `git diff --check`; docs validation; file/reference review.
 - A5 boundary for this batch: A5 authorization exists, but this batch remains docs/board-only; no runtime/test/package/config/provider/data change, no durable write, no MCP expansion, no migration/import-export apply, no push, tag, release, or deploy.
+
+## CM-0216 - P25.2 Schema/Version Policy Fixture Tests
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: fixture/test/docs-only schema-version policy contract.
+- Changed files: `tests/fixtures/schema-version-policy-v1.json`; `tests/schema-version-policy-fixture.test.js`; P25/status docs; `.agent_board/*`.
+- Result: policy fixture locks known schema families, accepted current versions, missing legacy read fallback, missing/unknown new-write rejection, unknown read warning/skip, import envelope version requirement, public MCP three-tool freeze, and no-side-effect/no-exposure safety.
+- Validation: `node --check tests\schema-version-policy-fixture.test.js`; targeted P25.2 test `10/10`; `npm test` `511/511`; `git diff --check`; docs validation.
+- A5 boundary for this batch: no runtime enforcement, public MCP schema/tool change, package/config change, service start, provider call, migration/import-export apply, durable write, tag, release, deploy, or push.

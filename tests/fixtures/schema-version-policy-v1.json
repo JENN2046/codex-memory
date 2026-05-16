@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "schema-version-policy-v1",
+  "version": "v1",
+  "phase": "P25.2-schema-version-policy-fixture-tests",
+  "mode": "fixture-only",
+  "fixtureOnly": true,
+  "runtimeEnforcementImplemented": false,
+  "sqliteMigrationImplemented": false,
+  "importExportApplyImplemented": false,
+  "mutated": false,
+  "providerCalls": 0,
+  "durableMemoryTouched": false,
+  "serviceStarted": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "schemaFamilies": [
+    {
+      "name": "mcp_contract",
+      "currentVersion": "mcp-contract-v1",
+      "acceptedVersions": [
+        "mcp-contract-v1"
+      ],
+      "missingVersionReadPolicy": "allow_with_current_contract",
+      "missingVersionWritePolicy": "reject_for_new_public_contract_change",
+      "unknownVersionReadPolicy": "reject_public_contract_drift",
+      "unknownVersionWritePolicy": "reject_public_contract_drift",
+      "fallbackSafe": false,
+      "requiresMigrationApply": false
+    },
+    {
+      "name": "memory_record",
+      "currentVersion": "v1",
+      "acceptedVersions": [
+        "v1",
+        "vNext"
+      ],
+      "missingVersionReadPolicy": "allow_legacy_read_with_fallback",
+      "missingVersionWritePolicy": "reject_new_write_missing_version",
+      "unknownVersionReadPolicy": "warn_and_skip_unsafe_fields",
+      "unknownVersionWritePolicy": "reject_unknown_version",
+      "fallbackSafe": true,
+      "requiresMigrationApply": false
+    },
+    {
+      "name": "audit_event",
+      "currentVersion": "mutation-audit-shape-v1",
+      "acceptedVersions": [
+        "mutation-audit-shape-v1"
+      ],
+      "missingVersionReadPolicy": "allow_legacy_audit_parse_with_warning",
+      "missingVersionWritePolicy": "reject_new_audit_missing_version",
+      "unknownVersionReadPolicy": "warn_and_skip_unsafe_fields",
+      "unknownVersionWritePolicy": "reject_unknown_version",
+      "fallbackSafe": true,
+      "requiresMigrationApply": false
+    },
+    {
+      "name": "lifecycle_policy",
+      "currentVersion": "lifecycle-policy-v1",
+      "acceptedVersions": [
+        "lifecycle-policy-v1",
+        "lifecycle-read-policy-v1",
+        "lifecycle-read-policy-runtime-v1"
+      ],
+      "missingVersionReadPolicy": "allow_default_off_policy",
+      "missingVersionWritePolicy": "reject_policy_write_missing_version",
+      "unknownVersionReadPolicy": "fail_safe_hidden_for_mutating_paths",
+      "unknownVersionWritePolicy": "reject_unknown_version",
+      "fallbackSafe": true,
+      "requiresMigrationApply": false
+    },
+    {
+      "name": "import_export_envelope",
+      "currentVersion": "vNext-import-export-safe-json",
+      "acceptedVersions": [
+        "vNext-import-export-safe-json"
+      ],
+      "missingVersionReadPolicy": "reject_import_preview_missing_version",
+      "missingVersionWritePolicy": "reject_export_missing_version",
+      "unknownVersionReadPolicy": "reject_import_preview_unknown_version",
+      "unknownVersionWritePolicy": "reject_unknown_version",
+      "fallbackSafe": false,
+      "requiresMigrationApply": false
+    },
+    {
+      "name": "migration_readiness_report",
+      "currentVersion": "vcp-memory-migration-readiness-v1",
+      "acceptedVersions": [
+        "vcp-memory-migration-readiness-v1"
+      ],
+      "missingVersionReadPolicy": "warn_report_not_ready",
+      "missingVersionWritePolicy": "reject_report_missing_version",
+      "unknownVersionReadPolicy": "warn_report_not_ready",
+      "unknownVersionWritePolicy": "reject_unknown_version",
+      "fallbackSafe": true,
+      "requiresMigrationApply": false
+    },
+    {
+      "name": "validation_aggregator_report",
+      "currentVersion": "v1-rc-validation-aggregator-v1",
+      "acceptedVersions": [
+        "v1-rc-validation-aggregator-v1"
+      ],
+      "missingVersionReadPolicy": "reject_gate_report_missing_version",
+      "missingVersionWritePolicy": "reject_report_missing_version",
+      "unknownVersionReadPolicy": "reject_gate_report_unknown_version",
+      "unknownVersionWritePolicy": "reject_unknown_version",
+      "fallbackSafe": false,
+      "requiresMigrationApply": false
+    }
+  ],
+  "policyCases": [
+    {
+      "id": "accepted-current-memory-record-read",
+      "schemaFamily": "memory_record",
+      "operation": "read",
+      "inputVersion": "v1",
+      "legacyRecord": false,
+      "expectedDecision": "allow",
+      "expectedMutated": false,
+      "requiresMigrationApply": false
+    },
+    {
+      "id": "missing-memory-record-read-fallback",
+      "schemaFamily": "memory_record",
+      "operation": "read",
+      "inputVersion": null,
+      "legacyRecord": true,
+      "expectedDecision": "allow_with_fallback",
+      "expectedFallbackVersion": "v1",
+      "expectedMutated": false,
+      "requiresMigrationApply": false
+    },
+    {
+      "id": "missing-memory-record-new-write",
+      "schemaFamily": "memory_record",
+      "operation": "write",
+      "inputVersion": null,
+      "legacyRecord": false,
+      "expectedDecision": "reject",
+      "expectedErrorCode": "schema_version_required",
+      "expectedMutated": false,
+      "requiresMigrationApply": false
+    },
+    {
+      "id": "unknown-memory-record-read",
+      "schemaFamily": "memory_record",
+      "operation": "read",
+      "inputVersion": "v99",
+      "legacyRecord": false,
+      "expectedDecision": "warn_and_skip_unsafe_fields",
+      "expectedMutated": false,
+      "requiresMigrationApply": false
+    },
+    {
+      "id": "unknown-memory-record-new-write",
+      "schemaFamily": "memory_record",
+      "operation": "write",
+      "inputVersion": "v99",
+      "legacyRecord": false,
+      "expectedDecision": "reject",
+      "expectedErrorCode": "unsupported_schema_version",
+      "expectedMutated": false,
+      "requiresMigrationApply": false
+    },
+    {
+      "id": "missing-import-envelope-preview",
+      "schemaFamily": "import_export_envelope",
+      "operation": "import_preview",
+      "inputVersion": null,
+      "legacyRecord": false,
+      "expectedDecision": "reject",
+      "expectedErrorCode": "schema_version_required",
+      "expectedMutated": false,
+      "requiresMigrationApply": false
+    },
+    {
+      "id": "unknown-validation-aggregator-report",
+      "schemaFamily": "validation_aggregator_report",
+      "operation": "gate_read",
+      "inputVersion": "v99",
+      "legacyRecord": false,
+      "expectedDecision": "reject",
+      "expectedErrorCode": "unsupported_schema_version",
+      "expectedMutated": false,
+      "requiresMigrationApply": false
+    }
+  ],
+  "safety": {
+    "mutated": false,
+    "providerCalls": 0,
+    "durableMemoryTouched": false,
+    "serviceStarted": false,
+    "sqliteMigrationApplied": false,
+    "importExportApplied": false,
+    "backupCreated": false,
+    "runtimeEnforcementChanged": false,
+    "packageChanged": false,
+    "configChanged": false,
+    "publicMcpExpanded": false,
+    "pushed": false,
+    "tagged": false,
+    "released": false,
+    "deployed": false,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false
+  },
+  "nextPhase": "P25.3-validation-aggregator-schema-status-report-shape"
+}
