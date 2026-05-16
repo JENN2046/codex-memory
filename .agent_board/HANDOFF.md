@@ -444,3 +444,21 @@ Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agen
 Validation: `git diff --check`; docs validation.
 
 Next safe step: commit this board-only finalization if validation passes, then select the next safe local task through Council review.
+
+## CM-0227 Commander Handoff - P25 Board-State Stable Handoff
+
+Goal: keep `.agent_board/RUN_STATE.md` stable after board-only finalization commits.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for this board-state wording stabilization until committed.
+
+Current area: `P25-board-state-stable-handoff`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation.
+
+Next safe step: commit this board-only stable handoff if validation passes, then select the next safe local task through Council review.
