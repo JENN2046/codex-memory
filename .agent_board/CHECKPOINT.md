@@ -618,12 +618,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0241 - P27 Migration Import-Export Approval Packet
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: docs/status/board-only approval packet for future non-fixture migration/import-export work.
 - Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
-- Result so far: P27 defines future approval packet boundaries for real-memory preview, export/import, backup/restore, SQLite migration apply, import/export apply, rollback evidence, validation, and stop conditions.
+- Result: P27 defines future approval packet boundaries for real-memory preview, export/import, backup/restore, SQLite migration apply, import/export apply, rollback evidence, validation, and stop conditions.
 - Validation: `git diff --check`; docs validation; P27 reference scan.
-- Read-only Verifier: first pass `NEEDS_FIX` only because board validation wording still said pending; second pass `NEEDS_FIX` only because `CMV-0315` still used `PARTIAL`.
+- Read-only Verifier: first pass `NEEDS_FIX` only because board validation wording still said pending; second pass `NEEDS_FIX` only because `CMV-0315` still used `PARTIAL`; final rerun `PASS`.
+- Commit: `680fbcc docs: define p27 migration approval packet`.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
+
+## CM-0242 - Post-P27 Board-State Reconciliation
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `680fbcc`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result so far: board state records that CM-0241 is committed locally and no longer pending guarded commit.
+- Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.

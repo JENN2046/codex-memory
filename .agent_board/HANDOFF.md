@@ -769,13 +769,13 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty for scoped CM-0241 docs/status/board edits.
+Worktree: CM-0241 committed locally at `680fbcc`; dirty only for CM-0242 board-state reconciliation.
 
 Current area: `P27-migration-import-export-approval-packet`
 
 Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation: `git diff --check`; docs validation; P27 reference scan; read-only Verifier first pass `NEEDS_FIX` only because board validation wording still said pending; second pass `NEEDS_FIX` only because `CMV-0315` still used `PARTIAL`.
+Validation: `git diff --check`; docs validation; P27 reference scan; read-only Verifier first pass `NEEDS_FIX` only because board validation wording still said pending; second pass `NEEDS_FIX` only because `CMV-0315` still used `PARTIAL`; final rerun `PASS`.
 
 MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -783,4 +783,30 @@ HTTP health: no new service action for CM-0241.
 
 Remaining risks: real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: rerun read-only Verifier after `CMV-0315` status correction; guarded local commit only if eligible.
+Commit: `680fbcc docs: define p27 migration approval packet`.
+
+Next safe step: validate and commit CM-0242 board-only reconciliation if final status/diff review remains clean.
+
+## CM-0242 Commander Handoff - Post-P27 Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `680fbcc`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for CM-0242 board-state reconciliation.
+
+Current area: `P27-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no new service action for CM-0242.
+
+Remaining risks: real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: commit this board-only reconciliation if validation passes, then select the next safe local task.
