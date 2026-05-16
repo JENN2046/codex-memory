@@ -550,5 +550,17 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Changed files: `src/cli/migration-import-export-dry-run-gate.js`; `tests/migration-import-export-dry-run-gate-cli.test.js`; `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
 - Worker result: targeted code/test slice completed with syntax checks, CLI test `12/12`, fixture test `10/10`, JSON smoke, and rejected `--apply` JSON smoke.
 - Validation: syntax checks; targeted CLI test `12/12`; targeted fixture test `10/10`; direct CLI `--json` smoke; rejected `--json --apply` smoke exited `1` with valid fail-closed JSON; `git diff --check`; docs validation; `npm test` `555/555`; read-only Verifier first pass `NEEDS_FIX` only on stale board validation wording.
-- Commit readiness: pending Verifier rerun after this board wording correction.
+- Read-only Verifier: rerun `PASS`; commit readiness `eligible`; required fixes none.
+- Commit: `6e39985 test: add p26 dry-run gate cli`.
 - A5 boundary: no package script, fixture mutation, real memory scan/export/import, SQLite migration apply, import/export apply, backup creation/restore, durable write, provider/model call, service startup, config/env/secret edit, public MCP expansion, push/tag/release/deploy.
+
+## CM-0236 - Post-P26.3 Board-State Reconciliation
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `6e39985`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board state records that CM-0235 is committed locally and no longer pending guarded commit.
+- Validation pending: `git diff --check`; docs validation.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, migration-import-export apply, service start, push, tag, release, or deploy.

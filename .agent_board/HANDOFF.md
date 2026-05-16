@@ -633,13 +633,13 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty for CM-0235 source/test/docs/status/board edits.
+Worktree: CM-0235 committed locally at `6e39985`; dirty only for CM-0236 board-state reconciliation.
 
 Current area: `P26.3-migration-import-export-dry-run-gate-cli-fixture-only`
 
 Changed files: `src/cli/migration-import-export-dry-run-gate.js`; `tests/migration-import-export-dry-run-gate-cli.test.js`; `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation: syntax checks; targeted CLI test `12/12`; targeted fixture test `10/10`; direct CLI `--json` smoke; rejected `--json --apply` smoke exited `1` with valid fail-closed JSON; `git diff --check`; docs validation; `npm test` `555/555`; read-only Verifier first pass `NEEDS_FIX` only on stale board validation wording.
+Validation: syntax checks; targeted CLI test `12/12`; targeted fixture test `10/10`; direct CLI `--json` smoke; rejected `--json --apply` smoke exited `1` with valid fail-closed JSON; `git diff --check`; docs validation; `npm test` `555/555`; read-only Verifier rerun `PASS`.
 
 MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -647,4 +647,22 @@ HTTP health: no new service action for CM-0235.
 
 Remaining risks: package script wiring, validation aggregator evidence shape, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: rerun read-only Verifier after board wording correction, then create a guarded local commit if eligible.
+Commit: `6e39985 test: add p26 dry-run gate cli`.
+
+## CM-0236 Commander Handoff - Post-P26.3 Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `6e39985`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for this board-state reconciliation until committed.
+
+Current area: `P26-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation pending: `git diff --check`; docs validation.
+
+Next safe step: commit this board-only reconciliation if validation passes, then start CM-0237 P26.4 aggregator evidence shape as the next Council-approved task.
