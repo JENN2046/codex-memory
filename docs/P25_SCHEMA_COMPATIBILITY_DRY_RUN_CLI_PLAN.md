@@ -2,7 +2,7 @@
 
 Phase: `P25.4-schema-compatibility-dry-run-cli-plan`
 
-Status: planning only
+Status: planning documented; P25.5 fixture contract added
 
 ## 1. Purpose
 
@@ -32,6 +32,7 @@ Current P25 evidence:
 
 - P25.2 fixture policy tests define accepted, missing, and unknown schema-version behavior.
 - P25.3 validation aggregator report shape exposes P25.2 policy fixture evidence.
+- P25.5 fixture contract locks the planned dry-run report shape without implementing the CLI.
 - runtime schema/version enforcement still reports as not implemented.
 - public MCP tools remain exactly `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -254,6 +255,17 @@ npm run gate:ci -- --json
 
 Do not run `gate:mainline`, live MCP/HTTP refresh, provider smoke, provider benchmark, rebuild-profile confirm, cleanup apply, migration apply, or import/export apply for this planning phase.
 
+For the P25.5 fixture-contract phase:
+
+```powershell
+node --check .\tests\schema-compatibility-dry-run-fixture.test.js
+node --test .\tests\schema-compatibility-dry-run-fixture.test.js
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
+P25.5 deliberately does not run `npm test` as a broad suite and does not execute any future CLI command because the CLI is not implemented in this phase.
+
 ## 10. Hard Stops
 
 Stop and request explicit approval before:
@@ -298,3 +310,14 @@ P25.5-schema-compatibility-dry-run-fixture-contract
 ```
 
 That slice should add only synthetic fixture data and fixture tests before any CLI implementation. Runtime schema/version enforcement remains blocked until dry-run evidence and explicit approval exist.
+
+## 13. P25.5 Fixture Contract Result
+
+P25.5 adds:
+
+- `tests/fixtures/schema-compatibility-dry-run-v1.json`
+- `tests/schema-compatibility-dry-run-fixture.test.js`
+
+The fixture is synthetic and fixture-only. It locks the planned dry-run report contract fields, accepted/missing/unknown policy counts, fail-closed `DRY_RUN_BLOCKED` semantics when blockers are present, no-side-effect safety flags, public MCP three-tool freeze, rejected flag list, and no raw secret/workspace exposure boundary.
+
+P25.5 does not implement the CLI, add a package script, implement runtime schema/version enforcement, scan real memory, run migration/import-export apply, write durable state, start services, call providers, push, tag, release, or deploy.

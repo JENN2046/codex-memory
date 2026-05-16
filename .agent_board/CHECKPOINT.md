@@ -353,3 +353,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation; diff inspection.
 - A5 boundary for this batch: no CLI implementation, no package script, no runtime schema/version enforcement, no public MCP expansion, no real memory scan, no migration/import-export apply, no durable write, no service start, no provider call, no push, tag, release, or deploy.
 - Next safe action: `P25.5-schema-compatibility-dry-run-fixture-contract` as fixture/test planning or implementation only after a separate scoped task.
+
+## CM-0220 - P25.5 Schema Compatibility Dry-Run Fixture Contract
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: fixture/test/docs/board-only contract for the future schema compatibility dry-run output.
+- Changed files: `tests/fixtures/schema-compatibility-dry-run-v1.json`; `tests/schema-compatibility-dry-run-fixture.test.js`; `docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result: the synthetic fixture locks planned report fields, accepted/missing/unknown policy counts, fail-closed blocker decision semantics, rejected unsafe flags, public MCP three-tool freeze, no-side-effect safety flags, and raw secret/workspace exposure boundaries.
+- Validation: `node --check tests\schema-compatibility-dry-run-fixture.test.js`; `node --test tests\schema-compatibility-dry-run-fixture.test.js` `9/9`; `node --test tests\schema-version-policy-fixture.test.js tests\schema-compatibility-dry-run-fixture.test.js` `19/19`; `git diff --check`; docs validation; read-only Verifier `PASS`.
+- A5 boundary for this batch: no CLI implementation, package script, runtime schema/version enforcement, public MCP expansion, real memory scan, migration/import-export apply, durable write, service start, provider call, push, tag, release, or deploy.
+- Next safe action: guarded local commit if pre-commit status/diff review remains clean, then separately scope any future CLI work.

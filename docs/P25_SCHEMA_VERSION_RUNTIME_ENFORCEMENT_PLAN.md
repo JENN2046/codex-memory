@@ -156,7 +156,8 @@ Recommended next phases:
 2. `P25.2-schema-version-policy-fixture-tests`
 3. `P25.3-validation-aggregator-schema-status-report-shape`
 4. `P25.4-schema-compatibility-dry-run-cli-plan`
-5. `P25.x-schema-version-runtime-enforcement-closeout-review`
+5. `P25.5-schema-compatibility-dry-run-fixture-contract`
+6. `P25.x-schema-version-runtime-enforcement-closeout-review`
 
 Implementation phases must define allowed files, forbidden files, rollback story, and validation commands before editing runtime code.
 
@@ -169,6 +170,8 @@ P25.3 validation aggregator schema status report shape is represented by the cur
 P25.3 does not implement runtime schema/version enforcement. The aggregator still reports `runtimeEnforcementImplemented=false` for the P25 policy evidence and keeps schema/version runtime enforcement as a blocker. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
 P25.4 schema compatibility dry-run CLI planning is documented in [P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md](./P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md). It defines a future fixture-first dry-run CLI boundary, candidate output contract, future allowed files, validation plan, hard stops, and rollback path. P25.4 is planning only: no CLI implementation, no package script, no runtime enforcement, no real memory scan, no migration/import-export apply, no durable write, no service start, no provider call, and no push/tag/release/deploy.
+
+P25.5 schema compatibility dry-run fixture contract is implemented in `tests/fixtures/schema-compatibility-dry-run-v1.json` and `tests/schema-compatibility-dry-run-fixture.test.js`. It locks the future dry-run output contract fields, accepted/missing/unknown policy counts, rejected apply-like and remote side-effect flags, public MCP three-tool freeze, no-side-effect safety flags, and no raw secret/workspace exposure. P25.5 still does not implement a CLI, add a package script, implement runtime enforcement, scan real memory, run migration/import-export apply, write durable state, start services, call providers, push, tag, release, or deploy.
 
 ## 10. Validation For This Planning Phase
 

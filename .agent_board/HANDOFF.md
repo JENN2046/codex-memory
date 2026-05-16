@@ -270,3 +270,39 @@ Recall impact: none; docs/board only.
 Remaining risks: future CLI is not implemented; runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked.
 
 Next safe step: `P25.5-schema-compatibility-dry-run-fixture-contract` if explicitly selected as a separate scoped local task; do not implement CLI, package script, runtime enforcement, or real memory scan from this handoff alone.
+
+## CM-0220 Commander Handoff - P25.5 Schema Compatibility Dry-Run Fixture Contract
+
+Goal: add a synthetic fixture/test contract for the future schema compatibility dry-run report without implementing the CLI or runtime enforcement.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty with CM-0220 fixture/test/docs/board edits pending guarded local commit.
+
+Current area: `P25.5-schema-compatibility-dry-run-fixture-contract`
+
+Changed files: `tests/fixtures/schema-compatibility-dry-run-v1.json`; `tests/schema-compatibility-dry-run-fixture.test.js`; `docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check tests\schema-compatibility-dry-run-fixture.test.js`; targeted P25.5 fixture test `9/9`; combined P25 fixture tests `19/19`; `git diff --check`; docs validation; read-only Verifier `PASS`.
+
+Not validated: CLI behavior; package script wiring; runtime schema/version enforcement; full final RC matrix; live MCP/HTTP refresh; provider/profile; migration/import-export; durable write path; real memory scan.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: not checked by this batch.
+
+Compare: not run by this batch.
+
+Rollback: not run by this batch.
+
+Profile gate: not run.
+
+Audit impact: none expected; fixture/test/docs only and no durable memory mutation.
+
+Recall impact: none expected; no recall runtime code changed.
+
+Remaining risks: future CLI remains unimplemented; runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
+
+Next safe step: guarded local commit if pre-commit status/diff review remains clean, then separately scope future CLI work.

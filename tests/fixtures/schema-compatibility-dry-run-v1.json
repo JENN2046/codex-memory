@@ -1,0 +1,424 @@
+{
+  "schemaVersion": "schema-compatibility-dry-run-v1",
+  "version": "v1",
+  "phase": "P25.5-schema-compatibility-dry-run-fixture-contract",
+  "mode": "fixture-only",
+  "fixtureOnly": true,
+  "cliImplemented": false,
+  "packageScriptAdded": false,
+  "runtimeEnforcementImplemented": false,
+  "realMemoryScanned": false,
+  "mutated": false,
+  "outputContract": {
+    "schema": "codex-memory.schema-compatibility-dry-run.v1",
+    "requiredTopLevelFields": [
+      "schema",
+      "phase",
+      "decision",
+      "source",
+      "summary",
+      "compatibility",
+      "families",
+      "blockers",
+      "warnings",
+      "rejectedFlags",
+      "publicMcpTools",
+      "safety",
+      "next"
+    ],
+    "decisionLabels": [
+      "DRY_RUN_COMPATIBLE",
+      "DRY_RUN_COMPATIBLE_WITH_WARNINGS",
+      "DRY_RUN_BLOCKED",
+      "DRY_RUN_INVALID_INPUT"
+    ]
+  },
+  "sampleReport": {
+    "schema": "codex-memory.schema-compatibility-dry-run.v1",
+    "phase": "P25.5-schema-compatibility-dry-run-fixture-contract",
+    "decision": "DRY_RUN_BLOCKED",
+    "source": {
+      "mode": "fixture",
+      "fixture": "tests/fixtures/schema-compatibility-dry-run-v1.json",
+      "realMemoryScanned": false,
+      "sandboxPathRequired": false
+    },
+    "summary": {
+      "familiesChecked": 7,
+      "policyCaseCount": 21,
+      "acceptedPolicyCount": 7,
+      "missingPolicyCount": 7,
+      "unknownPolicyCount": 7,
+      "compatibleCount": 11,
+      "warningCount": 6,
+      "blockerCount": 4,
+      "rejectedFlagCount": 13
+    },
+    "compatibility": {
+      "missingVersionFallbackAccepted": true,
+      "unknownReadVersionPolicy": "warn_or_skip_by_family",
+      "unknownWriteVersionPolicy": "reject",
+      "runtimeEnforcementImplemented": false,
+      "migrationRequired": false,
+      "importExportApplyRequired": false
+    },
+    "families": [
+      {
+        "name": "mcp_contract",
+        "currentVersion": "mcp-contract-v1",
+        "acceptedVersions": [
+          "mcp-contract-v1"
+        ],
+        "missingVersionPolicy": "reject_public_contract_drift",
+        "unknownVersionPolicy": "reject_public_contract_drift",
+        "fallbackSafe": false,
+        "requiresMigrationApply": false
+      },
+      {
+        "name": "memory_record",
+        "currentVersion": "v1",
+        "acceptedVersions": [
+          "v1",
+          "vNext"
+        ],
+        "missingVersionPolicy": "allow_legacy_read_with_fallback",
+        "unknownVersionPolicy": "warn_and_skip_unsafe_fields",
+        "fallbackSafe": true,
+        "requiresMigrationApply": false
+      },
+      {
+        "name": "audit_event",
+        "currentVersion": "mutation-audit-shape-v1",
+        "acceptedVersions": [
+          "mutation-audit-shape-v1"
+        ],
+        "missingVersionPolicy": "allow_legacy_parse_with_warning",
+        "unknownVersionPolicy": "warn_and_skip_unsafe_fields",
+        "fallbackSafe": true,
+        "requiresMigrationApply": false
+      },
+      {
+        "name": "lifecycle_policy",
+        "currentVersion": "lifecycle-policy-v1",
+        "acceptedVersions": [
+          "lifecycle-policy-v1",
+          "lifecycle-read-policy-v1",
+          "lifecycle-read-policy-runtime-v1"
+        ],
+        "missingVersionPolicy": "allow_default_off_policy",
+        "unknownVersionPolicy": "fail_safe_hidden_for_mutating_paths",
+        "fallbackSafe": true,
+        "requiresMigrationApply": false
+      },
+      {
+        "name": "import_export_envelope",
+        "currentVersion": "vNext-import-export-safe-json",
+        "acceptedVersions": [
+          "vNext-import-export-safe-json"
+        ],
+        "missingVersionPolicy": "reject_import_preview_missing_version",
+        "unknownVersionPolicy": "reject_import_preview_unknown_version",
+        "fallbackSafe": false,
+        "requiresMigrationApply": false
+      },
+      {
+        "name": "migration_readiness_report",
+        "currentVersion": "vcp-memory-migration-readiness-v1",
+        "acceptedVersions": [
+          "vcp-memory-migration-readiness-v1"
+        ],
+        "missingVersionPolicy": "warn_report_not_ready",
+        "unknownVersionPolicy": "warn_report_not_ready",
+        "fallbackSafe": true,
+        "requiresMigrationApply": false
+      },
+      {
+        "name": "validation_aggregator_report",
+        "currentVersion": "v1-rc-validation-aggregator-v1",
+        "acceptedVersions": [
+          "v1-rc-validation-aggregator-v1"
+        ],
+        "missingVersionPolicy": "reject_gate_report_missing_version",
+        "unknownVersionPolicy": "reject_gate_report_unknown_version",
+        "fallbackSafe": false,
+        "requiresMigrationApply": false
+      }
+    ],
+    "blockers": [
+      {
+        "id": "public-mcp-contract-drift",
+        "reason": "public MCP contract drift must fail closed",
+        "mutated": false
+      },
+      {
+        "id": "missing-import-envelope-version",
+        "reason": "import preview requires an explicit envelope version",
+        "mutated": false
+      },
+      {
+        "id": "unknown-validation-aggregator-report-version",
+        "reason": "gate reports with unknown versions cannot be accepted",
+        "mutated": false
+      },
+      {
+        "id": "runtime-enforcement-not-implemented",
+        "reason": "schema/version runtime enforcement remains planned only",
+        "mutated": false
+      }
+    ],
+    "warnings": [
+      {
+        "id": "missing-memory-record-version",
+        "reason": "legacy durable records may read through fallback",
+        "mutated": false
+      },
+      {
+        "id": "unknown-memory-record-version",
+        "reason": "unknown durable read versions skip unsafe fields",
+        "mutated": false
+      },
+      {
+        "id": "missing-audit-event-version",
+        "reason": "legacy audit parse is warning-only",
+        "mutated": false
+      },
+      {
+        "id": "unknown-audit-event-version",
+        "reason": "unknown audit versions skip unsafe fields",
+        "mutated": false
+      },
+      {
+        "id": "missing-migration-report-version",
+        "reason": "unversioned readiness report is not ready",
+        "mutated": false
+      },
+      {
+        "id": "unknown-migration-report-version",
+        "reason": "unknown readiness report is not ready",
+        "mutated": false
+      }
+    ],
+    "rejectedFlags": [
+      "--apply",
+      "--confirm",
+      "--migrate",
+      "--write",
+      "--mutate",
+      "--import",
+      "--export",
+      "--real-memory",
+      "--provider",
+      "--start-service",
+      "--deploy",
+      "--release",
+      "--push"
+    ],
+    "publicMcpTools": {
+      "frozen": true,
+      "tools": [
+        "record_memory",
+        "search_memory",
+        "memory_overview"
+      ]
+    },
+    "safety": {
+      "dryRun": true,
+      "mutated": false,
+      "providerCalls": 0,
+      "durableMemoryTouched": false,
+      "realMemoryScanned": false,
+      "serviceStarted": false,
+      "migrationApplied": false,
+      "importExportApplied": false,
+      "backupCreated": false,
+      "runtimeEnforcementChanged": false,
+      "packageChanged": false,
+      "configChanged": false,
+      "publicMcpExpanded": false,
+      "pushed": false,
+      "tagged": false,
+      "released": false,
+      "deployed": false,
+      "credentialValuesExposed": false,
+      "rawWorkspaceIdsExposed": false
+    },
+    "next": {
+      "runtimeEnforcementStillBlocked": true,
+      "requiresApprovalForRealMemoryScan": true,
+      "requiresApprovalForMigrationApply": true,
+      "requiresApprovalForImportExportApply": true,
+      "requiresApprovalForPackageScript": true
+    }
+  },
+  "policyCases": [
+    {
+      "id": "accepted-mcp-contract-current",
+      "category": "accepted_current_version",
+      "schemaFamily": "mcp_contract",
+      "inputVersion": "mcp-contract-v1",
+      "expectedDecision": "allow",
+      "expectedMutated": false
+    },
+    {
+      "id": "accepted-memory-record-current",
+      "category": "accepted_current_version",
+      "schemaFamily": "memory_record",
+      "inputVersion": "v1",
+      "expectedDecision": "allow",
+      "expectedMutated": false
+    },
+    {
+      "id": "accepted-audit-event-current",
+      "category": "accepted_current_version",
+      "schemaFamily": "audit_event",
+      "inputVersion": "mutation-audit-shape-v1",
+      "expectedDecision": "allow",
+      "expectedMutated": false
+    },
+    {
+      "id": "accepted-lifecycle-policy-current",
+      "category": "accepted_current_version",
+      "schemaFamily": "lifecycle_policy",
+      "inputVersion": "lifecycle-policy-v1",
+      "expectedDecision": "allow",
+      "expectedMutated": false
+    },
+    {
+      "id": "accepted-import-export-envelope-current",
+      "category": "accepted_current_version",
+      "schemaFamily": "import_export_envelope",
+      "inputVersion": "vNext-import-export-safe-json",
+      "expectedDecision": "allow",
+      "expectedMutated": false
+    },
+    {
+      "id": "accepted-migration-readiness-report-current",
+      "category": "accepted_current_version",
+      "schemaFamily": "migration_readiness_report",
+      "inputVersion": "vcp-memory-migration-readiness-v1",
+      "expectedDecision": "allow",
+      "expectedMutated": false
+    },
+    {
+      "id": "accepted-validation-aggregator-report-current",
+      "category": "accepted_current_version",
+      "schemaFamily": "validation_aggregator_report",
+      "inputVersion": "v1-rc-validation-aggregator-v1",
+      "expectedDecision": "allow",
+      "expectedMutated": false
+    },
+    {
+      "id": "missing-mcp-contract-version",
+      "category": "missing_version",
+      "schemaFamily": "mcp_contract",
+      "inputVersion": null,
+      "expectedDecision": "reject_public_contract_drift",
+      "expectedMutated": false
+    },
+    {
+      "id": "missing-memory-record-version",
+      "category": "missing_version",
+      "schemaFamily": "memory_record",
+      "inputVersion": null,
+      "expectedDecision": "allow_legacy_read_with_fallback",
+      "expectedMutated": false
+    },
+    {
+      "id": "missing-audit-event-version",
+      "category": "missing_version",
+      "schemaFamily": "audit_event",
+      "inputVersion": null,
+      "expectedDecision": "allow_legacy_parse_with_warning",
+      "expectedMutated": false
+    },
+    {
+      "id": "missing-lifecycle-policy-version",
+      "category": "missing_version",
+      "schemaFamily": "lifecycle_policy",
+      "inputVersion": null,
+      "expectedDecision": "allow_default_off_policy",
+      "expectedMutated": false
+    },
+    {
+      "id": "missing-import-export-envelope-version",
+      "category": "missing_version",
+      "schemaFamily": "import_export_envelope",
+      "inputVersion": null,
+      "expectedDecision": "reject_import_preview_missing_version",
+      "expectedMutated": false
+    },
+    {
+      "id": "missing-migration-readiness-report-version",
+      "category": "missing_version",
+      "schemaFamily": "migration_readiness_report",
+      "inputVersion": null,
+      "expectedDecision": "warn_report_not_ready",
+      "expectedMutated": false
+    },
+    {
+      "id": "missing-validation-aggregator-report-version",
+      "category": "missing_version",
+      "schemaFamily": "validation_aggregator_report",
+      "inputVersion": null,
+      "expectedDecision": "reject_gate_report_missing_version",
+      "expectedMutated": false
+    },
+    {
+      "id": "unknown-mcp-contract-version",
+      "category": "unknown_version",
+      "schemaFamily": "mcp_contract",
+      "inputVersion": "v99",
+      "expectedDecision": "reject_public_contract_drift",
+      "expectedMutated": false
+    },
+    {
+      "id": "unknown-memory-record-version",
+      "category": "unknown_version",
+      "schemaFamily": "memory_record",
+      "inputVersion": "v99",
+      "expectedDecision": "warn_and_skip_unsafe_fields",
+      "expectedMutated": false
+    },
+    {
+      "id": "unknown-audit-event-version",
+      "category": "unknown_version",
+      "schemaFamily": "audit_event",
+      "inputVersion": "v99",
+      "expectedDecision": "warn_and_skip_unsafe_fields",
+      "expectedMutated": false
+    },
+    {
+      "id": "unknown-lifecycle-policy-version",
+      "category": "unknown_version",
+      "schemaFamily": "lifecycle_policy",
+      "inputVersion": "v99",
+      "expectedDecision": "fail_safe_hidden_for_mutating_paths",
+      "expectedMutated": false
+    },
+    {
+      "id": "unknown-import-export-envelope-version",
+      "category": "unknown_version",
+      "schemaFamily": "import_export_envelope",
+      "inputVersion": "v99",
+      "expectedDecision": "reject_import_preview_unknown_version",
+      "expectedMutated": false
+    },
+    {
+      "id": "unknown-migration-readiness-report-version",
+      "category": "unknown_version",
+      "schemaFamily": "migration_readiness_report",
+      "inputVersion": "v99",
+      "expectedDecision": "warn_report_not_ready",
+      "expectedMutated": false
+    },
+    {
+      "id": "unknown-validation-aggregator-report-version",
+      "category": "unknown_version",
+      "schemaFamily": "validation_aggregator_report",
+      "inputVersion": "v99",
+      "expectedDecision": "reject_gate_report_unknown_version",
+      "expectedMutated": false
+    }
+  ],
+  "nextPhase": "P25.6-schema-compatibility-dry-run-cli-implementation-planning"
+}
