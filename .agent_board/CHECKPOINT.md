@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Create P24 validation aggregator implementation plan after the P23.12 A4-safe validation slice local commit.
+Add P24.4 minimal validation aggregator CLI decision and exit-code semantics after the P24.3 local commit.
 
 ## Current Area
 
-P24 validation aggregator implementation planning
+P24 validation aggregator CLI decision/exit-code semantics
 
 ## Current Status
 
@@ -35,7 +35,9 @@ P24 validation aggregator implementation planning
 - P23.10 defines final RC validation matrix execution planning, including validation groups, evidence sources, pass/fail semantics, execution order, evidence capture, stop conditions, and A4.8/A5 split.
 - P23.11 scopes final RC validation matrix execution, classifying validation items as A4.8-safe, A5-gated, runtime-implementation-required, or blocked before any matrix execution.
 - P23.12 executes the A4-safe slice only; decision `A4_SAFE_SLICE_PASSED`. Conditional live MCP/HTTP evidence was skipped because the service was not already reachable.
-- P24 plans a future validation aggregator but does not implement it.
+- P24 plans a future validation aggregator.
+- P24.1 fixture shape tests, P24.2 minimal core report builder, and P24.3 direct-node CLI wiring are committed locally.
+- P24.4 now adds default/strict/help exit-code semantics locally; requested validation passed.
 
 ## Completed Work In This Batch
 
@@ -142,12 +144,14 @@ P24 validation aggregator implementation planning
 - P24.1 validation aggregator fixture shape targeted validation: `node --check tests\v1-rc-validation-aggregator.test.js` passed; `node --test tests\v1-rc-validation-aggregator.test.js` passed `8/8`.
 - P24.2 validation aggregator minimal implementation targeted validation: syntax checks passed for `src\core\ValidationAggregatorService.js` and `tests\v1-rc-validation-aggregator-implementation.test.js`; targeted aggregator tests passed `13/13`; emitted decision remains `NOT_READY_BLOCKED`.
 - P24.3 validation aggregator CLI targeted validation: syntax checks passed for core/CLI/tests; fixture test passed `8/8`; implementation test passed `5/5`; CLI test passed `6/6`; direct CLI smoke emitted JSON decision `NOT_READY_BLOCKED`.
+- P24.4 validation: syntax checks passed for core/CLI/tests; fixture test passed `8/8`; implementation test passed `5/5`; CLI test passed `12/12`; default CLI smoke emitted JSON decision `NOT_READY_BLOCKED` and exit `0`; strict CLI smoke emitted JSON decision `NOT_READY_BLOCKED` and exit `1`; diff/docs/P2 whitespace validation passed.
 
 ## Not Done
 
 - No final RC validation matrix execution.
 - No full validation aggregator implementation.
 - No package script wiring for the minimal CLI.
+- No P24.5 evidence-source-map work yet.
 - No full final RC validation matrix execution.
 - No live MCP/HTTP refresh because service was not already reachable.
 - No temporary worktree created in this result-record phase.
@@ -177,4 +181,4 @@ P24 validation aggregator implementation planning
 
 ## Next Safe Action
 
-Run final P24.3 diff/docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P24.3-validation-aggregator-cli-wiring-minimal-implementation-local-commit`.
+Complete the authorized P24.4 local commit and stop before any push. Next recommended phase is `P24.5-validation-aggregator-evidence-source-map`.

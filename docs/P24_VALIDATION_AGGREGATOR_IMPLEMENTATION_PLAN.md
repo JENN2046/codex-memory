@@ -176,13 +176,21 @@ Suggested statuses:
 
 Decision labels:
 
-- `A4_SAFE_SLICE_PASSED`
+- `READY_FOR_V1_0_RC`
 - `READY_FOR_DOCS_ONLY_RC_REVIEW`
-- `READY_PENDING_A5_AUTHORIZATION`
+- `A4_SAFE_SLICE_PASSED`
+- `BLOCKED_RUNTIME_REQUIRED`
+- `BLOCKED_A5_REQUIRED`
 - `NOT_READY_BLOCKED`
-- `FAILED_VALIDATION`
 
 The aggregator must not report `READY_FOR_V1_0_RC` while full matrix execution, schema/runtime enforcement, or required A5 approvals remain unresolved.
+
+CLI exit-code semantics:
+
+- default report mode exits `0` for all current decision labels because it is read-only evidence/report generation.
+- strict gate mode exits `0` only for `READY_FOR_V1_0_RC`.
+- strict gate mode exits `1` for `READY_FOR_DOCS_ONLY_RC_REVIEW`, `A4_SAFE_SLICE_PASSED`, `NOT_READY_BLOCKED`, `BLOCKED_RUNTIME_REQUIRED`, and `BLOCKED_A5_REQUIRED` unless a future scoped phase explicitly adds a docs-only gate mode.
+- rejected live/provider/apply/deploy/release flags exit `1` without executing the rejected action.
 
 ## 10. A4-Safe Checks
 
@@ -331,14 +339,16 @@ Suggested sequence:
 1. `P24.1-validation-aggregator-fixture-shape-tests`
 2. `P24.2-validation-aggregator-minimal-implementation`
 3. `P24.3-validation-aggregator-cli-wiring-minimal-implementation`
-4. `P24.4-validation-aggregator-report-shape-gate`
-5. `P24.5-validation-aggregator-closeout-review`
+4. `P24.4-validation-aggregator-decision-exit-code-semantics`
+5. `P24.5-validation-aggregator-evidence-source-map`
 
 Do not combine package script addition, runtime implementation, live MCP refresh, provider execution, migration apply, or release action into the same phase.
 
 P24.2 adds the minimal local core implementation in `src/core/ValidationAggregatorService.js` plus narrow implementation tests in `tests/v1-rc-validation-aggregator-implementation.test.js`. It does not add a CLI wrapper, package script, live evidence refresh, full final RC matrix execution, schema/version runtime enforcement, or A5-gated action.
 
 P24.3 adds direct-node CLI wiring in `src/cli/v1-rc-validation-aggregator.js` plus narrow CLI tests in `tests/v1-rc-validation-aggregator-cli.test.js`. It does not add a package script, start services, refresh live MCP/HTTP evidence, run providers, apply migrations/import-export, mutate durable memory, or change the `NOT_READY_BLOCKED` decision.
+
+P24.4 adds minimal CLI decision and exit-code semantics: default report mode preserves JSON output and exits `0`; `--strict` preserves the same JSON output but exits `1` for the current `NOT_READY_BLOCKED` report; `--help` prints short usage text without running live checks. It does not add a package script, implement the full aggregator, implement schema/version runtime enforcement, start services, refresh live MCP/HTTP evidence, run providers, apply migrations/import-export, mutate durable memory, or change public MCP tools.
 
 ## 19. Stop Conditions
 
@@ -370,3 +380,5 @@ P24.1 fixture/shape-test work is the next completed implementation-facing contra
 P24.2 minimal implementation is the next completed core skeleton layer. The next safe phase after P24.2 is `P24.2-validation-aggregator-minimal-implementation-local-commit`, followed by a separate CLI wrapper plan or implementation phase that still avoids package script changes unless explicitly authorized.
 
 P24.3 minimal CLI wiring is the next completed executable wrapper layer. The next safe phase after P24.3 is `P24.3-validation-aggregator-cli-wiring-minimal-implementation-local-commit`, followed by a report-shape gate or full matrix aggregation planning phase that still avoids package script changes unless explicitly authorized.
+
+P24.4 decision/exit-code semantics is the next completed CLI gate-semantics layer. The next safe phase after P24.4 is `P24.5-validation-aggregator-evidence-source-map`, focused on mapping each report field/check to its source without package script changes, live refresh, provider calls, migrations, or release actions unless explicitly authorized.

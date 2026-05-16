@@ -2,6 +2,10 @@ const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 const test = require('node:test');
+const {
+  getExitCodeForDecision,
+  parseArgs
+} = require('../src/cli/v1-rc-validation-aggregator');
 
 const cliPath = path.join('src', 'cli', 'v1-rc-validation-aggregator.js');
 const workspaceRoot = path.resolve(__dirname, '..');
@@ -24,10 +28,11 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(result.status, 0, result.stderr || 'non-zero exit');
   const report = parseJsonResult(result);
   assert.equal(report.schemaVersion, 'v1-rc-validation-aggregator-v1');
-  assert.equal(report.phase, 'P24.3-validation-aggregator-cli-wiring-minimal-implementation');
+  assert.equal(report.phase, 'P24.4-validation-aggregator-decision-exit-code-semantics');
   assert.equal(report.generated_at, '2026-05-16T00:00:00.000Z');
   assert.equal(report.mode, 'read-only');
   assert.equal(report.evidence.p24Aggregator.minimalCliWiring, true);
+  assert.equal(report.evidence.p24Aggregator.decisionExitCodeSemantics, true);
 });
 
 test('minimal validation aggregator CLI preserves honest blocked decision', () => {
@@ -78,6 +83,100 @@ test('minimal validation aggregator CLI keeps A5-gated items blocked', () => {
   assert.equal(report.safety.serviceStarted, false);
   assert.equal(report.safety.mutated, false);
   assert.equal(report.safety.durableMemoryTouched, false);
+});
+
+test('minimal validation aggregator CLI strict mode exits 1 for current blocked report while emitting JSON', () => {
+  const result = runCli(['--strict', '--generated-at', '2026-05-16T00:00:00.000Z']);
+
+  assert.equal(result.status, 1, 'strict mode should fail closed for NOT_READY_BLOCKED');
+  assert.equal(result.stderr, '');
+  const report = parseJsonResult(result);
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.generated_at, '2026-05-16T00:00:00.000Z');
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
+  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+});
+
+test('minimal validation aggregator CLI strict mode does not execute A5-gated checks', () => {
+  const report = parseJsonResult(runCli(['--strict']));
+
+  for (const key of [
+    'migrationImportExportApply',
+    'providerExecution',
+    'startupWatchdog',
+    'clientConfigSwitch',
+    'productionDeploy',
+    'pushTagReleaseDeploy'
+  ]) {
+    assert.equal(report.checks[key].status, 'blocked_pending_a5', key);
+    assert.equal(report.checks[key].a5Gated, true, key);
+  }
+
+  assert.equal(report.safety.providerCalls, 0);
+  assert.equal(report.safety.serviceStarted, false);
+  assert.equal(report.safety.mutated, false);
+  assert.equal(report.safety.durableMemoryTouched, false);
+  assert.equal(report.safety.migrationApplied, false);
+  assert.equal(report.safety.importExportApplied, false);
+});
+
+test('minimal validation aggregator CLI help mode exits 0 without JSON report or live checks', () => {
+  const result = runCli(['--help']);
+
+  assert.equal(result.status, 0, result.stderr || 'non-zero exit');
+  assert.match(result.stdout, /Usage: node src\/cli\/v1-rc-validation-aggregator\.js/);
+  assert.match(result.stdout, /--strict/);
+  assert.match(result.stdout, /without running live checks/);
+  assert.throws(() => JSON.parse(result.stdout), SyntaxError);
+});
+
+test('minimal validation aggregator CLI decision exit-code semantics fail closed in strict mode', () => {
+  const defaultModeExpected = [
+    'READY_FOR_V1_0_RC',
+    'READY_FOR_DOCS_ONLY_RC_REVIEW',
+    'A4_SAFE_SLICE_PASSED',
+    'NOT_READY_BLOCKED',
+    'BLOCKED_RUNTIME_REQUIRED',
+    'BLOCKED_A5_REQUIRED'
+  ];
+
+  for (const decision of defaultModeExpected) {
+    assert.equal(getExitCodeForDecision(decision), 0, decision);
+  }
+
+  assert.equal(getExitCodeForDecision('READY_FOR_V1_0_RC', { strict: true }), 0);
+  for (const decision of [
+    'READY_FOR_DOCS_ONLY_RC_REVIEW',
+    'A4_SAFE_SLICE_PASSED',
+    'NOT_READY_BLOCKED',
+    'BLOCKED_RUNTIME_REQUIRED',
+    'BLOCKED_A5_REQUIRED'
+  ]) {
+    assert.equal(getExitCodeForDecision(decision, { strict: true }), 1, decision);
+  }
+  assert.equal(getExitCodeForDecision('READY_FOR_V1_0_RC', { rejected: true }), 1);
+});
+
+test('minimal validation aggregator CLI parses strict and help flags without implying live execution', () => {
+  assert.deepEqual(parseArgs(['--strict', '--pretty']), {
+    pretty: true,
+    strict: true,
+    help: false,
+    generatedAt: null,
+    rejectedFlag: null
+  });
+  assert.equal(parseArgs(['--help']).help, true);
+});
+
+test('minimal validation aggregator CLI package manifests remain untouched', () => {
+  const result = spawnSync('git', ['diff', '--name-only', '--', 'package.json', 'package-lock.json'], {
+    cwd: workspaceRoot,
+    encoding: 'utf8',
+    timeout: 30000
+  });
+
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout.trim(), '');
 });
 
 test('minimal validation aggregator CLI rejects live or side-effect flags', () => {

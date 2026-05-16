@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create P24 validation aggregator implementation plan after the P23.12 A4-safe validation slice local commit.
+Add P24.4 minimal validation aggregator CLI decision and exit-code semantics after the P24.3 local commit.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 is locally committed in `82fb28c`; P23.8 is locally committed in `d5f70b7`; P23.9 is locally committed in `0aa02fa`; P23.10 is locally committed in `56bc568`; P23.11 is locally committed in `e9971b8`; P23.12 is locally committed in `54586b8`; P24 docs/board edits are local on top of unpushed commits through `54586b8`. User did not authorize commit or push for P24.
+P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 is locally committed in `82fb28c`; P23.8 is locally committed in `d5f70b7`; P23.9 is locally committed in `0aa02fa`; P23.10 is locally committed in `56bc568`; P23.11 is locally committed in `e9971b8`; P23.12 is locally committed in `54586b8`; P24 planning through P24.3 are locally committed through `220ffa6`. P24.4 local commit is explicitly authorized in this phase. Push is not authorized.
 
 ## Current Area
 
-P24 validation aggregator implementation planning
+P24 validation aggregator CLI decision/exit-code semantics
 
 ## Findings
 
@@ -57,7 +57,9 @@ P24 validation aggregator implementation planning
 - P23.10 defines final RC validation matrix execution planning but does not execute the matrix.
 - P23.11 scopes final RC validation matrix execution and classifies items as A4.8-safe, A5-gated, runtime-implementation-required, or blocked.
 - P23.12 executes A4-safe validation only; decision `A4_SAFE_SLICE_PASSED`. Conditional live MCP/HTTP evidence was skipped because service was not already reachable.
-- P24 plans a validation aggregator implementation but does not implement it.
+- P24 plans a validation aggregator implementation.
+- P24.1 fixture shape tests, P24.2 minimal core report builder, and P24.3 direct-node CLI wiring are committed locally.
+- P24.4 adds default report exit `0`, strict blocked exit `1`, and help exit `0` semantics locally; requested validation passed.
 
 ## Changed Files
 
@@ -117,12 +119,14 @@ P24 validation aggregator implementation planning
 - P24.1 validation aggregator fixture shape targeted validation: `node --check tests\v1-rc-validation-aggregator.test.js` passed; `node --test tests\v1-rc-validation-aggregator.test.js` passed `8/8`.
 - P24.2 validation aggregator minimal implementation targeted validation: syntax checks passed for `src\core\ValidationAggregatorService.js` and `tests\v1-rc-validation-aggregator-implementation.test.js`; targeted aggregator tests passed `13/13`; emitted decision remains `NOT_READY_BLOCKED`.
 - P24.3 validation aggregator CLI targeted validation: syntax checks passed for core/CLI/tests; fixture test passed `8/8`; implementation test passed `5/5`; CLI test passed `6/6`; direct CLI smoke emitted JSON decision `NOT_READY_BLOCKED`.
+- P24.4 validation: syntax checks passed for core/CLI/tests; fixture test passed `8/8`; implementation test passed `5/5`; CLI test passed `12/12`; default CLI smoke emitted JSON decision `NOT_READY_BLOCKED` and exit `0`; strict CLI smoke emitted JSON decision `NOT_READY_BLOCKED` and exit `1`; diff/docs/P2 whitespace validation passed.
 
 ## Not Done
 
 - No final RC validation matrix execution.
 - No full validation aggregator implementation.
 - No package script wiring for the minimal CLI.
+- No P24.5 evidence-source-map work yet.
 - No full final RC validation matrix execution.
 - No live MCP/HTTP refresh because service was not already reachable.
 - No worktree created in this result-record phase.
@@ -149,4 +153,4 @@ P24 validation aggregator implementation planning
 
 ## Next Safe Step
 
-Run final P24.3 diff/docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P24.3-validation-aggregator-cli-wiring-minimal-implementation-local-commit`.
+Complete the authorized P24.4 local commit and stop before any push. Next recommended phase is `P24.5-validation-aggregator-evidence-source-map`.
