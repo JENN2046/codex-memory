@@ -979,7 +979,7 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty for CM-0249 docs/status/board-only implementation review edits.
+Worktree: CM-0249 committed locally at `461dc02`; dirty for CM-0250 fixture-only CLI source/test/docs/board edits.
 
 Current area: `P27.3-approval-packet-cli-implementation-review`
 
@@ -993,4 +993,28 @@ HTTP health: no service action for CM-0249.
 
 Remaining risks: no further push is authorized by the current `continue` instruction; actual CLI implementation, tests, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: guarded local commit if final diff review remains scoped, then move to P27.4 fixture-only CLI source/test implementation as the next useful local slice.
+Commit: `461dc02 docs: review p27 cli implementation scope`.
+
+## CM-0250 Commander Handoff - P27.4 Fixture-Only Approval Packet CLI
+
+Goal: add a direct-node fixture-only approval-packet CLI that reads only the committed P27 fixture and refuses non-fixture or side-effectful actions.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0250 fixture-only CLI source/test/docs/board edits.
+
+Current area: `P27.4-fixture-only-approval-packet-cli`
+
+Changed files: `src/cli/migration-import-export-approval-packet.js`; `tests/migration-import-export-approval-packet-cli.test.js`; `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: syntax checks passed; targeted CLI test `12/12`; targeted fixture test `13/13`; direct CLI `--json`, rejected `--json --apply`, and `--help` smokes passed; `npm test` `580/580`; `git diff --check` passed; docs validation passed; read-only Verifier `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0250.
+
+Remaining risks: package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: guarded local commit if final status/diff review remains clean, then select P27.5 validation aggregator evidence shape as a separate scoped task if still appropriate.

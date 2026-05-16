@@ -439,6 +439,60 @@ Decision: `P27_APPROVAL_PACKET_CLI_IMPLEMENTATION_REVIEW_READY_BLOCKED_FOR_SEPAR
 
 The future CLI appears safe as a narrow fixture-only source/test task, but P27.3 itself remains docs/status/board only. Do not implement the CLI in this phase.
 
+## P27.4 Fixture-Only CLI Result
+
+P27.4 adds the direct-node fixture-only CLI and targeted tests:
+
+- CLI: `src/cli/migration-import-export-approval-packet.js`
+- test: `tests/migration-import-export-approval-packet-cli.test.js`
+
+The CLI reads only:
+
+```text
+tests/fixtures/migration-import-export-approval-packet-v1.json
+```
+
+It does not add an npm package script.
+
+The CLI locks:
+
+- `--json` fixture report output
+- `status=blocked`
+- `decision=NOT_READY_BLOCKED` for the normal fixture report
+- `approvalStatus=BLOCKED_PENDING_APPROVAL`
+- `executionApproved=false`
+- `mutated=false`
+- `providerCalls=0`
+- `realMemoryScanned=false`
+- public MCP tools exactly `record_memory`, `search_memory`, and `memory_overview`
+- fail-closed JSON output for unsafe flags
+- non-fixture source modes rejected as invalid input
+- no raw secret, raw workspace id, or raw local path exposure in normal output
+
+Rejected unsafe flags:
+
+```text
+--apply
+--confirm
+--migrate
+--import
+--export
+--backup
+--restore
+--real-memory
+--provider
+--service
+--config
+--push
+--tag
+--release
+--deploy
+```
+
+P27.4 remains local and fixture-only. It does not scan real memory, export/import real memory, run SQLite migration apply, run import/export apply, create or restore backups, write durable state, call providers, expand public MCP tools, start services, change config/env/secrets, push, tag, release, or deploy.
+
+P27.4 decision: `P27_APPROVAL_PACKET_FIXTURE_ONLY_CLI_IMPLEMENTED`.
+
 ## Next Safe Action
 
-The next safe local action is either a guarded local commit for P27.3 or a separately scoped P27.4 fixture-only CLI source/test task. Do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.
+The next safe local action is targeted validation and a read-only Verifier review for P27.4. Do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.

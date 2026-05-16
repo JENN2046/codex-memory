@@ -478,7 +478,7 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0230 - First Authorized Push And Post-Push Gate
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: record first authorized push and post-push gate recovery.
@@ -716,12 +716,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0249 - P27.3 Approval Packet CLI Implementation Review
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: docs/status/board-only review for a future P27.4 fixture-only approval-packet CLI implementation slice.
 - Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
 - Result so far: P27.3 defines candidate implementation scope, allowed future behavior, still-disallowed actions, implementation preconditions, and a future task id without implementing the CLI.
 - Validation: `git diff --check` passed; docs validation passed; P27/P27.3 reference scan passed; read-only Verifier `PASS`.
-- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
+- Commit: `461dc02 docs: review p27 cli implementation scope`.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
+
+## CM-0250 - P27.4 Fixture-Only Approval Packet CLI
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: direct-node fixture-only approval-packet CLI implementation and targeted tests.
+- Changed files: `src/cli/migration-import-export-approval-packet.js`; `tests/migration-import-export-approval-packet-cli.test.js`; `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: CLI reads only the committed P27.1 fixture, emits JSON/text, rejects unsafe flags fail-closed, preserves public MCP three-tool freeze, and adds no package script.
+- Validation: syntax checks passed; targeted CLI test `12/12`; targeted fixture test `13/13`; direct CLI `--json`, rejected `--json --apply`, and `--help` smokes passed; `npm test` `580/580`; `git diff --check` passed; docs validation passed; read-only Verifier `PASS`.
+- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
+- A5 boundary: no package script, fixture mutation, real memory scan/export/import, SQLite migration apply, import/export apply, backup creation/restore, durable write, provider/model call, service startup, config/env/secret edit, public MCP expansion, push, tag, release, or deploy.
