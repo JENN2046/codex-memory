@@ -849,7 +849,7 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty for CM-0244 fixture/test/docs/board edits.
+Worktree: CM-0244 committed locally at `8dcbeb0`; dirty only for CM-0245 board-state reconciliation.
 
 Current area: `P27.1-migration-import-export-approval-packet-fixture-shape`
 
@@ -863,4 +863,30 @@ HTTP health: no service action for CM-0244.
 
 Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: guarded local commit only if final diff review remains scoped, then record a board-only checkpoint if needed.
+Commit: `8dcbeb0 test: add p27 approval packet fixture`.
+
+Next safe step: validate and commit CM-0245 board-only reconciliation if final status/diff review remains clean.
+
+## CM-0245 Commander Handoff - Post-P27.1 Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `8dcbeb0`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for CM-0245 board-state reconciliation.
+
+Current area: `P27-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0245.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: validate and commit this board-only reconciliation, then select the next safe local P27.2 planning slice.

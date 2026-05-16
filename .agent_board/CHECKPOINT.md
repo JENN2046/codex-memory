@@ -656,12 +656,23 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0244 - P27.1 Migration Import-Export Approval Packet Fixture Shape
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: synthetic fixture/test contract for P27 approval packet shape.
 - Changed files: `tests/fixtures/migration-import-export-approval-packet-v1.json`; `tests/migration-import-export-approval-packet-fixture.test.js`; `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
 - Result so far: fixture/test lock blocked approval status, required approvals, approval packet sections, no-side-effect safety flags, required wording, forbidden claims, and public MCP three-tool freeze.
 - Validation: `node --check tests\migration-import-export-approval-packet-fixture.test.js` passed; targeted fixture test `13/13`; combined fixture tests `32/32`; `npm test` `568/568`; `git diff --check` passed; docs validation passed; read-only Verifier `PASS`.
-- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
+- Commit: `8dcbeb0 test: add p27 approval packet fixture`.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
+
+## CM-0245 - Post-P27.1 Board-State Reconciliation
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `8dcbeb0`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result so far: board state records that CM-0244 is committed locally and no longer pending guarded commit.
+- Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
