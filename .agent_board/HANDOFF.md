@@ -161,4 +161,4 @@ P0 mainline health / multi-worker governance
 
 ## Next Safe Step
 
-CM-0207 P24.6 rejected-flag report contract hardening, CM-0208 P24.7 rejected report contract parity, and CM-0209 P24 docs sync are committed locally at `d4f966d`; CM-0210 post-commit checkpoint is committed locally at `5a81bc7`. Next safe step is validating and committing this board-state correction, then continuing with another local P24/P25 hardening slice. Stop before push/tag/release/deploy or any runtime/config/provider/data side effect.
+CM-0207 P24.6 rejected-flag report contract hardening, CM-0208 P24.7 rejected report contract parity, and CM-0209 P24 docs sync are committed locally at `d4f966d`; CM-0210/CM-0211 board checkpoints are local-only. Next safe step is selecting a fresh local P24 report-shape planning slice or P25 schema/version runtime enforcement planning slice. Stop before push/tag/release/deploy or any runtime/config/provider/data side effect.

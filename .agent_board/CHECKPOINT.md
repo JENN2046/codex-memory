@@ -270,3 +270,14 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Changed files: `.agent_board/TASK_QUEUE.md`; `.agent_board/RUN_STATE.md`; `.agent_board/HANDOFF.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/VALIDATION_LOG.md`.
 - Validation: `git diff --check`; docs validation.
 - A5 boundary: no source/test/runtime/package/config/provider/data change, no durable write, no MCP expansion, no push, tag, release, or deploy.
+
+## CM-0212 - Board State Finalization
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only final wording so `RUN_STATE.md` and `HANDOFF.md` do not become stale immediately after the commit hash changes.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/HANDOFF.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/VALIDATION_LOG.md`.
+- Validation: `git diff --check`; docs validation.
+- Next safe action: choose a fresh local P24 report-shape planning slice or P25 schema/version runtime enforcement planning slice.
+- A5 boundary: no source/test/runtime/package/config/provider/data change, no durable write, no MCP expansion, no push, tag, release, or deploy.
