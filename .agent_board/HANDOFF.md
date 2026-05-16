@@ -2,7 +2,7 @@
 
 ## Goal
 
-Close P22 local HTTP MCP deploy/validation evidence chain; production deploy remains blocked.
+Create P23.2 schema/versioning plan after P23.1 contract inventory.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Docs/board local-deploy-result and closeout edits are local; user explicitly requested no commit and no push.
+P23 planning, P23.1, P23.2, and P23.3 docs/board edits are local on top of the unpushed P22 closeout commit; user explicitly requested no commit and no push.
 
 ## Current Area
 
-P22 local HTTP MCP deploy closeout
+P23.3 validation matrix hardening
 
 ## Findings
 
@@ -37,12 +37,20 @@ P22 local HTTP MCP deploy closeout
 - Local HTTP MCP deploy/validation completed: `/health ok`, live `initialize/tools/list ok`, public MCP tools exactly `record_memory/search_memory/memory_overview`, `observe:http status=ok`, MCP/HTTP tests `12/12`.
 - Production deploy remains blocked pending separate A5 authorization.
 - Closeout records that this is not production deploy, startup hardening, watchdog installation, Codex/Claude client switch, migration, durable memory activation, or v1.0 release.
+- P23 planning baseline defines v1.0 objective, stable MCP contract, schema versioning, memory safety, local deployment, client integration, migration/import-export, validation matrix, release gates, and P23.1-P23.7 breakdown.
+- P23.1 inventories current public tools, tool purposes, documentation-level input/output shapes, compatibility expectations, drift risks, post-v1.0 candidates, A5-gated changes, and validation expectations.
+- P23.2 defines current schema baseline, versioning goals, version identifier strategy, compatibility policy, migration/import-export boundary, rollback requirements, validation requirements, drift risks, and A5-gated schema actions.
+- P23.3 defines v1.0 validation matrix hardening across docs/status/board, MCP/HTTP, schema/versioning, security, migration/import-export dry-run, rollback, client boundary, local deployment, production deployment, startup/watchdog, and tag/release gates.
 
 ## Changed Files
 
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md`
 - `docs/P22_LOCAL_DEPLOY_RESULT_RECORD.md`
 - `docs/P22_LOCAL_DEPLOY_CLOSEOUT.md`
+- `docs/P23_V1_0_MEMORY_KERNEL_PLAN.md`
+- `docs/P23_1_MCP_CONTRACT_INVENTORY.md`
+- `docs/P23_2_SCHEMA_VERSIONING_PLAN.md`
+- `docs/P23_3_VALIDATION_MATRIX_HARDENING.md`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -59,6 +67,10 @@ P22 local HTTP MCP deploy closeout
 - Local deploy evidence already completed: `/health ok`; live `initialize/tools/list ok`; `observe:http status=ok`; MCP/HTTP tests `12/12`.
 - P22 local deploy result-record docs validation: `git diff --check` passed; docs validation passed.
 - P22 local deploy closeout docs validation: `git diff --check` passed; docs validation passed.
+- P23 planning docs validation: `git diff --check` passed; docs validation passed.
+- P23.1 contract inventory docs validation: `git diff --check` passed; docs validation passed.
+- P23.2 schema/versioning docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
+- P23.3 validation matrix docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 
 ## Not Done
 
@@ -71,6 +83,7 @@ P22 local HTTP MCP deploy closeout
 - No production deploy.
 - No provider command.
 - No live HTTP MCP startup.
+- No validator implementation.
 - No real memory preview.
 - No config mutation.
 - No startup/watchdog operation.
@@ -82,4 +95,4 @@ P22 local HTTP MCP deploy closeout
 
 ## Next Safe Step
 
-Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23-v1.0-memory-kernel-planning`.
+Validate docs and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.4-local-production-hardening-plan`.

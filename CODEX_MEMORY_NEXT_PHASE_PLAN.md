@@ -522,3 +522,19 @@ npm run gate:mainline
 - Interpretation: this is not production deploy, not startup hardening, not watchdog installation, not client integration switch, not memory migration, and not v1.0 release.
 - Next recommended phase: `P23-v1.0-memory-kernel-planning`.
 - Still A5-gated: watchdog/startup install, Codex/Claude config switching, formal production deploy, provider execution, durable memory write, migration/import-export apply.
+
+## Current P23 v1.0 Memory Kernel Planning
+
+- Phase: `P23-v1.0-memory-kernel-planning`
+- Status: planning baseline created
+- Plan: [docs/P23_V1_0_MEMORY_KERNEL_PLAN.md](/A:/codex-memory/docs/P23_V1_0_MEMORY_KERNEL_PLAN.md)
+- Contract inventory: [docs/P23_1_MCP_CONTRACT_INVENTORY.md](/A:/codex-memory/docs/P23_1_MCP_CONTRACT_INVENTORY.md)
+- Schema/versioning plan: [docs/P23_2_SCHEMA_VERSIONING_PLAN.md](/A:/codex-memory/docs/P23_2_SCHEMA_VERSIONING_PLAN.md)
+- Validation matrix hardening: [docs/P23_3_VALIDATION_MATRIX_HARDENING.md](/A:/codex-memory/docs/P23_3_VALIDATION_MATRIX_HARDENING.md)
+- Scope: planning/docs/status/board only.
+- v1.0 blockers: public MCP contract drift, schema/versioning gaps, failing security or CI gates, missing rollback story, unresolved migration/import-export boundary, unclear Codex/Claude client boundary, raw secret/workspace exposure, and unapproved A5 actions.
+- Still A5-gated: production deploy, startup/watchdog install, Codex/Claude config switch, provider execution, durable memory mutation expansion, SQLite migration, import/export apply, tag/release/deploy.
+- P23.1 result: public MCP tools remain exactly `record_memory`, `search_memory`, `memory_overview`; public tool additions remain post-v1.0 or separately authorized.
+- P23.2 result: schema/versioning planning is documented; no schema implementation, migration apply, import/export apply, durable memory mutation, public MCP tool change, or production deploy occurred.
+- P23.3 result: v1.0 validation matrix hardening is documented; no validator implementation, runtime/test/config/provider/migration/durable-memory/watchdog/startup/deploy action occurred.
+- Next recommended phase: `P23.4-local-production-hardening-plan`.
