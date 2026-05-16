@@ -159,6 +159,8 @@ Recommended next phases:
 
 Implementation phases must define allowed files, forbidden files, rollback story, and validation commands before editing runtime code.
 
+P25.1 inventory is tracked in [P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md](./P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md). It confirms existing fixture/test coverage and identifies the missing fixture contract for accepted/missing/unknown schema-version behavior.
+
 ## 10. Validation For This Planning Phase
 
 Docs-only validation:
@@ -169,4 +171,3 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 ```
 
 This phase is `COMPLETED_VALIDATED` only if the diff remains docs/board-only and no hard-stop action is crossed.
-

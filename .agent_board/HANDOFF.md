@@ -161,4 +161,4 @@ P0 mainline health / multi-worker governance
 
 ## Next Safe Step
 
-CM-0207 P24.6 rejected-flag report contract hardening, CM-0208 P24.7 rejected report contract parity, and CM-0209 P24 docs sync are committed locally at `d4f966d`; CM-0210/CM-0211 board checkpoints are local-only. Current user authorization allows A5 mode today, except `push` is deferred to the final step. P25 schema/version runtime enforcement planning is in progress as docs/board only; no runtime enforcement, migration/import-export apply, provider call, config mutation, deploy, release, tag, or push has been executed in this batch.
+CM-0207 P24.6 rejected-flag report contract hardening, CM-0208 P24.7 rejected report contract parity, and CM-0209 P24 docs sync are committed locally at `d4f966d`; CM-0210/CM-0211 board checkpoints are local-only. Current user authorization allows A5 mode today, except `push` is deferred to the final step. P25 and P25.1 schema/version planning are in progress as docs/board only; no runtime enforcement, migration/import-export apply, provider call, config mutation, deploy, release, tag, or push has been executed in this batch.

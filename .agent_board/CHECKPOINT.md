@@ -293,3 +293,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Result: P25 now has a planning entry that defines enforcement surfaces, compatibility policy, future test plan, dry-run boundary, A5 hard stops, and proposed P25.1-P25.x phase split.
 - Validation: `git diff --check`; `scripts/validate-local.ps1 -Area docs`; P25 local link/reference check.
 - A5 boundary for this batch: authorization recorded, but no A5 action executed; no runtime enforcement, public MCP schema/tool change, package/config change, service start, provider call, migration/import-export apply, durable write, tag, release, deploy, or push.
+
+## CM-0215 - P25.1 Schema/Version Enforcement Fixture Inventory
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: inventory existing schema/version fixture and test coverage before adding future policy fixture tests.
+- Changed files: `docs/P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result: existing coverage is mapped across public MCP contract, MCP strictness, VCP object model, import/export envelope, migration readiness, lifecycle, mutation audit, controlled-write dry-run, validation aggregator, and exposure boundaries.
+- Next: `P25.2-schema-version-policy-fixture-tests`.
+- Validation: `git diff --check`; docs validation; file/reference review.
+- A5 boundary for this batch: A5 authorization exists, but this batch remains docs/board-only; no runtime/test/package/config/provider/data change, no durable write, no MCP expansion, no migration/import-export apply, no push, tag, release, or deploy.
