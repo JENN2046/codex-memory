@@ -195,3 +195,5 @@ Rationale:
 `P23.12-final-rc-validation-matrix-a4-safe-execution-local-commit`
 
 After that local commit, the next safe planning phase should separate validation aggregator implementation planning from schema/version runtime enforcement planning before any A5-gated live, provider, migration, config, startup/watchdog, deploy, push, tag, or release action.
+
+P24 validation aggregator implementation planning is tracked in [P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md).

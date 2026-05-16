@@ -555,4 +555,6 @@ npm run gate:mainline
 - P23.11 result: final RC validation matrix execution scope review is documented; validation items are classified as A4.8-safe, A5-gated, runtime-implementation-required, or blocked. Matrix execution is scoped but not run, and no service/runtime/provider/migration/config/release action occurred.
 - A4-safe validation slice execution: [docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md](/A:/codex-memory/docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md)
 - P23.12 result: A4-safe slice passed for non-live checks; conditional live MCP/HTTP refresh was skipped because local HTTP MCP was not already reachable and no service startup was authorized. Full final RC matrix remains not executed.
-- Next recommended phase: `P23.12-final-rc-validation-matrix-a4-safe-execution-local-commit`.
+- Validation aggregator implementation plan: [docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md)
+- P24 result: validation aggregator implementation is planned but not implemented; future aggregator scope, inputs, output contract, pass/fail semantics, A4-safe checks, conditional live checks, A5-gated checks, runtime-required checks, file/module candidates, test plan, rollback plan, and security boundaries are documented.
+- Next recommended phase: `P24-validation-aggregator-implementation-plan-local-commit`.

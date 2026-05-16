@@ -191,3 +191,5 @@ That phase should validate this docs/status/board-only burn-down plan, explicitl
 P23.10 final RC validation matrix execution planning is tracked in [P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md](/A:/codex-memory/docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md).
 
 P23.11 final RC validation matrix execution scope review is tracked in [P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md](/A:/codex-memory/docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md).
+
+P24 validation aggregator implementation planning is tracked in [P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md).
