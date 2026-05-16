@@ -413,3 +413,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation.
 - A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
 - Next safe action: select the next safe local P25 task through Council review.
+
+## CM-0225 - P25.6 Schema Compatibility Dry-Run CLI Fixture-Only
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: direct-node fixture-only schema compatibility dry-run CLI skeleton and targeted tests.
+- Changed files: `src/cli/schema-compatibility-dry-run.js`; `tests/schema-compatibility-dry-run-cli.test.js`; `docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result: CLI emits fixture-only schema compatibility report, keeps normal blocked report non-mutating, fails closed for unsafe flags, rejects non-fixture source modes and fixture paths outside `tests/fixtures`, and does not add package script wiring.
+- Validation: syntax checks; combined fixture/CLI tests `22/22`; CLI `--json` smoke; rejected `--apply` smoke exited `1` with valid JSON; `npm test` `533/533`; `git diff --check`; docs validation; Verifier first pass `NEEDS_FIX` on stale auto-commit wording only, corrected; Verifier rerun `PASS`.
+- A5 boundary for this batch: no package script, runtime schema/version enforcement, public MCP expansion, real memory scan, migration/import-export apply, durable write, service start, provider call, push, tag, release, or deploy.
+- Next safe action: guarded local commit if final status/diff review remains clean.

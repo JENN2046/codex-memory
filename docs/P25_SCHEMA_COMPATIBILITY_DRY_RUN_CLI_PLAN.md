@@ -2,7 +2,7 @@
 
 Phase: `P25.4-schema-compatibility-dry-run-cli-plan`
 
-Status: planning documented; P25.5 fixture contract added; P25.x closeout contract added
+Status: P25.6 direct-node fixture-only CLI skeleton added
 
 ## 1. Purpose
 
@@ -34,6 +34,7 @@ Current P25 evidence:
 - P25.3 validation aggregator report shape exposes P25.2 policy fixture evidence.
 - P25.5 fixture contract locks the planned dry-run report shape without implementing the CLI.
 - P25.x closeout defines the future P25.6 fixture-only CLI go/no-go contract.
+- P25.6 adds a direct-node fixture-only CLI skeleton without package script wiring or runtime enforcement.
 - runtime schema/version enforcement still reports as not implemented.
 - public MCP tools remain exactly `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -330,3 +331,20 @@ P25.x closeout is recorded in [P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_R
 It closes P25 as planning and fixture-backed evidence, not as runtime-enforced behavior. The next safe implementation slice is `P25.6-schema-compatibility-dry-run-cli-fixture-only`, limited to a direct-node fixture-only CLI skeleton and targeted tests.
 
 P25.6 remains blocked from package script wiring, real memory scans, runtime enforcement, migration/import-export apply, durable writes, service startup, provider calls, public MCP expansion, push, tag, release, and deploy unless separately approved.
+
+## 15. P25.6 Fixture-Only CLI Skeleton Result
+
+P25.6 adds:
+
+- `src/cli/schema-compatibility-dry-run.js`
+- `tests/schema-compatibility-dry-run-cli.test.js`
+
+The CLI is direct-node only:
+
+```powershell
+node .\src\cli\schema-compatibility-dry-run.js --json
+```
+
+It loads only the committed synthetic fixture by default, keeps `source.mode=fixture`, preserves `runtimeEnforcementImplemented=false`, emits `DRY_RUN_BLOCKED` for the normal fixture-backed report, exits non-zero for `--strict` blocked reports, and returns `DRY_RUN_INVALID_INPUT` with `safety.mutated=false` for unsafe flags such as `--apply`, `--real-memory`, `--provider`, and `--push`.
+
+P25.6 still does not add a package script, scan real memory, implement runtime schema/version enforcement, run migration/import-export apply, write durable state, start services, call providers, expand public MCP tools/schema, push, tag, release, or deploy.

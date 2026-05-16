@@ -400,3 +400,29 @@ Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agen
 Validation: `git diff --check`; docs validation.
 
 Next safe step: commit this board-only finalization if validation passes, then select the next safe local P25 task through Council review.
+
+## CM-0225 Commander Handoff - P25.6 Schema Compatibility Dry-Run CLI Fixture-Only
+
+Goal: implement the direct-node fixture-only schema compatibility dry-run CLI skeleton inside the P25.x closeout contract.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty with CM-0225 source/test/docs/status/board edits pending validation.
+
+Current area: `P25.6-schema-compatibility-dry-run-cli-fixture-only`
+
+Changed files: `src/cli/schema-compatibility-dry-run.js`; `tests/schema-compatibility-dry-run-cli.test.js`; `docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md`; `docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: syntax checks passed; combined fixture/CLI tests `22/22`; CLI `--json` smoke passed; rejected `--apply` smoke exited `1` with valid JSON; `npm test` `533/533`; `git diff --check`; docs validation; Verifier first pass `NEEDS_FIX` on stale auto-commit wording only, corrected; Verifier rerun `PASS`.
+
+Not validated: runtime schema/version enforcement; full final RC matrix; live MCP/HTTP refresh; provider/profile; migration/import-export; durable write path; real memory scan.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: not checked by this batch.
+
+Remaining risks: runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
+
+Next safe step: guarded local commit if final status/diff review remains clean.

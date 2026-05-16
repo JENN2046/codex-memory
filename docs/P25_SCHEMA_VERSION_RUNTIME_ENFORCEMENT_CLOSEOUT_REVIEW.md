@@ -154,3 +154,9 @@ P25 is closed as planning and fixture-backed evidence. It is not closed as runti
 `P25.6-schema-compatibility-dry-run-cli-fixture-only`
 
 The next phase may implement a direct-node fixture-only CLI skeleton if it uses the contract above. Any real memory scan, package script, runtime enforcement, migration/import-export apply, public MCP expansion, provider call, service start, push, tag, release, or deploy remains a separate hard-stop action.
+
+## P25.6 Result
+
+P25.6 implements the direct-node fixture-only CLI skeleton in `src/cli/schema-compatibility-dry-run.js` with targeted coverage in `tests/schema-compatibility-dry-run-cli.test.js`.
+
+The implementation stays inside this closeout contract: direct-node only, fixture-only by default, no package script, no real memory scan, no runtime enforcement, no migration/import-export apply, no durable write, no service start, no provider call, no public MCP expansion, no push, no tag, no release, and no deploy.
