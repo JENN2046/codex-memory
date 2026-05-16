@@ -511,12 +511,32 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty only for this board-state reconciliation until committed.
+Worktree: board reconciliation committed at `cfe7c20`, pushed to `origin/main`, then dirty only for this post-push record.
 
 Current area: `P25-board-state-reconciliation`
 
 Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation: `git diff --check`; docs validation.
+Validation: `git diff --check`; docs validation; post-push status/log checks.
 
-Next safe step: commit this board-only reconciliation if validation passes, then select the next safe local task through Council review.
+Commit: `cfe7c20 docs: record p25 dry-run evidence checkpoint`.
+
+## CM-0230 Commander Handoff - First Authorized Push And Post-Push Gate
+
+Goal: record the first explicitly authorized push and post-push mainline health recovery.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for this board-state record.
+
+Current area: `P0-mainline-health`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: push succeeded `042c330..cfe7c20`; post-push `git status -sb` aligned local `main` with `origin/main`; local HTTP MCP started by explicit user request; `/health` HTTP `200`; `observe:http status=ok`; `npm run gate:mainline` passed health, compare `43/43`, rollback `43/43`.
+
+Remaining risks: runtime schema/version enforcement remains unimplemented; full v1.0 RC remains blocked; no further push is authorized unless the user explicitly asks.
+
+Next safe step: finish this board-only record, then continue with the next Council-selected local task.

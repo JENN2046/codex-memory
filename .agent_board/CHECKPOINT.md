@@ -466,11 +466,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0229 - Post-P25.7 Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `d24759e`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 - Result: board state records that CM-0228 is committed locally and no longer pending guarded commit.
-- Validation: `git diff --check`; docs validation.
+- Commit: `cfe7c20 docs: record p25 dry-run evidence checkpoint`.
+- Validation: `git diff --check`; docs validation; post-push status/log checks.
 - A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
+
+## CM-0230 - First Authorized Push And Post-Push Gate
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: record first authorized push and post-push gate recovery.
+- Push: `git push origin main` succeeded, `042c330..cfe7c20 main -> main`.
+- Post-push Git state: local `main` and `origin/main` aligned at `cfe7c20`; worktree clean before this board-only record.
+- Runtime: local HTTP MCP was started only after explicit user request; PID `18104`; `/health` returned HTTP `200`.
+- Validation: `observe:http status=ok`; `npm run gate:mainline` passed health, compare `43/43`, rollback `43/43`.
+- A5 boundary: first push was explicitly authorized. No additional push is authorized yet; no tag, release, deploy, provider call, config mutation, migration/import-export apply, durable memory write, public MCP expansion, or startup/watchdog installation occurred.
