@@ -460,5 +460,17 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Result so far: aggregator summary/check/evidence/evidence_sources now include `schemaCompatibilityDryRunCli` and `p25SchemaCompatibilityDryRunCli`, with `fixtureOnly=true`, `cliExecuted=false`, `realMemoryScanned=false`, `runtimeEnforcementImplemented=false`, and `packageScriptAdded=false`.
 - Validation so far: syntax checks for changed JS/test files; `node --test tests\v1-rc-validation-aggregator.test.js` `9/9`; `node --test tests\v1-rc-validation-aggregator-implementation.test.js` `6/6`; `node --test tests\v1-rc-validation-aggregator-cli.test.js` `13/13`; `git diff --check`; docs validation; `npm test` `533/533`.
 - Read-only Verifier: `PASS`; commit readiness `eligible`; required fixes none.
-- Still pending: guarded local commit decision.
+- Commit: `d24759e test: surface p25 dry-run cli evidence`.
+- Post-commit evidence: `git status --short` clean before this board-only reconciliation; `git log --oneline --decorate -n 3`; `git show --stat --oneline --decorate --no-renames HEAD`; commit message includes `Co-authored-by: Codex <noreply@openai.com>` exactly once.
 - A5 boundary for this batch: no P25.6 CLI execution, package script, runtime schema/version enforcement, public MCP expansion, real memory scan, migration/import-export apply, durable write, service start, provider call, push, tag, release, or deploy.
+
+## CM-0229 - Post-P25.7 Board-State Reconciliation
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `d24759e`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board state records that CM-0228 is committed locally and no longer pending guarded commit.
+- Validation: `git diff --check`; docs validation.
+- A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.

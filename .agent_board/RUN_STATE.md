@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0228 / P25.7 validation aggregator schema compatibility dry-run CLI evidence shape |
-| Current area | P25.7 validation aggregator report-shape evidence |
+| Current task | CM-0229 / P25 board-state reconciliation |
+| Current area | P25 board-state reconciliation |
 | Last pushed baseline | `ffcddd737dae458a9af233991a1e15ad6b98de50` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added P25.7 validation aggregator report-shape evidence for the P25.6 fixture-only CLI, keeping `cliExecuted=false` and runtime enforcement unimplemented. |
-| Last validation | P25.7 validation passed: syntax checks for changed JS/test files; aggregator fixture test `9/9`; aggregator implementation test `6/6`; aggregator CLI report test `13/13`; `git diff --check`; docs validation; `npm test` `533/533`; read-only Verifier `PASS`. |
-| Worktree summary | Worktree contains scoped P25.7 source/test/docs/board edits. The batch records report-shape evidence only and does not execute the P25.6 CLI, add package scripts, scan real memory, implement runtime schema/version enforcement, run migration/import-export apply, write durable state, start services, call providers, expand public MCP tools/schema, push, tag, release, or deploy. |
+| Last action | Created guarded local commit `d24759e` for CM-0228 P25.7 validation aggregator dry-run CLI evidence shape. |
+| Last validation | P25.7 validation passed before commit: syntax checks for changed JS/test files; aggregator fixture test `9/9`; aggregator implementation test `6/6`; aggregator CLI report test `13/13`; `git diff --check`; docs validation; `npm test` `533/533`; read-only Verifier `PASS`; post-commit status/log/trailer checks passed. |
+| Worktree summary | Dirty only for this board-state reconciliation after the CM-0228 guarded local commit. Branch remains local-only and ahead of `origin/main`. No package script, lockfile, `.github`, `.env`, runtime config, Codex/Claude config, public MCP schema/tool expansion, schema/version runtime enforcement implementation, full final RC matrix execution, service start, live MCP refresh, SQLite migration apply, import/export apply, backup creation, restore, provider/model call, real memory preview, tag movement, production deploy, UI, service install, watchdog install, startup task install, durable memory write, durable data rewrite, push, tag, release, deploy, or mutation occurred in this batch. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for scoped P25 source/test/docs/board commit if validation passes and Verifier confirms no hard-stop drift |
 | Safe-push readiness | no; user explicitly authorized A5 mode today but said `push` should be done last |
-| Next planned action | Guarded local commit for CM-0228 if final status/diff review remains clean. `push` remains deferred to the final step. |
+| Next planned action | Validate and commit this board-only reconciliation if final status/diff review remains clean. `push` remains deferred to the final step. |
 
 ## Notes
 

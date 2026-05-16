@@ -499,4 +499,24 @@ Remaining risks: runtime schema/version enforcement remains unimplemented; real 
 
 Verifier: `PASS`; commit readiness `eligible`; required fixes none.
 
-Next safe step: guarded local commit if final status/diff review remains clean.
+Commit: `d24759e test: surface p25 dry-run cli evidence`.
+
+Next safe step: validate and commit board-only reconciliation if final status/diff review remains clean.
+
+## CM-0229 Commander Handoff - Post-P25.7 Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `d24759e`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for this board-state reconciliation until committed.
+
+Current area: `P25-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation.
+
+Next safe step: commit this board-only reconciliation if validation passes, then select the next safe local task through Council review.
