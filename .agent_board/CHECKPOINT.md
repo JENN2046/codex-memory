@@ -692,12 +692,23 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0247 - P27.2 Approval Packet CLI Plan
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: docs/status/board-only plan for a future direct-node fixture-only approval-packet CLI.
 - Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
 - Result so far: P27.2 names future CLI/test files, fixture-only source mode, output contract, rejected unsafe flags, validation matrix, and stop conditions without implementing the CLI.
 - Validation: `git diff --check` passed; docs validation passed; P27/P27.2 reference scan passed; read-only Verifier first pass `NEEDS_FIX` only on stale board validation wording; Verifier rerun `PASS`.
-- Commit readiness: `eligible`; guarded local commit pending final status/diff review.
+- Commit: `f5733e0 docs: plan p27 approval packet cli`.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
+
+## CM-0248 - Post-P27.2 Board-State Reconciliation
+
+- Status: `IN_PROGRESS`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `f5733e0`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result so far: board state records that CM-0247 is committed locally and no longer pending guarded commit.
+- Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.

@@ -927,7 +927,7 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty for CM-0247 docs/status/board-only planning edits.
+Worktree: CM-0247 committed locally at `f5733e0`; dirty only for CM-0248 board-state reconciliation.
 
 Current area: `P27.2-approval-packet-cli-plan`
 
@@ -941,4 +941,30 @@ HTTP health: no service action for CM-0247.
 
 Remaining risks: no further push is authorized by the current `continue` instruction; CLI implementation, tests, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: guarded local commit if final diff review remains scoped, then record a board-only checkpoint if needed.
+Commit: `f5733e0 docs: plan p27 approval packet cli`.
+
+Next safe step: validate and commit CM-0248 board-only reconciliation if final status/diff review remains clean.
+
+## CM-0248 Commander Handoff - Post-P27.2 Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `f5733e0`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for CM-0248 board-state reconciliation.
+
+Current area: `P27-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: pending `git diff --check`; docs validation; post-commit status/log/trailer checks.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0248.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; CLI implementation, tests, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: validate and commit this board-only reconciliation, then select the next safe local P27.3 planning/review slice.
