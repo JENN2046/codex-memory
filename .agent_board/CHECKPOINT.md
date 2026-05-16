@@ -517,12 +517,25 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0233 - Post-P26.1 Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `45f126d`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 - Result: board state records that CM-0232 is committed locally and no longer pending guarded commit.
-- Validation pending: `git diff --check`; docs validation.
+- Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Commit: `d788eaa docs: record p26 fixture checkpoint`.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
 - A5 boundary: no source/package/runtime change, no real memory scan/export/import, no import/export apply, no SQLite migration apply, no backup/restore, no durable write, no provider call, no public MCP expansion, no push/tag/release/deploy.
+
+## CM-0234 - P26.2 Migration Import-Export Dry-Run Gate CLI Plan
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: docs/status/board-only plan for a future direct-node fixture-only migration/import-export dry-run gate CLI.
+- Changed files: `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: P26.2 now defines future CLI source mode boundaries, output contract reuse from the P26.1 fixture, rejected unsafe flags, future validation matrix, and stop conditions. It explicitly does not implement CLI/source/tests/package scripts.
+- Validation: `git diff --check`; docs validation; P26/P26.2 reference scan; read-only Verifier `PASS`.
+- Commit readiness: `eligible`; required fixes none.
+- A5 boundary: no CLI implementation, no package script, no source/runtime/test change, no real memory scan/export/import, no SQLite migration apply, no import/export apply, no backup/restore touching live state, no durable write, no provider/model call, no public MCP expansion, no service startup, no push/tag/release/deploy.

@@ -147,7 +147,7 @@ Recommended sequence:
    - Add a synthetic fixture for the proposed gate output shape.
    - No runtime code and no real data.
 2. `P26.2-migration-import-export-dry-run-gate-cli-plan`
-   - Plan a direct-node or npm-script gate only after fixture contract exists.
+   - Plan a direct-node fixture-only CLI only after fixture contract exists.
    - Keep source mode fixture-only by default.
 3. `P26.3-migration-import-export-dry-run-gate-implementation`
    - Only if separately approved as a scoped A2/A3 source/test slice.
@@ -176,3 +176,135 @@ Decision: `P26_DRY_RUN_GATE_PLANNING_ONLY`.
 The repository has enough prior P13/P18/P23 evidence to plan the gate, but it does not yet have a dedicated P26 gate fixture or implementation.
 
 Next safe action after this plan is a separate `P26.1` fixture-contract slice. That next slice must remain synthetic and non-mutating.
+
+## 11. P26.1 Fixture Contract Result
+
+P26.1 adds a synthetic fixture/test contract:
+
+- fixture: `tests/fixtures/migration-import-export-dry-run-gate-v1.json`
+- test: `tests/migration-import-export-dry-run-gate-fixture.test.js`
+
+The fixture locks:
+
+- `schema=codex-memory.migration-import-export-dry-run-gate.v1`
+- `decision=NOT_READY_BLOCKED`
+- `mutated=false`
+- `providerCalls=0`
+- public MCP tools exactly `record_memory`, `search_memory`, and `memory_overview`
+- required approval list for SQLite migration apply, import/export apply, backup restore overwrite, and broad real memory export
+- safety flags that forbid real memory scan/export/import, migration/import-export apply, backup restore, durable writes, provider calls, public MCP expansion, push, tag, release, and deploy
+- raw secret and raw workspace exposure guards
+- no rewrite-on-read behavior
+
+P26.1 remains fixture/test only. It does not implement a CLI, add a package script, scan real memory, run migration/import-export apply, create or restore backups, write durable state, call providers, expand public MCP tools, push, tag, release, or deploy.
+
+## 12. P26.2 CLI Plan
+
+P26.2 plans a future direct-node, fixture-only CLI for the P26 dry-run gate. It does not implement that CLI.
+
+Future candidate files, if separately approved in P26.3:
+
+- `src/cli/migration-import-export-dry-run-gate.js`
+- `tests/migration-import-export-dry-run-gate-cli.test.js`
+
+P26.2 does not add those files.
+
+### Source Mode
+
+The future CLI should default to:
+
+```text
+sourceMode=fixture
+```
+
+Allowed future source modes:
+
+| Mode | Default | Notes |
+|---|---|---|
+| `fixture` | yes | Reads only `tests/fixtures/migration-import-export-dry-run-gate-v1.json` |
+| `real-memory-preview` | no | Blocked until a separate explicit approval packet exists |
+| `apply` | no | Forbidden for this CLI family |
+
+### Future Invocation
+
+Future direct-node invocation:
+
+```powershell
+node .\src\cli\migration-import-export-dry-run-gate.js --json
+```
+
+No npm package script should be added in P26.2. Package script wiring, if ever needed, must be separately approved after a working direct-node CLI exists.
+
+### Future Output Contract
+
+The future CLI should emit the same shape as the P26.1 fixture:
+
+- schema `codex-memory.migration-import-export-dry-run-gate.v1`
+- status `blocked`
+- decision `NOT_READY_BLOCKED`
+- `mutated=false`
+- `providerCalls=0`
+- public MCP three-tool freeze
+- checks for object model fixtures, mapping dry-run, migration readiness, import/export envelope, backup rollback, scope/lifecycle/audit, and secret/workspace exposure
+- required approvals
+- safety flags
+- `nextStep=review-dry-run-evidence-before-apply-approval`
+
+### Rejected Flags
+
+The future CLI must reject:
+
+```text
+--apply
+--confirm
+--migrate
+--import
+--export
+--backup
+--restore
+--real-memory
+--provider
+--push
+--tag
+--release
+--deploy
+```
+
+Rejected output should be valid JSON in `--json` mode, keep `mutated=false`, and preserve enough top-level shape for downstream report consumers.
+
+### Future Validation Matrix
+
+Future P26.3 implementation validation should include:
+
+```powershell
+node --check .\src\cli\migration-import-export-dry-run-gate.js
+node --check .\tests\migration-import-export-dry-run-gate-cli.test.js
+node --test .\tests\migration-import-export-dry-run-gate-cli.test.js
+node --test .\tests\migration-import-export-dry-run-gate-fixture.test.js
+node .\src\cli\migration-import-export-dry-run-gate.js --json
+node .\src\cli\migration-import-export-dry-run-gate.js --json --apply
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
+Broad `npm test` is recommended before any guarded local commit that adds a new `tests/*.test.js` file.
+
+### Stop Conditions
+
+Stop before implementation if the future CLI requires:
+
+- package script changes;
+- real memory scan/export/import;
+- SQLite migration apply;
+- import/export apply;
+- backup creation or restore touching live state;
+- durable writes;
+- provider/model calls;
+- public MCP tool/schema expansion;
+- service startup;
+- config/env/secret edits;
+- push, tag, release, or deploy.
+
+P26.2 decision: `P26_DRY_RUN_GATE_CLI_PLANNED_NOT_IMPLEMENTED`.
+
+Next safe action after P26.2 is either a guarded local commit or a separately scoped `P26.3` implementation plan/review. Do not implement the CLI from this planning text alone.
