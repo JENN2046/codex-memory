@@ -260,3 +260,13 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Pre-commit evidence: `git status --short`; `git diff --stat`; `git diff`; targeted aggregator tests CLI `13/13`, implementation `6/6`, fixture shape `9/9`; `git diff --check`; docs validation; `npm test` `501/501`.
 - Post-commit evidence: `git status --short` clean before this board-only checkpoint update; `git log --oneline --decorate -n 3`; `git show --stat --oneline --decorate --no-renames HEAD`; commit message includes the required `Co-authored-by: Codex <noreply@openai.com>` trailer exactly once.
 - A5 boundary: no push, tag, release, deploy, provider call, service start, config mutation, package/lockfile change, durable memory write, migration/import-export apply, or public MCP expansion.
+
+## CM-0211 - Board State Reconciliation After CM-0210
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only correction after `5a81bc7` so `RUN_STATE.md` and `HANDOFF.md` no longer point to the already-completed checkpoint commit as the next action.
+- Changed files: `.agent_board/TASK_QUEUE.md`; `.agent_board/RUN_STATE.md`; `.agent_board/HANDOFF.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/VALIDATION_LOG.md`.
+- Validation: `git diff --check`; docs validation.
+- A5 boundary: no source/test/runtime/package/config/provider/data change, no durable write, no MCP expansion, no push, tag, release, or deploy.
