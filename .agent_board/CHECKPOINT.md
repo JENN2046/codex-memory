@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Create P23.4 local production hardening plan after the P23 planning bundle local commit.
+Create P23.5 client integration readiness plan after the P23.4 local production hardening local commit.
 
 ## Current Area
 
-P23.4 local production hardening plan
+P23.5 client integration readiness plan
 
 ## Current Status
 
@@ -25,8 +25,9 @@ P23.4 local production hardening plan
 - P23.1 inventories current public tools, tool purposes, documentation-level input/output shapes, compatibility expectations, drift risks, post-v1.0 candidates, A5-gated changes, and validation expectations.
 - P23.2 defines current schema baseline, versioning goals, version identifier strategy, compatibility policy, migration/import-export boundary, rollback requirements, validation requirements, drift risks, and A5-gated schema actions.
 - P23.3 defines the v1.0 validation matrix across docs/status/board, MCP/HTTP, schema/versioning, security, migration/import-export dry-run, rollback, client boundary, local deploy, production deploy, startup/watchdog, and tag/release gates.
-- P23 planning through P23.3 are locally committed in `a3b2d77`; local main is ahead of origin/main by 2 with `b3c6bd9` and `a3b2d77`.
+- P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; local main is ahead of origin/main by 3 with `b3c6bd9`, `a3b2d77`, and `0e3e25b`.
 - P23.4 defines local production hardening planning for startup/watchdog requirements, health checks, port/session/log expectations, SQLite backup/restore, corruption recovery, restart semantics, operator runbook, and activation validation gates.
+- P23.5 defines client integration readiness planning for Codex/Claude identity, private/shared/project visibility, proposal-first cross-client writes, read/write policy, audit requirements, conflict/drift handling, and config switch readiness.
 
 ## Completed Work In This Batch
 
@@ -45,6 +46,8 @@ P23.4 local production hardening plan
 - Routed next recommended phase to `P23.4-local-production-hardening-plan`.
 - Added [P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md).
 - Routed next recommended phase to `P23.5-client-integration-readiness-plan`.
+- Added [P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md](/A:/codex-memory/docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md).
+- Routed next recommended phase to `P23.6-migration-import-export-readiness-plan`.
 - Added [P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md).
 - Recorded that deploy remains `NOT_APPROVED` / still blocked.
 - Recorded that the old `p22-rc-806cc847` candidate is superseded and must not be reused or moved.
@@ -67,6 +70,7 @@ P23.4 local production hardening plan
 - `docs/P23_2_SCHEMA_VERSIONING_PLAN.md`
 - `docs/P23_3_VALIDATION_MATRIX_HARDENING.md`
 - `docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md`
+- `docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -88,6 +92,7 @@ P23.4 local production hardening plan
 - P23.2 schema/versioning docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 - P23.3 validation matrix docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 - P23.4 local production hardening docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
+- P23.5 client integration readiness docs validation: `git diff --check` passed; docs validation passed; P23 docs trailing whitespace check passed.
 
 ## Not Done
 
@@ -98,6 +103,7 @@ P23.4 local production hardening plan
 - No `gate:ci` rerun in this result-record phase.
 - No validator implementation.
 - No local production hardening implementation.
+- No client integration config switch.
 - No compare / rollback rerun in this result-record phase.
 - No new live HTTP MCP startup in this result-record phase.
 - No provider command.
@@ -116,4 +122,4 @@ P23.4 local production hardening plan
 
 ## Next Safe Action
 
-Run docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.5-client-integration-readiness-plan`.
+Run docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P23.6-migration-import-export-readiness-plan`.

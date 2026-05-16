@@ -532,6 +532,7 @@ npm run gate:mainline
 - Schema/versioning plan: [docs/P23_2_SCHEMA_VERSIONING_PLAN.md](/A:/codex-memory/docs/P23_2_SCHEMA_VERSIONING_PLAN.md)
 - Validation matrix hardening: [docs/P23_3_VALIDATION_MATRIX_HARDENING.md](/A:/codex-memory/docs/P23_3_VALIDATION_MATRIX_HARDENING.md)
 - Local production hardening plan: [docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md)
+- Client integration readiness plan: [docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md](/A:/codex-memory/docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md)
 - Scope: planning/docs/status/board only.
 - v1.0 blockers: public MCP contract drift, schema/versioning gaps, failing security or CI gates, missing rollback story, unresolved migration/import-export boundary, unclear Codex/Claude client boundary, raw secret/workspace exposure, and unapproved A5 actions.
 - Still A5-gated: production deploy, startup/watchdog install, Codex/Claude config switch, provider execution, durable memory mutation expansion, SQLite migration, import/export apply, tag/release/deploy.
@@ -539,4 +540,5 @@ npm run gate:mainline
 - P23.2 result: schema/versioning planning is documented; no schema implementation, migration apply, import/export apply, durable memory mutation, public MCP tool change, or production deploy occurred.
 - P23.3 result: v1.0 validation matrix hardening is documented; no validator implementation, runtime/test/config/provider/migration/durable-memory/watchdog/startup/deploy action occurred.
 - P23.4 result: local production hardening planning is documented; no runtime/config/provider/migration/durable-memory/watchdog/startup/deploy action occurred.
-- Next recommended phase: `P23.5-client-integration-readiness-plan`.
+- P23.5 result: client integration readiness planning is documented; no Codex/Claude config, `.env`, runtime/config/provider/migration/durable-memory/watchdog/startup/deploy action occurred.
+- Next recommended phase: `P23.6-migration-import-export-readiness-plan`.

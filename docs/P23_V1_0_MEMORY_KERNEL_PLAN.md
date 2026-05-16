@@ -334,3 +334,5 @@ P23.2 schema/versioning planning is tracked in [P23_2_SCHEMA_VERSIONING_PLAN.md]
 P23.3 validation matrix hardening is tracked in [P23_3_VALIDATION_MATRIX_HARDENING.md](/A:/codex-memory/docs/P23_3_VALIDATION_MATRIX_HARDENING.md).
 
 P23.4 local production hardening planning is tracked in [P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md).
+
+P23.5 client integration readiness planning is tracked in [P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md](/A:/codex-memory/docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md).

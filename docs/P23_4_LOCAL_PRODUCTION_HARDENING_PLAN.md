@@ -354,3 +354,5 @@ Next recommended phase:
 `P23.5-client-integration-readiness-plan`
 
 P23.5 should plan Codex and Claude integration readiness while preserving the boundary that config switching, provider execution, startup/watchdog installation, production deploy, durable mutation expansion, migration/import-export apply, tag, release, and deploy remain separately approved actions.
+
+P23.5 client integration readiness planning is tracked in [P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md](/A:/codex-memory/docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md).
