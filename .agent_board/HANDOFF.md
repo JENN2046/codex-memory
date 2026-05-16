@@ -901,13 +901,13 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty only for CM-0246 board-state finalization.
+Worktree: CM-0246 committed locally at `a1d870a`; dirty for CM-0247 docs/status/board-only planning edits.
 
 Current area: `P27-board-state-finalization`
 
 Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation: pending `git diff --check`; docs validation.
+Validation: `git diff --check`; docs validation.
 
 MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -915,4 +915,30 @@ HTTP health: no service action for CM-0246.
 
 Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
 
-Next safe step: commit this board-only finalization if validation passes, then start P27.2 docs-only CLI plan.
+Commit: `a1d870a docs: finalize p27 fixture board state`.
+
+Next safe step: validate and commit CM-0247 docs-only CLI plan if final status/diff review remains clean.
+
+## CM-0247 Commander Handoff - P27.2 Approval Packet CLI Plan
+
+Goal: plan a future direct-node fixture-only approval-packet CLI without implementing it.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0247 docs/status/board-only planning edits.
+
+Current area: `P27.2-approval-packet-cli-plan`
+
+Changed files: `docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check` passed; docs validation passed; P27/P27.2 reference scan passed; read-only Verifier first pass `NEEDS_FIX` only on stale board validation wording; Verifier rerun `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0247.
+
+Remaining risks: no further push is authorized by the current `continue` instruction; CLI implementation, tests, package script wiring, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: guarded local commit if final diff review remains scoped, then record a board-only checkpoint if needed.

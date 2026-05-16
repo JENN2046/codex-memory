@@ -257,6 +257,124 @@ P27.1 remains fixture/test only. It does not scan real memory, export/import rea
 
 P27.1 decision: `P27_APPROVAL_PACKET_FIXTURE_SHAPE_LOCKED`.
 
+## P27.2 Direct-Node Fixture-Only CLI Plan
+
+P27.2 plans a future direct-node, fixture-only CLI for reviewing the P27 approval packet. It does not implement that CLI.
+
+Future candidate files, if separately approved in P27.3:
+
+- `src/cli/migration-import-export-approval-packet.js`
+- `tests/migration-import-export-approval-packet-cli.test.js`
+
+P27.2 does not add or edit those files.
+
+### Source Mode
+
+The future CLI should default to:
+
+```text
+sourceMode=fixture
+```
+
+Allowed future source modes:
+
+| Mode | Default | Notes |
+|---|---|---|
+| `fixture` | yes | Reads only `tests/fixtures/migration-import-export-approval-packet-v1.json` |
+| `real-memory-preview` | no | Blocked until a separate explicit approval packet exists |
+| `apply` | no | Forbidden for this CLI family |
+
+### Future Invocation
+
+Future direct-node invocation:
+
+```powershell
+node .\src\cli\migration-import-export-approval-packet.js --json
+```
+
+No npm package script should be added in P27.2. Package script wiring, if ever needed, must be separately approved after a working direct-node CLI exists.
+
+### Future Output Contract
+
+The future CLI should emit the same shape as the P27.1 fixture:
+
+- schema `codex-memory.migration-import-export-approval-packet.v1`
+- phase `P27.1-migration-import-export-approval-packet-fixture-shape`
+- `fixtureOnly=true`
+- `synthetic=true`
+- `mode=fixture-only`
+- `status=blocked`
+- `decision=NOT_READY_BLOCKED`
+- `approvalStatus=BLOCKED_PENDING_APPROVAL`
+- `executionApproved=false`
+- `mutated=false`
+- `providerCalls=0`
+- `realMemoryScanned=false`
+- public MCP tools exactly `record_memory`, `search_memory`, and `memory_overview`
+- approval packet sections and required approvals copied from the fixture
+- no-side-effect safety flags copied from the fixture
+- required wording and forbidden claims copied from the fixture
+- `nextStep=review-approval-packet-before-any-non-fixture-action`
+
+### Rejected Flags
+
+The future CLI must reject:
+
+```text
+--apply
+--confirm
+--migrate
+--import
+--export
+--backup
+--restore
+--real-memory
+--provider
+--service
+--config
+--push
+--tag
+--release
+--deploy
+```
+
+Rejected output should be valid JSON in `--json` mode, keep `mutated=false`, keep `providerCalls=0`, keep `realMemoryScanned=false`, and preserve enough top-level shape for downstream report consumers.
+
+### Future Validation Matrix
+
+Future P27.3 implementation validation should include:
+
+```powershell
+node --check .\src\cli\migration-import-export-approval-packet.js
+node --check .\tests\migration-import-export-approval-packet-cli.test.js
+node --test .\tests\migration-import-export-approval-packet-cli.test.js
+node --test .\tests\migration-import-export-approval-packet-fixture.test.js
+node .\src\cli\migration-import-export-approval-packet.js --json
+node .\src\cli\migration-import-export-approval-packet.js --json --apply
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
+```
+
+Broad `npm test` is recommended before any guarded local commit that adds a new `tests/*.test.js` file.
+
+### P27.2 Stop Conditions
+
+Stop before implementation if the future CLI requires:
+
+- package script changes
+- real memory scan/export/import
+- SQLite migration apply
+- import/export apply
+- backup creation or restore touching live state
+- durable writes
+- provider/model calls
+- public MCP tool/schema expansion
+- service startup
+- config/env/secret edits
+- push, tag, release, or deploy
+
+P27.2 decision: `P27_APPROVAL_PACKET_CLI_PLANNED_NOT_IMPLEMENTED`.
+
 ## Next Safe Action
 
-The next safe local action is a docs-only review or a direct-node fixture-only approval-packet CLI plan, if separately scoped. Do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.
+The next safe local action is either a guarded local commit for P27.2 or a separately scoped P27.3 fixture-only CLI implementation plan/review. Do not implement the CLI from this planning text alone, and do not move from P27 directly to real memory preview, backup/restore, migration apply, import/export apply, provider calls, service startup, public MCP expansion, push, tag, release, or deploy.
