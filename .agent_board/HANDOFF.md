@@ -699,12 +699,36 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty only for this board-state reconciliation until committed.
+Worktree: board-state reconciliation committed locally at `aabe4de`; currently dirty for CM-0239 docs/status/board closeout edits.
 
 Current area: `P26-board-state-reconciliation`
 
 Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Validation pending: `git diff --check`; docs validation.
+Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
 
-Next safe step: commit this board-only reconciliation if validation passes, then select the next safe P26 closeout/review task.
+Commit: `aabe4de docs: record p26 aggregator checkpoint`.
+
+## CM-0239 Commander Handoff - P26.x Closeout Review
+
+Goal: close the P26 fixture-only migration/import-export dry-run gate chain and define remaining approval boundaries.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for CM-0239 docs/status/board edits.
+
+Current area: `P26.x-migration-import-export-dry-run-gate-closeout-review`
+
+Changed files: `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_CLOSEOUT_REVIEW.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation; P26 closeout reference scan; read-only Verifier rerun `PASS`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no new service action for CM-0239.
+
+Remaining risks: real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
+
+Next safe step: create a guarded local commit for CM-0239 if final status/diff review remains clean.

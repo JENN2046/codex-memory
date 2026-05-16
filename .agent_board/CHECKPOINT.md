@@ -581,11 +581,24 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 
 ## CM-0238 - Post-P26.4 Board-State Reconciliation
 
-- Status: `IN_PROGRESS`
+- Status: `COMPLETED_VALIDATED`
 - Workspace: `A:\codex-memory`
 - Branch: `main`
 - Scope: board-only update after guarded local commit `6ca6f76`.
 - Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 - Result: board state records that CM-0237 is committed locally and no longer pending guarded commit.
-- Validation pending: `git diff --check`; docs validation.
+- Validation: `git diff --check`; docs validation; post-commit status/log/trailer checks.
+- Commit: `aabe4de docs: record p26 aggregator checkpoint`.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, migration-import-export apply, service start, push, tag, release, or deploy.
+
+## CM-0239 - P26.x Migration Import-Export Dry-Run Gate Closeout Review
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: docs/status/board-only closeout review for P26 planning, fixture, fixture-only CLI, and aggregator evidence.
+- Changed files: `docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_CLOSEOUT_REVIEW.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `STATUS.md`; `.agent_board/*`.
+- Result so far: P26 closeout result is `P26_DRY_RUN_GATE_FIXTURE_ONLY_CHAIN_CLOSED`; next recommended phase is `P27-migration-import-export-approval-packet`.
+- Validation: `git diff --check`; docs validation; P26 closeout reference scan; read-only Verifier first pass `NEEDS_FIX` only on stale board validation wording.
+- Read-only Verifier: rerun `PASS`; commit readiness `eligible`; required fixes none.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
