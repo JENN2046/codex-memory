@@ -557,4 +557,6 @@ npm run gate:mainline
 - P23.12 result: A4-safe slice passed for non-live checks; conditional live MCP/HTTP refresh was skipped because local HTTP MCP was not already reachable and no service startup was authorized. Full final RC matrix remains not executed.
 - Validation aggregator implementation plan: [docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md)
 - P24 result: validation aggregator implementation is planned but not implemented; future aggregator scope, inputs, output contract, pass/fail semantics, A4-safe checks, conditional live checks, A5-gated checks, runtime-required checks, file/module candidates, test plan, rollback plan, and security boundaries are documented.
-- Next recommended phase: `P24-validation-aggregator-implementation-plan-local-commit`.
+- P24.1 validation aggregator fixture shape tests: `tests/fixtures/v1-rc-validation-aggregator-v1.json` and `tests/v1-rc-validation-aggregator.test.js` lock the future aggregator output contract without implementing the aggregator or changing package scripts.
+- P24.1 result: fixture/test contract added; targeted shape test `8/8` passed; no runtime/service/provider/migration/durable-memory/config/watchdog/startup/push/tag/release/deploy action occurred.
+- Next recommended phase: `P24.1-validation-aggregator-fixture-shape-tests-local-commit`.

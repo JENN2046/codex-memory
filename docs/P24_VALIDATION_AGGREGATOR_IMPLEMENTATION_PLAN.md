@@ -260,6 +260,8 @@ Future implementation candidates:
 
 Implementation should avoid package changes unless explicitly approved. If package script addition is desired, request separate approval because package manifest changes are currently hard-stop constrained.
 
+P24.1 fixture/shape-test work locks the first expected aggregator output contract in `tests/fixtures/v1-rc-validation-aggregator-v1.json` and `tests/v1-rc-validation-aggregator.test.js`. It does not implement the aggregator executable or modify package scripts.
+
 ## 15. Test Plan
 
 Future tests should cover:
@@ -358,3 +360,5 @@ Stop if the next action requires:
 `P24-validation-aggregator-implementation-plan-local-commit`
 
 After this planning commit, the next implementation-safe phase should be `P24.1-validation-aggregator-fixture-shape-tests`, unless package script or runtime implementation approval is requested first.
+
+P24.1 fixture/shape-test work is the next completed implementation-facing contract layer. The next safe phase after P24.1 is `P24.1-validation-aggregator-fixture-shape-tests-local-commit`, followed by a separate scoped CLI/service implementation phase.

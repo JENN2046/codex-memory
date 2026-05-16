@@ -78,6 +78,8 @@ P24 validation aggregator implementation planning
 - `docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md`
 - `docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md`
 - `docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md`
+- `tests/fixtures/v1-rc-validation-aggregator-v1.json`
+- `tests/v1-rc-validation-aggregator.test.js`
 - `docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md`
 - `docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md`
 - `CODEX_MEMORY_NEXT_PHASE_PLAN.md`
@@ -108,11 +110,13 @@ P24 validation aggregator implementation planning
 - P23.11 final RC validation matrix execution scope review docs validation: `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed.
 - P23.12 A4-safe slice validation: `git status -sb` clean/ahead 10 at start; `git status --short` clean at start; `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed; docs/status/board, schema/version, client boundary, migration/import-export, and RC checklist reviews passed; `/health` probe showed service not already reachable, so live refresh was skipped.
 - P24 validation aggregator implementation plan docs validation: `git diff --check` passed; docs validation passed; P2 docs trailing whitespace check passed.
+- P24.1 validation aggregator fixture shape targeted validation: `node --check tests\v1-rc-validation-aggregator.test.js` passed; `node --test tests\v1-rc-validation-aggregator.test.js` passed `8/8`.
 
 ## Not Done
 
 - No final RC validation matrix execution.
 - No validation aggregator implementation.
+- No validation aggregator executable implementation.
 - No full final RC validation matrix execution.
 - No live MCP/HTTP refresh because service was not already reachable.
 - No worktree created in this result-record phase.
@@ -139,4 +143,4 @@ P24 validation aggregator implementation planning
 
 ## Next Safe Step
 
-Run docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P24-validation-aggregator-implementation-plan-local-commit`.
+Run final P24.1 diff/docs validation and report. Do not commit or push without explicit authorization. Next recommended phase is `P24.1-validation-aggregator-fixture-shape-tests-local-commit`.
