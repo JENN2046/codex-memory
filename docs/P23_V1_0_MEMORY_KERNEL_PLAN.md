@@ -338,3 +338,5 @@ P23.4 local production hardening planning is tracked in [P23_4_LOCAL_PRODUCTION_
 P23.5 client integration readiness planning is tracked in [P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md](/A:/codex-memory/docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md).
 
 P23.6 migration/import-export readiness planning is tracked in [P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md](/A:/codex-memory/docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md).
+
+P23.7 v1.0 release-candidate checklist is tracked in [P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md](/A:/codex-memory/docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md).
