@@ -79,18 +79,33 @@ function getExitCodeForDecision(decision, { strict = false, rejected = false } =
 }
 
 function buildRejectedReport(rejectedFlag) {
+  const report = buildV1RcValidationAggregatorReport();
   return {
-    schemaVersion: 'v1-rc-validation-aggregator-v1',
-    version: 'v1',
-    phase: 'P24.4-validation-aggregator-decision-exit-code-semantics',
-    mode: 'read-only',
-    decision: 'NOT_READY_BLOCKED',
+    ...report,
+    phase: 'P24.6-validation-aggregator-rejected-flag-contract-hardening',
     rejectedFlag,
     error: `${rejectedFlag} is outside the minimal validation aggregator CLI boundary.`,
-    mutated: false,
-    providerCalls: 0,
-    serviceStarted: false,
-    durableMemoryTouched: false,
+    evidence: {
+      ...report.evidence,
+      p24Aggregator: {
+        ...report.evidence.p24Aggregator,
+        minimalCliWiring: true,
+        decisionExitCodeSemantics: true,
+        rejectedFlagContractHardening: true
+      }
+    },
+    warnings: [
+      ...report.warnings,
+      'Rejected flag output preserves the stable report contract while failing closed.'
+    ],
+    recommendations: [
+      ...report.recommendations,
+      'Re-run without live/provider/apply/deploy/release flags.'
+    ],
+    mutated: report.safety.mutated,
+    providerCalls: report.safety.providerCalls,
+    serviceStarted: report.safety.serviceStarted,
+    durableMemoryTouched: report.safety.durableMemoryTouched,
     nextStep: 'Re-run without live/provider/apply/deploy/release flags.'
   };
 }

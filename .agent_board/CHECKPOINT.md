@@ -198,3 +198,54 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git status -sb`; `git log --oneline --decorate -n 12`; `git diff --check`; `scripts/validate-local.ps1 -Area docs`; Verifier `PASS`.
 - Not run: source tests, `npm test`, `gate:ci`, `gate:mainline`, live MCP/HTTP refresh, provider calls, migration/import-export apply.
 - Next safe action: P24.6 rejected-flag report contract hardening, local source/test-only, no package script and no A5-gated action.
+
+## CM-0207 - P24.6 Rejected-Flag Report Contract Hardening
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- HEAD at start: `eeb6d1e chore: record cm-0206 four agent calibration`
+- Changed files: `src/cli/v1-rc-validation-aggregator.js`; `tests/v1-rc-validation-aggregator-cli.test.js`; `.agent_board/*`.
+- Result: rejected side-effect/live flag output now reuses the stable aggregator report contract and still exits `1`.
+- Contract preserved: `safety`; `public_mcp_tools`; `evidence_sources`; no-side-effect mirror fields `mutated/providerCalls/serviceStarted/durableMemoryTouched`.
+- Validation: CLI test `12/12`; implementation test `6/6`; fixture shape test `9/9`; `git diff --check`; docs validation passed.
+- Not run: `npm test`; `gate:ci`; `gate:mainline`; live MCP/HTTP refresh; provider calls; migration/import-export apply.
+- A5 boundary: no package script, service start, config mutation, provider call, durable write, migration/import-export apply, MCP expansion, push, tag, release, or deploy.
+- Next safe action: optional guarded local commit if requested; otherwise continue with the next P24 report-shape hardening or P25 schema/version planning slice.
+
+## CM-0208 - P24.7 Rejected Report Contract Parity
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- HEAD at start: `eeb6d1e chore: record cm-0206 four agent calibration`
+- Changed files: `tests/v1-rc-validation-aggregator-cli.test.js`; `.agent_board/*`.
+- Result: rejected report output must include every normal aggregator report top-level key.
+- Contract checked: decision parity; public MCP tools parity; `evidence_sources` key parity; `safety.mutated=false`; `rejectedFlag`; boundary error message.
+- Validation: CLI test `13/13`; implementation test `6/6`; fixture shape test `9/9`; `git diff --check`; docs validation passed.
+- Not run: `npm test`; `gate:ci`; `gate:mainline`; live MCP/HTTP refresh; provider calls; migration/import-export apply.
+- A5 boundary: no runtime/package/config/provider/data/push/tag/release/deploy action.
+
+## CM-0209 - P24 Implementation Plan Docs Sync
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- HEAD at start: `eeb6d1e chore: record cm-0206 four agent calibration`
+- Changed files: `docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md`; `.agent_board/*`.
+- Result: P24 implementation plan now lists P24.6 and P24.7 in the implementation sequence and records their boundaries.
+- Validation: `git diff --check`; docs validation; P24.6/P24.7 reference check.
+- Not run: source tests for this docs-only sync; prior same-batch P24 tests passed CLI `13/13`, implementation `6/6`, fixture shape `9/9`.
+- A5 boundary: no runtime/package/config/provider/data/push/tag/release/deploy action.
+- Next safe action: optional guarded local commit if requested, or continue with another local P24/P25 hardening slice.
+
+## CM-0207/CM-0208/CM-0209 - Current Worktree Revalidation
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: pending P24.6 rejected-flag report contract hardening, P24.7 rejected report contract parity, and P24 docs sync.
+- Validation: syntax checks for `src/cli/v1-rc-validation-aggregator.js` and `tests/v1-rc-validation-aggregator-cli.test.js`; targeted aggregator tests CLI `13/13`, implementation `6/6`, fixture shape `9/9`; `git diff --check`; `scripts/validate-local.ps1 -Area docs`; `npm test` `501/501`.
+- Note: `validate-local.ps1` reported only the known user-level git ignore permission warning.
+- Not run: `gate:ci`; `gate:mainline`; live MCP/HTTP refresh; provider calls; migration/import-export apply.
+- A5 boundary: no service start, provider call, config mutation, package/lockfile change, durable memory write, migration/import-export apply, public MCP expansion, push, tag, release, or deploy.

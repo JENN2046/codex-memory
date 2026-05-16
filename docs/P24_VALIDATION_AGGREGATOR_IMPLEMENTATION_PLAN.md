@@ -341,6 +341,8 @@ Suggested sequence:
 3. `P24.3-validation-aggregator-cli-wiring-minimal-implementation`
 4. `P24.4-validation-aggregator-decision-exit-code-semantics`
 5. `P24.5-validation-aggregator-evidence-source-map`
+6. `P24.6-validation-aggregator-rejected-flag-contract-hardening`
+7. `P24.7-validation-aggregator-rejected-report-contract-parity`
 
 Do not combine package script addition, runtime implementation, live MCP refresh, provider execution, migration apply, or release action into the same phase.
 
@@ -351,6 +353,10 @@ P24.3 adds direct-node CLI wiring in `src/cli/v1-rc-validation-aggregator.js` pl
 P24.4 adds minimal CLI decision and exit-code semantics: default report mode preserves JSON output and exits `0`; `--strict` preserves the same JSON output but exits `1` for the current `NOT_READY_BLOCKED` report; `--help` prints short usage text without running live checks. It does not add a package script, implement the full aggregator, implement schema/version runtime enforcement, start services, refresh live MCP/HTTP evidence, run providers, apply migrations/import-export, mutate durable memory, or change public MCP tools.
 
 P24.5 adds a minimal `evidence_sources` map to the core validation aggregator report and fixture contract. The map traces the current decision, blockers, A4-safe slice, full final RC matrix status, schema/version runtime enforcement gap, public MCP tool freeze, A5-gated actions, conditional live MCP/HTTP status, and full-aggregator implementation gap to documented code, docs, or governance sources. The fixture contract changes only because the report top-level shape now includes `evidence_sources`; this phase still does not add a package script, implement the full aggregator, implement schema/version runtime enforcement, start services, refresh live MCP/HTTP evidence, run providers, apply migrations/import-export, mutate durable memory, or change public MCP tools.
+
+P24.6 hardens rejected live/provider/apply/deploy/push flag output. Rejected flag reports now fail closed with exit `1` while preserving the stable aggregator report contract, including `safety`, `public_mcp_tools`, `evidence_sources`, and no-side-effect mirror fields. This phase does not add a package script, start services, refresh live MCP/HTTP evidence, run providers, apply migrations/import-export, mutate durable memory, implement schema/version runtime enforcement, or change public MCP tools.
+
+P24.7 adds test-only top-level contract parity coverage for rejected reports. The CLI test now verifies rejected report output includes every normal report top-level key while preserving the blocked decision, public MCP tool list, evidence-source keys, no-mutation safety state, rejected flag, and boundary error message. This phase does not change runtime behavior, package manifests, config, provider behavior, durable data, or public MCP tools.
 
 ## 19. Stop Conditions
 
@@ -385,4 +391,6 @@ P24.3 minimal CLI wiring is the next completed executable wrapper layer. The nex
 
 P24.4 decision/exit-code semantics is the completed CLI gate-semantics layer.
 
-P24.5 evidence-source mapping is the next completed provenance layer. The next safe phase after P24.5 is `P24.5-validation-aggregator-evidence-source-map-local-commit`, followed by further report-shape hardening or full matrix aggregation planning that still avoids package script changes unless explicitly authorized.
+P24.5 evidence-source mapping is the completed provenance layer.
+
+P24.6 rejected-flag report contract hardening and P24.7 rejected report contract parity are the next completed local report-shape hardening layers. The next safe phase after P24.7 is either a guarded local commit for the P24.6/P24.7/P24 docs-sync batch or another local P24 report-shape hardening slice. Full matrix aggregation, package script addition, schema/version runtime enforcement, live MCP refresh, provider execution, migration/import-export apply, and release actions remain separate approval-gated phases.

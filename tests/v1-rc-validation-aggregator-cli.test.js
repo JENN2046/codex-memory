@@ -190,10 +190,38 @@ test('minimal validation aggregator CLI rejects live or side-effect flags', () =
     assert.equal(result.status, 1, flag);
     const report = parseJsonResult(result);
     assert.equal(report.decision, 'NOT_READY_BLOCKED', flag);
+    assert.equal(report.phase, 'P24.6-validation-aggregator-rejected-flag-contract-hardening', flag);
     assert.equal(report.rejectedFlag, flag);
     assert.equal(report.mutated, false, flag);
     assert.equal(report.providerCalls, 0, flag);
     assert.equal(report.serviceStarted, false, flag);
     assert.equal(report.durableMemoryTouched, false, flag);
+    assert.equal(report.safety.mutated, false, flag);
+    assert.equal(report.safety.providerCalls, 0, flag);
+    assert.equal(report.safety.serviceStarted, false, flag);
+    assert.equal(report.safety.durableMemoryTouched, false, flag);
+    assert.deepEqual(report.public_mcp_tools, [
+      'record_memory',
+      'search_memory',
+      'memory_overview'
+    ]);
+    assert.ok(report.evidence_sources.decision, flag);
+    assert.equal(report.evidence.p24Aggregator.rejectedFlagContractHardening, true, flag);
   }
+});
+
+test('minimal validation aggregator rejected report preserves normal top-level contract keys', () => {
+  const normalReport = parseJsonResult(runCli(['--generated-at', '2026-05-16T00:00:00.000Z']));
+  const rejectedReport = parseJsonResult(runCli(['--provider']));
+
+  for (const key of Object.keys(normalReport)) {
+    assert.equal(Object.hasOwn(rejectedReport, key), true, key);
+  }
+
+  assert.equal(rejectedReport.decision, normalReport.decision);
+  assert.deepEqual(rejectedReport.public_mcp_tools, normalReport.public_mcp_tools);
+  assert.deepEqual(Object.keys(rejectedReport.evidence_sources).sort(), Object.keys(normalReport.evidence_sources).sort());
+  assert.equal(rejectedReport.safety.mutated, false);
+  assert.equal(rejectedReport.rejectedFlag, '--provider');
+  assert.match(rejectedReport.error, /outside the minimal validation aggregator CLI boundary/);
 });
