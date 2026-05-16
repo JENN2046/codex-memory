@@ -342,3 +342,5 @@ P23.6 migration/import-export readiness planning is tracked in [P23_6_MIGRATION_
 P23.7 v1.0 release-candidate checklist is tracked in [P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md](/A:/codex-memory/docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md).
 
 P23.8 final v1.0 RC readiness review is tracked in [P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md](/A:/codex-memory/docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md).
+
+P23.9 blocker burn-down planning is tracked in [P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md](/A:/codex-memory/docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md).

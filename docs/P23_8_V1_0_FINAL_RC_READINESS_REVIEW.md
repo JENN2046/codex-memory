@@ -256,3 +256,5 @@ Next recommended phase:
 `P23.8-v1.0-final-rc-readiness-review-local-commit`
 
 That phase should validate this docs/status/board-only review bundle, explicitly stage only the intended files, and create one local-only commit if authorized. It must not push, tag, release, deploy, modify runtime code, modify tests, modify package files, modify `.env`, change runtime config, switch Codex/Claude config, implement validator aggregators, install watchdog/startup tasks, run providers, run SQLite migration apply, run import/export apply, perform durable memory writes, alter public MCP tools, or execute destructive rollback.
+
+P23.9 blocker burn-down planning is tracked in [P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md](/A:/codex-memory/docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md). It classifies the remaining blockers and orders safe planning phases before any A5-gated action.

@@ -283,3 +283,5 @@ Next recommended phase:
 That phase should validate the docs/status/board-only checklist bundle, stage only the intended files explicitly, create one local-only commit if authorized, and still avoid push, tag, release, deploy, runtime code changes, tests changes, package changes, config mutation, provider execution, migration/import-export apply, durable memory writes, public MCP changes, and startup/watchdog installation.
 
 P23.8 final v1.0 RC readiness review is tracked in [P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md](/A:/codex-memory/docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md). It records the final docs-only readiness decision without claiming full v1.0 RC readiness.
+
+P23.9 blocker burn-down planning is tracked in [P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md](/A:/codex-memory/docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md).
