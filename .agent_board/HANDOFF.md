@@ -306,3 +306,29 @@ Recall impact: none expected; no recall runtime code changed.
 Remaining risks: future CLI remains unimplemented; runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
 
 Next safe step: guarded local commit if pre-commit status/diff review remains clean, then separately scope future CLI work.
+
+## CM-0221 Commander Handoff - Post-P25.5 Board-State Reconciliation
+
+Goal: keep `.agent_board` current after guarded local commit `f2ca2c9`.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: clean immediately after `f2ca2c9`; dirty only for this board-state reconciliation until committed.
+
+Current area: `P25-board-state-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check`; docs validation.
+
+Not validated: source/runtime/test behavior; live MCP/HTTP refresh; provider/profile; migration/import-export; durable write path; real memory scan.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: not checked by this batch.
+
+Remaining risks: future CLI remains unimplemented; runtime schema/version enforcement remains unimplemented; real memory scan and migration/import-export apply remain A5-gated; full v1.0 RC remains blocked; `push` remains deferred to final explicit step.
+
+Next safe step: commit this board-only reconciliation if validation passes, then select the next safe local P25 task through Council review.

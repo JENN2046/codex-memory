@@ -365,3 +365,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `node --check tests\schema-compatibility-dry-run-fixture.test.js`; `node --test tests\schema-compatibility-dry-run-fixture.test.js` `9/9`; `node --test tests\schema-version-policy-fixture.test.js tests\schema-compatibility-dry-run-fixture.test.js` `19/19`; `git diff --check`; docs validation; read-only Verifier `PASS`.
 - A5 boundary for this batch: no CLI implementation, package script, runtime schema/version enforcement, public MCP expansion, real memory scan, migration/import-export apply, durable write, service start, provider call, push, tag, release, or deploy.
 - Next safe action: guarded local commit if pre-commit status/diff review remains clean, then separately scope any future CLI work.
+
+## CM-0221 - Post-P25.5 Board-State Reconciliation
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only update after guarded local commit `f2ca2c9`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board state now records that P25.5 is committed locally and no longer pending guarded commit.
+- Validation: `git diff --check`; docs validation.
+- A5 boundary for this batch: no source/test/runtime/package/config/provider/data/public MCP expansion, durable write, migration/import-export apply, service start, push, tag, release, or deploy.
+- Next safe action: select the next safe local P25 task through Council review.
