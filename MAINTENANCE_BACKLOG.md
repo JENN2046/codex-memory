@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
-- Local baseline: `HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`; worktree clean at P51 start.
+- Local baseline: local `main` is ahead of `origin/main = 1ae4286` with P51/P52 local commits plus the current P53-T1 inventory work; push is not authorized.
 - Current active program: P51-P62 Runtime-Enforced Governed Memory Spine Completion.
-- Current phase area: P51 post-P50 push board/status reconciliation, then P52 schema/version runtime enforcement boundary plan. Evidence-first / fail-closed / reversible boundaries preserved.
+- Current phase area: P53 ValidationAggregator evidence inventory and posture bridge. Evidence-first / fail-closed / reversible boundaries preserved.
 
 ## Active Queue
 
@@ -46,7 +46,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P51-T1 | docs-drift | A1 | done | Post-P50 push board/status reconciliation | `git diff --check`; docs validation; active stale wording scan | Complete and validated; active status/board docs now point to pushed `HEAD == origin/main == 1ae4286`; no source/test/runtime change and no RC-ready claim. |
 | P52-T1 | memory-governance | A1/A2 | done | Runtime Schema-Version Enforcement Boundary Plan | `node --check` new test; targeted fixture test; `npm test`; docs validation; `git diff --check` | Complete and validated; docs + synthetic fixture/test contract for schemaVersion / policyVersion / manifestVersion fail-closed exact-set semantics; no runtime enforcement implementation, public MCP expansion, or real memory read. |
 | P52-T2 | memory-governance | A2 | done | Minimal Runtime Enforcement Helper | changed JS syntax; targeted helper tests; no-touch regression; `npm test`; `git diff --check`; boundary scan | Complete and validated; pure explicit-input helper over caller-provided object only; covers missing, unknown, unsupported, duplicate, malformed, and mismatched versions while preserving no fs read, command execution, durable write, public MCP expansion, provider call, or real memory read. |
-| P53-T1 | observability-admin | A1 | todo | ValidationAggregator Evidence Inventory | docs/fixture review; aggregator tests if report shape changes; `git diff --check` | Next safe slice: inventory existing aggregator/fixtures/tests/validation logs/board evidence and define acceptable source map plus stale/missing/fresh semantics; do not execute runner or read live runtime evidence. |
+| P53-T1 | observability-admin | A1/A2 | done | ValidationAggregator Evidence Inventory | `node --check` new test; targeted P53 + aggregator tests; `npm test`; docs validation; `git diff --check` | Complete and validated; adds inventory doc, synthetic fixture, and fixture test defining accepted source types, committed/local/runtime/final-RC evidence classes, and fresh/stale/missing/unsupported/blocked/not_executed semantics. Does not execute runner, helper, live MCP, provider, runtime store scan, or real memory read. |
+| P53-T2 | observability-admin | A2 | todo | ValidationAggregator inventory posture bridge | changed aggregator JS syntax; targeted aggregator tests; `npm test`; `git diff --check`; boundary scan | Next safe slice: surface P53 inventory posture as static report-shape evidence only; do not import/read the P53 fixture, execute helper/gate/runner, refresh live MCP, scan runtime stores, or claim full aggregator/runtime/RC readiness. |
 
 ## Standing Boundaries
 

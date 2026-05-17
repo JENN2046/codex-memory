@@ -1,0 +1,315 @@
+{
+  "schemaVersion": "p53-validation-aggregator-evidence-inventory-v1",
+  "policyVersion": "p53-validation-aggregator-inventory-policy-v1",
+  "manifestVersion": "p53-validation-aggregator-inventory-manifest-v1",
+  "version": "v1",
+  "phase": "P53-T1-validation-aggregator-evidence-inventory",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "inventoryOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "validationAggregatorFullImplementation": false,
+  "aggregatorExecutesInventory": false,
+  "runnerExecuted": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "rcReady": false,
+  "freshnessWindowHours": 168,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "sourceClasses": [
+    {
+      "id": "committed_evidence",
+      "description": "Committed code, docs, fixtures, tests, or static report-shape evidence.",
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "local_validation",
+      "description": "Caller-provided local validation result or ledger reference.",
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "runtime_evidence",
+      "description": "Future explicit runtime boundary evidence object.",
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "final_rc_matrix_evidence",
+      "description": "Future final RC matrix runner output.",
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    }
+  ],
+  "acceptedSourceTypes": [
+    "committed_code_contract",
+    "committed_doc_contract",
+    "committed_fixture_contract",
+    "committed_helper_contract",
+    "committed_test_contract",
+    "local_validation_log",
+    "local_git_commit",
+    "explicit_input_evidence",
+    "static_aggregator_report_shape",
+    "runtime_boundary_report",
+    "final_rc_matrix_report"
+  ],
+  "statusSemantics": [
+    {
+      "id": "fresh",
+      "criticalGateDisposition": "can_support_planning_only",
+      "blocksV1Rc": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "stale",
+      "criticalGateDisposition": "fail_closed",
+      "blocksV1Rc": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "missing",
+      "criticalGateDisposition": "fail_closed",
+      "blocksV1Rc": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "unsupported",
+      "criticalGateDisposition": "fail_closed",
+      "blocksV1Rc": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "blocked",
+      "criticalGateDisposition": "fail_closed",
+      "blocksV1Rc": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "not_executed",
+      "criticalGateDisposition": "fail_closed",
+      "blocksV1Rc": true,
+      "readinessAuthority": false
+    }
+  ],
+  "inventoryRows": [
+    {
+      "id": "validation_aggregator_current_report_shape",
+      "sourceClass": "committed_evidence",
+      "sourceType": "static_aggregator_report_shape",
+      "status": "fresh",
+      "artifactRefs": [
+        "src/core/ValidationAggregatorService.js",
+        "tests/v1-rc-validation-aggregator-implementation.test.js",
+        "tests/fixtures/v1-rc-validation-aggregator-v1.json"
+      ],
+      "committedEvidence": true,
+      "localEvidence": false,
+      "runtimeEvidence": false,
+      "freshEvidence": true,
+      "acceptedForPlanning": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p36_p40_static_evidence_source_map",
+      "sourceClass": "committed_evidence",
+      "sourceType": "static_aggregator_report_shape",
+      "status": "fresh",
+      "artifactRefs": [
+        "src/core/ValidationAggregatorService.js",
+        "tests/v1-rc-validation-aggregator-implementation.test.js"
+      ],
+      "committedEvidence": true,
+      "localEvidence": false,
+      "runtimeEvidence": false,
+      "freshEvidence": true,
+      "acceptedForPlanning": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p45_final_rc_matrix_posture_bridge",
+      "sourceClass": "committed_evidence",
+      "sourceType": "static_aggregator_report_shape",
+      "status": "fresh",
+      "artifactRefs": [
+        "src/core/ValidationAggregatorService.js",
+        "tests/v1-rc-validation-aggregator-cli.test.js"
+      ],
+      "committedEvidence": true,
+      "localEvidence": false,
+      "runtimeEvidence": false,
+      "freshEvidence": true,
+      "acceptedForPlanning": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p52_minimal_runtime_schema_version_helper",
+      "sourceClass": "committed_evidence",
+      "sourceType": "committed_helper_contract",
+      "status": "fresh",
+      "artifactRefs": [
+        "src/core/RuntimeSchemaVersionEnforcementContract.js",
+        "tests/runtime-schema-version-enforcement-contract-helper.test.js"
+      ],
+      "committedEvidence": true,
+      "localEvidence": false,
+      "runtimeEvidence": false,
+      "freshEvidence": true,
+      "acceptedForPlanning": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p52_local_validation_result",
+      "sourceClass": "local_validation",
+      "sourceType": "local_validation_log",
+      "status": "fresh",
+      "artifactRefs": [
+        ".agent_board/VALIDATION_LOG.md"
+      ],
+      "committedEvidence": false,
+      "localEvidence": true,
+      "runtimeEvidence": false,
+      "freshEvidence": true,
+      "acceptedForPlanning": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "schema_version_runtime_enforcement",
+      "sourceClass": "runtime_evidence",
+      "sourceType": "runtime_boundary_report",
+      "status": "missing",
+      "artifactRefs": [],
+      "committedEvidence": false,
+      "localEvidence": false,
+      "runtimeEvidence": false,
+      "freshEvidence": false,
+      "acceptedForPlanning": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "final_rc_matrix_runner_execution",
+      "sourceClass": "final_rc_matrix_evidence",
+      "sourceType": "final_rc_matrix_report",
+      "status": "not_executed",
+      "artifactRefs": [],
+      "committedEvidence": false,
+      "localEvidence": false,
+      "runtimeEvidence": false,
+      "freshEvidence": false,
+      "acceptedForPlanning": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "governance_review_approval_audit_runtime_loop",
+      "sourceClass": "runtime_evidence",
+      "sourceType": "runtime_boundary_report",
+      "status": "blocked",
+      "artifactRefs": [],
+      "committedEvidence": false,
+      "localEvidence": false,
+      "runtimeEvidence": false,
+      "freshEvidence": false,
+      "acceptedForPlanning": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "unsupported_runtime_source_type_example",
+      "sourceClass": "runtime_evidence",
+      "sourceType": "unsupported_source_type",
+      "status": "unsupported",
+      "artifactRefs": [],
+      "committedEvidence": false,
+      "localEvidence": false,
+      "runtimeEvidence": false,
+      "freshEvidence": false,
+      "acceptedForPlanning": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "stale_validation_log_example",
+      "sourceClass": "local_validation",
+      "sourceType": "local_validation_log",
+      "status": "stale",
+      "artifactRefs": [
+        ".agent_board/VALIDATION_LOG.md"
+      ],
+      "committedEvidence": false,
+      "localEvidence": true,
+      "runtimeEvidence": false,
+      "freshEvidence": false,
+      "acceptedForPlanning": false,
+      "readinessAuthority": false
+    }
+  ],
+  "requiredGaps": [
+    "schema_version_runtime_enforcement_missing",
+    "validation_aggregator_full_implementation_incomplete",
+    "final_rc_matrix_runner_not_executed",
+    "runtime_governance_loop_blocked",
+    "runtime_recall_isolation_unproven",
+    "migration_import_export_backup_restore_approval_framework_missing",
+    "http_runtime_observability_evidence_missing"
+  ],
+  "blockedActions": [
+    "execute_final_rc_matrix_runner",
+    "execute_validation_commands_from_inventory",
+    "read_real_memory_content",
+    "scan_real_memory",
+    "scan_runtime_stores",
+    "start_service",
+    "call_provider",
+    "public_mcp_expansion",
+    "runtime_governance_mutation",
+    "durable_memory_write",
+    "durable_audit_write",
+    "migration_import_export_apply",
+    "backup_restore_apply",
+    "config_switch",
+    "watchdog_install",
+    "push_tag_release_deploy"
+  ],
+  "safety": {
+    "noImplicitFileDiscovery": true,
+    "noDirectoryScan": true,
+    "noCommandExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryRead": true,
+    "noRuntimeStoreScan": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "callerFieldsPassthroughAllowed": false
+  },
+  "requiredWording": [
+    "P53-T1 is an inventory contract only.",
+    "Fresh committed or local evidence can support planning only.",
+    "Missing, stale, unsupported, blocked, or not_executed critical evidence fails closed.",
+    "P53-T1 does not execute the aggregator, helper, gate, runner, live MCP, provider, runtime store, or real memory scan.",
+    "v1.0 RC remains NOT_READY_BLOCKED."
+  ],
+  "forbiddenClaims": [
+    "P53 implements the full ValidationAggregator",
+    "P53 executes the final RC matrix runner",
+    "P53 proves runtime schema enforcement",
+    "P53 authorizes real memory reads",
+    "P53 authorizes public MCP expansion",
+    "P53 makes v1.0 RC ready"
+  ]
+}

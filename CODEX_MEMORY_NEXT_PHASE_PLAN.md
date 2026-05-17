@@ -9,9 +9,10 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 ## Current Direction
 
 1. Treat P46-P50 as complete local evidence enforcement bridge posture only, not runtime/mainline/RC readiness.
-2. Start P51 by reconciling stale board/status facts to `HEAD == origin/main == 1ae4286`.
-3. Move next to P52 schema/version runtime enforcement boundary planning before any runtime implementation.
-4. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
+2. P51 post-push reconciliation is complete for pushed baseline `origin/main = 1ae4286`.
+3. P52 schema/version boundary plan and minimal explicit-input helper are complete locally.
+4. Move through P53 by separating ValidationAggregator inventory contracts from future full implementation.
+5. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
 
@@ -49,9 +50,10 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 - P51-T1 post-P50 push board/status reconciliation is complete locally in `1f89c63`.
 - P52-T1 runtime schema-version enforcement boundary plan is complete and committed locally in `884f2f6`.
-- P52-T2 minimal runtime enforcement helper is complete and validated.
-- P53-T1 ValidationAggregator evidence inventory is the next safe implementation slice.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion or P52-T1 boundary evidence.
+- P52-T2 minimal runtime enforcement helper is complete, validated, and locally committed.
+- P53-T1 ValidationAggregator evidence inventory is complete and validated.
+- P53-T2 ValidationAggregator inventory posture bridge is the next safe implementation slice.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, or P53 inventory evidence.
 
 ## Boundaries
 
@@ -70,7 +72,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P52-T2:
+After P53-T1:
 
-- Begin P53-T1 ValidationAggregator evidence inventory.
-- Keep P53-T1 inventory-only: inspect existing committed/local evidence, define source map and stale/missing/fresh semantics, but do not execute runner, helper, provider, runtime scan, or live MCP refresh.
+- Begin P53-T2 ValidationAggregator inventory posture bridge.
+- Keep P53-T2 report-shape-only: expose the P53 inventory posture without importing or reading the P53 fixture, executing helpers/gates/runners, collecting live runtime evidence, refreshing live MCP, scanning runtime stores, or claiming full ValidationAggregator/runtime/RC readiness.
