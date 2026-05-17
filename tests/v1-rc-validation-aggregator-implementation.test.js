@@ -11,6 +11,7 @@ const {
   VALIDATION_EVIDENCE_GATE_READINESS_STATUSES,
   VALIDATION_EVIDENCE_REJECTION_REASONS,
   VALIDATION_EVIDENCE_REJECTION_SUMMARY_STATUSES,
+  VALIDATION_EVIDENCE_SOURCE_CLASSES,
   VALIDATION_EVIDENCE_SOURCE_TYPES,
   buildV1RcValidationAggregatorReport,
   normalizeValidationEvidenceSources
@@ -732,6 +733,7 @@ test('validation evidence reader exposes only explicit committed and local valid
       {
         id: 'cmv-0333-committed',
         source_type: 'committed_validation',
+        evidence_class: 'committed_evidence',
         status: 'passed',
         source_ref: '.agent_board/VALIDATION_LOG.md#CMV-0333',
         observed_at: '2026-05-17T00:00:00.000Z',
@@ -749,6 +751,7 @@ test('validation evidence reader exposes only explicit committed and local valid
       {
         id: 'p28-targeted-local',
         source_type: 'local_validation',
+        evidence_class: 'local_validation',
         status: 'passed',
         source_ref: 'tests/v1-rc-validation-aggregator-implementation.test.js',
         observed_at: '2026-05-17T01:30:00.000Z',
@@ -780,6 +783,7 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.equal(reader.status, 'explicit_evidence_available');
   assert.equal(reader.sourceMode, 'explicit_safe_inputs_only');
   assert.deepEqual(reader.contract.sourceTypes, VALIDATION_EVIDENCE_SOURCE_TYPES);
+  assert.deepEqual(reader.contract.sourceClasses, VALIDATION_EVIDENCE_SOURCE_CLASSES);
   assert.equal(reader.contract.readsFiles, false);
   assert.equal(reader.contract.executesCommands, false);
   assert.equal(reader.contract.startsServices, false);
@@ -787,6 +791,10 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.equal(reader.rejectedCount, 0);
   assert.equal(reader.summary.committedValidationCount, 1);
   assert.equal(reader.summary.localValidationCount, 1);
+  assert.equal(reader.summary.committedEvidenceClassCount, 1);
+  assert.equal(reader.summary.localEvidenceClassCount, 1);
+  assert.equal(reader.summary.runtimeEvidenceClassCount, 0);
+  assert.equal(reader.summary.finalRcMatrixEvidenceClassCount, 0);
   assert.equal(reader.summary.passedCount, 2);
   assert.equal(reader.summary.allAcceptedSafe, true);
   assert.equal(reader.freshness.status, 'fresh_passed');
@@ -817,7 +825,13 @@ test('validation evidence reader exposes only explicit committed and local valid
     'committed_validation',
     'local_validation'
   ]);
+  assert.deepEqual(reader.commandCoverage.sourceClassesCovered, [
+    'committed_evidence',
+    'local_validation'
+  ]);
   assert.equal(reader.commandCoverage.requiredSourceTypesCovered, true);
+  assert.equal(reader.commandCoverage.runtimeEvidenceAccepted, false);
+  assert.equal(reader.commandCoverage.finalRcMatrixEvidenceAccepted, false);
   assert.equal(reader.commandCoverage.commandFamilies.git, 1);
   assert.equal(reader.commandCoverage.commandFamilies.node, 1);
   assert.equal(reader.commandCoverage.commandFamilies.npm, 0);
@@ -834,6 +848,10 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.deepEqual(reader.acceptedSources.map(source => source.id), [
     'cmv-0333-committed',
     'p28-targeted-local'
+  ]);
+  assert.deepEqual(reader.acceptedSources.map(source => source.evidence_class), [
+    'committed_evidence',
+    'local_validation'
   ]);
   assert.equal(reader.acceptedSources[0].safety.providerCalls, 0);
   assert.equal(reader.acceptedSources[0].safety.serviceStarted, false);
@@ -966,6 +984,37 @@ test('validation evidence gate readiness fails closed when explicit inputs inclu
   assert.equal(report.evidence.p28ValidationEvidenceReader.rejectionSummary.hasUnsupportedContractRejection, true);
   assert.equal(report.evidence.p28ValidationEvidenceReader.rejectionSummary.rawRejectedInputExposed, false);
   assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'rejected_or_unsafe_signal');
+});
+
+test('validation evidence reader rejects caller-claimed runtime and final RC evidence classes', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    validationEvidenceSources: [
+      {
+        id: 'runtime-claim',
+        source_type: 'local_validation',
+        evidence_class: 'runtime_evidence',
+        status: 'passed'
+      },
+      {
+        id: 'final-rc-claim',
+        source_type: 'committed_validation',
+        evidence_class: 'final_rc_matrix_evidence',
+        status: 'passed'
+      }
+    ]
+  });
+
+  assert.equal(report.evidence.p28ValidationEvidenceReader.acceptedCount, 0);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.rejectedCount, 2);
+  assert.equal(
+    report.evidence.p28ValidationEvidenceReader.rejectionSummary.reasonCounts.unsupported_source_class,
+    2
+  );
+  assert.equal(report.evidence.p28ValidationEvidenceReader.gateReadiness.status, 'not_ready_no_explicit_evidence');
+  assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'rejected_or_unsafe_signal');
+  assert.equal(report.evidence.p28ValidationEvidenceReader.commandCoverage.runtimeEvidenceAccepted, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.commandCoverage.finalRcMatrixEvidenceAccepted, false);
+  assert.equal(report.summary.validationEvidenceCanClaimV1RcReady, false);
 });
 
 test('validation evidence rejection summary counts rejected explicit input reasons without exposing raw input', () => {

@@ -16,6 +16,13 @@ const VALIDATION_EVIDENCE_SOURCE_TYPES = [
   'local_validation'
 ];
 
+const VALIDATION_EVIDENCE_SOURCE_CLASSES = [
+  'committed_evidence',
+  'local_validation',
+  'runtime_evidence',
+  'final_rc_matrix_evidence'
+];
+
 const VALIDATION_EVIDENCE_STATUSES = [
   'passed',
   'failed',
@@ -59,6 +66,7 @@ const VALIDATION_EVIDENCE_REJECTION_REASONS = [
   'invalid_source_shape',
   'sensitive_fragment_rejected',
   'unsupported_source_type',
+  'unsupported_source_class',
   'unsupported_status',
   'side_effect_evidence_rejected'
 ];
@@ -492,6 +500,15 @@ function safeEvidenceString(value, fallback = '') {
   return value.trim().slice(0, 240);
 }
 
+function deriveValidationEvidenceClass(source) {
+  if (typeof source.evidence_class === 'string' && source.evidence_class.trim() !== '') {
+    return safeEvidenceString(source.evidence_class);
+  }
+  if (source.source_type === 'committed_validation') return 'committed_evidence';
+  if (source.source_type === 'local_validation') return 'local_validation';
+  return '';
+}
+
 function normalizeEvidenceCommands(commands) {
   if (!Array.isArray(commands)) return [];
   return commands
@@ -632,6 +649,7 @@ function classifyEvidenceCommand(command) {
 function summarizeValidationEvidenceCommandCoverage(validationEvidenceReader) {
   const acceptedSources = validationEvidenceReader.acceptedSources;
   const sourceTypesCovered = [...new Set(acceptedSources.map(source => source.source_type))].sort();
+  const sourceClassesCovered = [...new Set(acceptedSources.map(source => source.evidence_class))].sort();
   const allCommands = acceptedSources.flatMap(source => source.commands);
   const uniqueCommands = [...new Set(allCommands)].sort();
   const sourcesWithCommands = acceptedSources.filter(source => source.commands.length > 0);
@@ -671,9 +689,12 @@ function summarizeValidationEvidenceCommandCoverage(validationEvidenceReader) {
     commandCount: allCommands.length,
     uniqueCommandCount: uniqueCommands.length,
     sourceTypesCovered,
+    sourceClassesCovered,
     requiredSourceTypesCovered: VALIDATION_EVIDENCE_SOURCE_TYPES.every(sourceType =>
       sourceTypesCovered.includes(sourceType)
     ),
+    runtimeEvidenceAccepted: sourceClassesCovered.includes('runtime_evidence'),
+    finalRcMatrixEvidenceAccepted: sourceClassesCovered.includes('final_rc_matrix_evidence'),
     commandFamilies,
     allAcceptedHaveCommands: acceptedSources.length > 0 &&
       sourcesWithCommands.length === acceptedSources.length
@@ -704,6 +725,7 @@ function summarizeValidationEvidenceRejections(validationEvidenceReader) {
     hasSensitiveRejection: reasonCounts.sensitive_fragment_rejected > 0,
     hasSideEffectRejection: reasonCounts.side_effect_evidence_rejected > 0,
     hasUnsupportedContractRejection: reasonCounts.unsupported_source_type > 0 ||
+      reasonCounts.unsupported_source_class > 0 ||
       reasonCounts.unsupported_status > 0 ||
       reasonCounts.invalid_source_shape > 0,
     rawRejectedInputExposed: false,
@@ -825,6 +847,20 @@ function normalizeValidationEvidenceSources(sources = []) {
       return;
     }
 
+    const evidenceClass = deriveValidationEvidenceClass(source);
+    if (
+      !VALIDATION_EVIDENCE_SOURCE_CLASSES.includes(evidenceClass) ||
+      evidenceClass === 'runtime_evidence' ||
+      evidenceClass === 'final_rc_matrix_evidence'
+    ) {
+      rejectedSources.push({
+        id,
+        accepted: false,
+        reason: 'unsupported_source_class'
+      });
+      return;
+    }
+
     if (!VALIDATION_EVIDENCE_STATUSES.includes(source.status)) {
       rejectedSources.push({
         id,
@@ -846,6 +882,7 @@ function normalizeValidationEvidenceSources(sources = []) {
     acceptedSources.push({
       id,
       source_type: source.source_type,
+      evidence_class: evidenceClass,
       status: source.status,
       source_ref: safeEvidenceString(source.source_ref, 'explicit-safe-input'),
       observed_at: safeEvidenceString(source.observed_at, ''),
@@ -873,6 +910,7 @@ function normalizeValidationEvidenceSources(sources = []) {
     sourceMode: 'explicit_safe_inputs_only',
     contract: {
       sourceTypes: VALIDATION_EVIDENCE_SOURCE_TYPES,
+      sourceClasses: VALIDATION_EVIDENCE_SOURCE_CLASSES,
       statuses: VALIDATION_EVIDENCE_STATUSES,
       readsFiles: false,
       executesCommands: false,
@@ -889,6 +927,10 @@ function normalizeValidationEvidenceSources(sources = []) {
     summary: {
       committedValidationCount: acceptedSources.filter(source => source.source_type === 'committed_validation').length,
       localValidationCount: acceptedSources.filter(source => source.source_type === 'local_validation').length,
+      committedEvidenceClassCount: acceptedSources.filter(source => source.evidence_class === 'committed_evidence').length,
+      localEvidenceClassCount: acceptedSources.filter(source => source.evidence_class === 'local_validation').length,
+      runtimeEvidenceClassCount: acceptedSources.filter(source => source.evidence_class === 'runtime_evidence').length,
+      finalRcMatrixEvidenceClassCount: acceptedSources.filter(source => source.evidence_class === 'final_rc_matrix_evidence').length,
       passedCount: acceptedSources.filter(source => source.status === 'passed').length,
       failedCount: acceptedSources.filter(source => source.status === 'failed').length,
       blockedCount: acceptedSources.filter(source => source.status === 'blocked').length,
@@ -1940,6 +1982,7 @@ module.exports = {
   VALIDATION_EVIDENCE_GATE_READINESS_STATUSES,
   VALIDATION_EVIDENCE_REJECTION_REASONS,
   VALIDATION_EVIDENCE_REJECTION_SUMMARY_STATUSES,
+  VALIDATION_EVIDENCE_SOURCE_CLASSES,
   VALIDATION_EVIDENCE_SOURCE_TYPES,
   VALIDATION_EVIDENCE_STATUSES,
   buildV1RcValidationAggregatorReport,
