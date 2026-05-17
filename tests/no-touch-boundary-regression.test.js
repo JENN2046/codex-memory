@@ -52,6 +52,10 @@ const noTouchTargets = [
     path: 'src/core/HttpRuntimeObservabilityOperationContract.js'
   },
   {
+    label: 'RcEvidenceReportContract',
+    path: 'src/core/RcEvidenceReportContract.js'
+  },
+  {
     label: 'FinalRcMatrixEvaluator',
     path: 'src/core/FinalRcMatrixEvaluator.js'
   },

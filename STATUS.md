@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `1ae4286 test: harden no-touch redaction regressions`。
-- 当前本地基线：本地 `main` 已包含 P51-P61-T1 本地工作和 post-commit board reconciliation `2811da3`，并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
+- 当前本地基线：本地 `main` 已包含 P51-P61-T1 本地工作和 stale board correction `ba1edf2`，并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P61-T2 RC evidence report explicit-input helper 候选；只有在保持 pure caller-provided object evaluation、no-side-effect、no runtime execution 时才可进入。P61-T1 已完成、验证并本地提交为 `360f4f9`，post-commit board reconciliation 已提交为 `2811da3`。
+- 当前任务：P61-T2 RC evidence report explicit-input helper 已完成并通过本地验证，正在准备 guarded local commit。该 helper 只处理 caller-provided object，不执行 `gate:mainline:strict`、final RC runner、live HTTP operation、provider call、service/watchdog/config 操作、durable write、public MCP expansion 或 RC-ready claim。
 
 ## 当前阻塞
 
@@ -21,9 +21,9 @@
 
 ## 当前优先级
 
-1. 评估并进入 P61-T2 explicit-input RC evidence report helper；不得 push，除非用户单独明确授权。
-2. P61-T2 必须继续本地、可逆、no-side-effect，不得执行 mainline gate、final RC runner、live HTTP operation、service/watchdog/startup install、config switch、provider call、durable write 或 public MCP expansion。
-3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54 command chain evidence、P55 trace evidence、P56 governance loop evidence、P57 boundary/helper evidence、P58 boundary/helper evidence、P59 boundary inventory evidence 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、或 final RC matrix execution。
+1. 提交 P61-T2 explicit-input RC evidence report helper 的本地 validated change；不得 push，除非用户单独明确授权。
+2. 下一条安全候选是 P62 v1.0 RC cutover preflight 的本地 evidence-only 边界盘点；不得 tag/release/deploy/config switch/watchdog install。
+3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54 command chain evidence、P55 trace evidence、P56 governance loop evidence、P57 boundary/helper evidence、P58 boundary/helper evidence、P59 boundary/helper evidence、P60 regression 或 P61 report helper 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、mainline gate execution、或 final RC matrix execution。
 4. 不 push，除非用户单独明确授权。
 
 ## 主要事实源

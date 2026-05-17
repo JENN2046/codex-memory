@@ -20,6 +20,7 @@ const centralizedRedactionTargets = [
   'src/core/RecallIsolationRuntimeProofContract.js',
   'src/core/MigrationImportExportBackupRestoreApprovalContract.js',
   'src/core/HttpRuntimeObservabilityOperationContract.js',
+  'src/core/RcEvidenceReportContract.js',
   'src/core/FinalRcMatrixEvaluator.js',
   'src/core/FinalRcRunnerCommandResultContract.js',
   'src/core/FinalRcRunnerExecutionPreflight.js',
