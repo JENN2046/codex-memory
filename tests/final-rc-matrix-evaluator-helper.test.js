@@ -7,10 +7,13 @@ const test = require('node:test');
 
 const {
   BLOCKED_ACTIONS,
+  EXPECTED_MODE,
+  EXPECTED_SCHEMA_VERSION,
   FAIL_CLOSED_STATES,
   FAIL_CLOSED_STATUSES,
   PUBLIC_MCP_TOOLS,
   REQUIRED_EVIDENCE_IDS,
+  REQUIRED_A5_BLOCKER_IDS,
   REQUIRED_INPUT_KEYS,
   SAFE_SOURCE_TYPES,
   evaluateFinalRcMatrix,
@@ -51,6 +54,8 @@ test('P45 evaluator summarizes explicit fixture input while staying NOT_READY_BL
 
   assert.equal(evaluation.sourceMode, 'explicit_input');
   assert.equal(evaluation.schemaVersion, 'p45-final-rc-matrix-evaluator-v1');
+  assert.equal(evaluation.schemaVersion, EXPECTED_SCHEMA_VERSION);
+  assert.equal(evaluation.mode, EXPECTED_MODE);
   assert.equal(evaluation.status, 'blocked_fail_closed');
   assert.equal(evaluation.decision, 'NOT_READY_BLOCKED');
   assert.equal(evaluation.inputContractAccepted, true);
@@ -72,10 +77,16 @@ test('P45 evaluator summarizes explicit fixture input while staying NOT_READY_BL
   assert.equal(evaluation.manifest.evidenceCollectedByEvaluator, false);
   assert.equal(evaluation.manifest.helperExecutedByEvaluator, false);
   assert.equal(evaluation.evidence.requiredPresent, true);
+  assert.equal(evaluation.evidence.exact, true);
   assert.equal(evaluation.evidence.safe, true);
   assert.deepEqual(evaluation.evidence.missingRequired, []);
+  assert.deepEqual(evaluation.evidence.duplicateIds, []);
   assert.deepEqual(evaluation.evidence.ids, REQUIRED_EVIDENCE_IDS);
+  assert.equal(evaluation.a5Blockers.requiredPresent, true);
+  assert.equal(evaluation.a5Blockers.exact, true);
   assert.equal(evaluation.a5Blockers.unresolvedCount, 5);
+  assert.deepEqual(evaluation.a5Blockers.missingRequired, []);
+  assert.deepEqual(evaluation.a5Blockers.duplicateIds, []);
   assert.equal(evaluation.a5Blockers.preservedBlocked, true);
   assert.equal(evaluation.a5Blockers.callerResolutionAccepted, false);
   assert.deepEqual(evaluation.publicMcpTools, {
@@ -83,8 +94,10 @@ test('P45 evaluator summarizes explicit fixture input while staying NOT_READY_BL
     tools: PUBLIC_MCP_TOOLS
   });
   assert.equal(evaluation.blockedActions.requiredPresent, true);
+  assert.equal(evaluation.blockedActions.exact, true);
   assert.deepEqual(evaluation.blockedActions.missingRequired, []);
   assert.equal(evaluation.failClosedStates.requiredPresent, true);
+  assert.equal(evaluation.failClosedStates.exact, true);
   assert.deepEqual(evaluation.failClosedStates.missingRequired, []);
   assert.equal(evaluation.safety.noSideEffects, true);
   assert.equal(evaluation.safety.readsFiles, false);
@@ -124,6 +137,7 @@ test('P45 evaluator normalizes allowlisted fields without arbitrary passthrough'
   assert.equal(Object.hasOwn(normalized, 'cliSummary'), false);
   assert.equal(Object.hasOwn(normalized, 'providerLatency'), false);
   assert.deepEqual(FAIL_CLOSED_STATUSES, FAIL_CLOSED_STATES);
+  assert.deepEqual(fixture.a5Blockers.map(blocker => blocker.id), REQUIRED_A5_BLOCKER_IDS);
   assert.deepEqual(REQUIRED_INPUT_KEYS, [
     'manifest',
     'evidence',
@@ -318,6 +332,113 @@ test('P45 evaluator rejects unsupported source type and runtime-observed evidenc
   assert.equal(evaluation.failClosedReasons.includes('unsupported_source_type'), true);
   assert.equal(evaluation.safety.readsFiles, false);
   assert.equal(evaluation.safety.executesCommands, false);
+});
+
+test('P45 evaluator fails closed for schema, mode, evidence, blocker, and exact-set drift', () => {
+  const fixture = loadFixture();
+
+  for (const [label, unsafeInput, expectedReason] of [
+    [
+      'schema-version',
+      {
+        ...fixture,
+        schemaVersion: 'p45-final-rc-matrix-evaluator-v999'
+      },
+      'schema_version_mismatch'
+    ],
+    [
+      'mode',
+      {
+        ...fixture,
+        mode: 'runtime-executed'
+      },
+      'mode_not_fixture_explicit'
+    ],
+    [
+      'duplicate-evidence',
+      {
+        ...fixture,
+        evidence: [
+          ...fixture.evidence,
+          fixture.evidence[0]
+        ]
+      },
+      'evidence_matrix_not_exact'
+    ],
+    [
+      'duplicate-a5-blocker',
+      {
+        ...fixture,
+        a5Blockers: [
+          ...fixture.a5Blockers,
+          fixture.a5Blockers[0]
+        ]
+      },
+      'a5_blockers_not_exact'
+    ],
+    [
+      'missing-a5-blockers',
+      {
+        ...fixture,
+        a5Blockers: [
+          {
+            id: 'placeholder-a5-blocker',
+            status: 'blocked_pending_a5',
+            unresolved: true
+          }
+        ]
+      },
+      'a5_blockers_not_exact'
+    ],
+    [
+      'extra-blocked-action',
+      {
+        ...fixture,
+        blockedActions: [
+          ...fixture.blockedActions,
+          'extra_blocked_action'
+        ]
+      },
+      'blocked_actions_not_exact'
+    ],
+    [
+      'extra-fail-closed-state',
+      {
+        ...fixture,
+        failClosedStates: [
+          ...fixture.failClosedStates,
+          'extra_state'
+        ]
+      },
+      'fail_closed_states_not_exact'
+    ]
+  ]) {
+    const evaluation = evaluateFinalRcMatrix(unsafeInput);
+
+    assert.equal(evaluation.inputContractAccepted, false, label);
+    assert.equal(evaluation.passed, false, label);
+    assert.equal(evaluation.canClaimFinalRcReady, false, label);
+    assert.equal(evaluation.failClosedReasons.includes(expectedReason), true, label);
+  }
+
+  const duplicateEvidenceEvaluation = evaluateFinalRcMatrix({
+    ...fixture,
+    evidence: [
+      ...fixture.evidence,
+      fixture.evidence[0]
+    ]
+  });
+  assert.equal(duplicateEvidenceEvaluation.evidence.exact, false);
+  assert.deepEqual(duplicateEvidenceEvaluation.evidence.duplicateIds, ['p36_scope_a5_boundary']);
+
+  const missingA5Evaluation = evaluateFinalRcMatrix({
+    ...fixture,
+    a5Blockers: [
+      fixture.a5Blockers[0]
+    ]
+  });
+  assert.equal(missingA5Evaluation.a5Blockers.exact, false);
+  assert.deepEqual(missingA5Evaluation.a5Blockers.missingRequired, REQUIRED_A5_BLOCKER_IDS.slice(1));
 });
 
 test('P45 evaluator fails closed for readiness, execution, public MCP, safety, or A5 bypass claims', () => {

@@ -1,5 +1,8 @@
 const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
+const EXPECTED_SCHEMA_VERSION = 'p45-final-rc-matrix-evaluator-v1';
+const EXPECTED_MODE = 'fixture-only-explicit-input';
+
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
   'search_memory',
@@ -27,6 +30,14 @@ const REQUIRED_EVIDENCE_IDS = Object.freeze([
   'p42_explicit_input_evidence_helper',
   'p43_recall_migration_isolation_helper',
   'p44_validation_aggregator_evidence_map'
+]);
+
+const REQUIRED_A5_BLOCKER_IDS = Object.freeze([
+  'migration-import-export-apply-a5-gated',
+  'provider-execution-a5-gated',
+  'startup-watchdog-a5-gated',
+  'codex-claude-config-switch-a5-gated',
+  'push-tag-release-deploy-a5-gated'
 ]);
 
 const FAIL_CLOSED_STATES = Object.freeze([
@@ -240,10 +251,23 @@ function hasEveryValue(values, requiredValues) {
   return requiredValues.every(value => values.includes(value));
 }
 
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function hasExactSet(values, requiredValues) {
+  return values.length === requiredValues.length &&
+    uniqueValues(values).length === values.length &&
+    hasEveryValue(values, requiredValues);
+}
+
 function evaluateFinalRcMatrix(input = {}) {
   const normalized = normalizeFinalRcMatrixEvaluation(input);
   const evidenceIds = normalized.evidence.map(evidence => evidence.id).filter(Boolean);
   const missingEvidenceIds = REQUIRED_EVIDENCE_IDS.filter(id => !evidenceIds.includes(id));
+  const duplicateEvidenceIds = uniqueValues(evidenceIds)
+    .filter(id => evidenceIds.filter(evidenceId => evidenceId === id).length > 1);
+  const evidenceMatrixExact = hasExactSet(evidenceIds, REQUIRED_EVIDENCE_IDS);
   const unsupportedSourceTypes = normalized.evidence
     .map(evidence => evidence.sourceType)
     .filter(sourceType => sourceType && !SAFE_SOURCE_TYPES.includes(sourceType));
@@ -252,7 +276,7 @@ function evaluateFinalRcMatrix(input = {}) {
     FAIL_CLOSED_STATES.includes(evidence.status)
   );
   const evidenceSafe = normalized.evidence.length > 0 &&
-    missingEvidenceIds.length === 0 &&
+    evidenceMatrixExact &&
     unsupportedSourceTypes.length === 0 &&
     normalized.evidence.every(evidence =>
       REQUIRED_EVIDENCE_IDS.includes(evidence.id) &&
@@ -262,20 +286,29 @@ function evaluateFinalRcMatrix(input = {}) {
       evidence.acceptedForEvaluation === true &&
       evidence.observedFromRuntime === false
     );
+  const schemaVersionSafe = normalized.schemaVersion === EXPECTED_SCHEMA_VERSION;
+  const modeSafe = normalized.mode === EXPECTED_MODE;
   const manifestSafe =
     normalized.manifest.present === true &&
     normalized.manifest.sourceMode === 'caller_provided' &&
     normalized.manifest.acceptedForPlanning === true &&
     normalized.manifest.evidenceCollectedByEvaluator === false &&
     normalized.manifest.helperExecutedByEvaluator === false;
+  const a5BlockerIds = normalized.a5Blockers.map(blocker => blocker.id).filter(Boolean);
+  const missingA5BlockerIds = REQUIRED_A5_BLOCKER_IDS.filter(id => !a5BlockerIds.includes(id));
+  const duplicateA5BlockerIds = uniqueValues(a5BlockerIds)
+    .filter(id => a5BlockerIds.filter(blockerId => blockerId === id).length > 1);
   const unresolvedA5Blockers = normalized.a5Blockers.filter(blocker =>
     blocker.unresolved === true || blocker.status === 'blocked_pending_a5'
   );
-  const a5BlockersPreserved = normalized.a5Blockers.length > 0 &&
+  const a5BlockersExact = hasExactSet(a5BlockerIds, REQUIRED_A5_BLOCKER_IDS);
+  const a5BlockersPreserved = a5BlockersExact &&
     unresolvedA5Blockers.length === normalized.a5Blockers.length;
   const publicMcpFrozen = arraysEqual(normalized.publicMcpTools, PUBLIC_MCP_TOOLS);
   const blockedActionsPresent = hasEveryValue(normalized.blockedActions, BLOCKED_ACTIONS);
+  const blockedActionsExact = hasExactSet(normalized.blockedActions, BLOCKED_ACTIONS);
   const failClosedStatesPresent = hasEveryValue(normalized.failClosedStates, FAIL_CLOSED_STATES);
+  const failClosedStatesExact = hasExactSet(normalized.failClosedStates, FAIL_CLOSED_STATES);
   const readinessClaimsBlocked = READINESS_FIELDS.every(field => normalized.readiness[field] === false);
   const safetyClear =
     NO_SIDE_EFFECT_FLAGS.every(flag => normalized.safety[flag] === true) &&
@@ -285,29 +318,37 @@ function evaluateFinalRcMatrix(input = {}) {
     normalized.safety.apiKeyExposed === false &&
     normalized.safety.callerFieldsPassthroughAllowed === false;
   const inputContractAccepted =
+    schemaVersionSafe &&
+    modeSafe &&
     normalized.fixtureOnly === true &&
     normalized.explicitInputOnly === true &&
     normalized.decision === 'NOT_READY_BLOCKED' &&
     manifestSafe &&
     evidenceSafe &&
     publicMcpFrozen &&
-    blockedActionsPresent &&
-    failClosedStatesPresent &&
+    blockedActionsExact &&
+    failClosedStatesExact &&
     a5BlockersPreserved &&
     readinessClaimsBlocked &&
     safetyClear;
   const failClosedReasons = [];
 
+  if (!schemaVersionSafe) failClosedReasons.push('schema_version_mismatch');
+  if (!modeSafe) failClosedReasons.push('mode_not_fixture_explicit');
   if (!manifestSafe) failClosedReasons.push('missing_or_unsafe_manifest');
   if (!evidenceSafe) failClosedReasons.push('missing_or_unsafe_evidence');
+  if (!evidenceMatrixExact) failClosedReasons.push('evidence_matrix_not_exact');
   if (unsafeCriticalEvidence.length > 0) failClosedReasons.push('critical_evidence_not_passed');
   if (unsupportedSourceTypes.length > 0) failClosedReasons.push('unsupported_source_type');
   if (!a5BlockersPreserved) failClosedReasons.push('a5_blocker_bypass_rejected');
+  if (!a5BlockersExact) failClosedReasons.push('a5_blockers_not_exact');
   if (unresolvedA5Blockers.length > 0) failClosedReasons.push('a5_blockers_unresolved');
   if (!readinessClaimsBlocked) failClosedReasons.push('readiness_claim_rejected');
   if (!publicMcpFrozen) failClosedReasons.push('public_mcp_not_frozen');
   if (!blockedActionsPresent) failClosedReasons.push('blocked_actions_missing');
+  if (!blockedActionsExact) failClosedReasons.push('blocked_actions_not_exact');
   if (!failClosedStatesPresent) failClosedReasons.push('fail_closed_states_missing');
+  if (!failClosedStatesExact) failClosedReasons.push('fail_closed_states_not_exact');
   if (!safetyClear) failClosedReasons.push('unsafe_side_effect_or_sensitive_claim');
 
   return {
@@ -345,7 +386,9 @@ function evaluateFinalRcMatrix(input = {}) {
     evidence: {
       count: normalized.evidence.length,
       requiredPresent: missingEvidenceIds.length === 0,
+      exact: evidenceMatrixExact,
       missingRequired: missingEvidenceIds,
+      duplicateIds: duplicateEvidenceIds,
       safe: evidenceSafe,
       unsafeCriticalIds: unsafeCriticalEvidence.map(evidence => evidence.id).filter(Boolean),
       unsupportedSourceTypes: [...new Set(unsupportedSourceTypes)],
@@ -355,6 +398,10 @@ function evaluateFinalRcMatrix(input = {}) {
       count: normalized.a5Blockers.length,
       unresolvedCount: unresolvedA5Blockers.length,
       unresolvedIds: unresolvedA5Blockers.map(blocker => blocker.id).filter(Boolean),
+      requiredPresent: missingA5BlockerIds.length === 0,
+      exact: a5BlockersExact,
+      missingRequired: missingA5BlockerIds,
+      duplicateIds: duplicateA5BlockerIds,
       preservedBlocked: a5BlockersPreserved,
       callerResolutionAccepted: false
     },
@@ -364,10 +411,12 @@ function evaluateFinalRcMatrix(input = {}) {
     },
     blockedActions: {
       requiredPresent: blockedActionsPresent,
+      exact: blockedActionsExact,
       missingRequired: BLOCKED_ACTIONS.filter(action => !normalized.blockedActions.includes(action))
     },
     failClosedStates: {
       requiredPresent: failClosedStatesPresent,
+      exact: failClosedStatesExact,
       states: normalized.failClosedStates,
       missingRequired: FAIL_CLOSED_STATES.filter(state => !normalized.failClosedStates.includes(state))
     },
@@ -400,11 +449,14 @@ function evaluateFinalRcMatrix(input = {}) {
 
 module.exports = {
   BLOCKED_ACTIONS,
+  EXPECTED_MODE,
+  EXPECTED_SCHEMA_VERSION,
   FAIL_CLOSED_STATES,
   FAIL_CLOSED_STATUSES,
   NO_SIDE_EFFECT_FLAGS,
   PUBLIC_MCP_TOOLS,
   READINESS_FIELDS,
+  REQUIRED_A5_BLOCKER_IDS,
   REQUIRED_EVIDENCE_IDS,
   REQUIRED_INPUT_KEYS,
   SAFE_SOURCE_TYPES,

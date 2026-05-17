@@ -469,6 +469,8 @@ FAILED
 
 | CMV-0428 | CM-0318-post-P45-board-reconciliation | COMPLETED_VALIDATED | `git diff --check`; docs validation; board diff inspection | Post-P45 board/status reconciliation after local commit `5ea714b`. Records P41-P45 local objective complete while preserving `NOT_READY_BLOCKED` and all runtime/mainline/final-RC/push/release/deploy/config/watchdog/A5 blockers. No source/test/package/runtime/provider/data/public MCP expansion, durable write, service start, migration-import-export apply, backup/restore, push, tag, release, or deploy. |
 
+| CMV-0429 | CM-0319-P45-strict-input-contract-review-fix | COMPLETED_VALIDATED | `node --check src\core\FinalRcMatrixEvaluator.js`; `node --check tests\final-rc-matrix-evaluator-helper.test.js`; targeted P45 evaluator tests `11/11`; local regression probe for bad schema, bad mode, missing A5 blocker categories, and duplicate evidence; `npm test` `835/835`; `git diff --check` | Fixes review findings in P45 evaluator by requiring exact `schemaVersion`, exact `mode`, exact no-duplicate evidence id matrix, exact no-duplicate required A5 blocker ids, and exact blocked-action / fail-closed-state sets before `inputContractAccepted=true`. Regression coverage proves version/mode drift, duplicate evidence, missing/duplicate A5 blockers, and extra blocked/fail-closed entries fail closed while `NOT_READY_BLOCKED` and no-side-effect boundaries remain preserved. No source outside P45 helper/tests except board note, no package/dependency change, no public MCP expansion, no runtime/provider/data scan, no durable write, no migration/import-export apply, no backup/restore, no push/tag/release/deploy. |
+
 ## Common Validation Commands
 
 ```powershell
