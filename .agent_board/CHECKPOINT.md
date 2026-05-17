@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0261 / guarded local commit for the validated P28.2-P28.7 evidence-reader chain.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0262 / post-commit board reconciliation after guarded local commit `e4af76b`.
 
 ## Current Area
 
-P28.x validation aggregator evidence-reader chain guarded commit
+P28.x validation aggregator evidence-reader chain post-commit reconciliation
 
 ## Current Status
 
@@ -39,7 +39,7 @@ P28.x validation aggregator evidence-reader chain guarded commit
 - P24.1 fixture shape tests, P24.2 minimal core report builder, and P24.3 direct-node CLI wiring are committed locally.
 - P24.4 adds default/strict/help exit-code semantics and is committed locally.
 - P28.1 added the explicit safe validation evidence reader foundation, was validated, committed, and pushed at `52c4fef`.
-- P28.2 post-push board reconciliation, P28.3 explicit-input evidence freshness/status summary, P28.4 explicit-input gate-readiness summary, P28.5 explicit-input command/source coverage summary, P28.6 explicit-input rejection reason summary, and P28.7 explicit-input confidence posture summary are complete and validated locally. User explicitly authorized the local guarded commit for CM-0255 through CM-0260; push remains unauthorized.
+- P28.2 post-push board reconciliation, P28.3 explicit-input evidence freshness/status summary, P28.4 explicit-input gate-readiness summary, P28.5 explicit-input command/source coverage summary, P28.6 explicit-input rejection reason summary, and P28.7 explicit-input confidence posture summary are complete, validated, and committed locally in `e4af76b`. Push remains unauthorized.
 
 ## Completed Work In This Batch
 
@@ -870,3 +870,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: pre-commit `git status --short`; `git diff --stat`; `git diff --name-only`; `git diff --check`; prior CM-0256 through CM-0260 source/test validation.
 - Commit: authorized, to be created by the guarded commit command.
 - A5 boundary: no push, tag, release, deploy, provider/model call, service/watchdog install or config switch, public MCP expansion, real memory scan/preview, SQLite migration apply, import/export apply, backup, or restore.
+
+## CM-0262 - Post-Commit Board Reconciliation
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only reconciliation after guarded local commit `e4af76b`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board records `e4af76b test: extend validation evidence summaries`; push remains unauthorized.
+- Validation: `git diff --check`; board diff inspection.
+- Commit: board-only reconciliation to be committed locally.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, service start, migration-import-export apply, backup/restore, tag, release, deploy, or push.
