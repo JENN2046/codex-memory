@@ -13,7 +13,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 - Remote baseline: `2b4a956 fix: harden governance evidence helper contracts`.
 - Local baseline: `main` is aligned with `origin/main` at `2b4a956`; P46-0 started from a clean worktree.
 - Current active program: P46-P50 Evidence Enforcement Bridge.
-- Current phase area: P46-0 post-push board/status reconciliation, then P46-T1 HTTP no-token mutation + sensitive redaction hardening. Fixture-only / dry-run-only / explicit-input-only boundaries preserved.
+- Current phase area: P47 evidence-to-enforcement gap map. Fixture-only / dry-run-only / explicit-input-only boundaries preserved.
 
 ## Active Queue
 
@@ -39,7 +39,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | CM-0320 | memory-governance | A2 | done | Governance evidence helper strict schema/version and exact-set review fix | changed JS syntax; targeted helper tests `65/65`; `npm test` `841/841`; `git diff --check`; boundary scan | Complete and pushed in `2b4a956`; hardens P31-P34/P42/P43 helper schema/version/exact-set fail-closed behavior. |
 | P46-0 | docs-drift | A1 | done | Post-push board/status reconciliation | `git diff --check`; docs validation; stale wording scan | Complete and validated; active board/status facts now point to `HEAD == origin/main == 2b4a956`; no source/test/runtime changes. |
 | P46-T1 | memory-governance | A2 | done | HTTP no-token mutation + sensitive redaction hardening | targeted HTTP/helper tests; `git diff --check`; `npm test` | Complete and validated; unified helper redaction through `SensitiveFragmentRedaction.js` and rejected no-token HTTP `record_memory` mutation while preserving authorized bearer write coverage. |
-| P47 | memory-governance | A1 | todo | Evidence-to-enforcement gap map | `git diff --check`; docs validation; boundary scan | Docs/status/board only; no runtime connection, real memory scan, public MCP expansion, or RC-ready claim. |
+| P47 | memory-governance | A1 | done | Evidence-to-enforcement gap map | `git diff --check`; docs validation; boundary scan | Complete and validated; docs/status/board only; no runtime connection, real memory scan, public MCP expansion, or RC-ready claim. |
+| P48 | memory-governance | A2 | todo | Evidence-chain consistency guard | targeted fixture/contract tests; `git diff --check`; `npm test` if targeted passes | Lock evidence IDs, source type whitelist, schema/policy versions, blocked actions, and fail-closed states as exact sets. |
 
 ## Standing Boundaries
 
