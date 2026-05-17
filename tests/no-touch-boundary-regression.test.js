@@ -36,6 +36,10 @@ const noTouchTargets = [
     path: 'src/core/EvidenceRuntimeTraceContract.js'
   },
   {
+    label: 'GovernanceLoopBoundaryContract',
+    path: 'src/core/GovernanceLoopBoundaryContract.js'
+  },
+  {
     label: 'FinalRcMatrixEvaluator',
     path: 'src/core/FinalRcMatrixEvaluator.js'
   },

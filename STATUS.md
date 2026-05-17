@@ -9,7 +9,7 @@
 - 当前本地基线：本地 `main` 已包含 P51-P56 本地工作并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P56-T1 governance review/approval/audit executable loop boundary contract 已完成并通过验证；下一条安全路线是 P56-T2 governance loop explicit-input helper，但必须继续禁止服务/provider/真实 memory/A5 操作。
+- 当前任务：P56-T2 governance loop explicit-input helper 已完成本地实现并通过验证；下一步是 guarded local commit 与 post-commit board reconciliation。必须继续禁止服务/provider/真实 memory/A5 操作。
 
 ## 当前阻塞
 
@@ -21,9 +21,10 @@
 
 ## 当前优先级
 
-1. 进入 P56-T2 governance loop explicit-input helper，先只处理 caller-provided P56 boundary object；不得读取 fixture、扫描目录、执行命令、写 durable audit/memory 或执行 approval。
-2. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54-T1 command inventory、P54-T2 caller-provided command result helper、P54-T3 preflight、P54-T4 injected-executor adapter contract、P55 trace evidence、或 P56-T1 boundary contract 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、或 final RC matrix execution。
-3. 不 push，除非用户单独明确授权。
+1. 对 P56-T2 做 guarded local commit，然后做 post-commit board/status reconciliation；不得 push，除非用户单独明确授权。
+2. 下一条安全路线候选是 P57-T1 recall isolation runtime proof boundary inventory，优先 synthetic/runtime-test-harness 规划；真实 memory scan 仍 blocked。
+3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54-T1 command inventory、P54-T2 caller-provided command result helper、P54-T3 preflight、P54-T4 injected-executor adapter contract、P55 trace evidence、P56-T1 boundary contract、或 P56-T2 helper 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、或 final RC matrix execution。
+4. 不 push，除非用户单独明确授权。
 
 ## 主要事实源
 
