@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P61 RC evidence report explicit-input helper validated; guarded local commit pending.
+P10 observability/admin; P61 RC evidence report explicit-input helper committed; post-commit board reconciliation in progress.
 
 ## Current Status
 
@@ -32,7 +32,7 @@ P10 observability/admin; P61 RC evidence report explicit-input helper validated;
 - P61-T1 mainline strict gate + RC evidence report boundary inventory is implemented, validated, and committed locally in `360f4f9`.
 - P61-T1 post-commit board reconciliation is locally committed in `2811da3`.
 - P61-T1 stale board correction is locally committed in `ba1edf2`.
-- P61-T2 RC evidence report explicit-input helper is implemented and validated locally; guarded local commit is pending.
+- P61-T2 RC evidence report explicit-input helper is implemented, validated, and committed locally in `15739cb`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -82,4 +82,4 @@ P10 observability/admin; P61 RC evidence report explicit-input helper validated;
 
 ## Next Safe Step
 
-Commit P61-T2 locally, then consider P62-T1 only if it remains local evidence/preflight boundary inventory with no cutover, tag, release, deploy, config switch, watchdog install, push, or RC_READY claim.
+Consider P62-T1 only if it remains local evidence/preflight boundary inventory with no cutover, tag, release, deploy, config switch, watchdog install, push, or RC_READY claim.

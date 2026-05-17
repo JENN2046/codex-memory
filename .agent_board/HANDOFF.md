@@ -14,11 +14,11 @@ Execute P51-P62 Runtime-Enforced Governed Memory Spine Completion under local A4
 
 ## Worktree
 
-Local `main` is ahead of `origin/main = 1ae4286 test: harden no-touch redaction regressions`; push is not authorized. P61-T1 is committed locally in `360f4f9`, post-commit board reconciliation is committed locally in `2811da3`, and stale board correction is committed locally in `ba1edf2`. P61-T2 is validated locally and pending guarded local commit.
+Local `main` is ahead of `origin/main = 1ae4286 test: harden no-touch redaction regressions`; push is not authorized. P61-T2 is committed locally in `15739cb`; post-commit board reconciliation is in progress.
 
 ## Current Area
 
-P10 observability/admin; P61 RC evidence report explicit-input helper validated; guarded local commit pending.
+P10 observability/admin; P61 RC evidence report explicit-input helper committed; post-commit board reconciliation in progress.
 
 ## Current Truth
 
@@ -40,7 +40,7 @@ P10 observability/admin; P61 RC evidence report explicit-input helper validated;
 - P61-T1 mainline strict gate + RC evidence report boundary inventory is implemented, validated, and committed locally in `360f4f9`.
 - P61-T1 post-commit board reconciliation is committed locally in `2811da3`.
 - P61-T1 stale board correction is committed locally in `ba1edf2`.
-- P61-T2 RC evidence report explicit-input helper is implemented and validated locally; guarded local commit is pending.
+- P61-T2 RC evidence report explicit-input helper is implemented, validated, and committed locally in `15739cb`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -63,4 +63,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Commit P61-T2 locally, then consider P62-T1 only if it remains local evidence/preflight boundary inventory with no cutover, tag, release, deploy, config switch, watchdog install, push, or RC_READY claim. Do not push unless explicitly authorized.
+Consider P62-T1 only if it remains local evidence/preflight boundary inventory with no cutover, tag, release, deploy, config switch, watchdog install, push, or RC_READY claim. Do not push unless explicitly authorized.
