@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P62 v1.0 RC cutover preflight boundary inventory committed; post-commit board reconciliation in progress.
+P10 observability/admin; P51-P62 local chain complete to A5 boundary.
 
 ## Current Status
 
