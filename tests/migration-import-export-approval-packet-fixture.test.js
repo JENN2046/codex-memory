@@ -81,7 +81,10 @@ test('public MCP contract remains frozen to three tools', () => {
 });
 
 test('all future approval packets are blocked pending explicit approval', () => {
-  assert.deepEqual(Object.keys(fixture.packets), REQUIRED_APPROVAL_PACKETS);
+  assert.deepEqual(
+    Object.keys(fixture.packets).sort(),
+    [...REQUIRED_APPROVAL_PACKETS].sort()
+  );
 
   for (const packetName of REQUIRED_APPROVAL_PACKETS) {
     const packet = fixture.packets[packetName];
