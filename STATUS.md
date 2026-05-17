@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `1ae4286 test: harden no-touch redaction regressions`。
-- 当前本地基线：本地 `main` 已包含 P51-P62-T6 本地 completion audit refresh 工作及 post-commit board/status reconciliation，并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；当前 `HEAD = 94c30a6 docs: reconcile p62 t6 post-commit board state`；推送仍未授权。
+- 当前本地基线：本地 `main` 已包含 P51-P62-T6 本地 completion audit refresh 工作及 post-commit board/status reconciliation，并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；当前 `HEAD` 是最新本地提交，应以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P62-T6 completion audit refresh 已完成、验证并本地提交为 `d5808bd`；post-commit board/status reconciliation 已本地提交为 `94c30a6`。P62-T6 只是 docs/fixture/test audit refresh，把 P62-T5 helper 纳入 completion audit 和 prompt-to-artifact audit；不授权或执行 cutover、tag、release、deploy、push、config switch、watchdog/startup install、mainline strict gate、final RC runner、runtime execution 或 RC_READY claim。
+- 当前任务：P62-T6 completion audit refresh 已完成、验证并本地提交为 `d5808bd`；post-commit board/status reconciliation 已本地记录，具体最新 `HEAD` 以 Git 实测为准。P62-T6 只是 docs/fixture/test audit refresh，把 P62-T5 helper 纳入 completion audit 和 prompt-to-artifact audit；不授权或执行 cutover、tag、release、deploy、push、config switch、watchdog/startup install、mainline strict gate、final RC runner、runtime execution 或 RC_READY claim。
 
 ## 当前阻塞
 
