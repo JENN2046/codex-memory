@@ -19,14 +19,15 @@ This active plan is the short routing document for the current P28-P40 Governed 
 - P34.2 helper: pure explicit-input helper over caller-provided review surface objects.
 - P34.3 ValidationAggregator evidence: static report-shape evidence only, committed locally in `c06436d`.
 - CM-0301 context hygiene: active board checkpoint/handoff compressed, committed locally in `4d8d11a`.
+- CM-0302 root docs hygiene: active status/plan/backlog docs compressed, committed locally in `3d774ad`.
 
 ## Current Task
 
-CM-0302 root active docs compression:
+P34.x governance review surface closeout:
 
-- Archive full pre-compression `STATUS.md`, `MAINTENANCE_BACKLOG.md`, and `CODEX_MEMORY_NEXT_PHASE_PLAN.md`.
-- Replace active files with compact current-state summaries.
-- Preserve detailed history in archive files, git history, `.agent_board/TASK_QUEUE.md`, and `.agent_board/VALIDATION_LOG.md`.
+- Add a closeout review for P34 safe-scope evidence.
+- Confirm that P34 remains fixture/helper/report-shape only.
+- Keep runtime governance review, real DB review, durable write, MCP expansion, and RC readiness blocked.
 
 ## Boundaries
 
@@ -41,7 +42,7 @@ CM-0302 root active docs compression:
 
 ## Next Candidate
 
-After CM-0302 validates and commits, Commander should choose either:
+After P34.x validates and commits, Commander should choose either:
 
-- `P34.x-governance-review-surface-closeout-review`, docs/status/board only; or
+- `P35` fixture-first/read-only governance slice; or
 - another small docs-context hygiene pass if active docs still produce obvious stale context pollution.

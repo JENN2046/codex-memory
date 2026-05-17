@@ -12,10 +12,10 @@ P6 docs drift / active-board context hygiene.
 
 - Last pushed baseline: `d210947 fix: redact governance helper output` on `origin/main`.
 - Local commits ahead of `origin/main`: `83bd388`, `9d3ab69`, `b9965f7`, `280ab9b`, `c06436d`.
-- Latest completed local task: CM-0301 / active-board context compression.
-- Latest local commit: `4d8d11a docs: compress active board handoff`.
+- Latest completed local task: CM-0302 / root active docs compression.
+- Latest local commit: `3d774ad docs: compress active status docs`.
 - CM-0300 validation: changed JS syntax checks, fixture JSON parse, targeted aggregator/helper tests `31/31`, `npm test` `714/714`, `git diff --check`, docs validation, P34.3 boundary scan, and read-only Verifier `PASS`.
-- Current task: CM-0302 root active docs compression to reduce stale status/plan/backlog context pollution.
+- Current task: CM-0303 / P34.x governance review surface closeout.
 
 ## Active Boundaries
 
@@ -28,7 +28,8 @@ P6 docs drift / active-board context hygiene.
 ## Context Compression
 
 - The pre-compression full checkpoint was moved to `.agent_board/archive/CHECKPOINT_FULL_PRE_CM0301.md`.
-- The pre-compression full root status/plan/backlog docs are being moved to `docs/archive/*_FULL_PRE_CM0302.md`.
+- The pre-compression full root status/plan/backlog docs were moved to `docs/archive/*_FULL_PRE_CM0302.md`.
+- P34.x closeout review is being added at `docs/P34_GOVERNANCE_REVIEW_SURFACE_CLOSEOUT_REVIEW.md`.
 - Active `CHECKPOINT.md` is now a short current-state checkpoint.
 - Detailed historical validation remains in `.agent_board/VALIDATION_LOG.md`.
 - Detailed task ledger remains in `.agent_board/TASK_QUEUE.md`.
@@ -36,4 +37,4 @@ P6 docs drift / active-board context hygiene.
 
 ## Next Safe Step
 
-Validate CM-0302 as docs/board-only with `git diff --check`, docs validation, active-doc archive/reference scan, and a read-only verifier. If scoped, create a guarded local commit. Push remains user-directed and not authorized.
+Validate CM-0303 as docs/board-only with `git diff --check`, docs validation, P34.x boundary scan, and a read-only verifier. If scoped, create a guarded local commit. Push remains user-directed and not authorized.

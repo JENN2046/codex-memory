@@ -14,26 +14,26 @@ Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-A
 
 ## Worktree
 
-Dirty for CM-0302 root active docs compression after CM-0301 local commit.
+Dirty for CM-0303 P34.x closeout docs/status/board updates after CM-0302 local commit.
 
 ## Current Area
 
-P6 docs drift / active docs context hygiene.
+P8 memory governance closeout review.
 
 ## Current Truth
 
 - `origin/main` baseline: `d210947 fix: redact governance helper output`.
-- Local commits ahead: `83bd388`, `9d3ab69`, `b9965f7`, `280ab9b`, `c06436d`.
-- Latest local commit: `4d8d11a docs: compress active board handoff`.
+- Local commits ahead: `83bd388`, `9d3ab69`, `b9965f7`, `280ab9b`, `c06436d`, `4d8d11a`, `3d774ad`.
+- Latest local commit: `3d774ad docs: compress active status docs`.
 - P34 chain status: inventory, fixture contract, explicit-input helper, and ValidationAggregator static report-shape evidence are complete locally.
 - Current release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`.
-- Current task: CM-0302 root active docs compression.
+- Current task: CM-0303 P34.x governance review surface closeout.
 
 ## Validation
 
 - CM-0300 passed: changed JS syntax checks; fixture JSON parse; targeted aggregator/helper tests `31/31`; `npm test` `714/714`; `git diff --check`; docs validation; P34.3 boundary scan; read-only Verifier `PASS`.
-- CM-0301 passed and is committed locally in `4d8d11a`.
-- CM-0302 pending validation: docs-only diff check, docs validation, active-doc archive/reference scan, and read-only Verifier.
+- CM-0302 passed and is committed locally in `3d774ad`.
+- CM-0303 pending validation: docs-only diff check, docs validation, P34.x boundary scan, and read-only Verifier.
 
 ## Hard Stops
 
@@ -49,4 +49,4 @@ No push, tag, release, deploy, provider/model call, real memory preview/export/i
 
 ## Next Safe Step
 
-Finish CM-0302 validation and guarded local commit if scoped. After that, continue with P34.x closeout or another small docs-context hygiene pass, whichever is the highest-value safe local task.
+Finish CM-0303 validation and guarded local commit if scoped. After that, continue with P35 fixture-first/read-only governance planning or another small docs-context hygiene pass, whichever is the highest-value safe local task.
