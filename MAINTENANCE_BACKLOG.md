@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
-- Local baseline: local `main` contains P51-P62-T6 local completion audit refresh work plus post-commit board/status reconciliation and is ahead of `origin/main = 1ae4286`; current `HEAD` is intentionally not hard-coded here and must be verified with `git status -sb` / `git log --oneline --decorate -n 10`; push is not authorized.
+- Local baseline: local `main` contains the P51-P62 local evidence/preflight/audit chain through post-T6 audit wording refinement, prompt-to-artifact validation refs, completion audit local-item mapping, and related board/status reconciliation; it is ahead of `origin/main = 1ae4286`; current `HEAD` is intentionally not hard-coded here and must be verified with `git status -sb` / `git log --oneline --decorate -n 10`; push is not authorized.
 - Current active program: P51-P62 Runtime-Enforced Governed Memory Spine Completion.
-- Current phase area: P62 A5/runtime authorization precondition boundary. Evidence-first / fail-closed / reversible boundaries preserved.
+- Current phase area: P62 local audit/refinement closeout at the A5/runtime boundary. Evidence-first / fail-closed / reversible boundaries preserved.
 
 ## Active Queue
 

@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary after P62-T6 completion audit refresh.
+P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary after post-T6 audit/refinement reconciliation.
 
 ## Current Status
 
@@ -41,6 +41,9 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62-T5 A5/runtime authorization precondition explicit-input helper is implemented, validated, and committed locally in `8535da1`.
 - P62-T6 completion audit refresh is implemented, validated, and committed locally in `d5808bd`.
 - P62-T6 post-commit board/status reconciliation is committed locally in `94c30a6`.
+- P62 post-T6 audit wording refinement and stale wording cleanup are locally committed.
+- P62 prompt-to-artifact validation refs are committed locally in `5c805c9`.
+- P62 completion audit local-item mapping is committed locally in `1808bba`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 

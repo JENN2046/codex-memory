@@ -88,7 +88,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P62-T4 A5/runtime authorization precondition matrix is complete, validated, and locally committed in `c97736d`.
 - P62-T5 A5/runtime authorization precondition explicit-input helper is complete, validated, and locally committed in `8535da1`.
 - P62-T6 completion audit refresh is complete, validated, and locally committed in `d5808bd`; it maps P62-T5 helper evidence into the completion audit and prompt-to-artifact audit without granting runtime authority.
-- P62-T6 post-commit board/status reconciliation is locally recorded; current local `HEAD` is intentionally verified from Git commands instead of hard-coded in this routing file.
+- P62 post-T6 audit wording refinement, prompt-to-artifact validation refs, and completion audit local-item mapping are complete, validated, and locally committed; current local `HEAD` is intentionally verified from Git commands instead of hard-coded in this routing file.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, P58 boundary/helper evidence, P59 boundary/helper evidence, P60 regression evidence, or P61 report helper evidence.
 
 ## Boundaries
@@ -108,7 +108,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P62-T6:
+After P62 local audit/refinement closeout:
 
 - Stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, runtime execution, or `RC_READY` claim unless explicitly authorized.
 - New local-only work should start from a new scoped goal or a clearly bounded follow-up task.
