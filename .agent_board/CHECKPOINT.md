@@ -11,9 +11,9 @@ P8 memory governance / P41 Post-P40 Closeout + Evidence Manifest Charter.
 ## Current Status
 
 - Last pushed baseline: `3e3f76d fix: harden local http and governance redaction` on `origin/main`.
-- Local branch is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, and post-P40 board sync `ba59537`.
+- Local branch is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, and CM-0313 `08597d6`.
 - Latest pushed task chain: P35.1 fixture contract, P35 post-push board reconciliation, and P35 security hardening.
-- Current task: CM-0313 / P41-T1 Post-P40 Closeout Review.
+- Current task: CM-0314 / P41-T2 Evidence Manifest Contract Fixture.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -50,4 +50,4 @@ P8 memory governance / P41 Post-P40 Closeout + Evidence Manifest Charter.
 
 ## Next Safe Step
 
-Validate CM-0313 P41-T1 closeout, then continue to P41-T2 evidence manifest contract fixture if safe. Push remains user-directed and not authorized.
+Validate CM-0314 P41-T2 evidence manifest contract fixture. Push remains user-directed and not authorized.

@@ -28,12 +28,12 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 
 ## Current Task
 
-P41-T1 Post-P40 Closeout Review:
+P41-T2 Evidence Manifest Contract Fixture:
 
-- Close P36-P40 as local evidence only.
+- Define a synthetic evidence manifest contract fixture for P41-P45.
 - Keep v1.0 RC `NOT_READY_BLOCKED`.
-- Do not implement runtime policy enforcement, evidence reader, final RC runner, or runtime policy kernel in P41-T1.
-- Record P41-P45 as evidence-first, fixture-only, explicit-input-only follow-up work.
+- Do not implement runtime policy enforcement, evidence reader, final RC runner, or runtime policy kernel in P41-T2.
+- Preserve source type whitelist, critical gate fail-closed semantics, blocked actions, safety flags, and forbidden claims.
 
 ## Boundaries
 
@@ -52,6 +52,6 @@ P41-T1 Post-P40 Closeout Review:
 
 ## Next Candidate
 
-After P41-T1:
+After P41-T2:
 
-- Continue to P41-T2 evidence manifest contract fixture if the docs/board closeout is validated.
+- Continue to P42-T1 explicit-input evidence helper if the fixture/test contract is validated.

@@ -1,0 +1,235 @@
+{
+  "schemaVersion": "p41-evidence-manifest-contract-v1",
+  "phase": "P41-evidence-manifest-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "explicitInputOnly": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "pushReady": false,
+  "releaseReady": false,
+  "deployReady": false,
+  "configSwitchReady": false,
+  "watchdogReady": false,
+  "rcReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "safeSourceTypes": [
+    "committed_fixture",
+    "committed_test",
+    "committed_doc",
+    "local_validation_summary",
+    "synthetic_fixture",
+    "sanitized_metadata",
+    "explicit_input"
+  ],
+  "acceptedSourceTypes": [
+    "committed_fixture",
+    "committed_test",
+    "committed_doc",
+    "local_validation_summary",
+    "synthetic_fixture",
+    "sanitized_metadata",
+    "explicit_input"
+  ],
+  "unsupportedSourceTypes": [],
+  "sourceEvidence": [
+    {
+      "id": "p36_scope_a5_boundary",
+      "phase": "P36-T1",
+      "sourceType": "committed_fixture",
+      "artifact": "tests/fixtures/p36-scope-a5-boundary-contract-v1.json",
+      "status": "pass",
+      "acceptedForPlanning": true,
+      "runtimeReady": false
+    },
+    {
+      "id": "p36_task_risk_labels",
+      "phase": "P36-T2",
+      "sourceType": "committed_fixture",
+      "artifact": "tests/fixtures/p36-task-risk-labels-contract-v1.json",
+      "status": "pass",
+      "acceptedForPlanning": true,
+      "runtimeReady": false
+    },
+    {
+      "id": "p37_policy_decision_envelope",
+      "phase": "P37-T1",
+      "sourceType": "committed_fixture",
+      "artifact": "tests/fixtures/p37-policy-decision-envelope-v1.json",
+      "status": "pass",
+      "acceptedForPlanning": true,
+      "runtimeReady": false
+    },
+    {
+      "id": "p38_recall_isolation",
+      "phase": "P38",
+      "sourceType": "committed_fixture",
+      "artifact": "tests/fixtures/p38-recall-isolation-v1.json",
+      "status": "pass",
+      "acceptedForPlanning": true,
+      "runtimeReady": false
+    },
+    {
+      "id": "p39_synthetic_migration_dry_run",
+      "phase": "P39",
+      "sourceType": "synthetic_fixture",
+      "artifact": "tests/fixtures/p39-synthetic-migration-dry-run-v1.json",
+      "status": "pass",
+      "acceptedForPlanning": true,
+      "runtimeReady": false
+    },
+    {
+      "id": "p40_local_readiness_report",
+      "phase": "P40",
+      "sourceType": "committed_fixture",
+      "artifact": "tests/fixtures/p40-local-readiness-report-v1.json",
+      "status": "pass",
+      "acceptedForPlanning": true,
+      "runtimeReady": false
+    }
+  ],
+  "criticalGateSemantics": {
+    "pass": "accepted_local_evidence_only",
+    "failed": "failure",
+    "skipped": "failure",
+    "unknown": "failure",
+    "warning_only": "failure",
+    "missing": "failure",
+    "ambiguous": "failure",
+    "unparsable": "failure",
+    "unsupported_source": "failure"
+  },
+  "failClosedCases": [
+    {
+      "id": "missing_manifest",
+      "claim": "manifest",
+      "claimedValue": null,
+      "acceptedForPlanning": false,
+      "nonzeroFailurePath": true,
+      "reasonCodes": [
+        "P41_MANIFEST_MISSING"
+      ]
+    },
+    {
+      "id": "unsupported_source_type",
+      "claim": "sourceType",
+      "claimedValue": "real_memory_scan",
+      "acceptedForPlanning": false,
+      "nonzeroFailurePath": true,
+      "reasonCodes": [
+        "P41_UNSUPPORTED_SOURCE_TYPE"
+      ]
+    },
+    {
+      "id": "warning_only_critical_gate",
+      "claim": "criticalGate",
+      "claimedValue": "warning_only",
+      "acceptedForPlanning": false,
+      "nonzeroFailurePath": true,
+      "reasonCodes": [
+        "P41_CRITICAL_GATE_WARNING_ONLY"
+      ]
+    },
+    {
+      "id": "unknown_critical_gate",
+      "claim": "criticalGate",
+      "claimedValue": "unknown",
+      "acceptedForPlanning": false,
+      "nonzeroFailurePath": true,
+      "reasonCodes": [
+        "P41_CRITICAL_GATE_UNKNOWN"
+      ]
+    },
+    {
+      "id": "runtime_ready_claim",
+      "claim": "runtimeReady",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "nonzeroFailurePath": true,
+      "reasonCodes": [
+        "P41_RUNTIME_READY_CLAIM_BLOCKED"
+      ]
+    },
+    {
+      "id": "public_mcp_expansion_claim",
+      "claim": "publicMcpExpanded",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "nonzeroFailurePath": true,
+      "reasonCodes": [
+        "P41_PUBLIC_MCP_EXPANSION_BLOCKED"
+      ]
+    }
+  ],
+  "blockedActions": [
+    "real_memory_content_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore",
+    "provider_call",
+    "service_start",
+    "config_switch",
+    "watchdog_install",
+    "public_mcp_expansion",
+    "dependency_change",
+    "durable_memory_write",
+    "durable_audit_write",
+    "push_tag_release_deploy"
+  ],
+  "safety": {
+    "noImplicitFileDiscovery": true,
+    "noDirectoryScan": true,
+    "noCommandExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryRead": true,
+    "noRuntimeStoreScan": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "authorizationHeaderExposed": false,
+    "apiKeyExposed": false,
+    "callerFieldsPassthroughAllowed": false
+  },
+  "requiredWording": [
+    "P41 evidence manifest is a synthetic fixture contract only.",
+    "Manifest evidence readiness does not mean runtime, mainline, final RC matrix, push, release, deploy, config, watchdog, or v1.0 RC readiness.",
+    "Critical warning-only, skipped, unknown, missing, ambiguous, unparsable, or unsupported evidence equals failure.",
+    "The manifest does not collect evidence by scanning files, running commands, starting services, reading real memory, or touching runtime stores."
+  ],
+  "forbiddenClaims": [
+    "P41 manifest authorizes runtime readiness",
+    "P41 manifest authorizes final RC matrix readiness",
+    "P41 manifest authorizes push",
+    "P41 manifest authorizes release",
+    "P41 manifest authorizes deploy",
+    "P41 manifest authorizes config switch",
+    "P41 manifest authorizes watchdog install",
+    "P41 manifest authorizes public MCP expansion",
+    "P41 manifest authorizes real memory scan"
+  ]
+}
