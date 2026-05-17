@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0298 / P34.1 governance review surface fixture contract.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0299 / P34.2 governance review surface explicit-input helper.
 
 ## Current Area
 
-P8 memory governance review surface fixture
+P8 memory governance review surface helper
 
 ## Current Status
 
@@ -984,3 +984,16 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Commit: eligible for guarded local commit.
 - Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
 - A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0299 - P34.2 Governance Review Surface Explicit-Input Helper
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: pure explicit-input helper for caller-provided governance review surface objects; no CLI/runtime integration.
+- Changed files: `src/core/MemoryGovernanceReviewSurfaceContract.js`; `tests/memory-governance-review-surface-helper.test.js`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/HANDOFF.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: helper normalizes/summarizes review surface evidence, source-type whitelist posture, required source surfaces/review sections/blockers/approvals, public MCP freeze, no-side-effect safety, and fail-closed readiness state. Tests cover unsupported source types, input attempts to redefine `SAFE_SOURCE_TYPES`, malformed input, no fs read, no command execution, no durable write, no public MCP expansion, no real DB review execution, no RC-ready claim, and sensitive fragment redaction.
+- Validation: `node --check src\core\MemoryGovernanceReviewSurfaceContract.js`; `node --check tests\memory-governance-review-surface-helper.test.js`; targeted helper/fixture tests `24/24`; `npm test` `714/714`; `git diff --check`; `scripts\validate-local.ps1 -Area docs`; P34.2 boundary scan with no unsafe hits in changed P34.2 files/status/board validation files and only a historical P23.8 `READY_FOR_DOCS_ONLY_RC_REVIEW` reference in `HANDOFF.md`.
+- Verification: first read-only Verifier pass found board wording drift only; rerun passed with commit readiness `eligible`.
+- Remaining validation: guarded local commit post-checks.
+- A5 boundary: no fixture read inside helper, no `governance:report` execution, no real DB review, no runtime governance integration, no durable memory/audit write, no public MCP expansion, no real memory scan, no provider/service/config action, no package script, no migration-import-export apply, no backup/restore, no push, tag, release, or deploy.

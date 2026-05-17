@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0298 / P34.1 governance review surface fixture contract.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0299 / P34.2 governance review surface explicit-input helper.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0298 fixture/test/status/board updates. Local `main` is ahead of `origin/main` by local commits `83bd388` and `9d3ab69`.
+Dirty for CM-0299 helper/test/status/board updates. Local `main` is ahead of `origin/main` by local commits `83bd388`, `9d3ab69`, and `b9965f7`.
 
 ## Current Area
 
-P8 memory governance review surface fixture
+P8 memory governance review surface helper
 
 ## Findings
 
@@ -103,8 +103,9 @@ P8 memory governance review surface fixture
 - CM-0296 is committed locally in `83bd388`; no push is authorized.
 - CM-0297 P34 governance review surface safe-scope inventory is complete pending Verifier and commit. It inventories read-only lifecycle / approval-packet / audit-evidence / admin-review / ValidationAggregator evidence only. Validation passed: `git diff --check`, docs validation, and P34 boundary reference scan.
 - CM-0297 is committed locally in `9d3ab69`; no push is authorized.
-- CM-0298 P34.1 governance review surface fixture contract is complete pending Verifier and commit. It adds synthetic fixture/test evidence only and does not implement helper/CLI/runtime review. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `704/704`, `git diff --check`, docs validation, and P34.1 boundary scan.
-- Next safe step: run read-only Verifier, guarded local commit if eligible, then enter P34.2 explicit-input helper candidate if still safe. No push is authorized.
+- CM-0298 P34.1 governance review surface fixture contract is committed locally in `b9965f7`. It adds synthetic fixture/test evidence only and does not implement helper/CLI/runtime review. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `704/704`, `git diff --check`, docs validation, P34.1 boundary scan, and read-only Verifier `PASS`.
+- CM-0299 P34.2 governance review surface explicit-input helper is complete pending guarded local commit. It adds `src/core/MemoryGovernanceReviewSurfaceContract.js` and `tests/memory-governance-review-surface-helper.test.js` as a pure helper over caller-provided review surface objects only. Validation passed: source/test syntax checks, targeted helper/fixture tests `24/24`, `npm test` `714/714`, `git diff --check`, docs validation, P34.2 boundary scan, and read-only Verifier rerun `PASS`. First read-only Verifier pass found board wording drift only.
+- Next safe step: guarded local commit if scoped. No push is authorized.
 
 ## Changed Files
 
