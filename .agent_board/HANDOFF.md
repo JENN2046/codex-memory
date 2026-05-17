@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0295 / P31-P33 governance helper redaction hardening.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0296 / post-CM-0295 board reconciliation before P34.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0295 source/test/status/board updates. Local `main` was aligned with `origin/main` at `dca5f6a` before CM-0295 edits.
+Dirty only for CM-0296 board/status reconciliation updates. Local `main` is aligned with `origin/main` at `d210947`.
 
 ## Current Area
 
-P8 memory governance helper output safety
+P0 mainline health board reconciliation
 
 ## Findings
 
@@ -98,8 +98,9 @@ P8 memory governance helper output safety
 - CM-0292 adds a pure explicit-input audit-evidence helper and focused tests. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `687/687`, `git diff --check`, docs validation, P33.2 boundary reference scan, and read-only Verifier `PASS`. CM-0292 is committed and pushed in `b8e0b95`.
 - CM-0293 adds static ValidationAggregator audit-evidence helper evidence shape. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `687/687`, `git diff --check`, docs validation, P33.3 boundary reference scan, and read-only Verifier `PASS`. CM-0293 was committed and pushed as `a62cc50` by explicit user instruction; post-push verification confirmed `HEAD == origin/main`.
 - CM-0294 adds P33.x closeout docs/status/board updates. Validation passed: `git diff --check`, docs validation, P33.x boundary reference scan, and read-only Verifier rerun `PASS`. CM-0294 was committed and pushed as `dca5f6a` by explicit user instruction.
-- CM-0295 hardens P31/P32/P33 governance helper normalized output redaction. Validation passed: changed source/test syntax checks, targeted helper tests `29/29`, `npm test` `690/690`, `git diff --check`, docs validation, boundary scan, and read-only Verifier rerun `PASS`.
-- Next safe step: create a guarded local commit if eligible. No push is authorized.
+- CM-0295 hardens P31/P32/P33 governance helper normalized output redaction. Validation passed: changed source/test syntax checks, targeted helper tests `29/29`, `npm test` `690/690`, `git diff --check`, docs validation, boundary scan, and read-only Verifier rerun `PASS`. CM-0295 was committed and pushed as `d210947` by explicit user instruction; post-push verification confirmed `HEAD == origin/main`.
+- CM-0296 board/status reconciliation clears stale CM-0295 in-progress wording and routes next safe work to P34. Validation passed: `git diff --check`, docs validation, and board diff inspection.
+- Next safe step: guarded local commit if eligible, then enter P34 governance review surface safe-scope inventory. No push is authorized.
 
 ## Changed Files
 
