@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0276 / post-CM-0275 board reconciliation |
-| Current area | P30 post-helper board reconciliation |
+| Current task | CM-0277 / P30.3 final RC validation matrix manifest helper aggregator evidence shape |
+| Current area | P30.3 ValidationAggregator report-shape evidence candidate |
 | Last pushed baseline | `52c4fef` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Completed guarded local CM-0275 commit `ed73d24`; started CM-0276 board-only reconciliation to clear stale pending-commit wording. |
-| Last validation | CM-0275 post-commit checks passed: `git status -sb`; `git log --oneline --decorate -n 8`; `git show --stat --oneline --decorate --no-renames HEAD`; commit message trailer check; `git diff --check`. |
-| Worktree summary | Dirty only for CM-0276 board reconciliation after local commit `ed73d24`. Local `main` is ahead of `origin/main` by 16 commits. No source/test/package script, lockfile, `.github`, `.env`, runtime config, Codex/Claude config, public MCP schema/tool expansion, SQLite migration apply, import/export apply, backup creation, restore, provider/model call, real memory scan/preview, tag movement, production deploy, UI, service install, watchdog install, startup task install, durable memory write, durable data rewrite, tag, release, deploy, or unauthorized remote mutation occurred. |
+| Last action | Completed guarded local CM-0276 board reconciliation commit `9646273`; selected CM-0277/P30.3 as the next safe local candidate. |
+| Last validation | CM-0276 post-commit checks passed: `git status -sb`; `git log --oneline --decorate -n 9`; commit message trailer check; `git diff --check`. |
+| Worktree summary | Clean after local CM-0276 board reconciliation commit `9646273`. Local `main` is ahead of `origin/main` by 17 commits. No source/test/package script, lockfile, `.github`, `.env`, runtime config, Codex/Claude config, public MCP schema/tool expansion, SQLite migration apply, import/export apply, backup creation, restore, provider/model call, real memory scan/preview, tag movement, production deploy, UI, service install, watchdog install, startup task install, durable memory write, durable data rewrite, tag, release, deploy, or unauthorized remote mutation occurred. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits; push remains not authorized |
 | Safe-push readiness | no push is authorized unless the user explicitly requests it |
-| Next planned action | Validate and commit CM-0276 board-only reconciliation, then continue to CM-0277/P30.3 only if it remains ValidationAggregator report-shape evidence without runner execution. Do not implement runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scan, provider/service/config action, migration-import-export apply, backup/restore, push, tag, release, or deploy. |
+| Next planned action | Inspect and implement CM-0277/P30.3 only if it remains ValidationAggregator report-shape evidence without runner execution. Do not implement runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scan, provider/service/config action, migration-import-export apply, backup/restore, push, tag, release, or deploy. |
 
 ## Notes
 

@@ -14,7 +14,7 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty only for CM-0276 board reconciliation after guarded local CM-0275 commit `ed73d24`. Local `main` is ahead of `origin/main` by 16 commits. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty only for post-CM-0276 board finalization after guarded local commit `9646273`. Local `main` is ahead of `origin/main` by 17 commits. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
@@ -72,8 +72,8 @@ P30.2 manifest helper candidate
 - CM-0273 is completed, validated, and committed locally in `5d91dac`, limited to a committed synthetic fixture plus focused fixture test for the future final RC validation matrix runner safe input contract. Validation passed: syntax check, targeted fixture test `11/11`, `npm test` `610/610`, `git diff --check`, docs validation, forbidden-fragment scan with intentional fixture-list hits only, and read-only Verifier `PASS`. It did not implement or execute a runner.
 - CM-0274 is completed and committed locally in `f2286f7` as board-only reconciliation after `5d91dac`; board finalization is committed locally in `f3a7116`.
 - CM-0275 is completed, validated, and committed locally in `ed73d24` as a pure helper over explicit fixture input only. It adds `src/core/FinalRcValidationMatrixManifest.js` and `tests/final-rc-validation-matrix-runner-manifest-helper.test.js`; source/test syntax checks, targeted helper test `7/7`, `npm test` `617/617`, `git diff --check`, docs validation, and read-only Verifier rerun `PASS` passed. Read-only Verifier first pass found and drove a fail-closed fix for unsafe runner/matrix/readiness claims.
-- CM-0276 is in progress as board-only reconciliation after `ed73d24`.
-- Next safe step: validate and commit CM-0276 board-only reconciliation, then continue to CM-0277/P30.3 only if it remains ValidationAggregator report-shape evidence without runner execution.
+- CM-0276 is completed and committed locally in `9646273` as board-only reconciliation after `ed73d24`.
+- Next safe step: continue to CM-0277/P30.3 only if it remains ValidationAggregator report-shape evidence without runner execution.
 
 ## Changed Files
 
