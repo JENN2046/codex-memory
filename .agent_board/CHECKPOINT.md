@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0288 / P32.3 ValidationAggregator approval-packet evidence shape.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0289 / P32.x memory governance approval-packet closeout review.
 
 ## Current Area
 
-P32.3 aggregator report-shape evidence
+P32.x docs/status/board closeout
 
 ## Current Status
 
@@ -63,8 +63,9 @@ P32.3 aggregator report-shape evidence
 - CM-0285 adds `docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to define future approval packet requirements for governed memory actions without approving or executing them. Validation passed: `git diff --check`, docs validation, P32 governance approval reference scan, and read-only Verifier `PASS`. CM-0285 is committed locally in `b5dafcb`.
 - CM-0286 adds `tests/fixtures/memory-governance-approval-packet-v1.json` and `tests/memory-governance-approval-packet-fixture.test.js` to lock the P32 approval-packet contract with synthetic fixture evidence only. Validation passed: test syntax check, targeted fixture test `14/14`, `npm test` `655/655`, `git diff --check`, docs validation, P32.1 reference scan, and read-only Verifier rerun `PASS`. CM-0286 is committed locally in `933160d`.
 - CM-0287 adds `src/core/MemoryGovernanceApprovalPacketContract.js` and `tests/memory-governance-approval-packet-helper.test.js`, a pure explicit-input helper over caller-provided approval packet objects only. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `664/664`, `git diff --check`, docs validation, P32.2 boundary reference scan, and read-only Verifier `PASS`. CM-0287 is committed locally in `c2eb3ec`.
-- CM-0288 adds static ValidationAggregator report-shape evidence for the P32.2 approval-packet helper. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `664/664`, `git diff --check`, docs validation, and P32.3 boundary reference scan. Read-only Verifier is pending.
-- Commander direction remains constrained: P32.3 may surface helper capability as static report-shape evidence only; durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0288 adds static ValidationAggregator report-shape evidence for the P32.2 approval-packet helper. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `664/664`, `git diff --check`, docs validation, P32.3 boundary reference scan, read-only Verifier `PASS`, and post-commit checks. CM-0288 is committed locally in `1ec4343`.
+- CM-0289 adds `docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P32 only as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence. Validation passed: `git diff --check`, docs validation, P32.x boundary reference scan, and read-only Verifier `PASS`.
+- Commander direction remains constrained: P32.x may close the local safe-scope evidence chain only; durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0288 / P32.3 ValidationAggregator approval-packet evidence shape.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0289 / P32.x memory governance approval-packet closeout review.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0288 aggregator source/test/fixture/status/board updates. Local `main` is ahead of `origin/main` by eleven local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0289 docs/status/board closeout updates. Local `main` is ahead of `origin/main` by twelve local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P32.3 aggregator report-shape evidence
+P32.x docs/status/board closeout
 
 ## Findings
 
@@ -91,8 +91,9 @@ P32.3 aggregator report-shape evidence
 - CM-0285 adds P32 approval-packet safe-scope inventory docs/status/board, defining future approval packet requirements for governed memory actions without approving or executing them. Validation passed: `git diff --check`, docs validation, P32 governance approval reference scan, and read-only Verifier `PASS`. CM-0285 is committed locally in `b5dafcb`.
 - CM-0286 adds a synthetic approval-packet fixture/test for P32.1. Validation passed: `node --check tests\memory-governance-approval-packet-fixture.test.js`, targeted fixture test `14/14`, `npm test` `655/655`, `git diff --check`, docs validation, P32.1 reference scan, and read-only Verifier rerun `PASS`. CM-0286 is committed locally in `933160d`.
 - CM-0287 adds P32.2 explicit-input helper/test files for caller-provided approval packet objects only. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `664/664`, `git diff --check`, docs validation, P32.2 boundary reference scan, and read-only Verifier `PASS`. CM-0287 is committed locally in `c2eb3ec`.
-- CM-0288 adds static ValidationAggregator report-shape evidence for the P32.2 approval-packet helper. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `664/664`, `git diff --check`, docs validation, and P32.3 boundary reference scan. Read-only Verifier is pending.
-- Next safe step: run read-only Verifier for CM-0288, then create a guarded local commit if eligible. No further push is authorized.
+- CM-0288 adds static ValidationAggregator report-shape evidence for the P32.2 approval-packet helper. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `664/664`, `git diff --check`, docs validation, P32.3 boundary reference scan, read-only Verifier `PASS`, and post-commit checks. CM-0288 is committed locally in `1ec4343`.
+- CM-0289 adds the P32.x approval-packet closeout review and routes the next safe phase to P33 audit-evidence inventory. Validation passed: `git diff --check`, docs validation, P32.x boundary reference scan, and read-only Verifier `PASS`.
+- Next safe step: create a guarded local commit for CM-0289, then continue to P33 audit-evidence inventory. No further push is authorized.
 
 ## Changed Files
 
