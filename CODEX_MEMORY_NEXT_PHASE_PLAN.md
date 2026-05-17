@@ -86,7 +86,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P62-T2 completion audit / gap report is complete, validated, and locally committed in `496d681`.
 - P62-T3 prompt-to-artifact completion audit checklist is complete, validated, and locally committed in `4696482`.
 - P62-T4 A5/runtime authorization precondition matrix is complete, validated, and locally committed in `c97736d`.
-- P62-T5 A5/runtime authorization precondition explicit-input helper is complete and validated; exact commit is current `HEAD` after this guarded local batch is committed.
+- P62-T5 A5/runtime authorization precondition explicit-input helper is complete, validated, and locally committed in `8535da1`.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, P58 boundary/helper evidence, P59 boundary/helper evidence, P60 regression evidence, or P61 report helper evidence.
 
 ## Boundaries
