@@ -52,6 +52,7 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62 post-T6 audit wording refinement and stale wording cleanup are locally committed.
 - P62 prompt-to-artifact validation refs are locally committed in `5c805c9`.
 - P62 completion audit local-item mapping is locally committed in `1808bba`.
+- P62 completion boundary blocker is recorded as `CMB-0005`; commander decision is recorded as `CMD-0012`; readiness-misread risk is recorded as `RR-0004`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -74,6 +75,7 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62-T5 validation passed: changed JS syntax checks, targeted helper test `7/7`, no-touch regression `4/4`, `npm test` `1073/1073`, `git diff --check`.
 - P62-T6 validation passed: changed audit test syntax, completion audit and prompt-to-artifact audit tests `19/19`, docs validation, `npm test` `1075/1075`, `git diff --check`.
 - P62 post-T6 audit/refinement validation passed: targeted P62 audit tests `36/36`, docs validation, `npm test` `1075/1075`, `git diff --check`, readiness scan.
+- P62 completion boundary board records passed docs validation, `git diff --check`, and blocker/decision/risk overclaim scans.
 
 ## Hard Stops
 
@@ -82,3 +84,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 ## Next Safe Step
 
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized.
+Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local audit completion as runtime or RC readiness.

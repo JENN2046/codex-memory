@@ -547,6 +547,7 @@ FAILED
 | CMV-0502 | P51-P62-runtime-a5-blocker-register-reconciliation | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; blocker/overclaim scan | Records the current P51-P62 runtime completion boundary in `BLOCKERS.md` with 9 runtime gaps and 16 A5 hard stops while preserving blocked runtime/A5 posture. |
 | CMV-0503 | P51-P62-completion-boundary-commander-decision | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; decision/overclaim scan | Records the commander decision that P51-P62 is local evidence/preflight/audit complete only while preserving blocked runtime/A5 posture. |
 | CMV-0504 | P51-P62-completion-boundary-risk-registration | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; risk/overclaim scan | Records the risk that P51-P62 local evidence/preflight/audit completion could be misread as runtime or RC readiness while preserving blocked runtime/A5 posture. |
+| CMV-0505 | P51-P62-completion-boundary-handoff-reconciliation | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; boundary-record/overclaim scan | Records `CMB-0005`, `CMD-0012`, and `RR-0004` in active resume surfaces while preserving blocked runtime/A5 posture. |
 
 ## Common Validation Commands
 

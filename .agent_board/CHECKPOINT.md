@@ -44,6 +44,7 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62 post-T6 audit wording refinement and stale wording cleanup are locally committed.
 - P62 prompt-to-artifact validation refs are committed locally in `5c805c9`.
 - P62 completion audit local-item mapping is committed locally in `1808bba`.
+- P62 completion boundary blocker is recorded as `CMB-0005`; commander decision is recorded as `CMD-0012`; readiness-misread risk is recorded as `RR-0004`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -151,6 +152,7 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62-T6 targeted completion audit and prompt-to-artifact audit tests (`19/19`)
 - `npm test` (`1075/1075`)
 - `git diff --check`
+- P62 completion boundary board records docs validation, `git diff --check`, and blocker/decision/risk overclaim scans
 
 ## Active Boundaries
 
@@ -169,3 +171,4 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 ## Next Safe Step
 
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized.
+Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local audit completion as runtime or RC readiness.
