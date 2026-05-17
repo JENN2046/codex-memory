@@ -1,5 +1,7 @@
 {
   "schemaVersion": "p52-runtime-schema-version-enforcement-boundary-v1",
+  "policyVersion": "p52-runtime-schema-version-policy-v1",
+  "manifestVersion": "p52-runtime-enforcement-manifest-v1",
   "version": "v1",
   "phase": "P52-T1-runtime-schema-version-enforcement-boundary-plan",
   "fixtureOnly": true,

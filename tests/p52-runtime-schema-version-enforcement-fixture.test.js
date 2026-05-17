@@ -44,6 +44,8 @@ const REQUIRED_BLOCKED_ACTIONS = [
 
 test('P52 runtime schema/version fixture parses as boundary planning only', () => {
   assert.equal(fixture.schemaVersion, 'p52-runtime-schema-version-enforcement-boundary-v1');
+  assert.equal(fixture.policyVersion, 'p52-runtime-schema-version-policy-v1');
+  assert.equal(fixture.manifestVersion, 'p52-runtime-enforcement-manifest-v1');
   assert.equal(fixture.version, 'v1');
   assert.equal(fixture.phase, 'P52-T1-runtime-schema-version-enforcement-boundary-plan');
   assert.equal(fixture.fixtureOnly, true);

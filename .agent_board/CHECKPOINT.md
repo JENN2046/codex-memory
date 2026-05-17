@@ -6,14 +6,14 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P8 memory-governance / P52 schema-version runtime enforcement boundary.
+P10 observability-admin / P53 ValidationAggregator evidence inventory.
 
 ## Current Status
 
 - Last pushed baseline: `1ae4286 test: harden no-touch redaction regressions` on `origin/main`.
 - Post-push verification confirmed `HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`.
 - Latest pushed task chain: P46-P50 Evidence Enforcement Bridge plus P50 review-fix no-touch/redaction hardening.
-- Current task: P52-T1 boundary plan is complete and validated; next route is P52-T2 explicit-input helper.
+- Current task: P52-T2 helper is complete and validated; next route is P53-T1 ValidationAggregator evidence inventory.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -33,6 +33,8 @@ P8 memory-governance / P52 schema-version runtime enforcement boundary.
 - User-authorized push completed: `2b4a956..1ae4286 main -> main`.
 - P51-T1 committed locally in `1f89c63`.
 - P52-T1 validation passed: `node --check tests\p52-runtime-schema-version-enforcement-fixture.test.js`, targeted fixture test `12/12`, `npm test` `863/863`, and `git diff --check`.
+- P52-T1 committed locally in `884f2f6`.
+- P52-T2 validation passed: changed JS syntax checks, targeted P52 tests `20/20`, no-touch test `4/4`, `npm test` `871/871`, and `git diff --check`.
 
 ## Active Boundaries
 
@@ -63,4 +65,4 @@ P8 memory-governance / P52 schema-version runtime enforcement boundary.
 
 ## Next Safe Step
 
-Create guarded local P52-T1 commit, then continue to P52-T2 minimal explicit-input helper.
+Create guarded local P52-T2 commit, then continue to P53-T1 ValidationAggregator evidence inventory.

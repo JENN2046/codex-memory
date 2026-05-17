@@ -48,8 +48,9 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 - P51-T1 post-P50 push board/status reconciliation is complete locally in `1f89c63`.
-- P52-T1 runtime schema-version enforcement boundary plan is complete and validated.
-- P52-T2 minimal runtime enforcement helper is the next safe implementation slice.
+- P52-T1 runtime schema-version enforcement boundary plan is complete and committed locally in `884f2f6`.
+- P52-T2 minimal runtime enforcement helper is complete and validated.
+- P53-T1 ValidationAggregator evidence inventory is the next safe implementation slice.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion or P52-T1 boundary evidence.
 
 ## Boundaries
@@ -69,7 +70,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P52-T1:
+After P52-T2:
 
-- Begin P52-T2 minimal helper over caller-provided objects only.
-- Keep P52-T2 local, explicit-input-only, fail-closed, and non-runtime-mutating.
+- Begin P53-T1 ValidationAggregator evidence inventory.
+- Keep P53-T1 inventory-only: inspect existing committed/local evidence, define source map and stale/missing/fresh semantics, but do not execute runner, helper, provider, runtime scan, or live MCP refresh.
