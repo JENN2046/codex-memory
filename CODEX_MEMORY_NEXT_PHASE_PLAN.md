@@ -9,8 +9,8 @@ This active plan is the short routing document for the current P28-P40 Governed 
 ## Current Direction
 
 1. Keep reducing stale context pollution in active docs.
-2. Close P34 governance review surface as safe-scope / fixture / explicit-input helper / static ValidationAggregator evidence only.
-3. Continue P35+ with small local, reversible, fixture-first/read-only governance slices.
+2. Continue P35 governed memory spine policy gate work with small local, reversible, fixture-first/read-only slices.
+3. Preserve all runtime, durable-write, public MCP, provider, migration/import-export, release, and deploy blockers.
 
 ## Current Completed Local Chain
 
@@ -20,14 +20,16 @@ This active plan is the short routing document for the current P28-P40 Governed 
 - P34.3 ValidationAggregator evidence: static report-shape evidence only, committed locally in `c06436d`.
 - CM-0301 context hygiene: active board checkpoint/handoff compressed, committed locally in `4d8d11a`.
 - CM-0302 root docs hygiene: active status/plan/backlog docs compressed, committed locally in `3d774ad`.
+- P34.x closeout: governance review surface safe-scope chain closed locally in `8220d64`.
 
 ## Current Task
 
-P34.x governance review surface closeout:
+P35 governed memory spine policy gate planning:
 
-- Add a closeout review for P34 safe-scope evidence.
-- Confirm that P34 remains fixture/helper/report-shape only.
-- Keep runtime governance review, real DB review, durable write, MCP expansion, and RC readiness blocked.
+- Define a future fixture-first policy gate over P31-P34 evidence.
+- Keep `decision=NOT_READY_BLOCKED`.
+- Do not implement runtime policy enforcement.
+- Do not approve governed actions or write durable state.
 
 ## Boundaries
 
@@ -42,7 +44,6 @@ P34.x governance review surface closeout:
 
 ## Next Candidate
 
-After P34.x validates and commits, Commander should choose either:
+After P35 planning validates and commits, Commander should choose:
 
-- `P35` fixture-first/read-only governance slice; or
-- another small docs-context hygiene pass if active docs still produce obvious stale context pollution.
+- `P35.1-governed-memory-policy-gate-fixture-contract`, synthetic fixture/test only.
