@@ -1,0 +1,232 @@
+{
+  "schemaVersion": "governed-memory-policy-gate-v1",
+  "version": "v1",
+  "phase": "P35.1-governed-memory-policy-gate-fixture-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "sourceMode": "fixture_only",
+  "policyGateImplemented": false,
+  "runtimeIntegrated": false,
+  "governedActionApproved": false,
+  "durableMemoryTouched": false,
+  "durableAuditWritten": false,
+  "publicMcpExpanded": false,
+  "realMemoryScanned": false,
+  "realDbReviewed": false,
+  "providerCalled": false,
+  "providerCalls": 0,
+  "mutated": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "safeSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "static_report_shape",
+    "local_validation_summary"
+  ],
+  "acceptedSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "static_report_shape",
+    "local_validation_summary"
+  ],
+  "unsupportedSourceTypes": [],
+  "acceptedForPlanning": true,
+  "sourceEvidence": [
+    {
+      "id": "p31_lifecycle_contract",
+      "sourceType": "committed_fixture",
+      "phase": "P31",
+      "artifacts": [
+        "tests/fixtures/memory-governance-lifecycle-contract-v1.json",
+        "src/core/MemoryGovernanceLifecycleContract.js"
+      ],
+      "acceptedForPlanning": true,
+      "runtimeIntegrated": false
+    },
+    {
+      "id": "p32_approval_packet",
+      "sourceType": "committed_fixture",
+      "phase": "P32",
+      "artifacts": [
+        "tests/fixtures/memory-governance-approval-packet-v1.json",
+        "src/core/MemoryGovernanceApprovalPacketContract.js"
+      ],
+      "acceptedForPlanning": true,
+      "governedActionApproved": false
+    },
+    {
+      "id": "p33_audit_evidence",
+      "sourceType": "committed_fixture",
+      "phase": "P33",
+      "artifacts": [
+        "tests/fixtures/memory-governance-audit-evidence-v1.json",
+        "src/core/MemoryGovernanceAuditEvidenceContract.js"
+      ],
+      "acceptedForPlanning": true,
+      "durableAuditWritten": false
+    },
+    {
+      "id": "p34_review_surface",
+      "sourceType": "committed_doc",
+      "phase": "P34",
+      "artifacts": [
+        "docs/P34_GOVERNANCE_REVIEW_SURFACE_CLOSEOUT_REVIEW.md",
+        "tests/fixtures/memory-governance-review-surface-v1.json",
+        "src/core/MemoryGovernanceReviewSurfaceContract.js"
+      ],
+      "acceptedForPlanning": true,
+      "realDbReviewed": false
+    },
+    {
+      "id": "validation_aggregator_report_shape",
+      "sourceType": "static_report_shape",
+      "phase": "P34.3",
+      "artifacts": [
+        "src/core/ValidationAggregatorService.js",
+        "tests/fixtures/v1-rc-validation-aggregator-v1.json"
+      ],
+      "acceptedForPlanning": true,
+      "helpersExecutedByAggregator": false
+    }
+  ],
+  "gateSummary": {
+    "decision": "NOT_READY_BLOCKED",
+    "readyForRuntime": false,
+    "readyForGovernedActionExecution": false,
+    "readyForDurableAuditWrite": false,
+    "readyForPublicMcpExpansion": false,
+    "readyForV1Rc": false,
+    "requiredRuntimeWork": [
+      "schema_version_runtime_enforcement",
+      "validation_aggregator_full_implementation",
+      "final_rc_matrix_runner",
+      "runtime_governance_review"
+    ],
+    "requiredApprovals": [
+      "governed_action_execution",
+      "durable_audit_write",
+      "durable_memory_mutation",
+      "public_mcp_expansion",
+      "real_memory_scan_or_preview",
+      "real_db_review",
+      "provider_or_model_call",
+      "migration_import_export_apply",
+      "backup_restore",
+      "push_tag_release_deploy"
+    ]
+  },
+  "failClosedCases": [
+    {
+      "id": "unsupported_source_type_claim",
+      "claim": "unsupportedSourceTypes",
+      "claimedValue": [
+        "external_runtime_scan"
+      ],
+      "acceptedForPlanning": false,
+      "reason": "unsupported_source_type"
+    },
+    {
+      "id": "runtime_policy_gate_executed_claim",
+      "claim": "policyGateImplemented",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "reason": "runtime_policy_gate_not_implemented"
+    },
+    {
+      "id": "governed_action_approved_claim",
+      "claim": "governedActionApproved",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "reason": "governed_action_not_approved"
+    },
+    {
+      "id": "durable_write_claim",
+      "claim": "durableAuditWritten",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "reason": "durable_write_not_approved"
+    },
+    {
+      "id": "public_mcp_expansion_claim",
+      "claim": "publicMcpExpanded",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "reason": "public_mcp_expansion_not_approved"
+    },
+    {
+      "id": "real_memory_scan_claim",
+      "claim": "realMemoryScanned",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "reason": "real_memory_scan_blocked"
+    },
+    {
+      "id": "real_db_review_claim",
+      "claim": "realDbReviewed",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "reason": "real_db_review_blocked"
+    },
+    {
+      "id": "provider_called_claim",
+      "claim": "providerCalled",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "reason": "provider_call_blocked"
+    },
+    {
+      "id": "v1_rc_ready_claim",
+      "claim": "readyForV1Rc",
+      "claimedValue": true,
+      "acceptedForPlanning": false,
+      "reason": "v1_rc_not_ready_blocked"
+    }
+  ],
+  "safety": {
+    "noRuntimePolicyGate": true,
+    "noGovernedActionExecution": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryScan": true,
+    "noRealDbReview": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noMigrationImportExportApply": true,
+    "noBackupRestore": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "authorizationHeaderExposed": false,
+    "apiKeyExposed": false
+  },
+  "requiredWording": [
+    "P35.1 is a synthetic fixture contract only.",
+    "The policy gate is not implemented at runtime.",
+    "Governed actions remain blocked pending explicit approval.",
+    "Durable audit and memory writes remain blocked.",
+    "Public MCP tools remain frozen at record_memory, search_memory, and memory_overview.",
+    "v1.0 RC remains NOT_READY_BLOCKED."
+  ],
+  "forbiddenClaims": [
+    "runtime policy gate is implemented",
+    "governed action execution is approved",
+    "durable audit write is approved",
+    "public MCP expansion is approved",
+    "real memory scan has executed",
+    "real database review has executed",
+    "provider call has executed",
+    "v1.0 RC readiness is unblocked"
+  ],
+  "next": "P35.2-governed-memory-policy-gate-explicit-input-helper-candidate"
+}

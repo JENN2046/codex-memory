@@ -21,12 +21,13 @@ This active plan is the short routing document for the current P28-P40 Governed 
 - CM-0301 context hygiene: active board checkpoint/handoff compressed, committed locally in `4d8d11a`.
 - CM-0302 root docs hygiene: active status/plan/backlog docs compressed, committed locally in `3d774ad`.
 - P34.x closeout: governance review surface safe-scope chain closed locally in `8220d64`.
+- P35 planning: governed memory spine policy gate plan committed locally in `29858e6`.
 
 ## Current Task
 
-P35 governed memory spine policy gate planning:
+P35.1 governed memory policy gate fixture contract:
 
-- Define a future fixture-first policy gate over P31-P34 evidence.
+- Add a synthetic fixture and focused test for future policy gate shape over P31-P34 evidence.
 - Keep `decision=NOT_READY_BLOCKED`.
 - Do not implement runtime policy enforcement.
 - Do not approve governed actions or write durable state.
@@ -44,6 +45,6 @@ P35 governed memory spine policy gate planning:
 
 ## Next Candidate
 
-After P35 planning validates and commits, Commander should choose:
+After P35.1 validates and commits, Commander should choose:
 
-- `P35.1-governed-memory-policy-gate-fixture-contract`, synthetic fixture/test only.
+- `P35.2-governed-memory-policy-gate-explicit-input-helper-candidate`, only if it remains pure explicit-input helper work with no runtime side effects.

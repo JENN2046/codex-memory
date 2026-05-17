@@ -14,26 +14,27 @@ Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-A
 
 ## Worktree
 
-Dirty for CM-0304 P35 policy gate planning docs/status/board updates after CM-0303 local commit.
+Dirty for CM-0305 P35.1 governed memory policy gate fixture/test plus status/board updates after CM-0304 local commit.
 
 ## Current Area
 
-P8 memory governance policy gate planning.
+P8 memory governance policy gate fixture contract.
 
 ## Current Truth
 
 - `origin/main` baseline: `d210947 fix: redact governance helper output`.
-- Local commits ahead: `83bd388`, `9d3ab69`, `b9965f7`, `280ab9b`, `c06436d`, `4d8d11a`, `3d774ad`, `8220d64`.
-- Latest local commit: `8220d64 docs: close p34 review surface`.
+- Local commits ahead: `83bd388`, `9d3ab69`, `b9965f7`, `280ab9b`, `c06436d`, `4d8d11a`, `3d774ad`, `8220d64`, `29858e6`.
+- Latest local commit: `29858e6 docs: plan p35 policy gate`.
 - P34 chain status: inventory, fixture contract, explicit-input helper, and ValidationAggregator static report-shape evidence are complete locally.
 - Current release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`.
-- Current task: CM-0304 P35 governed memory spine policy gate planning.
+- Current task: CM-0305 P35.1 governed memory policy gate fixture contract.
 
 ## Validation
 
 - CM-0300 passed: changed JS syntax checks; fixture JSON parse; targeted aggregator/helper tests `31/31`; `npm test` `714/714`; `git diff --check`; docs validation; P34.3 boundary scan; read-only Verifier `PASS`.
 - CM-0303 passed and is committed locally in `8220d64`.
-- CM-0304 pending validation: docs-only diff check, docs validation, P35 boundary scan, and read-only Verifier.
+- CM-0304 passed and is committed locally in `29858e6`.
+- CM-0305 validation passed: JS syntax check, targeted fixture test `11/11`, `npm test` `725/725`, `git diff --check`, docs validation, and P35.1 boundary scan. First read-only Verifier found board validation-state wording only; read-only Verifier rerun passed.
 
 ## Hard Stops
 
@@ -49,4 +50,4 @@ No push, tag, release, deploy, provider/model call, real memory preview/export/i
 
 ## Next Safe Step
 
-Finish CM-0304 validation and guarded local commit if scoped. After that, continue with P35.1 synthetic fixture contract or another small docs-context hygiene pass, whichever is the highest-value safe local task.
+Create a guarded local CM-0305 commit if scoped. After that, continue with P35.2 explicit-input helper candidate only if it remains pure local input normalization with no runtime side effects.
