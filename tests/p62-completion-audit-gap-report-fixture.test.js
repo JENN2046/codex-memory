@@ -23,7 +23,8 @@ const expectedCompletedLocalItems = [
   'p61_rc_evidence_report_boundary_and_helper',
   'p62_rc_cutover_preflight_boundary_inventory',
   'p62_completion_audit_and_authorization_preconditions',
-  'p62_a5_runtime_authorization_precondition_helper'
+  'p62_a5_runtime_authorization_precondition_helper',
+  'p62_post_t6_audit_refinement_and_validation_refs'
 ];
 
 const expectedRuntimeGaps = [

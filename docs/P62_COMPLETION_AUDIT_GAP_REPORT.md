@@ -34,6 +34,7 @@ The audit recognizes local artifacts for:
 - P62 RC cutover preflight boundary inventory
 - P62 completion audit / prompt-to-artifact audit / A5 authorization precondition matrix
 - P62 A5/runtime authorization precondition explicit-input helper
+- P62 post-T6 audit wording refinement and prompt-to-artifact validation reference mapping
 
 ## Remaining Critical Gaps
 
