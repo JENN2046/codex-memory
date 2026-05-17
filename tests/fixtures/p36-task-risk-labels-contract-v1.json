@@ -1,0 +1,333 @@
+{
+  "schemaVersion": "p36-task-risk-labels-contract-v1",
+  "version": "v1",
+  "phase": "P36-T2-task-risk-labels-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "runtimeIntegrated": false,
+  "policyKernelImplemented": false,
+  "publicMcpExpanded": false,
+  "realMemoryContentRead": false,
+  "mutated": false,
+  "labelContract": {
+    "requiredEnvelopeFields": [
+      "task_id",
+      "risk_label",
+      "scope_metadata",
+      "source_type",
+      "requested_actions",
+      "gate_results"
+    ],
+    "unknownRiskLabelDisposition": "A5-hard-stop",
+    "missingRiskLabelDisposition": "A5-hard-stop",
+    "ambiguousRiskLabelDisposition": "A5-hard-stop",
+    "unparsableRiskLabelDisposition": "A5-hard-stop",
+    "defaultAllow": false,
+    "warningOnlyGateAllowed": false,
+    "criticalSkippedUnknownEqualsFailure": true,
+    "failurePathExitCode": 1
+  },
+  "labels": [
+    {
+      "id": "A4-local-safe",
+      "machineStatus": "allow_local_fixture_only",
+      "requiresHumanApproval": false,
+      "requiresVerifierReview": true,
+      "requiresValidationEvidence": true,
+      "allowedActions": [
+        "docs_update",
+        "fixture_contract_update",
+        "focused_test_update",
+        "local_validation_run"
+      ],
+      "deniedActions": [
+        "real_memory_content_read",
+        "real_memory_preview",
+        "real_memory_export",
+        "real_memory_import",
+        "real_memory_scan",
+        "provider_call",
+        "model_call",
+        "public_mcp_expansion",
+        "durable_memory_write",
+        "durable_audit_write",
+        "dependency_change",
+        "watchdog_or_config_switch",
+        "push_tag_release_deploy"
+      ]
+    },
+    {
+      "id": "A4.8-guarded",
+      "machineStatus": "allow_guarded_local_after_validation",
+      "requiresHumanApproval": false,
+      "requiresVerifierReview": true,
+      "requiresValidationEvidence": true,
+      "allowedActions": [
+        "docs_update",
+        "fixture_contract_update",
+        "focused_test_update",
+        "local_validation_run",
+        "guarded_local_commit"
+      ],
+      "deniedActions": [
+        "real_memory_content_read",
+        "real_memory_preview",
+        "real_memory_export",
+        "real_memory_import",
+        "real_memory_scan",
+        "provider_call",
+        "model_call",
+        "public_mcp_expansion",
+        "durable_memory_write",
+        "durable_audit_write",
+        "dependency_change",
+        "watchdog_or_config_switch",
+        "push_tag_release_deploy"
+      ]
+    },
+    {
+      "id": "A5-hard-stop",
+      "machineStatus": "blocked_requires_separate_explicit_human_approval",
+      "requiresHumanApproval": true,
+      "requiresVerifierReview": true,
+      "requiresValidationEvidence": true,
+      "allowedActions": [],
+      "deniedActions": [
+        "real_memory_content_read",
+        "real_memory_preview",
+        "real_memory_export",
+        "real_memory_import",
+        "real_memory_scan",
+        "sqlite_migration_apply",
+        "backup",
+        "restore",
+        "provider_call",
+        "model_call",
+        "public_mcp_expansion",
+        "env_or_secret_edit",
+        "dependency_change",
+        "watchdog_or_config_switch",
+        "durable_memory_write",
+        "durable_audit_write",
+        "push_tag_release_deploy"
+      ]
+    }
+  ],
+  "criticalGates": [
+    "scope_metadata_present",
+    "scope_metadata_parseable",
+    "public_mcp_surface_frozen",
+    "no_real_memory_content_read",
+    "governance_namespace_isolated",
+    "no_durable_write",
+    "no_provider_or_model_call",
+    "no_dependency_change",
+    "no_runtime_ready_claim"
+  ],
+  "gateOutcomeSemantics": {
+    "pass": {
+      "acceptedForPlanning": true
+    },
+    "fail": {
+      "acceptedForPlanning": false,
+      "exitCode": 1
+    },
+    "unknown": {
+      "acceptedForPlanning": false,
+      "exitCode": 1
+    },
+    "skipped": {
+      "acceptedForPlanning": false,
+      "exitCode": 1
+    },
+    "warning_only": {
+      "acceptedForPlanning": false,
+      "exitCode": 1
+    }
+  },
+  "decisionCases": [
+    {
+      "id": "a4_local_safe_fixture_docs",
+      "risk_label": "A4-local-safe",
+      "requested_actions": [
+        "docs_update",
+        "fixture_contract_update",
+        "focused_test_update",
+        "local_validation_run"
+      ],
+      "criticalGateOutcomes": "pass",
+      "machineDecision": "allow_local_fixture_only",
+      "acceptedForPlanning": true,
+      "requiresHumanApproval": false,
+      "reasonCodes": [
+        "P36_A4_LOCAL_FIXTURE_ONLY"
+      ]
+    },
+    {
+      "id": "a48_guarded_local_commit",
+      "risk_label": "A4.8-guarded",
+      "requested_actions": [
+        "guarded_local_commit"
+      ],
+      "criticalGateOutcomes": "pass",
+      "machineDecision": "allow_guarded_local_after_validation",
+      "acceptedForPlanning": true,
+      "requiresHumanApproval": false,
+      "reasonCodes": [
+        "P36_A48_GUARDED_LOCAL_AFTER_VALIDATION"
+      ]
+    },
+    {
+      "id": "unknown_risk_label",
+      "risk_label": "unknown",
+      "requested_actions": [
+        "docs_update"
+      ],
+      "criticalGateOutcomes": "pass",
+      "machineDecision": "A5-hard-stop",
+      "acceptedForPlanning": false,
+      "requiresHumanApproval": true,
+      "reasonCodes": [
+        "P36_UNKNOWN_RISK_LABEL"
+      ]
+    },
+    {
+      "id": "missing_risk_label",
+      "risk_label": null,
+      "requested_actions": [
+        "fixture_contract_update"
+      ],
+      "criticalGateOutcomes": "pass",
+      "machineDecision": "A5-hard-stop",
+      "acceptedForPlanning": false,
+      "requiresHumanApproval": true,
+      "reasonCodes": [
+        "P36_MISSING_RISK_LABEL"
+      ]
+    },
+    {
+      "id": "critical_gate_unknown",
+      "risk_label": "A4-local-safe",
+      "requested_actions": [
+        "docs_update"
+      ],
+      "criticalGateOutcomes": "unknown",
+      "machineDecision": "deny",
+      "acceptedForPlanning": false,
+      "requiresHumanApproval": false,
+      "reasonCodes": [
+        "P36_CRITICAL_GATE_UNKNOWN"
+      ]
+    },
+    {
+      "id": "critical_gate_skipped",
+      "risk_label": "A4-local-safe",
+      "requested_actions": [
+        "docs_update"
+      ],
+      "criticalGateOutcomes": "skipped",
+      "machineDecision": "deny",
+      "acceptedForPlanning": false,
+      "requiresHumanApproval": false,
+      "reasonCodes": [
+        "P36_CRITICAL_GATE_SKIPPED"
+      ]
+    },
+    {
+      "id": "warning_only_critical_gate",
+      "risk_label": "A4.8-guarded",
+      "requested_actions": [
+        "guarded_local_commit"
+      ],
+      "criticalGateOutcomes": "warning_only",
+      "machineDecision": "deny",
+      "acceptedForPlanning": false,
+      "requiresHumanApproval": false,
+      "reasonCodes": [
+        "P36_WARNING_ONLY_CRITICAL_GATE"
+      ]
+    },
+    {
+      "id": "a4_requests_real_memory_scan",
+      "risk_label": "A4-local-safe",
+      "requested_actions": [
+        "real_memory_scan"
+      ],
+      "criticalGateOutcomes": "pass",
+      "machineDecision": "A5-hard-stop",
+      "acceptedForPlanning": false,
+      "requiresHumanApproval": true,
+      "reasonCodes": [
+        "P36_A5_ACTION_REQUESTED"
+      ]
+    },
+    {
+      "id": "a48_requests_public_mcp_expansion",
+      "risk_label": "A4.8-guarded",
+      "requested_actions": [
+        "public_mcp_expansion"
+      ],
+      "criticalGateOutcomes": "pass",
+      "machineDecision": "A5-hard-stop",
+      "acceptedForPlanning": false,
+      "requiresHumanApproval": true,
+      "reasonCodes": [
+        "P36_PUBLIC_MCP_EXPANSION_BLOCKED"
+      ]
+    },
+    {
+      "id": "malformed_envelope",
+      "risk_label": "A4-local-safe",
+      "requested_actions": [],
+      "criticalGateOutcomes": "unparsable",
+      "machineDecision": "deny",
+      "acceptedForPlanning": false,
+      "requiresHumanApproval": false,
+      "reasonCodes": [
+        "P36_UNPARSABLE_RISK_ENVELOPE"
+      ]
+    }
+  ],
+  "safety": {
+    "noRuntimePolicyKernel": true,
+    "noCommandExecution": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryContentRead": true,
+    "noRealMemoryPreview": true,
+    "noRealMemoryExport": true,
+    "noRealMemoryImport": true,
+    "noRealMemoryScan": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "structureLeakageApproved": false
+  },
+  "requiredWording": [
+    "P36-T2 is a synthetic task risk label contract only.",
+    "Unknown, missing, ambiguous, or unparsable risk labels map to A5-hard-stop.",
+    "Critical gate skipped, unknown, failed, or warning-only equals failure.",
+    "A4.8 guarded local work is not authorization for push, release, deploy, provider call, real memory content access, public MCP expansion, or durable write.",
+    "Fixture validation does not mean runtime policy enforcement is implemented."
+  ],
+  "forbiddenClaims": [
+    "unknown risk defaults to A4",
+    "warning-only critical gate may pass",
+    "A4.8 authorizes push",
+    "A4.8 authorizes real memory scan",
+    "risk fixture means runtime policy kernel is implemented",
+    "task risk labels make v1.0 RC ready"
+  ],
+  "next": "P37-T1-policy-decision-envelope-fixture-matrix"
+}

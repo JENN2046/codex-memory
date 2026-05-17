@@ -11,10 +11,11 @@ P8 memory governance / P36 Scope And A5 Boundary Contract.
 ## Current Status
 
 - Last pushed baseline: `3e3f76d fix: harden local http and governance redaction` on `origin/main`.
-- Local branch was aligned with `origin/main` before current uncommitted CM-0307 work.
+- Local branch is ahead of `origin/main` by CM-0307 local commit `408a92c`.
 - Latest pushed task chain: P35.1 fixture contract, P35 post-push board reconciliation, and P35 security hardening.
-- Current task: CM-0307 / P36-T1 Scope + A5 Boundary Contract fixture, validated and ready for scoped guarded local commit.
-- CM-0307 validation passed so far: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
+- Current task: CM-0308 / P36-T2 Task Risk Labels Contract fixture.
+- CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
+- CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 
 ## Active Boundaries
 
@@ -33,6 +34,7 @@ P8 memory governance / P36 Scope And A5 Boundary Contract.
 - P34.x closeout review was added at `docs/P34_GOVERNANCE_REVIEW_SURFACE_CLOSEOUT_REVIEW.md`.
 - P35 policy gate planning is recorded at `docs/P35_GOVERNED_MEMORY_SPINE_POLICY_GATE_PLAN.md`.
 - P36-T1 fixture/test/doc were added at `tests/fixtures/p36-scope-a5-boundary-contract-v1.json`, `tests/p36-scope-a5-boundary-contract-fixture.test.js`, and `docs/P36_SCOPE_A5_BOUNDARY_CONTRACT.md`.
+- P36-T2 fixture/test/doc are being added at `tests/fixtures/p36-task-risk-labels-contract-v1.json`, `tests/p36-task-risk-labels-contract-fixture.test.js`, and `docs/P36_TASK_RISK_LABELS_CONTRACT.md`.
 - Active `CHECKPOINT.md` is now a short current-state checkpoint.
 - Detailed historical validation remains in `.agent_board/VALIDATION_LOG.md`.
 - Detailed task ledger remains in `.agent_board/TASK_QUEUE.md`.
@@ -40,4 +42,4 @@ P8 memory governance / P36 Scope And A5 Boundary Contract.
 
 ## Next Safe Step
 
-Create a guarded local CM-0307 commit if staged diff remains scoped. Push remains user-directed and not authorized. Next safe task after CM-0307 is P36-T2 Task Risk Labels Contract, still fixture-only / dry-run-only.
+Create a guarded local CM-0308 commit if staged diff remains scoped. Push remains user-directed and not authorized. Next safe task after CM-0308 is P37-T1 Policy Decision Envelope Fixture Matrix, still synthetic fixture-only and not connected to vector/candidate/diary recall paths.

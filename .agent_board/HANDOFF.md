@@ -14,7 +14,7 @@ Execute the P36-P40 Boundary-first Governed Memory Spine long-running goal under
 
 ## Worktree
 
-CM-0307 P36-T1 docs/fixture/test/board changes are local, validated, and under guarded commit review.
+Dirty for CM-0308 P36-T2 docs/fixture/test/board updates.
 
 ## Current Area
 
@@ -23,16 +23,17 @@ P8 memory governance / P36 Scope And A5 Boundary Contract.
 ## Current Truth
 
 - `origin/main` baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local branch is aligned with `origin/main` before current uncommitted CM-0307 work.
-- Latest pushed implementation/test commit: `3e3f76d`.
+- Local branch is ahead of `origin/main` by local CM-0307 commit `408a92c`.
+- Latest pushed implementation/test commit: `3e3f76d`; latest local commit: `408a92c`.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
 - Current release/readiness state: boundary-first P36 planning; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: CM-0307 P36-T1 Scope + A5 Boundary Contract fixture, validated and ready for scoped guarded local commit if staged diff remains clean.
+- Current task: CM-0308 P36-T2 Task Risk Labels Contract fixture.
 
 ## Validation
 
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`; `node --test tests\p36-scope-a5-boundary-contract-fixture.test.js` (`12/12`); `npm test` (`739/739`); `git diff --check`; docs validation.
-- Boundary scan found only expected hard-stop policy wording; read-only Verifier review found no scope violation before commit staging.
+- CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`; targeted fixture test `11/11`; `npm test` `750/750`; `git diff --check`; docs validation.
+- Boundary scan found only expected forbidden-claim / hard-stop policy wording; read-only Verifier review found no runtime, public MCP, provider, real-memory, dependency, config, or remote action.
 
 ## Hard Stops
 
@@ -48,4 +49,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Create a guarded local CM-0307 commit if staged diff remains scoped; push remains blocked unless explicitly requested. Next safe task after CM-0307 is P36-T2 Task Risk Labels Contract, still fixture-only / dry-run-only.
+Create a guarded local CM-0308 commit if staged diff remains scoped; push remains blocked unless explicitly requested. Next safe task after CM-0308 is P37-T1 Policy Decision Envelope Fixture Matrix, still synthetic fixture-only and not connected to vector/candidate/diary recall paths.

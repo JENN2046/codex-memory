@@ -29,10 +29,10 @@ This active plan is the short routing document for the current P28-P40 Governed 
 
 P36-T1 Scope + A5 Boundary Contract:
 
-- Establish scope metadata, A5 deny list, governance namespace isolation, public MCP freeze, and fail-closed fixture cases.
+- Establish machine-readable A4-local-safe / A4.8-guarded / A5-hard-stop task risk labels.
 - Keep `decision=NOT_READY_BLOCKED`.
 - Do not implement runtime policy enforcement or a runtime policy kernel.
-- Do not let governance records, validation transcripts, redaction samples, or policy decisions enter normal user recall namespaces.
+- Unknown/missing/ambiguous/unparsable risk labels must map to `A5-hard-stop`; critical gate skipped/unknown/warning-only must fail.
 - Do not approve governed actions or write durable state.
 
 ## Boundaries
@@ -51,6 +51,6 @@ P36-T1 Scope + A5 Boundary Contract:
 
 ## Next Candidate
 
-After P36-T1 validation, Commander may choose:
+After P36-T2 validation, Commander may choose:
 
-- `P36-T2-task-risk-labels-contract`, only if it remains machine-readable, fixture-only, fail-closed, and does not alter public MCP or runtime behavior.
+- `P37-T1-policy-decision-envelope-fixture-matrix`, only if it remains synthetic fixture-only and does not enter vector/candidate/diary recall paths.
