@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0286 / P32.1 memory governance approval-packet fixture contract.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0287 / P32.2 memory governance approval-packet explicit-input helper.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0286 fixture/test/status/board updates. Local `main` is ahead of `origin/main` by nine local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0287 helper/test/status/board updates. Local `main` is ahead of `origin/main` by ten local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P32.1 fixture/test contract
+P32.2 explicit-input helper/test
 
 ## Findings
 
@@ -89,8 +89,9 @@ P32.1 fixture/test contract
 - CM-0283 adds P31.4 static ValidationAggregator governance lifecycle helper evidence shape. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator/governance tests `44/44`, `npm test` `641/641`, `git diff --check`, docs validation, and read-only Verifier `PASS`. CM-0283 is committed locally in `a7b3ffa`.
 - CM-0284 adds P31.x closeout review docs/status/board, closing P31 only as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence. Validation passed: `git diff --check`, docs validation, P31 reference scan, and read-only Verifier `PASS`. CM-0284 is committed locally in `968e742`.
 - CM-0285 adds P32 approval-packet safe-scope inventory docs/status/board, defining future approval packet requirements for governed memory actions without approving or executing them. Validation passed: `git diff --check`, docs validation, P32 governance approval reference scan, and read-only Verifier `PASS`. CM-0285 is committed locally in `b5dafcb`.
-- CM-0286 adds a synthetic approval-packet fixture/test for P32.1. Validation passed: `node --check tests\memory-governance-approval-packet-fixture.test.js`, targeted fixture test `14/14`, `npm test` `655/655`, `git diff --check`, docs validation, P32.1 reference scan, and read-only Verifier rerun `PASS`. Guarded local commit is pending.
-- Next safe step: create a guarded local commit for CM-0286 if pre-commit status/diff review remains clean, then continue to CM-0287/P32.2 explicit-input helper. No further push is authorized.
+- CM-0286 adds a synthetic approval-packet fixture/test for P32.1. Validation passed: `node --check tests\memory-governance-approval-packet-fixture.test.js`, targeted fixture test `14/14`, `npm test` `655/655`, `git diff --check`, docs validation, P32.1 reference scan, and read-only Verifier rerun `PASS`. CM-0286 is committed locally in `933160d`.
+- CM-0287 adds P32.2 explicit-input helper/test files for caller-provided approval packet objects only. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `664/664`, `git diff --check`, docs validation, and P32.2 boundary reference scan. Read-only Verifier is pending.
+- Next safe step: run read-only Verifier for CM-0287, then create a guarded local commit if eligible. No further push is authorized.
 
 ## Changed Files
 
