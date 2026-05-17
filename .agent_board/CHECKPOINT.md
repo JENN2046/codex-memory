@@ -13,7 +13,7 @@ P8 memory-governance / P56 governance review, approval, and audit executable loo
 - Last pushed baseline: `1ae4286 test: harden no-touch redaction regressions` on `origin/main`.
 - Local `main` is ahead of `origin/main`; push is not authorized.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
-- P56-T2 governance loop explicit-input helper is implemented and validated locally; guarded local commit is pending.
+- P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -54,4 +54,4 @@ P8 memory-governance / P56 governance review, approval, and audit executable loo
 
 ## Next Safe Step
 
-Guarded local P56-T2 commit, then post-commit board reconciliation. After that, route to P57-T1 recall isolation runtime proof boundary inventory only if it remains synthetic/runtime-test-harness planning first.
+Finish the P56-T2 post-commit board reconciliation commit. After that, route to P57-T1 recall isolation runtime proof boundary inventory only if it remains synthetic/runtime-test-harness planning first.
