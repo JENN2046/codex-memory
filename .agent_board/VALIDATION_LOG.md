@@ -545,6 +545,7 @@ FAILED
 | CMV-0500 | P62-post-T6-board-status-reconciliation | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; stale/overclaim scan | Reconciles compact status/plan/backlog and board handoff/checkpoint/run-state after P62 post-T6 audit refinement commits while preserving blocked runtime/A5 posture. |
 | CMV-0501 | P62-completion-audit-post-T6-closeout-wording | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; P62 audit stale/overclaim scan | Updates the P62 completion audit current result to post-T6 audit/refinement closeout wording while preserving blocked runtime/A5 posture. |
 | CMV-0502 | P51-P62-runtime-a5-blocker-register-reconciliation | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; blocker/overclaim scan | Records the current P51-P62 runtime completion boundary in `BLOCKERS.md` with 9 runtime gaps and 16 A5 hard stops while preserving blocked runtime/A5 posture. |
+| CMV-0503 | P51-P62-completion-boundary-commander-decision | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; decision/overclaim scan | Records the commander decision that P51-P62 is local evidence/preflight/audit complete only while preserving blocked runtime/A5 posture. |
 
 ## Common Validation Commands
 
