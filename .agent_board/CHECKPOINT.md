@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0281 / P31.2 memory governance lifecycle contract fixture.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0282 / P31.3 memory governance lifecycle contract helper.
 
 ## Current Area
 
-P31.2 synthetic governance lifecycle fixture/test
+P31.3 pure explicit-input governance lifecycle helper
 
 ## Current Status
 
@@ -56,7 +56,8 @@ P31.2 synthetic governance lifecycle fixture/test
 - CM-0278/CM-0278A are committed locally in `8f01654`; no push is authorized.
 - CM-0279 adds `docs/P31_MEMORY_GOVERNANCE_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to open memory governance only as docs/fixture-first inventory. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, and governance reference scan. Read-only Verifier first pass found stale pushed-baseline wording only; rerun passed. CM-0279 is committed locally in `2d5144a`.
 - CM-0280 adds `docs/P31_1_MEMORY_GOVERNANCE_FIXTURE_CONTRACT_REVIEW.md` and updates status/plan/backlog/board to identify the smallest next fixture gap as a synthetic `memory-governance-lifecycle-contract-v1` fixture/test. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, governance fixture contract reference scan, and read-only Verifier `PASS`. CM-0280 is committed locally in `042d06c`.
-- CM-0281 adds `tests/fixtures/memory-governance-lifecycle-contract-v1.json` and `tests/memory-governance-lifecycle-contract-fixture.test.js`, locking proposal accept/reject, supersession deferred, tombstone deferred, validate_memory internal-only, mutation audit, approval posture, safe source types, public MCP freeze, no-side-effect safety, and `NOT_READY_BLOCKED`. Validation passed: syntax check, targeted fixture test `15/15`, `npm test` `633/633`, `git diff --check`, docs validation, governance lifecycle contract reference scan, and read-only Verifier `PASS`. Commit is pending.
+- CM-0281 adds `tests/fixtures/memory-governance-lifecycle-contract-v1.json` and `tests/memory-governance-lifecycle-contract-fixture.test.js`, locking proposal accept/reject, supersession deferred, tombstone deferred, validate_memory internal-only, mutation audit, approval posture, safe source types, public MCP freeze, no-side-effect safety, and `NOT_READY_BLOCKED`. Validation passed: syntax check, targeted fixture test `15/15`, `npm test` `633/633`, `git diff --check`, docs validation, governance lifecycle contract reference scan, and read-only Verifier `PASS`. CM-0281 is committed locally in `efbd232`.
+- CM-0282 adds `src/core/MemoryGovernanceLifecycleContract.js` and `tests/memory-governance-lifecycle-contract-helper.test.js`, a pure explicit-input helper over caller-provided governance lifecycle contract objects. Validation passed so far: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `641/641`, `git diff --check`, and docs validation. Verifier/commit are pending.
 - Commander direction remains constrained: P31/P31.1 may review proposal/supersession/tombstone/validation/audit/approval fixture boundaries only; durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch

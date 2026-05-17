@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0281 / P31.2 memory governance lifecycle contract fixture.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0282 / P31.3 memory governance lifecycle contract helper.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0281 fixture/test/status/board updates. Local `main` is ahead of `origin/main` by four local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0282 source/test/status/board updates. Local `main` is ahead of `origin/main` by five local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P31.2 synthetic governance lifecycle fixture/test
+P31.3 pure explicit-input governance lifecycle helper
 
 ## Findings
 
@@ -84,8 +84,9 @@ P31.2 synthetic governance lifecycle fixture/test
 - CM-0278/CM-0278A are committed locally in `8f01654`; no push is authorized.
 - CM-0279 adds P31 memory governance safe-scope inventory docs and routes the next safe phase to P31.1 fixture contract review. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, and governance reference scan. Read-only Verifier first pass found stale pushed-baseline wording only; rerun passed. CM-0279 is committed locally in `2d5144a`.
 - CM-0280 adds P31.1 memory governance fixture contract review docs and routes the next safe phase to P31.2 synthetic lifecycle fixture contract. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, governance fixture contract reference scan, and read-only Verifier `PASS`. CM-0280 is committed locally in `042d06c`.
-- CM-0281 adds P31.2 governance lifecycle contract fixture/test. Validation passed: syntax check, targeted fixture test `15/15`, `npm test` `633/633`, `git diff --check`, docs validation, governance lifecycle contract reference scan, and read-only Verifier `PASS`. Commit is pending.
-- Next safe step: create guarded local commit if eligible, then continue to CM-0282/P31.3 helper candidate. No further push is authorized.
+- CM-0281 adds P31.2 governance lifecycle contract fixture/test. Validation passed: syntax check, targeted fixture test `15/15`, `npm test` `633/633`, `git diff --check`, docs validation, governance lifecycle contract reference scan, and read-only Verifier `PASS`. CM-0281 is committed locally in `efbd232`.
+- CM-0282 adds P31.3 pure explicit-input governance lifecycle helper and focused tests. Validation passed so far: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `641/641`, `git diff --check`, and docs validation. Verifier/commit are pending.
+- Next safe step: complete CM-0282 docs validation, run read-only Verifier, create guarded local commit if eligible, then continue to CM-0283/P31.4 ValidationAggregator governance evidence shape. No further push is authorized.
 
 ## Changed Files
 
