@@ -936,3 +936,16 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Commit: eligible for guarded local commit; push remains user-directed and not authorized for this cycle.
 - Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
 - A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0267 - P29 Post-CM-0266 Board Reconciliation
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only reconciliation after guarded local commit `a223d4b`.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board now records P29.4 aggregator evidence commit `a223d4b` and local ahead count `6`; push remains centrally directed by user and is not authorized.
+- Validation: `git status -sb`; `git log --oneline --decorate -n 7`; `git diff --check`; board diff inspection.
+- Commit: eligible for guarded local commit.
+- Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
+- A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.

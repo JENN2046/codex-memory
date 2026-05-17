@@ -1377,3 +1377,29 @@ Remaining risks: schema/version runtime enforcement still required; evaluation r
 Result: ValidationAggregator now records `evaluationReportAvailable=true`, `evaluationReportExecuted=false`, `evaluationReportReadsFiles=false`, `evaluationReportMutatesInput=false`, and malformed-case fail-closed evidence.
 
 Next safe step: guarded local commit for CM-0266, then CM-0267 next safe P29 boundary slice if no hard stop appears. Push remains unauthorized.
+
+## CM-0267 Commander Handoff - Post-CM-0266 Board Reconciliation
+
+Goal: record guarded local commit `a223d4b` and keep the P29 board state current before selecting the next safe local slice.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for board reconciliation after CM-0266 commit; no push is authorized.
+
+Current area: `P29-post-CM-0266-board-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git status -sb`; `git log --oneline --decorate -n 7`; `git diff --check`; board diff inspection.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0267.
+
+Remaining risks: schema/version runtime enforcement still required; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; push remains centrally directed by user.
+
+Result: board records CM-0266 commit `a223d4b` and local ahead count `6`.
+
+Next safe step: guarded local commit for CM-0267, then CM-0268 next safe P29 boundary slice if no hard stop appears. Push remains unauthorized.
