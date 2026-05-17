@@ -5,11 +5,11 @@
 ## 当前结论
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
-- 当前远端基线：`origin/main` = `d210947 fix: redact governance helper output`。
-- 当前本地基线：`main` 在 `origin/main` 之后已有本地提交 `83bd388`、`9d3ab69`、`b9965f7`、`280ab9b`、`c06436d`、`4d8d11a`、`3d774ad`、`8220d64`、`29858e6`、`c8325b6`。
-- 最新本地完成：P35.1 governed memory policy gate fixture contract 已提交在 `c8325b6`。P35.1 只添加 synthetic fixture/test，不实现 runtime policy gate。
+- 当前远端基线：`origin/main` = `3e3f76d fix: harden local http and governance redaction`。
+- 当前本地基线：`main` 与 `origin/main` 同步，当前 P36-T1 变更尚未提交。
+- 最新已推送完成：P35.1 governed memory policy gate fixture contract、P35 post-push board reconciliation、P35 security hardening 均已推送到 `3e3f76d`。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：post-CM0305 board reconciliation。按用户指示，暂不开启 P35.2 下一轮。
+- 当前任务：P36-T1 Scope + A5 Boundary Contract，本地 fixture-only / dry-run-only 边界合同切片。
 
 ## 当前阻塞
 
@@ -21,9 +21,9 @@
 
 ## 当前优先级
 
-1. 完成 post-CM0305 board reconciliation，保持 docs/board only。
-2. 暂停在 P35.2 explicit-input helper 候选之前，等待用户恢复长期目标循环。
-3. 继续 P35+ governed memory spine queue，fixture-first/read-only 优先。
+1. 完成 P36-T1 scope metadata / A5 deny list / public MCP freeze / fail-closed fixture contract。
+2. 继续 P36-T2 task risk labels contract，保持 machine-readable、fail-closed、fixture-only。
+3. P37 前不得让 policy decisions、validation transcripts、redaction samples 或 governance records 进入普通 recall namespace。
 
 ## 主要事实源
 

@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "p36-scope-a5-boundary-contract-v1",
+  "version": "v1",
+  "phase": "P36-T1-scope-a5-boundary-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "runtimeIntegrated": false,
+  "policyKernelImplemented": false,
+  "publicMcpExpanded": false,
+  "realMemoryContentRead": false,
+  "mutated": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "scopeContract": {
+    "requiredMetadata": [
+      "client",
+      "project",
+      "workspace",
+      "memory_kind",
+      "governance_record_kind",
+      "source"
+    ],
+    "denyByDefault": true,
+    "defaultToGlobalAllowed": false,
+    "unknownMetadataDisposition": "deny",
+    "missingMetadataDisposition": "deny",
+    "ambiguousMetadataDisposition": "deny",
+    "unparsableMetadataDisposition": "deny",
+    "normalUserRecallNamespaces": [
+      "user_memory",
+      "project_memory",
+      "task_memory"
+    ],
+    "governanceNamespaces": [
+      "governance_records",
+      "validation_transcripts",
+      "redaction_samples",
+      "policy_decisions"
+    ],
+    "governanceNamespacesEnterNormalRecall": false
+  },
+  "riskLabels": [
+    {
+      "id": "A4-local-safe",
+      "description": "Local, reversible, fixture-only or docs/test work with no durable runtime state mutation.",
+      "allowsFixtureOnlyWork": true,
+      "allowsDryRunOnlyWork": true,
+      "allowsRealMemoryContentRead": false,
+      "allowsPublicMcpExpansion": false
+    },
+    {
+      "id": "A4.8-guarded",
+      "description": "Guarded local work that requires explicit validation evidence and board reconciliation.",
+      "allowsFixtureOnlyWork": true,
+      "allowsDryRunOnlyWork": true,
+      "allowsRealMemoryContentRead": false,
+      "allowsPublicMcpExpansion": false
+    },
+    {
+      "id": "A5-hard-stop",
+      "description": "Requires separate explicit human approval before any execution.",
+      "allowsFixtureOnlyWork": false,
+      "allowsDryRunOnlyWork": false,
+      "allowsRealMemoryContentRead": false,
+      "allowsPublicMcpExpansion": false
+    }
+  ],
+  "unknownRiskLabelDisposition": "A5-hard-stop",
+  "a5DenyList": [
+    "real_memory_content_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "backup",
+    "restore",
+    "provider_call",
+    "model_call",
+    "public_mcp_tool_expansion",
+    "public_mcp_schema_expansion",
+    "env_or_secret_edit",
+    "watchdog_install_or_config_switch",
+    "dependency_change",
+    "durable_memory_write",
+    "durable_audit_write",
+    "push_tag_release_deploy"
+  ],
+  "failClosedCases": [
+    {
+      "id": "unknown_scope_metadata",
+      "input": "scope.client=unknown",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_UNKNOWN_SCOPE_METADATA"
+    },
+    {
+      "id": "missing_scope_metadata",
+      "input": "scope.project missing",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_MISSING_SCOPE_METADATA"
+    },
+    {
+      "id": "ambiguous_scope_metadata",
+      "input": "scope.workspace has conflicting values",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_AMBIGUOUS_SCOPE_METADATA"
+    },
+    {
+      "id": "unparsable_scope_metadata",
+      "input": "scope source is malformed",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_UNPARSABLE_SCOPE_METADATA"
+    },
+    {
+      "id": "unknown_risk_label",
+      "input": "risk_label=unknown",
+      "decision": "A5-hard-stop",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_UNKNOWN_RISK_LABEL"
+    },
+    {
+      "id": "critical_gate_skipped",
+      "input": "critical gate skipped",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_CRITICAL_GATE_SKIPPED"
+    },
+    {
+      "id": "warning_only_gate",
+      "input": "gate emits warning only",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_WARNING_ONLY_GATE"
+    },
+    {
+      "id": "dry_run_real_memory_content_read",
+      "input": "dry-run reads real memory content",
+      "decision": "A5-hard-stop",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_DRY_RUN_REAL_MEMORY_READ_BLOCKED"
+    },
+    {
+      "id": "public_mcp_expansion_attempt",
+      "input": "new public MCP governance tool",
+      "decision": "A5-hard-stop",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_PUBLIC_MCP_EXPANSION_BLOCKED"
+    },
+    {
+      "id": "governance_record_normal_recall_namespace",
+      "input": "policy decision enters user_memory namespace",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P36_GOVERNANCE_RECALL_POLLUTION_BLOCKED"
+    }
+  ],
+  "safety": {
+    "noRuntimePolicyKernel": true,
+    "noCommandExecution": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryContentRead": true,
+    "noRealMemoryPreview": true,
+    "noRealMemoryExport": true,
+    "noRealMemoryImport": true,
+    "noRealMemoryScan": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "structureLeakageApproved": false
+  },
+  "requiredWording": [
+    "P36-T1 is a synthetic fixture contract only.",
+    "Unknown, missing, ambiguous, or unparsable governance metadata must fail closed.",
+    "Dry-run does not authorize touching real memory content.",
+    "Public MCP tools remain frozen at record_memory, search_memory, and memory_overview.",
+    "Governance records, validation transcripts, redaction samples, and policy decisions must not enter normal user recall namespaces.",
+    "Readiness means local evidence report only, not operational cutover."
+  ],
+  "forbiddenClaims": [
+    "runtime policy kernel is implemented",
+    "fixture passing means runtime-ready",
+    "dry-run may read real memory content",
+    "warning-only gate is acceptable",
+    "unknown scope defaults to global",
+    "public MCP expansion is approved",
+    "readiness implies mainline cutover"
+  ],
+  "next": "P36-T2-risk-label-contract"
+}

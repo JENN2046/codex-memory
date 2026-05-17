@@ -8,9 +8,9 @@ This active plan is the short routing document for the current P28-P40 Governed 
 
 ## Current Direction
 
-1. Keep reducing stale context pollution in active docs.
-2. Continue P35 governed memory spine policy gate work with small local, reversible, fixture-first/read-only slices.
-3. Preserve all runtime, durable-write, public MCP, provider, migration/import-export, release, and deploy blockers.
+1. Execute P36 Scope And A5 Boundary Contract before any policy decision kernel or recall isolation work.
+2. Keep P36-P40 local, fixture-only, dry-run-only unless a task explicitly states otherwise.
+3. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
 
@@ -23,15 +23,16 @@ This active plan is the short routing document for the current P28-P40 Governed 
 - P34.x closeout: governance review surface safe-scope chain closed locally in `8220d64`.
 - P35 planning: governed memory spine policy gate plan committed locally in `29858e6`.
 - P35.1 fixture contract: governed memory policy gate fixture/test committed locally in `c8325b6`.
+- P35 security hardening and push reconciliation: remote/local baseline is `3e3f76d`.
 
 ## Current Task
 
-Post-CM0305 board reconciliation:
+P36-T1 Scope + A5 Boundary Contract:
 
-- Keep active board/status files aligned with `c8325b6`.
-- Do not start P35.2 until the user resumes the long-running execution loop.
+- Establish scope metadata, A5 deny list, governance namespace isolation, public MCP freeze, and fail-closed fixture cases.
 - Keep `decision=NOT_READY_BLOCKED`.
-- Do not implement runtime policy enforcement.
+- Do not implement runtime policy enforcement or a runtime policy kernel.
+- Do not let governance records, validation transcripts, redaction samples, or policy decisions enter normal user recall namespaces.
 - Do not approve governed actions or write durable state.
 
 ## Boundaries
@@ -44,9 +45,12 @@ Post-CM0305 board reconciliation:
 - Do not run provider/model calls.
 - Do not apply migration/import/export/backup/restore.
 - Do not push/tag/release/deploy without explicit user instruction.
+- Critical gate skipped/unknown equals failure.
+- Dry-run means synthetic fixtures or sanitized metadata only; it does not authorize touching real memory content.
+- Readiness means local evidence report only, not operational cutover.
 
 ## Next Candidate
 
-When the user resumes the long-running loop, Commander may choose:
+After P36-T1 validation, Commander may choose:
 
-- `P35.2-governed-memory-policy-gate-explicit-input-helper-candidate`, only if it remains pure explicit-input helper work with no runtime side effects.
+- `P36-T2-task-risk-labels-contract`, only if it remains machine-readable, fixture-only, fail-closed, and does not alter public MCP or runtime behavior.
