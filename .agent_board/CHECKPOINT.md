@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0285 / P32 memory governance approval-packet safe-scope inventory.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0286 / P32.1 memory governance approval-packet fixture contract.
 
 ## Current Area
 
-P32 docs/status/board inventory
+P32.1 fixture/test contract
 
 ## Current Status
 
@@ -60,8 +60,9 @@ P32 docs/status/board inventory
 - CM-0282 adds `src/core/MemoryGovernanceLifecycleContract.js` and `tests/memory-governance-lifecycle-contract-helper.test.js`, a pure explicit-input helper over caller-provided governance lifecycle contract objects. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `641/641`, `git diff --check`, docs validation, and read-only Verifier `PASS`. CM-0282 is committed locally in `e9e9bdb`.
 - CM-0283 adds static ValidationAggregator report-shape evidence for the P31.3 governance lifecycle helper in `src/core/ValidationAggregatorService.js`, `tests/fixtures/v1-rc-validation-aggregator-v1.json`, and aggregator tests. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator/governance tests `44/44`, `npm test` `641/641`, `git diff --check`, docs validation, and read-only Verifier `PASS`. CM-0283 is committed locally in `a7b3ffa`.
 - CM-0284 adds `docs/P31_MEMORY_GOVERNANCE_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P31 only as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence. Validation passed: `git diff --check`, docs validation, P31 reference scan, and read-only Verifier `PASS`. CM-0284 is committed locally in `968e742`.
-- CM-0285 adds `docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to define future approval packet requirements for governed memory actions without approving or executing them. Validation passed: `git diff --check`, docs validation, P32 governance approval reference scan, and read-only Verifier `PASS`. Guarded local commit is pending.
-- Commander direction remains constrained: P32 may inventory approval-packet requirements only; durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0285 adds `docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to define future approval packet requirements for governed memory actions without approving or executing them. Validation passed: `git diff --check`, docs validation, P32 governance approval reference scan, and read-only Verifier `PASS`. CM-0285 is committed locally in `b5dafcb`.
+- CM-0286 adds `tests/fixtures/memory-governance-approval-packet-v1.json` and `tests/memory-governance-approval-packet-fixture.test.js` to lock the P32 approval-packet contract with synthetic fixture evidence only. Validation passed: test syntax check, targeted fixture test `14/14`, `npm test` `655/655`, `git diff --check`, docs validation, P32.1 reference scan, and read-only Verifier rerun `PASS`. Guarded local commit is pending.
+- Commander direction remains constrained: P32.1 may validate fixture/test shape only; durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 

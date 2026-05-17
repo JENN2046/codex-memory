@@ -1,0 +1,297 @@
+{
+  "schemaVersion": "memory-governance-approval-packet-v1",
+  "version": "v1",
+  "phase": "P32.1-memory-governance-approval-packet-fixture-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "reviewOnly": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "approvalStatus": "BLOCKED_PENDING_APPROVAL",
+  "executionApproved": false,
+  "mutated": false,
+  "runtimeIntegrated": false,
+  "publicMcpExpanded": false,
+  "realMemoryScanned": false,
+  "providerCalls": 0,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "safeSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "explicit_input",
+    "static_report_shape",
+    "local_git_status",
+    "local_validation_summary"
+  ],
+  "acceptedSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "explicit_input",
+    "static_report_shape",
+    "local_git_status",
+    "local_validation_summary"
+  ],
+  "unsupportedSourceTypes": [],
+  "acceptedForPlanning": true,
+  "requiredPacketFields": [
+    "phaseId",
+    "objective",
+    "governedAction",
+    "actionOwner",
+    "approvalOwner",
+    "targetSurfaces",
+    "sourceEvidence",
+    "sourceType",
+    "redactionPolicy",
+    "lifecycleTransition",
+    "auditEventFamily",
+    "publicMcpImpact",
+    "durableWriteSurfaces",
+    "backupRequirement",
+    "rollbackPath",
+    "validationCommands",
+    "stopConditions",
+    "approvalScopeStatement"
+  ],
+  "governedActions": [
+    {
+      "id": "proposal_accept",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "proposalId",
+        "source",
+        "scope",
+        "fromStatus",
+        "toStatus",
+        "actor",
+        "reason",
+        "auditEvent",
+        "rollbackPath"
+      ],
+      "executionApproved": false,
+      "mutated": false
+    },
+    {
+      "id": "proposal_reject",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "proposalId",
+        "source",
+        "reason",
+        "auditEvent",
+        "redactionRules",
+        "reviewerIdentityPolicy"
+      ],
+      "executionApproved": false,
+      "mutated": false
+    },
+    {
+      "id": "supersession_apply",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "oldMemoryId",
+        "newMemoryId",
+        "supersedesLink",
+        "supersededByLink",
+        "visibilityPreservation",
+        "conflictPolicy",
+        "rollbackPath"
+      ],
+      "executionApproved": false,
+      "mutated": false
+    },
+    {
+      "id": "tombstone_apply",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "targetId",
+        "softDeletePolicy",
+        "hardDeleteProhibition",
+        "readVisibilityRule",
+        "restorationPath"
+      ],
+      "executionApproved": false,
+      "hardDeleteAllowed": false,
+      "mutated": false
+    },
+    {
+      "id": "validate_memory_internal_apply",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "internalOnlyScope",
+        "evidenceSource",
+        "resultPolicy",
+        "auditEvent",
+        "publicMcpExpansion"
+      ],
+      "publicMcpTool": false,
+      "executionApproved": false,
+      "mutated": false
+    },
+    {
+      "id": "governance_audit_write",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "eventType",
+        "targetIds",
+        "actorPolicy",
+        "reason",
+        "redactionPolicy",
+        "storageTarget",
+        "verification"
+      ],
+      "executionApproved": false,
+      "mutated": false
+    },
+    {
+      "id": "governance_report_write",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "outputPath",
+        "contentPolicy",
+        "secretRedaction",
+        "workspaceRedaction",
+        "retention",
+        "cleanup"
+      ],
+      "executionApproved": false,
+      "mutated": false
+    },
+    {
+      "id": "public_mcp_governance_expansion",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "toolSchemaProposal",
+        "compatibilityReview",
+        "strictGate",
+        "rollbackPath",
+        "clientImpact"
+      ],
+      "executionApproved": false,
+      "publicMcpExpanded": false
+    },
+    {
+      "id": "real_memory_governance_preview",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "readSurfaces",
+        "maximumRecords",
+        "redaction",
+        "outputPath",
+        "mutatedFalseValidation"
+      ],
+      "executionApproved": false,
+      "realMemoryScanned": false
+    },
+    {
+      "id": "backup_before_governance_apply",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "exactFiles",
+        "outputDirectory",
+        "manifest",
+        "checksum",
+        "retention",
+        "cleanup"
+      ],
+      "executionApproved": false,
+      "backupCreated": false
+    },
+    {
+      "id": "restore_after_governance_apply",
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "requiresExplicitApproval": true,
+      "requiredFields": [
+        "targetFiles",
+        "serviceIsolation",
+        "verifiedBackup",
+        "overwriteConfirmation",
+        "postRestoreChecks"
+      ],
+      "executionApproved": false,
+      "restorePerformed": false
+    }
+  ],
+  "requiredApprovals": [
+    "proposal_accept",
+    "proposal_reject",
+    "supersession_apply",
+    "tombstone_apply",
+    "validate_memory_internal_apply",
+    "governance_audit_write",
+    "governance_report_write",
+    "public_mcp_governance_expansion",
+    "real_memory_governance_preview",
+    "backup_before_governance_apply",
+    "restore_after_governance_apply",
+    "provider_service_config_action",
+    "push_tag_release_deploy"
+  ],
+  "blockers": [
+    "runtime_governance_integration_not_implemented",
+    "durable_mutation_not_approved",
+    "public_mcp_governance_expansion_not_approved",
+    "real_memory_scan_blocked",
+    "migration_import_export_apply_blocked",
+    "backup_restore_blocked",
+    "provider_service_config_action_blocked",
+    "schema_version_runtime_enforcement_incomplete",
+    "validation_aggregator_full_implementation_incomplete",
+    "final_rc_matrix_not_executed",
+    "v1_rc_not_ready_blocked"
+  ],
+  "safety": {
+    "noRuntimeGovernanceIntegration": true,
+    "noDurableMemoryWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryScan": true,
+    "noMigrationImportExportApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noPackageScriptChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false
+  },
+  "requiredWording": [
+    "P32 approval packet inventory does not approve or execute governed actions.",
+    "Each governed action remains BLOCKED_PENDING_APPROVAL until separately and explicitly approved.",
+    "Public MCP tools remain frozen at record_memory, search_memory, and memory_overview.",
+    "validate_memory remains internal-only.",
+    "v1.0 RC remains NOT_READY_BLOCKED."
+  ],
+  "forbiddenClaims": [
+    "runtime governance integration is implemented",
+    "durable governance mutation is approved",
+    "public MCP governance expansion is approved",
+    "real memory governance preview is complete",
+    "backup/restore is verified",
+    "v1.0 RC readiness is unblocked"
+  ],
+  "evidenceSources": [
+    "docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_SAFE_SCOPE_INVENTORY.md",
+    "docs/P31_MEMORY_GOVERNANCE_CLOSEOUT_REVIEW.md",
+    "tests/fixtures/memory-governance-lifecycle-contract-v1.json",
+    "docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md"
+  ],
+  "next": "P32.2-memory-governance-approval-packet-helper-candidate"
+}
