@@ -11,7 +11,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
-- Local baseline: local `main` is ahead of `origin/main = 1ae4286` by `8` commits through `0a5016d`; push is not authorized.
+- Local baseline: local `main` contains P51-P53 local commits and is ahead of `origin/main = 1ae4286`; use `git log --oneline --decorate -n 10` for the exact current HEAD; push is not authorized.
 - Current active program: P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 - Current phase area: P53 ValidationAggregator evidence inventory, posture bridge, and explicit evidence classification hardening. Evidence-first / fail-closed / reversible boundaries preserved.
 
