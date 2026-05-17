@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0296 / post-CM-0295 board reconciliation before P34.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0297 / P34 governance review surface safe-scope inventory.
 
 ## Current Area
 
-P0 mainline health board reconciliation
+P8 memory governance review surface inventory
 
 ## Current Status
 
@@ -72,7 +72,9 @@ P0 mainline health board reconciliation
 - CM-0294 adds `docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P33 only as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence. Validation passed: `git diff --check`, docs validation, P33.x boundary reference scan, and read-only Verifier rerun `PASS`. CM-0294 was committed and pushed as `dca5f6a` by explicit user instruction.
 - CM-0295 hardens P31/P32/P33 governance helper normalized output redaction. Validation passed: source/test syntax checks, targeted helper tests `29/29`, `npm test` `690/690`, `git diff --check`, docs validation, boundary scan, and read-only Verifier rerun `PASS`. CM-0295 was committed and pushed as `d210947` by explicit user instruction; post-push verification confirmed `HEAD == origin/main`.
 - CM-0296 reconciles board/status state after pushed `d210947`, clearing stale CM-0295 in-progress wording and routing next safe local work to P34. Validation passed: `git diff --check`, docs validation, and board diff inspection.
-- Commander direction remains constrained: CM-0296 may update board/status only; helper runtime integration, fixture reads by aggregator, durable audit writes, durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0296 is committed locally in `83bd388`; no push is authorized.
+- CM-0297 adds P34 governance review surface safe-scope inventory docs/status/board updates. Validation passed: `git diff --check`, docs validation, and P34 boundary reference scan.
+- Commander direction remains constrained: CM-0297 may update docs/status/board only; helper runtime integration, fixture reads by aggregator, durable audit writes, durable mutation, real DB governance review execution, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 

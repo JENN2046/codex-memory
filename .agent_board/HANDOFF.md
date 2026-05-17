@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0296 / post-CM-0295 board reconciliation before P34.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0297 / P34 governance review surface safe-scope inventory.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty only for CM-0296 board/status reconciliation updates. Local `main` is aligned with `origin/main` at `d210947`.
+Dirty for CM-0297 docs/status/board-only updates. Local `main` is ahead of `origin/main` by the guarded local CM-0296 commit `83bd388`.
 
 ## Current Area
 
-P0 mainline health board reconciliation
+P8 memory governance review surface inventory
 
 ## Findings
 
@@ -100,7 +100,9 @@ P0 mainline health board reconciliation
 - CM-0294 adds P33.x closeout docs/status/board updates. Validation passed: `git diff --check`, docs validation, P33.x boundary reference scan, and read-only Verifier rerun `PASS`. CM-0294 was committed and pushed as `dca5f6a` by explicit user instruction.
 - CM-0295 hardens P31/P32/P33 governance helper normalized output redaction. Validation passed: changed source/test syntax checks, targeted helper tests `29/29`, `npm test` `690/690`, `git diff --check`, docs validation, boundary scan, and read-only Verifier rerun `PASS`. CM-0295 was committed and pushed as `d210947` by explicit user instruction; post-push verification confirmed `HEAD == origin/main`.
 - CM-0296 board/status reconciliation clears stale CM-0295 in-progress wording and routes next safe work to P34. Validation passed: `git diff --check`, docs validation, and board diff inspection.
-- Next safe step: guarded local commit if eligible, then enter P34 governance review surface safe-scope inventory. No push is authorized.
+- CM-0296 is committed locally in `83bd388`; no push is authorized.
+- CM-0297 P34 governance review surface safe-scope inventory is complete pending Verifier and commit. It inventories read-only lifecycle / approval-packet / audit-evidence / admin-review / ValidationAggregator evidence only. Validation passed: `git diff --check`, docs validation, and P34 boundary reference scan.
+- Next safe step: run read-only Verifier, guarded local commit if eligible, then enter P34.1 fixture contract if still safe. No push is authorized.
 
 ## Changed Files
 
