@@ -14,7 +14,7 @@ Execute the P41-P45 Evidence-First Gate Spine long-running goal under Commander 
 
 ## Worktree
 
-Clean after CM-0316 local commit `8af5c64`.
+Dirty with intended CM-0317 P44 source/test/fixture/status/board changes only; guarded local commit pending final read-only Verifier.
 
 ## Current Area
 
@@ -27,7 +27,7 @@ P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
 - Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `8af5c64`; latest local docs/status commit: `08597d6`.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: CM-0317 P44-T1 ValidationAggregator P36-P40 Evidence Source Map.
+- Current task: CM-0317 P44-T1 ValidationAggregator P36-P40 Evidence Source Map is completed and validated in the worktree.
 
 ## Validation
 
@@ -36,6 +36,7 @@ P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
 - CM-0314 validation passed and committed locally at `8895816`: `node --check tests\p41-evidence-manifest-contract-fixture.test.js`; targeted fixture test `12/12`; `npm test` `802/802`; docs validation; `git diff --check`; boundary scan; read-only Verifier scope review `PASS`.
 - CM-0315 validation passed: `node --check src\core\EvidenceManifestContract.js`; `node --check tests\evidence-manifest-contract-helper.test.js`; targeted helper/fixture tests `22/22`; `npm test` `812/812`; `git diff --check`; docs validation; boundary scan with only expected hard-stop/history wording plus synthetic redaction-test strings.
 - CM-0316 validation passed: `node --check src\core\RecallMigrationIsolationContract.js`; `node --check tests\recall-migration-isolation-helper.test.js`; targeted helper/P38/P39 fixture tests `30/30`; `npm test` `822/822`; `git diff --check`; docs validation; boundary scan with only expected hard-stop/history wording plus synthetic redaction/static-boundary test strings.
+- CM-0317 validation passed: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; `node --check tests\v1-rc-validation-aggregator-cli.test.js`; fixture JSON parse; targeted aggregator tests `36/36`; `npm test` `824/824`; `git diff --check`; docs validation; P44 boundary scan with only expected unsafe explicit-input rejection fixtures.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -52,4 +53,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Continue to CM-0317 / P44-T1. Keep it report-shape only: no fixture reads, helper execution, gate/runner execution, live MCP refresh, provider call, or runtime-ready claim. Push remains blocked unless explicitly requested.
+Run read-only Verifier for CM-0317, then guarded local commit if PASS. Next safe task after commit is P45 fixture-only final RC matrix evaluator skeleton. Push remains blocked unless explicitly requested.

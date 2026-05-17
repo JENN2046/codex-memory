@@ -29,14 +29,15 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 - P41-T2 evidence manifest contract fixture: complete locally in `8895816`.
 - P42-T1 explicit-input evidence helper: complete locally in `169f5bc`.
 - P43-T1 recall/migration isolation explicit-input helper: complete locally in `8af5c64`.
+- P44-T1 ValidationAggregator P36-P40 evidence source map: complete and validated in the worktree; guarded local commit pending Verifier.
 
 ## Current Task
 
-P44-T1 ValidationAggregator P36-P40 Evidence Source Map:
+P44-T1 ValidationAggregator P36-P40 Evidence Source Map closeout:
 
-- Add ValidationAggregator report-shape evidence map for P36-P40 explicit evidence posture only.
+- Run read-only Verifier and guarded local commit for the completed ValidationAggregator report-shape evidence map.
 - Keep v1.0 RC `NOT_READY_BLOCKED`.
-- Distinguish local evidence report posture from runtime ready, final RC matrix ready, push/release/deploy/config/watchdog ready.
+- Keep local evidence posture scoped/report-only; no unqualified ready=true field.
 - Do not read fixtures, execute helpers/gates/runners, refresh live MCP, call providers, or claim runtime readiness.
 
 ## Boundaries
@@ -56,6 +57,6 @@ P44-T1 ValidationAggregator P36-P40 Evidence Source Map:
 
 ## Next Candidate
 
-After P44-T1:
+After P44-T1 commit:
 
-- Continue to P45 fixture-only final RC matrix evaluator skeleton after P44-T1 is scoped, validated, and committed locally.
+- Continue to P45 fixture-only final RC matrix evaluator skeleton.

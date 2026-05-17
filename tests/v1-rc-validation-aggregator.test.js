@@ -124,6 +124,13 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.match(fixture.evidence_sources.memory_governance_audit_evidence_contract_helper.source_ref, /src\/core\/MemoryGovernanceAuditEvidenceContract\.js/);
   assert.equal(fixture.evidence_sources.memory_governance_review_surface_contract_helper.status, 'helper_added_report_shape_only_not_executed');
   assert.match(fixture.evidence_sources.memory_governance_review_surface_contract_helper.source_ref, /src\/core\/MemoryGovernanceReviewSurfaceContract\.js/);
+  assert.equal(fixture.evidence_sources.p36_scope_a5_boundary_contract.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(fixture.evidence_sources.p36_task_risk_labels_contract.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(fixture.evidence_sources.p37_policy_decision_envelope_fixture_matrix.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(fixture.evidence_sources.p38_recall_isolation_fixture.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(fixture.evidence_sources.p39_synthetic_migration_dry_run_contract.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(fixture.evidence_sources.p40_local_readiness_report.status, 'local_evidence_report_added_not_runtime_ready');
+  assert.equal(fixture.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
   assert.equal(fixture.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
   assert.equal(fixture.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(fixture.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
@@ -240,6 +247,30 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.summary.memoryGovernanceReviewSurfaceContractRealMemoryScanned, false);
   assert.equal(fixture.summary.memoryGovernanceReviewSurfaceContractExecutionApproved, false);
   assert.equal(fixture.summary.memoryGovernanceReviewSurfaceContractCanClaimGovernanceReady, false);
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapImplemented, true);
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapAvailable, true);
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapSourceMode, 'static_report_shape_only');
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapReadsFixtures, false);
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapExecutesHelpers, false);
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapExecutesGates, false);
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapExecutesRunners, false);
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapRefreshesLiveMcp, false);
+  assert.equal(fixture.summary.p36P40EvidenceSourceMapCallsProviders, false);
+  assert.equal(fixture.summary.p36P40LocalEvidenceReportAvailable, true);
+  assert.equal(fixture.summary.p36P40LocalEvidenceReportReadyClaim, false);
+  assert.equal(fixture.summary.p36P40RuntimeReady, false);
+  assert.equal(fixture.summary.p36P40FinalRcMatrixReady, false);
+  assert.equal(fixture.summary.p36P40CanClaimV1RcReady, false);
+  assert.equal(fixture.summary.localEvidenceReportReadyClaim, false);
+  assert.equal(fixture.summary.runtimeReady, false);
+  assert.equal(fixture.summary.mainlineCutoverReady, false);
+  assert.equal(fixture.summary.finalRcMatrixReady, false);
+  assert.equal(fixture.summary.pushReady, false);
+  assert.equal(fixture.summary.releaseReady, false);
+  assert.equal(fixture.summary.deployReady, false);
+  assert.equal(fixture.summary.configSwitchReady, false);
+  assert.equal(fixture.summary.watchdogReady, false);
+  assert.equal(fixture.summary.rcReady, false);
   assert.equal(fixture.summary.productionDeployPerformed, false);
   assert.equal(fixture.summary.startupWatchdogInstalled, false);
   assert.equal(fixture.summary.codexClaudeConfigSwitched, false);
@@ -503,6 +534,62 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p34MemoryGovernanceReviewSurfaceContractHelper.canClaimGovernanceRuntimeReady, false);
   assert.equal(fixture.evidence.p34MemoryGovernanceReviewSurfaceContractHelper.canClaimV1RcReady, false);
   assert.equal(fixture.evidence.p34MemoryGovernanceReviewSurfaceContractHelper.a5GatedBlockersVisible, true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.status, 'static_report_shape_added_not_executed');
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.sourceMode, 'static_report_shape_only');
+  assert.deepEqual(fixture.evidence.p36P40EvidenceSourceMap.phasesCovered, [
+    'P36-T1',
+    'P36-T2',
+    'P37-T1',
+    'P38',
+    'P39',
+    'P40'
+  ]);
+  assert.deepEqual(fixture.evidence.p36P40EvidenceSourceMap.sources.map(source => source.id), [
+    'p36_scope_a5_boundary',
+    'p36_task_risk_labels',
+    'p37_policy_decision_envelope',
+    'p38_recall_isolation',
+    'p39_synthetic_migration_dry_run',
+    'p40_local_readiness_report'
+  ]);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.sources.every(source => source.source_type === 'committed_fixture'), true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.sources.every(source => source.acceptedForPlanning === false), true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.sources.every(source => source.fixtureReadByAggregator === false), true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.sources.every(source => source.testExecutedByAggregator === false), true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.localEvidenceReportAvailable, true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.localEvidenceReportReadyClaim, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.runtimeReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.finalRcMatrixReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.pushReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.releaseReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.deployReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.configSwitchReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.watchdogReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.rcReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.readsFixtures, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.executesHelpers, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.executesGates, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.executesRunners, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.refreshesLiveMcp, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.callsProviders, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.scansRealMemory, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.readsRuntimeStores, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.realMemoryContentRead, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.realMemoryPreviewed, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.dryRunRepresentsRealMemory, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.dryRunAuthorizesApply, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.migrationApplied, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.backupCreated, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.restorePerformed, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.warningOnlyEqualsFailure, true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.criticalSkippedEqualsFailure, true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.criticalUnknownEqualsFailure, true);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.durableMemoryTouched, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.durableAuditWritten, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.publicMcpExpanded, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.canClaimRuntimeReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.canClaimFinalRcReady, false);
+  assert.equal(fixture.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.status, 'no_explicit_validation_evidence');
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.implemented, true);
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.fullImplementation, false);
@@ -581,6 +668,9 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   assert.equal(fixture.checks.memoryGovernanceReviewSurfaceContractHelper.status, 'helper_added_report_shape_only_not_executed');
   assert.equal(fixture.checks.memoryGovernanceReviewSurfaceContractHelper.a4Safe, true);
   assert.equal(fixture.checks.memoryGovernanceReviewSurfaceContractHelper.blocksV1Rc, undefined);
+  assert.equal(fixture.checks.p36P40EvidenceSourceMap.status, 'static_report_shape_added_not_executed');
+  assert.equal(fixture.checks.p36P40EvidenceSourceMap.a4Safe, true);
+  assert.equal(fixture.checks.p36P40EvidenceSourceMap.blocksV1Rc, undefined);
   assert.equal(fixture.checks.validationAggregatorExecutable.status, 'planned_not_implemented');
   assert.equal(fixture.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
 
@@ -608,6 +698,7 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   assert.equal(fixture.a4_safe.includes('memoryGovernanceApprovalPacketContractHelper'), true);
   assert.equal(fixture.a4_safe.includes('memoryGovernanceAuditEvidenceContractHelper'), true);
   assert.equal(fixture.a4_safe.includes('memoryGovernanceReviewSurfaceContractHelper'), true);
+  assert.equal(fixture.a4_safe.includes('p36P40EvidenceSourceMap'), true);
   assert.equal(fixture.a5_gated.includes('providerExecution'), true);
   assert.equal(fixture.runtime_required.includes('validationAggregatorExecutable'), true);
   assert.equal(fixture.conditional_live.includes('health'), true);

@@ -1,6 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const Module = require('node:module');
 const path = require('node:path');
 
 const {
@@ -146,6 +147,30 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.memoryGovernanceReviewSurfaceContractRealMemoryScanned, false);
   assert.equal(report.summary.memoryGovernanceReviewSurfaceContractExecutionApproved, false);
   assert.equal(report.summary.memoryGovernanceReviewSurfaceContractCanClaimGovernanceReady, false);
+  assert.equal(report.summary.p36P40EvidenceSourceMapImplemented, true);
+  assert.equal(report.summary.p36P40EvidenceSourceMapAvailable, true);
+  assert.equal(report.summary.p36P40EvidenceSourceMapSourceMode, 'static_report_shape_only');
+  assert.equal(report.summary.p36P40EvidenceSourceMapReadsFixtures, false);
+  assert.equal(report.summary.p36P40EvidenceSourceMapExecutesHelpers, false);
+  assert.equal(report.summary.p36P40EvidenceSourceMapExecutesGates, false);
+  assert.equal(report.summary.p36P40EvidenceSourceMapExecutesRunners, false);
+  assert.equal(report.summary.p36P40EvidenceSourceMapRefreshesLiveMcp, false);
+  assert.equal(report.summary.p36P40EvidenceSourceMapCallsProviders, false);
+  assert.equal(report.summary.p36P40LocalEvidenceReportAvailable, true);
+  assert.equal(report.summary.p36P40LocalEvidenceReportReadyClaim, false);
+  assert.equal(report.summary.p36P40RuntimeReady, false);
+  assert.equal(report.summary.p36P40FinalRcMatrixReady, false);
+  assert.equal(report.summary.p36P40CanClaimV1RcReady, false);
+  assert.equal(report.summary.localEvidenceReportReadyClaim, false);
+  assert.equal(report.summary.runtimeReady, false);
+  assert.equal(report.summary.mainlineCutoverReady, false);
+  assert.equal(report.summary.finalRcMatrixReady, false);
+  assert.equal(report.summary.pushReady, false);
+  assert.equal(report.summary.releaseReady, false);
+  assert.equal(report.summary.deployReady, false);
+  assert.equal(report.summary.configSwitchReady, false);
+  assert.equal(report.summary.watchdogReady, false);
+  assert.equal(report.summary.rcReady, false);
   assert.equal(report.evidence.p25SchemaVersionPolicy.status, 'fixture_contract_added');
   assert.equal(report.evidence.p25SchemaVersionPolicy.fixture, 'tests/fixtures/schema-version-policy-v1.json');
   assert.equal(report.evidence.p25SchemaVersionPolicy.runtimeEnforcementImplemented, false);
@@ -398,6 +423,72 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p34MemoryGovernanceReviewSurfaceContractHelper.canClaimGovernanceRuntimeReady, false);
   assert.equal(report.evidence.p34MemoryGovernanceReviewSurfaceContractHelper.canClaimV1RcReady, false);
   assert.equal(report.evidence.p34MemoryGovernanceReviewSurfaceContractHelper.a5GatedBlockersVisible, true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.sourceMode, 'static_report_shape_only');
+  assert.deepEqual(report.evidence.p36P40EvidenceSourceMap.phasesCovered, [
+    'P36-T1',
+    'P36-T2',
+    'P37-T1',
+    'P38',
+    'P39',
+    'P40'
+  ]);
+  assert.deepEqual(report.evidence.p36P40EvidenceSourceMap.sources.map(source => source.id), [
+    'p36_scope_a5_boundary',
+    'p36_task_risk_labels',
+    'p37_policy_decision_envelope',
+    'p38_recall_isolation',
+    'p39_synthetic_migration_dry_run',
+    'p40_local_readiness_report'
+  ]);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.sources.every(source => source.source_type === 'committed_fixture'), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.sources.every(source => source.sourceMode === 'static_reference_only'), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.sources.every(source => source.acceptedForPlanning === false), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.sources.every(source => source.fixtureReadByAggregator === false), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.sources.every(source => source.testExecutedByAggregator === false), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.sources.every(source => source.helperExecutedByAggregator === false), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.sources.every(source => source.observedFromRuntime === false), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.localEvidenceReportAvailable, true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.localEvidenceReportReadyClaim, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.runtimeReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.mainlineCutoverReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.pushReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.releaseReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.deployReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.configSwitchReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.watchdogReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.rcReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.readsFixtures, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.executesHelpers, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.executesGates, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.executesRunners, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.refreshesLiveMcp, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.callsProviders, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.scansRealMemory, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.readsRuntimeStores, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.realMemoryContentRead, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.realMemoryPreviewed, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.dryRunRepresentsRealMemory, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.dryRunAuthorizesApply, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.migrationApplied, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.backupCreated, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.restorePerformed, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.deniedMigrationSources.includes('real_memory_content'), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.deniedMigrationSources.includes('provider_output'), true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.warningOnlyEqualsFailure, true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.criticalSkippedEqualsFailure, true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.criticalUnknownEqualsFailure, true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.durableMemoryTouched, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.durableAuditWritten, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.publicMcpExpanded, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.helperExecutedByAggregator, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.decisionImpact, 'none_report_only');
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.blockedDecisionRequired, true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
   assert.equal(report.evidence.p28ValidationEvidenceReader.status, 'no_explicit_validation_evidence');
   assert.equal(report.evidence.p28ValidationEvidenceReader.implemented, true);
   assert.equal(report.evidence.p28ValidationEvidenceReader.fullImplementation, false);
@@ -474,6 +565,21 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.match(report.evidence_sources.final_rc_validation_matrix_manifest_helper.source_ref, /src\/core\/FinalRcValidationMatrixManifest\.js/);
   assert.equal(report.evidence_sources.memory_governance_lifecycle_contract_helper.status, 'helper_added_report_shape_only_not_executed');
   assert.match(report.evidence_sources.memory_governance_lifecycle_contract_helper.source_ref, /src\/core\/MemoryGovernanceLifecycleContract\.js/);
+  assert.equal(report.evidence_sources.p36_scope_a5_boundary_contract.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(report.evidence_sources.p36_scope_a5_boundary_contract.source_type, 'committed_fixture');
+  assert.equal(report.evidence_sources.p36_scope_a5_boundary_contract.acceptedForPlanning, false);
+  assert.equal(report.evidence_sources.p36_scope_a5_boundary_contract.fixtureReadByAggregator, false);
+  assert.equal(report.evidence_sources.p36_scope_a5_boundary_contract.testExecutedByAggregator, false);
+  assert.match(report.evidence_sources.p36_scope_a5_boundary_contract.source_ref, /tests\/p36-scope-a5-boundary-contract-fixture\.test\.js/);
+  assert.equal(report.evidence_sources.p36_task_risk_labels_contract.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(report.evidence_sources.p37_policy_decision_envelope_fixture_matrix.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(report.evidence_sources.p38_recall_isolation_fixture.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(report.evidence_sources.p39_synthetic_migration_dry_run_contract.status, 'fixture_contract_added_not_runtime_ready');
+  assert.equal(report.evidence_sources.p40_local_readiness_report.status, 'local_evidence_report_added_not_runtime_ready');
+  assert.equal(report.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence_sources.p36_p40_evidence_source_map.source_type, 'local_validation_summary');
+  assert.equal(report.evidence_sources.p36_p40_evidence_source_map.acceptedForPlanning, false);
+  assert.match(report.evidence_sources.p36_p40_evidence_source_map.source_ref, /ValidationAggregatorService evidence\.p36P40EvidenceSourceMap/);
   assert.equal(report.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
@@ -852,6 +958,9 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.checks.memoryGovernanceReviewSurfaceContractHelper.status, 'helper_added_report_shape_only_not_executed');
   assert.equal(report.checks.memoryGovernanceReviewSurfaceContractHelper.a4Safe, true);
   assert.equal(report.checks.memoryGovernanceReviewSurfaceContractHelper.blocksV1Rc, undefined);
+  assert.equal(report.checks.p36P40EvidenceSourceMap.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.checks.p36P40EvidenceSourceMap.a4Safe, true);
+  assert.equal(report.checks.p36P40EvidenceSourceMap.blocksV1Rc, undefined);
   assert.equal(report.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
   assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), true);
   assert.equal(report.a5_gated.includes('providerExecution'), true);
@@ -867,6 +976,7 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.a4_safe.includes('memoryGovernanceApprovalPacketContractHelper'), true);
   assert.equal(report.a4_safe.includes('memoryGovernanceAuditEvidenceContractHelper'), true);
   assert.equal(report.a4_safe.includes('memoryGovernanceReviewSurfaceContractHelper'), true);
+  assert.equal(report.a4_safe.includes('p36P40EvidenceSourceMap'), true);
   assert.equal(report.conditional_live.includes('health'), true);
 
   for (const key of [
@@ -906,4 +1016,77 @@ test('minimal implementation reports no side effects and no sensitive surfaces',
   }
 
   assertNoSensitiveSurface(report);
+});
+
+test('P44 evidence source map is static report-shape only and does not import or execute helpers', () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'src', 'core', 'ValidationAggregatorService.js'), 'utf8');
+  const report = buildV1RcValidationAggregatorReport();
+
+  assert.equal(source.includes("require('node:fs')"), false);
+  assert.equal(source.includes("require('fs')"), false);
+  assert.equal(source.includes("require('node:child_process')"), false);
+  assert.equal(source.includes("require('child_process')"), false);
+  assert.equal(source.includes("require('./EvidenceManifestContract')"), false);
+  assert.equal(source.includes("require('./RecallMigrationIsolationContract')"), false);
+  assert.equal(source.includes("require('./FinalRcValidationMatrixManifest')"), false);
+  assert.equal(source.includes('readFileSync'), false);
+  assert.equal(source.includes('readdirSync'), false);
+  assert.equal(source.includes('spawnSync'), false);
+  assert.equal(source.includes('execFileSync'), false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.readsFixtures, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.executesHelpers, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.executesGates, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.refreshesLiveMcp, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+});
+
+test('P44 report builder does not touch fs, network, child process, helpers, or runtime modules', () => {
+  const originalLoad = Module._load;
+  const originalFetch = globalThis.fetch;
+  const blockedLoads = [
+    'node:fs',
+    'fs',
+    'node:child_process',
+    'child_process',
+    'node:http',
+    'http',
+    'node:https',
+    'https',
+    './EvidenceManifestContract',
+    './RecallMigrationIsolationContract',
+    './FinalRcValidationMatrixManifest',
+    './MemoryGovernanceLifecycleContract',
+    './MemoryGovernanceApprovalPacketContract',
+    './MemoryGovernanceAuditEvidenceContract',
+    './MemoryGovernanceReviewSurfaceContract',
+    '../storage/',
+    './storage/',
+    '../recall/',
+    './recall/',
+    '../adapters/',
+    './Provider'
+  ];
+
+  Module._load = function patchedLoad(request, parent, isMain) {
+    if (blockedLoads.some(blocked => request.includes(blocked))) {
+      throw new Error(`unexpected P44 aggregator load: ${request}`);
+    }
+    return originalLoad.call(this, request, parent, isMain);
+  };
+  globalThis.fetch = () => {
+    throw new Error('unexpected P44 aggregator fetch');
+  };
+
+  try {
+    const report = buildV1RcValidationAggregatorReport();
+    assert.equal(report.evidence.p36P40EvidenceSourceMap.sourceMode, 'static_report_shape_only');
+    assert.equal(report.evidence.p36P40EvidenceSourceMap.readsFixtures, false);
+    assert.equal(report.evidence.p36P40EvidenceSourceMap.executesHelpers, false);
+    assert.equal(report.evidence.p36P40EvidenceSourceMap.callsProviders, false);
+    assert.equal(report.evidence.p36P40EvidenceSourceMap.refreshesLiveMcp, false);
+  } finally {
+    Module._load = originalLoad;
+    globalThis.fetch = originalFetch;
+  }
 });

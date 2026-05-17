@@ -33,7 +33,14 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.mode, 'read-only');
   assert.equal(report.evidence.p24Aggregator.minimalCliWiring, true);
   assert.equal(report.evidence.p24Aggregator.decisionExitCodeSemantics, true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.localEvidenceReportAvailable, true);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.localEvidenceReportReadyClaim, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.runtimeReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
   assert.ok(report.evidence_sources.decision);
+  assert.equal(report.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
   assert.match(report.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
 });
 
@@ -56,6 +63,16 @@ test('minimal validation aggregator CLI preserves honest blocked decision', () =
   assert.equal(report.summary.migrationImportExportRealMemoryScanned, false);
   assert.equal(report.summary.migrationImportExportApplyPerformed, false);
   assert.equal(report.summary.migrationImportExportPackageScriptAdded, false);
+  assert.equal(report.summary.p36P40EvidenceSourceMapAvailable, true);
+  assert.equal(report.summary.p36P40LocalEvidenceReportAvailable, true);
+  assert.equal(report.summary.p36P40LocalEvidenceReportReadyClaim, false);
+  assert.equal(report.summary.p36P40RuntimeReady, false);
+  assert.equal(report.summary.p36P40FinalRcMatrixReady, false);
+  assert.equal(report.summary.p36P40CanClaimV1RcReady, false);
+  assert.equal(report.summary.localEvidenceReportReadyClaim, false);
+  assert.equal(report.summary.runtimeReady, false);
+  assert.equal(report.summary.finalRcMatrixReady, false);
+  assert.equal(report.summary.rcReady, false);
   assert.equal(report.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
 });
 
@@ -110,7 +127,13 @@ test('minimal validation aggregator CLI strict mode exits 1 for current blocked 
   assert.equal(report.generated_at, '2026-05-16T00:00:00.000Z');
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.localEvidenceReportReadyClaim, false);
+  assert.equal(report.summary.runtimeReady, false);
+  assert.equal(report.summary.finalRcMatrixReady, false);
+  assert.equal(report.summary.rcReady, false);
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
+  assert.equal(report.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
   assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
   assert.equal(report.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');

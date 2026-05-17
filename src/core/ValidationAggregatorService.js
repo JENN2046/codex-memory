@@ -81,7 +81,66 @@ const FORBIDDEN_EVIDENCE_FRAGMENTS = [
   'api_key',
   'providerapikey',
   'workspace_id',
-  '.env='
+  'raw_workspace_id',
+  'token=',
+  'password',
+  'sk_live_',
+  'sk-proj-',
+  'http://',
+  'https://',
+  'c:\\',
+  '.env'
+];
+
+const P36_P40_STATIC_EVIDENCE_SOURCES = [
+  {
+    id: 'p36_scope_a5_boundary',
+    source_type: 'committed_fixture',
+    status: 'fixture_contract_added_not_runtime_ready',
+    doc_ref: 'docs/P36_SCOPE_A5_BOUNDARY_CONTRACT.md',
+    test_ref: 'tests/p36-scope-a5-boundary-contract-fixture.test.js',
+    fixture_ref: 'tests/fixtures/p36-scope-a5-boundary-contract-v1.json'
+  },
+  {
+    id: 'p36_task_risk_labels',
+    source_type: 'committed_fixture',
+    status: 'fixture_contract_added_not_runtime_ready',
+    doc_ref: 'docs/P36_TASK_RISK_LABELS_CONTRACT.md',
+    test_ref: 'tests/p36-task-risk-labels-contract-fixture.test.js',
+    fixture_ref: 'tests/fixtures/p36-task-risk-labels-contract-v1.json'
+  },
+  {
+    id: 'p37_policy_decision_envelope',
+    source_type: 'committed_fixture',
+    status: 'fixture_contract_added_not_runtime_ready',
+    doc_ref: 'docs/P37_POLICY_DECISION_ENVELOPE_FIXTURE_MATRIX.md',
+    test_ref: 'tests/p37-policy-decision-envelope-fixture.test.js',
+    fixture_ref: 'tests/fixtures/p37-policy-decision-envelope-v1.json'
+  },
+  {
+    id: 'p38_recall_isolation',
+    source_type: 'committed_fixture',
+    status: 'fixture_contract_added_not_runtime_ready',
+    doc_ref: 'docs/P38_RECALL_ISOLATION_FIXTURES.md',
+    test_ref: 'tests/p38-recall-isolation-fixture.test.js',
+    fixture_ref: 'tests/fixtures/p38-recall-isolation-v1.json'
+  },
+  {
+    id: 'p39_synthetic_migration_dry_run',
+    source_type: 'committed_fixture',
+    status: 'fixture_contract_added_not_runtime_ready',
+    doc_ref: 'docs/P39_SYNTHETIC_MIGRATION_DRY_RUN_CONTRACT.md',
+    test_ref: 'tests/p39-synthetic-migration-dry-run-fixture.test.js',
+    fixture_ref: 'tests/fixtures/p39-synthetic-migration-dry-run-v1.json'
+  },
+  {
+    id: 'p40_local_readiness_report',
+    source_type: 'committed_fixture',
+    status: 'local_evidence_report_added_not_runtime_ready',
+    doc_ref: 'docs/P40_LOCAL_READINESS_REPORT.md',
+    test_ref: 'tests/p40-local-readiness-report-fixture.test.js',
+    fixture_ref: 'tests/fixtures/p40-local-readiness-report-v1.json'
+  }
 ];
 
 const EVIDENCE_SOURCES = {
@@ -164,6 +223,83 @@ const EVIDENCE_SOURCES = {
     source_type: 'explicit_input_governance_review_surface_helper',
     source_ref: 'src/core/MemoryGovernanceReviewSurfaceContract.js / tests/memory-governance-review-surface-helper.test.js / tests/fixtures/memory-governance-review-surface-v1.json',
     status: 'helper_added_report_shape_only_not_executed'
+  },
+  p36_scope_a5_boundary_contract: {
+    source_type: 'committed_fixture',
+    source_ref: 'docs/P36_SCOPE_A5_BOUNDARY_CONTRACT.md / tests/p36-scope-a5-boundary-contract-fixture.test.js / tests/fixtures/p36-scope-a5-boundary-contract-v1.json',
+    status: 'fixture_contract_added_not_runtime_ready',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    fixtureReadByAggregator: false,
+    testExecutedByAggregator: false,
+    helperExecutedByAggregator: false,
+    observedFromRuntime: false
+  },
+  p36_task_risk_labels_contract: {
+    source_type: 'committed_fixture',
+    source_ref: 'docs/P36_TASK_RISK_LABELS_CONTRACT.md / tests/p36-task-risk-labels-contract-fixture.test.js / tests/fixtures/p36-task-risk-labels-contract-v1.json',
+    status: 'fixture_contract_added_not_runtime_ready',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    fixtureReadByAggregator: false,
+    testExecutedByAggregator: false,
+    helperExecutedByAggregator: false,
+    observedFromRuntime: false
+  },
+  p37_policy_decision_envelope_fixture_matrix: {
+    source_type: 'committed_fixture',
+    source_ref: 'docs/P37_POLICY_DECISION_ENVELOPE_FIXTURE_MATRIX.md / tests/p37-policy-decision-envelope-fixture.test.js / tests/fixtures/p37-policy-decision-envelope-v1.json',
+    status: 'fixture_contract_added_not_runtime_ready',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    fixtureReadByAggregator: false,
+    testExecutedByAggregator: false,
+    helperExecutedByAggregator: false,
+    observedFromRuntime: false
+  },
+  p38_recall_isolation_fixture: {
+    source_type: 'committed_fixture',
+    source_ref: 'docs/P38_RECALL_ISOLATION_FIXTURES.md / tests/p38-recall-isolation-fixture.test.js / tests/fixtures/p38-recall-isolation-v1.json',
+    status: 'fixture_contract_added_not_runtime_ready',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    fixtureReadByAggregator: false,
+    testExecutedByAggregator: false,
+    helperExecutedByAggregator: false,
+    observedFromRuntime: false
+  },
+  p39_synthetic_migration_dry_run_contract: {
+    source_type: 'committed_fixture',
+    source_ref: 'docs/P39_SYNTHETIC_MIGRATION_DRY_RUN_CONTRACT.md / tests/p39-synthetic-migration-dry-run-fixture.test.js / tests/fixtures/p39-synthetic-migration-dry-run-v1.json',
+    status: 'fixture_contract_added_not_runtime_ready',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    fixtureReadByAggregator: false,
+    testExecutedByAggregator: false,
+    helperExecutedByAggregator: false,
+    observedFromRuntime: false
+  },
+  p40_local_readiness_report: {
+    source_type: 'committed_fixture',
+    source_ref: 'docs/P40_LOCAL_READINESS_REPORT.md / tests/p40-local-readiness-report-fixture.test.js / tests/fixtures/p40-local-readiness-report-v1.json',
+    status: 'local_evidence_report_added_not_runtime_ready',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    fixtureReadByAggregator: false,
+    testExecutedByAggregator: false,
+    helperExecutedByAggregator: false,
+    observedFromRuntime: false
+  },
+  p36_p40_evidence_source_map: {
+    source_type: 'local_validation_summary',
+    source_ref: 'ValidationAggregatorService evidence.p36P40EvidenceSourceMap',
+    status: 'static_report_shape_added_not_executed',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    fixtureReadByAggregator: false,
+    testExecutedByAggregator: false,
+    helperExecutedByAggregator: false,
+    observedFromRuntime: false
   },
   public_mcp_tools: {
     source_type: 'code_contract',
@@ -837,6 +973,30 @@ function buildV1RcValidationAggregatorReport({
       memoryGovernanceReviewSurfaceContractRealMemoryScanned: false,
       memoryGovernanceReviewSurfaceContractExecutionApproved: false,
       memoryGovernanceReviewSurfaceContractCanClaimGovernanceReady: false,
+      p36P40EvidenceSourceMapImplemented: true,
+      p36P40EvidenceSourceMapAvailable: true,
+      p36P40EvidenceSourceMapSourceMode: 'static_report_shape_only',
+      p36P40EvidenceSourceMapReadsFixtures: false,
+      p36P40EvidenceSourceMapExecutesHelpers: false,
+      p36P40EvidenceSourceMapExecutesGates: false,
+      p36P40EvidenceSourceMapExecutesRunners: false,
+      p36P40EvidenceSourceMapRefreshesLiveMcp: false,
+      p36P40EvidenceSourceMapCallsProviders: false,
+      p36P40LocalEvidenceReportAvailable: true,
+      p36P40LocalEvidenceReportReadyClaim: false,
+      p36P40RuntimeReady: false,
+      p36P40FinalRcMatrixReady: false,
+      p36P40CanClaimV1RcReady: false,
+      localEvidenceReportReadyClaim: false,
+      runtimeReady: false,
+      mainlineCutoverReady: false,
+      finalRcMatrixReady: false,
+      pushReady: false,
+      releaseReady: false,
+      deployReady: false,
+      configSwitchReady: false,
+      watchdogReady: false,
+      rcReady: false,
       productionDeployPerformed: false,
       startupWatchdogInstalled: false,
       codexClaudeConfigSwitched: false,
@@ -961,6 +1121,13 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true,
         evidence: 'P34.2 pure review-surface helper evaluates explicit caller-provided review input only; P34.3 records report-shape evidence without executing the helper or reading the fixture.'
       }),
+      p36P40EvidenceSourceMap: createCheck({
+        status: 'static_report_shape_added_not_executed',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P44 surfaces P36-P40 local evidence posture from static report-shape entries only; it does not read fixtures, execute helpers/gates/runners, refresh live MCP, or claim runtime/RC readiness.'
+      }),
       validationAggregatorExecutable: createCheck({
         status: 'minimal_implemented',
         requiredBeforeV1Rc: true,
@@ -1021,6 +1188,7 @@ function buildV1RcValidationAggregatorReport({
       'memoryGovernanceApprovalPacketContractHelper',
       'memoryGovernanceAuditEvidenceContractHelper',
       'memoryGovernanceReviewSurfaceContractHelper',
+      'p36P40EvidenceSourceMap',
       'clientBoundaryDocsReview',
       'migrationImportExportBoundaryDocsReview',
       'rcChecklistAlignmentReview',
@@ -1345,6 +1513,74 @@ function buildV1RcValidationAggregatorReport({
         canClaimV1RcReady: false,
         a5GatedBlockersVisible: true
       },
+      p36P40EvidenceSourceMap: {
+        status: 'static_report_shape_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        phasesCovered: [
+          'P36-T1',
+          'P36-T2',
+          'P37-T1',
+          'P38',
+          'P39',
+          'P40'
+        ],
+        sources: P36_P40_STATIC_EVIDENCE_SOURCES.map(source => ({
+          ...source,
+          sourceMode: 'static_reference_only',
+          acceptedForPlanning: false,
+          fixtureReadByAggregator: false,
+          testExecutedByAggregator: false,
+          helperExecutedByAggregator: false,
+          observedFromRuntime: false
+        })),
+        localEvidenceReportAvailable: true,
+        localEvidenceReportReadyClaim: false,
+        runtimeReady: false,
+        mainlineCutoverReady: false,
+        finalRcMatrixReady: false,
+        pushReady: false,
+        releaseReady: false,
+        deployReady: false,
+        configSwitchReady: false,
+        watchdogReady: false,
+        rcReady: false,
+        readsFixtures: false,
+        executesHelpers: false,
+        executesGates: false,
+        executesRunners: false,
+        refreshesLiveMcp: false,
+        callsProviders: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        realMemoryContentRead: false,
+        realMemoryPreviewed: false,
+        dryRunRepresentsRealMemory: false,
+        dryRunAuthorizesApply: false,
+        migrationApplied: false,
+        backupCreated: false,
+        restorePerformed: false,
+        deniedMigrationSources: [
+          'real_memory_content',
+          'real_diary',
+          'real_sqlite',
+          'real_vector_index',
+          'real_candidate_cache',
+          'provider_output'
+        ],
+        warningOnlyEqualsFailure: true,
+        criticalSkippedEqualsFailure: true,
+        criticalUnknownEqualsFailure: true,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -1364,7 +1600,8 @@ function buildV1RcValidationAggregatorReport({
     warnings: [
       'This report is generated by a minimal local implementation, not the full final RC matrix executor.',
       'Historical P22 live MCP evidence must not be treated as fresh P23/P24 live evidence.',
-      'A4_SAFE_SLICE_PASSED does not mean READY_FOR_V1_0_RC.'
+      'A4_SAFE_SLICE_PASSED does not mean READY_FOR_V1_0_RC.',
+      'P36-P40 local evidence report ready does not mean runtime, final RC matrix, push, release, deploy, config switch, watchdog, or v1.0 RC readiness.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',
