@@ -57,8 +57,9 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P53-T3 explicit evidence classification hardening is complete, validated, and locally committed in `0a5016d`.
 - P54-T1 final RC runner safe command inventory is complete and validated.
 - P54-T2 final RC runner explicit command-result helper is complete and validated.
-- P54-T3 local runner execution harness preflight is the next safe implementation slice.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, or P54 caller-provided command result evidence.
+- P54-T3 local runner execution harness preflight is complete and validated.
+- P54-T4 allowlisted local runner execution adapter is the next candidate, but it must remain constrained to the P54-T1 allowlist and P54-T3 preflight.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, or P54 preflight evidence.
 
 ## Boundaries
 
@@ -77,7 +78,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P54-T2:
+After P54-T3:
 
-- Begin P54-T3 final RC runner local execution harness preflight.
-- Keep P54-T3 allowlist-first: any execution-capable path must be limited to P54-T1 allowed local validation commands, must pass preflight against rejected commands, must preserve machine-readable fail-closed output, and must not start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, write durable state, expand public MCP, change dependencies, push/tag/release/deploy, or claim final RC readiness.
+- Begin P54-T4 final RC runner allowlisted local execution adapter only if it stays local and reversible.
+- Keep P54-T4 allowlist-first: execute only P54-T1 local validation commands after P54-T3 preflight, emit machine-readable command results, fail closed for any nonzero/skipped/warning-only/unknown/stale/unsupported result, and do not start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, write durable state, expand public MCP, change dependencies, push/tag/release/deploy, or claim final RC readiness.
