@@ -1,0 +1,273 @@
+{
+  "schemaVersion": "p56-governance-executable-loop-boundary-v1",
+  "policyVersion": "p56-governance-loop-policy-v1",
+  "manifestVersion": "p56-governance-loop-manifest-v1",
+  "version": "v1",
+  "phase": "P56-T1-governance-review-approval-audit-executable-loop-boundary",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "explicitInputOnly": true,
+  "dryRunOnly": true,
+  "localOnly": true,
+  "boundaryOnly": true,
+  "runtimeIntegrated": false,
+  "governanceLoopImplemented": false,
+  "governedActionExecutionApproved": false,
+  "governedActionExecuted": false,
+  "approvalExecutionReady": false,
+  "auditWriterImplemented": false,
+  "durableAuditWritten": false,
+  "durableMemoryWritten": false,
+  "publicMcpExpanded": false,
+  "realMemoryScanned": false,
+  "providerCalls": 0,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "p31_lifecycle_contract_helper",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/MemoryGovernanceLifecycleContract.js",
+        "tests/memory-governance-lifecycle-contract-helper.test.js",
+        "tests/fixtures/memory-governance-lifecycle-contract-v1.json"
+      ],
+      "runtimeAuthority": false,
+      "executionAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p32_approval_packet_helper",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/MemoryGovernanceApprovalPacketContract.js",
+        "tests/memory-governance-approval-packet-helper.test.js",
+        "tests/fixtures/memory-governance-approval-packet-v1.json"
+      ],
+      "runtimeAuthority": false,
+      "executionAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p33_audit_evidence_helper",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/MemoryGovernanceAuditEvidenceContract.js",
+        "tests/memory-governance-audit-evidence-helper.test.js",
+        "tests/fixtures/memory-governance-audit-evidence-v1.json"
+      ],
+      "runtimeAuthority": false,
+      "executionAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p34_review_surface_helper",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/MemoryGovernanceReviewSurfaceContract.js",
+        "tests/memory-governance-review-surface-helper.test.js",
+        "tests/fixtures/memory-governance-review-surface-v1.json"
+      ],
+      "runtimeAuthority": false,
+      "executionAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p55_evidence_runtime_trace_helper",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/EvidenceRuntimeTraceContract.js",
+        "tests/evidence-runtime-trace-contract-helper.test.js",
+        "tests/fixtures/p55-evidence-to-runtime-enforcement-trace-v1.json"
+      ],
+      "runtimeAuthority": false,
+      "executionAuthority": false,
+      "readinessAuthority": false
+    }
+  ],
+  "loopStages": [
+    {
+      "id": "review_packet_intake",
+      "status": "planning_only",
+      "inputMode": "explicit_input",
+      "canExecute": false,
+      "requiresApproval": false,
+      "durableWriteAllowed": false
+    },
+    {
+      "id": "approval_packet_evaluation",
+      "status": "blocked_pending_approval",
+      "inputMode": "explicit_input",
+      "canExecute": false,
+      "requiresApproval": true,
+      "durableWriteAllowed": false
+    },
+    {
+      "id": "audit_evidence_shape_evaluation",
+      "status": "blocked_pending_audit_writer",
+      "inputMode": "explicit_input",
+      "canExecute": false,
+      "requiresApproval": true,
+      "durableWriteAllowed": false
+    },
+    {
+      "id": "execution_gate_evaluation",
+      "status": "blocked_pending_a5_authorization",
+      "inputMode": "explicit_input",
+      "canExecute": false,
+      "requiresApproval": true,
+      "durableWriteAllowed": false
+    },
+    {
+      "id": "durable_write_gate",
+      "status": "blocked_pending_a5_authorization",
+      "inputMode": "explicit_input",
+      "canExecute": false,
+      "requiresApproval": true,
+      "durableWriteAllowed": false
+    },
+    {
+      "id": "post_action_evidence_gate",
+      "status": "not_executed",
+      "inputMode": "explicit_input",
+      "canExecute": false,
+      "requiresApproval": true,
+      "durableWriteAllowed": false
+    }
+  ],
+  "approvalStates": [
+    {
+      "id": "reviewed_not_approved",
+      "acceptedForPlanning": true,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_missing",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_unknown",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_warning_only",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_expired_or_stale",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_scope_mismatch",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    }
+  ],
+  "requiredRuntimeEvidence": [
+    "runtime_schema_version_enforcement",
+    "validation_aggregator_full_implementation",
+    "final_rc_matrix_runner_execution",
+    "governance_review_runtime_path",
+    "approval_execution_runtime_path",
+    "durable_audit_writer",
+    "durable_memory_mutation_policy",
+    "recall_isolation_runtime_proof"
+  ],
+  "failClosedStates": [
+    "missing",
+    "unknown",
+    "skipped",
+    "warning",
+    "warning_only",
+    "failed",
+    "stale",
+    "ambiguous",
+    "unparsable",
+    "unsupported",
+    "duplicate",
+    "scope_mismatch",
+    "approval_missing",
+    "approval_expired",
+    "fixture_only",
+    "dry_run_only"
+  ],
+  "blockedActions": [
+    "governed_action_execution",
+    "approval_execution",
+    "runtime_governance_integration",
+    "durable_memory_write",
+    "durable_audit_write",
+    "audit_writer_implementation",
+    "real_memory_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "provider_call",
+    "service_start",
+    "config_switch",
+    "watchdog_install",
+    "public_mcp_expansion",
+    "dependency_change",
+    "push_tag_release_deploy"
+  ],
+  "forbiddenClaims": [
+    "governance_runtime_ready",
+    "approval_execution_ready",
+    "audit_writer_ready",
+    "durable_write_ready",
+    "runtime_ready",
+    "final_rc_matrix_ready",
+    "v1_rc_ready",
+    "push_ready",
+    "release_ready",
+    "deploy_ready"
+  ],
+  "safety": {
+    "readsFilesImplicitly": false,
+    "scansDirectories": false,
+    "executesCommands": false,
+    "startsServices": false,
+    "callsProviders": false,
+    "readsRealMemory": false,
+    "scansRuntimeStores": false,
+    "writesDurableMemory": false,
+    "writesDurableAudit": false,
+    "expandsPublicMcp": false,
+    "remoteWrites": false,
+    "rawSensitiveOutputExposed": false
+  },
+  "readiness": {
+    "localBoundaryContractReady": true,
+    "governanceRuntimeReady": false,
+    "approvalExecutionReady": false,
+    "auditWriterReady": false,
+    "durableWriteReady": false,
+    "runtimeReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "pushReady": false,
+    "releaseReady": false,
+    "deployReady": false,
+    "configSwitchReady": false,
+    "watchdogReady": false
+  }
+}
