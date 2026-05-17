@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P61 RC evidence report explicit-input helper committed; post-commit board reconciliation in progress.
+P10 observability/admin; P62 v1.0 RC cutover preflight boundary inventory validated; guarded local commit pending.
 
 ## Current Status
 
@@ -33,6 +33,8 @@ P10 observability/admin; P61 RC evidence report explicit-input helper committed;
 - P61-T1 post-commit board reconciliation is locally committed in `2811da3`.
 - P61-T1 stale board correction is locally committed in `ba1edf2`.
 - P61-T2 RC evidence report explicit-input helper is implemented, validated, and committed locally in `15739cb`.
+- P61-T2 post-commit board reconciliation is locally committed in `ba1d87b`.
+- P62-T1 v1.0 RC cutover preflight boundary inventory is implemented and validated locally; guarded local commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -52,6 +54,14 @@ P10 observability/admin; P61 RC evidence report explicit-input helper committed;
 - Updated `tests/p60-no-touch-no-leak-redaction-regression.test.js`.
 - The helper accepts only caller-provided P61 report objects, enforces exact schema/policy/manifest/source/evidence/fail-closed/blocked-action sets, redacts sensitive strings, and keeps mainline gate execution, final RC runner execution, live HTTP operation, provider calls, service/watchdog/startup install, config switch, durable writes, public MCP expansion, final RC readiness, and v1 RC readiness blocked.
 
+## P62-T1 Evidence
+
+- Added `docs/P62_V1_RC_CUTOVER_PREFLIGHT_BOUNDARY.md`.
+- Added `tests/fixtures/p62-v1-rc-cutover-preflight-boundary-v1.json`.
+- Added `tests/p62-v1-rc-cutover-preflight-boundary-fixture.test.js`.
+- The fixture records required cutover preflight gates, unsatisfied gates, fail-closed states, blocked cutover actions, forbidden claims, safety flags, and readiness boundaries.
+- It keeps cutover execution, tag/release/deploy/push, config switch, watchdog/startup install, mainline strict gate execution, final RC runner execution, provider calls, durable writes, public MCP expansion, final RC readiness, and v1 RC readiness blocked.
+
 ## Validation
 
 - `node --check tests\p61-mainline-strict-gate-rc-evidence-report-boundary-fixture.test.js`
@@ -65,6 +75,11 @@ P10 observability/admin; P61 RC evidence report explicit-input helper committed;
 - P61-T2 targeted P54/P59/P60/P61/no-touch set (`47/47`)
 - `npm test` (`1029/1029`)
 - `git diff --check`
+- P62-T1 syntax check for new test
+- P62 fixture JSON parse
+- P62 targeted test (`10/10`)
+- P61/P62/no-touch targeted set (`35/35`)
+- `npm test` (`1039/1039`)
 
 ## Active Boundaries
 
@@ -82,4 +97,4 @@ P10 observability/admin; P61 RC evidence report explicit-input helper committed;
 
 ## Next Safe Step
 
-Consider P62-T1 only if it remains local evidence/preflight boundary inventory with no cutover, tag, release, deploy, config switch, watchdog install, push, or RC_READY claim.
+Commit P62-T1 locally, then stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized.
