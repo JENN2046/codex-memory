@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0271 / P29 schema-version runtime enforcement closeout review.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0272 / P30 final RC validation matrix runner safe-scope inventory.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0271 docs/status/board-only closeout after guarded local commit `29d0b83`. Local `main` is ahead of `origin/main` by 10 commits. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0272 docs/status/board-only inventory after guarded local commit `4093b3e`. Local `main` is ahead of `origin/main` by 11 commits. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P29 schema/version evidence-chain closeout
+P30 final RC validation matrix runner safe-scope inventory
 
 ## Findings
 
@@ -67,8 +67,9 @@ P29 schema/version evidence-chain closeout
 - P29.1 explicit-input `SchemaVersionPolicy` helper was committed in `a692f84`; P29.2 ValidationAggregator helper evidence was committed in `5765198`; P29.3 explicit policy evaluation report was committed in `fbb645e`.
 - CM-0266 and CM-0267 are committed locally through `88bfd59`; CM-0268 is committed locally in `89d5db8`; CM-0269 is committed locally in `e957885`.
 - CM-0270 board reconciliation after CM-0269 is committed locally in `29d0b83`.
-- CM-0271 is completed docs/status/board-only closeout for the P28/P29 evidence-reader, `SchemaVersionPolicy` helper, evaluation report, runtime boundary guard test, and ValidationAggregator report-shape evidence chain, pending guarded local commit.
-- Next safe local candidate after CM-0271 commit: CM-0272 P30 final RC validation matrix runner safe-scope inventory. It must consume explicit/local evidence and existing report shapes only. Runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration/import-export apply, backup/restore, and push remain blocked.
+- CM-0271 P29 closeout is committed locally in `4093b3e`.
+- CM-0272 is completed docs/status/board-only inventory for a future final RC validation matrix runner, pending guarded local commit. It defines explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, and push remain blocked.
+- Next safe local candidate after CM-0272 commit: CM-0273 / P30.1 fixture contract, limited to a committed synthetic fixture and focused fixture test.
 
 ## Changed Files
 

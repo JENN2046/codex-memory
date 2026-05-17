@@ -38,6 +38,7 @@
 - `gate:ci` fixture-only 设计：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)
 - P25 schema/version runtime enforcement plan：[docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md](/A:/codex-memory/docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md)
 - P29 schema/version runtime enforcement closeout：[docs/P29_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P29_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md)
+- P30 final RC validation matrix runner safe scope：[docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_SAFE_SCOPE_INVENTORY.md](/A:/codex-memory/docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_SAFE_SCOPE_INVENTORY.md)
 - 当前阶段记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
 - 浪潮 VCP 记忆能力评估：[VCP_MEMORY_CAPABILITY_ASSESSMENT.md](/A:/codex-memory/VCP_MEMORY_CAPABILITY_ASSESSMENT.md)
 - Phase D 迁移验收清单：[PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md](/A:/codex-memory/PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md)
