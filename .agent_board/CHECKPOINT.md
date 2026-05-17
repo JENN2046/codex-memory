@@ -19,7 +19,7 @@ P8 memory-governance / P58 migration/import-export/backup-restore approval frame
 - P57-T1 post-commit board reconciliation is locally committed in `19ad34b`.
 - P57-T2 recall isolation runtime proof explicit-input evaluator is implemented, validated, and committed locally in `6f29757`.
 - P57-T2 post-commit board reconciliation is locally committed in `c337ab4`.
-- P58-T1 migration/import-export/backup-restore approval framework boundary inventory is implemented and validated locally as docs/fixture/test only.
+- P58-T1 migration/import-export/backup-restore approval framework boundary inventory is implemented, validated, and committed locally in `5326169` as docs/fixture/test only.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -56,4 +56,4 @@ P8 memory-governance / P58 migration/import-export/backup-restore approval frame
 
 ## Next Safe Step
 
-Run final diff/docs validation for P58-T1, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation. After that, route to P58-T2 only if it remains explicit-input-only and no-side-effect.
+Evaluate P58-T2 only if it remains explicit-input-only and no-side-effect.

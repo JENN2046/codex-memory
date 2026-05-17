@@ -70,7 +70,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P56-T2 governance loop explicit-input helper is complete, validated, and locally committed in `f69fbbb`.
 - P57-T1 recall isolation runtime proof boundary inventory is complete, validated, and locally committed in `c89a772`.
 - P57-T2 recall isolation runtime proof explicit-input evaluator is complete, validated, and locally committed in `6f29757`.
-- P58-T1 migration/import-export/backup-restore approval framework boundary inventory is complete and validated locally as docs/fixture/test evidence only.
+- P58-T1 migration/import-export/backup-restore approval framework boundary inventory is complete, validated, and locally committed in `5326169` as docs/fixture/test evidence only.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, or P58 boundary evidence.
 
 ## Boundaries
@@ -90,8 +90,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P58-T1:
+After P58-T1 commit `5326169`:
 
-- First commit P58-T1 locally, then run post-commit board reconciliation for that commit.
-- Then consider P58-T2 approval framework explicit-input helper only if it stays caller-provided object only and does not read files, scan directories, execute commands, write durable state, call providers, import runtime stores, expand public MCP, or claim readiness.
+- Consider P58-T2 approval framework explicit-input helper only if it stays caller-provided object only and does not read files, scan directories, execute commands, write durable state, call providers, import runtime stores, expand public MCP, or claim readiness.
 - Keep P58 boundary-first: no real migration apply, import/export apply, backup/restore apply, real memory scan, durable write, provider call, public MCP expansion, or RC-ready claim.
