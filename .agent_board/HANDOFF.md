@@ -14,25 +14,27 @@ Execute the P41-P45 Evidence-First Gate Spine long-running goal under Commander 
 
 ## Worktree
 
-Dirty for CM-0314 P41-T2 docs/fixture/test/board updates.
+Dirty for CM-0315 P42-T1 helper/test/board updates.
 
 ## Current Area
 
-P8 memory governance / P41 Post-P40 Closeout + Evidence Manifest Charter.
+P8 memory governance / P42 Governed Policy Gate Explicit-Input Helper.
 
 ## Current Truth
 
 - `origin/main` baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, and CM-0313 `08597d6`.
-- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `6f7ade4`; latest local docs/status commit: `08597d6`.
+- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, and CM-0314 `8895816`.
+- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `8895816`; latest local docs/status commit: `08597d6`.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: CM-0314 P41-T2 Evidence Manifest Contract Fixture.
+- Current task: CM-0315 P42-T1 Explicit-Input Evidence Helper.
 
 ## Validation
 
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`; `node --test tests\p36-scope-a5-boundary-contract-fixture.test.js` (`12/12`); `npm test` (`739/739`); `git diff --check`; docs validation.
 - CM-0312 validation passed: `node --check tests\p40-local-readiness-report-fixture.test.js`; targeted fixture test `9/9`; `npm test` `790/790`; docs validation; `git diff --check`; boundary scan; read-only Verifier scope review `PASS`.
+- CM-0314 validation passed and committed locally at `8895816`: `node --check tests\p41-evidence-manifest-contract-fixture.test.js`; targeted fixture test `12/12`; `npm test` `802/802`; docs validation; `git diff --check`; boundary scan; read-only Verifier scope review `PASS`.
+- CM-0315 validation passed: `node --check src\core\EvidenceManifestContract.js`; `node --check tests\evidence-manifest-contract-helper.test.js`; targeted helper/fixture tests `22/22`; `npm test` `812/812`; `git diff --check`; docs validation; boundary scan with only expected hard-stop/history wording plus synthetic redaction-test strings.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -49,4 +51,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Validate CM-0314. If scoped and validated, create a guarded local commit only; push remains blocked unless explicitly requested. Next safe local task is P42-T1 explicit-input evidence helper.
+Finish CM-0315 `git diff --check`, docs validation, boundary scan, and Verifier review. If scoped and validated, create a guarded local commit only; push remains blocked unless explicitly requested.

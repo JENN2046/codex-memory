@@ -25,15 +25,18 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 - P35.1 fixture contract: governed memory policy gate fixture/test committed locally in `c8325b6`.
 - P35 security hardening and push reconciliation: remote/local baseline is `3e3f76d`.
 - P36-P40 boundary-first chain: complete locally through P40 commit `6f7ade4` and post-P40 board sync `ba59537`.
+- P41-T1 closeout: complete locally in `08597d6`.
+- P41-T2 evidence manifest contract fixture: complete locally in `8895816`.
 
 ## Current Task
 
-P41-T2 Evidence Manifest Contract Fixture:
+P42-T1 Explicit-Input Evidence Helper:
 
-- Define a synthetic evidence manifest contract fixture for P41-P45.
+- Add a pure helper over caller-provided P41 evidence manifest objects only.
 - Keep v1.0 RC `NOT_READY_BLOCKED`.
-- Do not implement runtime policy enforcement, evidence reader, final RC runner, or runtime policy kernel in P41-T2.
-- Preserve source type whitelist, critical gate fail-closed semantics, blocked actions, safety flags, and forbidden claims.
+- Reject unsupported source types, caller whitelist redefinition, warning-only/unknown/skipped/missing/ambiguous/unparsable critical evidence, malformed input, and readiness/runtime/public MCP/durable/provider claims.
+- Redact sensitive fragments in normalized output and unsupported source summaries.
+- Do not read files, scan directories, execute commands, start services, call providers, write durable state, expand public MCP, or connect runtime policy kernel.
 
 ## Boundaries
 
@@ -52,6 +55,6 @@ P41-T2 Evidence Manifest Contract Fixture:
 
 ## Next Candidate
 
-After P41-T2:
+After P42-T1:
 
-- Continue to P42-T1 explicit-input evidence helper if the fixture/test contract is validated.
+- Continue to P43-T1 recall / migration isolation explicit-input helper if CM-0315 stays scoped and validated.
