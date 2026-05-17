@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0299 / P34.2 governance review surface explicit-input helper.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0300 / P34.3 ValidationAggregator review-surface evidence shape.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0299 helper/test/status/board updates. Local `main` is ahead of `origin/main` by local commits `83bd388`, `9d3ab69`, and `b9965f7`.
+Dirty for CM-0300 aggregator/source/fixture/test/status/board updates. Local `main` is ahead of `origin/main` by local commits `83bd388`, `9d3ab69`, `b9965f7`, and `280ab9b`.
 
 ## Current Area
 
-P8 memory governance review surface helper
+P8 memory governance review surface aggregator evidence
 
 ## Findings
 
@@ -104,8 +104,9 @@ P8 memory governance review surface helper
 - CM-0297 P34 governance review surface safe-scope inventory is complete pending Verifier and commit. It inventories read-only lifecycle / approval-packet / audit-evidence / admin-review / ValidationAggregator evidence only. Validation passed: `git diff --check`, docs validation, and P34 boundary reference scan.
 - CM-0297 is committed locally in `9d3ab69`; no push is authorized.
 - CM-0298 P34.1 governance review surface fixture contract is committed locally in `b9965f7`. It adds synthetic fixture/test evidence only and does not implement helper/CLI/runtime review. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `704/704`, `git diff --check`, docs validation, P34.1 boundary scan, and read-only Verifier `PASS`.
-- CM-0299 P34.2 governance review surface explicit-input helper is complete pending guarded local commit. It adds `src/core/MemoryGovernanceReviewSurfaceContract.js` and `tests/memory-governance-review-surface-helper.test.js` as a pure helper over caller-provided review surface objects only. Validation passed: source/test syntax checks, targeted helper/fixture tests `24/24`, `npm test` `714/714`, `git diff --check`, docs validation, P34.2 boundary scan, and read-only Verifier rerun `PASS`. First read-only Verifier pass found board wording drift only.
-- Next safe step: guarded local commit if scoped. No push is authorized.
+- CM-0299 P34.2 governance review surface explicit-input helper was committed locally as `280ab9b test: add p34 governance review helper`; no push is authorized.
+- CM-0300 P34.3 ValidationAggregator review-surface evidence shape is complete pending guarded local commit. It adds static report-shape evidence for the P34.2 helper in `src/core/ValidationAggregatorService.js`, `tests/fixtures/v1-rc-validation-aggregator-v1.json`, and aggregator tests. Validation passed: changed JS syntax checks, fixture JSON parse, targeted aggregator/helper tests `31/31`, `npm test` `714/714`, `git diff --check`, docs validation, P34.3 boundary scan with only expected existing `READY_FOR_V1_0_RC` decision-contract negative assertions/fixture text hits, and read-only Verifier `PASS`.
+- Next safe step: guarded local commit for CM-0300 if scoped. No push is authorized. The next local-safe candidate is a docs/board-only stale documentation compression/inventory pass to reduce context pollution, per latest user direction.
 
 ## Changed Files
 

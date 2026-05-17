@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0299 / P34.2 governance review surface explicit-input helper.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0300 / P34.3 ValidationAggregator review-surface evidence shape.
 
 ## Current Area
 
-P8 memory governance review surface helper
+P8 memory governance review surface aggregator evidence
 
 ## Current Status
 
@@ -77,6 +77,10 @@ P8 memory governance review surface helper
 - CM-0297 is committed locally in `9d3ab69`; no push is authorized.
 - CM-0298 adds a synthetic P34.1 governance review surface fixture/test. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `704/704`, `git diff --check`, docs validation, and P34.1 boundary scan.
 - Commander direction remains constrained: CM-0298 may update fixture/test/status/board only; helper/CLI/runtime implementation, fixture reads by aggregator, durable audit writes, durable mutation, real DB governance review execution, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0299 was committed locally as `280ab9b test: add p34 governance review helper`; no push is authorized.
+- CM-0300 adds static ValidationAggregator report-shape evidence for the P34.2 review-surface helper in `src/core/ValidationAggregatorService.js`, `tests/fixtures/v1-rc-validation-aggregator-v1.json`, and aggregator tests.
+- CM-0300 validation passed: changed JS syntax checks, fixture JSON parse, targeted aggregator/helper tests `31/31`, `npm test` `714/714`, `git diff --check`, docs validation, P34.3 boundary scan with only expected existing `READY_FOR_V1_0_RC` decision-contract negative assertions/fixture text hits, and read-only Verifier `PASS`.
+- CM-0300 remains static report-shape evidence only: no helper import/execution, no P34 fixture read by aggregator, no `governance:report` execution, no real DB review, no governed action approval, no durable audit/memory write, no public MCP expansion, no real memory scan, no provider/service/config action, no package script, no migration-import-export apply, no backup/restore, no push/tag/release/deploy.
 
 ## Completed Work In This Batch
 
