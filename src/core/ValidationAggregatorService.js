@@ -140,6 +140,11 @@ const EVIDENCE_SOURCES = {
     source_ref: 'src/cli/migration-import-export-approval-packet.js / tests/migration-import-export-approval-packet-cli.test.js / tests/fixtures/migration-import-export-approval-packet-v1.json',
     status: 'fixture_only_cli_added_not_executed'
   },
+  final_rc_validation_matrix_manifest_helper: {
+    source_type: 'explicit_input_manifest_helper',
+    source_ref: 'src/core/FinalRcValidationMatrixManifest.js / tests/final-rc-validation-matrix-runner-manifest-helper.test.js / tests/fixtures/final-rc-validation-matrix-runner-safe-scope-v1.json',
+    status: 'helper_added_report_shape_only_not_executed'
+  },
   public_mcp_tools: {
     source_type: 'code_contract',
     source_ref: 'src/core/constants.js',
@@ -765,6 +770,14 @@ function buildV1RcValidationAggregatorReport({
       migrationImportExportApprovalPacketRealMemoryScanned: false,
       migrationImportExportApprovalPacketPackageScriptAdded: false,
       migrationImportExportRealMemoryScanned: false,
+      finalRcValidationMatrixManifestHelperImplemented: true,
+      finalRcValidationMatrixManifestHelperExplicitInputOnly: true,
+      finalRcValidationMatrixManifestHelperExecuted: false,
+      finalRcValidationMatrixRunnerImplemented: false,
+      finalRcValidationMatrixRunnerExecuted: false,
+      finalRcValidationMatrixExecuted: false,
+      finalRcValidationMatrixCanExecuteRunner: false,
+      finalRcValidationMatrixCanClaimFinalRcReady: false,
       productionDeployPerformed: false,
       startupWatchdogInstalled: false,
       codexClaudeConfigSwitched: false,
@@ -854,6 +867,13 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true,
         evidence: 'P27.4 direct-node fixture-only CLI exists; P27.5 records report-shape evidence without executing the CLI.'
       }),
+      finalRcValidationMatrixManifestHelper: createCheck({
+        status: 'helper_added_report_shape_only_not_executed',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P30.2 pure manifest helper evaluates explicit caller-provided fixture/report input only; P30.3 records report-shape evidence without executing the helper or runner.'
+      }),
       validationAggregatorExecutable: createCheck({
         status: 'minimal_implemented',
         requiredBeforeV1Rc: true,
@@ -909,6 +929,7 @@ function buildV1RcValidationAggregatorReport({
       'schemaCompatibilityDryRunCli',
       'migrationImportExportDryRunGateCli',
       'migrationImportExportApprovalPacketCli',
+      'finalRcValidationMatrixManifestHelper',
       'clientBoundaryDocsReview',
       'migrationImportExportBoundaryDocsReview',
       'rcChecklistAlignmentReview',
@@ -1039,6 +1060,41 @@ function buildV1RcValidationAggregatorReport({
         backupRestorePerformed: false,
         durableReportWritten: false,
         packageScriptAdded: false
+      },
+      p30FinalRcValidationMatrixManifestHelper: {
+        status: 'helper_added_report_shape_only_not_executed',
+        helper: 'src/core/FinalRcValidationMatrixManifest.js',
+        test: 'tests/final-rc-validation-matrix-runner-manifest-helper.test.js',
+        fixture: 'tests/fixtures/final-rc-validation-matrix-runner-safe-scope-v1.json',
+        manifestSchemaVersion: 'final-rc-validation-matrix-runner-safe-scope-v1',
+        sourceMode: 'explicit_input',
+        fixtureOnly: true,
+        syntheticFixture: true,
+        acceptedForPlanningAvailable: true,
+        manifestHelperImplemented: true,
+        manifestHelperExecuted: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        readsFiles: false,
+        executesCommands: false,
+        startsServices: false,
+        callsProviders: false,
+        mutatesInput: false,
+        durableMemoryTouched: false,
+        realMemoryScanned: false,
+        realMemoryPreview: false,
+        runnerImplemented: false,
+        runnerExecuted: false,
+        finalRcMatrixExecuted: false,
+        canExecuteRunner: false,
+        canClaimFinalRcReady: false,
+        blockedDecisionRequired: true,
+        runnerClaimsFailClosed: true,
+        publicMcpFrozen: true,
+        runtimeRequiredBlockersVisible: true,
+        a5GatedBlockersVisible: true,
+        failClosedRejectionDefaultsVisible: true,
+        publicMcpExpanded: false
       },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0

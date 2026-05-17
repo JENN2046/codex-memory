@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0275 / P30.2 final RC validation matrix runner manifest helper.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0277 / P30.3 final RC validation matrix manifest helper aggregator evidence shape.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty only for post-CM-0276 board finalization after guarded local commit `9646273`. Local `main` is ahead of `origin/main` by 17 commits. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty only for CM-0277 scoped source/test/fixture/docs/board updates. Local `main` is ahead of `origin/main`; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P30.2 manifest helper candidate
+P30.3 ValidationAggregator report-shape evidence
 
 ## Findings
 
@@ -73,7 +73,10 @@ P30.2 manifest helper candidate
 - CM-0274 is completed and committed locally in `f2286f7` as board-only reconciliation after `5d91dac`; board finalization is committed locally in `f3a7116`.
 - CM-0275 is completed, validated, and committed locally in `ed73d24` as a pure helper over explicit fixture input only. It adds `src/core/FinalRcValidationMatrixManifest.js` and `tests/final-rc-validation-matrix-runner-manifest-helper.test.js`; source/test syntax checks, targeted helper test `7/7`, `npm test` `617/617`, `git diff --check`, docs validation, and read-only Verifier rerun `PASS` passed. Read-only Verifier first pass found and drove a fail-closed fix for unsafe runner/matrix/readiness claims.
 - CM-0276 is completed and committed locally in `9646273` as board-only reconciliation after `ed73d24`.
-- Next safe step: continue to CM-0277/P30.3 only if it remains ValidationAggregator report-shape evidence without runner execution.
+- CM-0277 is implemented locally and pending final Verifier/commit. It only adds static ValidationAggregator evidence for P30.2 helper capability and preserves `helperExecutedByAggregator=false`, `fixtureReadByAggregator=false`, `runnerImplemented=false`, `runnerExecuted=false`, `finalRcMatrixExecuted=false`, `canExecuteRunner=false`, and `canClaimFinalRcReady=false`.
+- CM-0277 validation passed: changed JS syntax checks, targeted aggregator tests `21/21`, `npm test` `617/617`, `git diff --check`, and `scripts\validate-local.ps1 -Area docs`.
+- Read-only Verifier first pass found only board validation wording drift; rerun and guarded local commit are pending.
+- Next safe step: finish CM-0277 read-only Verifier rerun and guarded local commit; then perform the single user-authorized push of current `main`. After push, continue to CM-0278/P30.x docs/board-only closeout if no blocker appears.
 
 ## Changed Files
 

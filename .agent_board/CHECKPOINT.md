@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0275 / P30.2 final RC validation matrix runner manifest helper.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0277 / P30.3 final RC validation matrix manifest helper aggregator evidence shape.
 
 ## Current Area
 
-P30.2 manifest helper candidate
+P30.3 ValidationAggregator report-shape evidence
 
 ## Current Status
 
@@ -46,7 +46,10 @@ P30.2 manifest helper candidate
 - CM-0274 board-only reconciliation after `5d91dac` is committed locally in `f2286f7`, and board finalization is committed locally in `f3a7116`, clearing stale pending-commit wording and routing next work to CM-0275/P30.2 pure helper candidate.
 - CM-0275 added `src/core/FinalRcValidationMatrixManifest.js` and `tests/final-rc-validation-matrix-runner-manifest-helper.test.js`. The helper only normalizes/summarizes an explicit caller-provided manifest object and keeps `canExecuteRunner=false`, `canClaimFinalRcReady=false`, and `decision=NOT_READY_BLOCKED`.
 - CM-0275 validation passed after Verifier fix: source/test syntax checks, targeted helper test `7/7`, `npm test` `617/617`, `git diff --check`, docs validation, and read-only Verifier rerun `PASS`. Read-only Verifier first pass found a fail-closed gap in `acceptedForPlanning`; the helper now requires `decision=NOT_READY_BLOCKED`, `runnerImplemented=false`, `runnerExecuted=false`, and `finalRcMatrixExecuted=false`, with regression coverage. CM-0275 is committed locally in `ed73d24`.
-- CM-0276 board-only reconciliation after `ed73d24` is committed locally in `9646273`, routing next work to CM-0277/P30.3 report-shape evidence only. Commander direction remains constrained: P30 may consume explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0276 board-only reconciliation after `ed73d24` is committed locally in `9646273`, routing next work to CM-0277/P30.3 report-shape evidence only.
+- CM-0277 adds static ValidationAggregator report-shape evidence for the P30.2 manifest helper via `evidence.p30FinalRcValidationMatrixManifestHelper`, `checks.finalRcValidationMatrixManifestHelper`, and `evidence_sources.final_rc_validation_matrix_manifest_helper`.
+- CM-0277 validation passed: `node --check` changed JS files; targeted aggregator tests `21/21`; `npm test` `617/617`; `git diff --check`; `scripts\validate-local.ps1 -Area docs`. Read-only Verifier first pass found only board validation wording drift; rerun and guarded local commit are pending.
+- Commander direction remains constrained: P30 may consume explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 

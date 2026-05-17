@@ -145,3 +145,28 @@ The helper accepts an already-provided manifest object, normalizes the safe cont
 The helper keeps `canExecuteRunner=false`, `canClaimFinalRcReady=false`, `decision=NOT_READY_BLOCKED`, public MCP three-tool freeze, runtime-required blockers, A5-gated blockers, and fail-closed rejection defaults visible.
 
 Next recommended phase: `P30.3-final-rc-validation-matrix-aggregator-evidence-shape`, limited to report-shape evidence only if selected. No runner execution, package script, live service, provider call, real memory scan, durable mutation, migration/import-export apply, backup/restore, public MCP expansion, push, tag, release, or deploy is approved by P30.2.
+
+## P30.3 Result
+
+P30.3 surfaces the P30.2 helper capability in `ValidationAggregatorService` report shape only.
+
+It adds static evidence under `evidence.p30FinalRcValidationMatrixManifestHelper`, `checks.finalRcValidationMatrixManifestHelper`, and `evidence_sources.final_rc_validation_matrix_manifest_helper`.
+
+The aggregator does not import or execute `FinalRcValidationMatrixManifest`, does not read the P30 fixture, does not implement a runner, and does not execute the final RC matrix.
+
+The report preserves:
+
+- `decision=NOT_READY_BLOCKED`
+- `finalRcValidationMatrixManifestHelperExecuted=false`
+- `finalRcValidationMatrixRunnerImplemented=false`
+- `finalRcValidationMatrixRunnerExecuted=false`
+- `finalRcValidationMatrixExecuted=false`
+- `finalRcValidationMatrixCanExecuteRunner=false`
+- `finalRcValidationMatrixCanClaimFinalRcReady=false`
+- public MCP freeze
+- runtime-required blockers
+- A5-gated blockers
+
+Result: `P30_3_AGGREGATOR_EVIDENCE_SHAPE_ADDED_FULL_MATRIX_STILL_BLOCKED`
+
+Next safe work should stay fixture-first, explicit-input-only, or docs/reconciliation only. No runner execution, package script, live service, provider call, real memory scan, durable mutation, migration/import-export apply, backup/restore, public MCP expansion, push, tag, release, or deploy is approved by P30.3.
