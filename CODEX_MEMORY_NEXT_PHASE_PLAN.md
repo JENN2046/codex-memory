@@ -83,6 +83,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P61-T1 mainline strict gate + RC evidence report boundary inventory is complete, validated, and locally committed in `360f4f9` as docs/fixture/test evidence only; post-commit board reconciliation is locally committed in `2811da3`.
 - P61-T2 RC evidence report explicit-input helper is complete, validated, and locally committed in `15739cb`.
 - P62-T1 v1.0 RC cutover preflight boundary inventory is complete, validated, locally committed in `7baa384`, and followed by post-commit board reconciliation at current `HEAD`.
+- P62-T2 completion audit / gap report is complete and validated locally; guarded local commit pending.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, P58 boundary/helper evidence, P59 boundary/helper evidence, P60 regression evidence, or P61 report helper evidence.
 
 ## Boundaries
@@ -104,5 +105,5 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 After P62-T1:
 
-- Stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, or `RC_READY` claim unless explicitly authorized.
+- Commit P62-T2 locally, then stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, or `RC_READY` claim unless explicitly authorized.
 - New local-only work should start from a new scoped goal or a clearly bounded follow-up task.

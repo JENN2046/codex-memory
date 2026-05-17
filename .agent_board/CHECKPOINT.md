@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P51-P62 local chain complete to A5 boundary.
+P10 observability/admin; P62 completion audit / gap report validated; guarded local commit pending.
 
 ## Current Status
 
@@ -35,6 +35,7 @@ P10 observability/admin; P51-P62 local chain complete to A5 boundary.
 - P61-T2 RC evidence report explicit-input helper is implemented, validated, and committed locally in `15739cb`.
 - P61-T2 post-commit board reconciliation is locally committed in `ba1d87b`.
 - P62-T1 v1.0 RC cutover preflight boundary inventory is implemented, validated, and committed locally in `7baa384`.
+- P62-T2 completion audit / gap report is implemented and validated locally; guarded local commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -62,6 +63,14 @@ P10 observability/admin; P51-P62 local chain complete to A5 boundary.
 - The fixture records required cutover preflight gates, unsatisfied gates, fail-closed states, blocked cutover actions, forbidden claims, safety flags, and readiness boundaries.
 - It keeps cutover execution, tag/release/deploy/push, config switch, watchdog/startup install, mainline strict gate execution, final RC runner execution, provider calls, durable writes, public MCP expansion, final RC readiness, and v1 RC readiness blocked.
 
+## P62-T2 Evidence
+
+- Added `docs/P62_COMPLETION_AUDIT_GAP_REPORT.md`.
+- Added `tests/fixtures/p62-completion-audit-gap-report-v1.json`.
+- Added `tests/p62-completion-audit-gap-report-fixture.test.js`.
+- The fixture maps local P51-P62 artifacts to remaining runtime gaps and A5 hard stops.
+- It keeps objective completion, runtime readiness, final RC matrix readiness, v1 RC readiness, cutover, push/tag/release/deploy/config/watchdog, live/provider operation, and RC_READY blocked.
+
 ## Validation
 
 - `node --check tests\p61-mainline-strict-gate-rc-evidence-report-boundary-fixture.test.js`
@@ -80,6 +89,10 @@ P10 observability/admin; P51-P62 local chain complete to A5 boundary.
 - P62 targeted test (`10/10`)
 - P61/P62/no-touch targeted set (`35/35`)
 - `npm test` (`1039/1039`)
+- P62-T2 syntax check for new test
+- P62 completion audit fixture JSON parse
+- P62 audit/boundary targeted test (`18/18`)
+- `npm test` (`1047/1047`)
 
 ## Active Boundaries
 
@@ -97,4 +110,4 @@ P10 observability/admin; P51-P62 local chain complete to A5 boundary.
 
 ## Next Safe Step
 
-Stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized.
+Commit P62-T2 locally, then stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized.
