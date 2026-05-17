@@ -14,7 +14,7 @@ Execute the P36-P40 Boundary-first Governed Memory Spine long-running goal under
 
 ## Worktree
 
-Dirty for validated CM-0312 P40 docs/fixture/test/board updates pending guarded local commit.
+Clean after CM-0312 guarded local commit; this board/status-only reconciliation records the post-commit state.
 
 ## Current Area
 
@@ -23,11 +23,11 @@ P8 memory governance / P40 Local Readiness Report.
 ## Current Truth
 
 - `origin/main` baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, and CM-0311 `1ed25ad`; CM-0312 is validated and awaiting guarded local commit.
-- Latest pushed implementation/test commit: `3e3f76d`; latest local commit: `1ed25ad`.
+- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, and CM-0312 `6f7ade4`.
+- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `6f7ade4`.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
 - Current release/readiness state: P40 local evidence report only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: CM-0312 P40 Local Readiness Report.
+- Current task: P36-P40 local objective complete; push boundary remains.
 
 ## Validation
 
@@ -49,4 +49,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Create a guarded local CM-0312 commit only if the final staged diff stays scoped; push remains blocked unless explicitly requested. P36-P40 local objective then stops at push authorization boundary.
+Stop at push authorization boundary; push remains blocked unless explicitly requested. P36-P40 local objective is complete and validated.

@@ -11,7 +11,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, and CM-0311 `1ed25ad`; CM-0312/P40 is validated and awaiting guarded local commit.
+- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, and CM-0312 `6f7ade4`.
 - Current active program: P36-P40 Boundary-first Governed Memory Spine.
 - Current phase area: P40 Local Readiness Report; fixture-only / dry-run-only.
 

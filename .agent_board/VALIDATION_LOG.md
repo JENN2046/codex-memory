@@ -447,6 +447,8 @@ FAILED
 
 | CMV-0417 | CM-0312-P40-local-readiness-report | COMPLETED_VALIDATED | `node --check tests\p40-local-readiness-report-fixture.test.js`; targeted fixture test `9/9`; `npm test` `790/790`; `git diff --check`; `scripts\validate-local.ps1 -Area docs`; boundary scan with only expected forbidden-claim / hard-stop wording; read-only Verifier scope review `PASS` | Adds a synthetic local evidence report for P40 aggregating P36-T1, P36-T2, P37-T1, P38, and P39 fixture evidence. Readiness means local evidence report only and keeps `runtimeReady`, `mainlineCutoverReady`, `pushReady`, `releaseReady`, `deployReady`, `configSwitchReady`, `watchdogReady`, and `rcReady` false. No real memory content read/preview/export/import/scan, no migration apply, no backup/restore, no provider call, no public MCP expansion, no durable write, no config/watchdog action, no push/tag/release/deploy. |
 
+| CMV-0418 | CM-0313-post-P40-board-reconciliation | COMPLETED_VALIDATED | `git status -sb`; `git log --oneline --decorate -n 9`; P40 commit trailer check; board/status diff inspection; `git diff --check`; `scripts\validate-local.ps1 -Area docs` | Board/status-only reconciliation after guarded local commit `6f7ade4`. Records P36-P40 as complete locally and stops at the push authorization boundary. No source/test/package/runtime/provider/data/public MCP expansion, durable write, service start, migration-import-export apply, backup/restore, push, tag, release, or deploy. |
+
 ## Common Validation Commands
 
 ```powershell

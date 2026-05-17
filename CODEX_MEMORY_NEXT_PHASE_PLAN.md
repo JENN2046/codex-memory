@@ -51,6 +51,6 @@ P40 Local Readiness Report:
 
 ## Next Candidate
 
-After the guarded P40 commit, Commander may choose:
+After P40:
 
 - Close P36-P40 locally and stop at push authorization boundary, unless the user explicitly requests push.
