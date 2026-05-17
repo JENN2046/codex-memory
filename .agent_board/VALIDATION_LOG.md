@@ -546,6 +546,7 @@ FAILED
 | CMV-0501 | P62-completion-audit-post-T6-closeout-wording | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; P62 audit stale/overclaim scan | Updates the P62 completion audit current result to post-T6 audit/refinement closeout wording while preserving blocked runtime/A5 posture. |
 | CMV-0502 | P51-P62-runtime-a5-blocker-register-reconciliation | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; blocker/overclaim scan | Records the current P51-P62 runtime completion boundary in `BLOCKERS.md` with 9 runtime gaps and 16 A5 hard stops while preserving blocked runtime/A5 posture. |
 | CMV-0503 | P51-P62-completion-boundary-commander-decision | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; decision/overclaim scan | Records the commander decision that P51-P62 is local evidence/preflight/audit complete only while preserving blocked runtime/A5 posture. |
+| CMV-0504 | P51-P62-completion-boundary-risk-registration | COMPLETED_VALIDATED | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`; risk/overclaim scan | Records the risk that P51-P62 local evidence/preflight/audit completion could be misread as runtime or RC readiness while preserving blocked runtime/A5 posture. |
 
 ## Common Validation Commands
 
