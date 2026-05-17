@@ -14,27 +14,27 @@ Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-A
 
 ## Worktree
 
-Dirty for CM-0305 P35.1 governed memory policy gate fixture/test plus status/board updates after CM-0304 local commit.
+Dirty for CM-0306 post-CM0305 board reconciliation after CM-0305 local commit.
 
 ## Current Area
 
-P8 memory governance policy gate fixture contract.
+P8 memory governance board reconciliation before P35.2.
 
 ## Current Truth
 
 - `origin/main` baseline: `d210947 fix: redact governance helper output`.
-- Local commits ahead: `83bd388`, `9d3ab69`, `b9965f7`, `280ab9b`, `c06436d`, `4d8d11a`, `3d774ad`, `8220d64`, `29858e6`.
-- Latest local commit: `29858e6 docs: plan p35 policy gate`.
+- Local commits ahead: `83bd388`, `9d3ab69`, `b9965f7`, `280ab9b`, `c06436d`, `4d8d11a`, `3d774ad`, `8220d64`, `29858e6`, `c8325b6`.
+- Latest local implementation/test commit: `c8325b6 test: add p35 policy gate fixture`.
 - P34 chain status: inventory, fixture contract, explicit-input helper, and ValidationAggregator static report-shape evidence are complete locally.
 - Current release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`.
-- Current task: CM-0305 P35.1 governed memory policy gate fixture contract.
+- Current task: CM-0306 post-CM0305 board reconciliation.
 
 ## Validation
 
 - CM-0300 passed: changed JS syntax checks; fixture JSON parse; targeted aggregator/helper tests `31/31`; `npm test` `714/714`; `git diff --check`; docs validation; P34.3 boundary scan; read-only Verifier `PASS`.
 - CM-0303 passed and is committed locally in `8220d64`.
 - CM-0304 passed and is committed locally in `29858e6`.
-- CM-0305 validation passed: JS syntax check, targeted fixture test `11/11`, `npm test` `725/725`, `git diff --check`, docs validation, and P35.1 boundary scan. First read-only Verifier found board validation-state wording only; read-only Verifier rerun passed.
+- CM-0305 passed and is committed locally in `c8325b6`.
 
 ## Hard Stops
 
@@ -50,4 +50,4 @@ No push, tag, release, deploy, provider/model call, real memory preview/export/i
 
 ## Next Safe Step
 
-Create a guarded local CM-0305 commit if scoped. After that, continue with P35.2 explicit-input helper candidate only if it remains pure local input normalization with no runtime side effects.
+Validate and commit CM-0306 board-only reconciliation if scoped. After that, pause before P35.2 per user instruction. Resume with P35.2 only after the user explicitly continues the long-running loop.
