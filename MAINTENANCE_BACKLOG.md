@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, and P42-T1 `169f5bc`.
+- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, and P43-T1 `8af5c64`.
 - Current active program: P41-P45 Evidence-First Gate Spine.
-- Current phase area: P43 Recall-Migration Isolation Explicit-Input Helper; fixture-only / dry-run-only / explicit-input-only.
+- Current phase area: P44 ValidationAggregator P36-P40 Evidence Source Map; fixture-only / dry-run-only / explicit-input-only.
 
 ## Active Queue
 
@@ -33,7 +33,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P41-T1 | governed-memory-spine | A1 | done | Post-P40 Closeout Review | `git diff --check`; docs validation; boundary scan; Verifier | Complete and validated locally; docs/status/board only; confirms P36-P40 local evidence complete but not runtime/mainline/RC/push/release/deploy/config/watchdog ready. |
 | P41-T2 | governed-memory-spine | A2 | done | Evidence Manifest Contract Fixture | new fixture syntax/shape test; `npm test`; docs validation; boundary scan; Verifier | Complete and validated locally; synthetic fixture only; defines evidence manifest v1 source types, required gates, blocked actions, critical gate semantics, safety flags, and forbidden claims. |
 | P42-T1 | governed-memory-spine | A2 | done | Explicit-Input Evidence Helper | changed JS syntax; targeted helper tests; `npm test`; boundary scan; Verifier | Complete and committed locally in `169f5bc`; pure helper over caller-provided object only; no fs read, directory scan, command execution, durable write, public MCP expansion, runtime policy kernel, or RC-ready claim. |
-| P43-T1 | governed-memory-spine | A2 | done | Recall / Migration Isolation Explicit-Input Helper | changed JS syntax; targeted helper tests; `npm test`; boundary scan; Verifier | Complete and validated locally so far; pure helper over caller-provided object only; proves explicit-input isolation for governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned/out-of-scope memory, readiness reports, and synthetic migration metadata without touching normal recall/vector/candidate/ranking/projection/audit summary runtime. |
+| P43-T1 | governed-memory-spine | A2 | done | Recall / Migration Isolation Explicit-Input Helper | changed JS syntax; targeted helper tests; `npm test`; boundary scan; Verifier | Complete and committed locally in `8af5c64`; pure helper over caller-provided object only; proves explicit-input isolation for governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned/out-of-scope memory, readiness reports, and synthetic migration metadata without touching normal recall/vector/candidate/ranking/projection/audit summary runtime. |
 | P44-T1 | governed-memory-spine | A2 | todo | ValidationAggregator P36-P40 Evidence Source Map | changed JS syntax; targeted aggregator tests; `npm test`; boundary scan; Verifier | Future aggregator report-shape evidence only; no fixture read, helper execution, gate/runner execution, live MCP refresh, provider, or runtime-ready claim. |
 
 ## Standing Boundaries

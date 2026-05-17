@@ -14,20 +14,20 @@ Execute the P41-P45 Evidence-First Gate Spine long-running goal under Commander 
 
 ## Worktree
 
-Dirty for CM-0316 P43-T1 helper/test/board updates.
+Clean after CM-0316 local commit `8af5c64`.
 
 ## Current Area
 
-P8 memory governance / P43 Recall-Migration Isolation Explicit-Input Helper.
+P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
 
 ## Current Truth
 
 - `origin/main` baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, and CM-0315 `169f5bc`.
-- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `169f5bc`; latest local docs/status commit: `08597d6`.
+- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, CM-0315 `169f5bc`, and CM-0316 `8af5c64`.
+- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `8af5c64`; latest local docs/status commit: `08597d6`.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: CM-0316 P43-T1 Recall-Migration Isolation Explicit-Input Helper.
+- Current task: CM-0317 P44-T1 ValidationAggregator P36-P40 Evidence Source Map.
 
 ## Validation
 
@@ -52,4 +52,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Finish CM-0316 `git diff --check`, docs validation, boundary scan, and Verifier review. If scoped and validated, create a guarded local commit only; push remains blocked unless explicitly requested.
+Continue to CM-0317 / P44-T1. Keep it report-shape only: no fixture reads, helper execution, gate/runner execution, live MCP refresh, provider call, or runtime-ready claim. Push remains blocked unless explicitly requested.

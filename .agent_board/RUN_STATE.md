@@ -6,25 +6,25 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0316 / P43-T1 Recall-Migration Isolation Explicit-Input Helper |
+| Current task | CM-0317 / P44-T1 ValidationAggregator P36-P40 Evidence Source Map |
 | Current area | P8-memory-governance boundary-first spine |
 | Last pushed baseline | `3e3f76d` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Added CM-0316 P43-T1 recall-migration isolation explicit-input helper and tests. |
+| Last action | Created guarded local CM-0316 commit `8af5c64` for P43-T1 recall-migration isolation helper. |
 | Last validation | CM-0316 validation passed: `node --check src\core\RecallMigrationIsolationContract.js`; `node --check tests\recall-migration-isolation-helper.test.js`; targeted helper/P38/P39 fixture tests `30/30`; `npm test` `822/822`; `git diff --check`; docs validation; boundary scan showed only expected hard-stop/history wording plus synthetic redaction/static-boundary test strings. |
-| Worktree summary | Dirty for CM-0316 P43-T1 helper/test/board updates. Local `main` is ahead of `origin/main` through CM-0315. No runtime/provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/push/tag/release/deploy is authorized for CM-0316. |
+| Worktree summary | Clean after CM-0316 local commit `8af5c64`. Local `main` is ahead of `origin/main` through CM-0316. No runtime/provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/push/tag/release/deploy is authorized for the next local task. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized unless the user explicitly requests another push |
-| Next planned action | Finish CM-0316 `git diff --check`, docs validation, boundary scan, read-only Verifier review, then create guarded local commit if scoped. No push unless explicitly requested. |
+| Next planned action | Continue to CM-0317 / P44-T1 ValidationAggregator P36-P40 evidence source map. No push unless explicitly requested. |
 
 ## Notes
 
 - Project health: strong.
 - Governance health: strong.
-- Current truth: P28-P35.1 governance chain plus post-P35 security hardening is pushed to `origin/main` at `3e3f76d`. P36-T1 is committed locally at `408a92c`; P36-T2 at `d1f48c2`; P37-T1 at `cb7d1ef`; P38 at `251af9c`; P39 at `1ed25ad`; P40 at `6f7ade4`; post-P40 board sync at `ba59537`; P41-T1 at `08597d6`; P41-T2 at `8895816`; P42-T1 at `169f5bc`. The active long-term goal is P41-P45 Evidence-First Gate Spine.
+- Current truth: P28-P35.1 governance chain plus post-P35 security hardening is pushed to `origin/main` at `3e3f76d`. P36-T1 is committed locally at `408a92c`; P36-T2 at `d1f48c2`; P37-T1 at `cb7d1ef`; P38 at `251af9c`; P39 at `1ed25ad`; P40 at `6f7ade4`; post-P40 board sync at `ba59537`; P41-T1 at `08597d6`; P41-T2 at `8895816`; P42-T1 at `169f5bc`; P43-T1 at `8af5c64`. The active long-term goal is P41-P45 Evidence-First Gate Spine.
 - Release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`; helper output safety is hardened without changing runtime readiness.
 - Superseded artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
 - Current user authorization: persistent local A4/A4.8 execution is active for the P41-P45 evidence-first long-running goal. Push/tag/release/deploy, provider calls, real memory content read/preview/export/import/scan, diary/SQLite/vector/candidate/recall-audit scans, SQLite migration apply, backup/restore, watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edits, dependency changes, durable writes, and production deploy remain blocked unless separately explicit.

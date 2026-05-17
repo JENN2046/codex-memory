@@ -28,16 +28,16 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 - P41-T1 closeout: complete locally in `08597d6`.
 - P41-T2 evidence manifest contract fixture: complete locally in `8895816`.
 - P42-T1 explicit-input evidence helper: complete locally in `169f5bc`.
+- P43-T1 recall/migration isolation explicit-input helper: complete locally in `8af5c64`.
 
 ## Current Task
 
-P43-T1 Recall / Migration Isolation Explicit-Input Helper:
+P44-T1 ValidationAggregator P36-P40 Evidence Source Map:
 
-- Add a pure helper over caller-provided recall/migration isolation objects only.
+- Add ValidationAggregator report-shape evidence map for P36-P40 explicit evidence posture only.
 - Keep v1.0 RC `NOT_READY_BLOCKED`.
-- Prove governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned/out-of-scope memory, readiness reports, and synthetic migration metadata stay out of normal recall/vector/candidate/ranking/projection/user-visible audit summary by explicit input only.
-- Reject unsupported source types, warning-only/unknown/skipped/missing/ambiguous/unparsable evidence, malformed input, and readiness/runtime/public MCP/durable/provider claims.
-- Do not read files, scan directories, execute commands, start services, call providers, write durable state, expand public MCP, connect recall runtime, or touch runtime policy kernel.
+- Distinguish local evidence report posture from runtime ready, final RC matrix ready, push/release/deploy/config/watchdog ready.
+- Do not read fixtures, execute helpers/gates/runners, refresh live MCP, call providers, or claim runtime readiness.
 
 ## Boundaries
 
@@ -56,6 +56,6 @@ P43-T1 Recall / Migration Isolation Explicit-Input Helper:
 
 ## Next Candidate
 
-After P43-T1:
+After P44-T1:
 
-- Continue to P44 ValidationAggregator P36-P40 evidence source map only after P43-T1 is scoped, validated, and committed locally.
+- Continue to P45 fixture-only final RC matrix evaluator skeleton after P44-T1 is scoped, validated, and committed locally.

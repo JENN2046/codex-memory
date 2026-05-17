@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `3e3f76d fix: harden local http and governance redaction`。
-- 当前本地基线：`main` ahead `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, and P42-T1 `169f5bc`。
+- 当前本地基线：`main` ahead `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, and P43-T1 `8af5c64`。
 - 最新已推送完成：P35.1 governed memory policy gate fixture contract、P35 post-push board reconciliation、P35 security hardening 均已推送到 `3e3f76d`。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P43-T1 Recall / Migration Isolation Explicit-Input Helper 已实现并通过 syntax / targeted / `npm test`，等待 diff/docs/boundary validation 和 guarded local commit。
+- 当前任务：P44-T1 ValidationAggregator P36-P40 Evidence Source Map。
 
 ## 当前阻塞
 
@@ -21,8 +21,8 @@
 
 ## 当前优先级
 
-1. 完成 P43-T1 `git diff --check`、docs validation、boundary scan 和 Verifier review 后做 guarded local commit。
-2. 下一步进入 P44 ValidationAggregator P36-P40 evidence source map；不得执行 helper/gate/runner，不读 fixtures，不刷新 live MCP。
+1. 进入 P44 ValidationAggregator P36-P40 evidence source map；不得执行 helper/gate/runner，不读 fixtures，不刷新 live MCP。
+2. P44 必须继续输出 `NOT_READY_BLOCKED`，明确区分 local evidence report ready 与 runtime/final RC/push/release/deploy/config/watchdog readiness。
 3. P41-P45 不得连接真实 memory、diary/SQLite/vector/candidate/recall-audit scan、migration apply、backup/restore、provider、public MCP expansion、config/watchdog 或 release/deploy。
 
 ## 主要事实源
