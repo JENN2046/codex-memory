@@ -6,6 +6,7 @@ const path = require('node:path');
 const {
   PUBLIC_MCP_TOOLS,
   SCHEMA_VERSION_POLICY_ERRORS,
+  buildSchemaVersionPolicyEvaluationReport,
   createSchemaVersionPolicy,
   evaluateSchemaVersionPolicyCase,
   isMissingVersion,
@@ -147,4 +148,92 @@ test('schema version policy helper exposes pure operation predicates', () => {
   assert.equal(isWriteOperation('policy_write'), true);
   assert.equal(isWriteOperation('read'), false);
   assert.equal(isWriteOperation('import_preview'), false);
+});
+
+test('schema version policy evaluation report summarizes explicit cases without side effects', () => {
+  const fixture = loadFixture();
+  const before = JSON.stringify(fixture);
+  const report = buildSchemaVersionPolicyEvaluationReport(fixture, fixture.policyCases);
+
+  assert.equal(report.sourceMode, 'explicit_input');
+  assert.equal(report.runtimeEnforcementImplemented, false);
+  assert.equal(report.runtimeIntegrated, false);
+  assert.equal(report.familyCount, fixture.schemaFamilies.length);
+  assert.equal(report.policyCaseCount, fixture.policyCases.length);
+  assert.equal(report.acceptedCount, 2);
+  assert.equal(report.rejectedCount, 4);
+  assert.equal(report.warningCount, 1);
+  assert.equal(report.fallbackCount, 1);
+  assert.equal(report.decisionCounts.allow, 1);
+  assert.equal(report.decisionCounts.allow_with_fallback, 1);
+  assert.equal(report.decisionCounts.reject, 4);
+  assert.equal(report.decisionCounts.warn_and_skip_unsafe_fields, 1);
+  assert.equal(report.errorCounts.schema_version_required, 2);
+  assert.equal(report.errorCounts.unsupported_schema_version, 2);
+  assert.equal(report.familyCounts.memory_record, 5);
+  assert.equal(report.operationCounts.write, 2);
+  assert.deepEqual(report.publicMcpTools, {
+    frozen: true,
+    tools: PUBLIC_MCP_TOOLS
+  });
+  assert.equal(report.cases.length, fixture.policyCases.length);
+  assert.equal(report.cases.some(policyCase => policyCase.requiresMigrationApply), false);
+  assert.equal(report.mutated, false);
+  assert.equal(report.mutatesInput, false);
+  assert.equal(report.readsFiles, false);
+  assert.equal(report.executesCommands, false);
+  assert.equal(report.startsServices, false);
+  assert.equal(report.callsProviders, false);
+  assert.equal(report.runtimeEnforcementChanged, false);
+  assert.equal(report.durableMemoryTouched, false);
+  assert.equal(report.realMemoryScanned, false);
+  assert.equal(report.providerCalls, 0);
+  assert.equal(report.migrationApplied, false);
+  assert.equal(report.importExportApplied, false);
+  assert.equal(report.publicMcpExpanded, false);
+  assert.equal(JSON.stringify(fixture), before);
+});
+
+test('schema version policy evaluation report does not perform implicit fixture reads', () => {
+  const fixture = loadFixture();
+  const originalReadFileSync = fs.readFileSync;
+  fs.readFileSync = () => {
+    throw new Error('unexpected fs read during schema policy report');
+  };
+
+  try {
+    const report = buildSchemaVersionPolicyEvaluationReport(fixture, fixture.policyCases);
+
+    assert.equal(report.policyCaseCount, fixture.policyCases.length);
+    assert.equal(report.readsFiles, false);
+    assert.equal(report.realMemoryScanned, false);
+  } finally {
+    fs.readFileSync = originalReadFileSync;
+  }
+});
+
+test('schema version policy evaluation report fails closed for malformed explicit cases', () => {
+  const fixture = loadFixture();
+  const report = buildSchemaVersionPolicyEvaluationReport(fixture, [
+    null,
+    [],
+    {
+      id: 'known-case',
+      schemaFamily: 'memory_record',
+      operation: 'read',
+      inputVersion: 'v1'
+    }
+  ]);
+
+  assert.equal(report.policyCaseCount, 3);
+  assert.equal(report.acceptedCount, 1);
+  assert.equal(report.rejectedCount, 2);
+  assert.equal(report.errorCounts.unknown_schema_family, 2);
+  assert.equal(report.cases[0].decision, 'reject');
+  assert.equal(report.cases[0].errorCode, SCHEMA_VERSION_POLICY_ERRORS.UNKNOWN_SCHEMA_FAMILY);
+  assert.equal(report.cases[1].decision, 'reject');
+  assert.equal(report.cases[1].errorCode, SCHEMA_VERSION_POLICY_ERRORS.UNKNOWN_SCHEMA_FAMILY);
+  assert.equal(report.cases[2].decision, 'allow');
+  assert.equal(report.mutated, false);
+  assert.equal(report.readsFiles, false);
 });

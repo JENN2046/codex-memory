@@ -279,6 +279,91 @@ function evaluateSchemaVersionPolicyCase(policy, policyCase = {}) {
   return createSchemaVersionPolicy(policy).evaluate(policyCase);
 }
 
+function countBy(items, keyFn) {
+  return items.reduce((counts, item) => {
+    const key = keyFn(item) || 'unknown';
+    return {
+      ...counts,
+      [key]: (counts[key] || 0) + 1
+    };
+  }, {});
+}
+
+function buildSchemaVersionPolicyEvaluationReport(policy = {}, policyCases = []) {
+  const cases = Array.isArray(policyCases) ? policyCases : [];
+  const normalizedPolicy = normalizeSchemaVersionPolicy(policy);
+  const evaluator = createSchemaVersionPolicy(normalizedPolicy);
+  const evaluatedCases = cases.map(policyCase => {
+    const safePolicyCase = policyCase && typeof policyCase === 'object' && !Array.isArray(policyCase)
+      ? policyCase
+      : {};
+
+    return {
+      id: normalizeString(safePolicyCase.id),
+      schemaFamily: normalizeString(safePolicyCase.schemaFamily),
+      operation: normalizeString(safePolicyCase.operation) || 'read',
+      inputVersion: safePolicyCase.inputVersion ?? null,
+      legacyRecord: safePolicyCase.legacyRecord === true,
+      result: evaluator.evaluate(safePolicyCase)
+    };
+  });
+  const rejectedCases = evaluatedCases.filter(policyCase =>
+    policyCase.result.decision === SCHEMA_VERSION_POLICY_DECISIONS.REJECT
+  );
+  const warningCases = evaluatedCases.filter(policyCase => Boolean(policyCase.result.warning));
+  const fallbackCases = evaluatedCases.filter(policyCase => Boolean(policyCase.result.fallbackVersion));
+
+  return {
+    sourceMode: 'explicit_input',
+    runtimeEnforcementImplemented: false,
+    runtimeIntegrated: false,
+    familyCount: normalizedPolicy.schemaFamilies.length,
+    policyCaseCount: evaluatedCases.length,
+    acceptedCount: evaluatedCases.filter(policyCase => policyCase.result.accepted).length,
+    rejectedCount: rejectedCases.length,
+    warningCount: warningCases.length,
+    fallbackCount: fallbackCases.length,
+    decisionCounts: countBy(evaluatedCases, policyCase => policyCase.result.decision),
+    errorCounts: countBy(
+      rejectedCases.filter(policyCase => policyCase.result.errorCode),
+      policyCase => policyCase.result.errorCode
+    ),
+    familyCounts: countBy(evaluatedCases, policyCase => policyCase.schemaFamily),
+    operationCounts: countBy(evaluatedCases, policyCase => policyCase.operation),
+    publicMcpTools: {
+      frozen: normalizedPolicy.publicToolsFrozen,
+      tools: cloneArray(normalizedPolicy.publicTools)
+    },
+    cases: evaluatedCases.map(policyCase => ({
+      id: policyCase.id,
+      schemaFamily: policyCase.schemaFamily,
+      operation: policyCase.operation,
+      inputVersion: policyCase.inputVersion,
+      legacyRecord: policyCase.legacyRecord,
+      decision: policyCase.result.decision,
+      accepted: policyCase.result.accepted,
+      errorCode: policyCase.result.errorCode,
+      fallbackVersion: policyCase.result.fallbackVersion,
+      warning: policyCase.result.warning,
+      mutated: false,
+      requiresMigrationApply: false
+    })),
+    mutated: false,
+    mutatesInput: false,
+    readsFiles: false,
+    executesCommands: false,
+    startsServices: false,
+    callsProviders: false,
+    runtimeEnforcementChanged: false,
+    durableMemoryTouched: false,
+    realMemoryScanned: false,
+    providerCalls: 0,
+    migrationApplied: false,
+    importExportApplied: false,
+    publicMcpExpanded: false
+  };
+}
+
 function summarizeSchemaVersionPolicy(policy) {
   return createSchemaVersionPolicy(policy).summarize();
 }
@@ -287,6 +372,7 @@ module.exports = {
   PUBLIC_MCP_TOOLS,
   SCHEMA_VERSION_POLICY_DECISIONS,
   SCHEMA_VERSION_POLICY_ERRORS,
+  buildSchemaVersionPolicyEvaluationReport,
   createSchemaVersionPolicy,
   evaluateSchemaVersionPolicyCase,
   isMissingVersion,

@@ -908,3 +908,16 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Commit: eligible for guarded local commit; push remains user-directed and not authorized for this cycle.
 - Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
 - A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0265 - P29.3 Explicit SchemaVersionPolicy Evaluation Report
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: helper-side explicit-input policy-case evaluation report; no runtime integration.
+- Changed files: `src/core/SchemaVersionPolicy.js`; `tests/schema-version-policy-runtime.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: added `buildSchemaVersionPolicyEvaluationReport`, summarizing policy cases by decision, error, family, and operation while preserving no-side-effect safety flags. Tests cover committed fixture cases, no implicit fs reads, input immutability, and malformed explicit cases failing closed with `unknown_schema_family`.
+- Validation: `node --check src\core\SchemaVersionPolicy.js`; `node --check tests\schema-version-policy-runtime.test.js`; targeted schema tests `29/29`; `npm test` `596/596`; `git diff --check`.
+- Commit: eligible for guarded local commit; push remains user-directed and not authorized for this cycle.
+- Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
+- A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
