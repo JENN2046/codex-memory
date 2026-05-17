@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0293 / P33.3 ValidationAggregator audit-evidence helper evidence shape.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0294 / P33.x memory governance audit-evidence closeout review.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty only for completed CM-0293 source/test/fixture/status/board updates pending guarded local commit and this-cycle user-authorized push. Local `main` was aligned with `origin/main` at `b8e0b95` before CM-0293 edits.
+Dirty for CM-0294 docs/status/board updates. Local `main` is aligned with `origin/main` at `a62cc50` before CM-0294 edits.
 
 ## Current Area
 
-P33.3 aggregator report-shape evidence
+P33.x audit-evidence closeout review
 
 ## Findings
 
@@ -96,8 +96,9 @@ P33.3 aggregator report-shape evidence
 - CM-0290 adds P33 audit-evidence inventory docs/status/board updates. Validation passed: `git diff --check`, docs validation, P33 boundary reference scan, and read-only Verifier `PASS`. CM-0290 is committed locally in `2d34ccc`.
 - CM-0291 adds a synthetic audit-evidence fixture/test contract. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `678/678`, `git diff --check`, docs validation, P33.1 boundary scan, and read-only Verifier `PASS`. CM-0291 is committed locally in `3abee33`.
 - CM-0292 adds a pure explicit-input audit-evidence helper and focused tests. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `687/687`, `git diff --check`, docs validation, P33.2 boundary reference scan, and read-only Verifier `PASS`. CM-0292 is committed and pushed in `b8e0b95`.
-- CM-0293 adds static ValidationAggregator audit-evidence helper evidence shape. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `687/687`, `git diff --check`, docs validation, P33.3 boundary reference scan, and read-only Verifier `PASS`.
-- Next safe step: create a guarded local commit for CM-0293, run post-commit checks, perform the single user-authorized push, verify `HEAD == origin/main`, then run code review and select the next safe high-return local task.
+- CM-0293 adds static ValidationAggregator audit-evidence helper evidence shape. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `687/687`, `git diff --check`, docs validation, P33.3 boundary reference scan, and read-only Verifier `PASS`. CM-0293 was committed and pushed as `a62cc50` by explicit user instruction; post-push verification confirmed `HEAD == origin/main`.
+- CM-0294 adds P33.x closeout docs/status/board updates. Validation passed: `git diff --check`, docs validation, P33.x boundary reference scan, and read-only Verifier first pass `NEEDS_FIX` for board evidence wording only; fixes applied and Verifier rerun pending.
+- Next safe step: rerun read-only Verifier, then create a guarded local commit if eligible. No further push is authorized.
 
 ## Changed Files
 
