@@ -329,11 +329,21 @@ test('P34.2 helper redacts sensitive normalized output and unsupported source ty
       'authorization: Bearer REVIEW_TOKEN_1234567890'
     ],
     unsupportedSourceTypes: [
-      'api_key=REVIEW_API_KEY_1234567890'
+      'api_key=REVIEW_API_KEY_1234567890',
+      'password=REVIEW_PASSWORD_1234567890',
+      'token=REVIEW_SUMMARY_TOKEN_1234567890',
+      'set-cookie=session=REVIEW_COOKIE_1234567890'
     ],
     safeSourceTypes: [
       ...SAFE_SOURCE_TYPES,
       'raw_workspace_id=workspace-review-raw'
+    ],
+    requiredWording: [
+      ...fixture.requiredWording,
+      'password=REVIEW_WORDING_PASSWORD_1234567890',
+      'token=REVIEW_WORDING_TOKEN_1234567890',
+      'set-cookie=session=REVIEW_WORDING_COOKIE_1234567890',
+      '-----BEGIN PRIVATE KEY-----\nREVIEW_WORDING_PRIVATE_KEY_BODY'
     ],
     sourceSurfaces: fixture.sourceSurfaces.map((source, index) => index === 0
       ? {
@@ -373,6 +383,14 @@ test('P34.2 helper redacts sensitive normalized output and unsupported source ty
     'review_token_1234567890',
     'surface_token_1234567890',
     'artifact_api_key_1234567890',
+    'review_password_1234567890',
+    'review_summary_token_1234567890',
+    'review_cookie_1234567890',
+    'review_wording_password_1234567890',
+    'review_wording_token_1234567890',
+    'review_wording_cookie_1234567890',
+    'begin private key',
+    'review_wording_private_key_body',
     'workspace-surface-raw',
     'workspace-lifecycle-raw'
   ]) {

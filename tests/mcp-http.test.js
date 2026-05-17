@@ -92,6 +92,52 @@ test('HTTP MCP should expose health and tools/list', async () => {
   });
 });
 
+test('HTTP MCP should reject browser-origin no-token POST writes', async () => {
+  await withHttpServer(async ({ address }) => {
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://example.invalid',
+        'Sec-Fetch-Site': 'cross-site'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 3,
+        method: 'tools/list',
+        params: {}
+      })
+    });
+    const payload = await response.json();
+
+    assert.equal(response.status, 403);
+    assert.equal(payload.error, 'Forbidden');
+    assert.match(payload.message, /bearer token/i);
+  });
+});
+
+test('HTTP MCP should reject no-token simple POST content types', async () => {
+  await withHttpServer(async ({ address }) => {
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 4,
+        method: 'tools/list',
+        params: {}
+      })
+    });
+    const payload = await response.json();
+
+    assert.equal(response.status, 403);
+    assert.equal(payload.error, 'Forbidden');
+    assert.match(payload.message, /application\/json/i);
+  });
+});
+
 test('HTTP MCP should fail fast when non-loopback host has no bearer token', async () => {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-auth-'));
   const app = createCodexMemoryApplication({

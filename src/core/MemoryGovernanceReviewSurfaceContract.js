@@ -115,14 +115,7 @@ const NO_SIDE_EFFECT_SAFETY_FLAGS = Object.freeze([
   'noRemoteWrite'
 ]);
 
-const SENSITIVE_FRAGMENT_PATTERNS = Object.freeze([
-  /authorization\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi,
-  /bearer\s+[A-Za-z0-9._~+/=-]+/gi,
-  /api[_-]?key\s*[:=]\s*["']?[A-Za-z0-9._~+/=-]+["']?/gi,
-  /\bapi[_-]?key\b/gi,
-  /raw_workspace_id\s*[:=]\s*["']?[^"',;\s]+["']?/gi,
-  /\braw_workspace_id\b/gi
-]);
+const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -130,16 +123,6 @@ function isPlainObject(value) {
 
 function cloneArray(values) {
   return Array.isArray(values) ? [...values] : [];
-}
-
-function redactSensitiveFragments(value) {
-  let redacted = value;
-
-  for (const pattern of SENSITIVE_FRAGMENT_PATTERNS) {
-    redacted = redacted.replace(pattern, '<redacted>');
-  }
-
-  return redacted;
 }
 
 function normalizeString(value) {

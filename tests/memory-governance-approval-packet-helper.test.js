@@ -231,11 +231,20 @@ test('P32.2 helper redacts sensitive normalized output and unsupported source ty
       'authorization: Bearer APPROVAL_TOKEN_1234567890'
     ],
     unsupportedSourceTypes: [
-      'api_key=APPROVAL_API_KEY_1234567890'
+      'api_key=APPROVAL_API_KEY_1234567890',
+      'password=APPROVAL_PASSWORD_1234567890',
+      'token=APPROVAL_SUMMARY_TOKEN_1234567890',
+      'set-cookie=session=APPROVAL_COOKIE_1234567890'
     ],
     safeSourceTypes: [
       ...SAFE_SOURCE_TYPES,
       'raw_workspace_id=workspace-approval-raw'
+    ],
+    requiredWording: [
+      ...fixture.requiredWording,
+      'password=APPROVAL_WORDING_PASSWORD_1234567890',
+      'token=APPROVAL_WORDING_TOKEN_1234567890',
+      'set-cookie=session=APPROVAL_WORDING_COOKIE_1234567890'
     ],
     governedActions: fixture.governedActions.map((action, index) => index === 0
       ? {
@@ -264,6 +273,12 @@ test('P32.2 helper redacts sensitive normalized output and unsupported source ty
     'approval_token_1234567890',
     'action_token_1234567890',
     'field_api_key_1234567890',
+    'approval_password_1234567890',
+    'approval_summary_token_1234567890',
+    'approval_cookie_1234567890',
+    'approval_wording_password_1234567890',
+    'approval_wording_token_1234567890',
+    'approval_wording_cookie_1234567890',
     'workspace-action-raw'
   ]) {
     assert.equal(normalizedText.includes(forbidden), false);

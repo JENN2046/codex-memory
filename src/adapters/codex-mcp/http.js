@@ -45,6 +45,13 @@ function createUnauthorizedPayload() {
   };
 }
 
+function createForbiddenPayload(reason) {
+  return {
+    error: 'Forbidden',
+    message: reason
+  };
+}
+
 function isLoopbackHost(host) {
   const normalized = String(host || '').trim().toLowerCase();
   return normalized === 'localhost'
@@ -61,6 +68,37 @@ function getHttpAuthWarning({ host, bearerToken }) {
     throw new Error('CODEX_MEMORY_HTTP_TOKEN is required when CODEX_MEMORY_HTTP_HOST is not loopback.');
   }
   return 'HTTP MCP is bound to a loopback host without a bearer token; this is allowed for local development only.';
+}
+
+function getSingleHeaderValue(value) {
+  return Array.isArray(value) ? value[0] : value || '';
+}
+
+function isJsonContentType(value) {
+  const normalized = String(value || '').split(';')[0].trim().toLowerCase();
+  return normalized === 'application/json' || normalized.endsWith('+json');
+}
+
+function validateNoTokenWriteRequest(req) {
+  if (req.method !== 'POST' && req.method !== 'DELETE') {
+    return null;
+  }
+
+  const origin = getSingleHeaderValue(req.headers.origin).trim();
+  if (origin) {
+    return 'Browser-origin writes require bearer token authorization.';
+  }
+
+  const secFetchSite = getSingleHeaderValue(req.headers['sec-fetch-site']).trim().toLowerCase();
+  if (secFetchSite && secFetchSite !== 'none') {
+    return 'Browser fetch writes require bearer token authorization.';
+  }
+
+  if (req.method === 'POST' && !isJsonContentType(getSingleHeaderValue(req.headers['content-type']))) {
+    return 'No-token POST requests must use an application/json content type.';
+  }
+
+  return null;
 }
 
 function parseRequestBody(req, maxBytes = 1024 * 1024) {
@@ -185,6 +223,13 @@ function createStreamableHttpServer({
         return writeJson(res, 401, createUnauthorizedPayload(), {
           'WWW-Authenticate': 'Bearer'
         });
+      }
+
+      if (!bearerToken) {
+        const noTokenWriteRejection = validateNoTokenWriteRequest(req);
+        if (noTokenWriteRejection) {
+          return writeJson(res, 403, createForbiddenPayload(noTokenWriteRejection));
+        }
       }
 
       if (req.method === 'GET') {

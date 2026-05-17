@@ -201,7 +201,10 @@ test('P31.3 helper redacts sensitive normalized output and unsupported source ty
       'authorization: Bearer LIFECYCLE_TOKEN_1234567890'
     ],
     unsupportedSourceTypes: [
-      'api_key=LIFECYCLE_API_KEY_1234567890'
+      'api_key=LIFECYCLE_API_KEY_1234567890',
+      'password=LIFECYCLE_PASSWORD_1234567890',
+      'token=LIFECYCLE_SUMMARY_TOKEN_1234567890',
+      'set-cookie=session=LIFECYCLE_COOKIE_1234567890'
     ],
     safeSourceTypes: [
       ...SAFE_SOURCE_TYPES,
@@ -243,6 +246,9 @@ test('P31.3 helper redacts sensitive normalized output and unsupported source ty
     'lifecycle_token_1234567890',
     'surface_token_1234567890',
     'artifact_api_key_1234567890',
+    'lifecycle_password_1234567890',
+    'lifecycle_summary_token_1234567890',
+    'lifecycle_cookie_1234567890',
     'workspace-surface-raw'
   ]) {
     assert.equal(normalizedText.includes(forbidden), false);

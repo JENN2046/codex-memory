@@ -234,11 +234,20 @@ test('P33.2 helper redacts sensitive normalized output and unsupported source ty
       'authorization: Bearer AUDIT_TOKEN_1234567890'
     ],
     unsupportedSourceTypes: [
-      'api_key=AUDIT_API_KEY_1234567890'
+      'api_key=AUDIT_API_KEY_1234567890',
+      'password=AUDIT_PASSWORD_1234567890',
+      'token=AUDIT_SUMMARY_TOKEN_1234567890',
+      'set-cookie=session=AUDIT_COOKIE_1234567890'
     ],
     safeSourceTypes: [
       ...SAFE_SOURCE_TYPES,
       'raw_workspace_id=workspace-audit-raw'
+    ],
+    requiredWording: [
+      ...fixture.requiredWording,
+      'password=AUDIT_WORDING_PASSWORD_1234567890',
+      'token=AUDIT_WORDING_TOKEN_1234567890',
+      'set-cookie=session=AUDIT_WORDING_COOKIE_1234567890'
     ],
     eventFamilies: fixture.eventFamilies.map((eventFamily, index) => index === 0
       ? {
@@ -267,6 +276,12 @@ test('P33.2 helper redacts sensitive normalized output and unsupported source ty
     'audit_token_1234567890',
     'event_token_1234567890',
     'evidence_api_key_1234567890',
+    'audit_password_1234567890',
+    'audit_summary_token_1234567890',
+    'audit_cookie_1234567890',
+    'audit_wording_password_1234567890',
+    'audit_wording_token_1234567890',
+    'audit_wording_cookie_1234567890',
     'workspace-event-raw'
   ]) {
     assert.equal(normalizedText.includes(forbidden), false);
