@@ -98,6 +98,8 @@ test('P62 prompt-to-artifact audit includes P62-T5 authorization helper evidence
   assert.equal(p62Route.artifacts.includes('src/core/A5RuntimeAuthorizationPreconditionContract.js'), true);
   assert.equal(p62Route.artifacts.includes('docs/P62_A5_RUNTIME_AUTHORIZATION_PRECONDITION_MATRIX.md'), true);
   assert.equal(p62Route.validationRefs.includes('P62-T5 authorization precondition helper test'), true);
+  assert.equal(p62Route.validationRefs.includes('P62-T6 completion audit refresh tests'), true);
+  assert.equal(p62Route.validationRefs.includes('P62 audit wording reconciliation tests'), true);
 });
 
 test('P62 completion audit includes post-P62-T5 local audit and authorization items', () => {

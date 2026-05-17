@@ -219,6 +219,8 @@
         "P62-T3 prompt-to-artifact audit fixture test",
         "P62-T4 authorization precondition matrix fixture test",
         "P62-T5 authorization precondition helper test",
+        "P62-T6 completion audit refresh tests",
+        "P62 audit wording reconciliation tests",
         "npm test"
       ],
       "runtimeAuthority": false
