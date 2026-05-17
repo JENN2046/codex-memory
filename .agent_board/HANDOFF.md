@@ -14,7 +14,7 @@ Execute the P41-P45 Evidence-First Gate Spine long-running goal under Commander 
 
 ## Worktree
 
-Dirty with intended CM-0317 P44 source/test/fixture/status/board changes only; guarded local commit pending final read-only Verifier.
+Clean after CM-0317 local commit `ae7655a`.
 
 ## Current Area
 
@@ -23,11 +23,11 @@ P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
 ## Current Truth
 
 - `origin/main` baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, CM-0315 `169f5bc`, and CM-0316 `8af5c64`.
-- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `8af5c64`; latest local docs/status commit: `08597d6`.
+- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, CM-0315 `169f5bc`, CM-0316 `8af5c64`, and CM-0317 `ae7655a`.
+- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `ae7655a`.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: CM-0317 P44-T1 ValidationAggregator P36-P40 Evidence Source Map is completed and validated in the worktree.
+- Current task: CM-0318 P45-T1 Fixture-Only Final RC Matrix Evaluator Skeleton.
 
 ## Validation
 
@@ -53,4 +53,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Run read-only Verifier for CM-0317, then guarded local commit if PASS. Next safe task after commit is P45 fixture-only final RC matrix evaluator skeleton. Push remains blocked unless explicitly requested.
+Continue to CM-0318 / P45-T1 fixture-only final RC matrix evaluator skeleton. Push remains blocked unless explicitly requested.

@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, and P43-T1 `8af5c64`; P44-T1 is completed/validated in the worktree pending guarded local commit.
+- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, P43-T1 `8af5c64`, and P44-T1 `ae7655a`.
 - Current active program: P41-P45 Evidence-First Gate Spine.
-- Current phase area: P44 ValidationAggregator P36-P40 Evidence Source Map completed; fixture-only / dry-run-only / explicit-input-only boundaries preserved.
+- Current phase area: P45 Fixture-Only Final RC Matrix Evaluator Skeleton; fixture-only / dry-run-only / explicit-input-only boundaries preserved.
 
 ## Active Queue
 

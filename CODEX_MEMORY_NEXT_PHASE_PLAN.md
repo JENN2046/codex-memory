@@ -29,16 +29,16 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 - P41-T2 evidence manifest contract fixture: complete locally in `8895816`.
 - P42-T1 explicit-input evidence helper: complete locally in `169f5bc`.
 - P43-T1 recall/migration isolation explicit-input helper: complete locally in `8af5c64`.
-- P44-T1 ValidationAggregator P36-P40 evidence source map: complete and validated in the worktree; guarded local commit pending Verifier.
+- P44-T1 ValidationAggregator P36-P40 evidence source map: complete locally in `ae7655a`.
 
 ## Current Task
 
-P44-T1 ValidationAggregator P36-P40 Evidence Source Map closeout:
+P45-T1 Fixture-Only Final RC Matrix Evaluator Skeleton:
 
-- Run read-only Verifier and guarded local commit for the completed ValidationAggregator report-shape evidence map.
+- Build a fixture-only / explicit-input evaluator skeleton.
 - Keep v1.0 RC `NOT_READY_BLOCKED`.
-- Keep local evidence posture scoped/report-only; no unqualified ready=true field.
-- Do not read fixtures, execute helpers/gates/runners, refresh live MCP, call providers, or claim runtime readiness.
+- Runner/evaluator must not collect evidence, execute validation commands, execute helpers/gates/runners, refresh live MCP, call providers, read real memory/runtime stores, or claim full final RC validation matrix execution.
+- Missing manifest/evidence, warning-only, unknown, skipped, failed, and unresolved A5 blockers must fail closed.
 
 ## Boundaries
 
@@ -57,6 +57,6 @@ P44-T1 ValidationAggregator P36-P40 Evidence Source Map closeout:
 
 ## Next Candidate
 
-After P44-T1 commit:
+After P45-T1:
 
-- Continue to P45 fixture-only final RC matrix evaluator skeleton.
+- Reconcile board/status, then continue only if a safe local P41-P45 successor remains or stop at the next hard boundary.
