@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P62 completion audit / gap report validated; guarded local commit pending.
+P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary after P62-T2.
 
 ## Current Status
 
@@ -35,7 +35,7 @@ P10 observability/admin; P62 completion audit / gap report validated; guarded lo
 - P61-T2 RC evidence report explicit-input helper is implemented, validated, and committed locally in `15739cb`.
 - P61-T2 post-commit board reconciliation is locally committed in `ba1d87b`.
 - P62-T1 v1.0 RC cutover preflight boundary inventory is implemented, validated, and committed locally in `7baa384`.
-- P62-T2 completion audit / gap report is implemented and validated locally; guarded local commit is pending.
+- P62-T2 completion audit / gap report is implemented, validated, and committed locally in `496d681`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -110,4 +110,4 @@ P10 observability/admin; P62 completion audit / gap report validated; guarded lo
 
 ## Next Safe Step
 
-Commit P62-T2 locally, then stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized.
+Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized.
