@@ -16,7 +16,8 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 6. P55 must connect P52/P53/P54 local evidence to runtime enforcement gaps without treating fixture/local evidence as runtime enforcement.
 7. P56 starts the governance review/approval/audit executable loop boundary and explicit-input helper without durable writes or approval execution.
 8. P57 starts recall isolation runtime proof boundary inventory without executing the runtime proof or scanning real memory/runtime stores.
-9. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
+9. P57-T2 adds the explicit-input evaluator for caller-provided P57 boundary/proof objects while keeping runtime proof blocked.
+10. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
 
@@ -67,6 +68,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P56-T1 governance review/approval/audit executable loop boundary contract is complete and validated.
 - P56-T2 governance loop explicit-input helper is complete, validated, and locally committed in `f69fbbb`.
 - P57-T1 recall isolation runtime proof boundary inventory is complete, validated, and locally committed in `c89a772`.
+- P57-T2 recall isolation runtime proof explicit-input evaluator is complete and validated.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary evidence, or P56 helper evidence.
 
 ## Boundaries
@@ -86,8 +88,8 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P57-T1:
+After P57-T2:
 
-- First finish post-commit board reconciliation for local commit `c89a772`.
-- Then select P57-T2 recall isolation runtime proof explicit-input evaluator only if it remains pure helper over caller-provided synthetic proof objects.
-- Keep P57 helper-first: fail closed for missing/unknown/unsupported/duplicate/contaminated evidence, runtime-store scan claims, real-memory scan claims, durable writes, readiness overclaims, and safety leakage.
+- First do guarded local commit and post-commit board reconciliation.
+- Then select P58-T1 migration/import-export/backup-restore approval framework boundary inventory only if it stays synthetic fixture or sanitized metadata only.
+- Keep P58 boundary-first: no real migration apply, import/export apply, backup/restore apply, real memory scan, durable write, provider call, public MCP expansion, or RC-ready claim.

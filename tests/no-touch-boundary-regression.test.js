@@ -40,6 +40,10 @@ const noTouchTargets = [
     path: 'src/core/GovernanceLoopBoundaryContract.js'
   },
   {
+    label: 'RecallIsolationRuntimeProofContract',
+    path: 'src/core/RecallIsolationRuntimeProofContract.js'
+  },
+  {
     label: 'FinalRcMatrixEvaluator',
     path: 'src/core/FinalRcMatrixEvaluator.js'
   },

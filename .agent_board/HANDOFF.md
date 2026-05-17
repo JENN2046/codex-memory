@@ -14,25 +14,26 @@ Execute P51-P62 Runtime-Enforced Governed Memory Spine Completion under local A4
 
 ## Worktree
 
-Worktree is clean immediately after local commit `c89a772 test: add p57 recall isolation proof boundary`. `origin/main = 1ae4286 test: harden no-touch redaction regressions`; local `main` is ahead by 27 commits. Push is not authorized.
+P57-T2 helper/test/no-touch/status/board edits are validated and pending guarded local commit. `origin/main = 1ae4286 test: harden no-touch redaction regressions`; local `main` is ahead. Push is not authorized.
 
 ## Current Area
 
-P8 memory-governance / P57 recall isolation runtime proof boundary inventory.
+P8 memory-governance / P57 recall isolation runtime proof explicit-input evaluator.
 
 ## Current Truth
 
 - P46-P50 Evidence Enforcement Bridge is pushed to `origin/main` at `1ae4286`.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
-- P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`.
+- P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
+- P57-T2 recall isolation runtime proof explicit-input evaluator is implemented and validated locally.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
-- P56-T2 is not governance runtime execution, approval execution, audit writer readiness, durable write readiness, final RC readiness, or v1 RC readiness.
+- P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 
 ## Validation
 
-- P56-T2 validation passed: changed JS syntax checks, targeted helper test `6/6`, targeted governance loop/helper set `60/60`, no-touch regression `4/4`, boundary scan returned no hits, `npm test` `950/950`.
 - P57-T1 validation passed: new test syntax, fixture JSON parse, targeted P57 test `13/13`, targeted P38/P43/P55/P57 set `49/49`, `npm test` `963/963`.
+- P57-T2 validation passed: changed JS syntax checks, targeted helper/no-touch test `10/10`, targeted P38/P43/P55/P56/P57 set `61/61`, boundary scan returned no hits, `npm test` `969/969`.
 
 ## Hard Stops
 
@@ -40,4 +41,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Finish the P57-T1 post-commit board reconciliation commit. After that, the next safe candidate is P57-T2 recall isolation runtime proof explicit-input evaluator. Do not push unless explicitly authorized.
+Create the guarded local P57-T2 commit, then run post-commit board reconciliation. After that, the next safe candidate is P58-T1 migration/import-export/backup-restore approval framework boundary inventory. Do not push unless explicitly authorized.
