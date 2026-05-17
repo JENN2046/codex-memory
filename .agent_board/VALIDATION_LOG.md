@@ -455,6 +455,8 @@ FAILED
 
 | CMV-0421 | CM-0315-P42-T1-explicit-input-evidence-helper | COMPLETED_VALIDATED | `node --check src\core\EvidenceManifestContract.js`; `node --check tests\evidence-manifest-contract-helper.test.js`; targeted helper/fixture tests `22/22`; `npm test` `812/812`; `git diff --check`; `scripts\validate-local.ps1 -Area docs`; boundary scan with only expected hard-stop/history wording plus synthetic redaction-test strings | Adds a pure explicit-input helper over caller-provided P41 evidence manifest objects only. It normalizes allowlisted fields, rejects unsupported source types and caller whitelist redefinition, keeps warning-only/skipped/unknown/missing/ambiguous/unparsable critical evidence fail-closed, redacts sensitive fragments, local paths, URLs, `.env`, and workspace id fragments in normalized output and unsupported source summaries, and reports no file read, directory scan, command execution, service start, provider call, durable write, public MCP expansion, runtime policy kernel execution, or RC-ready claim. |
 
+| CMV-0422 | CM-0315-post-commit-board-reconciliation | COMPLETED_VALIDATED | `git status -sb`; `git log --oneline --decorate -n 10`; commit trailer check; `git diff --check`; docs validation | Board/status-only reconciliation after local commit `169f5bc`. Clears stale pending-commit wording and routes the next local task to CM-0316 / P43-T1. No source/test/package/runtime/provider/data/public MCP expansion, durable write, service start, migration-import-export apply, backup/restore, push, tag, release, or deploy. |
+
 ## Common Validation Commands
 
 ```powershell
