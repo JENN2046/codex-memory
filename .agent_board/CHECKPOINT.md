@@ -16,7 +16,7 @@ P10 observability-admin / P53 ValidationAggregator explicit evidence classificat
 - Current task: P53-T3 ValidationAggregator explicit evidence classification hardening.
 - P52-T2 helper is complete, validated, and committed locally in `86617ef`.
 - P53-T1 inventory doc/fixture/test is complete and validated locally.
-- P53-T2 inventory posture bridge is complete and validated locally.
+- P53-T2 inventory posture bridge is complete, validated, and committed locally in `19805db`.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -70,4 +70,4 @@ P10 observability-admin / P53 ValidationAggregator explicit evidence classificat
 
 ## Next Safe Step
 
-Create guarded local P53-T2 commit, then continue to P53-T3. Do not push unless explicitly authorized.
+Continue to P53-T3. Do not push unless explicitly authorized.
