@@ -56,8 +56,9 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P53-T2 ValidationAggregator inventory posture bridge is complete and validated.
 - P53-T3 explicit evidence classification hardening is complete, validated, and locally committed in `0a5016d`.
 - P54-T1 final RC runner safe command inventory is complete and validated.
-- P54-T2 final RC runner explicit command-result helper is the next safe implementation slice.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, or P54 command inventory evidence.
+- P54-T2 final RC runner explicit command-result helper is complete and validated.
+- P54-T3 local runner execution harness preflight is the next safe implementation slice.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, or P54 caller-provided command result evidence.
 
 ## Boundaries
 
@@ -76,7 +77,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P54-T1:
+After P54-T2:
 
-- Begin P54-T2 final RC runner explicit command-result helper.
-- Keep P54-T2 helper-only: normalize caller-provided command inventory/result objects, enforce exact allowed command ids, fail closed for missing/unknown/skipped/warning-only/stale/failed/unsupported/duplicate critical gates, and never read files, scan directories, execute commands, start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, or claim final RC readiness.
+- Begin P54-T3 final RC runner local execution harness preflight.
+- Keep P54-T3 allowlist-first: any execution-capable path must be limited to P54-T1 allowed local validation commands, must pass preflight against rejected commands, must preserve machine-readable fail-closed output, and must not start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, write durable state, expand public MCP, change dependencies, push/tag/release/deploy, or claim final RC readiness.

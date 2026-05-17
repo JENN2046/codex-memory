@@ -36,6 +36,10 @@ const noTouchTargets = [
     path: 'src/core/FinalRcMatrixEvaluator.js'
   },
   {
+    label: 'FinalRcRunnerCommandResultContract',
+    path: 'src/core/FinalRcRunnerCommandResultContract.js'
+  },
+  {
     label: 'RuntimeSchemaVersionEnforcementContract',
     path: 'src/core/RuntimeSchemaVersionEnforcementContract.js'
   },
