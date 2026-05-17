@@ -6,19 +6,20 @@ P36-P40 Boundary-first Governed Memory Spine.
 
 ## Current Area
 
-P8 memory governance / P36 Scope And A5 Boundary Contract.
+P8 memory governance / P40 Local Readiness Report.
 
 ## Current Status
 
 - Last pushed baseline: `3e3f76d fix: harden local http and governance redaction` on `origin/main`.
-- Local branch is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, and CM-0310 `251af9c`.
+- Local branch is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, and CM-0311 `1ed25ad`; CM-0312 is validated and awaiting guarded local commit.
 - Latest pushed task chain: P35.1 fixture contract, P35 post-push board reconciliation, and P35 security hardening.
-- Current task: CM-0311 / P39 Synthetic Migration Dry-run Contract.
+- Current task: CM-0312 / P40 Local Readiness Report.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
 - CM-0310 validation passed: `node --check tests\p38-recall-isolation-fixture.test.js`, targeted fixture test `10/10`, `npm test` `771/771`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
 - CM-0311 validation passed: `node --check tests\p39-synthetic-migration-dry-run-fixture.test.js`, targeted fixture test `10/10`, `npm test` `781/781`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop wording.
+- CM-0312 validation passed: `node --check tests\p40-local-readiness-report-fixture.test.js`, targeted fixture test `9/9`, `npm test` `790/790`, `git diff --check`, docs validation, boundary scan with only expected forbidden-claim / hard-stop wording, and read-only Verifier scope review `PASS`.
 
 ## Active Boundaries
 
@@ -41,6 +42,7 @@ P8 memory governance / P36 Scope And A5 Boundary Contract.
 - P37-T1 fixture/test/doc are being added at `tests/fixtures/p37-policy-decision-envelope-v1.json`, `tests/p37-policy-decision-envelope-fixture.test.js`, and `docs/P37_POLICY_DECISION_ENVELOPE_FIXTURE_MATRIX.md`.
 - P38 fixture/test/doc are being added at `tests/fixtures/p38-recall-isolation-v1.json`, `tests/p38-recall-isolation-fixture.test.js`, and `docs/P38_RECALL_ISOLATION_FIXTURES.md`.
 - P39 fixture/test/doc are being added at `tests/fixtures/p39-synthetic-migration-dry-run-v1.json`, `tests/p39-synthetic-migration-dry-run-fixture.test.js`, and `docs/P39_SYNTHETIC_MIGRATION_DRY_RUN_CONTRACT.md`.
+- P40 fixture/test/doc are being added at `tests/fixtures/p40-local-readiness-report-v1.json`, `tests/p40-local-readiness-report-fixture.test.js`, and `docs/P40_LOCAL_READINESS_REPORT.md`.
 - Active `CHECKPOINT.md` is now a short current-state checkpoint.
 - Detailed historical validation remains in `.agent_board/VALIDATION_LOG.md`.
 - Detailed task ledger remains in `.agent_board/TASK_QUEUE.md`.
@@ -48,4 +50,4 @@ P8 memory governance / P36 Scope And A5 Boundary Contract.
 
 ## Next Safe Step
 
-Create a guarded local CM-0311 commit if staged diff remains scoped. Push remains user-directed and not authorized. Next safe task after CM-0311 is P40 Local Readiness Report, still local evidence report only.
+Create a guarded local CM-0312 commit if the final staged diff stays scoped. Push remains user-directed and not authorized. P36-P40 local objective then stops at push authorization boundary.

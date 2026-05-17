@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, and CM-0310 `251af9c`.
+- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, and CM-0311 `1ed25ad`; CM-0312/P40 is validated and awaiting guarded local commit.
 - Current active program: P36-P40 Boundary-first Governed Memory Spine.
-- Current phase area: P36 Scope And A5 Boundary Contract; fixture-only / dry-run-only.
+- Current phase area: P40 Local Readiness Report; fixture-only / dry-run-only.
 
 ## Active Queue
 
@@ -28,7 +28,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P36-T2 | governed-memory-spine | A2 | done | Task Risk Labels Contract | targeted fixture/helper tests; `npm test`; docs validation; Verifier | Complete in local commit `d1f48c2`; defines A4-local-safe / A4.8-guarded / A5-hard-stop as machine-readable, fail-closed semantics. |
 | P37-T1 | governed-memory-spine | A2 | done | Policy Decision Envelope Fixture Matrix | targeted fixture tests; `npm test`; docs validation; Verifier | Complete in local commit `cb7d1ef`; remains synthetic fixture evidence only; no vector/candidate/diary recall path integration. |
 | P38 | governed-memory-spine | A2 | done | Recall Isolation Fixtures | targeted fixture tests; `npm test`; docs validation; Verifier | Complete in local commit `251af9c`; proves governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned/out-of-scope memory stay out of normal recall/candidate/ranking/projection/audit summary. |
-| P39 | governed-memory-spine | A2 | in_progress | Synthetic Migration Dry-run Contract | targeted fixture tests; `npm test`; docs validation; Verifier | Dry-run means synthetic fixture or sanitized metadata only; no real memory content read/preview/export/import/scan, migration apply, backup, or restore. |
+| P39 | governed-memory-spine | A2 | done | Synthetic Migration Dry-run Contract | targeted fixture tests; `npm test`; docs validation; Verifier | Complete in local commit `1ed25ad`; dry-run means synthetic fixture or sanitized metadata only; no real memory content read/preview/export/import/scan, migration apply, backup, or restore. |
+| P40 | governed-memory-spine | A2 | done | Local Readiness Report | targeted fixture tests; `npm test`; docs validation; Verifier | Complete and validated locally; aggregate P36-P39 local evidence only; does not claim runtime/mainline/push/release/deploy/config/watchdog/v1.0 RC readiness. |
 
 ## Standing Boundaries
 

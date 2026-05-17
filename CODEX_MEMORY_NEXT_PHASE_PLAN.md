@@ -8,7 +8,7 @@ This active plan is the short routing document for the current P28-P40 Governed 
 
 ## Current Direction
 
-1. Execute P36 Scope And A5 Boundary Contract before any policy decision kernel or recall isolation work.
+1. P36-P39 boundary, policy, recall-isolation, and synthetic migration dry-run fixtures are complete locally.
 2. Keep P36-P40 local, fixture-only, dry-run-only unless a task explicitly states otherwise.
 3. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
@@ -27,13 +27,13 @@ This active plan is the short routing document for the current P28-P40 Governed 
 
 ## Current Task
 
-P36-T1 Scope + A5 Boundary Contract:
+P40 Local Readiness Report:
 
-- Establish a synthetic migration dry-run contract over synthetic fixtures or sanitized metadata only.
+- Establishes a local readiness evidence report over P36-P39.
 - Keep `decision=NOT_READY_BLOCKED`.
 - Do not implement runtime policy enforcement or a runtime policy kernel.
-- Dry-run must not authorize real memory content read, preview, export, import, scan, migration apply, backup, or restore.
-- Do not approve governed actions or write durable state.
+- Readiness means local evidence report only, not runtime, mainline, push, release, deploy, config, watchdog, or v1.0 RC readiness.
+- Does not approve governed actions or write durable state.
 
 ## Boundaries
 
@@ -51,6 +51,6 @@ P36-T1 Scope + A5 Boundary Contract:
 
 ## Next Candidate
 
-After P39 validation, Commander may choose:
+After the guarded P40 commit, Commander may choose:
 
-- `P40-local-readiness-report`, only if readiness means local evidence report only and not runtime/mainline/deploy/config/watchdog readiness.
+- Close P36-P40 locally and stop at push authorization boundary, unless the user explicitly requests push.

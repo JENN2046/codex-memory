@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "p40-local-readiness-report-v1",
+  "phase": "P40-local-readiness-report",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "machineStatus": "LOCAL_EVIDENCE_REPORT_ONLY",
+  "localEvidenceReportReady": true,
+  "runtimeReady": false,
+  "mainlineCutoverReady": false,
+  "pushReady": false,
+  "releaseReady": false,
+  "deployReady": false,
+  "configSwitchReady": false,
+  "watchdogReady": false,
+  "rcReady": false,
+  "publicMcpExpanded": false,
+  "realMemoryContentRead": false,
+  "mutated": false,
+  "gates": [
+    {
+      "id": "P36-T1-scope-a5-boundary-contract",
+      "evidence": "tests/fixtures/p36-scope-a5-boundary-contract-v1.json",
+      "status": "pass",
+      "scope": "fixture_only",
+      "runtimeReady": false,
+      "reasonCodes": [
+        "P40_P36_T1_LOCAL_EVIDENCE_PRESENT"
+      ]
+    },
+    {
+      "id": "P36-T2-task-risk-labels-contract",
+      "evidence": "tests/fixtures/p36-task-risk-labels-contract-v1.json",
+      "status": "pass",
+      "scope": "fixture_only",
+      "runtimeReady": false,
+      "reasonCodes": [
+        "P40_P36_T2_LOCAL_EVIDENCE_PRESENT"
+      ]
+    },
+    {
+      "id": "P37-T1-policy-decision-envelope-fixture-matrix",
+      "evidence": "tests/fixtures/p37-policy-decision-envelope-v1.json",
+      "status": "pass",
+      "scope": "fixture_only",
+      "runtimeReady": false,
+      "reasonCodes": [
+        "P40_P37_T1_LOCAL_EVIDENCE_PRESENT"
+      ]
+    },
+    {
+      "id": "P38-recall-isolation-fixtures",
+      "evidence": "tests/fixtures/p38-recall-isolation-v1.json",
+      "status": "pass",
+      "scope": "fixture_only",
+      "runtimeReady": false,
+      "reasonCodes": [
+        "P40_P38_LOCAL_EVIDENCE_PRESENT"
+      ]
+    },
+    {
+      "id": "P39-synthetic-migration-dry-run-contract",
+      "evidence": "tests/fixtures/p39-synthetic-migration-dry-run-v1.json",
+      "status": "pass",
+      "scope": "fixture_only",
+      "runtimeReady": false,
+      "reasonCodes": [
+        "P40_P39_LOCAL_EVIDENCE_PRESENT"
+      ]
+    }
+  ],
+  "criticalGateSemantics": {
+    "skipped": "failure",
+    "unknown": "failure",
+    "warning_only": "failure",
+    "failed": "failure"
+  },
+  "blockedReadinessClaims": [
+    "runtime_ready",
+    "mainline_cutover_ready",
+    "push_ready",
+    "release_ready",
+    "deploy_ready",
+    "config_switch_ready",
+    "watchdog_ready",
+    "v1_rc_ready"
+  ],
+  "hardStops": [
+    "real_memory_content_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "backup",
+    "restore",
+    "provider_call",
+    "public_mcp_expansion",
+    "durable_memory_write",
+    "durable_audit_write",
+    "push_tag_release_deploy",
+    "config_switch",
+    "watchdog_install"
+  ],
+  "safety": {
+    "noCommandExecution": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryContentRead": true,
+    "noRealMemoryPreview": true,
+    "noRealMemoryExport": true,
+    "noRealMemoryImport": true,
+    "noRealMemoryScan": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "structureLeakageApproved": false
+  },
+  "requiredWording": [
+    "P40 readiness means local evidence report only.",
+    "Local evidence report readiness does not mean runtime, mainline cutover, push, release, deploy, config switch, watchdog, or v1.0 RC readiness.",
+    "Critical gate skipped, unknown, failed, or warning-only equals failure.",
+    "P40 does not read, preview, export, import, scan, migrate, back up, or restore real memory content."
+  ],
+  "forbiddenClaims": [
+    "local evidence report means runtime-ready",
+    "P40 authorizes mainline cutover",
+    "P40 authorizes push",
+    "P40 authorizes release",
+    "P40 authorizes deploy",
+    "P40 authorizes config switch",
+    "P40 authorizes watchdog install",
+    "P40 makes v1.0 RC ready"
+  ]
+}

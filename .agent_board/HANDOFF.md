@@ -14,25 +14,25 @@ Execute the P36-P40 Boundary-first Governed Memory Spine long-running goal under
 
 ## Worktree
 
-Dirty for CM-0311 P39 docs/fixture/test/board updates.
+Dirty for validated CM-0312 P40 docs/fixture/test/board updates pending guarded local commit.
 
 ## Current Area
 
-P8 memory governance / P36 Scope And A5 Boundary Contract.
+P8 memory governance / P40 Local Readiness Report.
 
 ## Current Truth
 
 - `origin/main` baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, and CM-0310 `251af9c`.
-- Latest pushed implementation/test commit: `3e3f76d`; latest local commit: `251af9c`.
+- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, and CM-0311 `1ed25ad`; CM-0312 is validated and awaiting guarded local commit.
+- Latest pushed implementation/test commit: `3e3f76d`; latest local commit: `1ed25ad`.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
-- Current release/readiness state: boundary-first P36 planning; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: CM-0311 P39 Synthetic Migration Dry-run Contract.
+- Current release/readiness state: P40 local evidence report only; v1.0 RC remains `NOT_READY_BLOCKED`.
+- Current task: CM-0312 P40 Local Readiness Report.
 
 ## Validation
 
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`; `node --test tests\p36-scope-a5-boundary-contract-fixture.test.js` (`12/12`); `npm test` (`739/739`); `git diff --check`; docs validation.
-- CM-0311 validation passed: `node --check tests\p39-synthetic-migration-dry-run-fixture.test.js`; targeted fixture test `10/10`; `npm test` `781/781`; `git diff --check`; docs validation.
+- CM-0312 validation passed: `node --check tests\p40-local-readiness-report-fixture.test.js`; targeted fixture test `9/9`; `npm test` `790/790`; docs validation; `git diff --check`; boundary scan; read-only Verifier scope review `PASS`.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -49,4 +49,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Create a guarded local CM-0311 commit if staged diff remains scoped; push remains blocked unless explicitly requested. Next safe task after CM-0311 is P40 Local Readiness Report, still local evidence report only.
+Create a guarded local CM-0312 commit only if the final staged diff stays scoped; push remains blocked unless explicitly requested. P36-P40 local objective then stops at push authorization boundary.
