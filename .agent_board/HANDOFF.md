@@ -18,7 +18,7 @@ Worktree was clean at P51 start. `HEAD == origin/main == 1ae42862182938265289733
 
 ## Current Area
 
-P6 docs-drift / P51 post-P50 push board/status reconciliation.
+P8 memory-governance / P52 schema-version runtime enforcement boundary.
 
 ## Current Truth
 
@@ -26,7 +26,7 @@ P6 docs-drift / P51 post-P50 push board/status reconciliation.
 - P46-P50 Evidence Enforcement Bridge is pushed.
 - Latest pushed implementation/test commit: `1ae4286`.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: P51-T1 reconciles active status/board docs to the pushed P46-P50 baseline; next safe task is P52-T1 runtime schema-version enforcement boundary plan.
+- Current task: P52-T1 boundary plan is complete and validated; next safe task is P52-T2 minimal explicit-input helper.
 
 ## Validation
 
@@ -51,6 +51,8 @@ P6 docs-drift / P51 post-P50 push board/status reconciliation.
 - P50 validation passed: `node --check tests\no-touch-boundary-regression.test.js`; targeted no-touch test `4/4`; `npm test` `850/850`; `git diff --check`.
 - P50 review-fix validation passed before push: `node --check tests\no-touch-boundary-regression.test.js`; `node --check tests\sensitive-fragment-redaction.test.js`; `node --check src\core\SensitiveFragmentRedaction.js`; targeted new tests `5/5`; targeted helper/no-touch/redaction tests `70/70`; `npm test` `851/851`; `git diff --check`.
 - User-authorized push completed: `2b4a956..1ae4286 main -> main`; post-push verification confirmed `HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`.
+- P51-T1 committed locally in `1f89c63`.
+- P52-T1 validation passed: `node --check tests\p52-runtime-schema-version-enforcement-fixture.test.js`; targeted fixture test `12/12`; `npm test` `863/863`; `git diff --check`.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -67,4 +69,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Continue to P52-T1 boundary plan without crossing runtime/data/A5 boundaries.
+Create guarded local P52-T1 commit, then continue to P52-T2 explicit-input helper without crossing runtime/data/A5 boundaries.

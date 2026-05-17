@@ -6,14 +6,14 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P6 docs-drift / P51 post-P50 push board/status reconciliation.
+P8 memory-governance / P52 schema-version runtime enforcement boundary.
 
 ## Current Status
 
 - Last pushed baseline: `1ae4286 test: harden no-touch redaction regressions` on `origin/main`.
 - Post-push verification confirmed `HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`.
 - Latest pushed task chain: P46-P50 Evidence Enforcement Bridge plus P50 review-fix no-touch/redaction hardening.
-- Current task: P51-T1 active status/board reconciliation to the pushed P46-P50 baseline.
+- Current task: P52-T1 boundary plan is complete and validated; next route is P52-T2 explicit-input helper.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -31,6 +31,8 @@ P6 docs-drift / P51 post-P50 push board/status reconciliation.
 - P50 validation passed: `node --check tests\no-touch-boundary-regression.test.js`, targeted no-touch test `4/4`, `npm test` `850/850`, and `git diff --check`.
 - P50 review-fix validation passed: changed JS syntax checks, targeted no-touch/redaction/helper tests `70/70`, `npm test` `851/851`, and `git diff --check`.
 - User-authorized push completed: `2b4a956..1ae4286 main -> main`.
+- P51-T1 committed locally in `1f89c63`.
+- P52-T1 validation passed: `node --check tests\p52-runtime-schema-version-enforcement-fixture.test.js`, targeted fixture test `12/12`, `npm test` `863/863`, and `git diff --check`.
 
 ## Active Boundaries
 
@@ -61,4 +63,4 @@ P6 docs-drift / P51 post-P50 push board/status reconciliation.
 
 ## Next Safe Step
 
-Continue to P52-T1 runtime schema-version enforcement boundary plan after P51 reconciliation.
+Create guarded local P52-T1 commit, then continue to P52-T2 minimal explicit-input helper.

@@ -1,0 +1,256 @@
+{
+  "schemaVersion": "p52-runtime-schema-version-enforcement-boundary-v1",
+  "version": "v1",
+  "phase": "P52-T1-runtime-schema-version-enforcement-boundary-plan",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "explicitInputOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "runtimeEnforcementImplemented": false,
+  "runtimeIntegrated": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "rcReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "requiredVersionFields": [
+    "schemaVersion",
+    "policyVersion",
+    "manifestVersion"
+  ],
+  "versionContract": {
+    "defaultAllow": false,
+    "unknownVersionDisposition": "deny",
+    "missingVersionDisposition": "deny",
+    "unsupportedVersionDisposition": "deny",
+    "duplicateVersionDisposition": "deny",
+    "malformedVersionDisposition": "deny",
+    "versionMismatchDisposition": "deny",
+    "ambiguousMetadataDisposition": "deny",
+    "unparsableMetadataDisposition": "deny",
+    "staleVersionDisposition": "deny",
+    "criticalSkippedUnknownEqualsFailure": true,
+    "warningOnlyGateAllowed": false,
+    "failurePathExitCode": 1
+  },
+  "boundaryStages": [
+    {
+      "id": "fixture_evidence",
+      "implementedByThisSlice": true,
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "explicit_input_helper",
+      "implementedByThisSlice": false,
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "runtime_enforcement",
+      "implementedByThisSlice": false,
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "rc_evidence_report",
+      "implementedByThisSlice": false,
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    }
+  ],
+  "failClosedCases": [
+    {
+      "id": "missing_schema_version",
+      "field": "schemaVersion",
+      "claimedValue": null,
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_SCHEMA_VERSION_MISSING"
+      ]
+    },
+    {
+      "id": "unknown_policy_version",
+      "field": "policyVersion",
+      "claimedValue": "unknown",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_POLICY_VERSION_UNKNOWN"
+      ]
+    },
+    {
+      "id": "unsupported_manifest_version",
+      "field": "manifestVersion",
+      "claimedValue": "unsupported",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_MANIFEST_VERSION_UNSUPPORTED"
+      ]
+    },
+    {
+      "id": "duplicate_schema_version",
+      "field": "schemaVersion",
+      "claimedValue": [
+        "p52-runtime-schema-version-enforcement-boundary-v1",
+        "p52-runtime-schema-version-enforcement-boundary-v1"
+      ],
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_SCHEMA_VERSION_DUPLICATE"
+      ]
+    },
+    {
+      "id": "malformed_policy_version",
+      "field": "policyVersion",
+      "claimedValue": "malformed",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_POLICY_VERSION_MALFORMED"
+      ]
+    },
+    {
+      "id": "version_mismatch",
+      "field": "versionSet",
+      "claimedValue": "schema-policy-manifest mismatch",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_VERSION_MISMATCH"
+      ]
+    },
+    {
+      "id": "ambiguous_metadata",
+      "field": "metadata",
+      "claimedValue": "ambiguous",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_METADATA_AMBIGUOUS"
+      ]
+    },
+    {
+      "id": "unparsable_metadata",
+      "field": "metadata",
+      "claimedValue": "unparsable",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_METADATA_UNPARSABLE"
+      ]
+    },
+    {
+      "id": "stale_version_claim",
+      "field": "versionSet",
+      "claimedValue": "stale",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_VERSION_STALE"
+      ]
+    },
+    {
+      "id": "warning_only_critical_gate",
+      "field": "criticalGate",
+      "claimedValue": "warning_only",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_CRITICAL_GATE_WARNING_ONLY"
+      ]
+    },
+    {
+      "id": "skipped_critical_gate",
+      "field": "criticalGate",
+      "claimedValue": "skipped",
+      "acceptedForPlanning": false,
+      "machineDecision": "deny",
+      "reasonCodes": [
+        "P52_CRITICAL_GATE_SKIPPED"
+      ]
+    },
+    {
+      "id": "valid_exact_versions_boundary_planning_only",
+      "field": "versionSet",
+      "claimedValue": "exact",
+      "acceptedForPlanning": true,
+      "machineDecision": "allow_boundary_planning_only",
+      "runtimeReady": false,
+      "reasonCodes": [
+        "P52_BOUNDARY_PLANNING_ONLY"
+      ]
+    }
+  ],
+  "blockedActions": [
+    "runtime_request_enforcement",
+    "runtime_policy_kernel_execution",
+    "real_memory_content_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore",
+    "provider_call",
+    "service_start",
+    "config_switch",
+    "watchdog_install",
+    "public_mcp_expansion",
+    "dependency_change",
+    "durable_memory_write",
+    "durable_audit_write",
+    "push_tag_release_deploy"
+  ],
+  "safety": {
+    "noImplicitFileDiscovery": true,
+    "noDirectoryScan": true,
+    "noCommandExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryRead": true,
+    "noRuntimeStoreScan": true,
+    "noRuntimePolicyKernel": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "callerFieldsPassthroughAllowed": false
+  },
+  "requiredWording": [
+    "P52-T1 is a synthetic boundary contract only.",
+    "Exact schemaVersion, policyVersion, and manifestVersion metadata are required before runtime enforcement can be considered.",
+    "Unknown, missing, unsupported, duplicate, malformed, ambiguous, unparsable, stale, mismatched, skipped, or warning-only critical evidence fails closed.",
+    "P52-T1 does not implement runtime enforcement, final RC execution, migration apply, durable writes, public MCP expansion, or v1.0 RC readiness."
+  ],
+  "forbiddenClaims": [
+    "P52 implements runtime enforcement",
+    "P52 authorizes runtime memory reads",
+    "P52 authorizes public MCP expansion",
+    "P52 authorizes migration apply",
+    "P52 makes final RC matrix ready",
+    "P52 makes v1.0 RC ready"
+  ]
+}
