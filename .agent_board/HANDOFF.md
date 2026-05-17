@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P36-P40 Boundary-first Governed Memory Spine long-running goal under Commander -> Architect -> Red Team -> Worker -> Verifier mode.
+Execute the P41-P45 Evidence-First Gate Spine long-running goal under Commander -> Architect -> Red Team -> Worker -> Verifier mode.
 
 ## Workspace
 
@@ -14,20 +14,20 @@ Execute the P36-P40 Boundary-first Governed Memory Spine long-running goal under
 
 ## Worktree
 
-Clean after CM-0312 guarded local commit; this board/status-only reconciliation records the post-commit state.
+Dirty for CM-0313 P41-T1 docs/status/board-only closeout.
 
 ## Current Area
 
-P8 memory governance / P40 Local Readiness Report.
+P8 memory governance / P41 Post-P40 Closeout + Evidence Manifest Charter.
 
 ## Current Truth
 
 - `origin/main` baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, and CM-0312 `6f7ade4`.
-- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `6f7ade4`.
+- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, and post-P40 board sync `ba59537`.
+- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `6f7ade4`; latest local board/status commit: `ba59537`.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
-- Current release/readiness state: P40 local evidence report only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: P36-P40 local objective complete; push boundary remains.
+- Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
+- Current task: CM-0313 P41-T1 Post-P40 Closeout Review.
 
 ## Validation
 
@@ -37,7 +37,7 @@ P8 memory governance / P40 Local Readiness Report.
 
 ## Hard Stops
 
-No push, tag, release, deploy, provider/model call, real memory content read/preview/export/import/scan, SQLite migration apply, backup/restore, service/watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edit, production deploy, dependency change, or durable memory/audit write is authorized.
+No push, tag, release, deploy, provider/model call, real memory content read/preview/export/import/scan, diary/SQLite/vector/candidate/recall-audit scan, SQLite migration apply, backup/restore, service/watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edit, production deploy, dependency change, or durable memory/audit write is authorized.
 
 ## Context Compression
 
@@ -49,4 +49,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Stop at push authorization boundary; push remains blocked unless explicitly requested. P36-P40 local objective is complete and validated.
+Validate CM-0313. If scoped and validated, create a guarded local commit only; push remains blocked unless explicitly requested. Next safe local task is P41-T2 evidence manifest contract fixture.

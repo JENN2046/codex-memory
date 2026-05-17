@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, and CM-0312 `6f7ade4`.
-- Current active program: P36-P40 Boundary-first Governed Memory Spine.
-- Current phase area: P40 Local Readiness Report; fixture-only / dry-run-only.
+- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, and post-P40 board sync `ba59537`.
+- Current active program: P41-P45 Evidence-First Gate Spine.
+- Current phase area: P41 Post-P40 Closeout + Evidence Manifest Charter; fixture-only / dry-run-only / explicit-input-only.
 
 ## Active Queue
 
@@ -30,6 +30,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P38 | governed-memory-spine | A2 | done | Recall Isolation Fixtures | targeted fixture tests; `npm test`; docs validation; Verifier | Complete in local commit `251af9c`; proves governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned/out-of-scope memory stay out of normal recall/candidate/ranking/projection/audit summary. |
 | P39 | governed-memory-spine | A2 | done | Synthetic Migration Dry-run Contract | targeted fixture tests; `npm test`; docs validation; Verifier | Complete in local commit `1ed25ad`; dry-run means synthetic fixture or sanitized metadata only; no real memory content read/preview/export/import/scan, migration apply, backup, or restore. |
 | P40 | governed-memory-spine | A2 | done | Local Readiness Report | targeted fixture tests; `npm test`; docs validation; Verifier | Complete and validated locally; aggregate P36-P39 local evidence only; does not claim runtime/mainline/push/release/deploy/config/watchdog/v1.0 RC readiness. |
+| P41-T1 | governed-memory-spine | A1 | done | Post-P40 Closeout Review | `git diff --check`; docs validation; boundary scan; Verifier | Complete and validated locally; docs/status/board only; confirms P36-P40 local evidence complete but not runtime/mainline/RC/push/release/deploy/config/watchdog ready. |
+| P41-T2 | governed-memory-spine | A2 | todo | Evidence Manifest Contract Fixture | new fixture syntax/shape test; `npm test`; docs validation; boundary scan; Verifier | Synthetic fixture only; define evidence manifest v1 source types, required gates, blocked actions, critical gate semantics, safety flags, and forbidden claims. |
+| P42-T1 | governed-memory-spine | A2 | todo | Explicit-Input Evidence Helper | changed JS syntax; targeted helper tests; `npm test`; boundary scan; Verifier | Pure helper over caller-provided object only; no fs read, command execution, durable write, public MCP expansion, or runtime policy kernel. |
 
 ## Standing Boundaries
 

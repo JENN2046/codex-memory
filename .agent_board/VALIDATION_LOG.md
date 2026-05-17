@@ -449,6 +449,8 @@ FAILED
 
 | CMV-0418 | CM-0313-post-P40-board-reconciliation | COMPLETED_VALIDATED | `git status -sb`; `git log --oneline --decorate -n 9`; P40 commit trailer check; board/status diff inspection; `git diff --check`; `scripts\validate-local.ps1 -Area docs` | Board/status-only reconciliation after guarded local commit `6f7ade4`. Records P36-P40 as complete locally and stops at the push authorization boundary. No source/test/package/runtime/provider/data/public MCP expansion, durable write, service start, migration-import-export apply, backup/restore, push, tag, release, or deploy. |
 
+| CMV-0419 | CM-0313-P41-T1-post-P40-closeout-review | COMPLETED_VALIDATED | `git diff --check`; `scripts\validate-local.ps1 -Area docs`; boundary scan with only expected hard-stop / historical negative readiness / anti-runtime-ready wording; read-only Verifier scope review `PASS` | Docs/status/board-only closeout after P36-P40. Records that P36-P40 is complete only as local fixture/dry-run evidence and is not runtime/mainline/final-RC-matrix/push/release/deploy/config/watchdog/v1.0 RC readiness. Routes next safe work to P41-T2 evidence manifest fixture. No source/test/package/runtime/provider/data/public MCP expansion, durable write, service start, diary/SQLite/vector/candidate/recall-audit scan, real memory read/preview/export/import/scan, migration-import-export apply, backup/restore, push, tag, release, or deploy. |
+
 ## Common Validation Commands
 
 ```powershell

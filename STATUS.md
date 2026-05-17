@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `3e3f76d fix: harden local http and governance redaction`。
-- 当前本地基线：`main` ahead `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, and CM-0312 `6f7ade4`。
+- 当前本地基线：`main` ahead `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, and post-P40 board sync `ba59537`。
 - 最新已推送完成：P35.1 governed memory policy gate fixture contract、P35 post-push board reconciliation、P35 security hardening 均已推送到 `3e3f76d`。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P36-P40 本地目标已完成并验证；停止在 push 授权边界。
+- 当前任务：P41-T1 Post-P40 Closeout Review 已验证，等待 guarded local commit；下一步 P41-T2 evidence manifest contract fixture。
 
 ## 当前阻塞
 
@@ -21,9 +21,9 @@
 
 ## 当前优先级
 
-1. 保持 P36-P40 本地完成状态，v1.0 RC 仍为 `NOT_READY_BLOCKED`。
-2. 等待用户是否授权 push。
-3. P40 不得连接真实 memory、migration apply、backup/restore、provider、public MCP expansion、config/watchdog 或 release/deploy。
+1. 提交已验证的 P41-T1 closeout。
+2. 进入 P41-T2 evidence manifest contract fixture，继续 fixture-only / explicit-input-only。
+3. P41-P45 不得连接真实 memory、diary/SQLite/vector/candidate/recall-audit scan、migration apply、backup/restore、provider、public MCP expansion、config/watchdog 或 release/deploy。
 
 ## 主要事实源
 

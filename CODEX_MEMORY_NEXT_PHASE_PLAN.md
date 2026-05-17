@@ -4,12 +4,12 @@
 
 ## Purpose
 
-This active plan is the short routing document for the current P28-P40 Governed Memory Spine program. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
+This active plan is the short routing document for the current P41-P45 Evidence-First Gate Spine program. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
 
 ## Current Direction
 
-1. P36-P39 boundary, policy, recall-isolation, and synthetic migration dry-run fixtures are complete locally.
-2. Keep P36-P40 local, fixture-only, dry-run-only unless a task explicitly states otherwise.
+1. Treat P36-P40 as complete local evidence only, not runtime/mainline/RC readiness.
+2. Keep P41-P45 local, fixture-only, dry-run-only, and explicit-input-only unless a task explicitly states otherwise.
 3. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
@@ -24,22 +24,23 @@ This active plan is the short routing document for the current P28-P40 Governed 
 - P35 planning: governed memory spine policy gate plan committed locally in `29858e6`.
 - P35.1 fixture contract: governed memory policy gate fixture/test committed locally in `c8325b6`.
 - P35 security hardening and push reconciliation: remote/local baseline is `3e3f76d`.
+- P36-P40 boundary-first chain: complete locally through P40 commit `6f7ade4` and post-P40 board sync `ba59537`.
 
 ## Current Task
 
-P40 Local Readiness Report:
+P41-T1 Post-P40 Closeout Review:
 
-- Establishes a local readiness evidence report over P36-P39.
-- Keep `decision=NOT_READY_BLOCKED`.
-- Do not implement runtime policy enforcement or a runtime policy kernel.
-- Readiness means local evidence report only, not runtime, mainline, push, release, deploy, config, watchdog, or v1.0 RC readiness.
-- Does not approve governed actions or write durable state.
+- Close P36-P40 as local evidence only.
+- Keep v1.0 RC `NOT_READY_BLOCKED`.
+- Do not implement runtime policy enforcement, evidence reader, final RC runner, or runtime policy kernel in P41-T1.
+- Record P41-P45 as evidence-first, fixture-only, explicit-input-only follow-up work.
 
 ## Boundaries
 
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain exactly `record_memory`, `search_memory`, `memory_overview`.
 - Do not implement runtime governance review.
+- Do not scan diary, SQLite, vector index, candidate cache, or recall audit for this goal.
 - Do not run `governance:report` against a real DB for this task.
 - Do not write durable audit/memory records.
 - Do not run provider/model calls.
@@ -51,6 +52,6 @@ P40 Local Readiness Report:
 
 ## Next Candidate
 
-After P40:
+After P41-T1:
 
-- Close P36-P40 locally and stop at push authorization boundary, unless the user explicitly requests push.
+- Continue to P41-T2 evidence manifest contract fixture if the docs/board closeout is validated.
