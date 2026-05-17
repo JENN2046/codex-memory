@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin no-touch / no-leak / redaction long-term regression.
+P10 observability/admin; P60 no-touch regression complete; P61 RC evidence report boundary candidate next.
 
 ## Current Status
 
@@ -27,7 +27,7 @@ P10 observability/admin no-touch / no-leak / redaction long-term regression.
 - P59-T1 post-commit board reconciliation is locally committed in `46fd98e`.
 - P59-T2 HTTP observability explicit-input evidence helper is implemented, validated, and committed locally in `a036c8d`.
 - P59-T2 post-commit board reconciliation is locally committed in `3206a0f`.
-- P60-T1 no-touch / no-leak / redaction long-term regression is implemented and validated locally.
+- P60-T1 no-touch / no-leak / redaction long-term regression is implemented, validated, and committed locally in `66d1978`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -44,6 +44,7 @@ P10 observability/admin no-touch / no-leak / redaction long-term regression.
 - `node --check tests\p60-no-touch-no-leak-redaction-regression.test.js`
 - Targeted P60/no-touch/sensitive-redaction test (`8/8`)
 - `npm test` (`1011/1011`)
+- Post-commit status/log/trailer/diff-check for `66d1978`
 
 ## Active Boundaries
 
@@ -61,4 +62,4 @@ P10 observability/admin no-touch / no-leak / redaction long-term regression.
 
 ## Next Safe Step
 
-Run final diff/docs validation for P60-T1 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation.
+Complete P60-T1 post-commit board/status reconciliation, then evaluate P61-T1 only if it remains local boundary inventory/report-shape work with no runtime side effects.

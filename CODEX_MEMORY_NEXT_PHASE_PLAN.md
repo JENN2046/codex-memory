@@ -78,7 +78,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P58-T2 migration/import-export/backup-restore approval framework explicit-input helper is complete, validated, and locally committed in `2470634`.
 - P59-T1 HTTP runtime observability / operation hardening boundary inventory is complete, validated, and locally committed in `c57be03` as docs/fixture/test evidence only.
 - P59-T2 HTTP observability explicit-input evidence helper is complete, validated, and locally committed in `a036c8d`.
-- P60-T1 no-touch / no-leak / redaction long-term regression is complete and validated locally, pending guarded local commit.
+- P60-T1 no-touch / no-leak / redaction long-term regression is complete, validated, and locally committed in `66d1978`.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, P58 boundary/helper evidence, P59 boundary inventory evidence, or P59 helper evidence.
 
 ## Boundaries
@@ -98,7 +98,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P60-T1 local validation:
+After P60-T1 commit `66d1978`:
 
-- Create the guarded local P60-T1 commit if final diff/docs validation remains clean.
-- Then reconcile active board/status and select the next safe local task without fs scan, child_process, provider/network, runtime store imports, durable writes, public MCP expansion, live HTTP operation, service/watchdog/startup install, config switch, push/tag/release/deploy, or RC-ready claim.
+- Reconcile active board/status to `66d1978`.
+- Consider P61-T1 RC evidence report boundary inventory only if it remains docs/fixture/test or explicit-input report-shape work and does not execute mainline gate, live HTTP operation, provider calls, service/watchdog/startup install, config switch, durable write, public MCP expansion, push/tag/release/deploy, or RC-ready claim.
