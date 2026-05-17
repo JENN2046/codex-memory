@@ -48,6 +48,10 @@ const noTouchTargets = [
     path: 'src/core/MigrationImportExportBackupRestoreApprovalContract.js'
   },
   {
+    label: 'HttpRuntimeObservabilityOperationContract',
+    path: 'src/core/HttpRuntimeObservabilityOperationContract.js'
+  },
+  {
     label: 'FinalRcMatrixEvaluator',
     path: 'src/core/FinalRcMatrixEvaluator.js'
   },

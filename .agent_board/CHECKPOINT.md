@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P4 HTTP runtime / operation hardening; P59-T1 post-commit reconciliation.
+P4 HTTP runtime / operation hardening; P59-T2 explicit-input helper.
 
 ## Current Status
 
@@ -24,25 +24,30 @@ P4 HTTP runtime / operation hardening; P59-T1 post-commit reconciliation.
 - P58-T2 approval framework explicit-input helper is implemented, validated, and committed locally in `2470634`.
 - P58-T2 post-commit board reconciliation is locally committed in `0092189`.
 - P59-T1 HTTP runtime observability / operation hardening boundary inventory is implemented, validated, and committed locally in `c57be03` as docs/fixture/test only.
+- P59-T1 post-commit board reconciliation is locally committed in `46fd98e`.
+- P59-T2 HTTP observability explicit-input evidence helper is implemented and validated locally.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
-## P59-T1 Evidence
+## P59-T2 Evidence
 
-- Added `docs/P59_HTTP_RUNTIME_OBSERVABILITY_OPERATION_HARDENING_BOUNDARY.md`.
-- Added `tests/fixtures/p59-http-runtime-observability-operation-hardening-boundary-v1.json`.
-- Added `tests/p59-http-runtime-observability-operation-hardening-boundary-fixture.test.js`.
-- The fixture records HTTP observability surfaces, source evidence, required runtime evidence, fail-closed states, operation hard stops, forbidden claims, safety, and readiness boundaries.
+- Added `src/core/HttpRuntimeObservabilityOperationContract.js`.
+- Added `tests/http-runtime-observability-operation-contract-helper.test.js`.
+- Added `HttpRuntimeObservabilityOperationContract` to `tests/no-touch-boundary-regression.test.js`.
+- The helper evaluates caller-provided P59 HTTP observability evidence objects only.
+- It enforces exact schema/policy/manifest/source/surface/runtime-evidence/fail-closed/blocked-action sets.
+- It fails closed for malformed input, version drift, non-exact sets, unsupported source types, execution/readiness/safety leakage, and sensitive fragments.
 - It keeps live HTTP observation, service start/stop, watchdog/startup install, config switch, provider call, durable writes, public MCP expansion, runtime readiness, final RC readiness, and v1 RC readiness blocked.
 
 ## Validation
 
-- `node --check tests\p59-http-runtime-observability-operation-hardening-boundary-fixture.test.js`
-- P59 fixture JSON parse
-- Targeted P59 test (`11/11`)
-- Targeted P59/HTTP/no-touch set (`32/32`)
-- `npm test` (`1000/1000`)
-- Post-commit status/log/trailer/diff-check for `c57be03`
+- `node --check src\core\HttpRuntimeObservabilityOperationContract.js`
+- `node --check tests\http-runtime-observability-operation-contract-helper.test.js`
+- `node --check tests\no-touch-boundary-regression.test.js`
+- Targeted helper/no-touch test (`12/12`)
+- Targeted P59/HTTP/no-touch set (`40/40`)
+- Boundary scan over `src\core\HttpRuntimeObservabilityOperationContract.js` returned no hits.
+- `npm test` (`1008/1008`)
 
 ## Active Boundaries
 
@@ -60,4 +65,4 @@ P4 HTTP runtime / operation hardening; P59-T1 post-commit reconciliation.
 
 ## Next Safe Step
 
-Complete P59-T1 post-commit board/status reconciliation, then evaluate P59-T2 only if it remains pure explicit-input helper work with no live HTTP operation or side effects.
+Run final diff/docs validation for P59-T2 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation.
