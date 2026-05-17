@@ -1,0 +1,231 @@
+{
+  "schemaVersion": "memory-governance-lifecycle-contract-v1",
+  "version": "v1",
+  "phase": "P31.2-memory-governance-lifecycle-contract-fixture",
+  "fixtureOnly": true,
+  "reviewOnly": true,
+  "synthetic": true,
+  "mutated": false,
+  "runtimeIntegrated": false,
+  "publicMcpExpanded": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "safeSourceTypes": [
+    "committed_fixture",
+    "committed_test",
+    "committed_doc",
+    "committed_report_shape",
+    "explicit_review_summary"
+  ],
+  "acceptedSourceTypes": [
+    "committed_fixture",
+    "committed_test",
+    "committed_doc",
+    "committed_report_shape",
+    "explicit_review_summary"
+  ],
+  "unsupportedSourceTypes": [],
+  "acceptedForPlanning": true,
+  "surfaces": [
+    {
+      "id": "proposal_lifecycle",
+      "status": "covered_by_existing_fixtures",
+      "sourceArtifacts": [
+        "tests/fixtures/lifecycle-policy-v1.json",
+        "tests/fixtures/controlled-write-proposal-review-v1.json",
+        "tests/fixtures/vcp-memory-object-model-v1.json"
+      ],
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresAudit": true,
+      "activeByDefaultAllowed": false,
+      "runtimeIntegrated": false
+    },
+    {
+      "id": "supersession_lifecycle",
+      "status": "deferred_until_link_integrity_runtime_design",
+      "sourceArtifacts": [
+        "tests/fixtures/controlled-write-tools-v1.json",
+        "tests/fixtures/mutation-audit-shape-v1.json",
+        "tests/fixtures/vcp-memory-object-model-v1.json"
+      ],
+      "requiresOldMemoryId": true,
+      "requiresNewMemoryId": true,
+      "requiresSupersedesLink": true,
+      "requiresSupersededByLink": true,
+      "mutated": false
+    },
+    {
+      "id": "tombstone_lifecycle",
+      "status": "deferred_soft_tombstone_only",
+      "sourceArtifacts": [
+        "tests/fixtures/lifecycle-policy-v1.json",
+        "tests/fixtures/controlled-write-tools-v1.json",
+        "tests/fixtures/vcp-memory-object-model-v1.json"
+      ],
+      "defaultAction": "tombstone",
+      "hardDeleteAllowed": false,
+      "visibleByDefault": false,
+      "requiresTombstoneReason": true,
+      "mutated": false
+    },
+    {
+      "id": "validate_memory_internal",
+      "status": "internal_only",
+      "sourceArtifacts": [
+        "tests/fixtures/validate-memory-runtime-v1.json",
+        "tests/validate-memory-runtime.test.js",
+        "tests/validate-memory-cli.test.js"
+      ],
+      "publicMcpTool": false,
+      "defaultMutates": false,
+      "requiresExplicitApprovalForApply": true,
+      "allowedTransitions": [
+        { "from": "proposal", "to": "active", "requiresEvidence": true },
+        { "from": "stale", "to": "active", "requiresEvidence": true }
+      ],
+      "forbiddenTransitions": [
+        { "from": "rejected", "to": "active" },
+        { "from": "tombstoned", "to": "active" },
+        { "from": "superseded", "to": "active" }
+      ]
+    },
+    {
+      "id": "mutation_audit",
+      "status": "shape_covered",
+      "sourceArtifacts": [
+        "tests/fixtures/mutation-audit-shape-v1.json"
+      ],
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresRedactionApplied": true,
+      "requiresLifecyclePolicyApplied": true,
+      "requiresScopePolicyApplied": true,
+      "appendOnly": true
+    },
+    {
+      "id": "approval_posture",
+      "status": "blocked_until_explicit_approval",
+      "sourceArtifacts": [
+        "tests/fixtures/controlled-write-proposal-review-v1.json"
+      ],
+      "runtimeMutationAllowedNow": false,
+      "publicMcpExpansionAllowedNow": false,
+      "realMemoryScanAllowedNow": false
+    },
+    {
+      "id": "public_mcp_freeze",
+      "status": "frozen",
+      "sourceArtifacts": [
+        "tests/fixtures/controlled-write-tools-v1.json",
+        "src/core/constants.js"
+      ],
+      "publicTools": [
+        "record_memory",
+        "search_memory",
+        "memory_overview"
+      ]
+    }
+  ],
+  "lifecycleCases": [
+    {
+      "id": "proposal_accept",
+      "from": "proposal",
+      "to": "active",
+      "acceptedForPlanning": true,
+      "runtimeIntegrated": false,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresAudit": true,
+      "requiresRedactionApplied": true,
+      "requiresLifecyclePolicyApplied": true,
+      "requiresScopePolicyApplied": true,
+      "internalOnly": true,
+      "publicMcpTool": false,
+      "mutated": false
+    },
+    {
+      "id": "proposal_reject",
+      "from": "proposal",
+      "to": "rejected",
+      "acceptedForPlanning": true,
+      "runtimeIntegrated": false,
+      "hiddenByDefault": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresAudit": true,
+      "mutated": false
+    },
+    {
+      "id": "supersession_deferred",
+      "from": "active",
+      "to": "superseded",
+      "acceptedForPlanning": false,
+      "deferred": true,
+      "requiresOldMemoryId": true,
+      "requiresNewMemoryId": true,
+      "requiresSupersedesLink": true,
+      "requiresSupersededByLink": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresAudit": true,
+      "mutated": false
+    },
+    {
+      "id": "tombstone_deferred",
+      "from": "active",
+      "to": "tombstoned",
+      "acceptedForPlanning": false,
+      "deferred": true,
+      "defaultAction": "tombstone",
+      "hardDeleteAllowed": false,
+      "hiddenByDefault": true,
+      "requiresTombstoneReason": true,
+      "requiresReason": true,
+      "requiresEvidence": true,
+      "requiresAudit": true,
+      "mutated": false
+    }
+  ],
+  "blockers": [
+    "runtime_schema_version_enforcement_incomplete",
+    "public_mcp_governance_expansion_not_approved",
+    "durable_mutation_not_approved",
+    "real_memory_scan_blocked",
+    "migration_import_export_apply_blocked",
+    "backup_restore_blocked",
+    "provider_service_config_action_blocked",
+    "final_rc_matrix_not_executed",
+    "v1_rc_not_ready_blocked"
+  ],
+  "requiredApprovals": [
+    "runtime_mutation",
+    "public_mcp_tool_or_schema_expansion",
+    "real_memory_scan_export_import",
+    "migration_import_export_apply",
+    "backup_restore",
+    "provider_service_config_action",
+    "push_tag_release_deploy"
+  ],
+  "safety": {
+    "noRuntimeMutation": true,
+    "noPublicMcpExpansion": true,
+    "noDurableMemoryWrite": true,
+    "noRealMemoryScan": true,
+    "noMigrationImportExportApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noPackageScriptChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false
+  },
+  "decision": "NOT_READY_BLOCKED",
+  "next": "P31.3-memory-governance-lifecycle-contract-helper-candidate"
+}
