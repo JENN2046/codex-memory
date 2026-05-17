@@ -120,6 +120,11 @@ const EVIDENCE_SOURCES = {
     source_ref: 'src/core/SchemaVersionPolicy.js / tests/schema-version-policy-runtime.test.js',
     status: 'helper_added_runtime_not_integrated'
   },
+  schema_version_runtime_boundary_guard: {
+    source_type: 'fixture_backed_runtime_boundary_test',
+    source_ref: 'tests/schema-version-runtime-boundary.test.js',
+    status: 'boundary_guard_added_runtime_not_integrated'
+  },
   schema_compatibility_dry_run_cli: {
     source_type: 'fixture_only_cli_contract',
     source_ref: 'src/cli/schema-compatibility-dry-run.js / tests/schema-compatibility-dry-run-cli.test.js / tests/fixtures/schema-compatibility-dry-run-v1.json',
@@ -742,6 +747,10 @@ function buildV1RcValidationAggregatorReport({
       schemaVersionPolicyHelperImplemented: true,
       schemaVersionPolicyHelperExplicitInputOnly: true,
       schemaVersionPolicyHelperRuntimeIntegrated: false,
+      schemaVersionRuntimeBoundaryGuardTestAdded: true,
+      schemaVersionRuntimeBoundaryGuardPublicSchemaFrozen: true,
+      schemaVersionRuntimeBoundaryGuardRejectsSchemaVersionArgs: true,
+      schemaVersionRuntimeBoundaryGuardRuntimeIntegrated: false,
       schemaCompatibilityDryRunCliImplemented: true,
       schemaCompatibilityDryRunCliFixtureOnly: true,
       schemaCompatibilityDryRunCliExecuted: false,
@@ -817,6 +826,13 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true,
         evidence: 'P29.1 SchemaVersionPolicy helper evaluates explicit parsed policy input only; it is not wired into runtime enforcement.'
       }),
+      schemaVersionRuntimeBoundaryGuard: createCheck({
+        status: 'boundary_guard_added_runtime_not_integrated',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P29.5 boundary guard test proves record_memory schema has no schema version args and ToolArgumentValidator rejects them before public MCP expansion; it is not runtime enforcement.'
+      }),
       schemaCompatibilityDryRunCli: createCheck({
         status: 'fixture_only_cli_added',
         requiredBeforeV1Rc: true,
@@ -889,6 +905,7 @@ function buildV1RcValidationAggregatorReport({
       'schemaVersionDocsReview',
       'schemaVersionPolicyFixture',
       'schemaVersionPolicyHelper',
+      'schemaVersionRuntimeBoundaryGuard',
       'schemaCompatibilityDryRunCli',
       'migrationImportExportDryRunGateCli',
       'migrationImportExportApprovalPacketCli',
@@ -958,6 +975,24 @@ function buildV1RcValidationAggregatorReport({
         rejectsUnknownFamilies: true,
         readsFiles: false,
         mutatesInput: false,
+        runtimeIntegrated: false,
+        runtimeEnforcementImplemented: false,
+        publicMcpExpanded: false
+      },
+      p29SchemaVersionRuntimeBoundaryGuard: {
+        status: 'boundary_guard_added_runtime_not_integrated',
+        test: 'tests/schema-version-runtime-boundary.test.js',
+        sourceMode: 'fixture_backed_test',
+        publicRecordMemorySchemaFrozen: true,
+        recordMemorySchemaVersionArgsExposed: false,
+        toolArgumentValidatorRejectsSchemaVersionArgs: true,
+        policyWriteRejectionReportOnly: true,
+        readsFiles: false,
+        executesCommands: false,
+        startsServices: false,
+        callsProviders: false,
+        durableMemoryTouched: false,
+        realMemoryScanned: false,
         runtimeIntegrated: false,
         runtimeEnforcementImplemented: false,
         publicMcpExpanded: false
