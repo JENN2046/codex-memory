@@ -14,20 +14,20 @@ Execute P46-P50 Evidence Enforcement Bridge under local A4/A4.8 boundaries, star
 
 ## Worktree
 
-P49 source/test/fixture/status/board edits are validated and ready for guarded local commit. Local `main` is ahead of `origin/main` by `ed01771`, `056b639`, `9fba356`, and `fa8c414`.
+P50 test/status/board edits are validated and ready for guarded local commit. Local `main` is ahead of `origin/main` by `ed01771`, `056b639`, `9fba356`, `fa8c414`, and `922069d`.
 
 ## Current Area
 
-P10 observability-admin / P49 ValidationAggregator P45 posture bridge.
+P10 observability-admin / P50 no-touch boundary regression suite.
 
 ## Current Truth
 
 - `origin/main` baseline: `2b4a956 fix: harden governance evidence helper contracts`.
-- Local branch started P46 from `origin/main` at `2b4a956` and is now ahead by local P46-P48 commits.
+- Local branch started P46 from `origin/main` at `2b4a956` and is now ahead by local P46-P49 commits.
 - Latest pushed implementation/test commit: `2b4a956`.
 - P36-P45 evidence-first / fixture-only / explicit-input chain plus CM-0320 strict schema/version exact-set hardening are pushed.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: P49 adds a static ValidationAggregator P45 posture bridge. Next safe task is P50 no-touch boundary regression suite.
+- Current task: P50 adds a no-touch boundary regression suite. P46-P50 is locally complete after guarded P50 commit.
 
 ## Validation
 
@@ -48,6 +48,8 @@ P10 observability-admin / P49 ValidationAggregator P45 posture bridge.
 - P48 validation passed: `node --check tests\evidence-chain-consistency-guard.test.js`; targeted guard test `4/4`; `npm test` `846/846`; `git diff --check`; boundary scan returned no hits.
 - P48 committed locally in `fa8c414`; no push was performed.
 - P49 validation passed: `node --check src\core\ValidationAggregatorService.js`; changed aggregator test syntax checks; targeted aggregator tests `36/36`; `npm test` `846/846`; `git diff --check`; require/import boundary scan showed only `./constants` in `ValidationAggregatorService.js`.
+- P49 committed locally in `922069d`; no push was performed.
+- P50 validation passed: `node --check tests\no-touch-boundary-regression.test.js`; targeted no-touch test `4/4`; `npm test` `850/850`; `git diff --check`.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -64,4 +66,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Create guarded local P49 commit, then proceed to P50 if safe. Push remains blocked unless explicitly requested.
+Create guarded local P50 commit. Push remains blocked unless explicitly requested.
