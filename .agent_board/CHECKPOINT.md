@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P61 RC evidence report boundary inventory.
+P10 observability/admin; P61 RC evidence report boundary inventory complete; P61-T2 explicit-input helper candidate next.
 
 ## Current Status
 
@@ -29,7 +29,7 @@ P10 observability/admin; P61 RC evidence report boundary inventory.
 - P59-T2 post-commit board reconciliation is locally committed in `3206a0f`.
 - P60-T1 no-touch / no-leak / redaction long-term regression is implemented, validated, and committed locally in `66d1978`.
 - P60-T1 post-commit board reconciliation is locally committed in `ca30af1`.
-- P61-T1 mainline strict gate + RC evidence report boundary inventory is implemented and validated locally.
+- P61-T1 mainline strict gate + RC evidence report boundary inventory is implemented, validated, and committed locally in `360f4f9`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -48,6 +48,7 @@ P10 observability/admin; P61 RC evidence report boundary inventory.
 - Targeted P61 test (`10/10`)
 - Targeted P54/P59/P60/P61/no-touch set (`70/70`)
 - `npm test` (`1021/1021`)
+- Post-commit status/log/trailer/diff-check for `360f4f9`
 
 ## Active Boundaries
 
@@ -65,4 +66,4 @@ P10 observability/admin; P61 RC evidence report boundary inventory.
 
 ## Next Safe Step
 
-Run final diff/docs validation for P61-T1 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation.
+Complete P61-T1 post-commit board/status reconciliation, then evaluate P61-T2 only if it remains pure explicit-input helper work with no runtime side effects.
