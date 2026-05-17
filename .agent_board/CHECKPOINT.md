@@ -22,6 +22,7 @@ P8 memory governance / P43 Recall-Migration Isolation Explicit-Input Helper.
 - CM-0312 validation passed: `node --check tests\p40-local-readiness-report-fixture.test.js`, targeted fixture test `9/9`, `npm test` `790/790`, `git diff --check`, docs validation, boundary scan with only expected forbidden-claim / hard-stop wording, and read-only Verifier scope review `PASS`.
 - CM-0314 validation passed and is committed locally at `8895816`: `node --check tests\p41-evidence-manifest-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `802/802`, `git diff --check`, docs validation, boundary scan with only expected P41 forbidden-claim / hard-stop / historical negative readiness wording, and read-only Verifier scope review `PASS`.
 - CM-0315 validation passed: `node --check src\core\EvidenceManifestContract.js`, `node --check tests\evidence-manifest-contract-helper.test.js`, targeted helper/fixture tests `22/22`, `npm test` `812/812`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop/history wording plus synthetic redaction-test strings.
+- CM-0316 validation passed: `node --check src\core\RecallMigrationIsolationContract.js`, `node --check tests\recall-migration-isolation-helper.test.js`, targeted helper/P38/P39 fixture tests `30/30`, `npm test` `822/822`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop/history wording plus synthetic redaction/static-boundary test strings.
 
 ## Active Boundaries
 
@@ -52,4 +53,4 @@ P8 memory governance / P43 Recall-Migration Isolation Explicit-Input Helper.
 
 ## Next Safe Step
 
-Continue to CM-0316 / P43-T1 recall-migration isolation explicit-input helper. Push remains user-directed and not authorized.
+Finish CM-0316 diff/docs/boundary validation and guarded local commit if scoped. Push remains user-directed and not authorized.

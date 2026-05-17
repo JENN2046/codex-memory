@@ -35,7 +35,7 @@ P43-T1 Recall / Migration Isolation Explicit-Input Helper:
 
 - Add a pure helper over caller-provided recall/migration isolation objects only.
 - Keep v1.0 RC `NOT_READY_BLOCKED`.
-- Prove governance records, validation transcripts, policy decisions, readiness reports, and synthetic migration metadata stay out of normal recall/vector/candidate/ranking/projection/user-visible audit summary by explicit input only.
+- Prove governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned/out-of-scope memory, readiness reports, and synthetic migration metadata stay out of normal recall/vector/candidate/ranking/projection/user-visible audit summary by explicit input only.
 - Reject unsupported source types, warning-only/unknown/skipped/missing/ambiguous/unparsable evidence, malformed input, and readiness/runtime/public MCP/durable/provider claims.
 - Do not read files, scan directories, execute commands, start services, call providers, write durable state, expand public MCP, connect recall runtime, or touch runtime policy kernel.
 

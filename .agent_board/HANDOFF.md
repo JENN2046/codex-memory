@@ -14,7 +14,7 @@ Execute the P41-P45 Evidence-First Gate Spine long-running goal under Commander 
 
 ## Worktree
 
-Clean after CM-0315 local commit `169f5bc`.
+Dirty for CM-0316 P43-T1 helper/test/board updates.
 
 ## Current Area
 
@@ -35,6 +35,7 @@ P8 memory governance / P43 Recall-Migration Isolation Explicit-Input Helper.
 - CM-0312 validation passed: `node --check tests\p40-local-readiness-report-fixture.test.js`; targeted fixture test `9/9`; `npm test` `790/790`; docs validation; `git diff --check`; boundary scan; read-only Verifier scope review `PASS`.
 - CM-0314 validation passed and committed locally at `8895816`: `node --check tests\p41-evidence-manifest-contract-fixture.test.js`; targeted fixture test `12/12`; `npm test` `802/802`; docs validation; `git diff --check`; boundary scan; read-only Verifier scope review `PASS`.
 - CM-0315 validation passed: `node --check src\core\EvidenceManifestContract.js`; `node --check tests\evidence-manifest-contract-helper.test.js`; targeted helper/fixture tests `22/22`; `npm test` `812/812`; `git diff --check`; docs validation; boundary scan with only expected hard-stop/history wording plus synthetic redaction-test strings.
+- CM-0316 validation passed: `node --check src\core\RecallMigrationIsolationContract.js`; `node --check tests\recall-migration-isolation-helper.test.js`; targeted helper/P38/P39 fixture tests `30/30`; `npm test` `822/822`; `git diff --check`; docs validation; boundary scan with only expected hard-stop/history wording plus synthetic redaction/static-boundary test strings.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -51,4 +52,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Continue to CM-0316 / P43-T1. Keep it explicit-input-only and do not connect normal recall, vector, candidate cache, ranking, projection, audit summary, real memory, or runtime stores. Push remains blocked unless explicitly requested.
+Finish CM-0316 `git diff --check`, docs validation, boundary scan, and Verifier review. If scoped and validated, create a guarded local commit only; push remains blocked unless explicitly requested.
