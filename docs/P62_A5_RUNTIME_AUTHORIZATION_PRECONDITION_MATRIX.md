@@ -1,6 +1,6 @@
 # P62 A5 Runtime Authorization Precondition Matrix
 
-P62-T4 records the authorization preconditions for the remaining P51-P62 runtime and cutover work. It is a local planning artifact only.
+This matrix records the authorization preconditions for the remaining P51-P62 runtime and cutover work. It is a local planning artifact only.
 
 ## Purpose
 
@@ -40,7 +40,7 @@ Before any future A5 action can be considered, the relevant preconditions must h
 
 ## Boundary
 
-P62-T4 must not:
+This matrix must not:
 
 - execute runtime enforcement
 - run final RC runner commands

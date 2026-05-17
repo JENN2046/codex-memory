@@ -1,6 +1,6 @@
 # P62 Completion Audit Gap Report
 
-P62-T2 records the completion audit for the P51-P62 local chain. It is a local evidence/gap report, not RC readiness and not cutover authorization.
+This report records the completion audit for the P51-P62 local chain. It is a local evidence/gap report, not RC readiness and not cutover authorization.
 
 ## Purpose
 

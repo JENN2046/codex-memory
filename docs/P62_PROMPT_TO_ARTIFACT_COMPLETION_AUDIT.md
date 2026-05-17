@@ -1,6 +1,6 @@
 # P62 Prompt-To-Artifact Completion Audit
 
-P62-T3 records a prompt-to-artifact completion audit for the active P51-P62 program. It is local evidence only. It is not runtime readiness, final RC readiness, cutover authorization, or a release signal.
+This report records a prompt-to-artifact completion audit for the active P51-P62 program. It is local evidence only. It is not runtime readiness, final RC readiness, cutover authorization, or a release signal.
 
 ## Audit Scope
 
