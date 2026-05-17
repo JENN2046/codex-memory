@@ -17,7 +17,8 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 7. P56 starts the governance review/approval/audit executable loop boundary and explicit-input helper without durable writes or approval execution.
 8. P57 starts recall isolation runtime proof boundary inventory without executing the runtime proof or scanning real memory/runtime stores.
 9. P57-T2 adds the explicit-input evaluator for caller-provided P57 boundary/proof objects while keeping runtime proof blocked.
-10. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
+10. P58-T1 defines the migration/import-export/backup-restore approval framework boundary inventory using docs/fixture/test evidence only.
+11. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
 
@@ -69,7 +70,8 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P56-T2 governance loop explicit-input helper is complete, validated, and locally committed in `f69fbbb`.
 - P57-T1 recall isolation runtime proof boundary inventory is complete, validated, and locally committed in `c89a772`.
 - P57-T2 recall isolation runtime proof explicit-input evaluator is complete, validated, and locally committed in `6f29757`.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary evidence, or P56 helper evidence.
+- P58-T1 migration/import-export/backup-restore approval framework boundary inventory is complete and validated locally as docs/fixture/test evidence only.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, or P58 boundary evidence.
 
 ## Boundaries
 
@@ -88,8 +90,8 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P57-T2:
+After P58-T1:
 
-- First finish post-commit board reconciliation for local commit `6f29757`.
-- Then select P58-T1 migration/import-export/backup-restore approval framework boundary inventory only if it stays synthetic fixture or sanitized metadata only.
+- First commit P58-T1 locally, then run post-commit board reconciliation for that commit.
+- Then consider P58-T2 approval framework explicit-input helper only if it stays caller-provided object only and does not read files, scan directories, execute commands, write durable state, call providers, import runtime stores, expand public MCP, or claim readiness.
 - Keep P58 boundary-first: no real migration apply, import/export apply, backup/restore apply, real memory scan, durable write, provider call, public MCP expansion, or RC-ready claim.

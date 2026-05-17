@@ -1,0 +1,357 @@
+{
+  "schemaVersion": "p58-migration-import-export-backup-restore-approval-boundary-v1",
+  "policyVersion": "p58-approval-framework-policy-v1",
+  "manifestVersion": "p58-approval-framework-manifest-v1",
+  "version": "v1",
+  "phase": "P58-T1-migration-import-export-backup-restore-approval-boundary",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "localOnly": true,
+  "dryRunOnly": true,
+  "boundaryInventoryOnly": true,
+  "runtimeIntegrated": false,
+  "approvalFrameworkImplemented": false,
+  "approvalExecutionReady": false,
+  "approvalExecuted": false,
+  "migrationFrameworkReady": false,
+  "migrationApplyReady": false,
+  "importExportFrameworkReady": false,
+  "importExportApplyReady": false,
+  "backupRestoreFrameworkReady": false,
+  "backupRestoreApplyReady": false,
+  "migrationApplied": false,
+  "importApplied": false,
+  "exportApplied": false,
+  "backupCreated": false,
+  "restorePerformed": false,
+  "realMemoryScanned": false,
+  "runtimeStoreScanned": false,
+  "durableMemoryWritten": false,
+  "durableAuditWritten": false,
+  "publicMcpExpanded": false,
+  "providerCalls": 0,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "allowedSourceTypes": [
+    "synthetic_fixture",
+    "sanitized_metadata"
+  ],
+  "deniedSourceTypes": [
+    "real_memory_content",
+    "real_diary",
+    "real_sqlite",
+    "real_vector_index",
+    "real_candidate_cache",
+    "real_recall_audit",
+    "operator_free_text",
+    "provider_output"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "p27_migration_import_export_approval_packet_contract",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/migration-import-export-approval-packet-v1.json",
+        "tests/migration-import-export-approval-packet-fixture.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    },
+    {
+      "id": "p39_synthetic_migration_dry_run_contract",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p39-synthetic-migration-dry-run-v1.json",
+        "tests/p39-synthetic-migration-dry-run-fixture.test.js",
+        "docs/P39_SYNTHETIC_MIGRATION_DRY_RUN_CONTRACT.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    },
+    {
+      "id": "p43_recall_migration_isolation_helper",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/RecallMigrationIsolationContract.js",
+        "tests/recall-migration-isolation-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    },
+    {
+      "id": "p55_evidence_runtime_trace_contract",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/EvidenceRuntimeTraceContract.js",
+        "tests/evidence-runtime-trace-contract-helper.test.js",
+        "docs/P55_EVIDENCE_TO_RUNTIME_ENFORCEMENT_TRACE_CONTRACT.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    },
+    {
+      "id": "p57_recall_isolation_runtime_proof_helper",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/RecallIsolationRuntimeProofContract.js",
+        "tests/recall-isolation-runtime-proof-contract-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    }
+  ],
+  "frameworkStages": [
+    {
+      "id": "source_scope_review",
+      "operationFamily": "source_scope",
+      "inputMode": "explicit_input",
+      "acceptedSources": [
+        "synthetic_fixture",
+        "sanitized_metadata"
+      ],
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "migration_plan_review",
+      "operationFamily": "migration",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "import_export_plan_review",
+      "operationFamily": "import_export",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "backup_plan_review",
+      "operationFamily": "backup",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "restore_plan_review",
+      "operationFamily": "restore",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "parity_and_rollback_readiness_review",
+      "operationFamily": "parity_rollback",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "approval_packet_review",
+      "operationFamily": "approval",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "failure_path_review",
+      "operationFamily": "failure_path",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "execution_gate",
+      "operationFamily": "execution",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    }
+  ],
+  "approvalStates": [
+    {
+      "id": "not_requested",
+      "acceptedForPlanning": true,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_missing",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_unknown",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_warning_only",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_expired",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_scope_mismatch",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "reviewed_not_executable",
+      "acceptedForPlanning": true,
+      "executionAllowed": false
+    },
+    {
+      "id": "approved_but_a5_blocked",
+      "acceptedForPlanning": true,
+      "executionAllowed": false
+    }
+  ],
+  "requiredApprovalEvidence": [
+    "source_scope_evidence",
+    "actor_scope_evidence",
+    "operation_plan",
+    "dry_run_report",
+    "parity_report",
+    "rollback_readiness_report",
+    "backup_plan",
+    "restore_plan",
+    "redaction_report",
+    "no_real_data_access_report",
+    "explicit_a5_authorization_packet",
+    "post_action_validation_plan",
+    "failure_path_plan"
+  ],
+  "unsatisfiedApprovalEvidence": [
+    "source_scope_evidence",
+    "actor_scope_evidence",
+    "operation_plan",
+    "dry_run_report",
+    "parity_report",
+    "rollback_readiness_report",
+    "backup_plan",
+    "restore_plan",
+    "redaction_report",
+    "no_real_data_access_report",
+    "explicit_a5_authorization_packet",
+    "post_action_validation_plan",
+    "failure_path_plan"
+  ],
+  "failClosedStates": [
+    "missing",
+    "unknown",
+    "skipped",
+    "warning",
+    "warning_only",
+    "failed",
+    "stale",
+    "ambiguous",
+    "unparsable",
+    "unsupported",
+    "duplicate",
+    "approval_missing",
+    "approval_unknown",
+    "approval_warning_only",
+    "approval_expired",
+    "scope_mismatch",
+    "source_scope_mismatch",
+    "rollback_not_ready",
+    "backup_unverified",
+    "restore_unverified",
+    "real_data_requested",
+    "apply_requested"
+  ],
+  "blockedActions": [
+    "real_memory_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "sqlite_migration_apply",
+    "import_apply",
+    "export_apply",
+    "backup_create",
+    "restore_perform",
+    "approval_execution",
+    "durable_memory_write",
+    "durable_audit_write",
+    "provider_call",
+    "service_start",
+    "config_switch",
+    "watchdog_install",
+    "public_mcp_expansion",
+    "dependency_change",
+    "push_tag_release_deploy"
+  ],
+  "forbiddenClaims": [
+    "migration_framework_ready",
+    "import_export_framework_ready",
+    "backup_restore_framework_ready",
+    "approval_execution_ready",
+    "migration_apply_authorized",
+    "import_export_apply_authorized",
+    "backup_restore_authorized",
+    "runtime_ready",
+    "final_rc_matrix_ready",
+    "v1_rc_ready"
+  ],
+  "safety": {
+    "readsFilesImplicitly": false,
+    "scansDirectories": false,
+    "executesCommands": false,
+    "startsServices": false,
+    "callsProviders": false,
+    "readsRealMemory": false,
+    "scansRuntimeStores": false,
+    "writesDurableMemory": false,
+    "writesDurableAudit": false,
+    "expandsPublicMcp": false,
+    "remoteWrites": false,
+    "rawSensitiveOutputExposed": false
+  },
+  "readiness": {
+    "localBoundaryInventoryReady": true,
+    "approvalFrameworkReady": false,
+    "approvalExecutionReady": false,
+    "migrationFrameworkReady": false,
+    "importExportFrameworkReady": false,
+    "backupRestoreFrameworkReady": false,
+    "runtimeReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "pushReady": false,
+    "releaseReady": false,
+    "deployReady": false,
+    "configSwitchReady": false,
+    "watchdogReady": false
+  }
+}

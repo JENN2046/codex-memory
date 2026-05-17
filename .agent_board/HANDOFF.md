@@ -14,11 +14,11 @@ Execute P51-P62 Runtime-Enforced Governed Memory Spine Completion under local A4
 
 ## Worktree
 
-Worktree is clean immediately after local commit `6f29757 feat: add p57 recall isolation proof helper`. `origin/main = 1ae4286 test: harden no-touch redaction regressions`; local `main` is ahead by 29 commits. Push is not authorized.
+Local `main` is ahead of `origin/main = 1ae4286 test: harden no-touch redaction regressions`; push is not authorized. P58-T1 files are validated locally and being prepared for guarded local commit.
 
 ## Current Area
 
-P8 memory-governance / P57 recall isolation runtime proof explicit-input evaluator.
+P8 memory-governance / P58 migration-import-export-backup-restore approval framework boundary inventory.
 
 ## Current Truth
 
@@ -26,14 +26,17 @@ P8 memory-governance / P57 recall isolation runtime proof explicit-input evaluat
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
-- P57-T2 recall isolation runtime proof explicit-input evaluator is implemented, validated, and committed locally in `6f29757`.
+- P57-T2 recall isolation runtime proof explicit-input evaluator is implemented, validated, and committed locally in `6f29757`; post-commit board reconciliation is committed locally in `c337ab4`.
+- P58-T1 migration/import-export/backup-restore approval framework boundary inventory is implemented and validated locally as docs/fixture/test only.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
+- P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
 
 ## Validation
 
 - P57-T1 validation passed: new test syntax, fixture JSON parse, targeted P57 test `13/13`, targeted P38/P43/P55/P57 set `49/49`, `npm test` `963/963`.
 - P57-T2 validation passed: changed JS syntax checks, targeted helper/no-touch test `10/10`, targeted P38/P43/P55/P56/P57 set `61/61`, boundary scan returned no hits, `npm test` `969/969`.
+- P58-T1 validation passed: new test syntax, fixture JSON parse, targeted P58 test `13/13`, targeted P39/P43/P55/P57/P58 set `68/68`, `npm test` `982/982`.
 
 ## Hard Stops
 
@@ -41,4 +44,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Finish the P57-T2 post-commit board reconciliation commit. After that, the next safe candidate is P58-T1 migration/import-export/backup-restore approval framework boundary inventory. Do not push unless explicitly authorized.
+Run final diff/docs validation for P58-T1, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation. Do not push unless explicitly authorized.
