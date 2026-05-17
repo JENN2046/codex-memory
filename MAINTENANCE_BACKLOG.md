@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
-- Local baseline: local `main` contains P51-P53 local commits and is ahead of `origin/main = 1ae4286`; use `git log --oneline --decorate -n 10` for the exact current HEAD; push is not authorized.
+- Local baseline: local `main` contains P51-P54 local work and is ahead of `origin/main = 1ae4286`; use `git log --oneline --decorate -n 10` for the exact current HEAD; push is not authorized.
 - Current active program: P51-P62 Runtime-Enforced Governed Memory Spine Completion.
-- Current phase area: P53 ValidationAggregator evidence inventory, posture bridge, and explicit evidence classification hardening. Evidence-first / fail-closed / reversible boundaries preserved.
+- Current phase area: P54 final RC runner safe command inventory and explicit command-result contract. Evidence-first / fail-closed / reversible boundaries preserved.
 
 ## Active Queue
 
@@ -49,7 +49,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P53-T1 | observability-admin | A1/A2 | done | ValidationAggregator Evidence Inventory | `node --check` new test; targeted P53 + aggregator tests; `npm test`; docs validation; `git diff --check` | Complete and validated; adds inventory doc, synthetic fixture, and fixture test defining accepted source types, committed/local/runtime/final-RC evidence classes, and fresh/stale/missing/unsupported/blocked/not_executed semantics. Does not execute runner, helper, live MCP, provider, runtime store scan, or real memory read. |
 | P53-T2 | observability-admin | A2 | done | ValidationAggregator inventory posture bridge | changed aggregator JS syntax; targeted aggregator tests; `npm test`; `git diff --check`; boundary scan | Complete and validated; surfaces P53 inventory posture as static report-shape evidence only; does not import/read the P53 fixture, execute helper/gate/runner, refresh live MCP, scan runtime stores, or claim full aggregator/runtime/RC readiness. |
 | P53-T3 | observability-admin | A2 | done | ValidationAggregator explicit evidence classification hardening | changed aggregator JS syntax; targeted aggregator tests; `npm test`; `git diff --check`; no-touch scan | Complete and validated; explicit caller-provided evidence can declare source class, but only committed/local classes are accepted. Caller-claimed runtime/final-RC evidence fails closed as `unsupported_source_class`; no fs scan, command execution, runtime store scan, provider, or runner execution. |
-| P54-T1 | observability-admin | A1/A2 | todo | Final RC runner safe command inventory | docs/fixture/test; `git diff --check`; docs validation; targeted fixture test | Next safe slice: define allowed local validation commands and runner fail-closed boundaries without executing the runner, starting services, calling providers, scanning real memory, or claiming final RC readiness. |
+| P54-T1 | observability-admin | A1/A2 | done | Final RC runner safe command inventory | docs/fixture/test; targeted final-RC tests; `npm test`; docs validation; `git diff --check` | Complete and validated; adds synthetic command inventory fixture/test/doc for allowed local validation commands, rejected commands, machine-readable output contract, and fail-closed critical gate semantics. Does not execute runner, start services, call providers, scan real memory/runtime stores, or claim final RC readiness. |
+| P54-T2 | observability-admin | A2 | todo | Final RC runner explicit command-result helper | changed JS syntax; targeted helper tests; `npm test`; `git diff --check`; no-touch scan | Next safe slice: pure helper over caller-provided command inventory/result objects only. No fs read, directory scan, command execution, service start, provider call, runtime store scan, real memory read, durable write, public MCP expansion, or RC-ready claim. |
 
 ## Standing Boundaries
 

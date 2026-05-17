@@ -1,0 +1,236 @@
+{
+  "schemaVersion": "p54-final-rc-runner-safe-command-inventory-v1",
+  "version": "v1",
+  "phase": "P54-T1-final-rc-runner-safe-command-inventory",
+  "mode": "fixture-only-command-inventory",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "runnerImplemented": false,
+  "runnerExecuted": false,
+  "commandsExecuted": false,
+  "finalRcMatrixExecuted": false,
+  "decision": "NOT_READY_BLOCKED",
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "sourceContract": {
+    "mode": "explicit_command_inventory_only",
+    "commandResultsAccepted": "caller_provided_future_runner_output_only",
+    "readsFiles": false,
+    "scansDirectories": false,
+    "executesCommands": false,
+    "startsServices": false,
+    "callsProviders": false,
+    "readsRealMemory": false,
+    "scansRuntimeStores": false,
+    "writesDurableState": false
+  },
+  "allowedCommandClasses": [
+    "syntax_check",
+    "targeted_node_test",
+    "full_local_test_suite",
+    "docs_validation",
+    "git_diff_check"
+  ],
+  "allowedCommands": [
+    {
+      "id": "syntax-runtime-schema-version-helper",
+      "class": "syntax_check",
+      "command": "node --check src/core/RuntimeSchemaVersionEnforcementContract.js",
+      "critical": true
+    },
+    {
+      "id": "syntax-validation-aggregator",
+      "class": "syntax_check",
+      "command": "node --check src/core/ValidationAggregatorService.js",
+      "critical": true
+    },
+    {
+      "id": "syntax-final-rc-evaluator",
+      "class": "syntax_check",
+      "command": "node --check src/core/FinalRcMatrixEvaluator.js",
+      "critical": true
+    },
+    {
+      "id": "test-runtime-schema-version-helper",
+      "class": "targeted_node_test",
+      "command": "node --test tests/runtime-schema-version-enforcement-contract-helper.test.js",
+      "critical": true
+    },
+    {
+      "id": "test-validation-aggregator",
+      "class": "targeted_node_test",
+      "command": "node --test tests/v1-rc-validation-aggregator-implementation.test.js tests/v1-rc-validation-aggregator.test.js tests/v1-rc-validation-aggregator-cli.test.js",
+      "critical": true
+    },
+    {
+      "id": "test-final-rc-evaluator",
+      "class": "targeted_node_test",
+      "command": "node --test tests/final-rc-matrix-evaluator-helper.test.js",
+      "critical": true
+    },
+    {
+      "id": "test-p54-command-inventory",
+      "class": "targeted_node_test",
+      "command": "node --test tests/p54-final-rc-runner-safe-command-inventory-fixture.test.js",
+      "critical": true
+    },
+    {
+      "id": "full-local-suite",
+      "class": "full_local_test_suite",
+      "command": "npm test",
+      "critical": true
+    },
+    {
+      "id": "docs-validation",
+      "class": "docs_validation",
+      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\validate-local.ps1 -Area docs",
+      "critical": true
+    },
+    {
+      "id": "git-diff-check",
+      "class": "git_diff_check",
+      "command": "git diff --check",
+      "critical": true
+    }
+  ],
+  "criticalGateSemantics": {
+    "acceptedPassStates": [
+      "passed"
+    ],
+    "failClosedStates": [
+      "missing",
+      "unknown",
+      "skipped",
+      "warning",
+      "warning_only",
+      "failed",
+      "stale",
+      "ambiguous",
+      "unparsable",
+      "unsupported",
+      "duplicate"
+    ],
+    "criticalSkippedEqualsFailure": true,
+    "criticalWarningOnlyEqualsFailure": true,
+    "unsupportedCommandEqualsFailure": true,
+    "duplicateCommandIdEqualsFailure": true,
+    "staleEvidenceEqualsFailure": true
+  },
+  "machineReadableOutputContract": {
+    "schemaVersion": "p54-final-rc-runner-output-v1",
+    "requiredTopLevelFields": [
+      "schemaVersion",
+      "generatedAt",
+      "decision",
+      "status",
+      "runnerExecuted",
+      "commandsExecuted",
+      "criticalGates",
+      "blockedActions",
+      "safety",
+      "readiness"
+    ],
+    "decisionUntilAllCriticalPass": "NOT_READY_BLOCKED",
+    "mustIncludeNonzeroFailurePath": true,
+    "mustRedactSensitiveFragments": true
+  },
+  "blockedActions": [
+    "read_fixture_implicitly",
+    "scan_directory_for_evidence",
+    "execute_unlisted_command",
+    "start_service",
+    "refresh_live_mcp",
+    "provider_call",
+    "real_memory_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "runtime_store_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "config_switch",
+    "watchdog_install",
+    "public_mcp_expansion",
+    "dependency_change",
+    "durable_memory_write",
+    "durable_audit_write",
+    "push_tag_release_deploy"
+  ],
+  "rejectedCommands": [
+    "npm run start:http:ensure",
+    "npm run start:http:watchdog:once",
+    "npm run start:http:install-task",
+    "npm run start:http:watchdog:install",
+    "npm run observe:http -- --json",
+    "npm run provider-smoke -- --json",
+    "npm run provider-benchmark -- --json",
+    "npm run rebuild-profile -- --confirm --json",
+    "npm run cleanup-legacy-chunks -- --apply --json",
+    "npm run rebuild-shadow",
+    "npm run vcp-memory:migration-readiness -- --apply",
+    "git push origin main",
+    "git tag",
+    "gh release create"
+  ],
+  "safety": {
+    "mutated": false,
+    "commandsExecutedByThisFixture": false,
+    "providerCalls": 0,
+    "serviceStarted": false,
+    "durableMemoryTouched": false,
+    "durableAuditTouched": false,
+    "realMemoryPreview": false,
+    "realMemoryScanned": false,
+    "runtimeStoresScanned": false,
+    "migrationApplied": false,
+    "importExportApplied": false,
+    "backupCreated": false,
+    "restorePerformed": false,
+    "packageChanged": false,
+    "configChanged": false,
+    "publicMcpExpanded": false,
+    "pushed": false,
+    "tagged": false,
+    "released": false,
+    "deployed": false,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "rcReadyClaimed": false
+  },
+  "readiness": {
+    "localCommandInventoryReady": true,
+    "runnerExecutionReady": false,
+    "runtimeReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "pushReady": false,
+    "releaseReady": false,
+    "deployReady": false,
+    "configSwitchReady": false,
+    "watchdogReady": false
+  },
+  "forbiddenFragments": [
+    "authorization:",
+    "bearer ",
+    "api_key",
+    "raw_workspace_id",
+    "set-cookie",
+    "password=",
+    "token=",
+    "providerapikey",
+    ".env",
+    "http://",
+    "https://",
+    "a:\\"
+  ],
+  "next": {
+    "recommendedPhase": "P54-T2-final-rc-runner-explicit-command-plan-helper",
+    "allowed": "pure helper over this caller-provided command inventory and explicit command result objects",
+    "forbidden": "runner execution, live service checks, provider calls, real memory scans, durable mutation, migration/import-export apply, backup/restore, public MCP expansion, dependency change, push/tag/release/deploy"
+  }
+}

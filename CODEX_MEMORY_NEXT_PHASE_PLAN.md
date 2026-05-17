@@ -11,7 +11,8 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 1. Treat P46-P50 as complete local evidence enforcement bridge posture only, not runtime/mainline/RC readiness.
 2. P51 post-push reconciliation is complete for pushed baseline `origin/main = 1ae4286`.
 3. P52 schema/version boundary plan and minimal explicit-input helper are complete locally.
-4. Move through P53 by separating ValidationAggregator inventory contracts from future full implementation.
+4. P53 separates ValidationAggregator inventory contracts from future full implementation.
+5. P54 begins the final RC runner execution chain with a safe command inventory before any execution-capable helper or runner.
 5. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
@@ -54,8 +55,9 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P53-T1 ValidationAggregator evidence inventory is complete and validated.
 - P53-T2 ValidationAggregator inventory posture bridge is complete and validated.
 - P53-T3 explicit evidence classification hardening is complete, validated, and locally committed in `0a5016d`.
-- P54-T1 final RC runner safe command inventory is the next safe implementation slice.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, or P53 inventory evidence.
+- P54-T1 final RC runner safe command inventory is complete and validated.
+- P54-T2 final RC runner explicit command-result helper is the next safe implementation slice.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, or P54 command inventory evidence.
 
 ## Boundaries
 
@@ -74,7 +76,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P53-T3:
+After P54-T1:
 
-- Begin P54-T1 final RC runner safe command inventory.
-- Keep P54-T1 inventory-only: define allowed local validation commands, disallowed commands, critical gate semantics, and machine-readable output contract without executing the runner, starting services, calling providers, scanning real memory/runtime stores, applying migration/import/export/backup/restore, or claiming final RC readiness.
+- Begin P54-T2 final RC runner explicit command-result helper.
+- Keep P54-T2 helper-only: normalize caller-provided command inventory/result objects, enforce exact allowed command ids, fail closed for missing/unknown/skipped/warning-only/stale/failed/unsupported/duplicate critical gates, and never read files, scan directories, execute commands, start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, or claim final RC readiness.
