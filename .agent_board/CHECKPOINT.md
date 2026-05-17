@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P8 memory-governance / P58 migration/import-export/backup-restore approval framework explicit-input helper.
+P8/P4 transition: P58 migration/import-export/backup-restore approval framework helper complete; P59 HTTP observability boundary inventory candidate next.
 
 ## Current Status
 
@@ -21,7 +21,7 @@ P8 memory-governance / P58 migration/import-export/backup-restore approval frame
 - P57-T2 post-commit board reconciliation is locally committed in `c337ab4`.
 - P58-T1 migration/import-export/backup-restore approval framework boundary inventory is implemented, validated, and committed locally in `5326169` as docs/fixture/test only.
 - P58-T1 post-commit board reconciliation is locally committed in `14ba9ce`.
-- P58-T2 approval framework explicit-input helper is implemented and validated locally.
+- P58-T2 approval framework explicit-input helper is implemented, validated, and committed locally in `2470634`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -61,4 +61,4 @@ P8 memory-governance / P58 migration/import-export/backup-restore approval frame
 
 ## Next Safe Step
 
-Run final docs validation for P58-T2 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation.
+Evaluate P59-T1 only if it remains local/read-only and no-side-effect.

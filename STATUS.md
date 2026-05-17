@@ -9,7 +9,7 @@
 - 当前本地基线：本地 `main` 已包含 P51-P58 本地工作并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P58-T2 approval framework explicit-input helper 已完成本地实现与验证，等待 guarded local commit。必须继续禁止服务/provider/真实 memory/A5 操作。
+- 当前任务：P58-T2 approval framework explicit-input helper 已完成、验证并本地提交为 `2470634`；board/status 已切到 P59-T1 HTTP observability boundary inventory 候选。必须继续禁止服务/provider/真实 memory/A5 操作。
 
 ## 当前阻塞
 
@@ -21,8 +21,8 @@
 
 ## 当前优先级
 
-1. 完成 P58-T2 guarded local commit，然后进行 post-commit board/status reconciliation；不得 push，除非用户单独明确授权。
-2. 下一条安全路线候选是 P59 HTTP runtime observability / operation hardening planning slice，只有在保持 local/read-only/no service install/no config switch/no provider call 时才可进入。
+1. 评估 P59-T1 HTTP runtime observability / operation hardening boundary inventory 是否可作为下一条安全本地任务进入；不得 push，除非用户单独明确授权。
+2. P59-T1 只有在保持 local/read-only/no service install/no config switch/no provider call 时才可进入。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54 command chain evidence、P55 trace evidence、P56 governance loop evidence、P57 boundary/helper evidence、P58 boundary/helper evidence 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、或 final RC matrix execution。
 4. 不 push，除非用户单独明确授权。
 
