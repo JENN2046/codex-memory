@@ -44,6 +44,10 @@ const noTouchTargets = [
     path: 'src/core/FinalRcRunnerExecutionPreflight.js'
   },
   {
+    label: 'FinalRcRunnerAllowlistedExecutionAdapter',
+    path: 'src/core/FinalRcRunnerAllowlistedExecutionAdapter.js'
+  },
+  {
     label: 'RuntimeSchemaVersionEnforcementContract',
     path: 'src/core/RuntimeSchemaVersionEnforcementContract.js'
   },

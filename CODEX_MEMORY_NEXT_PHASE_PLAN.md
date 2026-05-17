@@ -12,8 +12,9 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 2. P51 post-push reconciliation is complete for pushed baseline `origin/main = 1ae4286`.
 3. P52 schema/version boundary plan and minimal explicit-input helper are complete locally.
 4. P53 separates ValidationAggregator inventory contracts from future full implementation.
-5. P54 begins the final RC runner execution chain with a safe command inventory before any execution-capable helper or runner.
-5. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
+5. P54 establishes the final RC runner local chain through safe command inventory, explicit command-result evaluation, execution preflight, and an injected-executor adapter contract; it does not complete a real final RC matrix run.
+6. P55 must connect P52/P53/P54 local evidence to runtime enforcement gaps without treating fixture/local evidence as runtime enforcement.
+7. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
 
@@ -58,8 +59,9 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P54-T1 final RC runner safe command inventory is complete and validated.
 - P54-T2 final RC runner explicit command-result helper is complete and validated.
 - P54-T3 local runner execution harness preflight is complete and validated.
-- P54-T4 allowlisted local runner execution adapter is the next candidate, but it must remain constrained to the P54-T1 allowlist and P54-T3 preflight.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, or P54 preflight evidence.
+- P54-T4 allowlisted local runner execution adapter is complete and validated as an injected-executor contract only; tests use fake executor and no real shell/runtime command chain was run by the helper.
+- P55-T1 evidence-to-runtime enforcement trace contract is the next candidate.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, or P54 injected-executor adapter evidence.
 
 ## Boundaries
 
@@ -78,7 +80,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P54-T3:
+After P54-T4:
 
-- Begin P54-T4 final RC runner allowlisted local execution adapter only if it stays local and reversible.
-- Keep P54-T4 allowlist-first: execute only P54-T1 local validation commands after P54-T3 preflight, emit machine-readable command results, fail closed for any nonzero/skipped/warning-only/unknown/stale/unsupported result, and do not start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, write durable state, expand public MCP, change dependencies, push/tag/release/deploy, or claim final RC readiness.
+- Begin P55-T1 evidence-to-runtime enforcement trace contract as docs/fixture/test first.
+- Keep P55-T1 trace-first: map P52 schema/version helper evidence, P53 ValidationAggregator evidence posture, and P54 runner evidence contracts to explicit runtime enforcement gaps, fail closed for missing/unknown/stale/unsupported trace links, and do not run real runner commands, start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, write durable state, expand public MCP, change dependencies, push/tag/release/deploy, or claim runtime/final RC readiness.
