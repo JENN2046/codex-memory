@@ -5,11 +5,11 @@
 ## 当前结论
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
-- 当前远端基线：`origin/main` = `2b4a956 fix: harden governance evidence helper contracts`。
-- 当前本地基线：`main` 在 `922069d`，领先 `origin/main` 五个本地提交；P50 工作树变更已验证，等待 guarded local commit。
-- 最新已推送完成：P36-P45 evidence-first / fixture-only / explicit-input 链路，以及 CM-0320 governance evidence helper strict schema/version exact-set hardening，均已推送到 `2b4a956`。
+- 当前远端基线：`origin/main` = `1ae4286 test: harden no-touch redaction regressions`。
+- 当前本地基线：`HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`；worktree clean。
+- 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P50 no-touch boundary regression suite 已验证，等待 guarded local commit；P49 已本地提交到 `922069d`。
+- 当前任务：P51-T1 post-P50 push board/status reconciliation；下一条安全路线是 P52 schema/version runtime enforcement boundary plan。
 
 ## 当前阻塞
 
@@ -21,9 +21,9 @@
 
 ## 当前优先级
 
-1. 为 P50 no-touch boundary regression suite 创建 guarded local commit；不 push。
-2. P46-P50 本地 enforcement bridge 链路完成后，继续保持 `NOT_READY_BLOCKED`，不得误读为 runtime enforcement 或 final RC matrix execution。
-3. 后续任务需另起 P51+ 或由用户明确指定。
+1. 完成 P51-T1 active status/board reconciliation，清除误导性的旧本地待提交、领先远端、旧基线文案。
+2. 进入 P52-T1 runtime schema-version enforcement boundary plan：先做 docs + fixture/test contract，继续保持 fail-closed 和 no-runtime-ready 语义。
+3. 继续保持 `NOT_READY_BLOCKED`，不得把 P46-P50 local evidence bridge 误读为 runtime enforcement 或 final RC matrix execution。
 
 ## 主要事实源
 

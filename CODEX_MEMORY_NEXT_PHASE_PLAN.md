@@ -4,13 +4,13 @@
 
 ## Purpose
 
-This active plan is the short routing document for the current P46-P50 Evidence Enforcement Bridge program. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
+This active plan is the short routing document for the current P51-P62 Runtime-Enforced Governed Memory Spine Completion program. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
 
 ## Current Direction
 
-1. Treat P36-P45 as complete local evidence/helper posture only, not runtime/mainline/RC readiness.
-2. Start P46-P50 by reconciling stale board/status facts to `HEAD == origin/main == 2b4a956`.
-3. Keep P46-P50 local, fixture-only, dry-run-only, and explicit-input-only unless a task explicitly states otherwise.
+1. Treat P46-P50 as complete local evidence enforcement bridge posture only, not runtime/mainline/RC readiness.
+2. Start P51 by reconciling stale board/status facts to `HEAD == origin/main == 1ae4286`.
+3. Move next to P52 schema/version runtime enforcement boundary planning before any runtime implementation.
 4. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
@@ -24,7 +24,7 @@ This active plan is the short routing document for the current P46-P50 Evidence 
 - P34.x closeout: governance review surface safe-scope chain closed locally in `8220d64`.
 - P35 planning: governed memory spine policy gate plan committed locally in `29858e6`.
 - P35.1 fixture contract: governed memory policy gate fixture/test committed locally in `c8325b6`.
-- P35 security hardening and push reconciliation: superseded by the current pushed baseline `2b4a956`.
+- P35 security hardening and push reconciliation: superseded by later pushed baselines.
 - P36-P40 boundary-first chain: complete locally through P40 commit `6f7ade4` and post-P40 board sync `ba59537`.
 - P41-T1 closeout: complete locally in `08597d6`.
 - P41-T2 evidence manifest contract fixture: complete locally in `8895816`.
@@ -35,18 +35,21 @@ This active plan is the short routing document for the current P46-P50 Evidence 
 - P45-T1 fixture-only final RC matrix evaluator skeleton: complete locally in `5ea714b`.
 - P45 strict input contract review fix: complete and pushed in `c0989b0`.
 - CM-0320 governance evidence helper strict schema/version exact-set fix: complete and pushed in `2b4a956`.
+- P46-0 post-push board/status reconciliation: complete and pushed in `ed01771`.
+- P46-T1 HTTP no-token mutation + sensitive redaction hardening: complete and pushed in `056b639`.
+- P47 evidence-to-enforcement gap map: complete and pushed in `9fba356`.
+- P48 evidence-chain consistency guard: complete and pushed in `fa8c414`.
+- P49 ValidationAggregator P45 posture bridge: complete and pushed in `922069d`.
+- P50 no-touch boundary regression suite: complete and pushed in `97a43d4`.
+- P50 review hardening for no-touch/redaction regressions: complete and pushed in `1ae4286`.
 
 ## Current Task
 
-P46-P50 Evidence Enforcement Bridge:
+P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
-- P46-0 post-push board/status reconciliation is complete locally.
-- P46-T1 HTTP no-token mutation + sensitive redaction hardening is complete locally in `056b639`.
-- P47 evidence-to-enforcement gap map is complete locally in `9fba356`.
-- P48 evidence-chain consistency guard is complete locally in `fa8c414`.
-- P49 ValidationAggregator P45 posture bridge is complete locally in `922069d`.
-- P50 no-touch boundary regression suite is validated and pending guarded local commit.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from local evidence completion.
+- P51-T1 post-P50 push board/status reconciliation is in progress.
+- P52-T1 runtime schema-version enforcement boundary plan is the next safe implementation slice.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion.
 
 ## Boundaries
 
@@ -65,7 +68,7 @@ P46-P50 Evidence Enforcement Bridge:
 
 ## Next Candidate
 
-After P50 commit:
+After P51 reconciliation:
 
-- P46-P50 local enforcement bridge chain is complete as local evidence only.
-- Continue to a new P51+ goal only after user direction or a new local-safe objective is selected.
+- Begin P52-T1 docs + fixture/test contract for schemaVersion / policyVersion / manifestVersion enforcement semantics.
+- Keep P52-T1 local, evidence-first, fail-closed, and non-runtime-mutating.

@@ -10,10 +10,10 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Remote baseline: `2b4a956 fix: harden governance evidence helper contracts`.
-- Local baseline: `main` is at `922069d`, ahead of `origin/main` by five local commits; P50 changes are validated and pending guarded local commit.
-- Current active program: P46-P50 Evidence Enforcement Bridge.
-- Current phase area: P50 no-touch boundary regression suite. Fixture-only / dry-run-only / explicit-input-only boundaries preserved.
+- Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
+- Local baseline: `HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`; worktree clean at P51 start.
+- Current active program: P51-P62 Runtime-Enforced Governed Memory Spine Completion.
+- Current phase area: P51 post-P50 push board/status reconciliation, then P52 schema/version runtime enforcement boundary plan. Evidence-first / fail-closed / reversible boundaries preserved.
 
 ## Active Queue
 
@@ -37,12 +37,14 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P44-T1 | governed-memory-spine | A2 | done | ValidationAggregator P36-P40 Evidence Source Map | changed JS syntax; targeted aggregator tests; `npm test`; boundary scan; Verifier | Complete locally in `ae7655a`; static report-shape evidence only; no fixture read, helper execution, gate/runner execution, live MCP refresh, provider, real memory/runtime store scan, public MCP expansion, or runtime-ready claim. |
 | P45-T1 | governed-memory-spine | A2 | done | Fixture-only Final RC Matrix Evaluator Skeleton | changed JS syntax; targeted evaluator tests; `npm test`; boundary scan; Verifier | Complete locally in `5ea714b`. Explicit-input evaluator only; rejects unsupported/warning/unknown/skipped/failed/not_executed evidence, readiness claims, public MCP drift, safety leakage, and A5 bypass attempts; no command execution, evidence collection, helper execution, or full final RC matrix claim. |
 | CM-0320 | memory-governance | A2 | done | Governance evidence helper strict schema/version and exact-set review fix | changed JS syntax; targeted helper tests `65/65`; `npm test` `841/841`; `git diff --check`; boundary scan | Complete and pushed in `2b4a956`; hardens P31-P34/P42/P43 helper schema/version/exact-set fail-closed behavior. |
-| P46-0 | docs-drift | A1 | done | Post-push board/status reconciliation | `git diff --check`; docs validation; stale wording scan | Complete and validated; active board/status facts now point to `HEAD == origin/main == 2b4a956`; no source/test/runtime changes. |
+| P46-0 | docs-drift | A1 | done | Post-push board/status reconciliation | `git diff --check`; docs validation; stale wording scan | Complete and validated for the earlier CM-0320 push baseline; superseded by P51-T1 after the authorized P46-P50 push. |
 | P46-T1 | memory-governance | A2 | done | HTTP no-token mutation + sensitive redaction hardening | targeted HTTP/helper tests; `git diff --check`; `npm test` | Complete and validated; unified helper redaction through `SensitiveFragmentRedaction.js` and rejected no-token HTTP `record_memory` mutation while preserving authorized bearer write coverage. |
 | P47 | memory-governance | A1 | done | Evidence-to-enforcement gap map | `git diff --check`; docs validation; boundary scan | Complete and validated; docs/status/board only; no runtime connection, real memory scan, public MCP expansion, or RC-ready claim. |
 | P48 | memory-governance | A2 | done | Evidence-chain consistency guard | targeted fixture/contract tests; `git diff --check`; `npm test` | Complete and validated; test-only guard locks evidence IDs, source type whitelist, schema linkage, blocked actions, fail-closed states, A5 blockers, public MCP freeze, and no-readiness posture as exact sets. |
 | P49 | observability-admin | A2 | done | ValidationAggregator P45 posture bridge | targeted aggregator tests; `git diff --check`; `npm test` | Complete and validated; aggregator surfaces P45 evaluator skeleton posture as static report-shape only, without importing/executing evaluator, reading fixtures, running gates/runners, refreshing live MCP, or claiming final RC readiness. |
 | P50 | observability-admin | A2 | done | No-touch boundary regression suite | targeted no-touch tests; `git diff --check`; `npm test` | Complete and validated; no-touch regression prevents governance helpers, EvidenceManifestContract, FinalRcMatrixEvaluator, and ValidationAggregator from introducing fs scan, child_process, provider/network, runtime store imports, durable writes, or public MCP expansion. |
+| P51-T1 | docs-drift | A1 | done | Post-P50 push board/status reconciliation | `git diff --check`; docs validation; active stale wording scan | Complete and validated; active status/board docs now point to pushed `HEAD == origin/main == 1ae4286`; no source/test/runtime change and no RC-ready claim. |
+| P52-T1 | memory-governance | A1/A2 | todo | Runtime Schema-Version Enforcement Boundary Plan | docs diff; fixture/test contract validation once added | First safe next slice: docs + fixture/test contract for schemaVersion / policyVersion / manifestVersion fail-closed exact-set semantics; no public MCP expansion or real memory read. |
 
 ## Standing Boundaries
 
