@@ -1,0 +1,348 @@
+{
+  "schemaVersion": "p62-prompt-to-artifact-completion-audit-v1",
+  "policyVersion": "p62-completion-audit-policy-v1",
+  "manifestVersion": "p62-completion-audit-manifest-v1",
+  "phase": "P62-T3-prompt-to-artifact-completion-audit",
+  "localOnly": true,
+  "readOnly": true,
+  "fixtureOnly": true,
+  "auditOnly": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "objectiveComplete": false,
+  "acceptedForPlanning": true,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "routeRequirements": [
+    {
+      "id": "p51_post_p50_push_reconciliation",
+      "promptItem": "P51 Post-P50 Push Reconciliation",
+      "localStatus": "satisfied_for_local_scope",
+      "artifacts": [
+        "STATUS.md",
+        "MAINTENANCE_BACKLOG.md",
+        "CODEX_MEMORY_NEXT_PHASE_PLAN.md",
+        ".agent_board/TASK_QUEUE.md",
+        ".agent_board/VALIDATION_LOG.md"
+      ],
+      "validationRefs": [
+        "P51-T1 docs validation",
+        "active stale wording scan"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p52_schema_version_runtime_enforcement_boundary",
+      "promptItem": "P52 Schema / Version Runtime Enforcement",
+      "localStatus": "satisfied_for_local_scope",
+      "artifacts": [
+        "docs/P52_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_BOUNDARY_PLAN.md",
+        "src/core/RuntimeSchemaVersionEnforcementContract.js",
+        "tests/fixtures/p52-runtime-schema-version-enforcement-boundary-v1.json"
+      ],
+      "validationRefs": [
+        "P52-T1 fixture test",
+        "P52-T2 helper tests",
+        "no-touch regression",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p53_validation_aggregator_full_implementation_path",
+      "promptItem": "P53 ValidationAggregator Full Implementation",
+      "localStatus": "partial_static_posture_only",
+      "artifacts": [
+        "docs/P53_VALIDATION_AGGREGATOR_EVIDENCE_INVENTORY.md",
+        "src/core/ValidationAggregatorService.js",
+        "tests/fixtures/p53-validation-aggregator-evidence-inventory-v1.json"
+      ],
+      "validationRefs": [
+        "P53-T1 fixture test",
+        "P53-T2 aggregator tests",
+        "P53-T3 classification tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p54_final_rc_matrix_runner_execution_chain",
+      "promptItem": "P54 Final RC Matrix Runner Execution Chain",
+      "localStatus": "partial_injected_executor_contract_only",
+      "artifacts": [
+        "docs/P54_FINAL_RC_RUNNER_SAFE_COMMAND_INVENTORY.md",
+        "src/core/FinalRcRunnerCommandResultContract.js",
+        "src/core/FinalRcRunnerExecutionPreflight.js",
+        "src/core/FinalRcRunnerAllowlistedExecutionAdapter.js",
+        "tests/fixtures/p54-final-rc-runner-safe-command-inventory-v1.json"
+      ],
+      "validationRefs": [
+        "P54-T1 fixture test",
+        "P54-T2 helper tests",
+        "P54-T3 preflight tests",
+        "P54-T4 injected executor tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p55_evidence_to_runtime_enforcement_bridge",
+      "promptItem": "P55 Evidence-to-Runtime Enforcement Bridge",
+      "localStatus": "satisfied_for_local_scope",
+      "artifacts": [
+        "docs/P55_EVIDENCE_TO_RUNTIME_ENFORCEMENT_TRACE_CONTRACT.md",
+        "tests/fixtures/p55-evidence-to-runtime-enforcement-trace-v1.json"
+      ],
+      "validationRefs": [
+        "P55-T1 fixture test",
+        "P55-T2 helper tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p56_governance_review_approval_audit_loop",
+      "promptItem": "P56 Governance Review / Approval / Audit Executable Loop",
+      "localStatus": "partial_explicit_input_only",
+      "artifacts": [
+        "docs/P56_GOVERNANCE_EXECUTABLE_LOOP_BOUNDARY_CONTRACT.md",
+        "src/core/GovernanceLoopBoundaryContract.js",
+        "tests/fixtures/p56-governance-executable-loop-boundary-v1.json"
+      ],
+      "validationRefs": [
+        "P56-T1 fixture test",
+        "P56-T2 helper tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p57_recall_isolation_runtime_proof",
+      "promptItem": "P57 Recall Isolation Runtime Proof",
+      "localStatus": "partial_explicit_input_only",
+      "artifacts": [
+        "docs/P57_RECALL_ISOLATION_RUNTIME_PROOF_BOUNDARY_INVENTORY.md",
+        "src/core/RecallIsolationRuntimeProofContract.js",
+        "tests/fixtures/p57-recall-isolation-runtime-proof-boundary-v1.json"
+      ],
+      "validationRefs": [
+        "P57-T1 fixture test",
+        "P57-T2 evaluator tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p58_migration_import_export_backup_restore_framework",
+      "promptItem": "P58 Migration / Import-Export / Backup-Restore Approval Framework",
+      "localStatus": "partial_approval_execution_blocked",
+      "artifacts": [
+        "docs/P58_MIGRATION_IMPORT_EXPORT_BACKUP_RESTORE_APPROVAL_BOUNDARY.md",
+        "src/core/MigrationImportExportBackupRestoreApprovalContract.js",
+        "tests/fixtures/p58-migration-import-export-backup-restore-approval-boundary-v1.json"
+      ],
+      "validationRefs": [
+        "P58-T1 fixture test",
+        "P58-T2 helper tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p59_http_runtime_observability_operation_hardening",
+      "promptItem": "P59 HTTP Runtime Observability / Operation Hardening",
+      "localStatus": "partial_explicit_input_only",
+      "artifacts": [
+        "docs/P59_HTTP_RUNTIME_OBSERVABILITY_OPERATION_HARDENING_BOUNDARY.md",
+        "src/core/HttpRuntimeObservabilityOperationContract.js",
+        "tests/fixtures/p59-http-runtime-observability-operation-hardening-boundary-v1.json"
+      ],
+      "validationRefs": [
+        "P59-T1 fixture test",
+        "P59-T2 helper tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p60_no_touch_no_leak_redaction_regression",
+      "promptItem": "P60 No-touch / No-leak / Redaction Long-term Regression",
+      "localStatus": "satisfied_for_local_scope",
+      "artifacts": [
+        "tests/p60-no-touch-no-leak-redaction-regression.test.js",
+        "tests/no-touch-boundary-regression.test.js",
+        "src/core/SensitiveFragmentRedaction.js"
+      ],
+      "validationRefs": [
+        "P60-T1 regression tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p61_mainline_strict_gate_rc_evidence_report",
+      "promptItem": "P61 Mainline Strict Gate + RC Evidence Report",
+      "localStatus": "partial_report_helper_only",
+      "artifacts": [
+        "docs/P61_MAINLINE_STRICT_GATE_RC_EVIDENCE_REPORT_BOUNDARY.md",
+        "src/core/RcEvidenceReportContract.js",
+        "tests/fixtures/p61-mainline-strict-gate-rc-evidence-report-boundary-v1.json"
+      ],
+      "validationRefs": [
+        "P61-T1 fixture test",
+        "P61-T2 helper tests",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    },
+    {
+      "id": "p62_v1_rc_cutover_preflight",
+      "promptItem": "P62 v1.0 RC Cutover Preflight",
+      "localStatus": "partial_boundary_and_audit_only",
+      "artifacts": [
+        "docs/P62_V1_RC_CUTOVER_PREFLIGHT_BOUNDARY.md",
+        "docs/P62_COMPLETION_AUDIT_GAP_REPORT.md",
+        "tests/fixtures/p62-v1-rc-cutover-preflight-boundary-v1.json",
+        "tests/fixtures/p62-completion-audit-gap-report-v1.json"
+      ],
+      "validationRefs": [
+        "P62-T1 fixture test",
+        "P62-T2 audit fixture test",
+        "npm test"
+      ],
+      "runtimeAuthority": false
+    }
+  ],
+  "completionCriteria": [
+    {
+      "id": "schema_version_runtime_enforcement_proven",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P52 helper is explicit-input/local only and is not full runtime enforcement.",
+      "missingEvidence": "Runtime enforcement proof across schemaVersion policyVersion manifestVersion boundary."
+    },
+    {
+      "id": "validation_aggregator_full_implementation_complete",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P53 aggregator posture remains static/report-shape with explicit local evidence classification.",
+      "missingEvidence": "Full allowed evidence aggregation with runtime freshness and final gate authority."
+    },
+    {
+      "id": "final_rc_matrix_runner_executed",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P54 provides inventory, command-result helper, preflight, and injected-executor adapter only.",
+      "missingEvidence": "Real final RC matrix execution report over allowlisted local commands."
+    },
+    {
+      "id": "governance_runtime_loop_executed",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P56 remains dry-run explicit-input helper evidence only.",
+      "missingEvidence": "Controlled runtime review approval audit loop evidence with authorized durable writes."
+    },
+    {
+      "id": "recall_isolation_runtime_proof_executed",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P57 remains boundary inventory and explicit-input evaluator evidence only.",
+      "missingEvidence": "Runtime proof that governed evidence cannot contaminate normal recall surfaces."
+    },
+    {
+      "id": "migration_import_export_backup_restore_execution_authorized",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P58 remains synthetic/sanitized metadata approval framework evidence only.",
+      "missingEvidence": "Authorized execution framework proof for apply/restore actions."
+    },
+    {
+      "id": "http_runtime_operation_readiness_proven",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P59 remains explicit-input observability helper and boundary evidence.",
+      "missingEvidence": "Live HTTP operation readiness evidence without crossing service/config boundaries."
+    },
+    {
+      "id": "mainline_strict_gate_and_rc_report_passed",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P61 report helper exists but mainline strict gate is not executed for cutover.",
+      "missingEvidence": "Actual strict gate and machine-readable RC evidence report with all critical gates passed."
+    },
+    {
+      "id": "v1_rc_cutover_preflight_passed",
+      "requiredForGoalCompletion": true,
+      "currentStatus": "blocked",
+      "evidence": "P62 cutover preflight boundary and audit report exist.",
+      "missingEvidence": "Authorized cutover preflight and cutover evidence with no unresolved A5 blockers."
+    }
+  ],
+  "requiredValidationCommands": [
+    "node --check tests/p62-prompt-to-artifact-completion-audit-fixture.test.js",
+    "node --test tests/p62-prompt-to-artifact-completion-audit-fixture.test.js tests/p62-completion-audit-gap-report-fixture.test.js",
+    "npm test",
+    "git diff --check"
+  ],
+  "a5HardStops": [
+    "push",
+    "tag_create",
+    "release_create",
+    "deploy",
+    "config_switch",
+    "watchdog_install",
+    "startup_install",
+    "provider_call",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "rc_ready_claim"
+  ],
+  "forbiddenClaims": [
+    "objective_complete",
+    "runtime_ready",
+    "final_rc_matrix_ready",
+    "rc_ready",
+    "v1_rc_ready",
+    "cutover_ready",
+    "release_ready",
+    "deploy_ready",
+    "config_switch_ready",
+    "watchdog_ready"
+  ],
+  "safety": {
+    "readsFilesImplicitly": false,
+    "scansDirectories": false,
+    "executesCommands": false,
+    "startsServices": false,
+    "callsProviders": false,
+    "readsRealMemory": false,
+    "scansRuntimeStores": false,
+    "writesDurableMemory": false,
+    "writesDurableAudit": false,
+    "expandsPublicMcp": false,
+    "remoteWrites": false,
+    "rawSensitiveOutputExposed": false
+  },
+  "readiness": {
+    "promptToArtifactAuditReady": true,
+    "objectiveComplete": false,
+    "runtimeReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "cutoverReady": false,
+    "pushReady": false,
+    "tagReady": false,
+    "releaseReady": false,
+    "deployReady": false,
+    "configSwitchReady": false,
+    "watchdogReady": false
+  }
+}
