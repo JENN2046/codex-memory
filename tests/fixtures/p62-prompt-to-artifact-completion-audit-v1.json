@@ -205,12 +205,20 @@
       "artifacts": [
         "docs/P62_V1_RC_CUTOVER_PREFLIGHT_BOUNDARY.md",
         "docs/P62_COMPLETION_AUDIT_GAP_REPORT.md",
+        "docs/P62_PROMPT_TO_ARTIFACT_COMPLETION_AUDIT.md",
+        "docs/P62_A5_RUNTIME_AUTHORIZATION_PRECONDITION_MATRIX.md",
+        "src/core/A5RuntimeAuthorizationPreconditionContract.js",
         "tests/fixtures/p62-v1-rc-cutover-preflight-boundary-v1.json",
-        "tests/fixtures/p62-completion-audit-gap-report-v1.json"
+        "tests/fixtures/p62-completion-audit-gap-report-v1.json",
+        "tests/fixtures/p62-prompt-to-artifact-completion-audit-v1.json",
+        "tests/fixtures/p62-a5-runtime-authorization-precondition-matrix-v1.json"
       ],
       "validationRefs": [
         "P62-T1 fixture test",
         "P62-T2 audit fixture test",
+        "P62-T3 prompt-to-artifact audit fixture test",
+        "P62-T4 authorization precondition matrix fixture test",
+        "P62-T5 authorization precondition helper test",
         "npm test"
       ],
       "runtimeAuthority": false

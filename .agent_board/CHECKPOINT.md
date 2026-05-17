@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary after P62-T5 post-commit reconciliation.
+P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary after P62-T6 completion audit refresh.
 
 ## Current Status
 
@@ -39,6 +39,7 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62-T3 prompt-to-artifact completion audit checklist is implemented, validated, and committed locally in `4696482`.
 - P62-T4 A5/runtime authorization precondition matrix is implemented, validated, and committed locally in `c97736d`.
 - P62-T5 A5/runtime authorization precondition explicit-input helper is implemented, validated, and committed locally in `8535da1`.
+- P62-T6 completion audit refresh is implemented and validated locally.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -98,6 +99,16 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - The helper accepts only caller-provided P62 authorization precondition objects, enforces exact schema/policy/manifest/public-MCP/evidence/action/fail-closed/bundled-approval/forbidden-claim sets, redacts sensitive strings, and keeps authorization, runtime readiness, final RC matrix readiness, v1 RC readiness, cutover, push/tag/release/deploy/config/watchdog readiness blocked.
 - It performs no fs read, directory scan, command execution, provider call, runtime store import, durable write, public MCP expansion, or RC_READY claim.
 
+## P62-T6 Evidence
+
+- Updated `docs/P62_COMPLETION_AUDIT_GAP_REPORT.md`.
+- Updated `tests/fixtures/p62-completion-audit-gap-report-v1.json`.
+- Updated `tests/p62-completion-audit-gap-report-fixture.test.js`.
+- Updated `tests/fixtures/p62-prompt-to-artifact-completion-audit-v1.json`.
+- Updated `tests/p62-prompt-to-artifact-completion-audit-fixture.test.js`.
+- The audit now maps P62-T5 helper and authorization matrix evidence as local audit artifacts with `runtimeAuthority: false`.
+- It keeps objective completion, runtime readiness, final RC matrix readiness, v1 RC readiness, cutover, push/tag/release/deploy/config/watchdog, live/provider operation, and RC_READY blocked.
+
 ## Validation
 
 - `node --check tests\p61-mainline-strict-gate-rc-evidence-report-boundary-fixture.test.js`
@@ -132,6 +143,9 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62-T5 targeted helper test (`7/7`)
 - P62-T5 no-touch regression (`4/4`) and P60 redaction/no-touch regression (`3/3`)
 - `npm test` (`1073/1073`)
+- `git diff --check`
+- P62-T6 targeted completion audit and prompt-to-artifact audit tests (`19/19`)
+- `npm test` (`1075/1075`)
 - `git diff --check`
 
 ## Active Boundaries

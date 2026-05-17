@@ -89,6 +89,27 @@ test('P62 prompt-to-artifact audit separates local evidence from goal completion
   }
 });
 
+test('P62 prompt-to-artifact audit includes P62-T5 authorization helper evidence without runtime authority', () => {
+  const fixture = loadFixture();
+  const p62Route = fixture.routeRequirements.find((requirement) => requirement.id === 'p62_v1_rc_cutover_preflight');
+
+  assert.ok(p62Route);
+  assert.equal(p62Route.runtimeAuthority, false);
+  assert.equal(p62Route.artifacts.includes('src/core/A5RuntimeAuthorizationPreconditionContract.js'), true);
+  assert.equal(p62Route.artifacts.includes('docs/P62_A5_RUNTIME_AUTHORIZATION_PRECONDITION_MATRIX.md'), true);
+  assert.equal(p62Route.validationRefs.includes('P62-T5 authorization precondition helper test'), true);
+});
+
+test('P62 completion audit includes post-P62-T5 local audit and authorization items', () => {
+  const fixture = loadFixture();
+  const p62Route = fixture.routeRequirements.find((requirement) => requirement.id === 'p62_v1_rc_cutover_preflight');
+
+  assert.ok(p62Route);
+  assert.equal(p62Route.artifacts.includes('tests/fixtures/p62-completion-audit-gap-report-v1.json'), true);
+  assert.equal(p62Route.artifacts.includes('tests/fixtures/p62-prompt-to-artifact-completion-audit-v1.json'), true);
+  assert.equal(p62Route.artifacts.includes('tests/fixtures/p62-a5-runtime-authorization-precondition-matrix-v1.json'), true);
+});
+
 test('P62 prompt-to-artifact audit keeps public MCP frozen and A5 hard stops visible', () => {
   const fixture = loadFixture();
 

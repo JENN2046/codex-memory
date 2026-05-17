@@ -14,7 +14,7 @@ The report maps the P51-P62 objective to committed local artifacts and separates
 
 Decision: `NOT_READY_BLOCKED`.
 
-The local P51-P62 evidence-first chain is complete through P62-T1 boundary inventory, but the overall v1.0 RC objective is not complete because critical runtime and cutover requirements remain blocked or unexecuted.
+The local P51-P62 evidence-first chain is complete through P62-T5 explicit-input authorization precondition helper, but the overall v1.0 RC objective is not complete because critical runtime and cutover requirements remain blocked or unexecuted.
 
 ## Covered Local Evidence
 
@@ -32,6 +32,8 @@ The audit recognizes local artifacts for:
 - P60 no-touch/no-leak/redaction regression
 - P61 RC evidence report boundary and helper
 - P62 RC cutover preflight boundary inventory
+- P62 completion audit / prompt-to-artifact audit / A5 authorization precondition matrix
+- P62 A5/runtime authorization precondition explicit-input helper
 
 ## Remaining Critical Gaps
 
