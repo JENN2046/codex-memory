@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0297 / P34 governance review surface safe-scope inventory.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0298 / P34.1 governance review surface fixture contract.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0297 docs/status/board-only updates. Local `main` is ahead of `origin/main` by the guarded local CM-0296 commit `83bd388`.
+Dirty for CM-0298 fixture/test/status/board updates. Local `main` is ahead of `origin/main` by local commits `83bd388` and `9d3ab69`.
 
 ## Current Area
 
-P8 memory governance review surface inventory
+P8 memory governance review surface fixture
 
 ## Findings
 
@@ -102,7 +102,9 @@ P8 memory governance review surface inventory
 - CM-0296 board/status reconciliation clears stale CM-0295 in-progress wording and routes next safe work to P34. Validation passed: `git diff --check`, docs validation, and board diff inspection.
 - CM-0296 is committed locally in `83bd388`; no push is authorized.
 - CM-0297 P34 governance review surface safe-scope inventory is complete pending Verifier and commit. It inventories read-only lifecycle / approval-packet / audit-evidence / admin-review / ValidationAggregator evidence only. Validation passed: `git diff --check`, docs validation, and P34 boundary reference scan.
-- Next safe step: run read-only Verifier, guarded local commit if eligible, then enter P34.1 fixture contract if still safe. No push is authorized.
+- CM-0297 is committed locally in `9d3ab69`; no push is authorized.
+- CM-0298 P34.1 governance review surface fixture contract is complete pending Verifier and commit. It adds synthetic fixture/test evidence only and does not implement helper/CLI/runtime review. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `704/704`, `git diff --check`, docs validation, and P34.1 boundary scan.
+- Next safe step: run read-only Verifier, guarded local commit if eligible, then enter P34.2 explicit-input helper candidate if still safe. No push is authorized.
 
 ## Changed Files
 

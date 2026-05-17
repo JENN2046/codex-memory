@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0297 / P34 governance review surface safe-scope inventory.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0298 / P34.1 governance review surface fixture contract.
 
 ## Current Area
 
-P8 memory governance review surface inventory
+P8 memory governance review surface fixture
 
 ## Current Status
 
@@ -74,7 +74,9 @@ P8 memory governance review surface inventory
 - CM-0296 reconciles board/status state after pushed `d210947`, clearing stale CM-0295 in-progress wording and routing next safe local work to P34. Validation passed: `git diff --check`, docs validation, and board diff inspection.
 - CM-0296 is committed locally in `83bd388`; no push is authorized.
 - CM-0297 adds P34 governance review surface safe-scope inventory docs/status/board updates. Validation passed: `git diff --check`, docs validation, and P34 boundary reference scan.
-- Commander direction remains constrained: CM-0297 may update docs/status/board only; helper runtime integration, fixture reads by aggregator, durable audit writes, durable mutation, real DB governance review execution, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0297 is committed locally in `9d3ab69`; no push is authorized.
+- CM-0298 adds a synthetic P34.1 governance review surface fixture/test. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `704/704`, `git diff --check`, docs validation, and P34.1 boundary scan.
+- Commander direction remains constrained: CM-0298 may update fixture/test/status/board only; helper/CLI/runtime implementation, fixture reads by aggregator, durable audit writes, durable mutation, real DB governance review execution, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 

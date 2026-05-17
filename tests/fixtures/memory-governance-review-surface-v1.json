@@ -1,0 +1,253 @@
+{
+  "schemaVersion": "memory-governance-review-surface-v1",
+  "version": "v1",
+  "phase": "P34.1-governance-review-surface-fixture-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "reviewOnly": true,
+  "status": "blocked",
+  "reviewStatus": "evidence_only",
+  "reviewLevel": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "approvalStatus": "BLOCKED_PENDING_APPROVAL",
+  "executionApproved": false,
+  "mutated": false,
+  "runtimeIntegrated": false,
+  "governanceReportExecuted": false,
+  "realDbReviewExecuted": false,
+  "durableMemoryTouched": false,
+  "durableAuditWritten": false,
+  "publicMcpExpanded": false,
+  "realMemoryScanned": false,
+  "providerCalls": 0,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "safeSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "explicit_input",
+    "static_report_shape",
+    "local_git_status",
+    "local_validation_summary"
+  ],
+  "acceptedSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "explicit_input",
+    "static_report_shape",
+    "local_git_status",
+    "local_validation_summary"
+  ],
+  "unsupportedSourceTypes": [],
+  "acceptedForPlanning": true,
+  "sourceSurfaces": [
+    {
+      "id": "lifecycle_contract",
+      "sourceType": "committed_fixture",
+      "artifacts": [
+        "tests/fixtures/memory-governance-lifecycle-contract-v1.json",
+        "tests/memory-governance-lifecycle-contract-fixture.test.js",
+        "src/core/MemoryGovernanceLifecycleContract.js"
+      ],
+      "acceptedForPlanning": true,
+      "helperExecuted": false,
+      "fixtureReadByRuntime": false,
+      "runtimeIntegrated": false
+    },
+    {
+      "id": "approval_packet",
+      "sourceType": "committed_fixture",
+      "artifacts": [
+        "tests/fixtures/memory-governance-approval-packet-v1.json",
+        "tests/memory-governance-approval-packet-fixture.test.js",
+        "src/core/MemoryGovernanceApprovalPacketContract.js"
+      ],
+      "acceptedForPlanning": true,
+      "helperExecuted": false,
+      "fixtureReadByRuntime": false,
+      "executionApproved": false
+    },
+    {
+      "id": "audit_evidence",
+      "sourceType": "committed_fixture",
+      "artifacts": [
+        "tests/fixtures/memory-governance-audit-evidence-v1.json",
+        "tests/memory-governance-audit-evidence-fixture.test.js",
+        "src/core/MemoryGovernanceAuditEvidenceContract.js"
+      ],
+      "acceptedForPlanning": true,
+      "helperExecuted": false,
+      "fixtureReadByRuntime": false,
+      "durableAuditWritten": false
+    },
+    {
+      "id": "admin_review_surface",
+      "sourceType": "committed_fixture",
+      "artifacts": [
+        "tests/fixtures/admin-review-surface-v1.json",
+        "tests/admin-review-surface-shape.test.js",
+        "tests/fixtures/admin-review-schema-snapshot-v1.json",
+        "tests/admin-review-schema-snapshot-gate.test.js",
+        "src/cli/governance-report.js"
+      ],
+      "acceptedForPlanning": true,
+      "governanceReportExecuted": false,
+      "realDbReviewExecuted": false,
+      "unavailableSourceShapeRequired": true
+    },
+    {
+      "id": "validation_aggregator_report_shape",
+      "sourceType": "static_report_shape",
+      "artifacts": [
+        "src/core/ValidationAggregatorService.js",
+        "tests/fixtures/v1-rc-validation-aggregator-v1.json",
+        "tests/v1-rc-validation-aggregator-implementation.test.js",
+        "tests/v1-rc-validation-aggregator.test.js"
+      ],
+      "acceptedForPlanning": true,
+      "aggregatorExecutedHelpers": false,
+      "fixtureReadByAggregator": false,
+      "runtimeIntegrated": false
+    }
+  ],
+  "reviewSections": {
+    "lifecycleReview": {
+      "status": "evidence_only",
+      "visibleCases": [
+        "proposal_accept",
+        "proposal_reject",
+        "supersession_deferred",
+        "tombstone_deferred",
+        "validate_memory_internal"
+      ],
+      "runtimeIntegrated": false,
+      "mutated": false
+    },
+    "approvalReview": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "visibleActions": [
+        "proposal_accept",
+        "proposal_reject",
+        "supersession_apply",
+        "tombstone_apply",
+        "validate_memory_internal_apply",
+        "governance_audit_write",
+        "governance_report_write",
+        "public_mcp_governance_expansion",
+        "real_memory_governance_preview",
+        "backup_before_governance_apply",
+        "restore_after_governance_apply"
+      ],
+      "executionApproved": false,
+      "mutated": false
+    },
+    "auditEvidenceReview": {
+      "status": "BLOCKED_PENDING_APPROVAL",
+      "visibleEventFamilies": [
+        "memory_proposal_accept",
+        "memory_proposal_reject",
+        "memory_supersede",
+        "memory_tombstone",
+        "memory_validate_internal",
+        "governance_approval_decision",
+        "governance_report_write",
+        "governance_backup_created",
+        "governance_restore_performed",
+        "public_mcp_governance_expansion_review"
+      ],
+      "auditWriterImplemented": false,
+      "durableAuditWritten": false
+    },
+    "adminReviewSurface": {
+      "status": "fixture_backed",
+      "sourceCommandsDocumented": true,
+      "commandsExecutedByP34": false,
+      "governanceReportExecuted": false,
+      "realDbReviewExecuted": false,
+      "unavailableSourceShapeRequired": true
+    },
+    "aggregatorReview": {
+      "status": "static_report_shape_only",
+      "helpersExecutedByAggregator": false,
+      "fixturesReadByAggregator": false,
+      "canClaimGovernanceRuntimeReady": false,
+      "canClaimV1RcReady": false
+    }
+  },
+  "requiredApprovals": [
+    "runtime_governance_integration",
+    "governed_action_execution",
+    "audit_writer_implementation",
+    "durable_audit_write",
+    "durable_memory_mutation",
+    "public_mcp_governance_expansion",
+    "real_memory_scan_export_import",
+    "migration_import_export_apply",
+    "backup_restore",
+    "provider_service_config_action",
+    "push_tag_release_deploy"
+  ],
+  "blockers": [
+    "runtime_governance_integration_not_implemented",
+    "governed_action_execution_not_approved",
+    "audit_writer_not_implemented",
+    "durable_audit_write_not_approved",
+    "durable_mutation_not_approved",
+    "public_mcp_governance_expansion_not_approved",
+    "real_memory_scan_blocked",
+    "migration_import_export_apply_blocked",
+    "backup_restore_blocked",
+    "provider_service_config_action_blocked",
+    "schema_version_runtime_enforcement_incomplete",
+    "validation_aggregator_full_implementation_incomplete",
+    "final_rc_matrix_not_executed",
+    "v1_rc_not_ready_blocked"
+  ],
+  "safety": {
+    "noRuntimeGovernanceIntegration": true,
+    "noGovernedActionExecution": true,
+    "noAuditWriterImplementation": true,
+    "noDurableAuditWrite": true,
+    "noDurableMemoryWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryScan": true,
+    "noGovernanceReportExecution": true,
+    "noRealDbReviewExecution": true,
+    "noMigrationImportExportApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noPackageScriptChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "authorizationHeaderExposed": false,
+    "apiKeyExposed": false
+  },
+  "requiredWording": [
+    "P34 review surface fixture does not implement a runtime review CLI.",
+    "Review visibility does not approve governed action execution.",
+    "governance:report is not executed against the real configured database in P34.",
+    "Audit evidence records do not approve or perform durable audit writes.",
+    "Public MCP tools remain frozen at record_memory, search_memory, and memory_overview.",
+    "validate_memory remains internal-only.",
+    "v1.0 RC remains NOT_READY_BLOCKED."
+  ],
+  "forbiddenClaims": [
+    "runtime governance review CLI is implemented",
+    "governed actions are approved",
+    "audit writer is implemented",
+    "durable audit writes are approved",
+    "real database governance review has executed",
+    "public MCP governance expansion is approved",
+    "v1.0 RC readiness is unblocked"
+  ],
+  "next": "P34.2-governance-review-surface-explicit-input-helper-candidate"
+}
