@@ -1,0 +1,242 @@
+{
+  "schemaVersion": "p61-mainline-strict-gate-rc-evidence-report-boundary-v1",
+  "policyVersion": "p61-rc-evidence-report-policy-v1",
+  "manifestVersion": "p61-rc-evidence-report-manifest-v1",
+  "version": "v1",
+  "phase": "P61-T1-mainline-strict-gate-rc-evidence-report-boundary",
+  "fixtureOnly": true,
+  "localOnly": true,
+  "readOnly": true,
+  "boundaryInventoryOnly": true,
+  "mainlineStrictGateExecuted": false,
+  "finalRcRunnerExecuted": false,
+  "runtimeEvidenceCollected": false,
+  "liveHttpObserved": false,
+  "providerCalls": 0,
+  "realMemoryScanned": false,
+  "runtimeStoreScanned": false,
+  "durableMemoryWritten": false,
+  "durableAuditWritten": false,
+  "publicMcpExpanded": false,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "allowedSourceTypes": [
+    "committed_fixture",
+    "committed_test",
+    "committed_report_shape",
+    "sanitized_local_validation_log"
+  ],
+  "deniedSourceTypes": [
+    "live_provider_output",
+    "real_memory_content",
+    "real_diary",
+    "real_sqlite",
+    "real_vector_index",
+    "real_candidate_cache",
+    "real_recall_audit",
+    "raw_http_header",
+    "raw_bearer_token",
+    "operator_free_text",
+    "unverified_gate_summary"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "p52_runtime_schema_version_enforcement_helper",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "src/core/RuntimeSchemaVersionEnforcementContract.js",
+        "tests/runtime-schema-version-enforcement-contract-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "reportAuthority": false
+    },
+    {
+      "id": "p53_validation_aggregator_inventory_and_posture",
+      "sourceType": "committed_report_shape",
+      "artifactRefs": [
+        "src/core/ValidationAggregatorService.js",
+        "tests/v1-rc-validation-aggregator-implementation.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "reportAuthority": false
+    },
+    {
+      "id": "p54_final_rc_runner_local_chain",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "src/core/FinalRcRunnerAllowlistedExecutionAdapter.js",
+        "tests/final-rc-runner-allowlisted-execution-adapter.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "reportAuthority": false
+    },
+    {
+      "id": "p56_governance_loop_boundary_helper",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "src/core/GovernanceLoopBoundaryContract.js",
+        "tests/governance-loop-boundary-contract-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "reportAuthority": false
+    },
+    {
+      "id": "p57_recall_isolation_runtime_proof_helper",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "src/core/RecallIsolationRuntimeProofContract.js",
+        "tests/recall-isolation-runtime-proof-contract-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "reportAuthority": false
+    },
+    {
+      "id": "p58_migration_import_export_backup_restore_helper",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "src/core/MigrationImportExportBackupRestoreApprovalContract.js",
+        "tests/migration-import-export-backup-restore-approval-contract-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "reportAuthority": false
+    },
+    {
+      "id": "p59_http_observability_helper",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "src/core/HttpRuntimeObservabilityOperationContract.js",
+        "tests/http-runtime-observability-operation-contract-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "reportAuthority": false
+    },
+    {
+      "id": "p60_no_touch_no_leak_redaction_regression",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "tests/p60-no-touch-no-leak-redaction-regression.test.js",
+        "src/core/SensitiveFragmentRedaction.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "reportAuthority": false
+    }
+  ],
+  "requiredEvidenceGroups": [
+    "schema_runtime_enforcement",
+    "validation_aggregator_full_implementation",
+    "final_rc_runner_execution",
+    "governance_review_approval_audit_loop",
+    "recall_isolation_runtime_proof",
+    "migration_import_export_backup_restore_approval",
+    "http_observability_operation_hardening",
+    "no_touch_no_leak_redaction_regression",
+    "mainline_strict_gate_execution",
+    "machine_readable_rc_evidence_report"
+  ],
+  "unsatisfiedEvidenceGroups": [
+    "schema_runtime_enforcement",
+    "validation_aggregator_full_implementation",
+    "final_rc_runner_execution",
+    "governance_review_approval_audit_loop",
+    "recall_isolation_runtime_proof",
+    "migration_import_export_backup_restore_approval",
+    "http_observability_operation_hardening",
+    "mainline_strict_gate_execution",
+    "machine_readable_rc_evidence_report"
+  ],
+  "failClosedStates": [
+    "missing",
+    "unknown",
+    "skipped",
+    "warning",
+    "warning_only",
+    "failed",
+    "stale",
+    "ambiguous",
+    "unparsable",
+    "unsupported",
+    "duplicate",
+    "gate_not_executed",
+    "report_not_generated",
+    "runtime_evidence_missing",
+    "a5_authorization_missing",
+    "readiness_overclaim"
+  ],
+  "blockedActions": [
+    "mainline_strict_gate_execute",
+    "final_rc_runner_execute",
+    "live_http_observe",
+    "service_start",
+    "service_stop",
+    "watchdog_install",
+    "startup_install",
+    "config_switch",
+    "provider_call",
+    "real_memory_read",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "push_tag_release_deploy"
+  ],
+  "forbiddenClaims": [
+    "mainline_strict_gate_ready",
+    "rc_evidence_report_ready",
+    "final_rc_matrix_ready",
+    "runtime_ready",
+    "v1_rc_ready",
+    "release_ready",
+    "deploy_ready",
+    "config_switch_ready",
+    "watchdog_ready"
+  ],
+  "safety": {
+    "readsFilesImplicitly": false,
+    "scansDirectories": false,
+    "executesCommands": false,
+    "startsServices": false,
+    "callsProviders": false,
+    "readsRealMemory": false,
+    "scansRuntimeStores": false,
+    "writesDurableMemory": false,
+    "writesDurableAudit": false,
+    "expandsPublicMcp": false,
+    "remoteWrites": false,
+    "rawSensitiveOutputExposed": false
+  },
+  "readiness": {
+    "localBoundaryInventoryReady": true,
+    "mainlineStrictGateReady": false,
+    "rcEvidenceReportReady": false,
+    "runtimeReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "pushReady": false,
+    "releaseReady": false,
+    "deployReady": false,
+    "configSwitchReady": false,
+    "watchdogReady": false
+  }
+}

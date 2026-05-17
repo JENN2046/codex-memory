@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `1ae4286 test: harden no-touch redaction regressions`。
-- 当前本地基线：本地 `main` 已包含 P51-P60-T1 本地工作并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
+- 当前本地基线：本地 `main` 已包含 P51-P60-T1 本地工作，P61-T1 已本地验证待 guarded local commit，并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P60-T1 no-touch / no-leak / redaction long-term regression 已完成、验证并本地提交为 `66d1978`；board/status 正在进行 post-commit reconciliation。P60-T1 只是测试回归，不读取真实 memory、不执行 runtime operation、不启动 HTTP 服务、不安装 watchdog/startup、不切换配置、不调用 provider、不写 durable state、不扩 public MCP，也不是 operation/runtime/final-RC/v1-RC readiness。
+- 当前任务：P61-T1 mainline strict gate + RC evidence report boundary inventory 已完成并本地验证，正在进行 guarded local commit 前状态收敛。P61-T1 只是 docs/fixture/test boundary inventory，不执行 `gate:mainline:strict`、不执行 final RC runner、不收集 live runtime evidence、不读取真实 memory、不写 durable state、不扩 public MCP，也不是 mainline/runtime/final-RC/v1-RC readiness。
 
 ## 当前阻塞
 
@@ -21,8 +21,8 @@
 
 ## 当前优先级
 
-1. 完成 P60-T1 post-commit board/status reconciliation；不得 push，除非用户单独明确授权。
-2. 下一条安全候选进入 P61 RC evidence report 边界盘点，必须本地、可逆、no-side-effect，不得执行 mainline gate、live HTTP operation、service/watchdog/startup install、config switch、provider call、durable write 或 public MCP expansion。
+1. 完成 P61-T1 guarded local commit；不得 push，除非用户单独明确授权。
+2. 下一条安全候选必须继续本地、可逆、no-side-effect，不得执行 mainline gate、live HTTP operation、service/watchdog/startup install、config switch、provider call、durable write 或 public MCP expansion。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54 command chain evidence、P55 trace evidence、P56 governance loop evidence、P57 boundary/helper evidence、P58 boundary/helper evidence、P59 boundary inventory evidence 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、或 final RC matrix execution。
 4. 不 push，除非用户单独明确授权。
 

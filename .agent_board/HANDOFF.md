@@ -14,11 +14,11 @@ Execute P51-P62 Runtime-Enforced Governed Memory Spine Completion under local A4
 
 ## Worktree
 
-Local `main` is ahead of `origin/main = 1ae4286 test: harden no-touch redaction regressions`; push is not authorized. P60-T1 is committed locally in `66d1978`.
+Local `main` is ahead of `origin/main = 1ae4286 test: harden no-touch redaction regressions`; push is not authorized. P61-T1 is validated locally and pending guarded local commit.
 
 ## Current Area
 
-P10 observability/admin; P60 no-touch regression complete; P61 RC evidence report boundary candidate next.
+P10 observability/admin; P61 RC evidence report boundary inventory.
 
 ## Current Truth
 
@@ -36,6 +36,8 @@ P10 observability/admin; P60 no-touch regression complete; P61 RC evidence repor
 - P59-T2 HTTP observability explicit-input evidence helper is implemented, validated, and committed locally in `a036c8d`.
 - P59-T2 post-commit board reconciliation is committed locally in `3206a0f`.
 - P60-T1 no-touch / no-leak / redaction long-term regression is implemented, validated, and committed locally in `66d1978`.
+- P60-T1 post-commit board reconciliation is committed locally in `ca30af1`.
+- P61-T1 mainline strict gate + RC evidence report boundary inventory is implemented and validated locally.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -49,6 +51,7 @@ P10 observability/admin; P60 no-touch regression complete; P61 RC evidence repor
 - P59-T1 validation passed: new test syntax, fixture JSON parse, targeted P59 test `11/11`, targeted P59/HTTP/no-touch set `32/32`, `npm test` `1000/1000`, `git diff --check`, post-commit status/log/trailer/diff-check.
 - P59-T2 validation passed: changed JS syntax checks, targeted helper/no-touch test `12/12`, targeted P59/HTTP/no-touch set `40/40`, boundary scan returned no hits, `npm test` `1008/1008`, post-commit status/log/trailer/diff-check.
 - P60-T1 validation passed: new test syntax, targeted P60/no-touch/sensitive-redaction test `8/8`, `npm test` `1011/1011`, post-commit status/log/trailer/diff-check.
+- P61-T1 validation passed: new test syntax, fixture JSON parse, targeted P61 test `10/10`, targeted P54/P59/P60/P61/no-touch set `70/70`, `npm test` `1021/1021`.
 
 ## Hard Stops
 
@@ -56,4 +59,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Complete P60-T1 post-commit board/status reconciliation, then evaluate P61-T1 only if it remains local boundary inventory/report-shape work with no runtime side effects. Do not push unless explicitly authorized.
+Run final diff/docs validation for P61-T1 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation. Do not push unless explicitly authorized.

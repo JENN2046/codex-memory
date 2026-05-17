@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P60 no-touch regression complete; P61 RC evidence report boundary candidate next.
+P10 observability/admin; P61 RC evidence report boundary inventory.
 
 ## Current Status
 
@@ -28,23 +28,26 @@ P10 observability/admin; P60 no-touch regression complete; P61 RC evidence repor
 - P59-T2 HTTP observability explicit-input evidence helper is implemented, validated, and committed locally in `a036c8d`.
 - P59-T2 post-commit board reconciliation is locally committed in `3206a0f`.
 - P60-T1 no-touch / no-leak / redaction long-term regression is implemented, validated, and committed locally in `66d1978`.
+- P60-T1 post-commit board reconciliation is locally committed in `ca30af1`.
+- P61-T1 mainline strict gate + RC evidence report boundary inventory is implemented and validated locally.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
-## P60-T1 Evidence
+## P61-T1 Evidence
 
-- Added `tests/p60-no-touch-no-leak-redaction-regression.test.js`.
-- The regression locks centralized helper redaction through `src/core/SensitiveFragmentRedaction.js`.
-- The redaction corpus covers authorization/bearer headers, API keys, providerapikey, workspace_id/raw_workspace_id, set-cookie, token, password, URLs, `.env` files, and absolute paths.
-- The helper source targets must not import fs/child_process/network/runtime-store APIs or introduce execution/durable-write calls.
-- It is test-only and keeps runtime/service/provider/config/deploy operation, public MCP expansion, final RC readiness, and v1 RC readiness blocked.
+- Added `docs/P61_MAINLINE_STRICT_GATE_RC_EVIDENCE_REPORT_BOUNDARY.md`.
+- Added `tests/fixtures/p61-mainline-strict-gate-rc-evidence-report-boundary-v1.json`.
+- Added `tests/p61-mainline-strict-gate-rc-evidence-report-boundary-fixture.test.js`.
+- The fixture records required evidence groups, unsatisfied critical groups, fail-closed states, blocked actions, forbidden claims, safety, and readiness boundaries.
+- It keeps mainline gate execution, final RC runner execution, live HTTP observation, provider calls, real memory/runtime scans, durable writes, public MCP expansion, runtime readiness, final RC readiness, and v1 RC readiness blocked.
 
 ## Validation
 
-- `node --check tests\p60-no-touch-no-leak-redaction-regression.test.js`
-- Targeted P60/no-touch/sensitive-redaction test (`8/8`)
-- `npm test` (`1011/1011`)
-- Post-commit status/log/trailer/diff-check for `66d1978`
+- `node --check tests\p61-mainline-strict-gate-rc-evidence-report-boundary-fixture.test.js`
+- P61 fixture JSON parse
+- Targeted P61 test (`10/10`)
+- Targeted P54/P59/P60/P61/no-touch set (`70/70`)
+- `npm test` (`1021/1021`)
 
 ## Active Boundaries
 
@@ -62,4 +65,4 @@ P10 observability/admin; P60 no-touch regression complete; P61 RC evidence repor
 
 ## Next Safe Step
 
-Complete P60-T1 post-commit board/status reconciliation, then evaluate P61-T1 only if it remains local boundary inventory/report-shape work with no runtime side effects.
+Run final diff/docs validation for P61-T1 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation.
