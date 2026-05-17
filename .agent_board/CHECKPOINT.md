@@ -40,6 +40,7 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62-T4 A5/runtime authorization precondition matrix is implemented, validated, and committed locally in `c97736d`.
 - P62-T5 A5/runtime authorization precondition explicit-input helper is implemented, validated, and committed locally in `8535da1`.
 - P62-T6 completion audit refresh is implemented, validated, and committed locally in `d5808bd`.
+- P62-T6 post-commit board/status reconciliation is committed locally in `94c30a6`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 

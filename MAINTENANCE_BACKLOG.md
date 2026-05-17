@@ -11,7 +11,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
-- Local baseline: local `main` contains P51-P62-T6 local completion audit refresh work, is ahead of `origin/main = 1ae4286`, and current `HEAD = d5808bd test: refresh p62 completion audit coverage`; push is not authorized.
+- Local baseline: local `main` contains P51-P62-T6 local completion audit refresh work plus post-commit board/status reconciliation, is ahead of `origin/main = 1ae4286`, and current `HEAD = 94c30a6 docs: reconcile p62 t6 post-commit board state`; push is not authorized.
 - Current active program: P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 - Current phase area: P62 A5/runtime authorization precondition boundary. Evidence-first / fail-closed / reversible boundaries preserved.
 
@@ -74,6 +74,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P62-T5 | observability-admin | A2 | done | A5/runtime authorization precondition explicit-input helper | changed JS syntax; targeted helper/no-touch tests; `npm test`; `git diff --check` | Complete, validated, and committed locally in `8535da1`. Pure helper over caller-provided object only; fails closed for malformed/version drift/non-exact sets/unsupported evidence types/duplicates/granted A5 actions/readiness or safety leakage, redacts sensitive fields, and keeps authorization/runtime/final RC/v1 RC/cutover/push/tag/release/deploy/config/watchdog readiness blocked. No fs read, command execution, provider call, runtime import, durable write, public MCP expansion, or RC_READY claim. |
 | CM-0377 | docs-drift | A1 | done | P62-T5 post-commit board reconciliation | `git diff --check`; docs validation; post-commit status/log/trailer checks | Records exact local P62-T5 commit `8535da1` after guarded local commit. No source/test/package/runtime/provider/data/public MCP expansion, durable write, mainline gate execution, live HTTP operation, service start, migration-import-export apply, backup/restore, push/tag/release/deploy, or RC-ready claim. |
 | P62-T6 | observability-admin | A1/A2 | done | Completion audit refresh after P62-T5 helper | docs/fixture/test first; targeted audit tests; `npm test`; `git diff --check` | Complete, validated, and committed locally in `d5808bd`. Updates P62 completion audit and prompt-to-artifact audit so P62-T5 helper and authorization matrix are mapped as local evidence with no runtime authority. Keeps runtime, final RC, v1 RC, cutover, push/tag/release/deploy/config/watchdog readiness blocked. |
+| CM-0379 | docs-drift | A1 | done | P62-T6 HEAD reconciliation after completion audit | `git diff --check`; docs validation; stale wording scan; post-commit status/log/trailer checks | Records exact current `HEAD = 94c30a6` after the P62-T6 post-commit board reconciliation. No source/test/package/runtime/provider/data/public MCP expansion, durable write, mainline gate execution, live HTTP operation, service start, migration-import-export apply, backup/restore, push/tag/release/deploy, or RC-ready claim. |
 
 ## Standing Boundaries
 
