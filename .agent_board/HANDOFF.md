@@ -2,7 +2,7 @@
 
 ## Goal
 
-Close CM-0206 Single-Window 4-Agent read-only calibration after the P24.5 local commit.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0261 / guarded local commit for the validated P28.2-P28.7 evidence-reader chain.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-P23 planning through P23.3 are locally committed in `a3b2d77`; P23.4 is locally committed in `0e3e25b`; P23.5 is locally committed in `de64428`; P23.6 is locally committed in `9889378`; P23.7 is locally committed in `82fb28c`; P23.8 is locally committed in `d5f70b7`; P23.9 is locally committed in `0aa02fa`; P23.10 is locally committed in `56bc568`; P23.11 is locally committed in `e9971b8`; P23.12 is locally committed in `54586b8`; P24 planning through P24.4 are locally committed through `dc6196d`. P24.5 local commit is explicitly authorized for this phase. Push is not authorized.
+Dirty for completed CM-0255 board reconciliation plus completed CM-0256/CM-0260 source/test/fixture/board edits. User explicitly authorized local commit for this batch. Baseline before those edits was `52c4fefe7836a7fd056fa408bde32bf1d2edbfef`; local `main` and `origin/main` were aligned. CM-0254 / P28.1 was committed and pushed as `52c4fef test: add validation aggregator evidence reader`.
 
 ## Current Area
 
-P0 mainline health / multi-worker governance
+P28.x validation aggregator evidence-reader chain guarded commit
 
 ## Findings
 
@@ -60,12 +60,11 @@ P0 mainline health / multi-worker governance
 - P24 plans a validation aggregator implementation.
 - P24.1 fixture shape tests, P24.2 minimal core report builder, and P24.3 direct-node CLI wiring are committed locally.
 - P24.4 adds default report exit `0`, strict blocked exit `1`, and help exit `0` semantics and is committed locally.
-- P24.5 adds a minimal `evidence_sources` map to the report and fixture contract; requested validation passed.
-- P24.5 is already locally committed at `ca6e3ee chore: add P24.5 validation aggregator evidence source map`.
-- CM-0206 started read-only Worker Alpha, Worker Beta, and Read-Only Verifier contracts. Commander remains this main session.
-- Worker Alpha completed and recommended `P24.6-validation-aggregator-report-shape-hardening-plan`.
-- Worker Beta completed and recommended narrow `P24.6 rejected-flag report contract hardening` for `src/cli/v1-rc-validation-aggregator.js` and `tests/v1-rc-validation-aggregator-cli.test.js`.
-- Read-Only Verifier completed with `PASS`: scope remained board-only; no hard stop crossed; no secret/dependency/runtime/source/test drift.
+- P28.1 adds explicit safe committed/local validation evidence input handling to `ValidationAggregatorService`.
+- CM-0254 validation passed: `node --check` changed JS files; targeted aggregator tests `8/8`, `9/9`, `13/13`; `npm test` `582/582`; `git diff --check`.
+- CM-0254 was committed and pushed at `52c4fef`; post-push `HEAD == origin/main`.
+- CM-0255 is board-only reconciliation to clear stale post-push state.
+- Next safe local candidate after CM-0255: P28 validation aggregator evidence freshness/status summary, fixture-first and explicit-input only.
 
 ## Changed Files
 
@@ -1099,7 +1098,7 @@ Workspace: `A:\codex-memory`
 
 Branch: `main`
 
-Worktree: dirty for completed CM-0254 source/test/board edits; no local commit created.
+Worktree: CM-0254 committed and pushed; clean after push with `HEAD == origin/main == 52c4fef`.
 
 Current area: `P28.1-validation-aggregator-evidence-reader-foundation`
 
@@ -1111,6 +1110,164 @@ MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, an
 
 HTTP health: no service action for CM-0254.
 
-Remaining risks: schema/version runtime enforcement still required; validation aggregator full implementation still incomplete; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; no push is authorized.
+Remaining risks: schema/version runtime enforcement still required; validation aggregator full implementation still incomplete; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`.
 
-Next safe step: user may request a guarded local commit or select another local fixture-first phase; remote actions remain separately gated.
+Commit/push: `52c4fef test: add validation aggregator evidence reader`.
+
+Next safe step: CM-0255 board-only post-push reconciliation, then P28 validation aggregator evidence freshness/status summary if still safe.
+
+## CM-0255 Commander Handoff - P28.2 Post-Push Board Reconciliation
+
+Goal: reconcile `.agent_board` after authorized CM-0254 commit and push.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty only for completed CM-0255 board reconciliation edits.
+
+Current area: `P28.2-post-push-board-reconciliation`
+
+Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git status -sb`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0255.
+
+Remaining risks: no push is authorized for CM-0255; schema/version runtime enforcement, full validation aggregator implementation, provider execution, migration/import-export apply, backup/restore, service/watchdog/config actions, public MCP expansion, tag/release/deploy remain separately gated.
+
+Result: `HEAD == origin/main == 52c4fefe7836a7fd056fa408bde32bf1d2edbfef` verified; CM-0255 is complete and uncommitted.
+
+Next safe step: CM-0256 P28.3 explicit-input evidence freshness/status summary.
+
+## CM-0256 Commander Handoff - P28.3 ValidationAggregator Evidence Freshness Summary
+
+Goal: surface explicit-input-only freshness/status summary from accepted validation evidence without executing real gates.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0255 board reconciliation plus completed CM-0256 source/test/fixture/board edits; no commit created for CM-0255/CM-0256.
+
+Current area: `P28.3-validation-aggregator-evidence-freshness-summary`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `9/9`, `9/9`, `13/13`; `npm test` `583/583`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0256.
+
+Remaining risks: schema/version runtime enforcement still required; validation aggregator full implementation still incomplete; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; no push is authorized for CM-0255/CM-0256.
+
+Result: aggregator now reports explicit evidence freshness/status values `no_explicit_evidence`, `fresh_passed`, `fresh_with_warnings`, `stale_or_unknown`, and `failed_or_blocked` while preserving no-side-effect boundaries and the blocked RC decision.
+
+Next safe step: CM-0257 P28.4 explicit evidence gate-readiness summary.
+
+## CM-0257 Commander Handoff - P28.4 ValidationAggregator Evidence Gate-Readiness Summary
+
+Goal: surface explicit-input-only gate-readiness posture from accepted/rejected validation evidence and existing blockers without running real gates.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0255 board reconciliation plus completed CM-0256/CM-0257 source/test/fixture/board edits; no commit created for CM-0255/CM-0257.
+
+Current area: `P28.4-validation-aggregator-evidence-gate-readiness-summary`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `10/10`, `9/9`, `13/13`; `npm test` `584/584`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0257.
+
+Remaining risks: schema/version runtime enforcement still required; validation aggregator full implementation still incomplete; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; no push is authorized for CM-0255/CM-0257.
+
+Result: aggregator now reports explicit evidence gate readiness with `not_ready_*` statuses, `canClaimV1RcReady=false`, and validation/runtime/A5 blocker counts.
+
+Next safe step: CM-0258 P28.5 explicit evidence command coverage summary.
+
+## CM-0258 Commander Handoff - P28.5 ValidationAggregator Evidence Command Coverage Summary
+
+Goal: surface explicit-input-only command/source coverage from accepted validation evidence without executing those commands.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0255 board reconciliation plus completed CM-0256/CM-0258 source/test/fixture/board edits; no commit created for CM-0255/CM-0258.
+
+Current area: `P28.5-validation-aggregator-evidence-command-coverage-summary`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `11/11`, `9/9`, `13/13`; `npm test` `585/585`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0258.
+
+Remaining risks: schema/version runtime enforcement still required; validation aggregator full implementation still incomplete; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; no push is authorized for CM-0255/CM-0258.
+
+Result: aggregator now reports command coverage status, source types covered, command families, and `executesCommands=false` from accepted explicit evidence only.
+
+Next safe step: CM-0259 P28.6 explicit evidence rejection reason summary.
+
+## CM-0259 Commander Handoff - P28.6 ValidationAggregator Evidence Rejection Summary
+
+Goal: surface explicit-input-only rejection reason summary without exposing raw rejected inputs.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0255 board reconciliation plus completed CM-0256/CM-0259 source/test/fixture/board edits; no commit created for CM-0255/CM-0259.
+
+Current area: `P28.6-validation-aggregator-evidence-rejection-summary`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `12/12`, `9/9`, `13/13`; `npm test` `586/586`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0259.
+
+Remaining risks: schema/version runtime enforcement still required; validation aggregator full implementation still incomplete; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; no push is authorized for CM-0255/CM-0259.
+
+Result: aggregator now reports rejection status, known reason counts, sensitive/side-effect/contract rejection posture, and `rawRejectedInputExposed=false`.
+
+Next safe step: CM-0260 P28.7 explicit evidence confidence posture summary.
+
+## CM-0260 Commander Handoff - P28.7 ValidationAggregator Evidence Confidence Posture Summary
+
+Goal: surface explicit-input-only confidence posture without changing readiness.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0255 board reconciliation plus completed CM-0256/CM-0260 source/test/fixture/board edits; no commit created for CM-0255/CM-0260.
+
+Current area: `P28.7-validation-aggregator-evidence-confidence-posture-summary`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `12/12`, `9/9`, `13/13`; `npm test` `586/586`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0260.
+
+Remaining risks: schema/version runtime enforcement still required; validation aggregator full implementation still incomplete; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; no commit or push is authorized for CM-0255/CM-0260.
+
+Result: aggregator now reports confidence posture with `decisionImpact=none_report_only`, `canClaimV1RcReady=false`, and explicit limitations for final matrix, runtime enforcement, full aggregator implementation, and A5 actions.
+
+Next safe step: create the explicitly authorized guarded local commit, then run post-commit status/log/trailer checks. Push remains unauthorized.

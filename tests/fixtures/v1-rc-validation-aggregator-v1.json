@@ -37,6 +37,16 @@
     "validationEvidenceReaderImplemented": true,
     "validationEvidenceSourceContract": "explicit_safe_inputs_only",
     "validationEvidenceAcceptedCount": 0,
+    "validationEvidenceFreshnessStatus": "no_explicit_evidence",
+    "validationEvidenceStaleCount": 0,
+    "validationEvidenceGateReadinessStatus": "not_ready_no_explicit_evidence",
+    "validationEvidenceCanClaimV1RcReady": false,
+    "validationEvidenceCommandCoverageStatus": "no_explicit_evidence",
+    "validationEvidenceCommandCount": 0,
+    "validationEvidenceRejectionStatus": "no_rejections",
+    "validationEvidenceRejectedCount": 0,
+    "validationEvidenceConfidencePostureStatus": "no_explicit_evidence",
+    "validationEvidenceConfidenceCanClaimV1RcReady": false,
     "schemaVersionRuntimeEnforcementImplemented": false,
     "schemaCompatibilityDryRunCliImplemented": true,
     "schemaCompatibilityDryRunCliFixtureOnly": true,
@@ -283,6 +293,146 @@
       "status": "no_explicit_validation_evidence",
       "implemented": true,
       "fullImplementation": false,
+      "freshness": {
+        "status": "no_explicit_evidence",
+        "allowedStatuses": [
+          "no_explicit_evidence",
+          "fresh_passed",
+          "fresh_with_warnings",
+          "stale_or_unknown",
+          "failed_or_blocked"
+        ],
+        "referenceTime": "<generated-at-runtime>",
+        "staleAfterHours": 168,
+        "sourceCount": 0,
+        "sourcesWithObservedAt": 0,
+        "unknownFreshnessCount": 0,
+        "staleCount": 0,
+        "freshestObservedAt": "",
+        "hasFailedEvidence": false,
+        "hasBlockedEvidence": false,
+        "hasWarnings": false,
+        "allAcceptedPassed": false
+      },
+      "gateReadiness": {
+        "status": "not_ready_no_explicit_evidence",
+        "allowedStatuses": [
+          "not_ready_no_explicit_evidence",
+          "not_ready_failed_or_blocked_evidence",
+          "not_ready_rejected_evidence",
+          "not_ready_stale_or_unknown_evidence",
+          "not_ready_warning_evidence",
+          "not_ready_existing_blockers"
+        ],
+        "sourceMode": "explicit_safe_inputs_only",
+        "decisionImpact": "none_report_only",
+        "canClaimV1RcReady": false,
+        "readyForFinalRcMatrixRunner": false,
+        "acceptedEvidenceCount": 0,
+        "rejectedEvidenceCount": 0,
+        "freshnessStatus": "no_explicit_evidence",
+        "explicitEvidenceUsable": false,
+        "blockerCounts": {
+          "validationRequired": 1,
+          "runtimeRequired": 2,
+          "a5Gated": 6,
+          "totalUnresolved": 9
+        },
+        "blockedBy": [
+          "full-final-rc-matrix-not-executed",
+          "validation-aggregator-full-implementation-not-complete",
+          "schema-version-runtime-enforcement-not-implemented",
+          "migration-import-export-apply-a5-gated",
+          "provider-execution-a5-gated",
+          "startup-watchdog-a5-gated",
+          "codex-claude-config-switch-a5-gated",
+          "production-deploy-a5-gated",
+          "push-tag-release-deploy-a5-gated"
+        ]
+      },
+      "commandCoverage": {
+        "status": "no_explicit_evidence",
+        "allowedStatuses": [
+          "no_explicit_evidence",
+          "command_coverage_present",
+          "command_coverage_partial",
+          "command_coverage_missing"
+        ],
+        "sourceMode": "explicit_safe_inputs_only",
+        "executesCommands": false,
+        "commandTextSanitized": true,
+        "acceptedEvidenceCount": 0,
+        "sourcesWithCommands": 0,
+        "sourcesWithoutCommands": 0,
+        "commandCount": 0,
+        "uniqueCommandCount": 0,
+        "sourceTypesCovered": [],
+        "requiredSourceTypesCovered": false,
+        "commandFamilies": {
+          "git": 0,
+          "node": 0,
+          "npm": 0,
+          "other": 0
+        },
+        "allAcceptedHaveCommands": false
+      },
+      "rejectionSummary": {
+        "status": "no_rejections",
+        "allowedStatuses": [
+          "no_rejections",
+          "rejections_present",
+          "all_inputs_rejected"
+        ],
+        "knownReasons": [
+          "invalid_source_shape",
+          "sensitive_fragment_rejected",
+          "unsupported_source_type",
+          "unsupported_status",
+          "side_effect_evidence_rejected"
+        ],
+        "rejectedCount": 0,
+        "acceptedCount": 0,
+        "reasonCounts": {
+          "invalid_source_shape": 0,
+          "sensitive_fragment_rejected": 0,
+          "unsupported_source_type": 0,
+          "unsupported_status": 0,
+          "side_effect_evidence_rejected": 0
+        },
+        "hasSensitiveRejection": false,
+        "hasSideEffectRejection": false,
+        "hasUnsupportedContractRejection": false,
+        "rawRejectedInputExposed": false,
+        "rejectsUnsafeInputs": true
+      },
+      "confidencePosture": {
+        "status": "no_explicit_evidence",
+        "allowedStatuses": [
+          "no_explicit_evidence",
+          "failed_or_blocked_signal",
+          "rejected_or_unsafe_signal",
+          "stale_or_unknown_signal",
+          "partial_signal",
+          "usable_but_blocked"
+        ],
+        "sourceMode": "explicit_safe_inputs_only",
+        "decisionImpact": "none_report_only",
+        "canClaimV1RcReady": false,
+        "confidenceSignal": "limited_explicit_evidence",
+        "acceptedEvidenceCount": 0,
+        "rejectedEvidenceCount": 0,
+        "freshnessStatus": "no_explicit_evidence",
+        "gateReadinessStatus": "not_ready_no_explicit_evidence",
+        "commandCoverageStatus": "no_explicit_evidence",
+        "rejectionStatus": "no_rejections",
+        "limitations": [
+          "no_explicit_validation_evidence",
+          "full_final_rc_matrix_not_executed",
+          "runtime_schema_version_enforcement_missing",
+          "validation_aggregator_full_implementation_incomplete",
+          "a5_actions_blocked"
+        ]
+      },
       "sourceMode": "explicit_safe_inputs_only",
       "contract": {
         "sourceTypes": [

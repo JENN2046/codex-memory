@@ -152,6 +152,14 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.summary.validationEvidenceReaderImplemented, true);
   assert.equal(fixture.summary.validationEvidenceSourceContract, 'explicit_safe_inputs_only');
   assert.equal(fixture.summary.validationEvidenceAcceptedCount, 0);
+  assert.equal(fixture.summary.validationEvidenceFreshnessStatus, 'no_explicit_evidence');
+  assert.equal(fixture.summary.validationEvidenceStaleCount, 0);
+  assert.equal(fixture.summary.validationEvidenceGateReadinessStatus, 'not_ready_no_explicit_evidence');
+  assert.equal(fixture.summary.validationEvidenceCanClaimV1RcReady, false);
+  assert.equal(fixture.summary.validationEvidenceCommandCoverageStatus, 'no_explicit_evidence');
+  assert.equal(fixture.summary.validationEvidenceCommandCount, 0);
+  assert.equal(fixture.summary.validationEvidenceRejectionStatus, 'no_rejections');
+  assert.equal(fixture.summary.validationEvidenceRejectedCount, 0);
   assert.equal(fixture.summary.schemaVersionRuntimeEnforcementImplemented, false);
   assert.equal(fixture.summary.schemaCompatibilityDryRunCliImplemented, true);
   assert.equal(fixture.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
@@ -229,6 +237,29 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.contract.acceptsRealMemoryPreview, false);
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.acceptedCount, 0);
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.rejectedCount, 0);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.freshness.status, 'no_explicit_evidence');
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.freshness.referenceTime, '<generated-at-runtime>');
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.freshness.staleAfterHours, 168);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.freshness.sourceCount, 0);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.freshness.staleCount, 0);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.freshness.unknownFreshnessCount, 0);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.status, 'not_ready_no_explicit_evidence');
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.canClaimV1RcReady, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.readyForFinalRcMatrixRunner, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.blockerCounts.runtimeRequired, 2);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.blockerCounts.a5Gated, 6);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.commandCoverage.status, 'no_explicit_evidence');
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.commandCoverage.executesCommands, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.commandCoverage.commandCount, 0);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.commandCoverage.uniqueCommandCount, 0);
+  assert.deepEqual(fixture.evidence.p28ValidationEvidenceReader.commandCoverage.sourceTypesCovered, []);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.rejectionSummary.status, 'no_rejections');
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.rejectionSummary.rejectedCount, 0);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.rejectionSummary.rawRejectedInputExposed, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.rejectionSummary.rejectsUnsafeInputs, true);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'no_explicit_evidence');
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.confidencePosture.canClaimV1RcReady, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.confidencePosture.decisionImpact, 'none_report_only');
 });
 
 test('check groups classify A4-safe, A5-gated, runtime-required, and conditional live work', () => {

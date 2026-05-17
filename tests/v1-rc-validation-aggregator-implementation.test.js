@@ -4,6 +4,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const {
+  VALIDATION_EVIDENCE_COMMAND_COVERAGE_STATUSES,
+  VALIDATION_EVIDENCE_CONFIDENCE_POSTURE_STATUSES,
+  VALIDATION_EVIDENCE_FRESHNESS_STATUSES,
+  VALIDATION_EVIDENCE_GATE_READINESS_STATUSES,
+  VALIDATION_EVIDENCE_REJECTION_REASONS,
+  VALIDATION_EVIDENCE_REJECTION_SUMMARY_STATUSES,
   VALIDATION_EVIDENCE_SOURCE_TYPES,
   buildV1RcValidationAggregatorReport,
   normalizeValidationEvidenceSources
@@ -61,6 +67,16 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.validationEvidenceReaderImplemented, true);
   assert.equal(report.summary.validationEvidenceSourceContract, 'explicit_safe_inputs_only');
   assert.equal(report.summary.validationEvidenceAcceptedCount, 0);
+  assert.equal(report.summary.validationEvidenceFreshnessStatus, 'no_explicit_evidence');
+  assert.equal(report.summary.validationEvidenceStaleCount, 0);
+  assert.equal(report.summary.validationEvidenceGateReadinessStatus, 'not_ready_no_explicit_evidence');
+  assert.equal(report.summary.validationEvidenceCanClaimV1RcReady, false);
+  assert.equal(report.summary.validationEvidenceCommandCoverageStatus, 'no_explicit_evidence');
+  assert.equal(report.summary.validationEvidenceCommandCount, 0);
+  assert.equal(report.summary.validationEvidenceRejectionStatus, 'no_rejections');
+  assert.equal(report.summary.validationEvidenceRejectedCount, 0);
+  assert.equal(report.summary.validationEvidenceConfidencePostureStatus, 'no_explicit_evidence');
+  assert.equal(report.summary.validationEvidenceConfidenceCanClaimV1RcReady, false);
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
   assert.equal(report.summary.schemaCompatibilityDryRunCliImplemented, true);
   assert.equal(report.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
@@ -121,6 +137,42 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p28ValidationEvidenceReader.contract.callsProviders, false);
   assert.equal(report.evidence.p28ValidationEvidenceReader.contract.mutatesDurableState, false);
   assert.equal(report.evidence.p28ValidationEvidenceReader.acceptedCount, 0);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.freshness.status, 'no_explicit_evidence');
+  assert.equal(report.evidence.p28ValidationEvidenceReader.freshness.staleAfterHours, 168);
+  assert.deepEqual(
+    report.evidence.p28ValidationEvidenceReader.freshness.allowedStatuses,
+    VALIDATION_EVIDENCE_FRESHNESS_STATUSES
+  );
+  assert.equal(report.evidence.p28ValidationEvidenceReader.gateReadiness.status, 'not_ready_no_explicit_evidence');
+  assert.deepEqual(
+    report.evidence.p28ValidationEvidenceReader.gateReadiness.allowedStatuses,
+    VALIDATION_EVIDENCE_GATE_READINESS_STATUSES
+  );
+  assert.equal(report.evidence.p28ValidationEvidenceReader.gateReadiness.canClaimV1RcReady, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.gateReadiness.readyForFinalRcMatrixRunner, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.commandCoverage.status, 'no_explicit_evidence');
+  assert.deepEqual(
+    report.evidence.p28ValidationEvidenceReader.commandCoverage.allowedStatuses,
+    VALIDATION_EVIDENCE_COMMAND_COVERAGE_STATUSES
+  );
+  assert.equal(report.evidence.p28ValidationEvidenceReader.commandCoverage.executesCommands, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.rejectionSummary.status, 'no_rejections');
+  assert.deepEqual(
+    report.evidence.p28ValidationEvidenceReader.rejectionSummary.allowedStatuses,
+    VALIDATION_EVIDENCE_REJECTION_SUMMARY_STATUSES
+  );
+  assert.deepEqual(
+    report.evidence.p28ValidationEvidenceReader.rejectionSummary.knownReasons,
+    VALIDATION_EVIDENCE_REJECTION_REASONS
+  );
+  assert.equal(report.evidence.p28ValidationEvidenceReader.rejectionSummary.rawRejectedInputExposed, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'no_explicit_evidence');
+  assert.deepEqual(
+    report.evidence.p28ValidationEvidenceReader.confidencePosture.allowedStatuses,
+    VALIDATION_EVIDENCE_CONFIDENCE_POSTURE_STATUSES
+  );
+  assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.decisionImpact, 'none_report_only');
+  assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.canClaimV1RcReady, false);
 });
 
 test('minimal implementation preserves public MCP three-tool freeze', () => {
@@ -158,6 +210,7 @@ test('minimal implementation maps current conclusions to documented evidence sou
 
 test('validation evidence reader exposes only explicit committed and local validation inputs', () => {
   const report = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-17T02:00:00.000Z',
     validationEvidenceSources: [
       {
         id: 'cmv-0333-committed',
@@ -181,6 +234,7 @@ test('validation evidence reader exposes only explicit committed and local valid
         source_type: 'local_validation',
         status: 'passed',
         source_ref: 'tests/v1-rc-validation-aggregator-implementation.test.js',
+        observed_at: '2026-05-17T01:30:00.000Z',
         commands: ['node --test tests\\v1-rc-validation-aggregator-implementation.test.js'],
         summary: 'Targeted aggregator evidence-reader test input.',
         safety: {
@@ -196,6 +250,16 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
   assert.equal(report.summary.validationEvidenceAcceptedCount, 2);
+  assert.equal(report.summary.validationEvidenceFreshnessStatus, 'fresh_passed');
+  assert.equal(report.summary.validationEvidenceStaleCount, 0);
+  assert.equal(report.summary.validationEvidenceGateReadinessStatus, 'not_ready_existing_blockers');
+  assert.equal(report.summary.validationEvidenceCanClaimV1RcReady, false);
+  assert.equal(report.summary.validationEvidenceCommandCoverageStatus, 'command_coverage_present');
+  assert.equal(report.summary.validationEvidenceCommandCount, 2);
+  assert.equal(report.summary.validationEvidenceRejectionStatus, 'no_rejections');
+  assert.equal(report.summary.validationEvidenceRejectedCount, 0);
+  assert.equal(report.summary.validationEvidenceConfidencePostureStatus, 'usable_but_blocked');
+  assert.equal(report.summary.validationEvidenceConfidenceCanClaimV1RcReady, false);
   assert.equal(reader.status, 'explicit_evidence_available');
   assert.equal(reader.sourceMode, 'explicit_safe_inputs_only');
   assert.deepEqual(reader.contract.sourceTypes, VALIDATION_EVIDENCE_SOURCE_TYPES);
@@ -208,6 +272,48 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.equal(reader.summary.localValidationCount, 1);
   assert.equal(reader.summary.passedCount, 2);
   assert.equal(reader.summary.allAcceptedSafe, true);
+  assert.equal(reader.freshness.status, 'fresh_passed');
+  assert.equal(reader.freshness.referenceTime, '2026-05-17T02:00:00.000Z');
+  assert.equal(reader.freshness.sourcesWithObservedAt, 2);
+  assert.equal(reader.freshness.unknownFreshnessCount, 0);
+  assert.equal(reader.freshness.staleCount, 0);
+  assert.equal(reader.freshness.freshestObservedAt, '2026-05-17T01:30:00.000Z');
+  assert.equal(reader.freshness.allAcceptedPassed, true);
+  assert.equal(reader.freshness.hasFailedEvidence, false);
+  assert.equal(reader.freshness.hasBlockedEvidence, false);
+  assert.equal(reader.gateReadiness.status, 'not_ready_existing_blockers');
+  assert.equal(reader.gateReadiness.explicitEvidenceUsable, true);
+  assert.equal(reader.gateReadiness.canClaimV1RcReady, false);
+  assert.equal(reader.gateReadiness.readyForFinalRcMatrixRunner, false);
+  assert.equal(reader.gateReadiness.blockerCounts.validationRequired, 1);
+  assert.equal(reader.gateReadiness.blockerCounts.runtimeRequired, 2);
+  assert.equal(reader.gateReadiness.blockerCounts.a5Gated, 6);
+  assert.equal(reader.gateReadiness.blockedBy.includes('schema-version-runtime-enforcement-not-implemented'), true);
+  assert.equal(reader.commandCoverage.status, 'command_coverage_present');
+  assert.equal(reader.commandCoverage.executesCommands, false);
+  assert.equal(reader.commandCoverage.acceptedEvidenceCount, 2);
+  assert.equal(reader.commandCoverage.sourcesWithCommands, 2);
+  assert.equal(reader.commandCoverage.sourcesWithoutCommands, 0);
+  assert.equal(reader.commandCoverage.commandCount, 2);
+  assert.equal(reader.commandCoverage.uniqueCommandCount, 2);
+  assert.deepEqual(reader.commandCoverage.sourceTypesCovered, [
+    'committed_validation',
+    'local_validation'
+  ]);
+  assert.equal(reader.commandCoverage.requiredSourceTypesCovered, true);
+  assert.equal(reader.commandCoverage.commandFamilies.git, 1);
+  assert.equal(reader.commandCoverage.commandFamilies.node, 1);
+  assert.equal(reader.commandCoverage.commandFamilies.npm, 0);
+  assert.equal(reader.commandCoverage.allAcceptedHaveCommands, true);
+  assert.equal(reader.rejectionSummary.status, 'no_rejections');
+  assert.equal(reader.rejectionSummary.rejectedCount, 0);
+  assert.equal(reader.rejectionSummary.rejectsUnsafeInputs, true);
+  assert.equal(reader.confidencePosture.status, 'usable_but_blocked');
+  assert.equal(reader.confidencePosture.confidenceSignal, 'usable_explicit_evidence');
+  assert.equal(reader.confidencePosture.canClaimV1RcReady, false);
+  assert.equal(reader.confidencePosture.limitations.includes('full_final_rc_matrix_not_executed'), true);
+  assert.equal(reader.confidencePosture.limitations.includes('runtime_schema_version_enforcement_missing'), true);
+  assert.equal(reader.confidencePosture.limitations.includes('a5_actions_blocked'), true);
   assert.deepEqual(reader.acceptedSources.map(source => source.id), [
     'cmv-0333-committed',
     'p28-targeted-local'
@@ -216,6 +322,59 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.equal(reader.acceptedSources[0].safety.serviceStarted, false);
   assert.equal(reader.acceptedSources[0].safety.durableMemoryTouched, false);
   assert.equal(reader.acceptedSources[0].safety.realMemoryPreview, false);
+});
+
+test('validation evidence freshness summary surfaces stale, unknown, warning, and failing explicit inputs', () => {
+  const staleReport = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-17T00:00:00.000Z',
+    validationEvidenceSources: [
+      {
+        id: 'stale-committed',
+        source_type: 'committed_validation',
+        status: 'passed',
+        source_ref: '.agent_board/VALIDATION_LOG.md#CMV-0300',
+        observed_at: '2026-05-01T00:00:00.000Z',
+        safety: { mutated: false }
+      },
+      {
+        id: 'unknown-local',
+        source_type: 'local_validation',
+        status: 'warning',
+        source_ref: 'tests/v1-rc-validation-aggregator-implementation.test.js',
+        safety: { mutated: false }
+      }
+    ]
+  });
+  const failingReport = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-17T00:00:00.000Z',
+    validationEvidenceSources: [
+      {
+        id: 'failed-local',
+        source_type: 'local_validation',
+        status: 'failed',
+        source_ref: 'tests/v1-rc-validation-aggregator-implementation.test.js',
+        observed_at: '2026-05-17T00:00:00.000Z',
+        safety: { mutated: false }
+      }
+    ]
+  });
+
+  assert.equal(staleReport.decision, 'NOT_READY_BLOCKED');
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.freshness.status, 'stale_or_unknown');
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.freshness.staleCount, 1);
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.freshness.unknownFreshnessCount, 1);
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.freshness.hasWarnings, true);
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.freshness.allAcceptedPassed, false);
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.gateReadiness.status, 'not_ready_stale_or_unknown_evidence');
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.gateReadiness.explicitEvidenceUsable, false);
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.commandCoverage.status, 'command_coverage_missing');
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.commandCoverage.sourcesWithoutCommands, 2);
+  assert.equal(staleReport.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'stale_or_unknown_signal');
+  assert.equal(failingReport.decision, 'NOT_READY_BLOCKED');
+  assert.equal(failingReport.evidence.p28ValidationEvidenceReader.freshness.status, 'failed_or_blocked');
+  assert.equal(failingReport.evidence.p28ValidationEvidenceReader.freshness.hasFailedEvidence, true);
+  assert.equal(failingReport.evidence.p28ValidationEvidenceReader.gateReadiness.status, 'not_ready_failed_or_blocked_evidence');
+  assert.equal(failingReport.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'failed_or_blocked_signal');
 });
 
 test('validation evidence reader rejects unsafe, unsupported, or sensitive explicit inputs', () => {
@@ -252,6 +411,131 @@ test('validation evidence reader rejects unsafe, unsupported, or sensitive expli
     'sensitive_fragment_rejected'
   ]);
   assert.equal(JSON.stringify(reader).toLowerCase().includes('authorization:'), false);
+});
+
+test('validation evidence gate readiness fails closed when explicit inputs include rejections', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-17T00:00:00.000Z',
+    validationEvidenceSources: [
+      {
+        id: 'fresh-local',
+        source_type: 'local_validation',
+        status: 'passed',
+        source_ref: 'tests/v1-rc-validation-aggregator-implementation.test.js',
+        observed_at: '2026-05-17T00:00:00.000Z',
+        safety: { mutated: false }
+      },
+      {
+        id: 'unsupported-kind',
+        source_type: 'live_validation',
+        status: 'passed',
+        source_ref: 'manual-input',
+        observed_at: '2026-05-17T00:00:00.000Z',
+        safety: { mutated: false }
+      }
+    ]
+  });
+  const readiness = report.evidence.p28ValidationEvidenceReader.gateReadiness;
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(readiness.status, 'not_ready_rejected_evidence');
+  assert.equal(readiness.acceptedEvidenceCount, 1);
+  assert.equal(readiness.rejectedEvidenceCount, 1);
+  assert.equal(readiness.explicitEvidenceUsable, false);
+  assert.equal(readiness.canClaimV1RcReady, false);
+  assert.equal(report.summary.validationEvidenceRejectionStatus, 'rejections_present');
+  assert.equal(report.summary.validationEvidenceRejectedCount, 1);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.rejectionSummary.reasonCounts.unsupported_source_type, 1);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.rejectionSummary.hasUnsupportedContractRejection, true);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.rejectionSummary.rawRejectedInputExposed, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'rejected_or_unsafe_signal');
+});
+
+test('validation evidence rejection summary counts rejected explicit input reasons without exposing raw input', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    validationEvidenceSources: [
+      null,
+      {
+        id: 'provider-side-effect',
+        source_type: 'local_validation',
+        status: 'passed',
+        source_ref: 'manual-input',
+        safety: { providerCalls: 1 }
+      },
+      {
+        id: 'unsupported-kind',
+        source_type: 'live_validation',
+        status: 'passed',
+        source_ref: 'manual-input'
+      },
+      {
+        id: 'unsupported-status',
+        source_type: 'local_validation',
+        status: 'maybe',
+        source_ref: 'manual-input'
+      },
+      {
+        id: 'sensitive-summary',
+        source_type: 'local_validation',
+        status: 'passed',
+        source_ref: 'manual-input',
+        summary: 'authorization: should be rejected'
+      }
+    ]
+  });
+  const rejectionSummary = report.evidence.p28ValidationEvidenceReader.rejectionSummary;
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.summary.validationEvidenceRejectionStatus, 'all_inputs_rejected');
+  assert.equal(report.summary.validationEvidenceRejectedCount, 5);
+  assert.equal(rejectionSummary.status, 'all_inputs_rejected');
+  assert.equal(rejectionSummary.rejectedCount, 5);
+  assert.equal(rejectionSummary.acceptedCount, 0);
+  assert.equal(rejectionSummary.reasonCounts.invalid_source_shape, 1);
+  assert.equal(rejectionSummary.reasonCounts.side_effect_evidence_rejected, 1);
+  assert.equal(rejectionSummary.reasonCounts.unsupported_source_type, 1);
+  assert.equal(rejectionSummary.reasonCounts.unsupported_status, 1);
+  assert.equal(rejectionSummary.reasonCounts.sensitive_fragment_rejected, 1);
+  assert.equal(rejectionSummary.hasSensitiveRejection, true);
+  assert.equal(rejectionSummary.hasSideEffectRejection, true);
+  assert.equal(rejectionSummary.hasUnsupportedContractRejection, true);
+  assert.equal(rejectionSummary.rawRejectedInputExposed, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'rejected_or_unsafe_signal');
+  assertNoSensitiveSurface(report);
+});
+
+test('validation evidence command coverage reports partial explicit command evidence without execution', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    validationEvidenceSources: [
+      {
+        id: 'with-command',
+        source_type: 'local_validation',
+        status: 'passed',
+        source_ref: 'tests/v1-rc-validation-aggregator-implementation.test.js',
+        observed_at: '2026-05-17T00:00:00.000Z',
+        commands: ['npm test'],
+        safety: { mutated: false }
+      },
+      {
+        id: 'without-command',
+        source_type: 'local_validation',
+        status: 'passed',
+        source_ref: 'tests/v1-rc-validation-aggregator.test.js',
+        observed_at: '2026-05-17T00:00:00.000Z',
+        safety: { mutated: false }
+      }
+    ]
+  });
+  const coverage = report.evidence.p28ValidationEvidenceReader.commandCoverage;
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(coverage.status, 'command_coverage_partial');
+  assert.equal(coverage.executesCommands, false);
+  assert.equal(coverage.sourcesWithCommands, 1);
+  assert.equal(coverage.sourcesWithoutCommands, 1);
+  assert.equal(coverage.commandFamilies.npm, 1);
+  assert.equal(coverage.allAcceptedHaveCommands, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.status, 'partial_signal');
 });
 
 test('minimal implementation classifies A4, A5, runtime-required, and conditional live items', () => {

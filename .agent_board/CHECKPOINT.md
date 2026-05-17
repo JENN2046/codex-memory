@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Add P24.5 minimal validation aggregator evidence-source map after the P24.4 local commit.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0261 / guarded local commit for the validated P28.2-P28.7 evidence-reader chain.
 
 ## Current Area
 
-P24 validation aggregator evidence-source map
+P28.x validation aggregator evidence-reader chain guarded commit
 
 ## Current Status
 
@@ -14,7 +14,7 @@ P24 validation aggregator evidence-source map
 - `rc_target_commit`: `7fd17de624c0da76751e863e97302bed0dbec905`.
 - `approval_request_commit`: `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
 - Temporary gate execution checkout was created at `A:\codex-memory-gate-7fd17de`, verified at target HEAD, and removed.
-- Main workspace remains clean and synced at the latest docs baseline after result recording.
+- Main workspace was clean and synced at `52c4fefe7836a7fd056fa408bde32bf1d2edbfef` / `52c4fef test: add validation aggregator evidence reader` before CM-0255/CM-0256 local edits.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
 - Current work closes the already-recorded local HTTP MCP deploy/validation evidence chain after approved release creation.
 - Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
@@ -38,7 +38,8 @@ P24 validation aggregator evidence-source map
 - P24 plans a future validation aggregator.
 - P24.1 fixture shape tests, P24.2 minimal core report builder, and P24.3 direct-node CLI wiring are committed locally.
 - P24.4 adds default/strict/help exit-code semantics and is committed locally.
-- P24.5 now adds minimal `evidence_sources` provenance mapping locally; requested validation passed.
+- P28.1 added the explicit safe validation evidence reader foundation, was validated, committed, and pushed at `52c4fef`.
+- P28.2 post-push board reconciliation, P28.3 explicit-input evidence freshness/status summary, P28.4 explicit-input gate-readiness summary, P28.5 explicit-input command/source coverage summary, P28.6 explicit-input rejection reason summary, and P28.7 explicit-input confidence posture summary are complete and validated locally. User explicitly authorized the local guarded commit for CM-0255 through CM-0260; push remains unauthorized.
 
 ## Completed Work In This Batch
 
@@ -783,5 +784,89 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/*`.
 - Result: aggregator now exposes `p28ValidationEvidenceReader` with an `explicit_safe_inputs_only` contract, accepts `committed_validation` / `local_validation` inputs passed by the caller, rejects unsupported/side-effectful/sensitive inputs, and keeps `decision=NOT_READY_BLOCKED`.
 - Validation: syntax checks passed for changed JS test/source files; targeted aggregator tests `8/8`, `9/9`, `13/13`; `npm test` `582/582`; `git diff --check` passed.
-- Commit: not created for CM-0254.
+- Commit/push: `52c4fef test: add validation aggregator evidence reader`; local `HEAD` and `origin/main` are aligned.
 - A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0255 - P28.2 Post-Push Board Reconciliation
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: board-only reconciliation after authorized CM-0254 commit and push.
+- Changed files: `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: board state records that CM-0254 was committed and pushed at `52c4fef`, worktree was clean before reconciliation, and `HEAD == origin/main`.
+- Validation: `git status -sb`; `git rev-parse HEAD`; `git rev-parse origin/main`; `git diff --check`.
+- Commit: not created for CM-0255.
+- A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, service start, migration/import-export apply, backup/restore, tag, release, deploy, or unapproved push.
+
+## CM-0256 - P28.3 ValidationAggregator Evidence Freshness Summary
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: explicit-input-only freshness/status summary for accepted committed/local validation evidence.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/*`.
+- Result: aggregator now derives freshness/status from already-accepted explicit evidence only, including `no_explicit_evidence`, `fresh_passed`, `fresh_with_warnings`, `stale_or_unknown`, and `failed_or_blocked`; `decision=NOT_READY_BLOCKED` is preserved.
+- Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `9/9`, `9/9`, `13/13`; `npm test` `583/583`; `git diff --check`.
+- Commit: not created for CM-0256.
+- A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0257 - P28.4 ValidationAggregator Evidence Gate-Readiness Summary
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: explicit-input-only gate-readiness summary for accepted/rejected validation evidence and existing blockers.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/*`.
+- Result: aggregator now fails closed with `not_ready_*` readiness statuses, keeps `canClaimV1RcReady=false`, and surfaces existing validation/runtime/A5 blocker counts from explicit report state.
+- Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `10/10`, `9/9`, `13/13`; `npm test` `584/584`; `git diff --check`.
+- Commit: not created for CM-0257.
+- A5 boundary: no real gate execution, real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0258 - P28.5 ValidationAggregator Evidence Command Coverage Summary
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: explicit-input-only command/source coverage summary from accepted validation evidence.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/*`.
+- Result: aggregator now derives command coverage status, command families, source types covered, and `executesCommands=false` from accepted evidence without executing commands.
+- Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `11/11`, `9/9`, `13/13`; `npm test` `585/585`; `git diff --check`.
+- Commit: not created for CM-0258.
+- A5 boundary: no command execution beyond validation itself, no real gate execution, real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0259 - P28.6 ValidationAggregator Evidence Rejection Summary
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: explicit-input-only rejection reason summary from rejected validation evidence records.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/*`.
+- Result: aggregator now counts invalid shape, sensitive fragment, unsupported source/status, and side-effect rejections while keeping `rawRejectedInputExposed=false`.
+- Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `12/12`, `9/9`, `13/13`; `npm test` `586/586`; `git diff --check`.
+- Commit: not created for CM-0259.
+- A5 boundary: no command execution beyond validation itself, no real gate execution, real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0260 - P28.7 ValidationAggregator Evidence Confidence Posture Summary
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: explicit-input-only confidence posture summary from freshness, gate-readiness, command coverage, and rejection summaries.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/*`.
+- Result: aggregator now reports confidence posture while keeping `decisionImpact=none_report_only` and `canClaimV1RcReady=false`.
+- Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `12/12`, `9/9`, `13/13`; `npm test` `586/586`; `git diff --check`.
+- Commit: not created for CM-0260; explicit authorization required.
+- A5 boundary: no real gate execution, real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0261 - Guarded Local Commit Authorization
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: local commit authorization for CM-0255 through CM-0260.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/*`.
+- Result: user explicitly authorized local commit; push remains unauthorized.
+- Validation: pre-commit `git status --short`; `git diff --stat`; `git diff --name-only`; `git diff --check`; prior CM-0256 through CM-0260 source/test validation.
+- Commit: authorized, to be created by the guarded commit command.
+- A5 boundary: no push, tag, release, deploy, provider/model call, service/watchdog install or config switch, public MCP expansion, real memory scan/preview, SQLite migration apply, import/export apply, backup, or restore.
