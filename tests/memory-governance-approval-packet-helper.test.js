@@ -221,3 +221,68 @@ test('P32.2 helper rejects unblocked governed action records', () => {
   assert.equal(summary.safety.readsFiles, false);
   assert.equal(summary.safety.executesCommands, false);
 });
+
+test('P32.2 helper redacts sensitive normalized output and unsupported source types', () => {
+  const fixture = loadFixture();
+  const normalized = normalizeMemoryGovernanceApprovalPacketContract({
+    ...fixture,
+    acceptedSourceTypes: [
+      ...SAFE_SOURCE_TYPES,
+      'authorization: Bearer APPROVAL_TOKEN_1234567890'
+    ],
+    unsupportedSourceTypes: [
+      'api_key=APPROVAL_API_KEY_1234567890'
+    ],
+    safeSourceTypes: [
+      ...SAFE_SOURCE_TYPES,
+      'raw_workspace_id=workspace-approval-raw'
+    ],
+    governedActions: fixture.governedActions.map((action, index) => index === 0
+      ? {
+          ...action,
+          authorization: 'authorization: Bearer ACTION_TOKEN_1234567890',
+          bearer: 'Bearer ACTION_BEARER_1234567890',
+          api_key: 'api_key=ACTION_API_KEY_1234567890',
+          raw_workspace_id: 'raw_workspace_id=workspace-action-raw',
+          requiredFields: [
+            ...action.requiredFields,
+            'source authorization: Bearer FIELD_TOKEN_1234567890 api_key=FIELD_API_KEY_1234567890'
+          ]
+        }
+      : action
+    )
+  });
+  const summary = summarizeMemoryGovernanceApprovalPacketContract(normalized);
+  const normalizedText = JSON.stringify(normalized).toLowerCase();
+  const summaryText = JSON.stringify(summary).toLowerCase();
+
+  for (const forbidden of [
+    'authorization',
+    'bearer',
+    'api_key',
+    'raw_workspace_id',
+    'approval_token_1234567890',
+    'action_token_1234567890',
+    'field_api_key_1234567890',
+    'workspace-action-raw'
+  ]) {
+    assert.equal(normalizedText.includes(forbidden), false);
+    assert.equal(summaryText.includes(forbidden), false);
+  }
+
+  assert.equal(Object.hasOwn(normalized.governedActions[0], 'authorization'), false);
+  assert.equal(Object.hasOwn(normalized.governedActions[0], 'api_key'), false);
+  assert.equal(Object.hasOwn(normalized.governedActions[0], 'raw_workspace_id'), false);
+  assert.equal(summary.acceptedForPlanning, false);
+  assert.equal(summary.sourceContract.safe, false);
+  assert.equal(summary.sourceContract.unsupportedSourceTypes.every(sourceType =>
+    sourceType === '<redacted>' || sourceType.includes('<redacted>')
+  ), true);
+  assert.equal(summary.safety.readsFiles, false);
+  assert.equal(summary.safety.executesCommands, false);
+  assert.equal(summary.safety.mutatesDurableState, false);
+  assert.deepEqual(summary.publicMcpTools.tools, PUBLIC_MCP_TOOLS);
+  assert.equal(summary.publicMcpExpanded, false);
+  assert.equal(summary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(summary.acceptedForPlanning, false);
+});

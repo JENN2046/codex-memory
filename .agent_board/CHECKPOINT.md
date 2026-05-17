@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0293 / P33.3 ValidationAggregator audit-evidence helper evidence shape.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0295 / P31-P33 governance helper redaction hardening.
 
 ## Current Area
 
-P33.3 aggregator report-shape evidence
+P8 memory governance helper output safety
 
 ## Current Status
 
@@ -69,8 +69,9 @@ P33.3 aggregator report-shape evidence
 - CM-0291 adds `tests/fixtures/memory-governance-audit-evidence-v1.json` and `tests/memory-governance-audit-evidence-fixture.test.js` for a synthetic audit-evidence fixture contract. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `678/678`, `git diff --check`, docs validation, P33.1 boundary scan, and read-only Verifier `PASS`. CM-0291 is committed locally in `3abee33`.
 - CM-0292 adds `src/core/MemoryGovernanceAuditEvidenceContract.js` and `tests/memory-governance-audit-evidence-helper.test.js` for a pure explicit-input audit-evidence helper over caller-provided contract objects only. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `687/687`, `git diff --check`, docs validation, P33.2 boundary reference scan, and read-only Verifier `PASS`. CM-0292 is committed and pushed in `b8e0b95`.
 - CM-0293 adds static ValidationAggregator report-shape evidence for the P33.2 helper. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `687/687`, `git diff --check`, docs validation, P33.3 boundary reference scan, and read-only Verifier `PASS`. CM-0293 was committed and pushed as `a62cc50` by explicit user instruction; post-push verification confirmed `HEAD == origin/main`.
-- CM-0294 adds `docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P33 only as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence. Validation passed: `git diff --check`, docs validation, P33.x boundary reference scan, and read-only Verifier first pass `NEEDS_FIX` for board evidence wording only; fixes applied and Verifier rerun pending.
-- Commander direction remains constrained: P33.x may add closeout documentation only; helper execution, fixture reads by aggregator, durable audit writes, durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0294 adds `docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P33 only as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence. Validation passed: `git diff --check`, docs validation, P33.x boundary reference scan, and read-only Verifier rerun `PASS`. CM-0294 was committed and pushed as `dca5f6a` by explicit user instruction.
+- CM-0295 hardens P31/P32/P33 governance helper normalized output redaction. Validation passed: source/test syntax checks, targeted helper tests `29/29`, `npm test` `690/690`, `git diff --check`, docs validation, boundary scan, and read-only Verifier rerun `PASS`.
+- Commander direction remains constrained: CM-0295 may harden explicit-input helper output only; helper runtime integration, fixture reads by aggregator, durable audit writes, durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 

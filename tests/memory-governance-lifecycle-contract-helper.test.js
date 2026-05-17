@@ -191,3 +191,77 @@ test('P31.3 helper requires all governance surfaces and lifecycle cases', () => 
   assert.equal(summary.lifecycleCases.requiredPresent, false);
   assert.deepEqual(summary.lifecycleCases.missingRequired, ['tombstone_deferred']);
 });
+
+test('P31.3 helper redacts sensitive normalized output and unsupported source types', () => {
+  const fixture = loadFixture();
+  const normalized = normalizeMemoryGovernanceLifecycleContract({
+    ...fixture,
+    acceptedSourceTypes: [
+      ...SAFE_SOURCE_TYPES,
+      'authorization: Bearer LIFECYCLE_TOKEN_1234567890'
+    ],
+    unsupportedSourceTypes: [
+      'api_key=LIFECYCLE_API_KEY_1234567890'
+    ],
+    safeSourceTypes: [
+      ...SAFE_SOURCE_TYPES,
+      'raw_workspace_id=workspace-lifecycle-raw'
+    ],
+    surfaces: fixture.surfaces.map((surface, index) => index === 0
+      ? {
+          ...surface,
+          authorization: 'authorization: Bearer SURFACE_TOKEN_1234567890',
+          bearer: 'Bearer SURFACE_BEARER_1234567890',
+          api_key: 'api_key=SURFACE_API_KEY_1234567890',
+          raw_workspace_id: 'raw_workspace_id=workspace-surface-raw',
+          sourceArtifacts: [
+            ...surface.sourceArtifacts,
+            'artifact authorization: Bearer ARTIFACT_TOKEN_1234567890 api_key=ARTIFACT_API_KEY_1234567890'
+          ]
+        }
+      : surface
+    ),
+    lifecycleCases: fixture.lifecycleCases.map((lifecycleCase, index) => index === 0
+      ? {
+          ...lifecycleCase,
+          raw_workspace_id: 'raw_workspace_id=workspace-case-raw',
+          from: `${lifecycleCase.from} bearer CASE_TOKEN_1234567890`,
+          to: `${lifecycleCase.to} api_key=CASE_API_KEY_1234567890`
+        }
+      : lifecycleCase
+    )
+  });
+  const summary = summarizeMemoryGovernanceLifecycleContract(normalized);
+  const normalizedText = JSON.stringify(normalized).toLowerCase();
+  const summaryText = JSON.stringify(summary).toLowerCase();
+
+  for (const forbidden of [
+    'authorization',
+    'bearer',
+    'api_key',
+    'raw_workspace_id',
+    'lifecycle_token_1234567890',
+    'surface_token_1234567890',
+    'artifact_api_key_1234567890',
+    'workspace-surface-raw'
+  ]) {
+    assert.equal(normalizedText.includes(forbidden), false);
+    assert.equal(summaryText.includes(forbidden), false);
+  }
+
+  assert.equal(Object.hasOwn(normalized.surfaces[0], 'authorization'), false);
+  assert.equal(Object.hasOwn(normalized.surfaces[0], 'api_key'), false);
+  assert.equal(Object.hasOwn(normalized.lifecycleCases[0], 'raw_workspace_id'), false);
+  assert.equal(summary.acceptedForPlanning, false);
+  assert.equal(summary.sourceContract.safe, false);
+  assert.equal(summary.sourceContract.unsupportedSourceTypes.every(sourceType =>
+    sourceType === '<redacted>' || sourceType.includes('<redacted>')
+  ), true);
+  assert.equal(summary.safety.readsFiles, false);
+  assert.equal(summary.safety.executesCommands, false);
+  assert.equal(summary.safety.mutatesDurableState, false);
+  assert.deepEqual(summary.publicMcpTools.tools, PUBLIC_MCP_TOOLS);
+  assert.equal(summary.publicMcpExpanded, false);
+  assert.equal(summary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(summary.acceptedForPlanning, false);
+});

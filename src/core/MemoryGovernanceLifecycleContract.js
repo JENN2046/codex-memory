@@ -72,8 +72,27 @@ function cloneArray(values) {
   return Array.isArray(values) ? [...values] : [];
 }
 
+const SENSITIVE_FRAGMENT_PATTERNS = Object.freeze([
+  /authorization\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi,
+  /bearer\s+[A-Za-z0-9._~+/=-]+/gi,
+  /api[_-]?key\s*[:=]\s*["']?[A-Za-z0-9._~+/=-]+["']?/gi,
+  /\bapi[_-]?key\b/gi,
+  /raw_workspace_id\s*[:=]\s*["']?[^"',;\s]+["']?/gi,
+  /\braw_workspace_id\b/gi
+]);
+
+function redactSensitiveFragments(value) {
+  let redacted = value;
+
+  for (const pattern of SENSITIVE_FRAGMENT_PATTERNS) {
+    redacted = redacted.replace(pattern, '<redacted>');
+  }
+
+  return redacted;
+}
+
 function normalizeString(value) {
-  return typeof value === 'string' ? value.trim() : '';
+  return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
 function normalizeStringArray(values) {
@@ -90,7 +109,6 @@ function normalizeSurface(surface = {}) {
   const safeSurface = isPlainObject(surface) ? surface : {};
 
   return {
-    ...safeSurface,
     id: normalizeString(safeSurface.id),
     status: normalizeString(safeSurface.status),
     sourceArtifacts: normalizeStringArray(safeSurface.sourceArtifacts),
@@ -107,7 +125,6 @@ function normalizeLifecycleCase(lifecycleCase = {}) {
   const safeCase = isPlainObject(lifecycleCase) ? lifecycleCase : {};
 
   return {
-    ...safeCase,
     id: normalizeString(safeCase.id),
     from: normalizeString(safeCase.from),
     to: normalizeString(safeCase.to),

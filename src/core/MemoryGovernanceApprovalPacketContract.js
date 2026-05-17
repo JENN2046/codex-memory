@@ -101,8 +101,27 @@ function cloneArray(values) {
   return Array.isArray(values) ? [...values] : [];
 }
 
+const SENSITIVE_FRAGMENT_PATTERNS = Object.freeze([
+  /authorization\s*[:=]\s*(?:bearer\s+)?[^\s,;]+/gi,
+  /bearer\s+[A-Za-z0-9._~+/=-]+/gi,
+  /api[_-]?key\s*[:=]\s*["']?[A-Za-z0-9._~+/=-]+["']?/gi,
+  /\bapi[_-]?key\b/gi,
+  /raw_workspace_id\s*[:=]\s*["']?[^"',;\s]+["']?/gi,
+  /\braw_workspace_id\b/gi
+]);
+
+function redactSensitiveFragments(value) {
+  let redacted = value;
+
+  for (const pattern of SENSITIVE_FRAGMENT_PATTERNS) {
+    redacted = redacted.replace(pattern, '<redacted>');
+  }
+
+  return redacted;
+}
+
 function normalizeString(value) {
-  return typeof value === 'string' ? value.trim() : '';
+  return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
 function normalizeStringArray(values) {
@@ -123,7 +142,6 @@ function normalizeGovernedAction(action = {}) {
   const safeAction = isPlainObject(action) ? action : {};
 
   return {
-    ...safeAction,
     id: normalizeString(safeAction.id),
     status: normalizeString(safeAction.status),
     requiredFields: normalizeStringArray(safeAction.requiredFields),

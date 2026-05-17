@@ -224,3 +224,69 @@ test('P33.2 helper rejects unblocked event family records', () => {
   assert.equal(summary.safety.readsFiles, false);
   assert.equal(summary.safety.executesCommands, false);
 });
+
+test('P33.2 helper redacts sensitive normalized output and unsupported source types', () => {
+  const fixture = loadFixture();
+  const normalized = normalizeMemoryGovernanceAuditEvidenceContract({
+    ...fixture,
+    acceptedSourceTypes: [
+      ...SAFE_SOURCE_TYPES,
+      'authorization: Bearer AUDIT_TOKEN_1234567890'
+    ],
+    unsupportedSourceTypes: [
+      'api_key=AUDIT_API_KEY_1234567890'
+    ],
+    safeSourceTypes: [
+      ...SAFE_SOURCE_TYPES,
+      'raw_workspace_id=workspace-audit-raw'
+    ],
+    eventFamilies: fixture.eventFamilies.map((eventFamily, index) => index === 0
+      ? {
+          ...eventFamily,
+          authorization: 'authorization: Bearer EVENT_TOKEN_1234567890',
+          bearer: 'Bearer EVENT_BEARER_1234567890',
+          api_key: 'api_key=EVENT_API_KEY_1234567890',
+          raw_workspace_id: 'raw_workspace_id=workspace-event-raw'
+        }
+      : eventFamily
+    ),
+    requiredEvidenceFields: [
+      ...fixture.requiredEvidenceFields,
+      'source authorization: Bearer EVIDENCE_TOKEN_1234567890 api_key=EVIDENCE_API_KEY_1234567890'
+    ]
+  });
+  const summary = summarizeMemoryGovernanceAuditEvidenceContract(normalized);
+  const normalizedText = JSON.stringify(normalized).toLowerCase();
+  const summaryText = JSON.stringify(summary).toLowerCase();
+
+  for (const forbidden of [
+    'authorization',
+    'bearer',
+    'api_key',
+    'raw_workspace_id',
+    'audit_token_1234567890',
+    'event_token_1234567890',
+    'evidence_api_key_1234567890',
+    'workspace-event-raw'
+  ]) {
+    assert.equal(normalizedText.includes(forbidden), false);
+    assert.equal(summaryText.includes(forbidden), false);
+  }
+
+  assert.equal(Object.hasOwn(normalized.eventFamilies[0], 'authorization'), false);
+  assert.equal(Object.hasOwn(normalized.eventFamilies[0], 'api_key'), false);
+  assert.equal(Object.hasOwn(normalized.eventFamilies[0], 'raw_workspace_id'), false);
+  assert.equal(summary.acceptedForPlanning, false);
+  assert.equal(summary.sourceContract.safe, false);
+  assert.equal(summary.sourceContract.unsupportedSourceTypes.every(sourceType =>
+    sourceType === '<redacted>' || sourceType.includes('<redacted>')
+  ), true);
+  assert.equal(summary.safety.readsFiles, false);
+  assert.equal(summary.safety.executesCommands, false);
+  assert.equal(summary.safety.mutatesDurableState, false);
+  assert.equal(summary.safety.writesDurableAudit, false);
+  assert.deepEqual(summary.publicMcpTools.tools, PUBLIC_MCP_TOOLS);
+  assert.equal(summary.publicMcpExpanded, false);
+  assert.equal(summary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(summary.acceptedForPlanning, false);
+});
