@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P4 HTTP runtime / operation hardening; P59-T2 explicit-input helper.
+P4/P10 transition: P59 HTTP observability helper complete; P60 no-touch/no-leak/redaction regression candidate next.
 
 ## Current Status
 
@@ -25,7 +25,7 @@ P4 HTTP runtime / operation hardening; P59-T2 explicit-input helper.
 - P58-T2 post-commit board reconciliation is locally committed in `0092189`.
 - P59-T1 HTTP runtime observability / operation hardening boundary inventory is implemented, validated, and committed locally in `c57be03` as docs/fixture/test only.
 - P59-T1 post-commit board reconciliation is locally committed in `46fd98e`.
-- P59-T2 HTTP observability explicit-input evidence helper is implemented and validated locally.
+- P59-T2 HTTP observability explicit-input evidence helper is implemented, validated, and committed locally in `a036c8d`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -48,6 +48,7 @@ P4 HTTP runtime / operation hardening; P59-T2 explicit-input helper.
 - Targeted P59/HTTP/no-touch set (`40/40`)
 - Boundary scan over `src\core\HttpRuntimeObservabilityOperationContract.js` returned no hits.
 - `npm test` (`1008/1008`)
+- Post-commit status/log/trailer/diff-check for `a036c8d`
 
 ## Active Boundaries
 
@@ -65,4 +66,4 @@ P4 HTTP runtime / operation hardening; P59-T2 explicit-input helper.
 
 ## Next Safe Step
 
-Run final diff/docs validation for P59-T2 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation.
+Complete P59-T2 post-commit board/status reconciliation, then evaluate P60-T1 only if it remains local no-touch/no-leak/redaction regression work with no runtime side effects.

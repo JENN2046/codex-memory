@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `1ae4286 test: harden no-touch redaction regressions`。
-- 当前本地基线：本地 `main` 已包含 P51-P59-T1 本地工作并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
+- 当前本地基线：本地 `main` 已包含 P51-P59-T2 本地工作并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P59-T2 HTTP observability explicit-input evidence helper 已完成并本地验证，正在进行 guarded local commit 前状态收敛。P59-T2 只是 caller-provided object helper，不读取文件、不执行命令、不启动 HTTP 服务、不安装 watchdog/startup、不切换配置、不调用 provider、不写 durable state、不扩 public MCP，也不是 operation/runtime/final-RC/v1-RC readiness。
+- 当前任务：P59-T2 HTTP observability explicit-input evidence helper 已完成、验证并本地提交为 `a036c8d`；board/status 正在进行 post-commit reconciliation。P59-T2 只是 caller-provided object helper，不读取文件、不执行命令、不启动 HTTP 服务、不安装 watchdog/startup、不切换配置、不调用 provider、不写 durable state、不扩 public MCP，也不是 operation/runtime/final-RC/v1-RC readiness。
 
 ## 当前阻塞
 
@@ -21,8 +21,8 @@
 
 ## 当前优先级
 
-1. 完成 P59-T2 guarded local commit；不得 push，除非用户单独明确授权。
-2. 下一条 P59 本地安全候选必须继续 no-side-effect，不得 live HTTP operation、service/watchdog/startup install、config switch、provider call、durable write 或 public MCP expansion。
+1. 完成 P59-T2 post-commit board/status reconciliation；不得 push，除非用户单独明确授权。
+2. 下一条安全候选进入 P60 no-touch / no-leak / redaction 长期回归，只能做本地测试/fixture/helper 级防线，不得 live HTTP operation、service/watchdog/startup install、config switch、provider call、durable write 或 public MCP expansion。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54 command chain evidence、P55 trace evidence、P56 governance loop evidence、P57 boundary/helper evidence、P58 boundary/helper evidence、P59 boundary inventory evidence 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、或 final RC matrix execution。
 4. 不 push，除非用户单独明确授权。
 
