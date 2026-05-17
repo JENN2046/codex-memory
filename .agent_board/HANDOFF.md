@@ -14,11 +14,11 @@ Execute P46-P50 Evidence Enforcement Bridge under local A4/A4.8 boundaries, star
 
 ## Worktree
 
-P47 docs/status/board-only edits are validated and ready for guarded local commit. Local `main` is ahead of `origin/main` by `ed01771` and `056b639`.
+P48 test/status/board edits are validated and ready for guarded local commit. Local `main` is ahead of `origin/main` by `ed01771`, `056b639`, and `9fba356`.
 
 ## Current Area
 
-P8 memory-governance / P47 evidence-to-enforcement gap map.
+P8 memory-governance / P48 evidence-chain consistency guard.
 
 ## Current Truth
 
@@ -27,7 +27,7 @@ P8 memory-governance / P47 evidence-to-enforcement gap map.
 - Latest pushed implementation/test commit: `2b4a956`.
 - P36-P45 evidence-first / fixture-only / explicit-input chain plus CM-0320 strict schema/version exact-set hardening are pushed.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: P47 maps gaps between fixture/helper evidence and future runtime enforcement. Next safe task is P48 evidence-chain consistency guard.
+- Current task: P48 adds a test-only evidence-chain consistency guard. Next safe task is P49 ValidationAggregator P45 posture bridge.
 
 ## Validation
 
@@ -44,6 +44,8 @@ P8 memory-governance / P47 evidence-to-enforcement gap map.
 - P46-T1 validation passed: changed JS syntax checks for HTTP/redaction/helper/test files; targeted HTTP/helper tests `73/73`; `npm test` `842/842`; `git diff --check`; P42/P45 local redaction wrapper scan returned no matches.
 - P46-T1 committed locally in `056b639`; no push was performed.
 - P47 validation passed: `git diff --check`; `scripts\validate-local.ps1 -Area docs`; boundary scan showed only one expected historical negative-test wording hit in `TASK_QUEUE.md`.
+- P47 committed locally in `9fba356`; no push was performed.
+- P48 validation passed: `node --check tests\evidence-chain-consistency-guard.test.js`; targeted guard test `4/4`; `npm test` `846/846`; `git diff --check`; boundary scan returned no hits.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -60,4 +62,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Create guarded local P47 commit, then proceed to P48 if safe. Push remains blocked unless explicitly requested.
+Create guarded local P48 commit, then proceed to P49 if safe. Push remains blocked unless explicitly requested.

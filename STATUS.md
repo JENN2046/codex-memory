@@ -9,7 +9,7 @@
 - 当前本地基线：`main` 与 `origin/main` 对齐在 `2b4a956`；工作树在 P46-0 开始前为 clean。
 - 最新已推送完成：P36-P45 evidence-first / fixture-only / explicit-input 链路，以及 CM-0320 governance evidence helper strict schema/version exact-set hardening，均已推送到 `2b4a956`。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P47 evidence-to-enforcement gap map 已验证，等待 guarded local commit；P46-T1 已本地提交到 `056b639`。
+- 当前任务：P48 evidence-chain consistency guard 已验证，等待 guarded local commit；P47 已本地提交到 `9fba356`。
 
 ## 当前阻塞
 
@@ -21,8 +21,8 @@
 
 ## 当前优先级
 
-1. 为 P47 evidence-to-enforcement gap map 创建 guarded local commit；不 push。
-2. 后续 P48-P50 继续保持 fixture-only / explicit-input-only / dry-run-only，建立 consistency guard、ValidationAggregator P45 posture bridge 和 no-touch boundary regression。
+1. 为 P48 evidence-chain consistency guard 创建 guarded local commit；不 push。
+2. 后续 P49-P50 继续保持 fixture-only / explicit-input-only / dry-run-only，建立 ValidationAggregator P45 posture bridge 和 no-touch boundary regression。
 3. 继续保持 v1.0 RC `NOT_READY_BLOCKED`，不得把本地 gap map 误读为 runtime enforcement 或 final RC matrix execution。
 
 ## 主要事实源
