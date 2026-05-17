@@ -6,26 +6,26 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0262 / P28.x post-commit board reconciliation |
-| Current area | P28.x validation aggregator evidence-reader chain post-commit reconciliation |
+| Current task | CM-0263 / P29.1 explicit-input SchemaVersionPolicy helper |
+| Current area | P29 schema/version runtime enforcement safe helper foundation |
 | Last pushed baseline | `52c4fef` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Created authorized guarded local commit `e4af76b test: extend validation evidence summaries`; started board-only post-commit reconciliation. |
-| Last validation | CM-0261 post-commit checks passed: `git status -sb`; `git log --oneline --decorate -n 3`; `git show --stat --oneline --decorate --no-renames HEAD`; commit message trailer verified. |
-| Worktree summary | Dirty only for CM-0262 board-only post-commit reconciliation. Source/test/fixture changes from CM-0256/CM-0260 are committed in `e4af76b`; no package script, lockfile, `.github`, `.env`, runtime config, Codex/Claude config, public MCP schema/tool expansion, SQLite migration apply, import/export apply, backup creation, restore, provider/model call, real memory scan/preview, tag movement, production deploy, UI, service install, watchdog install, startup task install, durable memory write, durable data rewrite, tag, release, deploy, or unauthorized remote mutation occurred. |
+| Last action | Completed CM-0263 P29.1 explicit-input `SchemaVersionPolicy` helper and fixture-backed tests; user clarified push remains centrally directed and should be ignored unless explicitly requested. |
+| Last validation | `node --check src\core\SchemaVersionPolicy.js`; `node --check tests\schema-version-policy-runtime.test.js`; targeted P25/P29 schema tests `26/26`; `npm test` `593/593`; `git diff --check`. |
+| Worktree summary | Dirty for completed CM-0263 source/test/board edits before guarded local commit. Local `main` is ahead of `origin/main` by 2 commits. No package script, lockfile, `.github`, `.env`, runtime config, Codex/Claude config, public MCP schema/tool expansion, SQLite migration apply, import/export apply, backup creation, restore, provider/model call, real memory scan/preview, tag movement, production deploy, UI, service install, watchdog install, startup task install, durable memory write, durable data rewrite, tag, release, deploy, or unauthorized remote mutation occurred. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits; push remains not authorized |
 | Safe-push readiness | no push is authorized unless the user explicitly requests it |
-| Next planned action | Commit CM-0262 board-only post-commit reconciliation, then continue from P29 schema/version runtime enforcement safe planning if no new hard stop appears. |
+| Next planned action | Guarded local commit for CM-0263 if preflight stays clean, then continue to the next local P29 safe slice without push. |
 
 ## Notes
 
 - Project health: strong.
 - Governance health: strong.
-- Current truth: P22 security fix superseded prior RC candidate; fresh gate refresh passed; tag `p22-rc-7fd17de` has been created and pushed; GitHub prerelease has been created; local HTTP MCP deploy/validation evidence chain has been recorded and closed; P23 planning through P23.12, P24 through P24.7, P25 through P25.7, P26 through P26.x, P27 through P27.x, and P28.1 through P28.7 are complete. CM-0255/CM-0260 are committed locally in `e4af76b`; local `main` is ahead of `origin/main` by one commit before CM-0262 board-only reconciliation.
-- Release state: `VALIDATION_AGGREGATOR_SCHEMA_POLICY_EVIDENCE_ADDED_FULL_V1_0_RC_STILL_BLOCKED`.
+- Current truth: P22 security fix superseded prior RC candidate; fresh gate refresh passed; tag `p22-rc-7fd17de` has been created and pushed; GitHub prerelease has been created; local HTTP MCP deploy/validation evidence chain has been recorded and closed; P23 planning through P23.12, P24 through P24.7, P25 through P25.7, P26 through P26.x, P27 through P27.x, P28.1 through P28.7, and P29.1 explicit-input helper work are complete. CM-0255/CM-0260 are committed locally in `e4af76b`; post-commit board checkpoint is committed locally in `f33e757`; local `main` is ahead of `origin/main` by 2 commits before CM-0263 commit.
+- Release state: `SCHEMA_VERSION_POLICY_HELPER_ADDED_RUNTIME_ENFORCEMENT_STILL_BLOCKED`.
 - Superseded artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
 - Current user authorization: persistent local A4/A4.8 execution is active for the P28-P40 long-running goal. Push/tag/release/deploy, provider calls, real memory preview/export/import, SQLite migration apply, backup/restore, watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edits, and production deploy remain blocked unless separately explicit.
 - Backup creation and restore remain blocked.

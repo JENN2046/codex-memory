@@ -1271,3 +1271,29 @@ Remaining risks: schema/version runtime enforcement still required; validation a
 Result: aggregator now reports confidence posture with `decisionImpact=none_report_only`, `canClaimV1RcReady=false`, and explicit limitations for final matrix, runtime enforcement, full aggregator implementation, and A5 actions.
 
 Next safe step: commit CM-0262 board-only reconciliation locally, then continue from P29 schema/version runtime enforcement safe planning if no new hard stop appears. Push remains unauthorized.
+
+## CM-0263 Commander Handoff - P29.1 Explicit-Input SchemaVersionPolicy Helper
+
+Goal: create the first local, fixture-backed foundation for schema/version runtime enforcement without integrating it into real runtime read/write behavior.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0263 source/test/board edits; no push is authorized.
+
+Current area: `P29.1-schema-version-policy-helper-foundation`
+
+Changed files: `src/core/SchemaVersionPolicy.js`; `tests/schema-version-policy-runtime.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\SchemaVersionPolicy.js`; `node --check tests\schema-version-policy-runtime.test.js`; targeted schema tests `26/26`; `npm test` `593/593`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0263.
+
+Remaining risks: schema/version runtime enforcement still required; helper is not wired into `record_memory`, recall, imports/exports, migrations, or validation gate execution; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; push remains centrally directed by user.
+
+Result: `SchemaVersionPolicy` now evaluates explicit parsed policy input for accepted/missing/unknown versions with no mutation, no implicit fixture reads during evaluation, no provider/service/config/data action, and fail-closed unknown schema families.
+
+Next safe step: guarded local commit for CM-0263, then CM-0264 report-shape evidence in ValidationAggregator if no hard stop appears. Push remains unauthorized.

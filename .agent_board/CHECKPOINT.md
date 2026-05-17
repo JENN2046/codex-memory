@@ -882,3 +882,16 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; board diff inspection.
 - Commit: board-only reconciliation to be committed locally.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, service start, migration-import-export apply, backup/restore, tag, release, deploy, or push.
+
+## CM-0263 - P29.1 Explicit-Input SchemaVersionPolicy Helper
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: pure schema/version policy helper for explicit parsed policy input, fixture-backed only.
+- Changed files: `src/core/SchemaVersionPolicy.js`; `tests/schema-version-policy-runtime.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: added a read-only helper that evaluates accepted, missing, and unknown schema-version cases from caller-provided policy data. Tests prove no fixture mutation, no implicit fs reads during evaluation, no side effects, public MCP freeze, and fail-closed unknown family behavior.
+- Validation: `node --check src\core\SchemaVersionPolicy.js`; `node --check tests\schema-version-policy-runtime.test.js`; targeted schema policy tests `26/26`; `npm test` `593/593`; `git diff --check`.
+- Commit: eligible for guarded local commit; push remains user-directed and not authorized for this cycle.
+- Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
+- A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
