@@ -8,6 +8,7 @@ const {
   REJECTED_ACTIONS,
   REQUIRED_BLOCKERS,
   REQUIRED_REJECTION_DEFAULTS,
+  SAFE_SOURCE_TYPES,
   normalizeFinalRcValidationMatrixManifest,
   summarizeFinalRcValidationMatrixManifest
 } = require('../src/core/FinalRcValidationMatrixManifest');
@@ -35,6 +36,9 @@ test('P30.2 manifest helper summarizes explicit fixture input without side effec
   assert.equal(summary.blockedDecisionPreserved, true);
   assert.equal(summary.runnerClaimsBlocked, true);
   assert.equal(summary.sourceContract.safe, true);
+  assert.deepEqual(summary.sourceContract.safeSourceTypes, SAFE_SOURCE_TYPES);
+  assert.equal(summary.sourceContract.sourceTypesWhitelisted, true);
+  assert.deepEqual(summary.sourceContract.unsupportedSourceTypes, []);
   assert.deepEqual(summary.publicMcpTools, {
     frozen: true,
     tools: PUBLIC_MCP_TOOLS
@@ -66,6 +70,7 @@ test('P30.2 manifest helper normalizes the safe manifest contract without mutati
   assert.equal(normalized.fixtureOnly, true);
   assert.equal(normalized.synthetic, true);
   assert.equal(normalized.sourceContract.mode, 'explicit_safe_inputs_only');
+  assert.deepEqual(normalized.sourceContract.acceptedSourceTypes, SAFE_SOURCE_TYPES);
   assert.deepEqual(normalized.publicMcpTools, PUBLIC_MCP_TOOLS);
   assert.deepEqual(normalized.requiredRejectionDefaults, REQUIRED_REJECTION_DEFAULTS);
   assert.deepEqual(normalized.rejectedActions, REJECTED_ACTIONS);
@@ -135,10 +140,39 @@ test('P30.2 manifest helper rejects side-effectful or live-source evidence contr
 
   assert.equal(summary.acceptedForPlanning, false);
   assert.equal(summary.sourceContract.safe, false);
+  assert.equal(summary.sourceContract.sourceTypesWhitelisted, false);
+  assert.deepEqual(summary.sourceContract.unsupportedSourceTypes, ['live_service']);
   assert.equal(summary.safety.readsFiles, false);
   assert.equal(summary.safety.executesCommands, false);
   assert.equal(summary.safety.providerCalls, 1);
   assert.equal(summary.safety.serviceStarted, true);
+  assert.equal(summary.canExecuteRunner, false);
+  assert.equal(summary.canClaimFinalRcReady, false);
+});
+
+test('P30.2 manifest helper rejects unsupported source types without side effects', () => {
+  const fixture = loadFixture();
+  const unsupportedManifest = {
+    ...fixture,
+    sourceContract: {
+      ...fixture.sourceContract,
+      acceptedSourceTypes: [
+        ...SAFE_SOURCE_TYPES,
+        'ad_hoc_live_summary'
+      ]
+    }
+  };
+  const summary = summarizeFinalRcValidationMatrixManifest(unsupportedManifest);
+
+  assert.equal(summary.acceptedForPlanning, false);
+  assert.equal(summary.sourceContract.safe, false);
+  assert.equal(summary.sourceContract.sourceTypesWhitelisted, false);
+  assert.deepEqual(summary.sourceContract.safeSourceTypes, SAFE_SOURCE_TYPES);
+  assert.deepEqual(summary.sourceContract.unsupportedSourceTypes, ['ad_hoc_live_summary']);
+  assert.equal(summary.safety.readsFiles, false);
+  assert.equal(summary.safety.executesCommands, false);
+  assert.equal(summary.safety.startsServices, false);
+  assert.equal(summary.safety.callsProviders, false);
   assert.equal(summary.canExecuteRunner, false);
   assert.equal(summary.canClaimFinalRcReady, false);
 });

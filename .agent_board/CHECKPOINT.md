@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0277 / P30.3 final RC validation matrix manifest helper aggregator evidence shape.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0278 / P30.x closeout plus CM-0278A manifest source-type whitelist hardening.
 
 ## Current Area
 
-P30.3 ValidationAggregator report-shape evidence
+P30.x closeout plus P30.2 helper whitelist hardening
 
 ## Current Status
 
@@ -50,6 +50,9 @@ P30.3 ValidationAggregator report-shape evidence
 - CM-0277 adds static ValidationAggregator report-shape evidence for the P30.2 manifest helper via `evidence.p30FinalRcValidationMatrixManifestHelper`, `checks.finalRcValidationMatrixManifestHelper`, and `evidence_sources.final_rc_validation_matrix_manifest_helper`.
 - CM-0277 validation passed: `node --check` changed JS files; targeted aggregator tests `21/21`; `npm test` `617/617`; `git diff --check`; `scripts\validate-local.ps1 -Area docs`. Read-only Verifier first pass found only board validation wording drift; rerun passed.
 - CM-0277 guarded local commit `405ce73` was pushed by explicit user instruction. Post-push alignment verified: `HEAD == origin/main == 405ce73637c71fb4843bffbd27a3e3fbaeb4b3e6`.
+- CM-0277 post-push board result is committed locally in `7abebed`; no further push is authorized.
+- CM-0278 adds `docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P30 as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence only. Validation/Verifier/commit are pending.
+- CM-0278A adds `SAFE_SOURCE_TYPES` in `FinalRcValidationMatrixManifest` and fails closed when `acceptedSourceTypes` contains unsupported values. Targeted helper test `8/8` and full suite `618/618` passed.
 - Commander direction remains constrained: P30 may consume explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch

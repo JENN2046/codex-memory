@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0277 / P30.3 final RC validation matrix manifest helper aggregator evidence shape.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0278 / P30.x closeout plus CM-0278A manifest source-type whitelist hardening.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty only for CM-0277 scoped source/test/fixture/docs/board updates. Local `main` is ahead of `origin/main`; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0278 docs/board closeout updates and CM-0278A source/test hardening. Local `main` is ahead of `origin/main` by the post-push board result commit; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P30.3 ValidationAggregator report-shape evidence
+P30.x closeout plus P30.2 helper whitelist hardening
 
 ## Findings
 
@@ -77,7 +77,11 @@ P30.3 ValidationAggregator report-shape evidence
 - CM-0277 validation passed: changed JS syntax checks, targeted aggregator tests `21/21`, `npm test` `617/617`, `git diff --check`, and `scripts\validate-local.ps1 -Area docs`.
 - Read-only Verifier first pass found only board validation wording drift; rerun passed.
 - User-authorized push completed: `52c4fef..405ce73 main -> main`; post-push `HEAD == origin/main == 405ce73637c71fb4843bffbd27a3e3fbaeb4b3e6`.
-- Next safe step: commit this post-push board result locally if validation passes, then continue to CM-0278/P30.x docs/board-only closeout if no blocker appears. No further push is authorized.
+- Post-push board result is committed locally in `7abebed`; no further push is authorized.
+- CM-0278 adds P30 closeout review docs and routes the next safe phase to P31 memory governance safe-scope inventory.
+- CM-0278A tightens P30 manifest helper source type validation with `SAFE_SOURCE_TYPES`; unsupported `acceptedSourceTypes` now fail closed with `acceptedForPlanning=false`.
+- Validation passed so far: helper syntax checks, targeted helper test `8/8`, `npm test` `618/618`, `git diff --check`, docs validation, and P30/P31 boundary scan.
+- Next safe step: run read-only Verifier, create guarded local commit if eligible, then continue to CM-0279/P31 memory governance safe-scope inventory. No further push is authorized.
 
 ## Changed Files
 

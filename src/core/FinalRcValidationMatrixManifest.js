@@ -24,6 +24,13 @@ const REQUIRED_BLOCKERS = Object.freeze([
   'a5-actions-blocked'
 ]);
 
+const SAFE_SOURCE_TYPES = Object.freeze([
+  'committed_validation',
+  'local_validation',
+  'committed_fixture',
+  'committed_report_shape'
+]);
+
 const REJECTED_ACTIONS = Object.freeze([
   'start-service',
   'refresh-live',
@@ -190,16 +197,17 @@ function summarizeFinalRcValidationMatrixManifest(manifest = {}) {
   const blockerIds = normalized.blockers.map(blocker => blocker.id).filter(Boolean);
   const allowedInputClassIds = normalized.allowedInputClasses.map(inputClass => inputClass.id).filter(Boolean);
   const sourceTypes = normalized.sourceContract.acceptedSourceTypes;
+  const unsupportedSourceTypes = sourceTypes.filter(sourceType => !SAFE_SOURCE_TYPES.includes(sourceType));
+  const sourceTypesWhitelisted = sourceTypes.length > 0 && unsupportedSourceTypes.length === 0;
   const sourceContractSafe =
     normalized.sourceContract.mode === 'explicit_safe_inputs_only' &&
+    sourceTypesWhitelisted &&
     normalized.sourceContract.readsFiles === false &&
     normalized.sourceContract.executesCommands === false &&
     normalized.sourceContract.startsServices === false &&
     normalized.sourceContract.callsProviders === false &&
     normalized.sourceContract.mutatesDurableState === false &&
-    normalized.sourceContract.acceptsRealMemoryPreview === false &&
-    !sourceTypes.includes('live_service') &&
-    !sourceTypes.includes('real_memory');
+    normalized.sourceContract.acceptsRealMemoryPreview === false;
   const sideEffectFlagsClear = NO_SIDE_EFFECT_SAFETY_FLAGS.every(flag => normalized.safety[flag] === false);
   const publicMcpFrozen = arraysEqual(normalized.publicMcpTools, PUBLIC_MCP_TOOLS);
   const requiredBlockersPresent = hasEveryValue(blockerIds, REQUIRED_BLOCKERS);
@@ -245,6 +253,9 @@ function summarizeFinalRcValidationMatrixManifest(manifest = {}) {
       safe: sourceContractSafe,
       mode: normalized.sourceContract.mode,
       acceptedSourceTypes: sourceTypes,
+      safeSourceTypes: SAFE_SOURCE_TYPES,
+      sourceTypesWhitelisted,
+      unsupportedSourceTypes,
       acceptedStatuses: normalized.sourceContract.acceptedStatuses
     },
     allowedInputClasses: {
@@ -313,6 +324,7 @@ module.exports = {
   REJECTED_ACTIONS,
   REQUIRED_BLOCKERS,
   REQUIRED_REJECTION_DEFAULTS,
+  SAFE_SOURCE_TYPES,
   normalizeFinalRcValidationMatrixManifest,
   summarizeFinalRcValidationMatrixManifest
 };
