@@ -73,10 +73,11 @@ P30.3 ValidationAggregator report-shape evidence
 - CM-0274 is completed and committed locally in `f2286f7` as board-only reconciliation after `5d91dac`; board finalization is committed locally in `f3a7116`.
 - CM-0275 is completed, validated, and committed locally in `ed73d24` as a pure helper over explicit fixture input only. It adds `src/core/FinalRcValidationMatrixManifest.js` and `tests/final-rc-validation-matrix-runner-manifest-helper.test.js`; source/test syntax checks, targeted helper test `7/7`, `npm test` `617/617`, `git diff --check`, docs validation, and read-only Verifier rerun `PASS` passed. Read-only Verifier first pass found and drove a fail-closed fix for unsafe runner/matrix/readiness claims.
 - CM-0276 is completed and committed locally in `9646273` as board-only reconciliation after `ed73d24`.
-- CM-0277 is implemented locally and pending final Verifier/commit. It only adds static ValidationAggregator evidence for P30.2 helper capability and preserves `helperExecutedByAggregator=false`, `fixtureReadByAggregator=false`, `runnerImplemented=false`, `runnerExecuted=false`, `finalRcMatrixExecuted=false`, `canExecuteRunner=false`, and `canClaimFinalRcReady=false`.
+- CM-0277 is completed, committed, and pushed at `405ce73`. It only adds static ValidationAggregator evidence for P30.2 helper capability and preserves `helperExecutedByAggregator=false`, `fixtureReadByAggregator=false`, `runnerImplemented=false`, `runnerExecuted=false`, `finalRcMatrixExecuted=false`, `canExecuteRunner=false`, and `canClaimFinalRcReady=false`.
 - CM-0277 validation passed: changed JS syntax checks, targeted aggregator tests `21/21`, `npm test` `617/617`, `git diff --check`, and `scripts\validate-local.ps1 -Area docs`.
-- Read-only Verifier first pass found only board validation wording drift; rerun and guarded local commit are pending.
-- Next safe step: finish CM-0277 read-only Verifier rerun and guarded local commit; then perform the single user-authorized push of current `main`. After push, continue to CM-0278/P30.x docs/board-only closeout if no blocker appears.
+- Read-only Verifier first pass found only board validation wording drift; rerun passed.
+- User-authorized push completed: `52c4fef..405ce73 main -> main`; post-push `HEAD == origin/main == 405ce73637c71fb4843bffbd27a3e3fbaeb4b3e6`.
+- Next safe step: commit this post-push board result locally if validation passes, then continue to CM-0278/P30.x docs/board-only closeout if no blocker appears. No further push is authorized.
 
 ## Changed Files
 
