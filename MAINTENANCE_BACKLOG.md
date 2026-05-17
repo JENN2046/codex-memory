@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `2b4a956 fix: harden governance evidence helper contracts`.
-- Local baseline: `main` is aligned with `origin/main` at `2b4a956`; P46-0 started from a clean worktree.
+- Local baseline: `main` is at `fa8c414`, ahead of `origin/main` by four local commits; P49 changes are validated and pending guarded local commit.
 - Current active program: P46-P50 Evidence Enforcement Bridge.
-- Current phase area: P47 evidence-to-enforcement gap map. Fixture-only / dry-run-only / explicit-input-only boundaries preserved.
+- Current phase area: P49 ValidationAggregator P45 posture bridge. Fixture-only / dry-run-only / explicit-input-only boundaries preserved.
 
 ## Active Queue
 
@@ -41,7 +41,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P46-T1 | memory-governance | A2 | done | HTTP no-token mutation + sensitive redaction hardening | targeted HTTP/helper tests; `git diff --check`; `npm test` | Complete and validated; unified helper redaction through `SensitiveFragmentRedaction.js` and rejected no-token HTTP `record_memory` mutation while preserving authorized bearer write coverage. |
 | P47 | memory-governance | A1 | done | Evidence-to-enforcement gap map | `git diff --check`; docs validation; boundary scan | Complete and validated; docs/status/board only; no runtime connection, real memory scan, public MCP expansion, or RC-ready claim. |
 | P48 | memory-governance | A2 | done | Evidence-chain consistency guard | targeted fixture/contract tests; `git diff --check`; `npm test` | Complete and validated; test-only guard locks evidence IDs, source type whitelist, schema linkage, blocked actions, fail-closed states, A5 blockers, public MCP freeze, and no-readiness posture as exact sets. |
-| P49 | observability-admin | A2 | todo | ValidationAggregator P45 posture bridge | targeted aggregator tests; `git diff --check`; `npm test` if targeted passes | Surface P45 evaluator skeleton posture without importing/executing evaluator or reading fixtures. |
+| P49 | observability-admin | A2 | done | ValidationAggregator P45 posture bridge | targeted aggregator tests; `git diff --check`; `npm test` | Complete and validated; aggregator surfaces P45 evaluator skeleton posture as static report-shape only, without importing/executing evaluator, reading fixtures, running gates/runners, refreshing live MCP, or claiming final RC readiness. |
+| P50 | observability-admin | A2 | todo | No-touch boundary regression suite | targeted no-touch tests; `git diff --check`; `npm test` if targeted passes | Add boundary regression preventing governance helpers, EvidenceManifestContract, FinalRcMatrixEvaluator, and ValidationAggregator from introducing fs scan, child_process, provider/network, runtime store imports, durable writes, or public MCP expansion. |
 
 ## Standing Boundaries
 

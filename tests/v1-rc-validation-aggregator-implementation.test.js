@@ -161,6 +161,20 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.p36P40RuntimeReady, false);
   assert.equal(report.summary.p36P40FinalRcMatrixReady, false);
   assert.equal(report.summary.p36P40CanClaimV1RcReady, false);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorPostureAvailable, true);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorPostureSourceMode, 'static_report_shape_only');
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorExplicitInputOnly, true);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorFixtureOnly, true);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorImportedByAggregator, false);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorExecutedByAggregator, false);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorFixtureReadByAggregator, false);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorCollectsEvidence, false);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorExecutesHelpers, false);
+  assert.equal(report.summary.p45FinalRcMatrixRunnerExecuted, false);
+  assert.equal(report.summary.p45FinalRcMatrixReady, false);
+  assert.equal(report.summary.p45FinalRcMatrixCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p45FinalRcMatrixCanClaimV1RcReady, false);
+  assert.equal(report.summary.p45FinalRcMatrixRuntimeReady, false);
   assert.equal(report.summary.localEvidenceReportReadyClaim, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.mainlineCutoverReady, false);
@@ -489,6 +503,47 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimRuntimeReady, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimFinalRcReady, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.sourceMode, 'static_report_shape_only');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluator, 'src/core/FinalRcMatrixEvaluator.js');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.test, 'tests/final-rc-matrix-evaluator-helper.test.js');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.fixture, 'tests/fixtures/p45-final-rc-matrix-evaluator-v1.json');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorSchemaVersion, 'p45-final-rc-matrix-evaluator-v1');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.expectedMode, 'fixture-only-explicit-input');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.expectedDecision, 'NOT_READY_BLOCKED');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.explicitInputOnly, true);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.fixtureOnly, true);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorImportedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorExecutedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.helperExecutedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.gateExecutedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evidenceCollectedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.liveMcpRefreshedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.callsProviders, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.startsServices, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.readsFiles, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.scansRealMemory, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.readsRuntimeStores, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.durableMemoryTouched, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.publicMcpExpanded, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.runtimeMutationImplemented, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.runtimeIntegrated, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.finalRcMatrixExecuted, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.runtimeReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.pushReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.releaseReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.deployReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.configSwitchReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.watchdogReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.rcReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.decisionImpact, 'none_report_only');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.blockedDecisionRequired, true);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimV1RcReady, false);
   assert.equal(report.evidence.p28ValidationEvidenceReader.status, 'no_explicit_validation_evidence');
   assert.equal(report.evidence.p28ValidationEvidenceReader.implemented, true);
   assert.equal(report.evidence.p28ValidationEvidenceReader.fullImplementation, false);
@@ -580,6 +635,15 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.equal(report.evidence_sources.p36_p40_evidence_source_map.source_type, 'local_validation_summary');
   assert.equal(report.evidence_sources.p36_p40_evidence_source_map.acceptedForPlanning, false);
   assert.match(report.evidence_sources.p36_p40_evidence_source_map.source_ref, /ValidationAggregatorService evidence\.p36P40EvidenceSourceMap/);
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.source_type, 'local_validation_summary');
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.acceptedForPlanning, false);
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.fixtureReadByAggregator, false);
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.evaluatorImportedByAggregator, false);
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.evaluatorExecutedByAggregator, false);
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.observedFromRuntime, false);
+  assert.match(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.source_ref, /ValidationAggregatorService evidence\.p45FinalRcMatrixEvaluatorPosture/);
   assert.equal(report.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
@@ -961,6 +1025,9 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.checks.p36P40EvidenceSourceMap.status, 'static_report_shape_added_not_executed');
   assert.equal(report.checks.p36P40EvidenceSourceMap.a4Safe, true);
   assert.equal(report.checks.p36P40EvidenceSourceMap.blocksV1Rc, undefined);
+  assert.equal(report.checks.p45FinalRcMatrixEvaluatorPosture.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.checks.p45FinalRcMatrixEvaluatorPosture.a4Safe, true);
+  assert.equal(report.checks.p45FinalRcMatrixEvaluatorPosture.blocksV1Rc, undefined);
   assert.equal(report.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
   assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), true);
   assert.equal(report.a5_gated.includes('providerExecution'), true);
@@ -977,6 +1044,7 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.a4_safe.includes('memoryGovernanceAuditEvidenceContractHelper'), true);
   assert.equal(report.a4_safe.includes('memoryGovernanceReviewSurfaceContractHelper'), true);
   assert.equal(report.a4_safe.includes('p36P40EvidenceSourceMap'), true);
+  assert.equal(report.a4_safe.includes('p45FinalRcMatrixEvaluatorPosture'), true);
   assert.equal(report.conditional_live.includes('health'), true);
 
   for (const key of [
@@ -1029,6 +1097,7 @@ test('P44 evidence source map is static report-shape only and does not import or
   assert.equal(source.includes("require('./EvidenceManifestContract')"), false);
   assert.equal(source.includes("require('./RecallMigrationIsolationContract')"), false);
   assert.equal(source.includes("require('./FinalRcValidationMatrixManifest')"), false);
+  assert.equal(source.includes("require('./FinalRcMatrixEvaluator')"), false);
   assert.equal(source.includes('readFileSync'), false);
   assert.equal(source.includes('readdirSync'), false);
   assert.equal(source.includes('spawnSync'), false);
@@ -1038,6 +1107,12 @@ test('P44 evidence source map is static report-shape only and does not import or
   assert.equal(report.evidence.p36P40EvidenceSourceMap.executesGates, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.refreshesLiveMcp, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorImportedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorExecutedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimV1RcReady, false);
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
 });
 
@@ -1056,6 +1131,7 @@ test('P44 report builder does not touch fs, network, child process, helpers, or 
     './EvidenceManifestContract',
     './RecallMigrationIsolationContract',
     './FinalRcValidationMatrixManifest',
+    './FinalRcMatrixEvaluator',
     './MemoryGovernanceLifecycleContract',
     './MemoryGovernanceApprovalPacketContract',
     './MemoryGovernanceAuditEvidenceContract',
@@ -1085,6 +1161,12 @@ test('P44 report builder does not touch fs, network, child process, helpers, or 
     assert.equal(report.evidence.p36P40EvidenceSourceMap.executesHelpers, false);
     assert.equal(report.evidence.p36P40EvidenceSourceMap.callsProviders, false);
     assert.equal(report.evidence.p36P40EvidenceSourceMap.refreshesLiveMcp, false);
+    assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.sourceMode, 'static_report_shape_only');
+    assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorImportedByAggregator, false);
+    assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorExecutedByAggregator, false);
+    assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.fixtureReadByAggregator, false);
+    assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.callsProviders, false);
+    assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimV1RcReady, false);
   } finally {
     Module._load = originalLoad;
     globalThis.fetch = originalFetch;

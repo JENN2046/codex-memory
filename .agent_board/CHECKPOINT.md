@@ -6,14 +6,14 @@ P46-P50 Evidence Enforcement Bridge.
 
 ## Current Area
 
-P6 docs-drift / P46-0 post-push board/status reconciliation.
+P10 observability-admin / P49 ValidationAggregator P45 posture bridge.
 
 ## Current Status
 
 - Last pushed baseline: `2b4a956 fix: harden governance evidence helper contracts` on `origin/main`.
-- Local branch is aligned with `origin/main` at `2b4a956`; the worktree was clean before P46-0 edits.
+- Local branch started P46 from `origin/main` at `2b4a956`; P46-0, P46-T1, P47, and P48 are committed locally through `fa8c414`.
 - Latest pushed task chain: P36-P45 evidence-first / fixture-only / explicit-input chain plus CM-0320 governance evidence helper strict schema/version exact-set hardening.
-- Current task: P48 evidence-chain consistency guard is validated and ready for guarded local commit; next safe task is P49 ValidationAggregator P45 posture bridge.
+- Current task: P49 ValidationAggregator P45 posture bridge is validated and ready for guarded local commit; next safe task is P50 no-touch boundary regression suite.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -25,6 +25,8 @@ P6 docs-drift / P46-0 post-push board/status reconciliation.
 - CM-0316 validation passed: `node --check src\core\RecallMigrationIsolationContract.js`, `node --check tests\recall-migration-isolation-helper.test.js`, targeted helper/P38/P39 fixture tests `30/30`, `npm test` `822/822`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop/history wording plus synthetic redaction/static-boundary test strings.
 - CM-0317 validation passed: `node --check src\core\ValidationAggregatorService.js`, changed aggregator test syntax checks, fixture JSON parse, targeted aggregator tests `36/36`, `npm test` `824/824`, `git diff --check`, docs validation, and P44 boundary scan with only expected unsafe explicit-input rejection fixtures.
 - CM-0318 validation passed: `node --check src\core\FinalRcMatrixEvaluator.js`, `node --check tests\final-rc-matrix-evaluator-helper.test.js`, P45 fixture JSON parse, targeted P45 evaluator tests `10/10`, `npm test` `834/834`, `git diff --check`, docs validation, boundary scan with only expected forbidden-claim / hard-stop wording plus synthetic redaction-test strings, and read-only Verifier `PASS`.
+- P48 validation passed and is committed locally at `fa8c414`: `node --check tests\evidence-chain-consistency-guard.test.js`, targeted guard test `4/4`, `npm test` `846/846`, `git diff --check`, and boundary scan returned no hits.
+- P49 validation passed: changed JS syntax checks for `ValidationAggregatorService` and aggregator tests, targeted aggregator tests `36/36`, `npm test` `846/846`, `git diff --check`, and require/import boundary scan showing only `./constants` in `ValidationAggregatorService.js`.
 
 ## Active Boundaries
 
@@ -55,4 +57,4 @@ P6 docs-drift / P46-0 post-push board/status reconciliation.
 
 ## Next Safe Step
 
-Create guarded local P48 commit, then continue to P49 if safe. Push remains user-directed and not authorized.
+Create guarded local P49 commit, then continue to P50 if safe. Push remains user-directed and not authorized.

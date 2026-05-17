@@ -131,6 +131,11 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.equal(fixture.evidence_sources.p39_synthetic_migration_dry_run_contract.status, 'fixture_contract_added_not_runtime_ready');
   assert.equal(fixture.evidence_sources.p40_local_readiness_report.status, 'local_evidence_report_added_not_runtime_ready');
   assert.equal(fixture.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
+  assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.status, 'static_report_shape_added_not_executed');
+  assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.fixtureReadByAggregator, false);
+  assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.evaluatorImportedByAggregator, false);
+  assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.evaluatorExecutedByAggregator, false);
+  assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.runnerExecutedByAggregator, false);
   assert.equal(fixture.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
   assert.equal(fixture.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(fixture.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
@@ -261,6 +266,15 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.summary.p36P40RuntimeReady, false);
   assert.equal(fixture.summary.p36P40FinalRcMatrixReady, false);
   assert.equal(fixture.summary.p36P40CanClaimV1RcReady, false);
+  assert.equal(fixture.summary.p45FinalRcMatrixEvaluatorPostureAvailable, true);
+  assert.equal(fixture.summary.p45FinalRcMatrixEvaluatorPostureSourceMode, 'static_report_shape_only');
+  assert.equal(fixture.summary.p45FinalRcMatrixEvaluatorImportedByAggregator, false);
+  assert.equal(fixture.summary.p45FinalRcMatrixEvaluatorExecutedByAggregator, false);
+  assert.equal(fixture.summary.p45FinalRcMatrixEvaluatorFixtureReadByAggregator, false);
+  assert.equal(fixture.summary.p45FinalRcMatrixRunnerExecuted, false);
+  assert.equal(fixture.summary.p45FinalRcMatrixReady, false);
+  assert.equal(fixture.summary.p45FinalRcMatrixCanClaimFinalRcReady, false);
+  assert.equal(fixture.summary.p45FinalRcMatrixCanClaimV1RcReady, false);
   assert.equal(fixture.summary.localEvidenceReportReadyClaim, false);
   assert.equal(fixture.summary.runtimeReady, false);
   assert.equal(fixture.summary.mainlineCutoverReady, false);

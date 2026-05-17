@@ -39,8 +39,17 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.evidence.p36P40EvidenceSourceMap.runtimeReady, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.finalRcMatrixReady, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorImportedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.evaluatorExecutedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimV1RcReady, false);
   assert.ok(report.evidence_sources.decision);
   assert.equal(report.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.status, 'static_report_shape_added_not_executed');
   assert.match(report.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
 });
 
@@ -69,6 +78,14 @@ test('minimal validation aggregator CLI preserves honest blocked decision', () =
   assert.equal(report.summary.p36P40RuntimeReady, false);
   assert.equal(report.summary.p36P40FinalRcMatrixReady, false);
   assert.equal(report.summary.p36P40CanClaimV1RcReady, false);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorPostureAvailable, true);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorImportedByAggregator, false);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorExecutedByAggregator, false);
+  assert.equal(report.summary.p45FinalRcMatrixEvaluatorFixtureReadByAggregator, false);
+  assert.equal(report.summary.p45FinalRcMatrixRunnerExecuted, false);
+  assert.equal(report.summary.p45FinalRcMatrixReady, false);
+  assert.equal(report.summary.p45FinalRcMatrixCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p45FinalRcMatrixCanClaimV1RcReady, false);
   assert.equal(report.summary.localEvidenceReportReadyClaim, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);

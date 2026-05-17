@@ -43,7 +43,8 @@ P46-P50 Evidence Enforcement Bridge:
 - P46-0 post-push board/status reconciliation is complete locally.
 - P46-T1 HTTP no-token mutation + sensitive redaction hardening is complete locally in `056b639`.
 - P47 evidence-to-enforcement gap map is complete locally in `9fba356`.
-- P48 evidence-chain consistency guard is validated and pending guarded local commit.
+- P48 evidence-chain consistency guard is complete locally in `fa8c414`.
+- P49 ValidationAggregator P45 posture bridge is validated and pending guarded local commit.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from local evidence completion.
 
 ## Boundaries
@@ -63,7 +64,6 @@ P46-P50 Evidence Enforcement Bridge:
 
 ## Next Candidate
 
-After P48 commit:
+After P49 commit:
 
-- P49 ValidationAggregator P45 posture bridge.
 - P50 no-touch boundary regression suite.
