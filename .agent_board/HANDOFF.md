@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0289 / P32.x memory governance approval-packet closeout review.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0290 / P33 memory governance audit-evidence safe-scope inventory.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0289 docs/status/board closeout updates. Local `main` is ahead of `origin/main` by twelve local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0290 docs/status/board inventory updates. Local `main` is ahead of `origin/main` by thirteen local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P32.x docs/status/board closeout
+P33 docs/status/board inventory
 
 ## Findings
 
@@ -92,8 +92,9 @@ P32.x docs/status/board closeout
 - CM-0286 adds a synthetic approval-packet fixture/test for P32.1. Validation passed: `node --check tests\memory-governance-approval-packet-fixture.test.js`, targeted fixture test `14/14`, `npm test` `655/655`, `git diff --check`, docs validation, P32.1 reference scan, and read-only Verifier rerun `PASS`. CM-0286 is committed locally in `933160d`.
 - CM-0287 adds P32.2 explicit-input helper/test files for caller-provided approval packet objects only. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `664/664`, `git diff --check`, docs validation, P32.2 boundary reference scan, and read-only Verifier `PASS`. CM-0287 is committed locally in `c2eb3ec`.
 - CM-0288 adds static ValidationAggregator report-shape evidence for the P32.2 approval-packet helper. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `664/664`, `git diff --check`, docs validation, P32.3 boundary reference scan, read-only Verifier `PASS`, and post-commit checks. CM-0288 is committed locally in `1ec4343`.
-- CM-0289 adds the P32.x approval-packet closeout review and routes the next safe phase to P33 audit-evidence inventory. Validation passed: `git diff --check`, docs validation, P32.x boundary reference scan, and read-only Verifier `PASS`.
-- Next safe step: create a guarded local commit for CM-0289, then continue to P33 audit-evidence inventory. No further push is authorized.
+- CM-0289 adds the P32.x approval-packet closeout review and routes the next safe phase to P33 audit-evidence inventory. Validation passed: `git diff --check`, docs validation, P32.x boundary reference scan, and read-only Verifier `PASS`. CM-0289 is committed locally in `daf3360`.
+- CM-0290 adds P33 audit-evidence inventory docs/status/board updates. Validation passed: `git diff --check`, docs validation, P33 boundary reference scan, and read-only Verifier `PASS`.
+- Next safe step: create a guarded local commit for CM-0290, then continue to P33.1 fixture contract if still safe. No further push is authorized.
 
 ## Changed Files
 
