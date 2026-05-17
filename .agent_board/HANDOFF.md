@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0270 / P29 post-CM-0269 board reconciliation.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0271 / P29 schema-version runtime enforcement closeout review.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0270 board-only reconciliation after guarded local commit `e957885`. Local `main` is ahead of `origin/main` by 9 commits. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0271 docs/status/board-only closeout after guarded local commit `29d0b83`. Local `main` is ahead of `origin/main` by 10 commits. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P29 schema/version runtime enforcement board reconciliation
+P29 schema/version evidence-chain closeout
 
 ## Findings
 
@@ -66,8 +66,9 @@ P29 schema/version runtime enforcement board reconciliation
 - CM-0255 through CM-0260 were committed locally in `e4af76b`; P28 board checkpoint was committed in `f33e757`.
 - P29.1 explicit-input `SchemaVersionPolicy` helper was committed in `a692f84`; P29.2 ValidationAggregator helper evidence was committed in `5765198`; P29.3 explicit policy evaluation report was committed in `fbb645e`.
 - CM-0266 and CM-0267 are committed locally through `88bfd59`; CM-0268 is committed locally in `89d5db8`; CM-0269 is committed locally in `e957885`.
-- CM-0270 is board-only reconciliation after CM-0269. It clears pending-commit wording and keeps the Commander lane constrained to P29 schema/version runtime enforcement.
-- Next safe local candidate after CM-0270 commit: CM-0271 P29.7 schema/runtime enforcement safe candidate selection. It must remain fixture-first/read-only/report-shape unless a smaller helper/test slice is discovered. Public MCP expansion, durable write-path enforcement, and push remain blocked.
+- CM-0270 board reconciliation after CM-0269 is committed locally in `29d0b83`.
+- CM-0271 is completed docs/status/board-only closeout for the P28/P29 evidence-reader, `SchemaVersionPolicy` helper, evaluation report, runtime boundary guard test, and ValidationAggregator report-shape evidence chain, pending guarded local commit.
+- Next safe local candidate after CM-0271 commit: CM-0272 P30 final RC validation matrix runner safe-scope inventory. It must consume explicit/local evidence and existing report shapes only. Runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration/import-export apply, backup/restore, and push remain blocked.
 
 ## Changed Files
 
