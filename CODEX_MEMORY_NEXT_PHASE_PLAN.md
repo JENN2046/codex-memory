@@ -13,16 +13,16 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 3. P52 schema/version boundary plan and minimal explicit-input helper are complete locally.
 4. P53 separates ValidationAggregator inventory contracts from future full implementation.
 5. P54 establishes the final RC runner local chain through safe command inventory, explicit command-result evaluation, execution preflight, and an injected-executor adapter contract; it does not complete a real final RC matrix run.
-6. P55 must connect P52/P53/P54 local evidence to runtime enforcement gaps without treating fixture/local evidence as runtime enforcement.
-7. P56 starts the governance review/approval/audit executable loop boundary and explicit-input helper without durable writes or approval execution.
-8. P57 starts recall isolation runtime proof boundary inventory without executing the runtime proof or scanning real memory/runtime stores.
-9. P57-T2 adds the explicit-input evaluator for caller-provided P57 boundary/proof objects while keeping runtime proof blocked.
-10. P58-T1 defines the migration/import-export/backup-restore approval framework boundary inventory using docs/fixture/test evidence only.
-11. P58-T2 adds a pure explicit-input helper for caller-provided P58 approval metadata while keeping approval execution and all apply/restore actions blocked.
-12. P59-T1 defines the HTTP runtime observability / operation hardening boundary inventory as docs/fixture/test evidence only; it does not run live HTTP observation or make operation readiness claims.
-13. P59-T2 adds a pure explicit-input helper for caller-provided P59 HTTP observability evidence while keeping live HTTP operation and readiness blocked.
-14. P60 must extend no-touch / no-leak / redaction long-term regression without introducing runtime operations.
-15. P61 adds the RC evidence report boundary inventory and explicit-input report helper without executing mainline strict gate or final RC runner.
+6. P55 evidence-to-runtime trace contract and helper are complete locally; they map local evidence to runtime enforcement gaps without treating fixture/local evidence as runtime enforcement.
+7. P56 governance review/approval/audit executable loop boundary and explicit-input helper are complete locally without durable writes or approval execution.
+8. P57 recall isolation runtime proof boundary inventory and explicit-input evaluator are complete locally without executing the runtime proof or scanning real memory/runtime stores.
+9. P58 migration/import-export/backup-restore approval boundary and explicit-input helper are complete locally using docs/fixture/test evidence only; approval execution and all apply/restore actions remain blocked.
+10. P59 HTTP runtime observability / operation hardening boundary and explicit-input helper are complete locally as docs/fixture/test/helper evidence only; live HTTP operation readiness remains blocked.
+11. P60 no-touch / no-leak / redaction long-term regression is complete locally without introducing runtime operations.
+12. P61 RC evidence report boundary inventory and explicit-input report helper are complete locally without executing mainline strict gate or final RC runner.
+13. P62 cutover preflight boundary, completion audit, prompt-to-artifact audit, A5 precondition matrix, and post-T6 audit/refinement closeout are complete locally.
+14. The remaining P51-P62 work is blocked at runtime evidence and A5 authorization boundaries; do not convert local audit completion into runtime, final RC, cutover, push, release, deploy, config, watchdog, or `RC_READY` claims.
+15. Treat `CMB-0005`, `CMD-0012`, and `RR-0004` as controlling records for resume and completion-boundary decisions.
 16. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
