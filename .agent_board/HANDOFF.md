@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0262 / post-commit board reconciliation after guarded local commit `e4af76b`.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0266 / P29.4 ValidationAggregator schema policy evaluation report evidence.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty only for CM-0262 board-only post-commit reconciliation. CM-0255 through CM-0260 were committed locally in `e4af76b test: extend validation evidence summaries`; local `main` is ahead of `origin/main` by one commit before the CM-0262 board-only reconciliation. Push remains unauthorized.
+Dirty for completed CM-0266 source/test/fixture/board edits before guarded local commit. Local `main` is ahead of `origin/main` by 5 commits before the CM-0266 commit. Push remains unauthorized.
 
 ## Current Area
 
-P28.x validation aggregator evidence-reader chain post-commit reconciliation
+P29 schema/version runtime enforcement aggregator evidence bridge
 
 ## Findings
 
@@ -28,7 +28,7 @@ P28.x validation aggregator evidence-reader chain post-commit reconciliation
 - Temporary worktree `A:\codex-memory-gate-7fd17de` was created, verified, and removed during the approved execution.
 - Main workspace remained clean at `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
 - Recorded evidence includes `npm test 473/473`, `gate:ci` tests `458/458`, compare `43/43`, rollback `43/43`, `noProvider=true`, and `mutated=false`.
-- Current phase records evidence only and does not rerun gates.
+- Current phase records static ValidationAggregator evidence only and does not execute helper/runtime checks or rerun gates.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
 - Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
 - Target tag: `p22-rc-7fd17de`.
@@ -63,8 +63,10 @@ P28.x validation aggregator evidence-reader chain post-commit reconciliation
 - P28.1 adds explicit safe committed/local validation evidence input handling to `ValidationAggregatorService`.
 - CM-0254 validation passed: `node --check` changed JS files; targeted aggregator tests `8/8`, `9/9`, `13/13`; `npm test` `582/582`; `git diff --check`.
 - CM-0254 was committed and pushed at `52c4fef`; post-push `HEAD == origin/main`.
-- CM-0255 is board-only reconciliation to clear stale post-push state.
-- Next safe local candidate after CM-0255: P28 validation aggregator evidence freshness/status summary, fixture-first and explicit-input only.
+- CM-0255 through CM-0260 were committed locally in `e4af76b`; P28 board checkpoint was committed in `f33e757`.
+- P29.1 explicit-input `SchemaVersionPolicy` helper was committed in `a692f84`; P29.2 ValidationAggregator helper evidence was committed in `5765198`; P29.3 explicit policy evaluation report was committed in `fbb645e`.
+- CM-0266 is validated and pending guarded local commit. It surfaces P29.3 evaluation report capability in ValidationAggregator with `evaluationReportExecuted=false`, `runtimeIntegrated=false`, `runtimeEnforcementImplemented=false`, public MCP freeze, and `decision=NOT_READY_BLOCKED`.
+- Next safe local candidate after CM-0266 commit: CM-0267 P29 boundary hardening or report-shape bridge work, still fixture-first/read-only and no push.
 
 ## Changed Files
 
@@ -1349,3 +1351,29 @@ Remaining risks: schema/version runtime enforcement still required; helper repor
 Result: `SchemaVersionPolicy` can now build explicit evaluation reports with decision/error/family/operation counts, no-side-effect flags, no implicit fs reads, and fail-closed malformed-case behavior.
 
 Next safe step: guarded local commit for CM-0265, then CM-0266 report-shape bridge or further helper hardening if no hard stop appears. Push remains unauthorized.
+
+## CM-0266 Commander Handoff - P29.4 ValidationAggregator Schema Policy Evaluation Report Evidence
+
+Goal: surface the P29.3 explicit schema-policy evaluation report capability in ValidationAggregator evidence without executing the helper or changing runtime readiness.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0266 source/test/fixture/board edits; no push is authorized.
+
+Current area: `P29.4-validation-aggregator-schema-policy-evaluation-evidence`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted schema/aggregator tests `44/44`; `npm test` `596/596`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0266.
+
+Remaining risks: schema/version runtime enforcement still required; evaluation report is still not wired into `record_memory`, recall, imports/exports, migrations, or validation gate execution; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; push remains centrally directed by user.
+
+Result: ValidationAggregator now records `evaluationReportAvailable=true`, `evaluationReportExecuted=false`, `evaluationReportReadsFiles=false`, `evaluationReportMutatesInput=false`, and malformed-case fail-closed evidence.
+
+Next safe step: guarded local commit for CM-0266, then CM-0267 next safe P29 boundary slice if no hard stop appears. Push remains unauthorized.

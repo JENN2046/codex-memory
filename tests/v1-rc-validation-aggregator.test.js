@@ -198,6 +198,11 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.helper, 'src/core/SchemaVersionPolicy.js');
   assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.test, 'tests/schema-version-policy-runtime.test.js');
   assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.sourceMode, 'explicit_input');
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.evaluationReportAvailable, true);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.evaluationReportExecuted, false);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.evaluationReportReadsFiles, false);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.evaluationReportMutatesInput, false);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.evaluationReportMalformedCasesFailClosed, true);
   assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.readsFiles, false);
   assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.mutatesInput, false);
   assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.runtimeIntegrated, false);

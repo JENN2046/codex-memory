@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0262 / post-commit board reconciliation after guarded local commit `e4af76b`.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0266 / P29.4 ValidationAggregator schema policy evaluation report evidence.
 
 ## Current Area
 
-P28.x validation aggregator evidence-reader chain post-commit reconciliation
+P29 schema/version runtime enforcement aggregator evidence bridge
 
 ## Current Status
 
@@ -14,7 +14,7 @@ P28.x validation aggregator evidence-reader chain post-commit reconciliation
 - `rc_target_commit`: `7fd17de624c0da76751e863e97302bed0dbec905`.
 - `approval_request_commit`: `1ad3477b0f46eceef55608c0bbd3243c15681f38`.
 - Temporary gate execution checkout was created at `A:\codex-memory-gate-7fd17de`, verified at target HEAD, and removed.
-- Main workspace was clean and synced at `52c4fefe7836a7fd056fa408bde32bf1d2edbfef` / `52c4fef test: add validation aggregator evidence reader` before CM-0255/CM-0256 local edits.
+- Main workspace was clean and synced at `52c4fefe7836a7fd056fa408bde32bf1d2edbfef` / `52c4fef test: add validation aggregator evidence reader` before CM-0255/CM-0266 local edits.
 - Existing tag `p22-rc-806cc847` remains superseded and must not be moved or reused.
 - Current work closes the already-recorded local HTTP MCP deploy/validation evidence chain after approved release creation.
 - Artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`.
@@ -39,7 +39,9 @@ P28.x validation aggregator evidence-reader chain post-commit reconciliation
 - P24.1 fixture shape tests, P24.2 minimal core report builder, and P24.3 direct-node CLI wiring are committed locally.
 - P24.4 adds default/strict/help exit-code semantics and is committed locally.
 - P28.1 added the explicit safe validation evidence reader foundation, was validated, committed, and pushed at `52c4fef`.
-- P28.2 post-push board reconciliation, P28.3 explicit-input evidence freshness/status summary, P28.4 explicit-input gate-readiness summary, P28.5 explicit-input command/source coverage summary, P28.6 explicit-input rejection reason summary, and P28.7 explicit-input confidence posture summary are complete, validated, and committed locally in `e4af76b`. Push remains unauthorized.
+- P28.2 post-push board reconciliation, P28.3 explicit-input evidence freshness/status summary, P28.4 explicit-input gate-readiness summary, P28.5 explicit-input command/source coverage summary, P28.6 explicit-input rejection reason summary, and P28.7 explicit-input confidence posture summary are complete, validated, and committed locally in `e4af76b`. P28 post-commit board checkpoint is committed in `f33e757`.
+- P29.1 explicit-input `SchemaVersionPolicy` helper is committed in `a692f84`; P29.2 ValidationAggregator helper evidence is committed in `5765198`; P29.3 explicit policy evaluation report is committed in `fbb645e`.
+- Current CM-0266 changes are validated and pending guarded local commit: ValidationAggregator static evidence now records the P29.3 evaluation report capability with `evaluationReportExecuted=false`, `runtimeIntegrated=false`, `runtimeEnforcementImplemented=false`, and `decision=NOT_READY_BLOCKED`. Push remains unauthorized.
 
 ## Completed Work In This Batch
 
@@ -918,6 +920,19 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Changed files: `src/core/SchemaVersionPolicy.js`; `tests/schema-version-policy-runtime.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
 - Result: added `buildSchemaVersionPolicyEvaluationReport`, summarizing policy cases by decision, error, family, and operation while preserving no-side-effect safety flags. Tests cover committed fixture cases, no implicit fs reads, input immutability, and malformed explicit cases failing closed with `unknown_schema_family`.
 - Validation: `node --check src\core\SchemaVersionPolicy.js`; `node --check tests\schema-version-policy-runtime.test.js`; targeted schema tests `29/29`; `npm test` `596/596`; `git diff --check`.
+- Commit: eligible for guarded local commit; push remains user-directed and not authorized for this cycle.
+- Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
+- A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0266 - P29.4 ValidationAggregator Schema Policy Evaluation Report Evidence
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: static aggregator report-shape evidence for the P29.3 schema policy evaluation report capability.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: aggregator evidence now records that an explicit evaluation report exists while keeping `evaluationReportExecuted=false`, `runtimeIntegrated=false`, `runtimeEnforcementImplemented=false`, public MCP freeze, and `decision=NOT_READY_BLOCKED`.
+- Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted schema/aggregator tests `44/44`; `npm test` `596/596`; `git diff --check`.
 - Commit: eligible for guarded local commit; push remains user-directed and not authorized for this cycle.
 - Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
 - A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.

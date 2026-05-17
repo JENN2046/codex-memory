@@ -103,6 +103,11 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.test, 'tests/schema-version-policy-runtime.test.js');
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.sourceMode, 'explicit_input');
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.evaluatesAcceptedMissingUnknownVersions, true);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.evaluationReportAvailable, true);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.evaluationReportExecuted, false);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.evaluationReportReadsFiles, false);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.evaluationReportMutatesInput, false);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.evaluationReportMalformedCasesFailClosed, true);
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.rejectsUnknownFamilies, true);
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.readsFiles, false);
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.mutatesInput, false);
