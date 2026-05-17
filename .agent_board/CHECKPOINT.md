@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0290 / P33 memory governance audit-evidence safe-scope inventory.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0291 / P33.1 memory governance audit-evidence fixture contract.
 
 ## Current Area
 
-P33 docs/status/board inventory
+P33.1 fixture/test/status/board contract
 
 ## Current Status
 
@@ -65,8 +65,9 @@ P33 docs/status/board inventory
 - CM-0287 adds `src/core/MemoryGovernanceApprovalPacketContract.js` and `tests/memory-governance-approval-packet-helper.test.js`, a pure explicit-input helper over caller-provided approval packet objects only. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `664/664`, `git diff --check`, docs validation, P32.2 boundary reference scan, and read-only Verifier `PASS`. CM-0287 is committed locally in `c2eb3ec`.
 - CM-0288 adds static ValidationAggregator report-shape evidence for the P32.2 approval-packet helper. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator tests `21/21`, `npm test` `664/664`, `git diff --check`, docs validation, P32.3 boundary reference scan, read-only Verifier `PASS`, and post-commit checks. CM-0288 is committed locally in `1ec4343`.
 - CM-0289 adds `docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P32 only as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence. Validation passed: `git diff --check`, docs validation, P32.x boundary reference scan, and read-only Verifier `PASS`. CM-0289 is committed locally in `daf3360`.
-- CM-0290 adds `docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to inventory future governance audit evidence records without implementing audit writes. Validation passed: `git diff --check`, docs validation, P33 boundary reference scan, and read-only Verifier `PASS`.
-- Commander direction remains constrained: P33 may inventory audit evidence requirements only; durable audit writes, durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0290 adds `docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to inventory future governance audit evidence records without implementing audit writes. Validation passed: `git diff --check`, docs validation, P33 boundary reference scan, and read-only Verifier `PASS`. CM-0290 is committed locally in `2d34ccc`.
+- CM-0291 adds `tests/fixtures/memory-governance-audit-evidence-v1.json` and `tests/memory-governance-audit-evidence-fixture.test.js` for a synthetic audit-evidence fixture contract. Validation passed: new test syntax check, targeted fixture test `14/14`, `npm test` `678/678`, `git diff --check`, docs validation, P33.1 boundary scan, and read-only Verifier `PASS`.
+- Commander direction remains constrained: P33.1 may add fixture/test evidence only; durable audit writes, durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
