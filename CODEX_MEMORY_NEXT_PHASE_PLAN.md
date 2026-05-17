@@ -29,10 +29,10 @@ This active plan is the short routing document for the current P28-P40 Governed 
 
 P36-T1 Scope + A5 Boundary Contract:
 
-- Establish machine-readable A4-local-safe / A4.8-guarded / A5-hard-stop task risk labels.
+- Establish a synthetic policy decision envelope matrix for allow / deny / require_review / malformed / version mismatch / redaction uncertainty.
 - Keep `decision=NOT_READY_BLOCKED`.
 - Do not implement runtime policy enforcement or a runtime policy kernel.
-- Unknown/missing/ambiguous/unparsable risk labels must map to `A5-hard-stop`; critical gate skipped/unknown/warning-only must fail.
+- Policy decisions must not enter vector, candidate, diary, recall namespace, projection, or audit summary paths.
 - Do not approve governed actions or write durable state.
 
 ## Boundaries
@@ -51,6 +51,6 @@ P36-T1 Scope + A5 Boundary Contract:
 
 ## Next Candidate
 
-After P36-T2 validation, Commander may choose:
+After P37-T1 validation, Commander may choose:
 
-- `P37-T1-policy-decision-envelope-fixture-matrix`, only if it remains synthetic fixture-only and does not enter vector/candidate/diary recall paths.
+- `P38-recall-isolation-fixtures`, only if it remains synthetic fixture-only and proves governance/validation/redaction/policy/blocked/tombstoned/out-of-scope records stay out of normal recall paths.

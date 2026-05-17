@@ -1,0 +1,222 @@
+{
+  "schemaVersion": "p37-policy-decision-envelope-v1",
+  "policy_version": "p37-policy-v1",
+  "phase": "P37-T1-policy-decision-envelope-fixture-matrix",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "runtimeIntegrated": false,
+  "policyKernelImplemented": false,
+  "recallIntegrated": false,
+  "vectorPathTouched": false,
+  "candidatePathTouched": false,
+  "diaryPathTouched": false,
+  "projectionPathTouched": false,
+  "auditSummaryTouched": false,
+  "mutated": false,
+  "envelopeContract": {
+    "requiredFields": [
+      "decision_id",
+      "policy_version",
+      "decision",
+      "machine_status",
+      "reason_codes",
+      "risk_label",
+      "scope_metadata",
+      "evidence_source",
+      "failure_path"
+    ],
+    "acceptedDecisions": [
+      "allow",
+      "deny",
+      "require_review"
+    ],
+    "currentPolicyVersion": "p37-policy-v1",
+    "versionMismatchDisposition": "deny",
+    "malformedDisposition": "deny",
+    "redactionUncertaintyDisposition": "require_review",
+    "defaultAllow": false,
+    "failurePathExitCode": 1
+  },
+  "decisionCases": [
+    {
+      "id": "allow_local_fixture_only",
+      "decision_id": "p37-decision-allow-local-fixture-only",
+      "policy_version": "p37-policy-v1",
+      "decision": "allow",
+      "machine_status": "ALLOW_LOCAL_FIXTURE_ONLY",
+      "reason_codes": [
+        "P37_ALLOW_SYNTHETIC_FIXTURE_ONLY"
+      ],
+      "risk_label": "A4-local-safe",
+      "scope_metadata": {
+        "client": "synthetic-client",
+        "project": "synthetic-project",
+        "workspace": "synthetic-workspace",
+        "memory_kind": "policy_fixture",
+        "governance_record_kind": "policy_decision",
+        "source": "committed_fixture"
+      },
+      "evidence_source": {
+        "type": "committed_fixture",
+        "synthetic": true,
+        "readsRealMemoryContent": false
+      },
+      "failure_path": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "acceptedForPlanning": true
+    },
+    {
+      "id": "deny_a5_action",
+      "decision_id": "p37-decision-deny-a5-action",
+      "policy_version": "p37-policy-v1",
+      "decision": "deny",
+      "machine_status": "DENY_A5_HARD_STOP",
+      "reason_codes": [
+        "P37_A5_ACTION_BLOCKED"
+      ],
+      "risk_label": "A5-hard-stop",
+      "requested_action": "real_memory_scan",
+      "failure_path": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "acceptedForPlanning": false
+    },
+    {
+      "id": "require_review_redaction_uncertainty",
+      "decision_id": "p37-decision-require-review-redaction-uncertainty",
+      "policy_version": "p37-policy-v1",
+      "decision": "require_review",
+      "machine_status": "REQUIRE_REVIEW_REDACTION_UNCERTAINTY",
+      "reason_codes": [
+        "P37_REDACTION_UNCERTAINTY"
+      ],
+      "risk_label": "A4.8-guarded",
+      "summary_tokens": [
+        "policy-envelope",
+        "<REDACTED_SENSITIVE_FRAGMENT>",
+        "requires-review"
+      ],
+      "failure_path": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "acceptedForPlanning": false
+    },
+    {
+      "id": "deny_version_mismatch",
+      "decision_id": "p37-decision-deny-version-mismatch",
+      "policy_version": "p36-policy-v0",
+      "decision": "deny",
+      "machine_status": "DENY_POLICY_VERSION_MISMATCH",
+      "reason_codes": [
+        "P37_POLICY_VERSION_MISMATCH"
+      ],
+      "risk_label": "A4-local-safe",
+      "failure_path": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "acceptedForPlanning": false
+    },
+    {
+      "id": "deny_malformed_missing_decision_id",
+      "decision_id": null,
+      "policy_version": "p37-policy-v1",
+      "decision": "deny",
+      "machine_status": "DENY_MALFORMED_ENVELOPE",
+      "reason_codes": [
+        "P37_MALFORMED_ENVELOPE"
+      ],
+      "risk_label": "A4-local-safe",
+      "failure_path": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "acceptedForPlanning": false
+    },
+    {
+      "id": "deny_missing_reason_codes",
+      "decision_id": "p37-decision-deny-missing-reason-codes",
+      "policy_version": "p37-policy-v1",
+      "decision": "deny",
+      "machine_status": "DENY_MISSING_REASON_CODES",
+      "reason_codes": [],
+      "risk_label": "A4-local-safe",
+      "failure_path": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "acceptedForPlanning": false
+    },
+    {
+      "id": "deny_warning_only_gate",
+      "decision_id": "p37-decision-deny-warning-only-gate",
+      "policy_version": "p37-policy-v1",
+      "decision": "deny",
+      "machine_status": "DENY_WARNING_ONLY_GATE",
+      "reason_codes": [
+        "P37_WARNING_ONLY_GATE_BLOCKED"
+      ],
+      "risk_label": "A4.8-guarded",
+      "critical_gate_outcome": "warning_only",
+      "failure_path": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "acceptedForPlanning": false
+    }
+  ],
+  "isolation": {
+    "doesNotEnterVectorPath": true,
+    "doesNotEnterCandidatePath": true,
+    "doesNotEnterDiaryPath": true,
+    "doesNotEnterRecallNamespace": true,
+    "doesNotEnterProjection": true,
+    "doesNotEnterAuditSummary": true
+  },
+  "safety": {
+    "noRuntimePolicyKernel": true,
+    "noCommandExecution": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryContentRead": true,
+    "noRealMemoryPreview": true,
+    "noRealMemoryExport": true,
+    "noRealMemoryImport": true,
+    "noRealMemoryScan": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "structureLeakageApproved": false
+  },
+  "requiredWording": [
+    "P37-T1 is a synthetic policy decision envelope fixture matrix only.",
+    "Policy decisions do not enter vector, candidate, diary, projection, recall, or audit summary paths.",
+    "Version mismatch, malformed envelope, missing reason codes, warning-only gate, and A5 action requests fail closed.",
+    "Redaction uncertainty requires review and must not echo sensitive fragments.",
+    "Fixture validation does not mean runtime policy kernel enforcement is implemented."
+  ],
+  "forbiddenClaims": [
+    "policy kernel is runtime-ready",
+    "decision fixture may read real memory",
+    "policy decisions enter normal recall",
+    "version mismatch may pass",
+    "redaction uncertainty may allow",
+    "P37 makes v1.0 RC ready"
+  ],
+  "next": "P38-recall-isolation-fixtures"
+}

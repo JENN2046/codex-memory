@@ -11,7 +11,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local baseline: `main` is ahead of `origin/main` by CM-0307 local commit `408a92c`.
+- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c` and CM-0308 `d1f48c2`.
 - Current active program: P36-P40 Boundary-first Governed Memory Spine.
 - Current phase area: P36 Scope And A5 Boundary Contract; fixture-only / dry-run-only.
 
@@ -25,8 +25,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P35 | governed-memory-spine | A1 | done | Governed memory spine policy gate planning | `git diff --check`; docs validation; boundary scan; Verifier | Complete locally in `29858e6`; docs/status/board only; no runtime policy gate implementation. |
 | P35.1 | governed-memory-spine | A1/A2 | done | Governed memory policy gate fixture contract | targeted fixture test; `npm test`; docs validation; Verifier | Complete locally in `c8325b6`; synthetic fixture/test only; preserves `NOT_READY_BLOCKED` and committed/local source-type whitelist. |
 | P36-T1 | governed-memory-spine | A1/A2 | done | Scope + A5 Boundary Contract fixture | targeted fixture test; `npm test`; docs validation; Verifier | Complete in local commit `408a92c`; establishes scope metadata, A5 deny list, governance namespace isolation, public MCP freeze, and unknown/missing fail-closed fixtures. |
-| P36-T2 | governed-memory-spine | A2 | in_progress | Task Risk Labels Contract | targeted fixture/helper tests; `npm test`; docs validation; Verifier | Define A4-local-safe / A4.8-guarded / A5-hard-stop as machine-readable, fail-closed semantics. |
-| P37-T1 | governed-memory-spine | A2 | todo | Policy Decision Envelope Fixture Matrix | targeted fixture/helper tests; `npm test`; docs validation; Verifier | Must remain synthetic fixture evidence only; no vector/candidate/diary recall path integration. |
+| P36-T2 | governed-memory-spine | A2 | done | Task Risk Labels Contract | targeted fixture/helper tests; `npm test`; docs validation; Verifier | Complete in local commit `d1f48c2`; defines A4-local-safe / A4.8-guarded / A5-hard-stop as machine-readable, fail-closed semantics. |
+| P37-T1 | governed-memory-spine | A2 | in_progress | Policy Decision Envelope Fixture Matrix | targeted fixture tests; `npm test`; docs validation; Verifier | Must remain synthetic fixture evidence only; no vector/candidate/diary recall path integration. |
 
 ## Standing Boundaries
 

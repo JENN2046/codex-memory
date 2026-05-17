@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `3e3f76d fix: harden local http and governance redaction`。
-- 当前本地基线：`main` ahead `origin/main` by local CM-0307 commit `408a92c test: add p36 boundary contract fixture`。
+- 当前本地基线：`main` ahead `origin/main` by local CM-0307 `408a92c` and CM-0308 `d1f48c2`。
 - 最新已推送完成：P35.1 governed memory policy gate fixture contract、P35 post-push board reconciliation、P35 security hardening 均已推送到 `3e3f76d`。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P36-T2 Task Risk Labels Contract，本地 fixture-only / dry-run-only 风险标签语义切片。
+- 当前任务：P37-T1 Policy Decision Envelope Fixture Matrix，本地 synthetic fixture-only 决策 envelope 矩阵。
 
 ## 当前阻塞
 
@@ -21,9 +21,9 @@
 
 ## 当前优先级
 
-1. 完成 P36-T2 A4-local-safe / A4.8-guarded / A5-hard-stop machine-readable risk label fixture contract。
-2. 继续 P37-T1 policy decision envelope fixture matrix，保持 synthetic fixture-only，不进入 vector/candidate/diary recall path。
-3. P37 前不得让 policy decisions、validation transcripts、redaction samples 或 governance records 进入普通 recall namespace。
+1. 完成 P37-T1 allow / deny / require_review / malformed / version mismatch / redaction uncertainty fixture matrix。
+2. 继续 P38 recall isolation fixtures，证明治理记录、validation transcripts、redaction samples、blocked/tombstoned/out-of-scope memory 不进入普通 recall/candidate/ranking/projection/audit summary。
+3. P37/P38 不得连接 vector/candidate/diary recall path 或声称 runtime-ready。
 
 ## 主要事实源
 
