@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0278 / P30.x closeout plus CM-0278A manifest source-type whitelist hardening.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0279 / P31 memory governance safe-scope inventory.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0278 docs/board closeout updates and CM-0278A source/test hardening. Local `main` is ahead of `origin/main` by the post-push board result commit; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0279 docs/board-only inventory updates. Local `main` is ahead of `origin/main` by two local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P30.x closeout plus P30.2 helper whitelist hardening
+P31 docs/board-only governance inventory
 
 ## Findings
 
@@ -81,7 +81,9 @@ P30.x closeout plus P30.2 helper whitelist hardening
 - CM-0278 adds P30 closeout review docs and routes the next safe phase to P31 memory governance safe-scope inventory.
 - CM-0278A tightens P30 manifest helper source type validation with `SAFE_SOURCE_TYPES`; unsupported `acceptedSourceTypes` now fail closed with `acceptedForPlanning=false`.
 - Validation passed so far: helper syntax checks, targeted helper test `8/8`, `npm test` `618/618`, `git diff --check`, docs validation, and P30/P31 boundary scan.
-- Next safe step: run read-only Verifier, create guarded local commit if eligible, then continue to CM-0279/P31 memory governance safe-scope inventory. No further push is authorized.
+- CM-0278/CM-0278A are committed locally in `8f01654`; no push is authorized.
+- CM-0279 adds P31 memory governance safe-scope inventory docs and routes the next safe phase to P31.1 fixture contract review. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, and governance reference scan. Read-only Verifier first pass found stale pushed-baseline wording only; rerun passed. Commit is pending.
+- Next safe step: create guarded local commit if eligible, then continue to CM-0280/P31.1 fixture contract review. No further push is authorized.
 
 ## Changed Files
 

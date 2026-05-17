@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0278 / P30.x closeout plus CM-0278A manifest source-type whitelist hardening.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0279 / P31 memory governance safe-scope inventory.
 
 ## Current Area
 
-P30.x closeout plus P30.2 helper whitelist hardening
+P31 docs/board-only governance inventory
 
 ## Current Status
 
@@ -51,9 +51,11 @@ P30.x closeout plus P30.2 helper whitelist hardening
 - CM-0277 validation passed: `node --check` changed JS files; targeted aggregator tests `21/21`; `npm test` `617/617`; `git diff --check`; `scripts\validate-local.ps1 -Area docs`. Read-only Verifier first pass found only board validation wording drift; rerun passed.
 - CM-0277 guarded local commit `405ce73` was pushed by explicit user instruction. Post-push alignment verified: `HEAD == origin/main == 405ce73637c71fb4843bffbd27a3e3fbaeb4b3e6`.
 - CM-0277 post-push board result is committed locally in `7abebed`; no further push is authorized.
-- CM-0278 adds `docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P30 as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence only. Validation/Verifier/commit are pending.
+- CM-0278 adds `docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P30 as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence only.
 - CM-0278A adds `SAFE_SOURCE_TYPES` in `FinalRcValidationMatrixManifest` and fails closed when `acceptedSourceTypes` contains unsupported values. Targeted helper test `8/8` and full suite `618/618` passed.
-- Commander direction remains constrained: P30 may consume explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0278/CM-0278A are committed locally in `8f01654`; no push is authorized.
+- CM-0279 adds `docs/P31_MEMORY_GOVERNANCE_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to open memory governance only as docs/fixture-first inventory. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, and governance reference scan. Read-only Verifier first pass found stale pushed-baseline wording only; rerun passed. Commit is pending.
+- Commander direction remains constrained: P31 may inventory proposal/supersession/tombstone/validation/audit/approval boundaries only; durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
