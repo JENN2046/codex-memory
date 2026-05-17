@@ -4,7 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const {
-  buildV1RcValidationAggregatorReport
+  VALIDATION_EVIDENCE_SOURCE_TYPES,
+  buildV1RcValidationAggregatorReport,
+  normalizeValidationEvidenceSources
 } = require('../src/core/ValidationAggregatorService');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'v1-rc-validation-aggregator-v1.json');
@@ -56,6 +58,9 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.liveMcpHttpEvidenceRefreshed, false);
   assert.equal(report.summary.validationAggregatorImplemented, true);
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
+  assert.equal(report.summary.validationEvidenceReaderImplemented, true);
+  assert.equal(report.summary.validationEvidenceSourceContract, 'explicit_safe_inputs_only');
+  assert.equal(report.summary.validationEvidenceAcceptedCount, 0);
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
   assert.equal(report.summary.schemaCompatibilityDryRunCliImplemented, true);
   assert.equal(report.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
@@ -108,6 +113,14 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p27MigrationImportExportApprovalPacketCli.backupRestorePerformed, false);
   assert.equal(report.evidence.p27MigrationImportExportApprovalPacketCli.durableReportWritten, false);
   assert.equal(report.evidence.p27MigrationImportExportApprovalPacketCli.packageScriptAdded, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.status, 'no_explicit_validation_evidence');
+  assert.equal(report.evidence.p28ValidationEvidenceReader.implemented, true);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.fullImplementation, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.contract.readsFiles, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.contract.executesCommands, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.contract.callsProviders, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.contract.mutatesDurableState, false);
+  assert.equal(report.evidence.p28ValidationEvidenceReader.acceptedCount, 0);
 });
 
 test('minimal implementation preserves public MCP three-tool freeze', () => {
@@ -132,6 +145,7 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.equal(report.evidence_sources.schema_compatibility_dry_run_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
+  assert.equal(report.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
@@ -140,6 +154,104 @@ test('minimal implementation maps current conclusions to documented evidence sou
     'search_memory',
     'memory_overview'
   ]);
+});
+
+test('validation evidence reader exposes only explicit committed and local validation inputs', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    validationEvidenceSources: [
+      {
+        id: 'cmv-0333-committed',
+        source_type: 'committed_validation',
+        status: 'passed',
+        source_ref: '.agent_board/VALIDATION_LOG.md#CMV-0333',
+        observed_at: '2026-05-17T00:00:00.000Z',
+        commit: '9631b7e',
+        commands: ['git diff --check'],
+        summary: 'P27 closeout docs validation passed.',
+        safety: {
+          mutated: false,
+          providerCalls: 0,
+          serviceStarted: false,
+          durableMemoryTouched: false,
+          realMemoryPreview: false
+        }
+      },
+      {
+        id: 'p28-targeted-local',
+        source_type: 'local_validation',
+        status: 'passed',
+        source_ref: 'tests/v1-rc-validation-aggregator-implementation.test.js',
+        commands: ['node --test tests\\v1-rc-validation-aggregator-implementation.test.js'],
+        summary: 'Targeted aggregator evidence-reader test input.',
+        safety: {
+          mutated: false
+        }
+      }
+    ]
+  });
+
+  const reader = report.evidence.p28ValidationEvidenceReader;
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
+  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.validationEvidenceAcceptedCount, 2);
+  assert.equal(reader.status, 'explicit_evidence_available');
+  assert.equal(reader.sourceMode, 'explicit_safe_inputs_only');
+  assert.deepEqual(reader.contract.sourceTypes, VALIDATION_EVIDENCE_SOURCE_TYPES);
+  assert.equal(reader.contract.readsFiles, false);
+  assert.equal(reader.contract.executesCommands, false);
+  assert.equal(reader.contract.startsServices, false);
+  assert.equal(reader.acceptedCount, 2);
+  assert.equal(reader.rejectedCount, 0);
+  assert.equal(reader.summary.committedValidationCount, 1);
+  assert.equal(reader.summary.localValidationCount, 1);
+  assert.equal(reader.summary.passedCount, 2);
+  assert.equal(reader.summary.allAcceptedSafe, true);
+  assert.deepEqual(reader.acceptedSources.map(source => source.id), [
+    'cmv-0333-committed',
+    'p28-targeted-local'
+  ]);
+  assert.equal(reader.acceptedSources[0].safety.providerCalls, 0);
+  assert.equal(reader.acceptedSources[0].safety.serviceStarted, false);
+  assert.equal(reader.acceptedSources[0].safety.durableMemoryTouched, false);
+  assert.equal(reader.acceptedSources[0].safety.realMemoryPreview, false);
+});
+
+test('validation evidence reader rejects unsafe, unsupported, or sensitive explicit inputs', () => {
+  const reader = normalizeValidationEvidenceSources([
+    {
+      id: 'provider-side-effect',
+      source_type: 'local_validation',
+      status: 'passed',
+      source_ref: 'manual-input',
+      safety: {
+        providerCalls: 1
+      }
+    },
+    {
+      id: 'unsupported-kind',
+      source_type: 'live_validation',
+      status: 'passed',
+      source_ref: 'manual-input'
+    },
+    {
+      id: 'sensitive-summary',
+      source_type: 'local_validation',
+      status: 'passed',
+      source_ref: 'manual-input',
+      summary: 'authorization: should be rejected'
+    }
+  ]);
+
+  assert.equal(reader.acceptedCount, 0);
+  assert.equal(reader.rejectedCount, 3);
+  assert.deepEqual(reader.rejectedSources.map(source => source.reason), [
+    'side_effect_evidence_rejected',
+    'unsupported_source_type',
+    'sensitive_fragment_rejected'
+  ]);
+  assert.equal(JSON.stringify(reader).toLowerCase().includes('authorization:'), false);
 });
 
 test('minimal implementation classifies A4, A5, runtime-required, and conditional live items', () => {

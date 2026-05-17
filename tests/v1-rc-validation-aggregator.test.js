@@ -110,6 +110,7 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.equal(fixture.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
   assert.equal(fixture.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(fixture.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
+  assert.equal(fixture.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
   assert.equal(fixture.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(fixture.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
   assert.equal(fixture.decision, 'NOT_READY_BLOCKED');
@@ -148,6 +149,9 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.summary.fullFinalRcMatrixExecuted, false);
   assert.equal(fixture.summary.liveMcpHttpEvidenceRefreshed, false);
   assert.equal(fixture.summary.validationAggregatorImplemented, false);
+  assert.equal(fixture.summary.validationEvidenceReaderImplemented, true);
+  assert.equal(fixture.summary.validationEvidenceSourceContract, 'explicit_safe_inputs_only');
+  assert.equal(fixture.summary.validationEvidenceAcceptedCount, 0);
   assert.equal(fixture.summary.schemaVersionRuntimeEnforcementImplemented, false);
   assert.equal(fixture.summary.schemaCompatibilityDryRunCliImplemented, true);
   assert.equal(fixture.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
@@ -213,6 +217,18 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.backupRestorePerformed, false);
   assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.durableReportWritten, false);
   assert.equal(fixture.evidence.p27MigrationImportExportApprovalPacketCli.packageScriptAdded, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.status, 'no_explicit_validation_evidence');
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.implemented, true);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.fullImplementation, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.sourceMode, 'explicit_safe_inputs_only');
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.contract.readsFiles, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.contract.executesCommands, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.contract.startsServices, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.contract.callsProviders, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.contract.mutatesDurableState, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.contract.acceptsRealMemoryPreview, false);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.acceptedCount, 0);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.rejectedCount, 0);
 });
 
 test('check groups classify A4-safe, A5-gated, runtime-required, and conditional live work', () => {

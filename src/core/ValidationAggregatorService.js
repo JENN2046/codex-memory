@@ -11,6 +11,30 @@ const DECISION_LABELS = [
 
 const PUBLIC_MCP_TOOLS = TOOL_DEFINITIONS.map(tool => tool.name);
 
+const VALIDATION_EVIDENCE_SOURCE_TYPES = [
+  'committed_validation',
+  'local_validation'
+];
+
+const VALIDATION_EVIDENCE_STATUSES = [
+  'passed',
+  'failed',
+  'blocked',
+  'not_executed',
+  'warning',
+  'unknown'
+];
+
+const FORBIDDEN_EVIDENCE_FRAGMENTS = [
+  'authorization:',
+  'bearer ',
+  'set-cookie',
+  'api_key',
+  'providerapikey',
+  'workspace_id',
+  '.env='
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -76,6 +100,11 @@ const EVIDENCE_SOURCES = {
     source_type: 'runtime_gap',
     source_ref: 'docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md',
     status: 'minimal_only'
+  },
+  validation_evidence_reader: {
+    source_type: 'explicit_safe_input_contract',
+    source_ref: 'ValidationAggregatorService validationEvidenceSources[]',
+    status: 'foundation_added_read_only'
   }
 };
 
@@ -113,9 +142,173 @@ function buildBlocker(id, { status, category, requiresA5 = false, requiresRuntim
   };
 }
 
+function includesForbiddenEvidenceFragment(value) {
+  const encoded = JSON.stringify(value ?? '').toLowerCase();
+  return FORBIDDEN_EVIDENCE_FRAGMENTS.some(fragment => encoded.includes(fragment));
+}
+
+function safeEvidenceId(value, fallback) {
+  if (typeof value !== 'string' || value.trim() === '') return fallback;
+  if (includesForbiddenEvidenceFragment(value)) return fallback;
+  return value.trim().slice(0, 120);
+}
+
+function safeEvidenceString(value, fallback = '') {
+  if (typeof value !== 'string' || value.trim() === '') return fallback;
+  if (includesForbiddenEvidenceFragment(value)) return '<redacted>';
+  return value.trim().slice(0, 240);
+}
+
+function normalizeEvidenceCommands(commands) {
+  if (!Array.isArray(commands)) return [];
+  return commands
+    .filter(command => typeof command === 'string' && command.trim() !== '')
+    .map(command => safeEvidenceString(command))
+    .filter(command => command && command !== '<redacted>')
+    .slice(0, 12);
+}
+
+function hasUnsafeEvidenceSideEffect(source) {
+  const safety = source && typeof source.safety === 'object' && source.safety
+    ? source.safety
+    : {};
+
+  return safety.mutated === true ||
+    Number(safety.providerCalls || 0) > 0 ||
+    safety.serviceStarted === true ||
+    safety.durableMemoryTouched === true ||
+    safety.realMemoryPreview === true ||
+    safety.migrationApplied === true ||
+    safety.importExportApplied === true ||
+    safety.watchdogStartupInstalled === true ||
+    safety.configChanged === true ||
+    safety.pushed === true ||
+    safety.tagged === true ||
+    safety.released === true ||
+    safety.deployed === true;
+}
+
+function normalizeValidationEvidenceSources(sources = []) {
+  const inputSources = Array.isArray(sources) ? sources : [];
+  const acceptedSources = [];
+  const rejectedSources = [];
+
+  inputSources.forEach((source, index) => {
+    const fallbackId = `validation-evidence-${index + 1}`;
+    const id = safeEvidenceId(source && source.id, fallbackId);
+
+    if (!source || typeof source !== 'object' || Array.isArray(source)) {
+      rejectedSources.push({
+        id,
+        accepted: false,
+        reason: 'invalid_source_shape'
+      });
+      return;
+    }
+
+    if (includesForbiddenEvidenceFragment(source)) {
+      rejectedSources.push({
+        id,
+        accepted: false,
+        reason: 'sensitive_fragment_rejected'
+      });
+      return;
+    }
+
+    if (!VALIDATION_EVIDENCE_SOURCE_TYPES.includes(source.source_type)) {
+      rejectedSources.push({
+        id,
+        accepted: false,
+        reason: 'unsupported_source_type'
+      });
+      return;
+    }
+
+    if (!VALIDATION_EVIDENCE_STATUSES.includes(source.status)) {
+      rejectedSources.push({
+        id,
+        accepted: false,
+        reason: 'unsupported_status'
+      });
+      return;
+    }
+
+    if (hasUnsafeEvidenceSideEffect(source)) {
+      rejectedSources.push({
+        id,
+        accepted: false,
+        reason: 'side_effect_evidence_rejected'
+      });
+      return;
+    }
+
+    acceptedSources.push({
+      id,
+      source_type: source.source_type,
+      status: source.status,
+      source_ref: safeEvidenceString(source.source_ref, 'explicit-safe-input'),
+      observed_at: safeEvidenceString(source.observed_at, ''),
+      commit: safeEvidenceString(source.commit, ''),
+      commands: normalizeEvidenceCommands(source.commands),
+      summary: safeEvidenceString(source.summary, ''),
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        durableMemoryTouched: false,
+        realMemoryPreview: false,
+        migrationApplied: false,
+        importExportApplied: false,
+        configChanged: false,
+        pushed: false,
+        tagged: false,
+        released: false,
+        deployed: false
+      }
+    });
+  });
+
+  return {
+    sourceMode: 'explicit_safe_inputs_only',
+    contract: {
+      sourceTypes: VALIDATION_EVIDENCE_SOURCE_TYPES,
+      statuses: VALIDATION_EVIDENCE_STATUSES,
+      readsFiles: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      mutatesDurableState: false,
+      acceptsRealMemoryPreview: false
+    },
+    sourceCount: inputSources.length,
+    acceptedCount: acceptedSources.length,
+    rejectedCount: rejectedSources.length,
+    acceptedSources,
+    rejectedSources,
+    summary: {
+      committedValidationCount: acceptedSources.filter(source => source.source_type === 'committed_validation').length,
+      localValidationCount: acceptedSources.filter(source => source.source_type === 'local_validation').length,
+      passedCount: acceptedSources.filter(source => source.status === 'passed').length,
+      failedCount: acceptedSources.filter(source => source.status === 'failed').length,
+      blockedCount: acceptedSources.filter(source => source.status === 'blocked').length,
+      notExecutedCount: acceptedSources.filter(source => source.status === 'not_executed').length,
+      allAcceptedReadOnly: acceptedSources.every(source => source.safety.mutated === false),
+      allAcceptedSafe: acceptedSources.every(source =>
+        source.safety.providerCalls === 0 &&
+        source.safety.serviceStarted === false &&
+        source.safety.durableMemoryTouched === false &&
+        source.safety.realMemoryPreview === false
+      )
+    }
+  };
+}
+
 function buildV1RcValidationAggregatorReport({
-  generatedAt = new Date().toISOString()
+  generatedAt = new Date().toISOString(),
+  validationEvidenceSources = []
 } = {}) {
+  const validationEvidenceReader = normalizeValidationEvidenceSources(validationEvidenceSources);
+
   return {
     schemaVersion: 'v1-rc-validation-aggregator-v1',
     version: 'v1',
@@ -146,6 +339,9 @@ function buildV1RcValidationAggregatorReport({
       liveMcpHttpEvidenceRefreshed: false,
       validationAggregatorImplemented: true,
       validationAggregatorFullImplementation: false,
+      validationEvidenceReaderImplemented: true,
+      validationEvidenceSourceContract: validationEvidenceReader.sourceMode,
+      validationEvidenceAcceptedCount: validationEvidenceReader.acceptedCount,
       schemaVersionRuntimeEnforcementImplemented: false,
       schemaCompatibilityDryRunCliImplemented: true,
       schemaCompatibilityDryRunCliFixtureOnly: true,
@@ -382,6 +578,14 @@ function buildV1RcValidationAggregatorReport({
         backupRestorePerformed: false,
         durableReportWritten: false,
         packageScriptAdded: false
+      },
+      p28ValidationEvidenceReader: {
+        status: validationEvidenceReader.acceptedCount > 0
+          ? 'explicit_evidence_available'
+          : 'no_explicit_validation_evidence',
+        implemented: true,
+        fullImplementation: false,
+        ...validationEvidenceReader
       }
     },
     evidence_sources: EVIDENCE_SOURCES,
@@ -484,5 +688,8 @@ function buildV1RcValidationAggregatorReport({
 
 module.exports = {
   DECISION_LABELS,
-  buildV1RcValidationAggregatorReport
+  VALIDATION_EVIDENCE_SOURCE_TYPES,
+  VALIDATION_EVIDENCE_STATUSES,
+  buildV1RcValidationAggregatorReport,
+  normalizeValidationEvidenceSources
 };

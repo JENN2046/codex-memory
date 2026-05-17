@@ -34,6 +34,9 @@
     "fullFinalRcMatrixExecuted": false,
     "liveMcpHttpEvidenceRefreshed": false,
     "validationAggregatorImplemented": false,
+    "validationEvidenceReaderImplemented": true,
+    "validationEvidenceSourceContract": "explicit_safe_inputs_only",
+    "validationEvidenceAcceptedCount": 0,
     "schemaVersionRuntimeEnforcementImplemented": false,
     "schemaCompatibilityDryRunCliImplemented": true,
     "schemaCompatibilityDryRunCliFixtureOnly": true,
@@ -275,6 +278,47 @@
       "backupRestorePerformed": false,
       "durableReportWritten": false,
       "packageScriptAdded": false
+    },
+    "p28ValidationEvidenceReader": {
+      "status": "no_explicit_validation_evidence",
+      "implemented": true,
+      "fullImplementation": false,
+      "sourceMode": "explicit_safe_inputs_only",
+      "contract": {
+        "sourceTypes": [
+          "committed_validation",
+          "local_validation"
+        ],
+        "statuses": [
+          "passed",
+          "failed",
+          "blocked",
+          "not_executed",
+          "warning",
+          "unknown"
+        ],
+        "readsFiles": false,
+        "executesCommands": false,
+        "startsServices": false,
+        "callsProviders": false,
+        "mutatesDurableState": false,
+        "acceptsRealMemoryPreview": false
+      },
+      "sourceCount": 0,
+      "acceptedCount": 0,
+      "rejectedCount": 0,
+      "acceptedSources": [],
+      "rejectedSources": [],
+      "summary": {
+        "committedValidationCount": 0,
+        "localValidationCount": 0,
+        "passedCount": 0,
+        "failedCount": 0,
+        "blockedCount": 0,
+        "notExecutedCount": 0,
+        "allAcceptedReadOnly": true,
+        "allAcceptedSafe": true
+      }
     }
   },
   "evidence_sources": {
@@ -342,6 +386,11 @@
       "source_type": "runtime_gap",
       "source_ref": "docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md",
       "status": "minimal_only"
+    },
+    "validation_evidence_reader": {
+      "source_type": "explicit_safe_input_contract",
+      "source_ref": "ValidationAggregatorService validationEvidenceSources[]",
+      "status": "foundation_added_read_only"
     }
   },
   "blockers": [

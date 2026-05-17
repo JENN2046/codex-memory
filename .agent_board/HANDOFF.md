@@ -1090,3 +1090,27 @@ HTTP health: no service action for CM-0253.
 Remaining risks: no further push is authorized by the current `continue` instruction; real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore touching live state, durable writes, provider/model calls, public MCP expansion, push/tag/release/deploy, and service startup remain separately gated.
 
 Next safe step: guarded local commit if final status/diff review remains clean, then pause before selecting any new phase because P27 is closed and push still requires explicit authorization.
+
+## CM-0254 Commander Handoff - P28.1 ValidationAggregator Evidence-Reader Foundation
+
+Goal: move `ValidationAggregatorService` one step from static blocked-state report builder toward a read-only evidence reader.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0254 source/test/board edits; no local commit created.
+
+Current area: `P28.1-validation-aggregator-evidence-reader-foundation`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted aggregator tests `8/8`, `9/9`, `13/13`; `npm test` `582/582`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0254.
+
+Remaining risks: schema/version runtime enforcement still required; validation aggregator full implementation still incomplete; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; no push is authorized.
+
+Next safe step: user may request a guarded local commit or select another local fixture-first phase; remote actions remain separately gated.

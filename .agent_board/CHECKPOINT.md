@@ -773,3 +773,15 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Validation: `git diff --check`; docs validation; P27 closeout reference scan; read-only Verifier `PASS`.
 - Commit readiness: `eligible`; guarded local commit pending final status/diff review.
 - A5 boundary: no source/test/package/runtime/provider/data/public MCP expansion, durable write, real memory scan/export/import, SQLite migration apply, import/export apply, backup/restore, service start, push, tag, release, or deploy.
+
+## CM-0254 - P28.1 ValidationAggregator Evidence-Reader Foundation
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: local fixture-first foundation for explicit committed/local validation evidence inputs in `ValidationAggregatorService`.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/*`.
+- Result: aggregator now exposes `p28ValidationEvidenceReader` with an `explicit_safe_inputs_only` contract, accepts `committed_validation` / `local_validation` inputs passed by the caller, rejects unsupported/side-effectful/sensitive inputs, and keeps `decision=NOT_READY_BLOCKED`.
+- Validation: syntax checks passed for changed JS test/source files; targeted aggregator tests `8/8`, `9/9`, `13/13`; `npm test` `582/582`; `git diff --check` passed.
+- Commit: not created for CM-0254.
+- A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
