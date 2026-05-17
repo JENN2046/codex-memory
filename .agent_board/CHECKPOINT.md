@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0273 / P30.1 final RC validation matrix runner fixture contract.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0275 / P30.2 final RC validation matrix runner manifest helper.
 
 ## Current Area
 
-P30.1 final RC validation matrix runner fixture contract
+P30.2 manifest helper candidate
 
 ## Current Status
 
@@ -42,7 +42,8 @@ P30.1 final RC validation matrix runner fixture contract
 - P28.2 post-push board reconciliation, P28.3 explicit-input evidence freshness/status summary, P28.4 explicit-input gate-readiness summary, P28.5 explicit-input command/source coverage summary, P28.6 explicit-input rejection reason summary, and P28.7 explicit-input confidence posture summary are complete, validated, and committed locally in `e4af76b`. P28 post-commit board checkpoint is committed in `f33e757`.
 - P29.1 explicit-input `SchemaVersionPolicy` helper is committed in `a692f84`; P29.2 ValidationAggregator helper evidence is committed in `5765198`; P29.3 explicit policy evaluation report is committed in `fbb645e`.
 - CM-0266 and CM-0267 are committed locally through `88bfd59`; CM-0268 is committed locally in `89d5db8`; CM-0269 is committed locally in `e957885`; CM-0270 board reconciliation is committed locally in `29d0b83`; CM-0271 P29 closeout is committed locally in `4093b3e`; CM-0272 P30 safe-scope inventory is committed locally in `6c6c3d7`.
-- Current CM-0273 changes add a synthetic fixture and focused fixture test for the future final RC validation matrix runner safe input contract. Validation passed: syntax check, targeted fixture test `11/11`, `npm test` `610/610`, `git diff --check`, docs validation, forbidden-fragment scan with intentional fixture-list hits only, and read-only Verifier `PASS`. Guarded local commit is pending. Commander direction remains constrained: P30 may consume explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0273 added a synthetic fixture and focused fixture test for the future final RC validation matrix runner safe input contract. Validation passed: syntax check, targeted fixture test `11/11`, `npm test` `610/610`, `git diff --check`, docs validation, forbidden-fragment scan with intentional fixture-list hits only, and read-only Verifier `PASS`. CM-0273 is committed locally in `5d91dac`.
+- Current CM-0274 changes are completed board-only reconciliation after `5d91dac`, clearing stale pending-commit wording and routing next work to CM-0275/P30.2 pure helper candidate. Validation passed: `git diff --check`, docs validation, and board diff inspection. Commander direction remains constrained: P30 may consume explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
