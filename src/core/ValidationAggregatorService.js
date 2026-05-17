@@ -145,6 +145,11 @@ const EVIDENCE_SOURCES = {
     source_ref: 'src/core/FinalRcValidationMatrixManifest.js / tests/final-rc-validation-matrix-runner-manifest-helper.test.js / tests/fixtures/final-rc-validation-matrix-runner-safe-scope-v1.json',
     status: 'helper_added_report_shape_only_not_executed'
   },
+  memory_governance_lifecycle_contract_helper: {
+    source_type: 'explicit_input_governance_helper',
+    source_ref: 'src/core/MemoryGovernanceLifecycleContract.js / tests/memory-governance-lifecycle-contract-helper.test.js / tests/fixtures/memory-governance-lifecycle-contract-v1.json',
+    status: 'helper_added_report_shape_only_not_executed'
+  },
   public_mcp_tools: {
     source_type: 'code_contract',
     source_ref: 'src/core/constants.js',
@@ -778,6 +783,14 @@ function buildV1RcValidationAggregatorReport({
       finalRcValidationMatrixExecuted: false,
       finalRcValidationMatrixCanExecuteRunner: false,
       finalRcValidationMatrixCanClaimFinalRcReady: false,
+      memoryGovernanceLifecycleContractHelperImplemented: true,
+      memoryGovernanceLifecycleContractHelperExplicitInputOnly: true,
+      memoryGovernanceLifecycleContractHelperExecuted: false,
+      memoryGovernanceLifecycleContractHelperRuntimeIntegrated: false,
+      memoryGovernanceLifecycleContractPublicMcpExpanded: false,
+      memoryGovernanceLifecycleContractDurableMutationPerformed: false,
+      memoryGovernanceLifecycleContractRealMemoryScanned: false,
+      memoryGovernanceLifecycleContractCanClaimGovernanceReady: false,
       productionDeployPerformed: false,
       startupWatchdogInstalled: false,
       codexClaudeConfigSwitched: false,
@@ -874,6 +887,13 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true,
         evidence: 'P30.2 pure manifest helper evaluates explicit caller-provided fixture/report input only; P30.3 records report-shape evidence without executing the helper or runner.'
       }),
+      memoryGovernanceLifecycleContractHelper: createCheck({
+        status: 'helper_added_report_shape_only_not_executed',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P31.3 pure governance lifecycle helper evaluates explicit caller-provided contract input only; P31.4 records report-shape evidence without executing the helper or reading the fixture.'
+      }),
       validationAggregatorExecutable: createCheck({
         status: 'minimal_implemented',
         requiredBeforeV1Rc: true,
@@ -930,6 +950,7 @@ function buildV1RcValidationAggregatorReport({
       'migrationImportExportDryRunGateCli',
       'migrationImportExportApprovalPacketCli',
       'finalRcValidationMatrixManifestHelper',
+      'memoryGovernanceLifecycleContractHelper',
       'clientBoundaryDocsReview',
       'migrationImportExportBoundaryDocsReview',
       'rcChecklistAlignmentReview',
@@ -1095,6 +1116,44 @@ function buildV1RcValidationAggregatorReport({
         a5GatedBlockersVisible: true,
         failClosedRejectionDefaultsVisible: true,
         publicMcpExpanded: false
+      },
+      p31MemoryGovernanceLifecycleContractHelper: {
+        status: 'helper_added_report_shape_only_not_executed',
+        helper: 'src/core/MemoryGovernanceLifecycleContract.js',
+        test: 'tests/memory-governance-lifecycle-contract-helper.test.js',
+        fixture: 'tests/fixtures/memory-governance-lifecycle-contract-v1.json',
+        contractSchemaVersion: 'memory-governance-lifecycle-contract-v1',
+        sourceMode: 'explicit_input',
+        fixtureOnly: true,
+        syntheticFixture: true,
+        acceptedForPlanningAvailable: true,
+        lifecycleHelperImplemented: true,
+        lifecycleHelperExecuted: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        readsFiles: false,
+        executesCommands: false,
+        startsServices: false,
+        callsProviders: false,
+        mutatesInput: false,
+        durableMemoryTouched: false,
+        realMemoryScanned: false,
+        realMemoryPreview: false,
+        runtimeIntegrated: false,
+        runtimeMutationAllowed: false,
+        publicMcpExpanded: false,
+        publicMcpFrozen: true,
+        safeSourceTypesWhitelisted: true,
+        unsupportedSourceTypesRejected: true,
+        inputWhitelistRedefinitionRejected: true,
+        requiredSurfacesPresent: true,
+        requiredLifecycleCasesPresent: true,
+        requiredBlockersVisible: true,
+        requiredApprovalsVisible: true,
+        blockedDecisionRequired: true,
+        canClaimGovernanceRuntimeReady: false,
+        canClaimV1RcReady: false,
+        a5GatedBlockersVisible: true
       },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
