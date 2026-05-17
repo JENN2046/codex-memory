@@ -53,7 +53,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P52-T2 minimal runtime enforcement helper is complete, validated, and locally committed.
 - P53-T1 ValidationAggregator evidence inventory is complete and validated.
 - P53-T2 ValidationAggregator inventory posture bridge is complete and validated.
-- P53-T3 explicit evidence classification hardening is complete and validated.
+- P53-T3 explicit evidence classification hardening is complete, validated, and locally committed in `0a5016d`.
 - P54-T1 final RC runner safe command inventory is the next safe implementation slice.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, or P53 inventory evidence.
 
