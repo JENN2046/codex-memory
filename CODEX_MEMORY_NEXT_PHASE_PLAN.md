@@ -1,16 +1,17 @@
 # codex-memory Next Phase Plan
 
-更新时间：2026-05-17
+更新时间：2026-05-18
 
 ## Purpose
 
-This active plan is the short routing document for the current P41-P45 Evidence-First Gate Spine program. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
+This active plan is the short routing document for the current P46-P50 Evidence Enforcement Bridge program. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
 
 ## Current Direction
 
-1. Treat P36-P40 as complete local evidence only, not runtime/mainline/RC readiness.
-2. Keep P41-P45 local, fixture-only, dry-run-only, and explicit-input-only unless a task explicitly states otherwise.
-3. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
+1. Treat P36-P45 as complete local evidence/helper posture only, not runtime/mainline/RC readiness.
+2. Start P46-P50 by reconciling stale board/status facts to `HEAD == origin/main == 2b4a956`.
+3. Keep P46-P50 local, fixture-only, dry-run-only, and explicit-input-only unless a task explicitly states otherwise.
+4. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
 
@@ -23,7 +24,7 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 - P34.x closeout: governance review surface safe-scope chain closed locally in `8220d64`.
 - P35 planning: governed memory spine policy gate plan committed locally in `29858e6`.
 - P35.1 fixture contract: governed memory policy gate fixture/test committed locally in `c8325b6`.
-- P35 security hardening and push reconciliation: remote/local baseline is `3e3f76d`.
+- P35 security hardening and push reconciliation: superseded by the current pushed baseline `2b4a956`.
 - P36-P40 boundary-first chain: complete locally through P40 commit `6f7ade4` and post-P40 board sync `ba59537`.
 - P41-T1 closeout: complete locally in `08597d6`.
 - P41-T2 evidence manifest contract fixture: complete locally in `8895816`.
@@ -32,13 +33,15 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 - P44-T1 ValidationAggregator P36-P40 evidence source map: complete locally in `ae7655a`.
 - Post-P44 board reconciliation: complete locally in `93721b4`.
 - P45-T1 fixture-only final RC matrix evaluator skeleton: complete locally in `5ea714b`.
+- P45 strict input contract review fix: complete and pushed in `c0989b0`.
+- CM-0320 governance evidence helper strict schema/version exact-set fix: complete and pushed in `2b4a956`.
 
 ## Current Task
 
-P41-P45 post-closeout:
+P46-P50 Evidence Enforcement Bridge:
 
-- Finish post-P45 board/status reconciliation.
-- Stop at local objective completion unless a new safe local goal is provided.
+- Finish P46-0 post-push board/status reconciliation.
+- Then begin P46-T1 HTTP no-token mutation + sensitive redaction hardening within the allowed file list.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from local evidence completion.
 
 ## Boundaries
@@ -58,7 +61,10 @@ P41-P45 post-closeout:
 
 ## Next Candidate
 
-After P41-P45 closeout:
+After P46-0:
 
-- Await the next explicit goal or push authorization.
-- A reasonable future local-only successor would be a P46 planning/charter task, but it is not authorized by the current P41-P45 goal.
+- P46-T1 HTTP no-token mutation + sensitive redaction hardening.
+- P47 evidence-to-enforcement gap map.
+- P48 evidence-chain consistency guard.
+- P49 ValidationAggregator P45 posture bridge.
+- P50 no-touch boundary regression suite.

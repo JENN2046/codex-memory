@@ -2,18 +2,18 @@
 
 ## Current Goal
 
-P41-P45 Evidence-First Gate Spine.
+P46-P50 Evidence Enforcement Bridge.
 
 ## Current Area
 
-P10 observability-admin / P45 post-closeout reconciliation.
+P6 docs-drift / P46-0 post-push board/status reconciliation.
 
 ## Current Status
 
-- Last pushed baseline: `3e3f76d fix: harden local http and governance redaction` on `origin/main`.
-- Local branch is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, CM-0315 `169f5bc`, CM-0316 `8af5c64`, CM-0317 `ae7655a`, post-P44 board sync `93721b4`, and CM-0318 `5ea714b`.
-- Latest pushed task chain: P35.1 fixture contract, P35 post-push board reconciliation, and P35 security hardening.
-- Current task: P41-P45 Evidence-First Gate Spine local objective is complete; post-P45 board/status reconciliation is in progress.
+- Last pushed baseline: `2b4a956 fix: harden governance evidence helper contracts` on `origin/main`.
+- Local branch is aligned with `origin/main` at `2b4a956`; the worktree was clean before P46-0 edits.
+- Latest pushed task chain: P36-P45 evidence-first / fixture-only / explicit-input chain plus CM-0320 governance evidence helper strict schema/version exact-set hardening.
+- Current task: P46-0 post-push board/status reconciliation is validated and ready for guarded local commit; next safe implementation task is P46-T1 HTTP no-token mutation + sensitive redaction hardening.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -30,7 +30,7 @@ P10 observability-admin / P45 post-closeout reconciliation.
 
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
-- P41-P45 default mode is local, fixture-only, dry-run-only, and explicit-input-only unless a task explicitly states otherwise.
+- P46-P50 default mode is local, fixture-only, dry-run-only, and explicit-input-only unless a task explicitly states otherwise.
 - Unknown, missing, ambiguous, or unparsable scope metadata fails closed.
 - Unknown risk label is `A5-hard-stop`; critical skipped/unknown gate result fails.
 - Governance records, validation transcripts, redaction samples, and policy decisions must not enter normal user recall namespaces.
@@ -55,4 +55,4 @@ P10 observability-admin / P45 post-closeout reconciliation.
 
 ## Next Safe Step
 
-Finish post-P45 board/status reconciliation and commit it locally if validation passes. Push remains user-directed and not authorized.
+Create guarded local P46-0 board/status reconciliation commit, then continue to P46-T1 if safe. Push remains user-directed and not authorized.

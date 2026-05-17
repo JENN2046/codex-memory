@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-17
+更新时间：2026-05-18
 
 ## Purpose
 
@@ -10,10 +10,10 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Remote baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, P43-T1 `8af5c64`, P44-T1 `ae7655a`, post-P44 board sync `93721b4`, and P45-T1 `5ea714b`.
-- Current active program: P41-P45 Evidence-First Gate Spine.
-- Current phase area: P41-P45 local objective complete; post-P45 board/status reconciliation in progress. Fixture-only / dry-run-only / explicit-input-only boundaries preserved.
+- Remote baseline: `2b4a956 fix: harden governance evidence helper contracts`.
+- Local baseline: `main` is aligned with `origin/main` at `2b4a956`; P46-0 started from a clean worktree.
+- Current active program: P46-P50 Evidence Enforcement Bridge.
+- Current phase area: P46-0 post-push board/status reconciliation, then P46-T1 HTTP no-token mutation + sensitive redaction hardening. Fixture-only / dry-run-only / explicit-input-only boundaries preserved.
 
 ## Active Queue
 
@@ -36,6 +36,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P43-T1 | governed-memory-spine | A2 | done | Recall / Migration Isolation Explicit-Input Helper | changed JS syntax; targeted helper tests; `npm test`; boundary scan; Verifier | Complete and committed locally in `8af5c64`; pure helper over caller-provided object only; proves explicit-input isolation for governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned/out-of-scope memory, readiness reports, and synthetic migration metadata without touching normal recall/vector/candidate/ranking/projection/audit summary runtime. |
 | P44-T1 | governed-memory-spine | A2 | done | ValidationAggregator P36-P40 Evidence Source Map | changed JS syntax; targeted aggregator tests; `npm test`; boundary scan; Verifier | Complete locally in `ae7655a`; static report-shape evidence only; no fixture read, helper execution, gate/runner execution, live MCP refresh, provider, real memory/runtime store scan, public MCP expansion, or runtime-ready claim. |
 | P45-T1 | governed-memory-spine | A2 | done | Fixture-only Final RC Matrix Evaluator Skeleton | changed JS syntax; targeted evaluator tests; `npm test`; boundary scan; Verifier | Complete locally in `5ea714b`. Explicit-input evaluator only; rejects unsupported/warning/unknown/skipped/failed/not_executed evidence, readiness claims, public MCP drift, safety leakage, and A5 bypass attempts; no command execution, evidence collection, helper execution, or full final RC matrix claim. |
+| CM-0320 | memory-governance | A2 | done | Governance evidence helper strict schema/version and exact-set review fix | changed JS syntax; targeted helper tests `65/65`; `npm test` `841/841`; `git diff --check`; boundary scan | Complete and pushed in `2b4a956`; hardens P31-P34/P42/P43 helper schema/version/exact-set fail-closed behavior. |
+| P46-0 | docs-drift | A1 | done | Post-push board/status reconciliation | `git diff --check`; docs validation; stale wording scan | Complete and validated; active board/status facts now point to `HEAD == origin/main == 2b4a956`; no source/test/runtime changes. |
+| P46-T1 | memory-governance | A2 | todo | HTTP no-token mutation + sensitive redaction hardening | targeted HTTP/helper tests; `git diff --check`; `npm test` if targeted passes | Unify helper redaction through `SensitiveFragmentRedaction.js`; no runtime mutation, public MCP expansion, provider, durable write, or dependency change. |
 
 ## Standing Boundaries
 
