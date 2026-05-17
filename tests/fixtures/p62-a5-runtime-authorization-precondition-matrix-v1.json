@@ -1,0 +1,345 @@
+{
+  "schemaVersion": "p62-a5-runtime-authorization-precondition-matrix-v1",
+  "policyVersion": "p62-authorization-precondition-policy-v1",
+  "manifestVersion": "p62-authorization-precondition-manifest-v1",
+  "phase": "P62-T4-a5-runtime-authorization-precondition-matrix",
+  "localOnly": true,
+  "readOnly": true,
+  "fixtureOnly": true,
+  "planningOnly": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "authorizationGranted": false,
+  "acceptedForPlanning": true,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "preAuthorizationEvidence": [
+    {
+      "id": "runtime_schema_version_enforcement_proof",
+      "required": true,
+      "currentStatus": "missing_runtime_evidence",
+      "acceptedEvidenceTypes": [
+        "runtime_boundary_test_report",
+        "schema_policy_enforcement_report"
+      ],
+      "blockedBy": [
+        "runtime_enforcement_not_fully_proven"
+      ]
+    },
+    {
+      "id": "validation_aggregator_full_evidence_report",
+      "required": true,
+      "currentStatus": "missing_full_aggregation_evidence",
+      "acceptedEvidenceTypes": [
+        "aggregated_committed_local_runtime_evidence_report",
+        "stale_missing_unsupported_gate_report"
+      ],
+      "blockedBy": [
+        "validation_aggregator_full_implementation_incomplete"
+      ]
+    },
+    {
+      "id": "final_rc_matrix_execution_report",
+      "required": true,
+      "currentStatus": "not_executed",
+      "acceptedEvidenceTypes": [
+        "allowlisted_command_execution_report",
+        "machine_readable_rc_matrix_report"
+      ],
+      "blockedBy": [
+        "final_rc_matrix_runner_not_executed_as_real_matrix"
+      ]
+    },
+    {
+      "id": "governance_runtime_loop_evidence",
+      "required": true,
+      "currentStatus": "not_executed",
+      "acceptedEvidenceTypes": [
+        "review_packet_runtime_report",
+        "approval_decision_runtime_report",
+        "audit_runtime_report"
+      ],
+      "blockedBy": [
+        "governance_review_approval_audit_runtime_loop_not_executed"
+      ]
+    },
+    {
+      "id": "recall_isolation_runtime_proof",
+      "required": true,
+      "currentStatus": "not_executed",
+      "acceptedEvidenceTypes": [
+        "runtime_recall_isolation_report",
+        "contamination_absence_report"
+      ],
+      "blockedBy": [
+        "recall_isolation_runtime_proof_not_executed"
+      ]
+    },
+    {
+      "id": "migration_import_export_backup_restore_readiness",
+      "required": true,
+      "currentStatus": "approval_execution_blocked",
+      "acceptedEvidenceTypes": [
+        "synthetic_dry_run_parity_report",
+        "rollback_readiness_report",
+        "backup_restore_preflight_report"
+      ],
+      "blockedBy": [
+        "migration_import_export_backup_restore_approval_execution_blocked"
+      ]
+    },
+    {
+      "id": "http_operation_observability_evidence",
+      "required": true,
+      "currentStatus": "live_operation_not_claimed",
+      "acceptedEvidenceTypes": [
+        "http_health_evidence_report",
+        "http_failure_reporting_report",
+        "safe_shutdown_start_preflight_report"
+      ],
+      "blockedBy": [
+        "live_http_operation_readiness_not_claimed"
+      ]
+    },
+    {
+      "id": "mainline_strict_gate_rc_evidence",
+      "required": true,
+      "currentStatus": "not_executed_for_cutover",
+      "acceptedEvidenceTypes": [
+        "mainline_strict_gate_report",
+        "rc_evidence_report"
+      ],
+      "blockedBy": [
+        "mainline_strict_gate_not_executed_for_cutover"
+      ]
+    }
+  ],
+  "authorizationActions": [
+    {
+      "id": "push",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "tag_create",
+        "release_create",
+        "deploy",
+        "config_switch",
+        "watchdog_install",
+        "rc_ready_claim"
+      ]
+    },
+    {
+      "id": "tag_create",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "release_create",
+        "deploy",
+        "rc_ready_claim"
+      ]
+    },
+    {
+      "id": "release_create",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "deploy",
+        "config_switch",
+        "watchdog_install"
+      ]
+    },
+    {
+      "id": "deploy",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "config_switch",
+        "watchdog_install",
+        "provider_call"
+      ]
+    },
+    {
+      "id": "config_switch",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "watchdog_install",
+        "startup_install"
+      ]
+    },
+    {
+      "id": "watchdog_install",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "startup_install",
+        "config_switch"
+      ]
+    },
+    {
+      "id": "provider_call",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "durable_memory_write",
+        "durable_audit_write"
+      ]
+    },
+    {
+      "id": "real_memory_scan",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "real_memory_export",
+        "sqlite_migration_apply",
+        "backup_restore_apply"
+      ]
+    },
+    {
+      "id": "sqlite_migration_apply",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "import_export_apply",
+        "backup_restore_apply"
+      ]
+    },
+    {
+      "id": "import_export_apply",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "sqlite_migration_apply",
+        "backup_restore_apply"
+      ]
+    },
+    {
+      "id": "backup_restore_apply",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "sqlite_migration_apply",
+        "import_export_apply"
+      ]
+    },
+    {
+      "id": "durable_memory_write",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "durable_audit_write",
+        "public_mcp_expansion"
+      ]
+    },
+    {
+      "id": "durable_audit_write",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "durable_memory_write",
+        "public_mcp_expansion"
+      ]
+    },
+    {
+      "id": "public_mcp_expansion",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "durable_memory_write",
+        "rc_ready_claim"
+      ]
+    },
+    {
+      "id": "rc_ready_claim",
+      "risk": "A5-hard-stop",
+      "requiresSeparateExplicitApproval": true,
+      "granted": false,
+      "doesNotAuthorize": [
+        "tag_create",
+        "release_create",
+        "deploy"
+      ]
+    }
+  ],
+  "forbiddenBundledApprovals": [
+    "push_implies_release",
+    "release_implies_deploy",
+    "deploy_implies_config_switch",
+    "config_switch_implies_watchdog_install",
+    "provider_call_implies_runtime_ready",
+    "real_memory_scan_implies_export_or_migration",
+    "dry_run_implies_apply",
+    "local_evidence_implies_rc_ready",
+    "rc_ready_claim_implies_tag_or_release"
+  ],
+  "failClosedStates": [
+    "unknown_authorization",
+    "missing_authorization",
+    "ambiguous_authorization",
+    "bundled_authorization",
+    "stale_evidence",
+    "warning_only_evidence",
+    "skipped_critical_gate",
+    "unsupported_evidence_type",
+    "unparsable_evidence",
+    "duplicate_authorization_action",
+    "runtime_claim_without_runtime_report"
+  ],
+  "forbiddenClaims": [
+    "authorization_granted",
+    "runtime_ready",
+    "final_rc_matrix_ready",
+    "rc_ready",
+    "v1_rc_ready",
+    "cutover_ready",
+    "release_ready",
+    "deploy_ready",
+    "config_switch_ready",
+    "watchdog_ready"
+  ],
+  "safety": {
+    "readsFilesImplicitly": false,
+    "scansDirectories": false,
+    "executesCommands": false,
+    "startsServices": false,
+    "callsProviders": false,
+    "readsRealMemory": false,
+    "scansRuntimeStores": false,
+    "writesDurableMemory": false,
+    "writesDurableAudit": false,
+    "expandsPublicMcp": false,
+    "remoteWrites": false,
+    "rawSensitiveOutputExposed": false
+  },
+  "readiness": {
+    "authorizationMatrixReady": true,
+    "authorizationGranted": false,
+    "runtimeReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "cutoverReady": false,
+    "pushReady": false,
+    "tagReady": false,
+    "releaseReady": false,
+    "deployReady": false,
+    "configSwitchReady": false,
+    "watchdogReady": false
+  }
+}
