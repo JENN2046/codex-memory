@@ -17,7 +17,7 @@ P8 memory-governance / P57 recall isolation runtime proof explicit-input evaluat
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`.
 - P57-T1 post-commit board reconciliation is locally committed in `19ad34b`.
-- P57-T2 recall isolation runtime proof explicit-input evaluator is implemented and validated locally; guarded local commit is pending.
+- P57-T2 recall isolation runtime proof explicit-input evaluator is implemented, validated, and committed locally in `6f29757`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -57,4 +57,4 @@ P8 memory-governance / P57 recall isolation runtime proof explicit-input evaluat
 
 ## Next Safe Step
 
-Guarded local P57-T2 commit, then post-commit board reconciliation. After that, route to P58-T1 migration/import-export/backup-restore approval framework boundary inventory only if it remains synthetic fixture or sanitized metadata only.
+Finish the P57-T2 post-commit board reconciliation commit. After that, route to P58-T1 migration/import-export/backup-restore approval framework boundary inventory only if it remains synthetic fixture or sanitized metadata only.

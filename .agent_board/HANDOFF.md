@@ -14,7 +14,7 @@ Execute P51-P62 Runtime-Enforced Governed Memory Spine Completion under local A4
 
 ## Worktree
 
-P57-T2 helper/test/no-touch/status/board edits are validated and pending guarded local commit. `origin/main = 1ae4286 test: harden no-touch redaction regressions`; local `main` is ahead. Push is not authorized.
+Worktree is clean immediately after local commit `6f29757 feat: add p57 recall isolation proof helper`. `origin/main = 1ae4286 test: harden no-touch redaction regressions`; local `main` is ahead by 29 commits. Push is not authorized.
 
 ## Current Area
 
@@ -26,7 +26,7 @@ P8 memory-governance / P57 recall isolation runtime proof explicit-input evaluat
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
-- P57-T2 recall isolation runtime proof explicit-input evaluator is implemented and validated locally.
+- P57-T2 recall isolation runtime proof explicit-input evaluator is implemented, validated, and committed locally in `6f29757`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 
@@ -41,4 +41,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Create the guarded local P57-T2 commit, then run post-commit board reconciliation. After that, the next safe candidate is P58-T1 migration/import-export/backup-restore approval framework boundary inventory. Do not push unless explicitly authorized.
+Finish the P57-T2 post-commit board reconciliation commit. After that, the next safe candidate is P58-T1 migration/import-export/backup-restore approval framework boundary inventory. Do not push unless explicitly authorized.
