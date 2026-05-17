@@ -1,0 +1,651 @@
+﻿# codex-memory Status
+
+更新时间：2026-05-15（full pre-CM0302 archive）
+
+## 当前结论
+
+- `codex-memory` 已能独立承接 `vcp_codex_memory` 的 Codex 默认主链路，不再依赖 `VCPToolBox` 运行时。
+- 当前 `main` 最新已验证基线：health `200`、compare `43/43 matched (0/0)`、rollback `43/43 rollback-ready (0/0)`、`npm test` `184/184`、`gate:mainline:strict` `ok`、`scope:acceptance` `ok`、`gate:ci` fixture-only `ok`。PR #2 已按 superseded 说明关闭且未合并，远端分支 `codex/p1-vcp-memory-core-100-roadmap` 仍保留用于追溯。`scope:backfill:dry-run` 当前显示 `450` 条记录中 `442` 条缺少 `workspace_id`，`mutated=false`，不自动回填；`real-query-suite` 已升级为完整默认 dataset fixture assertion baseline：`caseCount=8`、`placeholderCount=0`、`fixtureOnlyCount=8`、`realCount=8`、`assertedCount=8`、`passedCount=8`、`failedCount=0`，并已接入 `gate:ci` 的 `checks.queries.detail`。维护期验收快照：[maintenance-acceptance-2026-05-08.md](/A:/codex-memory/logs/maintenance-acceptance-2026-05-08.md)。
+- Stale branch quarantine 已完成 docs/board-only 记录：[docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md](/A:/codex-memory/docs/STALE_BRANCH_REVIEW_codex_p1_vcp_memory_core_100_roadmap.md)。`codex/p1-vcp-memory-core-100-roadmap` 已确认是 superseded stale reference branch：不可整体 merge、不可 rebase、不可作为开发基线，只允许人工抽取并更新少量文档内容。后续开发基线仍是 `origin/main`。
+- P11 lifecycle read-policy loop 已完成并进入 `origin/main`：lifecycle schema、fixture tests、SQLite dry-run、runtime flag、`gate:ci` lifecyclePolicy summary、dashboard / `observe:http` / governance readPolicy summary 均已落地。
+- P11.8 lifecycle read-policy runtime flag 已进入主线：`CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY` 默认 `false`，关闭时 `search_memory` 保持 backward-compatible；开启时普通召回只保留 `active` / `stale`，过滤 `proposal` / `rejected` / `superseded` / `tombstoned`；缺 lifecycle status column 时 fail-safe 并记录 `lifecycleColumnAvailable=false`，不自动 migration，不新增 MCP public tools。
+- P11.9 lifecycle policy gate-ci summary 已进入主线：`gate:ci` 新增 `checks.lifecyclePolicy` fixture-only summary，展示 default-off、enabled include/exclude statuses、missing-column warn/fail-safe、`hiddenByLifecycleCount`、`staleResultCount`、audit summary shape 和 raw workspace id 不暴露；不改 `search_memory` runtime 行为，不新增 MCP tools，不做 SQLite migration。
+- P11.10 lifecycle read-policy observability summary 已进入主线：`dashboard`、`observe:http`、`governance:report` 输出只读 `readPolicy` summary，展示 lifecycle/soft flag、include/exclude status、recent hidden/stale counts、`lifecycleColumnAvailable` 和 `rawWorkspaceIdExposed=false`；不改 `search_memory` runtime 行为，不新增 MCP tools，不做 SQLite migration。
+- P12 controlled write tools 当前仍是 planning：新增计划入口 [docs/CONTROLLED_WRITE_TOOLS_PLAN.md](/A:/codex-memory/docs/CONTROLLED_WRITE_TOOLS_PLAN.md)，只规划 `update_memory` / `supersede_memory` / `forget_memory` / `audit_memory` / `validate_memory` / `checkpoint_memory` / `handoff_memory` 候选；本阶段不实现 runtime mutation，不新增 MCP public tools，不做 SQLite migration，不写真实 DB。
+- P12.1 controlled write fixture schemas 已进入主线：新增 `tests/fixtures/controlled-write-tools-v1.json` 与 `tests/controlled-write-tools-fixture.test.js`，锁住候选工具 schema、mutation boundary、audit shape 和 dry-run-first 规则；不改 runtime，不新增 MCP tools，不写真实 DB。
+- P12.2 mutation audit shape tests 已进入主线：新增 `tests/fixtures/mutation-audit-shape-v1.json` 与 `tests/mutation-audit-shape.test.js`，锁住 `memory_update` / `memory_supersede` / `memory_forget` / `memory_validate` / `memory_checkpoint` / `memory_handoff` 的 audit event shape、reason/evidence、redaction/lifecycle/scope policy flags、SecretScanner boundary、raw secret 禁止和 raw `workspace_id` low-risk summary 禁止；不改 runtime，不新增 MCP tools，不写真实 DB。
+- P12.3 controlled write dry-run CLI prototypes 已本地完成：新增 `tests/fixtures/controlled-write-dry-run-v1.json`、`src/cli/controlled-write-dry-run.js`、`tests/controlled-write-dry-run-cli.test.js` 和 `controlled-write:dry-run` npm script；CLI 只读 fixture，覆盖 update/supersede/forget/validate/checkpoint/handoff 和 read-only audit_memory，输出 candidate would-plan / audit preview / safety flags，拒绝 `--confirm/--apply/--write/--mutate`，始终 `mutated=false`；不新增 MCP tools，不改 MCP schema，不写真实 DB/diary/vector/audit log。
+- P12.4 MCP tool proposal review 已进入远端主线：新增 proposal review fixture/test 设计，明确 P12.4 不批准 public MCP expansion；`audit_memory` 只可进入未来 read-only public-tool proposal review，`validate_memory` 是 P12.5 显式批准后的推荐首个 runtime mutation 候选，update/supersede/forget/checkpoint/handoff 继续 defer。
+- A4.8 Safe Project Operator Rail 已进入远端主线：新增 safe project operator rail、safe-push policy、validation selection matrix、failure recovery、phase protocol 和 closeout schema；该批只做 docs/board/policy，不改 runtime、不改 tests、不改 package、不新增 MCP tools。
+- P12.5 first runtime mutation tool planning/approval gate 已完成：新增 approval gate 入口 [docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)，明确 `validate_memory` 仍只是首个候选；runtime mutation、MCP public tool expansion、MCP schema change、SQLite migration 和真实 DB/memory write 均保持 A5 hard stop，直到显式批准。
+- P12.5 validate_memory runtime fixture tests 已完成：新增 `tests/fixtures/validate-memory-runtime-v1.json` 与 `tests/validate-memory-runtime-fixture.test.js`，锁定 `validate_memory` runtime 前置 schema、`proposal/stale -> active` 允许流转、`rejected/tombstoned/superseded -> active` 禁止流转、audit required fields、dry-run-first、redaction、scope/lifecycle policy、SecretScanner / ToolArgumentValidator boundary；不实现 runtime mutation。
+- P12.5 narrow validate_memory internal runtime implementation 已完成本地验证：新增 internal `ValidateMemoryService`，只允许 `proposal/stale -> active`，默认 dry-run，实际 mutation 需 `dry_run=false` + `confirm=true`，写 `memory_validate` audit event，并经过 SecretScanner、ToolArgumentValidator、scope policy、lifecycle policy；不新增 public MCP tool，不改 MCP schema，不做 SQLite migration。
+- P12.5 validate_memory runtime implementation plan 已完成：新增 [docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_RUNTIME_IMPLEMENTATION_PLAN.md)，记录 `ValidateMemoryService`、`SqliteShadowStore`、`app.js` wiring、audit 写入、测试矩阵和 rollback story；本阶段 docs/tests-design only，不改 `src/`。
+- P12.5 validate_memory internal runtime review 已完成：新增 [docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md](/A:/codex-memory/docs/P12_5_VALIDATE_MEMORY_INTERNAL_RUNTIME_REVIEW.md)，结论 PASS；fixture / plan / runtime / tests 无 blocking drift，public MCP tools 仍冻结为三工具，无 SQLite migration / hard delete。
+- P12.5 validate_memory two-phase audit protocol 已完成本地验证：confirmed mutation 前先写 durable pending audit intent，再执行 lifecycle update，成功后写 committed audit，update 失败后写 cancelled audit；如果 committed append 在 update 后失败，返回 `validated-with-warning` / `auditCommitStatus=failed_after_mutation`，且 pending intent 已落盘。`client_id` / `visibility` expected guard 继续保留。验证覆盖 runtime `15/15`、CLI `12/12`、fixture `11/11`、MCP contract `7/7`、`npm test` `415/415`、`gate:ci`、`gate:mainline:strict`、lifecycle SQLite dry-run `mutated=false`。本补丁不新增 MCP public tools，不改 MCP schema，不做 SQLite migration，不改 package/dependency。
+- P12.6 validate_memory internal CLI wrapper 已完成本地验证：新增 `src/cli/validate-memory.js`、`tests/validate-memory-cli.test.js` 和 `validate-memory` npm script；CLI 默认 dry-run、`mutated=false`、输出 audit preview，confirmed apply 必须 `--json --apply --confirm` 并继续走 `ValidateMemoryService` 的 SecretScanner / ToolArgumentValidator / lifecycle / scope / audit 边界；不新增 public MCP tool，不改 MCP schema，不做 SQLite migration。
+- 当前决策：保持 `validate_memory` internal-only，不进入 public `validate_memory` MCP proposal review；public MCP tools 仍为 `record_memory` / `search_memory` / `memory_overview`。
+- P13 VCP-compatible memory object model planning 已完成本地验证：新增计划入口 [docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md](/A:/codex-memory/docs/VCP_COMPATIBLE_MEMORY_OBJECT_MODEL_PLAN.md)，规划 `MemoryRecord` vNext、chunk、tag、scope/context、checkpoint/handoff、audit、tombstone、proposal、migration 对象族；本阶段只做 planning，不改 runtime，不改 tests，不迁移数据。
+- P13.1 object model fixture schemas 已完成本地验证：新增 `tests/fixtures/vcp-memory-object-model-v1.json` 与 `tests/vcp-memory-object-model-fixture.test.js`，锁住对象族、`MemoryRecord` vNext required fields、privacy/lifecycle/audit boundaries、import/export safety、backward compatibility、raw secret 禁止和 raw `workspace_id` low-risk summary 禁止；不改 runtime，不新增 MCP tools，不做 migration。
+- P13.2 object model round-trip fixture tests 已完成本地验证：新增 `tests/fixtures/vcp-memory-object-round-trip-v1.json` 与 `tests/vcp-memory-object-round-trip.test.js`，证明 source fixture -> normalized object -> export-safe JSON -> reloaded object 不丢失 identity、scope、lifecycle、audit refs、provenance、privacy/import-export boundaries；测试纯函数只存在测试文件内，不改 runtime，不实现 import/export CLI，不做 SQLite migration。
+- P13.3 SQLite/diary mapping dry-run planning 已完成本地验证：新增 [docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md](/A:/codex-memory/docs/VCP_MEMORY_OBJECT_MAPPING_DRY_RUN_PLAN.md)，规划未来只读扫描 SQLite / diary / audit / chunk-vector metadata 的 mapping preview、missing field report、risk report 和 rollback story；本阶段只做 docs/board planning，不改 runtime，不改 tests，不做真实数据读取/写入，不做 migration。
+- P13.4 object mapping fixture tests 已完成本地验证：新增 `tests/fixtures/vcp-memory-object-mapping-v1.json` 与 `tests/vcp-memory-object-mapping-fixture.test.js`，验证 synthetic SQLite / diary / audit / chunk / tag metadata 可以形成 `MemoryRecord` vNext mapping preview；锁住 `memory_id`、title/kind/schema_version、scope/lifecycle、audit/chunk/tag refs、fixture-only `content_hash` / `content_ref`、missing field policy、inactive proposal、hidden tombstone、raw secret 禁止、low-risk raw `workspace_id` 禁止、`mutated=false` 和 no-side-effect；不改 runtime，不读取真实 DB/diary，不做 migration。
+- P13.5 SQLite/diary mapping dry-run CLI 已完成本地验证：新增 `src/cli/vcp-memory-object-mapping-dry-run.js`、`tests/fixtures/vcp-memory-object-mapping-dry-run-v1.json`、`tests/vcp-memory-object-mapping-dry-run-cli.test.js` 和 `vcp-memory:mapping:dry-run` npm script；CLI 默认 fixture mode，输出 scanned/mapped/unmapped counts、missing field counts、coverage、low-risk summary、risk/rollback/nextStep，始终 `mutated=false`，拒绝 `--confirm/--apply/--migrate`，不读取真实 DB/diary，不写 SQLite/diary/audit/vector/chunk，不生成 import/export 文件。
+- P13.6 import/export-safe JSON shape fixture tests 已完成本地验证：新增 `tests/fixtures/vcp-memory-import-export-shape-v1.json` 与 `tests/vcp-memory-import-export-shape.test.js`，锁住 export/import envelope、schema_version、exported_at、source project/client/workspace summary、records/chunks/tags/audit/tombstone/proposal/migration arrays、deterministic checksum、redaction/scope/lifecycle policy flags、dry-run-first import mode、`mutated=false`、raw secret/workspace boundary 和 no-side-effect；不实现 import/export CLI，不生成文件。
+- P13.7 migration readiness report 已完成本地验证：新增 `src/cli/vcp-memory-migration-readiness.js`、`tests/fixtures/vcp-memory-migration-readiness-v1.json`、`tests/vcp-memory-migration-readiness-cli.test.js` 和 `vcp-memory:migration-readiness` npm script；报告 P13 fixture/CLI readiness、missing prerequisites、migration blockers、required approvals、risk/nextStep，保持 `migrationBlocked=true`、`mutated=false`，拒绝 `--apply/--migrate/--confirm`，不做 migration、不写 DB/diary、不改 MCP。
+- P13.x closeout review 已完成：新增 [docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P13_OBJECT_MODEL_CLOSEOUT_REVIEW.md)，总结 P13 planning 到 P13.7 的完成范围、targeted/full-suite/CLI smoke 证据、boundary confirmation、remaining risks 和 P14 readiness judgment；结论是 P13 已 fixture/dry-run ready，migration 仍 blocked，可进入 `P14-donor-behavior-parity-gate-planning`，但不得进入 P14 implementation。
+- P14 donor behavior parity gate planning 已完成本地规划：新增 [docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md](/A:/codex-memory/docs/DONOR_BEHAVIOR_PARITY_GATE_PLAN.md)，规划 DeepMemo / TopicMemo / passive query / compare-rollback / error envelope / meta placement / ranking tie-breaker 等 donor surfaces 的 standing gate；本阶段只做 docs/board planning，不改 runtime、不改 tests、不改 package、不改 MCP、不改 import/export 或 migration。
+- P14.1 donor parity fixture inventory 已完成本地规划：新增 [docs/DONOR_PARITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/DONOR_PARITY_FIXTURE_INVENTORY.md)，记录当前 standard suite 实测 `43` cases、DeepMemo `24`、TopicMemo `19`、success `24`、error `19`、`8` 个 category 和 `7` 个 fixture root，并列出 passive query、known intentional differences、object-model drift marker、error/meta matrix 等 gap；不改 runtime、不新增 tests/fixtures。
+- P14.2 DeepMemo targeted parity fixtures 已进入 `origin/main`：commit `4251a27 test: add p14 deepmemo parity fixtures` 新增 `tests/fixtures/deepmemo-donor-parity-v1.json` 与 `tests/deepmemo-donor-parity-fixture.test.js`，锁住 success payload shape、blocked keyword `meta` placement、advanced syntax payload stability、three-window ranking order snapshot，并验证 active-memory fixture 文件 hash 前后不变；不改 runtime、不改 MCP、不写真实 DB/memory。
+- P14.3 TopicMemo targeted parity fixtures 已进入 `origin/main`：新增 `tests/fixtures/topicmemo-donor-parity-v1.json` 与 `tests/topicmemo-donor-parity-fixture.test.js`，锁住 ListTopics / GetTopicContent payload shape、missing topic/history error envelope、agentId alias boundary 和 locked-topic display，并验证 active-memory fixture 文件 hash 前后不变；不改 runtime、不改 MCP、不写真实 DB/memory。
+- Codex Desktop 当前推荐通过本地 HTTP MCP 接入，握手、自愈和用户态自启动链已经跑通。
+- Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。`claude mcp get/list` 显示 connected，直接 MCP `memory_overview` 调用成功；按用户最新批准使用 `deepseek-ai/deepseek-v4-flash` 后，模型侧 `memory_overview` 调用也已成功，交互式 `/mcp` 面板待补验。
+- `Phase A` 与 `Phase B` 已进入“可用并可回归”的阶段。
+- `Phase C` 已基本收口到“高 donor 兼容度”，现在具备全量重建、自动回填、增量同步，以及 `DeepMemo/TopicMemo` 的主要边界语义与展示语义兼容。
+- `Phase D` 的兼容与回滚层已经继续向前：除了 donor 风格 `DeepMemo/TopicMemo` 独立 CLI、只读 compare harness、active-memory 运维 CLI 外，现在还具备字段级 diff、批量 suite 对照、汇总级 diff 报告、只读 rollback readiness 报告，以及仓库内可复用的标准 active-memory suite 数据集。
+- `Phase D` 的标准 suite 过滤链又稳定了一层：`--expectation` 的多值 OR、顺序归一化、重复值去重都已经被 compare / rollback 回归固化。
+- `Phase D` 的 rollback readiness 报告又补了一层可观测性：suite summary / category / fixture 现在都会结构化汇总 rollback blocker 原因。
+- `Phase D` 的 compare harness 也补上了对称的“差异原因视角”：suite summary / category / fixture 现在都会结构化汇总 comparison outcome 和 drift reason。
+- `Phase D` 的 compare case 级诊断也补齐了：每条 case 现在都会直接暴露 `comparison.outcome` 和 `comparison.driftReasons`，文本报告也会预览这些原因。
+- `Phase D` 的 rollback case 级诊断也补齐了：每条 case 现在都会直接暴露 `summary.outcome` 和 `summary.blockerReasons`，文本报告也会预览这些原因。
+- `Phase D` 的文本报告也完成了一轮可读性收口：compare / rollback 的 suite 文本输出现在都会直接给 breakdown 行、category/fixture reason 预览，以及 case 级 reason 预览。
+- `Phase D` 的 README 现在也补上了更接近真实操作的 compare / rollback 排障流程，不再只是参数列表。
+- `Phase D` 现在已经补出独立的迁移验收清单：[PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md](/A:/codex-memory/PHASE_D_MIGRATION_ACCEPTANCE_CHECKLIST.md)，可以直接拿来做 compare / rollback 的切换前验收。
+- `Phase D` 的首轮独立迁移验收已经跑完：`npm test`、`compare --require-match`、`rollback --require-ready` 全部通过，当前结论是 `Pass with Known Gaps`，可进入灰度切主链阶段。
+- `Phase D` 现在还补出了一份独立的灰度切主链 playbook：[PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_PLAYBOOK.md)，把切换顺序、观察项、暂停条件和回滚动作写成了可执行步骤。
+- `Phase D` 现在还补出了一份独立的灰度执行记录模板：[PHASE_D_GRAY_ROLLOUT_LOG_TEMPLATE.md](/A:/codex-memory/PHASE_D_GRAY_ROLLOUT_LOG_TEMPLATE.md)，可以把每轮灰度的门禁结果和继续/暂停/回滚判断写成标准化记录。
+- `Phase D` 的第一份真实灰度记录也已落盘：[phase-d-gray-rollout-gray-01.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-01.md)。当前它是“灰度前基线记录”，结论是可进入 `Gray-02` 的真实切换观察。
+- `Phase D` 的 `Gray-02` 执行前清单也已补出：[PHASE_D_GRAY_02_PRECHECK.md](/A:/codex-memory/PHASE_D_GRAY_02_PRECHECK.md)，现在真实切换前需要看的入口点、端口、脚本和回退点都已经收口。
+- `Gray-02` 的执行前实跑也已经完成：[phase-d-gray-rollout-gray-02-precheck-pass.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-02-precheck-pass.md)。当前配置已指向 `codex-memory` HTTP MCP，门禁已绿，只差一次新会话观察。
+- `Gray-02` 的真实主入口观察也已完成：[phase-d-gray-rollout-gray-02.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-02.md)。当前可以确认：配置已生效、重启恢复正常、服务健康、compare/rollback 仍绿。
+- `Gray-03` 的持续稳定性观察也已完成：[phase-d-gray-rollout-gray-03.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-03.md)。当前可以确认：运行态健康、MCP 契约持续可用、compare/rollback 持续为绿。
+- `Gray-03` 现在还补出了持续稳定性观察计划和后续轮次记录骨架：
+  - [PHASE_D_GRAY_03_STABILITY_PLAN.md](/A:/codex-memory/PHASE_D_GRAY_03_STABILITY_PLAN.md)
+  - [PHASE_D_GRAY_FOLLOWUP_LOG_SKELETON.md](/A:/codex-memory/PHASE_D_GRAY_FOLLOWUP_LOG_SKELETON.md)
+- `Gray-04` 的后续稳定性观察也已完成：[phase-d-gray-rollout-gray-04.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-04.md)。当前可以确认：compare/rollback 继续全绿，日志侧也没有新的异常迹象。
+- `Gray-05` 的后续稳定性观察也已完成：[phase-d-gray-rollout-gray-05.md](/A:/codex-memory/logs/phase-d-gray-rollout-gray-05.md)。当前可以确认：Gray-03 计划里的后续两轮稳定性观察已经完整跑通。
+- `Phase D` 的默认主链切换结论也已形成：[PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md](/A:/codex-memory/PHASE_D_DEFAULT_MAINLINE_CONCLUSION.md)。当前结论是：`codex-memory` 可以作为 `vcp_codex_memory` 的默认主链实现。
+- `Phase E` 的后续精修 backlog 也已整理：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)。当前已经把后续工作按 `P0 / P1 / P2` 和“主线 / 精修线 / 可维护性”分组。
+- `Phase E` 的阶段总结也已整理：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)。当前可以更清楚地区分：哪些已经是稳定基线，哪些还属于后续 backlog。
+- `Phase E` 的最终收官说明也已整理：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)。当前没有 Phase E open blocker，后续 donor 边角、suite 扩容、provider benchmark 和文档压缩统一迁入维护期增量任务。
+- 维护期 backlog 也已整理：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)。当前维护期从 donor compatibility、provider/profile evidence、docs governance 三条低风险增量线开始。
+- 阶段导航页也已整理：[PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md)。当前 README / STATUS / MEMORY / 各阶段资产之间已有一张更薄的入口页可直接跳转。
+- 项目正式收官说明也已整理：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)。当前项目边界已明确切到“主项目收官，后续转维护与精修期”。
+- 维护期下一阶段薄版计划已整理：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)。当前只作为方向锚点，详细任务仍由 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md) 管理。
+- 文档治理规则已整理：[DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)。当前约定 README 是 operation map，STATUS 是当前事实状态，MAINTENANCE_BACKLOG 是维护期唯一任务队列，`.agent_board` 是本地执行轨道。
+- `gate:ci` fixture-only 设计已整理：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)。当前已实现为 `npm run gate:ci` / `src/cli/gate-ci.js`。
+- Verifier rail 已完成本地落地：`AGENTS.md` 已补充 Commander task contract 与 read-only Verifier protocol；`.agent_board/FILE_LOCKS.md` / `.agent_board/RISK_REGISTER.md` 已建立；Commander -> Worker -> Verifier 试跑已完成并通过最终 Verifier PASS。
+- `Phase E / P0-1` 已开始落成仓库标准门禁入口：新增 `gate:mainline` / `gate:mainline:strict`，把默认主链的 health、contract、compare、rollback 和全量回归收口成可复用 CLI。
+- `Phase E / P0-2` 也已开始落成仓库标准诊断入口：新增 `observe:http`，把 `/health`、HTTP 日志、watchdog 日志、bridge audit、recall audit 收口成一份可复用运行态报告。
+- `Phase E / P0-3` 已从“回滚预案入口”推进到“真实回滚演练已跑通”：`rollback:mainline:plan` 已不只是输出计划，当前 donor `6005` 也已经完成一次临时切换、握手验证与切回主链的闭环演练。
+- `Phase E / P1-1` 已完成第一刀扩展字段 drift 收口：CLI `--full` 与错误输出已把 donor 不需要的顶层扩展字段下沉到 `meta`，标准 active-memory suite 的 `extended-only-drift` 现已归零。
+- `Phase E / P1` 已开始收错误语义 / 诊断输出：当前先不改 donor 风格错误顶层，只把 `DeepMemo/TopicMemo` 的输入来源、命令、关键词与 blocked-keyword 诊断上下文补进 `meta`，并继续补齐 `DeepMemo` 的 `snake_case` donor 别名字段和 `query/rawQuery` 诊断别名。
+- `Phase E / P1` 继续收 `TopicMemo` 路由边界：`topic_id/topicId` 在未显式写 `command` 时会自动推断为 `GetTopicContent`，`topic-not-found / missing-history` 的诊断也已可回归。
+- `Phase E / P1` 再补 `TopicMemo` 的 `empty-history / history-read-error` 边界：`empty-history` 现在在 `--full` 下可见，`history-read-error` 也已带着 `meta.historyStatus` 稳定回归。
+- `Phase E / P1-2` 已继续收 donor 排序手感：第一刀先把 `DeepMemo` 的同分 tie-breaker 改成“同一话题内优先更靠后的命中窗口”；第二刀已把跨 topic 的同分边界收成“优先 fresher topic”；第三刀已把“更紧凑窗口优先”限制在跨 topic 同分结果里；第四刀把 `compactness > freshness` 的冲突优先级显式锁成回归；第五刀则把最末级 `topicId` 词典序兜底也补成稳定回归。
+
+## 历史分阶段进度快照
+
+下面百分比是 Phase D/E 收官前的历史粗估，用来解释迁移过程，不再作为当前项目完成度判断。当前权威状态以 `PROJECT_CLOSURE.md`、`PHASE_E_SUMMARY.md`、README 和最新验证输出为准。
+
+- `Phase A` 独立核心与 Codex MCP：约 `95%`
+- `Phase B` 高级被动召回主链：约 `85%`
+- `Phase C` 主动记忆体系：约 `90%`
+- `Phase D` 兼容层与迁移收口：约 `98%`
+
+整体粗估：约 `95%`
+
+## 今天新增完成
+
+- P12.6 validate_memory internal CLI wrapper：新增本地 `npm run validate-memory` 入口，覆盖默认 dry-run、confirmed apply、forbidden lifecycle、secret evidence、missing lifecycle column、unknown tool/mode、raw `workspace_id` 拒绝和 MCP public tools frozen 回归；当前仍是 internal-only，不开放 MCP。
+- P13 VCP-compatible memory object model planning：新增对象模型计划文档，明确 P13 只做 docs/tests-design planning，`validate_memory` 保持 internal-only，不新增 MCP tools，不做 migration。
+- P13.1 object model fixture schemas：新增对象模型 fixture 与测试，覆盖 13 个对象族、`MemoryRecord` vNext required fields、schema version、privacy/audit/lifecycle boundaries、inactive proposal、默认不可见 tombstone、raw secret 禁止和 low-risk raw `workspace_id` 禁止。
+- P13.2 object model round-trip fixture tests：新增 fixture-only round-trip fixture/test，覆盖 `MemoryRecord`、`MemoChunk`、`KnowledgeChunk`、`Tag`、`AuditEvent`、`MemoryProposal`、`Tombstone`、`Checkpoint`、`Handoff`，并锁住 identity/scope/lifecycle/supersession/audit/tag/chunk refs、source/provenance、inactive proposal、hidden tombstone、secret redaction、low-risk summary 不暴露 raw `workspace_id`、missing vNext null/unknown fallback、JSON stringify/parse 稳定性和 no-side-effect。
+- P13.3 SQLite/diary mapping dry-run planning：新增 dry-run mapping 计划文档，定义 mapping sources、dry-run output shape、mapping rules、missing field policy、安全规则、未来 P13.4-P13.7 顺序和 docs-only 验证入口。
+- P13.4 object mapping fixture tests：新增 synthetic mapping fixture/test，覆盖 SQLite record、diary record、audit log、chunk metadata、tag metadata 到 mapping preview 的 fixture-only 预演，验证缺失 required/optional 字段报告、lifecycle unknown fallback、source/provenance 缺失时 `importExportSafe=false`、proposal inactive、tombstone hidden、raw secret 禁止、low-risk raw `workspace_id` 禁止、`mutated=false` 和 no-side-effect。
+- P13.5 SQLite/diary mapping dry-run CLI：新增 fixture-backed dry-run CLI，默认只读 fixture source，输出 mapping preview counts / coverage / missing-field report / risk / rollback / next step，并锁住 no real DB/diary read、no import/export file generation、no migration 和 no side effect。
+- P13.6 import/export-safe JSON shape fixture tests：新增 fixture-only export/import envelope shape，验证 `memory_id`、chunk/tag/audit refs、hidden tombstone、inactive proposal、redaction required、raw secret/workspace 禁止、deterministic checksum、dry-run-first import mode、`mutated=false` 和 no-side-effect。
+- P13.7 migration readiness report：新增 read-only readiness CLI，验证 P13 object model、round-trip、mapping fixture、mapping dry-run CLI、import/export shape readiness，并明确 migration 仍 blocked，需要显式审批、SQLite backup/rollback、diary/import-export policy 和 post-migration gates。
+- P13.x closeout review：新增 P13 收官审查，确认 `validate_memory` internal-only、public MCP tools frozen、无 SQLite migration、无 import/export runtime、无真实 DB/diary 写入、无 runtime mapper、无 tag/release/deploy；下一步只建议 P14 planning / fixture / gate design。
+- P14 donor behavior parity gate planning：新增 donor parity standing gate 规划，后续先做 `P14.1-donor-parity-fixture-inventory`，不直接改 DeepMemo / TopicMemo / passive query runtime。
+- P14.1 donor parity fixture inventory：新增当前 suite 覆盖盘点，下一步建议 `P14.2-DeepMemo-targeted-parity-fixtures`。
+- P14.2 DeepMemo targeted parity fixtures：新增 targeted fixture/test 证据并已进入 `origin/main` at `4251a27`；P14.2 state reconciliation 已确认本地 HEAD、local `origin/main`、remote `refs/heads/main` 三者一致。
+- P14.3 TopicMemo targeted parity fixtures：新增 targeted fixture/test 证据，下一步建议 `P14.4-error-meta-parity-tests`。
+- P14.4 error/meta parity tests：新增 shared donor error/meta fixture/test 证据，锁住 DeepMemo / TopicMemo error envelope、diagnostic `meta` 下沉、DeepMemo full success diagnostics placement 和 known intentional differences allowlist；下一步建议 `P14.5-ranking-tie-breaker-parity-tests`。
+- P14.5 ranking/tie-breaker parity tests：新增 ranking/tie-breaker fixture/test 证据，锁住 standard-suite 当前全部 `ordering` cases 的顺序快照；下一步建议 `P14.6-compare-rollback-standing-gate-summary`。
+- P14.6 compare/rollback standing gate summary：新增 donor parity standing gate summary，确认 standard-suite compare `43/43 matched`、rollback `43/43 rollback-ready`，并记录 P14 targeted fixture evidence、boundary confirmations、remaining risks；下一步建议 `P15-real-query-quality-gate-planning`。
+- P15 real query quality gate planning：新增 [docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_GATE_PLAN.md)，把 query quality 与 donor parity 分离，规划 fixture-first standing gate；当前 `real-query-suite` 与 `query:quality` fixture recall dry-run 均为 `8/8`、`mutated=false`、`providerCalls=0`。
+- P15.1 real query quality fixture inventory：新增 [docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_FIXTURE_INVENTORY.md)，确认当前默认 suite 覆盖 `8` 个 sanitized documents / `8` 个 queries，含 `24` 个 positive assertions 和 `8` 个 negative assertions；缺口集中在 scope、lifecycle、privacy、raw `workspace_id` boundary、precision false-positive、report-shape 和 future real-memory dry-run planning。下一步建议 `P15.2-real-query-quality-fixture-expansion`。
+- P15.2 real query quality fixture expansion：新增 [docs/P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md](/A:/codex-memory/docs/P15_REAL_QUERY_QUALITY_FIXTURE_EXPANSION.md)，并把默认 suite 扩到 `14` cases / `15` sanitized documents；新增 scope safety、lifecycle safety、privacy redaction、workspace summary boundary、precision near-neighbor 和 report-shape cases。`real-query-suite` 与 `query:quality` fixture recall dry-run 均为 `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。本阶段不改 runtime、不扩大 `validate_memory` mutation surface、不开放 public `validate_memory` MCP tool、不进入 migration/import-export apply。
+- P15.3 query quality report shape tests：新增 [docs/P15_QUERY_QUALITY_REPORT_SHAPE_TESTS.md](/A:/codex-memory/docs/P15_QUERY_QUALITY_REPORT_SHAPE_TESTS.md)，并在 query tests 中锁住 `real-query-suite` / `query:quality` JSON top-level keys、`fixtureRecallDryRun` keys、assertion failure shape、`14/14` baseline、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`，继续禁止 fake `hitRate` / `qualityScore`。
+- P15.4 fixture recall dry-run standing gate：新增 [docs/P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md](/A:/codex-memory/docs/P15_FIXTURE_RECALL_DRY_RUN_STANDING_GATE.md)，并让 `gate:ci` 的 `checks.queries.detail.fixtureRecallDryRun` 成为 CI-safe standing signal；当前为 `enabled=true`、`14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`。本阶段不改 query runtime ranking、不调用 provider、不改 fixture data、不扩大 `validate_memory` mutation surface、不开放 public `validate_memory` MCP tool、不进入 migration/import-export apply。
+- P15.5 real-memory query dry-run planning：新增 [docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P15_REAL_MEMORY_QUERY_DRY_RUN_PLAN.md)，只规划未来 redacted / opt-in / read-only local dry-run 的边界和 approval packet；本阶段不实现 CLI、不读取真实 memory、不调用 provider、不写 durable memory、不做 migration/import-export apply、不改 MCP schema/tools、不扩大 `validate_memory` mutation surface。
+- P15.6 query quality closeout review：新增 [docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P15_QUERY_QUALITY_CLOSEOUT_REVIEW.md)，总结 P15.1-P15.5 证据、`14/14` fixture recall standing signal、remaining risks、boundary confirmations 和 P16 planning readiness；不启动 P16 implementation、不跑 provider、不读取真实 memory、不改 runtime。
+- P16 TagMemo semantic association parity planning：新增 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_PARITY_PLAN.md)，记录现有 `TagMemoEngine` / EPA / ResidualPyramid / SemanticGroupManager / passive `::TagMemo` surfaces、P16 gate categories、P16.1-P16.5 顺序和 hard boundaries；本阶段只做 planning，不改 runtime、不改 tests、不调 provider、不进入 V8。
+- P16.1 TagMemo semantic fixture inventory：新增 [docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_FIXTURE_INVENTORY.md)，盘点 `TagMemoEngine`、EPA、ResidualPyramid、SemanticGroupManager、CandidateGenerator、RerankService、RecallAuditService、passive syntax、LightMemo、`v8-diagnose`、Phase A/B/C tests、profile migration suite、active-memory suite 和 real-query suite 的现有覆盖与缺口；docs-only 验证已通过，本阶段只做 inventory，不改 runtime、不新增 tests/fixtures、不调 provider、不进入 V8。
+- P16.2 TagMemo semantic fixture shape tests：新增 `tests/fixtures/tagmemo-semantic-fixture-shape-v1.json` 与 `tests/tagmemo-semantic-fixture-shape.test.js`，锁住 `::TagMemo` directive parsing、explicit / plus / malformed weight shape、tag/title/body/evidence scoring contribution、telemetry keys、LightMemo `tag_boost` / `core_tags` compatibility query mapping 和 no-side-effect policy；targeted test `6/6`、`npm test` `426/426`、diff/docs validation 均通过；不改 runtime、不调 provider、不扩 MCP、不进入 V8。
+- P16.3 TagMemo targeted semantic fixtures：新增 `tests/fixtures/tagmemo-targeted-semantic-v1.json` 与 `tests/tagmemo-targeted-semantic-fixture.test.js`，使用 synthetic temp workspace 锁住 TagMemo+Rerank ordering、`::Group(tag)` semantic bucket interleaving、recall audit telemetry 和 no-side-effect policy；targeted test `3/3`、full suite `429/429`、diff/docs validation 均通过；不改 runtime、不调 provider、不扩 MCP、不进入 V8。
+- P16.4 semantic ranking evidence gate：新增 [docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md](/A:/codex-memory/docs/P16_SEMANTIC_RANKING_EVIDENCE_GATE.md)，汇总 P16.2/P16.3 fixture-backed ranking evidence，结论为 `PASS_AS_FIXTURE_BACKED_EVIDENCE`；可进入 P16.5 compare/rollback semantic gate，但 runtime tuning、provider benchmark、V8、public MCP expansion、migration 和 real memory mutation 仍全部 deferred。
+- P16.5 compare/rollback semantic gate：新增 [docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md](/A:/codex-memory/docs/P16_COMPARE_ROLLBACK_SEMANTIC_GATE.md)，targeted TagMemo fixtures `9/9` 通过，donor ordering compare `4/4 matched`，donor ordering rollback `4/4 rollback-ready`；结论为 `PASS_WITH_SCOPE_LIMITS`，说明 donor ordering compatibility 仍绿，但这不是 passive TagMemo live-quality proof。
+- P16.x TagMemo semantic association closeout review：新增 [docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P16_TAGMEMO_SEMANTIC_ASSOCIATION_CLOSEOUT_REVIEW.md)，总结 P16 planning / inventory / fixture / evidence / compare-rollback gate，结论为 `FIXTURE_BACKED_AND_GATE_CHECKED`；P17 只能从 planning / evidence 开始，不授权 V8 implementation、runtime tuning、provider benchmark、migration、MCP expansion 或 real memory mutation。
+- P17 advanced memory intelligence / V8 evidence gate planning：新增 [docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md](/A:/codex-memory/docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_EVIDENCE_GATE_PLAN.md)，把现有 `v8-diagnose`、TagMemo analysis、EPA、ResidualPyramid、geodesic rerank 和 meta-thinking surfaces 拆成 evidence-first gate categories；本阶段只做 planning/docs/board，不实现 V8、不调 runtime、不跑 provider、不改 MCP、不做 migration。
+- P17.1 V8 diagnostic surface inventory：新增 [docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_SURFACE_INVENTORY.md)，盘点 `v8-diagnose`、TagMemoEngine、EPA、ResidualPyramid、RerankService、CandidateGenerator、existing tests、future report fields、forbidden fields 和 synthetic query families；本阶段 inventory/docs/board only，不运行 `v8-diagnose`、不新增 tests、不改 runtime。
+- P17.2 V8 diagnostic fixture shape tests：新增 `tests/fixtures/v8-diagnostic-shape-v1.json`、`tests/v8-diagnostic-shape.test.js` 与 [docs/P17_V8_DIAGNOSTIC_FIXTURE_SHAPE_TESTS.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_FIXTURE_SHAPE_TESTS.md)，锁定 `v8-diagnose` synthetic report shape、安全 flags、forbidden fields 与 missing-query safe error shape；targeted fixture test `5/5`、full suite `434/434`、diff check、docs validation 均通过；本阶段 tests/fixtures/docs only，不改 `src/`、不做 runtime tuning、不跑 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply。
+- P17.3 V8 diagnostic CLI shape gate：新增 `tests/fixtures/v8-diagnostic-cli-gate-v1.json`、`tests/v8-diagnostic-cli-shape-gate.test.js` 与 [docs/P17_V8_DIAGNOSTIC_CLI_SHAPE_GATE.md](/A:/codex-memory/docs/P17_V8_DIAGNOSTIC_CLI_SHAPE_GATE.md)，锁住 `v8-diagnose` CLI JSON/text/error shell；targeted CLI gate `5/5`、full suite `439/439` 通过；本阶段不改 `src/`、不跑 provider、不读取 real memory、不调 runtime、不改 MCP、不做 migration/import-export apply。
+- P17.4 V8 query-family fixture tests：新增 `tests/fixtures/v8-query-family-v1.json`、`tests/v8-query-family-fixture.test.js` 与 [docs/P17_V8_QUERY_FAMILY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P17_V8_QUERY_FAMILY_FIXTURE_TESTS.md)，覆盖 technical / governance / quality / semantic / safety synthetic diagnostic families；targeted query-family test `4/4`、full suite `443/443` 通过；不改 `src/`、不跑 provider、不读 real memory、不调 runtime、不改 MCP、不做 migration/import-export apply。
+- P17.5 V8 evidence gate summary：新增 [docs/P17_V8_EVIDENCE_GATE_SUMMARY.md](/A:/codex-memory/docs/P17_V8_EVIDENCE_GATE_SUMMARY.md)，汇总 P17 planning / inventory / fixture shape / CLI gate / query-family evidence，结论为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED`；本阶段 docs/status/board only，不授权 V8 implementation、runtime tuning、provider benchmark、real memory preview、MCP expansion 或 migration/import-export apply。
+- P17.x advanced memory intelligence / V8 closeout review：新增 [docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P17_ADVANCED_MEMORY_INTELLIGENCE_V8_CLOSEOUT_REVIEW.md)，将 P17 关闭为 `DIAGNOSTIC_EVIDENCE_FIXTURE_BACKED_AND_CLOSED`；下一路线只能进入 P18 planning / dry-run safety，不授权 import/export apply、SQLite migration、real memory mutation、provider benchmark、MCP expansion、V8 implementation 或 release candidate。
+- P18 import/export/migration safety planning：新增 [docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_PLAN.md)，把 import/export/migration 路线限定为 dry-run-first、redaction-first、backup/rollback/A5-approval-first；本阶段 planning/docs/board only，不实现 apply、不迁移 SQLite、不读取真实 memory、不写 durable data、不改 MCP。
+- P18.1 import/export fixture inventory：新增 [docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_FIXTURE_INVENTORY.md)，盘点 P13 object model、round-trip、mapping、mapping dry-run、import/export shape、migration readiness、lifecycle dry-run、controlled-write dry-run 和 internal validate_memory guard 证据；结论是 P18.2 应补 multi-record export envelope、lifecycle variants、supersession refs、conflict preview、backup/rollback manifest shape 等 synthetic fixture/test，不授权 apply、migration、real memory preview 或 MCP expansion。
+- P18.2 export envelope fixture expansion：新增 `tests/fixtures/p18-export-envelope-v1.json`、`tests/p18-export-envelope-fixture.test.js` 与 [docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md](/A:/codex-memory/docs/P18_EXPORT_ENVELOPE_FIXTURE_EXPANSION.md)，锁住 multi-record envelope、deterministic ordering/checksum、lifecycle variants、supersession refs、import conflict preview、backup/rollback requirements、redaction flags、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`、`realMemoryPreview=false`；不实现 import/export runtime，不生成文件，不读取真实 memory，不改 MCP。
+- P18.3 import mapping dry-run evidence gate：新增 [docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md](/A:/codex-memory/docs/P18_IMPORT_MAPPING_DRY_RUN_EVIDENCE_GATE.md)，汇总现有 mapping dry-run CLI 与 migration readiness CLI 证据；mapping dry-run 为 fixture-only、`mutated=false`、scanned `3` / mapped `2` / unmapped `1`、no file generation / no migration / no real DB or diary read；migration readiness 为 `status=blocked`、`migrationBlocked=true`、required approvals 未满足。结论 `DRY_RUN_EVIDENCE_READY_BLOCKED_FOR_APPLY`，只能进入 P18.4 backup/rollback safety review。
+- P18.4 backup / rollback safety review：新增 [docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md](/A:/codex-memory/docs/P18_BACKUP_ROLLBACK_SAFETY_REVIEW.md)，定义未来 import/export apply 或 migration 之前必须具备的 backup requirement、rollback story、A5 approval packet 和 validation matrix；结论 `BACKUP_ROLLBACK_REVIEW_READY_BLOCKED_FOR_APPLY`，不执行备份、不恢复、不迁移、不读取/写入真实 memory。
+- P18.x import/export/migration safety closeout：新增 [docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P18_IMPORT_EXPORT_MIGRATION_SAFETY_CLOSEOUT_REVIEW.md)，将 P18 关闭为 `DRY_RUN_SAFETY_BACKED_AND_BLOCKED_FOR_APPLY`；P18 已具备 planning / fixture / dry-run evidence / backup-rollback review，但 apply、migration、real backup/restore、real memory preview、public MCP expansion 仍全部 blocked。
+- P19 observability/admin review surface planning：新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_PLAN.md)，规划 dashboard / `observe:http` / `governance:report` / gates 的只读 admin review surface；P19 从 planning / inventory / fixture shape 开始，不直接做 UI、不调用 provider、不读取 real memory、不改 MCP、不做 migration/import-export apply。
+- P19.1 observability/admin review surface inventory：新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_INVENTORY.md)，盘点 dashboard / `observe:http` / `governance:report` / `gate:ci` / `gate:mainline` 的现有 schema coverage 与缺口；下一步建议 P19.2 synthetic admin-review surface shape tests。
+- P19.2 admin review surface shape tests：新增 `tests/fixtures/admin-review-surface-v1.json`、`tests/admin-review-surface-shape.test.js` 和 [docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md](/A:/codex-memory/docs/P19_ADMIN_REVIEW_SURFACE_SHAPE_TESTS.md)，锁住 synthetic admin-review top-level/source/signal/safety/error shape；本阶段不实现 runtime aggregation、不做 UI、不读取 real memory、不改 MCP、不做 provider/migration/import-export apply。
+- P19.3 admin review schema snapshot gate：新增 `tests/fixtures/admin-review-schema-snapshot-v1.json`、`tests/admin-review-schema-snapshot-gate.test.js` 和 [docs/P19_ADMIN_REVIEW_SCHEMA_SNAPSHOT_GATE.md](/A:/codex-memory/docs/P19_ADMIN_REVIEW_SCHEMA_SNAPSHOT_GATE.md)，锁住 dashboard / `observe:http` / `governance:report` / `gate:ci` / planned admin-review 的 key-set snapshot；本阶段仍不实现 runtime aggregation 或 UI。P19.3 已完成 validation、guarded commit、safe-push 和 post-push hash verification at `c5784fc082f08231eb326671ac510c52491f3f04`。
+- P19.4 operator troubleshooting notes：新增 [docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md](/A:/codex-memory/docs/P19_OPERATOR_TROUBLESHOOTING_NOTES.md)，整理 dashboard / `observe:http` / `governance:report` / `gate:ci` / `gate:mainline` 的 operator troubleshooting map、review levels、blocked/unavailable 处理和 hard boundaries；本阶段 docs-only，不实现 runtime aggregation 或 UI。
+- P19.x observability/admin review surface closeout：新增 [docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P19_OBSERVABILITY_ADMIN_REVIEW_SURFACE_CLOSEOUT_REVIEW.md)，将 P19 关闭为 `ADMIN_REVIEW_SURFACE_FIXTURE_BACKED_AND_OPERATOR_NOTED`；P20 只能从 planning / inventory 开始。
+- P20 local production hardening planning：新增 [docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_PLAN.md)，规划 startup/watchdog inventory、health/readiness dry-run evidence、rollback/backup operations plan、local production safety checklist 和 closeout 顺序；docs validation 已通过；本阶段 docs/planning only，不安装服务、不改配置、不跑 provider、不做 backup/restore/migration/import-export apply。
+- P20.1 startup/watchdog inventory：新增 [docs/P20_STARTUP_WATCHDOG_INVENTORY.md](/A:/codex-memory/docs/P20_STARTUP_WATCHDOG_INVENTORY.md)，盘点 HTTP MCP startup / ensure / watchdog / install scripts、scheduled task 与 HKCU Run fallback 风险、watchdog log writes、hard-stop approval requirements 和 P20.2 health/readiness evidence handoff；本阶段 docs/inventory only，未启动服务、未安装 watchdog/startup task、未改真实配置。
+- P20.2 health/readiness dry-run evidence：新增 [docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P20_HEALTH_READINESS_DRY_RUN_EVIDENCE.md)，记录 CI-safe readiness evidence；`gate:ci` 的 compare `43/43`、rollback `43/43`、queries `14/14`、policy/lifecycle/docs checks 均通过且 `mutated=false` / `providerCalls=0`，但 embedded tests 当前 `448/449`，阻塞于 `tests/tagmemo-targeted-semantic-fixture.test.js` 的 P16.3 TagMemo ordering drift；本阶段未启动服务、未运行 watchdog、未观察 live HTTP/audit、未改真实配置。
+- P20.2a gate-ci TagMemo semantic drift review：新增 [docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md](/A:/codex-memory/docs/P20_GATE_CI_TAGMEMO_SEMANTIC_DRIFT_REVIEW.md)，只读复核 P16.3 blocker；standalone targeted test 当前 `2/3`，重复 targeted loop 均失败在 `tag-title-body-evidence-order`，score inspection 显示 tail records 仅差 `0.000094`，group(tag) case 仍保留 alpha/beta interleave 意图；下一步应先做 P20.2b fixture contract repair。
+- P20.2b TagMemo targeted fixture contract repair：新增 [docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md](/A:/codex-memory/docs/P20_TAGMEMO_TARGETED_FIXTURE_CONTRACT_REPAIR.md)，仅收窄 P16.3 fixture/test 的 exact ordering contract，不改 runtime scoring；targeted test `3/3`，`gate:ci` summary.ok=true、tests `449/449`、compare `43/43`、rollback `43/43`、queries `14/14`、`mutated=false`、`providerCalls=0`、`durableMemoryTouched=false`；`npm test` passed `464/464`。
+- P20.3 rollback / backup operations plan：新增 [docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md](/A:/codex-memory/docs/P20_ROLLBACK_BACKUP_OPERATIONS_PLAN.md)，定义未来 local production hardening 操作前必须具备的 protected assets、backup manifest shape、rollback story、A5 approval packet、validation matrix 和 hard stops；本阶段 docs-only，不创建 backup、不 restore、不改 Codex/Claude config、不安装或启动 service/watchdog、不读取真实 memory、不做 migration/import-export apply。
+- P20.4 local production safety checklist：新增 [docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_SAFETY_CHECKLIST.md)，整理未来 local production 操作前的 operator preflight、startup/watchdog safety、config safety、durable memory safety、warning signals、approval packet 和 stop conditions；本阶段 docs-only，不启动服务、不安装 watchdog/startup task、不改真实配置、不创建 backup/restore、不读取真实 memory、不做 migration/import-export apply。
+- P20.x local production hardening closeout：新增 [docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P20_LOCAL_PRODUCTION_HARDENING_CLOSEOUT_REVIEW.md)，总结 P20 planning/state reconciliation/P20.1-P20.4 evidence、boundary confirmations、remaining risks 和 P21 readiness judgment；结论为 `LOCAL_PRODUCTION_HARDENING_EVIDENCE_READY_BLOCKED_FOR_APPLY`，可进入 P21 planning，但仍不得改真实 Codex/Claude config、启动或安装 service/watchdog、创建 backup/restore、做 migration/import-export apply 或 release candidate。
+- P21 Codex / Claude client integration hardening planning：新增 [docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md](/A:/codex-memory/docs/P21_CODEX_CLAUDE_CLIENT_INTEGRATION_HARDENING_PLAN.md)，规划 client identity、scope/visibility、acceptance docs、MCP config guidance、cross-client private leakage fixture path 和 public tool freeze；本阶段 docs-only，不改真实 Codex/Claude config、不启动 service/watchdog、不改 MCP schema/public tools、不调用 provider、不做 migration/import-export apply、不进入 P22 release candidate。
+- P21.1 client integration inventory：新增 [docs/P21_CLIENT_INTEGRATION_INVENTORY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_INVENTORY.md)，盘点 Codex/Claude client docs、`scope:acceptance` / scope tests / MCP tests / Claude CLI command surfaces、acceptance evidence、P21.2+ gaps 和 hard-stop boundaries；本阶段 docs-only，不读写真实 config、不运行 live HTTP observation、不新增 tests、不改 runtime。
+- P21.2 client scope acceptance fixture review：新增 [docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_SCOPE_ACCEPTANCE_FIXTURE_REVIEW.md)，将现有 scope tests 映射到 P21 gate categories；targeted `scope-filter` 18/18、`scope-acceptance-cli` 5/5、`scope-backfill-dry-run` 7/7 均通过；本阶段不新增 tests/fixtures、不改 runtime、不读写真实 config、不运行 live HTTP observation。
+- P21.3 Claude acceptance evidence refresh plan：新增 [docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md](/A:/codex-memory/docs/P21_CLAUDE_ACCEPTANCE_EVIDENCE_REFRESH_PLAN.md)，规划 Claude acceptance refresh 的 Tier 0 docs-only、Tier 1 read-only observation 和 Tier 2 config/model-mutating boundaries；本阶段不运行 `claude mcp list/get/add/remove`，不启动 HTTP MCP，不调用 provider/model，不改真实配置。
+- P21.4 client privacy boundary fixture tests：新增 `tests/fixtures/p21-client-privacy-boundary-v1.json`、`tests/p21-client-privacy-boundary-fixture.test.js` 和 [docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P21_CLIENT_PRIVACY_BOUNDARY_FIXTURE_TESTS.md)，fixture-only 覆盖 same-client private、cross-client private hiding、project/workspace/shared visibility、missing optional scope unknown/null、low-risk raw workspace/secret 禁止、public tools frozen 和 no-side-effect；不改 runtime、不读写真实 config、不调用 provider。
+- P21.5 client integration standing gate summary：新增 [docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY.md)，汇总 P21 planning / inventory / scope acceptance review / Claude refresh planning / privacy-boundary fixture evidence；当前结论为 `P21_CLIENT_INTEGRATION_STANDING_GATE_SUMMARY_READY`，可进入 P21 closeout review，但不授权 live Claude、真实 config、runtime、provider、MCP expansion、migration/import-export apply 或 P22 release-candidate。
+- P21.x client integration hardening closeout review：新增 [docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P21_CLIENT_INTEGRATION_HARDENING_CLOSEOUT_REVIEW.md)，总结 P21 planning/P21.1-P21.5 完成范围、targeted evidence、boundary confirmations、remaining risks 和 P22 readiness judgment；结论为 `P21_CLIENT_INTEGRATION_HARDENING_CLOSED_READY_FOR_P22_PLANNING`，P22 必须从 planning / readiness review / approval-packet design 开始。
+- P22 release-candidate planning：新增 [docs/P22_RELEASE_CANDIDATE_PLAN.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_PLAN.md)，规划 candidate contract freeze、required readiness gates、approval packet、future P22 sequence 和 safety rules；结论为 `P22_RELEASE_CANDIDATE_PLANNED_BLOCKED_FOR_IMPLEMENTATION_APPROVAL`，不创建 release candidate、不 tag/release/deploy、不做 runtime/config/provider/migration/import-export apply。
+- P22.1 release-candidate readiness inventory：新增 [docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_READINESS_INVENTORY.md)，盘点 full suite、strict mainline、compare/rollback、gate:ci、client privacy、local production safety 等 RC gate 的最新证据与 freshness；结论为 `P22_RELEASE_CANDIDATE_READINESS_INVENTORIED_BLOCKED_FOR_GATE_REFRESH`，RC implementation 前仍需 fresh gate matrix。
+- P22.2 release-candidate gate matrix dry-run plan：新增 [docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_MATRIX_DRY_RUN_PLAN.md)，规划未来 RC gate matrix dry-run report shape、gate 列表、blocker semantics 和执行顺序；结论为 `P22_GATE_MATRIX_DRY_RUN_PLANNED_BLOCKED_FOR_EXECUTION_APPROVAL`，不运行 heavy/live gates、不新增 CLI/tests、不创建 RC。
+- P12.5 validate_memory two-phase audit protocol 已进入 `origin/main`：commit `41a5630 fix: add validate memory two phase audit` 是当前最新 runtime safety baseline；后续 `514bd6f` 仅为 P14/P15 state reconciliation docs/board 提交。P14.2-P14.6 与 P15 planning 也均已在 `origin/main`；当前无需补 P14/P15 实质代码。
+- `real-query-suite` 现在会读取脱敏 fixture 并真实校验每条 case 的 `expected.mustContain` / `expected.mustNotContain`；`query:quality` 复用同一只读 runner，继续保持 `mutated=false`，不会生成伪造 `hitRate` / `qualityScore`。
+- `real-query-suite` 默认 suite 已补齐 q5/q6/q7，当前覆盖 `benchmarks/default-dataset.json` 的全部 `8` 条 query。
+- `gate:ci` 现在包含 `queries` fixture-only check，JSON 输出会暴露 `caseCount/assertedCount/passedCount/failedCount`。
+- `gate:ci` JSON schema 已补进 README / VALIDATION，`tests/gate-ci-cli.test.js` 也用 schema snapshot 风格断言锁住 top-level、summary、checks、queries.detail 字段集合。
+- `governance:report` 现在输出只读 `review` surface：`review.status/reviewLevel/counts/hints`，把 proposal / tombstone / supersession / stale metrics 收成可复用的人工复核闭环。
+- README / VALIDATION 已补 `governance:report` 最小 `review` JSON 样例和 troubleshooting note，明确 unavailable / proposal / stale / tombstone / supersession 都只触发人工复核，不触发生命周期写入。
+- dashboard / http-observe 现在补了更细的 JSON schema snapshot，锁住 top-level、summary、governance、audit/scope/logs 等关键字段集合。
+- README / VALIDATION 已补 dashboard/http-observe schema contract 摘要，说明 `summary` / `governance` / `audits` / `scope` / `logs` 字段边界；这些输出只做只读观测，不授权 backfill、migration、lifecycle write 或 MCP contract 扩展。
+- P10 memory policy runtime gate 已完成本地硬化：写入前 secret scanner、MCP `tools/call` runtime schema validation、HTTP non-loopback empty-token fail-fast、默认关闭的 soft read policy flag、fixture recall dry-run 均已落地；public MCP tools 仍只有 `record_memory` / `search_memory` / `memory_overview`。
+- P10.1 已把 runtime policy gates 固化为文档与 CI-safe 可见面：新增 [docs/runtime-policy-gates.md](/A:/codex-memory/docs/runtime-policy-gates.md)，并让 `gate:ci` 输出 fixture-only `checks.policyPreflight` summary；不改变 runtime 默认行为，不进入 P11。
+- P11 memory lifecycle core planning 已 docs-only 完成：新增 [docs/MEMORY_LIFECYCLE_CORE_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_CORE_PLAN.md)，定义 `active/stale/proposal/rejected/superseded/tombstoned`、allowed transitions、audit event shape、read policy relationship 和 P11.1 fixture schema tests；不改 runtime，不新增 MCP tools，不迁移真实数据。
+- P11.1 lifecycle fixture schema tests 已 tests/docs-only 完成：新增 `tests/fixtures/lifecycle-policy-v1.json` 与 `tests/lifecycle-schema.test.js`，固化 status enum、allowed transitions、default read policy、audit required fields 和 `lifecycle_transition` event type；不改 runtime，不做 SQLite migration。
+- P11.2 lifecycle SQLite dry-run planning 已 docs/tests-design only 完成：新增 [docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_SQLITE_DRY_RUN_PLAN.md)，规划 `memory_records` lifecycle columns、audit shape、default values、dry-run report shape 和 migration safety rules；不改 runtime，不改 tests，不执行 SQLite migration。
+- P11.3 lifecycle SQLite dry-run CLI fixture tests 已本地完成：新增 `lifecycle:sqlite:dry-run` 和 `src/cli/lifecycle-sqlite-dry-run.js`，CLI 只读报告 lifecycle column gap、`mutated=false`、风险等级和 SQLite backup rollback 要求，并拒绝 `--confirm/--apply`；不改 MCP tools，不改 `search_memory` 默认行为，不执行 SQLite migration。
+- P11.4 lifecycle read-policy runtime flag planning 已 docs/board-only 完成：新增 [docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_PLAN.md)，规划 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY=false` 默认关闭、status visibility matrix、scope/visibility 过滤关系和 read audit summary；不改 runtime，不改 tests，不改 `package.json`，不改变 `search_memory` 行为，不新增 MCP tools。
+- P11.5 lifecycle read-policy fixture tests 已 tests/docs-only 完成：新增 `tests/fixtures/lifecycle-read-policy-v1.json` 与 `tests/lifecycle-read-policy-fixture.test.js`，固化 `active/stale` 默认 include、`proposal/rejected/superseded/tombstoned` 默认 exclude、private same-client/cross-client 规则，以及 read audit summary shape；不改 runtime，不改 `search_memory` 行为，不新增 MCP tools。
+- P11.6 lifecycle read-policy runtime flag implementation planning 已 docs/board-only 完成：新增 [docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/MEMORY_LIFECYCLE_READ_POLICY_RUNTIME_IMPLEMENTATION_PLAN.md)，规划 future runtime insertion points、missing-column behavior、audit summary shape 和 P11.7/P11.8/P11.9 顺序；不改 runtime，不改 tests，不改 `package.json`，不改变 `search_memory` 行为，不新增 MCP tools。
+- P11.7 lifecycle read-policy runtime fixture tests 已 tests/docs-only 完成：新增 `tests/fixtures/lifecycle-read-policy-runtime-v1.json` 与 `tests/lifecycle-read-policy-runtime-fixture.test.js`，固化默认 flags 为 false、flag 开启后的 `active/stale` include 与 `proposal/rejected/superseded/tombstoned` exclude、`staleResultCount`、soft read private same-client/cross-client、missing-column warn/fail-safe 和 audit summary shape；不改 runtime，不改 `search_memory` 行为，不新增 MCP tools，不做 SQLite migration。
+- P11.x stale branch quarantine and doc salvage 已 docs/board-only 完成：新增 stale branch review，并新增当前主线口径的 [PERSONAL_PRODUCTION_READINESS.md](/A:/codex-memory/docs/PERSONAL_PRODUCTION_READINESS.md)。本阶段不改 runtime/tests/package，不 merge/rebase/cherry-pick 旧分支，不 push；下一阶段仍回到 P11.8。
+- P11.8 lifecycle read-policy runtime flag implementation 已本地完成：新增默认关闭的 `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`；flag 关闭时 proposal/rejected/superseded/tombstoned 仍保持既有可见性；flag 开启时普通 `search_memory` 按 lifecycle status 过滤，保留 active/stale 并统计 `hiddenByLifecycleCount` / `staleResultCount`；audit summary 记录低风险 policy 字段且不暴露 raw `workspace_id`；无 SQLite migration、无 MCP tool expansion、无 provider call。
+- P11.9 lifecycle policy gate-ci summary 已本地完成：`gate:ci` JSON/text 均包含 `lifecyclePolicy` fixture-only check；JSON detail 包含 `fixtureOnly=true`、`mutated=false`、`noNetwork/noDaemon/noProvider=true`、`defaultEnabled=false`、enabled include/exclude statuses、missing-column behavior、stale/hidden counts、audit summary shape 与 `rawWorkspaceIdExposed=false`。
+- P11.10 lifecycle read-policy observability/dashboard summary 已本地完成：`dashboard`、`observe:http`、`governance:report` 均展示低风险 `readPolicy` summary；JSON/text 不输出 raw `workspace_id`；仅读取 config flags 与 recent recall audit summary，不调用 provider、不写 memory、不 migration。
+- P12 controlled write tools planning 已 docs/board-only 完成：新增 [docs/CONTROLLED_WRITE_TOOLS_PLAN.md](/A:/codex-memory/docs/CONTROLLED_WRITE_TOOLS_PLAN.md)，定义候选工具、推荐顺序、第一批边界、mutation rules、lifecycle transition mapping、audit event shape、permission boundaries、rollback model、dry-run-first rule、future validation matrix 和 non-goals；不改 runtime，不改 tests，不新增 MCP tools，不做 SQLite migration。
+- P12.1 controlled write fixture schemas 已 tests/docs-only 完成：新增 fixture-backed schema test，验证候选名称唯一、public tools frozen、dry-run-first、默认不 mutate、mutation-capable candidates 必须有 audit/reason/evidence、update 禁止 silent overwrite、supersede 双向 link、forget tombstone-only、audit read-only、validate 不默认恢复 rejected/tombstoned、以及不允许 raw secret / raw workspace_id summary。
+- P12.2 mutation audit shape tests 已 tests/docs-only 完成：新增 mutation audit shape fixture/test，验证 event types 唯一、required fields 完整、每类 mutation event 包含 tool name、reason/evidence、redaction/lifecycle/scope policy flags，且 update/supersede/forget/validate/checkpoint/handoff 的特殊边界均被锁住。
+- P12.3 controlled write dry-run CLI prototypes 已本地完成：新增 dry-run fixture、CLI、npm script 和 CLI 测试；报告包含 `fixtureOnly/noDatabase/noDiaryWrite/noVectorWrite/noAuditLogWrite/noDurableMemoryWrite/noMcpPublicToolExpansion/publicToolsFrozen`，并可用 `--tool <candidate>` 过滤候选。
+- P12.4 MCP tool proposal review 已进入远端主线：新增 `tests/fixtures/controlled-write-proposal-review-v1.json` 与 `tests/controlled-write-proposal-review.test.js`，锁住 public tools frozen、docs/tests-only、no runtime mutation、no DB/diary/vector/audit-log write，以及候选工具后续 proposal/defer 结论。
+- A4.8 governance rail 已进入远端主线：新增 [docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)、safe-push / validation / failure-recovery docs，以及 `.agent_board` phase/closeout schema。
+- P12.5 approval gate 已开始：新增 [docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md](/A:/codex-memory/docs/P12_5_RUNTIME_MUTATION_APPROVAL_GATE.md)，只定义显式批准包、候选范围、运行时前置条件和验证门槛；不实现 runtime mutation。
+- P12.5 validate_memory runtime fixture tests 已完成：新增 fixture/test 锁住 runtime 批准前契约；targeted `11/11`、full suite `291/291` 通过；不改 `src/`，不新增 MCP tools，不写真实 DB/memory。
+- P12.5 validate_memory internal runtime implementation 已完成本地验证：新增 targeted runtime test，覆盖 dry-run default、proposal/stale apply、rejected/tombstoned/superseded 禁止、reason/evidence、ToolArgumentValidator、SecretScanner、cross-client private 禁止、missing lifecycle column fail-safe、public MCP tools frozen；targeted `9/9`、fixture `11/11`、full suite `300/300`、`gate:ci`、`gate:mainline:strict`、lifecycle SQLite dry-run、diff/docs validation 均通过。
+- P12.5 validate_memory runtime implementation plan 已完成：补齐 docs/tests-design 计划文档，明确 component plan、audit fields、targeted/runtime gates、rollback story，以及 public MCP / SQLite migration / broader mutation tool 的后续审批边界。
+- P12.5 validate_memory internal runtime review 已完成：审查 `ValidateMemoryService`、`ToolArgumentValidator`、`SqliteShadowStore`、`app.js`、runtime fixture、targeted tests 和 P12.5 docs，结论 PASS；复跑 fixture/runtime/MCP contract/full suite/gate/lifecycle dry-run，均通过。
+- `P0.5`：`tests/dashboard-cli.test.js` 修复 dashboard 空 store 场景兼容断言；`payload.store.records` 改为非负数检查，并要求 `records=0` 时 `store.status='warn'`，清理 CI 空库误判；clean CI runner warnings 用例保留。
+- `Phase C` 的 `TopicMemo` 中文输出、错误文案、`status/result` 包络继续向 donor 收口。
+- `Phase C` 的 `DeepMemo` 高级查询语法继续收口：
+  - 引号短语
+  - `(term:weight)`
+  - `{a|b}`
+  - `[negative]`
+  - 英文逗号 / 全角逗号分段
+- 主动记忆现在能区分并暴露 donor 风格边界：
+  - `agent-not-found`
+  - `topic-not-found`
+  - `empty-history`
+  - `missing-history`
+  - `history-read-error`
+- `DeepMemo` 的 donor 风格外围边界已并入：
+  - blocked keyword 过滤
+  - rerank 失败后继续成功返回并回退原结果
+- `execute({ maid })` 现在在无显式 command 且无 query 时，默认按 donor 风格走 `ListTopics`
+- `TopicMemo` 的 donor 风格展示细节继续贴齐：
+  - 锁定话题显示 `🔒`
+  - 话题详情里的说话人按 donor 风格加粗
+- donor `settings.userName` 缺失时，主动记忆回退用户名现在对齐为 `主人`
+- `Phase D` 第一批兼容入口已新增：
+  - `src/cli/deepmemo.js`
+  - `src/cli/topicmemo.js`
+  - `src/cli/compare-vcp-active-memory.js`
+- active-memory 运维 CLI 已新增：
+  - `src/cli/active-memory.js`
+  - 支持 `health / rebuild / sync`
+- rollback readiness CLI 已新增：
+  - `src/cli/rollback-active-memory.js`
+  - 支持只读生成 rollback-ready 报告
+- donor 风格 CLI 现在支持：
+  - `stdin JSON -> stdout/stderr JSON -> exit code`
+  - 默认紧凑 `status/result` 包络
+  - `--full` 输出完整结构化 payload
+- compare harness 现在支持：
+  - 同一份输入同时跑新 CLI 和 legacy script
+  - 只读输出对照报告
+  - `--require-match` / `--require-legacy` 门槛控制
+  - success-path 与 error-path 两条回归链都已覆盖
+  - `coreDiff / extendedDiff` 两级字段差异输出
+  - suite 模式批量样本对照
+  - `aggregateDiff` 汇总级字段漂移统计
+- 仓库内标准 active-memory suite 数据集已落盘：
+  - `benchmarks/active-memory-suite/standard-suite.json`
+  - `benchmarks/active-memory-suite/README.md`
+  - `benchmarks/active-memory-suite/legacy/standard-legacy-runner.js`
+  - `benchmarks/active-memory-suite/vchat-fixture/`
+- compare harness 现在支持 suite 级按-case `env` 注入。
+- 当前仓库标准集已扩到 `25` 个 mixed-tool case。
+- compare / rollback 现在不再只依赖临时测试 case，也能直接跑仓库标准集。
+- 标准集新增覆盖：
+  - `DeepMemo` 多 topic 排序
+  - `DeepMemo` 多 agent / 多 fixture 成功检索
+  - `DeepMemo` 多 agent 默认 `exclude_latest`
+  - `DeepMemo` 多 agent `current_topic_id` 显式排除
+  - `DeepMemo` maid alias 命中
+  - `DeepMemo` 单 topic 多窗口复杂排序
+  - `DeepMemo` 单 topic 三窗口排序稳定性
+  - `DeepMemo` 更大的跨多 topic 排序集
+  - `DeepMemo` `agent-not-found`
+  - `TopicMemo` `agent-not-found`
+  - `TopicMemo` `agentId + maid` 混合过滤
+  - `TopicMemo` 多 agent `ListTopics / GetTopicContent`
+  - `TopicMemo` `settings.userName` 缺失回退到 `主人`
+- compare suite 的按-case `env` 现在会自动解析 `_PATH / _ROOT / _DIR` 相对路径到 suite 目录，备用 fixture root 已可直接写进标准集。
+- 仓库标准 suite 现在已经是自描述集：默认主 fixture 也显式带 root，不再依赖父进程环境变量。
+- compare suite 现在还支持 fixture manifest 预处理：
+  - fixture root 可带 `.codex-fixture-manifest.json`
+  - suite 运行时会复制到临时目录并打固定 `mtime`
+  - 多 topic / 多 agent 排序标准集现在更抗环境漂移
+  - 当前 `6` 个标准 fixture root 已全部 manifest 化
+- 标准 suite 现在还带一条 manifest 守门回归：
+  - 标准 suite 里引用的 fixture root 必须使用 `vchat-fixture*` 命名，并且位于 `benchmarks/active-memory-suite` 下
+  - 新增 `vchat-fixture*` 根目录但没补 manifest，会直接测试失败
+  - 在已有 fixture 里新增 `history.json` 但没补 manifest，也会直接测试失败
+  - 标准 suite 现在还带一层 case 分类元数据：
+    - 根级有 `metaVersion / metaSchema`
+    - 每个 case 都有 `meta.category / meta.expectation / meta.fixture / meta.tags`
+    - compare suite 报告会透传 `metaVersion / metaSchema / cases[*].meta`
+    - compare / rollback suite 报告现在还会输出按 `meta.category` 聚合的 `categoryAggregate`
+  - suite 过滤再前进一版：
+    - `--tag-all`（AND 语义）
+    - `--exclude-tag`
+    - `--exclude-fixture`
+    - suite 透传 `tagAllFilter / excludeTagFilter / excludeFixtureFilter`
+  - suite CLI 现在支持 `--category <meta.category>` 过滤
+  - suite CLI 现在支持 `--expectation <meta.expectation>` 过滤
+  - suite CLI 现在支持 `--tool <deepmemo|topicmemo>` 过滤
+  - suite CLI 现在支持 `--fixture <meta.fixture>` 过滤
+- suite CLI 现在支持 `--tag <meta.tags item>` 过滤
+  - `categoryAggregate` 现在还会按 `fixture` 输出二级分组 `fixtureAggregate`
+- `Phase D` 的 `--expectation` 多值过滤语义继续固化：
+  - compare / rollback 文档说明已明确为“逗号分隔 OR”
+  - `error,success` 多值场景已有回归
+  - `success,error` 反向顺序输入已有回归，过滤结果会归一化为稳定序列
+  - `success,error,success` 重复值输入已有回归，过滤结果会自动去重
+  - 对应断言会继续校验 case 总量、fixture 准备数量，以及 `meta.expectation` 值域只落在目标集合内
+- `Phase D` 的 rollback 汇总现在还会输出：
+  - `summary.recommendationBreakdown`
+  - `summary.blockerBreakdown`
+  - `categoryAggregate[*].recommendationBreakdown`
+  - `categoryAggregate[*].blockerBreakdown`
+  - `fixtureAggregate[*].recommendationBreakdown`
+  - `fixtureAggregate[*].blockerBreakdown`
+  - 新增 mixed-reason 回归覆盖 `rollback-safe + investigate-before-rollback + legacy-unavailable` 的并存场景
+  - `cases[*].summary.outcome`
+  - `cases[*].summary.blockerReasons`
+  - 单 case mismatch 现在也会稳定暴露更细的阻断原因，例如 `core-diff / result-mismatch`
+- rollback 文本输出现在还会：
+  - 在顶部输出紧凑的 `recommendationBreakdown` / `blockerBreakdown`
+  - 在 `categoryAggregate` / `fixtureAggregate` 行内直接预览 blocker
+  - 有专门的文本模式回归锁住关键行
+- `Phase D` 的 compare 汇总现在还会输出：
+  - `summary.comparisonBreakdown`
+  - `summary.driftReasonBreakdown`
+  - `categoryAggregate[*].comparisonBreakdown`
+  - `categoryAggregate[*].driftReasonBreakdown`
+  - `fixtureAggregate[*].comparisonBreakdown`
+  - `fixtureAggregate[*].driftReasonBreakdown`
+  - 新增 mixed-reason compare 回归覆盖 `matched + mismatched + legacy-unavailable` 并存，以及 `result-mismatch / core-diff / extended-only-drift` 的聚合语义
+  - `cases[*].comparison.outcome`
+  - `cases[*].comparison.driftReasons`
+  - suite 文本输出里的 case 预览现在也会直接显示 `outcome` 与 `driftReasons`
+- compare 文本输出现在还会：
+  - 在顶部输出紧凑的 `comparison-breakdown` / `drift-reason-breakdown`
+  - 在 `categoryAggregate` / `fixtureAggregate` 行内直接预览 drift reason
+  - 有专门的文本模式回归锁住关键行
+- README 现在还补了：
+  - compare 的“三步排障流程”
+  - rollback 的“三步回滚判定流程”
+  - 文本模式先扫摘要、JSON 模式再深挖的推荐顺序
+- `Phase E / P0-1` 已新增默认主链持续门禁 CLI：
+  - `src/cli/mainline-gate.js`
+  - `npm run gate:mainline`
+  - `npm run gate:mainline:strict`
+  - 日常模式检查 `health + compare --require-match + rollback --require-ready`
+  - 严格模式额外检查 `mcp-contract + mcp-http + npm test`
+- `Phase E / P0-2` 已新增 HTTP 运行态诊断 CLI：
+  - `src/cli/http-observe.js`
+  - `npm run observe:http`
+  - 汇总 `/health`、HTTP 日志、watchdog 日志、bridge audit、recall audit
+  - 输出 `ok / warn / error` 三级运行态诊断结论
+- `Phase E / P0-3` 已新增默认主链回滚预案 CLI：
+  - `src/cli/mainline-rollback.js`
+  - `npm run rollback:mainline:plan`
+  - 读取当前 `C:\Users\617\.codex\config.toml` 的 `vcp_codex_memory` 配置块
+  - 可自动从 `A:\VCP\VCPToolBox\config.env` 推断 legacy MCP URL
+  - 输出当前入口模式、legacy 目标、最小 rollback patch 和回滚步骤
+  - 当前真实环境里已提升为 `ok`：旧服务已在 `127.0.0.1:6005` 上可达，回滚 patch 可直接落地
+  - 已完成一次真实演练：[phase-e-mainline-rollback-drill-01.md](/A:/codex-memory/logs/phase-e-mainline-rollback-drill-01.md)（详见运行记录索引 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)）
+
+## 当前已验证
+
+- `git diff --check`：通过（P13.3 docs/board planning）
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：通过（P13.3 docs/board planning）
+- `node --test tests\vcp-memory-object-round-trip.test.js`：`18/18` 通过
+- `node --test tests\vcp-memory-object-model-fixture.test.js`：`13/13` 通过
+- `npm test`：`343/343` 通过
+- `git diff --check`：通过
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`：通过
+- `node --test tests/dashboard-cli.test.js`：`4/4` 通过
+- `npm run gate:mainline:strict`：`status: ok`（`health`、`contract`、`test`、`compare`、`rollback` 全绿）
+- `node --test .\tests\phase-c-active-recall.test.js`：`16/16` 通过
+- `node --test .\tests\active-memory-cli.test.js`：`1/1` 通过
+- `node --test .\tests\vcp-active-memory-cli.test.js`：`5/5` 通过
+- `node --test .\tests\compare-vcp-active-memory-cli.test.js`：`14/14` 通过
+- `node --test .\tests\rollback-active-memory-cli.test.js`：`11/11` 通过
+- `node --test .\tests\compare-vcp-active-memory-cli.test.js .\tests\rollback-active-memory-cli.test.js`：`25/25` 通过
+- `node --test .\tests\mainline-gate-cli.test.js`：`2/2` 通过
+- `node --test .\tests\http-observe-cli.test.js`：`2/2` 通过
+- `node --test .\tests\mainline-rollback-cli.test.js`：`3/3` 通过
+- `npm run gate:mainline`：通过
+- `npm run gate:mainline:strict`：通过
+- `npm run observe:http -- --json`：通过
+- `npm run rollback:mainline:plan -- --json`：通过
+- 当前 `summary.status=ok`
+- `rollbackTargetReachable=true`
+- legacy target = `http://127.0.0.1:6005/mcp/codex-memory`
+- `tools/list` 实探通过，返回 `record_memory / search_memory / memory_overview`
+- 临时把 `C:\Users\617\.codex\config.toml` 从 `7605` 切到 `6005` 后，`initialize` 返回 `200 + Mcp-Session-Id`
+- 演练后已切回 `http://127.0.0.1:7605/mcp/codex-memory`
+- 切回后 `npm run gate:mainline`：通过
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`：通过
+- compare 当前 `extendedMismatchCountTotal=0`
+- compare 当前 `driftReasonBreakdown={}`
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`：通过
+- rollback 当前 `extendedMismatchCountTotal=0`
+- `node --test .\tests\phase-c-active-recall.test.js`：`21/21` 通过
+- `npm test`：`94/94` 通过
+- 覆盖内容包括：
+  - donor-style VChat rebuild
+  - `DeepMemo/TopicMemo` 基础兼容与 donor 风格输出
+  - 空索引自动回填
+  - 当前 topic 排除
+  - 新增 / 更新 / 删除 topic 的增量同步
+  - 已建索引后的自动增量追平
+  - blocked keyword donor 边界
+  - rerank failure donor 边界
+  - agent / topic / history 状态分辨
+  - donor 锁定图标、加粗说话人、默认用户名回退
+  - donor 风格 `DeepMemo/TopicMemo` CLI 进程语义
+  - active-memory `health / rebuild / sync` CLI
+  - compare harness 对 error-path / success-path 的兼容比对
+  - rollback readiness 报告
+  - suite 级 compare / rollback 汇总报告
+  - 仓库内标准 suite 数据集的 compare / rollback 门禁
+  - fixture manifest 复制 + 固定 `mtime` 预处理
+  - `6` 个标准 fixture root 全量 manifest 化
+  - manifest 根目录级 / history 文件级覆盖检查
+  - 标准 suite case 分类元数据与 compare 报告透传
+  - compare / rollback 的按分类聚合视图
+  - `--expectation` 的多值 OR、反向顺序归一化、重复值去重
+  - rollback suite 的 recommendation/blocker 结构化原因汇总
+  - compare suite 的 comparison/drift 结构化原因汇总
+  - compare / rollback 文本模式的可读性回归
+  - 默认主链持续门禁 CLI
+  - 默认主链日常 gate 与严格 gate
+  - HTTP 运行态诊断 CLI
+  - 默认主链回滚预案 CLI
+  - `DeepMemo` 高级查询语法标准集
+  - `DeepMemo` blocked-keyword / rerank-fallback 标准集
+- `DeepMemo` 多 topic 排序 / 多 agent / 多 fixture / `exclude_latest` / `current_topic_id` / alias / 复杂排序 / `agent-not-found` 标准集
+- `TopicMemo` 多 agent / `agentId + maid` / `agent-not-found` / `settings.userName` 缺失回退标准集
+- `TopicMemo` 空历史 / 缺历史 / 缺话题标准集
+- 新增独立的 `Phase D` 迁移验收清单：
+  - compare / rollback 各自的文本模式、JSON 模式、门禁模式检查项
+  - 标准 suite / fixture manifest / case 元数据稳定性检查项
+  - 风险、阻断项、切换建议的手工收口模板
+- 首轮 `Phase D` 独立迁移验收已回填到清单：
+  - `npm test`：`80/80`
+  - `compare --require-match`：`25/25 matched`
+  - `rollback --require-ready`：`25/25 rollback-safe`
+  - 当前无 blocker，结论为 `Pass with Known Gaps`
+  - 当时的已知差距主要是 `extended-only-drift=25`、`extendedMismatchCountTotal=185`
+- 新增独立的灰度切主链 playbook：
+  - 切换前检查
+  - 灰度执行顺序
+  - 观察项与继续灰度标准
+  - 立即暂停灰度的触发条件
+  - 最小回滚动作与记录项
+- 新增独立的灰度执行记录模板：
+  - 每轮灰度的环境、变更、compare 结果、rollback 结果
+  - MCP / 主调用链观察
+  - 继续灰度 / 暂停灰度 / 回滚判断
+  - 已知差距变化与下一步动作
+- 新增 `Gray-01` 基线记录：
+  - 当前仍未切主入口
+  - compare 仍是 `25/25 matched`
+  - rollback 仍是 `25/25 rollback-safe`
+  - 当前建议推进到 `Gray-02` 的真实主入口切换观察
+- 新增 `Gray-02` 执行前清单：
+  - 明确主入口切换层在 `vcp_codex_memory` 的 Codex 接入层，而不是记忆核心层
+  - 明确默认目标地址是 `http://127.0.0.1:7605/mcp/codex-memory`
+  - 明确切换前命令、回退点和现场证据
+- 新增 `Gray-02` 预检查通过记录：
+  - `npm test=80/80`
+  - HTTP `/health` 已通过
+  - compare `25/25 matched`
+  - rollback `25/25 rollback-safe`
+  - `C:\Users\617\.codex\config.toml` 已指向 `http://127.0.0.1:7605/mcp/codex-memory`
+- 新增 `Gray-02` 真实观察记录：
+  - 用户重启后已成功回到当前会话
+  - 当前未出现 `vcp_codex_memory` 初始化失败或握手超时
+  - HTTP MCP 健康检查通过
+  - compare / rollback 在重启后再次复跑仍然全绿
+  - 当前建议进入 `Gray-03` 持续稳定性观察
+- 新增 `Gray-03` 稳定性观察记录：
+  - HTTP `/health` 持续通过
+  - `mcp-contract + mcp-http` 定向测试 `5/5`
+  - compare 持续 `25/25 matched`
+  - rollback 持续 `25/25 rollback-safe`
+  - 当前可开始讨论从“灰度主链”推进到“默认主链”
+- 新增 `Gray-03` 持续稳定性观察计划：
+  - 标准化 `Gray-04 / Gray-05` 的观察周期
+  - 固定每轮必查项、继续灰度标准、暂停灰度标准
+  - 固定推进到“默认主链”的门槛
+- 新增后续轮次记录骨架：
+  - 让 `Gray-04 / Gray-05` 可以直接复制填写
+  - 不再每轮重新组织观察字段
+- 新增 `Gray-04` 稳定性观察记录：
+  - health 继续通过
+  - compare 继续 `25/25 matched`
+  - rollback 继续 `25/25 rollback-safe`
+  - `codex-memory-http.log` 未出现新的异常迹象
+- 新增 `Gray-05` 稳定性观察记录：
+  - health 继续通过
+  - compare 继续 `25/25 matched`
+  - rollback 继续 `25/25 rollback-safe`
+  - `Gray-04 / Gray-05` 两轮后续稳定性观察均已完成
+- 新增默认主链切换结论：
+  - `codex-memory` 现在可以作为 `vcp_codex_memory` 的默认主链实现
+  - donor / 旧实现保留为只读对照和回滚参考，不再建议作为日常主链
+  - 当前剩余工作转为 donor 扩展 payload 的精修线
+- 新增 `Phase E / P1` 错误语义标准 suite 门禁收口：
+  - compare harness 现已把 `query / rawQuery / blockedKeywords / inputSource` 收窄为 error-path 专属 extended diff
+  - 标准 suite 新增 `DeepMemo invalid-json` case
+  - 标准 suite 新增 `TopicMemo invalid-json` case
+  - 标准 suite 新增 `TopicMemo unknown-command` case
+  - 标准 suite 新增 `DeepMemo` 多关键词组合 `all-keywords-blocked` case
+  - compare harness 现在会在新旧 success payload 都显式暴露 `meta` 时，额外比对 blocked/effective success-meta 字段
+  - 标准 suite 新增 `DeepMemo` 多关键词组合“部分屏蔽但仍成功”case
+  - 标准 suite 新增 `DeepMemo` 重复关键词去重 success case，把 blocked/effective 的去重与顺序稳定性也纳入门禁
+  - 标准 suite 新增 `DeepMemo` 高级查询语法混用 success case，把短语 / 可选组 / 权重项混用时的 blocked/effective donor 语义也纳入门禁
+  - 标准 suite 新增 `DeepMemo` blocked 配置重复值和大小写混用 success case，把 blocked config 归一化下的 blocked/effective donor 语义也纳入门禁
+  - 标准 suite 新增 `TopicMemo history-read-error` fixture 与 case
+  - 标准 suite 新增 `TopicMemo GetTopicContent agent-not-found` case，把显式内容取回路径上的 donor 错误语义也纳入门禁
+  - 标准 suite 新增 `TopicMemo GetTopicContent agentId/topicId alias` case，把多 agent alias 下的内容取回成功路径也纳入门禁
+  - legacy standard runner 现已按当前 Node 运行时真实 parser message 生成 `history-read-error` donor 文案
+  - `node --test .\tests\vcp-active-memory-cli.test.js = 17/17`
+  - `node --test .\tests\compare-vcp-active-memory-cli.test.js = 14/14`
+  - `node --test .\tests\rollback-active-memory-cli.test.js = 11/11`
+  - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`
+    - `matchedCaseCount = 36`
+  - `extendedMismatchCountTotal = 0`
+  - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`
+    - `readyCaseCount = 36`
+  - `extendedMismatchCountTotal = 0`
+  - `npm test = 123/123`
+
+## 当前风险
+
+- `Phase C` 的“增量”仍属于“增量解析 + 全树扫描”，规模继续放大后可能需要更细的快照或目录游标。
+- 主动记忆仍未完整并入 donor 侧全部 `LightMemo / DeepMemo / TopicMemo / MetaThinking` 语义细节。
+- `DeepMemo` 当前的 blocked-keyword 与 rerank 对齐属于“兼容级实现”，不是 donor 原插件的逐行复刻。
+- 新增的 donor 风格 CLI 已覆盖主动记忆的 `stdin/stderr/process.exit` 兼容入口；当前 compare / rollback 门禁已能守住标准 suite 的 donor 风格错误语义，但更细的 donor 别名层仍有继续精修空间。
+- `VCPToolBox / VCPChat` 仍是 donor 参考源，但当前边界保持只读，不再作为运行时依赖。
+
+## 下一步建议
+
+- P20.1 startup/watchdog inventory 已完成 guarded commit / safe-push 和 post-push hash verification，P20.1 对应提交为 `e56bc2a182302e86f9cf8c79f642e0e7badccc99`；当前已推送基线为第一轮 CI reconciliation commit `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`。
+- GitHub Actions `CI` 在 `591adf79863e1d2ed20232c0ca54b5711ff8c3ef` 上失败：Linux `npm test` 为 `470/472`，失败点是 `tests/donor-ranking-tie-breaker-parity-fixture.test.js` 与 `tests/tagmemo-targeted-semantic-fixture.test.js` 的 fixture contract 漂移；本地 Windows targeted tests 和 full `npm test` 均通过。
+- 第一轮 fixture-only/test-only 收窄已推送为 `7e3ef76da50ae28e3a75d7a5164e30541eaa98f4`，TagMemo drift 已修复，但 GitHub Actions `CI` run `25899201275` 仍在 donor ranking fixture 的另一个 exact memory-label ordered snippet 上失败。
+- 第二轮本地补丁继续只改 donor ranking fixture：全部 ranking/tie-breaker cases 改为 content-level `resultIncludes`，不再把 `[回忆片段N]` label 编号当作跨平台硬约束。验证：targeted donor `2/2`、targeted TagMemo `3/3`、`npm test` `472/472`、`gate:ci` ok（tests `457/457`、compare/rollback `43/43`、queries `14/14`）。需要 guarded commit / safe-push 后确认 Linux CI 回绿。
+- P22.3 release-candidate rollback/support story 已新增 [docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ROLLBACK_SUPPORT_STORY.md)，定义 future RC rollback tiers、support/troubleshooting map、operator handoff fields 和 approval boundaries；本阶段未运行 gate matrix、未启动服务、未安装 watchdog/startup task、未改真实配置、未读写真实 memory、未创建 RC。
+- P22.4 release-candidate approval packet template 已新增 [docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_APPROVAL_PACKET_TEMPLATE.md)，提供 future A5 approval packet 模板；默认状态 `NOT_APPROVED_TEMPLATE_ONLY`，不授权任何命令执行或 RC 创建。
+- P22.x release-candidate planning closeout review 已新增 [docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_PLANNING_CLOSEOUT_REVIEW.md)，关闭 P22 planning chain；结论 `P22_RELEASE_CANDIDATE_PLANNING_CLOSED_BLOCKED_FOR_EXPLICIT_RC_APPROVAL`。
+- P22 release-candidate gate refresh approval request draft 已切换为 temporary worktree execution model：[docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_APPROVAL_REQUEST.md) 记录 `rc_target_commit=806cc847cb37a3e428099b45871a4f1a13c4fa6f`、`approval_request_commit=c1bb2984a948220376f3fb4265d64589bc0c94c2`；gate execution checkout / temporary worktree 的 `HEAD` 必须等于 `rc_target_commit`，当前 `main` 可停留在 approval docs state。
+- P22 approved local non-provider RC gate refresh result 已记录在 [docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_GATE_REFRESH_RESULT.md)：result `PASS`；`npm test` `472/472`、`gate:ci` tests `457/457`、compare `43/43`、rollback `43/43` 均为已完成执行记录，本记录阶段未重跑 gates；temporary worktree 已移除，main clean at `ec588d564959212e47d046d4b323406c2fc62b58`。
+- P22.5 release-candidate artifact approval request 已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_APPROVAL_REQUEST.md)，起草未来创建 RC artifact 的 A5 approval packet；状态 `NOT_APPROVED`，decision `BLOCKED_HARD_STOP`，不创建 RC artifact，不 tag/release/deploy。
+- P22.6 release-candidate artifact manifest shape 已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_MANIFEST_SHAPE.md)，定义 future RC artifact JSON/Markdown manifest shape；只做 shape docs，不生成真实 artifact，不新增 fixture/test。
+- P22.7 release-candidate notes draft 已新增 [docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_NOTES_DRAFT.md)，汇总 candidate scope、已通过 gate evidence、blocked items、known gaps、non-goals、operator warnings 和 rollback/support references；这是 notes draft，不是 release。
+- P22.8 release-candidate operator handoff 已新增 [docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_OPERATOR_HANDOFF.md)，提供 future RC artifact approval 前的 operator checklist，覆盖 preflight、approved gates、remaining blockers、config/provider/migration boundaries、MCP freeze、client caveats 和 rollback/support。
+- P22.9 post-gate-refresh closeout review 已新增 [docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_POST_GATE_REFRESH_CLOSEOUT_REVIEW.md)，关闭 P22 gate-refresh 后的文档准备链；结论 `READY_TO_REQUEST_RC_ARTIFACT_APPROVAL`，但 RC artifact 未创建，tag/release/deploy 未执行，A5 approval 仍是创建 artifact 前置条件。
+- P22 release-candidate artifact creation approval request 已新增 [docs/P22_RELEASE_CANDIDATE_ARTIFACT_CREATION_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_CREATION_APPROVAL_REQUEST.md)，请求显式批准创建单个本地 Markdown artifact `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`；状态 `NOT_APPROVED`，decision `BLOCKED_HARD_STOP`，未创建 RC artifact。
+- P22 release-candidate artifact 已按显式批准创建：[docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md)。这是本地 Markdown artifact only；未 tag、未 release、未 deploy，未 provider call，未启动 live HTTP MCP，未改 config，未做 startup/watchdog operation，未读取 real memory preview，未写 durable memory，未做 migration/import-export apply，未扩展 public MCP。
+- P22.10 RC artifact creation closeout review 已新增 [docs/P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RC_ARTIFACT_CREATION_CLOSEOUT_REVIEW.md)，关闭 artifact creation 阶段；结果 `P22_RC_ARTIFACT_CREATED_DOCS_ONLY_CLOSED`，rollback story 为 revert docs artifact commit。
+- P22.11 tag/release/deploy approval request 已新增 [docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md)，将 tag、GitHub release、deploy 拆成三个独立 approval switches；默认均为 `NOT_APPROVED`，decision `BLOCKED_HARD_STOP`。
+- P22.12 release publication boundary checklist 已新增 [docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md](/A:/codex-memory/docs/P22_RELEASE_PUBLICATION_BOUNDARY_CHECKLIST.md)，记录 artifact exists does not equal released、target commit frozen、public MCP tool freeze、`validate_memory` internal-only 和 tag/release/deploy approval separation。
+- P22.13 post-artifact operator handoff 已新增 [docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md](/A:/codex-memory/docs/P22_POST_ARTIFACT_OPERATOR_HANDOFF.md)，记录 artifact path、gate evidence、已完成/未完成事项、next approval options、rollback path、troubleshooting notes、release warning 和 exact forbidden actions。
+- P22.x RC artifact readiness closeout review 已新增 [docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P22_RC_ARTIFACT_READINESS_CLOSEOUT_REVIEW.md)，关闭 post-artifact docs chain；结论 `READY_TO_REQUEST_TAG_RELEASE_DEPLOY_APPROVAL`，但 tag/release/deploy 仍未执行，A5 approval 仍是 publication 前置条件。
+- P22 tag-only approval request 已更新 [docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_TAG_RELEASE_DEPLOY_APPROVAL_REQUEST.md)：本阶段只请求 `p22-rc-806cc847` tag approval；tag approval 仍为 `NOT_APPROVED`，GitHub release approval 与 deploy approval 仍为 `NOT_APPROVED`；未创建或 push tag。
+- P22 security fix 已进入 `origin/main`：`7fd17de624c0da76751e863e97302bed0dbec905` 修复 `record_memory` scope metadata secret scan gap，验证 `security-write-policy 3/3`、`npm test 473/473`、`gate:ci` tests `458/458`、compare `43/43`、rollback `43/43`、`providerCalls=0`、`mutated=false`。既有 `p22-rc-806cc847` 不再作为最终候选；不得移动或复用该已推送 tag。fresh RC gate refresh approval request 已新增 [docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_APPROVAL_REQUEST.md)，状态 `DRAFT_NOT_APPROVED` / `BLOCKED_HARD_STOP`，建议新 tag 为 `p22-rc-7fd17de`，但当前未运行 fresh gates、未创建新 RC artifact、未创建 tag/release/deploy。
+- P22 security fix fresh RC gate refresh PASS 已记录：[docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md](/A:/codex-memory/docs/P22_SECURITY_FIX_FRESH_RC_GATE_REFRESH_RESULT.md)。执行目标 `rc_target_commit=7fd17de624c0da76751e863e97302bed0dbec905`，`approval_request_commit=1ad3477b0f46eceef55608c0bbd3243c15681f38`；临时 worktree `A:\codex-memory-gate-7fd17de` 已创建、验证、移除。记录的结果为 `npm test 473/473`、`gate:ci` tests `458/458`、compare `43/43`、rollback `43/43`、`noProvider=true`、`mutated=false`；本记录阶段未重跑 gates、未创建 RC artifact、未创建或移动 tag、未 release/deploy。
+- P22 security fix RC artifact creation approval request 已新增：[docs/P22_SECURITY_FIX_RC_ARTIFACT_CREATION_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_RC_ARTIFACT_CREATION_APPROVAL_REQUEST.md)。该请求只请求未来创建本地 Markdown artifact `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`，target `7fd17de624c0da76751e863e97302bed0dbec905`，suggested future tag `p22-rc-7fd17de`；当前 approval remains `NOT_APPROVED`，decision remains `BLOCKED_HARD_STOP`，未创建新 RC artifact，未创建或移动 tag，未 release/deploy。
+- P22 security-fix release-candidate artifact 已按显式批准创建：[docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md](/A:/codex-memory/docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md)。这是 local Markdown artifact only；未创建 tag，未移动 tag，未 push tag，未创建 GitHub release，未 deploy，未 provider/config/startup/watchdog/real-memory/durable-write/migration/import-export/public MCP/package/env change。
+- P22 security-fix tag-only approval request 已新增：[docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_ONLY_APPROVAL_REQUEST.md)。本阶段只请求 Git tag approval；proposed tag `p22-rc-7fd17de`，target `7fd17de624c0da76751e863e97302bed0dbec905`，artifact path `docs/P22_RELEASE_CANDIDATE_ARTIFACT_7fd17de.md`；tag approval / GitHub release approval / deploy approval 均仍为 `NOT_APPROVED`，未创建或 push tag。
+- P22 security-fix tag result 已记录：[docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_TAG_RESULT_RECORD.md)。Git tag `p22-rc-7fd17de` 已创建并 push，local/remote tag 均指向 `7fd17de624c0da76751e863e97302bed0dbec905`；未创建 GitHub release，未 deploy，未 provider/config/startup/watchdog/real-memory/durable-write/migration/import-export/public MCP/package/env change。
+- P22 GitHub release approval request 已新增：[docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_APPROVAL_REQUEST.md)。本阶段只请求未来为 tag `p22-rc-7fd17de` 创建 GitHub release；GitHub release approval remains `NOT_APPROVED`，deploy approval remains `NOT_APPROVED`；未创建 GitHub release，未 deploy。
+- P22 GitHub release result 已记录：[docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md](/A:/codex-memory/docs/P22_SECURITY_FIX_GITHUB_RELEASE_RESULT_RECORD.md)。GitHub prerelease `P22 Security-Fix Release Candidate p22-rc-7fd17de` 已创建，URL `https://github.com/JENN2046/codex-memory/releases/tag/p22-rc-7fd17de`；production deploy remains `NOT_APPROVED` / still blocked，未 provider/config/startup/watchdog/real-memory/durable-write/migration/import-export/public MCP/package/env change。
+- P22 local HTTP MCP deploy/validation result 已记录：[docs/P22_LOCAL_DEPLOY_RESULT_RECORD.md](/A:/codex-memory/docs/P22_LOCAL_DEPLOY_RESULT_RECORD.md)。`/health ok`、live `initialize/tools/list ok`、public MCP tools 仍为 `record_memory` / `search_memory` / `memory_overview`、`observe:http status=ok`、MCP/HTTP tests `12/12`；这是 local HTTP MCP deploy/validation，不是 production deploy、startup hardening、watchdog installation、client integration switch、memory migration 或 v1.0 release。
+- P22 local HTTP MCP deploy closeout 已记录：[docs/P22_LOCAL_DEPLOY_CLOSEOUT.md](/A:/codex-memory/docs/P22_LOCAL_DEPLOY_CLOSEOUT.md)。P22 local HTTP MCP deploy/validation evidence chain is recorded and closed；这不是 production deploy、startup hardening、watchdog installation、Codex/Claude client switch、migration、durable memory activation 或 v1.0 release。
+- P23 v1.0 Memory Kernel planning 已新增：[docs/P23_V1_0_MEMORY_KERNEL_PLAN.md](/A:/codex-memory/docs/P23_V1_0_MEMORY_KERNEL_PLAN.md)，定义 release objective、stable MCP contract、schema versioning、memory safety baseline、local deployment baseline、client integration、migration/import-export、validation matrix、release gates 和 P23.1-P23.7 phase breakdown；本阶段 planning/docs/status/board only，不改 runtime、不改 tests、不做 provider/config/migration/durable write/startup/deploy/tag/release。
+- P23.1 MCP public contract inventory 已新增：[docs/P23_1_MCP_CONTRACT_INVENTORY.md](/A:/codex-memory/docs/P23_1_MCP_CONTRACT_INVENTORY.md)，盘点 v1.0 public MCP contract，确认当前 public tools 仍为 `record_memory` / `search_memory` / `memory_overview`，并记录 contract freeze、backward compatibility、drift risks、post-v1.0 tool candidates 和 A5-gated contract changes。
+- P23.2 schema/versioning plan 已新增：[docs/P23_2_SCHEMA_VERSIONING_PLAN.md](/A:/codex-memory/docs/P23_2_SCHEMA_VERSIONING_PLAN.md)，定义 current schema baseline、v1.0 versioning goals、version identifier strategy、memory record/durable data compatibility、migration/import-export boundary、rollback requirements、validation requirements、schema drift risks 和 A5-gated schema actions；本阶段不实现 schema、不运行 SQLite migration、不 apply import/export、不写 durable memory、不改 public MCP tools、不 deploy。
+- P23.3 validation matrix hardening 已新增：[docs/P23_3_VALIDATION_MATRIX_HARDENING.md](/A:/codex-memory/docs/P23_3_VALIDATION_MATRIX_HARDENING.md)，定义 docs/status/board、MCP/HTTP、schema/versioning、security、migration/import-export dry-run、rollback、client boundary、local deploy、production deploy、startup/watchdog、tag/release 等 v1.0 validation matrix；本阶段不实现 validator、不改 runtime、不改 tests、不运行 SQLite migration apply、不 apply import/export、不写 durable memory、不改 public MCP tools、不 deploy、不安装 watchdog/startup、不切 Codex/Claude config。
+- P23.4 local production hardening plan 已新增：[docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md](/A:/codex-memory/docs/P23_4_LOCAL_PRODUCTION_HARDENING_PLAN.md)，规划 startup/watchdog requirements、health checks、port/session/log expectations、SQLite backup/restore、corruption recovery、restart semantics、operator runbook 和 activation validation gates；本阶段不安装 watchdog/startup、不改 Codex/Claude config、不跑 provider、不运行 SQLite migration apply、不 apply import/export、不写 durable memory、不改 public MCP tools、不改 runtime、不 tag/release/deploy。
+- P23.5 client integration readiness plan 已新增：[docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md](/A:/codex-memory/docs/P23_5_CLIENT_INTEGRATION_READINESS_PLAN.md)，规划 `client_id`、Codex/Claude private boundary、shared/project memory rules、cross-client proposal flow、read/write visibility policy、client-originated write audit、conflict/drift handling 和 config switch readiness checklist；本阶段不改 Codex/Claude config、不改 `.env`、不改 runtime、不跑 provider、不运行 SQLite migration apply、不 apply import/export、不写 durable memory、不改 public MCP tools、不安装 watchdog/startup、不 tag/release/deploy。
+- P23.6 migration/import-export readiness plan 已新增：[docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md](/A:/codex-memory/docs/P23_6_MIGRATION_IMPORT_EXPORT_READINESS_PLAN.md)，规划 migration dry-run before apply、export/import manifest requirements、checksum verification、audit trail、scope isolation、private/shared/project memory preservation、backup/restore、partial failure、rollback semantics 和 durable mutation boundary；本阶段不运行 SQLite migration apply、不 apply import/export、不写 durable memory、不 rewrite existing records、不改 runtime/tests、不改 public MCP tools、不改 `.env`、不改 Codex/Claude config、不跑 provider、不安装 watchdog/startup、不 tag/release/deploy。
+- P23.7 v1.0 release-candidate checklist 已新增：[docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md](/A:/codex-memory/docs/P23_7_V1_0_RELEASE_CANDIDATE_CHECKLIST.md)，汇总 P22 local HTTP MCP evidence chain、P23 planning chain、public MCP three-tool freeze、RC decision table、known blockers 和 A5-gated release actions；本阶段不 push、不 tag、不 release、不 deploy、不改 runtime/tests/package/config、不跑 provider、不运行 SQLite migration apply、不 apply import/export、不写 durable memory、不安装 watchdog/startup、不改 public MCP tools。
+- P23.8 final v1.0 RC readiness review 已新增：[docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md](/A:/codex-memory/docs/P23_8_V1_0_FINAL_RC_READINESS_REVIEW.md)，最终决策为 `READY_FOR_DOCS_ONLY_RC_REVIEW`：P22 local deploy evidence chain 已关闭、P23 planning chain 已到 P23.7、public MCP three-tool contract 仍冻结，但 fresh final RC validation matrix、schema/version runtime enforcement、production deploy、startup/watchdog、Codex/Claude config switch、provider execution、migration/import-export apply、durable mutation expansion、destructive rollback、push/tag/release/deploy 仍未完成或未授权。
+- P23.9 v1.0 blocker burn-down plan 已新增：[docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md](/A:/codex-memory/docs/P23_9_V1_0_BLOCKER_BURN_DOWN_PLAN.md)，分类 fresh final RC validation matrix、validation aggregator、schema/version runtime enforcement、migration/import-export apply、production deploy、startup/watchdog、Codex/Claude config switch、provider execution、durable mutation expansion、destructive rollback 和 push/tag/release/deploy blockers，并给出 P23.10-P29 burn-down 顺序；本阶段 planning/docs/status/board only，不执行 validation matrix、不实现 aggregator、不实现 schema/runtime enforcement、不运行 migration/import-export apply、不跑 provider、不写 durable memory、不安装 watchdog/startup、不改 config、不 push/tag/release/deploy。
+- P23.10 final RC validation matrix execution plan 已新增：[docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md](/A:/codex-memory/docs/P23_10_FINAL_RC_VALIDATION_MATRIX_EXECUTION_PLAN.md)，规划 docs/status/board、git hygiene、P23 trailing whitespace、MCP/HTTP evidence、public MCP three-tool check、schema/version review、aggregator readiness、migration/import-export dry-run、backup/restore、rollback、secret/workspace exposure、client boundary、production deploy、startup/watchdog、provider 和 push/tag/release gates；本阶段只规划 matrix，不执行 final RC validation matrix、不实现 aggregator、不实现 schema/runtime enforcement、不运行 migration/import-export apply、不跑 provider、不写 durable memory、不安装 watchdog/startup、不改 Codex/Claude config、不 push/tag/release/deploy。
+- P23.11 final RC validation matrix execution scope review 已新增：[docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md](/A:/codex-memory/docs/P23_11_FINAL_RC_VALIDATION_MATRIX_EXECUTION_SCOPE_REVIEW.md)，将 final RC matrix validation items 分类为 A4.8-safe、A5-gated、runtime-implementation-required 和 blocked；本阶段只做 scope review，不执行 final RC validation matrix、不启动服务、不跑 MCP/HTTP live tests、不实现 aggregator、不实现 schema/runtime enforcement、不运行 migration/import-export apply、不跑 provider、不写 durable memory、不安装 watchdog/startup、不改 Codex/Claude config、不 push/tag/release/deploy。
+- P23.12 final RC validation matrix A4-safe execution 已新增：[docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md](/A:/codex-memory/docs/P23_12_FINAL_RC_VALIDATION_MATRIX_A4_SAFE_EXECUTION.md)，执行 A4-safe git/docs/status/board/schema/client/migration/RC checklist review slice；decision `A4_SAFE_SLICE_PASSED`。Conditional live MCP/HTTP refresh 因本机 HTTP MCP 未 already reachable 而记录为 `NOT_EXECUTED_IN_P23_12`，未启动服务、未刷新 live MCP evidence、未执行 full final RC matrix、未执行 A5-gated actions。
+- P24 validation aggregator implementation plan 已新增：[docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md](/A:/codex-memory/docs/P24_VALIDATION_AGGREGATOR_IMPLEMENTATION_PLAN.md)，规划 automated v1.0 validation aggregator 的 goals、scope、inputs、output contract、pass/fail semantics、A4-safe checks、conditional live checks、A5-gated checks、runtime-required checks、candidate file/module map、test plan、rollback plan 和 secret-exposure boundaries；本阶段只做 implementation planning，不实现 aggregator、不改 runtime/tests/package、不启动服务、不刷新 live MCP evidence、不跑 provider、不运行 migration/import-export apply、不写 durable memory、不改 Codex/Claude config、不安装 watchdog/startup、不 push/tag/release/deploy。
+- P24.1 validation aggregator fixture shape tests 已新增：`tests/fixtures/v1-rc-validation-aggregator-v1.json` 与 `tests/v1-rc-validation-aggregator.test.js`，锁住 future v1.0 RC validation aggregator output contract、decision labels、A4/A5/runtime/conditional-live classifications、public MCP three-tool freeze、current blockers 和 no-side-effect / secret-exposure flags；targeted shape test `8/8` 通过。本阶段不实现 aggregator、不改 runtime/package、不启动服务、不刷新 live MCP evidence、不跑 provider、不运行 migration/import-export apply、不写 durable memory、不改 config、不安装 watchdog/startup、不 push/tag/release/deploy。
+- P24.2 validation aggregator minimal implementation 已新增：`src/core/ValidationAggregatorService.js` 与 `tests/v1-rc-validation-aggregator-implementation.test.js`，提供 minimal read-only report builder，输出 `NOT_READY_BLOCKED`，确认 `validationAggregatorImplemented=true` 但 `validationAggregatorFullImplementation=false`、schema/version runtime enforcement 未实现、full final RC matrix 未执行、live MCP/HTTP evidence 未刷新、A5-gated 项仍 blocked；targeted implementation/fixture tests `13/13` 通过。本阶段不加 CLI/package script、不启动服务、不跑 provider、不运行 migration/import-export apply、不写 durable memory、不改 config、不安装 watchdog/startup、不 push/tag/release/deploy。
+- P24.3 validation aggregator CLI wiring 已新增：`src/cli/v1-rc-validation-aggregator.js` 与 `tests/v1-rc-validation-aggregator-cli.test.js`，支持 `node src\cli\v1-rc-validation-aggregator.js` 直接输出 JSON report；CLI decision 仍为 `NOT_READY_BLOCKED`，public MCP tools 仍为三工具，schema/version runtime enforcement、full final RC matrix、live MCP refresh 与 A5-gated items 继续 blocked；CLI targeted test `6/6` 通过。本阶段不加 package script、不实现 full aggregator、不启动服务、不刷新 live MCP evidence、不跑 provider、不运行 migration/import-export apply、不写 durable memory、不改 config、不安装 watchdog/startup、不 push/tag/release/deploy。
+- P24.4 validation aggregator decision/exit-code semantics 已新增：`src/cli/v1-rc-validation-aggregator.js` 与 `tests/v1-rc-validation-aggregator-cli.test.js` 现在支持 default report mode exit `0`、`--strict` gate mode 对当前 `NOT_READY_BLOCKED` JSON report exit `1`、`--help` usage exit `0`；decision 仍为 `NOT_READY_BLOCKED`，public MCP tools 仍为三工具，A5-gated checks 仍保持 `blocked_pending_a5` 且未执行；CLI targeted test 当前 `12/12` 通过。本阶段不加 package script、不实现 full aggregator、不实现 schema/version runtime enforcement、不启动服务、不刷新 live MCP evidence、不跑 provider、不运行 migration/import-export apply、不写 durable memory、不改 config、不安装 watchdog/startup、不 push/tag/release/deploy。
+- P24.5 validation aggregator evidence-source map 已新增：`src/core/ValidationAggregatorService.js`、`tests/fixtures/v1-rc-validation-aggregator-v1.json`、fixture/implementation/CLI targeted tests 现在覆盖 `evidence_sources`，将当前 decision、blockers、A4-safe slice、full final RC matrix status、schema/version runtime enforcement gap、public MCP tool freeze、A5-gated actions、conditional live MCP/HTTP status 和 full-aggregator implementation gap 映射到代码/文档/governance 来源。fixture contract 仅因新增 top-level `evidence_sources` 而变化；decision 仍为 `NOT_READY_BLOCKED`，public MCP tools 仍为三工具，strict blocked mode 仍输出 valid JSON 且 exit `1`。本阶段不加 package script、不实现 full aggregator、不实现 schema/version runtime enforcement、不启动服务、不刷新 live MCP evidence、不跑 provider、不运行 migration/import-export apply、不写 durable memory、不改 config、不安装 watchdog/startup、不 push/tag/release/deploy。
+- P24.6/P24.7 validation aggregator rejected report hardening 已完成本地验证：rejected live/provider/apply/deploy/push flag output 现在失败关闭但保留 normal aggregator report contract，并新增 rejected top-level parity 覆盖；验证 CLI `13/13`、implementation `6/6`、fixture shape `9/9`、`npm test 501/501`。本阶段不加 package script、不实现 full aggregator、不实现 schema/version runtime enforcement、不启动服务、不刷新 live MCP evidence、不跑 provider、不运行 migration/import-export apply、不写 durable memory、不改 config、不安装 watchdog/startup、不 push/tag/release/deploy。
+- P25 schema/version runtime enforcement plan 已新增：[docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md](/A:/codex-memory/docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLAN.md)，规划 enforcement surfaces、compatibility policy、runtime candidates、future tests、dry-run boundary 和 A5 hard stops；本阶段 planning/docs/board only，不实现 runtime enforcement、不改 public MCP tools/schema、不运行 migration/import-export apply、不写 durable memory、不改 package/config、不 push/tag/release/deploy。
+- P25.1 schema/version enforcement fixture inventory 已新增：[docs/P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md](/A:/codex-memory/docs/P25_1_SCHEMA_VERSION_ENFORCEMENT_FIXTURE_INVENTORY.md)，盘点现有 MCP contract、VCP object、import/export、migration readiness、lifecycle、audit、controlled write 和 validation aggregator fixture/test 覆盖，并确认 P25.2 应补 accepted/missing/unknown schema-version fixture contract；本阶段不改 runtime、不改 tests、不改 package/config、不做 migration/import-export apply、不写 durable memory、不 push/tag/release/deploy。
+- P25.2 schema/version policy fixture tests 已新增：`tests/fixtures/schema-version-policy-v1.json` 与 `tests/schema-version-policy-fixture.test.js`，锁住 schema family 列表、accepted current versions、missing-version legacy read fallback、new write missing/unknown version rejection、unknown read warning/skip policy、import envelope version required、public MCP three-tool freeze、no-mutation/no-migration safety flags 和 raw secret/workspace 禁止；不实现 runtime enforcement、不改 public MCP tools/schema、不运行 migration/import-export apply、不写 durable memory、不改 package/config、不 push/tag/release/deploy。
+- P25.3 validation aggregator schema status report shape 已由 main-thread source/test changes 完成：aggregator report shape 增加 P25.2 policy fixture evidence，覆盖 `schemaVersionPolicyFixture`、`evidence.p25SchemaVersionPolicy`、`evidence_sources.schema_version_policy_fixture` 和 A4-safe grouping；`runtimeEnforcementImplemented=false` 仍保留，schema/version runtime enforcement 仍未实现，public MCP tools 仍冻结为三工具。
+- P25.3 validation follow-up 已修复 full-suite gate/dashboard 并发敏感问题：`gate:ci` CLI tests 使用 fixture command overrides，dashboard CLI tests 使用 mainline-gate command overrides，gate wrappers 提高 compare/rollback timeout；`npm test 511/511` 与 `npm run gate:ci -- --json` 均通过。
+- P25.4 schema compatibility dry-run CLI plan 已新增：[docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md](/A:/codex-memory/docs/P25_SCHEMA_COMPATIBILITY_DRY_RUN_CLI_PLAN.md)，规划 future fixture-first dry-run CLI boundary、source modes、future allowed files、output contract candidate、validation plan、hard stops 和 rollback path；本阶段 docs/board only，不实现 CLI、不加 package script、不实现 runtime enforcement、不扫描真实 memory、不做 migration/import-export apply、不写 durable memory、不启动服务、不跑 provider、不 push/tag/release/deploy。
+- P25.5 schema compatibility dry-run fixture contract 已新增：`tests/fixtures/schema-compatibility-dry-run-v1.json` 与 `tests/schema-compatibility-dry-run-fixture.test.js`，锁住 future dry-run report contract fields、accepted/missing/unknown policy counts、有 blockers 时 fail-closed 为 `DRY_RUN_BLOCKED`、public MCP three-tool freeze、rejected unsafe flags、no-side-effect safety 和 raw secret/workspace 禁止；不实现 CLI、不加 package script、不实现 runtime enforcement、不扫描真实 memory、不做 migration/import-export apply、不写 durable memory、不启动服务、不跑 provider、不 push/tag/release/deploy。
+- P25.x schema/version runtime enforcement closeout review 已新增：[docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md)，关闭 P25 planning/fixture evidence chain，结论为 `P25_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_PLANNING_AND_FIXTURES_CLOSED_READY_FOR_FIXTURE_ONLY_CLI`；P25 仍不是 runtime-enforced，下一步只允许另行 scoped 的 direct-node fixture-only CLI skeleton。
+- P25.6 schema compatibility dry-run fixture-only CLI skeleton 已新增：`src/cli/schema-compatibility-dry-run.js` 与 `tests/schema-compatibility-dry-run-cli.test.js`，提供 direct-node fixture-only JSON/text output、strict blocked exit、unsafe flags `DRY_RUN_INVALID_INPUT`、fixture path containment、public MCP freeze、no-side-effect safety 和 raw secret/workspace 禁止；不加 package script、不扫描真实 memory、不做 runtime enforcement、不做 migration/import-export apply、不写 durable memory、不启动服务、不跑 provider、不 push/tag/release/deploy。
+- P25.7 validation aggregator schema compatibility dry-run CLI evidence shape 已新增：`src/core/ValidationAggregatorService.js`、`tests/fixtures/v1-rc-validation-aggregator-v1.json`、`tests/v1-rc-validation-aggregator.test.js` 与 `tests/v1-rc-validation-aggregator-implementation.test.js` 现在记录 P25.6 fixture-only CLI 证据，明确 `schemaCompatibilityDryRunCliFixtureOnly=true`、`schemaCompatibilityDryRunCliExecuted=false`、`realMemoryScanned=false`、`runtimeEnforcementImplemented=false`、`packageScriptAdded=false`；不执行 P25.6 CLI、不加 package script、不扫描真实 memory、不做 runtime enforcement、不做 migration/import-export apply、不写 durable memory、不启动服务、不跑 provider、不 push/tag/release/deploy。
+- P26 migration/import-export dry-run gate plan 已新增：[docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md](/A:/codex-memory/docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_PLAN.md)，把 P13/P18/P23 既有 migration/import-export safety evidence 收束为 v1.0 dry-run gate contract、输出 shape、pass/warn/block 语义、hard stops 和后续 P26.1 fixture-contract 路径；本阶段 docs/board only，不新增 fixture/test/source/package/runtime，不扫描真实 memory，不做 import/export apply，不做 SQLite migration apply，不创建/恢复 backup，不写 durable memory，不跑 provider，不扩 public MCP，不 push/tag/release/deploy。
+- P26.1 migration/import-export dry-run gate fixture contract 已新增：`tests/fixtures/migration-import-export-dry-run-gate-v1.json` 与 `tests/migration-import-export-dry-run-gate-fixture.test.js`，锁住 blocked pre-approval behavior、`mutated=false`、`providerCalls=0`、public MCP freeze、required approvals、safety flags、raw secret/workspace 禁止和 no rewrite-on-read；不实现 CLI、不加 package script、不扫描真实 memory、不做 import/export apply、不做 SQLite migration apply、不创建/恢复 backup、不写 durable memory、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P26.2 migration/import-export dry-run gate CLI plan 已补入 P26 plan：定义 future direct-node fixture-only CLI boundary、candidate files、source modes、output contract、rejected flags、validation matrix 和 stop conditions；本阶段 docs/board only，不实现 CLI、不加 package script、不改 source/runtime、不扫描真实 memory、不做 import/export apply、不做 SQLite migration apply、不写 durable memory、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P26.3 migration/import-export dry-run gate fixture-only CLI 已新增：`src/cli/migration-import-export-dry-run-gate.js` 与 `tests/migration-import-export-dry-run-gate-cli.test.js`，提供 direct-node fixture-only JSON/text output、unsafe flags fail-closed JSON、public MCP freeze、no-side-effect safety 和 raw secret/workspace 禁止；不加 package script、不扫描/导入/导出真实 memory、不做 SQLite migration apply、不做 import/export apply、不创建/恢复 backup、不写 durable memory、不启动服务、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P26.4 validation aggregator evidence shape 已新增：`src/core/ValidationAggregatorService.js`、`tests/fixtures/v1-rc-validation-aggregator-v1.json` 与 validation aggregator tests 现在记录 P26.3 fixture-only CLI 证据，明确 `migrationImportExportDryRunGateCliImplemented=true`、`fixtureOnly=true`、`cliExecuted=false`、`realMemoryScanned=false`、`importExportApplyPerformed=false`、`packageScriptAdded=false`；不执行 P26.3 CLI、不加 package script、不扫描/导入/导出真实 memory、不做 SQLite migration apply、不做 import/export apply、不写 durable memory、不启动服务、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P26.x migration/import-export dry-run gate closeout review 已新增：[docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P26_MIGRATION_IMPORT_EXPORT_DRY_RUN_GATE_CLOSEOUT_REVIEW.md)，关闭 P26 planning / fixture / fixture-only CLI / aggregator evidence chain，结论 `P26_DRY_RUN_GATE_FIXTURE_ONLY_CHAIN_CLOSED`；不等于 real migration/import-export readiness。
+- P27 migration/import-export approval packet 已新增：[docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md](/A:/codex-memory/docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md)，定义 future real-memory preview、export/import、backup/restore、SQLite migration apply、import/export apply、rollback evidence 和 stop conditions 的审批包边界；本阶段 docs-only，不扫描真实 memory、不创建/恢复 backup、不做 apply、不写 durable state、不启动服务、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P27.1 migration/import-export approval packet fixture shape 已新增：`tests/fixtures/migration-import-export-approval-packet-v1.json` 与 `tests/migration-import-export-approval-packet-fixture.test.js`，锁住 approval packet shape、blocked status、required approvals、safety flags、required wording、forbidden claims 和 public MCP freeze；不扫描真实 memory、不创建/恢复 backup、不做 apply、不写 durable state、不启动服务、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P27.2 direct-node fixture-only approval-packet CLI plan 已新增：P27 文档现在规划 future CLI 文件、fixture-only source mode、输出契约、unsafe flags、验证矩阵和 stop conditions；本阶段 docs-only，不实现 CLI、不加测试或 package script、不扫描真实 memory、不创建/恢复 backup、不做 apply、不写 durable state、不启动服务、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P27.3 fixture-only approval-packet CLI implementation review 已新增：P27 文档现在审查 future P27.4 source/test slice 的 candidate files、fixture-only 行为、仍禁止动作和 implementation preconditions；本阶段 docs/status/board only，不实现 CLI、不加测试或 package script、不扫描真实 memory、不创建/恢复 backup、不做 apply、不写 durable state、不启动服务、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P27.4 fixture-only approval-packet CLI 已新增：`src/cli/migration-import-export-approval-packet.js` 与 `tests/migration-import-export-approval-packet-cli.test.js`，提供 direct-node fixture-only JSON/text output、unsafe flags fail-closed JSON、public MCP freeze、no-side-effect safety 和 raw secret/workspace 禁止；不加 package script、不扫描/导入/导出真实 memory、不做 SQLite migration apply、不做 import/export apply、不创建/恢复 backup、不写 durable state、不启动服务、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P27.5 validation aggregator evidence shape 已新增：aggregator report shape 现在记录 P27.4 approval-packet CLI evidence，并明确 `cliExecuted=false`、`executionApproved=false`、`realMemoryScanned=false`、`backupRestorePerformed=false`、`durableReportWritten=false`、`packageScriptAdded=false`；不从 aggregator 执行 CLI、不加 package script、不扫描/导入/导出真实 memory、不做 SQLite migration apply、不做 import/export apply、不创建/恢复 backup、不写 durable state、不启动服务、不跑 provider、不扩 public MCP、不 push/tag/release/deploy。
+- P27.x migration/import-export approval packet closeout review 已新增：[docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET_CLOSEOUT_REVIEW.md)，关闭 P27 approval-boundary documentation / fixture / fixture-only CLI / aggregator evidence chain；结论 `P27_APPROVAL_PACKET_FIXTURE_ONLY_CHAIN_CLOSED`，不等于 real migration/import-export approval 或 readiness。
+- P28/P29 validation evidence and schema/version boundary chain 已完成本地安全切片：P28 添加 explicit safe validation evidence reader summaries；P29 添加 `SchemaVersionPolicy` explicit-input helper、evaluation report、schema runtime boundary guard test，以及 ValidationAggregator 对这些证据的 report-shape 映射。该链路保持 fixture-first / read-only / report-shape，不实现 runtime enforcement、不扩 public MCP schema、不扫描真实 memory、不写 durable state、不 push/tag/release/deploy。
+- P29.x schema/version runtime enforcement closeout review 已新增：[docs/P29_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P29_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_CLOSEOUT_REVIEW.md)，结论 `P29_SCHEMA_VERSION_EVIDENCE_CHAIN_CLOSED_RUNTIME_ENFORCEMENT_STILL_BLOCKED`。下一推荐阶段是 `P30-final-rc-validation-matrix-runner-safe-scope`，只能消费 explicit/local evidence 和现有 report shapes。
+- P30 final RC validation matrix runner safe-scope inventory 已新增：[docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_SAFE_SCOPE_INVENTORY.md](/A:/codex-memory/docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_SAFE_SCOPE_INVENTORY.md)，只定义 future runner 可消费的 explicit/local evidence、committed fixture/report-shape evidence、P23/P24/P28/P29 provenance、public MCP freeze 和 no-side-effect safety 字段；不实现 runner、不执行 final RC matrix、不启动服务、不跑 provider、不扫描真实 memory、不写 durable state。
+- P30.1 final RC validation matrix runner fixture contract 已新增：`tests/fixtures/final-rc-validation-matrix-runner-safe-scope-v1.json` 与 `tests/final-rc-validation-matrix-runner-safe-scope-fixture.test.js`，锁住 future runner manifest 的 explicit safe inputs only、no runner implementation、no final RC matrix execution、public MCP freeze、no-side-effect safety、fail-closed rejection defaults 和 A4/conditional-live/runtime-required/A5 分组。
+- P30.2 final RC validation matrix runner manifest helper 已新增：`src/core/FinalRcValidationMatrixManifest.js` 与 `tests/final-rc-validation-matrix-runner-manifest-helper.test.js`，只对调用方显式传入的 manifest 对象做 normalize/summarize；不读 fixture 文件、不执行命令、不启动服务、不跑 provider、不改输入、不触碰 durable memory、不执行 runner，并保留 `canExecuteRunner=false` / `canClaimFinalRcReady=false`；后续小补丁新增 `SAFE_SOURCE_TYPES`，unsupported `acceptedSourceTypes` 会 fail closed 为 `acceptedForPlanning=false`。
+- P30.3 final RC validation matrix aggregator evidence shape 已新增：`ValidationAggregatorService` 只以静态 report-shape 方式暴露 P30.2 manifest helper evidence；aggregator 不 import/execute helper、不读 P30 fixture、不实现 runner、不执行 final RC matrix，并保留 `finalRcValidationMatrixCanExecuteRunner=false` / `finalRcValidationMatrixCanClaimFinalRcReady=false`。
+- P30.x final RC validation matrix runner closeout review 已新增：[docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_CLOSEOUT_REVIEW.md)，结论 `P30_FINAL_RC_MATRIX_SAFE_SCOPE_CHAIN_CLOSED_FULL_MATRIX_STILL_BLOCKED`：P30 只关闭 safe-scope / fixture / explicit-input helper / aggregator report-shape evidence，不实现 runner、不执行 final RC matrix。
+- P31 memory governance safe-scope inventory 已新增：[docs/P31_MEMORY_GOVERNANCE_SAFE_SCOPE_INVENTORY.md](/A:/codex-memory/docs/P31_MEMORY_GOVERNANCE_SAFE_SCOPE_INVENTORY.md)，只盘点 proposal、supersession、tombstone、validation、audit、approval boundary 与既有 lifecycle/controlled-write/object-model/admin-review 证据；不做 durable memory mutation、不扩 public MCP、不扫描真实 memory、不做 migration/import-export apply。
+- P31.1 memory governance fixture contract review 已新增：[docs/P31_1_MEMORY_GOVERNANCE_FIXTURE_CONTRACT_REVIEW.md](/A:/codex-memory/docs/P31_1_MEMORY_GOVERNANCE_FIXTURE_CONTRACT_REVIEW.md)，审查现有 lifecycle、controlled-write、proposal-review、mutation-audit、validate-memory-runtime 和 object-model fixture 覆盖，结论是最小缺口为一个 synthetic `memory-governance-lifecycle-contract-v1` 统一 contract；本阶段不新增 fixture/test、不改 runtime。
+- P31.2 memory governance lifecycle contract fixture 已新增：`tests/fixtures/memory-governance-lifecycle-contract-v1.json` 与 `tests/memory-governance-lifecycle-contract-fixture.test.js`，锁住 proposal accept/reject、supersession deferred、tombstone deferred、validate_memory internal-only、mutation audit、approval posture、safe source type whitelist、public MCP freeze、no-side-effect safety 和 `NOT_READY_BLOCKED`；不改 runtime、不扩 public MCP、不扫描真实 memory、不写 durable memory。
+- P31.3 memory governance lifecycle contract helper 已新增：`src/core/MemoryGovernanceLifecycleContract.js` 与 `tests/memory-governance-lifecycle-contract-helper.test.js`，只对调用方显式传入的 governance lifecycle contract 对象做 normalize/summarize；不读 fixture、不执行命令、不启动服务、不调 provider、不改输入、不触碰 durable memory，并对 unsupported source type、runtime/public MCP readiness claim、缺失 required surfaces/cases fail closed。
+- P31.4 ValidationAggregator governance lifecycle evidence shape 已新增：`src/core/ValidationAggregatorService.js`、`tests/fixtures/v1-rc-validation-aggregator-v1.json` 与 aggregator tests 现在把 P31.3 helper 作为 static report-shape evidence 记录；aggregator 不 import/execute helper、不读 P31 fixture、不做 runtime governance integration、不扩 public MCP、不扫描真实 memory、不写 durable memory。
+- P31.x memory governance safe-scope closeout review 已新增：[docs/P31_MEMORY_GOVERNANCE_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P31_MEMORY_GOVERNANCE_CLOSEOUT_REVIEW.md)，结论 `P31_MEMORY_GOVERNANCE_SAFE_SCOPE_CHAIN_CLOSED_RUNTIME_STILL_BLOCKED`：P31 只关闭 safe-scope / fixture / explicit-input helper / aggregator report-shape evidence，不等于 runtime governance integration、durable mutation approval、public MCP expansion 或 v1.0 RC readiness。
+- P32 memory governance approval-packet safe-scope inventory 已新增：[docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_SAFE_SCOPE_INVENTORY.md](/A:/codex-memory/docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_SAFE_SCOPE_INVENTORY.md)，定义 future approval packet 对 proposal accept/reject、supersession、tombstone、internal validation、audit/report writes、public MCP expansion、real-memory governance preview、backup、restore 的字段和阻断条件；本阶段 docs/status/board only，不批准或执行任何 governed action。
+- P32.1 memory governance approval-packet fixture contract 已新增：`tests/fixtures/memory-governance-approval-packet-v1.json` 与 `tests/memory-governance-approval-packet-fixture.test.js`，锁住 governed action approval packet shape、safe source types、required fields、blockers、no-side-effect safety、public MCP freeze 和 internal-only `validate_memory`；不改 runtime、不批准或执行 governed action、不做 durable mutation。
+- P32.2 memory governance approval-packet explicit-input helper 已新增：`src/core/MemoryGovernanceApprovalPacketContract.js` 与 `tests/memory-governance-approval-packet-helper.test.js`，只对调用方显式传入的 approval packet 对象做 normalize/summarize；不读 fixture、不执行命令、不启动服务、不调 provider、不改输入、不触碰 durable memory，并对 unsupported source type、execution/readiness/runtime claim、缺失 required packet fields/actions、unblocked governed action fail closed。
+- P32.3 ValidationAggregator approval-packet evidence shape 已新增：`src/core/ValidationAggregatorService.js`、`tests/fixtures/v1-rc-validation-aggregator-v1.json` 与 aggregator tests 现在把 P32.2 helper 作为 static report-shape evidence 记录；aggregator 不 import/execute helper、不读 P32 fixture、不批准 governed action、不做 runtime governance integration、不扩 public MCP、不扫描真实 memory、不写 durable memory。
+- P32.x memory governance approval-packet closeout review 已新增：[docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_CLOSEOUT_REVIEW.md)，结论 `P32_MEMORY_GOVERNANCE_APPROVAL_PACKET_CHAIN_CLOSED_RUNTIME_STILL_BLOCKED`：P32 只关闭 safe-scope / fixture / explicit-input helper / aggregator report-shape evidence，不等于 runtime governance integration、durable mutation approval、public MCP expansion 或 v1.0 RC readiness。
+- P33 memory governance audit-evidence safe-scope inventory 已新增：[docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_SAFE_SCOPE_INVENTORY.md](/A:/codex-memory/docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_SAFE_SCOPE_INVENTORY.md)，只盘点 future governance audit evidence records 的字段、安全来源、阻断条件和验证计划；不实现 audit writer、不写 durable audit log、不批准或执行 governed action。
+- P33.1 memory governance audit-evidence fixture contract 已新增：`tests/fixtures/memory-governance-audit-evidence-v1.json` 与 `tests/memory-governance-audit-evidence-fixture.test.js`，锁住 audit evidence event families、required evidence fields、safe source types、required blockers、no-side-effect safety、public MCP freeze 和 internal-only `validate_memory`；不实现 audit writer、不写 durable audit log、不批准或执行 governed action。
+- P33.2 memory governance audit-evidence explicit-input helper 已新增：`src/core/MemoryGovernanceAuditEvidenceContract.js` 与 `tests/memory-governance-audit-evidence-helper.test.js`，只对调用方显式传入的 audit evidence contract 对象做 normalize/summarize；不读 fixture、不执行命令、不启动服务、不调 provider、不改输入、不触碰 durable memory 或 durable audit log，并对 unsupported source type、audit writer/runtime/readiness claim、缺失 required evidence fields/event families、unblocked event family fail closed。
+- P33.3 ValidationAggregator audit-evidence helper evidence shape 已新增：`src/core/ValidationAggregatorService.js`、`tests/fixtures/v1-rc-validation-aggregator-v1.json` 与 aggregator tests 只把 P33.2 helper 能力作为 static report-shape evidence 暴露；aggregator 不 import/execute helper、不读 P33 fixture、不实现 audit writer、不写 durable audit log、不批准或执行 governed action。
+- P33.x memory governance audit-evidence closeout review 已新增：[docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P33_MEMORY_GOVERNANCE_AUDIT_EVIDENCE_CLOSEOUT_REVIEW.md)，关闭 P33 safe-scope / fixture / explicit-input helper / aggregator report-shape evidence chain；不等于 audit writer implementation、durable audit log write approval、runtime governance implementation 或 durable mutation approval。
+- P31/P32/P33 governance helper redaction hardening 已完成并推送为 `d210947`：`MemoryGovernanceLifecycleContract`、`MemoryGovernanceApprovalPacketContract`、`MemoryGovernanceAuditEvidenceContract` 不再从目标 normalized child records 透传调用方任意字段，并对 normalized strings / unsupported source type summaries 中的 `authorization`、`bearer`、`api_key`、`raw_workspace_id` 片段做 redaction；targeted helper tests `29/29`、`npm test` `690/690` 已通过。
+- P34 governance review surface safe-scope inventory 已新增：[docs/P34_GOVERNANCE_REVIEW_SURFACE_SAFE_SCOPE_INVENTORY.md](/A:/codex-memory/docs/P34_GOVERNANCE_REVIEW_SURFACE_SAFE_SCOPE_INVENTORY.md)，只盘点 future read-only governance review surface 如何汇总 lifecycle、approval-packet、audit-evidence、P19 admin-review 与 ValidationAggregator report-shape evidence；不实现 CLI、不执行 `governance:report` 真实 DB 读取、不批准 governed action、不写 durable audit/memory、不扩 public MCP。
+- P34.1 governance review surface fixture contract 已新增：`tests/fixtures/memory-governance-review-surface-v1.json` 与 `tests/memory-governance-review-surface-fixture.test.js`，锁住 review visibility does not approve execution、`governance:report` 不执行真实 DB review、admin-review/ValidationAggregator 只作 committed evidence/report-shape、public MCP freeze、no-side-effect safety 与 `NOT_READY_BLOCKED`。
+- P34.2 governance review surface explicit-input helper 已新增：`src/core/MemoryGovernanceReviewSurfaceContract.js` 与 `tests/memory-governance-review-surface-helper.test.js`，只 normalize/summarize 调用方显式传入的 review surface object；测试覆盖 unsupported source type fail-closed、输入不能重定义 `SAFE_SOURCE_TYPES`、malformed fail-closed、no fs read、no command execution、no durable write、no public MCP expansion、no real DB review execution、no RC-ready claim，以及 `authorization` / `bearer` / `api_key` / `raw_workspace_id` 敏感片段 redaction。
+- P34.3 ValidationAggregator review-surface helper evidence shape 已新增：`ValidationAggregatorService`、v1 RC aggregator fixture 和 aggregator tests 只把 P34.2 helper capability 暴露为 static report-shape evidence；aggregator 不 import/execute helper、不读 P34 fixture、不执行 `governance:report`、不做真实 DB review、不实现 runtime review、不批准 governed action、不写 durable audit/memory。
+- CM-0301 active-board context compression 已开始：完整旧 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 移至 `.agent_board/archive/`，活动文件压缩为当前状态与边界摘要，避免 stale handoff/checkpoint 污染默认上下文；这是 docs/board-only 维护，不改 runtime/source/test。
+- 当前结论：project_health strong；governance_health strong；current_truth `P22 security-fix GitHub prerelease created and local HTTP MCP deploy evidence chain closed; P23 planning through P23.12 committed locally; P24 planned and hardened through P24.7 locally; P25 schema/version runtime enforcement planning through fixture-only evidence committed locally; P26 migration/import-export dry-run gate chain committed locally; P27 migration-import-export approval packet chain committed locally; P28 validation evidence-reader chain committed locally; P29 schema/version evidence chain through closeout committed locally; P30 runner safe-scope chain through closeout plus source-type whitelist hardening committed locally; P31 memory governance safe-scope chain through closeout committed locally; P32 memory governance approval-packet chain through closeout committed locally; P33 audit-evidence safe-scope chain closed as fixture/helper/report-shape evidence; governance helper output redaction hardening pushed at d210947; P34 governance review surface safe-scope inventory, fixture contract, explicit-input helper, and aggregator report-shape evidence committed locally; active-board context compression in progress locally`；release_state `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`。旧 `p22-rc-806cc847` 已 superseded 且不得移动/复用；production deploy、watchdog/startup install、Codex/Claude config switching、provider execution、durable memory write、durable audit write、migration-import-export apply、backup/restore、real memory preview/export/import、public MCP expansion、runtime schema enforcement implementation、final RC matrix execution、runner implementation、package script、push/tag/release/deploy 仍需单独显式批准。
+- `Phase C` 现在更适合转入“维护性收尾”而不是继续大幅扩实现。
+## Phase E 建议
+
+- `P0` 先做：
+  - compare / rollback 持续门禁常态化
+  - HTTP MCP 运行态可观测性再补一层
+  - 回滚流程再收紧一层
+- `P1` 再做：
+  - donor 排序手感继续贴齐
+  - suite 数据集继续扩容
+  - 错误语义 / 诊断输出继续贴齐
+- `P2` 最后做：
+  - 文档导航优化
+  - provider / benchmark 资产继续沉淀
