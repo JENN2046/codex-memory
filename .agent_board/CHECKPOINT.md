@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0269 / P29.6 ValidationAggregator schema runtime boundary-guard evidence.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0270 / P29 post-CM-0269 board reconciliation.
 
 ## Current Area
 
-P29 schema/version runtime enforcement aggregator evidence bridge
+P29 schema/version runtime enforcement board reconciliation
 
 ## Current Status
 
@@ -41,8 +41,8 @@ P29 schema/version runtime enforcement aggregator evidence bridge
 - P28.1 added the explicit safe validation evidence reader foundation, was validated, committed, and pushed at `52c4fef`.
 - P28.2 post-push board reconciliation, P28.3 explicit-input evidence freshness/status summary, P28.4 explicit-input gate-readiness summary, P28.5 explicit-input command/source coverage summary, P28.6 explicit-input rejection reason summary, and P28.7 explicit-input confidence posture summary are complete, validated, and committed locally in `e4af76b`. P28 post-commit board checkpoint is committed in `f33e757`.
 - P29.1 explicit-input `SchemaVersionPolicy` helper is committed in `a692f84`; P29.2 ValidationAggregator helper evidence is committed in `5765198`; P29.3 explicit policy evaluation report is committed in `fbb645e`.
-- CM-0266 and CM-0267 are committed locally through `88bfd59`; CM-0268 is committed locally in `89d5db8`.
-- Current CM-0269 changes are validated and pending guarded local commit: ValidationAggregator report shape now records the CM-0268 boundary guard as evidence with `runtimeIntegrated=false`, `runtimeEnforcementImplemented=false`, `publicMcpExpanded=false`, and `decision=NOT_READY_BLOCKED`. Push remains centrally directed by the user and is not part of this local cycle.
+- CM-0266 and CM-0267 are committed locally through `88bfd59`; CM-0268 is committed locally in `89d5db8`; CM-0269 is committed locally in `e957885`.
+- Current CM-0270 changes are board-only reconciliation after CM-0269. Commander direction remains constrained to P29 schema/version runtime enforcement, using fixture-first/read-only/report-shape slices only until a genuinely safe runtime-adjacent step exists. Push remains centrally directed by the user and is not part of this local cycle.
 
 ## Completed Work In This Batch
 
