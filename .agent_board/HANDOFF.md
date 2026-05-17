@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0283 / P31.4 ValidationAggregator governance lifecycle evidence shape.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0284 / P31.x memory governance safe-scope closeout review.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0283 source/test/fixture/status/board updates. Local `main` is ahead of `origin/main` by six local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0284 docs/status/board updates. Local `main` is ahead of `origin/main` by seven local commits; use `git status -sb` for the exact current count. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P31.4 static ValidationAggregator evidence for governance lifecycle helper
+P31.x docs/status/board closeout
 
 ## Findings
 
@@ -86,8 +86,9 @@ P31.4 static ValidationAggregator evidence for governance lifecycle helper
 - CM-0280 adds P31.1 memory governance fixture contract review docs and routes the next safe phase to P31.2 synthetic lifecycle fixture contract. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, governance fixture contract reference scan, and read-only Verifier `PASS`. CM-0280 is committed locally in `042d06c`.
 - CM-0281 adds P31.2 governance lifecycle contract fixture/test. Validation passed: syntax check, targeted fixture test `15/15`, `npm test` `633/633`, `git diff --check`, docs validation, governance lifecycle contract reference scan, and read-only Verifier `PASS`. CM-0281 is committed locally in `efbd232`.
 - CM-0282 adds P31.3 pure explicit-input governance lifecycle helper and focused tests. Validation passed: source/test syntax checks, targeted helper/fixture tests `23/23`, `npm test` `641/641`, `git diff --check`, docs validation, and read-only Verifier `PASS`. CM-0282 is committed locally in `e9e9bdb`.
-- CM-0283 adds P31.4 static ValidationAggregator governance lifecycle helper evidence shape. Validation passed so far: source/test syntax checks, fixture JSON parse, targeted aggregator/governance tests `44/44`, `npm test` `641/641`, `git diff --check`, and docs validation. Verifier and commit are pending.
-- Next safe step: run read-only Verifier for CM-0283, create guarded local commit if eligible, then continue to CM-0284/P31.x safe-scope closeout review. No further push is authorized.
+- CM-0283 adds P31.4 static ValidationAggregator governance lifecycle helper evidence shape. Validation passed: source/test syntax checks, fixture JSON parse, targeted aggregator/governance tests `44/44`, `npm test` `641/641`, `git diff --check`, docs validation, and read-only Verifier `PASS`. CM-0283 is committed locally in `a7b3ffa`.
+- CM-0284 adds P31.x closeout review docs/status/board, closing P31 only as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence. Validation passed so far: `git diff --check`, docs validation, and P31 reference scan. Verifier and commit are pending.
+- Next safe step: run read-only Verifier for CM-0284, guarded local commit if eligible, then continue to CM-0285/P32 approval-packet safe-scope inventory. No further push is authorized.
 
 ## Changed Files
 
