@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0266 / P29.4 ValidationAggregator schema policy evaluation report evidence.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0268 / P29.5 schema/runtime enforcement boundary guard test.
 
 ## Current Area
 
-P29 schema/version runtime enforcement aggregator evidence bridge
+P29 schema/version runtime enforcement boundary guard
 
 ## Current Status
 
@@ -41,7 +41,8 @@ P29 schema/version runtime enforcement aggregator evidence bridge
 - P28.1 added the explicit safe validation evidence reader foundation, was validated, committed, and pushed at `52c4fef`.
 - P28.2 post-push board reconciliation, P28.3 explicit-input evidence freshness/status summary, P28.4 explicit-input gate-readiness summary, P28.5 explicit-input command/source coverage summary, P28.6 explicit-input rejection reason summary, and P28.7 explicit-input confidence posture summary are complete, validated, and committed locally in `e4af76b`. P28 post-commit board checkpoint is committed in `f33e757`.
 - P29.1 explicit-input `SchemaVersionPolicy` helper is committed in `a692f84`; P29.2 ValidationAggregator helper evidence is committed in `5765198`; P29.3 explicit policy evaluation report is committed in `fbb645e`.
-- Current CM-0266 changes are validated and pending guarded local commit: ValidationAggregator static evidence now records the P29.3 evaluation report capability with `evaluationReportExecuted=false`, `runtimeIntegrated=false`, `runtimeEnforcementImplemented=false`, and `decision=NOT_READY_BLOCKED`. Push remains unauthorized.
+- CM-0266 and CM-0267 are committed locally through `88bfd59`.
+- Current CM-0268 changes are validated and pending guarded local commit: `tests/schema-version-runtime-boundary.test.js` proves the public `record_memory` schema remains frozen without schema-version args, `ToolArgumentValidator` rejects attempted schema-version args before any public MCP expansion, and explicit policy write rejection remains report-only with `runtimeIntegrated=false`. Push remains centrally directed by the user and is not part of this local cycle.
 
 ## Completed Work In This Batch
 

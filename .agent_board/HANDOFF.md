@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0266 / P29.4 ValidationAggregator schema policy evaluation report evidence.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0268 / P29.5 schema/runtime enforcement boundary guard test.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for completed CM-0266 source/test/fixture/board edits before guarded local commit. Local `main` is ahead of `origin/main` by 5 commits before the CM-0266 commit. Push remains unauthorized.
+Dirty for completed CM-0268 test/board edits before guarded local commit. Local `main` is ahead of `origin/main` by 7 commits before the CM-0268 commit. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P29 schema/version runtime enforcement aggregator evidence bridge
+P29 schema/version runtime enforcement boundary guard
 
 ## Findings
 
@@ -65,8 +65,9 @@ P29 schema/version runtime enforcement aggregator evidence bridge
 - CM-0254 was committed and pushed at `52c4fef`; post-push `HEAD == origin/main`.
 - CM-0255 through CM-0260 were committed locally in `e4af76b`; P28 board checkpoint was committed in `f33e757`.
 - P29.1 explicit-input `SchemaVersionPolicy` helper was committed in `a692f84`; P29.2 ValidationAggregator helper evidence was committed in `5765198`; P29.3 explicit policy evaluation report was committed in `fbb645e`.
-- CM-0266 is validated and pending guarded local commit. It surfaces P29.3 evaluation report capability in ValidationAggregator with `evaluationReportExecuted=false`, `runtimeIntegrated=false`, `runtimeEnforcementImplemented=false`, public MCP freeze, and `decision=NOT_READY_BLOCKED`.
-- Next safe local candidate after CM-0266 commit: CM-0267 P29 boundary hardening or report-shape bridge work, still fixture-first/read-only and no push.
+- CM-0266 and CM-0267 are committed locally through `88bfd59`.
+- CM-0268 is validated and pending guarded local commit. It adds a fixture-backed runtime boundary guard test proving `record_memory` public schema remains frozen without `schema_version` / `schemaVersion`, `ToolArgumentValidator` rejects attempted schema-version args before public MCP expansion, and explicit policy write rejection remains report-only with `runtimeIntegrated=false`.
+- Next safe local candidate after CM-0268 commit: CM-0269 P29.6 schema/runtime enforcement safe candidate selection, still fixture-first/read-only unless a smaller helper/test slice is discovered. Public MCP expansion, durable write-path enforcement, and push remain blocked.
 
 ## Changed Files
 
