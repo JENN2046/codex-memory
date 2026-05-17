@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, P43-T1 `8af5c64`, P44-T1 `ae7655a`, and post-P44 board sync `93721b4`; P45-T1 is implemented/validated in the worktree and pending guarded local commit.
+- Local baseline: `main` is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, P43-T1 `8af5c64`, P44-T1 `ae7655a`, post-P44 board sync `93721b4`, and P45-T1 `5ea714b`.
 - Current active program: P41-P45 Evidence-First Gate Spine.
-- Current phase area: P45 Fixture-Only Final RC Matrix Evaluator Skeleton; fixture-only / dry-run-only / explicit-input-only boundaries preserved.
+- Current phase area: P41-P45 local objective complete; post-P45 board/status reconciliation in progress. Fixture-only / dry-run-only / explicit-input-only boundaries preserved.
 
 ## Active Queue
 
@@ -35,7 +35,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P42-T1 | governed-memory-spine | A2 | done | Explicit-Input Evidence Helper | changed JS syntax; targeted helper tests; `npm test`; boundary scan; Verifier | Complete and committed locally in `169f5bc`; pure helper over caller-provided object only; no fs read, directory scan, command execution, durable write, public MCP expansion, runtime policy kernel, or RC-ready claim. |
 | P43-T1 | governed-memory-spine | A2 | done | Recall / Migration Isolation Explicit-Input Helper | changed JS syntax; targeted helper tests; `npm test`; boundary scan; Verifier | Complete and committed locally in `8af5c64`; pure helper over caller-provided object only; proves explicit-input isolation for governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned/out-of-scope memory, readiness reports, and synthetic migration metadata without touching normal recall/vector/candidate/ranking/projection/audit summary runtime. |
 | P44-T1 | governed-memory-spine | A2 | done | ValidationAggregator P36-P40 Evidence Source Map | changed JS syntax; targeted aggregator tests; `npm test`; boundary scan; Verifier | Complete locally in `ae7655a`; static report-shape evidence only; no fixture read, helper execution, gate/runner execution, live MCP refresh, provider, real memory/runtime store scan, public MCP expansion, or runtime-ready claim. |
-| P45-T1 | governed-memory-spine | A2 | done | Fixture-only Final RC Matrix Evaluator Skeleton | changed JS syntax; targeted evaluator tests; `npm test`; boundary scan; Verifier | Implemented/validated in worktree; guarded local commit pending. Explicit-input evaluator only; rejects unsupported/warning/unknown/skipped/failed/not_executed evidence, readiness claims, public MCP drift, safety leakage, and A5 bypass attempts; no command execution, evidence collection, helper execution, or full final RC matrix claim. |
+| P45-T1 | governed-memory-spine | A2 | done | Fixture-only Final RC Matrix Evaluator Skeleton | changed JS syntax; targeted evaluator tests; `npm test`; boundary scan; Verifier | Complete locally in `5ea714b`. Explicit-input evaluator only; rejects unsupported/warning/unknown/skipped/failed/not_executed evidence, readiness claims, public MCP drift, safety leakage, and A5 bypass attempts; no command execution, evidence collection, helper execution, or full final RC matrix claim. |
 
 ## Standing Boundaries
 

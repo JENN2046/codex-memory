@@ -31,14 +31,15 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 - P43-T1 recall/migration isolation explicit-input helper: complete locally in `8af5c64`.
 - P44-T1 ValidationAggregator P36-P40 evidence source map: complete locally in `ae7655a`.
 - Post-P44 board reconciliation: complete locally in `93721b4`.
-- P45-T1 fixture-only final RC matrix evaluator skeleton: implemented and fully pre-commit validated in the worktree; guarded local commit pending.
+- P45-T1 fixture-only final RC matrix evaluator skeleton: complete locally in `5ea714b`.
 
 ## Current Task
 
-P45-T1 remaining local closeout:
+P41-P45 post-closeout:
 
-- Create guarded local P45 commit if the diff remains scoped.
-- Reconcile board/status after commit so P41-P45 is closed locally without runtime-ready overclaim.
+- Finish post-P45 board/status reconciliation.
+- Stop at local objective completion unless a new safe local goal is provided.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from local evidence completion.
 
 ## Boundaries
 
@@ -57,6 +58,7 @@ P45-T1 remaining local closeout:
 
 ## Next Candidate
 
-After P45-T1:
+After P41-P45 closeout:
 
-- Reconcile board/status, then continue only if a safe local P41-P45 successor remains or stop at the next hard boundary.
+- Await the next explicit goal or push authorization.
+- A reasonable future local-only successor would be a P46 planning/charter task, but it is not authorized by the current P41-P45 goal.

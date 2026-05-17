@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `3e3f76d fix: harden local http and governance redaction`。
-- 当前本地基线：`main` ahead `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, P43-T1 `8af5c64`, P44-T1 `ae7655a`, and post-P44 board sync `93721b4`；P45-T1 已在 worktree 中实现并通过完整预检，等待 guarded local commit。
+- 当前本地基线：`main` ahead `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, P41-T1 `08597d6`, P41-T2 `8895816`, P42-T1 `169f5bc`, P43-T1 `8af5c64`, P44-T1 `ae7655a`, post-P44 board sync `93721b4`, and P45-T1 `5ea714b`。
 - 最新已推送完成：P35.1 governed memory policy gate fixture contract、P35 post-push board reconciliation、P35 security hardening 均已推送到 `3e3f76d`。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：创建 P45-T1 guarded local commit，然后进行 post-P45 board/status reconciliation。
+- 当前任务：P41-P45 本地目标已完成；正在进行 post-P45 board/status reconciliation。
 
 ## 当前阻塞
 
@@ -21,7 +21,7 @@
 
 ## 当前优先级
 
-1. 创建 P45 fixture-only final RC matrix evaluator skeleton 的 guarded local commit。
+1. 完成 post-P45 board/status reconciliation 并本地提交。
 2. P45 只能判断 caller-provided explicit evidence；不得收集证据、执行 validation command、执行 helper/gate/runner，或声称 full final RC matrix 已执行。
 3. P41-P45 不得连接真实 memory、diary/SQLite/vector/candidate/recall-audit scan、migration apply、backup/restore、provider、public MCP expansion、config/watchdog 或 release/deploy。
 
