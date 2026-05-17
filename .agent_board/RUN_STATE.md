@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | P58-T2 approval framework explicit-input helper candidate |
+| Current task | P58-T2 approval framework explicit-input helper |
 | Current area | P8-memory-governance / migration/import-export/backup-restore approval framework boundary |
 | Last pushed baseline | `1ae4286` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | P58-T1 docs/fixture/test boundary inventory added, validated, committed locally in `5326169`, and active board/status reconciled for the next P58-T2 candidate. |
-| Last validation | P58-T1 validation passed: new test syntax check; fixture JSON parse; targeted P58 test `13/13`; targeted P39/P43/P55/P57/P58 set `68/68`; `npm test` `982/982`; post-commit status/log/trailer/diff-check passed for `5326169`. |
-| Worktree summary | Local `main` contains P51-P58 local work and is ahead of `origin/main = 1ae4286`; latest checked commit is `5326169`. Use `git status -sb` and `git log --oneline --decorate -n 10` for exact current state. No push is authorized. No runtime/provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/tag/release/deploy is authorized. |
+| Last action | P58-T2 explicit-input helper added and validated locally; P58-T1 is locally committed in `5326169` and post-commit board reconciliation is locally committed in `14ba9ce`. |
+| Last validation | P58-T2 validation passed: changed JS syntax checks; targeted helper/no-touch test `11/11`; targeted P39/P43/P55/P56/P57/P58/no-touch set `85/85`; boundary scan returned no hits; `npm test` `989/989`; `git diff --check` passed. |
+| Worktree summary | Local `main` contains P51-P58-T1 local work and is ahead of `origin/main = 1ae4286`; latest checked commit is `14ba9ce`. P58-T2 source/test changes are pending guarded local commit. Use `git status -sb` and `git log --oneline --decorate -n 10` for exact current state. No push is authorized. No runtime/provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/tag/release/deploy is authorized. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized unless the user explicitly requests another push |
-| Next planned action | Evaluate P58-T2 approval framework explicit-input helper only if it remains caller-provided object only and no-side-effect. No push unless explicitly requested. |
+| Next planned action | Run docs validation for P58-T2 board/status updates, create a guarded local commit if scope stays clean, then perform post-commit board reconciliation. No push unless explicitly requested. |
 
 ## Notes
 
