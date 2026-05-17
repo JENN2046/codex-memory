@@ -19,7 +19,8 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 9. P57-T2 adds the explicit-input evaluator for caller-provided P57 boundary/proof objects while keeping runtime proof blocked.
 10. P58-T1 defines the migration/import-export/backup-restore approval framework boundary inventory using docs/fixture/test evidence only.
 11. P58-T2 adds a pure explicit-input helper for caller-provided P58 approval metadata while keeping approval execution and all apply/restore actions blocked.
-12. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
+12. P59-T1 defines the HTTP runtime observability / operation hardening boundary inventory as docs/fixture/test evidence only; it does not run live HTTP observation or make operation readiness claims.
+13. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
 
@@ -73,7 +74,8 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P57-T2 recall isolation runtime proof explicit-input evaluator is complete, validated, and locally committed in `6f29757`.
 - P58-T1 migration/import-export/backup-restore approval framework boundary inventory is complete, validated, and locally committed in `5326169` as docs/fixture/test evidence only.
 - P58-T2 migration/import-export/backup-restore approval framework explicit-input helper is complete, validated, and locally committed in `2470634`.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, or P58 boundary/helper evidence.
+- P59-T1 HTTP runtime observability / operation hardening boundary inventory is complete and validated locally as docs/fixture/test evidence only, pending guarded local commit.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, P58 boundary/helper evidence, or P59 boundary inventory evidence.
 
 ## Boundaries
 
@@ -92,7 +94,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P58-T2 commit `2470634`:
+After P59-T1 local validation:
 
-- Consider P59-T1 HTTP runtime observability / operation hardening boundary inventory only if it stays local/read-only and does not install services/watchdogs/startup entries, switch config, call providers, write durable state, expand public MCP, or claim readiness.
-- Keep P59 boundary-first: no service/watchdog/startup install, no config switch, no provider call, no durable write, no public MCP expansion, no push/tag/release/deploy, and no RC-ready claim.
+- Create the guarded local P59-T1 commit if final diff/docs validation remains clean.
+- Then reconcile active board/status and select the next safe P59 local task without live HTTP operation, service/watchdog/startup install, config switch, provider call, durable write, public MCP expansion, push/tag/release/deploy, or RC-ready claim.
