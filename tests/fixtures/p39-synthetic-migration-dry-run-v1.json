@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "p39-synthetic-migration-dry-run-v1",
+  "phase": "P39-synthetic-migration-dry-run-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "runtimeIntegrated": false,
+  "migrationPlannerImplemented": false,
+  "realMemoryContentRead": false,
+  "realMemoryPreviewed": false,
+  "migrationApplied": false,
+  "importApplied": false,
+  "exportApplied": false,
+  "backupCreated": false,
+  "restorePerformed": false,
+  "mutated": false,
+  "dryRunScope": {
+    "allowedSources": [
+      "synthetic_fixture",
+      "sanitized_metadata"
+    ],
+    "deniedSources": [
+      "real_memory_content",
+      "real_diary",
+      "real_sqlite",
+      "real_vector_index",
+      "real_candidate_cache",
+      "provider_output"
+    ],
+    "dryRunRepresentsRealMemory": false,
+    "dryRunAuthorizesApply": false
+  },
+  "planContract": {
+    "requiredSections": [
+      "source_summary",
+      "mapping_plan",
+      "parity_checks",
+      "rollback_readiness",
+      "blocked_actions",
+      "failure_path"
+    ],
+    "failurePathExitCode": 1,
+    "criticalUnknownEqualsFailure": true,
+    "criticalSkippedEqualsFailure": true,
+    "warningOnlyEqualsFailure": true
+  },
+  "planCases": [
+    {
+      "id": "synthetic_fixture_plan",
+      "sourceType": "synthetic_fixture",
+      "machineStatus": "PLAN_ACCEPTED_FOR_SYNTHETIC_DRY_RUN",
+      "acceptedForPlanning": true,
+      "mutated": false,
+      "readsRealMemoryContent": false,
+      "reasonCodes": [
+        "P39_SYNTHETIC_FIXTURE_PLAN"
+      ]
+    },
+    {
+      "id": "sanitized_metadata_plan",
+      "sourceType": "sanitized_metadata",
+      "machineStatus": "PLAN_ACCEPTED_FOR_SANITIZED_METADATA_DRY_RUN",
+      "acceptedForPlanning": true,
+      "mutated": false,
+      "readsRealMemoryContent": false,
+      "reasonCodes": [
+        "P39_SANITIZED_METADATA_PLAN"
+      ]
+    },
+    {
+      "id": "real_memory_content_source",
+      "sourceType": "real_memory_content",
+      "machineStatus": "A5_HARD_STOP_REAL_MEMORY_CONTENT",
+      "acceptedForPlanning": false,
+      "mutated": false,
+      "readsRealMemoryContent": false,
+      "failurePath": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "reasonCodes": [
+        "P39_REAL_MEMORY_CONTENT_BLOCKED"
+      ]
+    },
+    {
+      "id": "migration_apply_requested",
+      "sourceType": "synthetic_fixture",
+      "requestedAction": "migration_apply",
+      "machineStatus": "A5_HARD_STOP_APPLY_REQUESTED",
+      "acceptedForPlanning": false,
+      "mutated": false,
+      "failurePath": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "reasonCodes": [
+        "P39_MIGRATION_APPLY_BLOCKED"
+      ]
+    },
+    {
+      "id": "parity_check_unknown",
+      "sourceType": "synthetic_fixture",
+      "criticalCheck": "parity",
+      "criticalCheckOutcome": "unknown",
+      "machineStatus": "DENY_PARITY_UNKNOWN",
+      "acceptedForPlanning": false,
+      "mutated": false,
+      "failurePath": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "reasonCodes": [
+        "P39_PARITY_UNKNOWN_FAIL_CLOSED"
+      ]
+    },
+    {
+      "id": "rollback_readiness_skipped",
+      "sourceType": "sanitized_metadata",
+      "criticalCheck": "rollback_readiness",
+      "criticalCheckOutcome": "skipped",
+      "machineStatus": "DENY_ROLLBACK_SKIPPED",
+      "acceptedForPlanning": false,
+      "mutated": false,
+      "failurePath": {
+        "nonzeroOnFailure": true,
+        "exitCodeOnFailure": 1
+      },
+      "reasonCodes": [
+        "P39_ROLLBACK_READINESS_SKIPPED"
+      ]
+    }
+  ],
+  "blockedActions": [
+    "real_memory_content_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "backup",
+    "restore",
+    "provider_call",
+    "public_mcp_expansion",
+    "durable_memory_write",
+    "durable_audit_write",
+    "push_tag_release_deploy"
+  ],
+  "safety": {
+    "noCommandExecution": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryContentRead": true,
+    "noRealMemoryPreview": true,
+    "noRealMemoryExport": true,
+    "noRealMemoryImport": true,
+    "noRealMemoryScan": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "structureLeakageApproved": false
+  },
+  "requiredWording": [
+    "P39 is a synthetic migration dry-run contract only.",
+    "Dry-run represents synthetic fixtures or sanitized metadata only.",
+    "Dry-run does not authorize real memory content read, preview, export, import, scan, migration apply, backup, or restore.",
+    "Unknown, skipped, failed, or warning-only parity and rollback readiness checks fail closed.",
+    "Fixture validation does not mean migration readiness for real memory."
+  ],
+  "forbiddenClaims": [
+    "dry-run previews real memory",
+    "synthetic migration dry-run authorizes apply",
+    "sanitized metadata authorizes export",
+    "rollback skipped may pass",
+    "P39 makes real migration ready",
+    "P39 makes v1.0 RC ready"
+  ],
+  "next": "P40-local-readiness-report"
+}

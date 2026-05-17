@@ -29,10 +29,10 @@ This active plan is the short routing document for the current P28-P40 Governed 
 
 P36-T1 Scope + A5 Boundary Contract:
 
-- Establish synthetic recall isolation fixtures for governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned memory, and out-of-scope memory.
+- Establish a synthetic migration dry-run contract over synthetic fixtures or sanitized metadata only.
 - Keep `decision=NOT_READY_BLOCKED`.
 - Do not implement runtime policy enforcement or a runtime policy kernel.
-- These isolated records must not enter normal recall namespace, candidate cache, ranking, projection, or audit summary.
+- Dry-run must not authorize real memory content read, preview, export, import, scan, migration apply, backup, or restore.
 - Do not approve governed actions or write durable state.
 
 ## Boundaries
@@ -51,6 +51,6 @@ P36-T1 Scope + A5 Boundary Contract:
 
 ## Next Candidate
 
-After P38 validation, Commander may choose:
+After P39 validation, Commander may choose:
 
-- `P39-synthetic-migration-dry-run-contract`, only if it remains synthetic fixture or sanitized metadata only and does not touch real memory content.
+- `P40-local-readiness-report`, only if readiness means local evidence report only and not runtime/mainline/deploy/config/watchdog readiness.
