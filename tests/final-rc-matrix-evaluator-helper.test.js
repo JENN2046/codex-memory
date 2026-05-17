@@ -41,7 +41,9 @@ function assertNoSensitiveSurface(value) {
     'a:\\',
     '.env',
     'https://example.test',
-    'workspace_id'
+    'workspace_id',
+    'providerapikey',
+    'evaluator_provider_api_key_1234567890'
   ]) {
     assert.equal(text.includes(forbidden), false, forbidden);
   }
@@ -514,7 +516,7 @@ test('P45 evaluator redacts sensitive strings and does not leak unsupported sour
       ? {
           ...evidence,
           id: 'authorization: Bearer EVALUATOR_TOKEN_1234567890',
-          sourceType: 'api_key=EVALUATOR_API_KEY_1234567890',
+          sourceType: 'providerapikey=EVALUATOR_PROVIDER_API_KEY_1234567890 api_key=EVALUATOR_API_KEY_1234567890',
           status: 'passed token=EVALUATOR_STATUS_TOKEN_1234567890',
           artifact: 'A:\\secret\\.env https://example.test workspace_id=workspace-public-id',
           raw_workspace_id: 'raw_workspace_id=workspace-raw'

@@ -101,15 +101,6 @@ const NO_SIDE_EFFECT_SAFETY_FLAGS = Object.freeze([
 
 const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
-function redactEvidenceManifestString(value) {
-  return redactSensitiveFragments(value)
-    .replace(/[A-Z]:[\\/][^"',;\s]+/gi, '<redacted>')
-    .replace(/https?:\/\/[^"',;\s]+/gi, '<redacted>')
-    .replace(/\.env\b/gi, '<redacted>')
-    .replace(/\bworkspace_id\s*[:=]\s*["']?[^"',;\s]+["']?/gi, '<redacted>')
-    .replace(/\bworkspace_id\b/gi, '<redacted>');
-}
-
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -119,7 +110,7 @@ function cloneArray(values) {
 }
 
 function normalizeString(value) {
-  return typeof value === 'string' ? redactEvidenceManifestString(value.trim()) : '';
+  return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
 function normalizeStringArray(values) {

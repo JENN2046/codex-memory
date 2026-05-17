@@ -133,17 +133,8 @@ function cloneArray(values) {
   return Array.isArray(values) ? [...values] : [];
 }
 
-function redactEvaluatorString(value) {
-  return redactSensitiveFragments(value)
-    .replace(/[A-Z]:[\\/][^"',;\s]+/gi, '<redacted>')
-    .replace(/https?:\/\/[^"',;\s]+/gi, '<redacted>')
-    .replace(/\.env\b/gi, '<redacted>')
-    .replace(/\bworkspace_id\s*[:=]\s*["']?[^"',;\s]+["']?/gi, '<redacted>')
-    .replace(/\bworkspace_id\b/gi, '<redacted>');
-}
-
 function normalizeString(value) {
-  return typeof value === 'string' ? redactEvaluatorString(value.trim()) : '';
+  return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
 function normalizeStringArray(values) {

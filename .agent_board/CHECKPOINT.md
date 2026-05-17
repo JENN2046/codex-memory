@@ -13,7 +13,7 @@ P6 docs-drift / P46-0 post-push board/status reconciliation.
 - Last pushed baseline: `2b4a956 fix: harden governance evidence helper contracts` on `origin/main`.
 - Local branch is aligned with `origin/main` at `2b4a956`; the worktree was clean before P46-0 edits.
 - Latest pushed task chain: P36-P45 evidence-first / fixture-only / explicit-input chain plus CM-0320 governance evidence helper strict schema/version exact-set hardening.
-- Current task: P46-0 post-push board/status reconciliation is validated and ready for guarded local commit; next safe implementation task is P46-T1 HTTP no-token mutation + sensitive redaction hardening.
+- Current task: P46-T1 HTTP no-token mutation + sensitive redaction hardening is validated and ready for guarded local commit; next safe task is P47 evidence-to-enforcement gap map.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -55,4 +55,4 @@ P6 docs-drift / P46-0 post-push board/status reconciliation.
 
 ## Next Safe Step
 
-Create guarded local P46-0 board/status reconciliation commit, then continue to P46-T1 if safe. Push remains user-directed and not authorized.
+Create guarded local P46-T1 commit, then continue to P47 if safe. Push remains user-directed and not authorized.

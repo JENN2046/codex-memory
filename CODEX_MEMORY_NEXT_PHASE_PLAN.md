@@ -40,8 +40,9 @@ This active plan is the short routing document for the current P46-P50 Evidence 
 
 P46-P50 Evidence Enforcement Bridge:
 
-- Finish P46-0 post-push board/status reconciliation.
-- Then begin P46-T1 HTTP no-token mutation + sensitive redaction hardening within the allowed file list.
+- P46-0 post-push board/status reconciliation is complete locally.
+- P46-T1 HTTP no-token mutation + sensitive redaction hardening is validated and pending guarded local commit.
+- Next safe task is P47 evidence-to-enforcement gap map.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from local evidence completion.
 
 ## Boundaries
@@ -61,9 +62,8 @@ P46-P50 Evidence Enforcement Bridge:
 
 ## Next Candidate
 
-After P46-0:
+After P46-T1:
 
-- P46-T1 HTTP no-token mutation + sensitive redaction hardening.
 - P47 evidence-to-enforcement gap map.
 - P48 evidence-chain consistency guard.
 - P49 ValidationAggregator P45 posture bridge.

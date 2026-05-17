@@ -225,9 +225,13 @@ test('P31.3 helper redacts sensitive normalized output and unsupported source ty
     ],
     unsupportedSourceTypes: [
       'api_key=LIFECYCLE_API_KEY_1234567890',
+      'providerapikey=LIFECYCLE_PROVIDER_API_KEY_1234567890',
       'password=LIFECYCLE_PASSWORD_1234567890',
       'token=LIFECYCLE_SUMMARY_TOKEN_1234567890',
-      'set-cookie=session=LIFECYCLE_COOKIE_1234567890'
+      'set-cookie=session=LIFECYCLE_COOKIE_1234567890',
+      'workspace_id=workspace-lifecycle-public',
+      'https://example.test/lifecycle',
+      'C:\\secret\\.env'
     ],
     safeSourceTypes: [
       ...SAFE_SOURCE_TYPES,
@@ -242,7 +246,7 @@ test('P31.3 helper redacts sensitive normalized output and unsupported source ty
           raw_workspace_id: 'raw_workspace_id=workspace-surface-raw',
           sourceArtifacts: [
             ...surface.sourceArtifacts,
-            'artifact authorization: Bearer ARTIFACT_TOKEN_1234567890 api_key=ARTIFACT_API_KEY_1234567890'
+            'artifact authorization: Bearer ARTIFACT_TOKEN_1234567890 api_key=ARTIFACT_API_KEY_1234567890 /home/user/.env'
           ]
         }
       : surface
@@ -272,6 +276,12 @@ test('P31.3 helper redacts sensitive normalized output and unsupported source ty
     'lifecycle_password_1234567890',
     'lifecycle_summary_token_1234567890',
     'lifecycle_cookie_1234567890',
+    'lifecycle_provider_api_key_1234567890',
+    'workspace_id',
+    'workspace-lifecycle-public',
+    'https://example.test',
+    'c:\\',
+    '.env',
     'workspace-surface-raw'
   ]) {
     assert.equal(normalizedText.includes(forbidden), false);

@@ -6,25 +6,25 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | P46-0 / post-push board/status reconciliation |
-| Current area | P6-docs-drift / P46-P50 Evidence Enforcement Bridge |
+| Current task | CM-0322 / P46-T1 HTTP no-token mutation + sensitive redaction hardening |
+| Current area | P8-memory-governance / HTTP boundary and helper redaction |
 | Last pushed baseline | `2b4a956` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | User-authorized push completed before this goal; `HEAD == origin/main == 2b4a956`. P46-P50 goal activated and P46-0 board/status reconciliation started. |
-| Last validation | P46-0 validation passed: `git diff --check`; `scripts\validate-local.ps1 -Area docs`; active stale wording scan returned no matches. |
-| Worktree summary | P46-0 board/status docs reconciliation is validated and ready for guarded local commit. No runtime/provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/push/tag/release/deploy is authorized. |
+| Last action | Hardened HTTP no-token mutation boundary and unified P31-P34/P42/P45 sensitive redaction through `SensitiveFragmentRedaction.js`. |
+| Last validation | P46-T1 validation passed: changed JS syntax checks; targeted HTTP/helper tests `73/73`; `npm test` `842/842`; `git diff --check`; wrapper scan shows P42/P45 no longer use local redaction wrappers. |
+| Worktree summary | P46-T1 source/test/board edits are validated and ready for guarded local commit. Local `main` is ahead of `origin/main` by P46-0 commit `ed01771`. No runtime/provider/data/public MCP expansion/durable write outside tests/service start/migration-import-export apply/backup/restore/push/tag/release/deploy is authorized. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized unless the user explicitly requests another push |
-| Next planned action | Create guarded local P46-0 board/status reconciliation commit, then continue to P46-T1 HTTP no-token mutation + sensitive redaction hardening if safe. No push unless explicitly requested. |
+| Next planned action | Create guarded local P46-T1 commit, then continue to P47 evidence-to-enforcement gap map if safe. No push unless explicitly requested. |
 
 ## Notes
 
 - Project health: strong.
 - Governance health: strong.
-- Current truth: P36-P45 evidence-first / fixture-only / explicit-input chain plus CM-0320 strict schema/version exact-set hardening is pushed to `origin/main` at `2b4a956`. The current long-running goal is P46-P50 Evidence Enforcement Bridge. v1.0 RC remains `NOT_READY_BLOCKED`.
+- Current truth: P36-P45 evidence-first / fixture-only / explicit-input chain plus CM-0320 strict schema/version exact-set hardening is pushed to `origin/main` at `2b4a956`. P46-0 is committed locally at `ed01771`; P46-T1 is validated and pending guarded local commit. v1.0 RC remains `NOT_READY_BLOCKED`.
 - Release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`; helper output safety is hardened without changing runtime readiness.
 - Superseded artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
 - Current user authorization: persistent local A4/A4.8 execution is active for the P46-P50 Evidence Enforcement Bridge goal. Push/tag/release/deploy, provider calls, real memory content read/preview/export/import/scan, diary/SQLite/vector/candidate/recall-audit scans, SQLite migration apply, backup/restore, watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edits, dependency changes, durable writes, runtime mutation implementation, and production deploy remain blocked unless separately explicit.

@@ -9,7 +9,7 @@
 - 当前本地基线：`main` 与 `origin/main` 对齐在 `2b4a956`；工作树在 P46-0 开始前为 clean。
 - 最新已推送完成：P36-P45 evidence-first / fixture-only / explicit-input 链路，以及 CM-0320 governance evidence helper strict schema/version exact-set hardening，均已推送到 `2b4a956`。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P46-P50 Evidence Enforcement Bridge 已启动；P46-0 正在修正 post-push board/status stale 状态。
+- 当前任务：P46-T1 HTTP no-token mutation + sensitive redaction hardening 已验证，等待 guarded local commit；下一步是 P47 evidence-to-enforcement gap map。
 
 ## 当前阻塞
 
@@ -21,9 +21,9 @@
 
 ## 当前优先级
 
-1. 完成 P46-0 post-push board/status reconciliation，清除旧的待提交、分支领先、推送未完成等 stale 状态。
-2. 进入 P46-T1 HTTP no-token mutation + sensitive redaction hardening：只统一 helper redaction 和测试覆盖，不新增阶段、不实现 runtime mutation、不改 public MCP schema。
-3. 后续 P47-P50 继续保持 fixture-only / explicit-input-only / dry-run-only，建立 evidence-to-enforcement gap map、consistency guard、ValidationAggregator P45 posture bridge 和 no-touch boundary regression。
+1. 为 P46-T1 创建 guarded local commit；不 push。
+2. 进入 P47 evidence-to-enforcement gap map，只做 docs/status/board 与本地证据差距图。
+3. 后续 P48-P50 继续保持 fixture-only / explicit-input-only / dry-run-only，建立 consistency guard、ValidationAggregator P45 posture bridge 和 no-touch boundary regression。
 
 ## 主要事实源
 

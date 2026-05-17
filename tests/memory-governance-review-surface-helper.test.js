@@ -369,9 +369,13 @@ test('P34.2 helper redacts sensitive normalized output and unsupported source ty
     ],
     unsupportedSourceTypes: [
       'api_key=REVIEW_API_KEY_1234567890',
+      'providerapikey=REVIEW_PROVIDER_API_KEY_1234567890',
       'password=REVIEW_PASSWORD_1234567890',
       'token=REVIEW_SUMMARY_TOKEN_1234567890',
-      'set-cookie=session=REVIEW_COOKIE_1234567890'
+      'set-cookie=session=REVIEW_COOKIE_1234567890',
+      'workspace_id=workspace-review-public',
+      'https://example.test/review',
+      'C:\\secret\\.env'
     ],
     safeSourceTypes: [
       ...SAFE_SOURCE_TYPES,
@@ -393,7 +397,7 @@ test('P34.2 helper redacts sensitive normalized output and unsupported source ty
           raw_workspace_id: 'raw_workspace_id=workspace-surface-raw',
           artifacts: [
             ...source.artifacts,
-            'artifact authorization: Bearer ARTIFACT_TOKEN_1234567890 api_key=ARTIFACT_API_KEY_1234567890'
+            'artifact authorization: Bearer ARTIFACT_TOKEN_1234567890 api_key=ARTIFACT_API_KEY_1234567890 /opt/app/.env'
           ]
         }
       : source
@@ -425,11 +429,17 @@ test('P34.2 helper redacts sensitive normalized output and unsupported source ty
     'review_password_1234567890',
     'review_summary_token_1234567890',
     'review_cookie_1234567890',
+    'review_provider_api_key_1234567890',
     'review_wording_password_1234567890',
     'review_wording_token_1234567890',
     'review_wording_cookie_1234567890',
     'begin private key',
     'review_wording_private_key_body',
+    'workspace_id',
+    'workspace-review-public',
+    'https://example.test',
+    'c:\\',
+    '.env',
     'workspace-surface-raw',
     'workspace-lifecycle-raw'
   ]) {

@@ -262,9 +262,13 @@ test('P33.2 helper redacts sensitive normalized output and unsupported source ty
     ],
     unsupportedSourceTypes: [
       'api_key=AUDIT_API_KEY_1234567890',
+      'providerapikey=AUDIT_PROVIDER_API_KEY_1234567890',
       'password=AUDIT_PASSWORD_1234567890',
       'token=AUDIT_SUMMARY_TOKEN_1234567890',
-      'set-cookie=session=AUDIT_COOKIE_1234567890'
+      'set-cookie=session=AUDIT_COOKIE_1234567890',
+      'workspace_id=workspace-audit-public',
+      'https://example.test/audit',
+      'C:\\secret\\.env'
     ],
     safeSourceTypes: [
       ...SAFE_SOURCE_TYPES,
@@ -288,7 +292,7 @@ test('P33.2 helper redacts sensitive normalized output and unsupported source ty
     ),
     requiredEvidenceFields: [
       ...fixture.requiredEvidenceFields,
-      'source authorization: Bearer EVIDENCE_TOKEN_1234567890 api_key=EVIDENCE_API_KEY_1234567890'
+      'source authorization: Bearer EVIDENCE_TOKEN_1234567890 api_key=EVIDENCE_API_KEY_1234567890 /var/tmp/.env'
     ]
   });
   const summary = summarizeMemoryGovernanceAuditEvidenceContract(normalized);
@@ -306,9 +310,15 @@ test('P33.2 helper redacts sensitive normalized output and unsupported source ty
     'audit_password_1234567890',
     'audit_summary_token_1234567890',
     'audit_cookie_1234567890',
+    'audit_provider_api_key_1234567890',
     'audit_wording_password_1234567890',
     'audit_wording_token_1234567890',
     'audit_wording_cookie_1234567890',
+    'workspace_id',
+    'workspace-audit-public',
+    'https://example.test',
+    'c:\\',
+    '.env',
     'workspace-event-raw'
   ]) {
     assert.equal(normalizedText.includes(forbidden), false);

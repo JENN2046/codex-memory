@@ -14,11 +14,11 @@ Execute P46-P50 Evidence Enforcement Bridge under local A4/A4.8 boundaries, star
 
 ## Worktree
 
-P46-0 board/status docs edits are validated and ready for guarded local commit. Before P46-0, `HEAD == origin/main == 2b4a956` and the worktree was clean.
+P46-T1 source/test/board edits are validated and ready for guarded local commit. Local `main` is ahead of `origin/main` by P46-0 commit `ed01771`.
 
 ## Current Area
 
-P6 docs-drift / P46-0 post-push board/status reconciliation.
+P8 memory-governance / P46-T1 HTTP no-token mutation + sensitive redaction hardening.
 
 ## Current Truth
 
@@ -27,7 +27,7 @@ P6 docs-drift / P46-0 post-push board/status reconciliation.
 - Latest pushed implementation/test commit: `2b4a956`.
 - P36-P45 evidence-first / fixture-only / explicit-input chain plus CM-0320 strict schema/version exact-set hardening are pushed.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: P46-0 reconciles stale board/status facts after the authorized push. Next safe task is P46-T1 HTTP no-token mutation + sensitive redaction hardening.
+- Current task: P46-T1 hardens HTTP no-token mutation and unifies helper sensitive redaction. Next safe task is P47 evidence-to-enforcement gap map.
 
 ## Validation
 
@@ -41,6 +41,7 @@ P6 docs-drift / P46-0 post-push board/status reconciliation.
 - CM-0320 validation passed before push: changed JS syntax checks for P31-P34/P42/P43 helpers and tests; targeted helper tests `65/65`; regression probe confirmed P31-P34 bad schema and P42/P43 bad schema / duplicate / extra-set inputs fail closed; `npm test` `841/841`; `git diff --check`; boundary scan showed only expected test fixtures, safety assertions, and blocker wording.
 - CM-0320 push verification: `HEAD == origin/main == 2b4a956`; worktree clean before P46-0.
 - P46-0 validation passed: `git diff --check`; `scripts\validate-local.ps1 -Area docs`; active stale wording scan returned no matches for the old baseline/ahead/pending-CM0320 wording.
+- P46-T1 validation passed: changed JS syntax checks for HTTP/redaction/helper/test files; targeted HTTP/helper tests `73/73`; `npm test` `842/842`; `git diff --check`; P42/P45 local redaction wrapper scan returned no matches.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -57,4 +58,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Create guarded local P46-0 commit, then proceed to P46-T1 if safe. Push remains blocked unless explicitly requested.
+Create guarded local P46-T1 commit, then proceed to P47 evidence-to-enforcement gap map if safe. Push remains blocked unless explicitly requested.

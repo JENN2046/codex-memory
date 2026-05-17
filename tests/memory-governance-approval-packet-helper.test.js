@@ -257,9 +257,13 @@ test('P32.2 helper redacts sensitive normalized output and unsupported source ty
     ],
     unsupportedSourceTypes: [
       'api_key=APPROVAL_API_KEY_1234567890',
+      'providerapikey=APPROVAL_PROVIDER_API_KEY_1234567890',
       'password=APPROVAL_PASSWORD_1234567890',
       'token=APPROVAL_SUMMARY_TOKEN_1234567890',
-      'set-cookie=session=APPROVAL_COOKIE_1234567890'
+      'set-cookie=session=APPROVAL_COOKIE_1234567890',
+      'workspace_id=workspace-approval-public',
+      'https://example.test/approval',
+      'C:\\secret\\.env'
     ],
     safeSourceTypes: [
       ...SAFE_SOURCE_TYPES,
@@ -280,7 +284,7 @@ test('P32.2 helper redacts sensitive normalized output and unsupported source ty
           raw_workspace_id: 'raw_workspace_id=workspace-action-raw',
           requiredFields: [
             ...action.requiredFields,
-            'source authorization: Bearer FIELD_TOKEN_1234567890 api_key=FIELD_API_KEY_1234567890'
+            'source authorization: Bearer FIELD_TOKEN_1234567890 api_key=FIELD_API_KEY_1234567890 /Users/example/.env'
           ]
         }
       : action
@@ -301,9 +305,15 @@ test('P32.2 helper redacts sensitive normalized output and unsupported source ty
     'approval_password_1234567890',
     'approval_summary_token_1234567890',
     'approval_cookie_1234567890',
+    'approval_provider_api_key_1234567890',
     'approval_wording_password_1234567890',
     'approval_wording_token_1234567890',
     'approval_wording_cookie_1234567890',
+    'workspace_id',
+    'workspace-approval-public',
+    'https://example.test',
+    'c:\\',
+    '.env',
     'workspace-action-raw'
   ]) {
     assert.equal(normalizedText.includes(forbidden), false);

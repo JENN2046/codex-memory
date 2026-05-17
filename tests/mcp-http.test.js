@@ -7,7 +7,7 @@ const path = require('node:path');
 const { createCodexMemoryApplication } = require('../src/app');
 const { createStreamableHttpServer, SESSION_HEADER } = require('../src/adapters/codex-mcp/http');
 
-async function withHttpServer(handler) {
+async function withHttpServer(handler, serverOptions = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
   const app = createCodexMemoryApplication({
     projectBasePath: tempBasePath,
@@ -22,7 +22,8 @@ async function withHttpServer(handler) {
     app,
     host: '127.0.0.1',
     port: 0,
-    mcpPath: '/mcp/codex-memory'
+    mcpPath: '/mcp/codex-memory',
+    ...serverOptions
   });
 
   const address = await httpServer.listen();
@@ -185,12 +186,47 @@ test('HTTP MCP should allow non-loopback host when bearer token is configured', 
   }
 });
 
-test('HTTP MCP should execute record_memory through tools/call', async () => {
+test('HTTP MCP should reject no-token mutation tool calls', async () => {
+  await withHttpServer(async ({ address }) => {
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 5,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: 'HTTP no-token mutation',
+            content: 'Type: checkpoint\nblocked no-token mutation',
+            evidence: 'http no-token mutation contract test',
+            validated: true,
+            reusable: false,
+            sensitivity: 'none'
+          }
+        }
+      })
+    });
+    const payload = await response.json();
+
+    assert.equal(response.status, 403);
+    assert.equal(payload.error, 'Forbidden');
+    assert.match(payload.message, /no-token/i);
+    assert.match(payload.message, /mutation/i);
+  });
+});
+
+test('HTTP MCP should execute record_memory through authorized tools/call', async () => {
   await withHttpServer(async ({ address }) => {
     const initResponse = await fetch(address.url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token'
       },
       body: JSON.stringify({
         jsonrpc: '2.0',
@@ -206,6 +242,7 @@ test('HTTP MCP should execute record_memory through tools/call', async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token',
         [SESSION_HEADER]: sessionId
       },
       body: JSON.stringify({
@@ -230,5 +267,5 @@ test('HTTP MCP should execute record_memory through tools/call', async () => {
     assert.equal(record.status, 200);
     assert.equal(payload.result.structuredContent.decision, 'accepted');
     assert.equal(payload.result.structuredContent.agentAlias, 'Codex');
-  });
+  }, { bearerToken: 'test-token' });
 });

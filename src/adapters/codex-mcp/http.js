@@ -101,6 +101,18 @@ function validateNoTokenWriteRequest(req) {
   return null;
 }
 
+function validateNoTokenJsonRpcRequest(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return null;
+  }
+
+  if (body.method === 'tools/call' && body.params?.name === 'record_memory') {
+    return 'No-token HTTP MCP requests cannot call mutation tools.';
+  }
+
+  return null;
+}
+
 function parseRequestBody(req, maxBytes = 1024 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -290,6 +302,13 @@ function createStreamableHttpServer({
         body = await parseRequestBody(req);
       } catch (error) {
         return writeJson(res, 400, jsonRpcError(null, -32600, 'Invalid Request', error.message));
+      }
+
+      if (!bearerToken) {
+        const noTokenJsonRpcRejection = validateNoTokenJsonRpcRequest(body);
+        if (noTokenJsonRpcRejection) {
+          return writeJson(res, 403, createForbiddenPayload(noTokenJsonRpcRejection));
+        }
       }
 
       const result = await mcpServer.handleJsonRpc(body, {
