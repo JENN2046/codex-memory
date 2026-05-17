@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0279 / P31 memory governance safe-scope inventory.
+P28-P40 Governed Memory Spine 12-month program. Current local cycle: CM-0280 / P31.1 memory governance fixture contract review.
 
 ## Current Area
 
-P31 docs/board-only governance inventory
+P31.1 docs/status/board-only governance fixture contract review
 
 ## Current Status
 
@@ -54,8 +54,9 @@ P31 docs/board-only governance inventory
 - CM-0278 adds `docs/P30_FINAL_RC_VALIDATION_MATRIX_RUNNER_CLOSEOUT_REVIEW.md` and updates status/plan/backlog/board to close P30 as safe-scope / fixture / explicit-input helper / aggregator report-shape evidence only.
 - CM-0278A adds `SAFE_SOURCE_TYPES` in `FinalRcValidationMatrixManifest` and fails closed when `acceptedSourceTypes` contains unsupported values. Targeted helper test `8/8` and full suite `618/618` passed.
 - CM-0278/CM-0278A are committed locally in `8f01654`; no push is authorized.
-- CM-0279 adds `docs/P31_MEMORY_GOVERNANCE_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to open memory governance only as docs/fixture-first inventory. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, and governance reference scan. Read-only Verifier first pass found stale pushed-baseline wording only; rerun passed. Commit is pending.
-- Commander direction remains constrained: P31 may inventory proposal/supersession/tombstone/validation/audit/approval boundaries only; durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
+- CM-0279 adds `docs/P31_MEMORY_GOVERNANCE_SAFE_SCOPE_INVENTORY.md` and updates status/plan/backlog/board to open memory governance only as docs/fixture-first inventory. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, and governance reference scan. Read-only Verifier first pass found stale pushed-baseline wording only; rerun passed. CM-0279 is committed locally in `2d5144a`.
+- CM-0280 adds `docs/P31_1_MEMORY_GOVERNANCE_FIXTURE_CONTRACT_REVIEW.md` and updates status/plan/backlog/board to identify the smallest next fixture gap as a synthetic `memory-governance-lifecycle-contract-v1` fixture/test. Validation passed: `git diff --check`, `scripts\validate-local.ps1 -Area docs`, governance fixture contract reference scan, and read-only Verifier `PASS`. Commit is pending.
+- Commander direction remains constrained: P31/P31.1 may review proposal/supersession/tombstone/validation/audit/approval fixture boundaries only; durable mutation, public MCP expansion, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, push, tag, release, and deploy remain blocked.
 
 ## Completed Work In This Batch
 
