@@ -11,9 +11,10 @@ P10 observability-admin / P53 ValidationAggregator evidence inventory.
 ## Current Status
 
 - Last pushed baseline: `1ae4286 test: harden no-touch redaction regressions` on `origin/main`.
-- Post-push verification confirmed `HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`.
+- Post-push verification confirmed `HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`; subsequent local P51/P52 commits now place local `HEAD` at `86617ef`, ahead of `origin/main` by `3`.
 - Latest pushed task chain: P46-P50 Evidence Enforcement Bridge plus P50 review-fix no-touch/redaction hardening.
-- Current task: P52-T2 helper is complete and validated; next route is P53-T1 ValidationAggregator evidence inventory.
+- Current task: P53-T1 ValidationAggregator evidence inventory.
+- P52-T2 helper is complete, validated, and committed locally in `86617ef`.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -65,4 +66,4 @@ P10 observability-admin / P53 ValidationAggregator evidence inventory.
 
 ## Next Safe Step
 
-Create guarded local P52-T2 commit, then continue to P53-T1 ValidationAggregator evidence inventory.
+Continue to P53-T1 ValidationAggregator evidence inventory. Do not push unless explicitly authorized.

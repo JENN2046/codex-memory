@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `1ae4286 test: harden no-touch redaction regressions`。
-- 当前本地基线：`HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`；worktree clean。
+- 当前本地基线：`HEAD = 86617ef feat: add p52 runtime schema version helper`；`origin/main = 1ae4286 test: harden no-touch redaction regressions`；本地 ahead `3`；worktree clean。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P52-T2 minimal explicit-input enforcement helper 已完成并验证；下一条安全路线是 P53-T1 ValidationAggregator evidence inventory。
+- 当前任务：P53-T1 ValidationAggregator evidence inventory；P52-T2 minimal explicit-input enforcement helper 已完成、验证并本地提交于 `86617ef`。
 
 ## 当前阻塞
 
@@ -21,9 +21,9 @@
 
 ## 当前优先级
 
-1. 为 P52-T2 minimal explicit-input helper 创建 guarded local commit；不 push。
-2. 进入 P53-T1 ValidationAggregator evidence inventory：只审查现有 aggregator、fixtures、tests、validation logs、.agent_board evidence，并定义可接受 evidence source map 与 stale/missing/fresh 语义，不执行 runner。
-3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper 误读为 live runtime enforcement 或 final RC matrix execution。
+1. 进入 P53-T1 ValidationAggregator evidence inventory：只审查现有 aggregator、fixtures、tests、validation logs、.agent_board evidence，并定义可接受 evidence source map 与 stale/missing/fresh 语义，不执行 runner。
+2. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper 误读为 live runtime enforcement 或 final RC matrix execution。
+3. 不 push，除非用户单独明确授权。
 
 ## 主要事实源
 
