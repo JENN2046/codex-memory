@@ -1,0 +1,304 @@
+{
+  "schemaVersion": "p55-evidence-to-runtime-enforcement-trace-v1",
+  "policyVersion": "p55-evidence-to-runtime-enforcement-policy-v1",
+  "manifestVersion": "p55-evidence-to-runtime-enforcement-manifest-v1",
+  "version": "v1",
+  "phase": "P55-T1-evidence-to-runtime-enforcement-trace-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "explicitInputOnly": true,
+  "traceOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "acceptedForPlanning": true,
+  "runtimeEnforcementImplemented": false,
+  "runtimeIntegrated": false,
+  "runtimeReady": false,
+  "validationAggregatorFullImplementation": false,
+  "finalRcMatrixExecuted": false,
+  "finalRcMatrixReady": false,
+  "rcReady": false,
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "p52_schema_version_boundary_contract",
+      "phase": "P52",
+      "sourceType": "committed_fixture_contract",
+      "evidenceClass": "committed_evidence",
+      "artifactRefs": [
+        "docs/P52_SCHEMA_VERSION_RUNTIME_ENFORCEMENT_BOUNDARY_PLAN.md",
+        "tests/fixtures/p52-runtime-schema-version-enforcement-boundary-v1.json",
+        "tests/p52-runtime-schema-version-enforcement-fixture.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p52_runtime_schema_version_helper_contract",
+      "phase": "P52",
+      "sourceType": "committed_helper_contract",
+      "evidenceClass": "committed_evidence",
+      "artifactRefs": [
+        "src/core/RuntimeSchemaVersionEnforcementContract.js",
+        "tests/runtime-schema-version-enforcement-contract-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p53_validation_aggregator_inventory_contract",
+      "phase": "P53",
+      "sourceType": "committed_fixture_contract",
+      "evidenceClass": "committed_evidence",
+      "artifactRefs": [
+        "docs/P53_VALIDATION_AGGREGATOR_EVIDENCE_INVENTORY.md",
+        "tests/fixtures/p53-validation-aggregator-evidence-inventory-v1.json",
+        "tests/p53-validation-aggregator-evidence-inventory-fixture.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p53_validation_aggregator_static_posture",
+      "phase": "P53",
+      "sourceType": "static_aggregator_report_shape",
+      "evidenceClass": "committed_evidence",
+      "artifactRefs": [
+        "src/core/ValidationAggregatorService.js",
+        "tests/v1-rc-validation-aggregator-implementation.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p54_final_rc_safe_command_inventory",
+      "phase": "P54",
+      "sourceType": "committed_fixture_contract",
+      "evidenceClass": "committed_evidence",
+      "artifactRefs": [
+        "docs/P54_FINAL_RC_RUNNER_SAFE_COMMAND_INVENTORY.md",
+        "tests/fixtures/p54-final-rc-runner-safe-command-inventory-v1.json",
+        "tests/p54-final-rc-runner-safe-command-inventory-fixture.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p54_final_rc_command_result_contract",
+      "phase": "P54",
+      "sourceType": "committed_helper_contract",
+      "evidenceClass": "committed_evidence",
+      "artifactRefs": [
+        "src/core/FinalRcRunnerCommandResultContract.js",
+        "tests/final-rc-runner-command-result-contract-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p54_final_rc_execution_preflight_contract",
+      "phase": "P54",
+      "sourceType": "committed_helper_contract",
+      "evidenceClass": "committed_evidence",
+      "artifactRefs": [
+        "src/core/FinalRcRunnerExecutionPreflight.js",
+        "tests/final-rc-runner-execution-preflight-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p54_final_rc_injected_executor_adapter_contract",
+      "phase": "P54",
+      "sourceType": "committed_helper_contract",
+      "evidenceClass": "committed_evidence",
+      "artifactRefs": [
+        "src/core/FinalRcRunnerAllowlistedExecutionAdapter.js",
+        "tests/final-rc-runner-allowlisted-execution-adapter.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    }
+  ],
+  "runtimeGaps": [
+    {
+      "id": "runtime_schema_version_boundary_enforcement",
+      "requiredRuntimeGate": "runtime_entrypoint_rejects_or_gates_schema_policy_manifest_versions",
+      "currentDisposition": "not_enforced",
+      "blocksRc": true
+    },
+    {
+      "id": "validation_aggregator_live_evidence_collection",
+      "requiredRuntimeGate": "aggregator_collects_allowed_local_runtime_evidence_without_unsafe_sources",
+      "currentDisposition": "not_implemented",
+      "blocksRc": true
+    },
+    {
+      "id": "final_rc_matrix_real_runner_execution",
+      "requiredRuntimeGate": "allowlisted_local_runner_executes_and_emits_machine_readable_evidence",
+      "currentDisposition": "not_executed",
+      "blocksRc": true
+    },
+    {
+      "id": "governance_review_approval_audit_runtime_loop",
+      "requiredRuntimeGate": "governance_review_approval_audit_loop_has_controlled_runtime_path",
+      "currentDisposition": "a5_blocked",
+      "blocksRc": true
+    },
+    {
+      "id": "recall_isolation_runtime_proof",
+      "requiredRuntimeGate": "governance_validation_policy_and_blocked_records_do_not_enter_normal_recall_runtime",
+      "currentDisposition": "not_proven",
+      "blocksRc": true
+    },
+    {
+      "id": "migration_import_export_backup_restore_approval_execution",
+      "requiredRuntimeGate": "approval_dry_run_parity_and_rollback_readiness_exist_before_apply",
+      "currentDisposition": "a5_blocked",
+      "blocksRc": true
+    },
+    {
+      "id": "http_observability_runtime_health_evidence",
+      "requiredRuntimeGate": "http_health_failure_reporting_and_operation_preflight_are_observable",
+      "currentDisposition": "not_collected",
+      "blocksRc": true
+    }
+  ],
+  "traceLinks": [
+    {
+      "sourceEvidenceId": "p52_schema_version_boundary_contract",
+      "runtimeGapId": "runtime_schema_version_boundary_enforcement",
+      "traceStatus": "gap_known_not_enforced"
+    },
+    {
+      "sourceEvidenceId": "p52_runtime_schema_version_helper_contract",
+      "runtimeGapId": "runtime_schema_version_boundary_enforcement",
+      "traceStatus": "helper_not_runtime_authority"
+    },
+    {
+      "sourceEvidenceId": "p53_validation_aggregator_inventory_contract",
+      "runtimeGapId": "validation_aggregator_live_evidence_collection",
+      "traceStatus": "inventory_not_collector"
+    },
+    {
+      "sourceEvidenceId": "p53_validation_aggregator_static_posture",
+      "runtimeGapId": "validation_aggregator_live_evidence_collection",
+      "traceStatus": "static_posture_not_full_implementation"
+    },
+    {
+      "sourceEvidenceId": "p54_final_rc_safe_command_inventory",
+      "runtimeGapId": "final_rc_matrix_real_runner_execution",
+      "traceStatus": "inventory_not_execution"
+    },
+    {
+      "sourceEvidenceId": "p54_final_rc_command_result_contract",
+      "runtimeGapId": "final_rc_matrix_real_runner_execution",
+      "traceStatus": "caller_result_contract_not_runner_execution"
+    },
+    {
+      "sourceEvidenceId": "p54_final_rc_execution_preflight_contract",
+      "runtimeGapId": "final_rc_matrix_real_runner_execution",
+      "traceStatus": "preflight_not_execution"
+    },
+    {
+      "sourceEvidenceId": "p54_final_rc_injected_executor_adapter_contract",
+      "runtimeGapId": "final_rc_matrix_real_runner_execution",
+      "traceStatus": "injected_executor_contract_not_real_matrix_completion"
+    }
+  ],
+  "failClosedStates": [
+    "missing",
+    "unknown",
+    "skipped",
+    "warning",
+    "warning_only",
+    "failed",
+    "stale",
+    "ambiguous",
+    "unparsable",
+    "unsupported",
+    "duplicate",
+    "fixture_only"
+  ],
+  "blockedActions": [
+    "real_memory_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "execute_real_final_rc_runner",
+    "execute_unlisted_command",
+    "start_service",
+    "provider_call",
+    "runtime_governance_mutation",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "config_switch",
+    "watchdog_install",
+    "public_mcp_expansion",
+    "dependency_change",
+    "durable_memory_write",
+    "durable_audit_write",
+    "push_tag_release_deploy"
+  ],
+  "forbiddenClaims": [
+    "runtime_ready",
+    "final_rc_matrix_ready",
+    "v1_rc_ready",
+    "mainline_cutover_ready",
+    "push_ready",
+    "release_ready",
+    "deploy_ready",
+    "config_switch_ready",
+    "watchdog_ready"
+  ],
+  "redactionRequirements": [
+    "auth_header",
+    "bearer_credential",
+    "application_credential",
+    "workspace_identifier",
+    "cookie_header",
+    "password_credential",
+    "token_credential",
+    "provider_credential",
+    "env_file_path",
+    "url",
+    "absolute_path"
+  ],
+  "safety": {
+    "readsFilesImplicitly": false,
+    "scansDirectories": false,
+    "executesCommands": false,
+    "startsServices": false,
+    "callsProviders": false,
+    "readsRealMemory": false,
+    "scansRuntimeStores": false,
+    "writesDurableState": false,
+    "expandsPublicMcp": false,
+    "remoteWrites": false,
+    "rawSensitiveOutputExposed": false
+  },
+  "readiness": {
+    "localTraceContractReady": true,
+    "runtimeEnforcementReady": false,
+    "validationAggregatorFullImplementationReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "pushReady": false,
+    "releaseReady": false,
+    "deployReady": false,
+    "configSwitchReady": false,
+    "watchdogReady": false
+  }
+}

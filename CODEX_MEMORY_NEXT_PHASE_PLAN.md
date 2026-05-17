@@ -60,8 +60,9 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P54-T2 final RC runner explicit command-result helper is complete and validated.
 - P54-T3 local runner execution harness preflight is complete and validated.
 - P54-T4 allowlisted local runner execution adapter is complete and validated as an injected-executor contract only; tests use fake executor and no real shell/runtime command chain was run by the helper.
-- P55-T1 evidence-to-runtime enforcement trace contract is the next candidate.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, or P54 injected-executor adapter evidence.
+- P55-T1 evidence-to-runtime enforcement trace contract is complete and validated.
+- P55-T2 evidence-to-runtime enforcement explicit-input helper is the next candidate.
+- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, or P55 trace evidence.
 
 ## Boundaries
 
@@ -80,7 +81,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P54-T4:
+After P55-T1:
 
-- Begin P55-T1 evidence-to-runtime enforcement trace contract as docs/fixture/test first.
-- Keep P55-T1 trace-first: map P52 schema/version helper evidence, P53 ValidationAggregator evidence posture, and P54 runner evidence contracts to explicit runtime enforcement gaps, fail closed for missing/unknown/stale/unsupported trace links, and do not run real runner commands, start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, write durable state, expand public MCP, change dependencies, push/tag/release/deploy, or claim runtime/final RC readiness.
+- Begin P55-T2 explicit-input trace helper only if it stays pure and caller-provided-object only.
+- Keep P55-T2 helper-first: evaluate caller-provided P55 trace objects, fail closed for malformed/missing/unknown/stale/unsupported/fixture-only readiness claims, redact sensitive fields, and do not read fixtures, scan directories, run real runner commands, start services, call providers, scan real memory/runtime stores, apply migration/import/export/backup/restore, write durable state, expand public MCP, change dependencies, push/tag/release/deploy, or claim runtime/final RC readiness.
