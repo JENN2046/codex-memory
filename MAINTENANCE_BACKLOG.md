@@ -11,9 +11,9 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
-- Local baseline: local `main` contains P51-P59-T2 local work through commit `a036c8d` and is ahead of `origin/main = 1ae4286`; use `git log --oneline --decorate -n 10` for the exact current HEAD; push is not authorized.
+- Local baseline: local `main` contains P51-P59-T2 local work through commit `a036c8d`; P60-T1 is validated locally pending guarded local commit; local `main` is ahead of `origin/main = 1ae4286`; use `git log --oneline --decorate -n 10` for the exact current HEAD; push is not authorized.
 - Current active program: P51-P62 Runtime-Enforced Governed Memory Spine Completion.
-- Current phase area: P59/P60 transition: P59 HTTP runtime observability helper complete, P60 no-touch/no-leak/redaction regression candidate next. Evidence-first / fail-closed / reversible boundaries preserved.
+- Current phase area: P60 no-touch / no-leak / redaction long-term regression. Evidence-first / fail-closed / reversible boundaries preserved.
 
 ## Active Queue
 
@@ -63,7 +63,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P58-T2 | memory-governance | A2 | done | Migration/import-export/backup-restore approval framework explicit-input helper | changed JS syntax; targeted helper tests; no-touch scan; `npm test`; `git diff --check` | Complete, validated, and committed locally in `2470634`; pure helper over caller-provided P58 boundary/approval metadata only. It enforces exact schema/policy/manifest/source/stage/approval/evidence/fail-closed/blocked-action sets, rejects malformed/version drift/authority/execution/durable-write/readiness/safety leakage, redacts sensitive fields, and keeps approval execution/runtime/RC readiness blocked. No fs read, directory scan, command execution, runtime store import, provider call, durable write, public MCP expansion, real migration/import-export/backup/restore apply, or readiness claim. |
 | P59-T1 | P4-http-runtime | A1/A2 | done | HTTP runtime observability / operation hardening boundary inventory | new test syntax; fixture JSON parse; targeted P59 test; targeted P59/HTTP/no-touch set; `npm test`; `git diff --check` | Complete, validated, and committed locally in `c57be03`. Docs/fixture/test inventory only; no live HTTP observation, service/watchdog/startup install, config switch, provider call, durable write, public MCP expansion, push/tag/release/deploy, or readiness claim. |
 | P59-T2 | P4-http-runtime | A2 | done | HTTP observability explicit-input evidence helper | changed JS syntax; targeted helper/no-touch tests; `npm test`; `git diff --check` | Complete, validated, and committed locally in `a036c8d`. Pure caller-provided object helper only; no fs scan, command execution, live HTTP operation, service/watchdog/startup install, config switch, provider call, durable write, public MCP expansion, push/tag/release/deploy, or readiness claim. |
-| P60-T1 | observability-admin | A1/A2 | todo | No-touch / no-leak / redaction long-term regression candidate | targeted regression tests; `npm test`; `git diff --check` | Candidate only if local tests/fixtures/helpers harden no fs scan, no child_process, no provider/network, no runtime store import, no durable write, no public MCP expansion, and sensitive redaction. No runtime/service/provider/config/deploy operation. |
+| P60-T1 | observability-admin | A1/A2 | done | No-touch / no-leak / redaction long-term regression | targeted regression tests; `npm test`; `git diff --check` | Completed and validated locally pending guarded local commit. Adds test-only coverage for centralized redaction and no-touch source constraints. No runtime/service/provider/config/deploy operation, durable write, or public MCP expansion. |
 
 ## Standing Boundaries
 

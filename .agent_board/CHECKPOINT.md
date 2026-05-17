@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P4/P10 transition: P59 HTTP observability helper complete; P60 no-touch/no-leak/redaction regression candidate next.
+P10 observability/admin no-touch / no-leak / redaction long-term regression.
 
 ## Current Status
 
@@ -26,29 +26,24 @@ P4/P10 transition: P59 HTTP observability helper complete; P60 no-touch/no-leak/
 - P59-T1 HTTP runtime observability / operation hardening boundary inventory is implemented, validated, and committed locally in `c57be03` as docs/fixture/test only.
 - P59-T1 post-commit board reconciliation is locally committed in `46fd98e`.
 - P59-T2 HTTP observability explicit-input evidence helper is implemented, validated, and committed locally in `a036c8d`.
+- P59-T2 post-commit board reconciliation is locally committed in `3206a0f`.
+- P60-T1 no-touch / no-leak / redaction long-term regression is implemented and validated locally.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
-## P59-T2 Evidence
+## P60-T1 Evidence
 
-- Added `src/core/HttpRuntimeObservabilityOperationContract.js`.
-- Added `tests/http-runtime-observability-operation-contract-helper.test.js`.
-- Added `HttpRuntimeObservabilityOperationContract` to `tests/no-touch-boundary-regression.test.js`.
-- The helper evaluates caller-provided P59 HTTP observability evidence objects only.
-- It enforces exact schema/policy/manifest/source/surface/runtime-evidence/fail-closed/blocked-action sets.
-- It fails closed for malformed input, version drift, non-exact sets, unsupported source types, execution/readiness/safety leakage, and sensitive fragments.
-- It keeps live HTTP observation, service start/stop, watchdog/startup install, config switch, provider call, durable writes, public MCP expansion, runtime readiness, final RC readiness, and v1 RC readiness blocked.
+- Added `tests/p60-no-touch-no-leak-redaction-regression.test.js`.
+- The regression locks centralized helper redaction through `src/core/SensitiveFragmentRedaction.js`.
+- The redaction corpus covers authorization/bearer headers, API keys, providerapikey, workspace_id/raw_workspace_id, set-cookie, token, password, URLs, `.env` files, and absolute paths.
+- The helper source targets must not import fs/child_process/network/runtime-store APIs or introduce execution/durable-write calls.
+- It is test-only and keeps runtime/service/provider/config/deploy operation, public MCP expansion, final RC readiness, and v1 RC readiness blocked.
 
 ## Validation
 
-- `node --check src\core\HttpRuntimeObservabilityOperationContract.js`
-- `node --check tests\http-runtime-observability-operation-contract-helper.test.js`
-- `node --check tests\no-touch-boundary-regression.test.js`
-- Targeted helper/no-touch test (`12/12`)
-- Targeted P59/HTTP/no-touch set (`40/40`)
-- Boundary scan over `src\core\HttpRuntimeObservabilityOperationContract.js` returned no hits.
-- `npm test` (`1008/1008`)
-- Post-commit status/log/trailer/diff-check for `a036c8d`
+- `node --check tests\p60-no-touch-no-leak-redaction-regression.test.js`
+- Targeted P60/no-touch/sensitive-redaction test (`8/8`)
+- `npm test` (`1011/1011`)
 
 ## Active Boundaries
 
@@ -66,4 +61,4 @@ P4/P10 transition: P59 HTTP observability helper complete; P60 no-touch/no-leak/
 
 ## Next Safe Step
 
-Complete P59-T2 post-commit board/status reconciliation, then evaluate P60-T1 only if it remains local no-touch/no-leak/redaction regression work with no runtime side effects.
+Run final diff/docs validation for P60-T1 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation.
