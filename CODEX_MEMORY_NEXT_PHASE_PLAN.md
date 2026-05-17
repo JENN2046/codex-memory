@@ -52,7 +52,8 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P52-T1 runtime schema-version enforcement boundary plan is complete and committed locally in `884f2f6`.
 - P52-T2 minimal runtime enforcement helper is complete, validated, and locally committed.
 - P53-T1 ValidationAggregator evidence inventory is complete and validated.
-- P53-T2 ValidationAggregator inventory posture bridge is the next safe implementation slice.
+- P53-T2 ValidationAggregator inventory posture bridge is complete and validated.
+- P53-T3 explicit evidence classification hardening is the next safe implementation slice.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, or P53 inventory evidence.
 
 ## Boundaries
@@ -72,7 +73,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P53-T1:
+After P53-T2:
 
-- Begin P53-T2 ValidationAggregator inventory posture bridge.
-- Keep P53-T2 report-shape-only: expose the P53 inventory posture without importing or reading the P53 fixture, executing helpers/gates/runners, collecting live runtime evidence, refreshing live MCP, scanning runtime stores, or claiming full ValidationAggregator/runtime/RC readiness.
+- Begin P53-T3 explicit evidence classification hardening.
+- Keep P53-T3 explicit-input-only: classify caller-provided evidence into committed/local/runtime/final-RC posture without fs scan, command execution, runtime store scan, provider calls, helper/gate/runner execution, or readiness claims.

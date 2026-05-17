@@ -6,16 +6,17 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability-admin / P53 ValidationAggregator inventory posture bridge.
+P10 observability-admin / P53 ValidationAggregator explicit evidence classification.
 
 ## Current Status
 
 - Last pushed baseline: `1ae4286 test: harden no-touch redaction regressions` on `origin/main`.
 - Post-push verification confirmed `HEAD == origin/main == 1ae4286218293826528973391f53950aeefb1c3c`; subsequent local P51/P52 commits now place local `HEAD` at `86617ef`, ahead of `origin/main` by `3`.
 - Latest pushed task chain: P46-P50 Evidence Enforcement Bridge plus P50 review-fix no-touch/redaction hardening.
-- Current task: P53-T2 ValidationAggregator inventory posture bridge.
+- Current task: P53-T3 ValidationAggregator explicit evidence classification hardening.
 - P52-T2 helper is complete, validated, and committed locally in `86617ef`.
 - P53-T1 inventory doc/fixture/test is complete and validated locally.
+- P53-T2 inventory posture bridge is complete and validated locally.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -38,6 +39,7 @@ P10 observability-admin / P53 ValidationAggregator inventory posture bridge.
 - P52-T1 committed locally in `884f2f6`.
 - P52-T2 validation passed: changed JS syntax checks, targeted P52 tests `20/20`, no-touch test `4/4`, `npm test` `871/871`, and `git diff --check`.
 - P53-T1 validation passed: new test syntax check, targeted P53 + aggregator tests `48/48`, fixture JSON parse, `npm test` `883/883`, docs validation, and `git diff --check`.
+- P53-T2 validation passed: aggregator JS/test syntax checks, fixture JSON parse, targeted P53 + aggregator tests `48/48`, `npm test` `883/883`, docs validation, `git diff --check`, and boundary scan.
 
 ## Active Boundaries
 
@@ -68,4 +70,4 @@ P10 observability-admin / P53 ValidationAggregator inventory posture bridge.
 
 ## Next Safe Step
 
-Continue to P53-T2 ValidationAggregator inventory posture bridge. Do not push unless explicitly authorized.
+Create guarded local P53-T2 commit, then continue to P53-T3. Do not push unless explicitly authorized.

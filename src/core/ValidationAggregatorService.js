@@ -143,6 +143,95 @@ const P36_P40_STATIC_EVIDENCE_SOURCES = [
   }
 ];
 
+const P53_VALIDATION_AGGREGATOR_INVENTORY_SOURCE_CLASSES = [
+  'committed_evidence',
+  'local_validation',
+  'runtime_evidence',
+  'final_rc_matrix_evidence'
+];
+
+const P53_VALIDATION_AGGREGATOR_INVENTORY_SOURCE_TYPES = [
+  'committed_code_contract',
+  'committed_doc_contract',
+  'committed_fixture_contract',
+  'committed_helper_contract',
+  'committed_test_contract',
+  'local_validation_log',
+  'local_git_commit',
+  'explicit_input_evidence',
+  'static_aggregator_report_shape',
+  'runtime_boundary_report',
+  'final_rc_matrix_report'
+];
+
+const P53_VALIDATION_AGGREGATOR_INVENTORY_STATUSES = [
+  'fresh',
+  'stale',
+  'missing',
+  'unsupported',
+  'blocked',
+  'not_executed'
+];
+
+const P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS = [
+  {
+    id: 'validation_aggregator_current_report_shape',
+    sourceClass: 'committed_evidence',
+    sourceType: 'static_aggregator_report_shape',
+    status: 'fresh',
+    acceptedForPlanning: true
+  },
+  {
+    id: 'p36_p40_static_evidence_source_map',
+    sourceClass: 'committed_evidence',
+    sourceType: 'static_aggregator_report_shape',
+    status: 'fresh',
+    acceptedForPlanning: true
+  },
+  {
+    id: 'p45_final_rc_matrix_posture_bridge',
+    sourceClass: 'committed_evidence',
+    sourceType: 'static_aggregator_report_shape',
+    status: 'fresh',
+    acceptedForPlanning: true
+  },
+  {
+    id: 'p52_minimal_runtime_schema_version_helper',
+    sourceClass: 'committed_evidence',
+    sourceType: 'committed_helper_contract',
+    status: 'fresh',
+    acceptedForPlanning: true
+  },
+  {
+    id: 'p52_local_validation_result',
+    sourceClass: 'local_validation',
+    sourceType: 'local_validation_log',
+    status: 'fresh',
+    acceptedForPlanning: true
+  },
+  {
+    id: 'schema_version_runtime_enforcement',
+    sourceClass: 'runtime_evidence',
+    sourceType: 'runtime_boundary_report',
+    status: 'missing',
+    acceptedForPlanning: false
+  },
+  {
+    id: 'final_rc_matrix_runner_execution',
+    sourceClass: 'final_rc_matrix_evidence',
+    sourceType: 'final_rc_matrix_report',
+    status: 'not_executed',
+    acceptedForPlanning: false
+  },
+  {
+    id: 'governance_review_approval_audit_runtime_loop',
+    sourceClass: 'runtime_evidence',
+    sourceType: 'runtime_boundary_report',
+    status: 'blocked',
+    acceptedForPlanning: false
+  }
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -337,6 +426,18 @@ const EVIDENCE_SOURCES = {
     source_type: 'explicit_safe_input_contract',
     source_ref: 'ValidationAggregatorService validationEvidenceSources[]',
     status: 'foundation_added_read_only'
+  },
+  p53_validation_aggregator_evidence_inventory: {
+    source_type: 'static_aggregator_report_shape',
+    source_ref: 'ValidationAggregatorService evidence.p53ValidationAggregatorEvidenceInventory',
+    status: 'static_report_shape_added_not_executed',
+    sourceMode: 'static_reference_only',
+    acceptedForPlanning: false,
+    fixtureReadByAggregator: false,
+    testExecutedByAggregator: false,
+    helperExecutedByAggregator: false,
+    runnerExecutedByAggregator: false,
+    observedFromRuntime: false
   }
 };
 
@@ -1013,6 +1114,25 @@ function buildV1RcValidationAggregatorReport({
       p45FinalRcMatrixCanClaimFinalRcReady: false,
       p45FinalRcMatrixCanClaimV1RcReady: false,
       p45FinalRcMatrixRuntimeReady: false,
+      p53ValidationAggregatorEvidenceInventoryAvailable: true,
+      p53ValidationAggregatorEvidenceInventorySourceMode: 'static_report_shape_only',
+      p53ValidationAggregatorEvidenceInventoryOnly: true,
+      p53ValidationAggregatorInventoryAcceptedForPlanningCount: 5,
+      p53ValidationAggregatorInventoryBlockedCount: 1,
+      p53ValidationAggregatorInventoryMissingCount: 1,
+      p53ValidationAggregatorInventoryNotExecutedCount: 1,
+      p53ValidationAggregatorInventoryUnsupportedCount: 0,
+      p53ValidationAggregatorInventoryStaleCount: 0,
+      p53ValidationAggregatorInventoryFreshCount: 5,
+      p53ValidationAggregatorInventoryFixtureReadByAggregator: false,
+      p53ValidationAggregatorInventoryTestExecutedByAggregator: false,
+      p53ValidationAggregatorInventoryHelperExecutedByAggregator: false,
+      p53ValidationAggregatorInventoryRunnerExecutedByAggregator: false,
+      p53ValidationAggregatorInventoryRuntimeObserved: false,
+      p53ValidationAggregatorFullImplementationComplete: false,
+      p53ValidationAggregatorInventoryCanClaimRuntimeReady: false,
+      p53ValidationAggregatorInventoryCanClaimFinalRcReady: false,
+      p53ValidationAggregatorInventoryCanClaimV1RcReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -1161,6 +1281,13 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true,
         evidence: 'P49 surfaces the P45 evaluator skeleton posture from static report-shape entries only; it does not import or execute the evaluator, read fixtures, run gates/runners, collect evidence, or claim final RC readiness.'
       }),
+      p53ValidationAggregatorEvidenceInventory: createCheck({
+        status: 'static_report_shape_added_not_executed',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P53 surfaces the ValidationAggregator inventory posture from static report-shape entries only; it does not read the P53 fixture, execute helpers/gates/runners, refresh live MCP, scan runtime stores, or claim full aggregator/runtime/RC readiness.'
+      }),
       validationAggregatorExecutable: createCheck({
         status: 'minimal_implemented',
         requiredBeforeV1Rc: true,
@@ -1223,6 +1350,7 @@ function buildV1RcValidationAggregatorReport({
       'memoryGovernanceReviewSurfaceContractHelper',
       'p36P40EvidenceSourceMap',
       'p45FinalRcMatrixEvaluatorPosture',
+      'p53ValidationAggregatorEvidenceInventory',
       'clientBoundaryDocsReview',
       'migrationImportExportBoundaryDocsReview',
       'rcChecklistAlignmentReview',
@@ -1662,6 +1790,79 @@ function buildV1RcValidationAggregatorReport({
         canClaimFinalRcReady: false,
         canClaimV1RcReady: false
       },
+      p53ValidationAggregatorEvidenceInventory: {
+        status: 'static_report_shape_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P53_VALIDATION_AGGREGATOR_EVIDENCE_INVENTORY.md',
+        test: 'tests/p53-validation-aggregator-evidence-inventory-fixture.test.js',
+        fixture: 'tests/fixtures/p53-validation-aggregator-evidence-inventory-v1.json',
+        inventorySchemaVersion: 'p53-validation-aggregator-evidence-inventory-v1',
+        inventoryPolicyVersion: 'p53-validation-aggregator-inventory-policy-v1',
+        inventoryManifestVersion: 'p53-validation-aggregator-inventory-manifest-v1',
+        inventoryOnly: true,
+        syntheticFixture: true,
+        acceptedSourceTypes: P53_VALIDATION_AGGREGATOR_INVENTORY_SOURCE_TYPES,
+        sourceClasses: P53_VALIDATION_AGGREGATOR_INVENTORY_SOURCE_CLASSES.map(id => ({
+          id,
+          runtimeAuthority: false,
+          readinessAuthority: false
+        })),
+        statusSemantics: P53_VALIDATION_AGGREGATOR_INVENTORY_STATUSES.map(id => ({
+          id,
+          criticalGateDisposition: id === 'fresh'
+            ? 'can_support_planning_only'
+            : 'fail_closed',
+          readinessAuthority: false
+        })),
+        inventoryRows: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS.map(row => ({
+          ...row,
+          readinessAuthority: false,
+          runtimeEvidenceObserved: false
+        })),
+        acceptedForPlanningCount: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS
+          .filter(row => row.acceptedForPlanning === true).length,
+        freshCount: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS
+          .filter(row => row.status === 'fresh').length,
+        staleCount: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS
+          .filter(row => row.status === 'stale').length,
+        missingCount: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS
+          .filter(row => row.status === 'missing').length,
+        unsupportedCount: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS
+          .filter(row => row.status === 'unsupported').length,
+        blockedCount: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS
+          .filter(row => row.status === 'blocked').length,
+        notExecutedCount: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS
+          .filter(row => row.status === 'not_executed').length,
+        fixtureReadByAggregator: false,
+        testExecutedByAggregator: false,
+        helperExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        realMemoryContentRead: false,
+        realMemoryPreviewed: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        finalRcMatrixExecuted: false,
+        finalRcMatrixReady: false,
+        runtimeReady: false,
+        rcReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -1682,7 +1883,8 @@ function buildV1RcValidationAggregatorReport({
       'This report is generated by a minimal local implementation, not the full final RC matrix executor.',
       'Historical P22 live MCP evidence must not be treated as fresh P23/P24 live evidence.',
       'A4_SAFE_SLICE_PASSED does not mean READY_FOR_V1_0_RC.',
-      'P36-P40 local evidence report ready does not mean runtime, final RC matrix, push, release, deploy, config switch, watchdog, or v1.0 RC readiness.'
+      'P36-P40 local evidence report ready does not mean runtime, final RC matrix, push, release, deploy, config switch, watchdog, or v1.0 RC readiness.',
+      'P53 inventory evidence is static report-shape posture only and does not complete the ValidationAggregator full implementation.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',

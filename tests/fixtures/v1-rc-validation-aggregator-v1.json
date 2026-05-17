@@ -1220,6 +1220,18 @@
       "runnerExecutedByAggregator": false,
       "observedFromRuntime": false
     },
+    "p53_validation_aggregator_evidence_inventory": {
+      "source_type": "static_aggregator_report_shape",
+      "source_ref": "ValidationAggregatorService evidence.p53ValidationAggregatorEvidenceInventory",
+      "status": "static_report_shape_added_not_executed",
+      "sourceMode": "static_reference_only",
+      "acceptedForPlanning": false,
+      "fixtureReadByAggregator": false,
+      "testExecutedByAggregator": false,
+      "helperExecutedByAggregator": false,
+      "runnerExecutedByAggregator": false,
+      "observedFromRuntime": false
+    },
     "public_mcp_tools": {
       "source_type": "code_contract",
       "source_ref": "src/core/constants.js",

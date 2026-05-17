@@ -132,6 +132,7 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.equal(fixture.evidence_sources.p40_local_readiness_report.status, 'local_evidence_report_added_not_runtime_ready');
   assert.equal(fixture.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
   assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.status, 'static_report_shape_added_not_executed');
+  assert.equal(fixture.evidence_sources.p53_validation_aggregator_evidence_inventory.status, 'static_report_shape_added_not_executed');
   assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.fixtureReadByAggregator, false);
   assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.evaluatorImportedByAggregator, false);
   assert.equal(fixture.evidence_sources.p45_final_rc_matrix_evaluator_posture.evaluatorExecutedByAggregator, false);

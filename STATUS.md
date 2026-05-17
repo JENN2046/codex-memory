@@ -9,7 +9,7 @@
 - 当前本地基线：`origin/main = 1ae4286 test: harden no-touch redaction regressions`；本地 `main` 已包含 P51/P52 本地提交和 P53-T1 inventory 工作；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P53-T1 ValidationAggregator evidence inventory 已完成并验证；下一条安全路线是 P53-T2 ValidationAggregator inventory posture bridge。
+- 当前任务：P53-T2 ValidationAggregator inventory posture bridge 已完成并验证；下一条安全路线是 P53-T3 explicit evidence classification hardening。
 
 ## 当前阻塞
 
@@ -21,8 +21,8 @@
 
 ## 当前优先级
 
-1. 进入 P53-T2 ValidationAggregator inventory posture bridge：只把 P53 inventory posture 作为静态报告面证据暴露，不能读取 P53 fixture、不能执行 helper/gate/runner、不能刷新 live MCP。
-2. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper 或 P53 inventory 误读为 live runtime enforcement、ValidationAggregator full implementation complete、或 final RC matrix execution。
+1. 进入 P53-T3 explicit evidence classification hardening：继续只处理 caller-provided evidence，不扫描文件、不执行命令、不读取 runtime stores。
+2. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper 或 P53 inventory/posture 误读为 live runtime enforcement、ValidationAggregator full implementation complete、或 final RC matrix execution。
 3. 不 push，除非用户单独明确授权。
 
 ## 主要事实源

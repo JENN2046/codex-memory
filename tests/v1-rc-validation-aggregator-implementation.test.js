@@ -175,6 +175,25 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.p45FinalRcMatrixCanClaimFinalRcReady, false);
   assert.equal(report.summary.p45FinalRcMatrixCanClaimV1RcReady, false);
   assert.equal(report.summary.p45FinalRcMatrixRuntimeReady, false);
+  assert.equal(report.summary.p53ValidationAggregatorEvidenceInventoryAvailable, true);
+  assert.equal(report.summary.p53ValidationAggregatorEvidenceInventorySourceMode, 'static_report_shape_only');
+  assert.equal(report.summary.p53ValidationAggregatorEvidenceInventoryOnly, true);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryAcceptedForPlanningCount, 5);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryFreshCount, 5);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryMissingCount, 1);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryBlockedCount, 1);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryNotExecutedCount, 1);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryUnsupportedCount, 0);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryStaleCount, 0);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryFixtureReadByAggregator, false);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryTestExecutedByAggregator, false);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryHelperExecutedByAggregator, false);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryRunnerExecutedByAggregator, false);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryRuntimeObserved, false);
+  assert.equal(report.summary.p53ValidationAggregatorFullImplementationComplete, false);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryCanClaimRuntimeReady, false);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryCanClaimV1RcReady, false);
   assert.equal(report.summary.localEvidenceReportReadyClaim, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.mainlineCutoverReady, false);
@@ -544,6 +563,48 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimRuntimeReady, false);
   assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimFinalRcReady, false);
   assert.equal(report.evidence.p45FinalRcMatrixEvaluatorPosture.canClaimV1RcReady, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceMode, 'static_report_shape_only');
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.inventoryOnly, true);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.testExecutedByAggregator, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.helperExecutedByAggregator, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.evidenceCollectedByAggregator, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.liveMcpRefreshedByAggregator, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.fullAggregatorImplementationComplete, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.runtimeReady, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.rcReady, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.canClaimV1RcReady, false);
+  assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
+    'committed_evidence',
+    'local_validation',
+    'runtime_evidence',
+    'final_rc_matrix_evidence'
+  ]);
+  assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.statusSemantics.map(entry => entry.id), [
+    'fresh',
+    'stale',
+    'missing',
+    'unsupported',
+    'blocked',
+    'not_executed'
+  ]);
+  assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.inventoryRows.map(row => row.id), [
+    'validation_aggregator_current_report_shape',
+    'p36_p40_static_evidence_source_map',
+    'p45_final_rc_matrix_posture_bridge',
+    'p52_minimal_runtime_schema_version_helper',
+    'p52_local_validation_result',
+    'schema_version_runtime_enforcement',
+    'final_rc_matrix_runner_execution',
+    'governance_review_approval_audit_runtime_loop'
+  ]);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.inventoryRows.every(row => row.readinessAuthority === false), true);
+  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.inventoryRows.every(row => row.runtimeEvidenceObserved === false), true);
   assert.equal(report.evidence.p28ValidationEvidenceReader.status, 'no_explicit_validation_evidence');
   assert.equal(report.evidence.p28ValidationEvidenceReader.implemented, true);
   assert.equal(report.evidence.p28ValidationEvidenceReader.fullImplementation, false);
@@ -644,6 +705,15 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.runnerExecutedByAggregator, false);
   assert.equal(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.observedFromRuntime, false);
   assert.match(report.evidence_sources.p45_final_rc_matrix_evaluator_posture.source_ref, /ValidationAggregatorService evidence\.p45FinalRcMatrixEvaluatorPosture/);
+  assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.status, 'static_report_shape_added_not_executed');
+  assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.source_type, 'static_aggregator_report_shape');
+  assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.acceptedForPlanning, false);
+  assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.fixtureReadByAggregator, false);
+  assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.testExecutedByAggregator, false);
+  assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.helperExecutedByAggregator, false);
+  assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.observedFromRuntime, false);
+  assert.match(report.evidence_sources.p53_validation_aggregator_evidence_inventory.source_ref, /ValidationAggregatorService evidence\.p53ValidationAggregatorEvidenceInventory/);
   assert.equal(report.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
