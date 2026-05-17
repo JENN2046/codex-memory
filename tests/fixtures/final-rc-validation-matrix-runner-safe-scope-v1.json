@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "final-rc-validation-matrix-runner-safe-scope-v1",
+  "version": "v1",
+  "phase": "P30.1-final-rc-validation-matrix-runner-fixture-contract",
+  "mode": "fixture-only",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "runnerImplemented": false,
+  "runnerExecuted": false,
+  "finalRcMatrixExecuted": false,
+  "decision": "NOT_READY_BLOCKED",
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "sourceContract": {
+    "mode": "explicit_safe_inputs_only",
+    "acceptedSourceTypes": [
+      "committed_validation",
+      "local_validation",
+      "committed_fixture",
+      "committed_report_shape"
+    ],
+    "acceptedStatuses": [
+      "passed",
+      "failed",
+      "blocked",
+      "not_executed",
+      "warning",
+      "unknown"
+    ],
+    "readsFiles": false,
+    "executesCommands": false,
+    "startsServices": false,
+    "callsProviders": false,
+    "mutatesDurableState": false,
+    "acceptsRealMemoryPreview": false
+  },
+  "allowedInputClasses": [
+    {
+      "id": "git-hygiene-summary",
+      "source": "caller-provided-command-summary",
+      "requiredSafety": {
+        "mutated": false,
+        "remoteWrite": false
+      }
+    },
+    {
+      "id": "docs-validation-summary",
+      "source": "caller-provided-local-validation-summary",
+      "requiredSafety": {
+        "mutated": false,
+        "providerCalls": 0
+      }
+    },
+    {
+      "id": "p23-matrix-docs",
+      "source": "committed-docs",
+      "requiredSafety": {
+        "historicalEvidenceOnly": true,
+        "fullMatrixExecuted": false
+      }
+    },
+    {
+      "id": "validation-aggregator-report",
+      "source": "explicit-report-shape",
+      "requiredSafety": {
+        "readsFiles": false,
+        "executesCommands": false
+      }
+    },
+    {
+      "id": "p28-validation-evidence-reader",
+      "source": "explicit-local-evidence",
+      "requiredSafety": {
+        "sourceTypes": [
+          "committed_validation",
+          "local_validation"
+        ]
+      }
+    },
+    {
+      "id": "p29-schema-version-boundary-evidence",
+      "source": "committed-report-shape",
+      "requiredSafety": {
+        "runtimeIntegrated": false,
+        "runtimeEnforcementImplemented": false,
+        "publicMcpExpanded": false
+      }
+    },
+    {
+      "id": "migration-import-export-fixture-evidence",
+      "source": "committed-fixture-only-evidence",
+      "requiredSafety": {
+        "realMemoryScanned": false,
+        "importExportApplyPerformed": false,
+        "backupRestorePerformed": false
+      }
+    }
+  ],
+  "matrixGroups": {
+    "a4Safe": [
+      "gitHygiene",
+      "docsValidation",
+      "p23MatrixDocsReview",
+      "validationAggregatorReportShape",
+      "schemaVersionBoundaryEvidence",
+      "migrationImportExportFixtureEvidence",
+      "secretWorkspaceDiffScan"
+    ],
+    "conditionalLive": [
+      "health",
+      "initializeToolsList",
+      "observeHttp",
+      "mcpHttpTests"
+    ],
+    "runtimeRequired": [
+      "schemaVersionRuntimeEnforcement",
+      "validationAggregatorFullImplementation",
+      "finalRcMatrixRunnerImplementation"
+    ],
+    "a5Gated": [
+      "providerExecution",
+      "migrationImportExportApply",
+      "backupRestoreExecution",
+      "startupWatchdogInstall",
+      "clientConfigSwitch",
+      "productionDeploy",
+      "pushTagReleaseDeploy"
+    ]
+  },
+  "requiredRejectionDefaults": [
+    "missing_explicit_evidence",
+    "stale_evidence",
+    "failed_or_blocked_evidence",
+    "unsupported_source_type",
+    "side_effect_evidence",
+    "sensitive_fragment",
+    "real_memory_preview",
+    "durable_mutation",
+    "public_mcp_expansion",
+    "remote_write"
+  ],
+  "rejectedActions": [
+    "start-service",
+    "refresh-live",
+    "provider",
+    "real-memory-scan",
+    "memory-preview",
+    "import",
+    "export",
+    "migrate",
+    "apply",
+    "backup",
+    "restore",
+    "config-switch",
+    "package-script",
+    "public-mcp-expand",
+    "push",
+    "tag",
+    "release",
+    "deploy"
+  ],
+  "safety": {
+    "mutated": false,
+    "providerCalls": 0,
+    "serviceStarted": false,
+    "durableMemoryTouched": false,
+    "realMemoryPreview": false,
+    "realMemoryScanned": false,
+    "migrationApplied": false,
+    "importExportApplied": false,
+    "backupCreated": false,
+    "restorePerformed": false,
+    "packageChanged": false,
+    "configChanged": false,
+    "publicMcpExpanded": false,
+    "pushed": false,
+    "tagged": false,
+    "released": false,
+    "deployed": false,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false
+  },
+  "blockers": [
+    {
+      "id": "full-final-rc-matrix-not-executed",
+      "category": "validation_required",
+      "status": "not_executed"
+    },
+    {
+      "id": "schema-version-runtime-enforcement-not-implemented",
+      "category": "runtime_required",
+      "status": "not_implemented"
+    },
+    {
+      "id": "final-rc-matrix-runner-not-implemented",
+      "category": "runtime_required",
+      "status": "not_implemented"
+    },
+    {
+      "id": "a5-actions-blocked",
+      "category": "approval_required",
+      "status": "blocked_pending_a5"
+    }
+  ],
+  "forbiddenFragments": [
+    "authorization:",
+    "bearer ",
+    "password=",
+    "api_key=",
+    "token=",
+    "raw_workspace_id"
+  ],
+  "next": {
+    "recommendedPhase": "P30.2-final-rc-validation-matrix-runner-manifest-helper",
+    "allowed": "pure helper over explicit fixture input only",
+    "forbidden": "runner execution, live checks, provider calls, real memory scans, durable mutation, package scripts, public MCP expansion, push/tag/release/deploy"
+  }
+}

@@ -127,3 +127,11 @@ P30 is opened only as a safe-scope inventory. The final RC matrix runner is not 
 `P30.1-final-rc-validation-matrix-runner-fixture-contract`
 
 The next safe phase may add a committed synthetic fixture and focused fixture test for the runner manifest. It must not implement a runner, add a package script, start services, call providers, scan real memory, apply migrations/import-export, create backups, restore backups, mutate durable state, expand public MCP tools, push, tag, release, or deploy.
+
+## P30.1 Result
+
+P30.1 adds the committed synthetic fixture `tests/fixtures/final-rc-validation-matrix-runner-safe-scope-v1.json` and focused fixture test `tests/final-rc-validation-matrix-runner-safe-scope-fixture.test.js`.
+
+The fixture locks the future runner manifest boundary: explicit safe inputs only, no runner implementation, no final RC matrix execution, public MCP three-tool freeze, no side effects, fail-closed rejection defaults, and A4/conditional-live/runtime-required/A5 split.
+
+Next recommended phase: `P30.2-final-rc-validation-matrix-runner-manifest-helper`, limited to a pure helper over explicit fixture input. No CLI, package script, live service, provider call, real memory scan, durable mutation, migration/import-export apply, backup/restore, public MCP expansion, push, tag, release, or deploy is approved by P30.1.

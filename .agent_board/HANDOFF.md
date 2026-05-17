@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0272 / P30 final RC validation matrix runner safe-scope inventory.
+Execute the P28-P40 Governed Memory Spine long-running goal under Persistent 4-Agent Council mode. Current cycle: CM-0273 / P30.1 final RC validation matrix runner fixture contract.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty for CM-0272 docs/status/board-only inventory after guarded local commit `4093b3e`. Local `main` is ahead of `origin/main` by 11 commits. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0273 fixture/test/docs/status/backlog/board edits after guarded local commit `6c6c3d7`. Local `main` is ahead of `origin/main` by 12 commits. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
-P30 final RC validation matrix runner safe-scope inventory
+P30.1 final RC validation matrix runner fixture contract
 
 ## Findings
 
@@ -68,8 +68,9 @@ P30 final RC validation matrix runner safe-scope inventory
 - CM-0266 and CM-0267 are committed locally through `88bfd59`; CM-0268 is committed locally in `89d5db8`; CM-0269 is committed locally in `e957885`.
 - CM-0270 board reconciliation after CM-0269 is committed locally in `29d0b83`.
 - CM-0271 P29 closeout is committed locally in `4093b3e`.
-- CM-0272 is completed docs/status/board-only inventory for a future final RC validation matrix runner, pending guarded local commit. It defines explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, and push remain blocked.
-- Next safe local candidate after CM-0272 commit: CM-0273 / P30.1 fixture contract, limited to a committed synthetic fixture and focused fixture test.
+- CM-0272 P30 safe-scope inventory is committed locally in `6c6c3d7`. It defines explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, and push remain blocked.
+- CM-0273 is completed and validated, limited to a committed synthetic fixture plus focused fixture test for the future final RC validation matrix runner safe input contract. Validation passed: syntax check, targeted fixture test `11/11`, `npm test` `610/610`, `git diff --check`, docs validation, forbidden-fragment scan with intentional fixture-list hits only, and read-only Verifier `PASS`. It did not implement or execute a runner.
+- Next safe local candidate after CM-0273 validation/commit: CM-0274 / P30.2 pure manifest helper over explicit fixture input only, if it remains no-runner and no-side-effect.
 
 ## Changed Files
 
