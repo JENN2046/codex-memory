@@ -1,9 +1,11 @@
 const SENSITIVE_FRAGMENT_PATTERNS = Object.freeze([
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/gi,
   /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*/gi,
-  /https?:\/\/[^"',;\s)]+/gi,
+  /[A-Za-z][A-Za-z0-9+.-]*:\/\/[^"',;\s)]+/gi,
   /\b[A-Z]:[\\/][^"',;\s)]+/gi,
+  /\\\\[A-Za-z0-9._$-]+[\\/][^"',;\s)]+/g,
   /(?:^|[\s"'(])\/(?:Users|home|var|tmp|etc|opt|mnt|Volumes)\/[^"',;\s)]+/gi,
+  /(?:^|[\s"'(])\/[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)+/gi,
   /\.env(?:\.[A-Za-z0-9_.-]+)?/gi,
   /\bauthorization\s*[:=]\s*(?:bearer\s+)?["']?[^"',;\s]+["']?/gi,
   /\bbearer\s+[A-Za-z0-9._~+/=-]{8,}/gi,

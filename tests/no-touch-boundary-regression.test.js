@@ -3,10 +3,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
-const {
-  buildV1RcValidationAggregatorReport
-} = require('../src/core/ValidationAggregatorService');
-
 const workspaceRoot = path.join(__dirname, '..');
 const frozenPublicMcpTools = [
   'record_memory',
@@ -17,48 +13,48 @@ const frozenPublicMcpTools = [
 const noTouchTargets = [
   {
     label: 'MemoryGovernanceLifecycleContract',
-    path: 'src/core/MemoryGovernanceLifecycleContract.js',
-    module: require('../src/core/MemoryGovernanceLifecycleContract')
+    path: 'src/core/MemoryGovernanceLifecycleContract.js'
   },
   {
     label: 'MemoryGovernanceApprovalPacketContract',
-    path: 'src/core/MemoryGovernanceApprovalPacketContract.js',
-    module: require('../src/core/MemoryGovernanceApprovalPacketContract')
+    path: 'src/core/MemoryGovernanceApprovalPacketContract.js'
   },
   {
     label: 'MemoryGovernanceAuditEvidenceContract',
-    path: 'src/core/MemoryGovernanceAuditEvidenceContract.js',
-    module: require('../src/core/MemoryGovernanceAuditEvidenceContract')
+    path: 'src/core/MemoryGovernanceAuditEvidenceContract.js'
   },
   {
     label: 'MemoryGovernanceReviewSurfaceContract',
-    path: 'src/core/MemoryGovernanceReviewSurfaceContract.js',
-    module: require('../src/core/MemoryGovernanceReviewSurfaceContract')
+    path: 'src/core/MemoryGovernanceReviewSurfaceContract.js'
   },
   {
     label: 'EvidenceManifestContract',
-    path: 'src/core/EvidenceManifestContract.js',
-    module: require('../src/core/EvidenceManifestContract')
+    path: 'src/core/EvidenceManifestContract.js'
   },
   {
     label: 'FinalRcMatrixEvaluator',
-    path: 'src/core/FinalRcMatrixEvaluator.js',
-    module: require('../src/core/FinalRcMatrixEvaluator')
+    path: 'src/core/FinalRcMatrixEvaluator.js'
   },
   {
     label: 'ValidationAggregatorService',
-    path: 'src/core/ValidationAggregatorService.js',
-    module: require('../src/core/ValidationAggregatorService')
+    path: 'src/core/ValidationAggregatorService.js'
   }
 ];
 
 const disallowedLoadPatterns = [
   /\brequire\(['"](?:node:fs|fs|node:child_process|child_process|node:http|http|node:https|https|node:net|net|node:tls|tls|node:dgram|dgram|node:sqlite|sqlite3|better-sqlite3)['"]\)/,
   /\bfrom\s+['"](?:node:fs|fs|node:child_process|child_process|node:http|http|node:https|https|node:net|net|node:tls|tls|node:dgram|dgram|node:sqlite|sqlite3|better-sqlite3)['"]/,
+  /\bimport\s*\(\s*['"](?:node:fs|fs|node:child_process|child_process|node:http|http|node:https|https|node:net|net|node:tls|tls|node:dgram|dgram|node:sqlite|sqlite3|better-sqlite3)['"]\s*\)/,
+  /\bmodule\s*\.\s*require\s*\(\s*['"](?:node:fs|fs|node:child_process|child_process|node:http|http|node:https|https|node:net|net|node:tls|tls|node:dgram|dgram|node:sqlite|sqlite3|better-sqlite3)['"]\s*\)/,
+  /\bcreateRequire\s*\(/,
   /\brequire\(['"](?:\.\.?\/)+(?:storage|recall|adapters)\//,
   /\bfrom\s+['"](?:\.\.?\/)+(?:storage|recall|adapters)\//,
+  /\bimport\s*\(\s*['"](?:\.\.?\/)+(?:storage|recall|adapters)\//,
+  /\bmodule\s*\.\s*require\s*\(\s*['"](?:\.\.?\/)+(?:storage|recall|adapters)\//,
   /\brequire\(['"][^'"]*(?:Sqlite|SQLite|Vector|Candidate|Recall|Provider|Embedding|Rerank)[^'"]*['"]\)/,
-  /\bfrom\s+['"][^'"]*(?:Sqlite|SQLite|Vector|Candidate|Recall|Provider|Embedding|Rerank)[^'"]*['"]/
+  /\bfrom\s+['"][^'"]*(?:Sqlite|SQLite|Vector|Candidate|Recall|Provider|Embedding|Rerank)[^'"]/,
+  /\bimport\s*\(\s*['"][^'"]*(?:Sqlite|SQLite|Vector|Candidate|Recall|Provider|Embedding|Rerank)[^'"]*['"]\s*\)/,
+  /\bmodule\s*\.\s*require\s*\(\s*['"][^'"]*(?:Sqlite|SQLite|Vector|Candidate|Recall|Provider|Embedding|Rerank)[^'"]*['"]\s*\)/
 ];
 
 const disallowedRuntimeCalls = [
@@ -84,33 +80,52 @@ function readTargetSource(target) {
   return fs.readFileSync(path.join(workspaceRoot, target.path), 'utf8');
 }
 
-test('P50 no-touch targets do not load fs, child_process, network, runtime store, recall, or provider modules', () => {
-  for (const target of noTouchTargets) {
-    const source = readTargetSource(target);
+function assertTargetSourceNoTouch(target) {
+  const source = readTargetSource(target);
 
-    for (const pattern of disallowedLoadPatterns) {
-      assert.equal(pattern.test(source), false, `${target.label} matches ${pattern}`);
-    }
+  for (const pattern of disallowedLoadPatterns) {
+    assert.equal(pattern.test(source), false, `${target.label} matches ${pattern}`);
   }
+
+  for (const pattern of disallowedRuntimeCalls) {
+    assert.equal(pattern.test(source), false, `${target.label} matches ${pattern}`);
+  }
+}
+
+function assertAllTargetSourcesNoTouch() {
+  for (const target of noTouchTargets) {
+    assertTargetSourceNoTouch(target);
+  }
+}
+
+function loadTargetModule(target) {
+  return require(path.join(workspaceRoot, target.path));
+}
+
+function loadAggregatorReportBuilder() {
+  const target = noTouchTargets.find(item => item.label === 'ValidationAggregatorService');
+  return loadTargetModule(target).buildV1RcValidationAggregatorReport;
+}
+
+test('P50 no-touch targets do not load fs, child_process, network, runtime store, recall, or provider modules', () => {
+  assertAllTargetSourcesNoTouch();
 });
 
 test('P50 no-touch targets do not introduce scan, command, network, or durable-write calls', () => {
-  for (const target of noTouchTargets) {
-    const source = readTargetSource(target);
-
-    for (const pattern of disallowedRuntimeCalls) {
-      assert.equal(pattern.test(source), false, `${target.label} matches ${pattern}`);
-    }
-  }
+  assertAllTargetSourcesNoTouch();
 });
 
 test('P50 no-touch targets keep public MCP surface frozen to the three existing tools', () => {
+  assertAllTargetSourcesNoTouch();
+
   for (const target of noTouchTargets) {
-    if (target.module.PUBLIC_MCP_TOOLS) {
-      assert.deepEqual(target.module.PUBLIC_MCP_TOOLS, frozenPublicMcpTools, target.label);
+    const targetModule = loadTargetModule(target);
+    if (targetModule.PUBLIC_MCP_TOOLS) {
+      assert.deepEqual(targetModule.PUBLIC_MCP_TOOLS, frozenPublicMcpTools, target.label);
     }
   }
 
+  const buildV1RcValidationAggregatorReport = loadAggregatorReportBuilder();
   const aggregatorReport = buildV1RcValidationAggregatorReport({
     generatedAt: '2026-05-18T00:00:00.000Z'
   });
@@ -120,6 +135,9 @@ test('P50 no-touch targets keep public MCP surface frozen to the three existing 
 });
 
 test('P50 no-touch regression preserves explicit non-runtime safety posture in aggregator report', () => {
+  assertAllTargetSourcesNoTouch();
+
+  const buildV1RcValidationAggregatorReport = loadAggregatorReportBuilder();
   const report = buildV1RcValidationAggregatorReport({
     generatedAt: '2026-05-18T00:00:00.000Z'
   });
