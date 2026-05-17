@@ -6,14 +6,14 @@ P41-P45 Evidence-First Gate Spine.
 
 ## Current Area
 
-P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
+P10 observability-admin / P45 Fixture-Only Final RC Matrix Evaluator Skeleton.
 
 ## Current Status
 
 - Last pushed baseline: `3e3f76d fix: harden local http and governance redaction` on `origin/main`.
-- Local branch is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, CM-0315 `169f5bc`, CM-0316 `8af5c64`, and CM-0317 `ae7655a`.
+- Local branch is ahead of `origin/main` by CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, CM-0315 `169f5bc`, CM-0316 `8af5c64`, CM-0317 `ae7655a`, and post-P44 board sync `93721b4`.
 - Latest pushed task chain: P35.1 fixture contract, P35 post-push board reconciliation, and P35 security hardening.
-- Current task: CM-0318 / P45-T1 Fixture-Only Final RC Matrix Evaluator Skeleton.
+- Current task: CM-0318 / P45-T1 Fixture-Only Final RC Matrix Evaluator Skeleton is implemented and fully pre-commit validated in the worktree; guarded local commit is pending.
 - CM-0307 validation passed: `node --check tests\p36-scope-a5-boundary-contract-fixture.test.js`, targeted fixture test `12/12`, `npm test` `739/739`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop policy wording.
 - CM-0308 validation passed: `node --check tests\p36-task-risk-labels-contract-fixture.test.js`, targeted fixture test `11/11`, `npm test` `750/750`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / hard-stop policy wording.
 - CM-0309 validation passed: `node --check tests\p37-policy-decision-envelope-fixture.test.js`, targeted fixture test `11/11`, `npm test` `761/761`, `git diff --check`, docs validation, and boundary scan with only expected forbidden-claim / isolation wording.
@@ -24,6 +24,7 @@ P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
 - CM-0315 validation passed: `node --check src\core\EvidenceManifestContract.js`, `node --check tests\evidence-manifest-contract-helper.test.js`, targeted helper/fixture tests `22/22`, `npm test` `812/812`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop/history wording plus synthetic redaction-test strings.
 - CM-0316 validation passed: `node --check src\core\RecallMigrationIsolationContract.js`, `node --check tests\recall-migration-isolation-helper.test.js`, targeted helper/P38/P39 fixture tests `30/30`, `npm test` `822/822`, `git diff --check`, docs validation, and boundary scan with only expected hard-stop/history wording plus synthetic redaction/static-boundary test strings.
 - CM-0317 validation passed: `node --check src\core\ValidationAggregatorService.js`, changed aggregator test syntax checks, fixture JSON parse, targeted aggregator tests `36/36`, `npm test` `824/824`, `git diff --check`, docs validation, and P44 boundary scan with only expected unsafe explicit-input rejection fixtures.
+- CM-0318 validation passed: `node --check src\core\FinalRcMatrixEvaluator.js`, `node --check tests\final-rc-matrix-evaluator-helper.test.js`, P45 fixture JSON parse, targeted P45 evaluator tests `10/10`, `npm test` `834/834`, `git diff --check`, docs validation, boundary scan with only expected forbidden-claim / hard-stop wording plus synthetic redaction-test strings, and read-only Verifier `PASS`.
 
 ## Active Boundaries
 
@@ -54,4 +55,4 @@ P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
 
 ## Next Safe Step
 
-Continue to CM-0318 / P45-T1 fixture-only final RC matrix evaluator skeleton. Push remains user-directed and not authorized.
+Create guarded local CM-0318 commit, then reconcile post-P45 board/status. Push remains user-directed and not authorized.

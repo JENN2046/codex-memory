@@ -30,15 +30,15 @@ This active plan is the short routing document for the current P41-P45 Evidence-
 - P42-T1 explicit-input evidence helper: complete locally in `169f5bc`.
 - P43-T1 recall/migration isolation explicit-input helper: complete locally in `8af5c64`.
 - P44-T1 ValidationAggregator P36-P40 evidence source map: complete locally in `ae7655a`.
+- Post-P44 board reconciliation: complete locally in `93721b4`.
+- P45-T1 fixture-only final RC matrix evaluator skeleton: implemented and fully pre-commit validated in the worktree; guarded local commit pending.
 
 ## Current Task
 
-P45-T1 Fixture-Only Final RC Matrix Evaluator Skeleton:
+P45-T1 remaining local closeout:
 
-- Build a fixture-only / explicit-input evaluator skeleton.
-- Keep v1.0 RC `NOT_READY_BLOCKED`.
-- Runner/evaluator must not collect evidence, execute validation commands, execute helpers/gates/runners, refresh live MCP, call providers, read real memory/runtime stores, or claim full final RC validation matrix execution.
-- Missing manifest/evidence, warning-only, unknown, skipped, failed, and unresolved A5 blockers must fail closed.
+- Create guarded local P45 commit if the diff remains scoped.
+- Reconcile board/status after commit so P41-P45 is closed locally without runtime-ready overclaim.
 
 ## Boundaries
 

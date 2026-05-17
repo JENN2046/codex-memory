@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "p45-final-rc-matrix-evaluator-v1",
+  "mode": "fixture-only-explicit-input",
+  "fixtureOnly": true,
+  "explicitInputOnly": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "manifest": {
+    "present": true,
+    "schemaVersion": "p41-evidence-manifest-contract-v1",
+    "sourceMode": "caller_provided",
+    "acceptedForPlanning": true,
+    "evidenceCollectedByEvaluator": false,
+    "helperExecutedByEvaluator": false
+  },
+  "evidence": [
+    {
+      "id": "p36_scope_a5_boundary",
+      "sourceType": "committed_fixture",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p36_task_risk_labels",
+      "sourceType": "committed_fixture",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p37_policy_decision_envelope",
+      "sourceType": "committed_fixture",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p38_recall_isolation",
+      "sourceType": "committed_fixture",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p39_synthetic_migration_dry_run",
+      "sourceType": "committed_fixture",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p40_local_readiness_report",
+      "sourceType": "committed_fixture",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p41_evidence_manifest_contract",
+      "sourceType": "committed_fixture",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p42_explicit_input_evidence_helper",
+      "sourceType": "committed_test",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p43_recall_migration_isolation_helper",
+      "sourceType": "committed_test",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    },
+    {
+      "id": "p44_validation_aggregator_evidence_map",
+      "sourceType": "local_validation_summary",
+      "status": "passed",
+      "sourceMode": "caller_provided",
+      "critical": true,
+      "acceptedForEvaluation": true,
+      "observedFromRuntime": false
+    }
+  ],
+  "a5Blockers": [
+    {
+      "id": "migration-import-export-apply-a5-gated",
+      "status": "blocked_pending_a5",
+      "unresolved": true
+    },
+    {
+      "id": "provider-execution-a5-gated",
+      "status": "blocked_pending_a5",
+      "unresolved": true
+    },
+    {
+      "id": "startup-watchdog-a5-gated",
+      "status": "blocked_pending_a5",
+      "unresolved": true
+    },
+    {
+      "id": "codex-claude-config-switch-a5-gated",
+      "status": "blocked_pending_a5",
+      "unresolved": true
+    },
+    {
+      "id": "push-tag-release-deploy-a5-gated",
+      "status": "blocked_pending_a5",
+      "unresolved": true
+    }
+  ],
+  "publicMcpTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "blockedActions": [
+    "collect_evidence",
+    "execute_validation_command",
+    "execute_helper",
+    "execute_gate",
+    "execute_runner",
+    "refresh_live_mcp",
+    "provider_call",
+    "real_memory_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "runtime_store_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore",
+    "service_start",
+    "config_switch",
+    "watchdog_install",
+    "public_mcp_expansion",
+    "dependency_change",
+    "durable_memory_write",
+    "durable_audit_write",
+    "push_tag_release_deploy"
+  ],
+  "failClosedStates": [
+    "missing",
+    "failed",
+    "blocked",
+    "not_executed",
+    "warning",
+    "warning_only",
+    "unknown",
+    "skipped",
+    "ambiguous",
+    "unparsable",
+    "unsupported"
+  ],
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "fullFinalRcMatrixExecuted": false,
+  "pushReady": false,
+  "releaseReady": false,
+  "deployReady": false,
+  "configSwitchReady": false,
+  "watchdogReady": false,
+  "rcReady": false,
+  "safety": {
+    "noFileRead": true,
+    "noDirectoryScan": true,
+    "noCommandExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noRuntimeStoreScan": true,
+    "noRealMemoryRead": true,
+    "noMigrationApply": true,
+    "noImportExportApply": true,
+    "noBackupRestore": true,
+    "noConfigMutation": true,
+    "noWatchdogInstall": true,
+    "noPublicMcpExpansion": true,
+    "noDependencyChange": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "authorizationHeaderExposed": false,
+    "apiKeyExposed": false,
+    "callerFieldsPassthroughAllowed": false
+  },
+  "requiredWording": [
+    "fixture-only evaluator skeleton",
+    "explicit caller-provided evidence only",
+    "does not execute validation commands",
+    "does not collect evidence",
+    "does not claim full final RC matrix execution",
+    "v1.0 RC remains NOT_READY_BLOCKED"
+  ],
+  "forbiddenClaims": [
+    "READY_FOR_V1_0_RC",
+    "final RC matrix executed",
+    "runtime ready",
+    "push ready",
+    "release ready",
+    "deploy ready",
+    "config switch ready",
+    "watchdog ready"
+  ]
+}

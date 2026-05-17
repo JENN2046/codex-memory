@@ -14,7 +14,7 @@ Execute the P41-P45 Evidence-First Gate Spine long-running goal under Commander 
 
 ## Worktree
 
-Clean after CM-0317 local commit `ae7655a`.
+P45 source/test/fixture plus board/status docs are fully pre-commit validated and modified for guarded local commit.
 
 ## Current Area
 
@@ -23,11 +23,11 @@ P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
 ## Current Truth
 
 - `origin/main` baseline: `3e3f76d fix: harden local http and governance redaction`.
-- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, CM-0315 `169f5bc`, CM-0316 `8af5c64`, and CM-0317 `ae7655a`.
-- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `ae7655a`.
+- Local branch is ahead of `origin/main` by local CM-0307 `408a92c`, CM-0308 `d1f48c2`, CM-0309 `cb7d1ef`, CM-0310 `251af9c`, CM-0311 `1ed25ad`, CM-0312 `6f7ade4`, post-P40 board sync `ba59537`, CM-0313 `08597d6`, CM-0314 `8895816`, CM-0315 `169f5bc`, CM-0316 `8af5c64`, CM-0317 `ae7655a`, and post-P44 board sync `93721b4`.
+- Latest pushed implementation/test commit: `3e3f76d`; latest local implementation/test commit: `ae7655a`; P45 implementation/test files are fully pre-commit validated in the worktree and pending guarded local commit.
 - P34/P35 chain status: P34 review surface, P35 policy gate planning/fixture, and P35 security hardening are pushed.
 - Current release/readiness state: P36-P40 local evidence chain complete only; v1.0 RC remains `NOT_READY_BLOCKED`.
-- Current task: CM-0318 P45-T1 Fixture-Only Final RC Matrix Evaluator Skeleton.
+- Current task: CM-0318 P45-T1 Fixture-Only Final RC Matrix Evaluator Skeleton is implemented and fully pre-commit validated in the worktree; guarded local commit remains.
 
 ## Validation
 
@@ -37,6 +37,7 @@ P10 observability-admin / P44 ValidationAggregator P36-P40 Evidence Source Map.
 - CM-0315 validation passed: `node --check src\core\EvidenceManifestContract.js`; `node --check tests\evidence-manifest-contract-helper.test.js`; targeted helper/fixture tests `22/22`; `npm test` `812/812`; `git diff --check`; docs validation; boundary scan with only expected hard-stop/history wording plus synthetic redaction-test strings.
 - CM-0316 validation passed: `node --check src\core\RecallMigrationIsolationContract.js`; `node --check tests\recall-migration-isolation-helper.test.js`; targeted helper/P38/P39 fixture tests `30/30`; `npm test` `822/822`; `git diff --check`; docs validation; boundary scan with only expected hard-stop/history wording plus synthetic redaction/static-boundary test strings.
 - CM-0317 validation passed: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; `node --check tests\v1-rc-validation-aggregator-cli.test.js`; fixture JSON parse; targeted aggregator tests `36/36`; `npm test` `824/824`; `git diff --check`; docs validation; P44 boundary scan with only expected unsafe explicit-input rejection fixtures.
+- CM-0318 validation passed: `node --check src\core\FinalRcMatrixEvaluator.js`; `node --check tests\final-rc-matrix-evaluator-helper.test.js`; P45 fixture JSON parse; targeted evaluator tests `10/10`; `npm test` `834/834`; `git diff --check`; docs validation; boundary scan with only expected forbidden-claim / hard-stop wording plus synthetic redaction-test strings; read-only Verifier `PASS`.
 - Boundary scan found only expected forbidden-claim / hard-stop wording; read-only Verifier review found no migration planner implementation, real memory access, migration apply, backup/restore, provider, public MCP, durable write, config, remote, or deploy action.
 
 ## Hard Stops
@@ -53,4 +54,4 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Continue to CM-0318 / P45-T1 fixture-only final RC matrix evaluator skeleton. Push remains blocked unless explicitly requested.
+Create guarded local CM-0318 commit, then reconcile post-P45 board/status. Push remains blocked unless explicitly requested.
