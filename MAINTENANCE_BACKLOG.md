@@ -11,7 +11,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
-- Local baseline: local `main` contains P51-P61-T1 local work through commit `360f4f9` and is ahead of `origin/main = 1ae4286`; use `git log --oneline --decorate -n 10` for the exact current HEAD; push is not authorized.
+- Local baseline: local `main` contains P51-P61-T1 local work through post-commit board reconciliation `2811da3` and is ahead of `origin/main = 1ae4286`; use `git log --oneline --decorate -n 10` for the exact current HEAD; push is not authorized.
 - Current active program: P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 - Current phase area: P61 mainline strict gate + RC evidence report boundary. Evidence-first / fail-closed / reversible boundaries preserved.
 
@@ -65,7 +65,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P59-T2 | P4-http-runtime | A2 | done | HTTP observability explicit-input evidence helper | changed JS syntax; targeted helper/no-touch tests; `npm test`; `git diff --check` | Complete, validated, and committed locally in `a036c8d`. Pure caller-provided object helper only; no fs scan, command execution, live HTTP operation, service/watchdog/startup install, config switch, provider call, durable write, public MCP expansion, push/tag/release/deploy, or readiness claim. |
 | P60-T1 | observability-admin | A1/A2 | done | No-touch / no-leak / redaction long-term regression | targeted regression tests; `npm test`; `git diff --check` | Complete, validated, and committed locally in `66d1978`. Adds test-only coverage for centralized redaction and no-touch source constraints. No runtime/service/provider/config/deploy operation, durable write, or public MCP expansion. |
 | P61-T1 | observability-admin | A1/A2 | done | Mainline strict gate + RC evidence report boundary inventory | docs/fixture/test first; targeted tests; `npm test`; `git diff --check` | Complete, validated, and committed locally in `360f4f9`. Boundary inventory only; does not execute mainline gate, final RC runner, live HTTP operation, provider calls, service/watchdog/startup install, config switch, durable write, public MCP expansion, push/tag/release/deploy, or RC-ready claim. |
-| P61-T2 | observability-admin | A2 | todo | RC evidence report explicit-input helper candidate | changed JS syntax; targeted helper/no-touch tests; `npm test`; `git diff --check` | Candidate only if pure caller-provided object evaluation. Do not execute mainline gate, final RC runner, live HTTP operation, provider calls, service/watchdog/startup install, config switch, durable write, public MCP expansion, push/tag/release/deploy, or RC-ready claim. |
+| P61-T2 | observability-admin | A2 | todo | RC evidence report explicit-input helper candidate | changed JS syntax; targeted helper/no-touch tests; `npm test`; `git diff --check` | Next candidate only if pure caller-provided object evaluation. Do not execute mainline gate, final RC runner, live HTTP operation, provider calls, service/watchdog/startup install, config switch, durable write, public MCP expansion, push/tag/release/deploy, or RC-ready claim. |
 
 ## Standing Boundaries
 

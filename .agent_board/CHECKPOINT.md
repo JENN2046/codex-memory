@@ -30,6 +30,7 @@ P10 observability/admin; P61 RC evidence report boundary inventory complete; P61
 - P60-T1 no-touch / no-leak / redaction long-term regression is implemented, validated, and committed locally in `66d1978`.
 - P60-T1 post-commit board reconciliation is locally committed in `ca30af1`.
 - P61-T1 mainline strict gate + RC evidence report boundary inventory is implemented, validated, and committed locally in `360f4f9`.
+- P61-T1 post-commit board reconciliation is locally committed in `2811da3`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -48,7 +49,7 @@ P10 observability/admin; P61 RC evidence report boundary inventory complete; P61
 - Targeted P61 test (`10/10`)
 - Targeted P54/P59/P60/P61/no-touch set (`70/70`)
 - `npm test` (`1021/1021`)
-- Post-commit status/log/trailer/diff-check for `360f4f9`
+- Post-commit status/log/trailer/diff-check for `360f4f9` and `2811da3`
 
 ## Active Boundaries
 
@@ -66,4 +67,4 @@ P10 observability/admin; P61 RC evidence report boundary inventory complete; P61
 
 ## Next Safe Step
 
-Complete P61-T1 post-commit board/status reconciliation, then evaluate P61-T2 only if it remains pure explicit-input helper work with no runtime side effects.
+Evaluate P61-T2 only if it remains pure explicit-input helper work with no runtime side effects.
