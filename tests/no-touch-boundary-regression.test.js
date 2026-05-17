@@ -32,6 +32,10 @@ const noTouchTargets = [
     path: 'src/core/EvidenceManifestContract.js'
   },
   {
+    label: 'EvidenceRuntimeTraceContract',
+    path: 'src/core/EvidenceRuntimeTraceContract.js'
+  },
+  {
     label: 'FinalRcMatrixEvaluator',
     path: 'src/core/FinalRcMatrixEvaluator.js'
   },

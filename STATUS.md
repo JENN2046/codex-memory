@@ -9,7 +9,7 @@
 - 当前本地基线：本地 `main` 已包含 P51-P55 本地工作并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P55-T1 evidence-to-runtime enforcement trace contract 已完成并通过验证；下一条安全路线是 P55-T2 explicit-input trace helper，但必须继续禁止服务/provider/真实 memory/A5 操作。
+- 当前任务：P55-T2 explicit-input trace helper 已完成并通过验证；下一条安全路线是 P56-T1 governance review/approval/audit executable loop boundary contract，但必须继续禁止服务/provider/真实 memory/A5 操作。
 
 ## 当前阻塞
 
@@ -21,8 +21,8 @@
 
 ## 当前优先级
 
-1. 进入 P55-T2 explicit-input trace helper，先只处理 caller-provided P55 trace object；不得读取 fixture、扫描目录、执行命令或连接 runtime。
-2. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54-T1 command inventory、P54-T2 caller-provided command result helper、P54-T3 preflight、P54-T4 injected-executor adapter contract、或 P55-T1 trace contract 误读为 live runtime enforcement、ValidationAggregator full implementation complete、或 final RC matrix execution。
+1. 进入 P56-T1 governance review/approval/audit executable loop boundary contract，先做 dry-run/explicit-input/local-only 边界；durable write、真实 audit write、memory mutation、approval execution 仍是 A5 hard stop。
+2. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54-T1 command inventory、P54-T2 caller-provided command result helper、P54-T3 preflight、P54-T4 injected-executor adapter contract、P55-T1 trace contract、或 P55-T2 trace helper 误读为 live runtime enforcement、ValidationAggregator full implementation complete、或 final RC matrix execution。
 3. 不 push，除非用户单独明确授权。
 
 ## 主要事实源
