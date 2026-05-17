@@ -66,7 +66,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P55-T2 evidence-to-runtime enforcement explicit-input helper is complete and validated.
 - P56-T1 governance review/approval/audit executable loop boundary contract is complete and validated.
 - P56-T2 governance loop explicit-input helper is complete, validated, and locally committed in `f69fbbb`.
-- P57-T1 recall isolation runtime proof boundary inventory is complete and validated.
+- P57-T1 recall isolation runtime proof boundary inventory is complete, validated, and locally committed in `c89a772`.
 - Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary evidence, or P56 helper evidence.
 
 ## Boundaries
@@ -88,6 +88,6 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 After P57-T1:
 
-- First do guarded local commit and post-commit board reconciliation.
+- First finish post-commit board reconciliation for local commit `c89a772`.
 - Then select P57-T2 recall isolation runtime proof explicit-input evaluator only if it remains pure helper over caller-provided synthetic proof objects.
 - Keep P57 helper-first: fail closed for missing/unknown/unsupported/duplicate/contaminated evidence, runtime-store scan claims, real-memory scan claims, durable writes, readiness overclaims, and safety leakage.
