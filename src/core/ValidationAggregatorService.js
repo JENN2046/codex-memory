@@ -115,6 +115,11 @@ const EVIDENCE_SOURCES = {
     source_ref: 'tests/fixtures/schema-version-policy-v1.json',
     status: 'fixture_contract_added'
   },
+  schema_version_policy_helper: {
+    source_type: 'explicit_input_policy_helper',
+    source_ref: 'src/core/SchemaVersionPolicy.js / tests/schema-version-policy-runtime.test.js',
+    status: 'helper_added_runtime_not_integrated'
+  },
   schema_compatibility_dry_run_cli: {
     source_type: 'fixture_only_cli_contract',
     source_ref: 'src/cli/schema-compatibility-dry-run.js / tests/schema-compatibility-dry-run-cli.test.js / tests/fixtures/schema-compatibility-dry-run-v1.json',
@@ -734,6 +739,9 @@ function buildV1RcValidationAggregatorReport({
       validationEvidenceConfidencePostureStatus: validationEvidenceConfidencePosture.status,
       validationEvidenceConfidenceCanClaimV1RcReady: false,
       schemaVersionRuntimeEnforcementImplemented: false,
+      schemaVersionPolicyHelperImplemented: true,
+      schemaVersionPolicyHelperExplicitInputOnly: true,
+      schemaVersionPolicyHelperRuntimeIntegrated: false,
       schemaCompatibilityDryRunCliImplemented: true,
       schemaCompatibilityDryRunCliFixtureOnly: true,
       schemaCompatibilityDryRunCliExecuted: false,
@@ -801,6 +809,13 @@ function buildV1RcValidationAggregatorReport({
         blocksV1Rc: false,
         a4Safe: true,
         evidence: 'P25.2 schema-version policy fixture covers accepted, missing, and unknown version behavior.'
+      }),
+      schemaVersionPolicyHelper: createCheck({
+        status: 'helper_added_runtime_not_integrated',
+        requiredBeforeV1Rc: true,
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'P29.1 SchemaVersionPolicy helper evaluates explicit parsed policy input only; it is not wired into runtime enforcement.'
       }),
       schemaCompatibilityDryRunCli: createCheck({
         status: 'fixture_only_cli_added',
@@ -873,6 +888,7 @@ function buildV1RcValidationAggregatorReport({
       'docsStatusBoardConsistency',
       'schemaVersionDocsReview',
       'schemaVersionPolicyFixture',
+      'schemaVersionPolicyHelper',
       'schemaCompatibilityDryRunCli',
       'migrationImportExportDryRunGateCli',
       'migrationImportExportApprovalPacketCli',
@@ -926,6 +942,20 @@ function buildV1RcValidationAggregatorReport({
         fixture: 'tests/fixtures/schema-version-policy-v1.json',
         test: 'tests/schema-version-policy-fixture.test.js',
         runtimeEnforcementImplemented: false
+      },
+      p29SchemaVersionPolicyHelper: {
+        status: 'helper_added_runtime_not_integrated',
+        helper: 'src/core/SchemaVersionPolicy.js',
+        test: 'tests/schema-version-policy-runtime.test.js',
+        sourceMode: 'explicit_input',
+        fixture: 'tests/fixtures/schema-version-policy-v1.json',
+        evaluatesAcceptedMissingUnknownVersions: true,
+        rejectsUnknownFamilies: true,
+        readsFiles: false,
+        mutatesInput: false,
+        runtimeIntegrated: false,
+        runtimeEnforcementImplemented: false,
+        publicMcpExpanded: false
       },
       p25SchemaCompatibilityDryRunCli: {
         status: 'fixture_only_cli_added',

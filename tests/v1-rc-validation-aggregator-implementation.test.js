@@ -78,6 +78,9 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.validationEvidenceConfidencePostureStatus, 'no_explicit_evidence');
   assert.equal(report.summary.validationEvidenceConfidenceCanClaimV1RcReady, false);
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.schemaVersionPolicyHelperImplemented, true);
+  assert.equal(report.summary.schemaVersionPolicyHelperExplicitInputOnly, true);
+  assert.equal(report.summary.schemaVersionPolicyHelperRuntimeIntegrated, false);
   assert.equal(report.summary.schemaCompatibilityDryRunCliImplemented, true);
   assert.equal(report.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
   assert.equal(report.summary.schemaCompatibilityDryRunCliExecuted, false);
@@ -95,6 +98,17 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p25SchemaVersionPolicy.status, 'fixture_contract_added');
   assert.equal(report.evidence.p25SchemaVersionPolicy.fixture, 'tests/fixtures/schema-version-policy-v1.json');
   assert.equal(report.evidence.p25SchemaVersionPolicy.runtimeEnforcementImplemented, false);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.status, 'helper_added_runtime_not_integrated');
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.helper, 'src/core/SchemaVersionPolicy.js');
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.test, 'tests/schema-version-policy-runtime.test.js');
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.sourceMode, 'explicit_input');
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.evaluatesAcceptedMissingUnknownVersions, true);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.rejectsUnknownFamilies, true);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.readsFiles, false);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.mutatesInput, false);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.runtimeIntegrated, false);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.runtimeEnforcementImplemented, false);
+  assert.equal(report.evidence.p29SchemaVersionPolicyHelper.publicMcpExpanded, false);
   assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
   assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.cli, 'src/cli/schema-compatibility-dry-run.js');
   assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.cliExecuted, false);
@@ -194,6 +208,8 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.match(report.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
   assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
   assert.equal(report.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
+  assert.equal(report.evidence_sources.schema_version_policy_helper.status, 'helper_added_runtime_not_integrated');
+  assert.match(report.evidence_sources.schema_version_policy_helper.source_ref, /src\/core\/SchemaVersionPolicy\.js/);
   assert.equal(report.evidence_sources.schema_compatibility_dry_run_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
@@ -545,6 +561,9 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
   assert.equal(report.checks.schemaVersionPolicyFixture.status, 'fixture_contract_added');
   assert.equal(report.checks.schemaVersionPolicyFixture.a4Safe, true);
+  assert.equal(report.checks.schemaVersionPolicyHelper.status, 'helper_added_runtime_not_integrated');
+  assert.equal(report.checks.schemaVersionPolicyHelper.a4Safe, true);
+  assert.equal(report.checks.schemaVersionPolicyHelper.blocksV1Rc, undefined);
   assert.equal(report.checks.schemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
   assert.equal(report.checks.schemaCompatibilityDryRunCli.a4Safe, true);
   assert.equal(report.checks.schemaCompatibilityDryRunCli.blocksV1Rc, undefined);
@@ -559,6 +578,7 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.a5_gated.includes('providerExecution'), true);
   assert.equal(report.a4_safe.includes('gitHygiene'), true);
   assert.equal(report.a4_safe.includes('schemaVersionPolicyFixture'), true);
+  assert.equal(report.a4_safe.includes('schemaVersionPolicyHelper'), true);
   assert.equal(report.a4_safe.includes('schemaCompatibilityDryRunCli'), true);
   assert.equal(report.a4_safe.includes('migrationImportExportDryRunGateCli'), true);
   assert.equal(report.a4_safe.includes('migrationImportExportApprovalPacketCli'), true);

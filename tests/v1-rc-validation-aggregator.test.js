@@ -108,6 +108,8 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.match(fixture.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
   assert.equal(fixture.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
   assert.equal(fixture.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
+  assert.equal(fixture.evidence_sources.schema_version_policy_helper.status, 'helper_added_runtime_not_integrated');
+  assert.match(fixture.evidence_sources.schema_version_policy_helper.source_ref, /src\/core\/SchemaVersionPolicy\.js/);
   assert.equal(fixture.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(fixture.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(fixture.evidence_sources.validation_evidence_reader.status, 'foundation_added_read_only');
@@ -192,6 +194,15 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p25SchemaVersionPolicy.status, 'fixture_contract_added');
   assert.equal(fixture.evidence.p25SchemaVersionPolicy.fixture, 'tests/fixtures/schema-version-policy-v1.json');
   assert.equal(fixture.evidence.p25SchemaVersionPolicy.runtimeEnforcementImplemented, false);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.status, 'helper_added_runtime_not_integrated');
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.helper, 'src/core/SchemaVersionPolicy.js');
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.test, 'tests/schema-version-policy-runtime.test.js');
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.sourceMode, 'explicit_input');
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.readsFiles, false);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.mutatesInput, false);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.runtimeIntegrated, false);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.runtimeEnforcementImplemented, false);
+  assert.equal(fixture.evidence.p29SchemaVersionPolicyHelper.publicMcpExpanded, false);
   assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
   assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.cli, 'src/cli/schema-compatibility-dry-run.js');
   assert.equal(fixture.evidence.p25SchemaCompatibilityDryRunCli.fixtureOnly, true);
@@ -273,6 +284,9 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   assert.equal(fixture.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
   assert.equal(fixture.checks.schemaVersionPolicyFixture.status, 'fixture_contract_added');
   assert.equal(fixture.checks.schemaVersionPolicyFixture.a4Safe, true);
+  assert.equal(fixture.checks.schemaVersionPolicyHelper.status, 'helper_added_runtime_not_integrated');
+  assert.equal(fixture.checks.schemaVersionPolicyHelper.a4Safe, true);
+  assert.equal(fixture.checks.schemaVersionPolicyHelper.blocksV1Rc, false);
   assert.equal(fixture.checks.schemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
   assert.equal(fixture.checks.schemaCompatibilityDryRunCli.a4Safe, true);
   assert.equal(fixture.checks.schemaCompatibilityDryRunCli.blocksV1Rc, undefined);
@@ -299,6 +313,7 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
 
   assert.equal(fixture.a4_safe.includes('gitHygiene'), true);
   assert.equal(fixture.a4_safe.includes('schemaVersionPolicyFixture'), true);
+  assert.equal(fixture.a4_safe.includes('schemaVersionPolicyHelper'), true);
   assert.equal(fixture.a4_safe.includes('schemaCompatibilityDryRunCli'), true);
   assert.equal(fixture.a4_safe.includes('migrationImportExportDryRunGateCli'), true);
   assert.equal(fixture.a4_safe.includes('migrationImportExportApprovalPacketCli'), true);

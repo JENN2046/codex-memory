@@ -1297,3 +1297,29 @@ Remaining risks: schema/version runtime enforcement still required; helper is no
 Result: `SchemaVersionPolicy` now evaluates explicit parsed policy input for accepted/missing/unknown versions with no mutation, no implicit fixture reads during evaluation, no provider/service/config/data action, and fail-closed unknown schema families.
 
 Next safe step: guarded local commit for CM-0263, then CM-0264 report-shape evidence in ValidationAggregator if no hard stop appears. Push remains unauthorized.
+
+## CM-0264 Commander Handoff - P29.2 ValidationAggregator SchemaVersionPolicy Helper Evidence
+
+Goal: surface P29.1 `SchemaVersionPolicy` helper evidence in the validation aggregator without executing helper/runtime checks or changing readiness.
+
+Workspace: `A:\codex-memory`
+
+Branch: `main`
+
+Worktree: dirty for completed CM-0264 source/test/fixture/board edits; no push is authorized.
+
+Current area: `P29.2-validation-aggregator-schema-policy-helper-evidence`
+
+Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted schema/aggregator tests `41/41`; `npm test` `593/593`; `git diff --check`.
+
+MCP mode: public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+
+HTTP health: no service action for CM-0264.
+
+Remaining risks: schema/version runtime enforcement still required; helper is still not wired into `record_memory`, recall, imports/exports, migrations, or validation gate execution; A5 actions remain blocked; v1.0 RC remains `NOT_READY_BLOCKED`; push remains centrally directed by user.
+
+Result: ValidationAggregator now records helper evidence with `sourceMode=explicit_input`, `readsFiles=false`, `mutatesInput=false`, `runtimeIntegrated=false`, and `runtimeEnforcementImplemented=false`.
+
+Next safe step: guarded local commit for CM-0264, then CM-0265 boundary hardening if no hard stop appears. Push remains unauthorized.

@@ -895,3 +895,16 @@ If continuing locally, start P24.6 rejected-flag report contract hardening as th
 - Commit: eligible for guarded local commit; push remains user-directed and not authorized for this cycle.
 - Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
 - A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
+
+## CM-0264 - P29.2 ValidationAggregator SchemaVersionPolicy Helper Evidence
+
+- Status: `COMPLETED_VALIDATED`
+- Workspace: `A:\codex-memory`
+- Branch: `main`
+- Scope: report-shape evidence only for the P29.1 explicit-input schema/version policy helper.
+- Changed files: `src/core/ValidationAggregatorService.js`; `tests/fixtures/v1-rc-validation-aggregator-v1.json`; `tests/v1-rc-validation-aggregator.test.js`; `tests/v1-rc-validation-aggregator-implementation.test.js`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`.
+- Result: aggregator now surfaces `schema_version_policy_helper` and `p29SchemaVersionPolicyHelper` evidence while keeping `runtimeIntegrated=false`, `runtimeEnforcementImplemented=false`, `decision=NOT_READY_BLOCKED`, public MCP freeze, and all A5 blockers.
+- Validation: `node --check src\core\ValidationAggregatorService.js`; `node --check tests\v1-rc-validation-aggregator-implementation.test.js`; `node --check tests\v1-rc-validation-aggregator.test.js`; targeted schema/aggregator tests `41/41`; `npm test` `593/593`; `git diff --check`.
+- Commit: eligible for guarded local commit; push remains user-directed and not authorized for this cycle.
+- Remaining blocker: runtime schema/version enforcement is still not integrated into record/read/write/gate paths and remains required before RC readiness.
+- A5 boundary: no real memory scan/preview, SQLite migration apply, import/export apply, backup/restore, provider/model call, service/watchdog install or config switch, public MCP expansion, push, tag, release, or deploy.
