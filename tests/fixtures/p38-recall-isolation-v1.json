@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "p38-recall-isolation-v1",
+  "phase": "P38-recall-isolation-fixtures",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "runtimeIntegrated": false,
+  "recallRuntimeIntegrated": false,
+  "candidateCacheIntegrated": false,
+  "rankingIntegrated": false,
+  "projectionIntegrated": false,
+  "auditSummaryIntegrated": false,
+  "mutated": false,
+  "normalRecallNamespaces": [
+    "user_memory",
+    "project_memory",
+    "task_memory"
+  ],
+  "isolatedNamespaces": [
+    "governance_records",
+    "validation_transcripts",
+    "redaction_samples",
+    "policy_decisions",
+    "blocked_memory",
+    "tombstoned_memory",
+    "out_of_scope_memory"
+  ],
+  "isolationRules": [
+    {
+      "record_kind": "governance_record",
+      "namespace": "governance_records",
+      "entersNormalRecall": false,
+      "entersCandidateCache": false,
+      "entersRanking": false,
+      "entersProjection": false,
+      "entersAuditSummary": false,
+      "reasonCode": "P38_GOVERNANCE_RECORD_ISOLATED"
+    },
+    {
+      "record_kind": "validation_transcript",
+      "namespace": "validation_transcripts",
+      "entersNormalRecall": false,
+      "entersCandidateCache": false,
+      "entersRanking": false,
+      "entersProjection": false,
+      "entersAuditSummary": false,
+      "reasonCode": "P38_VALIDATION_TRANSCRIPT_ISOLATED"
+    },
+    {
+      "record_kind": "redaction_sample",
+      "namespace": "redaction_samples",
+      "entersNormalRecall": false,
+      "entersCandidateCache": false,
+      "entersRanking": false,
+      "entersProjection": false,
+      "entersAuditSummary": false,
+      "reasonCode": "P38_REDACTION_SAMPLE_ISOLATED"
+    },
+    {
+      "record_kind": "policy_decision",
+      "namespace": "policy_decisions",
+      "entersNormalRecall": false,
+      "entersCandidateCache": false,
+      "entersRanking": false,
+      "entersProjection": false,
+      "entersAuditSummary": false,
+      "reasonCode": "P38_POLICY_DECISION_ISOLATED"
+    },
+    {
+      "record_kind": "blocked_memory",
+      "namespace": "blocked_memory",
+      "entersNormalRecall": false,
+      "entersCandidateCache": false,
+      "entersRanking": false,
+      "entersProjection": false,
+      "entersAuditSummary": false,
+      "reasonCode": "P38_BLOCKED_MEMORY_ISOLATED"
+    },
+    {
+      "record_kind": "tombstoned_memory",
+      "namespace": "tombstoned_memory",
+      "entersNormalRecall": false,
+      "entersCandidateCache": false,
+      "entersRanking": false,
+      "entersProjection": false,
+      "entersAuditSummary": false,
+      "reasonCode": "P38_TOMBSTONED_MEMORY_ISOLATED"
+    },
+    {
+      "record_kind": "out_of_scope_memory",
+      "namespace": "out_of_scope_memory",
+      "entersNormalRecall": false,
+      "entersCandidateCache": false,
+      "entersRanking": false,
+      "entersProjection": false,
+      "entersAuditSummary": false,
+      "reasonCode": "P38_OUT_OF_SCOPE_MEMORY_ISOLATED"
+    },
+    {
+      "record_kind": "active_in_scope_user_memory_control",
+      "namespace": "user_memory",
+      "entersNormalRecall": true,
+      "entersCandidateCache": true,
+      "entersRanking": true,
+      "entersProjection": true,
+      "entersAuditSummary": true,
+      "reasonCode": "P38_ACTIVE_IN_SCOPE_CONTROL_ALLOWED"
+    }
+  ],
+  "failClosedCases": [
+    {
+      "id": "unknown_record_kind",
+      "input": "record_kind=unknown",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P38_UNKNOWN_RECORD_KIND"
+    },
+    {
+      "id": "missing_namespace",
+      "input": "namespace missing",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P38_MISSING_NAMESPACE"
+    },
+    {
+      "id": "governance_record_claims_user_memory",
+      "input": "governance_record namespace=user_memory",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P38_GOVERNANCE_RECALL_POLLUTION_BLOCKED"
+    },
+    {
+      "id": "blocked_memory_claims_candidate_cache",
+      "input": "blocked_memory entersCandidateCache=true",
+      "decision": "deny",
+      "acceptedForPlanning": false,
+      "reasonCode": "P38_BLOCKED_CANDIDATE_CACHE_BLOCKED"
+    }
+  ],
+  "safety": {
+    "noRuntimeRecallIntegration": true,
+    "noCommandExecution": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryContentRead": true,
+    "noRealMemoryPreview": true,
+    "noRealMemoryExport": true,
+    "noRealMemoryImport": true,
+    "noRealMemoryScan": true,
+    "noMigrationApply": true,
+    "noBackupRestore": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noDependencyChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false,
+    "structureLeakageApproved": false
+  },
+  "requiredWording": [
+    "P38 is a synthetic recall isolation fixture only.",
+    "Governance records, validation transcripts, redaction samples, and policy decisions do not enter normal recall namespaces.",
+    "Blocked, tombstoned, and out-of-scope memory do not enter candidate cache, ranking, projection, or audit summary.",
+    "Fixture validation does not mean recall runtime isolation is implemented."
+  ],
+  "forbiddenClaims": [
+    "recall runtime isolation is implemented",
+    "governance records enter normal recall",
+    "validation transcripts enter candidate cache",
+    "redaction samples enter ranking",
+    "blocked memory enters projection",
+    "tombstoned memory enters audit summary",
+    "P38 makes v1.0 RC ready"
+  ],
+  "next": "P39-synthetic-migration-dry-run-contract"
+}

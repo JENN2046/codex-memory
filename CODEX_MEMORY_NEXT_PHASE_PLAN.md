@@ -29,10 +29,10 @@ This active plan is the short routing document for the current P28-P40 Governed 
 
 P36-T1 Scope + A5 Boundary Contract:
 
-- Establish a synthetic policy decision envelope matrix for allow / deny / require_review / malformed / version mismatch / redaction uncertainty.
+- Establish synthetic recall isolation fixtures for governance records, validation transcripts, redaction samples, policy decisions, blocked/tombstoned memory, and out-of-scope memory.
 - Keep `decision=NOT_READY_BLOCKED`.
 - Do not implement runtime policy enforcement or a runtime policy kernel.
-- Policy decisions must not enter vector, candidate, diary, recall namespace, projection, or audit summary paths.
+- These isolated records must not enter normal recall namespace, candidate cache, ranking, projection, or audit summary.
 - Do not approve governed actions or write durable state.
 
 ## Boundaries
@@ -51,6 +51,6 @@ P36-T1 Scope + A5 Boundary Contract:
 
 ## Next Candidate
 
-After P37-T1 validation, Commander may choose:
+After P38 validation, Commander may choose:
 
-- `P38-recall-isolation-fixtures`, only if it remains synthetic fixture-only and proves governance/validation/redaction/policy/blocked/tombstoned/out-of-scope records stay out of normal recall paths.
+- `P39-synthetic-migration-dry-run-contract`, only if it remains synthetic fixture or sanitized metadata only and does not touch real memory content.
