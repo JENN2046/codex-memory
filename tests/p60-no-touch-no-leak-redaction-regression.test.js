@@ -21,6 +21,7 @@ const centralizedRedactionTargets = [
   'src/core/MigrationImportExportBackupRestoreApprovalContract.js',
   'src/core/HttpRuntimeObservabilityOperationContract.js',
   'src/core/RcEvidenceReportContract.js',
+  'src/core/A5RuntimeAuthorizationPreconditionContract.js',
   'src/core/FinalRcMatrixEvaluator.js',
   'src/core/FinalRcRunnerCommandResultContract.js',
   'src/core/FinalRcRunnerExecutionPreflight.js',

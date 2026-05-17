@@ -56,6 +56,10 @@ const noTouchTargets = [
     path: 'src/core/RcEvidenceReportContract.js'
   },
   {
+    label: 'A5RuntimeAuthorizationPreconditionContract',
+    path: 'src/core/A5RuntimeAuthorizationPreconditionContract.js'
+  },
+  {
     label: 'FinalRcMatrixEvaluator',
     path: 'src/core/FinalRcMatrixEvaluator.js'
   },
