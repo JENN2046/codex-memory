@@ -4,6 +4,9 @@ const PUBLIC_MCP_TOOLS = Object.freeze([
   'memory_overview'
 ]);
 
+const EXPECTED_SCHEMA_VERSION = 'memory-governance-audit-evidence-v1';
+const EXPECTED_VERSION = 'v1';
+
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_doc',
   'committed_fixture',
@@ -202,6 +205,16 @@ function hasEveryValue(values, requiredValues) {
   return requiredValues.every(value => values.includes(value));
 }
 
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function hasExactSet(values, requiredValues) {
+  return values.length === requiredValues.length &&
+    uniqueValues(values).length === values.length &&
+    hasEveryValue(values, requiredValues);
+}
+
 function hasBlockedEventFamilies(eventFamilies) {
   return eventFamilies.every(eventFamily =>
     eventFamily.status === 'BLOCKED_PENDING_APPROVAL' &&
@@ -214,12 +227,15 @@ function hasBlockedEventFamilies(eventFamilies) {
 function summarizeMemoryGovernanceAuditEvidenceContract(contract = {}) {
   const normalized = normalizeMemoryGovernanceAuditEvidenceContract(contract);
   const safeSourceTypes = SAFE_SOURCE_TYPES;
+  const schemaVersionSafe = normalized.schemaVersion === EXPECTED_SCHEMA_VERSION;
+  const versionSafe = normalized.version === EXPECTED_VERSION;
   const unsupportedSourceTypes = normalized.acceptedSourceTypes
     .filter(sourceType => !safeSourceTypes.includes(sourceType));
   const unsupportedDeclaredSafeSourceTypes = normalized.safeSourceTypes
     .filter(sourceType => !safeSourceTypes.includes(sourceType));
   const sourceTypesWhitelisted =
-    normalized.acceptedSourceTypes.length > 0 &&
+    hasExactSet(normalized.acceptedSourceTypes, safeSourceTypes) &&
+    hasExactSet(normalized.safeSourceTypes, safeSourceTypes) &&
     unsupportedSourceTypes.length === 0 &&
     unsupportedDeclaredSafeSourceTypes.length === 0 &&
     normalized.unsupportedSourceTypes.length === 0;
@@ -229,6 +245,10 @@ function summarizeMemoryGovernanceAuditEvidenceContract(contract = {}) {
     hasEveryValue(normalized.requiredEvidenceFields, REQUIRED_EVIDENCE_FIELDS);
   const requiredBlockersPresent = hasEveryValue(normalized.blockers, REQUIRED_BLOCKERS);
   const requiredApprovalsPresent = hasEveryValue(normalized.requiredApprovals, REQUIRED_APPROVALS);
+  const eventFamiliesExact = hasExactSet(eventFamilyIds, REQUIRED_EVENT_FAMILY_IDS);
+  const evidenceFieldsExact = hasExactSet(normalized.requiredEvidenceFields, REQUIRED_EVIDENCE_FIELDS);
+  const blockersExact = hasExactSet(normalized.blockers, REQUIRED_BLOCKERS);
+  const approvalsExact = hasExactSet(normalized.requiredApprovals, REQUIRED_APPROVALS);
   const eventFamiliesBlocked = hasBlockedEventFamilies(normalized.eventFamilies);
   const publicMcpFrozen =
     normalized.publicToolsFrozen === true &&
@@ -251,15 +271,17 @@ function summarizeMemoryGovernanceAuditEvidenceContract(contract = {}) {
     normalized.realMemoryScanned === false &&
     normalized.providerCalls === 0;
   const acceptedForPlanning =
+    schemaVersionSafe &&
+    versionSafe &&
     normalized.fixtureOnly === true &&
     normalized.reviewOnly === true &&
     normalized.synthetic === true &&
     normalized.acceptedForPlanning === true &&
     sourceTypesWhitelisted &&
-    requiredEventFamiliesPresent &&
-    requiredEvidenceFieldsPresent &&
-    requiredBlockersPresent &&
-    requiredApprovalsPresent &&
+    eventFamiliesExact &&
+    evidenceFieldsExact &&
+    blockersExact &&
+    approvalsExact &&
     eventFamiliesBlocked &&
     publicMcpFrozen &&
     safetyFlagsClear &&
@@ -298,6 +320,7 @@ function summarizeMemoryGovernanceAuditEvidenceContract(contract = {}) {
       count: normalized.requiredEvidenceFields.length,
       ids: normalized.requiredEvidenceFields,
       requiredPresent: requiredEvidenceFieldsPresent,
+      exact: evidenceFieldsExact,
       missingRequired: REQUIRED_EVIDENCE_FIELDS.filter(field =>
         !normalized.requiredEvidenceFields.includes(field)
       )
@@ -306,6 +329,7 @@ function summarizeMemoryGovernanceAuditEvidenceContract(contract = {}) {
       count: eventFamilyIds.length,
       ids: eventFamilyIds,
       requiredPresent: requiredEventFamiliesPresent,
+      exact: eventFamiliesExact,
       blocked: eventFamiliesBlocked,
       missingRequired: REQUIRED_EVENT_FAMILY_IDS.filter(id => !eventFamilyIds.includes(id))
     },
@@ -322,12 +346,14 @@ function summarizeMemoryGovernanceAuditEvidenceContract(contract = {}) {
       count: normalized.blockers.length,
       ids: normalized.blockers,
       requiredPresent: requiredBlockersPresent,
+      exact: blockersExact,
       missingRequired: REQUIRED_BLOCKERS.filter(blocker => !normalized.blockers.includes(blocker))
     },
     requiredApprovals: {
       count: normalized.requiredApprovals.length,
       ids: normalized.requiredApprovals,
       requiredPresent: requiredApprovalsPresent,
+      exact: approvalsExact,
       missingRequired: REQUIRED_APPROVALS.filter(approval =>
         !normalized.requiredApprovals.includes(approval)
       )
@@ -348,6 +374,8 @@ function summarizeMemoryGovernanceAuditEvidenceContract(contract = {}) {
 }
 
 module.exports = {
+  EXPECTED_SCHEMA_VERSION,
+  EXPECTED_VERSION,
   PUBLIC_MCP_TOOLS,
   REQUIRED_APPROVALS,
   REQUIRED_BLOCKERS,

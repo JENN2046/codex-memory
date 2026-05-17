@@ -222,6 +222,31 @@ test('P32.2 helper rejects unblocked governed action records', () => {
   assert.equal(summary.safety.executesCommands, false);
 });
 
+test('P32.2 helper rejects schema/version drift and non-exact required sets', () => {
+  const fixture = loadFixture();
+
+  for (const unsafeContract of [
+    { ...fixture, schemaVersion: 'unsupported-schema' },
+    { ...fixture, version: 'v2' },
+    { ...fixture, requiredPacketFields: [...fixture.requiredPacketFields, fixture.requiredPacketFields[0]] },
+    { ...fixture, governedActions: [...fixture.governedActions, fixture.governedActions[0]] },
+    { ...fixture, blockers: [...fixture.blockers, 'unexpected_blocker'] },
+    { ...fixture, requiredApprovals: [...fixture.requiredApprovals, 'unexpected_approval'] }
+  ]) {
+    const summary = summarizeMemoryGovernanceApprovalPacketContract(unsafeContract);
+
+    assert.equal(summary.acceptedForPlanning, false);
+    assert.equal(summary.decision, 'NOT_READY_BLOCKED');
+    assert.equal(summary.approvalStatus, 'BLOCKED_PENDING_APPROVAL');
+    assert.equal(summary.executionApproved, false);
+    assert.equal(summary.runtimeIntegrated, false);
+    assert.equal(summary.publicMcpExpanded, false);
+    assert.equal(summary.mutated, false);
+    assert.equal(summary.safety.readsFiles, false);
+    assert.equal(summary.safety.executesCommands, false);
+  }
+});
+
 test('P32.2 helper redacts sensitive normalized output and unsupported source types', () => {
   const fixture = loadFixture();
   const normalized = normalizeMemoryGovernanceApprovalPacketContract({

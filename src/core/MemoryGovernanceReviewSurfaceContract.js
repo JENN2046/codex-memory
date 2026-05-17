@@ -4,6 +4,9 @@ const PUBLIC_MCP_TOOLS = Object.freeze([
   'memory_overview'
 ]);
 
+const EXPECTED_SCHEMA_VERSION = 'memory-governance-review-surface-v1';
+const EXPECTED_VERSION = 'v1';
+
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_doc',
   'committed_fixture',
@@ -283,6 +286,16 @@ function hasEveryValue(values, requiredValues) {
   return requiredValues.every(value => values.includes(value));
 }
 
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function hasExactSet(values, requiredValues) {
+  return values.length === requiredValues.length &&
+    uniqueValues(values).length === values.length &&
+    hasEveryValue(values, requiredValues);
+}
+
 function summarizeReviewSections(reviewSections) {
   const sectionIds = REQUIRED_REVIEW_SECTIONS.filter(section =>
     isPlainObject(reviewSections[section]) &&
@@ -292,7 +305,15 @@ function summarizeReviewSections(reviewSections) {
     reviewSections.lifecycleReview.visibleCases,
     REQUIRED_LIFECYCLE_CASES
   );
+  const lifecycleCasesExact = hasExactSet(
+    reviewSections.lifecycleReview.visibleCases,
+    REQUIRED_LIFECYCLE_CASES
+  );
   const approvalActionsPresent = hasEveryValue(
+    reviewSections.approvalReview.visibleActions,
+    REQUIRED_APPROVAL_ACTIONS
+  );
+  const approvalActionsExact = hasExactSet(
     reviewSections.approvalReview.visibleActions,
     REQUIRED_APPROVAL_ACTIONS
   );
@@ -300,19 +321,23 @@ function summarizeReviewSections(reviewSections) {
     reviewSections.auditEvidenceReview.visibleEventFamilies,
     REQUIRED_AUDIT_EVENT_FAMILIES
   );
+  const auditEventFamiliesExact = hasExactSet(
+    reviewSections.auditEvidenceReview.visibleEventFamilies,
+    REQUIRED_AUDIT_EVENT_FAMILIES
+  );
   const blocked =
     reviewSections.lifecycleReview.status === 'evidence_only' &&
     reviewSections.lifecycleReview.runtimeIntegrated === false &&
     reviewSections.lifecycleReview.mutated === false &&
-    lifecycleCasesPresent &&
+    lifecycleCasesExact &&
     reviewSections.approvalReview.status === 'BLOCKED_PENDING_APPROVAL' &&
     reviewSections.approvalReview.executionApproved === false &&
     reviewSections.approvalReview.mutated === false &&
-    approvalActionsPresent &&
+    approvalActionsExact &&
     reviewSections.auditEvidenceReview.status === 'BLOCKED_PENDING_APPROVAL' &&
     reviewSections.auditEvidenceReview.auditWriterImplemented === false &&
     reviewSections.auditEvidenceReview.durableAuditWritten === false &&
-    auditEventFamiliesPresent &&
+    auditEventFamiliesExact &&
     reviewSections.adminReviewSurface.status === 'fixture_backed' &&
     reviewSections.adminReviewSurface.sourceCommandsDocumented === true &&
     reviewSections.adminReviewSurface.commandsExecutedByP34 === false &&
@@ -333,18 +358,21 @@ function summarizeReviewSections(reviewSections) {
     blocked,
     lifecycleCases: {
       requiredPresent: lifecycleCasesPresent,
+      exact: lifecycleCasesExact,
       missingRequired: REQUIRED_LIFECYCLE_CASES.filter(lifecycleCase =>
         !reviewSections.lifecycleReview.visibleCases.includes(lifecycleCase)
       )
     },
     approvalActions: {
       requiredPresent: approvalActionsPresent,
+      exact: approvalActionsExact,
       missingRequired: REQUIRED_APPROVAL_ACTIONS.filter(action =>
         !reviewSections.approvalReview.visibleActions.includes(action)
       )
     },
     auditEventFamilies: {
       requiredPresent: auditEventFamiliesPresent,
+      exact: auditEventFamiliesExact,
       missingRequired: REQUIRED_AUDIT_EVENT_FAMILIES.filter(eventFamily =>
         !reviewSections.auditEvidenceReview.visibleEventFamilies.includes(eventFamily)
       )
@@ -355,17 +383,21 @@ function summarizeReviewSections(reviewSections) {
 function summarizeMemoryGovernanceReviewSurfaceContract(contract = {}) {
   const normalized = normalizeMemoryGovernanceReviewSurfaceContract(contract);
   const safeSourceTypes = SAFE_SOURCE_TYPES;
+  const schemaVersionSafe = normalized.schemaVersion === EXPECTED_SCHEMA_VERSION;
+  const versionSafe = normalized.version === EXPECTED_VERSION;
   const unsupportedSourceTypes = normalized.acceptedSourceTypes
     .filter(sourceType => !safeSourceTypes.includes(sourceType));
   const unsupportedDeclaredSafeSourceTypes = normalized.safeSourceTypes
     .filter(sourceType => !safeSourceTypes.includes(sourceType));
   const sourceTypesWhitelisted =
-    normalized.acceptedSourceTypes.length > 0 &&
+    hasExactSet(normalized.acceptedSourceTypes, safeSourceTypes) &&
+    hasExactSet(normalized.safeSourceTypes, safeSourceTypes) &&
     unsupportedSourceTypes.length === 0 &&
     unsupportedDeclaredSafeSourceTypes.length === 0 &&
     normalized.unsupportedSourceTypes.length === 0;
   const sourceSurfaceIds = normalized.sourceSurfaces.map(surface => surface.id).filter(Boolean);
   const requiredSourceSurfacesPresent = hasEveryValue(sourceSurfaceIds, REQUIRED_SOURCE_SURFACES);
+  const sourceSurfacesExact = hasExactSet(sourceSurfaceIds, REQUIRED_SOURCE_SURFACES);
   const sourceSurfacesSafe = normalized.sourceSurfaces.every(surface =>
     surface.acceptedForPlanning === true &&
     SAFE_SOURCE_TYPES.includes(surface.sourceType) &&
@@ -382,6 +414,8 @@ function summarizeMemoryGovernanceReviewSurfaceContract(contract = {}) {
   const reviewSummary = summarizeReviewSections(normalized.reviewSections);
   const requiredBlockersPresent = hasEveryValue(normalized.blockers, REQUIRED_BLOCKERS);
   const requiredApprovalsPresent = hasEveryValue(normalized.requiredApprovals, REQUIRED_APPROVALS);
+  const blockersExact = hasExactSet(normalized.blockers, REQUIRED_BLOCKERS);
+  const approvalsExact = hasExactSet(normalized.requiredApprovals, REQUIRED_APPROVALS);
   const publicMcpFrozen =
     normalized.publicToolsFrozen === true &&
     arraysEqual(normalized.publicTools, PUBLIC_MCP_TOOLS);
@@ -409,17 +443,19 @@ function summarizeMemoryGovernanceReviewSurfaceContract(contract = {}) {
     normalized.realMemoryScanned === false &&
     normalized.providerCalls === 0;
   const acceptedForPlanning =
+    schemaVersionSafe &&
+    versionSafe &&
     normalized.fixtureOnly === true &&
     normalized.reviewOnly === true &&
     normalized.synthetic === true &&
     normalized.acceptedForPlanning === true &&
     sourceTypesWhitelisted &&
-    requiredSourceSurfacesPresent &&
+    sourceSurfacesExact &&
     sourceSurfacesSafe &&
     reviewSummary.requiredPresent &&
     reviewSummary.blocked &&
-    requiredBlockersPresent &&
-    requiredApprovalsPresent &&
+    blockersExact &&
+    approvalsExact &&
     publicMcpFrozen &&
     safetyFlagsClear &&
     decisionBlocked &&
@@ -461,6 +497,7 @@ function summarizeMemoryGovernanceReviewSurfaceContract(contract = {}) {
       count: sourceSurfaceIds.length,
       ids: sourceSurfaceIds,
       requiredPresent: requiredSourceSurfacesPresent,
+      exact: sourceSurfacesExact,
       safe: sourceSurfacesSafe,
       missingRequired: REQUIRED_SOURCE_SURFACES.filter(surface => !sourceSurfaceIds.includes(surface))
     },
@@ -473,12 +510,14 @@ function summarizeMemoryGovernanceReviewSurfaceContract(contract = {}) {
       count: normalized.blockers.length,
       ids: normalized.blockers,
       requiredPresent: requiredBlockersPresent,
+      exact: blockersExact,
       missingRequired: REQUIRED_BLOCKERS.filter(blocker => !normalized.blockers.includes(blocker))
     },
     requiredApprovals: {
       count: normalized.requiredApprovals.length,
       ids: normalized.requiredApprovals,
       requiredPresent: requiredApprovalsPresent,
+      exact: approvalsExact,
       missingRequired: REQUIRED_APPROVALS.filter(approval =>
         !normalized.requiredApprovals.includes(approval)
       )
@@ -503,6 +542,8 @@ function summarizeMemoryGovernanceReviewSurfaceContract(contract = {}) {
 }
 
 module.exports = {
+  EXPECTED_SCHEMA_VERSION,
+  EXPECTED_VERSION,
   PUBLIC_MCP_TOOLS,
   REQUIRED_APPROVAL_ACTIONS,
   REQUIRED_APPROVALS,

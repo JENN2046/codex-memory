@@ -4,6 +4,8 @@ const PUBLIC_MCP_TOOLS = Object.freeze([
   'memory_overview'
 ]);
 
+const EXPECTED_SCHEMA_VERSION = 'p41-evidence-manifest-contract-v1';
+
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_fixture',
   'committed_test',
@@ -251,6 +253,16 @@ function hasEveryValue(values, requiredValues) {
   return requiredValues.every(value => values.includes(value));
 }
 
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function hasExactSet(values, requiredValues) {
+  return values.length === requiredValues.length &&
+    uniqueValues(values).length === values.length &&
+    hasEveryValue(values, requiredValues);
+}
+
 function summarizeCriticalGateSemantics(criticalGateSemantics) {
   const failureStatesFailClosed = CRITICAL_FAILURE_STATES.every(state =>
     criticalGateSemantics[state] === 'failure'
@@ -268,16 +280,21 @@ function summarizeCriticalGateSemantics(criticalGateSemantics) {
 
 function summarizeEvidenceManifestContract(manifest = {}) {
   const normalized = normalizeEvidenceManifestContract(manifest);
+  const schemaVersionSafe = normalized.schemaVersion === EXPECTED_SCHEMA_VERSION;
   const unsupportedAcceptedSourceTypes = normalized.acceptedSourceTypes
     .filter(sourceType => !SAFE_SOURCE_TYPES.includes(sourceType));
   const unsupportedDeclaredSafeSourceTypes = normalized.safeSourceTypes
     .filter(sourceType => !SAFE_SOURCE_TYPES.includes(sourceType));
   const sourceTypesWhitelisted =
-    normalized.acceptedSourceTypes.length > 0 &&
+    hasExactSet(normalized.acceptedSourceTypes, SAFE_SOURCE_TYPES) &&
+    hasExactSet(normalized.safeSourceTypes, SAFE_SOURCE_TYPES) &&
     unsupportedAcceptedSourceTypes.length === 0 &&
     unsupportedDeclaredSafeSourceTypes.length === 0 &&
     normalized.unsupportedSourceTypes.length === 0;
   const sourceEvidenceIds = normalized.sourceEvidence.map(source => source.id).filter(Boolean);
+  const sourceEvidenceExact = hasExactSet(sourceEvidenceIds, REQUIRED_SOURCE_EVIDENCE_IDS);
+  const duplicateSourceEvidenceIds = uniqueValues(sourceEvidenceIds)
+    .filter(id => sourceEvidenceIds.filter(sourceId => sourceId === id).length > 1);
   const sourceEvidenceRequiredPresent = hasEveryValue(
     sourceEvidenceIds,
     REQUIRED_SOURCE_EVIDENCE_IDS
@@ -290,9 +307,12 @@ function summarizeEvidenceManifestContract(manifest = {}) {
       source.acceptedForPlanning === true &&
       source.runtimeReady === false &&
       source.artifact.startsWith('tests/fixtures/')
-    );
+  );
   const criticalGateSemantics = summarizeCriticalGateSemantics(normalized.criticalGateSemantics);
   const failClosedCaseIds = normalized.failClosedCases.map(entry => entry.id).filter(Boolean);
+  const failClosedCasesExact = hasExactSet(failClosedCaseIds, REQUIRED_FAIL_CLOSED_CASES);
+  const duplicateFailClosedCaseIds = uniqueValues(failClosedCaseIds)
+    .filter(id => failClosedCaseIds.filter(caseId => caseId === id).length > 1);
   const failClosedCasesRequiredPresent = hasEveryValue(
     failClosedCaseIds,
     REQUIRED_FAIL_CLOSED_CASES
@@ -305,6 +325,7 @@ function summarizeEvidenceManifestContract(manifest = {}) {
       entry.reasonCodes.length > 0
     );
   const blockedActionsPresent = hasEveryValue(normalized.blockedActions, BLOCKED_ACTIONS);
+  const blockedActionsExact = hasExactSet(normalized.blockedActions, BLOCKED_ACTIONS);
   const publicMcpFrozen =
     normalized.publicToolsFrozen === true &&
     arraysEqual(normalized.publicTools, PUBLIC_MCP_TOOLS);
@@ -320,6 +341,7 @@ function summarizeEvidenceManifestContract(manifest = {}) {
     normalized.status === 'blocked' &&
     normalized.decision === 'NOT_READY_BLOCKED';
   const acceptedForPlanning =
+    schemaVersionSafe &&
     normalized.fixtureOnly === true &&
     normalized.synthetic === true &&
     normalized.explicitInputOnly === true &&
@@ -328,12 +350,12 @@ function summarizeEvidenceManifestContract(manifest = {}) {
     readinessBlocked &&
     publicMcpFrozen &&
     sourceTypesWhitelisted &&
-    sourceEvidenceRequiredPresent &&
+    sourceEvidenceExact &&
     sourceEvidenceSafe &&
     criticalGateSemantics.failureStatesFailClosed &&
-    failClosedCasesRequiredPresent &&
+    failClosedCasesExact &&
     failClosedCasesSafe &&
-    blockedActionsPresent &&
+    blockedActionsExact &&
     safetyFlagsClear;
 
   return {
@@ -369,7 +391,9 @@ function summarizeEvidenceManifestContract(manifest = {}) {
       count: sourceEvidenceIds.length,
       ids: sourceEvidenceIds,
       requiredPresent: sourceEvidenceRequiredPresent,
+      exact: sourceEvidenceExact,
       safe: sourceEvidenceSafe,
+      duplicateIds: duplicateSourceEvidenceIds,
       missingRequired: REQUIRED_SOURCE_EVIDENCE_IDS.filter(id => !sourceEvidenceIds.includes(id))
     },
     criticalGateSemantics,
@@ -377,7 +401,9 @@ function summarizeEvidenceManifestContract(manifest = {}) {
       count: failClosedCaseIds.length,
       ids: failClosedCaseIds,
       requiredPresent: failClosedCasesRequiredPresent,
+      exact: failClosedCasesExact,
       safe: failClosedCasesSafe,
+      duplicateIds: duplicateFailClosedCaseIds,
       missingRequired: REQUIRED_FAIL_CLOSED_CASES.filter(id => !failClosedCaseIds.includes(id))
     },
     publicMcpTools: {
@@ -388,6 +414,7 @@ function summarizeEvidenceManifestContract(manifest = {}) {
       count: normalized.blockedActions.length,
       ids: normalized.blockedActions,
       requiredPresent: blockedActionsPresent,
+      exact: blockedActionsExact,
       missingRequired: BLOCKED_ACTIONS.filter(action => !normalized.blockedActions.includes(action))
     },
     safety: {
@@ -417,6 +444,7 @@ function summarizeEvidenceManifestContract(manifest = {}) {
 module.exports = {
   BLOCKED_ACTIONS,
   CRITICAL_FAILURE_STATES,
+  EXPECTED_SCHEMA_VERSION,
   NO_SIDE_EFFECT_SAFETY_FLAGS,
   PUBLIC_MCP_TOOLS,
   READINESS_FIELDS,

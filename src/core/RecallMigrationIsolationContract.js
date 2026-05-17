@@ -4,6 +4,8 @@ const PUBLIC_MCP_TOOLS = Object.freeze([
   'memory_overview'
 ]);
 
+const EXPECTED_SCHEMA_VERSION = 'p43-recall-migration-isolation-contract-v1';
+
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_fixture',
   'committed_test',
@@ -242,19 +244,34 @@ function hasEveryValue(values, requiredValues) {
   return requiredValues.every(value => values.includes(value));
 }
 
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function hasExactSet(values, requiredValues) {
+  return values.length === requiredValues.length &&
+    uniqueValues(values).length === values.length &&
+    hasEveryValue(values, requiredValues);
+}
+
 function summarizeRecallMigrationIsolationContract(contract = {}) {
   const normalized = normalizeRecallMigrationIsolationContract(contract);
+  const schemaVersionSafe = normalized.schemaVersion === EXPECTED_SCHEMA_VERSION;
   const unsupportedAcceptedSourceTypes = normalized.acceptedSourceTypes
     .filter(sourceType => !SAFE_SOURCE_TYPES.includes(sourceType));
   const unsupportedDeclaredSafeSourceTypes = normalized.safeSourceTypes
     .filter(sourceType => !SAFE_SOURCE_TYPES.includes(sourceType));
   const sourceTypesWhitelisted =
-    normalized.acceptedSourceTypes.length > 0 &&
+    hasExactSet(normalized.acceptedSourceTypes, SAFE_SOURCE_TYPES) &&
+    hasExactSet(normalized.safeSourceTypes, SAFE_SOURCE_TYPES) &&
     unsupportedAcceptedSourceTypes.length === 0 &&
     unsupportedDeclaredSafeSourceTypes.length === 0 &&
     normalized.unsupportedSourceTypes.length === 0;
   const ruleKinds = normalized.isolationRules.map(rule => rule.recordKind).filter(Boolean);
   const requiredIsolationRulesPresent = hasEveryValue(ruleKinds, REQUIRED_ISOLATED_RECORD_KINDS);
+  const isolationRulesExact = hasExactSet(ruleKinds, REQUIRED_ISOLATED_RECORD_KINDS);
+  const duplicateIsolationRuleKinds = uniqueValues(ruleKinds)
+    .filter(kind => ruleKinds.filter(ruleKind => ruleKind === kind).length > 1);
   const isolatedNamespaceSet = new Set(normalized.isolatedNamespaces);
   const normalNamespaceSet = new Set(normalized.normalRecallNamespaces);
   const namespacesSeparated = normalized.isolatedNamespaces.length > 0 &&
@@ -278,7 +295,15 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
     normalized.migrationDryRun.allowedSources,
     REQUIRED_MIGRATION_ALLOWED_SOURCES
   );
+  const migrationAllowedSourcesExact = hasExactSet(
+    normalized.migrationDryRun.allowedSources,
+    REQUIRED_MIGRATION_ALLOWED_SOURCES
+  );
   const migrationDeniedSourcesPresent = hasEveryValue(
+    normalized.migrationDryRun.deniedSources,
+    REQUIRED_MIGRATION_DENIED_SOURCES
+  );
+  const migrationDeniedSourcesExact = hasExactSet(
     normalized.migrationDryRun.deniedSources,
     REQUIRED_MIGRATION_DENIED_SOURCES
   );
@@ -289,8 +314,8 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
     SAFE_SOURCE_TYPES.includes(normalized.migrationDryRun.sourceType);
   const migrationDryRunSafe =
     normalized.migrationDryRun.acceptedForPlanning === true &&
-    migrationAllowedSourcesPresent &&
-    migrationDeniedSourcesPresent &&
+    migrationAllowedSourcesExact &&
+    migrationDeniedSourcesExact &&
     migrationSourceTypesSafe &&
     normalized.migrationDryRun.dryRunRepresentsRealMemory === false &&
     normalized.migrationDryRun.dryRunAuthorizesApply === false &&
@@ -309,6 +334,7 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
     normalized.publicToolsFrozen === true &&
     arraysEqual(normalized.publicTools, PUBLIC_MCP_TOOLS);
   const blockedActionsPresent = hasEveryValue(normalized.blockedActions, BLOCKED_ACTIONS);
+  const blockedActionsExact = hasExactSet(normalized.blockedActions, BLOCKED_ACTIONS);
   const safetyFlagsClear =
     NO_SIDE_EFFECT_SAFETY_FLAGS.every(flag => normalized.safety[flag] === true) &&
     normalized.safety.rawSecretExposed === false &&
@@ -338,6 +364,7 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
     normalized.status === 'blocked' &&
     normalized.decision === 'NOT_READY_BLOCKED';
   const acceptedForPlanning =
+    schemaVersionSafe &&
     normalized.fixtureOnly === true &&
     normalized.synthetic === true &&
     normalized.explicitInputOnly === true &&
@@ -346,11 +373,11 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
     noRuntimeClaims &&
     sourceTypesWhitelisted &&
     namespacesSeparated &&
-    requiredIsolationRulesPresent &&
+    isolationRulesExact &&
     isolationRulesSafe &&
     migrationDryRunSafe &&
     publicMcpFrozen &&
-    blockedActionsPresent &&
+    blockedActionsExact &&
     safetyFlagsClear;
 
   return {
@@ -395,7 +422,9 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
       count: ruleKinds.length,
       recordKinds: ruleKinds,
       requiredPresent: requiredIsolationRulesPresent,
+      exact: isolationRulesExact,
       safe: isolationRulesSafe,
+      duplicateRecordKinds: duplicateIsolationRuleKinds,
       missingRequired: REQUIRED_ISOLATED_RECORD_KINDS.filter(kind => !ruleKinds.includes(kind))
     },
     migrationDryRun: {
@@ -404,6 +433,8 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
       deniedSources: normalized.migrationDryRun.deniedSources,
       allowedSourcesPresent: migrationAllowedSourcesPresent,
       deniedSourcesPresent: migrationDeniedSourcesPresent,
+      allowedSourcesExact: migrationAllowedSourcesExact,
+      deniedSourcesExact: migrationDeniedSourcesExact,
       sourceTypesSafe: migrationSourceTypesSafe,
       dryRunRepresentsRealMemory: false,
       dryRunAuthorizesApply: false,
@@ -419,6 +450,7 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
       count: normalized.blockedActions.length,
       ids: normalized.blockedActions,
       requiredPresent: blockedActionsPresent,
+      exact: blockedActionsExact,
       missingRequired: BLOCKED_ACTIONS.filter(action => !normalized.blockedActions.includes(action))
     },
     safety: {
@@ -454,6 +486,7 @@ function summarizeRecallMigrationIsolationContract(contract = {}) {
 
 module.exports = {
   BLOCKED_ACTIONS,
+  EXPECTED_SCHEMA_VERSION,
   NO_SIDE_EFFECT_SAFETY_FLAGS,
   PUBLIC_MCP_TOOLS,
   REQUIRED_ISOLATED_RECORD_KINDS,

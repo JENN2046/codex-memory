@@ -432,6 +432,34 @@ test('P43 helper rejects missing isolated kinds and unsafe migration dry-run cla
   }
 });
 
+test('P43 helper rejects schema drift and non-exact required sets', () => {
+  const contract = buildContract();
+
+  for (const unsafeContract of [
+    { ...contract, schemaVersion: 'unsupported-schema' },
+    { ...contract, isolationRules: [...contract.isolationRules, contract.isolationRules[0]] },
+    { ...contract, blockedActions: [...contract.blockedActions, 'unexpected_action'] },
+    {
+      ...contract,
+      migrationDryRun: {
+        ...contract.migrationDryRun,
+        deniedSources: [...contract.migrationDryRun.deniedSources, 'unexpected_denied_source']
+      }
+    }
+  ]) {
+    const summary = summarizeRecallMigrationIsolationContract(unsafeContract);
+
+    assert.equal(summary.acceptedForPlanning, false);
+    assert.equal(summary.decision, 'NOT_READY_BLOCKED');
+    assert.equal(summary.runtimeReady, false);
+    assert.equal(summary.recallRuntimeReady, false);
+    assert.equal(summary.migrationRuntimeReady, false);
+    assert.equal(summary.rcReady, false);
+    assert.equal(summary.safety.readsFiles, false);
+    assert.equal(summary.safety.executesCommands, false);
+  }
+});
+
 test('P43 helper rejects runtime, public MCP, durable, provider, and safety leakage claims', () => {
   const contract = buildContract();
 

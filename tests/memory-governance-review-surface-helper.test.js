@@ -320,6 +320,45 @@ test('P34.2 helper rejects missing blockers, approvals, or unsafe safety flags',
   }
 });
 
+test('P34.2 helper rejects schema/version drift and non-exact required sets', () => {
+  const fixture = loadFixture();
+
+  for (const unsafeContract of [
+    { ...fixture, schemaVersion: 'unsupported-schema' },
+    { ...fixture, version: 'v2' },
+    { ...fixture, sourceSurfaces: [...fixture.sourceSurfaces, fixture.sourceSurfaces[0]] },
+    { ...fixture, blockers: [...fixture.blockers, 'unexpected_blocker'] },
+    { ...fixture, requiredApprovals: [...fixture.requiredApprovals, 'unexpected_approval'] },
+    {
+      ...fixture,
+      reviewSections: {
+        ...fixture.reviewSections,
+        lifecycleReview: {
+          ...fixture.reviewSections.lifecycleReview,
+          visibleCases: [
+            ...fixture.reviewSections.lifecycleReview.visibleCases,
+            fixture.reviewSections.lifecycleReview.visibleCases[0]
+          ]
+        }
+      }
+    }
+  ]) {
+    const summary = summarizeMemoryGovernanceReviewSurfaceContract(unsafeContract);
+
+    assert.equal(summary.acceptedForPlanning, false);
+    assert.equal(summary.decision, 'NOT_READY_BLOCKED');
+    assert.equal(summary.approvalStatus, 'BLOCKED_PENDING_APPROVAL');
+    assert.equal(summary.reviewStatus, 'evidence_only');
+    assert.equal(summary.reviewLevel, 'blocked');
+    assert.equal(summary.executionApproved, false);
+    assert.equal(summary.runtimeIntegrated, false);
+    assert.equal(summary.publicMcpExpanded, false);
+    assert.equal(summary.mutated, false);
+    assert.equal(summary.safety.readsFiles, false);
+    assert.equal(summary.safety.executesCommands, false);
+  }
+});
+
 test('P34.2 helper redacts sensitive normalized output and unsupported source types', () => {
   const fixture = loadFixture();
   const normalized = normalizeMemoryGovernanceReviewSurfaceContract({

@@ -192,6 +192,29 @@ test('P31.3 helper requires all governance surfaces and lifecycle cases', () => 
   assert.deepEqual(summary.lifecycleCases.missingRequired, ['tombstone_deferred']);
 });
 
+test('P31.3 helper rejects schema/version drift and non-exact required sets', () => {
+  const fixture = loadFixture();
+
+  for (const unsafeContract of [
+    { ...fixture, schemaVersion: 'unsupported-schema' },
+    { ...fixture, version: 'v2' },
+    { ...fixture, surfaces: [...fixture.surfaces, fixture.surfaces[0]] },
+    { ...fixture, lifecycleCases: [...fixture.lifecycleCases, fixture.lifecycleCases[0]] },
+    { ...fixture, blockers: [...fixture.blockers, 'unexpected_blocker'] },
+    { ...fixture, requiredApprovals: [...fixture.requiredApprovals, 'unexpected_approval'] }
+  ]) {
+    const summary = summarizeMemoryGovernanceLifecycleContract(unsafeContract);
+
+    assert.equal(summary.acceptedForPlanning, false);
+    assert.equal(summary.decision, 'NOT_READY_BLOCKED');
+    assert.equal(summary.runtimeIntegrated, false);
+    assert.equal(summary.publicMcpExpanded, false);
+    assert.equal(summary.mutated, false);
+    assert.equal(summary.safety.readsFiles, false);
+    assert.equal(summary.safety.executesCommands, false);
+  }
+});
+
 test('P31.3 helper redacts sensitive normalized output and unsupported source types', () => {
   const fixture = loadFixture();
   const normalized = normalizeMemoryGovernanceLifecycleContract({

@@ -4,6 +4,9 @@ const PUBLIC_MCP_TOOLS = Object.freeze([
   'memory_overview'
 ]);
 
+const EXPECTED_SCHEMA_VERSION = 'memory-governance-lifecycle-contract-v1';
+const EXPECTED_VERSION = 'v1';
+
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_fixture',
   'committed_test',
@@ -36,6 +39,7 @@ const REQUIRED_BLOCKERS = Object.freeze([
   'real_memory_scan_blocked',
   'migration_import_export_apply_blocked',
   'backup_restore_blocked',
+  'provider_service_config_action_blocked',
   'final_rc_matrix_not_executed',
   'v1_rc_not_ready_blocked'
 ]);
@@ -172,15 +176,28 @@ function hasEveryValue(values, requiredValues) {
   return requiredValues.every(value => values.includes(value));
 }
 
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function hasExactSet(values, requiredValues) {
+  return values.length === requiredValues.length &&
+    uniqueValues(values).length === values.length &&
+    hasEveryValue(values, requiredValues);
+}
+
 function summarizeMemoryGovernanceLifecycleContract(contract = {}) {
   const normalized = normalizeMemoryGovernanceLifecycleContract(contract);
   const safeSourceTypes = SAFE_SOURCE_TYPES;
+  const schemaVersionSafe = normalized.schemaVersion === EXPECTED_SCHEMA_VERSION;
+  const versionSafe = normalized.version === EXPECTED_VERSION;
   const unsupportedSourceTypes = normalized.acceptedSourceTypes
     .filter(sourceType => !safeSourceTypes.includes(sourceType));
   const unsupportedDeclaredSafeSourceTypes = normalized.safeSourceTypes
     .filter(sourceType => !safeSourceTypes.includes(sourceType));
   const sourceTypesWhitelisted =
-    normalized.acceptedSourceTypes.length > 0 &&
+    hasExactSet(normalized.acceptedSourceTypes, safeSourceTypes) &&
+    hasExactSet(normalized.safeSourceTypes, safeSourceTypes) &&
     unsupportedSourceTypes.length === 0 &&
     unsupportedDeclaredSafeSourceTypes.length === 0 &&
     normalized.unsupportedSourceTypes.length === 0;
@@ -190,6 +207,10 @@ function summarizeMemoryGovernanceLifecycleContract(contract = {}) {
   const requiredLifecycleCasesPresent = hasEveryValue(lifecycleCaseIds, REQUIRED_LIFECYCLE_CASES);
   const requiredBlockersPresent = hasEveryValue(normalized.blockers, REQUIRED_BLOCKERS);
   const requiredApprovalsPresent = hasEveryValue(normalized.requiredApprovals, REQUIRED_APPROVALS);
+  const surfacesExact = hasExactSet(surfaceIds, REQUIRED_SURFACES);
+  const lifecycleCasesExact = hasExactSet(lifecycleCaseIds, REQUIRED_LIFECYCLE_CASES);
+  const blockersExact = hasExactSet(normalized.blockers, REQUIRED_BLOCKERS);
+  const approvalsExact = hasExactSet(normalized.requiredApprovals, REQUIRED_APPROVALS);
   const publicMcpFrozen =
     normalized.publicToolsFrozen === true &&
     arraysEqual(normalized.publicTools, PUBLIC_MCP_TOOLS);
@@ -203,15 +224,17 @@ function summarizeMemoryGovernanceLifecycleContract(contract = {}) {
     normalized.runtimeIntegrated === false &&
     normalized.publicMcpExpanded === false;
   const acceptedForPlanning =
+    schemaVersionSafe &&
+    versionSafe &&
     normalized.fixtureOnly === true &&
     normalized.reviewOnly === true &&
     normalized.synthetic === true &&
     normalized.acceptedForPlanning === true &&
     sourceTypesWhitelisted &&
-    requiredSurfacesPresent &&
-    requiredLifecycleCasesPresent &&
-    requiredBlockersPresent &&
-    requiredApprovalsPresent &&
+    surfacesExact &&
+    lifecycleCasesExact &&
+    blockersExact &&
+    approvalsExact &&
     publicMcpFrozen &&
     safetyFlagsClear &&
     decisionBlocked &&
@@ -244,12 +267,14 @@ function summarizeMemoryGovernanceLifecycleContract(contract = {}) {
       count: surfaceIds.length,
       ids: surfaceIds,
       requiredPresent: requiredSurfacesPresent,
+      exact: surfacesExact,
       missingRequired: REQUIRED_SURFACES.filter(surface => !surfaceIds.includes(surface))
     },
     lifecycleCases: {
       count: lifecycleCaseIds.length,
       ids: lifecycleCaseIds,
       requiredPresent: requiredLifecycleCasesPresent,
+      exact: lifecycleCasesExact,
       missingRequired: REQUIRED_LIFECYCLE_CASES.filter(lifecycleCase =>
         !lifecycleCaseIds.includes(lifecycleCase)
       )
@@ -262,12 +287,14 @@ function summarizeMemoryGovernanceLifecycleContract(contract = {}) {
       count: normalized.blockers.length,
       ids: normalized.blockers,
       requiredPresent: requiredBlockersPresent,
+      exact: blockersExact,
       missingRequired: REQUIRED_BLOCKERS.filter(blocker => !normalized.blockers.includes(blocker))
     },
     requiredApprovals: {
       count: normalized.requiredApprovals.length,
       ids: normalized.requiredApprovals,
       requiredPresent: requiredApprovalsPresent,
+      exact: approvalsExact,
       missingRequired: REQUIRED_APPROVALS.filter(approval =>
         !normalized.requiredApprovals.includes(approval)
       )
@@ -287,6 +314,8 @@ function summarizeMemoryGovernanceLifecycleContract(contract = {}) {
 }
 
 module.exports = {
+  EXPECTED_SCHEMA_VERSION,
+  EXPECTED_VERSION,
   PUBLIC_MCP_TOOLS,
   REQUIRED_APPROVALS,
   REQUIRED_BLOCKERS,

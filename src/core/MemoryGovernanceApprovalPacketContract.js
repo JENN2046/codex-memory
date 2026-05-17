@@ -4,6 +4,9 @@ const PUBLIC_MCP_TOOLS = Object.freeze([
   'memory_overview'
 ]);
 
+const EXPECTED_SCHEMA_VERSION = 'memory-governance-approval-packet-v1';
+const EXPECTED_VERSION = 'v1';
+
 const SAFE_SOURCE_TYPES = Object.freeze([
   'committed_doc',
   'committed_fixture',
@@ -199,6 +202,16 @@ function hasEveryValue(values, requiredValues) {
   return requiredValues.every(value => values.includes(value));
 }
 
+function uniqueValues(values) {
+  return [...new Set(values)];
+}
+
+function hasExactSet(values, requiredValues) {
+  return values.length === requiredValues.length &&
+    uniqueValues(values).length === values.length &&
+    hasEveryValue(values, requiredValues);
+}
+
 function hasBlockedGovernedActions(actions) {
   return actions.every(action =>
     action.status === 'BLOCKED_PENDING_APPROVAL' &&
@@ -212,12 +225,15 @@ function hasBlockedGovernedActions(actions) {
 function summarizeMemoryGovernanceApprovalPacketContract(contract = {}) {
   const normalized = normalizeMemoryGovernanceApprovalPacketContract(contract);
   const safeSourceTypes = SAFE_SOURCE_TYPES;
+  const schemaVersionSafe = normalized.schemaVersion === EXPECTED_SCHEMA_VERSION;
+  const versionSafe = normalized.version === EXPECTED_VERSION;
   const unsupportedSourceTypes = normalized.acceptedSourceTypes
     .filter(sourceType => !safeSourceTypes.includes(sourceType));
   const unsupportedDeclaredSafeSourceTypes = normalized.safeSourceTypes
     .filter(sourceType => !safeSourceTypes.includes(sourceType));
   const sourceTypesWhitelisted =
-    normalized.acceptedSourceTypes.length > 0 &&
+    hasExactSet(normalized.acceptedSourceTypes, safeSourceTypes) &&
+    hasExactSet(normalized.safeSourceTypes, safeSourceTypes) &&
     unsupportedSourceTypes.length === 0 &&
     unsupportedDeclaredSafeSourceTypes.length === 0 &&
     normalized.unsupportedSourceTypes.length === 0;
@@ -227,6 +243,10 @@ function summarizeMemoryGovernanceApprovalPacketContract(contract = {}) {
     hasEveryValue(normalized.requiredPacketFields, REQUIRED_PACKET_FIELDS);
   const requiredBlockersPresent = hasEveryValue(normalized.blockers, REQUIRED_BLOCKERS);
   const requiredApprovalsPresent = hasEveryValue(normalized.requiredApprovals, REQUIRED_APPROVALS);
+  const actionsExact = hasExactSet(actionIds, REQUIRED_ACTION_IDS);
+  const packetFieldsExact = hasExactSet(normalized.requiredPacketFields, REQUIRED_PACKET_FIELDS);
+  const blockersExact = hasExactSet(normalized.blockers, REQUIRED_BLOCKERS);
+  const approvalsExact = hasExactSet(normalized.requiredApprovals, REQUIRED_APPROVALS);
   const governedActionsBlocked = hasBlockedGovernedActions(normalized.governedActions);
   const publicMcpFrozen =
     normalized.publicToolsFrozen === true &&
@@ -247,15 +267,17 @@ function summarizeMemoryGovernanceApprovalPacketContract(contract = {}) {
     normalized.realMemoryScanned === false &&
     normalized.providerCalls === 0;
   const acceptedForPlanning =
+    schemaVersionSafe &&
+    versionSafe &&
     normalized.fixtureOnly === true &&
     normalized.reviewOnly === true &&
     normalized.synthetic === true &&
     normalized.acceptedForPlanning === true &&
     sourceTypesWhitelisted &&
-    requiredActionsPresent &&
-    requiredPacketFieldsPresent &&
-    requiredBlockersPresent &&
-    requiredApprovalsPresent &&
+    actionsExact &&
+    packetFieldsExact &&
+    blockersExact &&
+    approvalsExact &&
     governedActionsBlocked &&
     publicMcpFrozen &&
     safetyFlagsClear &&
@@ -292,6 +314,7 @@ function summarizeMemoryGovernanceApprovalPacketContract(contract = {}) {
       count: normalized.requiredPacketFields.length,
       ids: normalized.requiredPacketFields,
       requiredPresent: requiredPacketFieldsPresent,
+      exact: packetFieldsExact,
       missingRequired: REQUIRED_PACKET_FIELDS.filter(field =>
         !normalized.requiredPacketFields.includes(field)
       )
@@ -300,6 +323,7 @@ function summarizeMemoryGovernanceApprovalPacketContract(contract = {}) {
       count: actionIds.length,
       ids: actionIds,
       requiredPresent: requiredActionsPresent,
+      exact: actionsExact,
       blocked: governedActionsBlocked,
       missingRequired: REQUIRED_ACTION_IDS.filter(action => !actionIds.includes(action))
     },
@@ -316,12 +340,14 @@ function summarizeMemoryGovernanceApprovalPacketContract(contract = {}) {
       count: normalized.blockers.length,
       ids: normalized.blockers,
       requiredPresent: requiredBlockersPresent,
+      exact: blockersExact,
       missingRequired: REQUIRED_BLOCKERS.filter(blocker => !normalized.blockers.includes(blocker))
     },
     requiredApprovals: {
       count: normalized.requiredApprovals.length,
       ids: normalized.requiredApprovals,
       requiredPresent: requiredApprovalsPresent,
+      exact: approvalsExact,
       missingRequired: REQUIRED_APPROVALS.filter(approval =>
         !normalized.requiredApprovals.includes(approval)
       )
@@ -341,6 +367,8 @@ function summarizeMemoryGovernanceApprovalPacketContract(contract = {}) {
 }
 
 module.exports = {
+  EXPECTED_SCHEMA_VERSION,
+  EXPECTED_VERSION,
   PUBLIC_MCP_TOOLS,
   REQUIRED_ACTION_IDS,
   REQUIRED_APPROVALS,

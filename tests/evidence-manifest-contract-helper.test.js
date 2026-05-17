@@ -281,6 +281,27 @@ test('P42 helper requires P36-P40 source evidence, fail-closed cases, and blocke
   assert.deepEqual(summary.blockedActions.missingRequired, ['recall_audit_scan']);
 });
 
+test('P42 helper rejects schema drift and non-exact required sets', () => {
+  const fixture = loadFixture();
+
+  for (const unsafeManifest of [
+    { ...fixture, schemaVersion: 'unsupported-schema' },
+    { ...fixture, sourceEvidence: [...fixture.sourceEvidence, fixture.sourceEvidence[0]] },
+    { ...fixture, failClosedCases: [...fixture.failClosedCases, fixture.failClosedCases[0]] },
+    { ...fixture, blockedActions: [...fixture.blockedActions, 'unexpected_action'] }
+  ]) {
+    const summary = summarizeEvidenceManifestContract(unsafeManifest);
+
+    assert.equal(summary.acceptedForPlanning, false);
+    assert.equal(summary.localEvidenceReportReady, false);
+    assert.equal(summary.decision, 'NOT_READY_BLOCKED');
+    assert.equal(summary.runtimeReady, false);
+    assert.equal(summary.rcReady, false);
+    assert.equal(summary.safety.readsFiles, false);
+    assert.equal(summary.safety.executesCommands, false);
+  }
+});
+
 test('P42 helper rejects unsafe source evidence and warning-only fail-closed cases', () => {
   const fixture = loadFixture();
   const summary = summarizeEvidenceManifestContract({
