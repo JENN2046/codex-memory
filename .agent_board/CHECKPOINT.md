@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P4 HTTP runtime / operation hardening boundary inventory.
+P4 HTTP runtime / operation hardening; P59-T1 post-commit reconciliation.
 
 ## Current Status
 
@@ -23,7 +23,7 @@ P4 HTTP runtime / operation hardening boundary inventory.
 - P58-T1 post-commit board reconciliation is locally committed in `14ba9ce`.
 - P58-T2 approval framework explicit-input helper is implemented, validated, and committed locally in `2470634`.
 - P58-T2 post-commit board reconciliation is locally committed in `0092189`.
-- P59-T1 HTTP runtime observability / operation hardening boundary inventory is implemented and validated locally as docs/fixture/test only.
+- P59-T1 HTTP runtime observability / operation hardening boundary inventory is implemented, validated, and committed locally in `c57be03` as docs/fixture/test only.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -42,6 +42,7 @@ P4 HTTP runtime / operation hardening boundary inventory.
 - Targeted P59 test (`11/11`)
 - Targeted P59/HTTP/no-touch set (`32/32`)
 - `npm test` (`1000/1000`)
+- Post-commit status/log/trailer/diff-check for `c57be03`
 
 ## Active Boundaries
 
@@ -59,4 +60,4 @@ P4 HTTP runtime / operation hardening boundary inventory.
 
 ## Next Safe Step
 
-Run final docs validation for P59-T1 board/status updates, create a guarded local commit if scope remains clean, then perform post-commit board reconciliation.
+Complete P59-T1 post-commit board/status reconciliation, then evaluate P59-T2 only if it remains pure explicit-input helper work with no live HTTP operation or side effects.

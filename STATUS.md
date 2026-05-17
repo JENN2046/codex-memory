@@ -6,10 +6,10 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `1ae4286 test: harden no-touch redaction regressions`。
-- 当前本地基线：本地 `main` 已包含 P51-P58 本地工作并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
+- 当前本地基线：本地 `main` 已包含 P51-P59-T1 本地工作并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；以 `git log --oneline --decorate -n 10` 为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P59-T1 HTTP runtime observability / operation hardening boundary inventory 已完成并本地验证，正在进行 guarded local commit 前状态收敛。该任务只是 docs/fixture/test boundary inventory，不是 live HTTP observation、operation hardening readiness、runtime readiness、final RC readiness 或 v1.0 RC readiness。
+- 当前任务：P59-T1 HTTP runtime observability / operation hardening boundary inventory 已完成、验证并本地提交为 `c57be03`；board/status 正在收敛到下一条 P59 本地安全候选。P59-T1 只是 docs/fixture/test boundary inventory，不是 live HTTP observation、operation hardening readiness、runtime readiness、final RC readiness 或 v1.0 RC readiness。
 
 ## 当前阻塞
 
@@ -21,8 +21,8 @@
 
 ## 当前优先级
 
-1. 完成 P59-T1 guarded local commit；不得 push，除非用户单独明确授权。
-2. P59-T1 必须保持 local/read-only/no live HTTP operation/no service install/no config switch/no provider call/no durable write。
+1. 完成 P59-T1 post-commit board/status reconciliation；不得 push，除非用户单独明确授权。
+2. 下一条 P59 本地安全候选只能是 explicit-input / fixture-first / no-side-effect，不得 live HTTP operation、service/watchdog/startup install、config switch、provider call、durable write 或 public MCP expansion。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54 command chain evidence、P55 trace evidence、P56 governance loop evidence、P57 boundary/helper evidence、P58 boundary/helper evidence、P59 boundary inventory evidence 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、或 final RC matrix execution。
 4. 不 push，除非用户单独明确授权。
 
