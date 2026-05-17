@@ -14,7 +14,7 @@ A:\codex-memory
 
 ## Worktree
 
-Dirty only for post-CM-0274 board finalization after guarded local commit `f2286f7`. Local `main` is ahead of `origin/main` by 14 commits. Push remains centrally directed by the user and is not authorized for this cycle.
+Dirty for CM-0275 pure helper source/test/docs/status/backlog/board updates after guarded local board finalization commit `f3a7116`. Local `main` is ahead of `origin/main` by 15 commits. Push remains centrally directed by the user and is not authorized for this cycle.
 
 ## Current Area
 
@@ -70,8 +70,9 @@ P30.2 manifest helper candidate
 - CM-0271 P29 closeout is committed locally in `4093b3e`.
 - CM-0272 P30 safe-scope inventory is committed locally in `6c6c3d7`. It defines explicit/local evidence and committed fixture/report-shape inputs only; runner implementation, full matrix execution, runtime enforcement, public MCP expansion, durable write-path enforcement, real memory scans, provider/service/config actions, migration-import-export apply, backup/restore, and push remain blocked.
 - CM-0273 is completed, validated, and committed locally in `5d91dac`, limited to a committed synthetic fixture plus focused fixture test for the future final RC validation matrix runner safe input contract. Validation passed: syntax check, targeted fixture test `11/11`, `npm test` `610/610`, `git diff --check`, docs validation, forbidden-fragment scan with intentional fixture-list hits only, and read-only Verifier `PASS`. It did not implement or execute a runner.
-- CM-0274 is completed and committed locally in `f2286f7` as board-only reconciliation after `5d91dac`; post-commit checks passed.
-- Next safe local candidate after CM-0274 commit: CM-0275 / P30.2 pure manifest helper over explicit fixture input only, if it remains no-runner and no-side-effect.
+- CM-0274 is completed and committed locally in `f2286f7` as board-only reconciliation after `5d91dac`; board finalization is committed locally in `f3a7116`.
+- CM-0275 is completed and validated as a pure helper over explicit fixture input only. It adds `src/core/FinalRcValidationMatrixManifest.js` and `tests/final-rc-validation-matrix-runner-manifest-helper.test.js`; source/test syntax checks, targeted helper test `7/7`, `npm test` `617/617`, `git diff --check`, docs validation, and read-only Verifier rerun `PASS` passed. Read-only Verifier first pass found and drove a fail-closed fix for unsafe runner/matrix/readiness claims.
+- Next safe step: create a guarded local commit for CM-0275 if final pre-commit checks remain clean. Keep it no-runner and no-side-effect.
 
 ## Changed Files
 

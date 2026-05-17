@@ -135,3 +135,13 @@ P30.1 adds the committed synthetic fixture `tests/fixtures/final-rc-validation-m
 The fixture locks the future runner manifest boundary: explicit safe inputs only, no runner implementation, no final RC matrix execution, public MCP three-tool freeze, no side effects, fail-closed rejection defaults, and A4/conditional-live/runtime-required/A5 split.
 
 Next recommended phase: `P30.2-final-rc-validation-matrix-runner-manifest-helper`, limited to a pure helper over explicit fixture input. No CLI, package script, live service, provider call, real memory scan, durable mutation, migration/import-export apply, backup/restore, public MCP expansion, push, tag, release, or deploy is approved by P30.1.
+
+## P30.2 Result
+
+P30.2 adds the pure helper `src/core/FinalRcValidationMatrixManifest.js` and focused test `tests/final-rc-validation-matrix-runner-manifest-helper.test.js`.
+
+The helper accepts an already-provided manifest object, normalizes the safe contract, and summarizes whether it is acceptable for planning. It does not read fixture files, execute commands, start services, call providers, mutate input, touch durable memory, or execute a runner.
+
+The helper keeps `canExecuteRunner=false`, `canClaimFinalRcReady=false`, `decision=NOT_READY_BLOCKED`, public MCP three-tool freeze, runtime-required blockers, A5-gated blockers, and fail-closed rejection defaults visible.
+
+Next recommended phase: `P30.3-final-rc-validation-matrix-aggregator-evidence-shape`, limited to report-shape evidence only if selected. No runner execution, package script, live service, provider call, real memory scan, durable mutation, migration/import-export apply, backup/restore, public MCP expansion, push, tag, release, or deploy is approved by P30.2.
