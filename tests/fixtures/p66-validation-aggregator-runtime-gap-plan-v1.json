@@ -1,0 +1,182 @@
+{
+  "schemaVersion": "p66-validation-aggregator-runtime-gap-plan-v1",
+  "policyVersion": "p66-validation-aggregator-runtime-gap-plan-policy-v1",
+  "manifestVersion": "p66-validation-aggregator-runtime-gap-plan-manifest-v1",
+  "version": "v1",
+  "phase": "P66.3-validation-aggregator-runtime-gap-plan",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "planningOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "validationAggregatorFullImplementation": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "v1RcReady": false,
+  "rcReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "internalOnlyTools": [
+    "validate_memory"
+  ],
+  "purpose": "Plan the next local-safe proof sequence for the seven remaining ValidationAggregator runtime gaps.",
+  "remainingRuntimeGaps": [
+    {
+      "id": "validation_aggregator_full_implementation_incomplete",
+      "priority": 1,
+      "currentStatus": "open",
+      "nextAllowedWork": [
+        "docs",
+        "fixture",
+        "test",
+        "pure_helper"
+      ],
+      "requiresA5ApprovalBeforeRuntime": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "governance_review_approval_audit_runtime_loop_not_executed",
+      "priority": 2,
+      "currentStatus": "open",
+      "nextAllowedWork": [
+        "docs",
+        "fixture",
+        "test",
+        "pure_helper"
+      ],
+      "requiresA5ApprovalBeforeRuntime": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "recall_isolation_runtime_proof_not_executed",
+      "priority": 3,
+      "currentStatus": "open",
+      "nextAllowedWork": [
+        "docs",
+        "fixture",
+        "test",
+        "pure_helper"
+      ],
+      "requiresA5ApprovalBeforeRuntime": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "migration_import_export_backup_restore_approval_execution_blocked",
+      "priority": 4,
+      "currentStatus": "a5_blocked",
+      "nextAllowedWork": [
+        "docs",
+        "fixture",
+        "test"
+      ],
+      "requiresA5ApprovalBeforeRuntime": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "live_http_operation_readiness_not_claimed",
+      "priority": 5,
+      "currentStatus": "open_live_start_blocked",
+      "nextAllowedWork": [
+        "docs",
+        "fixture",
+        "test"
+      ],
+      "requiresA5ApprovalBeforeRuntime": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "mainline_strict_gate_not_executed_for_cutover",
+      "priority": 6,
+      "currentStatus": "open_cutover_gate_blocked",
+      "nextAllowedWork": [
+        "docs",
+        "fixture",
+        "test"
+      ],
+      "requiresA5ApprovalBeforeRuntime": true,
+      "readinessAuthority": false
+    },
+    {
+      "id": "rc_cutover_not_executed",
+      "priority": 7,
+      "currentStatus": "a5_blocked",
+      "nextAllowedWork": [
+        "docs",
+        "fixture",
+        "test"
+      ],
+      "requiresA5ApprovalBeforeRuntime": true,
+      "readinessAuthority": false
+    }
+  ],
+  "locallyEvidencedRuntimeGaps": [
+    "runtime_schema_version_enforcement_not_fully_proven",
+    "final_rc_matrix_runner_not_executed_as_real_matrix"
+  ],
+  "a5HardStops": [
+    "push",
+    "tag_create",
+    "release_create",
+    "deploy",
+    "config_switch",
+    "watchdog_install",
+    "startup_install",
+    "provider_call",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "rc_ready_claim"
+  ],
+  "failClosedRules": [
+    "missing_required_evidence_keeps_blocked",
+    "stale_evidence_keeps_blocked",
+    "unknown_source_keeps_blocked",
+    "unsupported_runtime_claim_keeps_blocked",
+    "a5_action_without_approval_keeps_blocked",
+    "readiness_claim_without_authority_keeps_blocked",
+    "secret_like_content_keeps_blocked",
+    "public_mcp_expansion_keeps_blocked"
+  ],
+  "safety": {
+    "mutated": false,
+    "fixtureOnly": true,
+    "planningOnly": true,
+    "noRuntimeImplementation": true,
+    "noCommandExecution": true,
+    "noGateExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noRealMemoryPreview": true,
+    "noRuntimeStoreScan": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noMigrationApply": true,
+    "noImportExportApply": true,
+    "noPublicMcpExpansion": true,
+    "noPackageChange": true,
+    "noSecretChange": true,
+    "noRemoteWrite": true,
+    "noTagReleaseDeploy": true
+  },
+  "forbiddenClaims": [
+    "P66.3 executes runtime gap proof",
+    "P66.3 completes ValidationAggregator full implementation",
+    "P66.3 makes runtimeReady true",
+    "P66.3 makes finalRcMatrixReady true",
+    "P66.3 makes v1RcReady true",
+    "P66.3 makes rcReady true",
+    "P66.3 authorizes RC_READY",
+    "P66.3 authorizes push tag release deploy"
+  ],
+  "nextRecommendedPhase": "P66.4-validation-aggregator-gap-priority-fixture-tests"
+}

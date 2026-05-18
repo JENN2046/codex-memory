@@ -56,7 +56,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P63-T1 final RC runtime evidence runner bridge is implemented, validated, and committed locally in `4425fce`; original local runner passed 11/11 critical gates and recorded `logs/p63-final-rc-runtime-evidence-report-01.md`.
 - P64-T1 runtime schema/version write-boundary proof is implemented, validated, and committed locally in `4425fce`; refreshed local runner passed 12/12 critical gates and recorded `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
 - P66.1 ValidationAggregator full-implementation definition is implemented, validated, and committed locally in `98154f2`.
-- P66.2 ValidationAggregator definition static bridge is implemented and validated locally; guarded commit is pending final local checks.
+- P66.2 ValidationAggregator definition static bridge is implemented, validated, and committed locally in `9f613d5`.
+- P66.3 ValidationAggregator runtime gap plan is implemented and validated locally as docs/fixture/test; guarded commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -101,4 +102,6 @@ P66.1 ValidationAggregator full-implementation definition is added in [docs/P66_
 
 P66.2 ValidationAggregator definition static bridge is implemented locally. ValidationAggregator now reports P66.1 definition criteria and blockers as static, non-authoritative evidence only. It does not read the fixture, execute helper/test/gate/runner logic, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
-Next safe action is to guarded-commit P66.2 after final local checks, then continue to P66.3 runtime-gap planning/fixture work. 中文解释：下一步只能继续本地安全证明或规划剩余 runtime gap，不能 push、tag、release、deploy、迁移、调用 provider、启动 live HTTP，或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.3 ValidationAggregator runtime gap plan is added as docs/fixture/test only. It locks the seven remaining runtime gaps, local-safe next work classes, A5-before-runtime boundaries, and fail-closed rules while preserving `NOT_READY_BLOCKED`.
+
+Next safe action is to validate and guarded-commit P66.3, then continue to P66.4 gap priority fixture tests. 中文解释：下一步只能给第一个剩余缺口补本地 fixture/test 验收标准，不能 push、tag、release、deploy、迁移、调用 provider、启动 live HTTP，或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
