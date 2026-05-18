@@ -239,7 +239,13 @@ P66.19 ValidationAggregator runtime evidence summary normalization closeout is i
 
 P66.19 validation passed: `git diff --check` and docs validation.
 
-Next safe action is to guarded-commit P66.19, then continue to P66.20 missing or stale evidence fail-closed proof if still inside local safe bounds. 中文解释：下一步先提交 closeout；之后只能做缺失/陈旧 evidence fail-closed 的本地证明，仍然不是 runtime 或 RC readiness。
+P66.19 is committed locally in `62f1e03`.
+
+P66.20 ValidationAggregator missing or stale evidence fail-closed proof is implemented locally as docs/fixture/test only. It defines missing, stale, duplicate, and unknown required-evidence fail-closed acceptance criteria without reading evidence files, implicitly refreshing stale evidence, executing runtime/gate/runner, starting services, calling providers, writing durable state, expanding public MCP, or claiming readiness.
+
+P66.20 validation passed: fixture syntax, targeted fixture test `18/18`, `npm test` `1229/1229`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.20, then continue to P66.21 missing or stale evidence fail-closed helper if still inside local safe bounds. 中文解释：下一步先提交 P66.20；之后只能做纯 explicit-input helper，仍然不是 runtime 或 RC readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
