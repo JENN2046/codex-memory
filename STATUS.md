@@ -10,7 +10,7 @@
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
 - 当前任务：P64-T1 runtime schema/version write-boundary proof 已在本地实现并纳入 final RC runtime evidence runner；`node .\src\cli\final-rc-matrix-runner.js --execute --json` 于 `2026-05-18T03:59:06.834Z` 通过 12/12 critical gates，并把 sanitized command evidence 交给 ValidationAggregator。具体最新 `HEAD` 以 Git 实测为准；推送仍未授权。
-- 当前完成：P65-T1 ValidationAggregator explicit runtime evidence summary ingestion 已本地实现并验证。该切片只消费 caller 显式传入的脱敏 runtime evidence summary，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不扩大 public MCP；当前仍保持 `NOT_READY_BLOCKED`。
+- 当前完成：P65-T1 ValidationAggregator explicit runtime evidence summary ingestion 已本地实现、验证并提交在 `04ae047`。该切片只消费 caller 显式传入的脱敏 runtime evidence summary，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不扩大 public MCP；当前仍保持 `NOT_READY_BLOCKED`。
 
 ## 当前阻塞
 

@@ -87,6 +87,6 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-P65-T1 ValidationAggregator explicit runtime evidence summary ingestion is complete and validated locally. It adds an explicit sanitized summary bridge for caller-provided runtime evidence and keeps the aggregator no-touch: no file reads, command execution, service start, provider call, real memory/runtime-store scan, durable mutation, public MCP expansion, or readiness claim.
+P65-T1 ValidationAggregator explicit runtime evidence summary ingestion is complete, validated, and committed locally in `04ae047`. It adds an explicit sanitized summary bridge for caller-provided runtime evidence and keeps the aggregator no-touch: no file reads, command execution, service start, provider call, real memory/runtime-store scan, durable mutation, public MCP expansion, or readiness claim.
 
-Next safe action is final diff inspection and guarded local commit if eligible. Stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+Next safe action is to stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized; a future local-only candidate can target another remaining runtime proof gap. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
