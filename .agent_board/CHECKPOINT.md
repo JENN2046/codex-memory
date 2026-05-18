@@ -245,7 +245,13 @@ P66.20 ValidationAggregator missing or stale evidence fail-closed proof is imple
 
 P66.20 validation passed: fixture syntax, targeted fixture test `18/18`, `npm test` `1229/1229`, `git diff --check`, and docs validation.
 
-Next safe action is to guarded-commit P66.20, then continue to P66.21 missing or stale evidence fail-closed helper if still inside local safe bounds. 中文解释：下一步先提交 P66.20；之后只能做纯 explicit-input helper，仍然不是 runtime 或 RC readiness。
+P66.20 is committed locally in `d2c8d7b`.
+
+P66.21 ValidationAggregator missing or stale evidence fail-closed helper is implemented locally as pure explicit-input code and tests. It accepts only caller-provided missing/stale evidence metadata, fails closed for version drift, public MCP drift, missing required evidence, stale evidence, duplicate evidence, unknown evidence, unsafe summaries, no-touch leakage, sensitive fragments, and readiness overclaims. It does not read files, execute commands, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+
+P66.21 validation passed: helper syntax, targeted helper test `12/12`, no-touch regression `4/4`, `npm test` `1241/1241`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.21, then continue to P66.22 missing or stale evidence fail-closed static bridge if still inside local safe bounds. 中文解释：下一步先提交 P66.21；之后只能做静态 report-shape bridge，仍然不是 runtime 或 RC readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 

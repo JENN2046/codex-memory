@@ -96,6 +96,10 @@ const noTouchTargets = [
     path: 'src/core/ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofContract.js'
   },
   {
+    label: 'ValidationAggregatorMissingStaleEvidenceFailClosedProofContract',
+    path: 'src/core/ValidationAggregatorMissingStaleEvidenceFailClosedProofContract.js'
+  },
+  {
     label: 'ValidationAggregatorService',
     path: 'src/core/ValidationAggregatorService.js'
   }
