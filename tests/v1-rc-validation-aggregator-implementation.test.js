@@ -1524,6 +1524,223 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   );
   assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.canClaimRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.canClaimCutoverReady, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopGapProofAvailable,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopGapProofSourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopGapHelperCapabilityOnly,
+    true
+  );
+  assert.equal(report.summary.p66ValidationAggregatorGovernanceRuntimeLoopStageCount, 6);
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopRequiredEvidenceGroupCount,
+    8
+  );
+  assert.equal(report.summary.p66ValidationAggregatorGovernanceRuntimeLoopApprovalStateCount, 7);
+  assert.equal(report.summary.p66ValidationAggregatorGovernanceRuntimeLoopFailClosedCaseCount, 20);
+  assert.equal(report.summary.p66ValidationAggregatorGovernanceRuntimeLoopDisallowedWorkCount, 29);
+  assert.equal(report.summary.p66ValidationAggregatorGovernanceRuntimeLoopFailClosedReasonCount, 31);
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopHelperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopHelperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopEvidenceFileReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopCommandExecutedByAggregator,
+    false
+  );
+  assert.equal(report.summary.p66ValidationAggregatorGovernanceRuntimeLoopExecuted, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopApprovalExecutionReady,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopAuditWriterReady,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopDurableWriteReady,
+    false
+  );
+  assert.equal(report.summary.p66ValidationAggregatorGovernanceRuntimeLoopRuntimeImplemented, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopFullImplementationComplete,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopCanClaimRuntimeReady,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopCanClaimFinalRcReady,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopCanClaimV1RcReady,
+    false
+  );
+  assert.equal(report.summary.p66ValidationAggregatorGovernanceRuntimeLoopCanClaimRcReady, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorGovernanceRuntimeLoopCanClaimCutoverReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.sourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.helper,
+    'src/core/ValidationAggregatorGovernanceRuntimeLoopGapContract.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.test,
+    'tests/validation-aggregator-governance-runtime-loop-gap-contract-helper.test.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.schemaVersion,
+    'p66-validation-aggregator-governance-runtime-loop-gap-fixture-v1'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.selectedGap,
+    'governance_review_approval_audit_runtime_loop_not_executed'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.helperCapabilityOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.explicitInputOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.metadataOnly,
+    true
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.stageAcceptanceCases.length, 6);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.requiredRuntimeEvidenceGroups.length,
+    8
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.approvalStates.length, 7);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.failClosedCases.length, 20);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.disallowedWork.length, 29);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.failClosedReasons.length, 31);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.stageAcceptanceCases
+      .every(stage => stage.canExecute === false && stage.durableWriteAllowed === false),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.requiredRuntimeEvidenceGroups
+      .every(group => group.currentStatus === 'missing' && group.mustFailClosedWhenMissing === true),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.approvalStates
+      .every(state => state.executionAllowed === false),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.helperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.helperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.fixtureReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.evidenceFileReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.realReviewPacketReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.realApprovalPacketReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.realAuditLogReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.commandExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.governanceRuntimeLoopExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.approvalExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.governedActionExecutedByAggregator,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.publicMcpExpanded, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.validateMemoryPublic, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.configMutated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.startupWatchdogOperated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.tagReleaseDeploy, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.runtimeMutationImplemented, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.governanceRuntimeLoopReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.governanceRuntimeLoopExecuted, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.approvalExecutionReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.auditWriterReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.durableWriteReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.fullAggregatorImplementationComplete,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.v1RcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.rcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.cutoverReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.decisionImpact,
+    'none_report_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.blockedDecisionRequired,
+    true
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.canClaimV1RcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.canClaimRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.canClaimCutoverReady, false);
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',

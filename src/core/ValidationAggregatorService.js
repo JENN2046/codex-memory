@@ -673,6 +673,125 @@ const P66_READINESS_OVERCLAIM_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const P66_GOVERNANCE_RUNTIME_LOOP_STAGE_IDS = [
+  'review_packet_intake',
+  'approval_packet_evaluation',
+  'audit_evidence_shape_evaluation',
+  'execution_gate_evaluation',
+  'durable_write_gate',
+  'post_action_evidence_gate'
+];
+
+const P66_GOVERNANCE_RUNTIME_LOOP_REQUIRED_EVIDENCE_GROUPS = [
+  'review_packet_intake_runtime_evidence',
+  'approval_packet_evaluation_runtime_evidence',
+  'audit_evidence_shape_runtime_evidence',
+  'execution_gate_runtime_evidence',
+  'durable_write_gate_runtime_evidence',
+  'post_action_evidence_runtime_evidence',
+  'governance_loop_no_touch_boundary_proof',
+  'governance_loop_readiness_overclaim_rejection_proof'
+];
+
+const P66_GOVERNANCE_RUNTIME_LOOP_APPROVAL_STATES = [
+  'reviewed_not_approved',
+  'approval_missing',
+  'approval_unknown',
+  'approval_warning_only',
+  'approval_expired_or_stale',
+  'approval_scope_mismatch',
+  'approval_without_a5_runtime_authority'
+];
+
+const P66_GOVERNANCE_RUNTIME_LOOP_FAIL_CLOSED_CASES = [
+  'missing_loop_identity',
+  'mismatched_loop_identity',
+  'missing_review_packet',
+  'missing_approval_packet',
+  'missing_audit_refs',
+  'missing_scope',
+  'scope_mismatch_between_review_approval_audit_and_execution',
+  'approval_missing',
+  'approval_unknown',
+  'approval_warning_only',
+  'approval_expired_or_stale',
+  'approval_without_a5_runtime_authority',
+  'execution_attempt_without_authority',
+  'durable_audit_write_claim',
+  'durable_memory_write_claim',
+  'real_packet_read_claim',
+  'real_audit_log_read_claim',
+  'provider_call_claim',
+  'public_mcp_expansion_claim',
+  'readiness_claim_without_authority'
+];
+
+const P66_GOVERNANCE_RUNTIME_LOOP_DISALLOWED_WORK = [
+  'runtime_governance_loop',
+  'governed_action_execution',
+  'approval_execution',
+  'durable_audit_writer',
+  'durable_memory_writer',
+  'real_review_packet_read',
+  'real_approval_packet_read',
+  'real_audit_log_read',
+  'real_memory_scan',
+  'runtime_store_scan',
+  'command_execution',
+  'gate_execution',
+  'runner_execution',
+  'service_start',
+  'provider_call',
+  'config_mutation',
+  'startup_watchdog_operation',
+  'migration_apply',
+  'import_export_apply',
+  'public_mcp_expansion',
+  'validate_memory_public_exposure',
+  'package_lockfile_change',
+  'env_secret_change',
+  'push',
+  'tag',
+  'release',
+  'deploy',
+  'rc_ready_claim',
+  'cutover_ready_claim'
+];
+
+const P66_GOVERNANCE_RUNTIME_LOOP_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'selected_gap_drift',
+  'evidence_group_drift',
+  'identity_contract_drift',
+  'scope_contract_drift',
+  'authority_contract_drift',
+  'audit_ref_contract_drift',
+  'missing_required_stage',
+  'duplicate_stage',
+  'unknown_stage',
+  'stage_allows_execution',
+  'missing_required_runtime_evidence_group',
+  'duplicate_runtime_evidence_group',
+  'unknown_runtime_evidence_group',
+  'runtime_evidence_group_not_missing',
+  'missing_required_approval_state',
+  'duplicate_approval_state',
+  'unknown_approval_state',
+  'approval_state_allows_execution',
+  'missing_required_fail_closed_case',
+  'duplicate_fail_closed_case',
+  'unknown_fail_closed_case',
+  'disallowed_work_drift',
+  'unsafe_low_risk_summary',
+  'unsafe_safety_flag',
+  'sensitive_fragment_rejected',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1959,6 +2078,37 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorReadinessOverclaimCanClaimV1RcReady: false,
       p66ValidationAggregatorReadinessOverclaimCanClaimRcReady: false,
       p66ValidationAggregatorReadinessOverclaimCanClaimCutoverReady: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopGapProofAvailable: true,
+      p66ValidationAggregatorGovernanceRuntimeLoopGapProofSourceMode:
+        'static_report_shape_only',
+      p66ValidationAggregatorGovernanceRuntimeLoopGapHelperCapabilityOnly: true,
+      p66ValidationAggregatorGovernanceRuntimeLoopStageCount:
+        P66_GOVERNANCE_RUNTIME_LOOP_STAGE_IDS.length,
+      p66ValidationAggregatorGovernanceRuntimeLoopRequiredEvidenceGroupCount:
+        P66_GOVERNANCE_RUNTIME_LOOP_REQUIRED_EVIDENCE_GROUPS.length,
+      p66ValidationAggregatorGovernanceRuntimeLoopApprovalStateCount:
+        P66_GOVERNANCE_RUNTIME_LOOP_APPROVAL_STATES.length,
+      p66ValidationAggregatorGovernanceRuntimeLoopFailClosedCaseCount:
+        P66_GOVERNANCE_RUNTIME_LOOP_FAIL_CLOSED_CASES.length,
+      p66ValidationAggregatorGovernanceRuntimeLoopDisallowedWorkCount:
+        P66_GOVERNANCE_RUNTIME_LOOP_DISALLOWED_WORK.length,
+      p66ValidationAggregatorGovernanceRuntimeLoopFailClosedReasonCount:
+        P66_GOVERNANCE_RUNTIME_LOOP_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorGovernanceRuntimeLoopHelperImportedByAggregator: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopHelperExecutedByAggregator: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopEvidenceFileReadByAggregator: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopCommandExecutedByAggregator: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopExecuted: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopApprovalExecutionReady: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopAuditWriterReady: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopDurableWriteReady: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopRuntimeImplemented: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopFullImplementationComplete: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopCanClaimRuntimeReady: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopCanClaimFinalRcReady: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopCanClaimV1RcReady: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopCanClaimRcReady: false,
+      p66ValidationAggregatorGovernanceRuntimeLoopCanClaimCutoverReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -3187,6 +3337,98 @@ function buildV1RcValidationAggregatorReport({
         canClaimRcReady: false,
         canClaimCutoverReady: false
       },
+      p66ValidationAggregatorGovernanceRuntimeLoopGapProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_39_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_HELPER.md',
+        helper: 'src/core/ValidationAggregatorGovernanceRuntimeLoopGapContract.js',
+        test:
+          'tests/validation-aggregator-governance-runtime-loop-gap-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion:
+          'p66-validation-aggregator-governance-runtime-loop-gap-fixture-v1',
+        policyVersion:
+          'p66-validation-aggregator-governance-runtime-loop-gap-fixture-policy-v1',
+        manifestVersion:
+          'p66-validation-aggregator-governance-runtime-loop-gap-fixture-manifest-v1',
+        selectedGap: 'governance_review_approval_audit_runtime_loop_not_executed',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        metadataOnly: true,
+        publicToolsFrozen: true,
+        stageAcceptanceCases: P66_GOVERNANCE_RUNTIME_LOOP_STAGE_IDS.map(id => ({
+          id,
+          required: true,
+          canExecute: false,
+          durableWriteAllowed: false
+        })),
+        requiredRuntimeEvidenceGroups:
+          P66_GOVERNANCE_RUNTIME_LOOP_REQUIRED_EVIDENCE_GROUPS.map(id => ({
+            id,
+            required: true,
+            currentStatus: 'missing',
+            mustFailClosedWhenMissing: true
+          })),
+        approvalStates: P66_GOVERNANCE_RUNTIME_LOOP_APPROVAL_STATES.map(id => ({
+          id,
+          executionAllowed: false
+        })),
+        failClosedCases: P66_GOVERNANCE_RUNTIME_LOOP_FAIL_CLOSED_CASES.map(id => ({
+          id,
+          required: true,
+          mustFailClosed: true
+        })),
+        disallowedWork: P66_GOVERNANCE_RUNTIME_LOOP_DISALLOWED_WORK,
+        failClosedReasons: P66_GOVERNANCE_RUNTIME_LOOP_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        realReviewPacketReadByAggregator: false,
+        realApprovalPacketReadByAggregator: false,
+        realAuditLogReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        governanceRuntimeLoopExecutedByAggregator: false,
+        approvalExecutedByAggregator: false,
+        governedActionExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        validateMemoryPublic: false,
+        configMutated: false,
+        startupWatchdogOperated: false,
+        tagReleaseDeploy: false,
+        runtimeMutationImplemented: false,
+        governanceRuntimeLoopReady: false,
+        governanceRuntimeLoopExecuted: false,
+        approvalExecutionReady: false,
+        auditWriterReady: false,
+        durableWriteReady: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        v1RcReady: false,
+        rcReady: false,
+        cutoverReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false,
+        canClaimRcReady: false,
+        canClaimCutoverReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -3219,7 +3461,8 @@ function buildV1RcValidationAggregatorReport({
       'P66.13 baseline binding proof helper capability is static and is not executed by the aggregator.',
       'P66.17 runtime evidence summary normalization helper capability is static and is not executed by the aggregator.',
       'P66.21 missing or stale evidence fail-closed helper capability is static and is not executed by the aggregator.',
-      'P66.33 readiness overclaim rejection helper capability is static and is not executed by the aggregator.'
+      'P66.33 readiness overclaim rejection helper capability is static and is not executed by the aggregator.',
+      'P66.39 governance runtime loop gap helper capability is static and is not executed by the aggregator.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',
