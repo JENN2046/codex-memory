@@ -25,6 +25,7 @@
 - 当前阶段：P66.9 ValidationAggregator evidence freshness proof helper 已新增 [docs/P66_9_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_PROOF_HELPER.md](/A:/codex-memory/docs/P66_9_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_PROOF_HELPER.md) 和纯 explicit-input helper。它只校验调用方传入的 freshness evidence，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不调用 provider、不写 durable state、不扩大 public MCP，也不声明 readiness。
 - 当前阶段：P66.10 ValidationAggregator evidence freshness static bridge 已新增 [docs/P66_10_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_STATIC_BRIDGE.md](/A:/codex-memory/docs/P66_10_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_STATIC_BRIDGE.md)。ValidationAggregator 只静态展示 P66.9 helper 能力，不 import/execute helper，不读文件、不执行命令、不声明 readiness。
 - 当前阶段：P66.11 ValidationAggregator evidence freshness closeout 已新增 [docs/P66_11_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_CLOSEOUT.md](/A:/codex-memory/docs/P66_11_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_CLOSEOUT.md)。它只关闭 evidence freshness proof slice，并把下一个本地安全证据组定为 `baseline_binding_proof`；v1.0 RC 仍是 `NOT_READY_BLOCKED`。
+- 当前阶段：P66.12 ValidationAggregator baseline binding proof fixture 已新增 [docs/P66_12_VALIDATION_AGGREGATOR_BASELINE_BINDING_PROOF_FIXTURE.md](/A:/codex-memory/docs/P66_12_VALIDATION_AGGREGATOR_BASELINE_BINDING_PROOF_FIXTURE.md)。它只用 fixture/test 定义 baseline binding 字段、commit role 分离、target/evidence subject 绑定、no-checkout/no-remote-lookup 和 fail-closed 规则；不 checkout/reset/detach、不执行命令、不声明 readiness。
 
 ## 当前阻塞
 
@@ -46,6 +47,7 @@
 - P66.9 是纯 explicit-input helper；它只证明 freshness evidence 本地标准，不是 runtime collector，不是 full implementation，不声明 `RC_READY`。
 - P66.10 是 static bridge/report-shape evidence；它不执行 P66.9 helper，不使 `validationAggregatorFullImplementation=true`，不声明 `RC_READY`。
 - P66.11 是 docs/board closeout；它不关闭整个 runtime gap，不执行 runtime，不声明 `RC_READY`。
+- P66.12 是 docs/fixture/test baseline-binding acceptance contract；它不 checkout/reset/detach，不执行 baseline runtime collector，不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 
