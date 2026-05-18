@@ -69,7 +69,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.12 ValidationAggregator baseline binding proof fixture is implemented, validated, and committed locally in `7a0d190`.
 - P66.13 ValidationAggregator baseline binding proof helper is implemented, validated, and committed locally in `85526b4`.
 - P66.14 ValidationAggregator baseline binding static bridge is implemented, validated, and committed locally in `e4eacd4`.
-- P66.15 ValidationAggregator baseline binding closeout is implemented and validated locally as docs/board only; guarded commit is pending.
+- P66.15 ValidationAggregator baseline binding closeout is implemented, validated, and committed locally in `e716302`.
+- P66.16 ValidationAggregator runtime evidence summary normalization proof is implemented and validated locally as docs/fixture/test only; guarded commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -138,6 +139,10 @@ P66.13 ValidationAggregator baseline binding proof helper is implemented locally
 
 P66.14 ValidationAggregator baseline binding static bridge is implemented and validated locally as static report-shape evidence. It does not import or execute the helper, read files, execute commands, checkout/reset/detach, query remotes, write durable state, expand public MCP, or claim readiness.
 
-P66.15 ValidationAggregator baseline binding closeout is implemented and validated locally as docs/board only. It closes the baseline binding proof slice and selects `runtime_evidence_summary_normalization_proof` as the next local-safe evidence group without executing runtime or claiming readiness.
+P66.15 ValidationAggregator baseline binding closeout is implemented, validated, and committed locally in `e716302`. It closes the baseline binding proof slice and selects `runtime_evidence_summary_normalization_proof` as the next local-safe evidence group without executing runtime or claiming readiness.
 
-Next safe action is to guarded-commit P66.15, then continue to P66.16 runtime evidence summary normalization proof if still inside local safe bounds. 中文解释：下一步只提交 docs/board closeout；之后可做本地证明边界，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.16 ValidationAggregator runtime evidence summary normalization proof is implemented locally as docs/fixture/test only. It defines fixture acceptance criteria for sanitized runtime evidence summary normalization, including exact required summary fields, local evidence count shape, remaining gap count shape, low-risk summary restrictions, safety fail-closed states, and readiness-overclaim rejection. It does not execute gates/runners, read evidence files, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+
+P66.16 validation passed: fixture syntax, targeted fixture test `17/17`, `npm test` `1200/1200`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.16, then continue to P66.17 runtime evidence summary normalization helper if still inside local safe bounds. 中文解释：下一步先提交本地 fixture/test/docs；之后只能做纯 explicit-input helper，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
