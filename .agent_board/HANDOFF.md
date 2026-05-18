@@ -68,7 +68,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.11 ValidationAggregator evidence freshness closeout is implemented, validated, and committed locally in `644d17c`.
 - P66.12 ValidationAggregator baseline binding proof fixture is implemented, validated, and committed locally in `7a0d190`.
 - P66.13 ValidationAggregator baseline binding proof helper is implemented, validated, and committed locally in `85526b4`.
-- P66.14 ValidationAggregator baseline binding static bridge is implemented and validated locally as static report-shape evidence only; guarded commit is pending.
+- P66.14 ValidationAggregator baseline binding static bridge is implemented, validated, and committed locally in `e4eacd4`.
+- P66.15 ValidationAggregator baseline binding closeout is implemented and validated locally as docs/board only; guarded commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -137,4 +138,6 @@ P66.13 ValidationAggregator baseline binding proof helper is implemented locally
 
 P66.14 ValidationAggregator baseline binding static bridge is implemented and validated locally as static report-shape evidence. It does not import or execute the helper, read files, execute commands, checkout/reset/detach, query remotes, write durable state, expand public MCP, or claim readiness.
 
-Next safe action is to guarded-commit P66.14, then continue to P66.15 baseline binding closeout if still inside local safe bounds. 中文解释：下一步只提交静态桥接；之后可做 docs/board closeout，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.15 ValidationAggregator baseline binding closeout is implemented and validated locally as docs/board only. It closes the baseline binding proof slice and selects `runtime_evidence_summary_normalization_proof` as the next local-safe evidence group without executing runtime or claiming readiness.
+
+Next safe action is to guarded-commit P66.15, then continue to P66.16 runtime evidence summary normalization proof if still inside local safe bounds. 中文解释：下一步只提交 docs/board closeout；之后可做本地证明边界，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
