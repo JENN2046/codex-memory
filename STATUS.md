@@ -5,8 +5,8 @@
 ## 当前结论
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
-- 当前远端基线：`origin/main` = `1ae4286 test: harden no-touch redaction regressions`。
-- 当前本地基线：本地 `main` 已包含 P51-P62 本地 completion audit refresh、post-T6 audit wording refinement、prompt-to-artifact validation refs、completion audit local-item mapping 及相关 board/status reconciliation，并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；当前 `HEAD` 是最新本地提交，应以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准；推送仍未授权。
+- 当前远端基线：`origin/main` = `6cd019a docs: refresh p66 runtime gap inventory`。
+- 当前本地基线：本地 `main` 已包含 P66.1-P66.7 本地 ValidationAggregator full-implementation definition / static bridge / runtime gap plan / source-registry proof chain，并领先 `origin/main = 6cd019a docs: refresh p66 runtime gap inventory`；当前 `HEAD` 是最新本地提交，应以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
 - 当前任务：P64-T1 runtime schema/version write-boundary proof 已在本地实现并纳入 final RC runtime evidence runner；`node .\src\cli\final-rc-matrix-runner.js --execute --json` 于 `2026-05-18T03:59:06.834Z` 通过 12/12 critical gates，并把 sanitized command evidence 交给 ValidationAggregator。具体最新 `HEAD` 以 Git 实测为准；推送仍未授权。
@@ -21,6 +21,7 @@
 - 当前阶段：P66.5 ValidationAggregator source registry proof helper 已新增 [docs/P66_5_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_PROOF_HELPER.md](/A:/codex-memory/docs/P66_5_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_PROOF_HELPER.md) 和纯 explicit-input helper。它只校验调用方传入的 source registry exact-set proof，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不调用 provider、不写 durable state、不扩大 public MCP，也不声明 readiness。
 - 当前阶段：P66.6 ValidationAggregator source registry static bridge 已新增 [docs/P66_6_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_STATIC_BRIDGE.md](/A:/codex-memory/docs/P66_6_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_STATIC_BRIDGE.md)。ValidationAggregator 只静态展示 P66.5 helper 能力，不 import/execute helper，不读文件、不执行命令、不声明 readiness。
 - 当前阶段：P66.7 ValidationAggregator source registry closeout 已新增 [docs/P66_7_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_CLOSEOUT.md](/A:/codex-memory/docs/P66_7_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_CLOSEOUT.md)。它只关闭 source-registry proof slice，并把下一个本地安全证据组定为 `evidence_freshness_proof`；v1.0 RC 仍是 `NOT_READY_BLOCKED`。
+- 当前阶段：P66.8 ValidationAggregator evidence freshness proof fixture 已新增 [docs/P66_8_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_PROOF_FIXTURE.md](/A:/codex-memory/docs/P66_8_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_PROOF_FIXTURE.md)。它只用 fixture/test 定义 freshness 字段、UTC timestamp、baseline binding、freshness window 和 fail-closed 规则；不读真实 evidence 文件、不执行命令、不声明 readiness。
 
 ## 当前阻塞
 
@@ -38,6 +39,7 @@
 - P66.5 是纯 explicit-input helper；它只证明 source registry exact-set 本地标准，不是 runtime collector，不是 full implementation，不声明 `RC_READY`。
 - P66.6 是 static bridge/report-shape evidence；它不执行 P66.5 helper，不使 `validationAggregatorFullImplementation=true`，不声明 `RC_READY`。
 - P66.7 是 docs/board closeout；它不关闭整个 runtime gap，不执行 runtime，不声明 `RC_READY`。
+- P66.8 是 docs/fixture/test freshness acceptance contract；它不读取 evidence 文件，不执行 runtime freshness collector，不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 

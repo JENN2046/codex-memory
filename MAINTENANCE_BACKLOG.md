@@ -10,8 +10,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Remote baseline: `1ae4286 test: harden no-touch redaction regressions`.
-- Local baseline: local `main` contains the P51-P62 local evidence/preflight/audit chain through post-T6 audit wording refinement, prompt-to-artifact validation refs, completion audit local-item mapping, and related board/status reconciliation; it is ahead of `origin/main = 1ae4286`; current `HEAD` is intentionally not hard-coded here and must be verified with `git status -sb` / `git log --oneline --decorate -n 10`; push is not authorized.
+- Remote baseline: `6cd019a docs: refresh p66 runtime gap inventory`.
+- Local baseline: local `main` contains the P66.1-P66.7 ValidationAggregator full-implementation definition / static bridge / runtime gap plan / source-registry proof chain; it is ahead of `origin/main = 6cd019a`; current `HEAD` is intentionally not hard-coded here and must be verified with `git status -sb` / `git log --oneline --decorate -n 10`; push is not authorized.
 - Current active program: P64 runtime schema/version write-boundary proof after P63 final RC runtime evidence bridge.
 - Current phase area: P64-T1 local runtime schema/version write-boundary guard plus final runner matrix refresh. Evidence-first / fail-closed / reversible boundaries preserved.
 
@@ -89,7 +89,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P66.5 | observability-admin | A2 | done | ValidationAggregator source registry proof helper | helper syntax; targeted helper test `8/8`; no-touch regression `4/4`; `npm test`; docs validation; `git diff --check` | Adds a pure explicit-input helper for source-registry exact-set proof only. It does not read files, execute commands, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness. |
 | P66.6 | observability-admin | A2 | done | ValidationAggregator source registry static bridge | changed JS syntax; targeted aggregator test `17/17`; no-touch regression `4/4`; `npm test`; docs validation; `git diff --check` | Exposes P66.5 helper capability as static, non-authoritative ValidationAggregator report evidence. Aggregator does not import/execute helper, read files, execute commands, start services, call providers, scan stores, write durable state, expand public MCP, or claim readiness. |
 | P66.7 | observability-admin | A1 | done | ValidationAggregator source registry closeout | docs validation; `git diff --check` | Closes the source-registry proof slice locally and selects `evidence_freshness_proof` as the next local-safe evidence group. It does not close the full runtime gap or claim readiness. |
-| P66.8 | observability-admin | A1/A2 | next | ValidationAggregator evidence freshness proof fixture | docs/fixture/test; targeted validation; `npm test` if tests are added | Define fixture/test acceptance criteria for evidence freshness before any helper. 中文解释：下一步只定义 freshness 证据的新 fixture/test，不读真实 evidence 文件、不执行命令、不声明 readiness。 |
+| P66.8 | observability-admin | A1/A2 | done | ValidationAggregator evidence freshness proof fixture | fixture syntax; targeted fixture test; `npm test`; docs validation; `git diff --check` | Defines fixture/test acceptance criteria for evidence freshness before any helper. It locks explicit freshness fields, UTC timestamp policy, baseline binding, freshness windows, low-risk summaries, and fail-closed rules without reading real evidence files or claiming readiness. |
+| P66.9 | observability-admin | A2 | next | ValidationAggregator evidence freshness proof helper | helper syntax; targeted helper test; no-touch regression; `npm test`; docs validation; `git diff --check` | Add a pure explicit-input helper for freshness proof only. 中文解释：下一步可以写 helper，但只能处理调用方传入对象；不能读文件、执行命令、启动服务、调用 provider、写 durable state 或声明 readiness。 |
 
 ## Standing Boundaries
 

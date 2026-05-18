@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "p66-validation-aggregator-evidence-freshness-proof-v1",
+  "policyVersion": "p66-validation-aggregator-evidence-freshness-proof-policy-v1",
+  "manifestVersion": "p66-validation-aggregator-evidence-freshness-proof-manifest-v1",
+  "version": "v1",
+  "phase": "P66.8-validation-aggregator-evidence-freshness-proof-fixture",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "acceptanceContractOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "selectedGap": {
+    "id": "validation_aggregator_full_implementation_incomplete",
+    "priority": 1,
+    "currentStatus": "open",
+    "remainsOpenAfterThisPhase": true,
+    "readinessAuthority": false
+  },
+  "evidenceGroup": {
+    "id": "evidence_freshness_proof",
+    "priority": 2,
+    "currentStatus": "acceptance_defined",
+    "required": true,
+    "remainsNonRuntime": true,
+    "readinessAuthority": false,
+    "mustFailClosedWhenMissing": true,
+    "mustFailClosedWhenStale": true
+  },
+  "validationAggregatorFullImplementation": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "v1RcReady": false,
+  "rcReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "internalOnlyTools": [
+    "validate_memory"
+  ],
+  "acceptedFutureLocalWork": [
+    "docs",
+    "fixture",
+    "test",
+    "pure_explicit_input_helper",
+    "static_report_shape_bridge"
+  ],
+  "requiredFreshnessFields": [
+    "evidence_id",
+    "source_id",
+    "source_kind",
+    "source_registry_version",
+    "baseline_commit",
+    "evidence_generated_at",
+    "evidence_validated_at",
+    "evidence_observed_hash",
+    "validation_status",
+    "validation_ref"
+  ],
+  "timestampPolicy": {
+    "format": "iso8601_utc_z",
+    "timezoneRequired": "UTC",
+    "allowLocalTimezone": false,
+    "allowImplicitNow": false,
+    "allowClockInference": false,
+    "allowMissingTimestampInference": false,
+    "generatedAtMustBeBeforeOrEqualValidatedAt": true
+  },
+  "baselinePolicy": {
+    "baselineCommitRequired": true,
+    "approvalRequestCommitIsNotBaseline": true,
+    "ambiguousBaselineFailsClosed": true,
+    "mismatchFailsClosed": true
+  },
+  "freshnessWindowPolicy": {
+    "sourceClassSpecific": true,
+    "mustBeDeclaredByEvidenceClass": true,
+    "noGlobalDefaultWindow": true,
+    "missingWindowFailsClosed": true,
+    "expiredWindowFailsClosed": true
+  },
+  "lowRiskSummary": {
+    "allowedFields": [
+      "evidence_id",
+      "source_kind",
+      "baseline_commit_short",
+      "validation_status",
+      "freshness_status",
+      "age_bucket",
+      "mutated"
+    ],
+    "disallowedFields": [
+      "raw_workspace_id",
+      "raw_workspace_path",
+      "raw_secret",
+      "raw_token",
+      "authorization_header",
+      "provider_key",
+      "absolute_path",
+      "live_service_url"
+    ],
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false
+  },
+  "failClosedCases": [
+    "missing_evidence_generated_at",
+    "missing_evidence_validated_at",
+    "non_utc_timestamp",
+    "non_iso8601_timestamp",
+    "generated_after_validated",
+    "future_timestamp",
+    "missing_baseline_commit",
+    "baseline_commit_mismatch",
+    "approval_request_commit_used_as_baseline",
+    "missing_freshness_window",
+    "expired_freshness_window",
+    "unknown_source_kind",
+    "unknown_source_registry_version",
+    "missing_validation_ref",
+    "unsafe_summary_claim",
+    "readiness_claim_without_authority"
+  ],
+  "disallowedWork": [
+    "runtime_collector",
+    "implicit_fixture_read",
+    "evidence_file_read",
+    "command_execution",
+    "gate_execution",
+    "runner_execution",
+    "service_start",
+    "provider_call",
+    "real_memory_scan",
+    "runtime_store_scan",
+    "durable_memory_write",
+    "durable_audit_write",
+    "migration_apply",
+    "import_export_apply",
+    "public_mcp_expansion",
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "rc_ready_claim"
+  ],
+  "safety": {
+    "mutated": false,
+    "fixtureOnly": true,
+    "acceptanceContractOnly": true,
+    "noRuntimeImplementation": true,
+    "noCommandExecution": true,
+    "noGateExecution": true,
+    "noRunnerExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noRealMemoryPreview": true,
+    "noRuntimeStoreScan": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noMigrationApply": true,
+    "noImportExportApply": true,
+    "noPublicMcpExpansion": true,
+    "noPackageChange": true,
+    "noSecretChange": true,
+    "noRemoteWrite": true,
+    "noTagReleaseDeploy": true
+  },
+  "forbiddenClaims": [
+    "P66.8 implements evidence freshness runtime collection",
+    "P66.8 reads real evidence files",
+    "P66.8 executes validation commands",
+    "P66.8 closes validation_aggregator_full_implementation_incomplete",
+    "P66.8 makes validationAggregatorFullImplementation true",
+    "P66.8 makes runtimeReady true",
+    "P66.8 makes v1RcReady true",
+    "P66.8 authorizes RC_READY",
+    "P66.8 authorizes push tag release deploy"
+  ],
+  "nextRecommendedPhase": "P66.9-validation-aggregator-evidence-freshness-proof-helper"
+}

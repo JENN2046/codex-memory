@@ -10,7 +10,7 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 
 ## Current Status
 
-- Last pushed baseline: `1ae4286 test: harden no-touch redaction regressions` on `origin/main`.
+- Last pushed baseline: `6cd019a docs: refresh p66 runtime gap inventory` on `origin/main`.
 - Local `main` is ahead of `origin/main`; push is not authorized.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
@@ -52,7 +52,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.4 ValidationAggregator gap priority fixture tests are implemented, validated, and committed locally in `3b7c335`.
 - P66.5 ValidationAggregator source registry proof helper is implemented, validated, and committed locally in `f7a9038`.
 - P66.6 ValidationAggregator source registry static bridge is implemented, validated, and committed locally in `92e47ce`.
-- P66.7 ValidationAggregator source registry closeout is implemented locally as docs/board only; validation and guarded commit are pending.
+- P66.7 ValidationAggregator source registry closeout is implemented, validated, and committed locally in `d6c0175`.
+- P66.8 ValidationAggregator evidence freshness proof fixture is implemented locally as docs/fixture/test only; validation and guarded commit are pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -221,5 +222,7 @@ P66.5 ValidationAggregator source registry proof helper is added as pure explici
 P66.6 ValidationAggregator source registry static bridge is added to the report shape. It exposes P66.5 helper capability without importing or executing the helper and keeps all readiness flags false.
 
 P66.7 ValidationAggregator source registry closeout records the source-registry proof slice as locally closed and selects `evidence_freshness_proof` as the next local-safe evidence group. The overall `validation_aggregator_full_implementation_incomplete` gap remains open.
+
+P66.8 ValidationAggregator evidence freshness proof fixture defines explicit freshness fields, UTC timestamp rules, baseline binding, freshness window policy, low-risk summary restrictions, and fail-closed cases. It does not read real evidence files or execute runtime collection.
 
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
