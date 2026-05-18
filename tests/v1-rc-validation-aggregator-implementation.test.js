@@ -962,6 +962,157 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.canClaimV1RcReady,
     false
   );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceFailClosedProofAvailable,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceFailClosedProofSourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceFailClosedProofHelperCapabilityOnly,
+    true
+  );
+  assert.equal(report.summary.p66ValidationAggregatorMissingStaleEvidenceRequiredGroupCount, 8);
+  assert.equal(report.summary.p66ValidationAggregatorMissingStaleEvidenceFailClosedReasonCount, 13);
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceHelperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceHelperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceRuntimeImplemented,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceFullImplementationComplete,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceCanClaimRuntimeReady,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceCanClaimFinalRcReady,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorMissingStaleEvidenceCanClaimV1RcReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.sourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.helperCapabilityOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.explicitInputOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.metadataOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.requiredEvidenceGroups.length,
+    8
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.failClosedReasons.length,
+    13
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.helperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.helperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.fixtureReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.evidenceFileReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.implicitEvidenceRefreshByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.commandExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.gateExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.runnerExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.evidenceCollectedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.liveMcpRefreshedByAggregator,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.scansDirectories, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.publicMcpExpanded, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.runtimeMutationImplemented,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.fullAggregatorImplementationComplete,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.rcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.decisionImpact,
+    'none_report_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.blockedDecisionRequired,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.canClaimRuntimeReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.canClaimFinalRcReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.canClaimV1RcReady,
+    false
+  );
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',

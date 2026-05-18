@@ -173,4 +173,10 @@ P66.21 ValidationAggregator missing or stale evidence fail-closed helper is impl
 
 P66.21 validation passed: helper syntax, targeted helper test `12/12`, no-touch regression `4/4`, `npm test` `1241/1241`, `git diff --check`, and docs validation.
 
-Next safe action is to guarded-commit P66.21, then continue to P66.22 missing or stale evidence fail-closed static bridge if still inside local safe bounds. 中文解释：下一步先提交 P66.21；之后只能做静态 report-shape bridge，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.21 is committed locally in `45f17d5`.
+
+P66.22 ValidationAggregator missing or stale evidence fail-closed static bridge is implemented locally. It exposes P66.21 helper capability as static, non-authoritative report evidence only. ValidationAggregator does not import or execute the helper, read files, execute commands, run gates/runners, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+
+P66.22 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1241/1241`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.22, then continue to P66.23 missing or stale evidence fail-closed closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.22；之后只能做 docs/board closeout，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
