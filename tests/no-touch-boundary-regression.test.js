@@ -108,6 +108,10 @@ const noTouchTargets = [
     path: 'src/core/ValidationAggregatorNoTouchBoundaryProofContract.js'
   },
   {
+    label: 'ValidationAggregatorReadinessOverclaimRejectionProofContract',
+    path: 'src/core/ValidationAggregatorReadinessOverclaimRejectionProofContract.js'
+  },
+  {
     label: 'ValidationAggregatorService',
     path: 'src/core/ValidationAggregatorService.js'
   }
