@@ -201,4 +201,6 @@ P65.2 push readiness approval request is drafted as docs/board only. Local paylo
 
 P66 remaining runtime gap inventory refresh is drafted as docs/board only. P63/P64 locally evidenced 2 runtime gaps; 7 runtime gaps remain open; 16 A5 hard stops remain blocked. v1.0 RC remains `NOT_READY_BLOCKED`.
 
+P66.1 ValidationAggregator full-implementation definition is added as docs/fixture/test only. It defines required criteria, fail-closed cases, forbidden claims, seven remaining runtime gaps, and sixteen A5 hard stops before `validationAggregatorFullImplementation` can ever become true.
+
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

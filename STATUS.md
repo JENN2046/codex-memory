@@ -14,6 +14,7 @@
 - 当前完成：P65.1 Final RC runner executed-field semantics hardening 已本地实现并验证。`finalRcMatrixExecuted` 不再代表本地 allowlisted runner 执行；新字段 `localRuntimeEvidenceMatrixExecuted` / `allowlistedFinalRcEvidenceRunnerExecuted` 表达本地执行证据，`fullFinalRcMatrixExecuted=false` 且显式 full-matrix execution/readiness 声明会被拒绝，继续阻止完整 RC matrix 误读。
 - 当前阶段：P65.2 push readiness approval request 已起草为 [docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md)。状态 `DRAFT_NOT_APPROVED` / `NOT_APPROVED` / `BLOCKED_HARD_STOP`；不执行 push。
 - 当前阶段：P66 remaining runtime gap inventory refresh 已新增 [docs/P66_REMAINING_RUNTIME_GAP_INVENTORY_REFRESH.md](/A:/codex-memory/docs/P66_REMAINING_RUNTIME_GAP_INVENTORY_REFRESH.md)。P63/P64 已本地证明 2 个 gap；剩余 7 个 runtime gap 和 16 个 A5 hard stop 继续阻止 `RC_READY`。
+- 当前阶段：P66.1 ValidationAggregator full implementation definition 已新增 [docs/P66_1_VALIDATION_AGGREGATOR_FULL_IMPLEMENTATION_DEFINITION.md](/A:/codex-memory/docs/P66_1_VALIDATION_AGGREGATOR_FULL_IMPLEMENTATION_DEFINITION.md)，并用 fixture/test 锁定 full implementation 的必要条件、7 个剩余 runtime gap、16 个 A5 hard stop 与 fail-closed 规则。仍保持 `NOT_READY_BLOCKED`。
 
 ## 当前阻塞
 
@@ -24,6 +25,7 @@
 - P65.1 只收紧报告字段语义；它不是 final RC matrix readiness、v1.0 RC readiness、cutover readiness 或 `RC_READY`。
 - P65.2 只是 push readiness / approval request；它不是 push 授权，不会更新远端。
 - P66 是 docs/board inventory refresh；它不执行 runtime、gate、push、tag、release、deploy 或任何 A5 操作。
+- P66.1 是 docs/fixture/test definition；它不实现 runtime collector，不使 `validationAggregatorFullImplementation=true`，不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 
