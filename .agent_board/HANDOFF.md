@@ -71,7 +71,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.14 ValidationAggregator baseline binding static bridge is implemented, validated, and committed locally in `e4eacd4`.
 - P66.15 ValidationAggregator baseline binding closeout is implemented, validated, and committed locally in `e716302`.
 - P66.16 ValidationAggregator runtime evidence summary normalization proof is implemented, validated, and committed locally in `e95aa56`.
-- P66.17 ValidationAggregator runtime evidence summary normalization helper is implemented and validated locally as pure explicit-input code and tests; guarded commit is pending.
+- P66.17 ValidationAggregator runtime evidence summary normalization helper is implemented, validated, and committed locally in `c8d6363`.
+- P66.18 ValidationAggregator runtime evidence summary normalization static bridge is implemented and validated locally; guarded commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -152,4 +153,10 @@ P66.17 ValidationAggregator runtime evidence summary normalization helper is imp
 
 P66.17 validation passed: helper syntax, targeted helper test `11/11`, no-touch regression `4/4`, `npm test` `1211/1211`, `git diff --check`, and docs validation.
 
-Next safe action is to guarded-commit P66.17, then continue to P66.18 runtime evidence summary normalization static bridge if still inside local safe bounds. 中文解释：下一步先提交本地 helper；之后只能做静态 report-shape bridge，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.17 is committed locally in `c8d6363`.
+
+P66.18 ValidationAggregator runtime evidence summary normalization static bridge is implemented locally. It exposes P66.17 helper capability as static, non-authoritative report evidence only. ValidationAggregator does not import or execute the helper, read files, execute commands, run gates/runners, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+
+P66.18 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1211/1211`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.18, then continue to P66.19 runtime evidence summary normalization closeout if still inside local safe bounds. 中文解释：下一步先提交静态 bridge；之后只能做 docs/board closeout，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

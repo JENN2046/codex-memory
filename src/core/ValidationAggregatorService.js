@@ -422,6 +422,34 @@ const P66_BASELINE_BINDING_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const P66_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_REQUIRED_FIELDS = [
+  'status',
+  'decision',
+  'runnerExecuted',
+  'commandsExecuted',
+  'localRuntimeEvidenceMatrixExecuted',
+  'allowlistedFinalRcEvidenceRunnerExecuted',
+  'criticalGates',
+  'locallyEvidencedRuntimeGaps',
+  'remainingRuntimeGaps',
+  'safety'
+];
+
+const P66_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'missing_runtime_evidence_summary',
+  'missing_required_summary_field',
+  'invalid_critical_gates',
+  'unsafe_low_risk_summary',
+  'unsafe_summary_rejected',
+  'sensitive_fragment_rejected',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1617,6 +1645,21 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorBaselineBindingCanClaimRuntimeReady: false,
       p66ValidationAggregatorBaselineBindingCanClaimFinalRcReady: false,
       p66ValidationAggregatorBaselineBindingCanClaimV1RcReady: false,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofAvailable: true,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofSourceMode:
+        'static_report_shape_only',
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofHelperCapabilityOnly: true,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationRequiredFieldCount:
+        P66_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_REQUIRED_FIELDS.length,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationFailClosedReasonCount:
+        P66_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationHelperImportedByAggregator: false,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationHelperExecutedByAggregator: false,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationRuntimeImplemented: false,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationFullImplementationComplete: false,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationCanClaimRuntimeReady: false,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationCanClaimFinalRcReady: false,
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationCanClaimV1RcReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -2560,6 +2603,57 @@ function buildV1RcValidationAggregatorReport({
         canClaimFinalRcReady: false,
         canClaimV1RcReady: false
       },
+      p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_17_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_HELPER.md',
+        helper: 'src/core/ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofContract.js',
+        test: 'tests/validation-aggregator-runtime-evidence-summary-normalization-proof-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion: 'p66-validation-aggregator-runtime-evidence-summary-normalization-proof-v1',
+        policyVersion: 'p66-validation-aggregator-runtime-evidence-summary-normalization-proof-policy-v1',
+        manifestVersion:
+          'p66-validation-aggregator-runtime-evidence-summary-normalization-proof-manifest-v1',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        sanitizedSummaryOnly: true,
+        publicToolsFrozen: true,
+        requiredSummaryFields: P66_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_REQUIRED_FIELDS.map(id => ({
+          id,
+          required: true,
+          mustFailClosedWhenMissing: true
+        })),
+        failClosedReasons: P66_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        rcReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -2589,7 +2683,8 @@ function buildV1RcValidationAggregatorReport({
       'P66.1 full-implementation definition is static and does not make validationAggregatorFullImplementation true.',
       'P66.5 source registry proof helper capability is static and is not executed by the aggregator.',
       'P66.9 evidence freshness proof helper capability is static and is not executed by the aggregator.',
-      'P66.13 baseline binding proof helper capability is static and is not executed by the aggregator.'
+      'P66.13 baseline binding proof helper capability is static and is not executed by the aggregator.',
+      'P66.17 runtime evidence summary normalization helper capability is static and is not executed by the aggregator.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',

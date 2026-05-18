@@ -815,6 +815,153 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.canClaimRuntimeReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.canClaimFinalRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.canClaimV1RcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofAvailable,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofSourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofHelperCapabilityOnly,
+    true
+  );
+  assert.equal(report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationRequiredFieldCount, 10);
+  assert.equal(report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationFailClosedReasonCount, 12);
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationHelperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationHelperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationRuntimeImplemented,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationFullImplementationComplete,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationCanClaimRuntimeReady,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationCanClaimFinalRcReady,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationCanClaimV1RcReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.sourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.helperCapabilityOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.explicitInputOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.sanitizedSummaryOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.requiredSummaryFields.length,
+    10
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.failClosedReasons.length,
+    12
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.helperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.helperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.fixtureReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.evidenceFileReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.commandExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.gateExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.runnerExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.evidenceCollectedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.liveMcpRefreshedByAggregator,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.scansDirectories, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.publicMcpExpanded, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.runtimeMutationImplemented,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.fullAggregatorImplementationComplete,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.rcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.decisionImpact,
+    'none_report_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.blockedDecisionRequired,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.canClaimRuntimeReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.canClaimFinalRcReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeEvidenceSummaryNormalizationProof.canClaimV1RcReady,
+    false
+  );
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',
