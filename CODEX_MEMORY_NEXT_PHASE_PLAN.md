@@ -12,7 +12,7 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 2. P51 post-push reconciliation is complete for pushed baseline `origin/main = 1ae4286`.
 3. P52 schema/version boundary plan and minimal explicit-input helper are complete locally.
 4. P53 separates ValidationAggregator inventory contracts from future full implementation.
-5. P54 establishes the final RC runner local chain through safe command inventory, explicit command-result evaluation, execution preflight, and an injected-executor adapter contract; it does not complete a real final RC matrix run.
+5. P54 establishes the final RC runner local chain through safe command inventory, explicit command-result evaluation, execution preflight, and an injected-executor adapter contract.
 6. P55 evidence-to-runtime trace contract and helper are complete locally; they map local evidence to runtime enforcement gaps without treating fixture/local evidence as runtime enforcement.
 7. P56 governance review/approval/audit executable loop boundary and explicit-input helper are complete locally without durable writes or approval execution.
 8. P57 recall isolation runtime proof boundary inventory and explicit-input evaluator are complete locally without executing the runtime proof or scanning real memory/runtime stores.
@@ -21,9 +21,11 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 11. P60 no-touch / no-leak / redaction long-term regression is complete locally without introducing runtime operations.
 12. P61 RC evidence report boundary inventory and explicit-input report helper are complete locally without executing mainline strict gate or final RC runner.
 13. P62 cutover preflight boundary, completion audit, prompt-to-artifact audit, A5 precondition matrix, and post-T6 audit/refinement closeout are complete locally.
-14. The remaining P51-P62 work is blocked at runtime evidence and A5 authorization boundaries; do not convert local audit completion into runtime, final RC, cutover, push, release, deploy, config, watchdog, or `RC_READY` claims.
-15. Treat `CMB-0005`, `CMD-0012`, and `RR-0004` as controlling records for resume and completion-boundary decisions.
-16. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
+14. P63-T1 implements and executes the local allowlisted final RC runtime evidence runner, including `gate:ci` and `gate:mainline:strict`, then bridges sanitized command evidence into ValidationAggregator.
+15. P64-T1 implements runtime schema/version write-boundary enforcement for direct core `record_memory` payloads without expanding public MCP tools; the refreshed final runner passed 12/12 critical gates.
+16. The remaining work is still blocked at runtime evidence and A5 authorization boundaries; do not convert P63/P64 local runner execution into final RC, cutover, push, release, deploy, config, watchdog, or `RC_READY` claims.
+17. Treat `CMB-0005`, `CMD-0012`, and `RR-0004` as controlling records for resume and completion-boundary decisions.
+18. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 
 ## Current Completed Local Chain
 
@@ -89,7 +91,9 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 - P62-T5 A5/runtime authorization precondition explicit-input helper is complete, validated, and locally committed in `8535da1`.
 - P62-T6 completion audit refresh is complete, validated, and locally committed in `d5808bd`; it maps P62-T5 helper evidence into the completion audit and prompt-to-artifact audit without granting runtime authority.
 - P62 post-T6 audit wording refinement, prompt-to-artifact validation refs, and completion audit local-item mapping are complete, validated, and locally committed; current local `HEAD` is intentionally verified from Git commands instead of hard-coded in this routing file.
-- Preserve `NOT_READY_BLOCKED`; do not infer runtime/mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command inventory evidence, P54 caller-provided command result evidence, P54 preflight evidence, P54 injected-executor adapter evidence, P55 trace evidence, P55 trace helper evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, P58 boundary/helper evidence, P59 boundary/helper evidence, P60 regression evidence, or P61 report helper evidence.
+- P63-T1 final RC runtime evidence bridge is implemented locally with `src/core/FinalRcRuntimeEvidenceRunner.js`, `src/cli/final-rc-matrix-runner.js`, targeted tests, and `docs/P63_FINAL_RC_RUNTIME_EVIDENCE_BRIDGE.md`; the real runner execution passed 11/11 critical gates and recorded local evidence in `logs/p63-final-rc-runtime-evidence-report-01.md`.
+- P64-T1 runtime schema/version write-boundary proof is implemented locally with `src/core/MemoryWriteService.js`, `tests/schema-version-runtime-boundary.test.js`, ValidationAggregator status updates, and `docs/P64_RUNTIME_SCHEMA_VERSION_WRITE_BOUNDARY_EVIDENCE.md`; the refreshed real runner execution passed 12/12 critical gates and recorded local evidence in `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
+- Preserve `NOT_READY_BLOCKED`; do not infer mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command chain evidence, P55 trace evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, P58 boundary/helper evidence, P59 boundary/helper evidence, P60 regression evidence, P61 report helper evidence, P63 local runner evidence, or P64 write-boundary evidence.
 
 ## Boundaries
 
@@ -108,7 +112,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P62 local audit/refinement closeout:
+After P64-T1 local schema/version write-boundary evidence:
 
 - Stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, runtime execution, or `RC_READY` claim unless explicitly authorized.
-- New local-only work should start from a new scoped goal or a clearly bounded follow-up task.
+- Next local-only candidate should target one remaining runtime proof gap at a time, starting with a stricter ValidationAggregator full-implementation slice.

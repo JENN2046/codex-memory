@@ -117,10 +117,13 @@ test('minimal validation aggregator CLI preserves public MCP three-tool freeze',
 test('minimal validation aggregator CLI keeps runtime blockers visible', () => {
   const report = parseJsonResult(runCli());
 
-  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, true);
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.fullFinalRcMatrixExecuted, false);
   assert.equal(report.summary.liveMcpHttpEvidenceRefreshed, false);
-  assert.equal(report.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
+  assert.equal(report.checks.schemaVersionRuntimeEnforcement.status, 'runtime_write_boundary_guard_added');
+  assert.equal(report.runtime_required.includes('validationAggregatorFullImplementation'), true);
+  assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), false);
   assert.equal(report.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
 });
 
@@ -154,7 +157,7 @@ test('minimal validation aggregator CLI strict mode exits 1 for current blocked 
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.generated_at, '2026-05-16T00:00:00.000Z');
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
-  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, true);
   assert.equal(report.summary.localEvidenceReportReadyClaim, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
@@ -163,7 +166,7 @@ test('minimal validation aggregator CLI strict mode exits 1 for current blocked 
   assert.equal(report.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
   assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.status, 'static_report_shape_added_not_executed');
   assert.equal(report.evidence.p36P40EvidenceSourceMap.canClaimV1RcReady, false);
-  assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
+  assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'runtime_write_boundary_guard_added');
   assert.equal(report.evidence_sources.migration_import_export_dry_run_gate_cli.status, 'fixture_only_cli_added_not_executed');
   assert.equal(report.evidence_sources.a5_gated_actions.status, 'blocked_pending_a5');
 });

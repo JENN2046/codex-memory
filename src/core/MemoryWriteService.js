@@ -4,6 +4,14 @@ const { VisibilityPolicy, Namespace, createShadowWriteStatus } = require('./type
 const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
 
 const HIGH_RISK_SENSITIVITY_PATTERN = /\b(secret|unsafe|credential|credentials|password|passwd|token|api[-_ ]?key|access[-_ ]?key|private[-_ ]?key|secret[-_ ]?key)\b/i;
+const SCHEMA_VERSION_METADATA_KEYS = Object.freeze([
+  'schema_version',
+  'schemaVersion',
+  'policy_version',
+  'policyVersion',
+  'manifest_version',
+  'manifestVersion'
+]);
 
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
@@ -33,6 +41,20 @@ function generateMemoryId(target) {
     ? crypto.randomUUID().replace(/-/g, '')
     : crypto.randomBytes(12).toString('hex');
   return `codex-${prefix}-${randomPart}`;
+}
+
+function findSchemaVersionMetadataKeys(payload = {}) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return [];
+  }
+
+  return SCHEMA_VERSION_METADATA_KEYS.filter(key =>
+    Object.prototype.hasOwnProperty.call(payload, key)
+  );
+}
+
+function formatSchemaVersionMetadataRejection(keys) {
+  return `schema/version metadata is not accepted by record_memory runtime boundary: ${keys.join(', ')}.`;
 }
 
 function validateProcessEntry(title, content) {
@@ -109,6 +131,13 @@ class MemoryWriteService {
 
     if (!this.executionContextResolver.isWritableByCodex(executionContext)) {
       result = this.buildRejectedResult('CodexMemoryBridge only allows writes from the Codex agent context.', executionContext, target || null);
+      await this.writeAudit(result);
+      return result;
+    }
+
+    const schemaVersionMetadataKeys = findSchemaVersionMetadataKeys(payload);
+    if (schemaVersionMetadataKeys.length > 0) {
+      result = this.buildRejectedResult(formatSchemaVersionMetadataRejection(schemaVersionMetadataKeys), executionContext, target || null);
       await this.writeAudit(result);
       return result;
     }
@@ -275,6 +304,8 @@ class MemoryWriteService {
 }
 
 module.exports = {
+  SCHEMA_VERSION_METADATA_KEYS,
+  findSchemaVersionMetadataKeys,
   MemoryWriteService,
   validateProcessEntry
 };

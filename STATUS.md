@@ -9,21 +9,21 @@
 - 当前本地基线：本地 `main` 已包含 P51-P62 本地 completion audit refresh、post-T6 audit wording refinement、prompt-to-artifact validation refs、completion audit local-item mapping 及相关 board/status reconciliation，并领先 `origin/main = 1ae4286 test: harden no-touch redaction regressions`；当前 `HEAD` 是最新本地提交，应以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准；推送仍未授权。
 - 最新已推送完成：P46-P50 Evidence Enforcement Bridge 全链路，包括 post-push reconciliation、HTTP no-token mutation + sensitive redaction hardening、evidence-to-enforcement gap map、evidence-chain consistency guard、ValidationAggregator P45 posture bridge、P50 no-touch boundary regression suite，以及 P50 review fix。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P51-P62 本地 evidence/preflight/audit 链已推进到 A5/runtime boundary；P62-T6 completion audit refresh 已完成、验证并本地提交为 `d5808bd`，后续 audit wording refinement、prompt-to-artifact validation refs、completion audit local-item mapping 也已本地提交并验证；具体最新 `HEAD` 以 Git 实测为准。这些工作只是 docs/fixture/test/helper 本地证据与审计对齐，不授权或执行 cutover、tag、release、deploy、push、config switch、watchdog/startup install、mainline strict gate、final RC runner、runtime execution 或 RC_READY claim。
+- 当前任务：P64-T1 runtime schema/version write-boundary proof 已在本地实现并纳入 final RC runtime evidence runner；`node .\src\cli\final-rc-matrix-runner.js --execute --json` 于 `2026-05-18T03:59:06.834Z` 通过 12/12 critical gates，并把 sanitized command evidence 交给 ValidationAggregator。具体最新 `HEAD` 以 Git 实测为准；推送仍未授权。
 
 ## 当前阻塞
 
 - v1.0 RC 仍是 `NOT_READY_BLOCKED`。
-- schema/version runtime enforcement still required。
+- schema/version runtime write-boundary proof 已有本地证据；ValidationAggregator full implementation 仍未完成。
 - ValidationAggregator full implementation still incomplete。
-- final RC matrix runner still incomplete / not executed as a real matrix；P54-T1 提供 safe command inventory，P54-T2 只接受 caller-provided command results，P54-T3 只做 execution preflight，P54-T4 只提供 injected-executor adapter contract 和 fake-executor 测试。
+- final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 
 ## 当前优先级
 
-1. P51-P62 当前本地安全链路已到 P62 post-T6 audit/refinement closeout；下一步若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。
-2. P62 后续 refinement 仅更新本地 audit coverage、validation refs 和 completion local-item mapping，确认 P62-T5 helper 有 artifact/test 映射且无 runtime authority；若继续本地工作，只能进入新的 local evidence/preflight/helper 任务，不得执行 live/provider/runtime cutover 或 A5 动作。
-3. 继续保持 `NOT_READY_BLOCKED`，不得把 P52 helper、P53 inventory/posture/classification、P54 command chain evidence、P55 trace evidence、P56 governance loop evidence、P57 boundary/helper evidence、P58 boundary/helper evidence、P59 boundary/helper evidence、P60 regression 或 P61 report helper 误读为 live runtime enforcement、ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、mainline gate execution、或 final RC matrix execution。
+1. P63-T1 已把 final RC matrix runner 从 fixture/helper 边界推进到本地 allowlisted real execution evidence；P64-T1 已把 schema/version runtime write-boundary proof 接入 core write path 和 final runner 矩阵；当前仍必须保持 `NOT_READY_BLOCKED`。
+2. 下一步只能继续处理剩余 7 个 runtime/A5 缺口中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。
+3. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
 4. 不 push，除非用户单独明确授权。
 
 ## 主要事实源

@@ -106,7 +106,7 @@ test('fixture maps current conclusions to documented evidence sources', () => {
   assert.ok(fixture.evidence_sources);
   assert.ok(fixture.evidence_sources.decision);
   assert.match(fixture.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
-  assert.equal(fixture.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
+  assert.equal(fixture.evidence_sources.schema_version_runtime_enforcement.status, 'runtime_write_boundary_guard_added');
   assert.equal(fixture.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
   assert.equal(fixture.evidence_sources.schema_version_policy_helper.status, 'helper_added_runtime_not_integrated');
   assert.match(fixture.evidence_sources.schema_version_policy_helper.source_ref, /src\/core\/SchemaVersionPolicy\.js/);
@@ -187,11 +187,11 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.summary.validationEvidenceCommandCount, 0);
   assert.equal(fixture.summary.validationEvidenceRejectionStatus, 'no_rejections');
   assert.equal(fixture.summary.validationEvidenceRejectedCount, 0);
-  assert.equal(fixture.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(fixture.summary.schemaVersionRuntimeEnforcementImplemented, true);
   assert.equal(fixture.summary.schemaVersionRuntimeBoundaryGuardTestAdded, true);
   assert.equal(fixture.summary.schemaVersionRuntimeBoundaryGuardPublicSchemaFrozen, true);
   assert.equal(fixture.summary.schemaVersionRuntimeBoundaryGuardRejectsSchemaVersionArgs, true);
-  assert.equal(fixture.summary.schemaVersionRuntimeBoundaryGuardRuntimeIntegrated, false);
+  assert.equal(fixture.summary.schemaVersionRuntimeBoundaryGuardRuntimeIntegrated, true);
   assert.equal(fixture.summary.schemaCompatibilityDryRunCliImplemented, true);
   assert.equal(fixture.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
   assert.equal(fixture.summary.schemaCompatibilityDryRunCliExecuted, false);
@@ -626,7 +626,7 @@ test('fixture honestly preserves current P23/P24 blocker state', () => {
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.status, 'not_ready_no_explicit_evidence');
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.canClaimV1RcReady, false);
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.readyForFinalRcMatrixRunner, false);
-  assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.blockerCounts.runtimeRequired, 2);
+  assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.blockerCounts.runtimeRequired, 1);
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.gateReadiness.blockerCounts.a5Gated, 6);
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.commandCoverage.status, 'no_explicit_evidence');
   assert.equal(fixture.evidence.p28ValidationEvidenceReader.commandCoverage.executesCommands, false);
@@ -650,13 +650,14 @@ test('check groups classify A4-safe, A5-gated, runtime-required, and conditional
   }
 
   assert.equal(fixture.checks.publicMcpTools.status, 'pass');
-  assert.equal(fixture.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
+  assert.equal(fixture.checks.schemaVersionRuntimeEnforcement.status, 'runtime_write_boundary_guard_added');
+  assert.equal(fixture.checks.schemaVersionRuntimeEnforcement.a4Safe, true);
   assert.equal(fixture.checks.schemaVersionPolicyFixture.status, 'fixture_contract_added');
   assert.equal(fixture.checks.schemaVersionPolicyFixture.a4Safe, true);
   assert.equal(fixture.checks.schemaVersionPolicyHelper.status, 'helper_added_runtime_not_integrated');
   assert.equal(fixture.checks.schemaVersionPolicyHelper.a4Safe, true);
   assert.equal(fixture.checks.schemaVersionPolicyHelper.blocksV1Rc, false);
-  assert.equal(fixture.checks.schemaVersionRuntimeBoundaryGuard.status, 'boundary_guard_added_runtime_not_integrated');
+  assert.equal(fixture.checks.schemaVersionRuntimeBoundaryGuard.status, 'runtime_write_boundary_guard_added');
   assert.equal(fixture.checks.schemaVersionRuntimeBoundaryGuard.a4Safe, true);
   assert.equal(fixture.checks.schemaVersionRuntimeBoundaryGuard.blocksV1Rc, false);
   assert.equal(fixture.checks.schemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');

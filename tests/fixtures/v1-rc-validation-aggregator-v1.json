@@ -47,14 +47,18 @@
     "validationEvidenceRejectedCount": 0,
     "validationEvidenceConfidencePostureStatus": "no_explicit_evidence",
     "validationEvidenceConfidenceCanClaimV1RcReady": false,
-    "schemaVersionRuntimeEnforcementImplemented": false,
+    "schemaVersionRuntimeEnforcementImplemented": true,
+    "schemaVersionRuntimeWriteBoundaryGuardImplemented": true,
+    "schemaVersionRuntimeWriteBoundaryRejectsMetadata": true,
+    "schemaVersionRuntimeWriteBoundaryPublicMcpFrozen": true,
+    "schemaVersionRuntimeWriteBoundaryDiaryWriteOnRejectedPayload": false,
     "schemaVersionPolicyHelperImplemented": true,
     "schemaVersionPolicyHelperExplicitInputOnly": true,
     "schemaVersionPolicyHelperRuntimeIntegrated": false,
     "schemaVersionRuntimeBoundaryGuardTestAdded": true,
     "schemaVersionRuntimeBoundaryGuardPublicSchemaFrozen": true,
     "schemaVersionRuntimeBoundaryGuardRejectsSchemaVersionArgs": true,
-    "schemaVersionRuntimeBoundaryGuardRuntimeIntegrated": false,
+    "schemaVersionRuntimeBoundaryGuardRuntimeIntegrated": true,
     "schemaCompatibilityDryRunCliImplemented": true,
     "schemaCompatibilityDryRunCliFixtureOnly": true,
     "schemaCompatibilityDryRunCliExecuted": false,
@@ -196,10 +200,11 @@
       "a4Safe": true
     },
     "schemaVersionRuntimeEnforcement": {
-      "status": "planned_not_implemented",
+      "status": "runtime_write_boundary_guard_added",
       "requiredBeforeV1Rc": true,
-      "blocksV1Rc": true,
-      "runtimeRequired": true
+      "blocksV1Rc": false,
+      "a4Safe": true,
+      "evidence": "MemoryWriteService now rejects schema/version metadata before diary persistence while public MCP tools remain frozen."
     },
     "schemaVersionPolicyFixture": {
       "status": "fixture_contract_added",
@@ -216,11 +221,11 @@
       "evidence": "P29.1 SchemaVersionPolicy helper evaluates explicit parsed policy input only; it is not wired into runtime enforcement."
     },
     "schemaVersionRuntimeBoundaryGuard": {
-      "status": "boundary_guard_added_runtime_not_integrated",
+      "status": "runtime_write_boundary_guard_added",
       "requiredBeforeV1Rc": true,
       "blocksV1Rc": false,
       "a4Safe": true,
-      "evidence": "P29.5 boundary guard test proves record_memory schema has no schema version args and ToolArgumentValidator rejects them before public MCP expansion; it is not runtime enforcement."
+      "evidence": "Boundary tests prove record_memory schema has no schema version args, ToolArgumentValidator rejects public schema version args, and MemoryWriteService rejects direct core schema/version metadata before diary persistence."
     },
     "schemaCompatibilityDryRunCli": {
       "status": "fixture_only_cli_added",
@@ -366,8 +371,7 @@
     "pushTagReleaseDeploy"
   ],
   "runtime_required": [
-    "validationAggregatorExecutable",
-    "schemaVersionRuntimeEnforcement"
+    "validationAggregatorExecutable"
   ],
   "conditional_live": [
     "health",
@@ -913,14 +917,13 @@
         "explicitEvidenceUsable": false,
         "blockerCounts": {
           "validationRequired": 1,
-          "runtimeRequired": 2,
+          "runtimeRequired": 1,
           "a5Gated": 6,
-          "totalUnresolved": 9
+          "totalUnresolved": 8
         },
         "blockedBy": [
           "full-final-rc-matrix-not-executed",
           "validation-aggregator-full-implementation-not-complete",
-          "schema-version-runtime-enforcement-not-implemented",
           "migration-import-export-apply-a5-gated",
           "provider-execution-a5-gated",
           "startup-watchdog-a5-gated",
@@ -1072,9 +1075,9 @@
       "status": "not_executed"
     },
     "schema_version_runtime_enforcement": {
-      "source_type": "runtime_gap",
-      "source_ref": "P25 pending",
-      "status": "not_implemented"
+      "source_type": "runtime_write_boundary_guard",
+      "source_ref": "src/core/MemoryWriteService.js / tests/schema-version-runtime-boundary.test.js",
+      "status": "runtime_write_boundary_guard_added"
     },
     "schema_version_policy_fixture": {
       "source_type": "fixture_contract",
@@ -1268,13 +1271,6 @@
     },
     {
       "id": "validation-aggregator-not-implemented",
-      "status": "planned_not_implemented",
-      "category": "runtime-required",
-      "requiresA5": false,
-      "requiresRuntimeImplementation": true
-    },
-    {
-      "id": "schema-version-runtime-enforcement-not-implemented",
       "status": "planned_not_implemented",
       "category": "runtime-required",
       "requiresA5": false,

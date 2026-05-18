@@ -168,7 +168,28 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - No SQLite migration apply, import/export apply, backup/restore apply.
 - No push/tag/release/deploy unless explicitly authorized.
 
+## P63-T1 Evidence
+
+- Added `src/core/FinalRcRuntimeEvidenceRunner.js`.
+- Added `src/cli/final-rc-matrix-runner.js`.
+- Added `tests/final-rc-runtime-evidence-runner.test.js`.
+- Added `docs/P63_FINAL_RC_RUNTIME_EVIDENCE_BRIDGE.md`.
+- Added `logs/p63-final-rc-runtime-evidence-report-01.md`.
+- Real runner execution passed 11/11 critical gates, including `gate:ci` and `gate:mainline:strict`.
+- ValidationAggregator accepted 11 sanitized local validation evidence inputs and still returned `NOT_READY_BLOCKED`.
+- This locally evidences `final_rc_matrix_runner_not_executed_as_real_matrix`, but keeps runtime readiness, final RC readiness, v1 RC readiness, cutover, and `RC_READY` blocked.
+
+## P64-T1 Evidence
+
+- Added schema/version metadata rejection to `src/core/MemoryWriteService.js`.
+- Extended `tests/schema-version-runtime-boundary.test.js` to prove direct core write-boundary rejection before diary persistence.
+- Updated `src/core/ValidationAggregatorService.js` and related aggregator fixtures/tests so schema/version runtime enforcement reports `runtime_write_boundary_guard_added`.
+- Updated `src/core/FinalRcRuntimeEvidenceRunner.js` so the final runner matrix includes the schema runtime boundary test.
+- Added `docs/P64_RUNTIME_SCHEMA_VERSION_WRITE_BOUNDARY_EVIDENCE.md`.
+- Added `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
+- Real runner execution passed 12/12 critical gates at `2026-05-18T03:59:06.834Z`.
+- This locally evidences `runtime_schema_version_enforcement_not_fully_proven` and `final_rc_matrix_runner_not_executed_as_real_matrix`, but keeps final RC readiness, v1 RC readiness, cutover, and `RC_READY` blocked.
+
 ## Next Safe Step
 
-Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized.
-Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local audit completion as runtime or RC readiness.
+Target one remaining runtime proof gap at a time, starting with a stricter ValidationAggregator full-implementation slice. Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

@@ -1,9 +1,12 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const fsPromises = require('node:fs/promises');
+const os = require('node:os');
 const path = require('node:path');
 
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
+const { createCodexMemoryApplication } = require('../src/app');
 const {
   ToolArgumentValidationError,
   validateToolArguments
@@ -14,9 +17,34 @@ const {
 } = require('../src/core/SchemaVersionPolicy');
 
 const fixturePath = path.join(__dirname, 'fixtures', 'schema-version-policy-v1.json');
+const requestContext = {
+  executionContext: {
+    agentAlias: 'Codex',
+    agentId: 'codex-desktop',
+    requestSource: 'schema-version-runtime-boundary-test'
+  }
+};
 
 function loadFixture() {
   return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+}
+
+async function withApp(handler) {
+  const tempBasePath = await fsPromises.mkdtemp(path.join(os.tmpdir(), 'codex-memory-schema-runtime-'));
+  const app = createCodexMemoryApplication({
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data')
+  });
+
+  await app.initialize();
+  try {
+    await handler({ app });
+  } finally {
+    await app.close();
+    await fsPromises.rm(tempBasePath, { recursive: true, force: true });
+  }
 }
 
 function baseRecordMemoryArgs(extra = {}) {
@@ -103,4 +131,32 @@ test('explicit schema policy report proves write rejection without runtime integ
   assert.equal(report.durableMemoryTouched, false);
   assert.equal(report.realMemoryScanned, false);
   assert.equal(report.publicMcpExpanded, false);
+});
+
+test('MemoryWriteService rejects schema version metadata before diary persistence', async () => {
+  await withApp(async ({ app }) => {
+    const result = await app.callTool('record_memory', baseRecordMemoryArgs({
+      schemaVersion: 'memory-record-v99',
+      policyVersion: 'policy-v99',
+      manifestVersion: 'manifest-v99'
+    }), requestContext);
+
+    assert.equal(result.decision, 'rejected');
+    assert.equal(result.filePath, null);
+    assert.equal(result.memoryId, null);
+    assert.match(result.reason, /schema\/version metadata is not accepted/);
+    assert.match(result.reason, /schemaVersion/);
+    assert.match(result.reason, /policyVersion/);
+    assert.match(result.reason, /manifestVersion/);
+    assert.doesNotMatch(result.reason, /memory-record-v99/);
+    assert.doesNotMatch(result.reason, /policy-v99/);
+    assert.doesNotMatch(result.reason, /manifest-v99/);
+
+    const auditText = await fsPromises.readFile(app.config.auditLogPath, 'utf8');
+    assert.match(auditText, /rejected/);
+    assert.match(auditText, /schema\/version metadata is not accepted/);
+    assert.doesNotMatch(auditText, /memory-record-v99/);
+    assert.doesNotMatch(auditText, /policy-v99/);
+    assert.doesNotMatch(auditText, /manifest-v99/);
+  });
 });

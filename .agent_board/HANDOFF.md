@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute P51-P62 Runtime-Enforced Governed Memory Spine Completion under local A4/A4.8 boundaries.
+Execute P51-P64 Runtime-Enforced Governed Memory Spine Completion under local A4/A4.8 boundaries.
 
 ## Workspace
 
@@ -18,7 +18,7 @@ Local `main` is ahead of `origin/main = 1ae4286 test: harden no-touch redaction 
 
 ## Current Area
 
-P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary after post-T6 audit/refinement reconciliation.
+P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to A5/runtime boundary after P64 schema write-boundary proof.
 
 ## Current Truth
 
@@ -53,6 +53,8 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62 prompt-to-artifact validation refs are locally committed in `5c805c9`.
 - P62 completion audit local-item mapping is locally committed in `1808bba`.
 - P62 completion boundary blocker is recorded as `CMB-0005`; commander decision is recorded as `CMD-0012`; readiness-misread risk is recorded as `RR-0004`.
+- P63-T1 final RC runtime evidence runner bridge is implemented locally; original local runner passed 11/11 critical gates and recorded `logs/p63-final-rc-runtime-evidence-report-01.md`.
+- P64-T1 runtime schema/version write-boundary proof is implemented locally; refreshed local runner passed 12/12 critical gates and recorded `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -76,6 +78,8 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62-T6 validation passed: changed audit test syntax, completion audit and prompt-to-artifact audit tests `19/19`, docs validation, `npm test` `1075/1075`, `git diff --check`.
 - P62 post-T6 audit/refinement validation passed: targeted P62 audit tests `36/36`, docs validation, `npm test` `1075/1075`, `git diff --check`, readiness scan.
 - P62 completion boundary board records passed docs validation, `git diff --check`, and blocker/decision/risk overclaim scans.
+- P63-T1 validation passed: syntax checks, targeted runner/aggregator/no-touch tests, real local runner 11/11 critical gates, docs validation, and `git diff --check`.
+- P64-T1 validation passed: syntax checks, schema runtime boundary test `4/4`, final runner test `5/5`, ValidationAggregator set `37/37`, real local runner 12/12 critical gates, docs validation, and `git diff --check`.
 
 ## Hard Stops
 
@@ -83,5 +87,6 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized.
-Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local audit completion as runtime or RC readiness.
+P64-T1 runtime schema/version write-boundary proof is now the latest local evidence slice. It implements a `MemoryWriteService.record()` guard for schema/version metadata, updates ValidationAggregator status, refreshes the final runner matrix, and the real runner passed 12/12 local critical gates while preserving `NOT_READY_BLOCKED`.
+
+Next safe local work should target one remaining runtime proof gap at a time, starting with a stricter ValidationAggregator full-implementation slice. Stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

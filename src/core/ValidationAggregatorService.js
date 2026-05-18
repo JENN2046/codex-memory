@@ -221,8 +221,9 @@ const P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS = [
     id: 'schema_version_runtime_enforcement',
     sourceClass: 'runtime_evidence',
     sourceType: 'runtime_boundary_report',
-    status: 'missing',
-    acceptedForPlanning: false
+    status: 'fresh',
+    acceptedForPlanning: true,
+    runtimeEvidenceObserved: true
   },
   {
     id: 'final_rc_matrix_runner_execution',
@@ -262,9 +263,9 @@ const EVIDENCE_SOURCES = {
     status: 'not_executed'
   },
   schema_version_runtime_enforcement: {
-    source_type: 'runtime_gap',
-    source_ref: 'P25 pending',
-    status: 'not_implemented'
+    source_type: 'runtime_write_boundary_guard',
+    source_ref: 'src/core/MemoryWriteService.js / tests/schema-version-runtime-boundary.test.js',
+    status: 'runtime_write_boundary_guard_added'
   },
   schema_version_policy_fixture: {
     source_type: 'fixture_contract',
@@ -965,11 +966,6 @@ function buildV1RcValidationAggregatorReport({
       category: 'runtime-required',
       requiresRuntimeImplementation: true
     }),
-    buildBlocker('schema-version-runtime-enforcement-not-implemented', {
-      status: 'planned_not_implemented',
-      category: 'runtime-required',
-      requiresRuntimeImplementation: true
-    }),
     buildBlocker('migration-import-export-apply-a5-gated', {
       status: 'blocked_pending_a5',
       category: 'a5-gated',
@@ -1059,14 +1055,18 @@ function buildV1RcValidationAggregatorReport({
       validationEvidenceRejectedCount: validationEvidenceRejectionSummary.rejectedCount,
       validationEvidenceConfidencePostureStatus: validationEvidenceConfidencePosture.status,
       validationEvidenceConfidenceCanClaimV1RcReady: false,
-      schemaVersionRuntimeEnforcementImplemented: false,
+      schemaVersionRuntimeEnforcementImplemented: true,
+      schemaVersionRuntimeWriteBoundaryGuardImplemented: true,
+      schemaVersionRuntimeWriteBoundaryRejectsMetadata: true,
+      schemaVersionRuntimeWriteBoundaryPublicMcpFrozen: true,
+      schemaVersionRuntimeWriteBoundaryDiaryWriteOnRejectedPayload: false,
       schemaVersionPolicyHelperImplemented: true,
       schemaVersionPolicyHelperExplicitInputOnly: true,
       schemaVersionPolicyHelperRuntimeIntegrated: false,
       schemaVersionRuntimeBoundaryGuardTestAdded: true,
       schemaVersionRuntimeBoundaryGuardPublicSchemaFrozen: true,
       schemaVersionRuntimeBoundaryGuardRejectsSchemaVersionArgs: true,
-      schemaVersionRuntimeBoundaryGuardRuntimeIntegrated: false,
+      schemaVersionRuntimeBoundaryGuardRuntimeIntegrated: true,
       schemaCompatibilityDryRunCliImplemented: true,
       schemaCompatibilityDryRunCliFixtureOnly: true,
       schemaCompatibilityDryRunCliExecuted: false,
@@ -1159,18 +1159,18 @@ function buildV1RcValidationAggregatorReport({
       p53ValidationAggregatorEvidenceInventoryAvailable: true,
       p53ValidationAggregatorEvidenceInventorySourceMode: 'static_report_shape_only',
       p53ValidationAggregatorEvidenceInventoryOnly: true,
-      p53ValidationAggregatorInventoryAcceptedForPlanningCount: 5,
+      p53ValidationAggregatorInventoryAcceptedForPlanningCount: 6,
       p53ValidationAggregatorInventoryBlockedCount: 1,
-      p53ValidationAggregatorInventoryMissingCount: 1,
+      p53ValidationAggregatorInventoryMissingCount: 0,
       p53ValidationAggregatorInventoryNotExecutedCount: 1,
       p53ValidationAggregatorInventoryUnsupportedCount: 0,
       p53ValidationAggregatorInventoryStaleCount: 0,
-      p53ValidationAggregatorInventoryFreshCount: 5,
+      p53ValidationAggregatorInventoryFreshCount: 6,
       p53ValidationAggregatorInventoryFixtureReadByAggregator: false,
       p53ValidationAggregatorInventoryTestExecutedByAggregator: false,
       p53ValidationAggregatorInventoryHelperExecutedByAggregator: false,
       p53ValidationAggregatorInventoryRunnerExecutedByAggregator: false,
-      p53ValidationAggregatorInventoryRuntimeObserved: false,
+      p53ValidationAggregatorInventoryRuntimeObserved: true,
       p53ValidationAggregatorFullImplementationComplete: false,
       p53ValidationAggregatorInventoryCanClaimRuntimeReady: false,
       p53ValidationAggregatorInventoryCanClaimFinalRcReady: false,
@@ -1227,10 +1227,11 @@ function buildV1RcValidationAggregatorReport({
         a4Safe: true
       }),
       schemaVersionRuntimeEnforcement: createCheck({
-        status: 'planned_not_implemented',
+        status: 'runtime_write_boundary_guard_added',
         requiredBeforeV1Rc: true,
-        blocksV1Rc: true,
-        runtimeRequired: true
+        blocksV1Rc: false,
+        a4Safe: true,
+        evidence: 'MemoryWriteService now rejects schema/version metadata before diary persistence while public MCP tools remain frozen.'
       }),
       schemaVersionPolicyFixture: createCheck({
         status: 'fixture_contract_added',
@@ -1247,11 +1248,11 @@ function buildV1RcValidationAggregatorReport({
         evidence: 'P29.1 SchemaVersionPolicy helper evaluates explicit parsed policy input only; it is not wired into runtime enforcement.'
       }),
       schemaVersionRuntimeBoundaryGuard: createCheck({
-        status: 'boundary_guard_added_runtime_not_integrated',
+        status: 'runtime_write_boundary_guard_added',
         requiredBeforeV1Rc: true,
         blocksV1Rc: false,
         a4Safe: true,
-        evidence: 'P29.5 boundary guard test proves record_memory schema has no schema version args and ToolArgumentValidator rejects them before public MCP expansion; it is not runtime enforcement.'
+        evidence: 'Boundary tests prove record_memory schema has no schema version args, ToolArgumentValidator rejects public schema version args, and MemoryWriteService rejects direct core schema/version metadata before diary persistence.'
       }),
       schemaCompatibilityDryRunCli: createCheck({
         status: 'fixture_only_cli_added',
@@ -1409,8 +1410,7 @@ function buildV1RcValidationAggregatorReport({
       'pushTagReleaseDeploy'
     ],
     runtime_required: [
-      'validationAggregatorFullImplementation',
-      'schemaVersionRuntimeEnforcement'
+      'validationAggregatorFullImplementation'
     ],
     conditional_live: [
       'health',
@@ -1464,12 +1464,14 @@ function buildV1RcValidationAggregatorReport({
         publicMcpExpanded: false
       },
       p29SchemaVersionRuntimeBoundaryGuard: {
-        status: 'boundary_guard_added_runtime_not_integrated',
+        status: 'runtime_write_boundary_guard_added',
         test: 'tests/schema-version-runtime-boundary.test.js',
         sourceMode: 'fixture_backed_test',
         publicRecordMemorySchemaFrozen: true,
         recordMemorySchemaVersionArgsExposed: false,
         toolArgumentValidatorRejectsSchemaVersionArgs: true,
+        memoryWriteServiceRejectsSchemaVersionMetadata: true,
+        diaryWriteOnRejectedPayload: false,
         policyWriteRejectionReportOnly: true,
         readsFiles: false,
         executesCommands: false,
@@ -1477,8 +1479,8 @@ function buildV1RcValidationAggregatorReport({
         callsProviders: false,
         durableMemoryTouched: false,
         realMemoryScanned: false,
-        runtimeIntegrated: false,
-        runtimeEnforcementImplemented: false,
+        runtimeIntegrated: true,
+        runtimeEnforcementImplemented: true,
         publicMcpExpanded: false
       },
       p25SchemaCompatibilityDryRunCli: {
@@ -1859,7 +1861,7 @@ function buildV1RcValidationAggregatorReport({
         inventoryRows: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS.map(row => ({
           ...row,
           readinessAuthority: false,
-          runtimeEvidenceObserved: false
+          runtimeEvidenceObserved: row.runtimeEvidenceObserved === true
         })),
         acceptedForPlanningCount: P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS
           .filter(row => row.acceptedForPlanning === true).length,

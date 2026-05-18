@@ -79,14 +79,18 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.validationEvidenceRejectedCount, 0);
   assert.equal(report.summary.validationEvidenceConfidencePostureStatus, 'no_explicit_evidence');
   assert.equal(report.summary.validationEvidenceConfidenceCanClaimV1RcReady, false);
-  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, true);
+  assert.equal(report.summary.schemaVersionRuntimeWriteBoundaryGuardImplemented, true);
+  assert.equal(report.summary.schemaVersionRuntimeWriteBoundaryRejectsMetadata, true);
+  assert.equal(report.summary.schemaVersionRuntimeWriteBoundaryPublicMcpFrozen, true);
+  assert.equal(report.summary.schemaVersionRuntimeWriteBoundaryDiaryWriteOnRejectedPayload, false);
   assert.equal(report.summary.schemaVersionPolicyHelperImplemented, true);
   assert.equal(report.summary.schemaVersionPolicyHelperExplicitInputOnly, true);
   assert.equal(report.summary.schemaVersionPolicyHelperRuntimeIntegrated, false);
   assert.equal(report.summary.schemaVersionRuntimeBoundaryGuardTestAdded, true);
   assert.equal(report.summary.schemaVersionRuntimeBoundaryGuardPublicSchemaFrozen, true);
   assert.equal(report.summary.schemaVersionRuntimeBoundaryGuardRejectsSchemaVersionArgs, true);
-  assert.equal(report.summary.schemaVersionRuntimeBoundaryGuardRuntimeIntegrated, false);
+  assert.equal(report.summary.schemaVersionRuntimeBoundaryGuardRuntimeIntegrated, true);
   assert.equal(report.summary.schemaCompatibilityDryRunCliImplemented, true);
   assert.equal(report.summary.schemaCompatibilityDryRunCliFixtureOnly, true);
   assert.equal(report.summary.schemaCompatibilityDryRunCliExecuted, false);
@@ -179,9 +183,9 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.p53ValidationAggregatorEvidenceInventoryAvailable, true);
   assert.equal(report.summary.p53ValidationAggregatorEvidenceInventorySourceMode, 'static_report_shape_only');
   assert.equal(report.summary.p53ValidationAggregatorEvidenceInventoryOnly, true);
-  assert.equal(report.summary.p53ValidationAggregatorInventoryAcceptedForPlanningCount, 5);
-  assert.equal(report.summary.p53ValidationAggregatorInventoryFreshCount, 5);
-  assert.equal(report.summary.p53ValidationAggregatorInventoryMissingCount, 1);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryAcceptedForPlanningCount, 6);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryFreshCount, 6);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryMissingCount, 0);
   assert.equal(report.summary.p53ValidationAggregatorInventoryBlockedCount, 1);
   assert.equal(report.summary.p53ValidationAggregatorInventoryNotExecutedCount, 1);
   assert.equal(report.summary.p53ValidationAggregatorInventoryUnsupportedCount, 0);
@@ -190,7 +194,7 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.p53ValidationAggregatorInventoryTestExecutedByAggregator, false);
   assert.equal(report.summary.p53ValidationAggregatorInventoryHelperExecutedByAggregator, false);
   assert.equal(report.summary.p53ValidationAggregatorInventoryRunnerExecutedByAggregator, false);
-  assert.equal(report.summary.p53ValidationAggregatorInventoryRuntimeObserved, false);
+  assert.equal(report.summary.p53ValidationAggregatorInventoryRuntimeObserved, true);
   assert.equal(report.summary.p53ValidationAggregatorFullImplementationComplete, false);
   assert.equal(report.summary.p53ValidationAggregatorInventoryCanClaimRuntimeReady, false);
   assert.equal(report.summary.p53ValidationAggregatorInventoryCanClaimFinalRcReady, false);
@@ -224,12 +228,14 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.runtimeIntegrated, false);
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.runtimeEnforcementImplemented, false);
   assert.equal(report.evidence.p29SchemaVersionPolicyHelper.publicMcpExpanded, false);
-  assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.status, 'boundary_guard_added_runtime_not_integrated');
+  assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.status, 'runtime_write_boundary_guard_added');
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.test, 'tests/schema-version-runtime-boundary.test.js');
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.sourceMode, 'fixture_backed_test');
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.publicRecordMemorySchemaFrozen, true);
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.recordMemorySchemaVersionArgsExposed, false);
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.toolArgumentValidatorRejectsSchemaVersionArgs, true);
+  assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.memoryWriteServiceRejectsSchemaVersionMetadata, true);
+  assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.diaryWriteOnRejectedPayload, false);
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.policyWriteRejectionReportOnly, true);
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.readsFiles, false);
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.executesCommands, false);
@@ -237,8 +243,8 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.callsProviders, false);
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.durableMemoryTouched, false);
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.realMemoryScanned, false);
-  assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.runtimeIntegrated, false);
-  assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.runtimeEnforcementImplemented, false);
+  assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.runtimeIntegrated, true);
+  assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.runtimeEnforcementImplemented, true);
   assert.equal(report.evidence.p29SchemaVersionRuntimeBoundaryGuard.publicMcpExpanded, false);
   assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
   assert.equal(report.evidence.p25SchemaCompatibilityDryRunCli.cli, 'src/cli/schema-compatibility-dry-run.js');
@@ -605,7 +611,17 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     'governance_review_approval_audit_runtime_loop'
   ]);
   assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.inventoryRows.every(row => row.readinessAuthority === false), true);
-  assert.equal(report.evidence.p53ValidationAggregatorEvidenceInventory.inventoryRows.every(row => row.runtimeEvidenceObserved === false), true);
+  assert.equal(
+    report.evidence.p53ValidationAggregatorEvidenceInventory.inventoryRows
+      .find(row => row.id === 'schema_version_runtime_enforcement').runtimeEvidenceObserved,
+    true
+  );
+  assert.equal(
+    report.evidence.p53ValidationAggregatorEvidenceInventory.inventoryRows
+      .filter(row => row.id !== 'schema_version_runtime_enforcement')
+      .every(row => row.runtimeEvidenceObserved === false),
+    true
+  );
   assert.equal(report.evidence.p28ValidationEvidenceReader.status, 'no_explicit_validation_evidence');
   assert.equal(report.evidence.p28ValidationEvidenceReader.implemented, true);
   assert.equal(report.evidence.p28ValidationEvidenceReader.fullImplementation, false);
@@ -669,7 +685,7 @@ test('minimal implementation maps current conclusions to documented evidence sou
   assert.ok(report.evidence_sources.decision);
   assert.equal(report.evidence_sources.decision.source_ref, 'ValidationAggregatorService');
   assert.match(report.evidence_sources.public_mcp_tools.source_ref, /src\/core\/constants\.js/);
-  assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'not_implemented');
+  assert.equal(report.evidence_sources.schema_version_runtime_enforcement.status, 'runtime_write_boundary_guard_added');
   assert.equal(report.evidence_sources.schema_version_policy_fixture.status, 'fixture_contract_added');
   assert.equal(report.evidence_sources.schema_version_policy_helper.status, 'helper_added_runtime_not_integrated');
   assert.match(report.evidence_sources.schema_version_policy_helper.source_ref, /src\/core\/SchemaVersionPolicy\.js/);
@@ -768,7 +784,7 @@ test('validation evidence reader exposes only explicit committed and local valid
 
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
-  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, false);
+  assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, true);
   assert.equal(report.summary.validationEvidenceAcceptedCount, 2);
   assert.equal(report.summary.validationEvidenceFreshnessStatus, 'fresh_passed');
   assert.equal(report.summary.validationEvidenceStaleCount, 0);
@@ -811,9 +827,9 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.equal(reader.gateReadiness.canClaimV1RcReady, false);
   assert.equal(reader.gateReadiness.readyForFinalRcMatrixRunner, false);
   assert.equal(reader.gateReadiness.blockerCounts.validationRequired, 1);
-  assert.equal(reader.gateReadiness.blockerCounts.runtimeRequired, 2);
+  assert.equal(reader.gateReadiness.blockerCounts.runtimeRequired, 1);
   assert.equal(reader.gateReadiness.blockerCounts.a5Gated, 6);
-  assert.equal(reader.gateReadiness.blockedBy.includes('schema-version-runtime-enforcement-not-implemented'), true);
+  assert.equal(reader.gateReadiness.blockedBy.includes('schema-version-runtime-enforcement-not-implemented'), false);
   assert.equal(reader.commandCoverage.status, 'command_coverage_present');
   assert.equal(reader.commandCoverage.executesCommands, false);
   assert.equal(reader.commandCoverage.acceptedEvidenceCount, 2);
@@ -1108,13 +1124,14 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   const report = buildV1RcValidationAggregatorReport();
 
   assert.equal(report.checks.validationAggregatorExecutable.status, 'minimal_implemented');
-  assert.equal(report.checks.schemaVersionRuntimeEnforcement.status, 'planned_not_implemented');
+  assert.equal(report.checks.schemaVersionRuntimeEnforcement.status, 'runtime_write_boundary_guard_added');
+  assert.equal(report.checks.schemaVersionRuntimeEnforcement.a4Safe, true);
   assert.equal(report.checks.schemaVersionPolicyFixture.status, 'fixture_contract_added');
   assert.equal(report.checks.schemaVersionPolicyFixture.a4Safe, true);
   assert.equal(report.checks.schemaVersionPolicyHelper.status, 'helper_added_runtime_not_integrated');
   assert.equal(report.checks.schemaVersionPolicyHelper.a4Safe, true);
   assert.equal(report.checks.schemaVersionPolicyHelper.blocksV1Rc, undefined);
-  assert.equal(report.checks.schemaVersionRuntimeBoundaryGuard.status, 'boundary_guard_added_runtime_not_integrated');
+  assert.equal(report.checks.schemaVersionRuntimeBoundaryGuard.status, 'runtime_write_boundary_guard_added');
   assert.equal(report.checks.schemaVersionRuntimeBoundaryGuard.a4Safe, true);
   assert.equal(report.checks.schemaVersionRuntimeBoundaryGuard.blocksV1Rc, undefined);
   assert.equal(report.checks.schemaCompatibilityDryRunCli.status, 'fixture_only_cli_added');
@@ -1148,7 +1165,7 @@ test('minimal implementation classifies A4, A5, runtime-required, and conditiona
   assert.equal(report.checks.p45FinalRcMatrixEvaluatorPosture.a4Safe, true);
   assert.equal(report.checks.p45FinalRcMatrixEvaluatorPosture.blocksV1Rc, undefined);
   assert.equal(report.checks.conditionalLiveMcpHttp.status, 'not_executed_service_not_running');
-  assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), true);
+  assert.equal(report.runtime_required.includes('schemaVersionRuntimeEnforcement'), false);
   assert.equal(report.a5_gated.includes('providerExecution'), true);
   assert.equal(report.a4_safe.includes('gitHygiene'), true);
   assert.equal(report.a4_safe.includes('schemaVersionPolicyFixture'), true);
