@@ -10,10 +10,10 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Remote baseline: `6cd019a docs: refresh p66 runtime gap inventory`.
-- Local baseline: local `main` contains the P66.1-P66.7 ValidationAggregator full-implementation definition / static bridge / runtime gap plan / source-registry proof chain; it is ahead of `origin/main = 6cd019a`; current `HEAD` is intentionally not hard-coded here and must be verified with `git status -sb` / `git log --oneline --decorate -n 10`; push is not authorized.
-- Current active program: P64 runtime schema/version write-boundary proof after P63 final RC runtime evidence bridge.
-- Current phase area: P64-T1 local runtime schema/version write-boundary guard plus final runner matrix refresh. Evidence-first / fail-closed / reversible boundaries preserved.
+- Remote baseline: `6a4009e feat: add p66 governance runtime loop helper`.
+- Local baseline: local `main` was fast-forwarded to the pushed P66.39 baseline; this post-sync board/status reconciliation may make local `main` ahead again. Current `HEAD` and ahead/behind state must be verified with `git status -sb` / `git log --oneline --decorate -n 10`; push is deferred by the active goal until completion and final validation.
+- Current active program: P66 remaining runtime gap local-safe proof chain after P63/P64 runtime evidence bridge.
+- Current phase area: post-sync board/status reconciliation, then P66.40 ValidationAggregator governance runtime loop gap static bridge. Evidence-first / fail-closed / reversible boundaries preserved.
 
 ## Active Queue
 

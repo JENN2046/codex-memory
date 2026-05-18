@@ -10,8 +10,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 
 ## Current Status
 
-- Last pushed baseline: `6cd019a docs: refresh p66 runtime gap inventory` on `origin/main`.
-- Local `main` is ahead of `origin/main`; push is not authorized.
+- Last pushed baseline: `6a4009e feat: add p66 governance runtime loop helper` on `origin/main`.
+- Local `main` was fast-forwarded to `origin/main = 6a4009e`; this board/status reconciliation may make local `main` ahead again. Push is deferred until active-goal completion and final validation.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
@@ -57,7 +57,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.9 ValidationAggregator evidence freshness proof helper is implemented, validated, and committed locally in `f34cb4c`.
 - P66.10 ValidationAggregator evidence freshness static bridge is implemented, validated, and committed locally in `d38520b`.
 - P66.11 ValidationAggregator evidence freshness closeout is implemented, validated, and committed locally in `644d17c`.
-- P66.12 ValidationAggregator baseline binding proof fixture is implemented locally as docs/fixture/test only; validation and guarded commit are pending.
+- P66.12 through P66.39 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `6a4009e`.
+- P66.40 ValidationAggregator governance runtime loop gap static bridge is the next local-safe candidate.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
