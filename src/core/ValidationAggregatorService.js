@@ -336,6 +336,44 @@ const P66_SOURCE_REGISTRY_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const P66_EVIDENCE_FRESHNESS_REQUIRED_FIELDS = [
+  'evidence_id',
+  'source_id',
+  'source_kind',
+  'source_registry_version',
+  'baseline_commit',
+  'evidence_generated_at',
+  'evidence_validated_at',
+  'evidence_observed_hash',
+  'validation_status',
+  'validation_ref'
+];
+
+const P66_EVIDENCE_FRESHNESS_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'missing_explicit_as_of',
+  'missing_expected_baseline_commit',
+  'missing_expected_source_registry_version',
+  'missing_evidence_record',
+  'missing_required_freshness_field',
+  'duplicate_evidence_id',
+  'non_iso8601_utc_timestamp',
+  'generated_after_validated',
+  'validated_after_as_of',
+  'baseline_commit_mismatch',
+  'source_registry_version_mismatch',
+  'validation_status_not_passed',
+  'missing_freshness_window',
+  'expired_freshness_window',
+  'unsafe_low_risk_summary',
+  'unsafe_no_touch_boundary',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1501,6 +1539,20 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorSourceRegistryCanClaimRuntimeReady: false,
       p66ValidationAggregatorSourceRegistryCanClaimFinalRcReady: false,
       p66ValidationAggregatorSourceRegistryCanClaimV1RcReady: false,
+      p66ValidationAggregatorEvidenceFreshnessProofAvailable: true,
+      p66ValidationAggregatorEvidenceFreshnessProofSourceMode: 'static_report_shape_only',
+      p66ValidationAggregatorEvidenceFreshnessProofHelperCapabilityOnly: true,
+      p66ValidationAggregatorEvidenceFreshnessRequiredFieldCount:
+        P66_EVIDENCE_FRESHNESS_REQUIRED_FIELDS.length,
+      p66ValidationAggregatorEvidenceFreshnessFailClosedReasonCount:
+        P66_EVIDENCE_FRESHNESS_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorEvidenceFreshnessHelperImportedByAggregator: false,
+      p66ValidationAggregatorEvidenceFreshnessHelperExecutedByAggregator: false,
+      p66ValidationAggregatorEvidenceFreshnessRuntimeImplemented: false,
+      p66ValidationAggregatorEvidenceFreshnessFullImplementationComplete: false,
+      p66ValidationAggregatorEvidenceFreshnessCanClaimRuntimeReady: false,
+      p66ValidationAggregatorEvidenceFreshnessCanClaimFinalRcReady: false,
+      p66ValidationAggregatorEvidenceFreshnessCanClaimV1RcReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -2333,6 +2385,58 @@ function buildV1RcValidationAggregatorReport({
         canClaimFinalRcReady: false,
         canClaimV1RcReady: false
       },
+      p66ValidationAggregatorEvidenceFreshnessProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_9_VALIDATION_AGGREGATOR_EVIDENCE_FRESHNESS_PROOF_HELPER.md',
+        helper: 'src/core/ValidationAggregatorEvidenceFreshnessProofContract.js',
+        test: 'tests/validation-aggregator-evidence-freshness-proof-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion: 'p66-validation-aggregator-evidence-freshness-proof-v1',
+        policyVersion: 'p66-validation-aggregator-evidence-freshness-proof-policy-v1',
+        manifestVersion: 'p66-validation-aggregator-evidence-freshness-proof-manifest-v1',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        timestampPolicyExplicitOnly: true,
+        baselineBindingRequired: true,
+        freshnessWindowRequired: true,
+        publicToolsFrozen: true,
+        requiredFreshnessFields: P66_EVIDENCE_FRESHNESS_REQUIRED_FIELDS.map(id => ({
+          id,
+          required: true,
+          mustFailClosedWhenMissing: true
+        })),
+        failClosedReasons: P66_EVIDENCE_FRESHNESS_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        rcReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -2360,7 +2464,8 @@ function buildV1RcValidationAggregatorReport({
       'P53 inventory evidence is static report-shape posture only and does not complete the ValidationAggregator full implementation.',
       'P65 runtime evidence summary ingestion is explicit-input-only and does not execute gates or claim RC readiness.',
       'P66.1 full-implementation definition is static and does not make validationAggregatorFullImplementation true.',
-      'P66.5 source registry proof helper capability is static and is not executed by the aggregator.'
+      'P66.5 source registry proof helper capability is static and is not executed by the aggregator.',
+      'P66.9 evidence freshness proof helper capability is static and is not executed by the aggregator.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',

@@ -698,6 +698,59 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.canClaimRuntimeReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.canClaimFinalRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.canClaimV1RcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessProofAvailable, true);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessProofSourceMode, 'static_report_shape_only');
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessProofHelperCapabilityOnly, true);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessRequiredFieldCount, 10);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessFailClosedReasonCount, 22);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessHelperImportedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessHelperExecutedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessRuntimeImplemented, false);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessFullImplementationComplete, false);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessCanClaimRuntimeReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorEvidenceFreshnessCanClaimV1RcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.sourceMode, 'static_report_shape_only');
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.helperCapabilityOnly, true);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.explicitInputOnly, true);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.timestampPolicyExplicitOnly, true);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.baselineBindingRequired, true);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.freshnessWindowRequired, true);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.requiredFreshnessFields.length, 10);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.failClosedReasons.length, 22);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.helperImportedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.helperExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.evidenceFileReadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.commandExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.gateExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.evidenceCollectedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.liveMcpRefreshedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.scansDirectories, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.publicMcpExpanded, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.runtimeMutationImplemented, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.fullAggregatorImplementationComplete, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.rcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.decisionImpact, 'none_report_only');
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.blockedDecisionRequired, true);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.canClaimV1RcReady, false);
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',
