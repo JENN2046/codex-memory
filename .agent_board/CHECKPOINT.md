@@ -287,6 +287,14 @@ P66.26 validation passed: aggregator syntax, targeted aggregator test `17/17`, n
 
 Next safe action is to guarded-commit P66.26 if eligible; after that, continue to P66.27 unsupported source fail-closed closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.26；之后只能做 unsupported source fail-closed 的 docs/board closeout，仍然不是 runtime 或 RC readiness。
 
+P66.26 ValidationAggregator unsupported source fail-closed static bridge is committed locally in `a5c3ce5`.
+
+P66.27 ValidationAggregator unsupported source fail-closed closeout is implemented locally as docs/board only. It closes the unsupported source fail-closed proof slice after P66.24-P66.26 and selects `no_touch_boundary_proof` as the next local-safe evidence group. It does not close the full runtime gap or claim readiness.
+
+P66.27 validation passed: `git diff --check` and docs validation.
+
+Next safe action is to guarded-commit P66.27 if eligible; after that, continue to P66.28 no-touch boundary proof if still inside local safe bounds. 中文解释：下一步先提交 P66.27；之后只能做 no-touch boundary proof 的本地 docs/fixture/test/helper/report-shape 工作，仍然不是 runtime 或 RC readiness。
+
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.

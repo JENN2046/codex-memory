@@ -208,3 +208,11 @@ P66.26 ValidationAggregator unsupported source fail-closed static bridge is impl
 P66.26 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1271/1271`, `git diff --check`, and docs validation.
 
 Next safe action is to guarded-commit P66.26 if eligible; after that, continue to P66.27 unsupported source fail-closed closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.26；之后只能做 unsupported source fail-closed 的 docs/board closeout，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+
+P66.26 ValidationAggregator unsupported source fail-closed static bridge is committed locally in `a5c3ce5`.
+
+P66.27 ValidationAggregator unsupported source fail-closed closeout is implemented locally as docs/board only. It adds [docs/P66_27_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_CLOSEOUT.md](/A:/codex-memory/docs/P66_27_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_CLOSEOUT.md), closes the unsupported source fail-closed proof slice after P66.24-P66.26, and selects `no_touch_boundary_proof` as the next local-safe evidence group. It does not close the full runtime gap, execute runtime/gate/runner/service/provider work, write durable state, expand public MCP, push/tag/release/deploy, or claim readiness.
+
+P66.27 validation passed: `git diff --check` and docs validation.
+
+Next safe action is to guarded-commit P66.27 if eligible; after that, continue to P66.28 no-touch boundary proof if still inside local safe bounds. 中文解释：下一步先提交 P66.27；之后只能做 no-touch boundary proof 的本地 docs/fixture/test/helper/report-shape 工作，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

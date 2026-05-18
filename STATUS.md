@@ -31,7 +31,7 @@
 - 当前阶段：P66.15 ValidationAggregator baseline binding closeout 已新增 [docs/P66_15_VALIDATION_AGGREGATOR_BASELINE_BINDING_CLOSEOUT.md](/A:/codex-memory/docs/P66_15_VALIDATION_AGGREGATOR_BASELINE_BINDING_CLOSEOUT.md)。它只关闭 baseline binding proof slice，并把下一个本地安全证据组定为 `runtime_evidence_summary_normalization_proof`；v1.0 RC 仍是 `NOT_READY_BLOCKED`。
 - 当前阶段：P66.16 ValidationAggregator runtime evidence summary normalization proof 已新增 [docs/P66_16_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_PROOF.md](/A:/codex-memory/docs/P66_16_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_PROOF.md)。它只用 fixture/test 定义 caller-provided sanitized runtime evidence summary 的归一化验收边界；不执行 gate/runner，不读 evidence 文件，不扫描真实 memory/runtime stores，不声明 readiness。
 - 当前阶段：P66.17 ValidationAggregator runtime evidence summary normalization helper 已新增 [docs/P66_17_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_HELPER.md](/A:/codex-memory/docs/P66_17_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_HELPER.md) 和纯 explicit-input helper。它只校验调用方传入的 sanitized runtime evidence summary，不 import/execute aggregator，不读文件、不执行命令、不启动服务、不调用 provider、不写 durable state、不扩大 public MCP，也不声明 readiness。
-- 当前阶段：P66.26 ValidationAggregator unsupported source fail-closed static bridge 已新增 [docs/P66_26_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_STATIC_BRIDGE.md](/A:/codex-memory/docs/P66_26_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_STATIC_BRIDGE.md)。ValidationAggregator 只静态展示 P66.25 helper 能力，不 import/execute helper，不读取真实 evidence 文件、不执行 runtime/gate/runner、不启动服务、不调用 provider、不写 durable state、不扩大 public MCP、不声明 `RC_READY`；v1.0 RC 仍是 `NOT_READY_BLOCKED`。
+- 当前阶段：P66.27 ValidationAggregator unsupported source fail-closed closeout 已新增 [docs/P66_27_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_CLOSEOUT.md](/A:/codex-memory/docs/P66_27_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_CLOSEOUT.md)。它只关闭 unsupported source fail-closed proof slice，并把下一个本地安全证据组定为 `no_touch_boundary_proof`；v1.0 RC 仍是 `NOT_READY_BLOCKED`。
 
 ## 当前阻塞
 
@@ -68,13 +68,14 @@
 - P66.24 是 docs/fixture/test acceptance contract；它不接受 unsupported source、不降级 unsupported source、不执行 runtime collector/gate/runner、不声明 `RC_READY`。
 - P66.25 是纯 explicit-input helper；它只证明 caller-provided unsupported source metadata 的本地 fail-closed 标准，不读取文件、不执行命令、不启动服务、不声明 `RC_READY`。
 - P66.26 是 static bridge/report-shape evidence；它不执行 P66.25 helper，不使 `validationAggregatorFullImplementation=true`，不声明 `RC_READY`。
+- P66.27 是 docs/board closeout；它不关闭整个 runtime gap，不执行 runtime，不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 
 ## 当前优先级
 
 1. P63-T1 已把 final RC matrix runner 从 fixture/helper 边界推进到本地 allowlisted real execution evidence；P64-T1 已把 schema/version runtime write-boundary proof 接入 core write path 和 final runner 矩阵；当前仍必须保持 `NOT_READY_BLOCKED`。
-2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。P66.27 的候选范围只能是 `unsupported_source_fail_closed_closeout` 的 docs/board closeout 工作。
+2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。P66.28 的候选范围只能是 `no_touch_boundary_proof` 的本地 docs/fixture/test/helper/report-shape 工作。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
 4. 不 push，除非用户单独明确授权。
 
