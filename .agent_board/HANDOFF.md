@@ -248,3 +248,11 @@ P66.31 ValidationAggregator no-touch boundary closeout is implemented locally as
 P66.31 validation passed: `git diff --check` and docs validation.
 
 Next safe action is to guarded-commit P66.31 if eligible; after that, continue to P66.32 readiness overclaim rejection proof if still inside local safe bounds. 中文解释：下一步先提交 P66.31；之后只能做 readiness overclaim rejection 的本地 docs/fixture/test/helper/report-shape 工作，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+
+P66.31 ValidationAggregator no-touch boundary closeout is committed locally in `2f0dc86`.
+
+P66.32 ValidationAggregator readiness overclaim rejection proof is implemented locally as docs/fixture/test acceptance contract. It adds [docs/P66_32_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_PROOF.md](/A:/codex-memory/docs/P66_32_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_PROOF.md), [p66-validation-aggregator-readiness-overclaim-rejection-proof-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-readiness-overclaim-rejection-proof-v1.json), and [p66-validation-aggregator-readiness-overclaim-rejection-proof-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-readiness-overclaim-rejection-proof-fixture.test.js). It keeps all readiness and cutover flags false when runtime gaps or A5 hard stops remain. It does not read evidence files, execute commands, start services, call providers, mutate config/startup/watchdog, write durable state, expand public MCP, push/tag/release/deploy, or claim readiness.
+
+P66.32 validation passed: fixture syntax, targeted fixture test `17/17`, `npm test` `1316/1316`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.32 if eligible; after that, continue to P66.33 readiness overclaim rejection helper if still inside local safe bounds. 中文解释：下一步先提交 P66.32；之后只能做 readiness overclaim rejection 的纯 explicit-input helper，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

@@ -32,6 +32,7 @@
 - 当前阶段：P66.16 ValidationAggregator runtime evidence summary normalization proof 已新增 [docs/P66_16_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_PROOF.md](/A:/codex-memory/docs/P66_16_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_PROOF.md)。它只用 fixture/test 定义 caller-provided sanitized runtime evidence summary 的归一化验收边界；不执行 gate/runner，不读 evidence 文件，不扫描真实 memory/runtime stores，不声明 readiness。
 - 当前阶段：P66.17 ValidationAggregator runtime evidence summary normalization helper 已新增 [docs/P66_17_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_HELPER.md](/A:/codex-memory/docs/P66_17_VALIDATION_AGGREGATOR_RUNTIME_EVIDENCE_SUMMARY_NORMALIZATION_HELPER.md) 和纯 explicit-input helper。它只校验调用方传入的 sanitized runtime evidence summary，不 import/execute aggregator，不读文件、不执行命令、不启动服务、不调用 provider、不写 durable state、不扩大 public MCP，也不声明 readiness。
 - 当前阶段：P66.31 ValidationAggregator no-touch boundary closeout 已新增 [docs/P66_31_VALIDATION_AGGREGATOR_NO_TOUCH_BOUNDARY_CLOSEOUT.md](/A:/codex-memory/docs/P66_31_VALIDATION_AGGREGATOR_NO_TOUCH_BOUNDARY_CLOSEOUT.md)。它只关闭 no-touch boundary proof slice，并把下一个本地安全证据组定为 `readiness_overclaim_rejection_proof`；v1.0 RC 仍是 `NOT_READY_BLOCKED`。
+- 当前阶段：P66.32 ValidationAggregator readiness overclaim rejection proof 已新增 [docs/P66_32_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_PROOF.md](/A:/codex-memory/docs/P66_32_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_PROOF.md)。它只用 fixture/test 定义 readiness overclaim 的 fail-closed 本地验收边界；不执行 runtime、gate、runner、service、provider、durable write、config/startup/watchdog、public MCP expansion、push/tag/release/deploy 或 `RC_READY`。
 
 ## 当前阻塞
 
@@ -73,13 +74,14 @@
 - P66.29 是纯 explicit-input helper；它只证明 caller-provided no-touch metadata 的本地 fail-closed 标准，不扫描文件、不执行命令、不启动服务、不声明 `RC_READY`。
 - P66.30 是 static bridge/report-shape evidence；它不执行 P66.29 helper，不使 `validationAggregatorFullImplementation=true`，不声明 `RC_READY`。
 - P66.31 是 docs/board closeout；它不关闭整个 runtime gap，不执行 runtime，不声明 `RC_READY`。
+- P66.32 是 docs/fixture/test acceptance contract；它只锁定 readiness overclaim rejection 的 fail-closed 本地证明边界，不执行 runtime/gate/runner/service/provider/config/startup/watchdog，不清除 runtime gap 或 A5 hard stop，不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 
 ## 当前优先级
 
 1. P63-T1 已把 final RC matrix runner 从 fixture/helper 边界推进到本地 allowlisted real execution evidence；P64-T1 已把 schema/version runtime write-boundary proof 接入 core write path 和 final runner 矩阵；当前仍必须保持 `NOT_READY_BLOCKED`。
-2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。P66.32 的候选范围只能是 `readiness_overclaim_rejection_proof` 的本地 docs/fixture/test/helper/report-shape 工作。
+2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。P66.33 的候选范围只能是 `readiness_overclaim_rejection_helper` 的纯 explicit-input helper/test/docs 工作。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
 4. 不 push，除非用户单独明确授权。
 

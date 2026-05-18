@@ -1,0 +1,295 @@
+{
+  "schemaVersion": "p66-validation-aggregator-readiness-overclaim-rejection-proof-v1",
+  "policyVersion": "p66-validation-aggregator-readiness-overclaim-rejection-proof-policy-v1",
+  "manifestVersion": "p66-validation-aggregator-readiness-overclaim-rejection-proof-manifest-v1",
+  "version": "v1",
+  "phase": "P66.32-validation-aggregator-readiness-overclaim-rejection-proof",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "acceptanceContractOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "selectedGap": {
+    "id": "validation_aggregator_full_implementation_incomplete",
+    "priority": 1,
+    "currentStatus": "open",
+    "remainsOpenAfterThisPhase": true,
+    "readinessAuthority": false
+  },
+  "evidenceGroup": {
+    "id": "readiness_overclaim_rejection_proof",
+    "priority": 8,
+    "currentStatus": "acceptance_defined",
+    "required": true,
+    "remainsNonRuntime": true,
+    "readinessAuthority": false,
+    "mustFailClosedWhenMissing": true,
+    "mustFailClosedWhenPartialEvidenceClaimsReady": true,
+    "mustFailClosedWhenStaticEvidenceClaimsRuntimeReady": true,
+    "mustFailClosedWhenA5BlockerClaimsCleared": true,
+    "mustFailClosedWhenRcReadyClaimDetected": true
+  },
+  "validationAggregatorFullImplementation": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "v1RcReady": false,
+  "rcReady": false,
+  "cutoverReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "internalOnlyTools": [
+    "validate_memory"
+  ],
+  "readinessClaims": [
+    {
+      "id": "validation-aggregator-full-implementation-ready",
+      "claim": "validationAggregatorFullImplementation=true",
+      "allowed": false,
+      "expectedStatus": "blocked_readiness_overclaim",
+      "expectedDecision": "NOT_READY_BLOCKED",
+      "failClosed": true,
+      "requiredMissingEvidence": [
+        "runtime_source_registry_exact_set_evidence",
+        "fresh_runtime_evidence",
+        "runtime_evidence_files_bound_to_target_commit",
+        "runtime_collector_no_touch_proof",
+        "readiness_authority_proof"
+      ]
+    },
+    {
+      "id": "runtime-ready",
+      "claim": "runtimeReady=true",
+      "allowed": false,
+      "expectedStatus": "blocked_readiness_overclaim",
+      "expectedDecision": "NOT_READY_BLOCKED",
+      "failClosed": true,
+      "requiredMissingEvidence": [
+        "runtime_collector_execution_evidence",
+        "critical_gate_pass_evidence",
+        "no_a5_blockers_remaining_evidence"
+      ]
+    },
+    {
+      "id": "final-rc-matrix-ready",
+      "claim": "finalRcMatrixReady=true",
+      "allowed": false,
+      "expectedStatus": "blocked_readiness_overclaim",
+      "expectedDecision": "NOT_READY_BLOCKED",
+      "failClosed": true,
+      "requiredMissingEvidence": [
+        "full_final_rc_matrix_execution_evidence",
+        "gate_mainline_strict_execution_evidence",
+        "compare_rollback_current_target_evidence"
+      ]
+    },
+    {
+      "id": "v1-rc-ready",
+      "claim": "v1RcReady=true",
+      "allowed": false,
+      "expectedStatus": "blocked_readiness_overclaim",
+      "expectedDecision": "NOT_READY_BLOCKED",
+      "failClosed": true,
+      "requiredMissingEvidence": [
+        "all_runtime_gaps_closed",
+        "all_a5_hard_stops_cleared",
+        "separate_release_authorization"
+      ]
+    },
+    {
+      "id": "rc-ready",
+      "claim": "RC_READY",
+      "allowed": false,
+      "expectedStatus": "blocked_rc_ready_overclaim",
+      "expectedDecision": "NOT_READY_BLOCKED",
+      "failClosed": true,
+      "requiredMissingEvidence": [
+        "runtime_gap_zero_count",
+        "a5_hard_stop_zero_count",
+        "explicit_rc_ready_authority"
+      ]
+    },
+    {
+      "id": "cutover-ready",
+      "claim": "cutoverReady=true",
+      "allowed": false,
+      "expectedStatus": "blocked_cutover_overclaim",
+      "expectedDecision": "NOT_READY_BLOCKED",
+      "failClosed": true,
+      "requiredMissingEvidence": [
+        "config_switch_approval",
+        "startup_watchdog_approval",
+        "post_cutover_validation_plan"
+      ]
+    }
+  ],
+  "runtimeGapStatus": {
+    "remainingRuntimeGapCount": 7,
+    "allRuntimeGapsClosed": false,
+    "closedByThisPhase": 0,
+    "mustRemainBlockedWhenGapCountNonZero": true
+  },
+  "a5HardStopStatus": {
+    "remainingA5HardStopCount": 16,
+    "allA5HardStopsCleared": false,
+    "clearedByThisPhase": 0,
+    "mustRemainBlockedWhenHardStopCountNonZero": true
+  },
+  "expectedFailClosedReport": {
+    "status": "blocked",
+    "decision": "NOT_READY_BLOCKED",
+    "accepted": false,
+    "rejected": true,
+    "failClosed": true,
+    "readinessOverclaimCount": 6,
+    "runtimeGapCount": 7,
+    "a5HardStopCount": 16,
+    "validationAggregatorFullImplementationReady": false,
+    "runtimeReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "rcReady": false,
+    "cutoverReady": false,
+    "canClaimRuntimeReady": false,
+    "canClaimFinalRcReady": false,
+    "canClaimV1RcReady": false,
+    "canClaimRcReady": false,
+    "canClaimCutoverReady": false
+  },
+  "failClosedCases": [
+    "missing_readiness_overclaim_rejection_proof",
+    "partial_evidence_claims_validation_aggregator_full_implementation",
+    "static_evidence_claims_runtime_ready",
+    "fixture_evidence_claims_final_rc_matrix_ready",
+    "stale_gate_evidence_claims_v1_rc_ready",
+    "local_runner_evidence_claims_rc_ready",
+    "runtime_gap_count_nonzero_claims_ready",
+    "a5_hard_stop_count_nonzero_claims_ready",
+    "public_mcp_expansion_claims_ready",
+    "validate_memory_public_claims_ready",
+    "config_switch_claims_cutover_ready",
+    "startup_watchdog_claims_cutover_ready",
+    "provider_call_claims_ready",
+    "real_memory_preview_claims_ready",
+    "durable_write_claims_ready",
+    "migration_apply_claims_ready",
+    "import_export_apply_claims_ready",
+    "tag_release_deploy_claims_ready"
+  ],
+  "allowedEvidencePosture": [
+    "fixture_acceptance_defined",
+    "pure_helper_available",
+    "static_report_shape_evidence",
+    "sanitized_local_command_evidence_recorded"
+  ],
+  "disallowedReadinessPosture": [
+    "runtime_collector_complete",
+    "runtime_gap_zero_count",
+    "a5_hard_stop_zero_count",
+    "final_rc_matrix_ready",
+    "v1_rc_ready",
+    "rc_ready",
+    "cutover_ready"
+  ],
+  "lowRiskSummary": {
+    "allowedFields": [
+      "status",
+      "decision",
+      "fail_closed",
+      "readiness_overclaim_count",
+      "runtime_gap_count",
+      "a5_hard_stop_count",
+      "readiness_blocked"
+    ],
+    "disallowedFields": [
+      "raw_workspace_id",
+      "raw_workspace_path",
+      "raw_secret",
+      "raw_token",
+      "authorization_header",
+      "provider_key",
+      "absolute_path",
+      "live_service_url",
+      "real_memory_content",
+      "durable_store_path",
+      "raw_source_payload"
+    ],
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false,
+    "rawSourcePayloadExposed": false
+  },
+  "disallowedWork": [
+    "runtime_collector",
+    "implicit_fixture_read",
+    "evidence_file_read",
+    "command_execution",
+    "gate_execution",
+    "runner_execution",
+    "service_start",
+    "provider_call",
+    "real_memory_scan",
+    "runtime_store_scan",
+    "durable_memory_write",
+    "durable_audit_write",
+    "config_mutation",
+    "startup_watchdog_operation",
+    "migration_apply",
+    "import_export_apply",
+    "public_mcp_expansion",
+    "validate_memory_public_exposure",
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "rc_ready_claim",
+    "cutover_ready_claim"
+  ],
+  "safety": {
+    "mutated": false,
+    "fixtureOnly": true,
+    "acceptanceContractOnly": true,
+    "noRuntimeImplementation": true,
+    "noFileReadByAggregator": true,
+    "noCommandExecution": true,
+    "noGateExecution": true,
+    "noRunnerExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noStartupWatchdogOperation": true,
+    "noRealMemoryPreview": true,
+    "noRuntimeStoreScan": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noMigrationApply": true,
+    "noImportExportApply": true,
+    "noPublicMcpExpansion": true,
+    "noPackageChange": true,
+    "noSecretChange": true,
+    "noRemoteWrite": true,
+    "noTagReleaseDeploy": true
+  },
+  "forbiddenClaims": [
+    "P66.32 implements runtime evidence collection",
+    "P66.32 reads evidence files",
+    "P66.32 executes commands",
+    "P66.32 starts services",
+    "P66.32 calls providers",
+    "P66.32 writes durable memory",
+    "P66.32 changes public MCP tools",
+    "P66.32 exposes validate_memory publicly",
+    "P66.32 makes ValidationAggregator a full implementation",
+    "P66.32 makes validationAggregatorFullImplementation true",
+    "P66.32 makes runtimeReady true",
+    "P66.32 makes finalRcMatrixReady true",
+    "P66.32 makes v1RcReady true",
+    "P66.32 authorizes RC_READY",
+    "P66.32 authorizes cutover",
+    "P66.32 authorizes push tag release deploy"
+  ],
+  "nextRecommendedPhase": "P66.33-validation-aggregator-readiness-overclaim-rejection-helper"
+}
