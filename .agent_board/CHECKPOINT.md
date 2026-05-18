@@ -359,6 +359,14 @@ P66.35 validation passed: `git diff --check` and docs validation.
 
 Next safe action is to guarded-commit P66.35 if eligible; after that, continue to P66.36 first-gap local proof closeout review if still inside local safe bounds. 中文解释：下一步先提交 P66.35；之后只能做第一项剩余 gap 的本地 proof 总收口审查，仍然不是 runtime 或 RC readiness。
 
+P66.35 ValidationAggregator readiness overclaim rejection closeout is committed locally in `7505533`.
+
+P66.36 ValidationAggregator first-gap local proof closeout review is implemented locally as docs/board only. It adds [docs/P66_36_VALIDATION_AGGREGATOR_FIRST_GAP_LOCAL_PROOF_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P66_36_VALIDATION_AGGREGATOR_FIRST_GAP_LOCAL_PROOF_CLOSEOUT_REVIEW.md), reviews P66.5-P66.35 local proof slices, and concludes `FIRST_GAP_LOCAL_PROOF_SLICES_COMPLETE_RUNTIME_GAP_STILL_OPEN`. It does not close the runtime gap, execute runtime/gate/runner/service/provider work, write durable state, expand public MCP, push/tag/release/deploy, or claim readiness.
+
+P66.36 validation passed: `git diff --check` and docs validation.
+
+Next safe action is to guarded-commit P66.36 if eligible; after that, continue to P66.37 governance runtime loop gap planning if still inside local safe bounds. 中文解释：下一步先提交 P66.36；之后只能做 governance runtime loop gap 的本地规划/fixture/test，仍然不是 runtime 或 RC readiness。
+
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.
