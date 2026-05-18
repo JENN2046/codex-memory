@@ -257,7 +257,13 @@ P66.22 ValidationAggregator missing or stale evidence fail-closed static bridge 
 
 P66.22 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1241/1241`, `git diff --check`, and docs validation.
 
-Next safe action is to guarded-commit P66.22, then continue to P66.23 missing or stale evidence fail-closed closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.22；之后只能做 docs/board closeout，仍然不是 runtime 或 RC readiness。
+P66.22 is committed locally in `8cfa0b2`.
+
+P66.23 ValidationAggregator missing or stale evidence fail-closed closeout is implemented locally as docs/board only. It closes the missing/stale evidence fail-closed proof slice and selects `unsupported_source_fail_closed_proof` as the next local-safe evidence group.
+
+P66.23 validation passed: `git diff --check` and docs validation.
+
+Next safe action is to guarded-commit P66.23, then continue to P66.24 unsupported source fail-closed proof if still inside local safe bounds. 中文解释：下一步先提交 P66.23；之后只能做 unsupported source fail-closed 的本地证明，仍然不是 runtime 或 RC readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
