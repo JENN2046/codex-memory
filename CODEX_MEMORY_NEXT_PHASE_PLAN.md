@@ -115,4 +115,5 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 After P64-T1 local schema/version write-boundary evidence:
 
 - Stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, runtime execution, or `RC_READY` claim unless explicitly authorized.
-- Next local-only candidate should target one remaining runtime proof gap at a time, starting with a stricter ValidationAggregator full-implementation slice.
+- Current local-only candidate: P65-T1 ValidationAggregator explicit runtime evidence summary ingestion. This is a stricter ValidationAggregator full-implementation evidence slice, but it remains explicit-input-only and cannot claim runtime readiness, final RC readiness, v1.0 RC readiness, or `RC_READY`.
+- After P65-T1, continue one remaining runtime proof gap at a time; any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, durable write, migration/import-export apply, public MCP expansion, or readiness claim still requires separate explicit authorization.

@@ -87,6 +87,6 @@ No push, tag, release, deploy, provider/model call, real memory content read/pre
 
 ## Next Safe Step
 
-P64-T1 runtime schema/version write-boundary proof is now the latest local evidence slice. It implements a `MemoryWriteService.record()` guard for schema/version metadata, updates ValidationAggregator status, refreshes the final runner matrix, and the real runner passed 12/12 local critical gates while preserving `NOT_READY_BLOCKED`.
+P65-T1 ValidationAggregator explicit runtime evidence summary ingestion is complete and validated locally. It adds an explicit sanitized summary bridge for caller-provided runtime evidence and keeps the aggregator no-touch: no file reads, command execution, service start, provider call, real memory/runtime-store scan, durable mutation, public MCP expansion, or readiness claim.
 
-Next safe local work should target one remaining runtime proof gap at a time, starting with a stricter ValidationAggregator full-implementation slice. Stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+Next safe action is final diff inspection and guarded local commit if eligible. Stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

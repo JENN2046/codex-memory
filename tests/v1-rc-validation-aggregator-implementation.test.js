@@ -13,6 +13,7 @@ const {
   VALIDATION_EVIDENCE_REJECTION_SUMMARY_STATUSES,
   VALIDATION_EVIDENCE_SOURCE_CLASSES,
   VALIDATION_EVIDENCE_SOURCE_TYPES,
+  RUNTIME_EVIDENCE_SUMMARY_STATUSES,
   buildV1RcValidationAggregatorReport,
   normalizeValidationEvidenceSources
 } = require('../src/core/ValidationAggregatorService');
@@ -79,6 +80,12 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.validationEvidenceRejectedCount, 0);
   assert.equal(report.summary.validationEvidenceConfidencePostureStatus, 'no_explicit_evidence');
   assert.equal(report.summary.validationEvidenceConfidenceCanClaimV1RcReady, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryStatus, 'no_explicit_runtime_evidence_summary');
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryRejected, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryLocallyEvidencedGapCount, 0);
+  assert.equal(report.summary.runtimeEvidenceSummaryRemainingGapCount, 0);
+  assert.equal(report.summary.runtimeEvidenceSummaryCanClaimV1RcReady, false);
   assert.equal(report.summary.schemaVersionRuntimeEnforcementImplemented, true);
   assert.equal(report.summary.schemaVersionRuntimeWriteBoundaryGuardImplemented, true);
   assert.equal(report.summary.schemaVersionRuntimeWriteBoundaryRejectsMetadata, true);
@@ -666,6 +673,16 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   );
   assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.decisionImpact, 'none_report_only');
   assert.equal(report.evidence.p28ValidationEvidenceReader.confidencePosture.canClaimV1RcReady, false);
+  assert.equal(report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.status, 'no_explicit_runtime_evidence_summary');
+  assert.deepEqual(
+    report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.allowedStatuses,
+    RUNTIME_EVIDENCE_SUMMARY_STATUSES
+  );
+  assert.equal(report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.contract.readsFiles, false);
+  assert.equal(report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.contract.executesCommands, false);
+  assert.equal(report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.contract.startsServices, false);
+  assert.equal(report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.contract.callsProviders, false);
+  assert.equal(report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.canClaimV1RcReady, false);
 });
 
 test('minimal implementation preserves public MCP three-tool freeze', () => {
@@ -676,6 +693,150 @@ test('minimal implementation preserves public MCP three-tool freeze', () => {
     'search_memory',
     'memory_overview'
   ]);
+});
+
+test('validation aggregator ingests explicit sanitized runtime evidence summary without executing or claiming readiness', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    generatedAt: '2026-05-18T02:00:00.000Z',
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      runnerExecuted: true,
+      commandsExecuted: true,
+      finalRcMatrixExecuted: true,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      criticalGates: {
+        total: 12,
+        passed: 12,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
+      locallyEvidencedRuntimeGaps: [
+        'runtime_schema_version_enforcement_not_fully_proven',
+        'final_rc_matrix_runner_not_executed_as_real_matrix'
+      ],
+      remainingRuntimeGaps: [
+        'validation_aggregator_full_implementation_incomplete',
+        'mainline_strict_gate_not_executed_for_cutover'
+      ],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        readsRealMemory: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
+  const bridge = report.evidence.p65ValidationAggregatorRuntimeEvidenceBridge;
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.deepEqual(bridge.allowedStatuses, RUNTIME_EVIDENCE_SUMMARY_STATUSES);
+  assert.equal(bridge.status, 'explicit_runtime_evidence_summary_available');
+  assert.equal(bridge.implemented, true);
+  assert.equal(bridge.fullImplementation, false);
+  assert.equal(bridge.accepted, true);
+  assert.equal(bridge.rejected, false);
+  assert.equal(bridge.contract.sourceMode, 'explicit_sanitized_summary_only');
+  assert.equal(bridge.contract.readsFiles, false);
+  assert.equal(bridge.contract.executesCommands, false);
+  assert.equal(bridge.contract.startsServices, false);
+  assert.equal(bridge.contract.callsProviders, false);
+  assert.equal(bridge.contract.mutatesDurableState, false);
+  assert.equal(bridge.summary.sourceStatus, 'local_runtime_evidence_passed_rc_still_blocked');
+  assert.equal(bridge.summary.sourceDecision, 'NOT_READY_BLOCKED');
+  assert.equal(bridge.summary.runnerExecuted, true);
+  assert.equal(bridge.summary.commandsExecutedBySource, true);
+  assert.equal(bridge.summary.commandsExecutedByAggregator, false);
+  assert.equal(bridge.summary.finalRcMatrixExecutedBySource, true);
+  assert.equal(bridge.summary.allCriticalCommandsPassed, true);
+  assert.equal(bridge.summary.criticalGateCount, 12);
+  assert.equal(bridge.summary.criticalGatePassedCount, 12);
+  assert.equal(bridge.summary.criticalGateFailedCount, 0);
+  assert.equal(bridge.summary.locallyEvidencedRuntimeGapCount, 2);
+  assert.equal(bridge.summary.remainingRuntimeGapCount, 2);
+  assert.equal(bridge.summary.noProvider, true);
+  assert.equal(bridge.summary.noDurableMemoryWrite, true);
+  assert.equal(bridge.summary.noRealMemoryPreview, true);
+  assert.equal(bridge.summary.noRemoteWrite, true);
+  assert.deepEqual(bridge.locallyEvidencedRuntimeGaps, [
+    'runtime_schema_version_enforcement_not_fully_proven',
+    'final_rc_matrix_runner_not_executed_as_real_matrix'
+  ]);
+  assert.deepEqual(bridge.remainingRuntimeGaps, [
+    'validation_aggregator_full_implementation_incomplete',
+    'mainline_strict_gate_not_executed_for_cutover'
+  ]);
+  assert.equal(bridge.canClaimRuntimeReady, false);
+  assert.equal(bridge.canClaimFinalRcReady, false);
+  assert.equal(bridge.canClaimV1RcReady, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryStatus, 'explicit_runtime_evidence_summary_available');
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryRejected, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryLocallyEvidencedGapCount, 2);
+  assert.equal(report.summary.runtimeEvidenceSummaryRemainingGapCount, 2);
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
+  assert.equal(report.summary.runtimeReady, false);
+  assert.equal(report.summary.finalRcMatrixReady, false);
+  assert.equal(report.summary.rcReady, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryCanClaimV1RcReady, false);
+  assertNoSensitiveSurface(report);
+});
+
+test('validation aggregator runtime evidence summary rejects readiness claims, side effects, and secrets', () => {
+  const readinessClaim = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_ready',
+      decision: 'READY_FOR_V1_0_RC',
+      runtimeReady: true,
+      finalRcMatrixReady: true,
+      v1RcReady: true,
+      rcReady: true,
+      safety: { mutated: false, providerCalls: 0 }
+    }
+  });
+  const unsafeSummary = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      status: 'provider_call_attempted',
+      decision: 'NOT_READY_BLOCKED',
+      safety: { mutated: false, providerCalls: 1 }
+    }
+  });
+  const secretSummary = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      summary: 'authorization: should never surface',
+      safety: { mutated: false, providerCalls: 0 }
+    }
+  });
+
+  assert.equal(
+    readinessClaim.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.status,
+    'runtime_evidence_summary_rejected'
+  );
+  assert.equal(
+    readinessClaim.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason,
+    'readiness_claim_rejected'
+  );
+  assert.equal(unsafeSummary.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason, 'unsafe_summary_rejected');
+  assert.equal(secretSummary.evidence.p65ValidationAggregatorRuntimeEvidenceBridge.rejectReason, 'sensitive_fragment_rejected');
+  assert.equal(readinessClaim.summary.runtimeEvidenceSummaryAccepted, false);
+  assert.equal(readinessClaim.summary.runtimeEvidenceSummaryRejected, true);
+  assert.equal(readinessClaim.summary.validationAggregatorFullImplementation, false);
+  assert.equal(readinessClaim.summary.runtimeReady, false);
+  assert.equal(readinessClaim.summary.finalRcMatrixReady, false);
+  assert.equal(readinessClaim.summary.rcReady, false);
+  assert.equal(readinessClaim.decision, 'NOT_READY_BLOCKED');
+  assertNoSensitiveSurface(secretSummary);
 });
 
 test('minimal implementation maps current conclusions to documented evidence sources', () => {

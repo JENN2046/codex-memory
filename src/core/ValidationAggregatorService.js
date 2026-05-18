@@ -82,6 +82,12 @@ const VALIDATION_EVIDENCE_CONFIDENCE_POSTURE_STATUSES = [
 
 const VALIDATION_EVIDENCE_STALE_AFTER_HOURS = 168;
 
+const RUNTIME_EVIDENCE_SUMMARY_STATUSES = [
+  'no_explicit_runtime_evidence_summary',
+  'explicit_runtime_evidence_summary_available',
+  'runtime_evidence_summary_rejected'
+];
+
 const FORBIDDEN_EVIDENCE_FRAGMENTS = [
   'authorization:',
   'bearer ',
@@ -519,6 +525,19 @@ function normalizeEvidenceCommands(commands) {
     .slice(0, 12);
 }
 
+function normalizeEvidenceStringList(values) {
+  if (!Array.isArray(values)) return [];
+  return values
+    .filter(value => typeof value === 'string' && value.trim() !== '')
+    .map(value => safeEvidenceString(value))
+    .filter(value => value && value !== '<redacted>')
+    .slice(0, 24);
+}
+
+function safeEvidenceNumber(value) {
+  return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
 function parseEvidenceTimestamp(value) {
   if (typeof value !== 'string' || value.trim() === '') return null;
   const parsed = new Date(value);
@@ -812,6 +831,172 @@ function hasUnsafeEvidenceSideEffect(source) {
     safety.deployed === true;
 }
 
+function normalizeRuntimeEvidenceSummary(summary = null) {
+  const contract = {
+    sourceMode: 'explicit_sanitized_summary_only',
+    readsFiles: false,
+    executesCommands: false,
+    startsServices: false,
+    callsProviders: false,
+    mutatesDurableState: false,
+    acceptsRealMemoryPreview: false,
+    acceptsRuntimeReadyClaim: false,
+    acceptsFinalRcReadyClaim: false,
+    acceptsV1RcReadyClaim: false
+  };
+  const empty = {
+    status: 'no_explicit_runtime_evidence_summary',
+    allowedStatuses: RUNTIME_EVIDENCE_SUMMARY_STATUSES,
+    implemented: true,
+    fullImplementation: false,
+    sourceMode: contract.sourceMode,
+    accepted: false,
+    rejected: false,
+    rejectReason: '',
+    contract,
+    summary: {
+      sourceStatus: '',
+      sourceDecision: '',
+      runnerExecuted: false,
+      commandsExecutedBySource: false,
+      commandsExecutedByAggregator: false,
+      finalRcMatrixExecutedBySource: false,
+      finalRcMatrixReady: false,
+      runtimeReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      allCriticalCommandsPassed: false,
+      criticalGateCount: 0,
+      criticalGatePassedCount: 0,
+      criticalGateFailedCount: 0,
+      locallyEvidencedRuntimeGapCount: 0,
+      remainingRuntimeGapCount: 0,
+      providerCalls: 0,
+      mutated: false,
+      noProvider: true,
+      noDurableMemoryWrite: true,
+      noRealMemoryPreview: true,
+      noRemoteWrite: true
+    },
+    locallyEvidencedRuntimeGaps: [],
+    remainingRuntimeGaps: [],
+    decisionImpact: 'none_report_only',
+    canClaimRuntimeReady: false,
+    canClaimFinalRcReady: false,
+    canClaimV1RcReady: false
+  };
+
+  if (!summary) return empty;
+
+  if (typeof summary !== 'object' || Array.isArray(summary)) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'invalid_summary_shape'
+    };
+  }
+
+  if (includesForbiddenEvidenceFragment(summary)) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'sensitive_fragment_rejected'
+    };
+  }
+
+  const safety = summary.safety && typeof summary.safety === 'object'
+    ? summary.safety
+    : {};
+  const providerCalls = Number(safety.providerCalls ?? safety.callsProviders ?? summary.providerCalls ?? 0);
+  const mutated = safety.mutated === true || summary.mutated === true;
+  const durableWrite = safety.writesDurableMemory === true ||
+    safety.durableMemoryTouched === true ||
+    safety.durableMemoryWrite === true;
+  const realMemoryPreview = safety.realMemoryPreview === true ||
+    safety.readsRealMemory === true ||
+    safety.realMemoryPreviewed === true;
+  const remoteWrite = safety.remoteWrites === true ||
+    safety.pushed === true ||
+    safety.tagged === true ||
+    safety.released === true ||
+    safety.deployed === true;
+
+  if (
+    mutated ||
+    Number(providerCalls || 0) > 0 ||
+    safety.serviceStarted === true ||
+    durableWrite ||
+    realMemoryPreview ||
+    remoteWrite ||
+    safety.migrationApplied === true ||
+    safety.importExportApplied === true ||
+    safety.configChanged === true ||
+    safety.watchdogStartupInstalled === true
+  ) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'unsafe_summary_rejected'
+    };
+  }
+
+  if (
+    summary.runtimeReady === true ||
+    summary.finalRcMatrixReady === true ||
+    summary.v1RcReady === true ||
+    summary.rcReady === true
+  ) {
+    return {
+      ...empty,
+      status: 'runtime_evidence_summary_rejected',
+      rejected: true,
+      rejectReason: 'readiness_claim_rejected'
+    };
+  }
+
+  const criticalGates = summary.criticalGates && typeof summary.criticalGates === 'object'
+    ? summary.criticalGates
+    : {};
+  const locallyEvidencedRuntimeGaps = normalizeEvidenceStringList(summary.locallyEvidencedRuntimeGaps);
+  const remainingRuntimeGaps = normalizeEvidenceStringList(summary.remainingRuntimeGaps);
+
+  return {
+    ...empty,
+    status: 'explicit_runtime_evidence_summary_available',
+    accepted: true,
+    summary: {
+      ...empty.summary,
+      sourceStatus: safeEvidenceString(summary.status, 'unknown'),
+      sourceDecision: safeEvidenceString(summary.decision, 'unknown'),
+      runnerExecuted: summary.runnerExecuted === true,
+      commandsExecutedBySource: summary.commandsExecuted === true,
+      commandsExecutedByAggregator: false,
+      finalRcMatrixExecutedBySource: summary.finalRcMatrixExecuted === true,
+      finalRcMatrixReady: false,
+      runtimeReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      allCriticalCommandsPassed: criticalGates.allCriticalCommandsPassed === true,
+      criticalGateCount: safeEvidenceNumber(criticalGates.total),
+      criticalGatePassedCount: safeEvidenceNumber(criticalGates.passed),
+      criticalGateFailedCount: safeEvidenceNumber(criticalGates.failed),
+      locallyEvidencedRuntimeGapCount: locallyEvidencedRuntimeGaps.length,
+      remainingRuntimeGapCount: remainingRuntimeGaps.length,
+      providerCalls: 0,
+      mutated: false,
+      noProvider: true,
+      noDurableMemoryWrite: true,
+      noRealMemoryPreview: true,
+      noRemoteWrite: true
+    },
+    locallyEvidencedRuntimeGaps,
+    remainingRuntimeGaps
+  };
+}
+
 function normalizeValidationEvidenceSources(sources = []) {
   const inputSources = Array.isArray(sources) ? sources : [];
   const acceptedSources = [];
@@ -949,9 +1134,11 @@ function normalizeValidationEvidenceSources(sources = []) {
 
 function buildV1RcValidationAggregatorReport({
   generatedAt = new Date().toISOString(),
-  validationEvidenceSources = []
+  validationEvidenceSources = [],
+  runtimeEvidenceSummary = null
 } = {}) {
   const validationEvidenceReader = normalizeValidationEvidenceSources(validationEvidenceSources);
+  const runtimeEvidenceSummaryBridge = normalizeRuntimeEvidenceSummary(runtimeEvidenceSummary);
   const validationEvidenceFreshness = summarizeValidationEvidenceFreshness({
     acceptedSources: validationEvidenceReader.acceptedSources,
     generatedAt
@@ -1055,6 +1242,14 @@ function buildV1RcValidationAggregatorReport({
       validationEvidenceRejectedCount: validationEvidenceRejectionSummary.rejectedCount,
       validationEvidenceConfidencePostureStatus: validationEvidenceConfidencePosture.status,
       validationEvidenceConfidenceCanClaimV1RcReady: false,
+      runtimeEvidenceSummaryStatus: runtimeEvidenceSummaryBridge.status,
+      runtimeEvidenceSummaryAccepted: runtimeEvidenceSummaryBridge.accepted,
+      runtimeEvidenceSummaryRejected: runtimeEvidenceSummaryBridge.rejected,
+      runtimeEvidenceSummaryLocallyEvidencedGapCount:
+        runtimeEvidenceSummaryBridge.summary.locallyEvidencedRuntimeGapCount,
+      runtimeEvidenceSummaryRemainingGapCount:
+        runtimeEvidenceSummaryBridge.summary.remainingRuntimeGapCount,
+      runtimeEvidenceSummaryCanClaimV1RcReady: false,
       schemaVersionRuntimeEnforcementImplemented: true,
       schemaVersionRuntimeWriteBoundaryGuardImplemented: true,
       schemaVersionRuntimeWriteBoundaryRejectsMetadata: true,
@@ -1919,6 +2114,9 @@ function buildV1RcValidationAggregatorReport({
         rejectionSummary: validationEvidenceRejectionSummary,
         confidencePosture: validationEvidenceConfidencePosture,
         ...validationEvidenceReader
+      },
+      p65ValidationAggregatorRuntimeEvidenceBridge: {
+        ...runtimeEvidenceSummaryBridge
       }
     },
     evidence_sources: EVIDENCE_SOURCES,
@@ -1928,7 +2126,8 @@ function buildV1RcValidationAggregatorReport({
       'Historical P22 live MCP evidence must not be treated as fresh P23/P24 live evidence.',
       'A4_SAFE_SLICE_PASSED does not mean READY_FOR_V1_0_RC.',
       'P36-P40 local evidence report ready does not mean runtime, final RC matrix, push, release, deploy, config switch, watchdog, or v1.0 RC readiness.',
-      'P53 inventory evidence is static report-shape posture only and does not complete the ValidationAggregator full implementation.'
+      'P53 inventory evidence is static report-shape posture only and does not complete the ValidationAggregator full implementation.',
+      'P65 runtime evidence summary ingestion is explicit-input-only and does not execute gates or claim RC readiness.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',
@@ -1987,7 +2186,9 @@ module.exports = {
   VALIDATION_EVIDENCE_SOURCE_CLASSES,
   VALIDATION_EVIDENCE_SOURCE_TYPES,
   VALIDATION_EVIDENCE_STATUSES,
+  RUNTIME_EVIDENCE_SUMMARY_STATUSES,
   buildV1RcValidationAggregatorReport,
+  normalizeRuntimeEvidenceSummary,
   normalizeValidationEvidenceSources,
   summarizeValidationEvidenceFreshness,
   summarizeValidationEvidenceGateReadiness,
