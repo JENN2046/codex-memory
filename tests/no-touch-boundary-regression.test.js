@@ -104,6 +104,10 @@ const noTouchTargets = [
     path: 'src/core/ValidationAggregatorUnsupportedSourceFailClosedProofContract.js'
   },
   {
+    label: 'ValidationAggregatorNoTouchBoundaryProofContract',
+    path: 'src/core/ValidationAggregatorNoTouchBoundaryProofContract.js'
+  },
+  {
     label: 'ValidationAggregatorService',
     path: 'src/core/ValidationAggregatorService.js'
   }

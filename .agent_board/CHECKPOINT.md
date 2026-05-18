@@ -303,6 +303,14 @@ P66.28 validation passed: fixture syntax, targeted fixture test `17/17`, `npm te
 
 Next safe action is to guarded-commit P66.28 if eligible; after that, continue to P66.29 no-touch boundary helper if still inside local safe bounds. 中文解释：下一步先提交 P66.28；之后只能做 no-touch boundary 的纯 explicit-input helper，仍然不是 runtime 或 RC readiness。
 
+P66.28 ValidationAggregator no-touch boundary proof is committed locally in `c70acfb`.
+
+P66.29 ValidationAggregator no-touch boundary helper is implemented locally. It adds a pure explicit-input helper for caller-provided no-touch proof metadata and extends no-touch regression coverage. It does not scan files, execute commands, start services, call providers, write durable state, expand public MCP, or claim readiness.
+
+P66.29 validation passed: helper syntax, targeted helper test `11/11`, no-touch regression `4/4`, `npm test` `1299/1299`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.29 if eligible; after that, continue to P66.30 no-touch boundary static bridge if still inside local safe bounds. 中文解释：下一步先提交 P66.29；之后只能做 no-touch boundary 的静态 bridge，aggregator 仍然不能执行 helper、扫描文件或声明 readiness。
+
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.
