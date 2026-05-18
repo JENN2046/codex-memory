@@ -19,6 +19,7 @@
 - 当前阶段：P66.3 ValidationAggregator runtime gap plan 已新增 [docs/P66_3_VALIDATION_AGGREGATOR_RUNTIME_GAP_PLAN.md](/A:/codex-memory/docs/P66_3_VALIDATION_AGGREGATOR_RUNTIME_GAP_PLAN.md)，并用 fixture/test 锁定 7 个剩余 runtime gap 的本地安全推进顺序、A5 前置边界和 fail-closed 规则。仍保持 `NOT_READY_BLOCKED`。
 - 当前阶段：P66.4 ValidationAggregator gap priority fixture tests 已新增 [docs/P66_4_VALIDATION_AGGREGATOR_GAP_PRIORITY_FIXTURE_TESTS.md](/A:/codex-memory/docs/P66_4_VALIDATION_AGGREGATOR_GAP_PRIORITY_FIXTURE_TESTS.md)，并用 fixture/test 锁定第一个剩余 gap `validation_aggregator_full_implementation_incomplete` 的验收证据组、禁用工作类型、A5 hard stops 与 forbidden claims。仍保持 `NOT_READY_BLOCKED`。
 - 当前阶段：P66.5 ValidationAggregator source registry proof helper 已新增 [docs/P66_5_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_PROOF_HELPER.md](/A:/codex-memory/docs/P66_5_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_PROOF_HELPER.md) 和纯 explicit-input helper。它只校验调用方传入的 source registry exact-set proof，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不调用 provider、不写 durable state、不扩大 public MCP，也不声明 readiness。
+- 当前阶段：P66.6 ValidationAggregator source registry static bridge 已新增 [docs/P66_6_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_STATIC_BRIDGE.md](/A:/codex-memory/docs/P66_6_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_STATIC_BRIDGE.md)。ValidationAggregator 只静态展示 P66.5 helper 能力，不 import/execute helper，不读文件、不执行命令、不声明 readiness。
 
 ## 当前阻塞
 
@@ -34,6 +35,7 @@
 - P66.3 是 docs/fixture/test runtime-gap plan；它不执行任何 runtime proof，不启动 live HTTP，不读取真实 memory/runtime stores，不清除 A5 hard stops，不声明 `RC_READY`。
 - P66.4 是 docs/fixture/test acceptance contract；它不关闭第一个 gap，不实现 runtime collector，不执行命令/runner/gate，不声明 `RC_READY`。
 - P66.5 是纯 explicit-input helper；它只证明 source registry exact-set 本地标准，不是 runtime collector，不是 full implementation，不声明 `RC_READY`。
+- P66.6 是 static bridge/report-shape evidence；它不执行 P66.5 helper，不使 `validationAggregatorFullImplementation=true`，不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 

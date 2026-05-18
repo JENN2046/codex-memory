@@ -59,7 +59,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.2 ValidationAggregator definition static bridge is implemented, validated, and committed locally in `9f613d5`.
 - P66.3 ValidationAggregator runtime gap plan is implemented, validated, and committed locally in `c7a6a8c`.
 - P66.4 ValidationAggregator gap priority fixture tests are implemented, validated, and committed locally in `3b7c335`.
-- P66.5 ValidationAggregator source registry proof helper is implemented and validated locally as a pure explicit-input helper; guarded commit is pending.
+- P66.5 ValidationAggregator source registry proof helper is implemented, validated, and committed locally in `f7a9038`.
+- P66.6 ValidationAggregator source registry static bridge is implemented and validated locally; guarded commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -110,4 +111,6 @@ P66.4 ValidationAggregator gap priority fixture tests are added as docs/fixture/
 
 P66.5 ValidationAggregator source registry proof helper is added as pure explicit-input code and tests. It keeps source-registry proof local-only and blocked from runtime/readiness authority.
 
-Next safe action is to finish validation and guarded-commit P66.5, then continue to P66.6 source-registry static bridge if still inside local safe bounds. 中文解释：下一步只把 P66.5 helper 能力作为静态 report evidence 展示；aggregator 不能执行 helper、读文件、启动服务、调用 provider、push、发布或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.6 ValidationAggregator source registry static bridge is implemented locally. It exposes the helper capability as static report evidence only and keeps helper execution, runtime authority, and readiness blocked.
+
+Next safe action is to finish validation and guarded-commit P66.6, then continue to P66.7 source-registry closeout if still inside local safe bounds. 中文解释：下一步只做 closeout 和下一证据组选择；不能执行真实 runtime、启动服务、调用 provider、push、发布或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

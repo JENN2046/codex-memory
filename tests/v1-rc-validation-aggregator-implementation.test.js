@@ -221,6 +221,18 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationCanClaimRuntimeReady, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationCanClaimFinalRcReady, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationCanClaimV1RcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryProofAvailable, true);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryProofSourceMode, 'static_report_shape_only');
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryProofHelperCapabilityOnly, true);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryRequiredSourceCount, 6);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryFailClosedReasonCount, 11);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryHelperImportedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryHelperExecutedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryRuntimeImplemented, false);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryFullImplementationComplete, false);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryCanClaimRuntimeReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorSourceRegistryCanClaimV1RcReady, false);
   assert.equal(report.summary.localEvidenceReportReadyClaim, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.mainlineCutoverReady, false);
@@ -647,6 +659,45 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.canClaimRuntimeReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.canClaimFinalRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.canClaimV1RcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorSourceRegistryProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.sourceMode, 'static_report_shape_only');
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.helperCapabilityOnly, true);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.explicitInputOnly, true);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.exactSetRequired, true);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.requiredSourceRegistryIds.length, 6);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.failClosedReasons.length, 11);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.helperImportedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.helperExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.evidenceFileReadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.commandExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.gateExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.evidenceCollectedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.liveMcpRefreshedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.scansDirectories, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.publicMcpExpanded, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.runtimeMutationImplemented, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.fullAggregatorImplementationComplete, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.rcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.decisionImpact, 'none_report_only');
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.blockedDecisionRequired, true);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorSourceRegistryProof.canClaimV1RcReady, false);
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',

@@ -313,6 +313,29 @@ const P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES = [
   'a5_approval_missing'
 ];
 
+const P66_SOURCE_REGISTRY_REQUIRED_IDS = [
+  'committed_fixture_evidence',
+  'committed_contract_test_evidence',
+  'static_report_shape_evidence',
+  'explicit_sanitized_runtime_summary_evidence',
+  'local_allowlisted_runner_evidence',
+  'runtime_write_boundary_guard_evidence'
+];
+
+const P66_SOURCE_REGISTRY_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'non_exact_source_registry',
+  'duplicate_source_registry_id',
+  'source_claims_runtime_authority',
+  'source_claims_readiness_authority',
+  'unsafe_no_touch_boundary',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1464,6 +1487,20 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorFullImplementationCanClaimRuntimeReady: false,
       p66ValidationAggregatorFullImplementationCanClaimFinalRcReady: false,
       p66ValidationAggregatorFullImplementationCanClaimV1RcReady: false,
+      p66ValidationAggregatorSourceRegistryProofAvailable: true,
+      p66ValidationAggregatorSourceRegistryProofSourceMode: 'static_report_shape_only',
+      p66ValidationAggregatorSourceRegistryProofHelperCapabilityOnly: true,
+      p66ValidationAggregatorSourceRegistryRequiredSourceCount:
+        P66_SOURCE_REGISTRY_REQUIRED_IDS.length,
+      p66ValidationAggregatorSourceRegistryFailClosedReasonCount:
+        P66_SOURCE_REGISTRY_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorSourceRegistryHelperImportedByAggregator: false,
+      p66ValidationAggregatorSourceRegistryHelperExecutedByAggregator: false,
+      p66ValidationAggregatorSourceRegistryRuntimeImplemented: false,
+      p66ValidationAggregatorSourceRegistryFullImplementationComplete: false,
+      p66ValidationAggregatorSourceRegistryCanClaimRuntimeReady: false,
+      p66ValidationAggregatorSourceRegistryCanClaimFinalRcReady: false,
+      p66ValidationAggregatorSourceRegistryCanClaimV1RcReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -2246,6 +2283,56 @@ function buildV1RcValidationAggregatorReport({
         canClaimFinalRcReady: false,
         canClaimV1RcReady: false
       },
+      p66ValidationAggregatorSourceRegistryProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_5_VALIDATION_AGGREGATOR_SOURCE_REGISTRY_PROOF_HELPER.md',
+        helper: 'src/core/ValidationAggregatorSourceRegistryProofContract.js',
+        test: 'tests/validation-aggregator-source-registry-proof-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion: 'p66-validation-aggregator-source-registry-proof-v1',
+        policyVersion: 'p66-validation-aggregator-source-registry-proof-policy-v1',
+        manifestVersion: 'p66-validation-aggregator-source-registry-proof-manifest-v1',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        exactSetRequired: true,
+        publicToolsFrozen: true,
+        requiredSourceRegistryIds: P66_SOURCE_REGISTRY_REQUIRED_IDS.map(id => ({
+          id,
+          required: true,
+          mustFailClosedWhenMissing: true
+        })),
+        failClosedReasons: P66_SOURCE_REGISTRY_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        rcReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -2272,7 +2359,8 @@ function buildV1RcValidationAggregatorReport({
       'P36-P40 local evidence report ready does not mean runtime, final RC matrix, push, release, deploy, config switch, watchdog, or v1.0 RC readiness.',
       'P53 inventory evidence is static report-shape posture only and does not complete the ValidationAggregator full implementation.',
       'P65 runtime evidence summary ingestion is explicit-input-only and does not execute gates or claim RC readiness.',
-      'P66.1 full-implementation definition is static and does not make validationAggregatorFullImplementation true.'
+      'P66.1 full-implementation definition is static and does not make validationAggregatorFullImplementation true.',
+      'P66.5 source registry proof helper capability is static and is not executed by the aggregator.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',
