@@ -1,0 +1,425 @@
+{
+  "schemaVersion": "p66-validation-aggregator-migration-import-export-backup-restore-approval-gap-plan-v1",
+  "policyVersion": "p66-validation-aggregator-migration-import-export-backup-restore-approval-gap-plan-policy-v1",
+  "manifestVersion": "p66-validation-aggregator-migration-import-export-backup-restore-approval-gap-plan-manifest-v1",
+  "version": "v1",
+  "phase": "P66.47-validation-aggregator-migration-import-export-backup-restore-approval-gap-planning",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "planningOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "selectedGap": {
+    "id": "migration_import_export_backup_restore_approval_execution_blocked",
+    "priority": 4,
+    "currentStatus": "a5_blocked",
+    "requiresA5ApprovalBeforeRuntime": true,
+    "remainsOpenAfterThisPhase": true,
+    "readinessAuthority": false
+  },
+  "priorGapLocalProofReview": {
+    "id": "recall_isolation_runtime_proof_not_executed",
+    "localProofSlicesComplete": true,
+    "runtimeGapStillOpen": true,
+    "readinessAuthority": false
+  },
+  "validationAggregatorFullImplementation": false,
+  "approvalExecutionReady": false,
+  "approvalExecuted": false,
+  "migrationFrameworkReady": false,
+  "migrationApplyReady": false,
+  "importExportFrameworkReady": false,
+  "importExportApplyReady": false,
+  "backupRestoreFrameworkReady": false,
+  "backupRestoreApplyReady": false,
+  "migrationApplied": false,
+  "importApplied": false,
+  "exportApplied": false,
+  "backupCreated": false,
+  "restorePerformed": false,
+  "realMemoryScanned": false,
+  "runtimeStoreScanned": false,
+  "durableMemoryWritten": false,
+  "durableAuditWritten": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "v1RcReady": false,
+  "rcReady": false,
+  "cutoverReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "internalOnlyTools": [
+    "validate_memory"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "p27_migration_import_export_approval_packet_contract",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/migration-import-export-approval-packet-v1.json",
+        "tests/migration-import-export-approval-packet-fixture.test.js",
+        "docs/P27_MIGRATION_IMPORT_EXPORT_APPROVAL_PACKET.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    },
+    {
+      "id": "p39_synthetic_migration_dry_run_contract",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p39-synthetic-migration-dry-run-v1.json",
+        "tests/p39-synthetic-migration-dry-run-fixture.test.js",
+        "docs/P39_SYNTHETIC_MIGRATION_DRY_RUN_CONTRACT.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    },
+    {
+      "id": "p58_migration_import_export_backup_restore_approval_boundary_inventory",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p58-migration-import-export-backup-restore-approval-boundary-v1.json",
+        "tests/p58-migration-import-export-backup-restore-approval-boundary-fixture.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    },
+    {
+      "id": "p62_a5_runtime_authorization_precondition_matrix",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p62-a5-runtime-authorization-precondition-matrix-v1.json",
+        "tests/p62-a5-runtime-authorization-precondition-matrix-fixture.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    },
+    {
+      "id": "p66_runtime_gap_plan",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p66-validation-aggregator-runtime-gap-plan-v1.json",
+        "tests/p66-validation-aggregator-runtime-gap-plan-fixture.test.js",
+        "docs/P66_3_VALIDATION_AGGREGATOR_RUNTIME_GAP_PLAN.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "executionAuthority": false
+    }
+  ],
+  "operationFamilies": [
+    "real_memory_preview",
+    "export",
+    "import",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_creation",
+    "restore_overwrite",
+    "durable_report_write",
+    "package_script_wiring",
+    "public_mcp_expansion",
+    "provider_model_call",
+    "service_startup",
+    "remote_release_action"
+  ],
+  "frameworkStages": [
+    {
+      "id": "source_scope_review",
+      "operationFamily": "source_scope",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "operation_plan_review",
+      "operationFamily": "operation_plan",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "dry_run_evidence_review",
+      "operationFamily": "dry_run",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "parity_and_rollback_readiness_review",
+      "operationFamily": "parity_rollback",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "backup_restore_plan_review",
+      "operationFamily": "backup_restore",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "redaction_and_no_real_data_access_review",
+      "operationFamily": "redaction_no_real_data",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "explicit_a5_authorization_packet_review",
+      "operationFamily": "approval",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "post_action_validation_plan_review",
+      "operationFamily": "post_action_validation",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    },
+    {
+      "id": "execution_gate",
+      "operationFamily": "execution",
+      "inputMode": "explicit_input",
+      "executionAllowed": false,
+      "durableWriteAllowed": false,
+      "requiresExplicitA5Approval": true
+    }
+  ],
+  "approvalStates": [
+    {
+      "id": "not_requested",
+      "acceptedForPlanning": true,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_missing",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_unknown",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_warning_only",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_expired",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "approval_scope_mismatch",
+      "acceptedForPlanning": false,
+      "executionAllowed": false
+    },
+    {
+      "id": "reviewed_not_executable",
+      "acceptedForPlanning": true,
+      "executionAllowed": false
+    },
+    {
+      "id": "approved_but_a5_blocked",
+      "acceptedForPlanning": true,
+      "executionAllowed": false
+    }
+  ],
+  "requiredApprovalEvidence": [
+    "source_scope_evidence",
+    "actor_scope_evidence",
+    "operation_plan",
+    "dry_run_report",
+    "parity_report",
+    "rollback_readiness_report",
+    "backup_plan",
+    "restore_plan",
+    "redaction_report",
+    "no_real_data_access_report",
+    "explicit_a5_authorization_packet",
+    "post_action_validation_plan",
+    "failure_path_plan"
+  ],
+  "unsatisfiedApprovalEvidence": [
+    "source_scope_evidence",
+    "actor_scope_evidence",
+    "operation_plan",
+    "dry_run_report",
+    "parity_report",
+    "rollback_readiness_report",
+    "backup_plan",
+    "restore_plan",
+    "redaction_report",
+    "no_real_data_access_report",
+    "explicit_a5_authorization_packet",
+    "post_action_validation_plan",
+    "failure_path_plan"
+  ],
+  "acceptedFutureLocalWork": [
+    "docs",
+    "fixture",
+    "test"
+  ],
+  "disallowedWork": [
+    "real_memory_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "sqlite_migration_apply",
+    "migration_apply",
+    "import_apply",
+    "export_apply",
+    "import_export_apply",
+    "backup_create",
+    "restore_perform",
+    "backup_restore_apply",
+    "approval_execution",
+    "command_execution",
+    "gate_execution",
+    "runner_execution",
+    "service_start",
+    "provider_call",
+    "config_mutation",
+    "startup_watchdog_operation",
+    "durable_memory_writer",
+    "durable_audit_writer",
+    "public_mcp_expansion",
+    "validate_memory_public_exposure",
+    "package_lockfile_change",
+    "env_secret_change",
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "rc_ready_claim",
+    "cutover_ready_claim"
+  ],
+  "failClosedCases": [
+    "missing_source_scope_evidence",
+    "missing_actor_scope_evidence",
+    "missing_operation_plan",
+    "missing_dry_run_report",
+    "missing_parity_report",
+    "missing_rollback_readiness_report",
+    "missing_backup_plan",
+    "missing_restore_plan",
+    "missing_redaction_report",
+    "missing_no_real_data_access_report",
+    "missing_explicit_a5_authorization_packet",
+    "missing_post_action_validation_plan",
+    "missing_failure_path_plan",
+    "approval_missing",
+    "approval_unknown",
+    "approval_warning_only",
+    "approval_expired",
+    "approval_scope_mismatch",
+    "source_scope_mismatch",
+    "actor_scope_mismatch",
+    "rollback_not_ready",
+    "backup_unverified",
+    "restore_unverified",
+    "real_data_requested",
+    "apply_requested",
+    "durable_write_claim",
+    "public_mcp_expansion_claim",
+    "readiness_claim_without_authority"
+  ],
+  "a5HardStops": [
+    "push",
+    "tag_create",
+    "release_create",
+    "deploy",
+    "config_switch",
+    "watchdog_install",
+    "startup_install",
+    "provider_call",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "rc_ready_claim"
+  ],
+  "safety": {
+    "mutated": false,
+    "fixtureOnly": true,
+    "planningOnly": true,
+    "noRuntimeImplementation": true,
+    "noApprovalExecution": true,
+    "noMigrationApply": true,
+    "noImportExportApply": true,
+    "noBackupRestoreApply": true,
+    "noRealMemoryRead": true,
+    "noRealMemoryPreview": true,
+    "noRealMemoryScan": true,
+    "noDiaryScan": true,
+    "noSqliteScan": true,
+    "noVectorIndexScan": true,
+    "noCandidateCacheScan": true,
+    "noRecallAuditScan": true,
+    "noRuntimeStoreScan": true,
+    "noCommandExecution": true,
+    "noGateExecution": true,
+    "noRunnerExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noStartupWatchdogOperation": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noPackageChange": true,
+    "noSecretChange": true,
+    "noRemoteWrite": true,
+    "noTagReleaseDeploy": true
+  },
+  "forbiddenClaims": [
+    "P66.47 approves migration import export backup or restore",
+    "P66.47 executes migration import export backup or restore",
+    "P66.47 reads previews exports imports or scans real memory",
+    "P66.47 writes durable memory or audit records",
+    "P66.47 makes migrationFrameworkReady true",
+    "P66.47 makes importExportFrameworkReady true",
+    "P66.47 makes backupRestoreFrameworkReady true",
+    "P66.47 makes approvalExecutionReady true",
+    "P66.47 closes migration_import_export_backup_restore_approval_execution_blocked",
+    "P66.47 makes validationAggregatorFullImplementation true",
+    "P66.47 makes runtimeReady true",
+    "P66.47 makes finalRcMatrixReady true",
+    "P66.47 makes v1RcReady true",
+    "P66.47 makes rcReady true",
+    "P66.47 authorizes RC_READY",
+    "P66.47 authorizes push tag release deploy"
+  ],
+  "nextRecommendedPhase": "P66.48-validation-aggregator-migration-import-export-backup-restore-approval-fixture-tests"
+}
