@@ -1331,6 +1331,199 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.canClaimRuntimeReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.canClaimFinalRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.canClaimV1RcReady, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorReadinessOverclaimRejectionProofAvailable,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorReadinessOverclaimRejectionProofSourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorReadinessOverclaimRejectionProofHelperCapabilityOnly,
+    true
+  );
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimRequiredClaimCount, 6);
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimFailClosedCaseCount, 18);
+  assert.equal(
+    report.summary.p66ValidationAggregatorReadinessOverclaimAllowedEvidencePostureCount,
+    4
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorReadinessOverclaimDisallowedReadinessPostureCount,
+    7
+  );
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimFailClosedReasonCount, 20);
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimHelperImportedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimHelperExecutedByAggregator, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorReadinessOverclaimEvidenceFileReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorReadinessOverclaimCommandExecutedByAggregator,
+    false
+  );
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimRuntimeImplemented, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorReadinessOverclaimFullImplementationComplete,
+    false
+  );
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimCanClaimRuntimeReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimCanClaimV1RcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimCanClaimRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorReadinessOverclaimCanClaimCutoverReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.sourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.helper,
+    'src/core/ValidationAggregatorReadinessOverclaimRejectionProofContract.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.test,
+    'tests/validation-aggregator-readiness-overclaim-rejection-proof-contract-helper.test.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.schemaVersion,
+    'p66-validation-aggregator-readiness-overclaim-rejection-proof-v1'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.helperCapabilityOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.explicitInputOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.metadataOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.requiredReadinessClaims.length,
+    6
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.failClosedCases.length,
+    18
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.allowedEvidencePosture.length,
+    4
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.disallowedReadinessPosture.length,
+    7
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.failClosedReasons.length,
+    20
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.requiredReadinessClaims
+      .every(claim => claim.mustReject === true),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.failClosedCases
+      .every(item => item.mustFailClosed === true),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.helperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.helperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.fixtureReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.evidenceFileReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.commandExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.gateExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.runnerExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.evidenceCollectedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.liveMcpRefreshedByAggregator,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.scansDirectories, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.publicMcpExpanded, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.validateMemoryPublic, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.configMutated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.startupWatchdogOperated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.tagReleaseDeploy, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.runtimeMutationImplemented,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.fullAggregatorImplementationComplete,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.runtimeIntegrated,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.v1RcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.rcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.cutoverReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.decisionImpact,
+    'none_report_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.blockedDecisionRequired,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.canClaimRuntimeReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.canClaimFinalRcReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.canClaimV1RcReady,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.canClaimRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorReadinessOverclaimRejectionProof.canClaimCutoverReady, false);
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',

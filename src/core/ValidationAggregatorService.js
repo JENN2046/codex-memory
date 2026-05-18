@@ -603,6 +603,76 @@ const P66_NO_TOUCH_BOUNDARY_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const P66_READINESS_OVERCLAIM_REQUIRED_CLAIMS = [
+  'validation-aggregator-full-implementation-ready',
+  'runtime-ready',
+  'final-rc-matrix-ready',
+  'v1-rc-ready',
+  'rc-ready',
+  'cutover-ready'
+];
+
+const P66_READINESS_OVERCLAIM_FAIL_CLOSED_CASES = [
+  'missing_readiness_overclaim_rejection_proof',
+  'partial_evidence_claims_validation_aggregator_full_implementation',
+  'static_evidence_claims_runtime_ready',
+  'fixture_evidence_claims_final_rc_matrix_ready',
+  'stale_gate_evidence_claims_v1_rc_ready',
+  'local_runner_evidence_claims_rc_ready',
+  'runtime_gap_count_nonzero_claims_ready',
+  'a5_hard_stop_count_nonzero_claims_ready',
+  'public_mcp_expansion_claims_ready',
+  'validate_memory_public_claims_ready',
+  'config_switch_claims_cutover_ready',
+  'startup_watchdog_claims_cutover_ready',
+  'provider_call_claims_ready',
+  'real_memory_preview_claims_ready',
+  'durable_write_claims_ready',
+  'migration_apply_claims_ready',
+  'import_export_apply_claims_ready',
+  'tag_release_deploy_claims_ready'
+];
+
+const P66_READINESS_OVERCLAIM_ALLOWED_EVIDENCE_POSTURE = [
+  'fixture_acceptance_defined',
+  'pure_helper_available',
+  'static_report_shape_evidence',
+  'sanitized_local_command_evidence_recorded'
+];
+
+const P66_READINESS_OVERCLAIM_DISALLOWED_READINESS_POSTURE = [
+  'runtime_collector_complete',
+  'runtime_gap_zero_count',
+  'a5_hard_stop_zero_count',
+  'final_rc_matrix_ready',
+  'v1_rc_ready',
+  'rc_ready',
+  'cutover_ready'
+];
+
+const P66_READINESS_OVERCLAIM_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'missing_required_readiness_claim',
+  'duplicate_readiness_claim',
+  'unknown_readiness_claim',
+  'readiness_claim_not_rejected',
+  'missing_required_fail_closed_case',
+  'duplicate_fail_closed_case',
+  'unknown_fail_closed_case',
+  'runtime_gap_count_overclaim',
+  'a5_hard_stop_count_overclaim',
+  'evidence_posture_drift',
+  'readiness_posture_drift',
+  'unsafe_low_risk_summary',
+  'unsafe_safety_flag',
+  'sensitive_fragment_rejected',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1864,6 +1934,31 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorNoTouchBoundaryCanClaimRuntimeReady: false,
       p66ValidationAggregatorNoTouchBoundaryCanClaimFinalRcReady: false,
       p66ValidationAggregatorNoTouchBoundaryCanClaimV1RcReady: false,
+      p66ValidationAggregatorReadinessOverclaimRejectionProofAvailable: true,
+      p66ValidationAggregatorReadinessOverclaimRejectionProofSourceMode:
+        'static_report_shape_only',
+      p66ValidationAggregatorReadinessOverclaimRejectionProofHelperCapabilityOnly: true,
+      p66ValidationAggregatorReadinessOverclaimRequiredClaimCount:
+        P66_READINESS_OVERCLAIM_REQUIRED_CLAIMS.length,
+      p66ValidationAggregatorReadinessOverclaimFailClosedCaseCount:
+        P66_READINESS_OVERCLAIM_FAIL_CLOSED_CASES.length,
+      p66ValidationAggregatorReadinessOverclaimAllowedEvidencePostureCount:
+        P66_READINESS_OVERCLAIM_ALLOWED_EVIDENCE_POSTURE.length,
+      p66ValidationAggregatorReadinessOverclaimDisallowedReadinessPostureCount:
+        P66_READINESS_OVERCLAIM_DISALLOWED_READINESS_POSTURE.length,
+      p66ValidationAggregatorReadinessOverclaimFailClosedReasonCount:
+        P66_READINESS_OVERCLAIM_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorReadinessOverclaimHelperImportedByAggregator: false,
+      p66ValidationAggregatorReadinessOverclaimHelperExecutedByAggregator: false,
+      p66ValidationAggregatorReadinessOverclaimEvidenceFileReadByAggregator: false,
+      p66ValidationAggregatorReadinessOverclaimCommandExecutedByAggregator: false,
+      p66ValidationAggregatorReadinessOverclaimRuntimeImplemented: false,
+      p66ValidationAggregatorReadinessOverclaimFullImplementationComplete: false,
+      p66ValidationAggregatorReadinessOverclaimCanClaimRuntimeReady: false,
+      p66ValidationAggregatorReadinessOverclaimCanClaimFinalRcReady: false,
+      p66ValidationAggregatorReadinessOverclaimCanClaimV1RcReady: false,
+      p66ValidationAggregatorReadinessOverclaimCanClaimRcReady: false,
+      p66ValidationAggregatorReadinessOverclaimCanClaimCutoverReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -3020,6 +3115,78 @@ function buildV1RcValidationAggregatorReport({
         canClaimFinalRcReady: false,
         canClaimV1RcReady: false
       },
+      p66ValidationAggregatorReadinessOverclaimRejectionProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_33_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_HELPER.md',
+        helper:
+          'src/core/ValidationAggregatorReadinessOverclaimRejectionProofContract.js',
+        test:
+          'tests/validation-aggregator-readiness-overclaim-rejection-proof-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion:
+          'p66-validation-aggregator-readiness-overclaim-rejection-proof-v1',
+        policyVersion:
+          'p66-validation-aggregator-readiness-overclaim-rejection-proof-policy-v1',
+        manifestVersion:
+          'p66-validation-aggregator-readiness-overclaim-rejection-proof-manifest-v1',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        metadataOnly: true,
+        publicToolsFrozen: true,
+        requiredReadinessClaims: P66_READINESS_OVERCLAIM_REQUIRED_CLAIMS.map(id => ({
+          id,
+          required: true,
+          mustReject: true
+        })),
+        failClosedCases: P66_READINESS_OVERCLAIM_FAIL_CLOSED_CASES.map(id => ({
+          id,
+          required: true,
+          mustFailClosed: true
+        })),
+        allowedEvidencePosture: P66_READINESS_OVERCLAIM_ALLOWED_EVIDENCE_POSTURE,
+        disallowedReadinessPosture:
+          P66_READINESS_OVERCLAIM_DISALLOWED_READINESS_POSTURE,
+        failClosedReasons: P66_READINESS_OVERCLAIM_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansSourceAtRuntime: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        validateMemoryPublic: false,
+        configMutated: false,
+        startupWatchdogOperated: false,
+        tagReleaseDeploy: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        v1RcReady: false,
+        rcReady: false,
+        cutoverReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false,
+        canClaimRcReady: false,
+        canClaimCutoverReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -3051,7 +3218,8 @@ function buildV1RcValidationAggregatorReport({
       'P66.9 evidence freshness proof helper capability is static and is not executed by the aggregator.',
       'P66.13 baseline binding proof helper capability is static and is not executed by the aggregator.',
       'P66.17 runtime evidence summary normalization helper capability is static and is not executed by the aggregator.',
-      'P66.21 missing or stale evidence fail-closed helper capability is static and is not executed by the aggregator.'
+      'P66.21 missing or stale evidence fail-closed helper capability is static and is not executed by the aggregator.',
+      'P66.33 readiness overclaim rejection helper capability is static and is not executed by the aggregator.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',

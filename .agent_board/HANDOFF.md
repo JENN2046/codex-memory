@@ -264,3 +264,11 @@ P66.33 ValidationAggregator readiness overclaim rejection helper is implemented 
 P66.33 validation passed: helper syntax, targeted helper test `13/13`, no-touch regression `4/4`, `npm test` `1329/1329`, `git diff --check`, and docs validation.
 
 Next safe action is to guarded-commit P66.33 if eligible; after that, continue to P66.34 readiness overclaim rejection static bridge if still inside local safe bounds. 中文解释：下一步先提交 P66.33；之后只能做 readiness overclaim rejection 的静态 bridge，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+
+P66.33 ValidationAggregator readiness overclaim rejection helper is committed locally in `ad125b9`.
+
+P66.34 ValidationAggregator readiness overclaim rejection static bridge is implemented locally. It adds static, non-authoritative report-shape evidence for the P66.33 helper capability in [ValidationAggregatorService.js](/A:/codex-memory/src/core/ValidationAggregatorService.js), locks the shape in [v1-rc-validation-aggregator-implementation.test.js](/A:/codex-memory/tests/v1-rc-validation-aggregator-implementation.test.js), and documents the slice in [docs/P66_34_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_STATIC_BRIDGE.md](/A:/codex-memory/docs/P66_34_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_STATIC_BRIDGE.md). It does not import or execute the helper, read evidence files, execute commands, run gates/runners, start services, call providers, mutate config/startup/watchdog, write durable state, expand public MCP, push/tag/release/deploy, or claim readiness.
+
+P66.34 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1329/1329`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.34 if eligible; after that, continue to P66.35 readiness overclaim rejection closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.34；之后只能做 readiness overclaim rejection 的 docs/board closeout，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
