@@ -792,6 +792,140 @@ const P66_GOVERNANCE_RUNTIME_LOOP_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const P66_RECALL_ISOLATION_RECORD_FAMILIES = [
+  'governance_records',
+  'validation_transcripts',
+  'redaction_samples',
+  'policy_decisions',
+  'readiness_reports',
+  'migration_metadata',
+  'blocked_memory',
+  'tombstoned_memory',
+  'out_of_scope_memory'
+];
+
+const P66_RECALL_ISOLATION_PROOF_SURFACES = [
+  'normal_recall_namespace',
+  'vector_index',
+  'candidate_cache',
+  'ranking',
+  'projection',
+  'user_visible_audit_summary',
+  'recall_audit_summary'
+];
+
+const P66_RECALL_ISOLATION_REQUIRED_RUNTIME_EVIDENCE_GROUPS = [
+  'synthetic_runtime_harness_plan',
+  'instrumented_namespace_assertions',
+  'vector_exclusion_assertions',
+  'candidate_cache_exclusion_assertions',
+  'ranking_exclusion_assertions',
+  'projection_exclusion_assertions',
+  'user_visible_audit_summary_exclusion_assertions',
+  'recall_audit_summary_exclusion_assertions',
+  'negative_controls_for_isolated_record_families',
+  'positive_control_for_active_in_scope_user_memory',
+  'no_durable_write_evidence',
+  'no_public_mcp_expansion_evidence',
+  'machine_readable_contamination_report'
+];
+
+const P66_RECALL_ISOLATION_CONTROL_CASES = [
+  'active_in_scope_user_memory_positive_control',
+  'isolated_record_negative_controls'
+];
+
+const P66_RECALL_ISOLATION_FAIL_CLOSED_CASES = [
+  'missing_isolated_record_family',
+  'duplicate_isolated_record_family',
+  'unknown_isolated_record_family',
+  'missing_proof_surface',
+  'duplicate_proof_surface',
+  'unknown_proof_surface',
+  'missing_required_runtime_evidence',
+  'duplicate_runtime_evidence',
+  'unknown_runtime_evidence',
+  'missing_positive_control',
+  'missing_negative_control',
+  'isolated_record_contaminates_normal_recall',
+  'isolated_record_contaminates_vector_index',
+  'isolated_record_contaminates_candidate_cache',
+  'isolated_record_contaminates_ranking',
+  'isolated_record_contaminates_projection',
+  'isolated_record_contaminates_user_visible_audit_summary',
+  'isolated_record_contaminates_recall_audit_summary',
+  'positive_control_missing_from_normal_recall',
+  'real_memory_scan_claim',
+  'runtime_store_scan_claim',
+  'contamination_report_from_real_data_claim',
+  'durable_write_claim',
+  'unsupported_source',
+  'unsafe_summary_claim',
+  'public_mcp_expansion_claim',
+  'readiness_claim_without_authority'
+];
+
+const P66_RECALL_ISOLATION_DISALLOWED_WORK = [
+  'real_memory_read',
+  'real_memory_preview',
+  'real_memory_export',
+  'real_memory_import',
+  'real_memory_scan',
+  'diary_scan',
+  'sqlite_scan',
+  'vector_index_scan',
+  'candidate_cache_scan',
+  'recall_audit_scan',
+  'runtime_recall_execution',
+  'runtime_store_scan',
+  'contamination_report_from_real_data',
+  'command_execution',
+  'gate_execution',
+  'runner_execution',
+  'service_start',
+  'provider_call',
+  'config_mutation',
+  'startup_watchdog_operation',
+  'durable_memory_writer',
+  'durable_audit_writer',
+  'migration_apply',
+  'import_export_apply',
+  'backup_restore_apply',
+  'public_mcp_expansion',
+  'validate_memory_public_exposure',
+  'package_lockfile_change',
+  'env_secret_change',
+  'push',
+  'tag',
+  'release',
+  'deploy',
+  'rc_ready_claim'
+];
+
+const P66_RECALL_ISOLATION_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'selected_gap_drift',
+  'source_plan_drift',
+  'isolated_record_family_drift',
+  'proof_surface_drift',
+  'control_case_drift',
+  'missing_required_runtime_evidence',
+  'duplicate_runtime_evidence',
+  'unknown_runtime_evidence',
+  'runtime_evidence_not_missing',
+  'missing_required_fail_closed_case',
+  'duplicate_fail_closed_case',
+  'unknown_fail_closed_case',
+  'disallowed_work_drift',
+  'unsafe_safety_flag',
+  'sensitive_fragment_rejected',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -2109,6 +2243,40 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorGovernanceRuntimeLoopCanClaimV1RcReady: false,
       p66ValidationAggregatorGovernanceRuntimeLoopCanClaimRcReady: false,
       p66ValidationAggregatorGovernanceRuntimeLoopCanClaimCutoverReady: false,
+      p66ValidationAggregatorRecallIsolationRuntimeProofAvailable: true,
+      p66ValidationAggregatorRecallIsolationRuntimeProofSourceMode:
+        'static_report_shape_only',
+      p66ValidationAggregatorRecallIsolationRuntimeProofHelperCapabilityOnly: true,
+      p66ValidationAggregatorRecallIsolationRecordFamilyCount:
+        P66_RECALL_ISOLATION_RECORD_FAMILIES.length,
+      p66ValidationAggregatorRecallIsolationProofSurfaceCount:
+        P66_RECALL_ISOLATION_PROOF_SURFACES.length,
+      p66ValidationAggregatorRecallIsolationRequiredEvidenceGroupCount:
+        P66_RECALL_ISOLATION_REQUIRED_RUNTIME_EVIDENCE_GROUPS.length,
+      p66ValidationAggregatorRecallIsolationControlCaseCount:
+        P66_RECALL_ISOLATION_CONTROL_CASES.length,
+      p66ValidationAggregatorRecallIsolationFailClosedCaseCount:
+        P66_RECALL_ISOLATION_FAIL_CLOSED_CASES.length,
+      p66ValidationAggregatorRecallIsolationDisallowedWorkCount:
+        P66_RECALL_ISOLATION_DISALLOWED_WORK.length,
+      p66ValidationAggregatorRecallIsolationFailClosedReasonCount:
+        P66_RECALL_ISOLATION_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorRecallIsolationHelperImportedByAggregator: false,
+      p66ValidationAggregatorRecallIsolationHelperExecutedByAggregator: false,
+      p66ValidationAggregatorRecallIsolationEvidenceFileReadByAggregator: false,
+      p66ValidationAggregatorRecallIsolationCommandExecutedByAggregator: false,
+      p66ValidationAggregatorRecallIsolationRealMemoryScannedByAggregator: false,
+      p66ValidationAggregatorRecallIsolationRuntimeStoreScannedByAggregator: false,
+      p66ValidationAggregatorRecallIsolationRuntimeProofExecuted: false,
+      p66ValidationAggregatorRecallIsolationContaminationReportReady: false,
+      p66ValidationAggregatorRecallIsolationDurableWriteReady: false,
+      p66ValidationAggregatorRecallIsolationRuntimeImplemented: false,
+      p66ValidationAggregatorRecallIsolationFullImplementationComplete: false,
+      p66ValidationAggregatorRecallIsolationCanClaimRuntimeReady: false,
+      p66ValidationAggregatorRecallIsolationCanClaimFinalRcReady: false,
+      p66ValidationAggregatorRecallIsolationCanClaimV1RcReady: false,
+      p66ValidationAggregatorRecallIsolationCanClaimRcReady: false,
+      p66ValidationAggregatorRecallIsolationCanClaimCutoverReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -3413,6 +3581,137 @@ function buildV1RcValidationAggregatorReport({
         governanceRuntimeLoopExecuted: false,
         approvalExecutionReady: false,
         auditWriterReady: false,
+        durableWriteReady: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        v1RcReady: false,
+        rcReady: false,
+        cutoverReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false,
+        canClaimRcReady: false,
+        canClaimCutoverReady: false
+      },
+      p66ValidationAggregatorRecallIsolationRuntimeProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_44_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_HELPER.md',
+        helper: 'src/core/ValidationAggregatorRecallIsolationRuntimeProofContract.js',
+        test:
+          'tests/validation-aggregator-recall-isolation-runtime-proof-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion:
+          'p66-validation-aggregator-recall-isolation-runtime-proof-fixture-v1',
+        policyVersion:
+          'p66-validation-aggregator-recall-isolation-runtime-proof-fixture-policy-v1',
+        manifestVersion:
+          'p66-validation-aggregator-recall-isolation-runtime-proof-fixture-manifest-v1',
+        selectedGap: 'recall_isolation_runtime_proof_not_executed',
+        sourcePlan:
+          'P66.42-validation-aggregator-recall-isolation-runtime-proof-gap-planning',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        metadataOnly: true,
+        publicToolsFrozen: true,
+        isolatedRecordFamilyAcceptanceCases:
+          P66_RECALL_ISOLATION_RECORD_FAMILIES.map(id => ({
+            id,
+            required: true,
+            currentStatus: 'acceptance_defined_not_runtime_executed',
+            mustBeExcludedFromAllProofSurfaces: true,
+            mustFailClosedWhenObserved: true
+          })),
+        proofSurfaceAcceptanceCases:
+          P66_RECALL_ISOLATION_PROOF_SURFACES.map(id => ({
+            id,
+            required: true,
+            runtimeStoreReadAllowed: false,
+            contaminationAllowed: false,
+            syntheticEvidenceAllowed: true,
+            realDataEvidenceAllowed: false,
+            futureEvidenceRequired: true
+          })),
+        controlCases: [
+          {
+            id: 'active_in_scope_user_memory_positive_control',
+            recordFamily: 'active_in_scope_user_memory',
+            required: true,
+            mayEnterNormalRecall: true,
+            mayEnterVectorIndex: true,
+            mayEnterCandidateCache: true,
+            mayEnterRanking: true,
+            mayEnterProjection: true,
+            mayEnterUserVisibleAuditSummary: true,
+            mayEnterRecallAuditSummary: true
+          },
+          {
+            id: 'isolated_record_negative_controls',
+            recordFamilies: P66_RECALL_ISOLATION_RECORD_FAMILIES,
+            required: true,
+            mayEnterNormalRecall: false,
+            mayEnterVectorIndex: false,
+            mayEnterCandidateCache: false,
+            mayEnterRanking: false,
+            mayEnterProjection: false,
+            mayEnterUserVisibleAuditSummary: false,
+            mayEnterRecallAuditSummary: false
+          }
+        ],
+        requiredRuntimeEvidenceGroups:
+          P66_RECALL_ISOLATION_REQUIRED_RUNTIME_EVIDENCE_GROUPS.map(id => ({
+            id,
+            required: true,
+            currentStatus: 'missing',
+            mustFailClosedWhenMissing: true
+          })),
+        failClosedCases: P66_RECALL_ISOLATION_FAIL_CLOSED_CASES.map(id => ({
+          id,
+          required: true,
+          mustFailClosed: true
+        })),
+        disallowedWork: P66_RECALL_ISOLATION_DISALLOWED_WORK,
+        failClosedReasons: P66_RECALL_ISOLATION_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        recallExecutedByAggregator: false,
+        recallIsolationRuntimeProofExecutedByAggregator: false,
+        contaminationReportProducedByAggregator: false,
+        realMemoryScannedByAggregator: false,
+        diaryScannedByAggregator: false,
+        sqliteScannedByAggregator: false,
+        vectorIndexScannedByAggregator: false,
+        candidateCacheScannedByAggregator: false,
+        recallAuditScannedByAggregator: false,
+        runtimeStoreScannedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        validateMemoryPublic: false,
+        configMutated: false,
+        startupWatchdogOperated: false,
+        tagReleaseDeploy: false,
+        runtimeMutationImplemented: false,
+        recallIsolationRuntimeProofReady: false,
+        recallIsolationRuntimeProofExecuted: false,
+        contaminationReportReady: false,
         durableWriteReady: false,
         fullAggregatorImplementationComplete: false,
         runtimeIntegrated: false,

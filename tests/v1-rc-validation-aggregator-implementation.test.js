@@ -1741,6 +1741,212 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.canClaimV1RcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.canClaimRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorGovernanceRuntimeLoopGapProof.canClaimCutoverReady, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorRecallIsolationRuntimeProofAvailable,
+    true
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRecallIsolationRuntimeProofSourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorRecallIsolationRuntimeProofHelperCapabilityOnly,
+    true
+  );
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationRecordFamilyCount, 9);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationProofSurfaceCount, 7);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationRequiredEvidenceGroupCount, 13);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationControlCaseCount, 2);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationFailClosedCaseCount, 27);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationDisallowedWorkCount, 34);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationFailClosedReasonCount, 21);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationHelperImportedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationHelperExecutedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationEvidenceFileReadByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationCommandExecutedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationRealMemoryScannedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationRuntimeStoreScannedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationRuntimeProofExecuted, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationContaminationReportReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationDurableWriteReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationRuntimeImplemented, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationFullImplementationComplete, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationCanClaimRuntimeReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationCanClaimV1RcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationCanClaimRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorRecallIsolationCanClaimCutoverReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.sourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.helper,
+    'src/core/ValidationAggregatorRecallIsolationRuntimeProofContract.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.test,
+    'tests/validation-aggregator-recall-isolation-runtime-proof-contract-helper.test.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.schemaVersion,
+    'p66-validation-aggregator-recall-isolation-runtime-proof-fixture-v1'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.selectedGap,
+    'recall_isolation_runtime_proof_not_executed'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.helperCapabilityOnly,
+    true
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.explicitInputOnly, true);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.metadataOnly, true);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.isolatedRecordFamilyAcceptanceCases.length,
+    9
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.proofSurfaceAcceptanceCases.length,
+    7
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.controlCases.length, 2);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.requiredRuntimeEvidenceGroups.length,
+    13
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.failClosedCases.length, 27);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.disallowedWork.length, 34);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.failClosedReasons.length, 21);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.isolatedRecordFamilyAcceptanceCases
+      .every(item => (
+        item.currentStatus === 'acceptance_defined_not_runtime_executed' &&
+        item.mustBeExcludedFromAllProofSurfaces === true &&
+        item.mustFailClosedWhenObserved === true
+      )),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.proofSurfaceAcceptanceCases
+      .every(surface => (
+        surface.runtimeStoreReadAllowed === false &&
+        surface.contaminationAllowed === false &&
+        surface.syntheticEvidenceAllowed === true &&
+        surface.realDataEvidenceAllowed === false &&
+        surface.futureEvidenceRequired === true
+      )),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.requiredRuntimeEvidenceGroups
+      .every(group => group.currentStatus === 'missing' && group.mustFailClosedWhenMissing === true),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.helperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.helperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.fixtureReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.evidenceFileReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.commandExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.recallExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.recallIsolationRuntimeProofExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.contaminationReportProducedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.realMemoryScannedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.diaryScannedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.sqliteScannedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.vectorIndexScannedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.candidateCacheScannedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.recallAuditScannedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.runtimeStoreScannedByAggregator,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.publicMcpExpanded, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.validateMemoryPublic, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.configMutated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.startupWatchdogOperated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.tagReleaseDeploy, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.runtimeMutationImplemented, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.recallIsolationRuntimeProofReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.recallIsolationRuntimeProofExecuted, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.contaminationReportReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.durableWriteReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.fullAggregatorImplementationComplete,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.v1RcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.rcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.cutoverReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.decisionImpact,
+    'none_report_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.blockedDecisionRequired,
+    true
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimV1RcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimCutoverReady, false);
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',
