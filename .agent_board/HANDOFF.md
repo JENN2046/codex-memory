@@ -240,3 +240,11 @@ P66.30 ValidationAggregator no-touch boundary static bridge is implemented local
 P66.30 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1299/1299`, `git diff --check`, and docs validation.
 
 Next safe action is to guarded-commit P66.30 if eligible; after that, continue to P66.31 no-touch boundary closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.30；之后只能做 no-touch boundary 的 docs/board closeout，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+
+P66.30 ValidationAggregator no-touch boundary static bridge is committed locally in `34d80ec`.
+
+P66.31 ValidationAggregator no-touch boundary closeout is implemented locally as docs/board only. It adds [docs/P66_31_VALIDATION_AGGREGATOR_NO_TOUCH_BOUNDARY_CLOSEOUT.md](/A:/codex-memory/docs/P66_31_VALIDATION_AGGREGATOR_NO_TOUCH_BOUNDARY_CLOSEOUT.md), closes the no-touch boundary proof slice after P66.28-P66.30, and selects `readiness_overclaim_rejection_proof` as the next local-safe evidence group. It does not close the full runtime gap, execute runtime/gate/runner/service/provider work, write durable state, expand public MCP, push/tag/release/deploy, or claim readiness.
+
+P66.31 validation passed: `git diff --check` and docs validation.
+
+Next safe action is to guarded-commit P66.31 if eligible; after that, continue to P66.32 readiness overclaim rejection proof if still inside local safe bounds. 中文解释：下一步先提交 P66.31；之后只能做 readiness overclaim rejection 的本地 docs/fixture/test/helper/report-shape 工作，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
