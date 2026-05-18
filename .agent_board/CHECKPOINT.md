@@ -221,7 +221,13 @@ P66.16 ValidationAggregator runtime evidence summary normalization proof is impl
 
 P66.16 validation passed: fixture syntax, targeted fixture test `17/17`, `npm test` `1200/1200`, `git diff --check`, and docs validation.
 
-Next safe action is to guarded-commit P66.16, then continue to P66.17 runtime evidence summary normalization helper if still inside local safe bounds. 中文解释：下一步先提交本地 fixture/test/docs；之后只能做纯 explicit-input helper，仍然不是 runtime 或 RC readiness。
+P66.16 is committed locally in `e95aa56`.
+
+P66.17 ValidationAggregator runtime evidence summary normalization helper is implemented locally as a pure explicit-input helper. It accepts only caller-provided sanitized runtime evidence summary metadata, fails closed for version drift, public MCP drift, missing fields, invalid critical gates, unsafe summaries, sensitive fragments, and readiness overclaims, and does not read files, execute commands, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+
+P66.17 validation passed: helper syntax, targeted helper test `11/11`, no-touch regression `4/4`, `npm test` `1211/1211`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.17, then continue to P66.18 runtime evidence summary normalization static bridge if still inside local safe bounds. 中文解释：下一步先提交本地 helper；之后只能做静态 report-shape bridge，仍然不是 runtime 或 RC readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
