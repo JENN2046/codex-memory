@@ -199,4 +199,6 @@ P65.1 is complete and validated locally as a runner semantics hardening slice. L
 
 P65.2 push readiness approval request is drafted as docs/board only. Local payload head is `066a35d`; origin/remote main is `8905939`; approval remains `NOT_APPROVED`; decision remains `BLOCKED_HARD_STOP`; no push was executed.
 
+P66 remaining runtime gap inventory refresh is drafted as docs/board only. P63/P64 locally evidenced 2 runtime gaps; 7 runtime gaps remain open; 16 A5 hard stops remain blocked. v1.0 RC remains `NOT_READY_BLOCKED`.
+
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

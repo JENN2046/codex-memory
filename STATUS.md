@@ -13,6 +13,7 @@
 - 当前完成：P65-T1 ValidationAggregator explicit runtime evidence summary ingestion 已本地实现、验证并提交在 `04ae047`。该切片只消费 caller 显式传入的脱敏 runtime evidence summary，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不扩大 public MCP；当前仍保持 `NOT_READY_BLOCKED`。
 - 当前完成：P65.1 Final RC runner executed-field semantics hardening 已本地实现并验证。`finalRcMatrixExecuted` 不再代表本地 allowlisted runner 执行；新字段 `localRuntimeEvidenceMatrixExecuted` / `allowlistedFinalRcEvidenceRunnerExecuted` 表达本地执行证据，`fullFinalRcMatrixExecuted=false` 且显式 full-matrix execution/readiness 声明会被拒绝，继续阻止完整 RC matrix 误读。
 - 当前阶段：P65.2 push readiness approval request 已起草为 [docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md)。状态 `DRAFT_NOT_APPROVED` / `NOT_APPROVED` / `BLOCKED_HARD_STOP`；不执行 push。
+- 当前阶段：P66 remaining runtime gap inventory refresh 已新增 [docs/P66_REMAINING_RUNTIME_GAP_INVENTORY_REFRESH.md](/A:/codex-memory/docs/P66_REMAINING_RUNTIME_GAP_INVENTORY_REFRESH.md)。P63/P64 已本地证明 2 个 gap；剩余 7 个 runtime gap 和 16 个 A5 hard stop 继续阻止 `RC_READY`。
 
 ## 当前阻塞
 
@@ -22,13 +23,14 @@
 - P65-T1 只证明 ValidationAggregator 可以安全归一化显式 runtime evidence summary；它不是 full implementation completion、不是 final RC matrix readiness，也不是 v1.0 RC readiness。
 - P65.1 只收紧报告字段语义；它不是 final RC matrix readiness、v1.0 RC readiness、cutover readiness 或 `RC_READY`。
 - P65.2 只是 push readiness / approval request；它不是 push 授权，不会更新远端。
+- P66 是 docs/board inventory refresh；它不执行 runtime、gate、push、tag、release、deploy 或任何 A5 操作。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 
 ## 当前优先级
 
 1. P63-T1 已把 final RC matrix runner 从 fixture/helper 边界推进到本地 allowlisted real execution evidence；P64-T1 已把 schema/version runtime write-boundary proof 接入 core write path 和 final runner 矩阵；当前仍必须保持 `NOT_READY_BLOCKED`。
-2. 下一步只能继续处理剩余 7 个 runtime/A5 缺口中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。
+2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
 4. 不 push，除非用户单独明确授权。
 
