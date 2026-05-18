@@ -112,13 +112,14 @@
 - P66.55 是 docs/board closeout，已完成本地验证；它只关闭 cutover-context mainline strict gate 的本地 proof slice，runtime gap 仍 open，不执行 cutover gate、RC cutover、配置切换或声明 `RC_READY`。
 - P66.56 是 docs/fixture/test planning，已完成本地验证；它只规划 `rc_cutover_not_executed`，不执行 RC cutover、不 push/tag/release/deploy、不切配置、不声明 `RC_READY`。
 - P66.57 是 docs/fixture/test acceptance contract，已完成本地验证；它只锁定 RC cutover 的本地验收边界，不执行 RC cutover、不 push/tag/release/deploy、不切配置、不声明 `RC_READY`。
+- P66.58 是 docs/board closeout，已完成本地验证；它只关闭 RC cutover 的本地 proof slice，runtime gap 仍 open，不执行 RC cutover、不 push/tag/release/deploy、不切配置、不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 
 ## 当前优先级
 
 1. P63-T1 已把 final RC matrix runner 从 fixture/helper 边界推进到本地 allowlisted real execution evidence；P64-T1 已把 schema/version runtime write-boundary proof 接入 core write path 和 final runner 矩阵；当前仍必须保持 `NOT_READY_BLOCKED`。
-2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。P66.57 候选范围只能是 RC cutover acceptance fixture/test；P66.58 候选范围只能是 RC cutover local closeout，不得执行 cutover gate、RC cutover、配置切换或声明 readiness。
+2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。P66.58 候选范围只能是 RC cutover local closeout；P66.59 候选范围只能是 seven-gap local proof chain review，不得执行 runtime proof、cutover gate、RC cutover、配置切换或声明 readiness。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
 4. 按 active goal 规则继续本地 guarded commits；不 push，直到目标完成并完成最终验证后再执行用户授权的 push。
 
