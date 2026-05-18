@@ -57,7 +57,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P64-T1 runtime schema/version write-boundary proof is implemented, validated, and committed locally in `4425fce`; refreshed local runner passed 12/12 critical gates and recorded `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
 - P66.1 ValidationAggregator full-implementation definition is implemented, validated, and committed locally in `98154f2`.
 - P66.2 ValidationAggregator definition static bridge is implemented, validated, and committed locally in `9f613d5`.
-- P66.3 ValidationAggregator runtime gap plan is implemented and validated locally as docs/fixture/test; guarded commit is pending.
+- P66.3 ValidationAggregator runtime gap plan is implemented, validated, and committed locally in `c7a6a8c`.
+- P66.4 ValidationAggregator gap priority fixture tests are implemented and validated locally as docs/fixture/test; guarded commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -104,4 +105,6 @@ P66.2 ValidationAggregator definition static bridge is implemented locally. Vali
 
 P66.3 ValidationAggregator runtime gap plan is added as docs/fixture/test only. It locks the seven remaining runtime gaps, local-safe next work classes, A5-before-runtime boundaries, and fail-closed rules while preserving `NOT_READY_BLOCKED`.
 
-Next safe action is to validate and guarded-commit P66.3, then continue to P66.4 gap priority fixture tests. 中文解释：下一步只能给第一个剩余缺口补本地 fixture/test 验收标准，不能 push、tag、release、deploy、迁移、调用 provider、启动 live HTTP，或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.4 ValidationAggregator gap priority fixture tests are added as docs/fixture/test only. They lock acceptance criteria for `validation_aggregator_full_implementation_incomplete` without closing the gap or adding runtime authority.
+
+Next safe action is to validate and guarded-commit P66.4, then continue to P66.5 source-registry proof helper if still inside local safe bounds. 中文解释：下一步可以做一个纯 explicit-input helper 来校验 source registry exact-set；不能读文件、执行命令、启动服务、调用 provider、push、发布或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.

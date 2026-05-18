@@ -48,7 +48,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P63-T1 final RC runtime evidence runner bridge and P64-T1 runtime schema/version write-boundary proof are implemented, validated, and committed locally in `4425fce`.
 - P66.1 ValidationAggregator full-implementation definition is implemented, validated, and committed locally in `98154f2`.
 - P66.2 ValidationAggregator definition static bridge is implemented, validated, and committed locally in `9f613d5`.
-- P66.3 ValidationAggregator runtime gap plan is implemented and validated locally as docs/fixture/test; guarded commit is pending.
+- P66.3 ValidationAggregator runtime gap plan is implemented, validated, and committed locally in `c7a6a8c`.
+- P66.4 ValidationAggregator gap priority fixture tests are implemented and validated locally as docs/fixture/test; guarded commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -209,5 +210,7 @@ P66.1 ValidationAggregator full-implementation definition is added as docs/fixtu
 P66.2 ValidationAggregator definition static bridge is implemented locally. It exposes the P66.1 definition as static, non-authoritative report-shape evidence only: no fixture read, no helper/test/gate/runner execution, no service start, no real memory/runtime-store scan, no provider call, no durable write, no public MCP expansion, and no runtime/final-RC/v1-RC readiness claim.
 
 P66.3 ValidationAggregator runtime gap plan is added as docs/fixture/test only. It locks the seven remaining runtime gaps in priority order, keeps high-risk runtime proof gaps behind A5 authorization, and preserves the public MCP freeze, internal-only `validate_memory`, all A5 hard stops, and `NOT_READY_BLOCKED`.
+
+P66.4 ValidationAggregator gap priority fixture tests are added as docs/fixture/test only. They lock the first remaining gap's acceptance criteria, required evidence groups, disallowed work, fail-closed cases, and forbidden readiness claims. The selected gap remains open.
 
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
