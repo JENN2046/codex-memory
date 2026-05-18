@@ -1,0 +1,361 @@
+{
+  "schemaVersion": "p66-validation-aggregator-cutover-mainline-strict-gate-gap-plan-v1",
+  "policyVersion": "p66-validation-aggregator-cutover-mainline-strict-gate-gap-plan-policy-v1",
+  "manifestVersion": "p66-validation-aggregator-cutover-mainline-strict-gate-gap-plan-manifest-v1",
+  "version": "v1",
+  "phase": "P66.53-validation-aggregator-cutover-mainline-strict-gate-gap-planning",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "planningOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "selectedGap": {
+    "id": "mainline_strict_gate_not_executed_for_cutover",
+    "priority": 6,
+    "currentStatus": "open_cutover_gate_blocked",
+    "requiresA5ApprovalBeforeRuntime": true,
+    "remainsOpenAfterThisPhase": true,
+    "readinessAuthority": false
+  },
+  "priorGapLocalProofReview": {
+    "id": "live_http_operation_readiness_not_claimed",
+    "localProofSlicesComplete": true,
+    "runtimeGapStillOpen": true,
+    "readinessAuthority": false
+  },
+  "validationAggregatorFullImplementation": false,
+  "mainlineStrictGateExecutedForCutover": false,
+  "cutoverMainlineStrictGateReady": false,
+  "cutoverContextAuthorized": false,
+  "targetCommitBound": false,
+  "originMainFresh": false,
+  "cleanWorktreeVerified": false,
+  "strictGateReportReady": false,
+  "failurePathReady": false,
+  "configSwitchReady": false,
+  "watchdogReady": false,
+  "startupReady": false,
+  "providerValidationReady": false,
+  "realMemoryScanned": false,
+  "runtimeStoreScanned": false,
+  "durableMemoryWritten": false,
+  "durableAuditWritten": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "v1RcReady": false,
+  "rcReady": false,
+  "cutoverReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "internalOnlyTools": [
+    "validate_memory"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "p61_mainline_strict_gate_rc_evidence_report_boundary",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p61-mainline-strict-gate-rc-evidence-report-boundary-v1.json",
+        "tests/p61-mainline-strict-gate-rc-evidence-report-boundary-fixture.test.js",
+        "docs/P61_MAINLINE_STRICT_GATE_RC_EVIDENCE_REPORT_BOUNDARY.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "cutoverAuthority": false
+    },
+    {
+      "id": "p62_v1_rc_cutover_preflight_boundary",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p62-v1-rc-cutover-preflight-boundary-v1.json",
+        "tests/p62-v1-rc-cutover-preflight-boundary-fixture.test.js",
+        "docs/P62_V1_RC_CUTOVER_PREFLIGHT_BOUNDARY.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "cutoverAuthority": false
+    },
+    {
+      "id": "p63_final_rc_runtime_evidence_bridge",
+      "sourceType": "committed_report",
+      "artifactRefs": [
+        "docs/P63_FINAL_RC_RUNTIME_EVIDENCE_BRIDGE.md",
+        "logs/p63-final-rc-runtime-evidence-report-01.md",
+        "tests/final-rc-runtime-evidence-runner.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "cutoverAuthority": false
+    },
+    {
+      "id": "p64_runtime_schema_version_write_boundary_evidence",
+      "sourceType": "committed_report",
+      "artifactRefs": [
+        "docs/P64_RUNTIME_SCHEMA_VERSION_WRITE_BOUNDARY_EVIDENCE.md",
+        "logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md",
+        "tests/schema-version-runtime-boundary.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "cutoverAuthority": false
+    },
+    {
+      "id": "p66_runtime_gap_plan",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p66-validation-aggregator-runtime-gap-plan-v1.json",
+        "tests/p66-validation-aggregator-runtime-gap-plan-fixture.test.js",
+        "docs/P66_3_VALIDATION_AGGREGATOR_RUNTIME_GAP_PLAN.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "cutoverAuthority": false
+    },
+    {
+      "id": "p66_live_http_operation_readiness_local_closeout",
+      "sourceType": "committed_doc",
+      "artifactRefs": [
+        "docs/P66_52_VALIDATION_AGGREGATOR_LIVE_HTTP_OPERATION_READINESS_LOCAL_CLOSEOUT.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "cutoverAuthority": false
+    }
+  ],
+  "requiredRuntimeEvidence": [
+    "explicit_a5_cutover_gate_authorization",
+    "target_commit_binding_evidence",
+    "origin_main_freshness_evidence",
+    "clean_worktree_evidence",
+    "mainline_strict_gate_cutover_context_execution_evidence",
+    "strict_gate_json_report",
+    "strict_gate_text_report",
+    "failure_path_report",
+    "no_config_switch_evidence",
+    "no_watchdog_startup_evidence",
+    "no_provider_call_evidence",
+    "no_release_action_evidence",
+    "machine_readable_cutover_gate_report"
+  ],
+  "unsatisfiedRuntimeEvidence": [
+    "explicit_a5_cutover_gate_authorization",
+    "target_commit_binding_evidence",
+    "origin_main_freshness_evidence",
+    "clean_worktree_evidence",
+    "mainline_strict_gate_cutover_context_execution_evidence",
+    "strict_gate_json_report",
+    "strict_gate_text_report",
+    "failure_path_report",
+    "no_config_switch_evidence",
+    "no_watchdog_startup_evidence",
+    "no_provider_call_evidence",
+    "no_release_action_evidence",
+    "machine_readable_cutover_gate_report"
+  ],
+  "blockedOperationFamilies": [
+    "gate_mainline_strict_execution",
+    "gate_ci_execution",
+    "final_rc_runner_execution",
+    "cutover_context_gate_execution",
+    "git_fetch_merge_rebase",
+    "git_checkout_reset_detach",
+    "config_switch",
+    "watchdog_install",
+    "startup_install",
+    "provider_call",
+    "real_memory_read",
+    "runtime_store_scan",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "remote_release_action"
+  ],
+  "readinessStates": [
+    {
+      "id": "not_requested",
+      "acceptedForPlanning": true,
+      "readinessAllowed": false
+    },
+    {
+      "id": "a5_cutover_gate_authorization_missing",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "target_commit_unbound",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "origin_main_freshness_unknown",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "worktree_unclean",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "strict_gate_not_executed",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "local_gate_not_cutover_context",
+      "acceptedForPlanning": true,
+      "readinessAllowed": false
+    },
+    {
+      "id": "reviewed_not_ready",
+      "acceptedForPlanning": true,
+      "readinessAllowed": false
+    }
+  ],
+  "acceptedFutureLocalWork": [
+    "docs",
+    "fixture",
+    "test"
+  ],
+  "disallowedWork": [
+    "gate_mainline_strict_execution",
+    "gate_ci_execution",
+    "final_rc_runner_execution",
+    "cutover_context_gate_execution",
+    "command_execution",
+    "runner_execution",
+    "git_fetch",
+    "git_merge",
+    "git_rebase",
+    "git_checkout",
+    "git_reset",
+    "git_detach_head",
+    "config_switch",
+    "env_secret_edit",
+    "watchdog_install",
+    "startup_install",
+    "provider_call",
+    "real_memory_read",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "runtime_store_scan",
+    "durable_memory_writer",
+    "durable_audit_writer",
+    "public_mcp_expansion",
+    "validate_memory_public_exposure",
+    "package_lockfile_change",
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "cutover",
+    "rc_ready_claim"
+  ],
+  "failClosedCases": [
+    "missing_source_evidence",
+    "duplicate_source_evidence",
+    "unknown_source_evidence",
+    "source_claims_runtime_authority",
+    "source_claims_readiness_authority",
+    "source_claims_cutover_authority",
+    "missing_runtime_evidence",
+    "duplicate_runtime_evidence",
+    "unknown_runtime_evidence",
+    "a5_cutover_gate_authorization_missing",
+    "target_commit_unbound",
+    "target_commit_mismatch",
+    "origin_main_freshness_unknown",
+    "worktree_unclean",
+    "strict_gate_not_executed",
+    "strict_gate_failed",
+    "strict_gate_stale",
+    "strict_gate_warning_only",
+    "strict_gate_not_cutover_context",
+    "strict_gate_report_missing",
+    "failure_path_missing",
+    "config_switch_requested",
+    "watchdog_install_requested",
+    "startup_install_requested",
+    "provider_call_requested",
+    "real_memory_scan_requested",
+    "runtime_store_scan_requested",
+    "durable_write_claim",
+    "public_mcp_expansion_claim",
+    "release_action_requested",
+    "readiness_claim_without_authority"
+  ],
+  "a5HardStops": [
+    "push",
+    "tag_create",
+    "release_create",
+    "deploy",
+    "config_switch",
+    "watchdog_install",
+    "startup_install",
+    "provider_call",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "rc_ready_claim"
+  ],
+  "safety": {
+    "mutated": false,
+    "fixtureOnly": true,
+    "planningOnly": true,
+    "noRuntimeImplementation": true,
+    "noCommandExecution": true,
+    "noGateExecution": true,
+    "noRunnerExecution": true,
+    "noGitStateChange": true,
+    "noConfigMutation": true,
+    "noWatchdogOperation": true,
+    "noStartupOperation": true,
+    "noProviderCall": true,
+    "noRealMemoryRead": true,
+    "noRealMemoryScan": true,
+    "noRuntimeStoreScan": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noPackageChange": true,
+    "noSecretChange": true,
+    "noRemoteWrite": true,
+    "noTagReleaseDeploy": true,
+    "noCutover": true
+  },
+  "forbiddenClaims": [
+    "P66.53 runs gate:mainline:strict",
+    "P66.53 runs gate:ci",
+    "P66.53 executes final RC runner",
+    "P66.53 executes cutover-context gate",
+    "P66.53 changes Git state",
+    "P66.53 switches Codex or Claude config",
+    "P66.53 installs watchdog or startup",
+    "P66.53 makes mainlineStrictGateExecutedForCutover true",
+    "P66.53 makes cutoverMainlineStrictGateReady true",
+    "P66.53 makes cutoverContextAuthorized true",
+    "P66.53 closes mainline_strict_gate_not_executed_for_cutover",
+    "P66.53 makes validationAggregatorFullImplementation true",
+    "P66.53 makes runtimeReady true",
+    "P66.53 makes finalRcMatrixReady true",
+    "P66.53 makes v1RcReady true",
+    "P66.53 makes rcReady true",
+    "P66.53 makes cutoverReady true",
+    "P66.53 authorizes RC_READY",
+    "P66.53 authorizes push tag release deploy"
+  ],
+  "nextRecommendedPhase": "P66.54-validation-aggregator-cutover-mainline-strict-gate-fixture-tests"
+}
