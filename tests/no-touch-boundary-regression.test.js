@@ -112,6 +112,10 @@ const noTouchTargets = [
     path: 'src/core/ValidationAggregatorReadinessOverclaimRejectionProofContract.js'
   },
   {
+    label: 'ValidationAggregatorGovernanceRuntimeLoopGapContract',
+    path: 'src/core/ValidationAggregatorGovernanceRuntimeLoopGapContract.js'
+  },
+  {
     label: 'ValidationAggregatorService',
     path: 'src/core/ValidationAggregatorService.js'
   }

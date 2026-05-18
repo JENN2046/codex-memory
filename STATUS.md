@@ -39,6 +39,7 @@
 - 当前阶段：P66.36 ValidationAggregator first-gap local proof closeout review 已新增 [docs/P66_36_VALIDATION_AGGREGATOR_FIRST_GAP_LOCAL_PROOF_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/P66_36_VALIDATION_AGGREGATOR_FIRST_GAP_LOCAL_PROOF_CLOSEOUT_REVIEW.md)。结论是 `FIRST_GAP_LOCAL_PROOF_SLICES_COMPLETE_RUNTIME_GAP_STILL_OPEN`；它不关闭 runtime gap，不声明 readiness。
 - 当前阶段：P66.37 ValidationAggregator governance runtime loop gap planning 已新增 [docs/P66_37_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_PLANNING.md](/A:/codex-memory/docs/P66_37_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_PLANNING.md)、[p66-validation-aggregator-governance-runtime-loop-gap-plan-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-governance-runtime-loop-gap-plan-v1.json) 和 [p66-validation-aggregator-governance-runtime-loop-gap-plan-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-governance-runtime-loop-gap-plan-fixture.test.js)。它只规划 `governance_review_approval_audit_runtime_loop_not_executed` 的本地 proof 路线，不执行 governance runtime loop、不执行 approval、不写 durable audit/memory、不声明 readiness。
 - 当前阶段：P66.38 ValidationAggregator governance runtime loop gap fixture tests 已新增 [docs/P66_38_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_FIXTURE_TESTS.md](/A:/codex-memory/docs/P66_38_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_FIXTURE_TESTS.md)、[p66-validation-aggregator-governance-runtime-loop-gap-fixture-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-governance-runtime-loop-gap-fixture-v1.json) 和 [p66-validation-aggregator-governance-runtime-loop-gap-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-governance-runtime-loop-gap-fixture.test.js)。它只锁定治理运行环的 identity/scope/approval/audit refs/stage/fail-closed 验收合同，不执行 runtime loop、不写 durable audit/memory、不声明 readiness。
+- 当前阶段：P66.39 ValidationAggregator governance runtime loop gap helper 已新增 [docs/P66_39_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_HELPER.md](/A:/codex-memory/docs/P66_39_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_HELPER.md) 和纯 explicit-input helper。它只校验调用方传入的 governance loop metadata，不读取真实 packet/log/memory，不执行 approval/runtime/gate/runner/service/provider，不写 durable audit/memory，不扩大 public MCP，也不声明 readiness。
 
 ## 当前阻塞
 
@@ -87,13 +88,14 @@
 - P66.36 是 docs/board review；它只确认第一项 gap 的本地 proof slices 已完整记录，但 runtime gap 仍 open，不声明 `RC_READY`。
 - P66.37 是 docs/fixture/test planning；它只启动 governance runtime loop gap 的本地 proof 路线，不执行 runtime loop、不执行 approval、不写 durable audit/memory、不声明 `RC_READY`。
 - P66.38 是 docs/fixture/test acceptance contract；它只锁定 governance runtime loop gap 的验收字段与 fail-closed 情况，不执行 runtime loop、不执行 approval、不写 durable audit/memory、不声明 `RC_READY`。
+- P66.39 是纯 explicit-input helper；它只证明 caller-provided governance loop metadata 的本地 fail-closed 标准，不读取真实 packet/log/memory，不执行 approval/runtime/gate/runner/service/provider，不写 durable audit/memory，不扩大 public MCP，不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 
 ## 当前优先级
 
 1. P63-T1 已把 final RC matrix runner 从 fixture/helper 边界推进到本地 allowlisted real execution evidence；P64-T1 已把 schema/version runtime write-boundary proof 接入 core write path 和 final runner 矩阵；当前仍必须保持 `NOT_READY_BLOCKED`。
-2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。P66.39 的候选范围只能是 `governance_review_approval_audit_runtime_loop_not_executed` 的纯 explicit-input helper 工作。
+2. 下一步只能继续处理 P66 记录的剩余 7 个 runtime gap / 16 个 A5 hard stop 中的本地可证明部分；若涉及 push/tag/release/deploy/config/watchdog/cutover/RC_READY，必须单独明确授权。P66.40 的候选范围只能是 `governance_review_approval_audit_runtime_loop_not_executed` 的静态 ValidationAggregator bridge 工作，且不得执行 P66.39 helper 或 runtime loop。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
 4. 不 push，除非用户单独明确授权。
 
