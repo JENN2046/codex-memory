@@ -288,3 +288,9 @@ P66.36 ValidationAggregator first-gap local proof closeout review is implemented
 P66.36 validation passed: `git diff --check` and docs validation.
 
 Next safe action is to guarded-commit P66.36 if eligible; after that, continue to P66.37 governance runtime loop gap planning if still inside local safe bounds. 中文解释：下一步先提交 P66.36；之后只能做 governance runtime loop gap 的本地规划/fixture/test，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+
+P66.36 ValidationAggregator first-gap local proof closeout review is committed locally in `dfa6ef8`.
+
+P66.37 ValidationAggregator governance runtime loop gap planning is implemented locally as docs/fixture/test planning. It adds [docs/P66_37_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_PLANNING.md](/A:/codex-memory/docs/P66_37_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_PLANNING.md), [p66-validation-aggregator-governance-runtime-loop-gap-plan-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-governance-runtime-loop-gap-plan-v1.json), and [p66-validation-aggregator-governance-runtime-loop-gap-plan-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-governance-runtime-loop-gap-plan-fixture.test.js). It selects `governance_review_approval_audit_runtime_loop_not_executed` as the next gap after P66.36, keeps the gap open, and preserves `NOT_READY_BLOCKED`. Validation passed: fixture syntax, targeted fixture test `16/16`, `npm test` `1345/1345`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.37 if eligible. 中文解释：下一步只能本地提交 P66.37；不能执行 governance runtime loop、approval、durable audit/memory write、provider/service/config 操作、public MCP expansion、push/tag/release/deploy 或 readiness claim。
