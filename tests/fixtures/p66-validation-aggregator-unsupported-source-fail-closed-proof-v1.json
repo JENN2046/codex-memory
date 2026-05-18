@@ -1,0 +1,248 @@
+{
+  "schemaVersion": "p66-validation-aggregator-unsupported-source-fail-closed-proof-v1",
+  "policyVersion": "p66-validation-aggregator-unsupported-source-fail-closed-proof-policy-v1",
+  "manifestVersion": "p66-validation-aggregator-unsupported-source-fail-closed-proof-manifest-v1",
+  "version": "v1",
+  "phase": "P66.24-validation-aggregator-unsupported-source-fail-closed-proof",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "acceptanceContractOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "selectedGap": {
+    "id": "validation_aggregator_full_implementation_incomplete",
+    "priority": 1,
+    "currentStatus": "open",
+    "remainsOpenAfterThisPhase": true,
+    "readinessAuthority": false
+  },
+  "evidenceGroup": {
+    "id": "unsupported_source_fail_closed_proof",
+    "priority": 6,
+    "currentStatus": "acceptance_defined",
+    "required": true,
+    "remainsNonRuntime": true,
+    "readinessAuthority": false,
+    "mustFailClosedWhenMissing": true,
+    "mustFailClosedWhenUnsupportedSourceType": true,
+    "mustFailClosedWhenUnsupportedSourceClass": true,
+    "mustFailClosedWhenUnknownSourceKind": true,
+    "mustFailClosedWhenOverclaiming": true
+  },
+  "validationAggregatorFullImplementation": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "v1RcReady": false,
+  "rcReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "internalOnlyTools": [
+    "validate_memory"
+  ],
+  "supportedSourceTypes": [
+    "committed_fixture",
+    "committed_doc",
+    "local_validation_summary",
+    "static_report_shape"
+  ],
+  "supportedSourceClasses": [
+    "committed_evidence",
+    "local_validation"
+  ],
+  "unsupportedSourceTypeCase": {
+    "id": "unsupported-source-type",
+    "sourceType": "live_http_mcp_runtime",
+    "sourceClass": "local_validation",
+    "expectedStatus": "blocked_unsupported_source_type",
+    "expectedDecision": "NOT_READY_BLOCKED",
+    "failClosed": true,
+    "mayDowngradeToStatic": false,
+    "mayClaimRuntimeReady": false
+  },
+  "unsupportedSourceClassCase": {
+    "id": "unsupported-source-class",
+    "sourceType": "local_validation_summary",
+    "sourceClass": "runtime_evidence",
+    "expectedStatus": "blocked_unsupported_source_class",
+    "expectedDecision": "NOT_READY_BLOCKED",
+    "failClosed": true,
+    "mayTreatAsCommittedEvidence": false,
+    "mayClaimRuntimeReady": false
+  },
+  "unknownSourceKindCase": {
+    "id": "unknown-source-kind",
+    "sourceType": "unexpected_evidence_feed",
+    "sourceClass": "unexpected_runtime_authority",
+    "expectedStatus": "blocked_unknown_source_kind",
+    "expectedDecision": "NOT_READY_BLOCKED",
+    "failClosed": true,
+    "mayInferSourceKind": false,
+    "mayClaimRuntimeReady": false
+  },
+  "blockedRuntimeSourceCases": [
+    {
+      "sourceType": "live_http_mcp_runtime",
+      "sourceClass": "runtime_evidence",
+      "blockedReason": "live_http_operation_requires_a5"
+    },
+    {
+      "sourceType": "provider_smoke_result",
+      "sourceClass": "runtime_evidence",
+      "blockedReason": "provider_call_requires_a5"
+    },
+    {
+      "sourceType": "real_memory_preview",
+      "sourceClass": "runtime_evidence",
+      "blockedReason": "real_memory_preview_requires_a5"
+    },
+    {
+      "sourceType": "durable_audit_write",
+      "sourceClass": "runtime_evidence",
+      "blockedReason": "durable_write_requires_a5"
+    },
+    {
+      "sourceType": "migration_apply_result",
+      "sourceClass": "runtime_evidence",
+      "blockedReason": "migration_apply_requires_a5"
+    },
+    {
+      "sourceType": "public_mcp_expansion_result",
+      "sourceClass": "runtime_evidence",
+      "blockedReason": "public_mcp_expansion_requires_a5"
+    }
+  ],
+  "expectedFailClosedReport": {
+    "status": "blocked",
+    "decision": "NOT_READY_BLOCKED",
+    "accepted": false,
+    "rejected": true,
+    "failClosed": true,
+    "unsupportedSourceTypeCount": 1,
+    "unsupportedSourceClassCount": 1,
+    "unknownSourceKindCount": 1,
+    "blockedRuntimeSourceCount": 6,
+    "validationAggregatorFullImplementationReady": false,
+    "runtimeReady": false,
+    "finalRcMatrixReady": false,
+    "v1RcReady": false,
+    "rcReady": false,
+    "canClaimRuntimeReady": false,
+    "canClaimFinalRcReady": false,
+    "canClaimV1RcReady": false,
+    "canClaimRcReady": false
+  },
+  "failClosedCases": [
+    "unsupported_source_type",
+    "unsupported_source_class",
+    "unknown_source_kind",
+    "runtime_source_without_a5_approval",
+    "provider_source_without_a5_approval",
+    "real_memory_source_without_a5_approval",
+    "durable_write_source_without_a5_approval",
+    "migration_apply_source_without_a5_approval",
+    "public_mcp_expansion_source_without_a5_approval",
+    "readiness_claim_without_authority",
+    "runtime_execution_claim",
+    "service_start_claim",
+    "provider_call_claim",
+    "real_memory_scan_claim",
+    "durable_write_claim",
+    "public_mcp_expansion_claim",
+    "a5_action_without_approval"
+  ],
+  "lowRiskSummary": {
+    "allowedFields": [
+      "status",
+      "decision",
+      "fail_closed",
+      "unsupported_source_type_count",
+      "unsupported_source_class_count",
+      "unknown_source_kind_count",
+      "blocked_runtime_source_count",
+      "readiness_blocked"
+    ],
+    "disallowedFields": [
+      "raw_workspace_id",
+      "raw_workspace_path",
+      "raw_secret",
+      "raw_token",
+      "authorization_header",
+      "provider_key",
+      "absolute_path",
+      "live_service_url",
+      "real_memory_content",
+      "durable_store_path",
+      "raw_source_payload"
+    ],
+    "rawWorkspaceIdExposed": false,
+    "rawSecretExposed": false,
+    "rawSourcePayloadExposed": false
+  },
+  "disallowedWork": [
+    "runtime_collector",
+    "implicit_fixture_read",
+    "evidence_file_read",
+    "command_execution",
+    "gate_execution",
+    "runner_execution",
+    "service_start",
+    "provider_call",
+    "real_memory_scan",
+    "runtime_store_scan",
+    "durable_memory_write",
+    "durable_audit_write",
+    "migration_apply",
+    "import_export_apply",
+    "public_mcp_expansion",
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "rc_ready_claim"
+  ],
+  "safety": {
+    "mutated": false,
+    "fixtureOnly": true,
+    "acceptanceContractOnly": true,
+    "noRuntimeImplementation": true,
+    "noImplicitSourceDowngrade": true,
+    "noFileReadByAggregator": true,
+    "noCommandExecution": true,
+    "noGateExecution": true,
+    "noRunnerExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noRealMemoryPreview": true,
+    "noRuntimeStoreScan": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noMigrationApply": true,
+    "noImportExportApply": true,
+    "noPublicMcpExpansion": true,
+    "noPackageChange": true,
+    "noSecretChange": true,
+    "noRemoteWrite": true,
+    "noTagReleaseDeploy": true
+  },
+  "forbiddenClaims": [
+    "P66.24 implements runtime evidence collection",
+    "P66.24 accepts live runtime sources",
+    "P66.24 downgrades unsupported sources to static sources",
+    "P66.24 reads evidence files",
+    "P66.24 executes gates or runners",
+    "P66.24 makes ValidationAggregator a full implementation",
+    "P66.24 makes validationAggregatorFullImplementation true",
+    "P66.24 makes runtimeReady true",
+    "P66.24 makes finalRcMatrixReady true",
+    "P66.24 makes v1RcReady true",
+    "P66.24 authorizes RC_READY",
+    "P66.24 authorizes push tag release deploy"
+  ],
+  "nextRecommendedPhase": "P66.25-validation-aggregator-unsupported-source-fail-closed-helper"
+}

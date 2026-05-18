@@ -263,7 +263,13 @@ P66.23 ValidationAggregator missing or stale evidence fail-closed closeout is im
 
 P66.23 validation passed: `git diff --check` and docs validation.
 
-Next safe action is to guarded-commit P66.23, then continue to P66.24 unsupported source fail-closed proof if still inside local safe bounds. 中文解释：下一步先提交 P66.23；之后只能做 unsupported source fail-closed 的本地证明，仍然不是 runtime 或 RC readiness。
+P66.23 ValidationAggregator missing or stale evidence fail-closed closeout is committed locally in `921b339`.
+
+P66.24 ValidationAggregator unsupported source fail-closed proof is implemented locally as docs/fixture/test only. It defines unsupported source type, unsupported source class, unknown source kind, A5-gated runtime source claim, low-risk summary, no-touch, and readiness-overclaim fail-closed acceptance criteria without reading evidence files, executing runtime/gate/runner, starting services, calling providers, writing durable state, expanding public MCP, or claiming readiness.
+
+P66.24 validation passed: fixture syntax, targeted fixture test `18/18`, `npm test` `1259/1259`, `git diff --check`, and docs validation.
+
+Next safe action is guarded-commit P66.24 if eligible; after that, continue to P66.25 unsupported source fail-closed helper if still inside local safe bounds. 中文解释：下一步先提交 P66.24；之后只能做 unsupported source fail-closed 的纯 helper，本阶段仍然不是 runtime 或 RC readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 

@@ -185,4 +185,10 @@ P66.23 ValidationAggregator missing or stale evidence fail-closed closeout is im
 
 P66.23 validation passed: `git diff --check` and docs validation.
 
-Next safe action is to guarded-commit P66.23, then continue to P66.24 unsupported source fail-closed proof if still inside local safe bounds. 中文解释：下一步先提交 P66.23；之后只能做 unsupported source fail-closed 的本地证明，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.23 ValidationAggregator missing or stale evidence fail-closed closeout is committed locally in `921b339`.
+
+P66.24 ValidationAggregator unsupported source fail-closed proof is implemented locally as docs/fixture/test only. It adds [docs/P66_24_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_PROOF.md](/A:/codex-memory/docs/P66_24_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_PROOF.md), fixture [p66-validation-aggregator-unsupported-source-fail-closed-proof-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-unsupported-source-fail-closed-proof-v1.json), and targeted fixture test [p66-validation-aggregator-unsupported-source-fail-closed-proof-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-unsupported-source-fail-closed-proof-fixture.test.js). It keeps the work local and acceptance-contract-only: no evidence file read, command/gate/runner execution, live service start, provider call, real memory/runtime-store scan, durable write, public MCP expansion, push/tag/release/deploy, or readiness claim.
+
+P66.24 validation passed: fixture syntax, targeted fixture test `18/18`, `npm test` `1259/1259`, `git diff --check`, and docs validation.
+
+Next safe action is guarded-commit P66.24 if eligible; after that, continue to P66.25 unsupported source fail-closed helper if still inside local safe bounds. 中文解释：下一步先提交 P66.24；之后只能做 unsupported source fail-closed 的纯 helper，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
