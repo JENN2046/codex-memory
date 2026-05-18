@@ -123,5 +123,6 @@ After P64-T1 local schema/version write-boundary evidence:
 - P66.2 ValidationAggregator definition static bridge is complete locally. 中文解释：ValidationAggregator 现在只把 P66.1 定义作为静态、非授权 report-shape evidence 展示；它不读取 fixture、不执行 runtime、不声明 readiness。
 - P66.3 ValidationAggregator full-implementation runtime plan is complete locally. 中文解释：P66.3 只把 7 个剩余 runtime gap 的本地安全推进顺序、A5 边界和 fail-closed 规则锁进 docs/fixture/test；它不执行 runtime 或声明 readiness。
 - P66.4 ValidationAggregator gap priority fixture tests is complete locally. 中文解释：P66.4 只锁定第一个剩余 gap 的验收证据组和禁用动作；它不关闭 gap、不实现 runtime、不声明 readiness。
-- Recommended next local phase: P66.5 ValidationAggregator source registry proof helper. 中文解释：下一步可以做一个纯 explicit-input helper 来校验 source registry exact-set；仍然不能读文件、执行命令、启动服务、调用 provider、迁移、push、发布或声明 `RC_READY`。
+- P66.5 ValidationAggregator source registry proof helper is complete locally. 中文解释：P66.5 只新增纯 explicit-input helper 来校验 source registry exact-set；它不读文件、不执行命令、不启动服务、不声明 readiness。
+- Recommended next local phase: P66.6 ValidationAggregator source registry static bridge. 中文解释：下一步只把 P66.5 helper 能力作为静态、非授权证据展示到 ValidationAggregator report；aggregator 不能执行 helper、读文件、启动服务或声明 `RC_READY`。
 - After P65-T1, continue one remaining runtime proof gap at a time; any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, durable write, migration/import-export apply, public MCP expansion, or readiness claim still requires separate explicit authorization.

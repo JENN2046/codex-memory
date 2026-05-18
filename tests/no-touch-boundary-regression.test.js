@@ -80,6 +80,10 @@ const noTouchTargets = [
     path: 'src/core/RuntimeSchemaVersionEnforcementContract.js'
   },
   {
+    label: 'ValidationAggregatorSourceRegistryProofContract',
+    path: 'src/core/ValidationAggregatorSourceRegistryProofContract.js'
+  },
+  {
     label: 'ValidationAggregatorService',
     path: 'src/core/ValidationAggregatorService.js'
   }
