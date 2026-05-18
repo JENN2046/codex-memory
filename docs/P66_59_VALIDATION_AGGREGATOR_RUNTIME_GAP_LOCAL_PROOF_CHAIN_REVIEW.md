@@ -94,9 +94,9 @@ decision=NOT_READY_BLOCKED
 - public MCP expansion
 - `RC_READY`
 
-## Final Local Push Preflight Boundary
+## Historical Next Boundary
 
-After this review is committed, the next safe action is final local validation and remote freshness preflight. That preflight may inspect:
+At the time of this review, the next safe action was final local validation and remote freshness preflight. That preflight could inspect:
 
 ```text
 git status -sb
@@ -110,7 +110,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 
 If `origin/main` has moved, do not push blindly. Stop and report the divergence.
 
-If local `main` is a clean fast-forward push candidate, the previously authorized final push may proceed.
+That push/preflight path has since been completed historically. Current-state reconciliation now lives in `P66.60`.
 
 ## Result
 
@@ -118,7 +118,7 @@ Result: `P66_59_SEVEN_GAP_LOCAL_PROOF_CHAIN_COMPLETE_RUNTIME_GAPS_STILL_OPEN`
 
 Decision: `NOT_READY_BLOCKED`
 
-Next recommended action:
+Historical next recommended action:
 
 ```text
 final-local-validation-and-push-preflight
