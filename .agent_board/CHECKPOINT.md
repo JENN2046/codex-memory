@@ -6,7 +6,7 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion.
 
 ## Current Area
 
-P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary after post-T6 audit/refinement reconciliation.
+P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to A5/runtime boundary after P64 schema write-boundary proof.
 
 ## Current Status
 
@@ -45,6 +45,7 @@ P10 observability/admin; P51-P62 local chain complete to A5/runtime boundary aft
 - P62 prompt-to-artifact validation refs are committed locally in `5c805c9`.
 - P62 completion audit local-item mapping is committed locally in `1808bba`.
 - P62 completion boundary blocker is recorded as `CMB-0005`; commander decision is recorded as `CMD-0012`; readiness-misread risk is recorded as `RR-0004`.
+- P63-T1 final RC runtime evidence runner bridge and P64-T1 runtime schema/version write-boundary proof are implemented, validated, and committed locally in `4425fce`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 

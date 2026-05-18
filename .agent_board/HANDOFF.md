@@ -14,7 +14,7 @@ Execute P51-P64 Runtime-Enforced Governed Memory Spine Completion under local A4
 
 ## Worktree
 
-Local `main` is ahead of `origin/main = 1ae4286 test: harden no-touch redaction regressions`; push is not authorized. P62-T6 completion audit refresh is committed locally in `d5808bd`; post-T6 audit wording refinement, prompt-to-artifact validation refs, completion audit local-item mapping, and related board/status reconciliation are also committed locally. Exact current `HEAD` must be read from `git status -sb` / `git log --oneline --decorate -n 10`.
+Local `main` is ahead of `origin/main = 1ae4286 test: harden no-touch redaction regressions`; push is not authorized. P62-T6 completion audit refresh is committed locally in `d5808bd`; post-T6 audit wording refinement, prompt-to-artifact validation refs, completion audit local-item mapping, related board/status reconciliation, and P63/P64 runtime evidence work are also committed locally. Exact current `HEAD` must be read from `git status -sb` / `git log --oneline --decorate -n 10`.
 
 ## Current Area
 
@@ -53,8 +53,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P62 prompt-to-artifact validation refs are locally committed in `5c805c9`.
 - P62 completion audit local-item mapping is locally committed in `1808bba`.
 - P62 completion boundary blocker is recorded as `CMB-0005`; commander decision is recorded as `CMD-0012`; readiness-misread risk is recorded as `RR-0004`.
-- P63-T1 final RC runtime evidence runner bridge is implemented locally; original local runner passed 11/11 critical gates and recorded `logs/p63-final-rc-runtime-evidence-report-01.md`.
-- P64-T1 runtime schema/version write-boundary proof is implemented locally; refreshed local runner passed 12/12 critical gates and recorded `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
+- P63-T1 final RC runtime evidence runner bridge is implemented, validated, and committed locally in `4425fce`; original local runner passed 11/11 critical gates and recorded `logs/p63-final-rc-runtime-evidence-report-01.md`.
+- P64-T1 runtime schema/version write-boundary proof is implemented, validated, and committed locally in `4425fce`; refreshed local runner passed 12/12 critical gates and recorded `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
