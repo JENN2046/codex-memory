@@ -60,7 +60,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.12 through P66.39 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `6a4009e`.
 - P66.40 ValidationAggregator governance runtime loop gap static bridge is implemented, validated, and committed locally in `7ec1071`.
 - P66.41 ValidationAggregator governance runtime loop gap closeout is implemented, validated, and committed locally in `37b0569`.
-- P66.42 ValidationAggregator recall isolation runtime proof gap planning is implemented and validated locally; guarded commit is eligible.
+- P66.42 ValidationAggregator recall isolation runtime proof gap planning is implemented, validated, and committed locally in `715403e`.
+- P66.43 ValidationAggregator recall isolation runtime proof fixture tests are implemented and validated locally; guarded commit is eligible.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -404,7 +405,11 @@ P66.41 ValidationAggregator governance runtime loop gap closeout is committed lo
 
 P66.42 ValidationAggregator recall isolation runtime proof gap planning is implemented and validated locally. It adds [docs/P66_42_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_GAP_PLANNING.md](/A:/codex-memory/docs/P66_42_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_GAP_PLANNING.md), [p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-v1.json), and [p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-fixture.test.js). It starts `recall_isolation_runtime_proof_not_executed` as local planning only and preserves `NOT_READY_BLOCKED`. Validation passed: fixture JSON parse, test syntax, targeted fixture test `18/18`, `npm test` `1396/1396`, docs validation, `git diff --check`, and boundary scan with only intended forbidden-claim/readiness-denial wording.
 
-Next safe action is to guarded-commit P66.42 if eligible; after that, continue to P66.43 recall isolation runtime proof fixture tests if still inside local safe bounds. 中文解释：下一步先提交 P66.42；之后只能做 recall isolation runtime proof 的本地 fixture/test 验收合同，不能扫描真实 memory/runtime stores 或声明 readiness。
+P66.42 ValidationAggregator recall isolation runtime proof gap planning is committed locally in `715403e`.
+
+P66.43 ValidationAggregator recall isolation runtime proof fixture tests are implemented and validated locally. It adds [docs/P66_43_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_FIXTURE_TESTS.md](/A:/codex-memory/docs/P66_43_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_FIXTURE_TESTS.md), [p66-validation-aggregator-recall-isolation-runtime-proof-fixture-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-recall-isolation-runtime-proof-fixture-v1.json), and [p66-validation-aggregator-recall-isolation-runtime-proof-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-recall-isolation-runtime-proof-fixture.test.js). It locks recall isolation acceptance criteria as local fixture/test only and preserves `NOT_READY_BLOCKED`. Validation passed: fixture JSON parse, test syntax, targeted fixture test `15/15`, `npm test` `1411/1411`, docs validation, `git diff --check`, and boundary scan with only intended forbidden-claim/readiness-denial wording.
+
+Next safe action is to guarded-commit P66.43 if eligible; after that, continue to P66.44 recall isolation runtime proof helper if still inside local safe bounds. 中文解释：下一步先提交 P66.43；之后只能做 recall isolation runtime proof 的 pure explicit-input helper，不能扫描真实 memory/runtime stores 或声明 readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
