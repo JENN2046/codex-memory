@@ -703,7 +703,10 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
       decision: 'NOT_READY_BLOCKED',
       runnerExecuted: true,
       commandsExecuted: true,
-      finalRcMatrixExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      finalRcMatrixExecuted: false,
+      fullFinalRcMatrixExecuted: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
       v1RcReady: false,
@@ -756,7 +759,10 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(bridge.summary.runnerExecuted, true);
   assert.equal(bridge.summary.commandsExecutedBySource, true);
   assert.equal(bridge.summary.commandsExecutedByAggregator, false);
-  assert.equal(bridge.summary.finalRcMatrixExecutedBySource, true);
+  assert.equal(bridge.summary.localRuntimeEvidenceMatrixExecutedBySource, true);
+  assert.equal(bridge.summary.allowlistedFinalRcEvidenceRunnerExecutedBySource, true);
+  assert.equal(bridge.summary.finalRcMatrixExecutedBySource, false);
+  assert.equal(bridge.summary.fullFinalRcMatrixExecutedBySource, false);
   assert.equal(bridge.summary.allCriticalCommandsPassed, true);
   assert.equal(bridge.summary.criticalGateCount, 12);
   assert.equal(bridge.summary.criticalGatePassedCount, 12);
@@ -798,6 +804,7 @@ test('validation aggregator runtime evidence summary rejects readiness claims, s
       decision: 'READY_FOR_V1_0_RC',
       runtimeReady: true,
       finalRcMatrixReady: true,
+      fullFinalRcMatrixExecuted: true,
       v1RcReady: true,
       rcReady: true,
       safety: { mutated: false, providerCalls: 0 }

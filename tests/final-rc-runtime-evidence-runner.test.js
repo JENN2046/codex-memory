@@ -149,7 +149,10 @@ test('P63 runner executes injected local matrix evidence and keeps RC blocked', 
   assert.equal(report.runnerImplemented, true);
   assert.equal(report.runnerExecuted, true);
   assert.equal(report.commandsExecuted, true);
-  assert.equal(report.finalRcMatrixExecuted, true);
+  assert.equal(report.localRuntimeEvidenceMatrixExecuted, true);
+  assert.equal(report.allowlistedFinalRcEvidenceRunnerExecuted, true);
+  assert.equal(report.finalRcMatrixExecuted, false);
+  assert.equal(report.fullFinalRcMatrixExecuted, false);
   assert.equal(report.finalRcMatrixReady, false);
   assert.equal(report.runtimeReady, false);
   assert.equal(report.v1RcReady, false);
@@ -186,6 +189,10 @@ test('P63 runner fails closed for dry-run or unsafe command evidence', () => {
   assert.equal(dryRun.status, 'blocked_fail_closed');
   assert.equal(dryRun.runnerExecuted, false);
   assert.equal(dryRun.commandsExecuted, false);
+  assert.equal(dryRun.localRuntimeEvidenceMatrixExecuted, false);
+  assert.equal(dryRun.allowlistedFinalRcEvidenceRunnerExecuted, false);
+  assert.equal(dryRun.finalRcMatrixExecuted, false);
+  assert.equal(dryRun.fullFinalRcMatrixExecuted, false);
   assert.equal(dryRun.safety.executesCommands, false);
   assert.equal(dryRun.remainingRuntimeGaps.length, RUNTIME_COMPLETION_GAPS.length);
 

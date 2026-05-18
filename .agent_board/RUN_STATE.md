@@ -6,25 +6,25 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | P65-T1 ValidationAggregator explicit runtime evidence summary ingestion completed locally; v1.0 RC remains NOT_READY_BLOCKED |
+| Current task | P65.1 Final RC runner executed-field semantics hardening completed locally; v1.0 RC remains NOT_READY_BLOCKED |
 | Current area | P10-observability-admin |
 | Last pushed baseline | `1ae4286` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | P65-T1 added an explicit sanitized runtime evidence summary bridge to ValidationAggregator, plus tests/status/board updates, and was committed locally in `04ae047`. Active board/status still avoids hard-coding mutable current `HEAD` and defers exact current state to Git commands. |
-| Last validation | P65-T1 validation passed: `node --check` for changed source/test; targeted implementation test `17/17`; targeted aggregator CLI/fixture/no-touch set `26/26`; `npm test` `1083/1083`; docs validation; `git diff --check`. |
-| Worktree summary | Local `main` contains P65-T1 commit `04ae047` and is ahead of `origin/main = 8905939`; push is not authorized. Use `git status -sb` and `git log --oneline --decorate -n 10` for the exact current `HEAD`. No provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/cutover/RC_READY is authorized. |
+| Last action | P65.1 narrowed Final RC runner executed-field semantics so local allowlisted execution uses `localRuntimeEvidenceMatrixExecuted` / `allowlistedFinalRcEvidenceRunnerExecuted`, while `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` prevent full RC matrix overclaim. Active board/status still avoids hard-coding mutable current `HEAD` and defers exact current state to Git commands. |
+| Last validation | P65.1 validation passed: changed source syntax checks; targeted runner/aggregator tests `22/22`; no-touch regression `4/4`; `npm test` `1083/1083`; docs validation; `git diff --check`. |
+| Worktree summary | Local `main` contains P65-T1 commit `04ae047` and P65 post-commit reconciliation `8549a0d`; P65.1 local changes are in guarded commit flow. Push is not authorized. Use `git status -sb` and `git log --oneline --decorate -n 10` for the exact current `HEAD`. No provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/cutover/RC_READY is authorized. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized unless the user explicitly requests another push |
-| Next planned action | Stop before push/tag/release/deploy/config/watchdog/cutover/RC_READY unless explicitly authorized; next local-only candidate can target another remaining runtime proof gap. |
+| Next planned action | Guarded local commit if eligible; then stop before push/tag/release/deploy/config/watchdog/cutover/RC_READY unless explicitly authorized. |
 
 ## Notes
 
 - Project health: strong.
 - Governance health: strong.
-- Current truth: Git reality currently supersedes old baseline wording; local `main` is ahead of `origin/main = 8905939` with P65-T1 commit `04ae047`. P65-T1 is validated local work and keeps v1.0 RC `NOT_READY_BLOCKED`.
+- Current truth: Git reality currently supersedes old baseline wording; local `main` is ahead of `origin/main = 8905939` with P65-T1 commit `04ae047` and post-commit board commit `8549a0d`. P65.1 is local work in guarded commit flow and keeps v1.0 RC `NOT_READY_BLOCKED`.
 - Completion boundary records: `CMB-0005`, `CMD-0012`, and `RR-0004` are controlling records for resume; completion audit fixtures still require `objectiveComplete=true`, zero runtime gaps, and zero A5 hard stops before any completion claim.
 - Release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`; helper output safety is hardened without changing runtime readiness.
 - Superseded artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.

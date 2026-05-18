@@ -11,6 +11,7 @@
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
 - 当前任务：P64-T1 runtime schema/version write-boundary proof 已在本地实现并纳入 final RC runtime evidence runner；`node .\src\cli\final-rc-matrix-runner.js --execute --json` 于 `2026-05-18T03:59:06.834Z` 通过 12/12 critical gates，并把 sanitized command evidence 交给 ValidationAggregator。具体最新 `HEAD` 以 Git 实测为准；推送仍未授权。
 - 当前完成：P65-T1 ValidationAggregator explicit runtime evidence summary ingestion 已本地实现、验证并提交在 `04ae047`。该切片只消费 caller 显式传入的脱敏 runtime evidence summary，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不扩大 public MCP；当前仍保持 `NOT_READY_BLOCKED`。
+- 当前完成：P65.1 Final RC runner executed-field semantics hardening 已本地实现并验证。`finalRcMatrixExecuted` 不再代表本地 allowlisted runner 执行；新字段 `localRuntimeEvidenceMatrixExecuted` / `allowlistedFinalRcEvidenceRunnerExecuted` 表达本地执行证据，`fullFinalRcMatrixExecuted=false` 且显式 full-matrix execution/readiness 声明会被拒绝，继续阻止完整 RC matrix 误读。
 
 ## 当前阻塞
 
@@ -18,6 +19,7 @@
 - schema/version runtime write-boundary proof 已有本地证据；ValidationAggregator full implementation 仍未完成。
 - ValidationAggregator full implementation still incomplete。
 - P65-T1 只证明 ValidationAggregator 可以安全归一化显式 runtime evidence summary；它不是 full implementation completion、不是 final RC matrix readiness，也不是 v1.0 RC readiness。
+- P65.1 只收紧报告字段语义；它不是 final RC matrix readiness、v1.0 RC readiness、cutover readiness 或 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 

@@ -860,7 +860,10 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       runnerExecuted: false,
       commandsExecutedBySource: false,
       commandsExecutedByAggregator: false,
+      localRuntimeEvidenceMatrixExecutedBySource: false,
+      allowlistedFinalRcEvidenceRunnerExecutedBySource: false,
       finalRcMatrixExecutedBySource: false,
+      fullFinalRcMatrixExecutedBySource: false,
       finalRcMatrixReady: false,
       runtimeReady: false,
       v1RcReady: false,
@@ -946,6 +949,7 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
   if (
     summary.runtimeReady === true ||
     summary.finalRcMatrixReady === true ||
+    summary.fullFinalRcMatrixExecuted === true ||
     summary.v1RcReady === true ||
     summary.rcReady === true
   ) {
@@ -974,7 +978,11 @@ function normalizeRuntimeEvidenceSummary(summary = null) {
       runnerExecuted: summary.runnerExecuted === true,
       commandsExecutedBySource: summary.commandsExecuted === true,
       commandsExecutedByAggregator: false,
-      finalRcMatrixExecutedBySource: summary.finalRcMatrixExecuted === true,
+      localRuntimeEvidenceMatrixExecutedBySource: summary.localRuntimeEvidenceMatrixExecuted === true,
+      allowlistedFinalRcEvidenceRunnerExecutedBySource:
+        summary.allowlistedFinalRcEvidenceRunnerExecuted === true,
+      finalRcMatrixExecutedBySource: false,
+      fullFinalRcMatrixExecutedBySource: false,
       finalRcMatrixReady: false,
       runtimeReady: false,
       v1RcReady: false,
