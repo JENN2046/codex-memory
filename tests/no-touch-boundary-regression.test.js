@@ -84,6 +84,10 @@ const noTouchTargets = [
     path: 'src/core/ValidationAggregatorSourceRegistryProofContract.js'
   },
   {
+    label: 'ValidationAggregatorEvidenceFreshnessProofContract',
+    path: 'src/core/ValidationAggregatorEvidenceFreshnessProofContract.js'
+  },
+  {
     label: 'ValidationAggregatorService',
     path: 'src/core/ValidationAggregatorService.js'
   }

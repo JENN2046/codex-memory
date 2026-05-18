@@ -62,7 +62,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.5 ValidationAggregator source registry proof helper is implemented, validated, and committed locally in `f7a9038`.
 - P66.6 ValidationAggregator source registry static bridge is implemented, validated, and committed locally in `92e47ce`.
 - P66.7 ValidationAggregator source registry closeout is implemented, validated, and committed locally in `d6c0175`.
-- P66.8 ValidationAggregator evidence freshness proof fixture is implemented locally as docs/fixture/test only; validation and guarded commit are pending.
+- P66.8 ValidationAggregator evidence freshness proof fixture is implemented, validated, and committed locally in `bcce0ba`.
+- P66.9 ValidationAggregator evidence freshness proof helper is implemented locally as pure helper/test only; validation and guarded commit are pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -119,4 +120,6 @@ P66.7 ValidationAggregator source registry closeout is added as docs/board only.
 
 P66.8 ValidationAggregator evidence freshness proof fixture is added as docs/fixture/test only. It defines explicit freshness fields, UTC timestamp rules, baseline binding, freshness windows, low-risk summary restrictions, and fail-closed cases without reading real evidence files.
 
-Next safe action is to validate and guarded-commit P66.8, then continue to P66.9 evidence freshness proof helper if still inside local safe bounds. 中文解释：下一步可以新增纯 explicit-input helper，但它只能处理调用方传入对象；不能读真实 evidence 文件、执行命令、启动服务、调用 provider、push、发布或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.9 ValidationAggregator evidence freshness proof helper is added as pure explicit-input code and tests. It keeps freshness proof local-only and blocked from runtime/readiness authority.
+
+Next safe action is to validate and guarded-commit P66.9, then continue to P66.10 evidence freshness static bridge if still inside local safe bounds. 中文解释：下一步只把 helper 能力作为静态证据写进 ValidationAggregator report；不能执行 helper、读真实 evidence 文件、执行命令、启动服务、调用 provider、push、发布或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
