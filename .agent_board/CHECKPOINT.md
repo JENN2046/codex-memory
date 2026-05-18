@@ -59,7 +59,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.11 ValidationAggregator evidence freshness closeout is implemented, validated, and committed locally in `644d17c`.
 - P66.12 through P66.39 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `6a4009e`.
 - P66.40 ValidationAggregator governance runtime loop gap static bridge is implemented, validated, and committed locally in `7ec1071`.
-- P66.41 ValidationAggregator governance runtime loop gap closeout is implemented and validated locally as docs/board only; guarded commit is eligible.
+- P66.41 ValidationAggregator governance runtime loop gap closeout is implemented, validated, and committed locally in `37b0569`.
+- P66.42 ValidationAggregator recall isolation runtime proof gap planning is implemented and validated locally; guarded commit is eligible.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -399,7 +400,11 @@ P66.40 ValidationAggregator governance runtime loop gap static bridge is committ
 
 P66.41 ValidationAggregator governance runtime loop gap closeout is implemented and validated locally as docs/board only. It adds [docs/P66_41_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_CLOSEOUT.md](/A:/codex-memory/docs/P66_41_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_CLOSEOUT.md) to close the P66.37-P66.40 local proof slice while keeping `governance_review_approval_audit_runtime_loop_not_executed` open at runtime and preserving `NOT_READY_BLOCKED`. Validation passed: docs validation, `git diff --check`, and boundary scan with only intended blocked/readiness-denial wording.
 
-Next safe action is to guarded-commit P66.41 if eligible; after that, continue to P66.42 recall isolation runtime proof gap planning if still inside local safe bounds. 中文解释：下一步先提交 P66.41；之后只能做 recall isolation runtime proof gap 的本地规划，不能扫描真实 memory/runtime stores 或声明 readiness。
+P66.41 ValidationAggregator governance runtime loop gap closeout is committed locally in `37b0569`.
+
+P66.42 ValidationAggregator recall isolation runtime proof gap planning is implemented and validated locally. It adds [docs/P66_42_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_GAP_PLANNING.md](/A:/codex-memory/docs/P66_42_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_GAP_PLANNING.md), [p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-v1.json), and [p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-fixture.test.js). It starts `recall_isolation_runtime_proof_not_executed` as local planning only and preserves `NOT_READY_BLOCKED`. Validation passed: fixture JSON parse, test syntax, targeted fixture test `18/18`, `npm test` `1396/1396`, docs validation, `git diff --check`, and boundary scan with only intended forbidden-claim/readiness-denial wording.
+
+Next safe action is to guarded-commit P66.42 if eligible; after that, continue to P66.43 recall isolation runtime proof fixture tests if still inside local safe bounds. 中文解释：下一步先提交 P66.42；之后只能做 recall isolation runtime proof 的本地 fixture/test 验收合同，不能扫描真实 memory/runtime stores 或声明 readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 

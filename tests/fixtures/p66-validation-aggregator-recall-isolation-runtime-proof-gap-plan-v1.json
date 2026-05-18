@@ -1,0 +1,349 @@
+{
+  "schemaVersion": "p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-v1",
+  "policyVersion": "p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-policy-v1",
+  "manifestVersion": "p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-manifest-v1",
+  "version": "v1",
+  "phase": "P66.42-validation-aggregator-recall-isolation-runtime-proof-gap-planning",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "planningOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "selectedGap": {
+    "id": "recall_isolation_runtime_proof_not_executed",
+    "priority": 3,
+    "currentStatus": "open",
+    "requiresA5ApprovalBeforeRuntime": true,
+    "remainsOpenAfterThisPhase": true,
+    "readinessAuthority": false
+  },
+  "priorGapLocalProofReview": {
+    "id": "governance_review_approval_audit_runtime_loop_not_executed",
+    "localProofSlicesComplete": true,
+    "runtimeGapStillOpen": true,
+    "readinessAuthority": false
+  },
+  "validationAggregatorFullImplementation": false,
+  "recallIsolationRuntimeProofReady": false,
+  "recallIsolationRuntimeProofExecuted": false,
+  "contaminationReportReady": false,
+  "contaminationReportProduced": false,
+  "realMemoryScanned": false,
+  "runtimeStoreScanned": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "v1RcReady": false,
+  "rcReady": false,
+  "cutoverReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "internalOnlyTools": [
+    "validate_memory"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "p38_recall_isolation_fixture",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p38-recall-isolation-v1.json",
+        "tests/p38-recall-isolation-fixture.test.js",
+        "docs/P38_RECALL_ISOLATION_FIXTURES.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p43_recall_migration_isolation_helper",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/RecallMigrationIsolationContract.js",
+        "tests/recall-migration-isolation-helper.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p55_evidence_runtime_trace_contract",
+      "sourceType": "committed_helper_contract",
+      "artifactRefs": [
+        "src/core/EvidenceRuntimeTraceContract.js",
+        "tests/evidence-runtime-trace-contract-helper.test.js",
+        "docs/P55_EVIDENCE_TO_RUNTIME_ENFORCEMENT_TRACE_CONTRACT.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    },
+    {
+      "id": "p57_recall_isolation_runtime_proof_boundary_inventory",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p57-recall-isolation-runtime-proof-boundary-v1.json",
+        "tests/p57-recall-isolation-runtime-proof-boundary-fixture.test.js",
+        "docs/P57_RECALL_ISOLATION_RUNTIME_PROOF_BOUNDARY_INVENTORY.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false
+    }
+  ],
+  "isolatedRecordFamilies": [
+    "governance_records",
+    "validation_transcripts",
+    "redaction_samples",
+    "policy_decisions",
+    "readiness_reports",
+    "migration_metadata",
+    "blocked_memory",
+    "tombstoned_memory",
+    "out_of_scope_memory"
+  ],
+  "proofSurfaces": [
+    {
+      "id": "normal_recall_namespace",
+      "runtimeStoreReadAllowed": false,
+      "contaminationAllowed": false,
+      "futureEvidenceRequired": true
+    },
+    {
+      "id": "vector_index",
+      "runtimeStoreReadAllowed": false,
+      "contaminationAllowed": false,
+      "futureEvidenceRequired": true
+    },
+    {
+      "id": "candidate_cache",
+      "runtimeStoreReadAllowed": false,
+      "contaminationAllowed": false,
+      "futureEvidenceRequired": true
+    },
+    {
+      "id": "ranking",
+      "runtimeStoreReadAllowed": false,
+      "contaminationAllowed": false,
+      "futureEvidenceRequired": true
+    },
+    {
+      "id": "projection",
+      "runtimeStoreReadAllowed": false,
+      "contaminationAllowed": false,
+      "futureEvidenceRequired": true
+    },
+    {
+      "id": "user_visible_audit_summary",
+      "runtimeStoreReadAllowed": false,
+      "contaminationAllowed": false,
+      "futureEvidenceRequired": true
+    },
+    {
+      "id": "recall_audit_summary",
+      "runtimeStoreReadAllowed": false,
+      "contaminationAllowed": false,
+      "futureEvidenceRequired": true
+    }
+  ],
+  "controls": [
+    {
+      "id": "active_in_scope_user_memory_positive_control",
+      "recordFamily": "active_in_scope_user_memory",
+      "mayEnterNormalRecall": true,
+      "mayEnterVectorIndex": true,
+      "mayEnterCandidateCache": true,
+      "mayEnterRanking": true,
+      "mayEnterProjection": true,
+      "mayEnterUserVisibleAuditSummary": true,
+      "mayEnterRecallAuditSummary": true
+    },
+    {
+      "id": "isolated_record_negative_controls",
+      "recordFamilies": [
+        "governance_records",
+        "validation_transcripts",
+        "redaction_samples",
+        "policy_decisions",
+        "readiness_reports",
+        "migration_metadata",
+        "blocked_memory",
+        "tombstoned_memory",
+        "out_of_scope_memory"
+      ],
+      "mayEnterNormalRecall": false,
+      "mayEnterVectorIndex": false,
+      "mayEnterCandidateCache": false,
+      "mayEnterRanking": false,
+      "mayEnterProjection": false,
+      "mayEnterUserVisibleAuditSummary": false,
+      "mayEnterRecallAuditSummary": false
+    }
+  ],
+  "requiredRuntimeProofEvidence": [
+    "synthetic_runtime_harness_plan",
+    "instrumented_namespace_assertions",
+    "vector_exclusion_assertions",
+    "candidate_cache_exclusion_assertions",
+    "ranking_exclusion_assertions",
+    "projection_exclusion_assertions",
+    "user_visible_audit_summary_exclusion_assertions",
+    "recall_audit_summary_exclusion_assertions",
+    "negative_controls_for_isolated_record_families",
+    "positive_control_for_active_in_scope_user_memory",
+    "no_durable_write_evidence",
+    "no_public_mcp_expansion_evidence",
+    "machine_readable_contamination_report"
+  ],
+  "unsatisfiedRuntimeProofEvidence": [
+    "synthetic_runtime_harness_plan",
+    "instrumented_namespace_assertions",
+    "vector_exclusion_assertions",
+    "candidate_cache_exclusion_assertions",
+    "ranking_exclusion_assertions",
+    "projection_exclusion_assertions",
+    "user_visible_audit_summary_exclusion_assertions",
+    "recall_audit_summary_exclusion_assertions",
+    "negative_controls_for_isolated_record_families",
+    "positive_control_for_active_in_scope_user_memory",
+    "no_durable_write_evidence",
+    "no_public_mcp_expansion_evidence",
+    "machine_readable_contamination_report"
+  ],
+  "acceptedFutureLocalWork": [
+    "docs",
+    "fixture",
+    "test",
+    "pure_explicit_input_helper",
+    "static_report_shape_bridge"
+  ],
+  "disallowedWork": [
+    "real_memory_read",
+    "real_memory_preview",
+    "real_memory_export",
+    "real_memory_import",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "runtime_recall_execution",
+    "runtime_store_scan",
+    "contamination_report_from_real_data",
+    "command_execution",
+    "gate_execution",
+    "runner_execution",
+    "service_start",
+    "provider_call",
+    "config_mutation",
+    "startup_watchdog_operation",
+    "durable_memory_writer",
+    "durable_audit_writer",
+    "migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "public_mcp_expansion",
+    "validate_memory_public_exposure",
+    "package_lockfile_change",
+    "env_secret_change",
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "rc_ready_claim"
+  ],
+  "failClosedCases": [
+    "missing_namespace_assertions",
+    "missing_vector_exclusion_assertions",
+    "missing_candidate_cache_exclusion_assertions",
+    "missing_ranking_exclusion_assertions",
+    "missing_projection_exclusion_assertions",
+    "missing_user_visible_audit_summary_assertions",
+    "missing_recall_audit_summary_assertions",
+    "missing_negative_controls",
+    "missing_positive_control",
+    "contaminated_recall_namespace",
+    "contaminated_vector_index",
+    "contaminated_candidate_cache",
+    "contaminated_ranking",
+    "contaminated_projection",
+    "contaminated_user_visible_audit_summary",
+    "contaminated_recall_audit_summary",
+    "real_memory_scan_claim",
+    "runtime_store_scan_claim",
+    "durable_write_claim",
+    "unsupported_source",
+    "unsafe_summary_claim",
+    "public_mcp_expansion_claim",
+    "readiness_claim_without_authority"
+  ],
+  "a5HardStops": [
+    "push",
+    "tag_create",
+    "release_create",
+    "deploy",
+    "config_switch",
+    "watchdog_install",
+    "startup_install",
+    "provider_call",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "rc_ready_claim"
+  ],
+  "safety": {
+    "mutated": false,
+    "fixtureOnly": true,
+    "planningOnly": true,
+    "noRuntimeImplementation": true,
+    "noRuntimeProofExecution": true,
+    "noRecallExecution": true,
+    "noRealMemoryRead": true,
+    "noRealMemoryScan": true,
+    "noDiaryScan": true,
+    "noSqliteScan": true,
+    "noVectorIndexScan": true,
+    "noCandidateCacheScan": true,
+    "noRecallAuditScan": true,
+    "noRuntimeStoreScan": true,
+    "noContaminationReportFromRealData": true,
+    "noCommandExecution": true,
+    "noGateExecution": true,
+    "noRunnerExecution": true,
+    "noServiceStart": true,
+    "noProviderCall": true,
+    "noConfigMutation": true,
+    "noStartupWatchdogOperation": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noMigrationApply": true,
+    "noImportExportApply": true,
+    "noBackupRestoreApply": true,
+    "noPublicMcpExpansion": true,
+    "noPackageChange": true,
+    "noSecretChange": true,
+    "noRemoteWrite": true,
+    "noTagReleaseDeploy": true
+  },
+  "forbiddenClaims": [
+    "P66.42 proves recall isolation runtime",
+    "P66.42 executes recall isolation runtime proof",
+    "P66.42 scans real memory",
+    "P66.42 reads diary SQLite vector candidate or recall audit stores",
+    "P66.42 produces contamination report from real data",
+    "P66.42 closes recall_isolation_runtime_proof_not_executed",
+    "P66.42 makes recallIsolationRuntimeProofReady true",
+    "P66.42 makes validationAggregatorFullImplementation true",
+    "P66.42 makes runtimeReady true",
+    "P66.42 makes finalRcMatrixReady true",
+    "P66.42 makes v1RcReady true",
+    "P66.42 makes rcReady true",
+    "P66.42 authorizes RC_READY",
+    "P66.42 authorizes push tag release deploy"
+  ],
+  "nextRecommendedPhase": "P66.43-validation-aggregator-recall-isolation-runtime-proof-fixture-tests"
+}
