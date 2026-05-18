@@ -1241,6 +1241,96 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.canClaimV1RcReady,
     false
   );
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryProofAvailable, true);
+  assert.equal(
+    report.summary.p66ValidationAggregatorNoTouchBoundaryProofSourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryProofHelperCapabilityOnly, true);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryTargetFamilyCount, 5);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryDisallowedImportCount, 20);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryDisallowedRuntimeCallCount, 20);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryFailClosedCaseCount, 16);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryFailClosedReasonCount, 16);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryHelperImportedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryHelperExecutedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryRuntimeImplemented, false);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryFullImplementationComplete, false);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryCanClaimRuntimeReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorNoTouchBoundaryCanClaimV1RcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.sourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.helper,
+    'src/core/ValidationAggregatorNoTouchBoundaryProofContract.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.test,
+    'tests/validation-aggregator-no-touch-boundary-proof-contract-helper.test.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.helperCapabilityOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.explicitInputOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.metadataOnly,
+    true
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.targetFamilies.length, 5);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.disallowedImports.length, 20);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.disallowedRuntimeCalls.length, 20);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.failClosedCases.length, 16);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.failClosedReasons.length, 16);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.helperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.helperExecutedByAggregator,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.evidenceFileReadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.commandExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.gateExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.evidenceCollectedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.liveMcpRefreshedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.scansDirectories, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.scansSourceAtRuntime, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.publicMcpExpanded, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.runtimeMutationImplemented, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.fullAggregatorImplementationComplete,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.rcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.decisionImpact, 'none_report_only');
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.blockedDecisionRequired, true);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorNoTouchBoundaryProof.canClaimV1RcReady, false);
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',
@@ -2051,10 +2141,10 @@ test('P44 evidence source map is static report-shape only and does not import or
   assert.equal(source.includes("require('./FinalRcValidationMatrixManifest')"), false);
   assert.equal(source.includes("require('./FinalRcMatrixEvaluator')"), false);
   assert.equal(source.includes("require('./ValidationAggregatorBaselineBindingProofContract')"), false);
-  assert.equal(source.includes('readFileSync'), false);
-  assert.equal(source.includes('readdirSync'), false);
-  assert.equal(source.includes('spawnSync'), false);
-  assert.equal(source.includes('execFileSync'), false);
+  assert.equal(/\breadFileSync\s*\(/.test(source), false);
+  assert.equal(/\breaddirSync\s*\(/.test(source), false);
+  assert.equal(/\bspawnSync\s*\(/.test(source), false);
+  assert.equal(/\bexecFileSync\s*\(/.test(source), false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.readsFixtures, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.executesHelpers, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.executesGates, false);

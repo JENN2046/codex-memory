@@ -311,6 +311,14 @@ P66.29 validation passed: helper syntax, targeted helper test `11/11`, no-touch 
 
 Next safe action is to guarded-commit P66.29 if eligible; after that, continue to P66.30 no-touch boundary static bridge if still inside local safe bounds. 中文解释：下一步先提交 P66.29；之后只能做 no-touch boundary 的静态 bridge，aggregator 仍然不能执行 helper、扫描文件或声明 readiness。
 
+P66.29 ValidationAggregator no-touch boundary helper is committed locally in `61d6357`.
+
+P66.30 ValidationAggregator no-touch boundary static bridge is implemented locally. It exposes P66.29 helper capability as static report evidence only. ValidationAggregator does not import or execute the helper, scan files, execute commands, run gates/runners, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+
+P66.30 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1299/1299`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.30 if eligible; after that, continue to P66.31 no-touch boundary closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.30；之后只能做 no-touch boundary 的 docs/board closeout，仍然不是 runtime 或 RC readiness。
+
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.

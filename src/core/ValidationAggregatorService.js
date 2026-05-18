@@ -511,6 +511,98 @@ const P66_UNSUPPORTED_SOURCE_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const P66_NO_TOUCH_BOUNDARY_TARGET_FAMILIES = [
+  'validation_aggregator_service',
+  'validation_aggregator_proof_helpers',
+  'final_rc_runner_helpers',
+  'governance_contract_helpers',
+  'evidence_contract_helpers'
+];
+
+const P66_NO_TOUCH_BOUNDARY_DISALLOWED_IMPORTS = [
+  'fs',
+  'node:fs',
+  'child_process',
+  'node:child_process',
+  'http',
+  'node:http',
+  'https',
+  'node:https',
+  'net',
+  'node:net',
+  'tls',
+  'node:tls',
+  'dgram',
+  'node:dgram',
+  'node:sqlite',
+  'sqlite3',
+  'better-sqlite3',
+  'src/storage',
+  'src/recall',
+  'src/adapters'
+];
+
+const P66_NO_TOUCH_BOUNDARY_DISALLOWED_RUNTIME_CALLS = [
+  'readFileSync',
+  'readdirSync',
+  'opendirSync',
+  'createReadStream',
+  'writeFileSync',
+  'appendFileSync',
+  'createWriteStream',
+  'mkdirSync',
+  'rmSync',
+  'unlinkSync',
+  'spawn',
+  'spawnSync',
+  'exec',
+  'execFile',
+  'execSync',
+  'execFileSync',
+  'fork',
+  'fetch',
+  'request',
+  'connect'
+];
+
+const P66_NO_TOUCH_BOUNDARY_FAIL_CLOSED_CASES = [
+  'missing_no_touch_proof',
+  'unsafe_import_detected',
+  'unsafe_runtime_call_detected',
+  'fs_read_detected',
+  'fs_write_detected',
+  'command_execution_detected',
+  'network_call_detected',
+  'runtime_store_import_detected',
+  'storage_recall_adapter_import_detected',
+  'provider_call_claim',
+  'service_start_claim',
+  'real_memory_scan_claim',
+  'durable_write_claim',
+  'public_mcp_expansion_claim',
+  'readiness_claim_without_authority',
+  'a5_action_without_approval'
+];
+
+const P66_NO_TOUCH_BOUNDARY_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'target_family_drift',
+  'disallowed_import_set_drift',
+  'disallowed_runtime_call_set_drift',
+  'missing_required_fail_closed_case',
+  'duplicate_fail_closed_case',
+  'unknown_fail_closed_case',
+  'unsafe_case_not_blocked',
+  'unsafe_low_risk_summary',
+  'unsafe_safety_flag',
+  'sensitive_fragment_rejected',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1751,6 +1843,27 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorUnsupportedSourceCanClaimRuntimeReady: false,
       p66ValidationAggregatorUnsupportedSourceCanClaimFinalRcReady: false,
       p66ValidationAggregatorUnsupportedSourceCanClaimV1RcReady: false,
+      p66ValidationAggregatorNoTouchBoundaryProofAvailable: true,
+      p66ValidationAggregatorNoTouchBoundaryProofSourceMode:
+        'static_report_shape_only',
+      p66ValidationAggregatorNoTouchBoundaryProofHelperCapabilityOnly: true,
+      p66ValidationAggregatorNoTouchBoundaryTargetFamilyCount:
+        P66_NO_TOUCH_BOUNDARY_TARGET_FAMILIES.length,
+      p66ValidationAggregatorNoTouchBoundaryDisallowedImportCount:
+        P66_NO_TOUCH_BOUNDARY_DISALLOWED_IMPORTS.length,
+      p66ValidationAggregatorNoTouchBoundaryDisallowedRuntimeCallCount:
+        P66_NO_TOUCH_BOUNDARY_DISALLOWED_RUNTIME_CALLS.length,
+      p66ValidationAggregatorNoTouchBoundaryFailClosedCaseCount:
+        P66_NO_TOUCH_BOUNDARY_FAIL_CLOSED_CASES.length,
+      p66ValidationAggregatorNoTouchBoundaryFailClosedReasonCount:
+        P66_NO_TOUCH_BOUNDARY_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorNoTouchBoundaryHelperImportedByAggregator: false,
+      p66ValidationAggregatorNoTouchBoundaryHelperExecutedByAggregator: false,
+      p66ValidationAggregatorNoTouchBoundaryRuntimeImplemented: false,
+      p66ValidationAggregatorNoTouchBoundaryFullImplementationComplete: false,
+      p66ValidationAggregatorNoTouchBoundaryCanClaimRuntimeReady: false,
+      p66ValidationAggregatorNoTouchBoundaryCanClaimFinalRcReady: false,
+      p66ValidationAggregatorNoTouchBoundaryCanClaimV1RcReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -2832,6 +2945,64 @@ function buildV1RcValidationAggregatorReport({
         startsServices: false,
         readsFiles: false,
         scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        rcReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
+      p66ValidationAggregatorNoTouchBoundaryProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_29_VALIDATION_AGGREGATOR_NO_TOUCH_BOUNDARY_HELPER.md',
+        helper: 'src/core/ValidationAggregatorNoTouchBoundaryProofContract.js',
+        test: 'tests/validation-aggregator-no-touch-boundary-proof-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion: 'p66-validation-aggregator-no-touch-boundary-proof-v1',
+        policyVersion: 'p66-validation-aggregator-no-touch-boundary-proof-policy-v1',
+        manifestVersion:
+          'p66-validation-aggregator-no-touch-boundary-proof-manifest-v1',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        metadataOnly: true,
+        publicToolsFrozen: true,
+        targetFamilies: P66_NO_TOUCH_BOUNDARY_TARGET_FAMILIES.map(id => ({
+          id,
+          required: true
+        })),
+        disallowedImports: P66_NO_TOUCH_BOUNDARY_DISALLOWED_IMPORTS,
+        disallowedRuntimeCalls: P66_NO_TOUCH_BOUNDARY_DISALLOWED_RUNTIME_CALLS,
+        failClosedCases: P66_NO_TOUCH_BOUNDARY_FAIL_CLOSED_CASES.map(id => ({
+          id,
+          required: true,
+          mustFailClosed: true
+        })),
+        failClosedReasons: P66_NO_TOUCH_BOUNDARY_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansSourceAtRuntime: false,
         scansRealMemory: false,
         readsRuntimeStores: false,
         durableMemoryTouched: false,
