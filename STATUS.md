@@ -15,6 +15,7 @@
 - 当前阶段：P65.2 push readiness approval request 已起草为 [docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md)。状态 `DRAFT_NOT_APPROVED` / `NOT_APPROVED` / `BLOCKED_HARD_STOP`；不执行 push。
 - 当前阶段：P66 remaining runtime gap inventory refresh 已新增 [docs/P66_REMAINING_RUNTIME_GAP_INVENTORY_REFRESH.md](/A:/codex-memory/docs/P66_REMAINING_RUNTIME_GAP_INVENTORY_REFRESH.md)。P63/P64 已本地证明 2 个 gap；剩余 7 个 runtime gap 和 16 个 A5 hard stop 继续阻止 `RC_READY`。
 - 当前阶段：P66.1 ValidationAggregator full implementation definition 已新增 [docs/P66_1_VALIDATION_AGGREGATOR_FULL_IMPLEMENTATION_DEFINITION.md](/A:/codex-memory/docs/P66_1_VALIDATION_AGGREGATOR_FULL_IMPLEMENTATION_DEFINITION.md)，并用 fixture/test 锁定 full implementation 的必要条件、7 个剩余 runtime gap、16 个 A5 hard stop 与 fail-closed 规则。仍保持 `NOT_READY_BLOCKED`。
+- 当前阶段：P66.2 ValidationAggregator definition static bridge 已本地实现并验证。ValidationAggregator 现在只以静态、非授权 report-shape 方式展示 P66.1 full-implementation definition：不读取 fixture、不执行 helper/test/gate/runner、不启动服务、不扫真实 memory/runtime stores、不调用 provider、不写 durable state、不扩大 public MCP，也不声明 runtime/final-RC/v1-RC readiness。
 
 ## 当前阻塞
 
@@ -26,6 +27,7 @@
 - P65.2 只是 push readiness / approval request；它不是 push 授权，不会更新远端。
 - P66 是 docs/board inventory refresh；它不执行 runtime、gate、push、tag、release、deploy 或任何 A5 操作。
 - P66.1 是 docs/fixture/test definition；它不实现 runtime collector，不使 `validationAggregatorFullImplementation=true`，不声明 `RC_READY`。
+- P66.2 是 static bridge/report-shape evidence；它不使 `validationAggregatorFullImplementation=true`，不补齐剩余 7 个 runtime gaps，不执行 final RC matrix，不声明 `RC_READY`。
 - final RC matrix runner 已有本地真实执行证据；P64 又消除了 schema/version runtime enforcement proof 缺口。final RC readiness、v1 RC readiness、cutover readiness 和 `RC_READY` 仍未成立。
 - Governance review/runtime execution、durable audit/memory write、public MCP expansion、migration/import-export apply、backup/restore、provider/model call、service/watchdog/startup install、Codex/Claude config switch、push/tag/release/deploy 都仍是 A5 hard stop，除非用户单独明确授权。
 

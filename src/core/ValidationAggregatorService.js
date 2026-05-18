@@ -247,6 +247,72 @@ const P53_VALIDATION_AGGREGATOR_INVENTORY_ROWS = [
   }
 ];
 
+const P66_FULL_IMPLEMENTATION_REQUIRED_CRITERIA = [
+  'safe_evidence_source_registry_complete',
+  'evidence_freshness_and_baseline_binding_complete',
+  'runtime_schema_version_boundary_evidence_ingested',
+  'final_rc_matrix_runner_evidence_ingested_without_overclaim',
+  'governance_review_approval_audit_runtime_loop_evidence_ingested',
+  'recall_isolation_runtime_proof_evidence_ingested',
+  'migration_import_export_backup_restore_approval_evidence_ingested',
+  'live_http_operation_readiness_evidence_ingested',
+  'cutover_context_mainline_strict_gate_evidence_ingested',
+  'rc_cutover_authorization_and_execution_evidence_ingested',
+  'a5_hard_stop_clearance_evidence_complete'
+];
+
+const P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS = [
+  'validation_aggregator_full_implementation_incomplete',
+  'governance_review_approval_audit_runtime_loop_not_executed',
+  'recall_isolation_runtime_proof_not_executed',
+  'migration_import_export_backup_restore_approval_execution_blocked',
+  'live_http_operation_readiness_not_claimed',
+  'mainline_strict_gate_not_executed_for_cutover',
+  'rc_cutover_not_executed'
+];
+
+const P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS = [
+  'runtime_schema_version_enforcement_not_fully_proven',
+  'final_rc_matrix_runner_not_executed_as_real_matrix'
+];
+
+const P66_FULL_IMPLEMENTATION_A5_HARD_STOPS = [
+  'push',
+  'tag_create',
+  'release_create',
+  'deploy',
+  'config_switch',
+  'watchdog_install',
+  'startup_install',
+  'provider_call',
+  'real_memory_scan',
+  'sqlite_migration_apply',
+  'import_export_apply',
+  'backup_restore_apply',
+  'durable_memory_write',
+  'durable_audit_write',
+  'public_mcp_expansion',
+  'rc_ready_claim'
+];
+
+const P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES = [
+  'missing_required_evidence',
+  'stale_evidence',
+  'unsupported_source_type',
+  'ambiguous_baseline',
+  'unsafe_summary_claim',
+  'readiness_claim_without_authority',
+  'full_matrix_execution_overclaim',
+  'provider_call_detected',
+  'service_start_detected',
+  'real_memory_preview_detected',
+  'durable_write_detected',
+  'migration_or_import_export_apply_detected',
+  'public_mcp_expansion_detected',
+  'secret_like_content_detected',
+  'a5_approval_missing'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1378,6 +1444,26 @@ function buildV1RcValidationAggregatorReport({
       p53ValidationAggregatorInventoryCanClaimRuntimeReady: false,
       p53ValidationAggregatorInventoryCanClaimFinalRcReady: false,
       p53ValidationAggregatorInventoryCanClaimV1RcReady: false,
+      p66ValidationAggregatorFullImplementationDefinitionAvailable: true,
+      p66ValidationAggregatorFullImplementationDefinitionSourceMode: 'static_report_shape_only',
+      p66ValidationAggregatorFullImplementationDefinitionOnly: true,
+      p66ValidationAggregatorFullImplementationRequiredCriteriaCount:
+        P66_FULL_IMPLEMENTATION_REQUIRED_CRITERIA.length,
+      p66ValidationAggregatorFullImplementationRemainingRuntimeGapCount:
+        P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS.length,
+      p66ValidationAggregatorFullImplementationLocallyEvidencedGapCount:
+        P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS.length,
+      p66ValidationAggregatorFullImplementationA5HardStopCount:
+        P66_FULL_IMPLEMENTATION_A5_HARD_STOPS.length,
+      p66ValidationAggregatorFullImplementationFailClosedCaseCount:
+        P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES.length,
+      p66ValidationAggregatorFullImplementationFixtureReadByAggregator: false,
+      p66ValidationAggregatorFullImplementationTestExecutedByAggregator: false,
+      p66ValidationAggregatorFullImplementationRuntimeImplemented: false,
+      p66ValidationAggregatorFullImplementationComplete: false,
+      p66ValidationAggregatorFullImplementationCanClaimRuntimeReady: false,
+      p66ValidationAggregatorFullImplementationCanClaimFinalRcReady: false,
+      p66ValidationAggregatorFullImplementationCanClaimV1RcReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -2110,6 +2196,56 @@ function buildV1RcValidationAggregatorReport({
         canClaimFinalRcReady: false,
         canClaimV1RcReady: false
       },
+      p66ValidationAggregatorFullImplementationDefinition: {
+        status: 'static_definition_added_not_runtime',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_1_VALIDATION_AGGREGATOR_FULL_IMPLEMENTATION_DEFINITION.md',
+        test: 'tests/p66-validation-aggregator-full-implementation-definition-fixture.test.js',
+        fixture: 'tests/fixtures/p66-validation-aggregator-full-implementation-definition-v1.json',
+        schemaVersion: 'p66-validation-aggregator-full-implementation-definition-v1',
+        policyVersion: 'p66-validation-aggregator-full-implementation-policy-v1',
+        manifestVersion: 'p66-validation-aggregator-full-implementation-manifest-v1',
+        definitionOnly: true,
+        syntheticFixture: true,
+        requiredCriteria: P66_FULL_IMPLEMENTATION_REQUIRED_CRITERIA.map(id => ({
+          id,
+          required: true,
+          mustFailClosedWhenMissing: true
+        })),
+        locallyEvidencedRuntimeGaps: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS,
+        remainingRuntimeGaps: P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS,
+        a5HardStops: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS,
+        failClosedCases: P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES,
+        fixtureReadByAggregator: false,
+        testExecutedByAggregator: false,
+        helperExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        realMemoryContentRead: false,
+        realMemoryPreviewed: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        finalRcMatrixExecuted: false,
+        finalRcMatrixReady: false,
+        runtimeReady: false,
+        rcReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -2135,7 +2271,8 @@ function buildV1RcValidationAggregatorReport({
       'A4_SAFE_SLICE_PASSED does not mean READY_FOR_V1_0_RC.',
       'P36-P40 local evidence report ready does not mean runtime, final RC matrix, push, release, deploy, config switch, watchdog, or v1.0 RC readiness.',
       'P53 inventory evidence is static report-shape posture only and does not complete the ValidationAggregator full implementation.',
-      'P65 runtime evidence summary ingestion is explicit-input-only and does not execute gates or claim RC readiness.'
+      'P65 runtime evidence summary ingestion is explicit-input-only and does not execute gates or claim RC readiness.',
+      'P66.1 full-implementation definition is static and does not make validationAggregatorFullImplementation true.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',

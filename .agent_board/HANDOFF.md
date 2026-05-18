@@ -55,6 +55,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P62 completion boundary blocker is recorded as `CMB-0005`; commander decision is recorded as `CMD-0012`; readiness-misread risk is recorded as `RR-0004`.
 - P63-T1 final RC runtime evidence runner bridge is implemented, validated, and committed locally in `4425fce`; original local runner passed 11/11 critical gates and recorded `logs/p63-final-rc-runtime-evidence-report-01.md`.
 - P64-T1 runtime schema/version write-boundary proof is implemented, validated, and committed locally in `4425fce`; refreshed local runner passed 12/12 critical gates and recorded `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
+- P66.1 ValidationAggregator full-implementation definition is implemented, validated, and committed locally in `98154f2`.
+- P66.2 ValidationAggregator definition static bridge is implemented and validated locally; guarded commit is pending final local checks.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -97,4 +99,6 @@ P66 remaining runtime gap inventory refresh is drafted in [docs/P66_REMAINING_RU
 
 P66.1 ValidationAggregator full-implementation definition is added in [docs/P66_1_VALIDATION_AGGREGATOR_FULL_IMPLEMENTATION_DEFINITION.md](/A:/codex-memory/docs/P66_1_VALIDATION_AGGREGATOR_FULL_IMPLEMENTATION_DEFINITION.md) with fixture [p66-validation-aggregator-full-implementation-definition-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-full-implementation-definition-v1.json). It is definition-only and keeps `validationAggregatorFullImplementation=false`, seven runtime gaps open, sixteen A5 hard stops blocked, and `NOT_READY_BLOCKED`.
 
-Next safe action is to stop before any push/tag/release/deploy/config/watchdog/cutover/RC_READY boundary unless explicitly authorized; a future local-only candidate can target another remaining runtime proof gap. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.2 ValidationAggregator definition static bridge is implemented locally. ValidationAggregator now reports P66.1 definition criteria and blockers as static, non-authoritative evidence only. It does not read the fixture, execute helper/test/gate/runner logic, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
+
+Next safe action is to guarded-commit P66.2 after final local checks, then continue to P66.3 runtime-gap planning/fixture work. 中文解释：下一步只能继续本地安全证明或规划剩余 runtime gap，不能 push、tag、release、deploy、迁移、调用 provider、启动 live HTTP，或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
