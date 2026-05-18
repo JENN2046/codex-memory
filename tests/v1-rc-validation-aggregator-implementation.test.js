@@ -751,6 +751,70 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.canClaimRuntimeReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.canClaimFinalRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorEvidenceFreshnessProof.canClaimV1RcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorBaselineBindingProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingProofAvailable, true);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingProofSourceMode, 'static_report_shape_only');
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingProofHelperCapabilityOnly, true);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingRequiredFieldCount, 10);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingKindCount, 4);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingFailClosedReasonCount, 25);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingHelperImportedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingHelperExecutedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingRuntimeImplemented, false);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingFullImplementationComplete, false);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingCanClaimRuntimeReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorBaselineBindingCanClaimV1RcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.sourceMode, 'static_report_shape_only');
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.helperCapabilityOnly, true);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.explicitInputOnly, true);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.targetCommitRequired, true);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorBaselineBindingProof.targetCommitMustEqualEvidenceSubjectCommit,
+    true
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.commitRoleSeparationRequired, true);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.noCheckoutRequiredByBridge, true);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.noRemoteLookupRequiredByBridge, true);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.requiredBaselineBindingFields.length, 10);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.allowedBaselineKinds.length, 4);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.failClosedReasons.length, 25);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.helperImportedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.helperExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.fixtureReadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.evidenceFileReadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.commandExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.gitCheckoutByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.gitResetByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.gitDetachHeadByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.gitRemoteLookupByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.gateExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.runnerExecutedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.evidenceCollectedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.liveMcpRefreshedByAggregator, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.scansDirectories, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.publicMcpExpanded, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.runtimeMutationImplemented, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.fullAggregatorImplementationComplete, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.rcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.decisionImpact, 'none_report_only');
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.blockedDecisionRequired, true);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.canClaimRuntimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.canClaimFinalRcReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorBaselineBindingProof.canClaimV1RcReady, false);
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',
@@ -1560,6 +1624,7 @@ test('P44 evidence source map is static report-shape only and does not import or
   assert.equal(source.includes("require('./RecallMigrationIsolationContract')"), false);
   assert.equal(source.includes("require('./FinalRcValidationMatrixManifest')"), false);
   assert.equal(source.includes("require('./FinalRcMatrixEvaluator')"), false);
+  assert.equal(source.includes("require('./ValidationAggregatorBaselineBindingProofContract')"), false);
   assert.equal(source.includes('readFileSync'), false);
   assert.equal(source.includes('readdirSync'), false);
   assert.equal(source.includes('spawnSync'), false);
@@ -1594,6 +1659,7 @@ test('P44 report builder does not touch fs, network, child process, helpers, or 
     './RecallMigrationIsolationContract',
     './FinalRcValidationMatrixManifest',
     './FinalRcMatrixEvaluator',
+    './ValidationAggregatorBaselineBindingProofContract',
     './MemoryGovernanceLifecycleContract',
     './MemoryGovernanceApprovalPacketContract',
     './MemoryGovernanceAuditEvidenceContract',

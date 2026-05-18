@@ -207,9 +207,13 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 
 P66.13 ValidationAggregator baseline binding proof helper is implemented locally as pure explicit-input code and tests. It accepts only caller-provided baseline binding evidence, fails closed for commit-role ambiguity, checkout mismatch, unsafe summaries, no-touch leakage, and readiness overclaims, and does not checkout/reset/detach, query remotes, read files, execute commands, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
 
-P66.13 validation passed: helper syntax, targeted helper test `11/11`, no-touch regression `4/4`, `npm test` `1183/1183`, `git diff --check`, and docs validation.
+P66.13 validation passed: helper syntax, targeted helper test `11/11`, no-touch regression `4/4`, `npm test` `1183/1183`, `git diff --check`, and docs validation. P66.13 is committed locally in `85526b4`.
 
-Next safe action is to guarded-commit P66.13, then continue to P66.14 baseline binding static bridge if still inside local safe bounds. 中文解释：下一步可以把 P66.13 helper 能力作为静态、非授权报告证据展示到 ValidationAggregator；不能 import/execute helper、读文件、执行命令、查远端、启动服务、调用 provider、push、发布或声明 `RC_READY`。
+P66.14 ValidationAggregator baseline binding static bridge is implemented and validated locally. It adds static report evidence for the P66.13 helper capability only; the aggregator does not import or execute the helper, read files, execute commands, checkout/reset/detach, query remotes, write durable state, expand public MCP, or claim readiness.
+
+P66.14 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1183/1183`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.14, then continue to P66.15 baseline binding closeout if still inside local safe bounds. 中文解释：下一步只提交静态桥接；之后可做 docs/board closeout，仍然不是 runtime 或 RC readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 

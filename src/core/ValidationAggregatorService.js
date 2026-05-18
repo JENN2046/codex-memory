@@ -374,6 +374,54 @@ const P66_EVIDENCE_FRESHNESS_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const P66_BASELINE_BINDING_REQUIRED_FIELDS = [
+  'evidence_id',
+  'baseline_binding_id',
+  'target_commit',
+  'target_commit_source',
+  'baseline_kind',
+  'baseline_ref',
+  'evidence_subject_commit',
+  'validation_scope',
+  'binding_observed_at',
+  'binding_status'
+];
+
+const P66_BASELINE_BINDING_KINDS = [
+  'rc_target_commit',
+  'local_validation_target_commit',
+  'temporary_gate_execution_checkout',
+  'docs_only_approval_state'
+];
+
+const P66_BASELINE_BINDING_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'missing_expected_target_commit',
+  'missing_baseline_binding',
+  'missing_required_baseline_field',
+  'duplicate_baseline_binding_id',
+  'missing_target_commit',
+  'missing_evidence_subject_commit',
+  'missing_baseline_kind',
+  'target_commit_mismatch',
+  'approval_request_commit_used_as_target_without_explicit_binding',
+  'current_main_head_used_as_target_without_explicit_binding',
+  'execution_checkout_commit_missing_for_gate_execution',
+  'execution_checkout_commit_mismatch',
+  'ambiguous_baseline_role',
+  'unknown_baseline_kind',
+  'malformed_commit_hash',
+  'non_utc_binding_timestamp',
+  'binding_status_not_bound',
+  'unsafe_summary_claim',
+  'unsafe_no_touch_boundary',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1553,6 +1601,22 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorEvidenceFreshnessCanClaimRuntimeReady: false,
       p66ValidationAggregatorEvidenceFreshnessCanClaimFinalRcReady: false,
       p66ValidationAggregatorEvidenceFreshnessCanClaimV1RcReady: false,
+      p66ValidationAggregatorBaselineBindingProofAvailable: true,
+      p66ValidationAggregatorBaselineBindingProofSourceMode: 'static_report_shape_only',
+      p66ValidationAggregatorBaselineBindingProofHelperCapabilityOnly: true,
+      p66ValidationAggregatorBaselineBindingRequiredFieldCount:
+        P66_BASELINE_BINDING_REQUIRED_FIELDS.length,
+      p66ValidationAggregatorBaselineBindingKindCount:
+        P66_BASELINE_BINDING_KINDS.length,
+      p66ValidationAggregatorBaselineBindingFailClosedReasonCount:
+        P66_BASELINE_BINDING_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorBaselineBindingHelperImportedByAggregator: false,
+      p66ValidationAggregatorBaselineBindingHelperExecutedByAggregator: false,
+      p66ValidationAggregatorBaselineBindingRuntimeImplemented: false,
+      p66ValidationAggregatorBaselineBindingFullImplementationComplete: false,
+      p66ValidationAggregatorBaselineBindingCanClaimRuntimeReady: false,
+      p66ValidationAggregatorBaselineBindingCanClaimFinalRcReady: false,
+      p66ValidationAggregatorBaselineBindingCanClaimV1RcReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -2437,6 +2501,65 @@ function buildV1RcValidationAggregatorReport({
         canClaimFinalRcReady: false,
         canClaimV1RcReady: false
       },
+      p66ValidationAggregatorBaselineBindingProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_13_VALIDATION_AGGREGATOR_BASELINE_BINDING_PROOF_HELPER.md',
+        helper: 'src/core/ValidationAggregatorBaselineBindingProofContract.js',
+        test: 'tests/validation-aggregator-baseline-binding-proof-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion: 'p66-validation-aggregator-baseline-binding-proof-v1',
+        policyVersion: 'p66-validation-aggregator-baseline-binding-proof-policy-v1',
+        manifestVersion: 'p66-validation-aggregator-baseline-binding-proof-manifest-v1',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        targetCommitRequired: true,
+        targetCommitMustEqualEvidenceSubjectCommit: true,
+        commitRoleSeparationRequired: true,
+        noCheckoutRequiredByBridge: true,
+        noRemoteLookupRequiredByBridge: true,
+        publicToolsFrozen: true,
+        requiredBaselineBindingFields: P66_BASELINE_BINDING_REQUIRED_FIELDS.map(id => ({
+          id,
+          required: true,
+          mustFailClosedWhenMissing: true
+        })),
+        allowedBaselineKinds: P66_BASELINE_BINDING_KINDS,
+        failClosedReasons: P66_BASELINE_BINDING_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
+        commandExecutedByAggregator: false,
+        gitCheckoutByAggregator: false,
+        gitResetByAggregator: false,
+        gitDetachHeadByAggregator: false,
+        gitRemoteLookupByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        rcReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
       p28ValidationEvidenceReader: {
         status: validationEvidenceReader.acceptedCount > 0
           ? 'explicit_evidence_available'
@@ -2465,7 +2588,8 @@ function buildV1RcValidationAggregatorReport({
       'P65 runtime evidence summary ingestion is explicit-input-only and does not execute gates or claim RC readiness.',
       'P66.1 full-implementation definition is static and does not make validationAggregatorFullImplementation true.',
       'P66.5 source registry proof helper capability is static and is not executed by the aggregator.',
-      'P66.9 evidence freshness proof helper capability is static and is not executed by the aggregator.'
+      'P66.9 evidence freshness proof helper capability is static and is not executed by the aggregator.',
+      'P66.13 baseline binding proof helper capability is static and is not executed by the aggregator.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',
