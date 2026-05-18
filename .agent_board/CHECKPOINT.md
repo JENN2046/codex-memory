@@ -295,6 +295,14 @@ P66.27 validation passed: `git diff --check` and docs validation.
 
 Next safe action is to guarded-commit P66.27 if eligible; after that, continue to P66.28 no-touch boundary proof if still inside local safe bounds. 中文解释：下一步先提交 P66.27；之后只能做 no-touch boundary proof 的本地 docs/fixture/test/helper/report-shape 工作，仍然不是 runtime 或 RC readiness。
 
+P66.27 ValidationAggregator unsupported source fail-closed closeout is committed locally in `9362456`.
+
+P66.28 ValidationAggregator no-touch boundary proof is implemented locally as docs/fixture/test acceptance contract. It defines no-touch import/call/mutation/readiness boundaries for ValidationAggregator and related helper families without scanning source at runtime, executing commands, starting services, calling providers, writing durable state, expanding public MCP, or claiming readiness.
+
+P66.28 validation passed: fixture syntax, targeted fixture test `17/17`, `npm test` `1288/1288`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.28 if eligible; after that, continue to P66.29 no-touch boundary helper if still inside local safe bounds. 中文解释：下一步先提交 P66.28；之后只能做 no-touch boundary 的纯 explicit-input helper，仍然不是 runtime 或 RC readiness。
+
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.

@@ -216,3 +216,11 @@ P66.27 ValidationAggregator unsupported source fail-closed closeout is implement
 P66.27 validation passed: `git diff --check` and docs validation.
 
 Next safe action is to guarded-commit P66.27 if eligible; after that, continue to P66.28 no-touch boundary proof if still inside local safe bounds. 中文解释：下一步先提交 P66.27；之后只能做 no-touch boundary proof 的本地 docs/fixture/test/helper/report-shape 工作，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+
+P66.27 ValidationAggregator unsupported source fail-closed closeout is committed locally in `9362456`.
+
+P66.28 ValidationAggregator no-touch boundary proof is implemented locally as docs/fixture/test acceptance contract. It adds [docs/P66_28_VALIDATION_AGGREGATOR_NO_TOUCH_BOUNDARY_PROOF.md](/A:/codex-memory/docs/P66_28_VALIDATION_AGGREGATOR_NO_TOUCH_BOUNDARY_PROOF.md), [p66-validation-aggregator-no-touch-boundary-proof-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-no-touch-boundary-proof-v1.json), and [p66-validation-aggregator-no-touch-boundary-proof-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-no-touch-boundary-proof-fixture.test.js). It does not scan source at runtime, execute commands, start services, call providers, write durable state, expand public MCP, push/tag/release/deploy, or claim readiness.
+
+P66.28 validation passed: fixture syntax, targeted fixture test `17/17`, `npm test` `1288/1288`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.28 if eligible; after that, continue to P66.29 no-touch boundary helper if still inside local safe bounds. 中文解释：下一步先提交 P66.28；之后只能做 no-touch boundary 的纯 explicit-input helper，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
