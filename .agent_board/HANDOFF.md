@@ -66,7 +66,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.9 ValidationAggregator evidence freshness proof helper is implemented, validated, and committed locally in `f34cb4c`.
 - P66.10 ValidationAggregator evidence freshness static bridge is implemented, validated, and committed locally in `d38520b`.
 - P66.11 ValidationAggregator evidence freshness closeout is implemented, validated, and committed locally in `644d17c`.
-- P66.12 ValidationAggregator baseline binding proof fixture is implemented locally as docs/fixture/test only; validation and guarded commit are pending.
+- P66.12 ValidationAggregator baseline binding proof fixture is implemented, validated, and committed locally in `7a0d190`.
+- P66.13 ValidationAggregator baseline binding proof helper is implemented and validated locally as pure explicit-input helper/test/docs only; guarded commit is pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -131,4 +132,6 @@ P66.11 ValidationAggregator evidence freshness closeout is added as docs/board o
 
 P66.12 ValidationAggregator baseline binding proof fixture is added as docs/fixture/test only. It defines explicit target/evidence commit binding, separated commit roles, no-checkout/no-remote-lookup fixture semantics, low-risk summary restrictions, and fail-closed cases.
 
-Next safe action is to validate and guarded-commit P66.12, then continue to P66.13 baseline binding proof helper if still inside local safe bounds. 中文解释：下一步可以新增纯 explicit-input helper，但它只能处理调用方传入对象；不能 checkout/reset/detach、查远端、执行命令、启动服务、调用 provider、push、发布或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.13 ValidationAggregator baseline binding proof helper is implemented locally as pure explicit-input code and tests. It accepts only caller-provided baseline binding evidence, fails closed for commit-role ambiguity, checkout mismatch, unsafe summaries, no-touch leakage, and readiness overclaims, and does not checkout/reset/detach, query remotes, read files, execute commands, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+
+Next safe action is to guarded-commit P66.13, then continue to P66.14 baseline binding static bridge if still inside local safe bounds. 中文解释：下一步可以把 P66.13 helper 能力作为静态、非授权报告证据展示到 ValidationAggregator；不能 import/execute helper、读文件、执行命令、查远端、启动服务、调用 provider、push、发布或声明 `RC_READY`。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
