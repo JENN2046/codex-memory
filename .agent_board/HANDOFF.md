@@ -155,8 +155,10 @@ P66.17 validation passed: helper syntax, targeted helper test `11/11`, no-touch 
 
 P66.17 is committed locally in `c8d6363`.
 
-P66.18 ValidationAggregator runtime evidence summary normalization static bridge is implemented locally. It exposes P66.17 helper capability as static, non-authoritative report evidence only. ValidationAggregator does not import or execute the helper, read files, execute commands, run gates/runners, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+P66.18 ValidationAggregator runtime evidence summary normalization static bridge is implemented, validated, and committed locally in `cd787ca`. It exposes P66.17 helper capability as static, non-authoritative report evidence only. ValidationAggregator does not import or execute the helper, read files, execute commands, run gates/runners, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
 
-P66.18 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1211/1211`, `git diff --check`, and docs validation.
+P66.19 ValidationAggregator runtime evidence summary normalization closeout is implemented locally as docs/board only. It closes the runtime evidence summary normalization proof slice and selects `missing_or_stale_evidence_fail_closed_proof` as the next local-safe evidence group.
 
-Next safe action is to guarded-commit P66.18, then continue to P66.19 runtime evidence summary normalization closeout if still inside local safe bounds. 中文解释：下一步先提交静态 bridge；之后只能做 docs/board closeout，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+P66.19 validation passed: `git diff --check` and docs validation.
+
+Next safe action is to guarded-commit P66.19, then continue to P66.20 missing or stale evidence fail-closed proof if still inside local safe bounds. 中文解释：下一步先提交 closeout；之后只能做缺失/陈旧 evidence fail-closed 的本地证明，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
