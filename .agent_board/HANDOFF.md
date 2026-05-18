@@ -73,7 +73,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.16 ValidationAggregator runtime evidence summary normalization proof is implemented, validated, and committed locally in `e95aa56`.
 - P66.17 ValidationAggregator runtime evidence summary normalization helper is implemented, validated, and committed locally in `c8d6363`.
 - P66.18 through P66.39 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `6a4009e`.
-- P66.40 ValidationAggregator governance runtime loop gap static bridge is implemented and validated locally; guarded commit is eligible.
+- P66.40 ValidationAggregator governance runtime loop gap static bridge is implemented, validated, and committed locally in `7ec1071`.
+- P66.41 ValidationAggregator governance runtime loop gap closeout is implemented and validated locally as docs/board only; guarded commit is eligible.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
@@ -316,4 +317,8 @@ P66.40 ValidationAggregator governance runtime loop gap static bridge is impleme
 
 Validation passed for P66.40: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1378/1378`, `git diff --check`, and docs validation.
 
-Next safe action is to guarded-commit P66.40 if eligible. 中文解释：下一步只能本地提交 P66.40；之后只能做 governance runtime loop gap 的 docs/board closeout，不能执行 governance runtime loop、approval、durable audit/memory write、provider/service/config 操作、public MCP expansion、push/tag/release/deploy 或 readiness claim。
+P66.40 ValidationAggregator governance runtime loop gap static bridge is committed locally in `7ec1071`.
+
+P66.41 ValidationAggregator governance runtime loop gap closeout is implemented and validated locally as docs/board only. It adds [docs/P66_41_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_CLOSEOUT.md](/A:/codex-memory/docs/P66_41_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_CLOSEOUT.md), records `GOVERNANCE_RUNTIME_LOOP_LOCAL_PROOF_SLICE_COMPLETE_RUNTIME_GAP_STILL_OPEN`, and keeps `NOT_READY_BLOCKED`. Validation passed: docs validation, `git diff --check`, and boundary scan with only intended blocked/readiness-denial wording.
+
+Next safe action is to guarded-commit P66.41 if eligible. 中文解释：下一步只能本地提交 P66.41；之后只能做 recall isolation runtime proof gap planning，不能扫描真实 memory/runtime stores、读取 diary/SQLite/vector/candidate/recall-audit、执行 runtime proof、写 durable state、push/tag/release/deploy 或声明 readiness。
