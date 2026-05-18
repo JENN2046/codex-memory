@@ -197,4 +197,6 @@ P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter 
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.
 
+P65.2 push readiness approval request is drafted as docs/board only. Local payload head is `066a35d`; origin/remote main is `8905939`; approval remains `NOT_APPROVED`; decision remains `BLOCKED_HARD_STOP`; no push was executed.
+
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
