@@ -1,0 +1,360 @@
+{
+  "schemaVersion": "p66-validation-aggregator-live-http-operation-readiness-gap-plan-v1",
+  "policyVersion": "p66-validation-aggregator-live-http-operation-readiness-gap-plan-policy-v1",
+  "manifestVersion": "p66-validation-aggregator-live-http-operation-readiness-gap-plan-manifest-v1",
+  "version": "v1",
+  "phase": "P66.50-validation-aggregator-live-http-operation-readiness-gap-planning",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "planningOnly": true,
+  "sourceMode": "committed_fixture",
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "selectedGap": {
+    "id": "live_http_operation_readiness_not_claimed",
+    "priority": 5,
+    "currentStatus": "open_live_start_blocked",
+    "requiresA5ApprovalBeforeRuntime": true,
+    "remainsOpenAfterThisPhase": true,
+    "readinessAuthority": false
+  },
+  "priorGapLocalProofReview": {
+    "id": "migration_import_export_backup_restore_approval_execution_blocked",
+    "localProofSlicesComplete": true,
+    "runtimeGapStillOpen": true,
+    "readinessAuthority": false
+  },
+  "validationAggregatorFullImplementation": false,
+  "httpRuntimeObserved": false,
+  "liveHttpOperationReadinessClaimed": false,
+  "operationHardeningReady": false,
+  "safeStartPreflightReady": false,
+  "safeShutdownPreflightReady": false,
+  "watchdogReady": false,
+  "startupReady": false,
+  "configSwitchReady": false,
+  "providerValidationReady": false,
+  "realMemoryScanned": false,
+  "runtimeStoreScanned": false,
+  "durableMemoryWritten": false,
+  "durableAuditWritten": false,
+  "runtimeReady": false,
+  "finalRcMatrixReady": false,
+  "v1RcReady": false,
+  "rcReady": false,
+  "cutoverReady": false,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "internalOnlyTools": [
+    "validate_memory"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "p59_http_runtime_observability_operation_boundary",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p59-http-runtime-observability-operation-hardening-boundary-v1.json",
+        "tests/p59-http-runtime-observability-operation-hardening-boundary-fixture.test.js",
+        "docs/P59_HTTP_RUNTIME_OBSERVABILITY_OPERATION_HARDENING_BOUNDARY.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "operationAuthority": false
+    },
+    {
+      "id": "p46_http_no_token_mutation_redaction_tests",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "tests/mcp-http.test.js",
+        "src/adapters/codex-mcp/http.js",
+        "src/core/SensitiveFragmentRedaction.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "operationAuthority": false
+    },
+    {
+      "id": "p54_runner_allowlisted_execution_adapter",
+      "sourceType": "committed_test",
+      "artifactRefs": [
+        "src/core/FinalRcRunnerAllowlistedExecutionAdapter.js",
+        "tests/final-rc-runner-allowlisted-execution-adapter.test.js"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "operationAuthority": false
+    },
+    {
+      "id": "p62_a5_runtime_authorization_precondition_matrix",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p62-a5-runtime-authorization-precondition-matrix-v1.json",
+        "tests/p62-a5-runtime-authorization-precondition-matrix-fixture.test.js",
+        "docs/P62_A5_RUNTIME_AUTHORIZATION_PRECONDITION_MATRIX.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "operationAuthority": false
+    },
+    {
+      "id": "p66_runtime_gap_plan",
+      "sourceType": "committed_fixture",
+      "artifactRefs": [
+        "tests/fixtures/p66-validation-aggregator-runtime-gap-plan-v1.json",
+        "tests/p66-validation-aggregator-runtime-gap-plan-fixture.test.js",
+        "docs/P66_3_VALIDATION_AGGREGATOR_RUNTIME_GAP_PLAN.md"
+      ],
+      "runtimeAuthority": false,
+      "readinessAuthority": false,
+      "operationAuthority": false
+    }
+  ],
+  "observabilitySurfaces": [
+    "http_health_endpoint",
+    "mcp_initialize",
+    "tools_list_public_mcp_freeze",
+    "http_observe_cli",
+    "no_token_mutation_guard",
+    "bearer_mutation_guard",
+    "failure_reporting",
+    "safe_start_preflight",
+    "safe_shutdown_preflight"
+  ],
+  "requiredRuntimeEvidence": [
+    "http_health_evidence",
+    "mcp_initialize_evidence",
+    "tools_list_public_mcp_freeze_evidence",
+    "no_token_mutation_rejection_evidence",
+    "bearer_token_mutation_guard_evidence",
+    "failure_reporting_evidence",
+    "redaction_evidence",
+    "no_service_install_evidence",
+    "no_config_switch_evidence",
+    "no_provider_call_evidence",
+    "safe_start_preflight_evidence",
+    "safe_shutdown_preflight_evidence",
+    "machine_readable_operation_report"
+  ],
+  "unsatisfiedRuntimeEvidence": [
+    "http_health_evidence",
+    "mcp_initialize_evidence",
+    "tools_list_public_mcp_freeze_evidence",
+    "no_token_mutation_rejection_evidence",
+    "bearer_token_mutation_guard_evidence",
+    "failure_reporting_evidence",
+    "redaction_evidence",
+    "no_service_install_evidence",
+    "no_config_switch_evidence",
+    "no_provider_call_evidence",
+    "safe_start_preflight_evidence",
+    "safe_shutdown_preflight_evidence",
+    "machine_readable_operation_report"
+  ],
+  "blockedOperationFamilies": [
+    "http_service_start",
+    "http_service_stop",
+    "http_health_observation",
+    "mcp_initialize_observation",
+    "tools_list_observation",
+    "observe_http_cli_execution",
+    "watchdog_once",
+    "watchdog_install",
+    "startup_install",
+    "config_switch",
+    "provider_call",
+    "real_memory_read",
+    "runtime_store_scan",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "remote_release_action"
+  ],
+  "readinessStates": [
+    {
+      "id": "not_requested",
+      "acceptedForPlanning": true,
+      "readinessAllowed": false
+    },
+    {
+      "id": "runtime_observation_missing",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "health_unavailable",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "mcp_contract_unverified",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "watchdog_unknown",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "config_switch_unknown",
+      "acceptedForPlanning": false,
+      "readinessAllowed": false
+    },
+    {
+      "id": "loopback_health_only",
+      "acceptedForPlanning": true,
+      "readinessAllowed": false
+    },
+    {
+      "id": "reviewed_not_ready",
+      "acceptedForPlanning": true,
+      "readinessAllowed": false
+    }
+  ],
+  "acceptedFutureLocalWork": [
+    "docs",
+    "fixture",
+    "test"
+  ],
+  "disallowedWork": [
+    "http_service_start",
+    "http_service_stop",
+    "start_http_ensure",
+    "start_http_watchdog_once",
+    "start_http_watchdog_install",
+    "startup_install",
+    "watchdog_install",
+    "observe_http_execution",
+    "health_check_execution",
+    "mcp_initialize_execution",
+    "tools_list_execution",
+    "config_switch",
+    "env_secret_edit",
+    "provider_call",
+    "real_memory_read",
+    "real_memory_scan",
+    "diary_scan",
+    "sqlite_scan",
+    "vector_index_scan",
+    "candidate_cache_scan",
+    "recall_audit_scan",
+    "runtime_store_scan",
+    "durable_memory_writer",
+    "durable_audit_writer",
+    "public_mcp_expansion",
+    "validate_memory_public_exposure",
+    "command_execution",
+    "gate_execution",
+    "runner_execution",
+    "package_lockfile_change",
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "rc_ready_claim"
+  ],
+  "failClosedCases": [
+    "missing_source_evidence",
+    "duplicate_source_evidence",
+    "unknown_source_evidence",
+    "source_claims_runtime_authority",
+    "source_claims_readiness_authority",
+    "missing_observability_surface",
+    "duplicate_observability_surface",
+    "unknown_observability_surface",
+    "missing_runtime_evidence",
+    "duplicate_runtime_evidence",
+    "unknown_runtime_evidence",
+    "runtime_observation_missing",
+    "health_unavailable",
+    "mcp_initialize_missing",
+    "tools_list_missing",
+    "public_mcp_drift",
+    "token_mutation_guard_missing",
+    "redaction_uncertain",
+    "safe_start_preflight_missing",
+    "safe_shutdown_preflight_missing",
+    "service_start_requested",
+    "service_stop_requested",
+    "watchdog_install_requested",
+    "startup_install_requested",
+    "config_switch_requested",
+    "provider_call_requested",
+    "real_memory_scan_requested",
+    "runtime_store_scan_requested",
+    "durable_write_claim",
+    "public_mcp_expansion_claim",
+    "readiness_claim_without_authority"
+  ],
+  "a5HardStops": [
+    "push",
+    "tag_create",
+    "release_create",
+    "deploy",
+    "config_switch",
+    "watchdog_install",
+    "startup_install",
+    "provider_call",
+    "real_memory_scan",
+    "sqlite_migration_apply",
+    "import_export_apply",
+    "backup_restore_apply",
+    "durable_memory_write",
+    "durable_audit_write",
+    "public_mcp_expansion",
+    "rc_ready_claim"
+  ],
+  "safety": {
+    "mutated": false,
+    "fixtureOnly": true,
+    "planningOnly": true,
+    "noRuntimeImplementation": true,
+    "noHttpServiceStart": true,
+    "noHttpServiceStop": true,
+    "noHttpObservationExecution": true,
+    "noCommandExecution": true,
+    "noGateExecution": true,
+    "noRunnerExecution": true,
+    "noWatchdogOperation": true,
+    "noStartupOperation": true,
+    "noConfigMutation": true,
+    "noProviderCall": true,
+    "noRealMemoryRead": true,
+    "noRealMemoryScan": true,
+    "noRuntimeStoreScan": true,
+    "noDurableMemoryWrite": true,
+    "noDurableAuditWrite": true,
+    "noPublicMcpExpansion": true,
+    "noPackageChange": true,
+    "noSecretChange": true,
+    "noRemoteWrite": true,
+    "noTagReleaseDeploy": true
+  },
+  "forbiddenClaims": [
+    "P66.50 starts HTTP MCP",
+    "P66.50 observes live HTTP runtime",
+    "P66.50 runs observe:http",
+    "P66.50 installs watchdog or startup",
+    "P66.50 switches Codex or Claude config",
+    "P66.50 makes httpRuntimeObserved true",
+    "P66.50 makes liveHttpOperationReadinessClaimed true",
+    "P66.50 makes operationHardeningReady true",
+    "P66.50 makes safeStartPreflightReady true",
+    "P66.50 makes safeShutdownPreflightReady true",
+    "P66.50 makes watchdogReady true",
+    "P66.50 makes configSwitchReady true",
+    "P66.50 closes live_http_operation_readiness_not_claimed",
+    "P66.50 makes validationAggregatorFullImplementation true",
+    "P66.50 makes runtimeReady true",
+    "P66.50 makes finalRcMatrixReady true",
+    "P66.50 makes v1RcReady true",
+    "P66.50 makes rcReady true",
+    "P66.50 authorizes RC_READY",
+    "P66.50 authorizes push tag release deploy"
+  ],
+  "nextRecommendedPhase": "P66.51-validation-aggregator-live-http-operation-readiness-fixture-tests"
+}
