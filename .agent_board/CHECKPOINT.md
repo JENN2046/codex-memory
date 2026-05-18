@@ -279,6 +279,14 @@ P66.25 validation passed: helper syntax, targeted helper test `12/12`, no-touch 
 
 Next safe action is guarded-commit P66.25 if eligible; after that, continue to P66.26 unsupported source fail-closed static bridge if still inside local safe bounds. 中文解释：下一步先提交 P66.25；之后只能做 unsupported source fail-closed 的静态 bridge，仍然不是 runtime 或 RC readiness。
 
+P66.25 ValidationAggregator unsupported source fail-closed helper is committed locally in `7c40928`.
+
+P66.26 ValidationAggregator unsupported source fail-closed static bridge is implemented locally. It exposes P66.25 helper capability as static report evidence only. ValidationAggregator does not import or execute the helper, read files, execute commands, run gates/runners, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
+
+P66.26 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1271/1271`, `git diff --check`, and docs validation.
+
+Next safe action is to guarded-commit P66.26 if eligible; after that, continue to P66.27 unsupported source fail-closed closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.26；之后只能做 unsupported source fail-closed 的 docs/board closeout，仍然不是 runtime 或 RC readiness。
+
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.

@@ -1113,6 +1113,134 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.evidence.p66ValidationAggregatorMissingStaleEvidenceFailClosedProof.canClaimV1RcReady,
     false
   );
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceFailClosedProofAvailable, true);
+  assert.equal(
+    report.summary.p66ValidationAggregatorUnsupportedSourceFailClosedProofSourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceFailClosedProofHelperCapabilityOnly, true);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceFailClosedCaseCount, 11);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceFailClosedReasonCount, 17);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceHelperImportedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceHelperExecutedByAggregator, false);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceRuntimeImplemented, false);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceFullImplementationComplete, false);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceCanClaimRuntimeReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceCanClaimFinalRcReady, false);
+  assert.equal(report.summary.p66ValidationAggregatorUnsupportedSourceCanClaimV1RcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.status,
+    'static_helper_capability_added_not_executed'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.sourceMode,
+    'static_report_shape_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.helper,
+    'src/core/ValidationAggregatorUnsupportedSourceFailClosedProofContract.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.test,
+    'tests/validation-aggregator-unsupported-source-fail-closed-proof-contract-helper.test.js'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.helperCapabilityOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.explicitInputOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.metadataOnly,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.failClosedCases.length,
+    11
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.failClosedReasons.length,
+    17
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.helperImportedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.helperExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.fixtureReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.evidenceFileReadByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.commandExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.gateExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.runnerExecutedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.evidenceCollectedByAggregator,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.liveMcpRefreshedByAggregator,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.callsProviders, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.startsServices, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.readsFiles, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.scansDirectories, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.scansRealMemory, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.readsRuntimeStores, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.durableMemoryTouched, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.durableAuditWritten, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.publicMcpExpanded, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.runtimeMutationImplemented,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.fullAggregatorImplementationComplete,
+    false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.runtimeIntegrated, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.runtimeReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.finalRcMatrixReady, false);
+  assert.equal(report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.rcReady, false);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.decisionImpact,
+    'none_report_only'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.blockedDecisionRequired,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.canClaimRuntimeReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.canClaimFinalRcReady,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorUnsupportedSourceFailClosedProof.canClaimV1RcReady,
+    false
+  );
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',

@@ -477,6 +477,40 @@ const P66_MISSING_STALE_EVIDENCE_FAIL_CLOSED_REASONS = [
   'readiness_overclaim'
 ];
 
+const P66_UNSUPPORTED_SOURCE_FAIL_CLOSED_CASES = [
+  'unsupported_source_type',
+  'unsupported_source_class',
+  'unknown_source_kind',
+  'runtime_source_without_a5_approval',
+  'provider_source_without_a5_approval',
+  'real_memory_source_without_a5_approval',
+  'durable_write_source_without_a5_approval',
+  'migration_apply_source_without_a5_approval',
+  'public_mcp_expansion_source_without_a5_approval',
+  'readiness_claim_without_authority',
+  'a5_action_without_approval'
+];
+
+const P66_UNSUPPORTED_SOURCE_FAIL_CLOSED_REASONS = [
+  'malformed_input',
+  'schema_version_mismatch',
+  'policy_version_mismatch',
+  'manifest_version_mismatch',
+  'public_mcp_tools_drift',
+  'supported_source_type_drift',
+  'supported_source_class_drift',
+  'missing_required_fail_closed_case',
+  'duplicate_fail_closed_case',
+  'unknown_fail_closed_case',
+  'unsupported_source_accepted',
+  'unsupported_source_downgraded',
+  'runtime_source_without_a5_not_blocked',
+  'unsafe_low_risk_summary',
+  'unsafe_safety_flag',
+  'sensitive_fragment_rejected',
+  'readiness_overclaim'
+];
+
 const EVIDENCE_SOURCES = {
   decision: {
     source_type: 'aggregator',
@@ -1702,6 +1736,21 @@ function buildV1RcValidationAggregatorReport({
       p66ValidationAggregatorMissingStaleEvidenceCanClaimRuntimeReady: false,
       p66ValidationAggregatorMissingStaleEvidenceCanClaimFinalRcReady: false,
       p66ValidationAggregatorMissingStaleEvidenceCanClaimV1RcReady: false,
+      p66ValidationAggregatorUnsupportedSourceFailClosedProofAvailable: true,
+      p66ValidationAggregatorUnsupportedSourceFailClosedProofSourceMode:
+        'static_report_shape_only',
+      p66ValidationAggregatorUnsupportedSourceFailClosedProofHelperCapabilityOnly: true,
+      p66ValidationAggregatorUnsupportedSourceFailClosedCaseCount:
+        P66_UNSUPPORTED_SOURCE_FAIL_CLOSED_CASES.length,
+      p66ValidationAggregatorUnsupportedSourceFailClosedReasonCount:
+        P66_UNSUPPORTED_SOURCE_FAIL_CLOSED_REASONS.length,
+      p66ValidationAggregatorUnsupportedSourceHelperImportedByAggregator: false,
+      p66ValidationAggregatorUnsupportedSourceHelperExecutedByAggregator: false,
+      p66ValidationAggregatorUnsupportedSourceRuntimeImplemented: false,
+      p66ValidationAggregatorUnsupportedSourceFullImplementationComplete: false,
+      p66ValidationAggregatorUnsupportedSourceCanClaimRuntimeReady: false,
+      p66ValidationAggregatorUnsupportedSourceCanClaimFinalRcReady: false,
+      p66ValidationAggregatorUnsupportedSourceCanClaimV1RcReady: false,
       localEvidenceReportReadyClaim: false,
       runtimeReady: false,
       mainlineCutoverReady: false,
@@ -2723,6 +2772,57 @@ function buildV1RcValidationAggregatorReport({
         fixtureReadByAggregator: false,
         evidenceFileReadByAggregator: false,
         implicitEvidenceRefreshByAggregator: false,
+        commandExecutedByAggregator: false,
+        gateExecutedByAggregator: false,
+        runnerExecutedByAggregator: false,
+        evidenceCollectedByAggregator: false,
+        liveMcpRefreshedByAggregator: false,
+        callsProviders: false,
+        startsServices: false,
+        readsFiles: false,
+        scansDirectories: false,
+        scansRealMemory: false,
+        readsRuntimeStores: false,
+        durableMemoryTouched: false,
+        durableAuditWritten: false,
+        publicMcpExpanded: false,
+        runtimeMutationImplemented: false,
+        fullAggregatorImplementationComplete: false,
+        runtimeIntegrated: false,
+        runtimeReady: false,
+        finalRcMatrixReady: false,
+        rcReady: false,
+        decisionImpact: 'none_report_only',
+        blockedDecisionRequired: true,
+        canClaimRuntimeReady: false,
+        canClaimFinalRcReady: false,
+        canClaimV1RcReady: false
+      },
+      p66ValidationAggregatorUnsupportedSourceFailClosedProof: {
+        status: 'static_helper_capability_added_not_executed',
+        sourceMode: 'static_report_shape_only',
+        doc: 'docs/P66_25_VALIDATION_AGGREGATOR_UNSUPPORTED_SOURCE_FAIL_CLOSED_HELPER.md',
+        helper: 'src/core/ValidationAggregatorUnsupportedSourceFailClosedProofContract.js',
+        test: 'tests/validation-aggregator-unsupported-source-fail-closed-proof-contract-helper.test.js',
+        noTouchRegression: 'tests/no-touch-boundary-regression.test.js',
+        schemaVersion: 'p66-validation-aggregator-unsupported-source-fail-closed-proof-v1',
+        policyVersion: 'p66-validation-aggregator-unsupported-source-fail-closed-proof-policy-v1',
+        manifestVersion:
+          'p66-validation-aggregator-unsupported-source-fail-closed-proof-manifest-v1',
+        helperCapabilityOnly: true,
+        explicitInputOnly: true,
+        metadataOnly: true,
+        publicToolsFrozen: true,
+        failClosedCases: P66_UNSUPPORTED_SOURCE_FAIL_CLOSED_CASES.map(id => ({
+          id,
+          required: true,
+          mustFailClosed: true
+        })),
+        failClosedReasons: P66_UNSUPPORTED_SOURCE_FAIL_CLOSED_REASONS,
+        helperImportedByAggregator: false,
+        helperExecutedByAggregator: false,
+        fixtureReadByAggregator: false,
+        evidenceFileReadByAggregator: false,
         commandExecutedByAggregator: false,
         gateExecutedByAggregator: false,
         runnerExecutedByAggregator: false,
