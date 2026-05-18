@@ -375,6 +375,14 @@ P66.37 validation passed: fixture syntax, targeted fixture test `16/16`, `npm te
 
 Next safe action is to validate and guarded-commit P66.37 if eligible; after that, continue to P66.38 governance runtime loop gap fixture tests if still inside local safe bounds. 中文解释：下一步先验证并提交 P66.37；之后只能做 governance runtime loop gap 的详细 fixture/test 验收，仍然不是 runtime 或 RC readiness。
 
+P66.37 ValidationAggregator governance runtime loop gap planning is committed locally in `d59cf3d`.
+
+P66.38 ValidationAggregator governance runtime loop gap fixture tests are implemented locally as docs/fixture/test acceptance contract. It adds [docs/P66_38_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_FIXTURE_TESTS.md](/A:/codex-memory/docs/P66_38_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_FIXTURE_TESTS.md), [p66-validation-aggregator-governance-runtime-loop-gap-fixture-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-governance-runtime-loop-gap-fixture-v1.json), and [p66-validation-aggregator-governance-runtime-loop-gap-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-governance-runtime-loop-gap-fixture.test.js). It locks identity, scope, approval authority, audit refs, six stage ordering, required runtime evidence groups, low-risk summary boundaries, and fail-closed cases. It does not execute governance runtime loop, approval execution, governed action execution, command/gate/runner execution, service start, provider call, config/startup/watchdog operation, real packet/log/memory read, durable audit/memory write, public MCP expansion, push/tag/release/deploy, or readiness claims.
+
+P66.38 validation passed: fixture syntax, targeted fixture test `20/20`, `npm test` `1365/1365`, `git diff --check`, and docs validation.
+
+Next safe action is to validate and guarded-commit P66.38 if eligible; after that, continue to P66.39 governance runtime loop gap helper if still inside local safe bounds. 中文解释：下一步先验证并提交 P66.38；之后只能做 governance runtime loop gap 的纯 explicit-input helper，仍然不是 runtime 或 RC readiness。
+
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.
