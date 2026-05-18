@@ -10,8 +10,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 
 ## Current Status
 
-- Last pushed baseline: `6a4009e feat: add p66 governance runtime loop helper` on `origin/main`.
-- Local `main` was fast-forwarded to `origin/main = 6a4009e`; this board/status reconciliation may make local `main` ahead again. Push is deferred until active-goal completion and final validation.
+- Last pushed baseline: `32da702 docs: review p66 runtime gap proof chain` on `origin/main`.
+- Local `main` is aligned with `origin/main` after the authorized push; verify exact current state with `git status -sb` before new work.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
@@ -57,11 +57,7 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.9 ValidationAggregator evidence freshness proof helper is implemented, validated, and committed locally in `f34cb4c`.
 - P66.10 ValidationAggregator evidence freshness static bridge is implemented, validated, and committed locally in `d38520b`.
 - P66.11 ValidationAggregator evidence freshness closeout is implemented, validated, and committed locally in `644d17c`.
-- P66.12 through P66.39 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `6a4009e`.
-- P66.40 ValidationAggregator governance runtime loop gap static bridge is implemented, validated, and committed locally in `7ec1071`.
-- P66.41 ValidationAggregator governance runtime loop gap closeout is implemented, validated, and committed locally in `37b0569`.
-- P66.42 ValidationAggregator recall isolation runtime proof gap planning is implemented, validated, and committed locally in `715403e`.
-- P66.43 ValidationAggregator recall isolation runtime proof fixture tests are implemented and validated locally; guarded commit is eligible.
+- P66.12 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -463,7 +459,7 @@ P66.58 ValidationAggregator RC cutover local closeout is implemented, validated,
 
 P66.59 ValidationAggregator runtime gap local proof chain review is implemented and validated locally as docs/board only. It adds [docs/P66_59_VALIDATION_AGGREGATOR_RUNTIME_GAP_LOCAL_PROOF_CHAIN_REVIEW.md](/A:/codex-memory/docs/P66_59_VALIDATION_AGGREGATOR_RUNTIME_GAP_LOCAL_PROOF_CHAIN_REVIEW.md), records all seven P66.3 local proof slices as complete, and keeps every runtime gap open with `NOT_READY_BLOCKED`. Validation passed: docs validation, `git diff --check`, and boundary scan with only intended blocker/readiness-denial wording.
 
-Next safe action is to guarded-commit P66.59 if final cached checks pass, then run final local validation and remote freshness preflight. 中文解释：下一步只能提交 P66.59；之后先检查远端新鲜度，不能盲推。
+Next safe action is to select the next local-safe backlog item from current docs/board state. 中文解释：P66.59 已提交并推送；runtime gaps 仍 open，不能声明 readiness。
 
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 

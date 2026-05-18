@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-18
+更新时间：2026-05-19
 
 ## Purpose
 
@@ -10,10 +10,10 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Remote baseline: `6a4009e feat: add p66 governance runtime loop helper`.
-- Local baseline: local `main` was fast-forwarded to the pushed P66.39 baseline; this post-sync board/status reconciliation may make local `main` ahead again. Current `HEAD` and ahead/behind state must be verified with `git status -sb` / `git log --oneline --decorate -n 10`; push is deferred by the active goal until completion and final validation.
-- Current active program: P66 remaining runtime gap local-safe proof chain after P63/P64 runtime evidence bridge.
-- Current phase area: P66.43 ValidationAggregator recall isolation runtime proof fixture tests. Evidence-first / fail-closed / reversible boundaries preserved.
+- Remote baseline: `32da702 docs: review p66 runtime gap proof chain`.
+- Local baseline: local `main` is aligned with `origin/main` after the authorized push; current `HEAD` and ahead/behind state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
+- Current active program: P66 remaining runtime gap local-safe proof chain is complete as local proof only; runtime gaps remain open.
+- Current phase area: next local-safe backlog selection. Evidence-first / fail-closed / reversible boundaries preserved.
 
 ## Active Queue
 
@@ -140,8 +140,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P66.56 | observability-admin | A1/A2 | done | ValidationAggregator RC cutover gap planning | fixture JSON parse; test syntax; targeted fixture test `18/18`; `npm test` `1550/1550`; docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED and committed locally in `032d273`. 中文解释：只能规划 `rc_cutover_not_executed`；不能执行 RC cutover、push/tag/release/deploy、配置切换或声明 readiness。 |
 | P66.57 | observability-admin | A1/A2 | done | ValidationAggregator RC cutover fixture tests | fixture JSON parse; test syntax; targeted fixture test `18/18`; `npm test` `1568/1568`; docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED and committed locally in `7a211bf`. 中文解释：只能锁定 `rc_cutover_not_executed` acceptance；不能执行 RC cutover、push/tag/release/deploy、配置切换或声明 readiness。 |
 | P66.58 | observability-admin | A1 | done | ValidationAggregator RC cutover local closeout | docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED and committed locally in `53644a3`. 中文解释：只能关闭 RC cutover 的本地 proof slice；runtime gap 仍 open，不能执行 RC cutover、push/tag/release/deploy、配置切换或声明 readiness。 |
-| P66.59 | observability-admin | A1 | done | ValidationAggregator runtime gap local proof chain review | docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED pending guarded commit. 中文解释：只能审查七个 gap 的本地 proof slice；runtime gap 仍 open，不能执行 runtime proof、RC cutover、push/tag/release/deploy 或声明 readiness。 |
-| Push-preflight | mainline-health | A1/A5-preflight | next | Final local validation and push preflight | `git status -sb`; `git fetch origin`; divergence check; `git diff --check`; docs validation | Next action after P66.59 commit. 中文解释：只做最终本地验证和远端新鲜度检查；若远端有新提交必须停止，不得盲推。 |
+| P66.59 | observability-admin | A1 | done | ValidationAggregator runtime gap local proof chain review | docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED, committed, and pushed in `32da702`. 中文解释：只能审查七个 gap 的本地 proof slice；runtime gap 仍 open，不能执行 runtime proof、RC cutover、push/tag/release/deploy 或声明 readiness。 |
+| Push-preflight | mainline-health | A1/A5-preflight | done | Final local validation and push preflight | `git status -sb`; `git fetch origin`; divergence check; `git diff --check`; docs validation | COMPLETED_VALIDATED; final preflight passed and authorized push completed to `origin/main` at `32da702`. 中文解释：最终本地验证和远端新鲜度检查已完成；不能把 push 完成误读为 runtime readiness。 |
 
 ## Standing Boundaries
 

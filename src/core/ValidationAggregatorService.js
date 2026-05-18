@@ -3761,7 +3761,8 @@ function buildV1RcValidationAggregatorReport({
       'P66.17 runtime evidence summary normalization helper capability is static and is not executed by the aggregator.',
       'P66.21 missing or stale evidence fail-closed helper capability is static and is not executed by the aggregator.',
       'P66.33 readiness overclaim rejection helper capability is static and is not executed by the aggregator.',
-      'P66.39 governance runtime loop gap helper capability is static and is not executed by the aggregator.'
+      'P66.39 governance runtime loop gap helper capability is static and is not executed by the aggregator.',
+      'P66.44 recall isolation runtime proof helper capability is static and is not executed by the aggregator.'
     ],
     recommendations: [
       'Add a scoped CLI wrapper only after this minimal core contract is committed.',

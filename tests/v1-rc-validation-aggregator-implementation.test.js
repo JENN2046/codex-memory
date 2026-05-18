@@ -1947,6 +1947,11 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimV1RcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimRcReady, false);
   assert.equal(report.evidence.p66ValidationAggregatorRecallIsolationRuntimeProof.canClaimCutoverReady, false);
+  assert.ok(
+    report.warnings.includes(
+      'P66.44 recall isolation runtime proof helper capability is static and is not executed by the aggregator.'
+    )
+  );
   assert.deepEqual(report.evidence.p53ValidationAggregatorEvidenceInventory.sourceClasses.map(entry => entry.id), [
     'committed_evidence',
     'local_validation',
