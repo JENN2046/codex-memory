@@ -351,6 +351,14 @@ P66.34 validation passed: aggregator syntax, targeted aggregator test `17/17`, n
 
 Next safe action is to guarded-commit P66.34 if eligible; after that, continue to P66.35 readiness overclaim rejection closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.34；之后只能做 readiness overclaim rejection 的 docs/board closeout，仍然不是 runtime 或 RC readiness。
 
+P66.34 ValidationAggregator readiness overclaim rejection static bridge is committed locally in `75fb6a9`.
+
+P66.35 ValidationAggregator readiness overclaim rejection closeout is implemented locally as docs/board only. It adds [docs/P66_35_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_CLOSEOUT.md](/A:/codex-memory/docs/P66_35_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_CLOSEOUT.md), closes the readiness-overclaim rejection proof slice after P66.32-P66.34, and records that the P66.4 local evidence-group sequence has completed one pass. It does not close the full runtime gap, execute runtime/gate/runner/service/provider work, write durable state, expand public MCP, push/tag/release/deploy, or claim readiness.
+
+P66.35 validation passed: `git diff --check` and docs validation.
+
+Next safe action is to guarded-commit P66.35 if eligible; after that, continue to P66.36 first-gap local proof closeout review if still inside local safe bounds. 中文解释：下一步先提交 P66.35；之后只能做第一项剩余 gap 的本地 proof 总收口审查，仍然不是 runtime 或 RC readiness。
+
 P65-T1 is complete, validated, and committed locally in `04ae047` as a stricter ValidationAggregator slice. It adds explicit sanitized runtime evidence summary ingestion only; the aggregator still does not execute gates, read files, start services, call providers, scan real memory/runtime stores, mutate durable state, expand public MCP, or claim runtime/final-RC/v1-RC readiness.
 
 P65.1 is complete and validated locally as a runner semantics hardening slice. Local allowlisted command execution is now represented by `localRuntimeEvidenceMatrixExecuted` and `allowlistedFinalRcEvidenceRunnerExecuted`; `finalRcMatrixExecuted=false` and `fullFinalRcMatrixExecuted=false` remain blocked, and sanitized runtime evidence summaries reject full-matrix execution/readiness claims so reports cannot be misread as full Final RC matrix completion.

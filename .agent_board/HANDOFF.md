@@ -272,3 +272,11 @@ P66.34 ValidationAggregator readiness overclaim rejection static bridge is imple
 P66.34 validation passed: aggregator syntax, targeted aggregator test `17/17`, no-touch regression `4/4`, `npm test` `1329/1329`, `git diff --check`, and docs validation.
 
 Next safe action is to guarded-commit P66.34 if eligible; after that, continue to P66.35 readiness overclaim rejection closeout if still inside local safe bounds. 中文解释：下一步先提交 P66.34；之后只能做 readiness overclaim rejection 的 docs/board closeout，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
+
+P66.34 ValidationAggregator readiness overclaim rejection static bridge is committed locally in `75fb6a9`.
+
+P66.35 ValidationAggregator readiness overclaim rejection closeout is implemented locally as docs/board only. It adds [docs/P66_35_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_CLOSEOUT.md](/A:/codex-memory/docs/P66_35_VALIDATION_AGGREGATOR_READINESS_OVERCLAIM_REJECTION_CLOSEOUT.md), closes the readiness-overclaim rejection proof slice after P66.32-P66.34, and records that the P66.4 local evidence-group sequence has completed one pass. It does not close the full runtime gap, execute runtime/gate/runner/service/provider work, write durable state, expand public MCP, push/tag/release/deploy, or claim readiness.
+
+P66.35 validation passed: `git diff --check` and docs validation.
+
+Next safe action is to guarded-commit P66.35 if eligible; after that, continue to P66.36 first-gap local proof closeout review if still inside local safe bounds. 中文解释：下一步先提交 P66.35；之后只能做第一项剩余 gap 的本地 proof 总收口审查，仍然不是 runtime 或 RC readiness。 Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
