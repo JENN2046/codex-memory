@@ -125,5 +125,6 @@ After P64-T1 local schema/version write-boundary evidence:
 - P66.4 ValidationAggregator gap priority fixture tests is complete locally. 中文解释：P66.4 只锁定第一个剩余 gap 的验收证据组和禁用动作；它不关闭 gap、不实现 runtime、不声明 readiness。
 - P66.5 ValidationAggregator source registry proof helper is complete locally. 中文解释：P66.5 只新增纯 explicit-input helper 来校验 source registry exact-set；它不读文件、不执行命令、不启动服务、不声明 readiness。
 - P66.6 ValidationAggregator source registry static bridge is complete locally. 中文解释：P66.6 只把 P66.5 helper 能力作为静态、非授权证据展示到 ValidationAggregator report；aggregator 不执行 helper、不读文件、不声明 readiness。
-- Recommended next local phase: P66.7 ValidationAggregator source registry closeout. 中文解释：下一步只关闭 source-registry proof slice 并选择下一个本地安全证据组；不能执行真实 runtime、A5 动作或声明 `RC_READY`。
+- P66.7 ValidationAggregator source registry closeout is complete locally. 中文解释：P66.7 只关闭 source-registry proof slice，并选择 `evidence_freshness_proof` 作为下一个本地安全证据组；它不关闭整个 runtime gap。
+- Recommended next local phase: P66.8 ValidationAggregator evidence freshness proof fixture. 中文解释：下一步只定义 freshness 证据的新 fixture/test，不读真实 evidence 文件、不执行命令、不启动服务、不调用 provider、不声明 `RC_READY`。
 - After P65-T1, continue one remaining runtime proof gap at a time; any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, durable write, migration/import-export apply, public MCP expansion, or readiness claim still requires separate explicit authorization.

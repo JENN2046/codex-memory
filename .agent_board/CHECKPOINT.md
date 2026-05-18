@@ -51,7 +51,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.3 ValidationAggregator runtime gap plan is implemented, validated, and committed locally in `c7a6a8c`.
 - P66.4 ValidationAggregator gap priority fixture tests are implemented, validated, and committed locally in `3b7c335`.
 - P66.5 ValidationAggregator source registry proof helper is implemented, validated, and committed locally in `f7a9038`.
-- P66.6 ValidationAggregator source registry static bridge is implemented and validated locally; guarded commit is pending.
+- P66.6 ValidationAggregator source registry static bridge is implemented, validated, and committed locally in `92e47ce`.
+- P66.7 ValidationAggregator source registry closeout is implemented locally as docs/board only; validation and guarded commit are pending.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -218,5 +219,7 @@ P66.4 ValidationAggregator gap priority fixture tests are added as docs/fixture/
 P66.5 ValidationAggregator source registry proof helper is added as pure explicit-input code. It accepts only caller-provided source registry objects, enforces the exact source set, fails closed for source/public-MCP/readiness/no-touch drift, and performs no file read, command execution, service start, provider call, real memory scan, durable write, public MCP expansion, or readiness claim.
 
 P66.6 ValidationAggregator source registry static bridge is added to the report shape. It exposes P66.5 helper capability without importing or executing the helper and keeps all readiness flags false.
+
+P66.7 ValidationAggregator source registry closeout records the source-registry proof slice as locally closed and selects `evidence_freshness_proof` as the next local-safe evidence group. The overall `validation_aggregator_full_implementation_incomplete` gap remains open.
 
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
