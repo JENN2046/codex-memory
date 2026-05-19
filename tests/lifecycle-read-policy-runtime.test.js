@@ -110,7 +110,7 @@ test('lifecycle read policy flag defaults to false and soft read policy remains 
   });
 });
 
-test('flag=false keeps search_memory backward-compatible for all lifecycle statuses', async () => {
+test('flag=false keeps search_memory compatible while recall isolation hides terminal lifecycle statuses', async () => {
   await withApp({ enableLifecycleReadPolicy: false }, async ({ app }) => {
     await writeLifecycleFixtures(app);
 
@@ -120,15 +120,12 @@ test('flag=false keeps search_memory backward-compatible for all lifecycle statu
     assert.deepEqual(titles, [
       'Lifecycle Active Visible',
       'Lifecycle Proposal Hidden',
-      'Lifecycle Rejected Hidden',
-      'Lifecycle Stale Visible',
-      'Lifecycle Superseded Hidden',
-      'Lifecycle Tombstoned Hidden'
+      'Lifecycle Stale Visible'
     ]);
   });
 });
 
-test('flag=true filters proposal, rejected, superseded, and tombstoned while keeping active and stale', async () => {
+test('flag=true filters remaining proposal records while recall isolation already hides terminal statuses', async () => {
   await withApp({ enableLifecycleReadPolicy: true }, async ({ app }) => {
     await writeLifecycleFixtures(app);
 
@@ -146,7 +143,7 @@ test('flag=true filters proposal, rejected, superseded, and tombstoned while kee
     assert.equal(latest.lifecyclePolicyApplied, true);
     assert.deepEqual(latest.lifecycleIncludedStatuses, ['active', 'stale']);
     assert.deepEqual(latest.lifecycleExcludedStatuses, ['proposal', 'rejected', 'superseded', 'tombstoned']);
-    assert.equal(latest.hiddenByLifecycleCount, 4);
+    assert.equal(latest.hiddenByLifecycleCount, 1);
     assert.equal(latest.staleResultCount, 1);
     assert.equal(latest.lifecycleColumnAvailable, true);
   });

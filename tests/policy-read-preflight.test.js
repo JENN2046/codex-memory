@@ -108,7 +108,7 @@ function applyHypotheticalSoftReadPolicy(records, { requestClientId = 'codex' } 
   });
 }
 
-test('policy preflight: current default search still returns proposal, tombstoned, and cross-client private records', async () => {
+test('policy preflight: current default search keeps proposal and cross-client private records while recall isolation hides tombstones', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
     const { shadowStore } = app.stores;
@@ -170,14 +170,18 @@ test('policy preflight: current default search still returns proposal, tombstone
 
     const results = searchResult.response.result.structuredContent.results || [];
     const resultIds = results.map(result => result.memoryId);
-    assert.equal(results.length, fixtures.length, 'current default read path should return all fixture records');
-    for (const expectedId of expectedIds) {
+    assert.equal(results.length, fixtures.length - 1, 'current default read path should hide tombstoned fixture records through recall isolation');
+    for (const expectedId of expectedIds.slice(0, 1)) {
       assert.ok(resultIds.includes(expectedId), `current default read path should include ${expectedId}`);
     }
+    assert.ok(resultIds.includes(expectedIds[1]), 'current default read path should include proposal records until soft read policy is enabled');
+    assert.equal(resultIds.includes(expectedIds[2]), false, 'current default read path should hide tombstoned records through recall isolation');
+    assert.ok(resultIds.includes(expectedIds[3]), 'current default read path should include cross-client private records until soft read policy is enabled');
+    assert.ok(resultIds.includes(expectedIds[4]), 'current default read path should include same-client private records');
   });
 });
 
-test('policy preflight: hypothetical default status and visibility policy would narrow mixed-governance results', async () => {
+test('policy preflight: hypothetical default status and visibility policy narrows remaining mixed-governance results', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
     const { shadowStore } = app.stores;
@@ -235,7 +239,7 @@ test('policy preflight: hypothetical default status and visibility policy would 
     }, requestContext);
 
     const results = searchResult.response.result.structuredContent.results || [];
-    assert.equal(results.length, fixtures.length, 'preflight baseline should expose all fixture records before policy');
+    assert.equal(results.length, fixtures.length - 2, 'preflight baseline should already hide rejected and tombstoned records through recall isolation');
 
     const records = await getPolicyRecords(shadowStore, results.map(result => result.memoryId));
     const hypothetical = applyHypotheticalSoftReadPolicy(records, { requestClientId: 'codex' });

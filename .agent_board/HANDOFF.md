@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record approved fresh A5-GAP-5 strict gate evidence for current `HEAD`. Keep all other runtime/A5 boundaries blocked until exact approval is provided.
+Repair the four local test failures exposed by the approved fresh A5-GAP-5 strict gate, then request fresh A5-GAP-5 rerun approval. Keep all other runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ Record approved fresh A5-GAP-5 strict gate evidence for current `HEAD`. Keep all
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended fresh A5-GAP-5 failed-gate evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A4 test-contract repair plus status/board updates until validation and guarded commit complete. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability-admin / mainline-health; A5-GAP-5 approved strict-gate-only evidence.
+P0 mainline-health / P8 memory-governance; local A4 test-contract repair after failed A5-GAP-5 evidence.
 
 ## Current Truth
 
@@ -31,6 +31,7 @@ P10 observability-admin / mainline-health; A5-GAP-5 approved strict-gate-only ev
 - A5-GAP-3 approved dry-run has now executed for `vcp-memory:migration-readiness fixture-only readiness report` at `d3e87c7fe9f2f37c1659c815d874e8550dff4a32` and is recorded in [docs/P66_A5_GAP_3_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_3_DRY_RUN_EVIDENCE.md). Result: `DRY_RUN_EXECUTED_MIGRATION_STILL_BLOCKED`; `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`, and no apply/import/export/backup/restore/durable write.
 - Post-GAP3 A5-GAP-6 has now been executed for approved evidence consumption only at `7783daa88622df10eea47404f09043f603bce9e0` and recorded in [docs/P66_A5_GAP_6_POST_GAP3_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GAP3_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP3_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized A5-GAP-1/2/3/4/5 summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - Fresh A5-GAP-5 has now been executed for current `HEAD` at `1c17d17cecc39c57f5df1473634451518dc97d32` and recorded in [docs/P66_A5_GAP_5_FRESH_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_FRESH_STRICT_GATE_EVIDENCE.md). Result: `TARGET_BOUND_GATE_FAILED_NOT_RC_READY`; test gate failed with 4 failures; no remote write or cutover occurred.
+- Local A4 repair is complete and recorded in [docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md](/A:/codex-memory/docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md). It updates stale test expectations to match explicit recall isolation hiding terminal lifecycle statuses before lifecycle soft read policy. Validation passed: lifecycle read-policy `6/6`, policy preflight `5/5`, full `npm test` `1573/1573`, and `git diff --check`. Fresh A5-GAP-5 rerun is still not approved or executed.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.

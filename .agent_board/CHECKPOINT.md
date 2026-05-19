@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record approved fresh A5-GAP-5 strict gate evidence for current `HEAD`. Preserve all other runtime/A5 hard stops.
+Repair the four local test failures exposed by the approved fresh A5-GAP-5 strict gate, then request a fresh A5-GAP-5 rerun approval. Preserve all other runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability-admin / mainline-health; A5-GAP-5 approved strict-gate-only evidence.
+P0 mainline-health / P8 memory-governance; local A4 test-contract repair after failed A5-GAP-5 evidence.
 
 ## Current Status
 
@@ -20,6 +20,7 @@ P10 observability-admin / mainline-health; A5-GAP-5 approved strict-gate-only ev
 - A5-GAP-3 approved dry-run has now executed for `vcp-memory:migration-readiness fixture-only readiness report` at `d3e87c7fe9f2f37c1659c815d874e8550dff4a32` and is recorded in [docs/P66_A5_GAP_3_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_3_DRY_RUN_EVIDENCE.md). Result: `DRY_RUN_EXECUTED_MIGRATION_STILL_BLOCKED`; `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`, and no apply/import/export/backup/restore/durable write.
 - Post-GAP3 A5-GAP-6 has now been executed for approved evidence consumption only at `7783daa88622df10eea47404f09043f603bce9e0` and recorded in [docs/P66_A5_GAP_6_POST_GAP3_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GAP3_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP3_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized A5-GAP-1/2/3/4/5 summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - Fresh A5-GAP-5 has now been executed for current `HEAD` at `1c17d17cecc39c57f5df1473634451518dc97d32` and recorded in [docs/P66_A5_GAP_5_FRESH_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_FRESH_STRICT_GATE_EVIDENCE.md). Result: `TARGET_BOUND_GATE_FAILED_NOT_RC_READY`; test gate failed with 4 failures; no remote write or cutover occurred.
+- Local A4 repair is now complete and recorded in [docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md](/A:/codex-memory/docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md). Root cause: stale tests still expected terminal lifecycle records to remain visible by default, while explicit recall isolation now hides `rejected`, `superseded`, and `tombstoned` before lifecycle soft read policy. Updated tests only; production behavior preserved. Validation passed: lifecycle read-policy `6/6`, policy preflight `5/5`, full `npm test` `1573/1573`, and `git diff --check`.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
@@ -218,6 +219,8 @@ P10 observability-admin / mainline-health; A5-GAP-5 approved strict-gate-only ev
 - This locally evidences `runtime_schema_version_enforcement_not_fully_proven` and `final_rc_matrix_runner_not_executed_as_real_matrix`, but keeps final RC readiness, v1 RC readiness, cutover, and `RC_READY` blocked.
 
 ## Next Safe Step
+
+Guarded-commit the A4 test-contract repair if eligible, then request a fresh A5-GAP-5 approval bound to the post-repair commit. Do not rerun `npm run gate:mainline:strict` without that fresh approval.
 
 P66.13 ValidationAggregator baseline binding proof helper is implemented locally as pure explicit-input code and tests. It accepts only caller-provided baseline binding evidence, fails closed for commit-role ambiguity, checkout mismatch, unsafe summaries, no-touch leakage, and readiness overclaims, and does not checkout/reset/detach, query remotes, read files, execute commands, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
 
