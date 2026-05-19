@@ -88,3 +88,11 @@ Handoff: report to Commander in conversation; do not edit files.
 - Worker Beta: completed. Recommended `P24.6 rejected-flag report contract hardening` touching only `src/cli/v1-rc-validation-aggregator.js` and `tests/v1-rc-validation-aggregator-cli.test.js`; keep exit `1`, no side effects, and preserve stable `safety` / `public_mcp_tools` / `evidence_sources` shape for rejected flag output.
 - Read-Only Verifier: `PASS`. Scope remained board-only; no hard stop crossed; no `.env`, dependency, `.github`, runtime data, source/test drift, provider call, service start, push, tag, release, deploy, stage, or commit.
 - Commander decision: CM-0206 is closed as board-only activation. No guarded commit requested for CM-0206. Next safe local candidate is the narrow P24.6 rejected-flag report contract hardening slice.
+
+## Phase F Local-Safe Prep - 2026-05-19
+
+- Anchor before this slice: `37d802dc2283a06083159c22ceaa24df7d00f3bc`.
+- New prep doc: [docs/PHASE_F_LOCAL_SAFE_PREP.md](/A:/codex-memory/docs/PHASE_F_LOCAL_SAFE_PREP.md).
+- Status remains `NOT_READY_BLOCKED`.
+- Selected first next slice: `CM-0525` readonly VCP parity gap inventory.
+- No runtime/source/test/dependency/config/runtime-data change, no A5 command, no recall observation, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.

@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - Phase F local-safe prep - 2026-05-19
+
+- Status: `LOCAL_SAFE_PREP`; project decision remains `NOT_READY_BLOCKED`.
+- Anchor before this slice: `37d802dc2283a06083159c22ceaa24df7d00f3bc`.
+- New document: [docs/PHASE_F_LOCAL_SAFE_PREP.md](/A:/codex-memory/docs/PHASE_F_LOCAL_SAFE_PREP.md).
+- Completed: selected docs-only Phase F lane and queued `CM-0525` through `CM-0528` as local-safe next candidates.
+- Fixed: `.agent_board/TASK_QUEUE.md` split `CM-0522` / `CM-0517` into separate rows and superseded old pre-aggregation Phase F placeholder.
+- Not run: runtime/source/test changes, A5 command, recall path observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: `CM-0525` readonly VCP parity gap inventory.
 ## Checkpoint - RC_PRECHECK_001 A5-GAP-6 aggregation executed - 2026-05-19
 
 - Status: `EVIDENCE_AGGREGATED_NOT_RC_READY`; project decision remains `NOT_READY_BLOCKED`.

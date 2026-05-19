@@ -131,3 +131,15 @@ Evidence: [docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_EVIDENCE.md](/A:/codex-memo
 Result: `EVIDENCE_AGGREGATED_NOT_RC_READY`.
 
 Project status remains `NOT_READY_BLOCKED`.
+
+## Week 4 Phase F Local-Safe Prep - 2026-05-19
+
+Phase F local-safe prep is recorded in [docs/PHASE_F_LOCAL_SAFE_PREP.md](/A:/codex-memory/docs/PHASE_F_LOCAL_SAFE_PREP.md).
+
+Selected first next slice: `CM-0525 Phase F readonly VCP parity gap inventory`.
+
+Allowed scope remains docs/fixtures/test-only hardening, readonly gap inventory, validation matrix refinement, observability/admin design draft, and memory governance proposal draft.
+
+Blocked without new exact approval: runtime mutation, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7, and readiness claims.
+
+Project status remains `NOT_READY_BLOCKED`.

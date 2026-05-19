@@ -56,6 +56,17 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - Readiness flags stayed false: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
 - Aggregator side effects: `readsFiles=false`, `executesCommands=false`, `startsServices=false`, `callsProviders=false`, `mutatesDurableState=false`.
 - Result: `EVIDENCE_AGGREGATED_NOT_RC_READY`; project remains `NOT_READY_BLOCKED`.
+
+## Phase F Local-Safe Prep - 2026-05-19
+
+- Current anchor before this slice: `37d802dc2283a06083159c22ceaa24df7d00f3bc`.
+- Prep doc: [docs/PHASE_F_LOCAL_SAFE_PREP.md](/A:/codex-memory/docs/PHASE_F_LOCAL_SAFE_PREP.md).
+- Completed: selected a non-A5 Phase F local-safe lane after readonly precheck and A5-GAP-6 aggregation evidence.
+- First next task: `CM-0525 Phase F readonly VCP parity gap inventory`.
+- Boundaries: docs/fixtures/test-only, inventory, validation matrix refinement, observability/admin design, memory governance proposal.
+- Not authorized: runtime mutation, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup change, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
+- Project status remains `NOT_READY_BLOCKED`.
+
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.
