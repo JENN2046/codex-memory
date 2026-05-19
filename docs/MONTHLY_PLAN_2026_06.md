@@ -143,3 +143,13 @@ Allowed scope remains docs/fixtures/test-only hardening, readonly gap inventory,
 Blocked without new exact approval: runtime mutation, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7, and readiness claims.
 
 Project status remains `NOT_READY_BLOCKED`.
+
+## Week 4 Phase F Readonly Inventory - 2026-05-19
+
+Readonly VCP parity gap inventory is recorded in [docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md](/A:/codex-memory/docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md).
+
+Selected next slice: `CM-0526 Phase F fixture/test-only parity hardening matrix`.
+
+The inventory used existing docs only and did not inspect real memory stores, execute runtime, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
+
+Project status remains `NOT_READY_BLOCKED`.

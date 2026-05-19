@@ -67,6 +67,17 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - Not authorized: runtime mutation, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup change, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
 - Project status remains `NOT_READY_BLOCKED`.
 
+
+## Phase F Readonly VCP Parity Gap Inventory - 2026-05-19
+
+- Anchor before this slice: `19cbe941e968034d69018822378654cbc070f191`.
+- Inventory doc: [docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md](/A:/codex-memory/docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md).
+- Completed: readonly inventory of VCP parity gaps using existing docs only.
+- Priority gaps: TagMemo / semantic association parity, donor behavior maintenance, query-quality confidence, memory governance, object-model/migration safety, observability/admin surface, client scope, runtime evidence closure, local production hardening.
+- First next task: `CM-0526 Phase F fixture/test-only parity hardening matrix`.
+- Not authorized: runtime mutation, real memory scan, recall observation, provider calls, migration/import/export/backup/restore apply, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
+- Project status remains `NOT_READY_BLOCKED`.
+
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.

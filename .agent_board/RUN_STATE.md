@@ -96,3 +96,11 @@ Handoff: report to Commander in conversation; do not edit files.
 - Status remains `NOT_READY_BLOCKED`.
 - Selected first next slice: `CM-0525` readonly VCP parity gap inventory.
 - No runtime/source/test/dependency/config/runtime-data change, no A5 command, no recall observation, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.
+
+## Phase F Readonly VCP Parity Gap Inventory - 2026-05-19
+
+- Anchor before this slice: `19cbe941e968034d69018822378654cbc070f191`.
+- Inventory doc: [docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md](/A:/codex-memory/docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md).
+- Status remains `NOT_READY_BLOCKED`.
+- Selected next slice: `CM-0526` fixture/test-only parity hardening matrix, starting with TagMemo / semantic association parity.
+- No runtime/source/test/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.

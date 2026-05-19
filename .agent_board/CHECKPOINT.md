@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - Phase F readonly VCP parity gap inventory - 2026-05-19
+
+- Status: `READONLY_INVENTORY_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
+- Anchor before this slice: `19cbe941e968034d69018822378654cbc070f191`.
+- New document: [docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md](/A:/codex-memory/docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md).
+- Completed: inventoried VCP parity gaps from existing docs only and selected `CM-0526` as the next local-safe fixture/test-only matrix.
+- Not run: runtime/source/test changes, A5 command, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: `CM-0526` Phase F fixture/test-only parity hardening matrix.
 ## Checkpoint - Phase F local-safe prep - 2026-05-19
 
 - Status: `LOCAL_SAFE_PREP`; project decision remains `NOT_READY_BLOCKED`.
