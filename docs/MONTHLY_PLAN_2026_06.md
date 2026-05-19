@@ -249,3 +249,7 @@ Phase F governance/observability fixture packs closed locally as synthetic fixtu
 ## CM-0541 Monthly Update
 
 Phase F VCP parity fixture pack integration index prepared as a local-safe docs/board slice. It links TagMemo, observability/admin, and memory-governance fixture packs while keeping runtime parity, durable writes, real-store reads, public MCP expansion, and readiness claims blocked. Status remains NOT_READY_BLOCKED.
+
+## CM-0542 Monthly Update
+
+Phase F VCP parity fixture coverage gap review prepared as a local-safe docs/board slice. It selects LightMemo directory semantics fixture planning as the next safe target while keeping runtime parity, durable writes, real-store reads, public MCP expansion, and readiness claims blocked. Status remains NOT_READY_BLOCKED.

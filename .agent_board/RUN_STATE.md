@@ -211,3 +211,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: docs/board index only; no runtime/source change, no HTTP observe, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
 - Next safe task: CM-0542 Phase F VCP parity fixture coverage gap review.
+
+## CM-0542 State
+
+- Current state: Phase F VCP parity fixture coverage gap review drafted locally.
+- Decision: NOT_READY_BLOCKED.
+- Boundary: docs/board review only; no runtime/source/test change, no HTTP observe, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
+- Next safe task: CM-0543 Phase F LightMemo directory semantics fixture plan.

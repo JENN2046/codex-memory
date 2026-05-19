@@ -643,3 +643,14 @@ Validation: pending combined targeted fixture tests, docs validation, diff check
 Not validated: runtime behavior, HTTP observe, governance report execution, durable memory/audit writes, real stores, public MCP schema.
 Remaining risks: integration index is discoverability evidence only, not runtime parity evidence.
 Next safe step: CM-0542 fixture coverage gap review.
+
+## CM-0542 Handoff
+
+Goal: review Phase F VCP parity fixture coverage gaps and select next local-safe target.
+Workspace: A:\codex-memory.
+Current area: P7-vcp-parity-hardening.
+Changed files: docs/PHASE_F_VCP_PARITY_FIXTURE_COVERAGE_GAP_REVIEW.md plus docs/board status files.
+Validation: pending combined targeted fixture tests, docs validation, diff check, readiness scan.
+Not validated: runtime behavior, LightMemo runtime recall, HTTP observe, governance report execution, durable memory/audit writes, real stores, public MCP schema.
+Remaining risks: selected LightMemo lane must remain synthetic fixture/test-only until separately planned.
+Next safe step: CM-0543 LightMemo directory semantics fixture plan.
