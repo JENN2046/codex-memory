@@ -2,7 +2,7 @@
 
 ## Goal
 
-Prepare the A5-GAP-1 governance production readiness approval packet. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
+Record the approved A5-GAP-1 governance production readiness evidence. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ Prepare the A5-GAP-1 governance production readiness approval packet. Keep all r
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended A5-GAP-1 governance production readiness packet docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has one approved sanitized audit append from the prior A5-GAP-1 smoke. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A5-GAP-1 governance production readiness evidence docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has one approved sanitized audit append from the prior A5-GAP-1 smoke. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 governance production readiness preflight packet.
+P8 memory-governance / P10 observability-admin; A5-GAP-1 governance production readiness evidence.
 
 ## Current Truth
 
@@ -37,6 +37,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 governance production r
 - A5-GAP-1 durable audit writer approval packet is now approved/executed and linked to [docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_EVIDENCE.md). The approved smoke wrote exactly one sanitized audit record through `AuditLogStore.appendWriteAudit()` to `logs/codex-memory-bridge.jsonl`; `appendedLineCount=1`, `readbackFound=true`, `readbackExactHashFound=true`, `durableMemoryWritten=false`, and recall audit unchanged. The next safe A5 move is a fresh A5-GAP-6 aggregation request consuming this new evidence; no such aggregation or additional runtime action is authorized yet.
 - A5-GAP-6 post-durable-audit aggregation refresh is now approved/executed and linked to [docs/P66_A5_GAP_6_POST_DURABLE_AUDIT_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_DURABLE_AUDIT_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, and kept `NOT_READY_BLOCKED` with locally evidenced count `6`, remaining count `6`, and readiness flags false.
 - A5-GAP-1 governance production readiness approval packet is now drafted as [docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, asks for subject `p66-a5-gap1-governance-production-readiness-readonly sanitized report`, durable write no, and read-only governance report only. No `governance:report`, SQLite read, runtime action, durable write, provider call, public MCP expansion, config/watchdog/startup change, push/release/deploy/cutover, or `RC_READY` is authorized.
+- A5-GAP-1 governance production readiness evidence is now approved/executed and linked to [docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_EVIDENCE.md). The approved read-only report was nominal, but read-policy evidence was unavailable/config-only, so production governance readiness remains blocked. Next safe A5 move is a fresh A5-GAP-6 aggregation refresh consuming this new evidence only.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.

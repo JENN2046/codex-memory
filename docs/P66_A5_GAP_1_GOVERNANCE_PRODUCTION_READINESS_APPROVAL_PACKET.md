@@ -6,7 +6,11 @@ Mode: `A5 preflight packet only`
 
 Risk: `A5-governance-production-readiness-readonly-preflight`
 
-Decision: `DRAFT_NOT_APPROVED`
+Decision: `APPROVED_EXECUTED_BY_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_EVIDENCE`
+
+Execution evidence:
+
+- [P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_EVIDENCE.md)
 
 ## Purpose
 
