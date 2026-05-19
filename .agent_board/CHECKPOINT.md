@@ -2,22 +2,23 @@
 
 ## Current Goal
 
-Record approved A5-GAP-3 fixture-only dry-run evidence. Preserve all other runtime/A5 hard stops.
+Record approved post-GAP3 A5-GAP-6 ValidationAggregator evidence refresh. Preserve all other runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability-admin / migration-import-export; A5-GAP-3 approved dry-run no-apply evidence.
+P10 observability-admin / validation-aggregator; A5-GAP-6 approved evidence consumption only, after A5-GAP-3.
 
 ## Current Status
 
 - Last pushed baseline: `a9177d5 fix: tighten review patch safety semantics` on `origin/main`.
-- Local `main` contains `6faa8baa375e7496dcf62cb4443668dd9f67f712 docs: record p66 a5 gap1 governance evidence` and is ahead of `origin/main = a9177d5` by 7 commits before this evidence slice; verify exact current state with `git status -sb` before new work.
-- User supplied a complete approval line for `A5-GAP-2`. The approved no-mutation recall isolation runtime proof read the five approved stores, produced sanitized contamination counts, and left before/after store snapshots unchanged; evidence is recorded in [docs/P66_A5_GAP_2_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). The proof failed closed with contamination markers, so recall isolation remains open. `A5-GAP-1`, `A5-GAP-4`, and `A5-GAP-5` evidence remain bounded to their approved contexts.
+- Local `main` contains `7783daa88622df10eea47404f09043f603bce9e0 docs: record p66 a5 gap3 dry-run evidence` and is ahead of `origin/main = a9177d5` by 13 commits before this evidence slice; verify exact current state with `git status -sb` before new work.
+- User supplied a complete approval line for post-GAP3 `A5-GAP-6`. The approved aggregation consumes only sanitized evidence from A5-GAP-1/2/3/4/5 and performs no new runtime action. Earlier `A5-GAP-2` proof failed closed before the A4 classifier layer and passed the fresh no-mutation rerun with limitation `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; recall isolation remains limited by the absence of a classified real sample.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - Fresh A5-GAP-2 rerun has now been executed for approved stores at `ceffc0f255c142875a0f41879539361dd547c4bc` and recorded in [docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). Result: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION`; limitation: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; store snapshots unchanged; no mutation.
 - A5-GAP-6 has now been executed for approved evidence consumption only at `16d3fe8af80fafad5b0db7ed29aacc6f7e51c1ff` and recorded in [docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - A5-GAP-3 dry-run/no-apply packet is prepared in [docs/P66_A5_GAP_3_DRY_RUN_APPROVAL_EXECUTION_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_3_DRY_RUN_APPROVAL_EXECUTION_PACKET.md). It is `DRAFT_NOT_APPROVED` and recommends only `action dry-run` target `vcp-memory:migration-readiness fixture-only readiness report`, with explicit no apply/import/export/backup/restore/durable write clauses. No dry-run was executed in this slice.
 - A5-GAP-3 approved dry-run has now executed for `vcp-memory:migration-readiness fixture-only readiness report` at `d3e87c7fe9f2f37c1659c815d874e8550dff4a32` and is recorded in [docs/P66_A5_GAP_3_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_3_DRY_RUN_EVIDENCE.md). Result: `DRY_RUN_EXECUTED_MIGRATION_STILL_BLOCKED`; `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`, and no apply/import/export/backup/restore/durable write.
+- Post-GAP3 A5-GAP-6 has now been executed for approved evidence consumption only at `7783daa88622df10eea47404f09043f603bce9e0` and recorded in [docs/P66_A5_GAP_6_POST_GAP3_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GAP3_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP3_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized A5-GAP-1/2/3/4/5 summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
