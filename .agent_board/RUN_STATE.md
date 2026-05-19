@@ -332,3 +332,21 @@ Scope:
 - keeps actual rollback, runtime changes, provider, real memory scan, migration/import/export/backup/restore apply, durable writes, public MCP expansion, push/tag/release/deploy, cutover, and readiness claims blocked
 
 Decision: ROLLBACK_DRILL_DESIGN_READY_FOR_REVIEW; project remains NOT_READY_BLOCKED.
+
+## CM-0555 Operational rollback drill read-only rehearsal readiness review
+
+Status: ROLLBACK_REHEARSAL_READY_FOR_READONLY
+Area: P5-rollback-readiness / P10-observability-admin
+Risk: A4 artifact/read-only/A5-boundary review only
+
+Review doc: docs/CM-0555_OPERATIONAL_ROLLBACK_DRILL_READONLY_REHEARSAL_REVIEW.md
+
+Answers:
+
+- Required artifacts: rollback drill design packet, exact rollback target, rehearsal mode, expected changed files for executable drill, preflight Git baseline, rollback evidence source, validation plan, stop conditions, no-readiness wording.
+- Current evidence: enough to prepare a read-only rehearsal, not enough to perform a real rollback.
+- Read-only commands: Git status/log/diff inspection, git diff --check, docs validation.
+- A5-triggering commands/actions: rollback:mainline:plan, active-memory compare/rollback, real rollback/revert/reset/restore, destructive cleanup/backup restore, runtime/source/test/package/config changes, provider, real memory scan, durable write, public MCP expansion, push/tag/release/deploy, cutover, readiness claim.
+- State remains NOT_READY_BLOCKED.
+
+Boundary: no rollback rehearsal command, no real rollback, no destructive/restore command, no src/tests change, no provider, no real memory scan, no durable write, no push/tag/release/deploy, no RC ready claim.
