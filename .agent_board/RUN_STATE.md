@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | RC_PRECHECK_001 readonly evidence captured; prepare post-precheck aggregation packet boundary |
+| Current task | RC_PRECHECK_001 A5-GAP-6 evidence-only aggregation packet prepared |
 | Current area | P6-docs-drift / P10-observability-admin / monthly planning |
 | Last pushed baseline | `103c3ac` on `origin/main`; local `main` is ahead by 9 at `a6030f3` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Executed exact `A5-RC-PRECHECK-READONLY` for `a6030f36b3026d360c6aa99f97a2d1af44365433`; strict gate, HTTP observe, active-memory compare, and rollback all passed; recorded evidence as `PRECHECK_PASSED_NOT_RC_READY`. |
-| Last validation | `git status -sb`; `git rev-parse HEAD`; `git log --oneline --decorate -n 10`; `npm run gate:mainline:strict`; `npm run observe:http -- --json`; active-memory compare/rollback. |
-| Worktree summary | `## main...origin/main [ahead 9]`; readonly precheck evidence docs/board update pending; project remains `NOT_READY_BLOCKED`. |
+| Last action | Prepared `RC_PRECHECK_001` A5-GAP-6 evidence-only aggregation approval packet as `DRAFT_NOT_APPROVED`; no aggregation executed. |
+| Last validation | Pending final docs validation and `git diff --check` for aggregation packet preparation. |
+| Worktree summary | `## main...origin/main [ahead 10]`; aggregation packet docs/board update pending; project remains `NOT_READY_BLOCKED`. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | still blocked: readonly precheck passed, but no push authorization and no RC/cutover readiness; do not push automatically |
-| Next planned action | Prepare A5-GAP-6 evidence-only aggregation packet from readonly precheck evidence; do not execute aggregation without separate exact approval. |
+| Next planned action | Await exact A5-GAP-6 aggregation approval or continue local-safe non-A5 Phase F prep. |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19

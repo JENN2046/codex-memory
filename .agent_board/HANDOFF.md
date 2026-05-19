@@ -37,6 +37,15 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - Results: strict gate `status=ok`, contract `15/15`, tests `1574/1574`, compare `43/43`, rollback `43/43`; HTTP observe `status=ok`, health HTTP `200`.
 - Limitation: recall observation not approved/not run; HTTP observe snapshot read-policy status was `config_only_no_recent_audit`; remaining runtime gaps stay open.
 - Next safe step: prepare A5-GAP-6 evidence-only aggregation packet; do not execute it without exact approval.
+
+## RC_PRECHECK_001 A5-GAP-6 Packet - 2026-05-19
+
+- Packet prepared: [docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_APPROVAL_PACKET.md](/A:/codex-memory/docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_APPROVAL_PACKET.md).
+- Status: `DRAFT_NOT_APPROVED`.
+- Target: `0a6077da748e9a6d2b98b92ca45b01364d76070d`.
+- Source evidence: [docs/RC_PRECHECK_001_READONLY_EVIDENCE.md](/A:/codex-memory/docs/RC_PRECHECK_001_READONLY_EVIDENCE.md).
+- No aggregation execution occurred.
+- Next boundary: exact A5-GAP-6 approval or local-safe non-A5 Phase F prep.
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.

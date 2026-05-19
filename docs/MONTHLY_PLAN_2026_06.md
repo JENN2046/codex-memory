@@ -111,3 +111,13 @@ Evidence: [docs/RC_PRECHECK_001_READONLY_EVIDENCE.md](/A:/codex-memory/docs/RC_P
 Result: `PRECHECK_PASSED_NOT_RC_READY`.
 
 Project status remains `NOT_READY_BLOCKED`. Recall observation, A5-GAP-6 aggregation execution, push, cutover, A5-GAP-7, and readiness claims remain blocked without separate exact approval.
+
+## Week 3 Packet Prepared - 2026-05-19
+
+A draft `A5-GAP-6` evidence-only aggregation approval packet has been prepared after readonly precheck evidence.
+
+Packet: [docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_APPROVAL_PACKET.md](/A:/codex-memory/docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_APPROVAL_PACKET.md).
+
+Status: `DRAFT_NOT_APPROVED`.
+
+No aggregation execution occurred. Project status remains `NOT_READY_BLOCKED`.

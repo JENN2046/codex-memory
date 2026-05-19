@@ -50,3 +50,15 @@ Status: `OPEN_AFTER_READONLY_PRECHECK`\r\n\r\nArea: P6-docs-drift / P10-observab
 Required approval/action: prepare A5-GAP-6 evidence-only aggregation packet, separately approve `A5-RC-PRECHECK-RECALL` with subject/query/audit boundary if needed, or choose local-safe non-A5 Phase F work.
 
 Safe state: `PRECHECK_PASSED_NOT_RC_READY` for readonly evidence, project remains `NOT_READY_BLOCKED`; no recall, aggregation execution, push, or cutover.
+
+## CMB-0008 - RC_PRECHECK_001 A5-GAP-6 aggregation approval required
+
+Status: `OPEN`
+
+Area: P10-observability-admin / validation-aggregator
+
+Reason: `RC_PRECHECK_001` readonly evidence exists, but evidence-only aggregation execution is a separate A5 boundary and has not been approved.
+
+Required approval/action: use the exact approval line in [docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_APPROVAL_PACKET.md](/A:/codex-memory/docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_APPROVAL_PACKET.md) after refreshing target commit if `HEAD` changes.
+
+Safe state: packet is `DRAFT_NOT_APPROVED`; no aggregation execution, recall, provider, real memory broad scan, migration/apply, config/watchdog/startup change, public MCP expansion, durable write, push, cutover, A5-GAP-7, or readiness claim.
