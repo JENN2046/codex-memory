@@ -10,13 +10,13 @@ Decision: `NOT_READY_BLOCKED`
 
 ## Purpose
 
-This document consolidates the current P66 runtime-gap truth after the pushed review-patch baseline reached:
+This document consolidates the current P66 runtime-gap truth after the pushed review-patch baseline and later A5 evidence docs reached:
 
 ```text
-origin/main == a9177d5
+origin/main == 103c3ac
 ```
 
-Local `main` may be ahead of `origin/main`; exact `HEAD`, ahead/behind, and worktree state must be verified from Git commands before any approval or execution.
+At the latest project review, local `main` and `origin/main` were aligned at `103c3ac` with a clean tracked worktree before docs/board cleanup. Exact `HEAD`, ahead/behind, and worktree state must still be verified from Git commands before any approval or execution.
 
 It is a current-state dashboard only. It does not execute runtime proofs, start HTTP MCP, call providers, read real memory, scan runtime stores, apply migration/import/export/backup/restore work, write durable memory or audit state, expand public MCP tools, push, tag, release, deploy, execute cutover, or claim `RC_READY`.
 
