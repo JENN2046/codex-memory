@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - MONTHLY_PLAN_2026_06 baseline freeze - 2026-05-19
+
+- Status: `NOT_READY_BLOCKED`.
+- Local anchor before monthly-plan commit: `8d3f07b docs: record rc precheck push readiness`.
+- Git position: `main...origin/main [ahead 8]`.
+- Remote baseline: `origin/main = 103c3ac`.
+- Completed in this slice: created monthly plan record, refreshed board baseline, preserved `CMB-0006`, and kept A4.8 safe-push fail-closed.
+- Blocked: `CM-0512` and `CM-0513` by `CMB-0006` until exact A5 approval.
+- Validation required for this checkpoint: `git diff --check`, docs validation, stale/readiness wording scan, and docs/board scope review.
+- Not run: strict gate, HTTP observe, recall path, compare/rollback, provider, migration/apply, config/watchdog/startup, push/tag/release/deploy/cutover.
 ## Checkpoint - RC_PRECHECK_001 weekly reconciliation - 2026-05-19
 
 - Status: `NOT_READY_BLOCKED`

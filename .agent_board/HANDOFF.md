@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record read-only verifier and push-readiness result for `RC_PRECHECK_001`; stop before push because safe-push does not fully pass while `CMB-0006` remains open.
+Prepare `MONTHLY_PLAN_2026_06` from the completed `RC_PRECHECK_001` push-readiness report; keep `CMB-0006` open and stop before A5/push boundaries.
 
 ## Workspace
 
@@ -14,12 +14,21 @@ Record read-only verifier and push-readiness result for `RC_PRECHECK_001`; stop 
 
 ## Worktree
 
-Current Git reality before push-readiness report commit: `## main...origin/main [ahead 7]`; latest local HEAD is `576d708`; `origin/main` remains `103c3ac`.
+Current Git reality at monthly-plan start: `## main...origin/main [ahead 8]`; latest local HEAD is `8d3f07b`; `origin/main` remains `103c3ac`.
 
 ## Current Area
 
-P6 docs-drift / P10 observability-admin; `AGENTS.md` governance cleanup and `RC_PRECHECK_001` target refresh preparation.
+P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze and RC_PRECHECK_001 approval-boundary maintenance.
 
+
+## Monthly Plan Baseline - 2026-05-19
+
+- `MONTHLY_PLAN_2026_06` is the next local planning record.
+- Local anchor is `8d3f07b docs: record rc precheck push readiness`.
+- Local `main` is ahead of `origin/main` by 8 commits; no push is authorized by this record.
+- `CMB-0006` remains the controlling blocker for `CM-0512` and `CM-0513`.
+- Default month path: local-safe docs/board/fixture/test-only work; exact A5 approval required for readonly precheck or recall observation.
+- Required status remains `NOT_READY_BLOCKED`.
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.

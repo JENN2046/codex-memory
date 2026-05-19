@@ -34,3 +34,7 @@ NOT_READY_BLOCKED
 ## Target Freshness
 
 This non-A5 precheck record was refreshed after governance cleanup commit `c943a42`. Any future full precheck must bind to the then-current exact `HEAD` before A5 commands run.
+
+## Monthly Supersession Note - 2026-05-19
+
+This record remains historical evidence for the `c943a42` non-A5 precheck stage. The active month-start planning anchor is `8d3f07b`; any future full precheck must bind to the execution-time exact `HEAD` and update the approval packet before A5 commands run.

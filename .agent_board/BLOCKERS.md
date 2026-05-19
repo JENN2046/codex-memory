@@ -42,3 +42,15 @@ Stop before:
 - destructive commands
 - writing outside workspace root
 - overwriting user-owned uncommitted changes
+
+## CMB-0007 - Monthly plan remains local-safe until A5 approval
+
+Status: `OPEN`
+
+Area: P6-docs-drift / P10-observability-admin
+
+Reason: `MONTHLY_PLAN_2026_06` may prepare precheck evidence chains, but execution of strict gate as RC evidence, HTTP observe, recall observation, active-memory compare/rollback, aggregation, push, release, deploy, or cutover still requires exact approval or fully passing A4.8 safe-push policy where applicable.
+
+Required approval/action: provide exact approval for `A5-RC-PRECHECK-READONLY`, separately approve `A5-RC-PRECHECK-RECALL` with subject/query/audit boundary, or choose local-safe non-A5 Phase F work.
+
+Safe state: `NOT_READY_BLOCKED`; no A5 commands run; no push.
