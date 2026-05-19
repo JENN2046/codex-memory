@@ -261,3 +261,11 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: CM_0549A_DESIGN_PACKET_READY_FOR_REVIEW.
 - Boundary: docs/design only; no runtime code, tests, HTTP service startup, provider call, real memory scan, durable memory write, package change, push, tag, release, deploy, cutover, or readiness claim.
 - Next safe step: review CM-0549A before selecting HTTP runtime implementation.
+
+## CM-0550 closeout notes
+
+- Current state: HTTP session TTL/cap/cleanup local runtime hardening completed in `16538ea`.
+- Decision: LOCAL_RUNTIME_HARDENING_COMPLETED_NOT_READY.
+- Project state: NOT_READY_BLOCKED.
+- Validation evidence: `node --test tests\mcp-http.test.js` passed `13/13`; `git diff --check` passed during implementation review.
+- Boundary: no RC precheck, no live HTTP observe, no provider, no real memory scan, no config/watchdog/startup change, no push/tag/release/deploy, no readiness claim.

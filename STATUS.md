@@ -261,3 +261,28 @@ CM-0549 has been patched with exact defaults, accepted ranges, invalid env fallb
 No runtime code, tests, HTTP service startup, provider call, real memory scan, durable write, package change, push, tag, release, deploy, or readiness claim changed in this slice.
 
 Next safe step: review CM-0549A before selecting any HTTP runtime implementation task.
+
+## CM-0550 HTTP session lifecycle hardening closeout
+
+Status: COMPLETED_VALIDATED
+Result: LOCAL_RUNTIME_HARDENING_COMPLETED_NOT_READY
+State: NOT_READY_BLOCKED
+
+HTTP MCP session lifecycle hardening has been implemented locally in `16538ea fix: harden HTTP MCP session lifecycle`.
+
+Completed local runtime hardening:
+
+- absolute session TTL
+- idle session TTL
+- max sessions
+- max streams per session
+- cleanup interval
+- invalid env fallback with warning metadata
+- HTTP 429 cap error shape
+
+Validation recorded for the implementation slice:
+
+- `node --test tests\mcp-http.test.js` passed `13/13`
+- `git diff --check` passed
+
+This closes the local HTTP session TTL/cap/cleanup hardening item only. It does not start RC precheck, does not claim live HTTP production readiness, does not modify config/watchdog/startup, and does not change `NOT_READY_BLOCKED`.

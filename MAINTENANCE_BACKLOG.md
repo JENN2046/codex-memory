@@ -264,3 +264,32 @@ Added implementation preconditions:
 - cap errors use HTTP 429 with sanitized error/code/message/meta envelope
 
 Boundary: no runtime implementation in CM-0549A; no source/test/provider/real-memory/durable-write/package/push/tag/release/deploy action.
+
+## CM-0550 HTTP session lifecycle hardening closeout
+
+Status: COMPLETED_VALIDATED
+Area: P4-http-runtime / P10-observability-admin
+Risk: completed local runtime hardening; no release/cutover readiness claim
+
+Local commit: `16538ea fix: harden HTTP MCP session lifecycle`
+
+Completed:
+
+- session absolute TTL
+- idle TTL
+- max sessions
+- max streams per session
+- cleanup interval
+- invalid env fallback plus warning metadata
+- HTTP 429 cap error shape
+- targeted HTTP tests updated and passed
+
+Remaining boundaries:
+
+- no RC precheck started
+- no push/tag/release/deploy in this closeout
+- no config/watchdog/startup change
+- no provider call
+- no real memory scan
+- no migration/import/export/backup/restore apply
+- project state remains `NOT_READY_BLOCKED`
