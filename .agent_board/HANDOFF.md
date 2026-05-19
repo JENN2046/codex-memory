@@ -686,3 +686,13 @@ Validation: combined Phase F fixture tests passed 22/22; docs validation passed;
 Not validated: runtime LightMemo recall, real memory stores, provider, HTTP observe, public MCP schema
 Remaining risk: fixture evidence is not runtime parity proof
 Next safe step: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan
+
+## CM-0546 fixture plan handoff
+
+Goal: Prepare Phase F EPA/ResidualPyramid chain metadata synthetic fixture plan.
+Status: COMPLETED_VALIDATED after local validation.
+Changed files: docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_PLAN.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: docs validation; git diff --check; readiness scan
+Not validated: runtime EPA/ResidualPyramid recall behavior, real memory stores, provider, HTTP observe, public MCP schema
+Remaining risk: planned fixture evidence will not be runtime parity proof
+Next safe step: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract

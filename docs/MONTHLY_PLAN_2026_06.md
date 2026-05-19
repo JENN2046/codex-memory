@@ -271,3 +271,13 @@ Scope: close out the synthetic LightMemo directory semantics fixture pack and pr
 Deliverable: `docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_PACK_CLOSEOUT_REVIEW.md`
 
 Boundary: docs/board evidence only; no runtime mutation, real recall observation, provider call, public MCP expansion, push, release, deploy, cutover, or readiness claim.
+
+## CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan
+
+Status: COMPLETED_VALIDATED after local validation
+Week: Phase F local safety work
+Scope: prepare synthetic EPA/ResidualPyramid chain metadata fixture plan and preserve NOT_READY_BLOCKED.
+
+Deliverable: `docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_PLAN.md`
+
+Boundary: docs/board planning only; no runtime mutation, real recall observation, provider call, public MCP expansion, push, release, deploy, cutover, or readiness claim.

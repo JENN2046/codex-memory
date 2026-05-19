@@ -739,3 +739,13 @@ Changed files: docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_PACK_CLOSEOUT_
 Validation: combined Phase F fixture tests passed 22/22; docs validation passed; readiness scan returned historical entries plus intended denial/boundary wording only; git diff --check passed after EOF cleanup
 Boundary: no runtime source change, no provider, no real memory scan, no HTTP observe, no public MCP expansion, no durable write, no push, no cutover, no readiness claim
 Next: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan
+
+## CM-0546 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P7-vcp-parity-hardening
+Scope: docs/board plan for synthetic EPA/ResidualPyramid chain metadata fixture pack
+Changed files: docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_PLAN.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: docs validation passed; git diff --check passed; readiness scan returned historical entries plus intended denial/boundary wording only
+Boundary: no runtime source change, no real recall-chain observation, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no push, no cutover, no readiness claim
+Next: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract

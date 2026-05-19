@@ -213,3 +213,15 @@ State: NOT_READY_BLOCKED
 Local closeout review has been completed for the synthetic Phase F LightMemo directory semantics fixture pack. The review records fixture-only coverage boundaries and does not claim runtime parity, real LightMemo recall validation, RC readiness, or cutover readiness.
 
 Next safe task: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan.
+
+## CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan
+
+Status: COMPLETED_VALIDATED
+Result: COMPLETED_VALIDATED
+State: NOT_READY_BLOCKED
+
+Local docs-only fixture plan has been prepared for Phase F EPA/ResidualPyramid chain metadata semantics. It defines future synthetic coverage for EPA expansion/pruning metadata, ResidualPyramid layer metadata, chain handoff metadata, and negative readiness cases.
+
+This does not claim runtime parity, real EPA/ResidualPyramid recall validation, RC readiness, or cutover readiness.
+
+Next safe task: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract.

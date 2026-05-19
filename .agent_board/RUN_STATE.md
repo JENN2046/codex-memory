@@ -232,3 +232,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: fixture/test/docs/board only; no runtime/source change, no real LightMemo recall, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
 - Next safe task: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan.
+
+## CM-0546 current-state record
+
+- Current state: Phase F EPA/ResidualPyramid chain metadata fixture plan prepared locally.
+- Decision: NOT_READY_BLOCKED.
+- Boundary: docs/board planning only; no runtime recall-chain execution, no real EPA/ResidualPyramid observation, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
+- Next safe task: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract.
