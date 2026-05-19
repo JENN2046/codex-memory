@@ -2,6 +2,7 @@
 
 | ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |
 |---|---|---|---|---|---|---|---|
+| CMV-0577 | `git diff --check`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; trailing whitespace scan; top-level status stale-baseline scan | P6-docs-drift / P0-mainline-health | Supreme Commander protocol | COMPLETED_VALIDATED | Added protocol entrypoint, wired A4.8/4-Agent/AGENTS links, and reconciled top-level status / next-phase surfaces to `a9177d5`. Historical queue/ledger rows may still mention older baselines as record evidence. | push requires explicit instruction | 2026-05-19 |
 | CMV-0001 | `npm run gate:mainline` | P0-mainline-health | push-after-1159873 | COMPLETED_VALIDATED | health `200`, compare `36/36 matched`, rollback `36/36 rollback-ready` | none | 2026-05-05 |
 | CMV-0002 | `git diff --check -- AGENTS.md README_CODEX_MEMORY_AUTOPILOT.md scripts/validate-local.ps1 scripts/validate-local.sh .agent_board/*.md` | P6-docs-drift | autopilot rail | COMPLETED_VALIDATED | whitespace/diff check passed | run local docs validator | 2026-05-05 |
 | CMV-0003 | `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` | P6-docs-drift | autopilot rail | FAILED | initial run exposed `Run-Step` argument forwarding bug in `scripts/validate-local.ps1` | fixed script and reran | 2026-05-05 |

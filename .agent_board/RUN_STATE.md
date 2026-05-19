@@ -6,25 +6,25 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | PASS_WITH_PATCH_RECOMMENDED review patch: HTTP no-token mutation tool set, Final RC runner authorization semantics, baseline/status reconciliation, and P66 runtime gap truth table |
-| Current area | P10-observability-admin |
-| Last pushed baseline | `0dec735` on `origin/main` |
+| Current task | Supreme Commander local autopilot protocol completed locally; push remains blocked unless explicitly requested |
+| Current area | P6-docs-drift / P0-mainline-health |
+| Last pushed baseline | `a9177d5` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Implemented local review patch and P66 gap dashboard consolidation on top of `HEAD == origin/main == 0dec735`. |
-| Last validation | Review patch passed `node --test tests\mcp-http.test.js` (8/8), `node --test tests\final-rc-runtime-evidence-runner.test.js` (5/5), `git diff --check`, and active status drift scan. |
-| Worktree summary | Baseline before this local slice is `HEAD == origin/main == 0dec735`; current worktree contains intended validated local review-patch edits only. No provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/cutover/RC_READY is authorized. |
+| Last action | Added Supreme Commander protocol docs and reconciled active status/board/next-phase surfaces to `a9177d5`. |
+| Last validation | Supreme Commander protocol / next-phase reconciliation slice passed `git diff --check`, docs validation, trailing whitespace scan, and active stale-baseline scan. Prior review patch passed targeted tests and was pushed to `origin/main` in `a9177d5`. |
+| Worktree summary | Baseline before this local slice is `HEAD == origin/main == a9177d5`; current worktree contains intended local docs/board protocol edits only. No provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/cutover/RC_READY is authorized. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
-| Safe-push readiness | no push is authorized for this local review patch unless explicitly requested |
-| Next planned action | Keep runtime-gap closure blocked until explicit runtime/A5 authorization; no push is authorized unless explicitly requested. |
+| Safe-push readiness | no push is authorized for this local protocol slice unless explicitly requested |
+| Next planned action | Stop before push unless explicitly requested; future project autopilot should use the Supreme Commander protocol as the controlling A4.8 entrypoint. |
 
 ## Notes
 
 - Project health: strong.
 - Governance health: strong.
-- Current truth: Git reality is authoritative; baseline before this local slice is `HEAD == origin/main == 0dec735`. P66.40 through P66.60 and the review-blocker fix are pushed. The seven P66.3 local proof slices are complete with no remaining local-safe closure work. All corresponding runtime gaps remain open and `NOT_READY_BLOCKED` remains controlling; the current local slice only tightens guard/report semantics and consolidates the P66 truth table.
+- Current truth: Git reality is authoritative; baseline before this local slice is `HEAD == origin/main == a9177d5`. P66.40 through P66.60, the review-blocker fix, and the review patch safety semantics are pushed. The seven P66.3 local proof slices are complete with no remaining local-safe closure work. All corresponding runtime gaps remain open and `NOT_READY_BLOCKED` remains controlling; the current local slice only adds the Supreme Commander protocol and reconciles active status surfaces.
 - Completion boundary records: `CMB-0005`, `CMD-0012`, and `RR-0004` are controlling records for resume; completion audit fixtures still require `objectiveComplete=true`, zero runtime gaps, and zero A5 hard stops before any completion claim.
 - Release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`; helper output safety is hardened without changing runtime readiness.
 - Superseded artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.

@@ -60,6 +60,12 @@ In short, A4.8 can auto-plan, auto-execute, auto-validate, auto-commit, auto-rea
 - run push readiness after guarded commits
 - safe-push when the safe-push policy passes
 
+## Supreme Commander Application
+
+The [Supreme Commander Autopilot Protocol](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) is the current top-level application of this rail.
+
+It does not add new authority. It names the controlling A4.8 role that reconciles repository reality, chooses the next safe local task, writes Worker contracts, runs validation, updates `.agent_board`, and stops at A5 hard boundaries with an approval packet instead of executing the blocked action.
+
 ## What A4.8 Must Not Do
 
 - bypass any A5 hard stop
@@ -87,6 +93,7 @@ For P12 controlled write work:
 
 ## Related Rails
 
+- [SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md)
 - [SAFE_PUSH_POLICY.md](/A:/codex-memory/docs/SAFE_PUSH_POLICY.md)
 - [VALIDATION_SELECTION_MATRIX.md](/A:/codex-memory/docs/VALIDATION_SELECTION_MATRIX.md)
 - [AUTOPILOT_FAILURE_RECOVERY.md](/A:/codex-memory/docs/AUTOPILOT_FAILURE_RECOVERY.md)

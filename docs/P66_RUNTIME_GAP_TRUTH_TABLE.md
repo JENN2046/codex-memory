@@ -13,7 +13,7 @@ Decision: `NOT_READY_BLOCKED`
 This document consolidates the current P66 runtime-gap truth after the repository reached:
 
 ```text
-HEAD == origin/main == 0dec735
+HEAD == origin/main == a9177d5
 ```
 
 It is a current-state dashboard only. It does not execute runtime proofs, start HTTP MCP, call providers, read real memory, scan runtime stores, apply migration/import/export/backup/restore work, write durable memory or audit state, expand public MCP tools, push, tag, release, deploy, execute cutover, or claim `RC_READY`.

@@ -1,10 +1,10 @@
 # codex-memory Next Phase Plan
 
-更新时间：2026-05-18
+更新时间：2026-05-19
 
 ## Purpose
 
-This active plan is the short routing document for the current P51-P62 Runtime-Enforced Governed Memory Spine Completion program. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
+This active plan is the short routing document for the current post-P66 local-safe project-operator work. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
 
 ## Current Direction
 
@@ -26,6 +26,8 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 16. The remaining work is still blocked at runtime evidence and A5 authorization boundaries; do not convert P63/P64 local runner execution into final RC, cutover, push, release, deploy, config, watchdog, or `RC_READY` claims.
 17. Treat `CMB-0005`, `CMD-0012`, and `RR-0004` as controlling records for resume and completion-boundary decisions.
 18. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
+19. P66 local proof chain is exhausted and the review patch safety semantics are pushed in `a9177d5`; seven runtime gaps remain open.
+20. Supreme Commander local autopilot protocol is the current A4.8 project-operator entrypoint; it does not add A5 authority.
 
 ## Current Completed Local Chain
 
@@ -59,41 +61,15 @@ This active plan is the short routing document for the current P51-P62 Runtime-E
 
 ## Current Task
 
-P51-P62 Runtime-Enforced Governed Memory Spine Completion:
+Supreme Commander local project-operator protocol and active state reconciliation:
 
-- P51-T1 post-P50 push board/status reconciliation is complete locally in `1f89c63`.
-- P52-T1 runtime schema-version enforcement boundary plan is complete and committed locally in `884f2f6`.
-- P52-T2 minimal runtime enforcement helper is complete, validated, and locally committed.
-- P53-T1 ValidationAggregator evidence inventory is complete and validated.
-- P53-T2 ValidationAggregator inventory posture bridge is complete and validated.
-- P53-T3 explicit evidence classification hardening is complete, validated, and locally committed in `0a5016d`.
-- P54-T1 final RC runner safe command inventory is complete and validated.
-- P54-T2 final RC runner explicit command-result helper is complete and validated.
-- P54-T3 local runner execution harness preflight is complete and validated.
-- P54-T4 allowlisted local runner execution adapter is complete and validated as an injected-executor contract only; tests use fake executor and no real shell/runtime command chain was run by the helper.
-- P55-T1 evidence-to-runtime enforcement trace contract is complete and validated.
-- P55-T2 evidence-to-runtime enforcement explicit-input helper is complete and validated.
-- P56-T1 governance review/approval/audit executable loop boundary contract is complete and validated.
-- P56-T2 governance loop explicit-input helper is complete, validated, and locally committed in `f69fbbb`.
-- P57-T1 recall isolation runtime proof boundary inventory is complete, validated, and locally committed in `c89a772`.
-- P57-T2 recall isolation runtime proof explicit-input evaluator is complete, validated, and locally committed in `6f29757`.
-- P58-T1 migration/import-export/backup-restore approval framework boundary inventory is complete, validated, and locally committed in `5326169` as docs/fixture/test evidence only.
-- P58-T2 migration/import-export/backup-restore approval framework explicit-input helper is complete, validated, and locally committed in `2470634`.
-- P59-T1 HTTP runtime observability / operation hardening boundary inventory is complete, validated, and locally committed in `c57be03` as docs/fixture/test evidence only.
-- P59-T2 HTTP observability explicit-input evidence helper is complete, validated, and locally committed in `a036c8d`.
-- P60-T1 no-touch / no-leak / redaction long-term regression is complete, validated, and locally committed in `66d1978`.
-- P61-T1 mainline strict gate + RC evidence report boundary inventory is complete, validated, and locally committed in `360f4f9` as docs/fixture/test evidence only; post-commit board reconciliation is locally committed in `2811da3`.
-- P61-T2 RC evidence report explicit-input helper is complete, validated, and locally committed in `15739cb`.
-- P62-T1 v1.0 RC cutover preflight boundary inventory is complete, validated, and locally committed in `7baa384`.
-- P62-T2 completion audit / gap report is complete, validated, and locally committed in `496d681`.
-- P62-T3 prompt-to-artifact completion audit checklist is complete, validated, and locally committed in `4696482`.
-- P62-T4 A5/runtime authorization precondition matrix is complete, validated, and locally committed in `c97736d`.
-- P62-T5 A5/runtime authorization precondition explicit-input helper is complete, validated, and locally committed in `8535da1`.
-- P62-T6 completion audit refresh is complete, validated, and locally committed in `d5808bd`; it maps P62-T5 helper evidence into the completion audit and prompt-to-artifact audit without granting runtime authority.
-- P62 post-T6 audit wording refinement, prompt-to-artifact validation refs, and completion audit local-item mapping are complete, validated, and locally committed; current local `HEAD` is intentionally verified from Git commands instead of hard-coded in this routing file.
-- P63-T1 final RC runtime evidence bridge is implemented locally with `src/core/FinalRcRuntimeEvidenceRunner.js`, `src/cli/final-rc-matrix-runner.js`, targeted tests, and `docs/P63_FINAL_RC_RUNTIME_EVIDENCE_BRIDGE.md`; the real runner execution passed 11/11 critical gates and recorded local evidence in `logs/p63-final-rc-runtime-evidence-report-01.md`.
-- P64-T1 runtime schema/version write-boundary proof is implemented locally with `src/core/MemoryWriteService.js`, `tests/schema-version-runtime-boundary.test.js`, ValidationAggregator status updates, and `docs/P64_RUNTIME_SCHEMA_VERSION_WRITE_BOUNDARY_EVIDENCE.md`; the refreshed real runner execution passed 12/12 critical gates and recorded local evidence in `logs/p64-runtime-schema-version-write-boundary-evidence-report-01.md`.
-- Preserve `NOT_READY_BLOCKED`; do not infer mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P50 local evidence completion, P52 helper evidence, P53 inventory evidence, P54 command chain evidence, P55 trace evidence, P56 boundary/helper evidence, P57 boundary/helper evidence, P58 boundary/helper evidence, P59 boundary/helper evidence, P60 regression evidence, P61 report helper evidence, P63 local runner evidence, or P64 write-boundary evidence.
+- `HEAD == origin/main == a9177d5` is the current pushed baseline before this local docs/board slice.
+- PASS_WITH_PATCH_RECOMMENDED review patch is pushed in `a9177d5`.
+- P66 local proof chain is complete as local evidence organization only; seven runtime gaps remain open.
+- [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md) is the current runtime-gap dashboard.
+- [docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) is the local A4.8 control protocol for choosing and validating future safe work.
+- Current local work is docs/board-only active state reconciliation. It does not execute runtime, start services, scan real stores, write durable state, expand public MCP, or claim readiness.
+- Preserve `NOT_READY_BLOCKED`; do not infer mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P66 local evidence, P63/P64 local runner evidence, the P66 truth table, or the Supreme Commander protocol.
 
 ## Boundaries
 
@@ -112,14 +88,13 @@ P51-P62 Runtime-Enforced Governed Memory Spine Completion:
 
 ## Next Candidate
 
-After P64-T1 local schema/version write-boundary evidence:
+After the Supreme Commander protocol / active-state reconciliation slice:
 
-- Stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, runtime execution, or `RC_READY` claim unless explicitly authorized.
-- Current local-only candidate: P65-T1 ValidationAggregator explicit runtime evidence summary ingestion. This is a stricter ValidationAggregator full-implementation evidence slice, but it remains explicit-input-only and cannot claim runtime readiness, final RC readiness, v1.0 RC readiness, or `RC_READY`.
-- P65.1 Final RC runner executed-field semantics hardening is the immediate follow-up: local allowlisted runner execution must be reported through `localRuntimeEvidenceMatrixExecuted` / `allowlistedFinalRcEvidenceRunnerExecuted`, while `finalRcMatrixExecuted=false`, `fullFinalRcMatrixExecuted=false`, and explicit full-matrix execution/readiness rejection continue to block full RC matrix readiness claims.
-- P65.2 push readiness approval request is the current docs/board phase: it records that local `main` is ahead of `origin/main` by the validated P65 chain and requests explicit approval before any `git push origin main`. Approval remains `NOT_APPROVED`; push remains blocked.
-- P66 remaining runtime gap inventory refresh records the current post-P65 truth: P63/P64 locally evidenced `runtime_schema_version_enforcement_not_fully_proven` and `final_rc_matrix_runner_not_executed_as_real_matrix`; seven runtime gaps remain open and sixteen A5 hard stops remain blocked.
-- P66.1 ValidationAggregator full-implementation definition is the current local fixture/test slice. It defines full implementation criteria, fail-closed cases, seven remaining runtime gaps, and sixteen A5 hard stops while preserving `NOT_READY_BLOCKED`.
+- Stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, runtime execution, durable write, real memory/runtime-store scan, public MCP expansion, or `RC_READY` claim unless explicitly authorized.
+- Current local-safe candidate: select one new A4/A4.8 task from `MAINTENANCE_BACKLOG.md` or `.agent_board/TASK_QUEUE.md` that is not another P66 runtime-gap closure claim.
+- If the next useful work would close any of the seven runtime gaps in [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md), stop and prepare an A5 approval packet instead of executing it.
+- If no non-A5 implementation task is available, the next local-safe action is a docs/board routing closeout and explicit A5 approval request, not more P67/P68 gap proliferation.
+- P65-T1 through P66.60 and the review patch are historical completed evidence; do not present them as the next current candidate.
 - P66.2 ValidationAggregator definition static bridge is complete locally. 中文解释：ValidationAggregator 现在只把 P66.1 定义作为静态、非授权 report-shape evidence 展示；它不读取 fixture、不执行 runtime、不声明 readiness。
 - P66.3 ValidationAggregator full-implementation runtime plan is complete locally. 中文解释：P66.3 只把 7 个剩余 runtime gap 的本地安全推进顺序、A5 边界和 fail-closed 规则锁进 docs/fixture/test；它不执行 runtime 或声明 readiness。
 - P66.4 ValidationAggregator gap priority fixture tests is complete locally. 中文解释：P66.4 只锁定第一个剩余 gap 的验收证据组和禁用动作；它不关闭 gap、不实现 runtime、不声明 readiness。
@@ -158,5 +133,5 @@ After P64-T1 local schema/version write-boundary evidence:
 - P66.37 ValidationAggregator governance runtime loop gap planning is complete locally as docs/fixture/test planning. 中文解释：P66.37 只把 `governance_review_approval_audit_runtime_loop_not_executed` 的本地 proof 路线锁定为 fixture/test/pure-helper/static-bridge 后续工作；不能执行 governance runtime loop、写 durable audit/memory、调用 provider、启动服务或声明 `RC_READY`。
 - P66.38 ValidationAggregator governance runtime loop gap fixture tests is complete locally as docs/fixture/test acceptance contract. 中文解释：P66.38 只锁定治理运行环的 identity、scope、approval、audit refs、stage ordering、required runtime evidence 和 fail-closed 合同；不能执行 runtime loop、approval、durable audit/memory write 或 readiness claim。
 - P66.39 ValidationAggregator governance runtime loop gap helper is complete locally. 中文解释：P66.39 只新增纯 explicit-input helper 来校验 caller-provided governance loop metadata；它不读取真实 packet/log/memory、不执行 approval/runtime/gate/runner/service/provider、不写 durable audit/memory、不扩大 public MCP、不声明 readiness。
-- Recommended next local phase: P66.40 ValidationAggregator governance runtime loop gap static bridge. 中文解释：下一步只能把 P66.39 helper 能力作为静态、非授权 report-shape evidence 接入 ValidationAggregator；aggregator 不得 import/execute helper、不读真实 packet/log、不执行 approval/runtime、不写 durable audit/memory 或声明 readiness。
-- After P65-T1, continue one remaining runtime proof gap at a time; any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, durable write, migration/import-export apply, public MCP expansion, or readiness claim still requires separate explicit authorization.
+- P66.40-P66.60 and the follow-up review patch are complete and pushed/reconciled through `a9177d5`; do not continue the same runtime-gap proof series as if it were still the current next phase.
+- After this routing reconciliation, the Supreme Commander must select a new non-A5 local task from active backlog/board, or prepare an explicit A5 approval packet if the next valuable work would touch runtime gap closure. Any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, durable write, migration/import-export apply, public MCP expansion, or readiness claim still requires separate explicit authorization.

@@ -28,6 +28,14 @@
 
 ## 四类逻辑角色
 
+### 0. Supreme Commander
+
+`Supreme Commander` 不是第五个 Worker。
+
+它是 A4.8 下的最高本地控制角色：负责读仓库现实、选择下一条安全任务、写 task contract、分配 Worker/Verifier、收口验证、更新 `.agent_board`，并在 A5 hard stop 前生成 approval packet 而不是越权执行。
+
+详细协议见 [SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md)。
+
 ### 1. Commander
 
 主控会话。

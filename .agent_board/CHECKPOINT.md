@@ -2,16 +2,16 @@
 
 ## Current Goal
 
-Close out the seven remaining runtime gaps to the fullest local-safe extent, then leave explicit runtime/A5 blocked boundaries.
+Implement the Supreme Commander local autopilot protocol and reconcile active status/board surfaces to the pushed `a9177d5` review-patch baseline while preserving all runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to A5/runtime boundary after P64 schema write-boundary proof.
+P6 docs-drift / P0 mainline-health; A4.8 Supreme Commander protocol and status reconciliation.
 
 ## Current Status
 
-- Last pushed baseline: `1a3d309 fix: reconcile p66 post-push review state` on `origin/main`.
-- Local `main` is ahead of `origin/main = 1a3d309` with P66.60 current-state reconciliation and review-blocker fix work pending push; verify exact current state with `git status -sb` before new work.
+- Last pushed baseline: `a9177d5 fix: tighten review patch safety semantics` on `origin/main`.
+- Local `main` started this protocol slice at `HEAD == origin/main == a9177d5`; verify exact current state with `git status -sb` before new work.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
@@ -59,7 +59,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.11 ValidationAggregator evidence freshness closeout is implemented, validated, and committed locally in `644d17c`.
 - P66.12 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
 - P66.60 runtime gap current-state reconciliation is implemented as docs/board only and confirms that no further local-safe work remains for the seven remaining runtime gaps.
-- P66.60 review blocker fix removes stale pushed/aligned wording and records local pending-push state correctly.
+- P66.60 review blocker fix and follow-up review patch safety semantics are pushed through `a9177d5`.
+- Supreme Commander local autopilot protocol is implemented and validated locally; it adds no new A5 authority.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 
@@ -497,4 +498,6 @@ P66.12 ValidationAggregator baseline binding proof fixture defines explicit targ
 
 Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-execution/RC_READY boundary unless explicitly authorized. Treat `CMD-0012`, `CMB-0005`, and `RR-0004` as controlling records for any resume that might otherwise treat local runner evidence as final RC or RC readiness.
 
-PASS_WITH_PATCH_RECOMMENDED review patch is implemented and validated locally on top of `HEAD == origin/main == 0dec735`. It tightens HTTP no-token mutation blocking with a conservative mutation-sensitive tool set, adds Final RC runner authorization posture fields (`authorizationClass=A4_LOCAL_EXECUTABLE_VALIDATION`, `cutoverAuthorized=false`, and `requiresA5For`), reconciles active baseline/status wording, and adds [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md). Validation passed: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan. No provider call, real memory/runtime-store scan, migration/import/export/backup/restore apply, durable write, public MCP expansion, config/watchdog/cutover, push, tag, release, deploy, or readiness claim occurred.
+PASS_WITH_PATCH_RECOMMENDED review patch is implemented, validated, and pushed in `a9177d5`. It tightens HTTP no-token mutation blocking with a conservative mutation-sensitive tool set, adds Final RC runner authorization posture fields (`authorizationClass=A4_LOCAL_EXECUTABLE_VALIDATION`, `cutoverAuthorized=false`, and `requiresA5For`), reconciles active baseline/status wording, and adds [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md). Validation passed: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan. No provider call, real memory/runtime-store scan, migration/import/export/backup/restore apply, durable write, public MCP expansion, config/watchdog/cutover, tag, release, deploy, or readiness claim occurred.
+
+Supreme Commander protocol slice is implemented and validated locally. It adds [docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md), wires the protocol into A4.8 / Single-Window 4-Agent / AGENTS entrypoints, and reconciles active status/board/next-phase wording to `a9177d5`. Validation passed: `git diff --check`, docs validation, trailing whitespace scan, and active stale-baseline scan. No service start, provider call, real memory/runtime-store scan, migration/import/export/backup/restore apply, durable write, public MCP expansion, config/watchdog/cutover, tag, release, deploy, push, or readiness claim occurred.

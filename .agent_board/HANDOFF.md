@@ -2,7 +2,7 @@
 
 ## Goal
 
-Close out the remaining runtime-gap work under local A4/A4.8 boundaries by exhausting all local-safe proof work, reconciling current state, and leaving explicit blocked boundaries where runtime/A5 authority is required.
+Implement the Supreme Commander local autopilot protocol as a safe A4.8 project-operator entrypoint, reconcile active status surfaces to the pushed review-patch baseline, and keep all runtime/A5 boundaries blocked.
 
 ## Workspace
 
@@ -14,16 +14,16 @@ Close out the remaining runtime-gap work under local A4/A4.8 boundaries by exhau
 
 ## Worktree
 
-Baseline before the current local review-patch slice is `HEAD == origin/main == 0dec735 docs: fix p66 pending push baseline wording`. The current worktree contains intended local review-patch edits until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Baseline before the current local protocol slice is `HEAD == origin/main == a9177d5 fix: tighten review patch safety semantics`. The current worktree contains intended docs/board protocol edits until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to A5/runtime boundary after P64 schema write-boundary proof.
+P6 docs-drift / P0 mainline-health; Supreme Commander protocol and active status baseline reconciliation.
 
 ## Current Truth
 
-- P46-P66 pushed baseline is now `origin/main = 0dec735`; P66.60 and its review-blocker fix are already pushed.
-- Current local slice implements PASS_WITH_PATCH_RECOMMENDED review fixes: HTTP no-token mutation tool-set hardening, Final RC runner authorization semantics, baseline/status reconciliation, and `docs/P66_RUNTIME_GAP_TRUTH_TABLE.md`.
+- P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
+- Current local slice implements the Supreme Commander A4.8 protocol entrypoint and reconciles active docs/board wording after the `a9177d5` push.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
@@ -74,15 +74,17 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.16 ValidationAggregator runtime evidence summary normalization proof is implemented, validated, and committed locally in `e95aa56`.
 - P66.17 ValidationAggregator runtime evidence summary normalization helper is implemented, validated, and committed locally in `c8d6363`.
 - P66.18 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
-- P66.60 runtime gap current-state reconciliation is implemented as docs/board only and reconciles the seven remaining runtime gaps against pushed state now at `origin/main = 0dec735`.
-- P66.60 review-blocker fix removed stale pushed/aligned wording before it was pushed in `0dec735`; current baseline docs are being reconciled again so they do not preserve stale pending-push language.
+- P66.60 runtime gap current-state reconciliation is implemented as docs/board only and reconciles the seven remaining runtime gaps against pushed state now superseded by `origin/main = a9177d5`.
+- P66.60 review-blocker fix and follow-up review patch are pushed; current baseline docs are being reconciled again so they do not preserve stale local/pushed language.
+- Supreme Commander protocol is implemented locally in [SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md), with A4.8 / 4-Agent / next-phase entry links updated.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
 
 ## Validation
 
-- Current review patch validation passed: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan.
+- Current review patch validation passed before push: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan.
+- Supreme Commander protocol validation passed: `git diff --check`, docs validation, trailing whitespace scan, and active stale-baseline scan.
 - P57-T1 validation passed: new test syntax, fixture JSON parse, targeted P57 test `13/13`, targeted P38/P43/P55/P57 set `49/49`, `npm test` `963/963`.
 - P57-T2 validation passed: changed JS syntax checks, targeted helper/no-touch test `10/10`, targeted P38/P43/P55/P56/P57 set `61/61`, boundary scan returned no hits, `npm test` `969/969`.
 - P58-T1 validation passed: new test syntax, fixture JSON parse, targeted P58 test `13/13`, targeted P39/P43/P55/P57/P58 set `68/68`, `npm test` `982/982`.
