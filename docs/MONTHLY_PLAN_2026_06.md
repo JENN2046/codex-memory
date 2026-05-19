@@ -193,3 +193,11 @@ Controlled query expansion negative fixtures are recorded in [docs/PHASE_F_TAGME
 This slice extends the synthetic TagMemo fixture/test only and did not modify source/runtime, inspect real memory stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
 
 Project status remains `NOT_READY_BLOCKED`.
+
+## Week 4 Phase F Deterministic Ordering Tie-Breaker Fixtures - 2026-05-19
+
+Deterministic ordering tie-breaker fixtures are recorded in [docs/PHASE_F_TAGMEMO_DETERMINISTIC_ORDERING_TIE_BREAKER_FIXTURES.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_DETERMINISTIC_ORDERING_TIE_BREAKER_FIXTURES.md).
+
+This slice extends the synthetic TagMemo fixture/test only and did not modify source/runtime, inspect real memory stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
+
+Project status remains `NOT_READY_BLOCKED`.

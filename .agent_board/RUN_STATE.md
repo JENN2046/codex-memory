@@ -137,3 +137,11 @@ Handoff: report to Commander in conversation; do not edit files.
 - Extended fixture/test with generic tag collision, nearby topic over-expansion, and provider-score dependency negative cases.
 - Status remains `NOT_READY_BLOCKED`.
 - No source/runtime/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.
+
+## Phase F TagMemo Deterministic Ordering Tie-Breaker Fixtures - 2026-05-19
+
+- Anchor before this slice: `aa7d28f`.
+- Added docs record: [docs/PHASE_F_TAGMEMO_DETERMINISTIC_ORDERING_TIE_BREAKER_FIXTURES.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_DETERMINISTIC_ORDERING_TIE_BREAKER_FIXTURES.md).
+- Extended fixture/test with recency, topic specificity, and no-random/provider-dependency ordering cases.
+- Status remains `NOT_READY_BLOCKED`.
+- No source/runtime/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.

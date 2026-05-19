@@ -397,6 +397,127 @@
       ],
       "orderingExpectation": "no_provider_score_dependency",
       "donorCompatibilityNote": "provider-dependent ranking is outside this fixture-only slice"
+    },
+    {
+      "scenarioId": "ordering-tie-breaker-recency-stable",
+      "coverage": "recency tie-breaker is explicit and deterministic when association class is equal",
+      "memories": [
+        {
+          "id": "m-recency-newer",
+          "tags": [
+            "tagmemo"
+          ],
+          "topic": "ordering",
+          "textClass": "equal-association",
+          "tieBreaker": 1,
+          "syntheticTimestamp": "2026-05-19T10:00:00Z"
+        },
+        {
+          "id": "m-recency-older",
+          "tags": [
+            "tagmemo"
+          ],
+          "topic": "ordering",
+          "textClass": "equal-association",
+          "tieBreaker": 2,
+          "syntheticTimestamp": "2026-05-18T10:00:00Z"
+        }
+      ],
+      "query": {
+        "text": "tagmemo ordering recency",
+        "tags": [
+          "tagmemo"
+        ],
+        "topic": "ordering"
+      },
+      "expectedAssociations": [
+        "m-recency-newer",
+        "m-recency-older"
+      ],
+      "blockedAssociations": [],
+      "orderingExpectation": "newer_synthetic_timestamp_before_older_when_association_equal",
+      "donorCompatibilityNote": "deterministic local tie-breaker only; not a live ranking claim"
+    },
+    {
+      "scenarioId": "ordering-tie-breaker-topic-specificity",
+      "coverage": "topic-specific candidate wins over broad topic candidate when tags are equal",
+      "memories": [
+        {
+          "id": "m-topic-specific",
+          "tags": [
+            "tagmemo"
+          ],
+          "topic": "tagmemo semantic ordering",
+          "textClass": "specific-topic",
+          "tieBreaker": 1
+        },
+        {
+          "id": "m-topic-broad",
+          "tags": [
+            "tagmemo"
+          ],
+          "topic": "memory",
+          "textClass": "broad-topic",
+          "tieBreaker": 2
+        }
+      ],
+      "query": {
+        "text": "tagmemo semantic ordering",
+        "tags": [
+          "tagmemo"
+        ],
+        "topic": "tagmemo semantic ordering"
+      },
+      "expectedAssociations": [
+        "m-topic-specific",
+        "m-topic-broad"
+      ],
+      "blockedAssociations": [],
+      "orderingExpectation": "specific_topic_before_broad_topic",
+      "donorCompatibilityNote": "topic specificity is fixture-defined; runtime scoring is not executed"
+    },
+    {
+      "scenarioId": "ordering-tie-breaker-no-randomness-negative",
+      "coverage": "ordering fixture rejects random/provider-dependent order claims",
+      "memories": [
+        {
+          "id": "m-deterministic-a",
+          "tags": [
+            "tagmemo"
+          ],
+          "topic": "deterministic",
+          "textClass": "stable-a",
+          "tieBreaker": 1
+        },
+        {
+          "id": "m-deterministic-b",
+          "tags": [
+            "tagmemo"
+          ],
+          "topic": "deterministic",
+          "textClass": "stable-b",
+          "tieBreaker": 2
+        }
+      ],
+      "query": {
+        "text": "deterministic tagmemo ordering",
+        "tags": [
+          "tagmemo"
+        ],
+        "topic": "deterministic"
+      },
+      "expectedAssociations": [
+        "m-deterministic-a",
+        "m-deterministic-b"
+      ],
+      "blockedAssociations": [],
+      "orderingExpectation": "stable_order_no_random_or_provider_dependency",
+      "donorCompatibilityNote": "random/provider-dependent ordering is explicitly outside fixture-only evidence",
+      "forbiddenClaims": [
+        "randomOrderingAllowed",
+        "providerScoreRequired",
+        "runtimeRankingExecuted"
+      ]
     }
   ]
 }

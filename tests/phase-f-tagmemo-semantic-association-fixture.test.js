@@ -17,7 +17,10 @@ const REQUIRED_SCENARIOS = [
   'readiness-overclaim-rejected',
   'query-expansion-tag-collision-negative',
   'query-expansion-topic-neighbor-negative',
-  'query-expansion-provider-score-negative'
+  'query-expansion-provider-score-negative',
+  'ordering-tie-breaker-recency-stable',
+  'ordering-tie-breaker-topic-specificity',
+  'ordering-tie-breaker-no-randomness-negative'
 ];
 
 test('phase f tagmemo semantic association fixture keeps a no-runtime boundary', () => {
@@ -48,10 +51,7 @@ test('phase f tagmemo semantic association scenarios define expected and blocked
 });
 
 test('phase f tagmemo semantic association fixture rejects readiness overclaims', () => {
-  const safetyScenario = fixture.scenarios.find((scenario) => scenario.scenarioId === 'readiness-overclaim-rejected',
-  'query-expansion-tag-collision-negative',
-  'query-expansion-topic-neighbor-negative',
-  'query-expansion-provider-score-negative');
+  const safetyScenario = fixture.scenarios.find((scenario) => scenario.scenarioId === 'readiness-overclaim-rejected');
   assert.ok(safetyScenario);
   assert.deepEqual(safetyScenario.forbiddenClaims, [
     'RC_READY',
@@ -76,5 +76,21 @@ test('phase f tagmemo controlled query expansion negatives stay blocked', () => 
     assert.ok(scenario.expectedAssociations.length > 0, `${scenarioId} expectedAssociations empty`);
     assert.ok(scenario.blockedAssociations.length > 0, `${scenarioId} blockedAssociations empty`);
     assert.notDeepEqual(scenario.expectedAssociations, scenario.blockedAssociations, `${scenarioId} expected and blocked overlap`);
+  }
+});
+test('phase f tagmemo ordering tie-breaker scenarios are deterministic', () => {
+  const orderingScenarioIds = [
+    'ordering-tie-breaker-deterministic',
+    'ordering-tie-breaker-recency-stable',
+    'ordering-tie-breaker-topic-specificity',
+    'ordering-tie-breaker-no-randomness-negative'
+  ];
+
+  for (const scenarioId of orderingScenarioIds) {
+    const scenario = fixture.scenarios.find((candidate) => candidate.scenarioId === scenarioId);
+    assert.ok(scenario, `${scenarioId} missing`);
+    assert.ok(scenario.orderingExpectation, `${scenarioId} orderingExpectation missing`);
+    assert.notEqual(scenario.orderingExpectation, 'random_ordering_allowed', 'ordering must not allow random ordering');
+    assert.notEqual(scenario.orderingExpectation, 'provider_score_required', 'ordering must not require provider scores');
   }
 });
