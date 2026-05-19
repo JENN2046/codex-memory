@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record the A5-GAP-6 post-read-policy-audit-writer evidence-only aggregation. Preserve all remaining runtime/A5 hard stops.
+Prepare the A5-GAP-1 production governance readiness readonly packet. Preserve all remaining runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability-admin / ValidationAggregator; A5-GAP-6 post-read-policy-audit-writer evidence-only aggregation.
+P8 memory-governance / P10 observability-admin; A5-GAP-1 production governance readiness readonly packet.
 
 ## Current Status
 
@@ -37,6 +37,7 @@ P10 observability-admin / ValidationAggregator; A5-GAP-6 post-read-policy-audit-
 - A5-GAP-1 read-policy audit writer approval packet is now drafted as [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests exactly one sanitized read-policy audit JSONL evidence append plus read-only `governance:report` verification, and does not execute runtime action, append audit evidence, write memory records, or touch cutover/A5-GAP-7.
 - A5-GAP-1 read-policy audit writer evidence is now approved/executed and recorded in [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_EVIDENCE.md). It appended exactly one sanitized read-policy audit evidence record to configured recall audit JSONL, with `appendedLineCount=1` and `auditRecordHash=e3bb93b6429f74d97ed7c84a5382f0b11876baddf4bfae9469a07f7a45b05900`; read-only `governance:report` then observed `readPolicy.status=ok`, `auditEvidenceAvailable=true`, and `recentReadPolicyAuditCount=1`. This closes the subject-bound no-recent-read-policy-audit-evidence smoke limitation but does not unlock production governance readiness.
 - A5-GAP-6 post-read-policy-audit-writer evidence-only aggregation is now approved/executed and recorded in [docs/P66_A5_GAP_6_POST_READ_POLICY_AUDIT_WRITER_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_READ_POLICY_AUDIT_WRITER_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, accepted the explicit runtime evidence summary, reported locally evidenced count `10`, remaining count `6`, `commandsExecutedByAggregator=false`, and kept readiness flags false.
+- A5-GAP-1 production governance readiness readonly packet is now drafted as [docs/P66_A5_GAP_1_PRODUCTION_GOVERNANCE_READINESS_READONLY_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_PRODUCTION_GOVERNANCE_READINESS_READONLY_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests only read-only `governance:report`, durable write no, and one sanitized evidence document. It does not execute the command, write durable audit/memory, call providers, run migration/import/export/backup/restore, touch cutover/A5-GAP-7, or claim readiness.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
