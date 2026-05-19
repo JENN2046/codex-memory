@@ -385,3 +385,22 @@ Answers:
 - State remains NOT_READY_BLOCKED.
 
 Boundary: no rollback rehearsal command, no real rollback, no destructive/restore command, no src/tests change, no provider, no real memory scan, no durable write, no push/tag/release/deploy, no RC ready claim.
+
+## CM-0556 Read-only rollback rehearsal approval packet
+
+Status: READONLY_ROLLBACK_REHEARSAL_PACKET_READY
+Area: P5-rollback-readiness / P10-observability-admin
+Risk: docs/board approval packet only
+
+Packet: docs/CM-0556_READONLY_ROLLBACK_REHEARSAL_APPROVAL_PACKET.md
+
+Written boundaries:
+
+- rehearsal goal: inspect rollback artifacts and classify commands without mutation
+- read-only artifact/evidence/status checks: CM-0554, CM-0555, status/backlog/board, Git branch/log/diff metadata
+- allowed future command classes: git status/log, git diff name/stat, read-only artifact reads
+- forbidden: reset, restore, revert, checkout rollback, real rollback, destructive cleanup, backup restore
+- forbidden: src/tests/package/runtime/config changes, provider, real memory scan, durable write, public MCP expansion, push/tag/release/deploy, cutover, A5-GAP-7, RC ready claim
+- A5-triggering commands remain outside this packet: rollback:mainline:plan, compare-active-memory, rollback-active-memory
+
+Decision: READONLY_ROLLBACK_REHEARSAL_PACKET_READY; real rollback remains blocked; state remains NOT_READY_BLOCKED.
