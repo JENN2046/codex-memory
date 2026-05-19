@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record approved A5-GAP-1 subject-bound no-durable-write governance loop evidence for `p66-a5-gap1-governance-loop-smoke sanitized test subject` at `13fae2575fcac9bdd3b990c4da9fec074ee79a4b` and keep all other runtime/A5 boundaries blocked until exact approval is provided.
+Record approved A5-GAP-2 no-mutation recall isolation runtime proof evidence for stores `real_diary`, `real_sqlite`, `real_vector_index`, `real_candidate_cache`, and `real_recall_audit` at `6faa8baa375e7496dcf62cb4443668dd9f67f712` and keep all other runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,16 +14,16 @@ Record approved A5-GAP-1 subject-bound no-durable-write governance loop evidence
 
 ## Worktree
 
-Current local `main` contains `13fae2575fcac9bdd3b990c4da9fec074ee79a4b docs: record p66 a5 gap4 http readiness evidence` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 6 commits before this evidence slice. The current worktree contains intended A5-GAP-1 evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` contains `6faa8baa375e7496dcf62cb4443668dd9f67f712 docs: record p66 a5 gap1 governance evidence` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 7 commits before this evidence slice. The current worktree contains intended A5-GAP-2 evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability-admin / P8 memory-governance; A5-GAP-1 subject-bound no-durable-write governance loop evidence.
+P10 observability-admin / P8 memory-governance; A5-GAP-2 no-mutation recall isolation runtime proof evidence.
 
 ## Current Truth
 
 - P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
-- Current local slice records approved `A5-GAP-1` evidence. The sanitized test subject governance loop executed in memory with durable write `false`; the evidence is subject-bound and does not authorize durable audit/memory write, production readiness, cutover, or `RC_READY`. `A5-GAP-4` live HTTP evidence remains endpoint-bound to `http://127.0.0.1:7605` at `53554c174b8b270c7bf792a368a3f4c249044b1d`. `A5-GAP-5` strict gate evidence remains target-bound to `96b6a3c`. Other A5 approval lines still contain placeholders and remain not approved.
+- Current local slice records approved `A5-GAP-2` evidence. The no-mutation recall isolation runtime proof read only the five approved stores, produced sanitized counts/hashes, and left store snapshots unchanged. It failed closed with contamination markers, so recall isolation remains open. `A5-GAP-1` governance evidence remains subject-bound; `A5-GAP-4` live HTTP evidence remains endpoint-bound to `http://127.0.0.1:7605` at `53554c174b8b270c7bf792a368a3f4c249044b1d`; `A5-GAP-5` strict gate evidence remains target-bound to `96b6a3c`. Other A5 approval lines still require exact approval.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
@@ -77,6 +77,7 @@ P10 observability-admin / P8 memory-governance; A5-GAP-1 subject-bound no-durabl
 - P66.60 runtime gap current-state reconciliation is implemented as docs/board only and reconciles the seven remaining runtime gaps against pushed state now superseded by `origin/main = a9177d5`.
 - P66.60 review-blocker fix and follow-up review patch are pushed; current baseline docs are being reconciled again so they do not preserve stale local/pushed language.
 - A5-GAP-1 subject-bound no-durable-write governance loop evidence is recorded locally in [docs/P66_A5_GAP_1_GOVERNANCE_LOOP_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_LOOP_EVIDENCE.md) with result `SUBJECT_BOUND_PASSED_NO_DURABLE_WRITE`: six stages executed in memory, audit destination `in_memory_only`, durableWrite false, mutated false.
+- A5-GAP-2 no-mutation recall isolation runtime proof evidence is recorded locally in [docs/P66_A5_GAP_2_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md) with result `EXECUTED_FAIL_CLOSED_CONTAMINATION_MARKERS_DETECTED`: before/after store snapshots unchanged; raw content not output; search pipeline not executed; contamination markers found in normal recall, diary source text, SQLite chunk projection, and recall-audit summary surfaces.
 - A5-GAP-4 endpoint-bound live HTTP readiness evidence is recorded locally in [docs/P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md) with result `ENDPOINT_BOUND_PASSED_WITH_WARNINGS`: health ok, initialize ok, public MCP tools frozen, observe health ok / HTTP 200 / HTTP log errors 0 / watchdog ensure failures 0 / historical watchdog recoveries 9.
 - Supreme Commander protocol is committed locally in `f46b36d`, and post-commit state is recorded in `ef599ca`, with A4.8 / 4-Agent / next-phase entry links updated. Push remains blocked unless explicitly requested.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
@@ -85,7 +86,7 @@ P10 observability-admin / P8 memory-governance; A5-GAP-1 subject-bound no-durabl
 
 ## Validation
 
-- Current A5-GAP-1 validation passed: preflight `git status --short --branch`, `git rev-parse HEAD`, in-memory governance-loop Node execution, post-execution `git diff --stat`, and post-execution `git status --short --branch`. Current A5-GAP-4 validation passed earlier: preflight, `/health`, MCP `initialize`, MCP `tools/list`, and `node .\src\cli\http-observe.js --json --health-url http://127.0.0.1:7605/health` sanitized summary. Current review patch validation passed before push: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan.
+- Current A5-GAP-2 validation passed: preflight `git status --short --branch`, `git rev-parse HEAD`, `git diff --stat`, `git diff --check`; read-only scoped contamination scan; post-execution `git status --short --branch` and `git diff --stat` stayed clean before evidence docs were written. One first in-memory script attempt failed on a variable-name error and produced no mutation. Current A5-GAP-1 and A5-GAP-4 validations passed earlier in their bounded contexts; current review patch validation passed before push: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan.
 - Supreme Commander protocol validation passed: `git diff --check`, docs validation, trailing whitespace scan, and active stale-baseline scan.
 - P57-T1 validation passed: new test syntax, fixture JSON parse, targeted P57 test `13/13`, targeted P38/P43/P55/P57 set `49/49`, `npm test` `963/963`.
 - P57-T2 validation passed: changed JS syntax checks, targeted helper/no-touch test `10/10`, targeted P38/P43/P55/P56/P57 set `61/61`, boundary scan returned no hits, `npm test` `969/969`.
@@ -109,7 +110,7 @@ P10 observability-admin / P8 memory-governance; A5-GAP-1 subject-bound no-durabl
 
 ## Hard Stops
 
-No push, tag, release, deploy, provider/model call, real memory content read/preview/export/import/scan, diary/SQLite/vector/candidate/recall-audit scan, SQLite migration apply, backup/restore, service/watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edit, dependency change, durable memory/audit write, runtime mutation, or production deploy is authorized unless separately explicit.
+No push, tag, release, deploy, provider/model call, raw memory content preview/export/import, new diary/SQLite/vector/candidate/recall-audit scan, SQLite migration apply, backup/restore, service/watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edit, dependency change, durable memory/audit write, runtime mutation, or production deploy is authorized unless separately explicit.
 
 ## Next Safe Step
 

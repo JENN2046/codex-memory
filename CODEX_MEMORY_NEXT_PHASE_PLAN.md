@@ -15,7 +15,7 @@ This active plan is the short routing document for the current post-P66 local-sa
 5. P54 establishes the final RC runner local chain through safe command inventory, explicit command-result evaluation, execution preflight, and an injected-executor adapter contract.
 6. P55 evidence-to-runtime trace contract and helper are complete locally; they map local evidence to runtime enforcement gaps without treating fixture/local evidence as runtime enforcement.
 7. P56 governance review/approval/audit executable loop boundary and explicit-input helper are complete locally without durable writes or approval execution.
-8. P57 recall isolation runtime proof boundary inventory and explicit-input evaluator are complete locally without executing the runtime proof or scanning real memory/runtime stores.
+8. P57 recall isolation runtime proof boundary inventory and explicit-input evaluator are complete locally; A5-GAP-2 later executed an approved no-mutation read-only proof against real stores and failed closed with contamination markers.
 9. P58 migration/import-export/backup-restore approval boundary and explicit-input helper are complete locally using docs/fixture/test evidence only; approval execution and all apply/restore actions remain blocked.
 10. P59 HTTP runtime observability / operation hardening boundary and explicit-input helper are complete locally as docs/fixture/test/helper evidence only; live HTTP operation readiness remains blocked.
 11. P60 no-touch / no-leak / redaction long-term regression is complete locally without introducing runtime operations.
@@ -26,9 +26,9 @@ This active plan is the short routing document for the current post-P66 local-sa
 16. The remaining work is still blocked at runtime evidence and A5 authorization boundaries; do not convert P63/P64 local runner execution into final RC, cutover, push, release, deploy, config, watchdog, or `RC_READY` claims.
 17. Treat `CMB-0005`, `CMD-0012`, and `RR-0004` as controlling records for resume and completion-boundary decisions.
 18. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
-19. P66 local proof chain is exhausted and the review patch safety semantics are pushed in `a9177d5`; four runtime gaps remain open after subject/endpoint/target-bound `A5-GAP-1`, `A5-GAP-4`, and `A5-GAP-5` evidence records.
+19. P66 local proof chain is exhausted and the review patch safety semantics are pushed in `a9177d5`; four runtime gaps remain open after subject/store/endpoint/target-bound `A5-GAP-1`, `A5-GAP-2`, `A5-GAP-4`, and `A5-GAP-5` evidence records.
 20. Supreme Commander local autopilot protocol is the current A4.8 project-operator entrypoint; it does not add A5 authority.
-21. Current runtime-gap work has three approved bounded executions: `A5-GAP-1` governance loop passed without durable write for sanitized test subject at commit `13fae2575fcac9bdd3b990c4da9fec074ee79a4b`, recorded in [P66_A5_GAP_1_GOVERNANCE_LOOP_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_LOOP_EVIDENCE.md); `A5-GAP-4` live HTTP readiness passed with warnings for endpoint `http://127.0.0.1:7605` at commit `53554c174b8b270c7bf792a368a3f4c249044b1d`, recorded in [P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md); `A5-GAP-5` strict gate passed for target `96b6a3c`, recorded in [P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md). The other A5 lines still contain placeholders and remain not approved.
+21. Current runtime-gap work has four approved bounded executions: `A5-GAP-1` governance loop passed without durable write for sanitized test subject at commit `13fae2575fcac9bdd3b990c4da9fec074ee79a4b`, recorded in [P66_A5_GAP_1_GOVERNANCE_LOOP_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_LOOP_EVIDENCE.md); `A5-GAP-2` no-mutation recall isolation runtime proof executed against approved real stores at commit `6faa8baa375e7496dcf62cb4443668dd9f67f712` and failed closed with contamination markers, recorded in [P66_A5_GAP_2_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md); `A5-GAP-4` live HTTP readiness passed with warnings for endpoint `http://127.0.0.1:7605` at commit `53554c174b8b270c7bf792a368a3f4c249044b1d`, recorded in [P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md); `A5-GAP-5` strict gate passed for target `96b6a3c`, recorded in [P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md). The remaining A5 lines still require exact approval before execution.
 
 ## Current Completed Local Chain
 
@@ -62,22 +62,22 @@ This active plan is the short routing document for the current post-P66 local-sa
 
 ## Current Task
 
-A5-GAP-1 subject-bound governance loop evidence:
+A5-GAP-2 no-mutation recall isolation runtime proof evidence:
 
-- Current local `main` contains `13fae2575fcac9bdd3b990c4da9fec074ee79a4b docs: record p66 a5 gap4 http readiness evidence` and is ahead of `origin/main = a9177d5` by 6 commits before this evidence slice; exact state must be rechecked before approval or execution.
+- Current local `main` contains `6faa8baa375e7496dcf62cb4443668dd9f67f712 docs: record p66 a5 gap1 governance evidence` and is ahead of `origin/main = a9177d5` by 7 commits before this evidence slice; exact state must be rechecked before approval or execution.
 - PASS_WITH_PATCH_RECOMMENDED review patch is pushed in `a9177d5`.
-- P66 local proof chain is complete as local evidence organization only; four runtime gaps remain open after bounded `A5-GAP-1`, `A5-GAP-4`, and `A5-GAP-5` evidence records.
+- P66 local proof chain is complete as local evidence organization only; four runtime gaps remain open after bounded `A5-GAP-1`, `A5-GAP-2`, `A5-GAP-4`, and `A5-GAP-5` evidence records. `A5-GAP-2` has executed, but it failed closed with contamination markers and does not close recall isolation.
 - [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md) is the current runtime-gap dashboard.
 - [docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) is the local A4.8 control protocol for choosing and validating future safe work.
-- Current local work records the approved A5-GAP-1 governance loop evidence. It did not execute push, tag, release, deploy, config/watchdog/startup changes, provider calls, real memory scan, memory mutation, migration/import-export/backup/restore apply, durable writes, public MCP expansion, cutover, or `RC_READY`.
-- Preserve `NOT_READY_BLOCKED`; do not infer final-RC/push/release/deploy/config/watchdog/cutover readiness from P46-P66 local evidence, P63/P64 local runner evidence, the P66 truth table, the Supreme Commander protocol, the A5 approval packet, the subject-bound A5-GAP-1 no-durable evidence, the endpoint-bound A5-GAP-4 HTTP evidence, or the target-bound A5-GAP-5 gate evidence.
+- Current local work records the approved A5-GAP-2 recall isolation runtime proof evidence. It did not execute push, tag, release, deploy, config/watchdog/startup changes, provider calls, search pipeline, memory mutation, migration/import-export/backup/restore apply, durable writes, public MCP expansion, cutover, or `RC_READY`.
+- Preserve `NOT_READY_BLOCKED`; do not infer final-RC/push/release/deploy/config/watchdog/cutover readiness from P46-P66 local evidence, P63/P64 local runner evidence, the P66 truth table, the Supreme Commander protocol, the A5 approval packet, the subject-bound A5-GAP-1 no-durable evidence, the fail-closed A5-GAP-2 contamination evidence, the endpoint-bound A5-GAP-4 HTTP evidence, or the target-bound A5-GAP-5 gate evidence.
 
 ## Boundaries
 
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain exactly `record_memory`, `search_memory`, `memory_overview`.
 - Do not implement runtime governance review.
-- Do not scan diary, SQLite, vector index, candidate cache, or recall audit for this goal.
+- Do not scan diary, SQLite, vector index, candidate cache, or recall audit again without a fresh exact A5 approval line.
 - Do not run `governance:report` against a real DB for this task.
 - Do not write durable audit/memory records.
 - Do not run provider/model calls.
@@ -92,7 +92,7 @@ A5-GAP-1 subject-bound governance loop evidence:
 After the A5 approval packet slice:
 
 - Stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, runtime execution, durable write, real memory/runtime-store scan, public MCP expansion, or `RC_READY` claim unless explicitly authorized.
-- Current local-safe candidate: validate and commit this A5-GAP-1 evidence if eligible; then wait for exact A5 approval lines for remaining gaps or select a separate non-A5 local task.
+- Current local-safe candidate: validate and commit this A5-GAP-2 evidence if eligible; then implement an explicit recall-isolation classification/exclusion layer locally before requesting a fresh A5-GAP-2 rerun, or wait for exact A5 approval lines for other remaining gaps.
 - If the next useful work would close any of the seven runtime gaps in [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md), use [docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md) and require a separate explicit approval line before execution.
 - If no non-A5 implementation task is available, the next local-safe action is a docs/board routing closeout and explicit A5 approval request, not more P67/P68 gap proliferation.
 - P65-T1 through P66.60 and the review patch are historical completed evidence; do not present them as the next current candidate.
