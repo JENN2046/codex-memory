@@ -176,3 +176,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: fixture/test/docs/board only; no source/runtime change, no HTTP observe/service start, no provider, no real memory scan, no public MCP expansion, no durable write, no push, no cutover, no readiness claim.
 - Next safe task: CM-0537 memory governance proposal draft refresh.
+
+## CM-0537 State
+
+- Current state: Phase F memory governance proposal draft refreshed locally.
+- Decision: NOT_READY_BLOCKED.
+- Boundary: docs/board design-only; no runtime/source/test change, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
+- Next safe task: CM-0538 memory governance proposal fixture plan.

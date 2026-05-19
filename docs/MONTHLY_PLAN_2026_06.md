@@ -229,3 +229,7 @@ Phase F observability/admin review surface fixture plan prepared as a local-safe
 ## CM-0536 Monthly Update
 
 Phase F observability/admin review surface synthetic fixture contract added as local fixture/test-only work. It keeps public MCP tools frozen and preserves NOT_READY_BLOCKED.
+
+## CM-0537 Monthly Update
+
+Phase F memory governance proposal draft refreshed as design-only local work. It defines proposal/supersession/tombstone/forget-flow boundaries and keeps durable writes, real-store reads, public MCP expansion, and readiness claims blocked. Status remains NOT_READY_BLOCKED.
