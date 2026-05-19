@@ -5,11 +5,11 @@
 ## 当前结论
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
-- 当前 Git 基线：`HEAD == origin/main == a9177d5 fix: tighten review patch safety semantics`，当前 ahead/behind 和 worktree 状态仍必须以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准。
-- 当前本地任务：最高指挥官本地自动推进协议落地与 active status/board 基线校准已本地实现并验证；不启动服务、不改配置、不执行 provider/real-memory/migration/apply/backup/release/deploy/cutover。
+- 当前 Git 基线：本地 `main` 包含 `f46b36d docs: add supreme commander autopilot protocol` 且领先 `origin/main = a9177d5 fix: tighten review patch safety semantics`；精确 `HEAD`、ahead/behind 和 worktree 状态仍必须以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准。
+- 当前本地任务：最高指挥官本地自动推进协议已本地提交在 `f46b36d`；本轮只做 post-commit active status/board 校准，不启动服务、不改配置、不执行 provider/real-memory/migration/apply/backup/release/deploy/cutover、不 push。
 - 最新已推送完成：PASS_WITH_PATCH_RECOMMENDED 审查补丁与 P66 runtime gap 状态面收束已推送到 `origin/main = a9177d5`。该提交包含 HTTP no-token mutation guard、Final RC runner 授权语义、P66 runtime gap truth table、测试契约补丁和状态措辞修正。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P66.60 当前态对齐已确认 7 个 remaining runtime gaps 的本地安全工作已经耗尽；本轮本地任务已落地并验证 [Supreme Commander protocol](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) 并校准 active status/board。没有新的 runtime/cutover 任务被授权。P66 local proof chain 完成不等于 runtime readiness。
+- 当前任务：P66.60 当前态对齐已确认 7 个 remaining runtime gaps 的本地安全工作已经耗尽；[Supreme Commander protocol](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) 已本地提交在 `f46b36d`。没有新的 runtime/cutover 任务被授权。P66 local proof chain 完成不等于 runtime readiness。
 - 当前完成：P65-T1 ValidationAggregator explicit runtime evidence summary ingestion 已本地实现、验证并提交在 `04ae047`。该切片只消费 caller 显式传入的脱敏 runtime evidence summary，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不扩大 public MCP；当前仍保持 `NOT_READY_BLOCKED`。
 - 当前完成：P65.1 Final RC runner executed-field semantics hardening 已本地实现并验证。`finalRcMatrixExecuted` 不再代表本地 allowlisted runner 执行；新字段 `localRuntimeEvidenceMatrixExecuted` / `allowlistedFinalRcEvidenceRunnerExecuted` 表达本地执行证据，`fullFinalRcMatrixExecuted=false` 且显式 full-matrix execution/readiness 声明会被拒绝，继续阻止完整 RC matrix 误读。
 - 当前阶段：P65.2 push readiness approval request 已起草为 [docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md)。状态 `DRAFT_NOT_APPROVED` / `NOT_APPROVED` / `BLOCKED_HARD_STOP`；不执行 push。

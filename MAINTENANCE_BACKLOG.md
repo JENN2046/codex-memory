@@ -10,8 +10,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Git baseline before this local protocol slice: `HEAD == origin/main == a9177d5 fix: tighten review patch safety semantics`.
-- Current local work: Supreme Commander local autopilot protocol and active status/board baseline reconciliation; current `HEAD`, ahead/behind, and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
+- Git baseline after the local protocol commit: local `main` contains `f46b36d docs: add supreme commander autopilot protocol` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics`; exact `HEAD` is verified from Git commands.
+- Current local work: post-commit active status/board reconciliation after the Supreme Commander protocol commit; current `HEAD`, ahead/behind, and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
 - Current active program: P66 remaining runtime gap local-safe proof chain and current-state reconciliation are complete as local proof only; runtime gaps remain open.
 - Current phase area: no further local-safe runtime-gap closure work remains; this local slice only formalizes the Supreme Commander protocol and reconciles active status surfaces after the `a9177d5` push.
 
@@ -19,6 +19,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 | ID | Area | Risk | Status | Task | Validation | Notes |
 |---|---|---|---|---|---|---|
+| SupremeCommander-postcommit | docs-drift / mainline-health | A1 | done | Reconcile active status/board after local commit `f46b36d` | `git diff --check`; docs validation; status/log check | COMPLETED_VALIDATED locally. Docs/board only. No service start, config change, provider call, real memory scan, durable write, public MCP expansion, migration/import-export/backup/restore apply, tag, release, deploy, or push. |
 | SupremeCommander-A4.8 | docs-drift / mainline-health | A1 | done | Add the Supreme Commander local autopilot protocol and reconcile active status surfaces to `a9177d5` | `git diff --check`; docs validation; stale baseline scan | COMPLETED_VALIDATED locally. Local docs/governance only. No service start, config change, provider call, real memory scan, durable write, public MCP expansion, migration/import-export/backup/restore apply, tag, release, deploy, or push. |
 | ReviewPatch-P66Truth | observability-admin / P4-http-runtime | A1/A2 | done | PASS_WITH_PATCH_RECOMMENDED review patch: HTTP no-token mutation set, Final RC runner authorization semantics, baseline reconciliation, P66 runtime gap truth table | `node --test tests\mcp-http.test.js` 8/8; `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5; `git diff --check`; active status drift scan | COMPLETED_VALIDATED and pushed in `a9177d5`. No provider, real memory scan, migration/import/export/backup/restore apply, durable write, public MCP expansion, config/watchdog/cutover, tag, release, deploy, or readiness claim. |
 | CM-0301 | docs-drift | A1 | done | Compress active `.agent_board` checkpoint/handoff | `git diff --check`; docs validation; Verifier | Complete locally in `4d8d11a`; full old files archived under `.agent_board/archive/`. |

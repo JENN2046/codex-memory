@@ -2,7 +2,7 @@
 
 ## Current Goal
 
-Implement the Supreme Commander local autopilot protocol and reconcile active status/board surfaces to the pushed `a9177d5` review-patch baseline while preserving all runtime/A5 hard stops.
+Reconcile active status/board surfaces after the local `f46b36d` Supreme Commander protocol commit while preserving all runtime/A5 hard stops.
 
 ## Current Area
 
@@ -11,7 +11,7 @@ P6 docs-drift / P0 mainline-health; A4.8 Supreme Commander protocol and status r
 ## Current Status
 
 - Last pushed baseline: `a9177d5 fix: tighten review patch safety semantics` on `origin/main`.
-- Local `main` started this protocol slice at `HEAD == origin/main == a9177d5`; verify exact current state with `git status -sb` before new work.
+- Local `main` contains `f46b36d docs: add supreme commander autopilot protocol` and is ahead of `origin/main = a9177d5`; verify exact current state with `git status -sb` before new work.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
@@ -60,7 +60,7 @@ P6 docs-drift / P0 mainline-health; A4.8 Supreme Commander protocol and status r
 - P66.12 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
 - P66.60 runtime gap current-state reconciliation is implemented as docs/board only and confirms that no further local-safe work remains for the seven remaining runtime gaps.
 - P66.60 review blocker fix and follow-up review patch safety semantics are pushed through `a9177d5`.
-- Supreme Commander local autopilot protocol is implemented and validated locally; it adds no new A5 authority.
+- Supreme Commander local autopilot protocol is implemented, validated, and committed locally in `f46b36d`; it adds no new A5 authority and remains unpushed.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 

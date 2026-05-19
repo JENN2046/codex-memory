@@ -14,7 +14,7 @@ Implement the Supreme Commander local autopilot protocol as a safe A4.8 project-
 
 ## Worktree
 
-Baseline before the current local protocol slice is `HEAD == origin/main == a9177d5 fix: tighten review patch safety semantics`. The current worktree contains intended docs/board protocol edits until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` contains `f46b36d docs: add supreme commander autopilot protocol` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics`. The current worktree contains intended post-commit docs/board reconciliation until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
@@ -76,7 +76,7 @@ P6 docs-drift / P0 mainline-health; Supreme Commander protocol and active status
 - P66.18 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
 - P66.60 runtime gap current-state reconciliation is implemented as docs/board only and reconciles the seven remaining runtime gaps against pushed state now superseded by `origin/main = a9177d5`.
 - P66.60 review-blocker fix and follow-up review patch are pushed; current baseline docs are being reconciled again so they do not preserve stale local/pushed language.
-- Supreme Commander protocol is implemented locally in [SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md), with A4.8 / 4-Agent / next-phase entry links updated.
+- Supreme Commander protocol is committed locally in `f46b36d`, with A4.8 / 4-Agent / next-phase entry links updated. Push remains blocked unless explicitly requested.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
