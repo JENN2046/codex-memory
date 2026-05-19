@@ -884,3 +884,13 @@ Validation: git diff --check and docs validation for this docs/board slice.
 Not validated: release, tag, deploy, push, real rollback, provider calls, real memory broad scan, durable writes, migration/import/export/backup/restore apply, public MCP expansion, V8 implementation, VCP full parity.
 Remaining risk: dogfood must remain local/scoped/non-release unless separately approved; real rollback remains A5 blocked.
 Next safe step: prepare a separate local dogfood checklist if requested; do not claim RC readiness.
+
+## DOGFOOD_001 handoff
+
+Goal: Prepare local scoped non-release dogfood plan without executing dogfood or smoke checks.
+Status: DOGFOOD_001_PLAN_READY_NOT_EXECUTED.
+Changed files: docs/DOGFOOD_001_LOCAL_SCOPED_NON_RELEASE_PLAN.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: git diff --check and docs validation for this docs/board slice.
+Not validated: dogfood execution, smoke checks, Codex/Claude config switch, provider calls, real memory broad scan, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push/tag/release/deploy, RC readiness.
+Remaining risk: future smoke checks must be separately confirmed with exact command list and boundary.
+Next safe step: stop after plan validation or ask for separate smoke-check authorization.

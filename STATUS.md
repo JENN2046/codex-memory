@@ -455,3 +455,23 @@ Recorded:
 - VCP full parity is not claimed.
 
 Boundary: no push/tag/release/deploy, no provider call, no real memory broad scan, no durable write, no migration/import/export/backup/restore apply, no public MCP expansion, no src/tests change, and no RC ready/runtime readiness/final RC readiness/production readiness/cutover readiness claim.
+
+## DOGFOOD_001 local scoped non-release plan
+
+Status: DOGFOOD_001_PLAN_READY_NOT_EXECUTED
+Result: DOGFOOD_001_PLAN_READY_NOT_EXECUTED
+State: NOT_READY_BLOCKED
+
+Plan record: docs/DOGFOOD_001_LOCAL_SCOPED_NON_RELEASE_PLAN.md
+
+Recorded:
+
+- DOGFOOD_001 is a plan-only docs/board slice.
+- Entry condition is LOCAL_RC_CANDIDATE_001_RECORDED_NOT_RC_READY.
+- Dogfood may be considered only as local/scoped/non-release.
+- Allowed local-only smoke checks are written only as a candidate list and are not executed.
+- Future smoke-check execution requires separate confirmation with exact commands and boundaries.
+- Real rollback remains A5 blocked.
+- RC remains NOT_READY_BLOCKED.
+
+Boundary: no dogfood execution, no Codex/Claude default config switch, no provider call, no real memory broad scan, no durable write, no migration/import/export/backup/restore apply, no public MCP expansion, no push/tag/release/deploy, and no RC ready/runtime readiness/final RC readiness/production readiness/cutover readiness claim.

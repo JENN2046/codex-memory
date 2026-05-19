@@ -462,3 +462,28 @@ Current local candidate facts:
 - VCP full parity is not claimed.
 
 Next safe candidate: decide whether to prepare a local dogfood checklist. Do not run provider calls, real memory broad scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, tag, release, deploy, cutover, or readiness claims without separate exact approval.
+
+## DOGFOOD_001 local scoped non-release plan
+
+Status: DOGFOOD_001_PLAN_READY_NOT_EXECUTED
+Area: P0-mainline-health / P10-observability-admin
+Risk: A4 docs/board plan only
+
+Plan record: docs/DOGFOOD_001_LOCAL_SCOPED_NON_RELEASE_PLAN.md
+
+Current boundary:
+
+- Plan only; dogfood is not executed.
+- Dogfood may be considered only as local/scoped/non-release.
+- Allowed local-only smoke checks are candidate checks only and are not run in this slice.
+- Future smoke-check execution requires separate confirmation with exact command list and boundary.
+- No Codex/Claude default config switch.
+- No provider call.
+- No real memory broad scan.
+- No durable write.
+- No migration/import/export/backup/restore apply.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No RC ready claim.
+
+Next safe candidate: if requested, prepare or execute a separately confirmed local dogfood smoke checklist. Keep NOT_READY_BLOCKED until a separate approved process changes it.
