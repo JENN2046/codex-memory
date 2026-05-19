@@ -4,6 +4,7 @@
 
 ## 当前结论
 
+- 当前 Phase F TagMemo semantic association fixture tests：已新增 synthetic fixture 和 structure-only test，记录在 [PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_TESTS](/A:/codex-memory/docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_TESTS.md)。该切片不改 source/runtime、不读真实 memory store、不执行 recall/provider/A5；项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F TagMemo semantic association fixture plan：已在 [PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_PLAN](/A:/codex-memory/docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_PLAN.md) 完成 docs-only 计划。它只定义未来 synthetic fixture/test contract，不新增 fixtures/tests、不改 source/runtime。下一步推荐 `CM-0530` TagMemo semantic association fixture tests；项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F fixture/test-only parity hardening matrix：已在 [PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX](/A:/codex-memory/docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md) 完成 docs-only 矩阵。它只定义后续 fixture/test-only 覆盖类别，不新增 fixtures/tests、不改 source/runtime。下一步推荐 `CM-0529` TagMemo semantic association fixture plan；项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F readonly VCP parity gap inventory：已在 [PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY](/A:/codex-memory/docs/PHASE_F_READONLY_VCP_PARITY_GAP_INVENTORY.md) 完成只读盘点。盘点只使用现有 docs/board/roadmap，不读取真实 memory store、不执行 runtime、不跑 A5。下一步推荐 `CM-0526` fixture/test-only parity hardening matrix，先从 TagMemo / semantic association parity 开始；项目继续保持 `NOT_READY_BLOCKED`。

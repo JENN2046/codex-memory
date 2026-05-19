@@ -1,0 +1,112 @@
+{
+  "version": "phase-f-tagmemo-semantic-association-v1",
+  "publicMcpToolsFrozen": ["record_memory", "search_memory", "memory_overview"],
+  "runtimeExecution": false,
+  "realMemoryStoreRead": false,
+  "providerCall": false,
+  "durableMutation": false,
+  "readinessClaimsAllowed": false,
+  "scenarios": [
+    {
+      "scenarioId": "tagmemo-association-strength-basic",
+      "coverage": "explicit tag relation ranks stronger than loose keyword overlap",
+      "memories": [
+        { "id": "m-tag-strong", "tags": ["agentic-memory", "tagmemo"], "topic": "semantic association", "textClass": "explicit-tag-related" },
+        { "id": "m-keyword-loose", "tags": ["notes"], "topic": "unrelated", "textClass": "loose-keyword-overlap" }
+      ],
+      "query": { "text": "tagmemo semantic association", "tags": ["tagmemo"], "topic": "semantic association" },
+      "expectedAssociations": ["m-tag-strong"],
+      "blockedAssociations": ["m-keyword-loose"],
+      "orderingExpectation": "explicit_tag_relation_before_loose_keyword_overlap",
+      "donorCompatibilityNote": "donor-like association strength target; exact donor parity is not claimed"
+    },
+    {
+      "scenarioId": "semantic-grouping-topic-cluster",
+      "coverage": "topic co-membership groups related records",
+      "memories": [
+        { "id": "m-topic-a", "tags": ["semantic"], "topic": "memory governance", "textClass": "topic-member" },
+        { "id": "m-topic-b", "tags": ["governance"], "topic": "memory governance", "textClass": "topic-member" },
+        { "id": "m-topic-blocked", "tags": ["runtime"], "topic": "http operations", "textClass": "unrelated-topic" }
+      ],
+      "query": { "text": "memory governance cluster", "tags": ["governance"], "topic": "memory governance" },
+      "expectedAssociations": ["m-topic-a", "m-topic-b"],
+      "blockedAssociations": ["m-topic-blocked"],
+      "orderingExpectation": "same_topic_members_before_unrelated_topic",
+      "donorCompatibilityNote": "topic grouping expected; broad synonym expansion is blocked"
+    },
+    {
+      "scenarioId": "query-expansion-controlled",
+      "coverage": "query expansion adds bounded semantic neighbors",
+      "memories": [
+        { "id": "m-neighbor", "tags": ["recall", "association"], "topic": "tagmemo neighbor", "textClass": "bounded-neighbor" },
+        { "id": "m-vague", "tags": ["general"], "topic": "memory", "textClass": "vague-overlap" }
+      ],
+      "query": { "text": "association neighbor", "tags": ["association"], "topic": "tagmemo neighbor" },
+      "expectedAssociations": ["m-neighbor"],
+      "blockedAssociations": ["m-vague"],
+      "orderingExpectation": "bounded_neighbor_only",
+      "donorCompatibilityNote": "controlled expansion only; no broad conceptual sweep"
+    },
+    {
+      "scenarioId": "blocked-over-expansion-negative",
+      "coverage": "negative control for semantic drift",
+      "memories": [
+        { "id": "m-valid", "tags": ["tagmemo"], "topic": "association", "textClass": "valid" },
+        { "id": "m-blocked", "tags": ["deployment"], "topic": "release", "textClass": "blocked-drift" }
+      ],
+      "query": { "text": "tagmemo association", "tags": ["tagmemo"], "topic": "association" },
+      "expectedAssociations": ["m-valid"],
+      "blockedAssociations": ["m-blocked"],
+      "orderingExpectation": "blocked_records_absent",
+      "donorCompatibilityNote": "negative drift case documents local safety preference"
+    },
+    {
+      "scenarioId": "epa-residual-explicit-input",
+      "coverage": "EPA and ResidualPyramid influence represented as explicit metadata only",
+      "memories": [
+        { "id": "m-epa", "tags": ["epa"], "topic": "recall-stage", "textClass": "explicit-metadata" }
+      ],
+      "query": { "text": "epa recall influence", "tags": ["epa"], "topic": "recall-stage" },
+      "expectedAssociations": ["m-epa"],
+      "blockedAssociations": [],
+      "orderingExpectation": "explicit_metadata_no_runtime_chain_execution",
+      "donorCompatibilityNote": "metadata shape only; no real recall chain execution"
+    },
+    {
+      "scenarioId": "ordering-tie-breaker-deterministic",
+      "coverage": "equal association cases use stable tie-breakers",
+      "memories": [
+        { "id": "m-order-1", "tags": ["tagmemo"], "topic": "ordering", "textClass": "tie-a", "tieBreaker": 1 },
+        { "id": "m-order-2", "tags": ["tagmemo"], "topic": "ordering", "textClass": "tie-b", "tieBreaker": 2 }
+      ],
+      "query": { "text": "tagmemo ordering", "tags": ["tagmemo"], "topic": "ordering" },
+      "expectedAssociations": ["m-order-1", "m-order-2"],
+      "blockedAssociations": [],
+      "orderingExpectation": "tie_breaker_ascending",
+      "donorCompatibilityNote": "stable local ordering; provider scores are not used"
+    },
+    {
+      "scenarioId": "donor-difference-documented",
+      "coverage": "intentional donor differences are explicit",
+      "memories": [
+        { "id": "m-local-diff", "tags": ["local-first"], "topic": "donor difference", "textClass": "intentional-difference" }
+      ],
+      "query": { "text": "donor difference", "tags": ["local-first"], "topic": "donor difference" },
+      "expectedAssociations": ["m-local-diff"],
+      "blockedAssociations": [],
+      "orderingExpectation": "documented_difference_no_exact_parity_claim",
+      "donorCompatibilityNote": "intentional local-first difference; exact donor parity is not claimed"
+    },
+    {
+      "scenarioId": "readiness-overclaim-rejected",
+      "coverage": "fixture rejects readiness and public MCP overclaims",
+      "memories": [],
+      "query": { "text": "readiness claim", "tags": [], "topic": "safety" },
+      "expectedAssociations": [],
+      "blockedAssociations": [],
+      "orderingExpectation": "not_applicable",
+      "donorCompatibilityNote": "safety fixture only",
+      "forbiddenClaims": ["RC_READY", "runtimeReady=true", "finalRcMatrixReady=true", "rcReady=true", "publicMcpExpansionApproved", "providerCallExecuted", "realMemoryStoreRead"]
+    }
+  ]
+}

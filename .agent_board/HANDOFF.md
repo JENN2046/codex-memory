@@ -100,6 +100,17 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - Not authorized in this slice: fixture/test implementation, runtime mutation, real memory scan, recall observation, provider calls, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
 - Project status remains `NOT_READY_BLOCKED`.
 
+
+## Phase F TagMemo Semantic Association Fixture Tests - 2026-05-19
+
+- Anchor before this slice: `015ca28`.
+- Added fixture: [tests/fixtures/phase-f-tagmemo-semantic-association-v1.json](/A:/codex-memory/tests/fixtures/phase-f-tagmemo-semantic-association-v1.json).
+- Added test: [tests/phase-f-tagmemo-semantic-association-fixture.test.js](/A:/codex-memory/tests/phase-f-tagmemo-semantic-association-fixture.test.js).
+- Docs record: [docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_TESTS.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_TESTS.md).
+- Scope: synthetic fixture and structure-only test; no runtime behavior change.
+- Not authorized: real recall observation, memory-store read, provider calls, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
+- Project status remains `NOT_READY_BLOCKED`.
+
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.
