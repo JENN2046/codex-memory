@@ -226,3 +226,21 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Archive
 
 - Full backlog before compression: [docs/archive/MAINTENANCE_BACKLOG_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/MAINTENANCE_BACKLOG_FULL_PRE_CM0302.md)
+
+## CM-0549 HTTP session hardening design packet
+
+Status: CM_0549_DESIGN_PACKET_READY_FOR_REVIEW
+Area: P4-http-runtime / P10-observability-admin
+Risk: design-only now; future runtime implementation is medium risk
+
+Design packet: `docs/CM-0549_HTTP_SESSION_HARDENING_DESIGN.md`
+
+Future implementation candidate:
+
+- Add `CODEX_MEMORY_HTTP_SESSION_TTL_MS` parsing.
+- Add `CODEX_MEMORY_HTTP_MAX_SESSIONS` cap.
+- Add `CODEX_MEMORY_HTTP_MAX_STREAMS_PER_SESSION` cap.
+- Add deterministic cleanup for expired sessions/streams.
+- Add targeted tests before any broad gate.
+
+Boundary: no runtime implementation in CM-0549; no provider call, real memory scan, durable write, package change, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.

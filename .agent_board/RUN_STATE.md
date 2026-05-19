@@ -247,3 +247,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Review input: PASS_WITH_PATCH_RECOMMENDED; no severe blocker; patch recommended to reduce thick status surface.
 - Boundary: docs/board consolidation only; no runtime source change, no HTTP session implementation, no real memory scan, no provider, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
 - Next safe task: CM-0549 HTTP session TTL/cap/cleanup hardening design packet.
+
+## CM-0549 HTTP session hardening design packet
+
+- Current state: HTTP session TTL/cap/cleanup design packet prepared.
+- Decision: CM_0549_DESIGN_PACKET_READY_FOR_REVIEW.
+- Boundary: docs/design only; no runtime code, tests, HTTP service startup, provider call, real memory scan, durable memory write, package change, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: review CM-0549 before selecting CM-0550 implementation candidate.

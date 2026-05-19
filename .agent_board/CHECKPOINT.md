@@ -759,3 +759,13 @@ Changed files: docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; docs/P66_RUNTIME_GAP_TRU
 Validation: docs validation; readiness scan; git diff --check
 Boundary: no runtime source change, no HTTP session implementation, no real memory scan, no provider, no public MCP expansion, no durable write, no push, no cutover, no readiness claim
 Next: CM-0549 HTTP session TTL/cap/cleanup hardening design packet
+
+## CM-0549 validation checkpoint
+
+Status: CM_0549_DESIGN_PACKET_READY_FOR_REVIEW after local validation
+Area: P4-http-runtime / P10-observability-admin
+Scope: docs/design packet for HTTP session TTL, max sessions, max streams per session, and cleanup
+Changed files: docs/CM-0549_HTTP_SESSION_HARDENING_DESIGN.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: git diff --check; docs validation
+Boundary: no runtime source change, no tests change, no HTTP service startup, no provider, no real memory scan, no durable write, no package change, no push/tag/release/deploy
+Next: review design packet before any runtime implementation

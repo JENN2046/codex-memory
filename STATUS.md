@@ -237,3 +237,15 @@ Review conclusion `PASS_WITH_PATCH_RECOMMENDED` has been accepted as a docs/boar
 P2 HTTP session TTL/cap/cleanup remains a follow-up design backlog item, not implemented in this slice.
 
 Next safe task: CM-0549 HTTP session TTL/cap/cleanup hardening design packet.
+
+## CM-0549 HTTP session hardening design packet
+
+Status: CM_0549_DESIGN_PACKET_READY_FOR_REVIEW
+Result: CM_0549_DESIGN_PACKET_READY_FOR_REVIEW
+State: NOT_READY_BLOCKED
+
+HTTP MCP session TTL/cap/cleanup hardening has been captured as a docs/design-only packet in `docs/CM-0549_HTTP_SESSION_HARDENING_DESIGN.md`.
+
+No runtime code, tests, package files, HTTP service, provider, real memory store, durable write, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim changed in this slice.
+
+Next safe step: review the design packet before selecting any runtime implementation task.
