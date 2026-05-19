@@ -111,7 +111,11 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
     assert.equal(payload.mode, 'governance-report');
     assert.equal(payload.destructive, false);
     assert.equal(payload.summary.status, 'ok');
-    assert.equal(payload.readPolicy.status, 'unavailable');
+    assert.equal(payload.readPolicy.status, 'config_only_no_recent_audit');
+    assert.equal(payload.readPolicy.source, 'config-only-no-recent-audit');
+    assert.equal(payload.readPolicy.configEvidenceAvailable, true);
+    assert.equal(payload.readPolicy.auditEvidenceAvailable, false);
+    assert.equal(payload.readPolicy.readPolicyConfigured, false);
     assert.equal(payload.readPolicy.lifecyclePolicyEnabled, false);
     assert.equal(payload.readPolicy.softReadPolicyEnabled, false);
     assert.deepEqual(payload.readPolicy.lifecycleIncludedStatuses, ['active', 'stale']);
@@ -161,6 +165,54 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
     assert.equal(payload.review.counts.stale30d, 2);
     assert.equal(payload.review.counts.stale90d, 1);
     assert.ok(payload.review.hints.some(hint => hint.includes('proposal')));
+    assert.equal(JSON.stringify(payload).includes('workspace_id'), false);
+  } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('governance-report CLI should surface recent read-policy audit evidence when present', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-governance-report-'));
+  const dbPath = path.join(tempBasePath, 'state', 'governance.sqlite');
+  const recallLogPath = path.join(tempBasePath, 'logs', 'recall.jsonl');
+
+  try {
+    await seedGovernanceDb(dbPath);
+    await fs.mkdir(path.dirname(recallLogPath), { recursive: true });
+    await fs.writeFile(recallLogPath, `${JSON.stringify({
+      recallType: 'read-policy',
+      readPolicyApplied: true,
+      lifecyclePolicyApplied: true,
+      hiddenByLifecycleCount: 2,
+      staleResultCount: 1,
+      lifecycleColumnAvailable: true,
+      scopeWorkspacePresent: true
+    })}\n`, 'utf8');
+
+    const result = await runGovernanceReport({
+      args: ['--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DB_PATH: dbPath,
+        CODEX_MEMORY_RECALL_LOG: recallLogPath
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr || 'non-zero exit');
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.readPolicy.status, 'ok');
+    assert.equal(payload.readPolicy.source, 'config-and-recent-recall-audit');
+    assert.equal(payload.readPolicy.configEvidenceAvailable, true);
+    assert.equal(payload.readPolicy.auditEvidenceAvailable, true);
+    assert.equal(payload.readPolicy.recentReadPolicyAuditCount, 1);
+    assert.equal(payload.readPolicy.recentReadPolicyAppliedCount, 1);
+    assert.equal(payload.readPolicy.recentLifecyclePolicyAppliedCount, 1);
+    assert.equal(payload.readPolicy.recentHiddenByLifecycleCount, 2);
+    assert.equal(payload.readPolicy.recentStaleResultCount, 1);
+    assert.equal(payload.readPolicy.lifecycleColumnAvailable, true);
+    assert.equal(payload.readPolicy.scopeWorkspacePresent, true);
+    assert.equal(payload.review.readPolicy.status, 'ok');
+    assert.equal(payload.review.readPolicy.auditEvidenceAvailable, true);
     assert.equal(JSON.stringify(payload).includes('workspace_id'), false);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
@@ -219,6 +271,9 @@ test('governance-report CLI should fail cleanly when the database is missing', a
     assert.equal(payload.review.status, 'error');
     assert.equal(payload.review.reviewLevel, 'unavailable');
     assert.equal(payload.review.counts.totalRecords, 0);
+    assert.equal(payload.review.readPolicy.status, 'config_only_no_recent_audit');
+    assert.equal(payload.review.readPolicy.configEvidenceAvailable, true);
+    assert.equal(payload.review.readPolicy.auditEvidenceAvailable, false);
     assert.equal(payload.review.readPolicy.rawWorkspaceIdExposed, false);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });

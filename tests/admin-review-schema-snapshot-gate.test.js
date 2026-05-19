@@ -76,6 +76,8 @@ test('admin review schema snapshot locks non-empty key sets without duplicates',
 test('admin review schema snapshot keeps review safety fields visible', () => {
   const { snapshots } = loadFixture();
   assert.deepEqual(snapshots.dashboard.readPolicyKeys, sorted([
+    'auditEvidenceAvailable',
+    'configEvidenceAvailable',
     'lifecycleColumnAvailable',
     'lifecycleExcludedStatuses',
     'lifecycleIncludedStatuses',
@@ -84,6 +86,7 @@ test('admin review schema snapshot keeps review safety fields visible', () => {
     'mutated',
     'noProvider',
     'rawWorkspaceIdExposed',
+    'readPolicyConfigured',
     'recentHiddenByLifecycleCount',
     'recentLifecyclePolicyAppliedCount',
     'recentReadPolicyAppliedCount',

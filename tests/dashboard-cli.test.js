@@ -146,6 +146,8 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.audits.recall.rawWorkspaceId, undefined);
 
   assertKeySet(payload.readPolicy, [
+    'auditEvidenceAvailable',
+    'configEvidenceAvailable',
     'lifecycleColumnAvailable',
     'lifecycleExcludedStatuses',
     'lifecycleIncludedStatuses',
@@ -154,6 +156,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'mutated',
     'noProvider',
     'rawWorkspaceIdExposed',
+    'readPolicyConfigured',
     'recentHiddenByLifecycleCount',
     'recentLifecyclePolicyAppliedCount',
     'recentReadPolicyAppliedCount',
@@ -166,6 +169,9 @@ test('dashboard CLI should report all sections in json mode', async () => {
   ], 'dashboard read policy');
   assert.equal(typeof payload.readPolicy.lifecyclePolicyEnabled, 'boolean');
   assert.equal(typeof payload.readPolicy.softReadPolicyEnabled, 'boolean');
+  assert.equal(payload.readPolicy.configEvidenceAvailable, true);
+  assert.equal(typeof payload.readPolicy.auditEvidenceAvailable, 'boolean');
+  assert.equal(typeof payload.readPolicy.readPolicyConfigured, 'boolean');
   assert.deepEqual(payload.readPolicy.lifecycleIncludedStatuses, ['active', 'stale']);
   assert.deepEqual(payload.readPolicy.lifecycleExcludedStatuses, ['proposal', 'rejected', 'superseded', 'tombstoned']);
   assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);

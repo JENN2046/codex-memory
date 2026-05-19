@@ -54,6 +54,8 @@
         "summary"
       ],
       "readPolicyKeys": [
+        "auditEvidenceAvailable",
+        "configEvidenceAvailable",
         "lifecycleColumnAvailable",
         "lifecycleExcludedStatuses",
         "lifecycleIncludedStatuses",
@@ -62,6 +64,7 @@
         "mutated",
         "noProvider",
         "rawWorkspaceIdExposed",
+        "readPolicyConfigured",
         "recentHiddenByLifecycleCount",
         "recentLifecyclePolicyAppliedCount",
         "recentReadPolicyAppliedCount",

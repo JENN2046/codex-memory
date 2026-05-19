@@ -88,12 +88,18 @@ function buildReadPolicySurface({ config = null, recallEntries = [] } = {}) {
   const scopeWorkspaceSignals = policyEntries
     .map(entry => entry.scopeWorkspacePresent)
     .filter(value => typeof value === 'boolean');
+  const hasRecentAuditEvidence = policyEntries.length > 0;
+  const lifecyclePolicyEnabled = !!effectiveConfig.enableLifecycleReadPolicy;
+  const softReadPolicyEnabled = !!effectiveConfig.enableSoftReadPolicy;
 
   return {
-    status: policyEntries.length > 0 ? 'ok' : 'unavailable',
-    source: policyEntries.length > 0 ? 'recent-recall-audit' : 'config-only',
-    lifecyclePolicyEnabled: !!effectiveConfig.enableLifecycleReadPolicy,
-    softReadPolicyEnabled: !!effectiveConfig.enableSoftReadPolicy,
+    status: hasRecentAuditEvidence ? 'ok' : 'config_only_no_recent_audit',
+    source: hasRecentAuditEvidence ? 'config-and-recent-recall-audit' : 'config-only-no-recent-audit',
+    configEvidenceAvailable: true,
+    auditEvidenceAvailable: hasRecentAuditEvidence,
+    readPolicyConfigured: lifecyclePolicyEnabled || softReadPolicyEnabled,
+    lifecyclePolicyEnabled,
+    softReadPolicyEnabled,
     lifecycleIncludedStatuses: LIFECYCLE_INCLUDED_STATUSES,
     lifecycleExcludedStatuses: LIFECYCLE_EXCLUDED_STATUSES,
     recentReadPolicyAuditCount: policyEntries.length,

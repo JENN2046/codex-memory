@@ -357,6 +357,8 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       visibility: 1
     });
     assertKeySet(payload.readPolicy, [
+      'auditEvidenceAvailable',
+      'configEvidenceAvailable',
       'lifecycleColumnAvailable',
       'lifecycleExcludedStatuses',
       'lifecycleIncludedStatuses',
@@ -365,6 +367,7 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       'mutated',
       'noProvider',
       'rawWorkspaceIdExposed',
+      'readPolicyConfigured',
       'recentHiddenByLifecycleCount',
       'recentLifecyclePolicyAppliedCount',
       'recentReadPolicyAppliedCount',
@@ -377,6 +380,9 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     ], 'http-observe read policy');
     assert.deepEqual(payload.readPolicy.lifecycleIncludedStatuses, ['active', 'stale']);
     assert.deepEqual(payload.readPolicy.lifecycleExcludedStatuses, ['proposal', 'rejected', 'superseded', 'tombstoned']);
+    assert.equal(payload.readPolicy.configEvidenceAvailable, true);
+    assert.equal(payload.readPolicy.auditEvidenceAvailable, true);
+    assert.equal(typeof payload.readPolicy.readPolicyConfigured, 'boolean');
     assert.equal(payload.readPolicy.recentHiddenByLifecycleCount, 3);
     assert.equal(payload.readPolicy.recentStaleResultCount, 1);
     assert.equal(payload.readPolicy.lifecycleColumnAvailable, true);

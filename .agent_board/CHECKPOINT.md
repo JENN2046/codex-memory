@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Refresh the approved A5-GAP-6 remaining view after A5-GAP-1 governance production readiness evidence. Preserve all remaining runtime/A5 hard stops.
+Add A4 governance read-policy evidence surface before requesting fresh A5-GAP-1 rerun. Preserve all remaining runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability-admin / validation-aggregator; A5-GAP-6 post-governance-readiness evidence aggregation.
+P8 memory-governance / P10 observability-admin; A4 governance read-policy evidence surface.
 
 ## Current Status
 
@@ -28,6 +28,7 @@ P10 observability-admin / validation-aggregator; A5-GAP-6 post-governance-readin
 - A5-GAP-1 governance production readiness approval packet is now drafted as [docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, asks for subject `p66-a5-gap1-governance-production-readiness-readonly sanitized report`, durable write no, and read-only governance report only. It does not run `governance:report`, read SQLite, write durable state, or claim readiness.
 - A5-GAP-1 governance production readiness evidence is now approved/executed and recorded in [docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_PRODUCTION_READINESS_EVIDENCE.md). The approved read-only `governance:report` returned summary/review `ok` and `nominal`, with proposal/tombstone/superseded/stale counts 0, but read-policy evidence was `unavailable` / `config-only`, so production governance readiness remains `NOT_READY_BLOCKED`.
 - A5-GAP-6 post-governance-readiness evidence-only aggregation refresh is now approved/executed and recorded in [docs/P66_A5_GAP_6_POST_GOVERNANCE_READINESS_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GOVERNANCE_READINESS_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, accepted the explicit runtime evidence summary, reported locally evidenced count `7`, remaining count `6`, `commandsExecutedByAggregator=false`, and kept readiness flags false. The first extraction attempt used a stale field path and failed with no mutation.
+- A4 governance read-policy evidence surface is implemented in [src/cli/governance-report.js](/A:/codex-memory/src/cli/governance-report.js) and recorded in [docs/P66_A4_GOVERNANCE_READ_POLICY_EVIDENCE_SURFACE.md](/A:/codex-memory/docs/P66_A4_GOVERNANCE_READ_POLICY_EVIDENCE_SURFACE.md). `buildReadPolicySurface()` now distinguishes config-only/no-recent-audit evidence from recent audit evidence, and full validation passed: targeted observability tests `15/15`, `npm test` `1574/1574`, docs validation, and `git diff --check`. Fresh A5-GAP-1 read-only rerun is not executed and requires exact approval after commit.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.

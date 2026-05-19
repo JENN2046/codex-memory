@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | Refresh A5-GAP-6 remaining view after governance readiness evidence |
-| Current area | P10-observability-admin / validation-aggregator |
+| Current task | Add A4 governance read-policy evidence surface |
+| Current area | P8-memory-governance / P10-observability-admin |
 | Last pushed baseline | `a9177d5` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Executed approved evidence-only A5-GAP-6 aggregation refresh consuming updated A5-GAP-1/2/3/4/5 sanitized evidence after the governance readiness report. |
-| Last validation | In-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })` accepted the explicit summary with locally evidenced count `7`, remaining count `6`, `commandsExecutedByAggregator=false`, and all readiness flags false; `scripts\validate-local.ps1 -Area docs` and `git diff --check` passed. |
-| Worktree summary | Local `main` is ahead of `origin/main`; runtime audit stream remains changed under ignored `logs/*.jsonl`, and current tracked worktree contains intended A5-GAP-6 post-governance-readiness evidence docs/board updates. No additional governance report execution/provider/public MCP expansion/additional durable write/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/startup/cutover/RC_READY is authorized. |
+| Last action | Implemented A4 explicit read-policy evidence status fields in `governance:report`, with targeted tests for config-only and recent-audit cases. |
+| Last validation | Syntax checks passed; targeted observability tests passed `15/15`; `npm test` passed `1574/1574`; `scripts\validate-local.ps1 -Area docs` and `git diff --check` passed. |
+| Worktree summary | Local `main` is ahead of `origin/main`; runtime audit stream remains changed under ignored `logs/*.jsonl`, and current tracked worktree contains intended A4 governance read-policy evidence surface source/test/docs/board updates. No fresh real governance report execution/provider/public MCP expansion/additional durable write/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/startup/cutover/RC_READY is authorized. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized for this local protocol slice unless explicitly requested |
-| Next planned action | Validate and guarded-commit the A5-GAP-6 post-governance-readiness evidence if eligible. Then choose the next exact A5 packet; do not proceed to cutover or A5-GAP-7. |
+| Next planned action | Run broader validation, guarded-commit the A4 read-policy evidence surface if eligible, then request exact A5-GAP-1 read-only rerun approval. |
 
 ## Notes
 
