@@ -621,3 +621,14 @@ Validation: pending targeted test, docs validation, diff check, readiness/author
 Not validated: runtime behavior, governance report execution, durable memory/audit writes, real stores, public MCP schema.
 Remaining risks: fixture negative cases must remain clearly synthetic and non-authorizing.
 Next safe step: CM-0540 fixture pack closeout review.
+
+## CM-0540 Handoff
+
+Goal: close out local Phase F governance/observability fixture packs.
+Workspace: A:\codex-memory.
+Current area: P8-memory-governance / P10-observability-admin.
+Changed files: docs/PHASE_F_GOVERNANCE_OBSERVABILITY_FIXTURE_PACK_CLOSEOUT_REVIEW.md plus docs/board status files.
+Validation: pending combined targeted fixture tests, docs validation, diff check, readiness scan.
+Not validated: runtime behavior, HTTP observe, governance report execution, durable memory/audit writes, real stores, public MCP schema.
+Remaining risks: fixture-pack evidence remains synthetic and must not be treated as runtime readiness.
+Next safe step: CM-0541 integration index.

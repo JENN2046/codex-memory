@@ -197,3 +197,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: fixture/test/docs/board only; no runtime/source change, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
 - Next safe task: CM-0540 governance/observability fixture pack closeout review.
+
+## CM-0540 State
+
+- Current state: Phase F governance/observability fixture pack closeout review drafted locally.
+- Decision: NOT_READY_BLOCKED.
+- Boundary: docs/board closeout only; no runtime/source change, no HTTP observe, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
+- Next safe task: CM-0541 Phase F VCP parity fixture pack integration index.
