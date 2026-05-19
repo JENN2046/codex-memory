@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record `RC_PRECHECK_001` exact A5 approval blocker and keep `CM-0512` / `CM-0513` stopped until approval.
+Summarize this week's `RC_PRECHECK_001` local commits and keep the handoff ready for a future exact A5 approval or a local-safe next task.
 
 ## Workspace
 
@@ -14,7 +14,7 @@ Record `RC_PRECHECK_001` exact A5 approval blocker and keep `CM-0512` / `CM-0513
 
 ## Worktree
 
-Current Git reality before blocker commit: `## main...origin/main [ahead 5]`; latest local HEAD is `7959acf3cc2242372c7e7d955f017713c4fb7c63`; `origin/main` remains `103c3ac`.
+Current Git reality before weekly reconciliation commit: `## main...origin/main [ahead 6]`; latest local HEAD is `86d495ab48158c83e88592181f8647da39651321`; `origin/main` remains `103c3ac`.
 
 ## Current Area
 
@@ -38,6 +38,7 @@ P6 docs-drift / P10 observability-admin; `AGENTS.md` governance cleanup and `RC_
 - `RC_PRECHECK_001` target is refreshed to `c943a42f5858a140c8e80362267844b40628385a`. Any future full precheck execution must re-read exact `HEAD` before A5 commands run and update the packet if the target changed.
 - `RC_PRECHECK_001` approval packet is split into `A5-RC-PRECHECK-READONLY` and `A5-RC-PRECHECK-RECALL`. Default next approval should be readonly only; recall observation requires a separately named subject/query/audit boundary.
 - `CMB-0006` blocks `CM-0512` and `CM-0513`: no exact `A5-RC-PRECHECK-READONLY` or `A5-RC-PRECHECK-RECALL` approval is present, so no full precheck, aggregation packet, cutover, or readiness claim may run.
+- `RC_PRECHECK_001` weekly status is recorded in [docs/RC_PRECHECK_001_WEEKLY_STATUS.md](/A:/codex-memory/docs/RC_PRECHECK_001_WEEKLY_STATUS.md): commits through `86d495a` are local-only, no A5 precheck ran, and `NOT_READY_BLOCKED` remains controlling.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - Fresh A5-GAP-2 rerun has now been executed for approved stores at `ceffc0f255c142875a0f41879539361dd547c4bc` and recorded in [docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). Result: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION`; limitation: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; store snapshots unchanged; no mutation.
 - A5-GAP-6 has now been executed for approved evidence consumption only at `16d3fe8af80fafad5b0db7ed29aacc6f7e51c1ff` and recorded in [docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.

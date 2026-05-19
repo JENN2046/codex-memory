@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - RC_PRECHECK_001 weekly reconciliation - 2026-05-19
+
+- Status: `NOT_READY_BLOCKED`
+- Local anchor before checkpoint commit: `86d495ab48158c83e88592181f8647da39651321`
+- Completed: governance cleanup, target refresh, split approval boundaries, no-approval blocker.
+- Blocked: `CM-0512` and `CM-0513` by `CMB-0006` until exact approval.
+- Validation required for this checkpoint: docs validation, `git diff --check`, stale target/baseline scan, and clean status after commit.
+- Not run: strict gate, HTTP observe, recall path, compare/rollback, provider, migration/apply, config/watchdog/startup, push/tag/release/deploy/cutover.
+
 ## Current Goal
 
 Record approved A5-GAP-6 post-classified-sample-write evidence. Preserve all remaining runtime/A5 hard stops.
@@ -18,7 +27,7 @@ P10 observability-admin / validation-aggregator; A5-GAP-6 evidence-only aggregat
 - A5-GAP-2 sanitized classified sample write evidence is now executed and recorded in [docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md). Result: `PASSED_POSITIVE_CLASSIFIED_SAMPLE_ISOLATED`; `sampleCountCreated=1`; `sampleContractMatched=true`; `sampleChunkCount=0`; vector/cache/recall-audit exact id occurrences `0`; `projectionLeakageCount=0`; one normal write-path audit append occurred as unavoidable. No backfill, migration, import/export, backup/restore, provider, public MCP expansion, config/watchdog/startup, cutover, remote write, or readiness claim occurred.
 - A5-GAP-6 post-classified-sample-write approval packet is drafted as [docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests only future exact-approval evidence-only aggregation over updated A5-GAP-1/2/3/4/5 sanitized evidence, and executes no aggregation or runtime action.
 - A5-GAP-6 post-classified-sample-write evidence is now approved/executed and recorded in [docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP2_CLASSIFIED_SAMPLE_WRITE_RUNTIME_STILL_BLOCKED`; summary accepted; locally evidenced bounded count `12`; remaining count `6`; `commandsExecutedByAggregator=false`; readiness flags false. No new runtime action, provider call, service start, runtime-store scan, durable write, public MCP expansion, config/watchdog/startup change, remote write, cutover, or readiness claim occurred.
-- Local `main` contains `1c17d17cecc39c57f5df1473634451518dc97d32 docs: refresh p66 a5 gap6 aggregator evidence` and is ahead of `origin/main = a9177d5` by 14 commits before this evidence slice; verify exact current state with `git status -sb` before new work.
+- Historical P66 evidence commits are superseded by current `RC_PRECHECK_001` local planning state; verify exact current `HEAD`, ahead/behind, and worktree state with `git status -sb` before new work.
 - User supplied a complete approval line for fresh `A5-GAP-5`. The approved strict gate ran only `npm run gate:mainline:strict` for current `HEAD`, performed no remote write, and failed in the test gate: health ok, contract ok, test error (`1569/1573` pass, 4 fail), compare ok, rollback ok.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - Fresh A5-GAP-2 rerun has now been executed for approved stores at `ceffc0f255c142875a0f41879539361dd547c4bc` and recorded in [docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). Result: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION`; limitation: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; store snapshots unchanged; no mutation.
