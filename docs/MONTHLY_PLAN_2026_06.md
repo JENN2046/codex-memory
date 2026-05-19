@@ -253,3 +253,7 @@ Phase F VCP parity fixture pack integration index prepared as a local-safe docs/
 ## CM-0542 Monthly Update
 
 Phase F VCP parity fixture coverage gap review prepared as a local-safe docs/board slice. It selects LightMemo directory semantics fixture planning as the next safe target while keeping runtime parity, durable writes, real-store reads, public MCP expansion, and readiness claims blocked. Status remains NOT_READY_BLOCKED.
+
+## CM-0543 Monthly Update
+
+Phase F LightMemo directory semantics fixture plan prepared as a local-safe docs/board slice. It defines future synthetic coverage for maid/folder/alias/excluded-folder/all-KB behavior while keeping real LightMemo recall, real-store reads, public MCP expansion, durable writes, and readiness claims blocked. Status remains NOT_READY_BLOCKED.

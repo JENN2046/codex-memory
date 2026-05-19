@@ -654,3 +654,14 @@ Validation: pending combined targeted fixture tests, docs validation, diff check
 Not validated: runtime behavior, LightMemo runtime recall, HTTP observe, governance report execution, durable memory/audit writes, real stores, public MCP schema.
 Remaining risks: selected LightMemo lane must remain synthetic fixture/test-only until separately planned.
 Next safe step: CM-0543 LightMemo directory semantics fixture plan.
+
+## CM-0543 Handoff
+
+Goal: prepare Phase F LightMemo directory semantics fixture plan.
+Workspace: A:\codex-memory.
+Current area: P7-vcp-parity-hardening.
+Changed files: docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_PLAN.md plus docs/board status files.
+Validation: pending docs validation, diff check, readiness scan.
+Not validated: runtime behavior, real LightMemo recall, real memory stores, provider, HTTP observe, public MCP schema.
+Remaining risks: future CM-0544 must remain synthetic fixture/test-only.
+Next safe step: CM-0544 synthetic fixture contract.

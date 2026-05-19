@@ -218,3 +218,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: docs/board review only; no runtime/source/test change, no HTTP observe, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
 - Next safe task: CM-0543 Phase F LightMemo directory semantics fixture plan.
+
+## CM-0543 State
+
+- Current state: Phase F LightMemo directory semantics fixture plan drafted locally.
+- Decision: NOT_READY_BLOCKED.
+- Boundary: docs/board plan only; no runtime/source/test change, no real LightMemo recall, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
+- Next safe task: CM-0544 Phase F LightMemo directory semantics synthetic fixture contract.

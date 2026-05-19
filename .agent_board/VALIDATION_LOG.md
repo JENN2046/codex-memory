@@ -718,3 +718,5 @@ npm run profile-gate -- --json --summary-only
 - CMV-0640 | P7-vcp-parity-hardening / P8-memory-governance / P10-observability-admin | CM-0541 Phase F VCP parity fixture pack integration index | COMPLETED_VALIDATED | Combined targeted fixture tests passed 16/16; docs validation passed; git diff --check passed after EOF cleanup; readiness scan returned historical entries and explicit denial/boundary wording only.
 
 - CMV-0641 | P7-vcp-parity-hardening | CM-0542 Phase F VCP parity fixture coverage gap review | COMPLETED_VALIDATED | Combined targeted fixture tests passed 16/16; docs validation passed; git diff --check passed after EOF cleanup; readiness scan returned historical entries and explicit non-claim wording only.
+
+- CMV-0642 | P7-vcp-parity-hardening | CM-0543 Phase F LightMemo directory semantics fixture plan | COMPLETED_VALIDATED | Docs-only fixture-plan slice prepared; git diff --check passed after EOF cleanup; docs validation passed; readiness scan returned historical entries and explicit denial/boundary wording only.

@@ -715,3 +715,10 @@ Supreme Commander protocol slice is implemented and validated locally. It adds [
 - Scope: docs-only coverage gap review across current Phase F fixture packs.
 - Boundary: no runtime/source/test change in this slice, no HTTP observe, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
 - Next: CM-0543 Phase F LightMemo directory semantics fixture plan.
+
+## CM-0543 Phase F LightMemo directory semantics fixture plan
+
+- Status: COMPLETED_VALIDATED pending final validation/commit.
+- Scope: docs-only fixture plan for synthetic LightMemo directory semantics scenarios.
+- Boundary: no runtime/source/test change in this slice, no real LightMemo recall, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
+- Next: CM-0544 Phase F LightMemo directory semantics synthetic fixture contract.
