@@ -1,10 +1,10 @@
 # RC_PRECHECK_001 A5-GAP-6 Evidence-Only Aggregation Approval Packet
 
-Status: `DRAFT_NOT_APPROVED`
+Status: `EXECUTED_APPROVED_EVIDENCE_AGGREGATED_NOT_RC_READY`
 
 Decision: `NOT_READY_BLOCKED`
 
-Packet target commit: `0a6077da748e9a6d2b98b92ca45b01364d76070d`
+Packet target commit at preparation: `0a6077da748e9a6d2b98b92ca45b01364d76070d`
 
 Source evidence target: `a6030f36b3026d360c6aa99f97a2d1af44365433`
 
@@ -14,7 +14,7 @@ Remote baseline: `origin/main = 103c3ac`
 
 Prepare a future exact approval boundary for `A5-GAP-6` evidence-only aggregation after `RC_PRECHECK_001` readonly evidence passed as `PRECHECK_PASSED_NOT_RC_READY`.
 
-This packet is not approval. It executes no aggregation and no runtime action.
+This packet was superseded by exact approval for current HEAD `a1f54d6413fe0d1ee4d3ae1923b7bec4144aab9a`; evidence-only aggregation has been executed and recorded in [docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_EVIDENCE.md](/A:/codex-memory/docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_EVIDENCE.md).
 
 ## Eligible Source Evidence
 
@@ -68,3 +68,11 @@ I approve A5-GAP-6 evidence-only aggregation for RC_PRECHECK_001 on local main a
 ## Current Safe Next Step
 
 Stop at packet preparation, or request exact approval using the line above.
+
+## Execution Result - 2026-05-19
+
+Exact approval was provided for current HEAD `a1f54d6413fe0d1ee4d3ae1923b7bec4144aab9a`.
+
+Result: `EVIDENCE_AGGREGATED_NOT_RC_READY`.
+
+Project decision remains `NOT_READY_BLOCKED`.

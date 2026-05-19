@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - RC_PRECHECK_001 A5-GAP-6 aggregation executed - 2026-05-19
+
+- Status: `EVIDENCE_AGGREGATED_NOT_RC_READY`; project decision remains `NOT_READY_BLOCKED`.
+- Approval target: `a1f54d6413fe0d1ee4d3ae1923b7bec4144aab9a`.
+- Source evidence: `docs/RC_PRECHECK_001_READONLY_EVIDENCE.md` and existing approved sanitized A5 evidence referenced by `docs/P66_RUNTIME_GAP_TRUTH_TABLE.md`.
+- Aggregator result: explicit summary accepted, locally evidenced count `5`, remaining count `6`, readiness flags false.
+- Not run: recall path observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: local-safe Phase F prep unless new exact A5 approval is provided.
 ## Checkpoint - RC_PRECHECK_001 A5-GAP-6 packet prepared - 2026-05-19
 
 - Status: `DRAFT_NOT_APPROVED`; project decision remains `NOT_READY_BLOCKED`.

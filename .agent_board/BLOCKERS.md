@@ -53,12 +53,8 @@ Safe state: `PRECHECK_PASSED_NOT_RC_READY` for readonly evidence, project remain
 
 ## CMB-0008 - RC_PRECHECK_001 A5-GAP-6 aggregation approval required
 
-Status: `OPEN`
+Status: `CLOSED_EXECUTED_NOT_READY`\r\n\r\nArea: P10-observability-admin / validation-aggregator\r\n\r\nResolution: exact A5-GAP-6 evidence-only aggregation approval was provided and executed for current HEAD `a1f54d6413fe0d1ee4d3ae1923b7bec4144aab9a`.
 
-Area: P10-observability-admin / validation-aggregator
+Next action: continue local-safe Phase F prep or request a separate exact approval for recall observation/cutover-related work if needed.
 
-Reason: `RC_PRECHECK_001` readonly evidence exists, but evidence-only aggregation execution is a separate A5 boundary and has not been approved.
-
-Required approval/action: use the exact approval line in [docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_APPROVAL_PACKET.md](/A:/codex-memory/docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_APPROVAL_PACKET.md) after refreshing target commit if `HEAD` changes.
-
-Safe state: packet is `DRAFT_NOT_APPROVED`; no aggregation execution, recall, provider, real memory broad scan, migration/apply, config/watchdog/startup change, public MCP expansion, durable write, push, cutover, A5-GAP-7, or readiness claim.
+Safe state: aggregation evidence recorded as `EVIDENCE_AGGREGATED_NOT_RC_READY`; no recall, provider, real memory broad scan, migration/apply, config/watchdog/startup change, public MCP expansion, durable write, push, cutover, A5-GAP-7, or readiness claim.

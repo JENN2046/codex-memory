@@ -46,6 +46,16 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - Source evidence: [docs/RC_PRECHECK_001_READONLY_EVIDENCE.md](/A:/codex-memory/docs/RC_PRECHECK_001_READONLY_EVIDENCE.md).
 - No aggregation execution occurred.
 - Next boundary: exact A5-GAP-6 approval or local-safe non-A5 Phase F prep.
+
+## RC_PRECHECK_001 A5-GAP-6 Aggregation Evidence - 2026-05-19
+
+- Evidence recorded: [docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_EVIDENCE.md](/A:/codex-memory/docs/RC_PRECHECK_001_A5_GAP_6_AGGREGATION_EVIDENCE.md).
+- Exact approval target: `a1f54d6413fe0d1ee4d3ae1923b7bec4144aab9a`.
+- Aggregator accepted explicit sanitized summary: `runtimeEvidenceSummaryAccepted=true`.
+- Counts: locally evidenced `5`, remaining `6`.
+- Readiness flags stayed false: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+- Aggregator side effects: `readsFiles=false`, `executesCommands=false`, `startsServices=false`, `callsProviders=false`, `mutatesDurableState=false`.
+- Result: `EVIDENCE_AGGREGATED_NOT_RC_READY`; project remains `NOT_READY_BLOCKED`.
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.
