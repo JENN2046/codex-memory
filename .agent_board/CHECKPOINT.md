@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - Phase F TagMemo semantic association fixture plan - 2026-05-19
+
+- Status: `FIXTURE_PLAN_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
+- Anchor before this slice: `55cd41e0efaa97c337d30372a7a7a7aae751b47f`.
+- New document: [docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_PLAN.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_PLAN.md).
+- Completed: planned future synthetic TagMemo semantic association fixture/test contract and queued `CM-0530`.
+- Not run: fixture/test/source/runtime changes, A5 command, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: `CM-0530` Phase F TagMemo semantic association fixture tests.
 ## Checkpoint - Phase F fixture/test-only parity hardening matrix - 2026-05-19
 
 - Status: `FIXTURE_TEST_ONLY_MATRIX_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.

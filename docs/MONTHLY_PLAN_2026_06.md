@@ -163,3 +163,13 @@ Selected next slice: `CM-0529 Phase F TagMemo semantic association fixture plan`
 This slice only defines future fixture/test categories and did not add fixtures/tests, modify source/runtime, inspect real memory stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
 
 Project status remains `NOT_READY_BLOCKED`.
+
+## Week 4 Phase F TagMemo Fixture Plan - 2026-05-19
+
+TagMemo semantic association fixture plan is recorded in [docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_PLAN.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_PLAN.md).
+
+Selected next slice: `CM-0530 Phase F TagMemo semantic association fixture tests`.
+
+This slice only defines the future synthetic fixture/test contract and did not add fixtures/tests, modify source/runtime, inspect real memory stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
+
+Project status remains `NOT_READY_BLOCKED`.

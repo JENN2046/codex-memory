@@ -112,3 +112,11 @@ Handoff: report to Commander in conversation; do not edit files.
 - Status remains `NOT_READY_BLOCKED`.
 - Selected next slice: `CM-0529` TagMemo semantic association fixture plan.
 - No fixture/test/source/runtime/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.
+
+## Phase F TagMemo Semantic Association Fixture Plan - 2026-05-19
+
+- Anchor before this slice: `55cd41e0efaa97c337d30372a7a7a7aae751b47f`.
+- Plan doc: [docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_PLAN.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_PLAN.md).
+- Status remains `NOT_READY_BLOCKED`.
+- Selected next slice: `CM-0530` TagMemo semantic association fixture tests.
+- No fixture/test/source/runtime/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.
