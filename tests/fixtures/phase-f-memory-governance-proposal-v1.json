@@ -1,0 +1,87 @@
+{
+  "version": "phase-f-memory-governance-proposal-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "durableMemoryWritten": false,
+  "durableAuditWritten": false,
+  "realMemoryStoreRead": false,
+  "providerCalled": false,
+  "objects": [
+    {
+      "id": "memory_proposal",
+      "defaultState": "DRAFT_NOT_APPROVED",
+      "purpose": "candidate memory change before durable mutation",
+      "applyBoundary": "exact approval before durable write",
+      "requiresExactApproval": true,
+      "defaultDurableMutation": false
+    },
+    {
+      "id": "supersession_record",
+      "defaultState": "REVIEW_READY_NOT_APPROVED",
+      "purpose": "explain why one memory item should replace or narrow another",
+      "applyBoundary": "exact approval before applied supersession",
+      "requiresExactApproval": true,
+      "defaultDurableMutation": false
+    },
+    {
+      "id": "tombstone_record",
+      "defaultState": "REVIEW_READY_NOT_APPROVED",
+      "purpose": "mark a memory item as intentionally hidden or retired",
+      "applyBoundary": "exact approval before durable tombstone",
+      "requiresExactApproval": true,
+      "defaultDurableMutation": false
+    },
+    {
+      "id": "forget_request",
+      "defaultState": "FORGET_REQUESTED",
+      "purpose": "request removal or suppression of memory",
+      "applyBoundary": "exact approval before destructive deletion or durable suppression",
+      "requiresExactApproval": true,
+      "defaultDurableMutation": false
+    },
+    {
+      "id": "governance_review",
+      "defaultState": "DRAFT_NOT_APPROVED",
+      "purpose": "review result for a proposal without acting as execution authority",
+      "applyBoundary": "review text alone is not authority",
+      "requiresExactApproval": true,
+      "defaultDurableMutation": false
+    }
+  ],
+  "states": [
+    "DRAFT_NOT_APPROVED",
+    "REVIEW_READY_NOT_APPROVED",
+    "APPROVED_FOR_EXACT_ACTION",
+    "APPLIED_WITH_AUDIT",
+    "REJECTED",
+    "SUPERSEDED",
+    "TOMBSTONED",
+    "FORGET_REQUESTED",
+    "FORGET_APPLIED_WITH_AUDIT"
+  ],
+  "approvalRequirements": [
+    "exactTargetObjectId",
+    "exactAction",
+    "exactScope",
+    "exactAllowedCommandPathOrNoCommandMarker",
+    "durableWriteYesNo",
+    "realStoreReadYesNo",
+    "destructiveDeletionYesNo",
+    "auditRequirement",
+    "forbiddenSideEffects"
+  ],
+  "forbiddenDefaults": [
+    "approval already granted",
+    "durable memory already written",
+    "durable audit already written",
+    "destructive deletion already applied",
+    "public MCP expansion approved",
+    "provider call executed",
+    "real memory store read",
+    "runtimeReady=true",
+    "finalRcMatrixReady=true",
+    "rcReady=true",
+    "RC_READY"
+  ]
+}

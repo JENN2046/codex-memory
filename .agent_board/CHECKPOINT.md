@@ -687,3 +687,10 @@ Supreme Commander protocol slice is implemented and validated locally. It adds [
 - Scope: docs-only fixture/test plan for governance proposal states.
 - Boundary: no runtime/source/test change, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
 - Next: CM-0539 memory governance proposal synthetic fixture contract.
+
+## CM-0539 Phase F memory governance proposal synthetic fixture contract
+
+- Status: COMPLETED_VALIDATED pending final validation/commit.
+- Scope: synthetic JSON fixture, structure-only test, docs/board evidence.
+- Boundary: no runtime/source change, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
+- Next: CM-0540 governance/observability fixture pack closeout review.
