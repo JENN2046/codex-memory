@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | Prepare A5-GAP-2 classified sample recall isolation readonly approval packet |
+| Current task | Record A5-GAP-2 classified sample recall isolation readonly evidence |
 | Current area | P10-observability-admin / recall-isolation |
 | Last pushed baseline | `a9177d5` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Prepared a draft A5-GAP-2 packet for read-only classified isolation positive-sample presence and projection proof. |
-| Last validation | Docs validation passed, `git diff --check` passed, and overclaim scan found no new readiness/approval claim in the packet slice. |
-| Worktree summary | Local `main` is ahead of `origin/main`; current tracked worktree contains intended A5-GAP-2 packet docs/board updates only. No runtime store scan, sample creation/backfill, provider/public MCP expansion/durable write/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/startup/cutover/A5-GAP-7/RC_READY is authorized by this packet slice. |
+| Last action | Executed approved A5-GAP-2 read-only classified sample positive-sample presence and projection proof. |
+| Last validation | Preflight matched `HEAD=ff55256105e58725c8dbc45cb2d6a68fde98929e`; read-only approved-store scan returned `FAIL_CLOSED_NO_CLASSIFIED_REAL_SAMPLE_PRESENT`, `classifiedSampleCount=0`, `projectionLeakageCount=0`, and `storeSnapshotsUnchanged=true`; docs validation and `git diff --check` passed; overclaim scan found only negative/readiness-blocked contexts. |
+| Worktree summary | Local `main` is ahead of `origin/main`; current tracked worktree contains intended A5-GAP-2 classified-sample readonly evidence docs/board updates. No sample creation/backfill, provider/public MCP expansion/durable write/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/startup/cutover/A5-GAP-7/RC_READY is authorized by this evidence slice. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized for this local protocol slice unless explicitly requested |
-| Next planned action | Guarded-commit the A5-GAP-2 classified sample recall isolation readonly packet, then request the exact A5-GAP-2 approval line using the post-packet commit hash. |
+| Next planned action | Guarded-commit the A5-GAP-2 classified sample readonly fail-closed evidence, then choose the next exact A5 packet. |
 
 ## Notes
 
