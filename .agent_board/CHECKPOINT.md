@@ -2,17 +2,17 @@
 
 ## Current Goal
 
-Record approved A5-GAP-5 cutover-context strict gate evidence for target `96b6a3c` while preserving all other runtime/A5 hard stops.
+Record approved A5-GAP-4 endpoint-bound live HTTP readiness evidence for `http://127.0.0.1:7605` at `53554c174b8b270c7bf792a368a3f4c249044b1d` while preserving all other runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability-admin / P0 mainline-health; A5-GAP-5 strict gate evidence.
+P10 observability-admin / P4 HTTP runtime; A5-GAP-4 endpoint-bound live HTTP readiness evidence.
 
 ## Current Status
 
 - Last pushed baseline: `a9177d5 fix: tighten review patch safety semantics` on `origin/main`.
-- Local `main` contains `96b6a3c docs: reconcile p66 a5 packet commit state` and is ahead of `origin/main = a9177d5` by 4 commits before this evidence slice; verify exact current state with `git status -sb` before new work.
-- User supplied a complete approval line for `A5-GAP-5` only. `npm run gate:mainline:strict` passed for target `96b6a3c`; evidence is recorded in [docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md). Other A5 lines still contain placeholders and remain not approved.
+- Local `main` contains `53554c174b8b270c7bf792a368a3f4c249044b1d docs: record p66 a5 gap5 strict gate evidence` and is ahead of `origin/main = a9177d5` by 5 commits before this evidence slice; verify exact current state with `git status -sb` before new work.
+- User supplied a complete approval line for `A5-GAP-4` only. Read-only `/health`, MCP `initialize`, MCP `tools/list`, and `http-observe` summary passed with warnings for endpoint `http://127.0.0.1:7605`; evidence is recorded in [docs/P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md). `A5-GAP-5` evidence remains recorded in [docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md). Other A5 lines still contain placeholders and remain not approved.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
@@ -61,6 +61,7 @@ P10 observability-admin / P0 mainline-health; A5-GAP-5 strict gate evidence.
 - P66.12 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
 - P66.60 runtime gap current-state reconciliation is implemented as docs/board only and confirms that no further local-safe work remains for the seven remaining runtime gaps.
 - P66.60 review blocker fix and follow-up review patch safety semantics are pushed through `a9177d5`.
+- A5-GAP-4 endpoint-bound live HTTP readiness evidence is recorded locally for `53554c174b8b270c7bf792a368a3f4c249044b1d` / `http://127.0.0.1:7605` with result `ENDPOINT_BOUND_PASSED_WITH_WARNINGS`: health ok, initialize ok, public MCP tools frozen, observe health ok / HTTP 200 / HTTP log errors 0 / watchdog ensure failures 0 / historical watchdog recoveries 9.
 - Supreme Commander local autopilot protocol is implemented, validated, and committed locally in `f46b36d`; it adds no new A5 authority and remains unpushed.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.

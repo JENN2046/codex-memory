@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record approved A5-GAP-5 cutover-context strict gate evidence for target `96b6a3c` and keep all other runtime/A5 boundaries blocked until exact approval is provided.
+Record approved A5-GAP-4 endpoint-bound live HTTP readiness evidence for `http://127.0.0.1:7605` at `53554c174b8b270c7bf792a368a3f4c249044b1d` and keep all other runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,16 +14,16 @@ Record approved A5-GAP-5 cutover-context strict gate evidence for target `96b6a3
 
 ## Worktree
 
-Current local `main` contains `96b6a3c docs: reconcile p66 a5 packet commit state` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 4 commits before this evidence slice. The current worktree contains intended A5-GAP-5 evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` contains `53554c174b8b270c7bf792a368a3f4c249044b1d docs: record p66 a5 gap5 strict gate evidence` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 5 commits before this evidence slice. The current worktree contains intended A5-GAP-4 evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability-admin / P0 mainline-health; A5-GAP-5 strict gate evidence.
+P10 observability-admin / P4 HTTP runtime; A5-GAP-4 endpoint-bound live HTTP readiness evidence.
 
 ## Current Truth
 
 - P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
-- Current local slice records approved `A5-GAP-5` evidence. `npm run gate:mainline:strict` passed for target `96b6a3c`; the evidence is target-bound and does not authorize cutover or `RC_READY`. Other A5 approval lines still contain placeholders and remain not approved.
+- Current local slice records approved `A5-GAP-4` evidence. Read-only `/health`, MCP `initialize`, MCP `tools/list`, and `http-observe` summary passed with warnings for endpoint `http://127.0.0.1:7605`; the evidence is endpoint-bound and does not authorize config/watchdog/startup change, production readiness, cutover, or `RC_READY`. `A5-GAP-5` strict gate evidence remains target-bound to `96b6a3c` and does not authorize cutover or `RC_READY`. Other A5 approval lines still contain placeholders and remain not approved.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
@@ -76,6 +76,7 @@ P10 observability-admin / P0 mainline-health; A5-GAP-5 strict gate evidence.
 - P66.18 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
 - P66.60 runtime gap current-state reconciliation is implemented as docs/board only and reconciles the seven remaining runtime gaps against pushed state now superseded by `origin/main = a9177d5`.
 - P66.60 review-blocker fix and follow-up review patch are pushed; current baseline docs are being reconciled again so they do not preserve stale local/pushed language.
+- A5-GAP-4 endpoint-bound live HTTP readiness evidence is recorded locally in [docs/P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_4_LIVE_HTTP_READINESS_EVIDENCE.md) with result `ENDPOINT_BOUND_PASSED_WITH_WARNINGS`: health ok, initialize ok, public MCP tools frozen, observe health ok / HTTP 200 / HTTP log errors 0 / watchdog ensure failures 0 / historical watchdog recoveries 9.
 - Supreme Commander protocol is committed locally in `f46b36d`, and post-commit state is recorded in `ef599ca`, with A4.8 / 4-Agent / next-phase entry links updated. Push remains blocked unless explicitly requested.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
@@ -83,7 +84,7 @@ P10 observability-admin / P0 mainline-health; A5-GAP-5 strict gate evidence.
 
 ## Validation
 
-- Current review patch validation passed before push: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan.
+- Current A5-GAP-4 validation passed: preflight `git status --short --branch`, `git rev-parse HEAD`, `/health`, MCP `initialize`, MCP `tools/list`, and `node .\src\cli\http-observe.js --json --health-url http://127.0.0.1:7605/health` sanitized summary. Current review patch validation passed before push: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan.
 - Supreme Commander protocol validation passed: `git diff --check`, docs validation, trailing whitespace scan, and active stale-baseline scan.
 - P57-T1 validation passed: new test syntax, fixture JSON parse, targeted P57 test `13/13`, targeted P38/P43/P55/P57 set `49/49`, `npm test` `963/963`.
 - P57-T2 validation passed: changed JS syntax checks, targeted helper/no-touch test `10/10`, targeted P38/P43/P55/P56/P57 set `61/61`, boundary scan returned no hits, `npm test` `969/969`.
