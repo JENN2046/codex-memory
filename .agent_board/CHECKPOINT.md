@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record the A5-GAP-1 production governance readiness readonly evidence. Preserve all remaining runtime/A5 hard stops.
+Record the A5-GAP-6 post-production-governance-readiness evidence-only aggregation. Preserve all remaining runtime/A5 hard stops.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 production governance readiness readonly evidence.
+P10 observability-admin / ValidationAggregator; A5-GAP-6 post-production-governance-readiness evidence-only aggregation.
 
 ## Current Status
 
@@ -39,6 +39,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 production governance r
 - A5-GAP-6 post-read-policy-audit-writer evidence-only aggregation is now approved/executed and recorded in [docs/P66_A5_GAP_6_POST_READ_POLICY_AUDIT_WRITER_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_READ_POLICY_AUDIT_WRITER_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, accepted the explicit runtime evidence summary, reported locally evidenced count `10`, remaining count `6`, `commandsExecutedByAggregator=false`, and kept readiness flags false.
 - A5-GAP-1 production governance readiness readonly packet is now drafted as [docs/P66_A5_GAP_1_PRODUCTION_GOVERNANCE_READINESS_READONLY_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_PRODUCTION_GOVERNANCE_READINESS_READONLY_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests only read-only `governance:report`, durable write no, and one sanitized evidence document. It does not execute the command, write durable audit/memory, call providers, run migration/import/export/backup/restore, touch cutover/A5-GAP-7, or claim readiness.
 - A5-GAP-1 production governance readiness readonly evidence is now approved/executed and recorded in [docs/P66_A5_GAP_1_PRODUCTION_GOVERNANCE_READINESS_READONLY_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_PRODUCTION_GOVERNANCE_READINESS_READONLY_EVIDENCE.md). It ran only read-only `governance:report`, returned summary/review `ok`, reviewLevel `nominal`, proposal/tombstone/superseded/stale counts 0, `readPolicy.status=ok`, `auditEvidenceAvailable=true`, `recentReadPolicyAuditCount=1`, `mutated=false`, and `migrationApplied=false`. It proves the read-only production governance surface is locally acceptable, but does not unlock runtime/RC/cutover readiness.
+- A5-GAP-6 post-production-governance-readiness evidence-only aggregation is now approved/executed and recorded in [docs/P66_A5_GAP_6_POST_PRODUCTION_GOVERNANCE_READINESS_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_PRODUCTION_GOVERNANCE_READINESS_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, accepted the explicit runtime evidence summary, reported locally evidenced count `11`, remaining count `6`, `commandsExecutedByAggregator=false`, and kept readiness flags false.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
