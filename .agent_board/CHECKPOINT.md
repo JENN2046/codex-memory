@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - Phase F TagMemo fixture pack local closeout review - 2026-05-19
+
+- Status: `LOCAL_FIXTURE_PACK_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
+- Anchor before this slice: `af0a990`.
+- Closeout doc: [docs/PHASE_F_TAGMEMO_FIXTURE_PACK_LOCAL_CLOSEOUT_REVIEW.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_FIXTURE_PACK_LOCAL_CLOSEOUT_REVIEW.md).
+- Completed: closed the local synthetic TagMemo fixture pack and selected `CM-0534` observability/admin design draft.
+- Not run: source/runtime changes, A5 command, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: CM-0534 Phase F observability/admin review surface design draft.
 ## Checkpoint - Phase F TagMemo deterministic ordering tie-breaker fixtures - 2026-05-19
 
 - Status: `FIXTURE_TESTS_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
