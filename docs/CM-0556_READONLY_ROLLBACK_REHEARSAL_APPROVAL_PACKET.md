@@ -44,6 +44,33 @@ A future approved read-only rehearsal may inspect:
 
 The rehearsal may reference recent evidence such as RC precheck rollback harness result `43/43 rollback-ready`, but that evidence remains compatibility/readiness-harness evidence. It is not an actual operational rollback execution artifact.
 
+## Packet-Defined Rollback Rehearsal Baseline
+
+Rollback rehearsal baseline: `6c8bee0262d90fda0f05735b250c36aac83761a8`
+
+Current packet HEAD at baseline binding time: `04dc89207101e65ef4fc64346ff7e90bf686a5c3`
+
+Why this baseline was selected:
+
+- It is the exact result of `git merge-base HEAD origin/main` at CM-0556A binding time.
+- It is also the exact current `origin/main` commit at binding time.
+- It is the fork point for the local ahead-only docs/runtime-hardening/precheck sequence now under read-only rollback rehearsal consideration.
+
+Allowed future read-only diff range must use the exact baseline:
+
+```powershell
+git diff --name-only 6c8bee0262d90fda0f05735b250c36aac83761a8..HEAD
+git diff --stat 6c8bee0262d90fda0f05735b250c36aac83761a8..HEAD
+```
+
+If this baseline does not exist, is not an ancestor of `HEAD`, no longer matches the intended packet-defined rehearsal baseline, or its `origin/main` meaning becomes ambiguous, the future rehearsal must stop with:
+
+```text
+READONLY_ROLLBACK_REHEARSAL_BLOCKED_SCOPE_DRIFT
+```
+
+This baseline binding authorizes only future read-only rollback rehearsal consideration. It does not authorize real rollback, reset, restore, revert, checkout rollback, destructive cleanup, backup restore, rollback planning commands, active-memory compare/rollback, runtime/source/test/package/config changes, provider calls, real memory scans, durable writes, public MCP expansion, push, tag, release, deploy, cutover, A5-GAP-7, or readiness claims.
+
 ## Allowed Commands For Future Read-Only Rehearsal
 
 Only these command classes may be approved by this packet:
@@ -51,8 +78,8 @@ Only these command classes may be approved by this packet:
 ```powershell
 git status -sb
 git log --oneline --decorate -n 20
-git diff --name-only <base>..HEAD
-git diff --stat <base>..HEAD
+git diff --name-only 6c8bee0262d90fda0f05735b250c36aac83761a8..HEAD
+git diff --stat 6c8bee0262d90fda0f05735b250c36aac83761a8..HEAD
 Get-Content -Raw docs/CM-0554_OPERATIONAL_ROLLBACK_DRILL_DESIGN.md
 Get-Content -Raw docs/CM-0555_OPERATIONAL_ROLLBACK_DRILL_READONLY_REHEARSAL_REVIEW.md
 ```
@@ -119,7 +146,7 @@ Any command that may mutate files, runtime state, Git history, durable memory/au
 A future approval should name:
 
 ```text
-I approve CM-0556 read-only rollback rehearsal for target <exact target or range>, using only: git status -sb, git log --oneline --decorate -n 20, git diff --name-only <base>..HEAD, git diff --stat <base>..HEAD, and read-only artifact reads of CM-0554/CM-0555. This approval does not authorize reset, restore, revert, checkout rollback, real rollback, destructive cleanup, backup restore, rollback:mainline:plan, compare-active-memory, rollback-active-memory, src/tests/package/runtime/config changes, provider calls, real memory scans, durable writes, public MCP expansion, push, tag, release, deploy, cutover, A5-GAP-7, or any readiness claim.
+I approve CM-0556 read-only rollback rehearsal for target 6c8bee0262d90fda0f05735b250c36aac83761a8..HEAD, using only: git status -sb, git log --oneline --decorate -n 20, git diff --name-only 6c8bee0262d90fda0f05735b250c36aac83761a8..HEAD, git diff --stat 6c8bee0262d90fda0f05735b250c36aac83761a8..HEAD, and read-only artifact reads of CM-0554/CM-0555. This approval does not authorize reset, restore, revert, checkout rollback, real rollback, destructive cleanup, backup restore, rollback:mainline:plan, compare-active-memory, rollback-active-memory, src/tests/package/runtime/config changes, provider calls, real memory scans, durable writes, public MCP expansion, push, tag, release, deploy, cutover, A5-GAP-7, or any readiness claim.
 ```
 
 If the target or command list is ambiguous, result must be:

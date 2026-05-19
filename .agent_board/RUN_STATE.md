@@ -369,3 +369,22 @@ Written boundaries:
 - A5-triggering commands remain outside this packet: rollback:mainline:plan, compare-active-memory, rollback-active-memory
 
 Decision: READONLY_ROLLBACK_REHEARSAL_PACKET_READY; real rollback remains blocked; state remains NOT_READY_BLOCKED.
+
+## CM-0556A Read-only rollback rehearsal baseline binding patch
+
+Status: ROLLBACK_REHEARSAL_BASELINE_CONFIRMED
+Area: P5-rollback-readiness / P10-observability-admin
+Risk: docs/board baseline binding only
+
+Packet: docs/CM-0556_READONLY_ROLLBACK_REHEARSAL_APPROVAL_PACKET.md
+
+Baseline binding:
+
+- packet-defined rollback rehearsal baseline: 6c8bee0262d90fda0f05735b250c36aac83761a8
+- selected because git merge-base HEAD origin/main resolved to this exact commit
+- origin/main also resolved to this exact commit at binding time
+- required future read-only diff range: 6c8bee0262d90fda0f05735b250c36aac83761a8..HEAD
+
+Fail-closed rule: if the baseline does not exist, is not in HEAD lineage, or no longer matches the intended packet-defined rehearsal baseline / origin-main meaning, future rehearsal result must be READONLY_ROLLBACK_REHEARSAL_BLOCKED_SCOPE_DRIFT.
+
+Boundary: baseline binding only. It authorizes future read-only rehearsal consideration only; no rollback rehearsal, no git diff baseline execution in this patch, no reset/restore/revert/checkout rollback, no rollback:mainline:plan, no compare/rollback-active-memory, no provider, no real memory scan, no durable write, no push/tag/release/deploy, no readiness claim.
