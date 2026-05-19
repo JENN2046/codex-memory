@@ -2,7 +2,7 @@
 
 ## Goal
 
-Keep the project control surface aligned after the approved A5-GAP-6 post-classified-sample-write evidence was committed and pushed. All remaining runtime/A5 boundaries stay blocked until exact approval is provided.
+Prepare `RC_PRECHECK_001` local execution packet and non-A5 precheck records after local commit `9eb17ad`, while keeping all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ Keep the project control surface aligned after the approved A5-GAP-6 post-classi
 
 ## Worktree
 
-Review-time Git reality: local `main` and `origin/main` are aligned at `103c3ac`, and the tracked worktree was clean before this docs/board cleanup. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current Git reality before this stage: local `main` is ahead of `origin/main` by 1 commit at `9eb17ad`; `origin/main` remains `103c3ac`; `git status --short` was clean before packet/precheck docs were edited.
 
 ## Current Area
 
-P6 docs-drift / P10 observability-admin; board/status reconciliation after project review.
+P10 observability-admin / `RC_PRECHECK_001`; execution approval packet and local non-A5 precheck preparation.
 
 ## Current Truth
 
@@ -31,6 +31,9 @@ P6 docs-drift / P10 observability-admin; board/status reconciliation after proje
 - A5-GAP-6 post-classified-sample-write approval packet is now drafted as [docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md). It is not approval and executes nothing. It asks only to consume updated approved A5-GAP-1/2/3/4/5 sanitized evidence, including the latest A5-GAP-2 positive-control write evidence, with no new runtime action.
 - A5-GAP-6 post-classified-sample-write evidence has now executed under exact approval and is linked to [docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated approved A5-GAP-1/2/3/4/5 sanitized evidence only, including the A5-GAP-2 positive-control write proof, executed no new runtime action, accepted the explicit runtime evidence summary, reported locally evidenced count `12`, remaining count `6`, and kept `commandsExecutedByAggregator=false` with readiness flags false.
 - Current review validation confirms the main health surface is green: `npm test` passed `1574/1574`, `npm run gate:mainline:strict` passed, `observe:http -- --json` reported HTTP health ok, real `search_memory` wrote one recall audit entry observed as `recallRecentCount=1`, and active-memory compare/rollback both passed `43/43`. This does not change readiness: remaining runtime gaps and A5 hard stops still require exact approval.
+- Local commit `9eb17ad docs: reconcile project review state` is the current local-only baseline and leaves `main` ahead of `origin/main` by 1. No push, tag, release, deploy, or cutover has been authorized.
+- `RC_PRECHECK_001` execution packet is now prepared as `DRAFT_NOT_APPROVED`. It names A1/A2 Git/docs checks separately from A5-only RC evidence commands: strict gate, HTTP observe, recall audit observation, and active-memory compare/rollback.
+- `CM-0510` local non-A5 precheck is limited to Git baseline, docs validation, `git diff --check`, and stale/readiness wording scan. It must not run strict gate, HTTP observe, recall path, compare/rollback, provider calls, migration/import/export/backup/restore apply, config/watchdog/startup changes, push, tag, release, deploy, or cutover.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - Fresh A5-GAP-2 rerun has now been executed for approved stores at `ceffc0f255c142875a0f41879539361dd547c4bc` and recorded in [docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). Result: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION`; limitation: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; store snapshots unchanged; no mutation.
 - A5-GAP-6 has now been executed for approved evidence consumption only at `16d3fe8af80fafad5b0db7ed29aacc6f7e51c1ff` and recorded in [docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
