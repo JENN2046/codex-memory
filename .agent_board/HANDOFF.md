@@ -2,7 +2,7 @@
 
 ## Goal
 
-Refresh `RC_PRECHECK_001` target commit after local governance cleanup commit `c943a42`, while keeping all remaining runtime/A5 boundaries blocked until exact approval is provided.
+Split `RC_PRECHECK_001` full precheck approval into readonly and recall-specific boundaries while keeping all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,7 +14,7 @@ Refresh `RC_PRECHECK_001` target commit after local governance cleanup commit `c
 
 ## Worktree
 
-Current Git reality after governance cleanup commit: `## main...origin/main [ahead 3]`; latest local HEAD is `c943a42f5858a140c8e80362267844b40628385a`; `origin/main` remains `103c3ac`.
+Current Git reality before split-approval commit: `## main...origin/main [ahead 4]`; latest local HEAD is `bd28304496c4d642f1a9940c4b1fcea316218517`; `origin/main` remains `103c3ac`.
 
 ## Current Area
 
@@ -36,6 +36,7 @@ P6 docs-drift / P10 observability-admin; `AGENTS.md` governance cleanup and `RC_
 - `CM-0510` local non-A5 precheck is limited to Git baseline, docs validation, `git diff --check`, and stale/readiness wording scan. It must not run strict gate, HTTP observe, recall path, compare/rollback, provider calls, migration/import/export/backup/restore apply, config/watchdog/startup changes, push, tag, release, deploy, or cutover.
 - `AGENTS.md` governance cleanup keeps A4.8 safe-push policy but makes it fail-closed: if policy does not fully pass, push must stop. It also moves volatile state out of AGENTS, protects any real Codex/Claude config path, includes `FILE_LOCKS` / `RISK_REGISTER` as board-required files, and narrows full initialization to non-trivial repo work.
 - `RC_PRECHECK_001` target is refreshed to `c943a42f5858a140c8e80362267844b40628385a`. Any future full precheck execution must re-read exact `HEAD` before A5 commands run and update the packet if the target changed.
+- `RC_PRECHECK_001` approval packet is split into `A5-RC-PRECHECK-READONLY` and `A5-RC-PRECHECK-RECALL`. Default next approval should be readonly only; recall observation requires a separately named subject/query/audit boundary.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - Fresh A5-GAP-2 rerun has now been executed for approved stores at `ceffc0f255c142875a0f41879539361dd547c4bc` and recorded in [docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). Result: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION`; limitation: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; store snapshots unchanged; no mutation.
 - A5-GAP-6 has now been executed for approved evidence consumption only at `16d3fe8af80fafad5b0db7ed29aacc6f7e51c1ff` and recorded in [docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
