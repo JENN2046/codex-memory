@@ -10,15 +10,16 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Git baseline after the local protocol/status commits: local `main` contains `ef599ca docs: record supreme commander protocol commit state` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 2 commits; exact `HEAD` is verified from Git commands.
-- Current local work: A5 preflight approval packet for the seven remaining runtime gaps; current `HEAD`, ahead/behind, and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
+- Git baseline after the A5 approval packet commit: local `main` contains `02a49e7 docs: draft p66 a5 runtime gap approval packet` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 3 commits; exact `HEAD` is verified from Git commands.
+- Current local work: post-commit active status/board reconciliation after the A5 preflight approval packet; current `HEAD`, ahead/behind, and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
 - Current active program: P66 remaining runtime gap local-safe proof chain and current-state reconciliation are complete as local proof only; runtime gaps remain open.
-- Current phase area: no further local-safe runtime-gap closure work remains; this local slice prepares explicit approval wording for future A5 real closure without executing it.
+- Current phase area: no further local-safe runtime-gap closure work remains; the A5 approval packet has been drafted and committed locally, but real closure remains blocked until exact approval lines are provided.
 
 ## Active Queue
 
 | ID | Area | Risk | Status | Task | Validation | Notes |
 |---|---|---|---|---|---|---|
+| P66-A5-ApprovalPacket-postcommit | docs-drift / mainline-health | A1 | done | Reconcile active status/board after commit `02a49e7` | `git diff --check`; docs validation; status/log check | COMPLETED_VALIDATED locally. Docs/board only. No service start, config change, provider call, real memory scan, durable write, public MCP expansion, migration/import-export/backup/restore apply, tag, release, deploy, or push. |
 | P66-A5-ApprovalPacket | observability-admin / mainline-health | A5-preflight | done | Draft A5 real-closure approval packet for seven remaining runtime gaps | `git diff --check`; docs validation; overclaim/stale-baseline scan; read-only verifier | COMPLETED_VALIDATED locally. Packet remains `DRAFT_NOT_APPROVED` and does not authorize or execute runtime, provider, real memory scan, migration/import/export/backup/restore apply, durable write, public MCP expansion, config/watchdog/cutover, push/tag/release/deploy, or `RC_READY`. |
 | SupremeCommander-postcommit | docs-drift / mainline-health | A1 | done | Reconcile active status/board after local commit `f46b36d` | `git diff --check`; docs validation; status/log check | COMPLETED_VALIDATED locally. Docs/board only. No service start, config change, provider call, real memory scan, durable write, public MCP expansion, migration/import-export/backup/restore apply, tag, release, deploy, or push. |
 | SupremeCommander-A4.8 | docs-drift / mainline-health | A1 | done | Add the Supreme Commander local autopilot protocol and reconcile active status surfaces to `a9177d5` | `git diff --check`; docs validation; stale baseline scan | COMPLETED_VALIDATED locally. Local docs/governance only. No service start, config change, provider call, real memory scan, durable write, public MCP expansion, migration/import-export/backup/restore apply, tag, release, deploy, or push. |

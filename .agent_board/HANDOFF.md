@@ -2,7 +2,7 @@
 
 ## Goal
 
-Draft an A5 approval packet for real closure of the seven remaining P66 runtime gaps, reconcile active status surfaces, and keep all runtime/A5 boundaries blocked until exact approval is provided.
+Reconcile active status surfaces after the local `02a49e7` A5 approval packet commit and keep all runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,16 +14,16 @@ Draft an A5 approval packet for real closure of the seven remaining P66 runtime 
 
 ## Worktree
 
-Current local `main` contains `ef599ca docs: record supreme commander protocol commit state` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 2 commits before this approval-packet slice. The current worktree contains intended A5 approval packet docs/board reconciliation until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` contains `02a49e7 docs: draft p66 a5 runtime gap approval packet` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 3 commits. The current worktree contains intended post-commit docs/board reconciliation until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability-admin / P0 mainline-health; P66 A5 runtime-gap closure approval packet.
+P6 docs-drift / P0 mainline-health; P66 A5 approval packet post-commit reconciliation.
 
 ## Current Truth
 
 - P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
-- Current local slice drafts [docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md), an A5 preflight packet with separate approval switches for the seven open runtime gaps. It is `DRAFT_NOT_APPROVED` and grants no runtime authority.
+- Current local slice reconciles status/board after [docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md) was committed locally in `02a49e7`. The packet remains `DRAFT_NOT_APPROVED` and grants no runtime authority.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.

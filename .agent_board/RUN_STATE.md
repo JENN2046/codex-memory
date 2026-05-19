@@ -6,25 +6,25 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | Draft A5 runtime-gap closure approval packet for the seven remaining P66 gaps; push and execution remain blocked unless explicitly requested |
-| Current area | P10-observability-admin / P0-mainline-health |
+| Current task | Post-commit active status/board reconciliation after A5 approval packet commit `02a49e7`; push and runtime execution remain blocked unless explicitly requested |
+| Current area | P6-docs-drift / P0-mainline-health |
 | Last pushed baseline | `a9177d5` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Created guarded local commit `ef599ca docs: record supreme commander protocol commit state`; now drafting an A5 approval packet for future runtime-gap closure without executing it. |
-| Last validation | Supreme Commander protocol and post-commit reconciliation passed `git diff --check`, docs validation, trailing whitespace scan, active stale-baseline scan, and status/log checks. Prior review patch passed targeted tests and was pushed to `origin/main` in `a9177d5`. |
-| Worktree summary | Local `main` contains `ef599ca` and is ahead of `origin/main = a9177d5` by 2 commits before this approval-packet slice; exact `HEAD` must be verified from Git commands. Current worktree contains intended docs/board approval-packet work only. No provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/cutover/RC_READY is authorized. |
+| Last action | Created guarded local commit `02a49e7 docs: draft p66 a5 runtime gap approval packet`; now reconciling active status/board to local ahead-3 state. |
+| Last validation | A5 approval packet slice passed `git diff --check`, docs validation, stale/overclaim scan, and read-only Verifier PASS. Prior review patch passed targeted tests and was pushed to `origin/main` in `a9177d5`. |
+| Worktree summary | Local `main` contains `02a49e7` and is ahead of `origin/main = a9177d5` by 3 commits; exact `HEAD` must be verified from Git commands. Current worktree contains intended post-commit docs/board reconciliation only. No provider/data/public MCP expansion/durable write/service start/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/cutover/RC_READY is authorized. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized for this local protocol slice unless explicitly requested |
-| Next planned action | Validate and guarded-commit the A5 approval packet if eligible; stop before any runtime execution or push unless explicitly requested. Future project autopilot should use the Supreme Commander protocol as the controlling A4.8 entrypoint. |
+| Next planned action | Validate and guarded-commit post-commit board/status reconciliation if eligible; after that, wait for exact A5 approval lines or select a separate non-A5 local task. Stop before any runtime execution or push unless explicitly requested. |
 
 ## Notes
 
 - Project health: strong.
 - Governance health: strong.
-- Current truth: Git reality is authoritative; local `main` contains `ef599ca` and is ahead of `origin/main = a9177d5`. P66.40 through P66.60, the review-blocker fix, and the review patch safety semantics are pushed; Supreme Commander protocol and its status reconciliation are committed locally only. The seven P66.3 local proof slices are complete with no remaining local-safe closure work. The current A5 approval packet is only a draft and all corresponding runtime gaps remain open with `NOT_READY_BLOCKED` controlling.
+- Current truth: Git reality is authoritative; local `main` contains `02a49e7` and is ahead of `origin/main = a9177d5` by 3 commits. P66.40 through P66.60, the review-blocker fix, and the review patch safety semantics are pushed; Supreme Commander protocol, its status reconciliation, and the P66 A5 approval packet are committed locally only. The seven P66.3 local proof slices are complete with no remaining local-safe closure work. The A5 approval packet is only a draft and all corresponding runtime gaps remain open with `NOT_READY_BLOCKED` controlling.
 - Completion boundary records: `CMB-0005`, `CMD-0012`, and `RR-0004` are controlling records for resume; completion audit fixtures still require `objectiveComplete=true`, zero runtime gaps, and zero A5 hard stops before any completion claim.
 - Release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`; helper output safety is hardened without changing runtime readiness.
 - Superseded artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
