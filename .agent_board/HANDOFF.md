@@ -14,7 +14,7 @@ Close out the remaining runtime-gap work under local A4/A4.8 boundaries by exhau
 
 ## Worktree
 
-Local `main` is aligned with `origin/main` at `1a3d309 fix: reconcile p66 post-push review state`. The worktree is clean. Exact current `HEAD` must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Local `main` is ahead of `origin/main = 1a3d309 fix: reconcile p66 post-push review state` with P66.60 current-state reconciliation and review-blocker fix work pending push. The worktree is clean. Exact current `HEAD` must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
@@ -22,7 +22,7 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 
 ## Current Truth
 
-- P46-P66/P66.60 pushed baseline is `origin/main = 1a3d309`.
+- P46-P66 pushed baseline is `origin/main = 1a3d309`; P66.60 and its review-blocker fix are local pending-push work on top of that baseline.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
@@ -73,7 +73,8 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.16 ValidationAggregator runtime evidence summary normalization proof is implemented, validated, and committed locally in `e95aa56`.
 - P66.17 ValidationAggregator runtime evidence summary normalization helper is implemented, validated, and committed locally in `c8d6363`.
 - P66.18 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
-- P66.60 runtime gap current-state reconciliation is implemented as docs/board only and reconciles the seven remaining runtime gaps against `HEAD = origin/main = 1a3d309`.
+- P66.60 runtime gap current-state reconciliation is implemented as docs/board only and reconciles the seven remaining runtime gaps against local pending-push state on top of `origin/main = 1a3d309`.
+- P66.60 review-blocker fix removes stale pushed/aligned wording so local pending commits are not misread as already pushed.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.

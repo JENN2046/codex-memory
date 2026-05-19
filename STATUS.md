@@ -6,7 +6,7 @@
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前远端基线：`origin/main` = `1a3d309 fix: reconcile p66 post-push review state`。
-- 当前本地基线：本地 `main` 与 `origin/main` 当前对齐到 `1a3d309`；当前 `HEAD` 和 ahead/behind 状态仍必须以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准。
+- 当前本地基线：本地 `main` 在 `origin/main = 1a3d309` 之上包含 P66.60 当前态对齐和本次 review blocker 修复；当前 `HEAD` 和 ahead/behind 状态仍必须以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准。
 - 最新已推送完成：P66.40-P66.59 ValidationAggregator runtime gap local proof chain review、最终 push preflight、以及 post-push review-state reconciliation，`origin/main` 已到 `1a3d309`。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
 - 当前任务：P66.60 当前态对齐已确认 7 个 remaining runtime gaps 的本地安全工作已经耗尽；没有新的 runtime/cutover 任务被授权。P66 local proof chain 完成不等于 runtime readiness。
@@ -45,7 +45,7 @@
 - 当前阶段：P66.41 ValidationAggregator governance runtime loop gap closeout 已本地实现并验证，新增 [docs/P66_41_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_CLOSEOUT.md](/A:/codex-memory/docs/P66_41_VALIDATION_AGGREGATOR_GOVERNANCE_RUNTIME_LOOP_GAP_CLOSEOUT.md)。它只记录 P66.37-P66.40 本地 proof slice 完成，runtime gap 仍 open，`NOT_READY_BLOCKED` 仍保持。
 - 当前阶段：P66.42 ValidationAggregator recall isolation runtime proof gap planning 已本地实现并验证，新增 [docs/P66_42_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_GAP_PLANNING.md](/A:/codex-memory/docs/P66_42_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_GAP_PLANNING.md)、[p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-v1.json) 和 [p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-fixture.test.js)。它只规划 recall isolation runtime proof，不执行真实扫描或 runtime proof。
 - 当前阶段：P66.43 ValidationAggregator recall isolation runtime proof fixture tests 已本地实现并验证，新增 [docs/P66_43_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_FIXTURE_TESTS.md](/A:/codex-memory/docs/P66_43_VALIDATION_AGGREGATOR_RECALL_ISOLATION_RUNTIME_PROOF_FIXTURE_TESTS.md)、[p66-validation-aggregator-recall-isolation-runtime-proof-fixture-v1.json](/A:/codex-memory/tests/fixtures/p66-validation-aggregator-recall-isolation-runtime-proof-fixture-v1.json) 和 [p66-validation-aggregator-recall-isolation-runtime-proof-fixture.test.js](/A:/codex-memory/tests/p66-validation-aggregator-recall-isolation-runtime-proof-fixture.test.js)。它只锁定本地验收合同，不执行真实扫描或 runtime proof。
-- 当前阶段：P66.60 当前态对齐已新增 [docs/P66_60_RUNTIME_GAP_CURRENT_STATE_RECONCILIATION.md](/A:/codex-memory/docs/P66_60_RUNTIME_GAP_CURRENT_STATE_RECONCILIATION.md)。它把 7 个 remaining runtime gaps 统一对齐到 `HEAD = origin/main = 1a3d309` 的现实，明确说明本地安全 proof chain 已全部完成、已没有新的本地安全工作可做，而真实 gap closure 仍需要 runtime/A5 授权。
+- 当前阶段：P66.60 当前态对齐已新增 [docs/P66_60_RUNTIME_GAP_CURRENT_STATE_RECONCILIATION.md](/A:/codex-memory/docs/P66_60_RUNTIME_GAP_CURRENT_STATE_RECONCILIATION.md)。它把 7 个 remaining runtime gaps 统一对齐到 `origin/main = 1a3d309` 之后的本地 pending-push 现实，明确说明本地安全 proof chain 已全部完成、已没有新的本地安全工作可做，而真实 gap closure 仍需要 runtime/A5 授权。
 
 ## 当前阻塞
 
@@ -121,7 +121,7 @@
 ## 当前优先级
 
 1. P63-T1 已把 final RC matrix runner 从 fixture/helper 边界推进到本地 allowlisted real execution evidence；P64-T1 已把 schema/version runtime write-boundary proof 接入 core write path 和 final runner 矩阵；当前仍必须保持 `NOT_READY_BLOCKED`。
-2. P66.59 seven-gap local proof chain review、最终本地验证/远端新鲜度 preflight、以及 P66.60 当前态对齐已完成并推送到 `origin/main = 1a3d309`；这 7 个 gap 已无新的本地安全工作，后续真实 closure 只能等待 runtime/A5 授权。
+2. P66.59 seven-gap local proof chain review、最终本地验证/远端新鲜度 preflight、以及 post-push review-state reconciliation 已推送到 `origin/main = 1a3d309`；P66.60 当前态对齐和 review blocker 修复仍是本地 pending-push 工作。这 7 个 gap 已无新的本地安全工作，后续真实 closure 只能等待 runtime/A5 授权。
 3. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
 4. 按 active goal 规则继续本地 guarded commits；不 push，直到目标完成并完成最终验证后再执行用户授权的 push。
 

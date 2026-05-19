@@ -11,7 +11,7 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 ## Current Status
 
 - Last pushed baseline: `1a3d309 fix: reconcile p66 post-push review state` on `origin/main`.
-- Local `main` is aligned with `origin/main` at `1a3d309`; verify exact current state with `git status -sb` before new work.
+- Local `main` is ahead of `origin/main = 1a3d309` with P66.60 current-state reconciliation and review-blocker fix work pending push; verify exact current state with `git status -sb` before new work.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
@@ -59,6 +59,7 @@ P10 observability/admin / P8 memory-governance; P51-P64 local chain complete to 
 - P66.11 ValidationAggregator evidence freshness closeout is implemented, validated, and committed locally in `644d17c`.
 - P66.12 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
 - P66.60 runtime gap current-state reconciliation is implemented as docs/board only and confirms that no further local-safe work remains for the seven remaining runtime gaps.
+- P66.60 review blocker fix removes stale pushed/aligned wording and records local pending-push state correctly.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 

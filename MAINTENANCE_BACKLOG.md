@@ -11,7 +11,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 ## Current Baseline
 
 - Remote baseline: `1a3d309 fix: reconcile p66 post-push review state`.
-- Local baseline: local `main` is aligned with `origin/main` at `1a3d309`; current `HEAD` and ahead/behind state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
+- Local baseline: local `main` is ahead of `origin/main = 1a3d309` with P66.60 current-state reconciliation and review-blocker fix work pending push; current `HEAD` and ahead/behind state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
 - Current active program: P66 remaining runtime gap local-safe proof chain and current-state reconciliation are complete as local proof only; runtime gaps remain open.
 - Current phase area: no further local-safe runtime-gap work remains; wait for a new explicitly authorized local-safe backlog item or runtime/A5 authority.
 
@@ -142,7 +142,8 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P66.58 | observability-admin | A1 | done | ValidationAggregator RC cutover local closeout | docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED and committed locally in `53644a3`. 中文解释：只能关闭 RC cutover 的本地 proof slice；runtime gap 仍 open，不能执行 RC cutover、push/tag/release/deploy、配置切换或声明 readiness。 |
 | P66.59 | observability-admin | A1 | done | ValidationAggregator runtime gap local proof chain review | docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED, committed, and pushed in `32da702`. 中文解释：只能审查七个 gap 的本地 proof slice；runtime gap 仍 open，不能执行 runtime proof、RC cutover、push/tag/release/deploy 或声明 readiness。 |
 | Push-preflight | mainline-health | A1/A5-preflight | done | Final local validation and push preflight | `git status -sb`; `git fetch origin`; divergence check; `git diff --check`; docs validation | COMPLETED_VALIDATED; final preflight passed and authorized push completed to `origin/main` at `32da702`. 中文解释：最终本地验证和远端新鲜度检查已完成；不能把 push 完成误读为 runtime readiness。 |
-| P66.60 | observability-admin | A1 | done | Runtime gap current-state reconciliation | docs validation; `git diff --check`; state drift scan | COMPLETED_VALIDATED; reconciles all seven remaining runtime gaps to `HEAD = origin/main = 1a3d309` and records that no further local-safe runtime-gap work remains. 中文解释：本地安全 proof chain 已做完，后续真实 gap closure 只能等待 runtime/A5 授权。 |
+| P66.60 | observability-admin | A1 | done | Runtime gap current-state reconciliation | docs validation; `git diff --check`; state drift scan | COMPLETED_VALIDATED; reconciles all seven remaining runtime gaps to the local pending-push state on top of `origin/main = 1a3d309` and records that no further local-safe runtime-gap work remains. 中文解释：本地安全 proof chain 已做完，后续真实 gap closure 只能等待 runtime/A5 授权。 |
+| P66.60-review-fix | observability-admin | A1 | done | Fix P66.60 pending-push baseline wording | `git diff --check`; docs validation | COMPLETED_VALIDATED; removes stale pushed/aligned wording so push preflight does not misread pending local commits as already pushed. |
 
 ## Standing Boundaries
 

@@ -16,15 +16,18 @@ This phase is docs/board only. It does not execute runtime proofs, run gates, st
 
 ## Repository Reality
 
-Current checked reality:
+Current checked reality at the start of this reconciliation:
 
 ```text
 branch = main
 worktree = clean
-HEAD = origin/main = 1a3d309 fix: reconcile p66 post-push review state
+origin/main = 1a3d309 fix: reconcile p66 post-push review state
+local main = ahead of origin/main with P66.60 reconciliation work pending push
 ```
 
 `1a3d309` is a post-push reconciliation commit on top of `32da702`. It does not close any runtime gap. It updates board/status state and adds the missing P66.44 static-warning coverage in ValidationAggregator report/test surfaces.
+
+Exact local `HEAD` and ahead/behind state must be read from Git at the time of handoff or push preflight.
 
 ## Runtime Gap State
 
