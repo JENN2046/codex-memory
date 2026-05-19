@@ -231,4 +231,4 @@ Handoff: report to Commander in conversation; do not edit files.
 - Current state: Phase F LightMemo directory semantics synthetic fixture contract added locally.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: fixture/test/docs/board only; no runtime/source change, no real LightMemo recall, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
-- Next safe task: CM-0545 Phase F LightMemo directory semantics fixture closeout review.
+- Next safe task: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan.

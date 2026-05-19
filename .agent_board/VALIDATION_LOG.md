@@ -722,3 +722,5 @@ npm run profile-gate -- --json --summary-only
 - CMV-0642 | P7-vcp-parity-hardening | CM-0543 Phase F LightMemo directory semantics fixture plan | COMPLETED_VALIDATED | Docs-only fixture-plan slice prepared; git diff --check passed after EOF cleanup; docs validation passed; readiness scan returned historical entries and explicit denial/boundary wording only.
 
 - CMV-0643 | P7-vcp-parity-hardening | CM-0544 Phase F LightMemo directory semantics synthetic fixture contract | COMPLETED_VALIDATED | Targeted LightMemo fixture test passed 6/6; docs validation passed; git diff --check passed after EOF cleanup; readiness scan returned historical entries plus intended fixture negative/boundary wording only.
+
+| CMV-0644 | P7-vcp-parity-hardening | CM-0545 Phase F LightMemo directory semantics fixture closeout review | COMPLETED_VALIDATED | Combined Phase F fixture tests passed 22/22; docs validation passed; readiness scan returned historical entries plus intended denial/boundary wording only; git diff --check passed after EOF cleanup. | Boundary: no runtime/source/provider/real-memory/HTTP/public-MCP/push/cutover/readiness action. |

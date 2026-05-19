@@ -728,4 +728,14 @@ Supreme Commander protocol slice is implemented and validated locally. It adds [
 - Status: COMPLETED_VALIDATED pending final validation/commit.
 - Scope: synthetic JSON fixture, structure-only test, docs/board evidence.
 - Boundary: no runtime/source change, no real LightMemo recall, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
-- Next: CM-0545 Phase F LightMemo directory semantics fixture closeout review.
+- Next: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan.
+
+## CM-0545 closeout validation record
+
+Status: COMPLETED_VALIDATED
+Area: P7-vcp-parity-hardening
+Scope: docs/board closeout for synthetic LightMemo directory semantics fixture pack
+Changed files: docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_PACK_CLOSEOUT_REVIEW.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: combined Phase F fixture tests passed 22/22; docs validation passed; readiness scan returned historical entries plus intended denial/boundary wording only; git diff --check passed after EOF cleanup
+Boundary: no runtime source change, no provider, no real memory scan, no HTTP observe, no public MCP expansion, no durable write, no push, no cutover, no readiness claim
+Next: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan

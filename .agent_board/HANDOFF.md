@@ -675,4 +675,14 @@ Changed files: LightMemo fixture JSON, structure-only test, fixture-test doc, an
 Validation: pending targeted fixture test, docs validation, diff check, readiness scan.
 Not validated: runtime behavior, real LightMemo recall, real memory stores, provider, HTTP observe, public MCP schema.
 Remaining risks: fixture evidence must not be treated as runtime LightMemo parity proof.
-Next safe step: CM-0545 LightMemo fixture closeout review.
+Next safe step: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan.
+
+## CM-0545 closeout handoff
+
+Goal: Close Phase F LightMemo directory semantics fixture pack as synthetic fixture/test-only evidence.
+Status: COMPLETED_VALIDATED
+Changed files: docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_PACK_CLOSEOUT_REVIEW.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: combined Phase F fixture tests passed 22/22; docs validation passed; git diff --check passed; readiness scan historical/boundary-only
+Not validated: runtime LightMemo recall, real memory stores, provider, HTTP observe, public MCP schema
+Remaining risk: fixture evidence is not runtime parity proof
+Next safe step: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan
