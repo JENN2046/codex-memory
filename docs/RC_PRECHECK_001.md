@@ -2,23 +2,54 @@
 
 Phase: `RC_PRECHECK_001`
 
-Mode: `target refreshed; not approved for execution`
+Mode: `target drift rule patched; not approved for execution`
 
 Risk: `A4 docs/board refresh only`
 
 Decision: `NOT_READY_BLOCKED`
 
-Current packet target commit: `765ab1825535c8b66078e50ff43ac519488d25f8`
+Runtime evidence target baseline: `f4eb17173b6870dbc8ae55efe9801a62e359cac6`
 
 ## Purpose
 
-Keep the `RC_PRECHECK_001` execution map accurate after local commits moved `HEAD` beyond earlier evidence targets.
+Keep the `RC_PRECHECK_001` execution map accurate while allowing metadata-only docs/board refresh commits to exist after the runtime evidence target baseline.
 
 This record is a planning and approval surface only. It does not execute RC precheck and does not claim `RC_READY`, runtime readiness, final RC readiness, v1 RC readiness, cutover readiness, migration readiness, or production readiness.
 
 ## Current Execution Status
 
-`RC_PRECHECK_001` is not ready to execute because the approval packet required a target/baseline refresh. The target has now been refreshed to the current local `HEAD`, but no new exact A5 execution approval has been granted for this target.
+`RC_PRECHECK_001` is still not ready to execute. The runtime evidence target baseline is fixed at `f4eb17173b6870dbc8ae55efe9801a62e359cac6`, but any future execution must first prove that the local worktree is clean, `HEAD` descends from that baseline, and every post-target commit is docs/board-only metadata refresh.
+
+## Target Drift Rule
+
+A newer local `HEAD` may be acceptable only when post-target commits touch docs/board metadata paths only:
+
+- `docs/`
+- `STATUS.md`
+- `MAINTENANCE_BACKLOG.md`
+- `.agent_board/`
+
+If any post-target commit touches `src/`, `tests/`, package manifests or lockfiles, runtime data, config/watchdog/startup surfaces, public MCP schema/tools, provider/profile runtime config, `.env`, secrets, migrations, backup/restore, or any other non-docs/board path, the controlling result remains:
+
+```text
+NOT_READY_BLOCKED
+```
+
+## Required Pre-Execution Checks
+
+Before any future approved `RC_PRECHECK_001` execution, confirm:
+
+```powershell
+git status --short
+git merge-base --is-ancestor f4eb17173b6870dbc8ae55efe9801a62e359cac6 HEAD
+git diff --name-only f4eb17173b6870dbc8ae55efe9801a62e359cac6..HEAD
+```
+
+Proceed only if:
+
+- `git status --short` is clean
+- `HEAD` lineage contains the runtime evidence target baseline
+- post-target commits only change docs/board metadata paths
 
 ## Allowed Future Readonly Precheck Commands
 
@@ -57,8 +88,10 @@ A readonly precheck does not authorize:
 
 | item | required evidence | current source | status |
 |---|---|---|---|
-| Git baseline | Exact `HEAD`, branch, ahead/behind, and tracked worktree state | future exact execution: `git status -sb`; `git log --oneline --decorate -n 10` | pending for current target |
-| Strict gate | Fresh local strict gate evidence for the target commit | future exact execution: `npm run gate:mainline:strict` | pending exact approval |
+| Target baseline | Runtime evidence target baseline and lineage check | `git merge-base --is-ancestor f4eb17173b6870dbc8ae55efe9801a62e359cac6 HEAD` | pending future execution |
+| Post-target scope | Post-target commits touch docs/board metadata only | `git diff --name-only f4eb17173b6870dbc8ae55efe9801a62e359cac6..HEAD` | pending future execution |
+| Git baseline | Exact `HEAD`, branch, ahead/behind, and tracked worktree state | future exact execution: `git status -sb`; `git log --oneline --decorate -n 10` | pending exact approval |
+| Strict gate | Fresh local strict gate evidence for the target baseline state plus allowed metadata-only drift | future exact execution: `npm run gate:mainline:strict` | pending exact approval |
 | HTTP observe | Loopback HTTP health and observability summary | future exact execution: `npm run observe:http -- --json` | pending exact approval; not production readiness |
 | Recall audit | One real recall path observation if needed | separate `A5-RC-PRECHECK-RECALL` approval only | not approved |
 | Active-memory compare | Donor-compatible active-memory compare suite | future exact execution: compare command | pending exact approval |
@@ -75,7 +108,7 @@ Maximum successful future readonly result:
 PRECHECK_PASSED_NOT_RC_READY
 ```
 
-Any warning, failure, missing approval, target drift, stale baseline, or boundary ambiguity must resolve to:
+Any warning, failure, missing approval, target drift outside docs/board metadata-only scope, stale baseline, dirty worktree, broken lineage, or boundary ambiguity must resolve to:
 
 ```text
 NOT_READY_BLOCKED
@@ -92,4 +125,4 @@ rcReady=false
 
 ## Next Safe Step
 
-Ask for a new exact `A5-RC-PRECHECK-READONLY` approval bound to `765ab1825535c8b66078e50ff43ac519488d25f8`, or continue local-safe docs/fixture/design work. Do not run RC precheck until that approval exists.
+After this docs/board rule patch is reviewed and committed, ask for a new exact `A5-RC-PRECHECK-READONLY` approval bound to the runtime evidence target baseline `f4eb17173b6870dbc8ae55efe9801a62e359cac6` with metadata-only drift checks, or continue local-safe docs/fixture/design work. Do not run RC precheck until that approval exists.

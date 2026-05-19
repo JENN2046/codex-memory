@@ -70,3 +70,14 @@ Reason: RC precheck target/baseline has been refreshed to current local HEAD 765
 Required approval/action: user must provide a new exact A5-RC-PRECHECK-READONLY approval line bound to 765ab1825535c8b66078e50ff43ac519488d25f8 before any strict gate, HTTP observe, compare, rollback, or public MCP freeze evidence capture is run. Recall path observation still requires separate exact A5-RC-PRECHECK-RECALL approval.
 
 Safe state: NOT_READY_BLOCKED; docs/board packet refreshed only.
+## CMB-0010 - RC_PRECHECK_001 target drift rule patched but execution still not approved
+
+Status: OPEN_RULE_PATCHED_NOT_APPROVED
+
+Area: P10-observability-admin / RC_PRECHECK_001
+
+Reason: Runtime evidence target baseline is f4eb17173b6870dbc8ae55efe9801a62e359cac6, and metadata-only newer commits may be allowed only after clean status, lineage, and docs/board-only post-target checks. No new exact execution approval has been granted after this rule patch.
+
+Required approval/action: provide exact A5-RC-PRECHECK-READONLY approval bound to f4eb17173b6870dbc8ae55efe9801a62e359cac6 and the metadata-only drift rule before running strict gate, HTTP observe, compare, rollback, or public MCP freeze evidence capture.
+
+Safe state: RC_PRECHECK_001_NOT_READY; docs/board rule patch only.

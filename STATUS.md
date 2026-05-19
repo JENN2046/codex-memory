@@ -305,3 +305,19 @@ Updated:
 - docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md now records HTTP session TTL/cap/cleanup as local runtime hardening completed while keeping future HTTP observe/precheck behind exact approval.
 
 Boundary: no RC precheck, no HTTP observe, no strict gate, no compare/rollback, no source/test change, no HTTP startup, no provider, no real memory scan, no durable write, no push/tag/release/deploy.
+## CM-0552 RC_PRECHECK_001 target drift rule patch
+
+Status: CM_0552_TARGET_DRIFT_RULE_PATCH_READY_FOR_REVIEW
+Area: P6-docs-drift / P10-observability-admin
+Risk: A4 docs/board refresh only
+
+Runtime evidence target baseline: f4eb17173b6870dbc8ae55efe9801a62e359cac6
+
+Updated:
+
+- Runtime evidence target baseline is fixed at f4eb171 while newer metadata-only docs/board refresh commits may exist above it.
+- Allowed post-target newer commits must touch only docs/, STATUS.md, MAINTENANCE_BACKLOG.md, and .agent_board/.
+- Any post-target change under src/, tests/, package manifests or lockfiles, runtime data, config/watchdog/startup, public MCP schema/tools, provider/profile runtime config, .env, secrets, migrations, backup/restore, or other non-docs/board paths keeps RC_PRECHECK_001 at NOT_READY_BLOCKED.
+- Future execution must first confirm a clean git status --short, HEAD lineage containing the target baseline, and post-target commits limited to docs/board metadata.
+
+Boundary: no gate:mainline:strict, no observe:http, no compare/rollback, no RC precheck evidence capture, no source/test/package/runtime change, no provider, no real memory scan, no migration/import/export/backup/restore apply, no public MCP expansion, no push/tag/release/deploy, no readiness claim.

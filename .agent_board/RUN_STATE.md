@@ -277,3 +277,19 @@ Handoff: report to Commander in conversation; do not edit files.
 - Status: CM_0551_RC_PRECHECK_PACKET_REFRESH_READY_FOR_REVIEW after validation.
 - Boundary: docs/board refresh only; no RC precheck, strict gate, HTTP observe, compare/rollback, recall observation, source/test change, provider call, real memory scan, durable write, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
 - Next safe step: request exact approval bound to the current target before any RC_PRECHECK_001 execution.
+## CM-0552 RC_PRECHECK_001 target drift rule patch
+
+Status: CM_0552_TARGET_DRIFT_RULE_PATCH_READY_FOR_REVIEW
+Area: P6-docs-drift / P10-observability-admin
+Risk: A4 docs/board refresh only
+
+Runtime evidence target baseline: f4eb17173b6870dbc8ae55efe9801a62e359cac6
+
+Updated:
+
+- Runtime evidence target baseline is fixed at f4eb171 while newer metadata-only docs/board refresh commits may exist above it.
+- Allowed post-target newer commits must touch only docs/, STATUS.md, MAINTENANCE_BACKLOG.md, and .agent_board/.
+- Any post-target change under src/, tests/, package manifests or lockfiles, runtime data, config/watchdog/startup, public MCP schema/tools, provider/profile runtime config, .env, secrets, migrations, backup/restore, or other non-docs/board paths keeps RC_PRECHECK_001 at NOT_READY_BLOCKED.
+- Future execution must first confirm a clean git status --short, HEAD lineage containing the target baseline, and post-target commits limited to docs/board metadata.
+
+Boundary: no gate:mainline:strict, no observe:http, no compare/rollback, no RC precheck evidence capture, no source/test/package/runtime change, no provider, no real memory scan, no migration/import/export/backup/restore apply, no public MCP expansion, no push/tag/release/deploy, no readiness claim.
