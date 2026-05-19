@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record the approved A5-GAP-1 durable audit writer evidence. Preserve all remaining runtime/A5 hard stops.
+Record the approved A5-GAP-6 post-durable-audit aggregation evidence. Preserve all remaining runtime/A5 hard stops.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 durable audit writer evidence.
+P10 observability-admin / validation-aggregator; A5-GAP-6 post-durable-audit evidence-only aggregation.
 
 ## Current Status
 
@@ -24,6 +24,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 durable audit writer ev
 - A5-GAP-5 rerun has now been approved and executed for `ddb1e7db8a83337f89b142578f7df9e4faff46ac`, and recorded in [docs/P66_A5_GAP_5_RERUN_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_RERUN_STRICT_GATE_EVIDENCE.md). Result: `TARGET_BOUND_GATE_PASSED_NOT_RC_READY`; health ok, contract `15/15`, test `1573/1573`, compare `43/43`, rollback `43/43`; no remote write or cutover occurred.
 - A5-GAP-6 post-GAP5 evidence-only aggregation refresh has now been approved and executed for `dcdad612b024876cf1137c5193af4e9c10607791`, and recorded in [docs/P66_A5_GAP_6_POST_GAP5_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GAP5_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP5_RUNTIME_STILL_BLOCKED`; summary accepted, locally evidenced count `5`, remaining count `6`, `commandsExecutedByAggregator=false`, readiness flags false.
 - A5-GAP-1 durable audit writer approval packet is now approved/executed and points to [docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_EVIDENCE.md). The approved smoke wrote exactly one sanitized audit line to `logs/codex-memory-bridge.jsonl` through `AuditLogStore.appendWriteAudit()`, with `readbackFound=true`, `readbackExactHashFound=true`, `durableMemoryWritten=false`, and recall audit unchanged. This is not durable memory writer readiness, production governance readiness, runtime readiness, cutover readiness, or `RC_READY`.
+- A5-GAP-6 post-durable-audit evidence-only aggregation refresh is now approved/executed and recorded in [docs/P66_A5_GAP_6_POST_DURABLE_AUDIT_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_DURABLE_AUDIT_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, accepted the explicit runtime evidence summary, reported locally evidenced count `6`, remaining count `6`, `commandsExecutedByAggregator=false`, and kept readiness flags false.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
