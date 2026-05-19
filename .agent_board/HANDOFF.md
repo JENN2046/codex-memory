@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record the approved A5-GAP-1 read-policy audit evidence scenario for `governance_read_policy_no_recent_audit_evidence`. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
+Refresh A5-GAP-6 after the approved A5-GAP-1 read-policy audit evidence scenario. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ Record the approved A5-GAP-1 read-policy audit evidence scenario for `governance
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended A5-GAP-1 read-policy audit evidence docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has one approved sanitized audit append from the prior A5-GAP-1 smoke. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A5-GAP-6 post-read-policy-audit evidence docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has one approved sanitized audit append from the prior A5-GAP-1 smoke. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 read-policy audit evidence.
+P10 observability-admin / validation-aggregator; post-read-policy-audit A5-GAP-6 evidence-only aggregation.
 
 ## Current Truth
 
@@ -44,6 +44,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 read-policy audit evide
 - A5-GAP-6 post-read-policy-rerun aggregation refresh is approved/executed and linked to [docs/P66_A5_GAP_6_POST_READ_POLICY_RERUN_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_READ_POLICY_RERUN_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, and kept `NOT_READY_BLOCKED` with locally evidenced count `8`, remaining count `6`, and readiness flags false. The next safe move is to choose the next exact A5 packet; no cutover, A5-GAP-7, or additional runtime action is authorized.
 - A5-GAP-1 read-policy audit evidence packet is drafted and linked to [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE_APPROVAL_PACKET.md). It requests only read-only `governance:report`, subject `p66-a5-gap1-read-policy-audit-evidence-readonly sanitized report`, durable write no. It is not approval and executes nothing.
 - A5-GAP-1 read-policy audit evidence is approved/executed and linked to [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE.md). It ran only read-only `governance:report` at `cda8c1c3770ec968510e8ec11abe009e8a5ed844`, returned summary/review `ok`, reviewLevel `nominal`, `readPolicy.status=config_only_no_recent_audit`, `configEvidenceAvailable=true`, `auditEvidenceAvailable=false`, and `recentReadPolicyAuditCount=0`. It confirms no recent read-policy audit evidence and does not unlock production governance readiness.
+- A5-GAP-6 post-read-policy-audit aggregation refresh is approved/executed and linked to [docs/P66_A5_GAP_6_POST_READ_POLICY_AUDIT_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_READ_POLICY_AUDIT_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, and kept `NOT_READY_BLOCKED` with locally evidenced count `9`, remaining count `6`, and readiness flags false.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
