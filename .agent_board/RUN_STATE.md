@@ -169,3 +169,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: docs/board only; no runtime/source change, no HTTP observe, no provider, no real memory scan, no public MCP expansion, no durable write, no push, no cutover, no readiness claim.
 - Next safe task: CM-0536 synthetic fixture contract.
+
+## CM-0536 State
+
+- Current state: Phase F observability/admin review surface synthetic fixture contract added locally.
+- Decision: NOT_READY_BLOCKED.
+- Boundary: fixture/test/docs/board only; no source/runtime change, no HTTP observe/service start, no provider, no real memory scan, no public MCP expansion, no durable write, no push, no cutover, no readiness claim.
+- Next safe task: CM-0537 memory governance proposal draft refresh.

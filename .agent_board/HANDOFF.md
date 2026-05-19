@@ -577,3 +577,14 @@ Validation: pending final docs validation and diff check in this slice.
 Not validated: runtime behavior, HTTP observe, provider, real memory stores, public MCP schema.
 Remaining risks: future CM-0536 must remain synthetic fixture/test-only.
 Next safe step: add synthetic fixture and structure-only test after this docs plan is committed.
+
+## CM-0536 Handoff
+
+Goal: add Phase F observability/admin review surface synthetic fixture contract.
+Workspace: A:\codex-memory.
+Current area: P10-observability-admin.
+Changed files: fixture JSON, structure-only test, fixture-test doc, and docs/board status files.
+Validation: pending targeted test, docs validation, diff check, readiness scan.
+Not validated: runtime behavior, HTTP observe, provider, real memory stores, public MCP schema.
+Remaining risks: fixture evidence must not be treated as runtime readiness.
+Next safe step: CM-0537 memory governance proposal draft refresh, if this slice validates and commits cleanly.

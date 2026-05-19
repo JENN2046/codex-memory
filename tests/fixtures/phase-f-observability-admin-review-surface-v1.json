@@ -1,0 +1,73 @@
+{
+  "version": "phase-f-observability-admin-review-surface-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "local_fixture_or_design_only",
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "realMemoryStoreRead": false,
+  "durableStateMutated": false,
+  "nextSafeAction": "local-safe docs/fixture/test-only task",
+  "surfaces": [
+    {
+      "id": "phase_f_parity_summary",
+      "purpose": "summarize local Phase F fixture and design progress for operator review",
+      "artifactType": "json_and_markdown",
+      "evidenceBoundary": "fixture/design-only evidence; not runtime parity evidence",
+      "mustNotClaim": ["RC_READY", "runtimeReady=true", "finalRcMatrixReady=true", "rcReady=true"],
+      "requiresApprovalFor": ["runtime_execution", "provider", "real_memory_scan", "cutover"]
+    },
+    {
+      "id": "tagmemo_fixture_pack_status",
+      "purpose": "report synthetic TagMemo fixture coverage and targeted test status",
+      "artifactType": "json_and_markdown",
+      "evidenceBoundary": "synthetic fixture-only evidence; no real memory store read",
+      "mustNotClaim": ["runtime parity complete", "provider validated", "real recall validated"],
+      "requiresApprovalFor": ["real_memory_scan", "provider", "recall_observation"]
+    },
+    {
+      "id": "runtime_gap_boundary_status",
+      "purpose": "link remaining runtime gaps to exact approval boundaries",
+      "artifactType": "markdown",
+      "evidenceBoundary": "boundary inventory only; no closure without approved evidence",
+      "mustNotClaim": ["gap closed", "runtimeReady=true", "RC_READY"],
+      "requiresApprovalFor": ["A5", "durable_write", "migration_apply", "cutover"]
+    },
+    {
+      "id": "public_mcp_freeze_status",
+      "purpose": "confirm public MCP surface remains frozen to the protected three tools",
+      "artifactType": "json",
+      "evidenceBoundary": "static fixture contract only; no MCP schema mutation",
+      "mustNotClaim": ["public MCP expansion approved", "new MCP tools available"],
+      "requiresApprovalFor": ["public_mcp_expansion"]
+    },
+    {
+      "id": "operator_next_safe_action",
+      "purpose": "name the next local-safe task without crossing hard-stop boundaries",
+      "artifactType": "markdown",
+      "evidenceBoundary": "handoff guidance only; not execution authority",
+      "mustNotClaim": ["approval granted", "push authorized", "cutover authorized"],
+      "requiresApprovalFor": ["push", "tag", "release", "deploy", "cutover"]
+    },
+    {
+      "id": "readiness_overclaim_guard",
+      "purpose": "reject forbidden readiness and approval-overclaim wording in review surfaces",
+      "artifactType": "json",
+      "evidenceBoundary": "fixture guard only; no readiness proof",
+      "mustNotClaim": ["RC_READY", "runtimeReady=true", "finalRcMatrixReady=true", "rcReady=true", "PRECHECK_PASSED_RC_READY"],
+      "requiresApprovalFor": ["readiness_claim", "A5_GAP_7", "cutover"]
+    }
+  ],
+  "hardStops": ["A5", "push", "cutover", "public_mcp_expansion", "provider", "real_memory_scan"],
+  "forbiddenClaims": [
+    "RC_READY",
+    "runtimeReady=true",
+    "finalRcMatrixReady=true",
+    "rcReady=true",
+    "approval granted",
+    "public MCP expansion approved",
+    "providerCalled=true",
+    "realMemoryStoreRead=true",
+    "durableStateMutated=true"
+  ]
+}

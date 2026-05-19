@@ -185,3 +185,5 @@
 - Full pre-compression status document: [docs/archive/STATUS_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/STATUS_FULL_PRE_CM0302.md)
 
 - CM-0535: Phase F observability/admin review surface fixture plan drafted; status remains NOT_READY_BLOCKED; next safe local task is CM-0536 synthetic fixture contract.
+
+- CM-0536: Phase F observability/admin review surface synthetic fixture contract added; status remains NOT_READY_BLOCKED; next local-safe candidate is CM-0537 memory governance proposal draft refresh.

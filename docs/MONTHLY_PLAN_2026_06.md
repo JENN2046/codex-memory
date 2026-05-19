@@ -225,3 +225,7 @@ Project status remains `NOT_READY_BLOCKED`.
 ## CM-0535 Monthly Update
 
 Phase F observability/admin review surface fixture plan prepared as a local-safe docs/board slice. It preserves the public MCP freeze and routes next work to a synthetic fixture/test contract only. Status remains NOT_READY_BLOCKED.
+
+## CM-0536 Monthly Update
+
+Phase F observability/admin review surface synthetic fixture contract added as local fixture/test-only work. It keeps public MCP tools frozen and preserves NOT_READY_BLOCKED.
