@@ -29,7 +29,7 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 | recall isolation runtime proof | A4 explicit projection isolation exists; A5 no-mutation scan and sanitized positive-control write/projection proof exist. Broad real-memory isolation and future sample coverage remain incomplete. | yes, bounded approved stores and one sanitized positive-control write | A4 plus A5 bounded evidence | no | If needed, request exact approval for the next bounded recall isolation proof; no broad scan or backfill by default. |
 | migration / import / export / backup / restore execution | Fixture-only migration-readiness dry-run evidence exists and remains blocked for real apply/import/export/backup/restore. | fixture-only dry-run; no real data apply | A5 dry-run only | no | Create a separate exact A5 packet naming one real action and one target before any apply/import/export/backup/restore action. |
 | live HTTP operation readiness | Endpoint-bound historical HTTP evidence exists for loopback `7605`, with no config/watchdog/startup change. HTTP session TTL/cap/cleanup hardening is completed locally in `16538ea`; closeout recorded in `765ab18`; targeted HTTP tests passed `13/13`. | yes, local runtime hardening only; no fresh observe for current packet target; no config/watchdog/startup change | A4/CM-0550 local hardening plus historical A5 endpoint evidence | no | Future HTTP observe/precheck requires exact approval bound to current target and endpoint. Do not infer production readiness from local hardening alone. |
-| current-head strict gate for cutover | Target-bound strict-gate evidence exists for older approved targets. Current local `HEAD` is `765ab1825535c8b66078e50ff43ac519488d25f8`, so RC/cutover-context evidence needs fresh exact approval for this target. | yes for older target-bound gates; not current cutover | A5 target-bound gate evidence | no | For RC precheck/cutover evidence, request exact A5 approval bound to current `HEAD`; do not infer readiness from stale target gates. |
+| current-head strict gate for cutover | Readonly RC_PRECHECK_001 evidence passed at local HEAD `638325a` with strict gate ok, tests `1601/1601`, compare `43/43`, rollback `43/43`, and HTTP observe ok. This is precheck evidence only, not cutover or readiness evidence. | yes for older target-bound gates; not current cutover | A5 target-bound gate evidence | no | For cutover evidence, request separate exact A5 approval; do not infer readiness from readonly precheck pass. |
 | RC cutover | No RC cutover, tag, release, deploy, production transition, or readiness transition has been executed. | no | A5 required | no | Execute only after zero open runtime gaps, fresh approved gates, explicit release boundary approval, and final human authorization. |
 
 ## Current Minimal Backlog
@@ -52,3 +52,14 @@ This table does not authorize:
 - push, tag, release, deploy, or RC cutover
 - A5-GAP-7
 - `RC_READY`, runtime readiness, final RC readiness, production readiness, or cutover readiness claims
+## RC_PRECHECK_001 Closeout - 2026-05-19
+
+- Result: PRECHECK_PASSED_NOT_RC_READY.
+- strict gate ok.
+- tests 1601/1601.
+- compare 43/43 matched.
+- rollback 43/43 rollback-ready.
+- HTTP observe ok.
+- SQLite ExperimentalWarning noted with successful command exits.
+- no provider, no mutation, no durable write, no push.
+- Controlling state remains NOT_READY_BLOCKED.

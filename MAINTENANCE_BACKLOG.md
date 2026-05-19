@@ -328,3 +328,25 @@ Updated:
 - Future execution must first confirm a clean git status --short, HEAD lineage containing the target baseline, and post-target commits limited to docs/board metadata.
 
 Boundary: no gate:mainline:strict, no observe:http, no compare/rollback, no RC precheck evidence capture, no source/test/package/runtime change, no provider, no real memory scan, no migration/import/export/backup/restore apply, no public MCP expansion, no push/tag/release/deploy, no readiness claim.
+
+## RC_PRECHECK_001 closeout notes - 2026-05-19
+
+Status: PRECHECK_PASSED_NOT_RC_READY
+Area: P10-observability-admin / RC_PRECHECK_001
+Risk: A5 approved readonly/local precheck evidence; no readiness claim
+Target context: 638325a docs: clarify RC precheck target drift rule
+
+Evidence recorded:
+
+- strict gate ok
+- tests 1601/1601
+- compare 43/43 matched
+- rollback 43/43 rollback-ready
+- HTTP observe ok; health HTTP 200
+- SQLite ExperimentalWarning noted during observe/compare/rollback, with command exit code 0
+- no provider call
+- no mutation or migration apply
+- no durable write
+- no push/tag/release/deploy
+
+Decision: state remains NOT_READY_BLOCKED. This closeout does not authorize recall observation, provider calls, real memory scans, migration/import/export/backup/restore apply, public MCP expansion, durable writes, push, release, deploy, cutover, A5-GAP-7, or RC_READY/runtime readiness claims.

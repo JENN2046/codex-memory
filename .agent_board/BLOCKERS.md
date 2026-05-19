@@ -81,3 +81,15 @@ Reason: Runtime evidence target baseline is f4eb17173b6870dbc8ae55efe9801a62e359
 Required approval/action: provide exact A5-RC-PRECHECK-READONLY approval bound to f4eb17173b6870dbc8ae55efe9801a62e359cac6 and the metadata-only drift rule before running strict gate, HTTP observe, compare, rollback, or public MCP freeze evidence capture.
 
 Safe state: RC_PRECHECK_001_NOT_READY; docs/board rule patch only.
+
+## CMB-0011 - Post-precheck readiness remains blocked
+
+Status: OPEN_NOT_READY_AFTER_PRECHECK
+
+Area: P10-observability-admin / RC_PRECHECK_001
+
+Reason: RC_PRECHECK_001 readonly/local evidence passed with PRECHECK_PASSED_NOT_RC_READY, but this is not RC readiness, runtime readiness, cutover readiness, or release readiness.
+
+Required approval/action: separate exact approval remains required for recall observation, A5-GAP-6 aggregation, runtime gap closure, public MCP expansion, provider, real-memory work, migration/import/export/backup/restore apply, durable write, push/tag/release/deploy, cutover, or A5-GAP-7.
+
+Safe state: NOT_READY_BLOCKED.

@@ -592,3 +592,5 @@ P10-observability-admin
 
 | CM-0551 | P6-docs-drift / P10-observability-admin | A4 | done | RC_PRECHECK_001 target/baseline refresh | `git diff --check`; docs validation | Bound RC_PRECHECK_001 packet to current local HEAD `765ab18`; refreshed allowed commands, forbidden actions, evidence output shape, and HTTP hardening truth-table status. No RC precheck/runtime/source/test/push/readiness action. |
 | CM-0552 | P6-docs-drift / P10-observability-admin | A4 | done | RC_PRECHECK_001 target drift rule patch | git diff --check; docs validation | Adds runtime evidence target baseline f4eb171, metadata-only newer commit exception, and fail-closed checks for non-docs/board drift. No RC precheck/runtime/source/test/push/readiness action. |
+
+| CM-0553 | P10-observability-admin | A5-approved-readonly | done | RC_PRECHECK_001 closeout notes | git diff --check; docs validation | Records PRECHECK_PASSED_NOT_RC_READY: strict gate ok, tests 1601/1601, compare 43/43, rollback 43/43, HTTP observe ok, SQLite ExperimentalWarning noted, no provider/mutation/push; state remains NOT_READY_BLOCKED. |
