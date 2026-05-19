@@ -14,7 +14,10 @@ const REQUIRED_SCENARIOS = [
   'epa-residual-explicit-input',
   'ordering-tie-breaker-deterministic',
   'donor-difference-documented',
-  'readiness-overclaim-rejected'
+  'readiness-overclaim-rejected',
+  'query-expansion-tag-collision-negative',
+  'query-expansion-topic-neighbor-negative',
+  'query-expansion-provider-score-negative'
 ];
 
 test('phase f tagmemo semantic association fixture keeps a no-runtime boundary', () => {
@@ -45,7 +48,10 @@ test('phase f tagmemo semantic association scenarios define expected and blocked
 });
 
 test('phase f tagmemo semantic association fixture rejects readiness overclaims', () => {
-  const safetyScenario = fixture.scenarios.find((scenario) => scenario.scenarioId === 'readiness-overclaim-rejected');
+  const safetyScenario = fixture.scenarios.find((scenario) => scenario.scenarioId === 'readiness-overclaim-rejected',
+  'query-expansion-tag-collision-negative',
+  'query-expansion-topic-neighbor-negative',
+  'query-expansion-provider-score-negative');
   assert.ok(safetyScenario);
   assert.deepEqual(safetyScenario.forbiddenClaims, [
     'RC_READY',
@@ -56,4 +62,19 @@ test('phase f tagmemo semantic association fixture rejects readiness overclaims'
     'providerCallExecuted',
     'realMemoryStoreRead'
   ]);
+});
+test('phase f tagmemo controlled query expansion negatives stay blocked', () => {
+  const negativeScenarioIds = [
+    'query-expansion-tag-collision-negative',
+    'query-expansion-topic-neighbor-negative',
+    'query-expansion-provider-score-negative'
+  ];
+
+  for (const scenarioId of negativeScenarioIds) {
+    const scenario = fixture.scenarios.find((candidate) => candidate.scenarioId === scenarioId);
+    assert.ok(scenario, `${scenarioId} missing`);
+    assert.ok(scenario.expectedAssociations.length > 0, `${scenarioId} expectedAssociations empty`);
+    assert.ok(scenario.blockedAssociations.length > 0, `${scenarioId} blockedAssociations empty`);
+    assert.notDeepEqual(scenario.expectedAssociations, scenario.blockedAssociations, `${scenarioId} expected and blocked overlap`);
+  }
 });

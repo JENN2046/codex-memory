@@ -129,3 +129,11 @@ Handoff: report to Commander in conversation; do not edit files.
 - Docs record: [docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_TESTS.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_SEMANTIC_ASSOCIATION_FIXTURE_TESTS.md).
 - Status remains `NOT_READY_BLOCKED`.
 - No source/runtime/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.
+
+## Phase F TagMemo Controlled Query Expansion Negative Fixtures - 2026-05-19
+
+- Anchor before this slice: `27af924`.
+- Added docs record: [docs/PHASE_F_TAGMEMO_CONTROLLED_QUERY_EXPANSION_NEGATIVE_FIXTURES.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_CONTROLLED_QUERY_EXPANSION_NEGATIVE_FIXTURES.md).
+- Extended fixture/test with generic tag collision, nearby topic over-expansion, and provider-score dependency negative cases.
+- Status remains `NOT_READY_BLOCKED`.
+- No source/runtime/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.

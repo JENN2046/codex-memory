@@ -111,6 +111,16 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - Not authorized: real recall observation, memory-store read, provider calls, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
 - Project status remains `NOT_READY_BLOCKED`.
 
+
+## Phase F TagMemo Controlled Query Expansion Negative Fixtures - 2026-05-19
+
+- Anchor before this slice: `27af924`.
+- Docs record: [docs/PHASE_F_TAGMEMO_CONTROLLED_QUERY_EXPANSION_NEGATIVE_FIXTURES.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_CONTROLLED_QUERY_EXPANSION_NEGATIVE_FIXTURES.md).
+- Completed: added synthetic negative scenarios for generic tag collision, nearby topic over-expansion, and provider-score dependency.
+- Scope: fixture/test-only; no runtime behavior change.
+- Not authorized: real recall observation, memory-store read, provider calls, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
+- Project status remains `NOT_READY_BLOCKED`.
+
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.

@@ -185,3 +185,11 @@ Added targeted structure test: `tests/phase-f-tagmemo-semantic-association-fixtu
 This slice did not modify source/runtime, inspect real memory stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
 
 Project status remains `NOT_READY_BLOCKED`.
+
+## Week 4 Phase F Controlled Query Expansion Negative Fixtures - 2026-05-19
+
+Controlled query expansion negative fixtures are recorded in [docs/PHASE_F_TAGMEMO_CONTROLLED_QUERY_EXPANSION_NEGATIVE_FIXTURES.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_CONTROLLED_QUERY_EXPANSION_NEGATIVE_FIXTURES.md).
+
+This slice extends the synthetic TagMemo fixture/test only and did not modify source/runtime, inspect real memory stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
+
+Project status remains `NOT_READY_BLOCKED`.

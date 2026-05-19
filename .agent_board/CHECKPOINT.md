@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - Phase F TagMemo controlled query expansion negative fixtures - 2026-05-19
+
+- Status: `FIXTURE_TESTS_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
+- Anchor before this slice: `27af924`.
+- Updated fixture/test: `tests/fixtures/phase-f-tagmemo-semantic-association-v1.json` and `tests/phase-f-tagmemo-semantic-association-fixture.test.js`.
+- Added docs record: [docs/PHASE_F_TAGMEMO_CONTROLLED_QUERY_EXPANSION_NEGATIVE_FIXTURES.md](/A:/codex-memory/docs/PHASE_F_TAGMEMO_CONTROLLED_QUERY_EXPANSION_NEGATIVE_FIXTURES.md).
+- Not run: source/runtime changes, A5 command, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: CM-0532 deterministic ordering tie-breaker fixture deepening, or stop if a hard-stop boundary appears.
 ## Checkpoint - Phase F TagMemo semantic association fixture tests - 2026-05-19
 
 - Status: `FIXTURE_TESTS_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
