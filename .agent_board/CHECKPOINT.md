@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - Phase F fixture/test-only parity hardening matrix - 2026-05-19
+
+- Status: `FIXTURE_TEST_ONLY_MATRIX_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
+- Anchor before this slice: `2971e58245b6c850160c43ca6fdb587f1b1316b3`.
+- New document: [docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md](/A:/codex-memory/docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md).
+- Completed: defined fixture/test-only parity categories and selected `CM-0529` as the next local-safe TagMemo fixture-plan slice.
+- Not run: fixture/test/source/runtime changes, A5 command, recall observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: `CM-0529` Phase F TagMemo semantic association fixture plan.
 ## Checkpoint - Phase F readonly VCP parity gap inventory - 2026-05-19
 
 - Status: `READONLY_INVENTORY_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.

@@ -153,3 +153,13 @@ Selected next slice: `CM-0526 Phase F fixture/test-only parity hardening matrix`
 The inventory used existing docs only and did not inspect real memory stores, execute runtime, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
 
 Project status remains `NOT_READY_BLOCKED`.
+
+## Week 4 Phase F Fixture/Test-Only Matrix - 2026-05-19
+
+Fixture/test-only parity hardening matrix is recorded in [docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md](/A:/codex-memory/docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md).
+
+Selected next slice: `CM-0529 Phase F TagMemo semantic association fixture plan`.
+
+This slice only defines future fixture/test categories and did not add fixtures/tests, modify source/runtime, inspect real memory stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
+
+Project status remains `NOT_READY_BLOCKED`.

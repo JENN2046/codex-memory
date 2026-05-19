@@ -104,3 +104,11 @@ Handoff: report to Commander in conversation; do not edit files.
 - Status remains `NOT_READY_BLOCKED`.
 - Selected next slice: `CM-0526` fixture/test-only parity hardening matrix, starting with TagMemo / semantic association parity.
 - No runtime/source/test/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.
+
+## Phase F Fixture/Test-Only Parity Hardening Matrix - 2026-05-19
+
+- Anchor before this slice: `2971e58245b6c850160c43ca6fdb587f1b1316b3`.
+- Matrix doc: [docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md](/A:/codex-memory/docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md).
+- Status remains `NOT_READY_BLOCKED`.
+- Selected next slice: `CM-0529` TagMemo semantic association fixture plan.
+- No fixture/test/source/runtime/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.

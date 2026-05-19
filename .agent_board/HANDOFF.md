@@ -78,6 +78,17 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - Not authorized: runtime mutation, real memory scan, recall observation, provider calls, migration/import/export/backup/restore apply, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
 - Project status remains `NOT_READY_BLOCKED`.
 
+
+## Phase F Fixture/Test-Only Parity Hardening Matrix - 2026-05-19
+
+- Anchor before this slice: `2971e58245b6c850160c43ca6fdb587f1b1316b3`.
+- Matrix doc: [docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md](/A:/codex-memory/docs/PHASE_F_FIXTURE_TEST_ONLY_PARITY_HARDENING_MATRIX.md).
+- Completed: docs-only matrix for fixture/test-only parity hardening categories.
+- First next task: `CM-0529 Phase F TagMemo semantic association fixture plan`.
+- Covered categories: TagMemo association strength, semantic grouping, query expansion, EPA/ResidualPyramid interactions, deterministic ordering, donor edge maintenance, query-quality dry-run, governance/lifecycle fixtures, object-model/migration dry-run, observability/admin report shape, and client-scope parity.
+- Not authorized: fixture/test implementation in this slice, runtime mutation, real memory scan, recall observation, provider calls, migration/import/export/backup/restore apply, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
+- Project status remains `NOT_READY_BLOCKED`.
+
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.
