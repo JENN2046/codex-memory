@@ -6,6 +6,8 @@ Default mode: `A4-Sustained Local Autopilot`.
 
 This file adapts the universal sustained local autopilot pattern to the real `codex-memory` project. It is not a blank-project scaffold. It is a continuation rail for an existing, mature `vcp_codex_memory` runtime.
 
+This file is the project constitution, not the live project journal. Keep durable operating rules here. Put volatile phase status, current commit facts, temporary blockers, active task state, approval packets, and handoff details in `STATUS.md`, `.agent_board`, or dedicated docs.
+
 ---
 
 ## 0. Plain Meaning
@@ -35,6 +37,8 @@ Do not redraw the four-layer architecture without evidence.
 Do not bypass the gates.
 
 Do not push unless the user explicitly authorizes it or the A4.8 safe-push policy applies and readiness is ready.
+
+If the A4.8 safe-push policy does not fully pass, or if push readiness is uncertain, stale, contradicted by repository reality, or missing required evidence, stop before push and report the blocker.
 
 ---
 
@@ -310,7 +314,9 @@ Codex should stop only for hard stops, unsafe state, unclear goal that cannot be
 
 ### 7.1 A4.8 Safe Project Operator Rail
 
-When explicitly activated, `A4.8 Safe Project Operator Rail` lets Codex select the next safe local phase from the roadmap/backlog/board, split work into planning / fixture / dry-run / runtime / gate / observability subphases, run validation selection automatically, create guarded commits, run push readiness, and safe-push only when the safe-push policy passes.
+When explicitly activated, `A4.8 Safe Project Operator Rail` lets Codex select the next safe local phase from the roadmap/backlog/board, split work into planning / fixture / dry-run / runtime / gate / observability subphases, run validation selection automatically, create guarded commits, run push readiness, and safe-push only when the safe-push policy fully passes.
+
+Fail-closed rule: if any safe-push requirement is unmet, unknown, stale, contradicted by Git state, blocked by A5 hard stops, or missing evidence, Codex must stop before push. Push-readiness checks are allowed under A4.8; actual push is allowed only when the safe-push policy applies completely or the user gives explicit push authorization.
 
 Reference docs:
 
@@ -321,6 +327,19 @@ Reference docs:
 - [AUTOPILOT_FAILURE_RECOVERY.md](/A:/codex-memory/docs/AUTOPILOT_FAILURE_RECOVERY.md)
 
 A4.8 is not unlimited permission. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview` unless a dedicated approved phase explicitly authorizes expansion. A5 hard stops remain manual, including real DB/memory mutation, SQLite migration, MCP public tool/schema expansion, provider calls, dependency changes, secrets/env edits, release/tag/deploy, destructive commands, and stale branch merge/rebase/cherry-pick.
+
+---
+
+## 7.2 Push Authority Rule
+
+Push is allowed only through one of two routes:
+
+1. The user explicitly authorizes the exact push action.
+2. `A4.8 Safe Project Operator Rail` is explicitly active and the safe-push policy fully passes.
+
+Safe-push requires fresh repository reality, current validation evidence, clean scope, no unresolved A5 hard stop for the push target, no secret/dependency/config/runtime-data surprise, and no stale branch or remote ambiguity.
+
+If any push requirement is unmet, unknown, stale, contradicted by Git state, or missing evidence, Codex must stop before push and report the blocker. Push-readiness checks may continue locally; actual push must not occur.
 
 ---
 
@@ -337,6 +356,8 @@ Required files:
 .agent_board/HANDOFF.md
 .agent_board/BLOCKERS.md
 .agent_board/DECISIONS.md
+.agent_board/FILE_LOCKS.md
+.agent_board/RISK_REGISTER.md
 .agent_board/VALIDATION_LOG.md
 ```
 
@@ -395,7 +416,7 @@ Each task should include:
 
 ## 10. Initialization Loop
 
-At the beginning of work:
+At the beginning of non-trivial repository work, implementation work, validation work, branch-sensitive work, rollback-sensitive work, migration-sensitive work, release-like work, or commit/push work:
 
 1. Inspect Git state.
 2. Read `README.md`.
@@ -407,6 +428,8 @@ At the beginning of work:
 8. Decompose the goal into queue items.
 9. Select one `in_progress` item.
 10. Begin safe local execution.
+
+For small read-only questions, narrow reviews, typo-level docs edits, or targeted single-file checks, use targeted inspection instead of the full initialization loop. Still inspect Git state before editing, validation, commit, push-readiness, or any action that could affect user-owned work.
 
 Required Git checks:
 
@@ -762,7 +785,7 @@ Stop and request explicit approval before:
 - tag
 - remote write
 - production write
-- changing `C:\Users\617\.codex\config.toml`
+- changing real Codex or Claude client config, including `%USERPROFILE%\.codex\config.toml`, `$HOME\.codex\config.toml`, or any user-specific Codex/Claude config path
 - switching 7605/6005 mainline in real config
 - installing/updating/removing watchdog scheduled task
 - modifying HKCU Run startup entry
@@ -1124,7 +1147,7 @@ Move in small verified steps.
 
 Commit locally only when guarded.
 
-Never push outside explicit user authorization or the A4.8 safe-push policy.
+Never push outside explicit user authorization or the A4.8 safe-push policy. If the A4.8 safe-push policy does not fully apply, stop before push.
 
 The goal is not more motion.
 

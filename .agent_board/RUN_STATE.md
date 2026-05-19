@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | Prepare `RC_PRECHECK_001` execution packet and local non-A5 precheck records |
-| Current area | P10-observability-admin / RC_PRECHECK_001 |
+| Current task | Commit `AGENTS.md` governance cleanup and prepare for RC_PRECHECK_001 target refresh |
+| Current area | P6-docs-drift / P10-observability-admin |
 | Last pushed baseline | `103c3ac` on `origin/main`; local `main` is ahead by 1 at `9eb17ad` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Created local guarded commit `9eb17ad docs: reconcile project review state`; preparing `RC_PRECHECK_001` DRAFT_NOT_APPROVED execution packet and non-A5 precheck record. |
-| Last validation | `CM-0510` local non-A5 precheck will validate only Git baseline, docs validation, `git diff --check`, and stale/readiness wording scan; A5 precheck commands remain blocked without exact approval. |
-| Worktree summary | Before `RC_PRECHECK_001` packet work, `git status -sb` reported `main...origin/main [ahead 1]`, `HEAD=9eb17ad`, and `git status --short` was clean. Current stage remains docs/board-only and `NOT_READY_BLOCKED`. |
+| Last action | Updated `AGENTS.md` governance rules: A4.8 safe-push remains allowed only when fully passed, push readiness now fails closed, project constitution vs live journal boundaries are explicit, and initialization loop is narrowed for small tasks. |
+| Last validation | `git diff --check`, docs validation, and governance keyword scan passed for `AGENTS.md` cleanup before board registration. |
+| Worktree summary | Local `main` is ahead of `origin/main` by 2 at `112ec9f`; current tracked changes are docs/board governance cleanup only and remain `NOT_READY_BLOCKED`. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized for this local protocol slice unless explicitly requested |
-| Next planned action | Complete `CM-0508` to `CM-0511`: reconcile board after `9eb17ad`, prepare `RC_PRECHECK_001` execution approval packet, run local non-A5 docs/Git precheck, and stop before any A5 command. |
+| Next planned action | Guarded local commit for `AGENTS.md` governance cleanup, then refresh `RC_PRECHECK_001` target commit to the new local HEAD. |
 
 ## Notes
 
