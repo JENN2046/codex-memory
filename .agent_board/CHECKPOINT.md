@@ -2,17 +2,18 @@
 
 ## Current Goal
 
-Record approved A5-GAP-2 no-mutation recall isolation runtime proof evidence for stores `real_diary`, `real_sqlite`, `real_vector_index`, `real_candidate_cache`, and `real_recall_audit` at `6faa8baa375e7496dcf62cb4443668dd9f67f712` while preserving all other runtime/A5 hard stops.
+Implement local A4 recall isolation/classification projection layer after A5-GAP-2 failed closed, then request fresh A5-GAP-2 rerun approval for the guarded commit. Preserve all other runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability-admin / P8 memory-governance; A5-GAP-2 no-mutation recall isolation runtime proof evidence.
+P8 memory-governance / P7 vcp-parity-hardening; A4 recall isolation projection layer. Fresh A5-GAP-2 runtime proof remains blocked until exact approval.
 
 ## Current Status
 
 - Last pushed baseline: `a9177d5 fix: tighten review patch safety semantics` on `origin/main`.
 - Local `main` contains `6faa8baa375e7496dcf62cb4443668dd9f67f712 docs: record p66 a5 gap1 governance evidence` and is ahead of `origin/main = a9177d5` by 7 commits before this evidence slice; verify exact current state with `git status -sb` before new work.
 - User supplied a complete approval line for `A5-GAP-2`. The approved no-mutation recall isolation runtime proof read the five approved stores, produced sanitized contamination counts, and left before/after store snapshots unchanged; evidence is recorded in [docs/P66_A5_GAP_2_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). The proof failed closed with contamination markers, so recall isolation remains open. `A5-GAP-1`, `A5-GAP-4`, and `A5-GAP-5` evidence remain bounded to their approved contexts.
+- Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.

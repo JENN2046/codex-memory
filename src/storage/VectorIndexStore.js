@@ -2,6 +2,8 @@ const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
+const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
+
 function cosineSimilarity(left, right) {
   if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length || left.length === 0) {
     return 0;
@@ -242,6 +244,15 @@ class VectorIndexStore {
     if (!this.config.enableVectorIndex) return;
     await this.ensureReady();
 
+    if (isRecallIsolated(record)) {
+      if (this.index.vectors[record.memoryId]) {
+        delete this.index.vectors[record.memoryId];
+        await this.flush();
+        return true;
+      }
+      return false;
+    }
+
     const vector = await this.getSingleEmbeddingCached(this.buildRecordText(record), { inputKind: 'document' });
     this.index.vectors[record.memoryId] = {
       memoryId: record.memoryId,
@@ -256,14 +267,16 @@ class VectorIndexStore {
     };
 
     await this.flush();
+    return true;
   }
 
   async deleteRecord(memoryId) {
     if (!this.config.enableVectorIndex) return;
     await this.ensureReady();
-    if (!this.index.vectors[memoryId]) return;
+    if (!this.index.vectors[memoryId]) return false;
     delete this.index.vectors[memoryId];
     await this.flush();
+    return true;
   }
 
   async getScoreMap(query, records = []) {
@@ -286,9 +299,10 @@ class VectorIndexStore {
 
   async rebuildDiaryVectors(records = []) {
     await this.ensureReady();
+    const searchableRecords = filterRecallIsolatedItems(records);
     const buckets = new Map();
 
-    for (const record of records) {
+    for (const record of searchableRecords) {
       const key = record.target || 'process';
       if (!buckets.has(key)) {
         buckets.set(key, []);

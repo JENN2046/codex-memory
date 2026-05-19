@@ -1,5 +1,7 @@
 const crypto = require('node:crypto');
 
+const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
+
 class KnowledgeBaseSyncService {
   constructor({ config, diaryStore, shadowStore, vectorStore, chunkIndexingService, candidateCacheStore = null }) {
     this.config = config;
@@ -22,19 +24,24 @@ class KnowledgeBaseSyncService {
     let vectorWrites = 0;
     let chunkWrites = 0;
     let prunedRecords = 0;
+    let isolationProjectionClears = 0;
     let diaryVectorWrites = 0;
+    let isolatedRecords = 0;
 
     for (const record of diaryRecords) {
       if (!record.memoryId) continue;
+      const isolated = isRecallIsolated(record);
+      if (isolated) isolatedRecords += 1;
 
       const recordKey = this.getRecordKey(record);
       const existing = existingMap.get(recordKey);
       const hasCurrentFingerprintChunks = existing
         ? await this.hasCurrentFingerprintChunks(record)
         : false;
-      const needsRefresh = force || this.shouldRefreshRecord(existing, record) || !hasCurrentFingerprintChunks;
+      const needsRefresh = force || this.shouldRefreshRecord(existing, record) || (!isolated && !hasCurrentFingerprintChunks);
+      const needsIsolationChunkClear = isolated && hasCurrentFingerprintChunks;
 
-      if (this.config.enableShadowWrites && needsRefresh) {
+      if (this.config.enableShadowWrites && (needsRefresh || needsIsolationChunkClear)) {
         if (existing) {
           record.projectId = record.projectId || existing.projectId || null;
           record.workspaceId = record.workspaceId || existing.workspaceId || null;
@@ -46,19 +53,30 @@ class KnowledgeBaseSyncService {
         }
         await this.shadowStore.upsertRecord(record);
         await this.shadowStore.clearReconcileTasks(record.memoryId, 'sqlite');
-        sqliteWrites += 1;
+        if (needsRefresh) sqliteWrites += 1;
 
         if (this.chunkIndexingService) {
-          await this.chunkIndexingService.indexRecord(record);
+          if (isolated) {
+            await this.shadowStore.replaceChunksForRecord(record, []);
+            if (needsIsolationChunkClear) isolationProjectionClears += 1;
+          } else {
+            await this.chunkIndexingService.indexRecord(record);
+          }
           await this.shadowStore.clearReconcileTasks(record.memoryId, 'chunks');
-          chunkWrites += 1;
+          if (!isolated) chunkWrites += 1;
         }
       }
 
-      if (this.config.enableVectorIndex && needsRefresh) {
-        await this.vectorStore.upsertRecord(record);
+      if (this.config.enableVectorIndex && (needsRefresh || isolated)) {
+        if (isolated) {
+          if (await this.vectorStore.deleteRecord(record.memoryId)) {
+            isolationProjectionClears += 1;
+          }
+        } else {
+          await this.vectorStore.upsertRecord(record);
+        }
         await this.shadowStore.clearReconcileTasks(record.memoryId, 'vector');
-        vectorWrites += 1;
+        if (!isolated) vectorWrites += 1;
       }
     }
 
@@ -80,9 +98,9 @@ class KnowledgeBaseSyncService {
       }
     }
 
-    const changed = sqliteWrites > 0 || vectorWrites > 0 || chunkWrites > 0 || prunedRecords > 0;
+    const changed = sqliteWrites > 0 || vectorWrites > 0 || chunkWrites > 0 || prunedRecords > 0 || isolationProjectionClears > 0;
     if (this.config.enableVectorIndex) {
-      diaryVectorWrites = await this.vectorStore.rebuildDiaryVectors(diaryRecords);
+      diaryVectorWrites = await this.vectorStore.rebuildDiaryVectors(filterRecallIsolatedItems(diaryRecords));
     }
     if (changed && this.candidateCacheStore) {
       if (this.candidateCacheStore.clearCurrentFingerprint) {
@@ -98,6 +116,8 @@ class KnowledgeBaseSyncService {
       vectorWrites,
       chunkWrites,
       prunedRecords,
+      isolationProjectionClears,
+      isolatedRecords,
       diaryVectorWrites,
       changed,
       syncToken: this.buildSyncToken(target, diaryRecords)

@@ -1,5 +1,6 @@
 const crypto = require('node:crypto');
 
+const { isRecallIsolated } = require('../core/RecallIsolationClassifier');
 const { stripMemoryMarkers } = require('../storage/DiaryStore');
 const { chunkText } = require('./chunkText');
 
@@ -11,6 +12,14 @@ class ChunkIndexingService {
   }
 
   async indexRecord(record) {
+    if (isRecallIsolated(record)) {
+      await this.shadowStore.replaceChunksForRecord(record, []);
+      return {
+        chunkCount: 0,
+        isolated: true
+      };
+    }
+
     const sourceText = stripMemoryMarkers(record.cleanedText || record.rawText || '')
       || [
         `Title: ${record.title}`,

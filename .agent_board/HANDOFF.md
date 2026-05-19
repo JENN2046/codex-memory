@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record approved A5-GAP-2 no-mutation recall isolation runtime proof evidence for stores `real_diary`, `real_sqlite`, `real_vector_index`, `real_candidate_cache`, and `real_recall_audit` at `6faa8baa375e7496dcf62cb4443668dd9f67f712` and keep all other runtime/A5 boundaries blocked until exact approval is provided.
+Implement local A4 recall isolation/classification projection layer after A5-GAP-2 failed closed, then request fresh A5-GAP-2 rerun approval for the guarded commit. Keep all other runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,16 +14,17 @@ Record approved A5-GAP-2 no-mutation recall isolation runtime proof evidence for
 
 ## Worktree
 
-Current local `main` contains `6faa8baa375e7496dcf62cb4443668dd9f67f712 docs: record p66 a5 gap1 governance evidence` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 7 commits before this evidence slice. The current worktree contains intended A5-GAP-2 evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A4 source/test/docs/board updates for recall isolation projection. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability-admin / P8 memory-governance; A5-GAP-2 no-mutation recall isolation runtime proof evidence.
+P8 memory-governance / P7 vcp-parity-hardening; A4 recall isolation projection layer. Fresh A5-GAP-2 runtime proof remains blocked until exact approval.
 
 ## Current Truth
 
 - P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
 - Current local slice records approved `A5-GAP-2` evidence. The no-mutation recall isolation runtime proof read only the five approved stores, produced sanitized counts/hashes, and left store snapshots unchanged. It failed closed with contamination markers, so recall isolation remains open. `A5-GAP-1` governance evidence remains subject-bound; `A5-GAP-4` live HTTP evidence remains endpoint-bound to `http://127.0.0.1:7605` at `53554c174b8b270c7bf792a368a3f4c249044b1d`; `A5-GAP-5` strict gate evidence remains target-bound to `96b6a3c`. Other A5 approval lines still require exact approval.
+- Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.

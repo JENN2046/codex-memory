@@ -1,4 +1,5 @@
 const { getDiaryNamesForTarget, getTargetForDiaryName } = require('../core/constants');
+const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
 const { stripMemoryMarkers } = require('../storage/DiaryStore');
 const { compactText, uniqueTokens } = require('./text');
 
@@ -205,7 +206,7 @@ class KnowledgeBaseRecallPipeline {
   async aggregateCandidates({ candidates = [], includeContent = false }) {
     const groups = new Map();
 
-    for (const candidate of candidates) {
+    for (const candidate of filterRecallIsolatedItems(candidates)) {
       const key = candidate.memoryId || candidate.sourceFile || candidate.chunkId;
       if (!groups.has(key)) {
         groups.set(key, []);
@@ -224,6 +225,9 @@ class KnowledgeBaseRecallPipeline {
         const ordered = sortByPrimaryScore(group);
         const best = ordered[0];
         const record = best.memoryId ? recordMap.get(best.memoryId) : null;
+        if (record && isRecallIsolated(record)) {
+          return null;
+        }
         const cleanContent = record
           ? stripMemoryMarkers(record.rawText || record.content || '')
           : stripMemoryMarkers(best.text || '');
@@ -254,6 +258,7 @@ class KnowledgeBaseRecallPipeline {
           text: cleanText
         };
       })
+      .filter(Boolean)
       .sort((left, right) => (right.score || 0) - (left.score || 0));
   }
 

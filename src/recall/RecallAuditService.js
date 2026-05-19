@@ -1,4 +1,5 @@
 const { getDiaryNameForTarget, getTargetForDiaryName } = require('../core/constants');
+const { filterRecallIsolatedItems } = require('../core/RecallIsolationClassifier');
 
 function normalizeTagArray(tags) {
   return [...new Set((Array.isArray(tags) ? tags : [])
@@ -52,7 +53,7 @@ class RecallAuditService {
       scopeAudit = null,
       policyAudit = {}
     } = options;
-    const safeResults = Array.isArray(results) ? results.filter(Boolean) : [];
+    const safeResults = filterRecallIsolatedItems(Array.isArray(results) ? results.filter(Boolean) : []);
     const scopeApplied = !!scopeAudit?.scopeApplied;
     const scopeVisibility = normalizeScopeVisibility(scopeAudit?.scopeVisibility);
 
@@ -99,7 +100,7 @@ class RecallAuditService {
       scopeAudit = null
     } = options;
 
-    const safeResults = Array.isArray(results) ? results.filter(Boolean) : [];
+    const safeResults = filterRecallIsolatedItems(Array.isArray(results) ? results.filter(Boolean) : []);
     if (safeResults.length === 0) return null;
 
     const dbName = getDiaryNameForTarget(target);

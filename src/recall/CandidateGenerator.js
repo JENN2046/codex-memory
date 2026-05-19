@@ -1,5 +1,9 @@
 const crypto = require('node:crypto');
 
+const {
+  ISOLATION_CLASSIFIER_VERSION,
+  filterRecallIsolatedItems
+} = require('../core/RecallIsolationClassifier');
 const { cosineSimilarity } = require('../storage/VectorIndexStore');
 const { stripMemoryMarkers } = require('../storage/DiaryStore');
 const { compactText, contentTokens, uniqueTokens } = require('./text');
@@ -71,13 +75,15 @@ class CandidateGenerator {
       const cached = await this.candidateCacheStore.get(cacheKey);
       if (cached) {
         return {
-          ...cached,
+          ...this.filterCandidateState(cached),
           fromCache: true
         };
       }
     }
 
-    const semanticChunks = await this.shadowStore.listChunks(target, candidateFilters);
+    const semanticChunks = filterRecallIsolatedItems(
+      await this.shadowStore.listChunks(target, candidateFilters)
+    );
     const queryVector = await this.vectorStore.getSingleEmbeddingCached(queryText);
     const activeQueryVector = this.buildActiveQueryVector(queryVector, contextState);
     const semanticCandidates = this.rankChunks({
@@ -91,7 +97,9 @@ class CandidateGenerator {
 
     let timeCandidates = [];
     if (searchPlan.useTime) {
-      const timedChunks = await this.shadowStore.listChunksByTimeRanges(target, queryAnalysis.timeRanges || [], candidateFilters);
+      const timedChunks = filterRecallIsolatedItems(
+        await this.shadowStore.listChunksByTimeRanges(target, queryAnalysis.timeRanges || [], candidateFilters)
+      );
       timeCandidates = this.rankChunks({
         chunks: timedChunks,
         queryVector: activeQueryVector,
@@ -138,6 +146,7 @@ class CandidateGenerator {
         geodesicrerank: !!directives.geodesicrerank
       },
       searchPlan,
+      isolationClassifierVersion: ISOLATION_CLASSIFIER_VERSION,
       candidateFilters,
       timeRanges: (queryAnalysis.timeRanges || []).map(range => ({
         start: range?.start instanceof Date ? range.start.toISOString() : null,
@@ -148,6 +157,19 @@ class CandidateGenerator {
     };
 
     return crypto.createHash('sha1').update(JSON.stringify(payload)).digest('hex');
+  }
+
+  filterCandidateState(state = {}) {
+    const semanticCandidates = filterRecallIsolatedItems(state.semanticCandidates || []);
+    const timeCandidates = filterRecallIsolatedItems(state.timeCandidates || []);
+    return {
+      ...state,
+      semanticCandidates,
+      timeCandidates,
+      allCandidates: Array.isArray(state.allCandidates)
+        ? filterRecallIsolatedItems(state.allCandidates)
+        : [...semanticCandidates, ...timeCandidates]
+    };
   }
 
   buildActiveQueryVector(queryVector, contextState) {
