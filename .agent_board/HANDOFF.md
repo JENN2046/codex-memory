@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record the A5-GAP-6 post-production-governance-readiness evidence-only aggregation. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
+Prepare the next precise A5 packet for the remaining A5-GAP-2 recall isolation limitation. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,15 +14,17 @@ Record the A5-GAP-6 post-production-governance-readiness evidence-only aggregati
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended A5-GAP-6 post-production-governance-readiness aggregation evidence docs/board updates until validation and guarded commit complete. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A5-GAP-2 classified sample recall isolation readonly packet docs/board updates until validation and guarded commit complete. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability-admin / ValidationAggregator; A5-GAP-6 post-production-governance-readiness evidence-only aggregation.
+P10 observability-admin / recall isolation; A5-GAP-2 classified sample positive-sample proof packet.
 
 ## Current Truth
 
 - P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
+- Current packet slice drafts [docs/P66_A5_GAP_2_CLASSIFIED_SAMPLE_RECALL_ISOLATION_READONLY_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_2_CLASSIFIED_SAMPLE_RECALL_ISOLATION_READONLY_APPROVAL_PACKET.md) as `DRAFT_NOT_APPROVED`. It narrows the next requested action to read-only classified isolation positive-sample presence and projection proof, exact approved five-store set, no mutation, no backfill, no migration, and no durable write. It is not approval and executes nothing.
+- Packet validation passed: docs validation, `git diff --check`, and overclaim scan. Next step is guarded local commit, then exact A5-GAP-2 approval request using the post-packet commit hash.
 - Current local slice records approved fresh `A5-GAP-5` strict gate evidence. It ran only `npm run gate:mainline:strict` for current `HEAD`, performed no remote write, and failed in the test gate: health ok, contract ok, test error (`1569/1573` pass, 4 fail), compare ok, rollback ok. `A5-GAP-1` governance evidence remains subject-bound; `A5-GAP-2` fresh rerun remains no-mutation with limitation `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; `A5-GAP-3` remains fixture-only dry-run with migration blocked; `A5-GAP-4` live HTTP evidence remains endpoint-bound; post-GAP3 `A5-GAP-6` remains evidence-consumption only. Other A5 approval lines still require exact approval.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - Fresh A5-GAP-2 rerun has now been executed for approved stores at `ceffc0f255c142875a0f41879539361dd547c4bc` and recorded in [docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). Result: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION`; limitation: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; store snapshots unchanged; no mutation.
