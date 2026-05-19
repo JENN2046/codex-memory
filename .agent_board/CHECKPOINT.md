@@ -659,3 +659,10 @@ Stop before any push/tag/release/deploy/config/watchdog/cutover/runtime-executio
 PASS_WITH_PATCH_RECOMMENDED review patch is implemented, validated, and pushed in `a9177d5`. It tightens HTTP no-token mutation blocking with a conservative mutation-sensitive tool set, adds Final RC runner authorization posture fields (`authorizationClass=A4_LOCAL_EXECUTABLE_VALIDATION`, `cutoverAuthorized=false`, and `requiresA5For`), reconciles active baseline/status wording, and adds [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md). Validation passed: `node --test tests\mcp-http.test.js` 8/8, `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5, `git diff --check`, and active status drift scan. No provider call, real memory/runtime-store scan, migration/import/export/backup/restore apply, durable write, public MCP expansion, config/watchdog/cutover, tag, release, deploy, or readiness claim occurred.
 
 Supreme Commander protocol slice is implemented and validated locally. It adds [docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md), wires the protocol into A4.8 / Single-Window 4-Agent / AGENTS entrypoints, and reconciles active status/board/next-phase wording to `a9177d5`. Validation passed: `git diff --check`, docs validation, trailing whitespace scan, and active stale-baseline scan. No service start, provider call, real memory/runtime-store scan, migration/import/export/backup/restore apply, durable write, public MCP expansion, config/watchdog/cutover, tag, release, deploy, push, or readiness claim occurred.
+
+## CM-0535 Phase F observability/admin review surface fixture plan
+
+- Status: COMPLETED_VALIDATED pending final commit.
+- Scope: docs/board only; new fixture plan for future synthetic review-surface contract.
+- Boundary: no runtime/source change, no HTTP observe/service start, no real memory scan, no provider, no public MCP expansion, no durable write, no push, no cutover, no readiness claim.
+- Next: CM-0536 synthetic fixture contract.

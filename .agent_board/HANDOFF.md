@@ -566,3 +566,14 @@ P66.58 ValidationAggregator RC cutover local closeout is implemented, validated,
 P66.59 ValidationAggregator runtime gap local proof chain review is implemented and validated locally as docs/board only. It adds [docs/P66_59_VALIDATION_AGGREGATOR_RUNTIME_GAP_LOCAL_PROOF_CHAIN_REVIEW.md](/A:/codex-memory/docs/P66_59_VALIDATION_AGGREGATOR_RUNTIME_GAP_LOCAL_PROOF_CHAIN_REVIEW.md), records all seven P66.3 local proof slices as complete, and keeps every runtime gap open with `NOT_READY_BLOCKED`. Validation passed: docs validation, `git diff --check`, and boundary scan with only intended blocker/readiness-denial wording.
 
 Next safe action is to stop runtime-gap closure work unless explicit runtime/A5 authorization is granted; otherwise select a different local-safe backlog item. 中文解释：7 个 runtime gap 的本地安全工作已经耗尽，不能把本地 proof chain 误读为 runtime readiness 或 `RC_READY`。
+
+## CM-0535 Handoff
+
+Goal: prepare Phase F observability/admin review surface fixture plan.
+Workspace: A:\codex-memory.
+Current area: P10-observability-admin.
+Changed files: docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_FIXTURE_PLAN.md plus docs/board status files.
+Validation: pending final docs validation and diff check in this slice.
+Not validated: runtime behavior, HTTP observe, provider, real memory stores, public MCP schema.
+Remaining risks: future CM-0536 must remain synthetic fixture/test-only.
+Next safe step: add synthetic fixture and structure-only test after this docs plan is committed.

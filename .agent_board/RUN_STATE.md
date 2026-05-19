@@ -162,3 +162,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 - Selected next slice: `CM-0535` observability/admin review surface fixture plan.
 - No source/runtime/dependency/config/runtime-data change, no HTTP observe/service start, no A5 command, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.
+
+## CM-0535 State
+
+- Current state: Phase F observability/admin review surface fixture plan drafted locally.
+- Decision: NOT_READY_BLOCKED.
+- Boundary: docs/board only; no runtime/source change, no HTTP observe, no provider, no real memory scan, no public MCP expansion, no durable write, no push, no cutover, no readiness claim.
+- Next safe task: CM-0536 synthetic fixture contract.

@@ -221,3 +221,7 @@ Selected next slice: `CM-0535 Phase F observability/admin review surface fixture
 This slice did not modify source/runtime, start HTTP, run observe, inspect real memory/audit stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
 
 Project status remains `NOT_READY_BLOCKED`.
+
+## CM-0535 Monthly Update
+
+Phase F observability/admin review surface fixture plan prepared as a local-safe docs/board slice. It preserves the public MCP freeze and routes next work to a synthetic fixture/test contract only. Status remains NOT_READY_BLOCKED.

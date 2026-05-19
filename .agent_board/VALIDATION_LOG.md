@@ -702,3 +702,5 @@ npm run profile-health
 npm run shadow-compare -- --query "embedding profile migration"
 npm run profile-gate -- --json --summary-only
 ```
+
+- CMV-0634 | P10-observability-admin | CM-0535 Phase F observability/admin review surface fixture plan | COMPLETED_VALIDATED | Docs/board fixture-plan slice prepared; git diff --check passed; docs validation passed; readiness/public MCP boundary scan returned no current-state overclaim.
