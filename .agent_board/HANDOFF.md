@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record approved post-GAP3 A5-GAP-6 ValidationAggregator evidence refresh. Keep all other runtime/A5 boundaries blocked until exact approval is provided.
+Record approved fresh A5-GAP-5 strict gate evidence for current `HEAD`. Keep all other runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,22 +14,23 @@ Record approved post-GAP3 A5-GAP-6 ValidationAggregator evidence refresh. Keep a
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended post-GAP3 A5-GAP-6 evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended fresh A5-GAP-5 failed-gate evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability-admin / validation-aggregator; A5-GAP-6 approved evidence consumption only, after A5-GAP-3.
+P10 observability-admin / mainline-health; A5-GAP-5 approved strict-gate-only evidence.
 
 ## Current Truth
 
 - P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
-- Current local slice records approved post-GAP3 `A5-GAP-6` evidence aggregation. It consumes only sanitized evidence from approved A5-GAP-1/2/3/4/5, performs no new runtime action, and keeps `NOT_READY_BLOCKED`. `A5-GAP-1` governance evidence remains subject-bound; `A5-GAP-2` fresh rerun remains no-mutation with limitation `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; `A5-GAP-3` remains fixture-only dry-run with migration blocked; `A5-GAP-4` live HTTP evidence remains endpoint-bound to `http://127.0.0.1:7605` at `53554c174b8b270c7bf792a368a3f4c249044b1d`; `A5-GAP-5` strict gate evidence remains target-bound to `96b6a3c`. Other A5 approval lines still require exact approval.
+- Current local slice records approved fresh `A5-GAP-5` strict gate evidence. It ran only `npm run gate:mainline:strict` for current `HEAD`, performed no remote write, and failed in the test gate: health ok, contract ok, test error (`1569/1573` pass, 4 fail), compare ok, rollback ok. `A5-GAP-1` governance evidence remains subject-bound; `A5-GAP-2` fresh rerun remains no-mutation with limitation `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; `A5-GAP-3` remains fixture-only dry-run with migration blocked; `A5-GAP-4` live HTTP evidence remains endpoint-bound; post-GAP3 `A5-GAP-6` remains evidence-consumption only. Other A5 approval lines still require exact approval.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - Fresh A5-GAP-2 rerun has now been executed for approved stores at `ceffc0f255c142875a0f41879539361dd547c4bc` and recorded in [docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). Result: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION`; limitation: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; store snapshots unchanged; no mutation.
 - A5-GAP-6 has now been executed for approved evidence consumption only at `16d3fe8af80fafad5b0db7ed29aacc6f7e51c1ff` and recorded in [docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - A5-GAP-3 dry-run/no-apply packet is prepared in [docs/P66_A5_GAP_3_DRY_RUN_APPROVAL_EXECUTION_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_3_DRY_RUN_APPROVAL_EXECUTION_PACKET.md). It is `DRAFT_NOT_APPROVED` and recommends only `action dry-run` target `vcp-memory:migration-readiness fixture-only readiness report`, with explicit no apply/import/export/backup/restore/durable write clauses. No dry-run was executed in this slice.
 - A5-GAP-3 approved dry-run has now executed for `vcp-memory:migration-readiness fixture-only readiness report` at `d3e87c7fe9f2f37c1659c815d874e8550dff4a32` and is recorded in [docs/P66_A5_GAP_3_DRY_RUN_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_3_DRY_RUN_EVIDENCE.md). Result: `DRY_RUN_EXECUTED_MIGRATION_STILL_BLOCKED`; `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`, and no apply/import/export/backup/restore/durable write.
 - Post-GAP3 A5-GAP-6 has now been executed for approved evidence consumption only at `7783daa88622df10eea47404f09043f603bce9e0` and recorded in [docs/P66_A5_GAP_6_POST_GAP3_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GAP3_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP3_RUNTIME_STILL_BLOCKED`; ValidationAggregator accepted the explicit sanitized A5-GAP-1/2/3/4/5 summary but kept `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- Fresh A5-GAP-5 has now been executed for current `HEAD` at `1c17d17cecc39c57f5df1473634451518dc97d32` and recorded in [docs/P66_A5_GAP_5_FRESH_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_FRESH_STRICT_GATE_EVIDENCE.md). Result: `TARGET_BOUND_GATE_FAILED_NOT_RC_READY`; test gate failed with 4 failures; no remote write or cutover occurred.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
