@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | RC_PRECHECK_001 A5-GAP-6 evidence-only aggregation executed; prepare local-safe Phase F prep |
-| Current area | P6-docs-drift / P10-observability-admin / monthly planning |
-| Last pushed baseline | `103c3ac` on `origin/main`; local `main` is ahead by 9 at `a6030f3` |
+| Current task | LOCAL_RC_CANDIDATE_001 local candidate status and dogfood boundary recording |
+| Current area | P0-mainline-health / P5-rollback-readiness / P10-observability-admin |
+| Last pushed baseline | `6c8bee0` on `origin/main`; local `main` is ahead by 13 at `33955fe` before this docs/board slice |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Executed exact A5-GAP-6 evidence-only aggregation for `RC_PRECHECK_001` using explicit sanitized summary; result `EVIDENCE_AGGREGATED_NOT_RC_READY`. |
-| Last validation | Git baseline; inline Node `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })` with explicit sanitized summary; final docs validation pending. |
-| Worktree summary | `## main...origin/main [ahead 11]`; aggregation evidence docs/board update pending; project remains `NOT_READY_BLOCKED`. |
+| Last action | Recorded read-only rollback rehearsal closeout in `33955fe`; local candidate review found `LOCAL_RC_CANDIDATE_REVIEW_READY` with state still `NOT_READY_BLOCKED`. |
+| Last validation | `git diff --check` and docs validation planned for LOCAL_RC_CANDIDATE_001 docs/board slice. |
+| Worktree summary | `## main...origin/main [ahead 13]` before this docs/board slice; project remains `NOT_READY_BLOCKED`. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | still blocked: readonly precheck passed, but no push authorization and no RC/cutover readiness; do not push automatically |
-| Next planned action | Run final docs validation, commit aggregation evidence locally, then continue local-safe Phase F prep unless a new exact A5 approval is provided. |
+| Next planned action | Validate and commit LOCAL_RC_CANDIDATE_001 locally; if accepted, prepare a separate local dogfood checklist without release/readiness claims. |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19

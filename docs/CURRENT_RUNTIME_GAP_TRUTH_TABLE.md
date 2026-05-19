@@ -63,3 +63,15 @@ This table does not authorize:
 - SQLite ExperimentalWarning noted with successful command exits.
 - no provider, no mutation, no durable write, no push.
 - Controlling state remains NOT_READY_BLOCKED.
+
+## LOCAL_RC_CANDIDATE_001 - 2026-05-20
+
+- Result: LOCAL_RC_CANDIDATE_001_RECORDED_NOT_RC_READY.
+- RC_PRECHECK_001 remains recorded as PRECHECK_PASSED_NOT_RC_READY.
+- read-only rollback rehearsal remains recorded as READONLY_ROLLBACK_REHEARSAL_COMPLETED_NOT_READY.
+- real rollback remains A5 blocked and requires separate exact approval plus validation plan.
+- dogfood may start only as local/scoped/non-release work.
+- RC remains NOT_READY_BLOCKED.
+- V8 is not implemented.
+- VCP full parity is not claimed.
+- This local candidate record does not change any `complete?` value in the truth table.

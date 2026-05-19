@@ -442,3 +442,23 @@ Recorded:
 - RC remains NOT_READY_BLOCKED
 
 Boundary: no reset/restore/revert/checkout rollback, no rollback:mainline:plan, no compare/rollback-active-memory, no provider, no real memory scan, no durable write, no push/tag/release/deploy, no readiness claim.
+
+## LOCAL_RC_CANDIDATE_001
+
+Status: LOCAL_RC_CANDIDATE_001_RECORDED_NOT_RC_READY
+Area: P0-mainline-health / P5-rollback-readiness / P10-observability-admin
+Risk: A4 docs/board status recording only
+
+Candidate record: docs/LOCAL_RC_CANDIDATE_001.md
+
+Current local candidate facts:
+
+- RC_PRECHECK_001 is recorded as PRECHECK_PASSED_NOT_RC_READY.
+- read-only rollback rehearsal is recorded as READONLY_ROLLBACK_REHEARSAL_COMPLETED_NOT_READY.
+- real rollback remains A5 blocked because the inspected rollback range includes src/tests.
+- dogfood may start only as local/scoped/non-release work.
+- RC remains NOT_READY_BLOCKED.
+- V8 is not implemented.
+- VCP full parity is not claimed.
+
+Next safe candidate: decide whether to prepare a local dogfood checklist. Do not run provider calls, real memory broad scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, tag, release, deploy, cutover, or readiness claims without separate exact approval.

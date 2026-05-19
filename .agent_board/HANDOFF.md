@@ -874,3 +874,13 @@ Recorded:
 - RC remains NOT_READY_BLOCKED
 
 Boundary: no reset/restore/revert/checkout rollback, no rollback:mainline:plan, no compare/rollback-active-memory, no provider, no real memory scan, no durable write, no push/tag/release/deploy, no readiness claim.
+
+## LOCAL_RC_CANDIDATE_001 handoff
+
+Goal: Record local candidate status and dogfood preparation boundary without entering release, cutover, or readiness claim.
+Status: LOCAL_RC_CANDIDATE_001_RECORDED_NOT_RC_READY.
+Changed files: docs/LOCAL_RC_CANDIDATE_001.md; STATUS.md; MAINTENANCE_BACKLOG.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; .agent_board/*
+Validation: git diff --check and docs validation for this docs/board slice.
+Not validated: release, tag, deploy, push, real rollback, provider calls, real memory broad scan, durable writes, migration/import/export/backup/restore apply, public MCP expansion, V8 implementation, VCP full parity.
+Remaining risk: dogfood must remain local/scoped/non-release unless separately approved; real rollback remains A5 blocked.
+Next safe step: prepare a separate local dogfood checklist if requested; do not claim RC readiness.
