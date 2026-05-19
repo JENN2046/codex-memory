@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record approved A5-GAP-1 governance read-policy rerun evidence after the A4 read-policy evidence surface. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
+Refresh A5-GAP-6 evidence-only aggregation after the approved A5-GAP-1 governance read-policy rerun. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ Record approved A5-GAP-1 governance read-policy rerun evidence after the A4 read
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended A5-GAP-1 read-policy rerun evidence docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has one approved sanitized audit append from the prior A5-GAP-1 smoke. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A5-GAP-6 post-read-policy-rerun evidence docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has one approved sanitized audit append from the prior A5-GAP-1 smoke. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 read-only governance read-policy rerun evidence.
+P10 observability-admin / validation-aggregator; A5-GAP-6 evidence-only aggregation after read-policy rerun.
 
 ## Current Truth
 
@@ -41,6 +41,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 read-only governance re
 - A5-GAP-6 post-governance-readiness aggregation refresh is now approved/executed and linked to [docs/P66_A5_GAP_6_POST_GOVERNANCE_READINESS_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GOVERNANCE_READINESS_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, and kept `NOT_READY_BLOCKED` with locally evidenced count `7`, remaining count `6`, and readiness flags false. The next safe move is to choose the next exact A5 packet; no cutover, A5-GAP-7, or additional runtime action is authorized.
 - A4 governance read-policy evidence surface is implemented and linked to [docs/P66_A4_GOVERNANCE_READ_POLICY_EVIDENCE_SURFACE.md](/A:/codex-memory/docs/P66_A4_GOVERNANCE_READ_POLICY_EVIDENCE_SURFACE.md). It changes `governance:report` read-policy wording from coarse unavailable/config-only to explicit `config_only_no_recent_audit` vs `config-and-recent-recall-audit`, plus `configEvidenceAvailable`, `auditEvidenceAvailable`, and `readPolicyConfigured`. Full validation passed: targeted observability tests `15/15`, `npm test` `1574/1574`, docs validation, and `git diff --check`. Guarded commit remains pending. Fresh A5-GAP-1 read-only rerun still requires exact approval after commit.
 - A5-GAP-1 governance read-policy rerun is approved/executed and linked to [docs/P66_A5_GAP_1_GOVERNANCE_READ_POLICY_RERUN_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_READ_POLICY_RERUN_EVIDENCE.md). It ran only `npm run governance:report -- --json`, returned `readPolicy.status=config_only_no_recent_audit`, `configEvidenceAvailable=true`, `auditEvidenceAvailable=false`, and `readPolicyConfigured=false`, and kept all readiness flags false. The next safe A5 move is an exact A5-GAP-6 evidence-only aggregation request consuming updated A5-GAP-1/2/3/4/5 evidence.
+- A5-GAP-6 post-read-policy-rerun aggregation refresh is approved/executed and linked to [docs/P66_A5_GAP_6_POST_READ_POLICY_RERUN_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_READ_POLICY_RERUN_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, and kept `NOT_READY_BLOCKED` with locally evidenced count `8`, remaining count `6`, and readiness flags false. The next safe move is to choose the next exact A5 packet; no cutover, A5-GAP-7, or additional runtime action is authorized.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
