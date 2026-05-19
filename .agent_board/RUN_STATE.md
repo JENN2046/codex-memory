@@ -239,3 +239,11 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: docs/board planning only; no runtime recall-chain execution, no real EPA/ResidualPyramid observation, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
 - Next safe task: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract.
+
+## CM-0548 current runtime truth table consolidation
+
+- Current state: `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` is the current authoritative runtime gap dashboard.
+- Decision: NOT_READY_BLOCKED.
+- Review input: PASS_WITH_PATCH_RECOMMENDED; no severe blocker; patch recommended to reduce thick status surface.
+- Boundary: docs/board consolidation only; no runtime source change, no HTTP session implementation, no real memory scan, no provider, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
+- Next safe task: CM-0549 HTTP session TTL/cap/cleanup hardening design packet.

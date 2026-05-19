@@ -1,4 +1,5 @@
 # P66 Runtime Gap Truth Table
+> Supersession note: this P66 table is now historical source/evidence detail. The current authoritative runtime gap dashboard is [CURRENT_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md). Use the current table for operator decisions before RC/precheck/cutover discussion.
 
 Phase: `P66-runtime-gap-truth-table`
 

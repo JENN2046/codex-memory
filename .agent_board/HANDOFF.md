@@ -690,9 +690,19 @@ Next safe step: CM-0546 Phase F EPA/ResidualPyramid chain metadata fixture plan
 ## CM-0546 fixture plan handoff
 
 Goal: Prepare Phase F EPA/ResidualPyramid chain metadata synthetic fixture plan.
-Status: COMPLETED_VALIDATED after local validation.
+Status: COMPLETED_VALIDATED.
 Changed files: docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_PLAN.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
 Validation: docs validation; git diff --check; readiness scan
 Not validated: runtime EPA/ResidualPyramid recall behavior, real memory stores, provider, HTTP observe, public MCP schema
 Remaining risk: planned fixture evidence will not be runtime parity proof
 Next safe step: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract
+
+## CM-0548 handoff
+
+Goal: Convert review recommendation P1 into a single current runtime gap truth table.
+Status: COMPLETED_VALIDATED
+Changed files: docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; docs/P66_RUNTIME_GAP_TRUTH_TABLE.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: docs validation; readiness scan; git diff --check
+Not validated: runtime behavior, HTTP session lifecycle, real memory stores, provider, public MCP schema
+Remaining risk: HTTP session TTL/cap/cleanup is still design-only backlog until CM-0549+
+Next safe step: CM-0549 HTTP session TTL/cap/cleanup hardening design packet

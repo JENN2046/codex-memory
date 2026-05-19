@@ -225,3 +225,15 @@ Local docs-only fixture plan has been prepared for Phase F EPA/ResidualPyramid c
 This does not claim runtime parity, real EPA/ResidualPyramid recall validation, RC readiness, or cutover readiness.
 
 Next safe task: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract.
+
+## CM-0548 Current runtime gap truth table consolidation
+
+Status: COMPLETED_VALIDATED
+Result: COMPLETED_VALIDATED
+State: NOT_READY_BLOCKED
+
+Review conclusion `PASS_WITH_PATCH_RECOMMENDED` has been accepted as a docs/board consolidation task. `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` is now the current authoritative runtime gap dashboard. `docs/P66_RUNTIME_GAP_TRUTH_TABLE.md` remains historical source/evidence detail.
+
+P2 HTTP session TTL/cap/cleanup remains a follow-up design backlog item, not implemented in this slice.
+
+Next safe task: CM-0549 HTTP session TTL/cap/cleanup hardening design packet.

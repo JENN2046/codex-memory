@@ -749,3 +749,13 @@ Changed files: docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_PLAN.md; 
 Validation: docs validation passed; git diff --check passed; readiness scan returned historical entries plus intended denial/boundary wording only
 Boundary: no runtime source change, no real recall-chain observation, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no push, no cutover, no readiness claim
 Next: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract
+
+## CM-0548 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P10-observability-admin / P6-docs-drift
+Scope: current runtime gap truth table consolidation after remote static review
+Changed files: docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; docs/P66_RUNTIME_GAP_TRUTH_TABLE.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: docs validation; readiness scan; git diff --check
+Boundary: no runtime source change, no HTTP session implementation, no real memory scan, no provider, no public MCP expansion, no durable write, no push, no cutover, no readiness claim
+Next: CM-0549 HTTP session TTL/cap/cleanup hardening design packet
