@@ -1,3 +1,14 @@
+## CMB-0006 - RC_PRECHECK_001 exact A5 approval required
+
+- Status: `blocked`
+- Area: `P10-observability-admin / RC_PRECHECK_001`
+- Blocking tasks: `CM-0512`, `CM-0513`
+- Current local target at blocker creation: `7959acf3cc2242372c7e7d955f017713c4fb7c63`
+- Reason: no exact approval has been provided for `A5-RC-PRECHECK-READONLY` or `A5-RC-PRECHECK-RECALL`.
+- Safe state: packet remains `DRAFT_NOT_APPROVED`; project remains `NOT_READY_BLOCKED`.
+- Do not run: `npm run gate:mainline:strict`, `npm run observe:http -- --json`, active-memory compare/rollback, recall path observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or `A5-GAP-7`.
+- Unblock condition: user provides an exact approval line copied from `docs/RC_PRECHECK_001_EXECUTION_APPROVAL_PACKET.md`, with target refreshed to the then-current `HEAD`.
+
 # BLOCKERS.md — codex-memory
 
 | ID | Status | Type | Area | Affected Task | Reason | Required Human Action | Created |
