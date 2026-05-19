@@ -2,17 +2,17 @@
 
 ## Current Goal
 
-Reconcile active status/board surfaces after the local `02a49e7` A5 approval packet commit while preserving all runtime/A5 hard stops until exact approval is provided.
+Record approved A5-GAP-5 cutover-context strict gate evidence for target `96b6a3c` while preserving all other runtime/A5 hard stops.
 
 ## Current Area
 
-P6 docs-drift / P0 mainline-health; A5 approval packet post-commit status reconciliation.
+P10 observability-admin / P0 mainline-health; A5-GAP-5 strict gate evidence.
 
 ## Current Status
 
 - Last pushed baseline: `a9177d5 fix: tighten review patch safety semantics` on `origin/main`.
-- Local `main` contains `02a49e7 docs: draft p66 a5 runtime gap approval packet` and is ahead of `origin/main = a9177d5` by 3 commits; verify exact current state with `git status -sb` before new work.
-- [docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md) is committed locally in `02a49e7` as `DRAFT_NOT_APPROVED`; it grants no runtime authority and closes no gap.
+- Local `main` contains `96b6a3c docs: reconcile p66 a5 packet commit state` and is ahead of `origin/main = a9177d5` by 4 commits before this evidence slice; verify exact current state with `git status -sb` before new work.
+- User supplied a complete approval line for `A5-GAP-5` only. `npm run gate:mainline:strict` passed for target `96b6a3c`; evidence is recorded in [docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md). Other A5 lines still contain placeholders and remain not approved.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.

@@ -28,7 +28,7 @@ This active plan is the short routing document for the current post-P66 local-sa
 18. Preserve all real memory, durable-write, public MCP, provider, migration/import-export, release, deploy, config, watchdog, and dependency blockers.
 19. P66 local proof chain is exhausted and the review patch safety semantics are pushed in `a9177d5`; seven runtime gaps remain open.
 20. Supreme Commander local autopilot protocol is the current A4.8 project-operator entrypoint; it does not add A5 authority.
-21. Current runtime-gap work is A5 preflight only: [P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md) was committed locally in `02a49e7`, drafts separate approval switches for the seven open gaps, and remains `DRAFT_NOT_APPROVED`.
+21. Current runtime-gap work has one approved target-bound execution: `A5-GAP-5` strict gate passed for target `96b6a3c` and is recorded in [P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_CUTOVER_STRICT_GATE_EVIDENCE.md). The other A5 lines still contain placeholders and remain not approved.
 
 ## Current Completed Local Chain
 
@@ -62,15 +62,15 @@ This active plan is the short routing document for the current post-P66 local-sa
 
 ## Current Task
 
-A5 runtime-gap closure approval packet post-commit state:
+A5-GAP-5 target-bound strict gate evidence:
 
-- Current local `main` contains `02a49e7 docs: draft p66 a5 runtime gap approval packet` and is ahead of `origin/main = a9177d5` by 3 commits; exact state must be rechecked before approval or execution.
+- Current local `main` contains `96b6a3c docs: reconcile p66 a5 packet commit state` and is ahead of `origin/main = a9177d5` by 4 commits before this evidence slice; exact state must be rechecked before approval or execution.
 - PASS_WITH_PATCH_RECOMMENDED review patch is pushed in `a9177d5`.
 - P66 local proof chain is complete as local evidence organization only; seven runtime gaps remain open.
 - [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md) is the current runtime-gap dashboard.
 - [docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) is the local A4.8 control protocol for choosing and validating future safe work.
-- Current local work is docs/board-only post-commit reconciliation for the A5 approval packet. It does not execute runtime, start services, scan real stores, write durable state, expand public MCP, or claim readiness.
-- Preserve `NOT_READY_BLOCKED`; do not infer mainline/final-RC/push/release/deploy/config/watchdog readiness from P46-P66 local evidence, P63/P64 local runner evidence, the P66 truth table, the Supreme Commander protocol, or the A5 approval packet.
+- Current local work records the approved A5-GAP-5 strict gate evidence. It did not execute push, tag, release, deploy, config/watchdog/startup, provider calls, real memory scan, migration/import-export/backup/restore apply, durable writes, public MCP expansion, cutover, or `RC_READY`.
+- Preserve `NOT_READY_BLOCKED`; do not infer final-RC/push/release/deploy/config/watchdog/cutover readiness from P46-P66 local evidence, P63/P64 local runner evidence, the P66 truth table, the Supreme Commander protocol, the A5 approval packet, or the target-bound A5-GAP-5 gate evidence.
 
 ## Boundaries
 
@@ -92,7 +92,7 @@ A5 runtime-gap closure approval packet post-commit state:
 After the A5 approval packet slice:
 
 - Stop before any push, tag, release, deploy, config switch, watchdog/startup install, final RC cutover, live/provider operation, runtime execution, durable write, real memory/runtime-store scan, public MCP expansion, or `RC_READY` claim unless explicitly authorized.
-- Current local-safe candidate: validate and commit this post-commit reconciliation if eligible; then wait for exact A5 approval lines or select a separate non-A5 local task.
+- Current local-safe candidate: validate and commit this A5-GAP-5 evidence if eligible; then wait for exact A5 approval lines for remaining gaps or select a separate non-A5 local task.
 - If the next useful work would close any of the seven runtime gaps in [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md), use [docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md) and require a separate explicit approval line before execution.
 - If no non-A5 implementation task is available, the next local-safe action is a docs/board routing closeout and explicit A5 approval request, not more P67/P68 gap proliferation.
 - P65-T1 through P66.60 and the review patch are historical completed evidence; do not present them as the next current candidate.

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Reconcile active status surfaces after the local `02a49e7` A5 approval packet commit and keep all runtime/A5 boundaries blocked until exact approval is provided.
+Record approved A5-GAP-5 cutover-context strict gate evidence for target `96b6a3c` and keep all other runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,16 +14,16 @@ Reconcile active status surfaces after the local `02a49e7` A5 approval packet co
 
 ## Worktree
 
-Current local `main` contains `02a49e7 docs: draft p66 a5 runtime gap approval packet` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 3 commits. The current worktree contains intended post-commit docs/board reconciliation until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` contains `96b6a3c docs: reconcile p66 a5 packet commit state` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 4 commits before this evidence slice. The current worktree contains intended A5-GAP-5 evidence docs/board updates until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P6 docs-drift / P0 mainline-health; P66 A5 approval packet post-commit reconciliation.
+P10 observability-admin / P0 mainline-health; A5-GAP-5 strict gate evidence.
 
 ## Current Truth
 
 - P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
-- Current local slice reconciles status/board after [docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md) was committed locally in `02a49e7`. The packet remains `DRAFT_NOT_APPROVED` and grants no runtime authority.
+- Current local slice records approved `A5-GAP-5` evidence. `npm run gate:mainline:strict` passed for target `96b6a3c`; the evidence is target-bound and does not authorize cutover or `RC_READY`. Other A5 approval lines still contain placeholders and remain not approved.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.

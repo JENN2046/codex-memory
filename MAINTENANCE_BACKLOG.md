@@ -10,10 +10,10 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Git baseline after the A5 approval packet commit: local `main` contains `02a49e7 docs: draft p66 a5 runtime gap approval packet` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 3 commits; exact `HEAD` is verified from Git commands.
-- Current local work: post-commit active status/board reconciliation after the A5 preflight approval packet; current `HEAD`, ahead/behind, and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
+- Git baseline before A5-GAP-5 evidence recording: local `main` contains `96b6a3c docs: reconcile p66 a5 packet commit state` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 4 commits; exact `HEAD` is verified from Git commands.
+- Current local work: record A5-GAP-5 target-bound strict-gate evidence after approved `npm run gate:mainline:strict` execution for commit `96b6a3c`; current `HEAD`, ahead/behind, and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
 - Current active program: P66 remaining runtime gap local-safe proof chain and current-state reconciliation are complete as local proof only; runtime gaps remain open.
-- Current phase area: no further local-safe runtime-gap closure work remains; the A5 approval packet has been drafted and committed locally, but real closure remains blocked until exact approval lines are provided.
+- Current phase area: A5-GAP-5 has target-bound evidence for `96b6a3c`; remaining runtime gaps stay blocked until exact approval lines are provided.
 
 ## Active Queue
 
