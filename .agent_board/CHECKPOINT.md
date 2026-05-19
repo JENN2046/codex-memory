@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - Phase F observability/admin review surface design draft - 2026-05-19
+
+- Status: `DESIGN_DRAFT_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
+- Anchor before this slice: `ed72545`.
+- Design doc: [docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md](/A:/codex-memory/docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md).
+- Completed: design-only local review surface plan and selected `CM-0535` fixture plan.
+- Not run: source/runtime changes, HTTP observe/service start, A5 command, provider calls, real memory/audit reads, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: CM-0535 Phase F observability/admin review surface fixture plan.
 ## Checkpoint - Phase F TagMemo fixture pack local closeout review - 2026-05-19
 
 - Status: `LOCAL_FIXTURE_PACK_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.

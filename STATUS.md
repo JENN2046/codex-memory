@@ -4,6 +4,7 @@
 
 ## 当前结论
 
+- 当前 Phase F observability/admin review surface design draft：已在 [PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT](/A:/codex-memory/docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md) 完成 design-only 草案。public MCP tools 仍冻结为 `record_memory` / `search_memory` / `memory_overview`；未启动 HTTP、未读真实 memory/audit、未改 source/runtime；项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F TagMemo fixture pack closeout：已在 [PHASE_F_TAGMEMO_FIXTURE_PACK_LOCAL_CLOSEOUT_REVIEW](/A:/codex-memory/docs/PHASE_F_TAGMEMO_FIXTURE_PACK_LOCAL_CLOSEOUT_REVIEW.md) 完成本地 synthetic fixture pack 收口。目标 fixture test 最新为 `6/6`；下一步推荐 `CM-0534` observability/admin review surface design draft；项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F deterministic ordering tie-breaker fixtures：已为 TagMemo synthetic fixture 增加 recency、topic specificity、no-random/provider-dependency ordering 场景。该切片只改 fixture/test/docs/board，不改 source/runtime、不读真实 memory store、不执行 recall/provider/A5；项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F controlled query expansion negative fixtures：已为 TagMemo synthetic fixture 增加泛标签碰撞、近邻话题误扩展、provider 分数依赖三个负向场景。该切片只改 fixture/test/docs/board，不改 source/runtime、不读真实 memory store、不执行 recall/provider/A5；项目继续保持 `NOT_READY_BLOCKED`。

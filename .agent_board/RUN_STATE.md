@@ -153,3 +153,12 @@ Handoff: report to Commander in conversation; do not edit files.
 - Status remains `NOT_READY_BLOCKED`.
 - Selected next slice: `CM-0534` observability/admin review surface design draft.
 - No source/runtime/dependency/config/runtime-data change, no A5 command, no recall observation, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.
+
+## Phase F Observability/Admin Review Surface Design Draft - 2026-05-19
+
+- Anchor before this slice: `ed72545`.
+- Design doc: [docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md](/A:/codex-memory/docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md).
+- Status remains `NOT_READY_BLOCKED`.
+- Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+- Selected next slice: `CM-0535` observability/admin review surface fixture plan.
+- No source/runtime/dependency/config/runtime-data change, no HTTP observe/service start, no A5 command, no real memory scan, no provider call, no durable write, no public MCP expansion, no push, no cutover, and no readiness claim.

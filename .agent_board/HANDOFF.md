@@ -141,6 +141,17 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - Not authorized: runtime recall behavior changes, real recall observation, memory-store read, provider calls, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
 - Project status remains `NOT_READY_BLOCKED`.
 
+
+## Phase F Observability/Admin Review Surface Design Draft - 2026-05-19
+
+- Anchor before this slice: `ed72545`.
+- Design doc: [docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md](/A:/codex-memory/docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md).
+- Completed: design-only review surface draft for Phase F local fixture/design evidence.
+- Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+- Next safe task: `CM-0535 Phase F observability/admin review surface fixture plan`.
+- Not authorized: source/runtime implementation, HTTP observe/service start, real memory/audit read, provider calls, public MCP expansion, durable write, push/tag/release/deploy/cutover, A5-GAP-7, or readiness claim.
+- Project status remains `NOT_READY_BLOCKED`.
+
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.

@@ -211,3 +211,13 @@ The local synthetic fixture pack is complete with targeted test evidence `6/6`. 
 This slice did not modify source/runtime, inspect real memory stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
 
 Project status remains `NOT_READY_BLOCKED`.
+
+## Week 4 Phase F Observability/Admin Design Draft - 2026-05-19
+
+Observability/admin review surface design draft is recorded in [docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md](/A:/codex-memory/docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md).
+
+Selected next slice: `CM-0535 Phase F observability/admin review surface fixture plan`.
+
+This slice did not modify source/runtime, start HTTP, run observe, inspect real memory/audit stores, run A5 commands, call providers, expand public MCP, mutate durable state, push, cut over, or claim readiness.
+
+Project status remains `NOT_READY_BLOCKED`.
