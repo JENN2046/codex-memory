@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 const { createCodexMemoryApplication } = require('../src/app');
-const { createStreamableHttpServer, SESSION_HEADER } = require('../src/adapters/codex-mcp/http');
+const { createStreamableHttpServer, SESSION_HEADER, createSessionHardeningConfig } = require('../src/adapters/codex-mcp/http');
 
 async function withHttpServer(handler, serverOptions = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
@@ -29,7 +29,7 @@ async function withHttpServer(handler, serverOptions = {}) {
   const address = await httpServer.listen();
 
   try {
-    await handler({ app, address });
+    await handler({ app, address, httpServer });
   } finally {
     await httpServer.close();
     await app.close();
@@ -281,4 +281,132 @@ test('HTTP MCP should execute record_memory through authorized tools/call', asyn
     assert.equal(payload.result.structuredContent.decision, 'accepted');
     assert.equal(payload.result.structuredContent.agentAlias, 'Codex');
   }, { bearerToken: 'test-token' });
+});
+test('HTTP MCP session hardening should expose invalid env fallback warnings', async () => {
+  const hardening = createSessionHardeningConfig({
+    CODEX_MEMORY_HTTP_SESSION_TTL_MS: 'not-a-number',
+    CODEX_MEMORY_HTTP_SESSION_IDLE_TTL_MS: '-1',
+    CODEX_MEMORY_HTTP_MAX_SESSIONS: '999',
+    CODEX_MEMORY_HTTP_MAX_STREAMS_PER_SESSION: '0',
+    CODEX_MEMORY_HTTP_SESSION_CLEANUP_INTERVAL_MS: '1'
+  });
+
+  assert.equal(hardening.absoluteTtlMs, 30 * 60 * 1000);
+  assert.equal(hardening.idleTtlMs, 10 * 60 * 1000);
+  assert.equal(hardening.maxSessions, 64);
+  assert.equal(hardening.maxStreamsPerSession, 8);
+  assert.equal(hardening.cleanupIntervalMs, 60 * 1000);
+  assert.deepEqual(hardening.warnings.map(warning => warning.key), [
+    'CODEX_MEMORY_HTTP_SESSION_TTL_MS',
+    'CODEX_MEMORY_HTTP_SESSION_IDLE_TTL_MS',
+    'CODEX_MEMORY_HTTP_MAX_SESSIONS',
+    'CODEX_MEMORY_HTTP_MAX_STREAMS_PER_SESSION',
+    'CODEX_MEMORY_HTTP_SESSION_CLEANUP_INTERVAL_MS'
+  ]);
+  assert.equal(hardening.warnings.some(warning => Object.hasOwn(warning, 'raw')), false);
+});
+
+test('HTTP MCP session hardening should reject max sessions plus one with 429', async () => {
+  await withHttpServer(async ({ address }) => {
+    const first = await fetch(address.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: {} })
+    });
+    assert.equal(first.status, 200);
+    assert.ok(first.headers.get(SESSION_HEADER));
+
+    const second = await fetch(address.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'initialize', params: {} })
+    });
+    const payload = await second.json();
+    assert.equal(second.status, 429);
+    assert.equal(payload.error, 'session_limit_exceeded');
+    assert.equal(payload.code, 'HTTP_SESSION_LIMIT_EXCEEDED');
+    assert.equal(payload.meta.limitType, 'sessions');
+    assert.equal(payload.meta.limit, 1);
+    assert.equal(JSON.stringify(payload).includes('Bearer'), false);
+  }, {
+    sessionHardeningEnv: {
+      CODEX_MEMORY_HTTP_MAX_SESSIONS: '1',
+      CODEX_MEMORY_HTTP_SESSION_CLEANUP_INTERVAL_MS: '10000'
+    }
+  });
+});
+
+test('HTTP MCP session hardening cleanup after expiry should allow new sessions', async () => {
+  let currentTime = 0;
+  await withHttpServer(async ({ address, httpServer }) => {
+    const first = await fetch(address.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize', params: {} })
+    });
+    assert.equal(first.status, 200);
+
+    currentTime = 6 * 60 * 1000;
+    httpServer.cleanupExpiredSessions();
+
+    const second = await fetch(address.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'initialize', params: {} })
+    });
+    assert.equal(second.status, 200);
+    assert.ok(second.headers.get(SESSION_HEADER));
+  }, {
+    sessionClock: () => currentTime,
+    sessionHardeningEnv: {
+      CODEX_MEMORY_HTTP_MAX_SESSIONS: '1',
+      CODEX_MEMORY_HTTP_SESSION_TTL_MS: String(5 * 60 * 1000),
+      CODEX_MEMORY_HTTP_SESSION_IDLE_TTL_MS: String(2 * 60 * 1000),
+      CODEX_MEMORY_HTTP_SESSION_CLEANUP_INTERVAL_MS: '10000'
+    }
+  });
+});
+
+test('HTTP MCP session hardening should reject max streams plus one and allow after close', async () => {
+  await withHttpServer(async ({ address }) => {
+    const first = await fetch(address.url);
+    assert.equal(first.status, 200);
+    const sessionId = first.headers.get(SESSION_HEADER);
+    assert.ok(sessionId);
+
+    const second = await fetch(address.url, { headers: { [SESSION_HEADER]: sessionId } });
+    const payload = await second.json();
+    assert.equal(second.status, 429);
+    assert.equal(payload.error, 'session_stream_limit_exceeded');
+    assert.equal(payload.code, 'HTTP_SESSION_STREAM_LIMIT_EXCEEDED');
+    assert.equal(payload.meta.limitType, 'streams_per_session');
+    assert.equal(payload.meta.limit, 1);
+
+    first.body.cancel();
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    const third = await fetch(address.url, { headers: { [SESSION_HEADER]: sessionId } });
+    assert.equal(third.status, 200);
+    third.body.cancel();
+  }, {
+    sessionHardeningEnv: {
+      CODEX_MEMORY_HTTP_MAX_STREAMS_PER_SESSION: '1',
+      CODEX_MEMORY_HTTP_SESSION_CLEANUP_INTERVAL_MS: '10000'
+    }
+  });
+});
+
+test('HTTP MCP session hardening should expose sanitized warning metadata on health', async () => {
+  await withHttpServer(async ({ address }) => {
+    const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'));
+    const payload = await health.json();
+    assert.equal(health.status, 200);
+    assert.equal(payload.sessionHardening.maxSessions, 64);
+    assert.equal(payload.sessionHardening.warnings[0].key, 'CODEX_MEMORY_HTTP_MAX_SESSIONS');
+    assert.equal(Object.hasOwn(payload.sessionHardening.warnings[0], 'raw'), false);
+  }, {
+    sessionHardeningEnv: {
+      CODEX_MEMORY_HTTP_MAX_SESSIONS: '999'
+    }
+  });
 });

@@ -6,6 +6,40 @@ const crypto = require('node:crypto');
 const { CodexMemoryMcpServer, jsonRpcError } = require('./server');
 
 const SESSION_HEADER = 'Mcp-Session-Id';
+const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
+const HTTP_SESSION_STREAM_LIMIT_ERROR = 'HTTP_SESSION_STREAM_LIMIT_EXCEEDED';
+const SESSION_HARDENING_SPECS = {
+  absoluteTtlMs: {
+    envKey: 'CODEX_MEMORY_HTTP_SESSION_TTL_MS',
+    defaultValue: 30 * 60 * 1000,
+    min: 5 * 60 * 1000,
+    max: 24 * 60 * 60 * 1000
+  },
+  idleTtlMs: {
+    envKey: 'CODEX_MEMORY_HTTP_SESSION_IDLE_TTL_MS',
+    defaultValue: 10 * 60 * 1000,
+    min: 60 * 1000,
+    max: 2 * 60 * 60 * 1000
+  },
+  maxSessions: {
+    envKey: 'CODEX_MEMORY_HTTP_MAX_SESSIONS',
+    defaultValue: 64,
+    min: 1,
+    max: 256
+  },
+  maxStreamsPerSession: {
+    envKey: 'CODEX_MEMORY_HTTP_MAX_STREAMS_PER_SESSION',
+    defaultValue: 8,
+    min: 1,
+    max: 32
+  },
+  cleanupIntervalMs: {
+    envKey: 'CODEX_MEMORY_HTTP_SESSION_CLEANUP_INTERVAL_MS',
+    defaultValue: 60 * 1000,
+    min: 10 * 1000,
+    max: 5 * 60 * 1000
+  }
+};
 const NO_TOKEN_BLOCKED_TOOLS = new Set([
   'record_memory',
   'validate_memory',
@@ -64,6 +98,56 @@ function createForbiddenPayload(reason) {
   };
 }
 
+function parseHardeningNumber(spec, env = process.env) {
+  const raw = env[spec.envKey];
+  if (raw === undefined || raw === null || raw === '') {
+    return { value: spec.defaultValue, warning: null };
+  }
+
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value <= 0 || value < spec.min || value > spec.max) {
+    return {
+      value: spec.defaultValue,
+      warning: {
+        key: spec.envKey,
+        reason: !Number.isFinite(value) ? 'invalid_number' : value <= 0 ? 'non_positive' : 'out_of_range',
+        defaultValue: spec.defaultValue,
+        min: spec.min,
+        max: spec.max
+      }
+    };
+  }
+
+  return { value, warning: null };
+}
+
+function createSessionHardeningConfig(env = process.env) {
+  const warnings = [];
+  const config = {};
+
+  for (const [key, spec] of Object.entries(SESSION_HARDENING_SPECS)) {
+    const parsed = parseHardeningNumber(spec, env);
+    config[key] = parsed.value;
+    if (parsed.warning) {
+      warnings.push(parsed.warning);
+    }
+  }
+
+  return { ...config, warnings };
+}
+
+function createSessionLimitPayload({ limitType, limit }) {
+  const isStreamLimit = limitType === 'streams_per_session';
+  return {
+    error: isStreamLimit ? 'session_stream_limit_exceeded' : 'session_limit_exceeded',
+    code: isStreamLimit ? HTTP_SESSION_STREAM_LIMIT_ERROR : HTTP_SESSION_LIMIT_ERROR,
+    message: isStreamLimit ? 'HTTP session stream limit exceeded' : 'HTTP session limit exceeded',
+    meta: {
+      limitType,
+      limit
+    }
+  };
+}
 function isLoopbackHost(host) {
   const normalized = String(host || '').trim().toLowerCase();
   return normalized === 'localhost'
@@ -169,28 +253,30 @@ function createStreamableHttpServer({
   port = 7605,
   mcpPath = '/mcp/codex-memory',
   bearerToken = '',
-  baseRequestContext = {}
+  baseRequestContext = {},
+  sessionHardeningEnv = process.env,
+  sessionClock = () => Date.now()
 }) {
   const authWarning = getHttpAuthWarning({ host, bearerToken });
   const pathname = normalizePathname(mcpPath);
   const healthPathname = normalizePathname('/health');
   const mcpServer = new CodexMemoryMcpServer({ app });
   const sessionStreams = new Map();
+  const sessionMetadata = new Map();
+  const sessionHardening = createSessionHardeningConfig(sessionHardeningEnv);
   const defaultExecutionContext = {
     agentAlias: process.env.CODEX_MEMORY_AGENT_ALIAS || baseRequestContext.executionContext?.agentAlias || app.config.allowedAgentAlias || 'Codex',
     agentId: process.env.CODEX_MEMORY_AGENT_ID || baseRequestContext.executionContext?.agentId || app.config.defaultAgentId,
     requestSource: process.env.CODEX_MEMORY_REQUEST_SOURCE || baseRequestContext.executionContext?.requestSource || app.config.defaultRequestSource
   };
 
-  function createSession(existingId = null) {
-    const sessionId = existingId || crypto.randomUUID();
-    if (!mcpServer.sessions.has(sessionId)) {
-      mcpServer.sessions.set(sessionId, {});
-    }
-    if (!sessionStreams.has(sessionId)) {
-      sessionStreams.set(sessionId, new Set());
-    }
-    return sessionId;
+  function now() {
+    return sessionClock();
+  }
+
+  function isSessionExpired(metadata, timestamp = now()) {
+    return timestamp - metadata.createdAt >= sessionHardening.absoluteTtlMs
+      || timestamp - metadata.lastSeenAt >= sessionHardening.idleTtlMs;
   }
 
   function closeSession(sessionId) {
@@ -206,6 +292,53 @@ function createStreamableHttpServer({
       sessionStreams.delete(sessionId);
     }
     mcpServer.sessions.delete(sessionId);
+    sessionMetadata.delete(sessionId);
+  }
+
+  function cleanupExpiredSessions(timestamp = now()) {
+    for (const [sessionId, metadata] of sessionMetadata.entries()) {
+      if (isSessionExpired(metadata, timestamp)) {
+        closeSession(sessionId);
+      }
+    }
+  }
+
+  function touchSession(sessionId, timestamp = now()) {
+    const metadata = sessionMetadata.get(sessionId);
+    if (metadata) {
+      metadata.lastSeenAt = timestamp;
+    }
+  }
+
+  function createSession(existingId = null) {
+    cleanupExpiredSessions();
+    const sessionId = existingId || crypto.randomUUID();
+    if (sessionMetadata.has(sessionId)) {
+      touchSession(sessionId);
+      if (!sessionStreams.has(sessionId)) {
+        sessionStreams.set(sessionId, new Set());
+      }
+      return { sessionId, rejected: null };
+    }
+
+    if (sessionMetadata.size >= sessionHardening.maxSessions) {
+      return {
+        sessionId: null,
+        rejected: createSessionLimitPayload({
+          limitType: 'sessions',
+          limit: sessionHardening.maxSessions
+        })
+      };
+    }
+
+    const timestamp = now();
+    mcpServer.sessions.set(sessionId, {});
+    sessionMetadata.set(sessionId, {
+      createdAt: timestamp,
+      lastSeenAt: timestamp
+    });
+    sessionStreams.set(sessionId, new Set());
+    return { sessionId, rejected: null };
   }
 
   function authorize(req) {
@@ -217,8 +350,14 @@ function createStreamableHttpServer({
     return header === `Bearer ${bearerToken}`;
   }
 
+  const cleanupTimer = setInterval(() => cleanupExpiredSessions(), sessionHardening.cleanupIntervalMs);
+  if (typeof cleanupTimer.unref === 'function') {
+    cleanupTimer.unref();
+  }
+
   const server = http.createServer(async (req, res) => {
     try {
+      cleanupExpiredSessions();
       const url = new URL(req.url || '/', `http://${req.headers.host || `${host}:${port}`}`);
       const requestPathname = normalizePathname(url.pathname);
 
@@ -232,6 +371,14 @@ function createStreamableHttpServer({
           auth: {
             required: !!bearerToken,
             warning: authWarning
+          },
+          sessionHardening: {
+            absoluteTtlMs: sessionHardening.absoluteTtlMs,
+            idleTtlMs: sessionHardening.idleTtlMs,
+            maxSessions: sessionHardening.maxSessions,
+            maxStreamsPerSession: sessionHardening.maxStreamsPerSession,
+            cleanupIntervalMs: sessionHardening.cleanupIntervalMs,
+            warnings: sessionHardening.warnings
           }
         });
       }
@@ -257,8 +404,18 @@ function createStreamableHttpServer({
       }
 
       if (req.method === 'GET') {
-        const sessionId = createSession(getSessionIdFromHeaders(req));
+        const session = createSession(getSessionIdFromHeaders(req));
+        if (session.rejected) {
+          return writeJson(res, 429, session.rejected);
+        }
+        const sessionId = session.sessionId;
         const streams = sessionStreams.get(sessionId);
+        if (streams.size >= sessionHardening.maxStreamsPerSession) {
+          return writeJson(res, 429, createSessionLimitPayload({
+            limitType: 'streams_per_session',
+            limit: sessionHardening.maxStreamsPerSession
+          }));
+        }
 
         res.writeHead(200, {
           'Content-Type': 'text/event-stream; charset=utf-8',
@@ -275,6 +432,9 @@ function createStreamableHttpServer({
             res.write(`: heartbeat ${Date.now()}\n\n`);
           }
         }, 15000);
+        if (typeof heartbeat.unref === 'function') {
+          heartbeat.unref();
+        }
 
         req.on('close', () => {
           clearInterval(heartbeat);
@@ -323,15 +483,23 @@ function createStreamableHttpServer({
         }
       }
 
+      const requestSessionId = getSessionIdFromHeaders(req);
+      if (requestSessionId) {
+        touchSession(requestSessionId);
+      }
+
       const result = await mcpServer.handleJsonRpc(body, {
         ...baseRequestContext,
-        sessionId: getSessionIdFromHeaders(req) || undefined,
+        sessionId: requestSessionId || undefined,
         executionContext: defaultExecutionContext
       });
 
       if (result.sessionId) {
+        const session = createSession(result.sessionId);
+        if (session.rejected) {
+          return writeJson(res, 429, session.rejected);
+        }
         res.setHeader(SESSION_HEADER, result.sessionId);
-        createSession(result.sessionId);
       }
 
       if (result.notification) {
@@ -353,6 +521,8 @@ function createStreamableHttpServer({
     port,
     pathname,
     authWarning,
+    sessionHardening,
+    cleanupExpiredSessions,
     async listen() {
       await new Promise((resolve, reject) => {
         server.once('error', reject);
@@ -373,6 +543,7 @@ function createStreamableHttpServer({
           };
     },
     async close() {
+      clearInterval(cleanupTimer);
       for (const sessionId of sessionStreams.keys()) {
         closeSession(sessionId);
       }
@@ -382,11 +553,11 @@ function createStreamableHttpServer({
     }
   };
 }
-
 module.exports = {
   SESSION_HEADER,
   createStreamableHttpServer,
   getHttpAuthWarning,
   isLoopbackHost,
-  normalizePathname
+  normalizePathname,
+  createSessionHardeningConfig
 };
