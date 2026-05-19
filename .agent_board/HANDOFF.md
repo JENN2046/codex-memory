@@ -2,7 +2,7 @@
 
 ## Goal
 
-Record approved A5-GAP-2 sanitized classified sample write evidence. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
+Prepare fresh A5-GAP-6 post-classified-sample-write approval packet. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ Record approved A5-GAP-2 sanitized classified sample write evidence. Keep all re
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended A5-GAP-2 sanitized classified sample write evidence docs/board updates until validation and guarded commit complete. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A5-GAP-6 post-classified-sample-write approval packet docs/board updates until validation and guarded commit complete. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P10 observability-admin / recall isolation; A5-GAP-2 sanitized classified positive-control write/projection proof.
+P10 observability-admin / validation-aggregator; A5-GAP-6 evidence-only aggregation approval packet.
 
 ## Current Truth
 
@@ -28,6 +28,7 @@ P10 observability-admin / recall isolation; A5-GAP-2 sanitized classified positi
 - Approved A5-GAP-2 classified-sample readonly proof has now executed and is linked to [docs/P66_A5_GAP_2_CLASSIFIED_SAMPLE_RECALL_ISOLATION_READONLY_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_CLASSIFIED_SAMPLE_RECALL_ISOLATION_READONLY_EVIDENCE.md). It failed closed because no explicit classified real sample exists in the approved stores. Projection leakage was 0 and snapshots were unchanged. Further sample creation/backfill/migration still needs a new exact A5 packet.
 - A5-GAP-2 sanitized classified sample write packet is now drafted as [docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md). It is not approval and executes nothing. It is the next proposed exact approval boundary if the user wants to create exactly one synthetic/sanitized positive control sample.
 - A5-GAP-2 sanitized classified sample write evidence has now executed and is linked to [docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md). It created exactly one sanitized `validation_transcripts` positive-control sample through the real write path and proved projection leakage 0 across SQLite chunks, vector index, candidate cache, and recall audit. Normal write-path audit appended once as unavoidable; no backfill/migration/import/export/backup/restore/provider/public-MCP/config/watchdog/startup/cutover/remote write/readiness claim occurred.
+- A5-GAP-6 post-classified-sample-write approval packet is now drafted as [docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md). It is not approval and executes nothing. It asks only to consume updated approved A5-GAP-1/2/3/4/5 sanitized evidence, including the latest A5-GAP-2 positive-control write evidence, with no new runtime action.
 - Current local slice records approved fresh `A5-GAP-5` strict gate evidence. It ran only `npm run gate:mainline:strict` for current `HEAD`, performed no remote write, and failed in the test gate: health ok, contract ok, test error (`1569/1573` pass, 4 fail), compare ok, rollback ok. `A5-GAP-1` governance evidence remains subject-bound; `A5-GAP-2` fresh rerun remains no-mutation with limitation `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; `A5-GAP-3` remains fixture-only dry-run with migration blocked; `A5-GAP-4` live HTTP evidence remains endpoint-bound; post-GAP3 `A5-GAP-6` remains evidence-consumption only. Other A5 approval lines still require exact approval.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
 - Fresh A5-GAP-2 rerun has now been executed for approved stores at `ceffc0f255c142875a0f41879539361dd547c4bc` and recorded in [docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_RERUN_RECALL_ISOLATION_RUNTIME_PROOF_EVIDENCE.md). Result: `EXECUTED_PASSED_NO_EXPLICIT_ISOLATION_PROJECTION_LEAKAGE_DETECTED_WITH_LIMITATION`; limitation: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; store snapshots unchanged; no mutation.

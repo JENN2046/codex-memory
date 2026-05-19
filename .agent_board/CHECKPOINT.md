@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record approved A5-GAP-2 sanitized classified sample write evidence. Preserve all remaining runtime/A5 hard stops.
+Prepare fresh A5-GAP-6 post-classified-sample-write approval packet. Preserve all remaining runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability-admin / recall isolation; A5-GAP-2 sanitized classified positive-control write/projection proof.
+P10 observability-admin / validation-aggregator; A5-GAP-6 evidence-only aggregation approval packet.
 
 ## Current Status
 
@@ -16,6 +16,7 @@ P10 observability-admin / recall isolation; A5-GAP-2 sanitized classified positi
 - Approved A5-GAP-2 classified-sample readonly evidence is now recorded in [docs/P66_A5_GAP_2_CLASSIFIED_SAMPLE_RECALL_ISOLATION_READONLY_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_CLASSIFIED_SAMPLE_RECALL_ISOLATION_READONLY_EVIDENCE.md). Result: `FAIL_CLOSED_NO_CLASSIFIED_REAL_SAMPLE_PRESENT`; `classifiedSampleCount=0`; `projectionLeakageCount=0`; `storeSnapshotsUnchanged=true`; no mutation or readiness claim.
 - A5-GAP-2 sanitized classified sample write packet is drafted as [docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests exactly one synthetic/sanitized classified sample only if later approved exactly, and keeps migration/backfill/provider/public-MCP/config/cutover/readiness blocked.
 - A5-GAP-2 sanitized classified sample write evidence is now executed and recorded in [docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md). Result: `PASSED_POSITIVE_CLASSIFIED_SAMPLE_ISOLATED`; `sampleCountCreated=1`; `sampleContractMatched=true`; `sampleChunkCount=0`; vector/cache/recall-audit exact id occurrences `0`; `projectionLeakageCount=0`; one normal write-path audit append occurred as unavoidable. No backfill, migration, import/export, backup/restore, provider, public MCP expansion, config/watchdog/startup, cutover, remote write, or readiness claim occurred.
+- A5-GAP-6 post-classified-sample-write approval packet is drafted as [docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_CLASSIFIED_SAMPLE_WRITE_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests only future exact-approval evidence-only aggregation over updated A5-GAP-1/2/3/4/5 sanitized evidence, and executes no aggregation or runtime action.
 - Local `main` contains `1c17d17cecc39c57f5df1473634451518dc97d32 docs: refresh p66 a5 gap6 aggregator evidence` and is ahead of `origin/main = a9177d5` by 14 commits before this evidence slice; verify exact current state with `git status -sb` before new work.
 - User supplied a complete approval line for fresh `A5-GAP-5`. The approved strict gate ran only `npm run gate:mainline:strict` for current `HEAD`, performed no remote write, and failed in the test gate: health ok, contract ok, test error (`1569/1573` pass, 4 fail), compare ok, rollback ok.
 - Current A4 slice adds `RecallIsolationClassifier` and wires explicit projection exclusion into recall aggregation, chunk indexing, vector indexing, candidate-cache filtering, diary vector rebuild, sync projection clearing, and recall audit summaries. It does not rerun A5-GAP-2, scan real stores, write durable memory/audit, call providers, expand public MCP, change config/watchdog/startup, push, tag, release, deploy, cut over, or claim `RC_READY`.
