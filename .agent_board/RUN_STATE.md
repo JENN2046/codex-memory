@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | Record approved A5-GAP-5 rerun strict gate evidence |
-| Current area | P10-observability-admin / P0-mainline-health |
+| Current task | Record approved A5-GAP-6 post-GAP5 aggregation refresh evidence |
+| Current area | P10-observability-admin / validation-aggregator |
 | Last pushed baseline | `a9177d5` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Executed the approved A5-GAP-5 rerun strict gate for target `ddb1e7db8a83337f89b142578f7df9e4faff46ac`; the gate passed health, contract, test, compare, and rollback. |
-| Last validation | `npm run gate:mainline:strict` returned `status=ok`: contract `15/15`, test `1573/1573`, compare `43/43`, rollback `43/43`. |
-| Worktree summary | Local `main` is ahead of `origin/main`; current worktree contains intended A5-GAP-5 rerun evidence docs/board updates. No provider/public MCP expansion/durable write/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/startup/cutover/RC_READY is authorized. |
+| Last action | Executed the approved A5-GAP-6 post-GAP5 evidence-only aggregation refresh using sanitized A5-GAP-1/2/3/4/5 evidence. |
+| Last validation | In-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })` accepted the summary with locally evidenced count `5`, remaining count `6`, `commandsExecutedByAggregator=false`, and readiness flags false. |
+| Worktree summary | Local `main` is ahead of `origin/main`; current worktree contains intended A5-GAP-6 post-GAP5 aggregation evidence docs/board updates. No provider/public MCP expansion/durable write/migration-import-export apply/backup/restore/tag/release/deploy/config/watchdog/startup/cutover/RC_READY is authorized. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized for this local protocol slice unless explicitly requested |
-| Next planned action | Validate and guarded-commit the A5-GAP-5 rerun evidence if eligible. Then the safest next A5 step is an A5-GAP-6 evidence-only aggregation refresh consuming A5-GAP-1/2/3/4/5 sanitized evidence; stop before any unapproved strict-gate rerun, push, cutover, durable write, config/watchdog/startup change, migration-import-export/backup/restore apply, or other A5 execution. |
+| Next planned action | Validate and guarded-commit the A5-GAP-6 post-GAP5 evidence if eligible. Then prepare the next exact A5 packet for one of the remaining six gap/limitation items; stop before any unapproved push, cutover, durable write, config/watchdog/startup change, migration-import-export/backup/restore apply, or other A5 execution. |
 
 ## Notes
 

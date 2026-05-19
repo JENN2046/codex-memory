@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Record the approved A5-GAP-5 rerun strict gate evidence for `ddb1e7db8a83337f89b142578f7df9e4faff46ac`. Preserve all other runtime/A5 hard stops.
+Record the approved A5-GAP-6 post-GAP5 evidence-only aggregation refresh. Preserve all other runtime/A5 hard stops.
 
 ## Current Area
 
-P10 observability-admin / P0 mainline-health; A5-GAP-5 approved strict-gate-only evidence.
+P10 observability-admin / validation-aggregator; A5-GAP-6 approved no-new-runtime-action evidence.
 
 ## Current Status
 
@@ -22,6 +22,7 @@ P10 observability-admin / P0 mainline-health; A5-GAP-5 approved strict-gate-only
 - Fresh A5-GAP-5 has now been executed for current `HEAD` at `1c17d17cecc39c57f5df1473634451518dc97d32` and recorded in [docs/P66_A5_GAP_5_FRESH_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_FRESH_STRICT_GATE_EVIDENCE.md). Result: `TARGET_BOUND_GATE_FAILED_NOT_RC_READY`; test gate failed with 4 failures; no remote write or cutover occurred.
 - Local A4 repair is now complete and recorded in [docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md](/A:/codex-memory/docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md). Root cause: stale tests still expected terminal lifecycle records to remain visible by default, while explicit recall isolation now hides `rejected`, `superseded`, and `tombstoned` before lifecycle soft read policy. Updated tests only; production behavior preserved. Validation passed: lifecycle read-policy `6/6`, policy preflight `5/5`, full `npm test` `1573/1573`, and `git diff --check`.
 - A5-GAP-5 rerun has now been approved and executed for `ddb1e7db8a83337f89b142578f7df9e4faff46ac`, and recorded in [docs/P66_A5_GAP_5_RERUN_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_RERUN_STRICT_GATE_EVIDENCE.md). Result: `TARGET_BOUND_GATE_PASSED_NOT_RC_READY`; health ok, contract `15/15`, test `1573/1573`, compare `43/43`, rollback `43/43`; no remote write or cutover occurred.
+- A5-GAP-6 post-GAP5 evidence-only aggregation refresh has now been approved and executed for `dcdad612b024876cf1137c5193af4e9c10607791`, and recorded in [docs/P66_A5_GAP_6_POST_GAP5_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GAP5_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP5_RUNTIME_STILL_BLOCKED`; summary accepted, locally evidenced count `5`, remaining count `6`, `commandsExecutedByAggregator=false`, readiness flags false.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
@@ -221,7 +222,7 @@ P10 observability-admin / P0 mainline-health; A5-GAP-5 approved strict-gate-only
 
 ## Next Safe Step
 
-Guarded-commit the A5-GAP-5 rerun evidence if eligible. The next safest A5 step is an evidence-only A5-GAP-6 aggregation refresh consuming A5-GAP-1/2/3/4/5 sanitized evidence and performing no new runtime action.
+Guarded-commit the A5-GAP-6 post-GAP5 evidence if eligible. Then prepare the next exact A5 packet for one of the remaining six gap/limitation items; do not run any new runtime action without exact approval.
 
 P66.13 ValidationAggregator baseline binding proof helper is implemented locally as pure explicit-input code and tests. It accepts only caller-provided baseline binding evidence, fails closed for commit-role ambiguity, checkout mismatch, unsafe summaries, no-touch leakage, and readiness overclaims, and does not checkout/reset/detach, query remotes, read files, execute commands, start services, call providers, scan real memory/runtime stores, write durable state, expand public MCP, or claim readiness.
 
