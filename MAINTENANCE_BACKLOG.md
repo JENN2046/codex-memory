@@ -10,15 +10,16 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
-- Remote baseline: `1a3d309 fix: reconcile p66 post-push review state`.
-- Local baseline: local `main` is ahead of `origin/main = 1a3d309` with P66.60 current-state reconciliation and review-blocker fix work pending push; current `HEAD` and ahead/behind state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
+- Git baseline before this local review-patch slice: `HEAD == origin/main == 0dec735 docs: fix p66 pending push baseline wording`.
+- Current local work: PASS_WITH_PATCH_RECOMMENDED review patch and P66 runtime gap dashboard consolidation; current `HEAD`, ahead/behind, and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10`.
 - Current active program: P66 remaining runtime gap local-safe proof chain and current-state reconciliation are complete as local proof only; runtime gaps remain open.
-- Current phase area: no further local-safe runtime-gap work remains; wait for a new explicitly authorized local-safe backlog item or runtime/A5 authority.
+- Current phase area: no further local-safe runtime-gap closure work remains; this local slice only tightens review-found guard/report semantics and consolidates the P66 runtime gap truth table.
 
 ## Active Queue
 
 | ID | Area | Risk | Status | Task | Validation | Notes |
 |---|---|---|---|---|---|---|
+| ReviewPatch-P66Truth | observability-admin / P4-http-runtime | A1/A2 | done | PASS_WITH_PATCH_RECOMMENDED review patch: HTTP no-token mutation set, Final RC runner authorization semantics, baseline reconciliation, P66 runtime gap truth table | `node --test tests\mcp-http.test.js` 8/8; `node --test tests\final-rc-runtime-evidence-runner.test.js` 5/5; `git diff --check`; active status drift scan | COMPLETED_VALIDATED locally. No provider, real memory scan, migration/import/export/backup/restore apply, durable write, public MCP expansion, config/watchdog/cutover, push, tag, release, deploy, or readiness claim. |
 | CM-0301 | docs-drift | A1 | done | Compress active `.agent_board` checkpoint/handoff | `git diff --check`; docs validation; Verifier | Complete locally in `4d8d11a`; full old files archived under `.agent_board/archive/`. |
 | CM-0302 | docs-drift | A1 | done | Compress root active status/plan/backlog docs | `git diff --check`; docs validation; reference scan; Verifier | Complete locally in `3d774ad`; full old root docs archived under `docs/archive/`. |
 | P34.x | memory-governance | A1 | done | Governance review surface closeout review | `git diff --check`; docs validation; boundary scan; Verifier | Complete locally in `8220d64`; docs/status/board only; no runtime review execution. |
@@ -142,7 +143,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 | P66.58 | observability-admin | A1 | done | ValidationAggregator RC cutover local closeout | docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED and committed locally in `53644a3`. 中文解释：只能关闭 RC cutover 的本地 proof slice；runtime gap 仍 open，不能执行 RC cutover、push/tag/release/deploy、配置切换或声明 readiness。 |
 | P66.59 | observability-admin | A1 | done | ValidationAggregator runtime gap local proof chain review | docs validation; `git diff --check`; boundary scan | COMPLETED_VALIDATED, committed, and pushed in `32da702`. 中文解释：只能审查七个 gap 的本地 proof slice；runtime gap 仍 open，不能执行 runtime proof、RC cutover、push/tag/release/deploy 或声明 readiness。 |
 | Push-preflight | mainline-health | A1/A5-preflight | done | Final local validation and push preflight | `git status -sb`; `git fetch origin`; divergence check; `git diff --check`; docs validation | COMPLETED_VALIDATED; final preflight passed and authorized push completed to `origin/main` at `32da702`. 中文解释：最终本地验证和远端新鲜度检查已完成；不能把 push 完成误读为 runtime readiness。 |
-| P66.60 | observability-admin | A1 | done | Runtime gap current-state reconciliation | docs validation; `git diff --check`; state drift scan | COMPLETED_VALIDATED; reconciles all seven remaining runtime gaps to the local pending-push state on top of `origin/main = 1a3d309` and records that no further local-safe runtime-gap work remains. 中文解释：本地安全 proof chain 已做完，后续真实 gap closure 只能等待 runtime/A5 授权。 |
+| P66.60 | observability-admin | A1 | done | Runtime gap current-state reconciliation | docs validation; `git diff --check`; state drift scan | COMPLETED_VALIDATED; reconciled all seven remaining runtime gaps to the pushed state now at `origin/main = 0dec735` and records that no further local-safe runtime-gap work remains. 中文解释：本地安全 proof chain 已做完，后续真实 gap closure 只能等待 runtime/A5 授权。 |
 | P66.60-review-fix | observability-admin | A1 | done | Fix P66.60 pending-push baseline wording | `git diff --check`; docs validation | COMPLETED_VALIDATED; removes stale pushed/aligned wording so push preflight does not misread pending local commits as already pushed. |
 
 ## Standing Boundaries

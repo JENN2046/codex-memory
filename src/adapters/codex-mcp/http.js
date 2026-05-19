@@ -6,6 +6,18 @@ const crypto = require('node:crypto');
 const { CodexMemoryMcpServer, jsonRpcError } = require('./server');
 
 const SESSION_HEADER = 'Mcp-Session-Id';
+const NO_TOKEN_BLOCKED_TOOLS = new Set([
+  'record_memory',
+  'validate_memory',
+  'update_memory',
+  'forget_memory',
+  'supersede_memory',
+  'audit_memory',
+  'checkpoint_memory',
+  'handoff_memory',
+  'import_memory',
+  'export_memory'
+]);
 
 function normalizePathname(pathname) {
   if (typeof pathname !== 'string' || !pathname.trim()) {
@@ -106,7 +118,7 @@ function validateNoTokenJsonRpcRequest(body) {
     return null;
   }
 
-  if (body.method === 'tools/call' && body.params?.name === 'record_memory') {
+  if (body.method === 'tools/call' && NO_TOKEN_BLOCKED_TOOLS.has(body.params?.name)) {
     return 'No-token HTTP MCP requests cannot call mutation tools.';
   }
 

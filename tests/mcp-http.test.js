@@ -188,35 +188,48 @@ test('HTTP MCP should allow non-loopback host when bearer token is configured', 
 
 test('HTTP MCP should reject no-token mutation tool calls', async () => {
   await withHttpServer(async ({ address }) => {
-    const response = await fetch(address.url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 5,
-        method: 'tools/call',
-        params: {
-          name: 'record_memory',
-          arguments: {
-            target: 'process',
-            title: 'HTTP no-token mutation',
-            content: 'Type: checkpoint\nblocked no-token mutation',
-            evidence: 'http no-token mutation contract test',
-            validated: true,
-            reusable: false,
-            sensitivity: 'none'
-          }
+    const mutationCalls = [
+      {
+        name: 'record_memory',
+        arguments: {
+          target: 'process',
+          title: 'HTTP no-token mutation',
+          content: 'Type: checkpoint\nblocked no-token mutation',
+          evidence: 'http no-token mutation contract test',
+          validated: true,
+          reusable: false,
+          sensitivity: 'none'
         }
-      })
-    });
-    const payload = await response.json();
+      },
+      {
+        name: 'validate_memory',
+        arguments: {
+          memoryId: 'future-public-mutation-tool',
+          decision: 'reject'
+        }
+      }
+    ];
 
-    assert.equal(response.status, 403);
-    assert.equal(payload.error, 'Forbidden');
-    assert.match(payload.message, /no-token/i);
-    assert.match(payload.message, /mutation/i);
+    for (const [index, params] of mutationCalls.entries()) {
+      const response = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 5 + index,
+          method: 'tools/call',
+          params
+        })
+      });
+      const payload = await response.json();
+
+      assert.equal(response.status, 403);
+      assert.equal(payload.error, 'Forbidden');
+      assert.match(payload.message, /no-token/i);
+      assert.match(payload.message, /mutation/i);
+    }
   });
 });
 

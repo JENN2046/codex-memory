@@ -4,8 +4,10 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  AUTHORIZATION_CLASS,
   P63_SCHEMA_VERSION,
   PUBLIC_MCP_TOOLS,
+  REQUIRES_A5_FOR,
   RUNTIME_COMPLETION_GAPS,
   UNSAFE_CLI_FLAGS,
   buildFinalRcRuntimeEvidenceMatrix,
@@ -18,6 +20,14 @@ const {
 
 const workspaceRoot = path.resolve(__dirname, '..');
 const cliPath = path.join('src', 'cli', 'final-rc-matrix-runner.js');
+const EXPECTED_REQUIRES_A5_FOR = [
+  'provider_call',
+  'real_memory_scan',
+  'migration_apply',
+  'backup_restore',
+  'push_tag_release_deploy',
+  'rc_cutover'
+];
 
 function passingExecutor(command) {
   const payload = command.id === 'gate-ci'
@@ -91,6 +101,13 @@ function assertNoSensitiveSurface(value) {
   }
 }
 
+function assertAuthorizationPosture(report) {
+  assert.equal(report.authorizationClass, AUTHORIZATION_CLASS);
+  assert.deepEqual(REQUIRES_A5_FOR, EXPECTED_REQUIRES_A5_FOR);
+  assert.deepEqual(report.requiresA5For, EXPECTED_REQUIRES_A5_FOR);
+  assert.equal(report.cutoverAuthorized, false);
+}
+
 test('P63 runtime evidence matrix is local allowlisted and does not include A5 commands', () => {
   const matrix = buildFinalRcRuntimeEvidenceMatrix();
 
@@ -145,6 +162,7 @@ test('P63 runner executes injected local matrix evidence and keeps RC blocked', 
   assert.equal(report.schemaVersion, P63_SCHEMA_VERSION);
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
   assert.equal(report.status, 'local_runtime_evidence_passed_rc_still_blocked');
+  assertAuthorizationPosture(report);
   assert.deepEqual(report.publicMcpTools, PUBLIC_MCP_TOOLS);
   assert.equal(report.runnerImplemented, true);
   assert.equal(report.runnerExecuted, true);
@@ -187,6 +205,7 @@ test('P63 runner fails closed for dry-run or unsafe command evidence', () => {
   });
 
   assert.equal(dryRun.status, 'blocked_fail_closed');
+  assertAuthorizationPosture(dryRun);
   assert.equal(dryRun.runnerExecuted, false);
   assert.equal(dryRun.commandsExecuted, false);
   assert.equal(dryRun.localRuntimeEvidenceMatrixExecuted, false);
@@ -208,6 +227,7 @@ test('P63 runner fails closed for dry-run or unsafe command evidence', () => {
   });
 
   assert.equal(unsafe.status, 'blocked_fail_closed');
+  assertAuthorizationPosture(unsafe);
   assert.equal(unsafe.criticalGates.allCriticalCommandsPassed, false);
   assert.equal(unsafe.criticalGates.failedIds.includes('gate-ci'), true);
   assert.equal(unsafe.locallyEvidencedRuntimeGaps.includes('runtime_schema_version_enforcement_not_fully_proven'), false);
@@ -241,6 +261,7 @@ test('P63 CLI defaults to dry-run and rejects unsafe flags', () => {
 
   assert.equal(result.status, 1);
   assert.equal(report.status, 'blocked_fail_closed');
+  assertAuthorizationPosture(report);
   assert.equal(report.runnerExecuted, false);
   assert.equal(report.commandsExecuted, false);
   assert.equal(report.safety.executesCommands, false);
@@ -255,6 +276,7 @@ test('P63 CLI defaults to dry-run and rejects unsafe flags', () => {
 
   assert.equal(rejected.status, 1);
   assert.equal(rejectedReport.rejectedFlag, '--provider');
+  assertAuthorizationPosture(rejectedReport);
   assert.equal(rejectedReport.runnerExecuted, false);
   assert.equal(rejectedReport.safety.callsProviders, false);
 });

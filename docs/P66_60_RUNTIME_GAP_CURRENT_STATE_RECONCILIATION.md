@@ -10,7 +10,7 @@ Decision: `NOT_READY_BLOCKED`
 
 ## Purpose
 
-Reconcile the seven remaining runtime gaps against current repository reality after the authorized `32da702` push and the later post-push review-state fix at `1a3d309`.
+Reconcile the seven remaining runtime gaps against current repository reality after the authorized `32da702` push, the post-push review-state fix at `1a3d309`, and the later pushed review-blocker wording fix at `0dec735`.
 
 This phase is docs/board only. It does not execute runtime proofs, run gates, start services, call providers, read real memory, scan runtime stores, write durable memory or audit records, switch config, install watchdog/startup entries, expand public MCP tools, push, tag, release, deploy, execute RC cutover, or claim `RC_READY`.
 
@@ -21,11 +21,11 @@ Current checked reality at the start of this reconciliation:
 ```text
 branch = main
 worktree = clean
-origin/main = 1a3d309 fix: reconcile p66 post-push review state
-local main = ahead of origin/main with P66.60 reconciliation work pending push
+origin/main = 0dec735 docs: fix p66 pending push baseline wording
+local main = aligned with origin/main before the PASS_WITH_PATCH_RECOMMENDED local review-patch slice
 ```
 
-`1a3d309` is a post-push reconciliation commit on top of `32da702`. It does not close any runtime gap. It updates board/status state and adds the missing P66.44 static-warning coverage in ValidationAggregator report/test surfaces.
+`1a3d309` is a post-push reconciliation commit on top of `32da702`. `0dec735` fixes stale pending-push wording after the P66.60 reconciliation. Neither commit closes any runtime gap.
 
 Exact local `HEAD` and ahead/behind state must be read from Git at the time of handoff or push preflight.
 

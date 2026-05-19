@@ -4,6 +4,16 @@ const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const P63_SCHEMA_VERSION = 'p63-final-rc-runtime-evidence-runner-v1';
 const P63_PHASE = 'P63-T1-final-rc-matrix-runner-real-execution-evidence-bridge';
 const DECISION = 'NOT_READY_BLOCKED';
+const AUTHORIZATION_CLASS = 'A4_LOCAL_EXECUTABLE_VALIDATION';
+
+const REQUIRES_A5_FOR = Object.freeze([
+  'provider_call',
+  'real_memory_scan',
+  'migration_apply',
+  'backup_restore',
+  'push_tag_release_deploy',
+  'rc_cutover'
+]);
 
 const PUBLIC_MCP_TOOLS = Object.freeze([
   'record_memory',
@@ -65,6 +75,14 @@ const UNSAFE_CLI_FLAGS = Object.freeze([
   '--rc-ready',
   '--cutover'
 ]);
+
+function buildAuthorizationPosture() {
+  return {
+    authorizationClass: AUTHORIZATION_CLASS,
+    requiresA5For: REQUIRES_A5_FOR,
+    cutoverAuthorized: false
+  };
+}
 
 function commandBin(name) {
   if (name === 'powershell') return process.platform === 'win32' ? 'powershell' : 'pwsh';
@@ -607,6 +625,7 @@ function buildBlockedReport({ generatedAt, matrix, reason }) {
     decision: DECISION,
     status: 'blocked_fail_closed',
     blockedReason: safeString(reason, 'runner_not_executed'),
+    ...buildAuthorizationPosture(),
     publicMcpTools: PUBLIC_MCP_TOOLS,
     runnerImplemented: true,
     runnerExecuted: false,
@@ -723,6 +742,7 @@ function runFinalRcRuntimeEvidenceMatrix({
     status: allCriticalCommandsPassed
       ? 'local_runtime_evidence_passed_rc_still_blocked'
       : 'blocked_fail_closed',
+    ...buildAuthorizationPosture(),
     publicMcpTools: PUBLIC_MCP_TOOLS,
     runnerImplemented: true,
     runnerExecuted,
@@ -772,10 +792,12 @@ function runFinalRcRuntimeEvidenceMatrix({
 
 module.exports = {
   A5_HARD_STOPS,
+  AUTHORIZATION_CLASS,
   DECISION,
   P63_PHASE,
   P63_SCHEMA_VERSION,
   PUBLIC_MCP_TOOLS,
+  REQUIRES_A5_FOR,
   RUNTIME_COMPLETION_GAPS,
   UNSAFE_CLI_FLAGS,
   buildFinalRcRuntimeEvidenceMatrix,

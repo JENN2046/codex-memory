@@ -2,6 +2,8 @@
 const { spawnSync } = require('node:child_process');
 
 const {
+  AUTHORIZATION_CLASS,
+  REQUIRES_A5_FOR,
   UNSAFE_CLI_FLAGS,
   runFinalRcRuntimeEvidenceMatrix
 } = require('../core/FinalRcRuntimeEvidenceRunner');
@@ -126,6 +128,9 @@ function buildRejectedReport(options) {
     decision: 'NOT_READY_BLOCKED',
     status: 'blocked_fail_closed',
     rejectedFlag: options.rejectedFlag || options.unknownFlag,
+    authorizationClass: AUTHORIZATION_CLASS,
+    requiresA5For: REQUIRES_A5_FOR,
+    cutoverAuthorized: false,
     runnerExecuted: false,
     commandsExecuted: false,
     localRuntimeEvidenceMatrixExecuted: false,
