@@ -6,7 +6,11 @@ Mode: `A5 preflight packet only`
 
 Risk: `A5-durable-read-policy-audit-write-preflight`
 
-Decision: `DRAFT_NOT_APPROVED`
+Decision: `APPROVED_EXECUTED_BY_A5_GAP_1_READ_POLICY_AUDIT_WRITER_EVIDENCE`
+
+Execution evidence:
+
+- [P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_EVIDENCE.md)
 
 ## Purpose
 

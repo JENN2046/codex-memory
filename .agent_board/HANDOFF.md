@@ -2,7 +2,7 @@
 
 ## Goal
 
-Prepare the A5-GAP-1 read-policy audit writer packet. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
+Record the A5-GAP-1 read-policy audit writer evidence. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ Prepare the A5-GAP-1 read-policy audit writer packet. Keep all remaining runtime
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended A5-GAP-1 read-policy audit writer packet docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has one approved sanitized audit append from the prior A5-GAP-1 smoke. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A5-GAP-1 read-policy audit writer evidence docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has the approved sanitized read-policy audit append from this A5-GAP-1 smoke plus the prior approved audit append. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 read-policy audit writer packet.
+P8 memory-governance / P10 observability-admin; A5-GAP-1 read-policy audit writer evidence.
 
 ## Current Truth
 
@@ -46,6 +46,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 read-policy audit write
 - A5-GAP-1 read-policy audit evidence is approved/executed and linked to [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE.md). It ran only read-only `governance:report` at `cda8c1c3770ec968510e8ec11abe009e8a5ed844`, returned summary/review `ok`, reviewLevel `nominal`, `readPolicy.status=config_only_no_recent_audit`, `configEvidenceAvailable=true`, `auditEvidenceAvailable=false`, and `recentReadPolicyAuditCount=0`. It confirms no recent read-policy audit evidence and does not unlock production governance readiness.
 - A5-GAP-6 post-read-policy-audit aggregation refresh is approved/executed and linked to [docs/P66_A5_GAP_6_POST_READ_POLICY_AUDIT_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_READ_POLICY_AUDIT_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, executed no new runtime action, and kept `NOT_READY_BLOCKED` with locally evidenced count `9`, remaining count `6`, and readiness flags false.
 - A5-GAP-1 read-policy audit writer packet is drafted and linked to [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_APPROVAL_PACKET.md). It requests exactly one sanitized read-policy audit JSONL evidence append plus read-only `governance:report` verification. It is not approval and executes nothing.
+- A5-GAP-1 read-policy audit writer evidence is approved/executed and linked to [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_WRITER_EVIDENCE.md). It appended exactly one sanitized read-policy audit evidence record, then read-only `governance:report` observed `readPolicy.status=ok`, `auditEvidenceAvailable=true`, and `recentReadPolicyAuditCount=1`. The next safe A5 move is an exact A5-GAP-6 evidence-only aggregation request consuming updated A5-GAP-1/2/3/4/5 evidence.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
