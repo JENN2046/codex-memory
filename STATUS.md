@@ -5,11 +5,11 @@
 ## 当前结论
 
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
-- 当前 Git 基线：本地 `main` 包含 `f46b36d docs: add supreme commander autopilot protocol` 且领先 `origin/main = a9177d5 fix: tighten review patch safety semantics`；精确 `HEAD`、ahead/behind 和 worktree 状态仍必须以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准。
-- 当前本地任务：最高指挥官本地自动推进协议已本地提交在 `f46b36d`；本轮只做 post-commit active status/board 校准，不启动服务、不改配置、不执行 provider/real-memory/migration/apply/backup/release/deploy/cutover、不 push。
+- 当前 Git 基线：本地 `main` 包含 `ef599ca docs: record supreme commander protocol commit state` 且领先 `origin/main = a9177d5 fix: tighten review patch safety semantics` 2 个本地提交；精确 `HEAD`、ahead/behind 和 worktree 状态仍必须以 `git status -sb` / `git log --oneline --decorate -n 10` 实测为准。
+- 当前本地任务：按用户要求为 7 个 open runtime gaps 起草 A5 real-closure approval packet；本轮只做 A5 preflight packet / docs / board 校准，不启动服务、不改配置、不执行 provider/real-memory/migration/apply/backup/release/deploy/cutover、不 push。
 - 最新已推送完成：PASS_WITH_PATCH_RECOMMENDED 审查补丁与 P66 runtime gap 状态面收束已推送到 `origin/main = a9177d5`。该提交包含 HTTP no-token mutation guard、Final RC runner 授权语义、P66 runtime gap truth table、测试契约补丁和状态措辞修正。
 - 最新上下文维护：CM-0301 已把活动 `.agent_board/CHECKPOINT.md` / `.agent_board/HANDOFF.md` 压缩为当前摘要，完整旧版保留在 `.agent_board/archive/`。
-- 当前任务：P66.60 当前态对齐已确认 7 个 remaining runtime gaps 的本地安全工作已经耗尽；[Supreme Commander protocol](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) 已本地提交在 `f46b36d`。没有新的 runtime/cutover 任务被授权。P66 local proof chain 完成不等于 runtime readiness。
+- 当前任务：P66.60 当前态对齐已确认 7 个 remaining runtime gaps 的本地安全工作已经耗尽；[Supreme Commander protocol](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) 已本地提交并由 `ef599ca` 记录状态。本轮新增 [P66 A5 runtime gap closure approval packet](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md)，状态 `DRAFT_NOT_APPROVED`。没有新的 runtime/cutover 执行被授权。P66 local proof chain 完成不等于 runtime readiness。
 - 当前完成：P65-T1 ValidationAggregator explicit runtime evidence summary ingestion 已本地实现、验证并提交在 `04ae047`。该切片只消费 caller 显式传入的脱敏 runtime evidence summary，不读文件、不执行命令、不启动服务、不扫真实 memory/runtime stores、不扩大 public MCP；当前仍保持 `NOT_READY_BLOCKED`。
 - 当前完成：P65.1 Final RC runner executed-field semantics hardening 已本地实现并验证。`finalRcMatrixExecuted` 不再代表本地 allowlisted runner 执行；新字段 `localRuntimeEvidenceMatrixExecuted` / `allowlistedFinalRcEvidenceRunnerExecuted` 表达本地执行证据，`fullFinalRcMatrixExecuted=false` 且显式 full-matrix execution/readiness 声明会被拒绝，继续阻止完整 RC matrix 误读。
 - 当前阶段：P65.2 push readiness approval request 已起草为 [docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md](/A:/codex-memory/docs/P65_2_PUSH_READINESS_APPROVAL_REQUEST.md)。状态 `DRAFT_NOT_APPROVED` / `NOT_APPROVED` / `BLOCKED_HARD_STOP`；不执行 push。
@@ -122,8 +122,9 @@
 
 1. P63-T1 已把 final RC matrix runner 从 fixture/helper 边界推进到本地 allowlisted real execution evidence；P64-T1 已把 schema/version runtime write-boundary proof 接入 core write path 和 final runner 矩阵；当前仍必须保持 `NOT_READY_BLOCKED`。
 2. P66.59 seven-gap local proof chain review、最终本地验证/远端新鲜度 preflight、post-push review-state reconciliation、P66.60 当前态对齐、review blocker 修复、以及审查补丁安全语义修正已推送到 `origin/main = a9177d5`。这 7 个 gap 已无新的本地安全工作，后续真实 closure 只能等待 runtime/A5 授权；当前 dashboard 以 [P66 runtime gap truth table](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md) 为准。
-3. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
-4. 按 active goal 规则继续本地 guarded commits；不 push，直到目标完成并完成最终验证后再执行用户授权的 push。
+3. A5 real-closure approval packet 已进入本地起草；每个 gap 必须逐项显式批准，任何模糊“继续”都不能授权 provider、real memory scan、migration/import-export/backup/restore apply、durable write、public MCP expansion、push/tag/release/deploy、config/watchdog/cutover 或 `RC_READY`。
+4. 继续保持 `NOT_READY_BLOCKED`，不得把 P63/P64 local runner evidence、P66 local proof chain、P66 truth table 或 A5 approval packet 误读为 ValidationAggregator full implementation complete、governance runtime loop complete、recall isolation runtime proof complete、migration/import-export/backup-restore approval execution ready、HTTP operation readiness、cutover-context mainline gate execution、final RC readiness、v1 RC readiness 或 `RC_READY`。
+5. 按 active goal 规则继续本地 guarded commits；不 push，直到目标完成并完成最终验证后再执行用户授权的 push。
 
 ## 主要事实源
 

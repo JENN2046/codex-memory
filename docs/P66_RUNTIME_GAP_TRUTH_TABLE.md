@@ -10,13 +10,17 @@ Decision: `NOT_READY_BLOCKED`
 
 ## Purpose
 
-This document consolidates the current P66 runtime-gap truth after the repository reached:
+This document consolidates the current P66 runtime-gap truth after the pushed review-patch baseline reached:
 
 ```text
-HEAD == origin/main == a9177d5
+origin/main == a9177d5
 ```
 
+Local `main` may be ahead of `origin/main`; exact `HEAD`, ahead/behind, and worktree state must be verified from Git commands before any approval or execution.
+
 It is a current-state dashboard only. It does not execute runtime proofs, start HTTP MCP, call providers, read real memory, scan runtime stores, apply migration/import/export/backup/restore work, write durable memory or audit state, expand public MCP tools, push, tag, release, deploy, execute cutover, or claim `RC_READY`.
+
+The current A5 preflight packet for real closure is [P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md). That packet is `DRAFT_NOT_APPROVED`; it does not grant authorization.
 
 ## Truth Table
 
@@ -34,4 +38,4 @@ It is a current-state dashboard only. It does not execute runtime proofs, start 
 
 The seven gaps above remain open. P66 local proof chain completion means the local evidence map is organized; it does not mean runtime readiness, final RC readiness, v1.0 RC readiness, cutover readiness, or `RC_READY`.
 
-Future work should reference this table instead of adding new P67/P68 documents for the same gap inventory.
+Future work should reference this table and the A5 approval packet instead of adding new P67/P68 documents for the same gap inventory.

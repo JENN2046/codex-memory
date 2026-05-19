@@ -2,7 +2,7 @@
 
 ## Goal
 
-Implement the Supreme Commander local autopilot protocol as a safe A4.8 project-operator entrypoint, reconcile active status surfaces to the pushed review-patch baseline, and keep all runtime/A5 boundaries blocked.
+Draft an A5 approval packet for real closure of the seven remaining P66 runtime gaps, reconcile active status surfaces, and keep all runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,16 +14,16 @@ Implement the Supreme Commander local autopilot protocol as a safe A4.8 project-
 
 ## Worktree
 
-Current local `main` contains `f46b36d docs: add supreme commander autopilot protocol` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics`. The current worktree contains intended post-commit docs/board reconciliation until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` contains `ef599ca docs: record supreme commander protocol commit state` and is ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics` by 2 commits before this approval-packet slice. The current worktree contains intended A5 approval packet docs/board reconciliation until validation completes. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P6 docs-drift / P0 mainline-health; Supreme Commander protocol and active status baseline reconciliation.
+P10 observability-admin / P0 mainline-health; P66 A5 runtime-gap closure approval packet.
 
 ## Current Truth
 
 - P46-P66 pushed baseline plus the review patch is now `origin/main = a9177d5`; P66.60, its review-blocker fix, and the PASS_WITH_PATCH_RECOMMENDED safety semantics patch are already pushed.
-- Current local slice implements the Supreme Commander A4.8 protocol entrypoint and reconciles active docs/board wording after the `a9177d5` push.
+- Current local slice drafts [docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md), an A5 preflight packet with separate approval switches for the seven open runtime gaps. It is `DRAFT_NOT_APPROVED` and grants no runtime authority.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.
@@ -76,7 +76,7 @@ P6 docs-drift / P0 mainline-health; Supreme Commander protocol and active status
 - P66.18 through P66.59 ValidationAggregator local proof slices are implemented, validated, committed, and pushed through `32da702`.
 - P66.60 runtime gap current-state reconciliation is implemented as docs/board only and reconciles the seven remaining runtime gaps against pushed state now superseded by `origin/main = a9177d5`.
 - P66.60 review-blocker fix and follow-up review patch are pushed; current baseline docs are being reconciled again so they do not preserve stale local/pushed language.
-- Supreme Commander protocol is committed locally in `f46b36d`, with A4.8 / 4-Agent / next-phase entry links updated. Push remains blocked unless explicitly requested.
+- Supreme Commander protocol is committed locally in `f46b36d`, and post-commit state is recorded in `ef599ca`, with A4.8 / 4-Agent / next-phase entry links updated. Push remains blocked unless explicitly requested.
 - v1.0 RC remains `NOT_READY_BLOCKED`.
 - P57-T2 is not recall isolation runtime proof execution, contamination report readiness, final RC readiness, or v1 RC readiness.
 - P58-T1 is not approval execution, migration readiness, import/export readiness, backup/restore readiness, runtime readiness, final RC readiness, or v1 RC readiness.
