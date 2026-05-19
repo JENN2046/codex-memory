@@ -782,3 +782,20 @@ Evidence recorded:
 - no push/tag/release/deploy
 
 Decision: state remains NOT_READY_BLOCKED. This closeout does not authorize recall observation, provider calls, real memory scans, migration/import/export/backup/restore apply, public MCP expansion, durable writes, push, release, deploy, cutover, A5-GAP-7, or RC_READY/runtime readiness claims.
+## CM-0554 Operational rollback drill design packet
+
+Status: ROLLBACK_DRILL_DESIGN_READY_FOR_REVIEW
+Area: P5-rollback-readiness / P10-observability-admin
+Risk: A4 docs/board design only
+
+Design packet: docs/CM-0554_OPERATIONAL_ROLLBACK_DRILL_DESIGN.md
+
+Scope:
+
+- defines what a future rollback drill may roll back
+- defines success criteria and evidence shape
+- lists design-only allowed commands
+- lists future executable drill commands as candidates only
+- keeps actual rollback, runtime changes, provider, real memory scan, migration/import/export/backup/restore apply, durable writes, public MCP expansion, push/tag/release/deploy, cutover, and readiness claims blocked
+
+Decision: ROLLBACK_DRILL_DESIGN_READY_FOR_REVIEW; project remains NOT_READY_BLOCKED.
