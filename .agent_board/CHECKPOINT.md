@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Prepare the minimal A5-GAP-1 read-policy audit evidence packet for `governance_read_policy_no_recent_audit_evidence`. Preserve all remaining runtime/A5 hard stops.
+Record the approved A5-GAP-1 read-policy audit evidence scenario for `governance_read_policy_no_recent_audit_evidence`. Preserve all remaining runtime/A5 hard stops.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 read-policy audit evidence packet.
+P8 memory-governance / P10 observability-admin; A5-GAP-1 read-policy audit evidence.
 
 ## Current Status
 
@@ -32,6 +32,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 read-policy audit evide
 - A5-GAP-1 governance read-policy rerun is now approved/executed and recorded in [docs/P66_A5_GAP_1_GOVERNANCE_READ_POLICY_RERUN_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_GOVERNANCE_READ_POLICY_RERUN_EVIDENCE.md). The approved read-only `governance:report` returned summary/review `ok`, reviewLevel `nominal`, proposal/tombstone/superseded/stale counts 0, `readPolicy.status=config_only_no_recent_audit`, `configEvidenceAvailable=true`, `auditEvidenceAvailable=false`, and `readPolicyConfigured=false`. This narrows the old unavailable/config-only evidence but production governance readiness remains blocked.
 - A5-GAP-6 post-read-policy-rerun evidence-only aggregation refresh is now approved/executed and recorded in [docs/P66_A5_GAP_6_POST_READ_POLICY_RERUN_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_READ_POLICY_RERUN_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). It consumed updated A5-GAP-1/2/3/4/5 sanitized evidence only, accepted the explicit runtime evidence summary, reported locally evidenced count `8`, remaining count `6`, `commandsExecutedByAggregator=false`, and kept readiness flags false.
 - A5-GAP-1 read-policy audit evidence approval packet is now drafted as [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests only read-only `governance:report` for subject `p66-a5-gap1-read-policy-audit-evidence-readonly sanitized report`, durable write no, and does not execute runtime action or touch cutover/A5-GAP-7.
+- A5-GAP-1 read-policy audit evidence is now approved/executed and recorded in [docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_READ_POLICY_AUDIT_EVIDENCE.md). It ran only `npm run governance:report -- --json` at `cda8c1c3770ec968510e8ec11abe009e8a5ed844`, returned summary/review `ok`, reviewLevel `nominal`, `readPolicy.status=config_only_no_recent_audit`, `configEvidenceAvailable=true`, `auditEvidenceAvailable=false`, `recentReadPolicyAuditCount=0`, `mutated=false`, and `migrationApplied=false`. This confirms the no-recent-audit limitation and keeps production governance readiness blocked.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
