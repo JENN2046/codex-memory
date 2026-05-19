@@ -416,3 +416,22 @@ Baseline binding:
 Fail-closed rule: if the baseline does not exist, is not in HEAD lineage, or no longer matches the intended packet-defined rehearsal baseline / origin-main meaning, future rehearsal result must be READONLY_ROLLBACK_REHEARSAL_BLOCKED_SCOPE_DRIFT.
 
 Boundary: baseline binding only. It authorizes future read-only rehearsal consideration only; no rollback rehearsal, no git diff baseline execution in this patch, no reset/restore/revert/checkout rollback, no rollback:mainline:plan, no compare/rollback-active-memory, no provider, no real memory scan, no durable write, no push/tag/release/deploy, no readiness claim.
+
+## CM-0556B Read-only rollback rehearsal closeout
+
+Status: READONLY_ROLLBACK_REHEARSAL_COMPLETED_NOT_READY
+Area: P5-rollback-readiness / P10-observability-admin
+Risk: docs/board closeout only
+
+Closeout doc: docs/CM-0556_READONLY_ROLLBACK_REHEARSAL_CLOSEOUT.md
+
+Recorded:
+
+- baseline = 6c8bee0262d90fda0f05735b250c36aac83761a8
+- HEAD = 69c6856
+- diff = 19 files, 2040 insertions, 80 deletions
+- src/tests present in rollback range: `src/adapters/codex-mcp/http.js`, `tests/mcp-http.test.js`
+- real rollback requires separate exact A5 approval and explicit validation plan
+- RC remains NOT_READY_BLOCKED
+
+Boundary: no reset/restore/revert/checkout rollback, no rollback:mainline:plan, no compare/rollback-active-memory, no provider, no real memory scan, no durable write, no push/tag/release/deploy, no readiness claim.
