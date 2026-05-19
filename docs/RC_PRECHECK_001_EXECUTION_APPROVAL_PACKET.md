@@ -4,9 +4,11 @@ Status: `DRAFT_NOT_APPROVED`
 
 Decision: `NOT_READY_BLOCKED`
 
-Target commit: `9eb17ad`
+Target commit: `c943a42f5858a140c8e80362267844b40628385a`
 
 Remote baseline: `origin/main = 103c3ac`
+
+Execution-time target rule: before any approved full precheck execution, re-read `git rev-parse HEAD`; if `HEAD` is no longer `c943a42f5858a140c8e80362267844b40628385a`, update this packet and approval line before running any A5 command.
 
 Endpoint for future HTTP evidence, if approved: `http://127.0.0.1:7605`
 
@@ -39,7 +41,7 @@ These commands may be used only as bounded `RC_PRECHECK_001` evidence if the use
 
 ## Copyable Approval Line
 
-I approve `RC_PRECHECK_001` full precheck for target commit `9eb17ad` on local `main`, endpoint `http://127.0.0.1:7605`, using only: Git baseline, `npm run gate:mainline:strict`, `npm run observe:http -- --json`, one approved recall path observation with recall audit evidence, active-memory compare, active-memory rollback, public MCP freeze confirmation, and remaining runtime gaps confirmation. This approval does not authorize provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable memory writes beyond the explicitly approved recall observation if any, push, tag, release, deploy, RC cutover, A5-GAP-7, or any readiness claim.
+I approve `RC_PRECHECK_001` full precheck for target commit `c943a42f5858a140c8e80362267844b40628385a` on local `main`, endpoint `http://127.0.0.1:7605`, using only: Git baseline, `npm run gate:mainline:strict`, `npm run observe:http -- --json`, one approved recall path observation with recall audit evidence, active-memory compare, active-memory rollback, public MCP freeze confirmation, and remaining runtime gaps confirmation. This approval does not authorize provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable memory writes beyond the explicitly approved recall observation if any, push, tag, release, deploy, RC cutover, A5-GAP-7, or any readiness claim.
 
 ## Required Result Wording
 

@@ -4,7 +4,7 @@ Status: `COMPLETED_VALIDATED`
 
 Decision: `NOT_READY_BLOCKED`
 
-Target commit: `9eb17ad`
+Target commit: `c943a42f5858a140c8e80362267844b40628385a`
 
 Remote baseline: `origin/main = 103c3ac`
 
@@ -16,7 +16,7 @@ It does not run strict gate, HTTP observe, recall path observation, active-memor
 
 ## Expected Evidence
 
-- `git status -sb` shows local `main` ahead of `origin/main` by 1 at `9eb17ad` before this docs/board stage.
+- `git status -sb` shows local `main` ahead of `origin/main` by 3 at `c943a42` before this docs/board stage.
 - `git status --short` is clean before this docs/board stage.
 - Final validation for this docs/board stage must pass `git diff --check` and docs validation.
 - Stale/readiness scan must find no current-state overclaim.
@@ -30,3 +30,7 @@ Required decision remains:
 ```text
 NOT_READY_BLOCKED
 ```
+
+## Target Freshness
+
+This non-A5 precheck record was refreshed after governance cleanup commit `c943a42`. Any future full precheck must bind to the then-current exact `HEAD` before A5 commands run.
