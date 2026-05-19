@@ -708,3 +708,5 @@ npm run profile-gate -- --json --summary-only
 - CMV-0635 | P10-observability-admin | CM-0536 Phase F observability/admin review surface synthetic fixture contract | COMPLETED_VALIDATED | Targeted fixture test passed 5/5; docs validation passed; git diff --check passed after EOF cleanup; readiness/public MCP boundary scan returned only intended forbidden-claim fixture cases.
 
 - CMV-0636 | P8-memory-governance | CM-0537 Phase F memory governance proposal draft refresh | COMPLETED_VALIDATED | Design-only governance proposal draft prepared; git diff --check passed after EOF cleanup; docs validation passed; readiness/overclaim scan returned only historical entries and explicit non-authorizing state names.
+
+- CMV-0637 | P8-memory-governance | CM-0538 Phase F memory governance proposal fixture plan | COMPLETED_VALIDATED | Docs-only fixture-plan slice prepared; git diff --check passed after EOF cleanup; docs validation passed; readiness/authorization scan returned only historical entries and explicit forbidden/default-negative wording.

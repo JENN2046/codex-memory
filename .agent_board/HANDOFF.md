@@ -599,3 +599,14 @@ Validation: pending docs validation, diff check, readiness/overclaim scan.
 Not validated: runtime behavior, governance report execution, durable memory/audit writes, real stores, public MCP schema.
 Remaining risks: future fixture work must not be treated as durable governance execution.
 Next safe step: CM-0538 memory governance proposal fixture plan.
+
+## CM-0538 Handoff
+
+Goal: prepare Phase F memory governance proposal fixture plan.
+Workspace: A:\codex-memory.
+Current area: P8-memory-governance.
+Changed files: docs/PHASE_F_MEMORY_GOVERNANCE_PROPOSAL_FIXTURE_PLAN.md plus docs/board status files.
+Validation: pending docs validation, diff check, readiness/authorization scan.
+Not validated: runtime behavior, governance report execution, durable memory/audit writes, real stores, public MCP schema.
+Remaining risks: future fixture negative cases must not be mistaken for granted approval.
+Next safe step: CM-0539 synthetic fixture contract.

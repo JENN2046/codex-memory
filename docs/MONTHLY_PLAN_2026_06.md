@@ -233,3 +233,7 @@ Phase F observability/admin review surface synthetic fixture contract added as l
 ## CM-0537 Monthly Update
 
 Phase F memory governance proposal draft refreshed as design-only local work. It defines proposal/supersession/tombstone/forget-flow boundaries and keeps durable writes, real-store reads, public MCP expansion, and readiness claims blocked. Status remains NOT_READY_BLOCKED.
+
+## CM-0538 Monthly Update
+
+Phase F memory governance proposal fixture plan prepared as a local-safe docs/board slice. It keeps durable memory/audit writes, real-store reads, public MCP expansion, and readiness claims blocked. Status remains NOT_READY_BLOCKED.
