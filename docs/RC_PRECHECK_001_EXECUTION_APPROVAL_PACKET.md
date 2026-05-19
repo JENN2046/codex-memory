@@ -1,66 +1,91 @@
 # RC_PRECHECK_001 Execution Approval Packet
 
-Status: READONLY_EXECUTED_RECALL_DRAFT_NOT_APPROVED
+Status: TARGET_REFRESHED_DRAFT_NOT_APPROVED
 
-Decision: PRECHECK_PASSED_NOT_RC_READY / NOT_READY_BLOCKED
+Decision: NOT_READY_BLOCKED
 
-Prepared/executed readonly target commit: `a6030f36b3026d360c6aa99f97a2d1af44365433`
+Current packet target commit: `765ab1825535c8b66078e50ff43ac519488d25f8`
 
-Remote baseline: origin/main = 103c3ac
+Target binding rule: before any future approved `RC_PRECHECK_001` execution, re-read `git rev-parse HEAD`. If `HEAD` differs from the current packet target, stop and refresh this packet before running any A5 command.
+
+Remote baseline rule: re-read `git status -sb` and `git log --oneline --decorate -n 10` at execution time. Do not infer the current remote baseline from historical packet text.
 
 Endpoint for future HTTP evidence, if approved: http://127.0.0.1:7605
 
-Execution-time target rule: before any approved full precheck execution, re-read `git rev-parse HEAD`; if `HEAD` is no longer `8d3f07b6a3b2a7dc7f0cf0d33a6eecfd7f612b62`, update this packet and approval line before running any A5 command.
-
 ## Purpose
 
-Prepare exact-approval boundaries for future RC_PRECHECK_001 evidence capture. The readonly boundary has now been executed under exact user approval; the recall boundary remains draft/not approved and executes nothing.
+Refresh the `RC_PRECHECK_001` approval packet so future precheck evidence binds to the current local `HEAD` instead of stale target coordinates.
 
-## A1/A2 Local Checks Already Allowed For Precheck Preparation
+This packet does not execute RC precheck. It does not run strict gate, HTTP observe, recall observation, compare, rollback, provider calls, real memory scans, migrations, backup/restore, public MCP expansion, durable writes, push, tag, release, deploy, cutover, or any readiness transition.
 
-`powershell
+## Current Readiness Decision
+
+`RC_PRECHECK_001` is not ready to execute until a new exact approval line names the current packet target commit and boundary.
+
+Required controlling result remains:
+
+```text
+NOT_READY_BLOCKED
+```
+
+## Allowed Commands For A Future A5-RC-PRECHECK-READONLY Approval
+
+Only the following command groups may be included in a future exact `A5-RC-PRECHECK-READONLY` approval:
+
+```powershell
 git status -sb
 git log --oneline --decorate -n 10
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
-`
+npm run gate:mainline:strict
+npm run observe:http -- --json
+npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match
+npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready
+```
 
-These commands may support local docs/board freshness only. They do not establish RC readiness.
+The HTTP observe command is loopback/local precheck evidence only. It is not live service readiness, production readiness, config/watchdog/startup readiness, cutover readiness, or `RC_READY`.
 
-## A5-RC-PRECHECK-READONLY Approval Line
+## Forbidden Actions
 
-Recommended first approval boundary:
+This packet does not authorize:
 
-`	ext
-I approve A5-RC-PRECHECK-READONLY for target commit 8d3f07b6a3b2a7dc7f0cf0d33a6eecfd7f612b62 on local main, endpoint http://127.0.0.1:7605, using only: Git baseline, npm run gate:mainline:strict, npm run observe:http -- --json, npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match, npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready, public MCP freeze confirmation, and remaining runtime gaps confirmation. This approval does not authorize recall path observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable memory writes, push, tag, release, deploy, RC cutover, A5-GAP-7, or any readiness claim.
-`
+- recall path observation; that still requires separate exact `A5-RC-PRECHECK-RECALL` approval with named subject/query/audit boundary
+- provider calls
+- real memory broad scans
+- migration/import/export apply
+- backup/restore apply
+- public MCP expansion
+- durable memory writes
+- config/watchdog/startup changes
+- push, tag, release, deploy, or RC cutover
+- A5-GAP-7
+- any readiness claim
 
-## A5-RC-PRECHECK-RECALL Approval Line
+## Evidence Output Shape
 
-Use only if a real recall audit observation is needed after the readonly precheck boundary is understood:
+If a future exact approved readonly precheck passes, the maximum allowed result is:
 
-`	ext
-I approve A5-RC-PRECHECK-RECALL for target commit 8d3f07b6a3b2a7dc7f0cf0d33a6eecfd7f612b62 on local main, using exactly one named recall subject/query and bounded recall audit observation to be written into the execution packet before running. This approval does not authorize provider calls, real memory broad scans beyond the named recall path, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable memory writes outside the explicitly approved recall/audit path, push, tag, release, deploy, RC cutover, A5-GAP-7, or any readiness claim.
-`
-
-The recall approval line is intentionally incomplete until the exact subject/query/audit boundary is named. Do not execute it as written.
-
-## Required Result Wording
-
-If approved readonly precheck passes, record only:
-
-`	ext
+```text
 PRECHECK_PASSED_NOT_RC_READY
-`
+```
 
-If any warning, failure, missing approval, target drift, or boundary ambiguity appears, record:
+If any warning, failure, missing approval, target drift, stale baseline, or boundary ambiguity appears, the only allowed controlling result is:
 
-`	ext
+```text
 NOT_READY_BLOCKED
-`
+```
+
+All evidence output must keep:
+
+```text
+runtimeReady=false
+finalRcMatrixReady=false
+v1RcReady=false
+rcReady=false
+```
 
 No result may claim `RC_READY`, runtime readiness, final RC readiness, v1 RC readiness, cutover readiness, migration readiness, or production readiness.
 
-## Readonly Execution Result
+## Historical Evidence Boundary
 
-Exact `A5-RC-PRECHECK-READONLY` approval was executed on 2026-05-19 for `a6030f36b3026d360c6aa99f97a2d1af44365433`. Evidence is recorded in [docs/RC_PRECHECK_001_READONLY_EVIDENCE.md](/A:/codex-memory/docs/RC_PRECHECK_001_READONLY_EVIDENCE.md). Result: `PRECHECK_PASSED_NOT_RC_READY`; project remains `NOT_READY_BLOCKED`.
+Earlier readonly precheck evidence remains historical evidence only. It cannot be reused as current-target evidence after local `HEAD` moved. Future execution must bind to the current packet target and fresh exact approval.

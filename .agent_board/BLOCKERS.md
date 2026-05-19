@@ -58,3 +58,15 @@ Status: `CLOSED_EXECUTED_NOT_READY`\r\n\r\nArea: P10-observability-admin / valid
 Next action: continue local-safe Phase F prep or request a separate exact approval for recall observation/cutover-related work if needed.
 
 Safe state: aggregation evidence recorded as `EVIDENCE_AGGREGATED_NOT_RC_READY`; no recall, provider, real memory broad scan, migration/apply, config/watchdog/startup change, public MCP expansion, durable write, push, cutover, A5-GAP-7, or readiness claim.
+
+## CMB-0009 - RC_PRECHECK_001 current-target exact approval required
+
+Status: OPEN_TARGET_REFRESHED_NOT_APPROVED
+
+Area: P10-observability-admin / RC_PRECHECK_001
+
+Reason: RC precheck target/baseline has been refreshed to current local HEAD 765ab1825535c8b66078e50ff43ac519488d25f8, but no new exact A5 execution approval has been granted for this target.
+
+Required approval/action: user must provide a new exact A5-RC-PRECHECK-READONLY approval line bound to 765ab1825535c8b66078e50ff43ac519488d25f8 before any strict gate, HTTP observe, compare, rollback, or public MCP freeze evidence capture is run. Recall path observation still requires separate exact A5-RC-PRECHECK-RECALL approval.
+
+Safe state: NOT_READY_BLOCKED; docs/board packet refreshed only.

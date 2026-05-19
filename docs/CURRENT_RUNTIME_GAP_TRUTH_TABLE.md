@@ -3,7 +3,8 @@
 Status: CURRENT_RUNTIME_TRUTH_TABLE
 Decision: NOT_READY_BLOCKED
 Scope: authoritative current runtime gap dashboard
-Source baseline: `origin/main == 6c8bee0` after safe-push verification
+Local baseline: `765ab1825535c8b66078e50ff43ac519488d25f8`
+Remote baseline: must be re-read before push, precheck, release, or cutover-sensitive work
 
 ## Purpose
 
@@ -17,7 +18,7 @@ This document is a status table only. It does not execute runtime proofs, start 
 
 The project remains `NOT_READY_BLOCKED`.
 
-A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, or endpoint-bound observation does not become runtime readiness unless this table says so.
+A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
 ## Truth Table
 
@@ -27,16 +28,16 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 | governance review / approval / audit runtime loop | Subject-bound in-memory governance loop, durable audit writer smoke, read-policy audit writer smoke, and read-only governance reports exist as bounded evidence. No durable memory governance write or full production loop completion has been approved. | yes, bounded subject/read-only evidence; no durable memory governance write | A5 bounded evidence | no | Prepare exact approval only if a full governance runtime loop is needed; otherwise keep evidence historical and blocked. |
 | recall isolation runtime proof | A4 explicit projection isolation exists; A5 no-mutation scan and sanitized positive-control write/projection proof exist. Broad real-memory isolation and future sample coverage remain incomplete. | yes, bounded approved stores and one sanitized positive-control write | A4 plus A5 bounded evidence | no | If needed, request exact approval for the next bounded recall isolation proof; no broad scan or backfill by default. |
 | migration / import / export / backup / restore execution | Fixture-only migration-readiness dry-run evidence exists and remains blocked for real apply/import/export/backup/restore. | fixture-only dry-run; no real data apply | A5 dry-run only | no | Create a separate exact A5 packet naming one real action and one target before any apply/import/export/backup/restore action. |
-| live HTTP operation readiness | Endpoint-bound HTTP evidence exists for loopback `7605`, including health/MCP/observe evidence, with no config/watchdog/startup change. Local HTTP session TTL/cap/cleanup hardening is completed in `16538ea` and targeted HTTP tests passed `13/13`. | yes, endpoint-bound observation plus local runtime hardening; no config/watchdog/startup change | A5 endpoint-bound evidence plus A4/CM-0550 local hardening | no | For readiness evidence, run only a future explicitly approved fresh HTTP observe/precheck against the target commit and endpoint; do not infer production readiness from local hardening alone. |
-| current-head strict gate for cutover | Target-bound strict-gate evidence exists for older approved targets. Current pushed `HEAD` is now `6c8bee0`, so any cutover-context gate would need fresh exact approval for this target. | yes for older target-bound gates; not current cutover | A5 target-bound gate evidence | no | For RC precheck/cutover evidence, request exact A5 approval bound to current `HEAD`; do not infer readiness from stale target gates. |
+| live HTTP operation readiness | Endpoint-bound historical HTTP evidence exists for loopback `7605`, with no config/watchdog/startup change. HTTP session TTL/cap/cleanup hardening is completed locally in `16538ea`; closeout recorded in `765ab18`; targeted HTTP tests passed `13/13`. | yes, local runtime hardening only; no fresh observe for current packet target; no config/watchdog/startup change | A4/CM-0550 local hardening plus historical A5 endpoint evidence | no | Future HTTP observe/precheck requires exact approval bound to current target and endpoint. Do not infer production readiness from local hardening alone. |
+| current-head strict gate for cutover | Target-bound strict-gate evidence exists for older approved targets. Current local `HEAD` is `765ab1825535c8b66078e50ff43ac519488d25f8`, so RC/cutover-context evidence needs fresh exact approval for this target. | yes for older target-bound gates; not current cutover | A5 target-bound gate evidence | no | For RC precheck/cutover evidence, request exact A5 approval bound to current `HEAD`; do not infer readiness from stale target gates. |
 | RC cutover | No RC cutover, tag, release, deploy, production transition, or readiness transition has been executed. | no | A5 required | no | Execute only after zero open runtime gaps, fresh approved gates, explicit release boundary approval, and final human authorization. |
 
 ## Current Minimal Backlog
 
 1. Keep this table as the sole current runtime gap dashboard.
 2. Treat `docs/P66_RUNTIME_GAP_TRUTH_TABLE.md` as historical source/evidence detail, not the current map.
-3. Prepare HTTP session TTL / max sessions / max streams / idle cleanup as the next production-hardening design item.
-4. Continue `RC_PRECHECK_001` only through exact approval lines; any pass remains precheck evidence, not readiness.
+3. Treat HTTP session TTL/cap/cleanup as local runtime hardening completed; future HTTP observe/precheck still requires exact approval.
+4. Refresh `RC_PRECHECK_001` only through exact approval lines; any pass remains precheck evidence, not readiness.
 
 ## Hard Boundary
 

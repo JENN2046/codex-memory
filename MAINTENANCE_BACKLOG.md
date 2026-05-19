@@ -293,3 +293,22 @@ Remaining boundaries:
 - no real memory scan
 - no migration/import/export/backup/restore apply
 - project state remains `NOT_READY_BLOCKED`
+
+## CM-0551 RC_PRECHECK_001 target/baseline refresh
+
+Status: CM_0551_RC_PRECHECK_PACKET_REFRESH_READY_FOR_REVIEW
+Area: P6-docs-drift / P10-observability-admin
+Risk: A4 docs/board refresh only
+
+Current packet target commit: 765ab1825535c8b66078e50ff43ac519488d25f8
+
+Updated:
+
+- RC_PRECHECK_001 packet now binds to current local HEAD and requires target refresh before any future A5 execution if HEAD drifts.
+- Allowed future readonly precheck commands are limited to Git baseline, local docs checks, strict gate, HTTP observe, and active-memory compare/rollback under exact approval.
+- observe:http remains loopback/local precheck evidence only, not live/production/config/watchdog/startup/cutover readiness.
+- Forbidden actions remain recall observation without separate approval, provider, real memory broad scan, migration/import/export apply, backup/restore, public MCP expansion, durable writes, push/tag/release/deploy, RC cutover, A5-GAP-7, and readiness claims.
+- Evidence output shape remains fail-closed: maximum PRECHECK_PASSED_NOT_RC_READY; warnings/failures/missing approval/target drift/boundary ambiguity become NOT_READY_BLOCKED; readiness flags stay false.
+- docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md now records HTTP session TTL/cap/cleanup as local runtime hardening completed while keeping future HTTP observe/precheck behind exact approval.
+
+Boundary: no RC precheck, no HTTP observe, no strict gate, no compare/rollback, no source/test change, no HTTP startup, no provider, no real memory scan, no durable write, no push/tag/release/deploy.
