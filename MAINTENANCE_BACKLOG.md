@@ -244,3 +244,23 @@ Future implementation candidate:
 - Add targeted tests before any broad gate.
 
 Boundary: no runtime implementation in CM-0549; no provider call, real memory scan, durable write, package change, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+
+## CM-0549A HTTP session hardening design patch
+
+Status: CM_0549A_DESIGN_PACKET_READY_FOR_REVIEW
+Area: P4-http-runtime / P10-observability-admin
+Risk: design-only now; future runtime implementation remains medium risk
+
+Design patch: `docs/CM-0549_HTTP_SESSION_HARDENING_DESIGN.md`
+
+Added implementation preconditions:
+
+- absolute TTL default 30 minutes, range 5 minutes to 24 hours
+- idle TTL default 10 minutes, range 1 minute to 2 hours
+- max sessions default 64, range 1 to 256
+- max streams per session default 8, range 1 to 32
+- cleanup interval default 60 seconds, range 10 seconds to 5 minutes
+- invalid env falls back to default with warning metadata and no startup crash
+- cap errors use HTTP 429 with sanitized error/code/message/meta envelope
+
+Boundary: no runtime implementation in CM-0549A; no source/test/provider/real-memory/durable-write/package/push/tag/release/deploy action.

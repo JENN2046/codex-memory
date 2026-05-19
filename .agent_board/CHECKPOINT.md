@@ -769,3 +769,13 @@ Changed files: docs/CM-0549_HTTP_SESSION_HARDENING_DESIGN.md; STATUS.md; MAINTEN
 Validation: git diff --check; docs validation
 Boundary: no runtime source change, no tests change, no HTTP service startup, no provider, no real memory scan, no durable write, no package change, no push/tag/release/deploy
 Next: review design packet before any runtime implementation
+
+## CM-0549A validation checkpoint
+
+Status: CM_0549A_DESIGN_PACKET_READY_FOR_REVIEW after local validation
+Area: P4-http-runtime / P10-observability-admin
+Scope: docs/design patch for HTTP session hardening implementation preconditions
+Changed files: docs/CM-0549_HTTP_SESSION_HARDENING_DESIGN.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: git diff --check; docs validation
+Boundary: no runtime source change, no tests change, no HTTP service startup, no provider, no real memory scan, no durable write, no package change, no push/tag/release/deploy
+Next: review design patch before any runtime implementation

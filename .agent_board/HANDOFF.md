@@ -716,3 +716,13 @@ Validation: git diff --check; docs validation
 Not validated: runtime HTTP behavior, HTTP service startup, tests, provider, real memory stores
 Remaining risk: future implementation must inspect `src/adapters/codex-mcp/http.js` and add targeted tests under a fresh scoped task
 Next safe step: review design packet; if accepted, create/select CM-0550 implementation task
+
+## CM-0549A handoff
+
+Goal: Patch HTTP MCP session TTL/cap/cleanup design with exact implementation preconditions.
+Status: CM_0549A_DESIGN_PACKET_READY_FOR_REVIEW after local validation
+Changed files: docs/CM-0549_HTTP_SESSION_HARDENING_DESIGN.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: git diff --check; docs validation
+Not validated: runtime HTTP behavior, tests, HTTP service startup, provider, real memory stores
+Remaining risk: future implementation must still be selected as a fresh scoped task
+Next safe step: review CM-0549A; if accepted, select implementation task explicitly

@@ -254,3 +254,10 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: CM_0549_DESIGN_PACKET_READY_FOR_REVIEW.
 - Boundary: docs/design only; no runtime code, tests, HTTP service startup, provider call, real memory scan, durable memory write, package change, push, tag, release, deploy, cutover, or readiness claim.
 - Next safe step: review CM-0549 before selecting CM-0550 implementation candidate.
+
+## CM-0549A HTTP session hardening design patch
+
+- Current state: CM-0549 design packet patched with exact defaults, ranges, invalid env fallback, TTL semantics, 429 cap error shape, and expanded test matrix.
+- Decision: CM_0549A_DESIGN_PACKET_READY_FOR_REVIEW.
+- Boundary: docs/design only; no runtime code, tests, HTTP service startup, provider call, real memory scan, durable memory write, package change, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: review CM-0549A before selecting HTTP runtime implementation.

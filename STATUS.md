@@ -249,3 +249,15 @@ HTTP MCP session TTL/cap/cleanup hardening has been captured as a docs/design-on
 No runtime code, tests, package files, HTTP service, provider, real memory store, durable write, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim changed in this slice.
 
 Next safe step: review the design packet before selecting any runtime implementation task.
+
+## CM-0549A HTTP session hardening design patch
+
+Status: CM_0549A_DESIGN_PACKET_READY_FOR_REVIEW
+Result: CM_0549A_DESIGN_PACKET_READY_FOR_REVIEW
+State: NOT_READY_BLOCKED
+
+CM-0549 has been patched with exact defaults, accepted ranges, invalid env fallback behavior, absolute/idle TTL semantics, HTTP 429 cap error shape, and additional test-matrix cases.
+
+No runtime code, tests, HTTP service startup, provider call, real memory scan, durable write, package change, push, tag, release, deploy, or readiness claim changed in this slice.
+
+Next safe step: review CM-0549A before selecting any HTTP runtime implementation task.
