@@ -1,0 +1,110 @@
+{
+  "version": "phase-f-lightmemo-directory-semantics-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "realMemoryStoreRead": false,
+  "durableStateMutated": false,
+  "scenarios": [
+    {
+      "scenarioId": "maid-basic-directory-scope",
+      "queryShape": "maid",
+      "directoryIntent": "select one explicit maid directory scope",
+      "expectedScopes": ["maid:project-alpha"],
+      "blockedScopes": ["folder:project-alpha-notes", "all_knowledge_bases"],
+      "aliasMap": {},
+      "excludedFolders": [],
+      "searchAllKnowledgeBases": false,
+      "donorCompatibilityNote": "LightMemo maid intent should not silently widen to folder or all-KB recall.",
+      "mustNotClaim": ["runtime parity", "real LightMemo recall validated", "RC_READY"]
+    },
+    {
+      "scenarioId": "folder-basic-directory-scope",
+      "queryShape": "folder",
+      "directoryIntent": "select one explicit folder scope",
+      "expectedScopes": ["folder:project-alpha-notes"],
+      "blockedScopes": ["maid:project-alpha", "maid:project-beta"],
+      "aliasMap": {},
+      "excludedFolders": [],
+      "searchAllKnowledgeBases": false,
+      "donorCompatibilityNote": "Folder intent should remain folder-scoped unless an explicit alias map says otherwise.",
+      "mustNotClaim": ["runtime parity", "real LightMemo recall validated", "RC_READY"]
+    },
+    {
+      "scenarioId": "maid-and-folder-or-scope",
+      "queryShape": "maid AND (folder1 OR folder2)",
+      "directoryIntent": "select exact maid plus explicit allowed folder set",
+      "expectedScopes": ["maid:project-alpha", "folder:folder1", "folder:folder2"],
+      "blockedScopes": ["folder:folder3", "maid:project-beta", "all_knowledge_bases"],
+      "aliasMap": {},
+      "excludedFolders": [],
+      "searchAllKnowledgeBases": false,
+      "donorCompatibilityNote": "Compound directory intent must honor the OR set without leaking outside it.",
+      "mustNotClaim": ["runtime parity", "real LightMemo recall validated", "RC_READY"]
+    },
+    {
+      "scenarioId": "search-all-knowledge-bases-explicit",
+      "queryShape": "search_all_knowledge_bases=true",
+      "directoryIntent": "explicit all knowledge base search",
+      "expectedScopes": ["all_knowledge_bases"],
+      "blockedScopes": ["implicit_all_kb_from_broad_query"],
+      "aliasMap": {},
+      "excludedFolders": [],
+      "searchAllKnowledgeBases": true,
+      "donorCompatibilityNote": "All-KB behavior must be explicit, not inferred from a broad or ambiguous query.",
+      "mustNotClaim": ["runtime parity", "real LightMemo recall validated", "RC_READY"]
+    },
+    {
+      "scenarioId": "excluded-folder-respected",
+      "queryShape": "folder with excluded folders",
+      "directoryIntent": "select folder scope while excluding named subfolders",
+      "expectedScopes": ["folder:project-alpha-notes"],
+      "blockedScopes": ["folder:project-alpha-notes/private", "folder:project-alpha-notes/archive"],
+      "aliasMap": {},
+      "excludedFolders": ["private", "archive"],
+      "searchAllKnowledgeBases": false,
+      "donorCompatibilityNote": "Excluded folders should remain blocked even when parent folder intent matches.",
+      "mustNotClaim": ["runtime parity", "real LightMemo recall validated", "RC_READY"]
+    },
+    {
+      "scenarioId": "directory-alias-map-explicit",
+      "queryShape": "directory alias map",
+      "directoryIntent": "resolve alias only through explicit alias map evidence",
+      "expectedScopes": ["folder:canonical-research-notes"],
+      "blockedScopes": ["folder:research-random", "fuzzy_alias_expansion"],
+      "aliasMap": {
+        "research": "folder:canonical-research-notes"
+      },
+      "excludedFolders": [],
+      "searchAllKnowledgeBases": false,
+      "donorCompatibilityNote": "Alias behavior must be evidence-backed and deterministic, not fuzzy expansion.",
+      "mustNotClaim": ["runtime parity", "real LightMemo recall validated", "RC_READY"]
+    },
+    {
+      "scenarioId": "cross-directory-overreach-negative",
+      "queryShape": "broad directory-like query",
+      "directoryIntent": "reject implicit cross-directory widening",
+      "expectedScopes": ["folder:explicit-requested-scope"],
+      "blockedScopes": ["maid:unrelated", "folder:unrelated", "all_knowledge_bases"],
+      "aliasMap": {},
+      "excludedFolders": [],
+      "searchAllKnowledgeBases": false,
+      "donorCompatibilityNote": "Broad natural-language directory hints should not become silent global recall.",
+      "mustNotClaim": ["runtime parity", "real LightMemo recall validated", "RC_READY"]
+    },
+    {
+      "scenarioId": "readiness-overclaim-rejected",
+      "queryShape": "safety case",
+      "directoryIntent": "fixture-only evidence boundary",
+      "expectedScopes": ["synthetic_fixture_only"],
+      "blockedScopes": ["runtime VCP parity", "real LightMemo recall validated", "RC_READY"],
+      "aliasMap": {},
+      "excludedFolders": [],
+      "searchAllKnowledgeBases": false,
+      "donorCompatibilityNote": "Fixture evidence must not be converted into runtime parity or readiness claims.",
+      "mustNotClaim": ["runtime VCP parity", "real LightMemo recall validated", "runtimeReady=true", "finalRcMatrixReady=true", "rcReady=true", "RC_READY"]
+    }
+  ]
+}

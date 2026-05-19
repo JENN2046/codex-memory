@@ -257,3 +257,7 @@ Phase F VCP parity fixture coverage gap review prepared as a local-safe docs/boa
 ## CM-0543 Monthly Update
 
 Phase F LightMemo directory semantics fixture plan prepared as a local-safe docs/board slice. It defines future synthetic coverage for maid/folder/alias/excluded-folder/all-KB behavior while keeping real LightMemo recall, real-store reads, public MCP expansion, durable writes, and readiness claims blocked. Status remains NOT_READY_BLOCKED.
+
+## CM-0544 Monthly Update
+
+Phase F LightMemo directory semantics synthetic fixture contract added as local fixture/test-only work. It keeps real LightMemo recall, real-store reads, public MCP expansion, durable writes, and readiness claims blocked. Status remains NOT_READY_BLOCKED.

@@ -665,3 +665,14 @@ Validation: pending docs validation, diff check, readiness scan.
 Not validated: runtime behavior, real LightMemo recall, real memory stores, provider, HTTP observe, public MCP schema.
 Remaining risks: future CM-0544 must remain synthetic fixture/test-only.
 Next safe step: CM-0544 synthetic fixture contract.
+
+## CM-0544 Handoff
+
+Goal: add Phase F LightMemo directory semantics synthetic fixture contract.
+Workspace: A:\codex-memory.
+Current area: P7-vcp-parity-hardening.
+Changed files: LightMemo fixture JSON, structure-only test, fixture-test doc, and docs/board status files.
+Validation: pending targeted fixture test, docs validation, diff check, readiness scan.
+Not validated: runtime behavior, real LightMemo recall, real memory stores, provider, HTTP observe, public MCP schema.
+Remaining risks: fixture evidence must not be treated as runtime LightMemo parity proof.
+Next safe step: CM-0545 LightMemo fixture closeout review.

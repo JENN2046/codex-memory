@@ -201,3 +201,5 @@
 - CM-0542: Phase F VCP parity fixture coverage gap review drafted; status remains NOT_READY_BLOCKED; next local-safe candidate is CM-0543 LightMemo directory semantics fixture plan.
 
 - CM-0543: Phase F LightMemo directory semantics fixture plan drafted; status remains NOT_READY_BLOCKED; next local-safe candidate is CM-0544 synthetic fixture contract.
+
+- CM-0544: Phase F LightMemo directory semantics synthetic fixture contract added; status remains NOT_READY_BLOCKED; next local-safe candidate is CM-0545 fixture closeout review.
