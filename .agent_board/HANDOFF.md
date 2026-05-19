@@ -2,7 +2,7 @@
 
 ## Goal
 
-Prepare the A5-GAP-1 durable audit writer approval packet. Keep all runtime/A5 boundaries blocked until exact approval is provided.
+Record the approved A5-GAP-1 durable audit writer evidence. Keep all remaining runtime/A5 boundaries blocked until exact approval is provided.
 
 ## Workspace
 
@@ -14,11 +14,11 @@ Prepare the A5-GAP-1 durable audit writer approval packet. Keep all runtime/A5 b
 
 ## Worktree
 
-Current local `main` is ahead of `origin/main` and contains intended A5-GAP-1 durable audit writer packet docs/board updates until validation and guarded commit complete. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
+Current local `main` is ahead of `origin/main` and contains intended A5-GAP-1 durable audit writer evidence docs/board updates until validation and guarded commit complete. The runtime audit stream under ignored `logs/*.jsonl` has one approved sanitized audit append. Exact current `HEAD` and worktree state must still be verified with `git status -sb` / `git log --oneline --decorate -n 10` before new work.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 durable audit writer preflight packet.
+P8 memory-governance / P10 observability-admin; A5-GAP-1 durable audit writer evidence.
 
 ## Current Truth
 
@@ -34,7 +34,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 durable audit writer pr
 - Local A4 repair is complete and recorded in [docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md](/A:/codex-memory/docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md). It updates stale test expectations to match explicit recall isolation hiding terminal lifecycle statuses before lifecycle soft read policy. Validation passed: lifecycle read-policy `6/6`, policy preflight `5/5`, full `npm test` `1573/1573`, and `git diff --check`. Fresh A5-GAP-5 rerun is still not approved or executed.
 - A5-GAP-5 rerun is now approved and executed for `ddb1e7db8a83337f89b142578f7df9e4faff46ac`, and recorded in [docs/P66_A5_GAP_5_RERUN_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_RERUN_STRICT_GATE_EVIDENCE.md). Result: `TARGET_BOUND_GATE_PASSED_NOT_RC_READY`; health ok, contract `15/15`, test `1573/1573`, compare `43/43`, rollback `43/43`. Fresh A5-GAP-6 aggregation refresh is the next safest A5 step, but it still requires exact approval.
 - A5-GAP-6 post-GAP5 aggregation refresh is now approved and executed for `dcdad612b024876cf1137c5193af4e9c10607791`, and recorded in [docs/P66_A5_GAP_6_POST_GAP5_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GAP5_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP5_RUNTIME_STILL_BLOCKED`; summary accepted, locally evidenced count `5`, remaining count `6`, `commandsExecutedByAggregator=false`, readiness flags false. The next safe move is to prepare the next exact A5 packet for one of the remaining six gap/limitation items; no new runtime action is authorized by this record.
-- A5-GAP-1 durable audit writer approval packet is now prepared as [docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests one sanitized subject-bound durable audit writer smoke, and performs no runtime action or durable write in this slice. Next action is exact human approval or another local preflight packet.
+- A5-GAP-1 durable audit writer approval packet is now approved/executed and linked to [docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_EVIDENCE.md). The approved smoke wrote exactly one sanitized audit record through `AuditLogStore.appendWriteAudit()` to `logs/codex-memory-bridge.jsonl`; `appendedLineCount=1`, `readbackFound=true`, `readbackExactHashFound=true`, `durableMemoryWritten=false`, and recall audit unchanged. The next safe A5 move is a fresh A5-GAP-6 aggregation request consuming this new evidence; no such aggregation or additional runtime action is authorized yet.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`; post-commit board reconciliation is committed locally in `12e6666`.
 - P57-T1 recall isolation runtime proof boundary inventory is implemented, validated, and committed locally in `c89a772`; post-commit board reconciliation is committed locally in `19ad34b`.

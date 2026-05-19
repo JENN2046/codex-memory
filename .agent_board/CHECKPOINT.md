@@ -2,11 +2,11 @@
 
 ## Current Goal
 
-Prepare the A5-GAP-1 durable audit writer approval packet. Preserve all runtime/A5 hard stops.
+Record the approved A5-GAP-1 durable audit writer evidence. Preserve all remaining runtime/A5 hard stops.
 
 ## Current Area
 
-P8 memory-governance / P10 observability-admin; A5-GAP-1 durable audit writer preflight packet.
+P8 memory-governance / P10 observability-admin; A5-GAP-1 durable audit writer evidence.
 
 ## Current Status
 
@@ -23,7 +23,7 @@ P8 memory-governance / P10 observability-admin; A5-GAP-1 durable audit writer pr
 - Local A4 repair is now complete and recorded in [docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md](/A:/codex-memory/docs/P66_A4_STRICT_GATE_TEST_FAILURE_REPAIR.md). Root cause: stale tests still expected terminal lifecycle records to remain visible by default, while explicit recall isolation now hides `rejected`, `superseded`, and `tombstoned` before lifecycle soft read policy. Updated tests only; production behavior preserved. Validation passed: lifecycle read-policy `6/6`, policy preflight `5/5`, full `npm test` `1573/1573`, and `git diff --check`.
 - A5-GAP-5 rerun has now been approved and executed for `ddb1e7db8a83337f89b142578f7df9e4faff46ac`, and recorded in [docs/P66_A5_GAP_5_RERUN_STRICT_GATE_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_5_RERUN_STRICT_GATE_EVIDENCE.md). Result: `TARGET_BOUND_GATE_PASSED_NOT_RC_READY`; health ok, contract `15/15`, test `1573/1573`, compare `43/43`, rollback `43/43`; no remote write or cutover occurred.
 - A5-GAP-6 post-GAP5 evidence-only aggregation refresh has now been approved and executed for `dcdad612b024876cf1137c5193af4e9c10607791`, and recorded in [docs/P66_A5_GAP_6_POST_GAP5_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md](/A:/codex-memory/docs/P66_A5_GAP_6_POST_GAP5_VALIDATION_AGGREGATOR_EVIDENCE_EVALUATION.md). Result: `EXECUTED_APPROVED_EVIDENCE_CONSUMED_AFTER_A5_GAP5_RUNTIME_STILL_BLOCKED`; summary accepted, locally evidenced count `5`, remaining count `6`, `commandsExecutedByAggregator=false`, readiness flags false.
-- A5-GAP-1 durable audit writer approval packet is now prepared as [docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_APPROVAL_PACKET.md). It is `DRAFT_NOT_APPROVED`, requests one sanitized subject-bound durable audit writer smoke, and performs no runtime action or durable write in this slice.
+- A5-GAP-1 durable audit writer approval packet is now approved/executed and points to [docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_EVIDENCE.md](/A:/codex-memory/docs/P66_A5_GAP_1_DURABLE_AUDIT_WRITER_EVIDENCE.md). The approved smoke wrote exactly one sanitized audit line to `logs/codex-memory-bridge.jsonl` through `AuditLogStore.appendWriteAudit()`, with `readbackFound=true`, `readbackExactHashFound=true`, `durableMemoryWritten=false`, and recall audit unchanged. This is not durable memory writer readiness, production governance readiness, runtime readiness, cutover readiness, or `RC_READY`.
 - P51-T1 through P56-T1 are locally committed through `a31ff3a`.
 - P56-T2 governance loop explicit-input helper is implemented, validated, and committed locally in `f69fbbb`.
 - P56-T2 post-commit board reconciliation is locally committed in `12e6666`.
