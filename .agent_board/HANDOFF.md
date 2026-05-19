@@ -2,7 +2,7 @@
 
 ## Goal
 
-Prepare `MONTHLY_PLAN_2026_06` from the completed `RC_PRECHECK_001` push-readiness report; keep `CMB-0006` open and stop before A5/push boundaries.
+Record exact `A5-RC-PRECHECK-READONLY` execution for `RC_PRECHECK_001`; keep project `NOT_READY_BLOCKED` and stop before recall, aggregation execution, push, or cutover.
 
 ## Workspace
 
@@ -14,7 +14,7 @@ Prepare `MONTHLY_PLAN_2026_06` from the completed `RC_PRECHECK_001` push-readine
 
 ## Worktree
 
-Current Git reality at monthly-plan start: `## main...origin/main [ahead 8]`; latest local HEAD is `8d3f07b`; `origin/main` remains `103c3ac`.
+Current Git reality at readonly precheck execution: `## main...origin/main [ahead 9]`; latest local HEAD is `a6030f3`; `origin/main` remains `103c3ac`.
 
 ## Current Area
 
@@ -26,9 +26,17 @@ P6 docs-drift / P10 observability-admin; `MONTHLY_PLAN_2026_06` baseline freeze 
 - `MONTHLY_PLAN_2026_06` is the next local planning record.
 - Local anchor is `8d3f07b docs: record rc precheck push readiness`.
 - Local `main` is ahead of `origin/main` by 8 commits; no push is authorized by this record.
-- `CMB-0006` remains the controlling blocker for `CM-0512` and `CM-0513`.
+- `CMB-0006` is closed for readonly execution; `CM-0513` may prepare an aggregation packet but must not execute aggregation without separate exact approval.
 - Default month path: local-safe docs/board/fixture/test-only work; exact A5 approval required for readonly precheck or recall observation.
-- Required status remains `NOT_READY_BLOCKED`.
+- Readonly result is `PRECHECK_PASSED_NOT_RC_READY`; required project status remains `NOT_READY_BLOCKED`.
+
+## RC_PRECHECK_001 Readonly Evidence - 2026-05-19
+
+- Exact approval executed for target `a6030f36b3026d360c6aa99f97a2d1af44365433`.
+- Evidence doc: [docs/RC_PRECHECK_001_READONLY_EVIDENCE.md](/A:/codex-memory/docs/RC_PRECHECK_001_READONLY_EVIDENCE.md).
+- Results: strict gate `status=ok`, contract `15/15`, tests `1574/1574`, compare `43/43`, rollback `43/43`; HTTP observe `status=ok`, health HTTP `200`.
+- Limitation: recall observation not approved/not run; HTTP observe snapshot read-policy status was `config_only_no_recent_audit`; remaining runtime gaps stay open.
+- Next safe step: prepare A5-GAP-6 evidence-only aggregation packet; do not execute it without exact approval.
 ## Current Truth
 
 - P46-P66 pushed baseline, review patch, and later A5 evidence docs are now pushed through `origin/main = 103c3ac`.

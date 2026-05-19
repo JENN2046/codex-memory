@@ -101,3 +101,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1
 ```
 
 State scans must reject current-state overclaims for readiness, approval, stale target, stale ahead/behind, and unsafe push language.
+
+## Week 2 Result - 2026-05-19
+
+`A5-RC-PRECHECK-READONLY` was exactly approved and executed for target `a6030f36b3026d360c6aa99f97a2d1af44365433`.
+
+Evidence: [docs/RC_PRECHECK_001_READONLY_EVIDENCE.md](/A:/codex-memory/docs/RC_PRECHECK_001_READONLY_EVIDENCE.md).
+
+Result: `PRECHECK_PASSED_NOT_RC_READY`.
+
+Project status remains `NOT_READY_BLOCKED`. Recall observation, A5-GAP-6 aggregation execution, push, cutover, A5-GAP-7, and readiness claims remain blocked without separate exact approval.

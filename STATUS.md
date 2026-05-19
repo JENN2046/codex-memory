@@ -4,6 +4,7 @@
 
 ## 当前结论
 
+- 当前 RC_PRECHECK_001 readonly evidence：用户已按 exact approval line 批准并执行 `a6030f36b3026d360c6aa99f97a2d1af44365433` 的 `A5-RC-PRECHECK-READONLY`。结果记录在 [RC_PRECHECK_001 readonly evidence](/A:/codex-memory/docs/RC_PRECHECK_001_READONLY_EVIDENCE.md)：strict gate passed（contract `15/15`，tests `1574/1574`，compare `43/43`，rollback `43/43`），HTTP observe `status=ok` / health `200`，active-memory compare `43/43 matched`，rollback `43/43 rollback-ready`。最高结论仅为 `PRECHECK_PASSED_NOT_RC_READY`；recall observation、A5-GAP-6 aggregation execution、push、cutover、A5-GAP-7 和 readiness claim 均未授权/未执行。
 - 当前 MONTHLY_PLAN_2026_06：本地月初计划已从 `8d3f07b docs: record rc precheck push readiness` 建立；`main...origin/main [ahead 8]`，`origin/main = 103c3ac`；`CMB-0006` 继续阻塞 `CM-0512` / `CM-0513`，默认只推进 local-safe docs/board/fixture/test-only 工作，不 push、不 cutover、不声明 `RC_READY`。
 - `codex-memory` 已是可用的本地 `vcp_codex_memory` runtime：HTTP/stdio MCP、`record_memory` / `search_memory` / `memory_overview`、SQLite shadow store、vector index、audit、active-memory compatibility、DeepMemo / TopicMemo、compare / rollback / gate / observe 工具链均已存在。
 - 当前 RC_PRECHECK_001 weekly status：本地已完成 governance cleanup、target refresh、readonly/recall approval split、以及 no-approval blocker 记录，最新本地锚点为 `86d495a`；`CM-0512` / `CM-0513` 继续被 `CMB-0006` 阻塞，状态保持 `NOT_READY_BLOCKED`。任何 full precheck、recall observation、aggregation、push、release、deploy 或 cutover 仍需 exact approval。

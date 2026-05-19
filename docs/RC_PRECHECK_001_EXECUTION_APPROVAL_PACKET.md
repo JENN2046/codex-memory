@@ -1,10 +1,10 @@
 # RC_PRECHECK_001 Execution Approval Packet
 
-Status: DRAFT_NOT_APPROVED
+Status: READONLY_EXECUTED_RECALL_DRAFT_NOT_APPROVED
 
-Decision: NOT_READY_BLOCKED
+Decision: PRECHECK_PASSED_NOT_RC_READY / NOT_READY_BLOCKED
 
-Prepared target commit at last packet refresh: `8d3f07b6a3b2a7dc7f0cf0d33a6eecfd7f612b62`
+Prepared/executed readonly target commit: `a6030f36b3026d360c6aa99f97a2d1af44365433`
 
 Remote baseline: origin/main = 103c3ac
 
@@ -14,7 +14,7 @@ Execution-time target rule: before any approved full precheck execution, re-read
 
 ## Purpose
 
-Prepare exact-approval boundaries for future RC_PRECHECK_001 evidence capture. This packet is not approval and executes nothing.
+Prepare exact-approval boundaries for future RC_PRECHECK_001 evidence capture. The readonly boundary has now been executed under exact user approval; the recall boundary remains draft/not approved and executes nothing.
 
 ## A1/A2 Local Checks Already Allowed For Precheck Preparation
 
@@ -60,3 +60,7 @@ NOT_READY_BLOCKED
 `
 
 No result may claim `RC_READY`, runtime readiness, final RC readiness, v1 RC readiness, cutover readiness, migration readiness, or production readiness.
+
+## Readonly Execution Result
+
+Exact `A5-RC-PRECHECK-READONLY` approval was executed on 2026-05-19 for `a6030f36b3026d360c6aa99f97a2d1af44365433`. Evidence is recorded in [docs/RC_PRECHECK_001_READONLY_EVIDENCE.md](/A:/codex-memory/docs/RC_PRECHECK_001_READONLY_EVIDENCE.md). Result: `PRECHECK_PASSED_NOT_RC_READY`; project remains `NOT_READY_BLOCKED`.

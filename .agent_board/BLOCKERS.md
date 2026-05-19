@@ -1,13 +1,13 @@
 ## CMB-0006 - RC_PRECHECK_001 exact A5 approval required
 
-- Status: `blocked`
+- Status: `CLOSED_READONLY_EXECUTED_RECALL_NOT_APPROVED`
 - Area: `P10-observability-admin / RC_PRECHECK_001`
-- Blocking tasks: `CM-0512`, `CM-0513`
-- Current local target at blocker creation: `7959acf3cc2242372c7e7d955f017713c4fb7c63`
-- Reason: no exact approval has been provided for `A5-RC-PRECHECK-READONLY` or `A5-RC-PRECHECK-RECALL`.
-- Safe state: packet remains `DRAFT_NOT_APPROVED`; project remains `NOT_READY_BLOCKED`.
-- Do not run: `npm run gate:mainline:strict`, `npm run observe:http -- --json`, active-memory compare/rollback, recall path observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or `A5-GAP-7`.
-- Unblock condition: user provides an exact approval line copied from `docs/RC_PRECHECK_001_EXECUTION_APPROVAL_PACKET.md`, with target refreshed to the then-current `HEAD`.
+- Blocking tasks: none for readonly precheck; recall observation and aggregation execution remain separate approval boundaries
+- Current executed readonly target: `a6030f36b3026d360c6aa99f97a2d1af44365433`
+- Resolution: exact `A5-RC-PRECHECK-READONLY` approval was provided and executed; `A5-RC-PRECHECK-RECALL` was not approved or run.
+- Safe state: readonly evidence recorded as `PRECHECK_PASSED_NOT_RC_READY`; project remains `NOT_READY_BLOCKED`.
+- Do not run without new exact approval: recall path observation, A5-GAP-6 aggregation execution, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable writes, push, tag, release, deploy, cutover, or `A5-GAP-7`.
+- Next boundary: prepare a separate A5-GAP-6 evidence-only aggregation packet, or request separate recall approval with exact subject/query/audit boundary.
 
 # BLOCKERS.md — codex-memory
 
@@ -45,12 +45,8 @@ Stop before:
 
 ## CMB-0007 - Monthly plan remains local-safe until A5 approval
 
-Status: `OPEN`
+Status: `OPEN_AFTER_READONLY_PRECHECK`\r\n\r\nArea: P6-docs-drift / P10-observability-admin\r\n\r\nReason: `A5-RC-PRECHECK-READONLY` has executed, but recall observation, A5-GAP-6 aggregation execution, push, release, deploy, cutover, and readiness claims still require separate exact approval or fully passing A4.8 safe-push policy where applicable.
 
-Area: P6-docs-drift / P10-observability-admin
+Required approval/action: prepare A5-GAP-6 evidence-only aggregation packet, separately approve `A5-RC-PRECHECK-RECALL` with subject/query/audit boundary if needed, or choose local-safe non-A5 Phase F work.
 
-Reason: `MONTHLY_PLAN_2026_06` may prepare precheck evidence chains, but execution of strict gate as RC evidence, HTTP observe, recall observation, active-memory compare/rollback, aggregation, push, release, deploy, or cutover still requires exact approval or fully passing A4.8 safe-push policy where applicable.
-
-Required approval/action: provide exact approval for `A5-RC-PRECHECK-READONLY`, separately approve `A5-RC-PRECHECK-RECALL` with subject/query/audit boundary, or choose local-safe non-A5 Phase F work.
-
-Safe state: `NOT_READY_BLOCKED`; no A5 commands run; no push.
+Safe state: `PRECHECK_PASSED_NOT_RC_READY` for readonly evidence, project remains `NOT_READY_BLOCKED`; no recall, aggregation execution, push, or cutover.

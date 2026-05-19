@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - RC_PRECHECK_001 readonly evidence captured - 2026-05-19
+
+- Status: `PRECHECK_PASSED_NOT_RC_READY`; project decision remains `NOT_READY_BLOCKED`.
+- Target: `a6030f36b3026d360c6aa99f97a2d1af44365433`.
+- Git position during execution: `main...origin/main [ahead 9]`.
+- Commands run under exact approval: Git baseline, `npm run gate:mainline:strict`, `npm run observe:http -- --json`, active-memory compare, active-memory rollback.
+- Results: strict gate passed with tests `1574/1574`, contract `15/15`, compare `43/43`, rollback `43/43`; HTTP observe `status=ok` / health `200`; active-memory compare `43/43 matched`; rollback `43/43 rollback-ready`.
+- Not run: recall path observation, provider calls, real memory broad scans, migration/import/export/backup/restore apply, config/watchdog/startup changes, public MCP expansion, durable memory writes, push/tag/release/deploy/cutover, A5-GAP-7.
+- Next safe step: prepare A5-GAP-6 evidence-only aggregation packet only; execution requires separate exact approval.
 ## Checkpoint - MONTHLY_PLAN_2026_06 baseline freeze - 2026-05-19
 
 - Status: `NOT_READY_BLOCKED`.
