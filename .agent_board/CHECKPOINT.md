@@ -701,3 +701,10 @@ Supreme Commander protocol slice is implemented and validated locally. It adds [
 - Scope: docs-only closeout review for observability/admin and memory-governance fixture packs.
 - Boundary: no runtime/source/test change in this slice, no HTTP observe, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
 - Next: CM-0541 Phase F VCP parity fixture pack integration index.
+
+## CM-0541 Phase F VCP parity fixture pack integration index
+
+- Status: COMPLETED_VALIDATED pending final validation/commit.
+- Scope: docs-only integration index for TagMemo, observability/admin, and memory-governance fixture packs.
+- Boundary: no runtime/source/test change in this slice, no HTTP observe, no governance report execution, no durable memory/audit write, no real memory scan, no provider, no public MCP expansion, no migration/apply, no push, no cutover, no readiness claim.
+- Next: CM-0542 Phase F VCP parity fixture coverage gap review.

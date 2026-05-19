@@ -245,3 +245,7 @@ Phase F memory governance proposal synthetic fixture contract added as local fix
 ## CM-0540 Monthly Update
 
 Phase F governance/observability fixture packs closed locally as synthetic fixture/test evidence. Runtime gaps and A5 hard stops remain open; status remains NOT_READY_BLOCKED.
+
+## CM-0541 Monthly Update
+
+Phase F VCP parity fixture pack integration index prepared as a local-safe docs/board slice. It links TagMemo, observability/admin, and memory-governance fixture packs while keeping runtime parity, durable writes, real-store reads, public MCP expansion, and readiness claims blocked. Status remains NOT_READY_BLOCKED.

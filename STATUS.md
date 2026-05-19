@@ -195,3 +195,5 @@
 - CM-0539: Phase F memory governance proposal synthetic fixture contract added; status remains NOT_READY_BLOCKED; next local-safe candidate is CM-0540 fixture pack closeout review.
 
 - CM-0540: Phase F governance/observability fixture pack closeout review drafted; status remains NOT_READY_BLOCKED; next local-safe candidate is CM-0541 integration index.
+
+- CM-0541: Phase F VCP parity fixture pack integration index drafted; status remains NOT_READY_BLOCKED; next local-safe candidate is CM-0542 fixture coverage gap review.

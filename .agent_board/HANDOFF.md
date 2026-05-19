@@ -632,3 +632,14 @@ Validation: pending combined targeted fixture tests, docs validation, diff check
 Not validated: runtime behavior, HTTP observe, governance report execution, durable memory/audit writes, real stores, public MCP schema.
 Remaining risks: fixture-pack evidence remains synthetic and must not be treated as runtime readiness.
 Next safe step: CM-0541 integration index.
+
+## CM-0541 Handoff
+
+Goal: create Phase F VCP parity fixture pack integration index.
+Workspace: A:\codex-memory.
+Current area: P7-vcp-parity-hardening / P8-memory-governance / P10-observability-admin.
+Changed files: docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md plus docs/board status files.
+Validation: pending combined targeted fixture tests, docs validation, diff check, readiness scan.
+Not validated: runtime behavior, HTTP observe, governance report execution, durable memory/audit writes, real stores, public MCP schema.
+Remaining risks: integration index is discoverability evidence only, not runtime parity evidence.
+Next safe step: CM-0542 fixture coverage gap review.
