@@ -6,6 +6,12 @@ const {
   REQUIRED_SOURCE_REGISTRY_IDS,
   evaluateValidationAggregatorSourceRegistryProof
 } = require('./ValidationAggregatorSourceRegistryProofContract');
+const {
+  EXPECTED_MANIFEST_VERSION: EVIDENCE_FRESHNESS_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: EVIDENCE_FRESHNESS_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: EVIDENCE_FRESHNESS_SCHEMA_VERSION,
+  evaluateValidationAggregatorEvidenceFreshnessProof
+} = require('./ValidationAggregatorEvidenceFreshnessProofContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -63,6 +69,76 @@ function buildSourceRegistryProofInput(patch = {}) {
   };
 }
 
+function buildEvidenceFreshnessProofInput(patch = {}) {
+  const asOf = patch.asOf || '2026-05-20T00:00:00.000Z';
+  const baselineCommit = patch.expectedBaselineCommit ||
+    '0000000000000000000000000000000000000000';
+  const sourceRegistryVersion = patch.expectedSourceRegistryVersion ||
+    'validation-aggregator-source-registry-v1';
+
+  return {
+    schemaVersion: EVIDENCE_FRESHNESS_SCHEMA_VERSION,
+    policyVersion: EVIDENCE_FRESHNESS_POLICY_VERSION,
+    manifestVersion: EVIDENCE_FRESHNESS_MANIFEST_VERSION,
+    explicitInputOnly: true,
+    sourceMode: 'explicit_input',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    asOf,
+    expectedBaselineCommit: baselineCommit,
+    expectedSourceRegistryVersion: sourceRegistryVersion,
+    validationAggregatorFullImplementation: false,
+    publicMcpTools: [...PUBLIC_MCP_TOOLS],
+    evidenceRecords: [
+      {
+        evidence_id: 'validation-aggregator-source-registry-proof',
+        source_id: 'source_registry_proof',
+        source_kind: 'local_safe_collector_unit',
+        source_registry_version: sourceRegistryVersion,
+        baseline_commit: baselineCommit,
+        evidence_generated_at: '2026-05-20T00:00:00.000Z',
+        evidence_validated_at: '2026-05-20T00:00:00.000Z',
+        evidence_observed_hash:
+          '0000000000000000000000000000000000000000000000000000000000000000',
+        validation_status: 'passed',
+        validation_ref: 'tests/validation-aggregator-runtime-proof-collector.test.js'
+      }
+    ],
+    freshnessWindows: [
+      {
+        source_kind: 'local_safe_collector_unit',
+        max_age_ms: 604800000
+      }
+    ],
+    lowRiskSummary: {
+      rawWorkspaceIdExposed: false,
+      rawSecretExposed: false
+    },
+    safety: {
+      readsFiles: false,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      evidenceFreshnessProofReady: false,
+      validationAggregatorFullImplementationReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -103,6 +179,27 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     units.sourceRegistryProof = buildNotSuppliedUnit('source_registry_proof');
   }
 
+  if (hasOwnObject(safeInputs, 'evidenceFreshnessProof')) {
+    const result = evaluateValidationAggregatorEvidenceFreshnessProof(
+      safeInputs.evidenceFreshnessProof
+    );
+    units.evidenceFreshnessProof = {
+      id: 'evidence_freshness_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      evidenceFreshness: result.evidenceFreshness,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.evidenceFreshnessProof = buildNotSuppliedUnit('evidence_freshness_proof');
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -126,6 +223,7 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
       rejectedUnitCount,
       missingUnitCount,
       sourceRegistryProofAccepted: units.sourceRegistryProof.accepted,
+      evidenceFreshnessProofAccepted: units.evidenceFreshnessProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -154,6 +252,7 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
 
 module.exports = {
   COLLECTOR_SCHEMA_VERSION,
+  buildEvidenceFreshnessProofInput,
   buildSourceRegistryProofInput,
   collectValidationAggregatorRuntimeProofUnits
 };
