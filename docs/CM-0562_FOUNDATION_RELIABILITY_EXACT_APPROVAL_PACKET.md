@@ -6,7 +6,7 @@ Date: 2026-05-20
 
 ## Purpose
 
-This packet prepares the next Phase 1 Foundation Reliability gate after CM-0558, CM-0560, and CM-0561.
+This packet prepares the next Phase 1 Foundation Reliability gate after CM-0558, CM-0560, CM-0561, CM-0563, and CM-0564.
 
 It does not execute validation.
 
@@ -22,17 +22,24 @@ Current preparation baseline:
 
 ```text
 branch: main
-prep HEAD: 6a147b514ed109b284305c0fdf1609ac9cc26feb
+prep HEAD: 77dec659d9a16b9795eab7fb1e9bf88798bcdc7c
 current status: RC_NOT_READY_BLOCKED
+```
+
+Current refresh note:
+
+```text
+docs/CM-0565_FOUNDATION_RELIABILITY_EXACT_APPROVAL_BASELINE_REFRESH.md
 ```
 
 Baseline rule:
 
 ```text
-Before execution, re-read git status, current HEAD, origin/main, and this packet.
+Before execution, re-read git status, current HEAD, origin/main, remote main, this packet, and the current refresh note.
 If HEAD changed after this packet, rebind the target baseline explicitly before executing.
 Docs/board-only drift may be accepted only if inspected and named.
 Any src/tests/package/runtime drift requires a fresh approval packet or explicit re-approval.
+If live remote verification fails, execution remains blocked until remote main can be verified.
 ```
 
 ## Scope
