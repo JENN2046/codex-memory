@@ -40,6 +40,7 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 4. Use `docs/RC_PRECHECK_002_PLAN.md` as a planning-only packet; do not execute `RC_PRECHECK_002` without future exact approval naming target and commands.
 5. Any precheck pass remains precheck evidence, not readiness.
 6. Use `docs/A5_ENABLEMENT_OBSTACLE_CLEARANCE_001.md` as the current A5 startup obstacle map; it does not execute A5 or close runtime gaps.
+7. Use `docs/CM-0557_JSONRPC_NO_TOKEN_MUTATION_REJECTION_PLAN.md` as the CM-0557 to CM-0559 repair runway entry point; it does not authorize true `record_memory`, true `search_memory`, real memory scans, durable writes, or readiness claims.
 
 ## Hard Boundary
 
@@ -179,4 +180,14 @@ This table does not authorize:
 - A5 is narrowed to exact-approval execution units, not a standing always-on mode.
 - Recommended next exact A5 unit is `AUTH_WRITE_PATH_VALIDATION_001`.
 - This obstacle clearance does not execute provider calls, real memory broad scans, durable memory/audit writes, config switch, migration/backup apply, public MCP expansion, push/tag/release/deploy/cutover, or readiness claims.
+- Controlling state remains RC_NOT_READY_BLOCKED.
+
+## CM-0557 JSON-RPC No-Token Mutation Rejection Plan - 2026-05-20
+
+- Result: CM_0557_PLAN_READY_FOR_COMMIT.
+- Plan doc: `docs/CM-0557_JSONRPC_NO_TOKEN_MUTATION_REJECTION_PLAN.md`.
+- Scope: local repair runway for no-token `record_memory` rejection envelope and `search_memory` timeout read-only analysis.
+- `record_memory` no-token rejection should keep HTTP 403 while returning a JSON-RPC error envelope.
+- `search_memory` timeout remains an independent read-only chain-analysis item.
+- No true `record_memory`, true `search_memory`, `.jsonl` read, real memory scan, durable write/audit write, provider call, config switch, migration/import/export/backup/restore apply, public MCP expansion, package change, push/tag/release/deploy/cutover, or readiness claim is authorized.
 - Controlling state remains RC_NOT_READY_BLOCKED.
