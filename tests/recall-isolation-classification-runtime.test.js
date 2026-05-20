@@ -340,3 +340,84 @@ test('recall aggregation and audit projection drop isolated results', async () =
   assert.deepEqual(entry.memoryIds, ['mem-normal']);
   assert.equal(isRecallIsolated(entry), false);
 });
+
+test('recall pipeline abort should skip recall audit side effect', async () => {
+  const controller = new AbortController();
+  let auditRecordCount = 0;
+  const pipeline = new KnowledgeBaseRecallPipeline({
+    compatibilitySyntaxAdapter: {
+      parse() {
+        return { query: 'alpha', directives: {}, passiveBlocks: [], activeBlocks: [] };
+      }
+    },
+    timeExpressionParser: {
+      parse() {
+        return [];
+      }
+    },
+    tagMemoEngine: {
+      analyzeQuery() {
+        return { queryText: 'alpha', tokens: ['alpha'], timeRanges: [] };
+      }
+    },
+    contextVectorManager: null,
+    knowledgeBaseSyncService: {
+      async syncTarget() {
+        return { syncToken: '', changed: false };
+      }
+    },
+    candidateGenerator: {
+      async generate() {
+        return {
+          searchPlan: { finalLimit: 5, semanticPoolSize: 5, useTime: false, useRerank: false },
+          semanticCandidates: [{
+            chunkId: 'normal-1',
+            memoryId: 'mem-normal',
+            target: 'process',
+            title: 'Alpha feature',
+            text: 'alpha implementation detail',
+            tags: ['feature'],
+            score: 0.9,
+            source: 'rag'
+          }],
+          timeCandidates: [],
+          allCandidates: []
+        };
+      }
+    },
+    rerankService: {
+      config: {}
+    },
+    recallAuditService: {
+      async record() {
+        auditRecordCount += 1;
+      }
+    },
+    recallEnhancer: {
+      enhance(results) {
+        controller.abort();
+        return results;
+      }
+    },
+    shadowStore: {
+      async getRecordsByIds(ids) {
+        return ids.map(id => baseRecord({
+          memoryId: id,
+          title: 'Alpha feature',
+          tags: ['feature']
+        }));
+      }
+    }
+  });
+
+  await assert.rejects(
+    () => pipeline.search({
+      query: 'alpha',
+      target: 'process',
+      limit: 5,
+      signal: controller.signal
+    }),
+    error => error?.code === 'SEARCH_MEMORY_TIMEOUT'
+  );
+  assert.equal(auditRecordCount, 0);
+});
