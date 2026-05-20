@@ -3,8 +3,8 @@
 Status: CURRENT_RUNTIME_TRUTH_TABLE
 Decision: NOT_READY_BLOCKED
 Scope: authoritative current runtime gap dashboard
-Local baseline: `47d23345c04f5e15433149620558e87a2fd56c1e`
-Remote baseline: `47d23345c04f5e15433149620558e87a2fd56c1e` after CM-0560 search timeout boundary push sync; must be re-read before push, precheck, release, or cutover-sensitive work
+Runtime change baseline: `47d23345c04f5e15433149620558e87a2fd56c1e`
+Branch-head rule: latest local/remote branch head must be re-read with Git before push, precheck, release, or cutover-sensitive work; docs/board reconciliation commits after the runtime baseline do not change runtime readiness.
 
 ## Purpose
 
