@@ -131,3 +131,16 @@ This table does not authorize:
 - forbidden actions all remained `no`.
 - final state: NOT_READY_BLOCKED.
 - This dogfood compare/rollback closeout does not change any `complete?` value in the truth table and does not establish runtime, production, cutover, or RC readiness.
+
+## DOGFOOD_SUMMARY_001 - 2026-05-20
+
+- Result: DOGFOOD_SUMMARY_001_READY_FOR_COMMIT.
+- Summary doc: `docs/DOGFOOD_SUMMARY_001.md`.
+- DOGFOOD_001 through DOGFOOD_004 are summarized by command, result, evidence, and forbidden-item preservation.
+- All four rounds remain `NOT_RC_READY`.
+- Controlling state remains NOT_READY_BLOCKED.
+- Real rollback remains A5 blocked.
+- V8 is not implemented.
+- VCP full parity is not claimed.
+- This summary does not change any `complete?` value in the truth table.
+- This summary does not authorize DOGFOOD_005/006/007, provider calls, real memory scans, durable memory/audit writes, config switch, migration/backup apply, public MCP expansion, push/tag/release/deploy, cutover, real rollback, or readiness claims.

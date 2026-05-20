@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | AGENTS v0.3.1 compatibility note post-push reconciliation |
-| Current area | P6-docs-drift / P10-observability-admin |
-| Last pushed baseline | `ce36258` on `origin/main` |
+| Current task | DOGFOOD_SUMMARY_001 docs/board summary |
+| Current area | P0-mainline-health / P5-rollback-readiness / P10-observability-admin |
+| Last pushed baseline | `3b63814` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Created, validated, committed, and explicitly pushed docs-only AGENTS v0.3.1 compatibility note at `ce36258`; then performed read-only post-push reconciliation. |
-| Last validation | `git status --branch --short`; `git log --oneline --decorate -n 5`; `git ls-remote origin refs/heads/main`; read-only STATUS/RUN_STATE/VALIDATION_LOG reconciliation; project remains `NOT_READY_BLOCKED`. |
-| Worktree summary | Local `main` and `origin/main` were aligned at `ce36258` before this docs/board reconciliation slice; no runtime/source/test change. |
+| Last action | Prepared DOGFOOD_SUMMARY_001 as a docs/board-only summary of DOGFOOD_001 through DOGFOOD_004; all four remain NOT_RC_READY and the project remains `NOT_READY_BLOCKED`. |
+| Last validation | `git diff --check` passed; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed. |
+| Worktree summary | Local `main` and `origin/main` were aligned before this docs/board summary slice; current intended changes are limited to `docs/DOGFOOD_SUMMARY_001.md`, `STATUS.md`, `MAINTENANCE_BACKLOG.md`, `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`, and `.agent_board/*`. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
-| Safe-push readiness | no new push is authorized for this reconciliation slice; do not push automatically |
-| Next planned action | Validate and locally commit this docs/board reconciliation; do not push, tag, release, deploy, cut over, or claim readiness. |
+| Safe-push readiness | no push is authorized for DOGFOOD_SUMMARY_001; do not push automatically |
+| Next planned action | Await explicit stage/commit request for this validated docs-only summary. 中文解释：下一步只适合在用户明确授权后暂存/提交这组已验证的文档/board 变更，不能执行 runtime、real rollback、发布或 readiness claim。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19

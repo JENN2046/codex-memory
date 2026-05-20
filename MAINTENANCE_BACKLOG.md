@@ -567,3 +567,26 @@ Closeout facts:
 - final state: NOT_READY_BLOCKED.
 
 Boundary preserved: no real rollback/reset/restore/revert, provider call, real memory broad scan, durable memory/audit write, migration/backup apply, HTTP observe, config switch, public MCP expansion, src/tests/package change, push/tag/release/deploy/cutover, or readiness claim.
+
+## DOGFOOD_SUMMARY_001
+
+Status: DOGFOOD_SUMMARY_001_READY_FOR_COMMIT
+Area: P0-mainline-health / P5-rollback-readiness / P10-observability-admin
+Risk: A4 docs/board summary only
+
+Summary doc: [docs/DOGFOOD_SUMMARY_001.md](/A:/codex-memory/docs/DOGFOOD_SUMMARY_001.md)
+
+Recorded:
+
+- DOGFOOD_001 result remains `DOGFOOD_COMPLETED_NOT_RC_READY`.
+- DOGFOOD_002 result remains `DOGFOOD_002_COMPLETED_NOT_RC_READY`.
+- DOGFOOD_003 result remains `DOGFOOD_003_HTTP_OBSERVE_COMPLETED_NOT_RC_READY`.
+- DOGFOOD_004 result remains `DOGFOOD_004_COMPARE_ROLLBACK_COMPLETED_NOT_RC_READY`.
+- All four rounds remain `NOT_RC_READY`.
+- Controlling repository state remains `NOT_READY_BLOCKED`.
+- Real rollback remains A5 blocked and requires separate exact approval plus validation plan.
+- V8 is not implemented, so VCP full parity cannot be claimed.
+
+Boundary preserved: no DOGFOOD_005/006/007, provider call, real memory scan, durable memory/audit write, config switch, migration/backup apply, public MCP expansion, push/tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: stage and commit only this docs/board summary after validation passes. 中文解释：下一步只适合提交已验证的汇总记录，不能把四轮 dogfood 证据扩大成发布或 real rollback 授权。
