@@ -105,3 +105,18 @@ This table does not authorize:
 - forbidden actions all remained `no`.
 - final state: NOT_READY_BLOCKED.
 - This dogfood closeout does not change any `complete?` value in the truth table.
+
+## DOGFOOD_003 HTTP Observe Closeout - 2026-05-20
+
+- Result: DOGFOOD_003_HTTP_OBSERVE_COMPLETED_NOT_RC_READY.
+- endpoint: `http://127.0.0.1:7605/health`.
+- HTTP status: `200`.
+- service: `vcp_codex_memory`.
+- auth required: `false`.
+- token posture: no-token local loopback observe only.
+- `noProvider=true`.
+- `mutated=false`.
+- `migrationApplied=false`.
+- SQLite ExperimentalWarning noted.
+- final state: NOT_READY_BLOCKED.
+- This dogfood HTTP observe closeout does not change any `complete?` value in the truth table and does not establish runtime, production, cutover, or RC readiness.

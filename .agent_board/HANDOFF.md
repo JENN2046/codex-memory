@@ -916,3 +916,14 @@ Evidence recorded: branch `main...origin/main [ahead 16]`; HEAD `f4d4097`; diff 
 Not validated: HTTP observe, compare/rollback, provider calls, real memory scan, durable memory/audit write, config switch, migration/backup apply, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, readiness.
 Remaining risk: DOGFOOD_002 is not RC readiness; project remains NOT_READY_BLOCKED.
 Next safe step: staged review and local commit if requested; no push or readiness claim.
+
+## DOGFOOD_003 HTTP observe closeout handoff
+
+Goal: Record approved DOGFOOD_003 HTTP observe evidence without starting HTTP or expanding into runtime/release work.
+Status: DOGFOOD_003_HTTP_OBSERVE_COMPLETED_NOT_RC_READY.
+Changed files: STATUS.md; MAINTENANCE_BACKLOG.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; .agent_board/*
+Validation: git diff --check and docs validation for this closeout notes slice.
+Evidence recorded: endpoint `http://127.0.0.1:7605/health`; HTTP status `200`; service `vcp_codex_memory`; auth required `false`; token posture no-token local loopback observe only; `noProvider=true`; `mutated=false`; `migrationApplied=false`; SQLite ExperimentalWarning noted.
+Not validated: service startup, compare/rollback, provider calls, real memory scan, durable memory/audit write, config switch, migration/backup apply, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, readiness.
+Remaining risk: HTTP observe is dogfood evidence only, not RC/runtime/production readiness; project remains NOT_READY_BLOCKED.
+Next safe step: staged review and local commit if requested; no push or readiness claim.

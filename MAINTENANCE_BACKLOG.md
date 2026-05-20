@@ -529,3 +529,24 @@ Closeout facts:
 - final state: NOT_READY_BLOCKED.
 
 Boundary preserved: no HTTP observe, compare/rollback, provider call, real memory scan, durable memory/audit write, config switch, migration/backup apply, public MCP expansion, src/tests/package change, push/tag/release/deploy/cutover, or readiness claim.
+
+## DOGFOOD_003 HTTP observe closeout notes
+
+Status: DOGFOOD_003_HTTP_OBSERVE_COMPLETED_NOT_RC_READY
+Area: P4-http-runtime / P10-observability-admin
+Risk: approved HTTP observe only; no service startup
+
+Closeout facts:
+
+- endpoint: `http://127.0.0.1:7605/health`.
+- HTTP status: `200`.
+- service: `vcp_codex_memory`.
+- auth required: `false`.
+- token posture: no-token local loopback observe only.
+- `noProvider=true`.
+- `mutated=false`.
+- `migrationApplied=false`.
+- SQLite ExperimentalWarning noted.
+- final state: NOT_READY_BLOCKED.
+
+Boundary preserved: no HTTP startup, provider call, real memory scan, durable memory/audit write, compare/rollback, config switch, migration/backup apply, public MCP expansion, src/tests/package change, push/tag/release/deploy/cutover, or readiness claim.
