@@ -495,3 +495,25 @@ Recorded:
 - final state: NOT_READY_BLOCKED.
 
 Forbidden actions not touched: push/tag/release/deploy, provider call, real memory scan, durable memory/audit write, HTTP observe, compare/rollback, src/tests/package changes, and readiness claims.
+
+## DOGFOOD_002 closeout notes
+
+Status: DOGFOOD_002_COMPLETED_NOT_RC_READY
+Result: DOGFOOD_002_COMPLETED_NOT_RC_READY
+State: NOT_READY_BLOCKED
+
+Recorded:
+
+- branch: `main...origin/main [ahead 16]`.
+- HEAD: `f4d4097`.
+- `git diff --check` passed.
+- docs validation passed.
+- `STATUS.md` read confirmed.
+- `MAINTENANCE_BACKLOG.md` read confirmed.
+- `docs/DOGFOOD_001_LOCAL_SCOPED_NON_RELEASE_PLAN.md` read confirmed.
+- `docs/LOCAL_RC_CANDIDATE_001.md` read confirmed.
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` read confirmed.
+- forbidden actions all remained `no`.
+- final state: NOT_READY_BLOCKED.
+
+Forbidden actions not touched: HTTP observe, compare/rollback, provider call, real memory scan, durable memory/audit write, config switch, migration/backup apply, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, and readiness claims.

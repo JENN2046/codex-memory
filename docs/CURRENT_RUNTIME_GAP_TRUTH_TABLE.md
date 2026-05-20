@@ -89,3 +89,19 @@ This table does not authorize:
 - forbidden actions all remained `no`.
 - final state: NOT_READY_BLOCKED.
 - This dogfood closeout does not change any `complete?` value in the truth table.
+
+## DOGFOOD_002 Closeout - 2026-05-20
+
+- Result: DOGFOOD_002_COMPLETED_NOT_RC_READY.
+- branch: `main...origin/main [ahead 16]`.
+- HEAD: `f4d4097`.
+- `git diff --check` passed.
+- docs validation passed.
+- `STATUS.md` read confirmed.
+- `MAINTENANCE_BACKLOG.md` read confirmed.
+- `docs/DOGFOOD_001_LOCAL_SCOPED_NON_RELEASE_PLAN.md` read confirmed.
+- `docs/LOCAL_RC_CANDIDATE_001.md` read confirmed.
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` read confirmed.
+- forbidden actions all remained `no`.
+- final state: NOT_READY_BLOCKED.
+- This dogfood closeout does not change any `complete?` value in the truth table.
