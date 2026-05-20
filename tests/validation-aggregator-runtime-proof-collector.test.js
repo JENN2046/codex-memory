@@ -12,6 +12,7 @@ const {
   buildEvidenceFreshnessProofInput,
   buildMissingStaleEvidenceFailClosedProofInput,
   buildNoTouchBoundaryProofInput,
+  buildReadinessOverclaimRejectionProofInput,
   buildRuntimeEvidenceSummaryNormalizationProofInput,
   buildSourceRegistryProofInput,
   buildUnsupportedSourceFailClosedProofInput,
@@ -28,10 +29,10 @@ test('runtime proof collector waits for explicit inputs without claiming readine
   assert.equal(report.fullImplementationComplete, false);
   assert.equal(report.status, 'runtime_proof_collector_waiting_for_explicit_evidence');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
-  assert.equal(report.summary.availableUnitCount, 7);
+  assert.equal(report.summary.availableUnitCount, 8);
   assert.equal(report.summary.executedUnitCount, 0);
   assert.equal(report.summary.acceptedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 7);
+  assert.equal(report.summary.missingUnitCount, 8);
   assert.equal(report.units.sourceRegistryProof.status, 'not_supplied');
   assert.equal(report.units.evidenceFreshnessProof.status, 'not_supplied');
   assert.equal(report.units.baselineBindingProof.status, 'not_supplied');
@@ -39,6 +40,7 @@ test('runtime proof collector waits for explicit inputs without claiming readine
   assert.equal(report.units.missingStaleEvidenceFailClosedProof.status, 'not_supplied');
   assert.equal(report.units.unsupportedSourceFailClosedProof.status, 'not_supplied');
   assert.equal(report.units.noTouchBoundaryProof.status, 'not_supplied');
+  assert.equal(report.units.readinessOverclaimRejectionProof.status, 'not_supplied');
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
@@ -61,7 +63,7 @@ test('runtime proof collector executes source registry proof from explicit sanit
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 6);
+  assert.equal(report.summary.missingUnitCount, 7);
   assert.equal(report.summary.sourceRegistryProofAccepted, true);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -69,6 +71,7 @@ test('runtime proof collector executes source registry proof from explicit sanit
   assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
   assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
   assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
   assert.equal(report.units.sourceRegistryProof.executed, true);
   assert.equal(report.units.sourceRegistryProof.accepted, true);
   assert.equal(report.units.sourceRegistryProof.status, 'source_registry_proof_accepted_runtime_still_blocked');
@@ -88,7 +91,7 @@ test('runtime proof collector executes evidence freshness proof from explicit sa
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 6);
+  assert.equal(report.summary.missingUnitCount, 7);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, true);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -96,6 +99,7 @@ test('runtime proof collector executes evidence freshness proof from explicit sa
   assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
   assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
   assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
   assert.equal(report.units.evidenceFreshnessProof.executed, true);
   assert.equal(report.units.evidenceFreshnessProof.accepted, true);
   assert.equal(
@@ -118,7 +122,7 @@ test('runtime proof collector executes baseline binding proof from explicit sani
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 6);
+  assert.equal(report.summary.missingUnitCount, 7);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, true);
@@ -126,6 +130,7 @@ test('runtime proof collector executes baseline binding proof from explicit sani
   assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
   assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
   assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
   assert.equal(report.units.baselineBindingProof.executed, true);
   assert.equal(report.units.baselineBindingProof.accepted, true);
   assert.equal(
@@ -149,7 +154,7 @@ test('runtime proof collector executes runtime evidence summary normalization pr
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 6);
+  assert.equal(report.summary.missingUnitCount, 7);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -157,6 +162,7 @@ test('runtime proof collector executes runtime evidence summary normalization pr
   assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
   assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
   assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
   assert.equal(report.units.runtimeEvidenceSummaryNormalizationProof.executed, true);
   assert.equal(report.units.runtimeEvidenceSummaryNormalizationProof.accepted, true);
   assert.equal(
@@ -186,7 +192,7 @@ test('runtime proof collector executes missing stale evidence fail-closed proof 
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 6);
+  assert.equal(report.summary.missingUnitCount, 7);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -194,6 +200,7 @@ test('runtime proof collector executes missing stale evidence fail-closed proof 
   assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, true);
   assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
   assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
   assert.equal(report.units.missingStaleEvidenceFailClosedProof.executed, true);
   assert.equal(report.units.missingStaleEvidenceFailClosedProof.accepted, true);
   assert.equal(
@@ -220,7 +227,7 @@ test('runtime proof collector executes unsupported source fail-closed proof from
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 6);
+  assert.equal(report.summary.missingUnitCount, 7);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -228,6 +235,7 @@ test('runtime proof collector executes unsupported source fail-closed proof from
   assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
   assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, true);
   assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
   assert.equal(report.units.unsupportedSourceFailClosedProof.executed, true);
   assert.equal(report.units.unsupportedSourceFailClosedProof.accepted, true);
   assert.equal(
@@ -253,7 +261,7 @@ test('runtime proof collector executes no-touch boundary proof from explicit san
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 6);
+  assert.equal(report.summary.missingUnitCount, 7);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -261,6 +269,7 @@ test('runtime proof collector executes no-touch boundary proof from explicit san
   assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
   assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
   assert.equal(report.summary.noTouchBoundaryProofAccepted, true);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
   assert.equal(report.units.noTouchBoundaryProof.executed, true);
   assert.equal(report.units.noTouchBoundaryProof.accepted, true);
   assert.equal(
@@ -278,7 +287,43 @@ test('runtime proof collector executes no-touch boundary proof from explicit san
   assert.equal(report.canClaimV1RcReady, false);
 });
 
-test('runtime proof collector aggregates accepted explicit source registry freshness baseline summary missing-stale unsupported-source and no-touch units', () => {
+test('runtime proof collector executes readiness overclaim rejection proof from explicit sanitized input only', () => {
+  const report = collectValidationAggregatorRuntimeProofUnits({
+    readinessOverclaimRejectionProof:
+      buildReadinessOverclaimRejectionProofInput()
+  });
+
+  assert.equal(report.status, 'runtime_proof_collector_partial_evidence_accepted_not_ready');
+  assert.equal(report.summary.executedUnitCount, 1);
+  assert.equal(report.summary.acceptedUnitCount, 1);
+  assert.equal(report.summary.rejectedUnitCount, 0);
+  assert.equal(report.summary.missingUnitCount, 7);
+  assert.equal(report.summary.sourceRegistryProofAccepted, false);
+  assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
+  assert.equal(report.summary.baselineBindingProofAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryNormalizationProofAccepted, false);
+  assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
+  assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
+  assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, true);
+  assert.equal(report.units.readinessOverclaimRejectionProof.executed, true);
+  assert.equal(report.units.readinessOverclaimRejectionProof.accepted, true);
+  assert.equal(
+    report.units.readinessOverclaimRejectionProof.status,
+    'readiness_overclaim_rejection_proof_accepted_runtime_still_blocked'
+  );
+  assert.equal(
+    report.units.readinessOverclaimRejectionProof.summary.requiredFailClosedCaseCount,
+    18
+  );
+  assert.deepEqual(report.units.readinessOverclaimRejectionProof.failClosedReasons, []);
+  assert.equal(report.units.readinessOverclaimRejectionProof.summary.runtimeGapCount, 7);
+  assert.equal(report.canClaimRuntimeReady, false);
+  assert.equal(report.canClaimFinalRcReady, false);
+  assert.equal(report.canClaimV1RcReady, false);
+});
+
+test('runtime proof collector aggregates accepted explicit source registry freshness baseline summary missing-stale unsupported-source no-touch and overclaim units', () => {
   const report = collectValidationAggregatorRuntimeProofUnits({
     sourceRegistryProof: buildSourceRegistryProofInput(),
     evidenceFreshnessProof: buildEvidenceFreshnessProofInput(),
@@ -289,12 +334,14 @@ test('runtime proof collector aggregates accepted explicit source registry fresh
       buildMissingStaleEvidenceFailClosedProofInput(),
     unsupportedSourceFailClosedProof:
       buildUnsupportedSourceFailClosedProofInput(),
-    noTouchBoundaryProof: buildNoTouchBoundaryProofInput()
+    noTouchBoundaryProof: buildNoTouchBoundaryProofInput(),
+    readinessOverclaimRejectionProof:
+      buildReadinessOverclaimRejectionProofInput()
   });
 
-  assert.equal(report.summary.availableUnitCount, 7);
-  assert.equal(report.summary.executedUnitCount, 7);
-  assert.equal(report.summary.acceptedUnitCount, 7);
+  assert.equal(report.summary.availableUnitCount, 8);
+  assert.equal(report.summary.executedUnitCount, 8);
+  assert.equal(report.summary.acceptedUnitCount, 8);
   assert.equal(report.summary.rejectedUnitCount, 0);
   assert.equal(report.summary.missingUnitCount, 0);
   assert.equal(report.summary.sourceRegistryProofAccepted, true);
@@ -304,6 +351,7 @@ test('runtime proof collector aggregates accepted explicit source registry fresh
   assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, true);
   assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, true);
   assert.equal(report.summary.noTouchBoundaryProofAccepted, true);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, true);
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.v1RcReady, false);
@@ -335,6 +383,38 @@ test('runtime proof collector fails closed when no-touch proof accepts an unsafe
   assert.deepEqual(
     report.units.noTouchBoundaryProof.unsafeCasesNotBlocked,
     ['unsafe_import_detected']
+  );
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
+  assert.equal(report.summary.v1RcReady, false);
+});
+
+test('runtime proof collector fails closed when readiness overclaim input accepts rc-ready', () => {
+  const overclaimInput = buildReadinessOverclaimRejectionProofInput();
+  const report = collectValidationAggregatorRuntimeProofUnits({
+    readinessOverclaimRejectionProof:
+      buildReadinessOverclaimRejectionProofInput({
+        readinessClaims: overclaimInput.readinessClaims.map(item =>
+          item.id === 'rc-ready'
+            ? { ...item, allowed: true }
+            : item
+        )
+      })
+  });
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.summary.executedUnitCount, 1);
+  assert.equal(report.summary.acceptedUnitCount, 0);
+  assert.equal(report.summary.rejectedUnitCount, 1);
+  assert.equal(report.units.readinessOverclaimRejectionProof.accepted, false);
+  assert.equal(
+    report.units.readinessOverclaimRejectionProof.failClosedReasons.includes(
+      'readiness_claim_not_rejected'
+    ),
+    true
+  );
+  assert.deepEqual(
+    report.units.readinessOverclaimRejectionProof.readinessClaimsNotRejected,
+    ['rc-ready']
   );
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.v1RcReady, false);
@@ -549,7 +629,9 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
         buildMissingStaleEvidenceFailClosedProofInput(),
       unsupportedSourceFailClosedProof:
         buildUnsupportedSourceFailClosedProofInput(),
-      noTouchBoundaryProof: buildNoTouchBoundaryProofInput()
+      noTouchBoundaryProof: buildNoTouchBoundaryProofInput(),
+      readinessOverclaimRejectionProof:
+        buildReadinessOverclaimRejectionProofInput()
     }
   });
 
@@ -560,8 +642,8 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
     report.summary.validationAggregatorRuntimeProofCollectorStatus,
     'runtime_proof_collector_partial_evidence_accepted_not_ready'
   );
-  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorAcceptedUnitCount, 7);
-  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorExecutedUnitCount, 7);
+  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorAcceptedUnitCount, 8);
+  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorExecutedUnitCount, 8);
   assert.equal(report.summary.validationAggregatorRuntimeProofCollectorCanClaimV1RcReady, false);
   assert.equal(
     report.evidence.p66ValidationAggregatorRuntimeProofCollector.units.sourceRegistryProof.accepted,
@@ -593,6 +675,11 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
   assert.equal(
     report.evidence.p66ValidationAggregatorRuntimeProofCollector.units
       .noTouchBoundaryProof.accepted,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeProofCollector.units
+      .readinessOverclaimRejectionProof.accepted,
     true
   );
   assert.equal(report.summary.runtimeReady, false);
@@ -638,10 +725,12 @@ test('runtime proof collector does not perform fs, command, provider, or runtime
         buildMissingStaleEvidenceFailClosedProofInput(),
       unsupportedSourceFailClosedProof:
         buildUnsupportedSourceFailClosedProofInput(),
-      noTouchBoundaryProof: buildNoTouchBoundaryProofInput()
+      noTouchBoundaryProof: buildNoTouchBoundaryProofInput(),
+      readinessOverclaimRejectionProof:
+        buildReadinessOverclaimRejectionProofInput()
     });
 
-    assert.equal(report.summary.acceptedUnitCount, 7);
+    assert.equal(report.summary.acceptedUnitCount, 8);
     assert.equal(report.safety.readsFiles, false);
     assert.equal(report.safety.executesCommands, false);
     assert.equal(report.safety.readsRealMemory, false);

@@ -54,6 +54,17 @@ const {
   REQUIRED_TARGET_FAMILIES,
   evaluateValidationAggregatorNoTouchBoundaryProof
 } = require('./ValidationAggregatorNoTouchBoundaryProofContract');
+const {
+  EXPECTED_MANIFEST_VERSION: READINESS_OVERCLAIM_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: READINESS_OVERCLAIM_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: READINESS_OVERCLAIM_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: READINESS_OVERCLAIM_PUBLIC_MCP_TOOLS,
+  REQUIRED_ALLOWED_EVIDENCE_POSTURE,
+  REQUIRED_DISALLOWED_READINESS_POSTURE,
+  REQUIRED_FAIL_CLOSED_CASES: READINESS_OVERCLAIM_REQUIRED_FAIL_CLOSED_CASES,
+  REQUIRED_READINESS_CLAIMS,
+  evaluateValidationAggregatorReadinessOverclaimRejectionProof
+} = require('./ValidationAggregatorReadinessOverclaimRejectionProofContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -505,6 +516,85 @@ function buildNoTouchBoundaryProofInput(patch = {}) {
   };
 }
 
+function buildReadinessOverclaimRejectionProofInput(patch = {}) {
+  const readinessClaims = patch.readinessClaims ||
+    REQUIRED_READINESS_CLAIMS.map(claimId => ({
+      id: claimId,
+      claim: `${claimId}=true`,
+      allowed: false,
+      expectedStatus: claimId === 'rc-ready'
+        ? 'blocked_rc_ready_overclaim'
+        : claimId === 'cutover-ready'
+          ? 'blocked_cutover_overclaim'
+          : 'blocked_readiness_overclaim',
+      expectedDecision: 'NOT_READY_BLOCKED',
+      failClosed: true,
+      readinessAuthority: false,
+      requiredMissingEvidence: [`${claimId}_missing_evidence`]
+    }));
+
+  return {
+    schemaVersion: READINESS_OVERCLAIM_SCHEMA_VERSION,
+    policyVersion: READINESS_OVERCLAIM_POLICY_VERSION,
+    manifestVersion: READINESS_OVERCLAIM_MANIFEST_VERSION,
+    explicitInputOnly: true,
+    sourceMode: 'explicit_metadata_only',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    validationAggregatorFullImplementation: false,
+    publicMcpTools: [...READINESS_OVERCLAIM_PUBLIC_MCP_TOOLS],
+    readinessClaims,
+    runtimeGapStatus: {
+      remainingRuntimeGapCount: 7,
+      allRuntimeGapsClosed: false,
+      closedByThisPhase: 0,
+      mustRemainBlockedWhenGapCountNonZero: true
+    },
+    a5HardStopStatus: {
+      remainingA5HardStopCount: 16,
+      allA5HardStopsCleared: false,
+      clearedByThisPhase: 0,
+      mustRemainBlockedWhenHardStopCountNonZero: true
+    },
+    failClosedCases: [...READINESS_OVERCLAIM_REQUIRED_FAIL_CLOSED_CASES],
+    allowedEvidencePosture: [...REQUIRED_ALLOWED_EVIDENCE_POSTURE],
+    disallowedReadinessPosture: [...REQUIRED_DISALLOWED_READINESS_POSTURE],
+    lowRiskSummary: {
+      rawWorkspaceIdExposed: false,
+      rawSecretExposed: false,
+      rawSourcePayloadExposed: false
+    },
+    safety: {
+      readsEvidenceFiles: false,
+      executesCommands: false,
+      runsGates: false,
+      runsRunners: false,
+      startsServices: false,
+      callsProviders: false,
+      mutatesConfig: false,
+      operatesStartupWatchdog: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      exposesValidateMemoryPublicly: false,
+      remoteWrites: false,
+      tagReleaseDeploy: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      readinessOverclaimRejectionProofReady: false,
+      validationAggregatorFullImplementationReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      cutoverReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -693,6 +783,36 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'readinessOverclaimRejectionProof')) {
+    const result = evaluateValidationAggregatorReadinessOverclaimRejectionProof(
+      safeInputs.readinessOverclaimRejectionProof
+    );
+    units.readinessOverclaimRejectionProof = {
+      id: 'readiness_overclaim_rejection_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      summary: result.summary,
+      missingRequiredReadinessClaims: result.missingRequiredReadinessClaims,
+      duplicateReadinessClaims: result.duplicateReadinessClaims,
+      unknownReadinessClaims: result.unknownReadinessClaims,
+      readinessClaimsNotRejected: result.readinessClaimsNotRejected,
+      missingRequiredFailClosedCases: result.missingRequiredFailClosedCases,
+      duplicateFailClosedCases: result.duplicateFailClosedCases,
+      unknownFailClosedCases: result.unknownFailClosedCases,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.readinessOverclaimRejectionProof = buildNotSuppliedUnit(
+      'readiness_overclaim_rejection_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -726,6 +846,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.unsupportedSourceFailClosedProof.accepted,
       noTouchBoundaryProofAccepted:
         units.noTouchBoundaryProof.accepted,
+      readinessOverclaimRejectionProofAccepted:
+        units.readinessOverclaimRejectionProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -758,6 +880,7 @@ module.exports = {
   buildEvidenceFreshnessProofInput,
   buildMissingStaleEvidenceFailClosedProofInput,
   buildNoTouchBoundaryProofInput,
+  buildReadinessOverclaimRejectionProofInput,
   buildRuntimeEvidenceSummaryNormalizationProofInput,
   buildSourceRegistryProofInput,
   buildUnsupportedSourceFailClosedProofInput,
