@@ -178,6 +178,74 @@ test('candidate generator filters isolated chunks from fresh and cached candidat
   assert.deepEqual(cached.semanticCandidates.map(item => item.memoryId), ['mem-normal']);
 });
 
+test('candidate generator abort should skip candidate cache write side effect', async () => {
+  const controller = new AbortController();
+  let cacheSetCount = 0;
+  const generator = new CandidateGenerator({
+    config: {
+      defaultSearchLimit: 5,
+      maxSearchLimit: 10,
+      candidatePoolMultiplier: 1,
+      rerankMultiplier: 1,
+      embeddingFingerprint: 'test'
+    },
+    shadowStore: {
+      async listChunks() {
+        return [{
+          chunkId: 'normal-1',
+          memoryId: 'mem-normal',
+          target: 'process',
+          title: 'Alpha feature',
+          text: 'alpha implementation detail',
+          tags: ['feature'],
+          vector: [1, 0],
+          createdAt: '2026-05-19T00:00:00.000Z',
+          updatedAt: '2026-05-19T00:00:00.000Z'
+        }];
+      }
+    },
+    vectorStore: {
+      async getSingleEmbeddingCached() {
+        controller.abort();
+        return [1, 0];
+      },
+      getDiaryVector() {
+        return null;
+      }
+    },
+    tagMemoEngine: {
+      scoreRecord() {
+        return {
+          boost: 0,
+          normalizedScore: 0,
+          matchedTags: [],
+          matchedCoreTags: []
+        };
+      }
+    },
+    candidateCacheStore: {
+      async get() {
+        return null;
+      },
+      async set() {
+        cacheSetCount += 1;
+      }
+    }
+  });
+
+  await assert.rejects(
+    () => generator.generate({
+      queryText: 'alpha',
+      queryAnalysis: { queryText: 'alpha', tokens: ['alpha'], timeRanges: [] },
+      directives: {},
+      limit: 5,
+      signal: controller.signal
+    }),
+    error => error?.code === 'SEARCH_MEMORY_TIMEOUT'
+  );
+  assert.equal(cacheSetCount, 0);
+});
+
 test('vector index skips isolated records and excludes them from diary vectors', async () => {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-isolation-'));
   const vectorIndexPath = path.join(tempDir, 'memory-vectors.json');
