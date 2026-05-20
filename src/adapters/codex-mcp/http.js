@@ -98,6 +98,10 @@ function createForbiddenPayload(reason) {
   };
 }
 
+function createForbiddenJsonRpcPayload(body, reason) {
+  return jsonRpcError(body?.id ?? null, -32000, 'Forbidden', reason);
+}
+
 function parseHardeningNumber(spec, env = process.env) {
   const raw = env[spec.envKey];
   if (raw === undefined || raw === null || raw === '') {
@@ -479,7 +483,7 @@ function createStreamableHttpServer({
       if (!bearerToken) {
         const noTokenJsonRpcRejection = validateNoTokenJsonRpcRequest(body);
         if (noTokenJsonRpcRejection) {
-          return writeJson(res, 403, createForbiddenPayload(noTokenJsonRpcRejection));
+          return writeJson(res, 403, createForbiddenJsonRpcPayload(body, noTokenJsonRpcRejection));
         }
       }
 

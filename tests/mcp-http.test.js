@@ -226,9 +226,12 @@ test('HTTP MCP should reject no-token mutation tool calls', async () => {
       const payload = await response.json();
 
       assert.equal(response.status, 403);
-      assert.equal(payload.error, 'Forbidden');
-      assert.match(payload.message, /no-token/i);
-      assert.match(payload.message, /mutation/i);
+      assert.equal(payload.jsonrpc, '2.0');
+      assert.equal(payload.id, 5 + index);
+      assert.equal(payload.error.code, -32000);
+      assert.equal(payload.error.message, 'Forbidden');
+      assert.match(payload.error.data, /no-token/i);
+      assert.match(payload.error.data, /mutation/i);
     }
   });
 });
