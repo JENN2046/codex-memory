@@ -3,7 +3,7 @@
 Status: CURRENT_RUNTIME_TRUTH_TABLE
 Decision: NOT_READY_BLOCKED
 Scope: authoritative current runtime gap dashboard
-Runtime change baseline: `0805af782b7f2f9d88a5a34e69defcc863e1fc8f`
+Runtime change baseline: `a4fdaf85be21031901f35139129f68a1c521c2f2`
 Branch-head rule: latest local/remote branch head must be re-read with Git before push, precheck, release, or cutover-sensitive work; docs/board reconciliation commits after the runtime baseline do not change runtime readiness.
 
 ## Purpose
@@ -48,7 +48,8 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 12. Use `docs/CM-0563_CANDIDATE_CACHE_ABORT_SIDE_EFFECT_FIXTURE.md` as fixture-only evidence at baseline `e664c84caebcb40aa12c21ac1cf09c6d1e511824` that an aborted synthetic candidate-generation path skips candidate cache writes. It does not execute true recall, does not inspect real candidate cache files, does not prove memory recall reliability, and does not change any `complete?` value in this table.
 13. Use `docs/CM-0564_RECALL_AUDIT_ABORT_SIDE_EFFECT_FIXTURE.md` as fixture-only evidence at baseline `3713f1a8431650650dee5ec2229a92589e4f41b2` that an aborted synthetic recall pipeline skips recall audit writes; local validation includes recall isolation runtime tests 7/7, MCP contract tests 9/9, full `npm test` 1605/1605, `git diff --check`, and docs validation. It does not execute true recall, does not read `.jsonl`, does not prove memory recall reliability, and does not change any `complete?` value in this table.
 14. Use `docs/CM-0565_FOUNDATION_RELIABILITY_EXACT_APPROVAL_BASELINE_REFRESH.md` as the current docs-only refresh of the CM-0562 exact-approval boundary; it is pushed and reconciled at `0bc16db61f7b0ee0348f77d87d08f58bb2abb14f`, with CM-0562 prep HEAD refreshed to local baseline `77dec659d9a16b9795eab7fb1e9bf88798bcdc7c`. It does not execute true `record_memory` or true `search_memory`, and future execution remains blocked until live remote main is freshly verified and the user gives exact approval.
-15. Use `docs/CM-0566_FOUNDATION_RELIABILITY_EXIT_CRITERIA.md` as the current Phase 1 to Phase 2 transition guard. It does not execute validation and does not change any `complete?` value; it prevents treating fixture evidence, docs-only refreshes, green tests, or pushed branch state as Phase 1 completion.
+15. Use `docs/CM-0566_FOUNDATION_RELIABILITY_EXIT_CRITERIA.md` as the Phase 1 to Phase 2 transition guard. It prevents treating fixture evidence, docs-only refreshes, green tests, or pushed branch state as Phase 1 completion.
+16. Use CM-0567 as the current bounded recall validation evidence: exact-approved one-query `search_memory` validation at target baseline `295ac8aabd6108d9b79b0fd7808bd01d3239c1c1` returned in 650 ms, did not time out, returned 3 sanitized results, and matched canary id `cm0562-auth-write-ea2b982-20260520` / memory id `codex-process-9ad477061c1a485982feb5c1f86a3301`. Durable audit write was forbidden and therefore suppressed in-process; `durableAuditWriteCount=0`, `recallAuditAppendSuppressedInProcess=1`. Together with the CM-0562 authorized write evidence, this supports `PHASE_1_FOUNDATION_RELIABILITY_ACCEPTED_NOT_READY`; it does not change any runtime gap row to complete and does not claim memory write/recall reliability.
 
 ## Hard Boundary
 
