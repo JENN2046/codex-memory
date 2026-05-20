@@ -42,7 +42,8 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 6. Use `docs/A5_ENABLEMENT_OBSTACLE_CLEARANCE_001.md` as the current A5 startup obstacle map; it does not execute A5 or close runtime gaps.
 7. Use `docs/CM-0557_JSONRPC_NO_TOKEN_MUTATION_REJECTION_PLAN.md` as the CM-0557 to CM-0559 repair runway entry point; it does not authorize true `record_memory`, true `search_memory`, real memory scans, durable writes, or readiness claims.
 8. Use `docs/CM-0559_SEARCH_MEMORY_TIMEOUT_READONLY_ANALYSIS.md` as the search timeout analysis that recommended CM-0560.
-9. Use `docs/CM-0560_SEARCH_MEMORY_TIMEOUT_BOUNDARY.md` as the current local timeout-boundary evidence. CM-0560 controls the client-visible JSON-RPC timeout error shape, but it does not cancel deeper in-flight recall work, does not prove memory recall reliability, and does not change any `complete?` value in this table.
+9. Use `docs/CM-0560_SEARCH_MEMORY_TIMEOUT_BOUNDARY.md` as the local timeout-boundary evidence. CM-0560 controls the client-visible JSON-RPC timeout error shape, but it does not prove memory recall reliability and does not change any `complete?` value in this table.
+10. Use `docs/CM-0561_SEARCH_MEMORY_COOPERATIVE_ABORT_BOUNDARY.md` as the cooperative abort-boundary evidence. CM-0561 reduces post-timeout side-effect risk at app/recall/candidate awaited boundaries, but it is not hard cancellation, does not prove memory recall reliability, and does not change any `complete?` value in this table.
 
 ## Hard Boundary
 

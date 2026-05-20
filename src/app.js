@@ -6,7 +6,10 @@ const { ValidateMemoryService } = require('./core/ValidateMemoryService');
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
-const { runSearchMemoryWithTimeout } = require('./core/SearchMemoryTimeoutPolicy');
+const {
+  runSearchMemoryWithTimeout,
+  throwIfSearchMemoryAborted
+} = require('./core/SearchMemoryTimeoutPolicy');
 const { DiaryStore } = require('./storage/DiaryStore');
 const { SqliteShadowStore } = require('./storage/SqliteShadowStore');
 const { VectorIndexStore } = require('./storage/VectorIndexStore');
@@ -362,7 +365,8 @@ function createCodexMemoryApplication(overrides = {}) {
     vcpPassiveMemoryAdapter
   });
 
-  async function executeSearchMemory(args = {}, requestContext = {}) {
+  async function executeSearchMemory(args = {}, requestContext = {}, { signal = null } = {}) {
+    throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
     const scopeAudit = buildScopeAuditContext(scopeFilter);
     const searchResults = await passiveRecallService.search({
@@ -375,21 +379,26 @@ function createCodexMemoryApplication(overrides = {}) {
       candidateFilters: buildScopeCandidateFilters(scopeFilter),
       auditContext: {
         scope: scopeAudit
-      }
+      },
+      signal
     });
+    throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const filtered = (scopeFilter && searchResults && searchResults.length)
       ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)
       : searchResults;
+    throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const lifecycleFiltered = await applyLifecycleReadPolicy(filtered, {
       config,
       shadowStore
     });
+    throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const policyFiltered = await applySoftReadPolicy(lifecycleFiltered.results, {
       config,
       shadowStore,
       requestContext,
       scope: scopeFilter
     });
+    throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     if (config.enableLifecycleReadPolicy) {
       const statusByMemoryId = lifecycleFiltered.audit.statusByMemoryId || new Map();
       const policyAudit = {
@@ -475,7 +484,7 @@ function createCodexMemoryApplication(overrides = {}) {
 
       if (toolName === 'search_memory') {
         return runSearchMemoryWithTimeout(
-          () => executeSearchMemory(args, requestContext),
+          ({ signal }) => executeSearchMemory(args, requestContext, { signal }),
           { timeoutMs: config.searchMemoryTimeoutMs }
         );
       }

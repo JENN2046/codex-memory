@@ -4,6 +4,7 @@ const {
   ISOLATION_CLASSIFIER_VERSION,
   filterRecallIsolatedItems
 } = require('../core/RecallIsolationClassifier');
+const { throwIfSearchMemoryAborted } = require('../core/SearchMemoryTimeoutPolicy');
 const { cosineSimilarity } = require('../storage/VectorIndexStore');
 const { stripMemoryMarkers } = require('../storage/DiaryStore');
 const { compactText, contentTokens, uniqueTokens } = require('./text');
@@ -54,7 +55,8 @@ class CandidateGenerator {
     };
   }
 
-  async generate({ target = 'both', queryText, queryAnalysis, directives = {}, limit, syncToken = '', contextState = null, candidateFilters = {} }) {
+  async generate({ target = 'both', queryText, queryAnalysis, directives = {}, limit, syncToken = '', contextState = null, candidateFilters = {}, signal = null }) {
+    throwIfSearchMemoryAborted(signal);
     const searchPlan = this.buildSearchPlan({
       limit,
       directives,
@@ -73,6 +75,7 @@ class CandidateGenerator {
 
     if (this.candidateCacheStore) {
       const cached = await this.candidateCacheStore.get(cacheKey);
+      throwIfSearchMemoryAborted(signal);
       if (cached) {
         return {
           ...this.filterCandidateState(cached),
@@ -84,7 +87,9 @@ class CandidateGenerator {
     const semanticChunks = filterRecallIsolatedItems(
       await this.shadowStore.listChunks(target, candidateFilters)
     );
+    throwIfSearchMemoryAborted(signal);
     const queryVector = await this.vectorStore.getSingleEmbeddingCached(queryText);
+    throwIfSearchMemoryAborted(signal);
     const activeQueryVector = this.buildActiveQueryVector(queryVector, contextState);
     const semanticCandidates = this.rankChunks({
       chunks: semanticChunks,
@@ -100,6 +105,7 @@ class CandidateGenerator {
       const timedChunks = filterRecallIsolatedItems(
         await this.shadowStore.listChunksByTimeRanges(target, queryAnalysis.timeRanges || [], candidateFilters)
       );
+      throwIfSearchMemoryAborted(signal);
       timeCandidates = this.rankChunks({
         chunks: timedChunks,
         queryVector: activeQueryVector,
@@ -119,6 +125,7 @@ class CandidateGenerator {
     };
 
     if (this.candidateCacheStore) {
+      throwIfSearchMemoryAborted(signal);
       await this.candidateCacheStore.set(cacheKey, {
         searchPlan,
         semanticCandidates,

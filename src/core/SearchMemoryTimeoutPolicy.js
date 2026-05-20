@@ -18,6 +18,12 @@ class SearchMemoryTimeoutError extends Error {
   }
 }
 
+function throwIfSearchMemoryAborted(signal, timeoutMs = DEFAULT_SEARCH_MEMORY_TIMEOUT_MS) {
+  if (signal?.aborted) {
+    throw new SearchMemoryTimeoutError(timeoutMs);
+  }
+}
+
 function normalizeSearchMemoryTimeoutMs(value, fallback = DEFAULT_SEARCH_MEMORY_TIMEOUT_MS) {
   const parsed = Number.parseInt(String(value ?? ''), 10);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
@@ -25,13 +31,17 @@ function normalizeSearchMemoryTimeoutMs(value, fallback = DEFAULT_SEARCH_MEMORY_
 
 async function runSearchMemoryWithTimeout(operation, { timeoutMs = DEFAULT_SEARCH_MEMORY_TIMEOUT_MS } = {}) {
   const boundedTimeoutMs = normalizeSearchMemoryTimeoutMs(timeoutMs);
+  const controller = new AbortController();
   let timeout = null;
 
   try {
     return await Promise.race([
-      Promise.resolve().then(operation),
+      Promise.resolve().then(() => operation({ signal: controller.signal })),
       new Promise((_, reject) => {
-        timeout = setTimeout(() => reject(new SearchMemoryTimeoutError(boundedTimeoutMs)), boundedTimeoutMs);
+        timeout = setTimeout(() => {
+          controller.abort();
+          reject(new SearchMemoryTimeoutError(boundedTimeoutMs));
+        }, boundedTimeoutMs);
       })
     ]);
   } finally {
@@ -45,5 +55,6 @@ module.exports = {
   DEFAULT_SEARCH_MEMORY_TIMEOUT_MS,
   SearchMemoryTimeoutError,
   normalizeSearchMemoryTimeoutMs,
-  runSearchMemoryWithTimeout
+  runSearchMemoryWithTimeout,
+  throwIfSearchMemoryAborted
 };

@@ -1,5 +1,6 @@
 const { getDiaryNamesForTarget, getTargetForDiaryName } = require('../core/constants');
 const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
+const { throwIfSearchMemoryAborted } = require('../core/SearchMemoryTimeoutPolicy');
 const { stripMemoryMarkers } = require('../storage/DiaryStore');
 const { compactText, uniqueTokens } = require('./text');
 
@@ -58,12 +59,14 @@ class KnowledgeBaseRecallPipeline {
     contextText = '',
     contextMessages = [],
     candidateFilters = {},
-    auditContext = {}
+    auditContext = {},
+    signal = null
   }) {
     if (typeof query !== 'string' || !query.trim()) {
       throw new Error('query must be a non-empty string');
     }
 
+    throwIfSearchMemoryAborted(signal);
     const parsed = compatibility || this.compatibilitySyntaxAdapter.parse(query);
     const queryText = compactText(parsed.query || query);
     const directives = parsed.directives || {};
@@ -85,10 +88,12 @@ class KnowledgeBaseRecallPipeline {
       })
       : { available: false };
 
+    throwIfSearchMemoryAborted(signal);
     const syncState = this.knowledgeBaseSyncService
       ? await this.knowledgeBaseSyncService.syncTarget(target)
       : { syncToken: '', changed: false };
 
+    throwIfSearchMemoryAborted(signal);
     const candidateState = await this.candidateGenerator.generate({
       target,
       queryText,
@@ -97,9 +102,11 @@ class KnowledgeBaseRecallPipeline {
       limit,
       syncToken: syncState.syncToken || '',
       contextState,
-      candidateFilters
+      candidateFilters,
+      signal
     });
 
+    throwIfSearchMemoryAborted(signal);
     const rerankState = await this.finalizeChunkCandidates({
       queryText,
       directives,
@@ -107,17 +114,20 @@ class KnowledgeBaseRecallPipeline {
       candidateState
     });
 
+    throwIfSearchMemoryAborted(signal);
     const aggregated = await this.aggregateCandidates({
       candidates: rerankState.results,
       includeContent
     });
 
+    throwIfSearchMemoryAborted(signal);
     const finalResults = this.recallEnhancer.enhance(aggregated, {
       directives,
       queryAnalysis,
       limit: candidateState.searchPlan.finalLimit
     });
 
+    throwIfSearchMemoryAborted(signal);
     await this.recordAudit({
       target,
       finalResults,

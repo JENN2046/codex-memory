@@ -280,6 +280,52 @@ test('MCP search_memory timeout should return sanitized JSON-RPC error', async (
   }, { searchMemoryTimeoutMs: 5 });
 });
 
+test('MCP search_memory timeout should abort before post-timeout read-policy audit summary', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    let receivedSignal = false;
+    let readPolicySummaryCount = 0;
+
+    app.services.passiveRecallService.search = async ({ signal }) => {
+      receivedSignal = !!signal;
+      return new Promise(resolve => {
+        signal.addEventListener('abort', () => {
+          setTimeout(() => resolve([]), 10);
+        }, { once: true });
+      });
+    };
+    app.recall.recallAuditService.recordReadPolicySummary = async () => {
+      readPolicySummaryCount += 1;
+    };
+
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 14,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'timeout abort audit boundary SHOULD_NOT_LEAK_0561',
+          target: 'process',
+          limit: 1
+        }
+      }
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 50));
+    const serialized = JSON.stringify(result.response);
+
+    assert.equal(receivedSignal, true);
+    assert.equal(readPolicySummaryCount, 0);
+    assert.equal(result.response.error.code, -32002);
+    assert.equal(result.response.error.data.code, 'SEARCH_MEMORY_TIMEOUT');
+    assert.doesNotMatch(serialized, /SHOULD_NOT_LEAK_0561/);
+  }, {
+    enableLifecycleReadPolicy: true,
+    searchMemoryTimeoutMs: 5
+  });
+});
+
 test('MCP schema contract should expose scope in search_memory', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
