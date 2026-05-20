@@ -7,13 +7,14 @@ const path = require('node:path');
 const { createCodexMemoryApplication } = require('../src/app');
 const { CodexMemoryMcpServer } = require('../src/adapters/codex-mcp/server');
 
-async function withApp(handler) {
+async function withApp(handler, appOverrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-test-'));
   const app = createCodexMemoryApplication({
     projectBasePath: tempBasePath,
     dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
     logsDir: path.join(tempBasePath, 'logs'),
-    dataDir: path.join(tempBasePath, 'data')
+    dataDir: path.join(tempBasePath, 'data'),
+    ...appOverrides
   });
 
   await app.initialize();
@@ -242,6 +243,41 @@ test('MCP runtime schema validation should reject invalid scope with -32602', as
     assert.equal(result.response.error.code, -32602);
     assert.match(result.response.error.data, /visibility/);
   });
+});
+
+test('MCP search_memory timeout should return sanitized JSON-RPC error', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const secretQuery = 'timeout query with SHOULD_NOT_LEAK_0560';
+    app.services.passiveRecallService.search = async () => new Promise(() => {});
+
+    const startedAt = Date.now();
+    const result = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 13,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: secretQuery,
+          target: 'process',
+          limit: 1
+        }
+      }
+    });
+    const elapsedMs = Date.now() - startedAt;
+    const serialized = JSON.stringify(result.response);
+
+    assert.equal(result.response.jsonrpc, '2.0');
+    assert.equal(result.response.id, 13);
+    assert.equal(result.response.error.code, -32002);
+    assert.equal(result.response.error.message, 'Search memory timeout');
+    assert.equal(result.response.error.data.code, 'SEARCH_MEMORY_TIMEOUT');
+    assert.equal(result.response.error.data.reason, 'search_memory exceeded the configured timeout.');
+    assert.equal(result.response.error.data.timeoutMs, 5);
+    assert.ok(elapsedMs < 1000);
+    assert.doesNotMatch(serialized, /SHOULD_NOT_LEAK_0560/);
+  }, { searchMemoryTimeoutMs: 5 });
 });
 
 test('MCP schema contract should expose scope in search_memory', async () => {

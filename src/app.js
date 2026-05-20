@@ -6,6 +6,7 @@ const { ValidateMemoryService } = require('./core/ValidateMemoryService');
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
+const { runSearchMemoryWithTimeout } = require('./core/SearchMemoryTimeoutPolicy');
 const { DiaryStore } = require('./storage/DiaryStore');
 const { SqliteShadowStore } = require('./storage/SqliteShadowStore');
 const { VectorIndexStore } = require('./storage/VectorIndexStore');
@@ -361,6 +362,56 @@ function createCodexMemoryApplication(overrides = {}) {
     vcpPassiveMemoryAdapter
   });
 
+  async function executeSearchMemory(args = {}, requestContext = {}) {
+    const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
+    const scopeAudit = buildScopeAuditContext(scopeFilter);
+    const searchResults = await passiveRecallService.search({
+      query: args.query,
+      target: args.target || 'both',
+      limit: args.limit,
+      includeContent: !!args.include_content,
+      contextText: args.context_text || '',
+      source: 'mcp',
+      candidateFilters: buildScopeCandidateFilters(scopeFilter),
+      auditContext: {
+        scope: scopeAudit
+      }
+    });
+    const filtered = (scopeFilter && searchResults && searchResults.length)
+      ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)
+      : searchResults;
+    const lifecycleFiltered = await applyLifecycleReadPolicy(filtered, {
+      config,
+      shadowStore
+    });
+    const policyFiltered = await applySoftReadPolicy(lifecycleFiltered.results, {
+      config,
+      shadowStore,
+      requestContext,
+      scope: scopeFilter
+    });
+    if (config.enableLifecycleReadPolicy) {
+      const statusByMemoryId = lifecycleFiltered.audit.statusByMemoryId || new Map();
+      const policyAudit = {
+        ...lifecycleFiltered.audit,
+        staleResultCount: policyFiltered.filter(item => {
+          const memoryId = item.memoryId || item.memory_id;
+          return String(statusByMemoryId.get(memoryId) || '').trim().toLowerCase() === 'stale';
+        }).length
+      };
+      delete policyAudit.statusByMemoryId;
+      policyAudit.hiddenByLifecycleCount = Number(lifecycleFiltered.audit.hiddenByLifecycleCount || 0);
+      await recallAuditService.recordReadPolicySummary({
+        target: args.target || 'both',
+        results: policyFiltered,
+        source: 'mcp',
+        scopeAudit,
+        policyAudit
+      });
+    }
+    return { results: policyFiltered };
+  }
+
   return {
     config,
     stores: {
@@ -423,53 +474,10 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'search_memory') {
-        const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
-        const scopeAudit = buildScopeAuditContext(scopeFilter);
-        const searchResults = await passiveRecallService.search({
-          query: args.query,
-          target: args.target || 'both',
-          limit: args.limit,
-          includeContent: !!args.include_content,
-          contextText: args.context_text || '',
-          source: 'mcp',
-          candidateFilters: buildScopeCandidateFilters(scopeFilter),
-          auditContext: {
-            scope: scopeAudit
-          }
-        });
-        const filtered = (scopeFilter && searchResults && searchResults.length)
-          ? await applyScopeFilter(searchResults, scopeFilter, shadowStore)
-          : searchResults;
-        const lifecycleFiltered = await applyLifecycleReadPolicy(filtered, {
-          config,
-          shadowStore
-        });
-        const policyFiltered = await applySoftReadPolicy(lifecycleFiltered.results, {
-          config,
-          shadowStore,
-          requestContext,
-          scope: scopeFilter
-        });
-        if (config.enableLifecycleReadPolicy) {
-          const statusByMemoryId = lifecycleFiltered.audit.statusByMemoryId || new Map();
-          const policyAudit = {
-            ...lifecycleFiltered.audit,
-            staleResultCount: policyFiltered.filter(item => {
-              const memoryId = item.memoryId || item.memory_id;
-              return String(statusByMemoryId.get(memoryId) || '').trim().toLowerCase() === 'stale';
-            }).length
-          };
-          delete policyAudit.statusByMemoryId;
-          policyAudit.hiddenByLifecycleCount = Number(lifecycleFiltered.audit.hiddenByLifecycleCount || 0);
-          await recallAuditService.recordReadPolicySummary({
-            target: args.target || 'both',
-            results: policyFiltered,
-            source: 'mcp',
-            scopeAudit,
-            policyAudit
-          });
-        }
-        return { results: policyFiltered };
+        return runSearchMemoryWithTimeout(
+          () => executeSearchMemory(args, requestContext),
+          { timeoutMs: config.searchMemoryTimeoutMs }
+        );
       }
 
       if (toolName === 'memory_overview') {

@@ -355,6 +355,7 @@ function createConfig(overrides = {}) {
     embeddingEndpoints,
     maxSearchLimit: Number.parseInt(String(overrides.maxSearchLimit || process.env.CODEX_MEMORY_MAX_SEARCH_LIMIT || '10'), 10) || 10,
     defaultSearchLimit: Number.parseInt(String(overrides.defaultSearchLimit || process.env.CODEX_MEMORY_DEFAULT_SEARCH_LIMIT || '5'), 10) || 5,
+    searchMemoryTimeoutMs: parsePositiveInteger(overrides.searchMemoryTimeoutMs || process.env.CODEX_MEMORY_SEARCH_TIMEOUT_MS || '30000', 30000),
     chunkMaxChars: Number.parseInt(String(overrides.chunkMaxChars || process.env.CODEX_MEMORY_CHUNK_MAX_CHARS || '900'), 10) || 900,
     chunkOverlapChars: Number.parseInt(String(overrides.chunkOverlapChars || process.env.CODEX_MEMORY_CHUNK_OVERLAP_CHARS || '120'), 10) || 120,
     candidatePoolMultiplier: Number.parseFloat(String(overrides.candidatePoolMultiplier || process.env.CODEX_MEMORY_CANDIDATE_POOL_MULTIPLIER || '2')) || 2,

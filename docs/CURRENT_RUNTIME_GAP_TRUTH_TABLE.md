@@ -41,7 +41,8 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 5. Any precheck pass remains precheck evidence, not readiness.
 6. Use `docs/A5_ENABLEMENT_OBSTACLE_CLEARANCE_001.md` as the current A5 startup obstacle map; it does not execute A5 or close runtime gaps.
 7. Use `docs/CM-0557_JSONRPC_NO_TOKEN_MUTATION_REJECTION_PLAN.md` as the CM-0557 to CM-0559 repair runway entry point; it does not authorize true `record_memory`, true `search_memory`, real memory scans, durable writes, or readiness claims.
-8. Use `docs/CM-0559_SEARCH_MEMORY_TIMEOUT_READONLY_ANALYSIS.md` as the current search timeout analysis; it recommends CM-0560 and does not close recall reliability.
+8. Use `docs/CM-0559_SEARCH_MEMORY_TIMEOUT_READONLY_ANALYSIS.md` as the search timeout analysis that recommended CM-0560.
+9. Use `docs/CM-0560_SEARCH_MEMORY_TIMEOUT_BOUNDARY.md` as the current local timeout-boundary evidence. CM-0560 controls the client-visible JSON-RPC timeout error shape, but it does not cancel deeper in-flight recall work, does not prove memory recall reliability, and does not change any `complete?` value in this table.
 
 ## Hard Boundary
 

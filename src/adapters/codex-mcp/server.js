@@ -160,6 +160,16 @@ class CodexMemoryMcpServer {
           };
         }
         appendToolErrorLog(this.app, params.name, error);
+        if (Number.isInteger(error?.jsonRpcCode)) {
+          return {
+            response: jsonRpcError(
+              id,
+              error.jsonRpcCode,
+              error.jsonRpcMessage || 'Tool error',
+              error.jsonRpcData ?? error.message ?? 'Unknown tool execution error'
+            )
+          };
+        }
         return {
           response: jsonRpcError(id, -32603, 'Internal error', error.message || 'Unknown tool execution error')
         };

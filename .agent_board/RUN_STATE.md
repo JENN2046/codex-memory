@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0559 search timeout read-only analysis |
+| Current task | CM-0560 search timeout boundary |
 | Current area | P4-http-runtime / P10-observability-admin |
 | Last pushed baseline | `6758952` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Completed CM-0558 targeted JSON-RPC envelope patch locally, then ran CM-0559 allowed read-only source-pattern analysis for `search_memory` timeout. |
-| Last validation | CM-0558 validation passed: `node --check` for HTTP adapter/test, `node --test .\tests\mcp-http.test.js` 13/13, and `git diff --check`. CM-0559 docs validation is pending. |
-| Worktree summary | Current intended changes are docs/board only for CM-0559 analysis; no true `record_memory`, true `search_memory`, `.jsonl` read, real memory scan, durable write/audit write, provider call, config switch, package change, push, tag, release, deploy, cutover, or readiness claim. |
+| Last action | Implemented CM-0560 app-level timeout boundary for `search_memory`, added sanitized JSON-RPC timeout error handling, and added mock MCP contract coverage. |
+| Last validation | CM-0560 targeted validation passed: `node --check` for changed source/test files; `node --test .\tests\mcp-contract.test.js` 8/8; `node --test .\tests\phase-b-passive-recall.test.js` 4/4; `git diff --check`; docs validation. |
+| Worktree summary | Current intended changes are CM-0560 source/test/docs/board updates. No true `record_memory`, true live `search_memory`, `.jsonl` read, real memory scan, durable write/audit write, provider call, config switch, package change, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
-| Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
-| Safe-push readiness | no push is authorized for this A5 obstacle-clearance slice; do not push automatically |
-| Next planned action | Validate and locally commit CM-0559 analysis, then prepare CM-0560 as a separate targeted runtime-fix plan if requested. 中文解释：下一步只适合提交只读分析并单独规划 search timeout 修复，不能调用真实检索、读取真实记忆、push 或声明 ready。 |
+| Guarded auto-commit allowed | yes for local commits when scoped and validated; current goal also allows automatic push only after push-readiness preflight passes |
+| Safe-push readiness | pending preflight; do not push until status/log/diff checks confirm scope and clean committed range |
+| Next planned action | Create guarded local CM-0560 commit, run push-readiness preflight, push only if preflight passes, then do post-push project-state update. 中文解释：下一步先本地提交，再检查是否可安全推送；不调用真实检索、不读取真实记忆，也不声明 ready。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19
