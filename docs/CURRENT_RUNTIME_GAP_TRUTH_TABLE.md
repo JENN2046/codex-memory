@@ -3,8 +3,8 @@
 Status: CURRENT_RUNTIME_TRUTH_TABLE
 Decision: NOT_READY_BLOCKED
 Scope: authoritative current runtime gap dashboard
-Local baseline: `675895237c96bdebf4718f41c6318dbd5974aebc`
-Remote baseline: `675895237c96bdebf4718f41c6318dbd5974aebc` after HTTP JSON-RPC rejection-shape fix post-push sync; must be re-read before push, precheck, release, or cutover-sensitive work
+Local baseline: `47d23345c04f5e15433149620558e87a2fd56c1e`
+Remote baseline: `47d23345c04f5e15433149620558e87a2fd56c1e` after CM-0560 search timeout boundary push sync; must be re-read before push, precheck, release, or cutover-sensitive work
 
 ## Purpose
 
