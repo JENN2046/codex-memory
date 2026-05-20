@@ -111,13 +111,15 @@ class KnowledgeBaseRecallPipeline {
       queryText,
       directives,
       queryAnalysis,
-      candidateState
+      candidateState,
+      signal
     });
 
     throwIfSearchMemoryAborted(signal);
     const aggregated = await this.aggregateCandidates({
       candidates: rerankState.results,
-      includeContent
+      includeContent,
+      signal
     });
 
     throwIfSearchMemoryAborted(signal);
@@ -137,13 +139,15 @@ class KnowledgeBaseRecallPipeline {
       contextState,
       rerankMeta: rerankState.meta,
       source,
-      auditContext
+      auditContext,
+      signal
     });
 
     return finalResults;
   }
 
-  async finalizeChunkCandidates({ queryText, directives, queryAnalysis = {}, candidateState }) {
+  async finalizeChunkCandidates({ queryText, directives, queryAnalysis = {}, candidateState, signal = null }) {
+    throwIfSearchMemoryAborted(signal);
     const { searchPlan, semanticCandidates, timeCandidates } = candidateState;
     const useRerank = searchPlan.useRerank;
     const chunkResultLimit = directives.group
@@ -167,13 +171,17 @@ class KnowledgeBaseRecallPipeline {
 
       if (useRerank) {
         if (semanticCandidates.length > 0) {
+          throwIfSearchMemoryAborted(signal);
           const rerankedSemantic = await this.rerankService.rerank(queryText, semanticCandidates, semanticResultLimit, rerankOptions);
+          throwIfSearchMemoryAborted(signal);
           finalSemantic = rerankedSemantic.results;
           rerankMeta = rerankedSemantic;
         }
 
         if (timeCandidates.length > 0 && timeResultLimit > 0) {
+          throwIfSearchMemoryAborted(signal);
           const rerankedTime = await this.rerankService.rerank(queryText, timeCandidates, timeResultLimit, rerankOptions);
+          throwIfSearchMemoryAborted(signal);
           finalTime = rerankedTime.results;
           rerankMeta = rerankedTime;
         }
@@ -195,12 +203,14 @@ class KnowledgeBaseRecallPipeline {
     }
 
     if (useRerank) {
+      throwIfSearchMemoryAborted(signal);
       const reranked = await this.rerankService.rerank(
         queryText,
         semanticCandidates,
         Math.min(searchPlan.semanticPoolSize, chunkResultLimit),
         rerankOptions
       );
+      throwIfSearchMemoryAborted(signal);
       return {
         results: reranked.results,
         meta: reranked
@@ -213,7 +223,8 @@ class KnowledgeBaseRecallPipeline {
     };
   }
 
-  async aggregateCandidates({ candidates = [], includeContent = false }) {
+  async aggregateCandidates({ candidates = [], includeContent = false, signal = null }) {
+    throwIfSearchMemoryAborted(signal);
     const groups = new Map();
 
     for (const candidate of filterRecallIsolatedItems(candidates)) {
@@ -225,10 +236,12 @@ class KnowledgeBaseRecallPipeline {
     }
 
     const memoryIds = [...new Set(candidates.map(candidate => candidate.memoryId).filter(Boolean))];
+    throwIfSearchMemoryAborted(signal);
     const recordMap = new Map(
       (await this.shadowStore.getRecordsByIds(memoryIds))
         .map(record => [record.memoryId, record])
     );
+    throwIfSearchMemoryAborted(signal);
 
     return [...groups.entries()]
       .map(([key, group]) => {
@@ -272,12 +285,14 @@ class KnowledgeBaseRecallPipeline {
       .sort((left, right) => (right.score || 0) - (left.score || 0));
   }
 
-  async recordAudit({ target, finalResults, queryAnalysis, directives, candidateState, contextState, rerankMeta, source, auditContext = {} }) {
+  async recordAudit({ target, finalResults, queryAnalysis, directives, candidateState, contextState, rerankMeta, source, auditContext = {}, signal = null }) {
+    throwIfSearchMemoryAborted(signal);
     for (const dbName of getDiaryNamesForTarget(target)) {
       const currentTarget = getTargetForDiaryName(dbName);
       const targetResults = finalResults.filter(result => result.target === currentTarget);
       if (targetResults.length === 0) continue;
 
+      throwIfSearchMemoryAborted(signal);
       await this.recallAuditService.record({
         target: currentTarget,
         recallType: 'snippet',
@@ -295,6 +310,7 @@ class KnowledgeBaseRecallPipeline {
         source,
         scopeAudit: auditContext.scope || null
       });
+      throwIfSearchMemoryAborted(signal);
     }
   }
 

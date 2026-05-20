@@ -390,6 +390,130 @@ test('recall pipeline passes abort signal into sync and stops before candidates'
   assert.equal(auditRecordCount, 0);
 });
 
+test('recall pipeline abort after rerank should skip aggregate lookup and recall audit', async () => {
+  const controller = new AbortController();
+  let rerankCount = 0;
+  let aggregateLookupCount = 0;
+  let auditRecordCount = 0;
+  const pipeline = new KnowledgeBaseRecallPipeline({
+    compatibilitySyntaxAdapter: {
+      parse() {
+        return { query: 'alpha', directives: { rerank: true }, passiveBlocks: [], activeBlocks: [] };
+      }
+    },
+    timeExpressionParser: {
+      parse() {
+        return [];
+      }
+    },
+    tagMemoEngine: {
+      analyzeQuery() {
+        return { queryText: 'alpha', tokens: ['alpha'], timeRanges: [] };
+      }
+    },
+    contextVectorManager: null,
+    knowledgeBaseSyncService: {
+      async syncTarget() {
+        return { syncToken: '', changed: false };
+      }
+    },
+    candidateGenerator: {
+      async generate() {
+        return {
+          searchPlan: { finalLimit: 5, semanticPoolSize: 5, useTime: false, useRerank: true },
+          semanticCandidates: [{
+            chunkId: 'normal-1',
+            memoryId: 'mem-normal',
+            target: 'process',
+            title: 'Alpha feature',
+            text: 'alpha implementation detail',
+            tags: ['feature'],
+            score: 0.9,
+            source: 'rag'
+          }],
+          timeCandidates: [],
+          allCandidates: []
+        };
+      }
+    },
+    rerankService: {
+      config: {},
+      async rerank(_queryText, candidates) {
+        rerankCount += 1;
+        controller.abort();
+        return { results: candidates, mode: 'local-rrf', successRate: 1 };
+      }
+    },
+    recallAuditService: {
+      async record() {
+        auditRecordCount += 1;
+      }
+    },
+    recallEnhancer: {
+      enhance(results) {
+        return results;
+      }
+    },
+    shadowStore: {
+      async getRecordsByIds() {
+        aggregateLookupCount += 1;
+        return [];
+      }
+    }
+  });
+
+  await assert.rejects(
+    () => pipeline.search({
+      query: 'alpha',
+      target: 'process',
+      limit: 5,
+      signal: controller.signal
+    }),
+    error => error?.code === 'SEARCH_MEMORY_TIMEOUT'
+  );
+  assert.equal(rerankCount, 1);
+  assert.equal(aggregateLookupCount, 0);
+  assert.equal(auditRecordCount, 0);
+});
+
+test('recall aggregate abort guard should skip record lookup side effect', async () => {
+  const controller = new AbortController();
+  controller.abort();
+  let aggregateLookupCount = 0;
+  const pipeline = new KnowledgeBaseRecallPipeline({
+    compatibilitySyntaxAdapter: null,
+    timeExpressionParser: null,
+    tagMemoEngine: null,
+    candidateGenerator: null,
+    rerankService: null,
+    recallAuditService: null,
+    recallEnhancer: null,
+    knowledgeBaseSyncService: null,
+    shadowStore: {
+      async getRecordsByIds() {
+        aggregateLookupCount += 1;
+        return [];
+      }
+    }
+  });
+
+  await assert.rejects(
+    () => pipeline.aggregateCandidates({
+      candidates: [{
+        chunkId: 'normal-1',
+        memoryId: 'mem-normal',
+        target: 'process',
+        title: 'Alpha feature',
+        text: 'alpha implementation detail',
+        score: 0.9
+      }],
+      signal: controller.signal
+    }),
+    error => error?.code === 'SEARCH_MEMORY_TIMEOUT'
+  );
+  assert.equal(aggregateLookupCount, 0);
+});
+
 test('vector index skips isolated records and excludes them from diary vectors', async () => {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-isolation-'));
   const vectorIndexPath = path.join(tempDir, 'memory-vectors.json');
