@@ -104,6 +104,20 @@ const {
   SAFE_SOURCE_TYPES: MIGRATION_APPROVAL_SAFE_SOURCE_TYPES,
   evaluateMigrationImportExportBackupRestoreApproval
 } = require('./MigrationImportExportBackupRestoreApprovalContract');
+const {
+  DENIED_SOURCE_TYPES: HTTP_OBSERVABILITY_DENIED_SOURCE_TYPES,
+  EXPECTED_MANIFEST_VERSION: HTTP_OBSERVABILITY_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: HTTP_OBSERVABILITY_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: HTTP_OBSERVABILITY_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: HTTP_OBSERVABILITY_PUBLIC_MCP_TOOLS,
+  REQUIRED_BLOCKED_ACTIONS: HTTP_OBSERVABILITY_REQUIRED_BLOCKED_ACTIONS,
+  REQUIRED_FAIL_CLOSED_STATES: HTTP_OBSERVABILITY_REQUIRED_FAIL_CLOSED_STATES,
+  REQUIRED_OBSERVABILITY_SURFACE_IDS,
+  REQUIRED_RUNTIME_EVIDENCE: HTTP_OBSERVABILITY_REQUIRED_RUNTIME_EVIDENCE,
+  REQUIRED_SOURCE_EVIDENCE_IDS: HTTP_OBSERVABILITY_REQUIRED_SOURCE_EVIDENCE_IDS,
+  SAFE_SOURCE_TYPES: HTTP_OBSERVABILITY_SAFE_SOURCE_TYPES,
+  evaluateHttpRuntimeObservabilityOperation
+} = require('./HttpRuntimeObservabilityOperationContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -1071,6 +1085,113 @@ function buildMigrationImportExportBackupRestoreApprovalProofInput(patch = {}) {
   };
 }
 
+function buildHttpRuntimeObservabilitySourceEvidence(overrides = {}) {
+  return HTTP_OBSERVABILITY_REQUIRED_SOURCE_EVIDENCE_IDS.map(id => ({
+    id,
+    sourceType: 'committed_fixture',
+    artifactRefs: [`validation-aggregator:${id}`],
+    runtimeAuthority: false,
+    readinessAuthority: false,
+    operationAuthority: false,
+    ...overrides[id]
+  }));
+}
+
+function buildHttpRuntimeObservabilitySurfaces(overrides = {}) {
+  return REQUIRED_OBSERVABILITY_SURFACE_IDS.map(id => ({
+    id,
+    readOnly: true,
+    requiresLiveService: [
+      'http_health_endpoint',
+      'mcp_initialize',
+      'tools_list_public_mcp_freeze',
+      'http_observe_cli',
+      'no_token_mutation_guard',
+      'bearer_mutation_guard'
+    ].includes(id),
+    executedInThisPhase: false,
+    canClaimRuntimeReady: false,
+    ...overrides[id]
+  }));
+}
+
+function buildHttpRuntimeObservabilityOperationProofInput(patch = {}) {
+  return {
+    schemaVersion: HTTP_OBSERVABILITY_SCHEMA_VERSION,
+    policyVersion: HTTP_OBSERVABILITY_POLICY_VERSION,
+    manifestVersion: HTTP_OBSERVABILITY_MANIFEST_VERSION,
+    fixtureOnly: true,
+    localOnly: true,
+    readOnly: true,
+    boundaryInventoryOnly: true,
+    runtimeObserved: false,
+    httpServiceStarted: false,
+    httpServiceStopped: false,
+    watchdogInstalled: false,
+    startupInstalled: false,
+    configSwitched: false,
+    providerCalls: 0,
+    realMemoryScanned: false,
+    runtimeStoreScanned: false,
+    durableMemoryWritten: false,
+    durableAuditWritten: false,
+    publicMcpExpanded: false,
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    acceptedForPlanning: true,
+    publicMcpTools: [...HTTP_OBSERVABILITY_PUBLIC_MCP_TOOLS],
+    allowedSourceTypes: [...HTTP_OBSERVABILITY_SAFE_SOURCE_TYPES],
+    deniedSourceTypes: [...HTTP_OBSERVABILITY_DENIED_SOURCE_TYPES],
+    sourceEvidence: buildHttpRuntimeObservabilitySourceEvidence(),
+    observabilitySurfaces: buildHttpRuntimeObservabilitySurfaces(),
+    requiredRuntimeEvidence: [...HTTP_OBSERVABILITY_REQUIRED_RUNTIME_EVIDENCE],
+    unsatisfiedRuntimeEvidence: [...HTTP_OBSERVABILITY_REQUIRED_RUNTIME_EVIDENCE],
+    failClosedStates: [...HTTP_OBSERVABILITY_REQUIRED_FAIL_CLOSED_STATES],
+    blockedActions: [...HTTP_OBSERVABILITY_REQUIRED_BLOCKED_ACTIONS],
+    forbiddenClaims: [
+      'http-runtime-ready',
+      'operation-hardening-ready',
+      'safe-start-ready',
+      'safe-shutdown-ready',
+      'runtime-ready',
+      'v1-rc-ready'
+    ],
+    safety: {
+      readsFilesImplicitly: false,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      stopsServices: false,
+      installsWatchdog: false,
+      installsStartup: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      localBoundaryInventoryReady: true,
+      httpRuntimeObserved: false,
+      operationHardeningReady: false,
+      safeStartPreflightReady: false,
+      safeShutdownPreflightReady: false,
+      watchdogReady: false,
+      configSwitchReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      pushReady: false,
+      releaseReady: false,
+      deployReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -1384,6 +1505,32 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'httpRuntimeObservabilityOperationProof')) {
+    const result = evaluateHttpRuntimeObservabilityOperation(
+      safeInputs.httpRuntimeObservabilityOperationProof
+    );
+    units.httpRuntimeObservabilityOperationProof = {
+      id: 'http_runtime_observability_operation_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      sourceTypes: result.sourceTypes,
+      sourceEvidence: result.sourceEvidence,
+      observabilitySurfaces: result.observabilitySurfaces,
+      runtimeEvidence: result.runtimeEvidence,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.httpRuntimeObservabilityOperationProof = buildNotSuppliedUnit(
+      'http_runtime_observability_operation_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -1425,6 +1572,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.recallIsolationRuntimeProof.accepted,
       migrationImportExportBackupRestoreApprovalProofAccepted:
         units.migrationImportExportBackupRestoreApprovalProof.accepted,
+      httpRuntimeObservabilityOperationProofAccepted:
+        units.httpRuntimeObservabilityOperationProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -1456,6 +1605,7 @@ module.exports = {
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
   buildGovernanceRuntimeLoopGapProofInput,
+  buildHttpRuntimeObservabilityOperationProofInput,
   buildMigrationImportExportBackupRestoreApprovalProofInput,
   buildMissingStaleEvidenceFailClosedProofInput,
   buildNoTouchBoundaryProofInput,

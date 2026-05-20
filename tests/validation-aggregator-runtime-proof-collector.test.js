@@ -11,6 +11,7 @@ const {
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
   buildGovernanceRuntimeLoopGapProofInput,
+  buildHttpRuntimeObservabilityOperationProofInput,
   buildMigrationImportExportBackupRestoreApprovalProofInput,
   buildMissingStaleEvidenceFailClosedProofInput,
   buildNoTouchBoundaryProofInput,
@@ -32,10 +33,10 @@ test('runtime proof collector waits for explicit inputs without claiming readine
   assert.equal(report.fullImplementationComplete, false);
   assert.equal(report.status, 'runtime_proof_collector_waiting_for_explicit_evidence');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
-  assert.equal(report.summary.availableUnitCount, 11);
+  assert.equal(report.summary.availableUnitCount, 12);
   assert.equal(report.summary.executedUnitCount, 0);
   assert.equal(report.summary.acceptedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 11);
+  assert.equal(report.summary.missingUnitCount, 12);
   assert.equal(report.units.sourceRegistryProof.status, 'not_supplied');
   assert.equal(report.units.evidenceFreshnessProof.status, 'not_supplied');
   assert.equal(report.units.baselineBindingProof.status, 'not_supplied');
@@ -48,6 +49,10 @@ test('runtime proof collector waits for explicit inputs without claiming readine
   assert.equal(report.units.recallIsolationRuntimeProof.status, 'not_supplied');
   assert.equal(
     report.units.migrationImportExportBackupRestoreApprovalProof.status,
+    'not_supplied'
+  );
+  assert.equal(
+    report.units.httpRuntimeObservabilityOperationProof.status,
     'not_supplied'
   );
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
@@ -72,7 +77,7 @@ test('runtime proof collector executes source registry proof from explicit sanit
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, true);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -101,7 +106,7 @@ test('runtime proof collector executes evidence freshness proof from explicit sa
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, true);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -133,7 +138,7 @@ test('runtime proof collector executes baseline binding proof from explicit sani
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, true);
@@ -166,7 +171,7 @@ test('runtime proof collector executes runtime evidence summary normalization pr
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -205,7 +210,7 @@ test('runtime proof collector executes missing stale evidence fail-closed proof 
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -241,7 +246,7 @@ test('runtime proof collector executes unsupported source fail-closed proof from
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -276,7 +281,7 @@ test('runtime proof collector executes no-touch boundary proof from explicit san
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -313,7 +318,7 @@ test('runtime proof collector executes readiness overclaim rejection proof from 
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -350,7 +355,7 @@ test('runtime proof collector executes governance runtime loop gap proof from ex
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -387,7 +392,7 @@ test('runtime proof collector executes recall isolation runtime proof from expli
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -425,7 +430,7 @@ test('runtime proof collector executes migration import export backup restore ap
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 10);
+  assert.equal(report.summary.missingUnitCount, 11);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -456,7 +461,46 @@ test('runtime proof collector executes migration import export backup restore ap
   assert.equal(report.canClaimV1RcReady, false);
 });
 
-test('runtime proof collector aggregates accepted explicit source registry freshness baseline summary missing-stale unsupported-source no-touch overclaim governance recall isolation and migration approval units', () => {
+test('runtime proof collector executes http runtime observability operation proof from explicit sanitized input only', () => {
+  const report = collectValidationAggregatorRuntimeProofUnits({
+    httpRuntimeObservabilityOperationProof:
+      buildHttpRuntimeObservabilityOperationProofInput()
+  });
+
+  assert.equal(report.status, 'runtime_proof_collector_partial_evidence_accepted_not_ready');
+  assert.equal(report.summary.executedUnitCount, 1);
+  assert.equal(report.summary.acceptedUnitCount, 1);
+  assert.equal(report.summary.rejectedUnitCount, 0);
+  assert.equal(report.summary.missingUnitCount, 11);
+  assert.equal(report.summary.sourceRegistryProofAccepted, false);
+  assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
+  assert.equal(report.summary.baselineBindingProofAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryNormalizationProofAccepted, false);
+  assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
+  assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
+  assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
+  assert.equal(report.summary.governanceRuntimeLoopGapProofAccepted, false);
+  assert.equal(report.summary.recallIsolationRuntimeProofAccepted, false);
+  assert.equal(report.summary.migrationImportExportBackupRestoreApprovalProofAccepted, false);
+  assert.equal(report.summary.httpRuntimeObservabilityOperationProofAccepted, true);
+  assert.equal(report.units.httpRuntimeObservabilityOperationProof.executed, true);
+  assert.equal(report.units.httpRuntimeObservabilityOperationProof.accepted, true);
+  assert.equal(
+    report.units.httpRuntimeObservabilityOperationProof.status,
+    'boundary_accepted_http_operation_still_blocked'
+  );
+  assert.equal(report.units.httpRuntimeObservabilityOperationProof.sourceEvidence.exact, true);
+  assert.equal(report.units.httpRuntimeObservabilityOperationProof.observabilitySurfaces.exact, true);
+  assert.equal(report.units.httpRuntimeObservabilityOperationProof.runtimeEvidence.requiredExact, true);
+  assert.deepEqual(report.units.httpRuntimeObservabilityOperationProof.failClosedReasons, []);
+  assert.equal(report.units.httpRuntimeObservabilityOperationProof.readiness.httpRuntimeObserved, false);
+  assert.equal(report.canClaimRuntimeReady, false);
+  assert.equal(report.canClaimFinalRcReady, false);
+  assert.equal(report.canClaimV1RcReady, false);
+});
+
+test('runtime proof collector aggregates accepted explicit source registry freshness baseline summary missing-stale unsupported-source no-touch overclaim governance recall isolation migration approval and http observability units', () => {
   const report = collectValidationAggregatorRuntimeProofUnits({
     sourceRegistryProof: buildSourceRegistryProofInput(),
     evidenceFreshnessProof: buildEvidenceFreshnessProofInput(),
@@ -475,12 +519,14 @@ test('runtime proof collector aggregates accepted explicit source registry fresh
     recallIsolationRuntimeProof:
       buildRecallIsolationRuntimeProofInput(),
     migrationImportExportBackupRestoreApprovalProof:
-      buildMigrationImportExportBackupRestoreApprovalProofInput()
+      buildMigrationImportExportBackupRestoreApprovalProofInput(),
+    httpRuntimeObservabilityOperationProof:
+      buildHttpRuntimeObservabilityOperationProofInput()
   });
 
-  assert.equal(report.summary.availableUnitCount, 11);
-  assert.equal(report.summary.executedUnitCount, 11);
-  assert.equal(report.summary.acceptedUnitCount, 11);
+  assert.equal(report.summary.availableUnitCount, 12);
+  assert.equal(report.summary.executedUnitCount, 12);
+  assert.equal(report.summary.acceptedUnitCount, 12);
   assert.equal(report.summary.rejectedUnitCount, 0);
   assert.equal(report.summary.missingUnitCount, 0);
   assert.equal(report.summary.sourceRegistryProofAccepted, true);
@@ -494,6 +540,7 @@ test('runtime proof collector aggregates accepted explicit source registry fresh
   assert.equal(report.summary.governanceRuntimeLoopGapProofAccepted, true);
   assert.equal(report.summary.recallIsolationRuntimeProofAccepted, true);
   assert.equal(report.summary.migrationImportExportBackupRestoreApprovalProofAccepted, true);
+  assert.equal(report.summary.httpRuntimeObservabilityOperationProofAccepted, true);
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.v1RcReady, false);
@@ -653,6 +700,38 @@ test('runtime proof collector fails closed when migration approval stage allows 
   assert.deepEqual(
     report.units.migrationImportExportBackupRestoreApprovalProof.frameworkStages.unsafeIds,
     ['execution_gate']
+  );
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
+  assert.equal(report.summary.v1RcReady, false);
+});
+
+test('runtime proof collector fails closed when http observability surface claims execution', () => {
+  const httpObservabilityInput = buildHttpRuntimeObservabilityOperationProofInput();
+  const report = collectValidationAggregatorRuntimeProofUnits({
+    httpRuntimeObservabilityOperationProof:
+      buildHttpRuntimeObservabilityOperationProofInput({
+        observabilitySurfaces: httpObservabilityInput.observabilitySurfaces.map(item =>
+          item.id === 'http_observe_cli'
+            ? { ...item, executedInThisPhase: true }
+            : item
+        )
+      })
+  });
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.summary.executedUnitCount, 1);
+  assert.equal(report.summary.acceptedUnitCount, 0);
+  assert.equal(report.summary.rejectedUnitCount, 1);
+  assert.equal(report.units.httpRuntimeObservabilityOperationProof.accepted, false);
+  assert.equal(
+    report.units.httpRuntimeObservabilityOperationProof.failClosedReasons.includes(
+      'surface_claims_execution_or_readiness'
+    ),
+    true
+  );
+  assert.deepEqual(
+    report.units.httpRuntimeObservabilityOperationProof.observabilitySurfaces.unsafeIds,
+    ['http_observe_cli']
   );
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.v1RcReady, false);
@@ -875,7 +954,9 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
       recallIsolationRuntimeProof:
         buildRecallIsolationRuntimeProofInput(),
       migrationImportExportBackupRestoreApprovalProof:
-        buildMigrationImportExportBackupRestoreApprovalProofInput()
+        buildMigrationImportExportBackupRestoreApprovalProofInput(),
+      httpRuntimeObservabilityOperationProof:
+        buildHttpRuntimeObservabilityOperationProofInput()
     }
   });
 
@@ -886,8 +967,8 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
     report.summary.validationAggregatorRuntimeProofCollectorStatus,
     'runtime_proof_collector_partial_evidence_accepted_not_ready'
   );
-  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorAcceptedUnitCount, 11);
-  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorExecutedUnitCount, 11);
+  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorAcceptedUnitCount, 12);
+  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorExecutedUnitCount, 12);
   assert.equal(report.summary.validationAggregatorRuntimeProofCollectorCanClaimV1RcReady, false);
   assert.equal(
     report.evidence.p66ValidationAggregatorRuntimeProofCollector.units.sourceRegistryProof.accepted,
@@ -941,6 +1022,11 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
       .migrationImportExportBackupRestoreApprovalProof.accepted,
     true
   );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeProofCollector.units
+      .httpRuntimeObservabilityOperationProof.accepted,
+    true
+  );
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
   assert.equal(report.summary.rcReady, false);
@@ -992,10 +1078,12 @@ test('runtime proof collector does not perform fs, command, provider, or runtime
       recallIsolationRuntimeProof:
         buildRecallIsolationRuntimeProofInput(),
       migrationImportExportBackupRestoreApprovalProof:
-        buildMigrationImportExportBackupRestoreApprovalProofInput()
+        buildMigrationImportExportBackupRestoreApprovalProofInput(),
+      httpRuntimeObservabilityOperationProof:
+        buildHttpRuntimeObservabilityOperationProofInput()
     });
 
-    assert.equal(report.summary.acceptedUnitCount, 11);
+    assert.equal(report.summary.acceptedUnitCount, 12);
     assert.equal(report.safety.readsFiles, false);
     assert.equal(report.safety.executesCommands, false);
     assert.equal(report.safety.readsRealMemory, false);
