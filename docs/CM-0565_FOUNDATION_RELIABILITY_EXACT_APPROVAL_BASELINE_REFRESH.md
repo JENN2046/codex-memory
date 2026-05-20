@@ -118,8 +118,26 @@ production ready: not claimed
 controlling status: RC_NOT_READY_BLOCKED
 ```
 
+## Post-Push Reconciliation
+
+CM-0565 docs-only refresh was committed and pushed at:
+
+```text
+0bc16db61f7b0ee0348f77d87d08f58bb2abb14f
+```
+
+Post-push remote reconciliation confirmed:
+
+```text
+local HEAD: 0bc16db61f7b0ee0348f77d87d08f58bb2abb14f
+origin/main: 0bc16db61f7b0ee0348f77d87d08f58bb2abb14f
+remote refs/heads/main: 0bc16db61f7b0ee0348f77d87d08f58bb2abb14f
+```
+
+This reconciliation does not execute CM-0562 live validation and does not change the approval requirement.
+
 ## Next Safe Action
 
-Run docs-only validation for this refresh and commit it locally.
+Request an exact CM-0562 approval only if the user is ready to allow the named bounded runtime actions.
 
 Do not execute CM-0562 live validation until a future exact approval binds the target baseline and live remote state.
