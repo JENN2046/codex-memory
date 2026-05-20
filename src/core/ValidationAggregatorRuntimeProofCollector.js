@@ -118,6 +118,17 @@ const {
   SAFE_SOURCE_TYPES: HTTP_OBSERVABILITY_SAFE_SOURCE_TYPES,
   evaluateHttpRuntimeObservabilityOperation
 } = require('./HttpRuntimeObservabilityOperationContract');
+const {
+  EXPECTED_MANIFEST_VERSION: EVIDENCE_RUNTIME_TRACE_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: EVIDENCE_RUNTIME_TRACE_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: EVIDENCE_RUNTIME_TRACE_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: EVIDENCE_RUNTIME_TRACE_PUBLIC_MCP_TOOLS,
+  REQUIRED_BLOCKED_ACTIONS: EVIDENCE_RUNTIME_TRACE_REQUIRED_BLOCKED_ACTIONS,
+  REQUIRED_FAIL_CLOSED_STATES: EVIDENCE_RUNTIME_TRACE_REQUIRED_FAIL_CLOSED_STATES,
+  REQUIRED_RUNTIME_GAP_IDS: EVIDENCE_RUNTIME_TRACE_REQUIRED_RUNTIME_GAP_IDS,
+  REQUIRED_SOURCE_EVIDENCE_IDS: EVIDENCE_RUNTIME_TRACE_REQUIRED_SOURCE_EVIDENCE_IDS,
+  evaluateEvidenceRuntimeTrace
+} = require('./EvidenceRuntimeTraceContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -1192,6 +1203,106 @@ function buildHttpRuntimeObservabilityOperationProofInput(patch = {}) {
   };
 }
 
+function buildEvidenceRuntimeTraceSourceEvidence(overrides = {}) {
+  return EVIDENCE_RUNTIME_TRACE_REQUIRED_SOURCE_EVIDENCE_IDS.map(id => ({
+    id,
+    phase: 'P55',
+    sourceType: 'committed_fixture',
+    evidenceClass: id,
+    artifactRefs: [`validation-aggregator:${id}`],
+    runtimeAuthority: false,
+    readinessAuthority: false,
+    ...overrides[id]
+  }));
+}
+
+function buildEvidenceRuntimeTraceGaps(overrides = {}) {
+  return EVIDENCE_RUNTIME_TRACE_REQUIRED_RUNTIME_GAP_IDS.map(id => ({
+    id,
+    requiredRuntimeGate: `${id}_gate`,
+    currentDisposition: 'blocked',
+    blocksRc: true,
+    ...overrides[id]
+  }));
+}
+
+function buildEvidenceRuntimeTraceLinks(overrides = {}) {
+  return EVIDENCE_RUNTIME_TRACE_REQUIRED_SOURCE_EVIDENCE_IDS.map((sourceEvidenceId, index) => {
+    const runtimeGapId = EVIDENCE_RUNTIME_TRACE_REQUIRED_RUNTIME_GAP_IDS[
+      index % EVIDENCE_RUNTIME_TRACE_REQUIRED_RUNTIME_GAP_IDS.length
+    ];
+
+    return {
+      sourceEvidenceId,
+      runtimeGapId,
+      traceStatus: 'blocked_trace_only',
+      ...overrides[sourceEvidenceId]
+    };
+  });
+}
+
+function buildEvidenceRuntimeTraceProofInput(patch = {}) {
+  return {
+    schemaVersion: EVIDENCE_RUNTIME_TRACE_SCHEMA_VERSION,
+    policyVersion: EVIDENCE_RUNTIME_TRACE_POLICY_VERSION,
+    manifestVersion: EVIDENCE_RUNTIME_TRACE_MANIFEST_VERSION,
+    fixtureOnly: true,
+    synthetic: true,
+    explicitInputOnly: true,
+    traceOnly: true,
+    sourceMode: 'committed_fixture',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    acceptedForPlanning: true,
+    runtimeEnforcementImplemented: false,
+    runtimeIntegrated: false,
+    runtimeReady: false,
+    validationAggregatorFullImplementation: false,
+    finalRcMatrixExecuted: false,
+    finalRcMatrixReady: false,
+    rcReady: false,
+    publicMcpTools: [...EVIDENCE_RUNTIME_TRACE_PUBLIC_MCP_TOOLS],
+    sourceEvidence: buildEvidenceRuntimeTraceSourceEvidence(),
+    runtimeGaps: buildEvidenceRuntimeTraceGaps(),
+    traceLinks: buildEvidenceRuntimeTraceLinks(),
+    failClosedStates: [...EVIDENCE_RUNTIME_TRACE_REQUIRED_FAIL_CLOSED_STATES],
+    blockedActions: [...EVIDENCE_RUNTIME_TRACE_REQUIRED_BLOCKED_ACTIONS],
+    forbiddenClaims: [
+      'runtime-enforcement-ready',
+      'validation-aggregator-full-implementation-ready',
+      'final-rc-matrix-ready',
+      'v1-rc-ready',
+      'runtime-ready'
+    ],
+    safety: {
+      readsFilesImplicitly: false,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      localTraceContractReady: true,
+      runtimeEnforcementReady: false,
+      validationAggregatorFullImplementationReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      pushReady: false,
+      releaseReady: false,
+      deployReady: false,
+      configSwitchReady: false,
+      watchdogReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -1531,6 +1642,31 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'evidenceRuntimeTraceProof')) {
+    const result = evaluateEvidenceRuntimeTrace(
+      safeInputs.evidenceRuntimeTraceProof
+    );
+    units.evidenceRuntimeTraceProof = {
+      id: 'evidence_runtime_trace_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      sourceEvidence: result.sourceEvidence,
+      runtimeGaps: result.runtimeGaps,
+      traceLinks: result.traceLinks,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.evidenceRuntimeTraceProof = buildNotSuppliedUnit(
+      'evidence_runtime_trace_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -1574,6 +1710,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.migrationImportExportBackupRestoreApprovalProof.accepted,
       httpRuntimeObservabilityOperationProofAccepted:
         units.httpRuntimeObservabilityOperationProof.accepted,
+      evidenceRuntimeTraceProofAccepted:
+        units.evidenceRuntimeTraceProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -1604,6 +1742,7 @@ module.exports = {
   COLLECTOR_SCHEMA_VERSION,
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
+  buildEvidenceRuntimeTraceProofInput,
   buildGovernanceRuntimeLoopGapProofInput,
   buildHttpRuntimeObservabilityOperationProofInput,
   buildMigrationImportExportBackupRestoreApprovalProofInput,
