@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0561 search timeout cooperative abort boundary |
+| Current task | CM-0562 Foundation Reliability exact-approval packet |
 | Current area | P4-http-runtime / P10-observability-admin |
 | Last pushed runtime baseline | `0805af782b7f2f9d88a5a34e69defcc863e1fc8f`; latest branch head must be verified with Git after docs/board reconciliation |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Implemented, validated, committed, push-readiness checked, and pushed CM-0561 cooperative abort boundary for `search_memory` timeout. |
-| Last validation | CM-0561 validation passed: `node --check` changed source/test files; `node --test .\tests\mcp-contract.test.js` 9/9; `node --test .\tests\phase-b-passive-recall.test.js` 4/4; `npm test` 1603/1603; `git diff --check`; docs validation. |
-| Worktree summary | Post-CM-0561 project-state reconciliation only. No true `record_memory`, true live `search_memory`, `.jsonl` read, real memory scan, durable write/audit write, provider call, config switch, package change, public MCP expansion, tag, release, deploy, cutover, or readiness claim. |
+| Last action | Prepared CM-0562 planning-only exact-approval packet for bounded authorized write-path validation and bounded recall validation. |
+| Last validation | CM-0562 docs validation passed: `git diff --check`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`. CM-0561 validation passed: `node --check` changed source/test files; `node --test .\tests\mcp-contract.test.js` 9/9; `node --test .\tests\phase-b-passive-recall.test.js` 4/4; `npm test` 1603/1603. |
+| Worktree summary | Current intended changes are docs/board only for CM-0562 packet. No true `record_memory`, true live `search_memory`, `.jsonl` read, real memory scan, durable write/audit write, provider call, config switch, package change, public MCP expansion, tag, release, deploy, cutover, or readiness claim. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; current goal also allows automatic push only after push-readiness preflight passes |
 | Safe-push readiness | CM-0561 push completed; post-push reconciliation confirmed `origin/main` at `0805af782b7f2f9d88a5a34e69defcc863e1fc8f` before this docs/board status update |
-| Next planned action | Commit and push this CM-0561 post-push project-state update, then continue Phase 1 with an exact-approval packet for bounded write/recall validation or fixture-only side-effect isolation tests. 中文解释：下一步只同步这次推送后的项目状态；之后继续第 1 阶段，不调用真实检索、不读取真实记忆，也不声明 ready。 |
+| Next planned action | Validate, commit, push-readiness check, and push the CM-0562 packet; then either wait for exact approval or continue fixture-only side-effect isolation tests. 中文解释：下一步只提交授权包，不执行真实写入或检索，也不声明 ready。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19

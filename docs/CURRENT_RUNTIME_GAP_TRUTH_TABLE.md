@@ -44,6 +44,7 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 8. Use `docs/CM-0559_SEARCH_MEMORY_TIMEOUT_READONLY_ANALYSIS.md` as the search timeout analysis that recommended CM-0560.
 9. Use `docs/CM-0560_SEARCH_MEMORY_TIMEOUT_BOUNDARY.md` as the local timeout-boundary evidence. CM-0560 controls the client-visible JSON-RPC timeout error shape, but it does not prove memory recall reliability and does not change any `complete?` value in this table.
 10. Use `docs/CM-0561_SEARCH_MEMORY_COOPERATIVE_ABORT_BOUNDARY.md` as the cooperative abort-boundary evidence at runtime baseline `0805af782b7f2f9d88a5a34e69defcc863e1fc8f`. CM-0561 reduces post-timeout side-effect risk at app/recall/candidate awaited boundaries, but it is not hard cancellation, does not prove memory recall reliability, and does not change any `complete?` value in this table.
+11. Use `docs/CM-0562_FOUNDATION_RELIABILITY_EXACT_APPROVAL_PACKET.md` as the current Phase 1 exact-approval packet for bounded authorized write-path and bounded recall validation. It is `DRAFT_NOT_APPROVED`, does not execute validation, does not close any gap, and does not change any `complete?` value in this table.
 
 ## Hard Boundary
 
