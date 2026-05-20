@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-19
+更新时间：2026-05-20
 
 ## Purpose
 
@@ -10,6 +10,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
+- Current A5 enablement obstacle clearance: current synced `main` is `675895237c96bdebf4718f41c6318dbd5974aebc fix: return json-rpc error for no-token mutations`. The HTTP no-token mutation rejection shape is fixed and pushed. Remaining A5 startup blockers are not Git blockers; they are exact-approval/runtime-gap blockers. Recommended next exact unit is `AUTH_WRITE_PATH_VALIDATION_001`, still requiring separate approval before any authorized write-path validation.
 - Git baseline before A5-GAP-1 durable audit writer smoke: local `main` is at `f473f99c2f308f00ea324bfde4a9e6195dbd9b27 docs: prepare p66 a5 gap1 durable audit packet` and ahead of `origin/main = a9177d5 fix: tighten review patch safety semantics`; exact `HEAD` is verified from Git commands.
 - Current local work: record approved fresh A5-GAP-5 cutover-context strict gate evidence for current `HEAD`. The strict gate failed in the test gate (`1569/1573` pass, 4 fail), while health, contract, compare, and rollback passed. No remote write or cutover occurred.
 - Current A4 repair: the four stale test-contract failures from the fresh A5-GAP-5 gate have been fixed locally. Updated tests now reflect explicit recall isolation hiding `rejected`, `superseded`, and `tombstoned` before lifecycle soft read policy. Fresh A5-GAP-5 rerun is still not executed and requires new exact approval.

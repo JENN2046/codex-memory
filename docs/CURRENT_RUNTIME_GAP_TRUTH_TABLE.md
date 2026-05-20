@@ -3,8 +3,8 @@
 Status: CURRENT_RUNTIME_TRUTH_TABLE
 Decision: NOT_READY_BLOCKED
 Scope: authoritative current runtime gap dashboard
-Local baseline: `c840d060970483295c6bda01068560032eccd148`
-Remote baseline: `c840d060970483295c6bda01068560032eccd148` after DOGFOOD_SUMMARY_001 post-push sync; must be re-read before push, precheck, release, or cutover-sensitive work
+Local baseline: `675895237c96bdebf4718f41c6318dbd5974aebc`
+Remote baseline: `675895237c96bdebf4718f41c6318dbd5974aebc` after HTTP JSON-RPC rejection-shape fix post-push sync; must be re-read before push, precheck, release, or cutover-sensitive work
 
 ## Purpose
 
@@ -39,6 +39,7 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 3. Treat HTTP session TTL/cap/cleanup as local runtime hardening completed; future HTTP observe/precheck still requires exact approval.
 4. Use `docs/RC_PRECHECK_002_PLAN.md` as a planning-only packet; do not execute `RC_PRECHECK_002` without future exact approval naming target and commands.
 5. Any precheck pass remains precheck evidence, not readiness.
+6. Use `docs/A5_ENABLEMENT_OBSTACLE_CLEARANCE_001.md` as the current A5 startup obstacle map; it does not execute A5 or close runtime gaps.
 
 ## Hard Boundary
 
@@ -160,3 +161,22 @@ This table does not authorize:
 - Future precheck execution must re-read local HEAD, `origin/main`, and remote main and stop on drift unless a new exact approval updates the target.
 - This planning record does not change any `complete?` value in the truth table.
 - This planning record does not authorize RC_PRECHECK_002 execution, HTTP observe, compare/rollback, provider calls, real memory scans, durable memory/audit writes, config switch, migration/backup apply, public MCP expansion, push/tag/release/deploy, cutover, real rollback, or readiness claims.
+
+## HTTP JSON-RPC Rejection Shape Fix - 2026-05-20
+
+- Result: HTTP_JSONRPC_REJECTION_SHAPE_FIX_PUSHED_NOT_RC_READY.
+- Commit: `675895237c96bdebf4718f41c6318dbd5974aebc`.
+- no-token `record_memory` mutation rejection now returns a JSON-RPC error envelope instead of a plain JSON `403` body.
+- Controlled live MCP validation after local restart observed health 200, JSON-RPC `initialize`, JSON-RPC `tools/list`, JSON-RPC `Forbidden` for no-token `record_memory`, and bounded `search_memory` result in 795 ms.
+- This fix does not prove authorized write-path readiness.
+- This fix does not close any `complete?` value in the truth table.
+- Controlling state remains RC_NOT_READY_BLOCKED.
+
+## A5 Enablement Obstacle Clearance - 2026-05-20
+
+- Result: A5_ENABLEMENT_OBSTACLE_CLEARANCE_001_READY_FOR_COMMIT.
+- Note: `docs/A5_ENABLEMENT_OBSTACLE_CLEARANCE_001.md`.
+- A5 is narrowed to exact-approval execution units, not a standing always-on mode.
+- Recommended next exact A5 unit is `AUTH_WRITE_PATH_VALIDATION_001`.
+- This obstacle clearance does not execute provider calls, real memory broad scans, durable memory/audit writes, config switch, migration/backup apply, public MCP expansion, push/tag/release/deploy/cutover, or readiness claims.
+- Controlling state remains RC_NOT_READY_BLOCKED.

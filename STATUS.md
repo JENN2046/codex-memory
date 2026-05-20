@@ -1,9 +1,10 @@
 # codex-memory Status
 
-更新时间：2026-05-19
+更新时间：2026-05-20
 
 ## 当前结论
 
+- 当前 A5 enablement obstacle clearance：已新增 [A5_ENABLEMENT_OBSTACLE_CLEARANCE_001](/A:/codex-memory/docs/A5_ENABLEMENT_OBSTACLE_CLEARANCE_001.md)，把“启动 A5 自动化”收敛为 exact-approval A5 execution units，而不是常开模式。当前 mode 统一表述为 `A4.8 Single-Window 4-Agent Compact Autopilot`，控制状态仍为 `RC_NOT_READY_BLOCKED`。当前 pushed HEAD 为 `675895237c96bdebf4718f41c6318dbd5974aebc`；HTTP no-token `record_memory` 反序列化问题已修复并推送，但授权写入路径尚未 acceptance。推荐下一项是 `AUTH_WRITE_PATH_VALIDATION_001`，它仍需单独 exact approval；未执行 provider、real memory broad scan、durable memory/audit write、config switch、migration/backup apply、public MCP expansion、push/tag/release/deploy/cutover 或 readiness claim。
 - 当前 RC_PRECHECK_002 planning：已新增 [RC_PRECHECK_002_PLAN](/A:/codex-memory/docs/RC_PRECHECK_002_PLAN.md) 作为 planning-only packet。记录 `LOCAL_RC_CANDIDATE_CLOSEOUT_ACCEPTED`、`DOGFOOD_001`–`DOGFOOD_004` 已完成并由 `DOGFOOD_SUMMARY_001` 汇总、`DOGFOOD_SUMMARY_001` 已远端同步到 `c840d06`、real rollback remains A5 blocked、RC remains `NOT_READY_BLOCKED`、V8 not implemented。该计划只定义 future exact-approval 下的 candidate commands、evidence output shape、stop conditions 和 target drift rule；未执行 RC_PRECHECK_002、HTTP observe、compare/rollback、provider、real memory scan、durable write/audit、config switch、migration/backup apply、public MCP expansion、push/tag/release/deploy/cutover 或 readiness claim。
 - 当前 DOGFOOD_SUMMARY_001：已新增 [DOGFOOD_SUMMARY_001](/A:/codex-memory/docs/DOGFOOD_SUMMARY_001.md) 汇总 `DOGFOOD_001` / `DOGFOOD_002` / `DOGFOOD_003` / `DOGFOOD_004` 的命令、结果、证据和禁止项。四轮全部保持 `NOT_RC_READY`，控制状态仍为 `NOT_READY_BLOCKED`；real rollback 仍 A5 blocked；V8 未实现，不能声明 VCP full parity。未新增 `DOGFOOD_005/006/007`，未执行 provider、real memory scan、durable write/audit、config switch、migration/backup apply、public MCP expansion、push/tag/release/deploy 或 readiness claim。
 - 当前 AGENTS v0.3.1 compatibility note：已在 [AGENTS_V0_3_1_COMPATIBILITY_NOTE](/A:/codex-memory/docs/AGENTS_V0_3_1_COMPATIBILITY_NOTE.md) 记录 selective adoption 结论，并已推送到 `origin/main = ce36258`。该 note 不替换或削弱当前 `AGENTS.md`，profile 仍为 `Standard`，BHA state 仍为 `BHA_ABSENT`，当前执行仍走 A4/A4.8 codex-memory rails；未启动 HTTP、未读真实 memory/audit、未写 durable memory/audit、未调用 provider、未执行 migration/rebuild/cleanup/apply/confirm，项目继续保持 `NOT_READY_BLOCKED`。

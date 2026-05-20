@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | HTTP no-token JSON-RPC mutation rejection fix |
-| Current area | P0-mainline-health / P4-http-runtime |
-| Last pushed baseline | `228d3e5` on `origin/main` |
+| Current task | A5 enablement obstacle clearance |
+| Current area | P10-observability-admin / P4-http-runtime |
+| Last pushed baseline | `6758952` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Fixed HTTP no-token mutation `tools/call` rejection to preserve the block while returning a JSON-RPC error envelope, then restarted live HTTP MCP via controlled local stop/start and ran bounded live MCP validation. |
-| Last validation | `git diff --check` passed; `node --test .\tests\mcp-http.test.js` passed 13/13; `npm run gate:mainline:strict` passed with contract 20/20, tests 1601/1601, compare 43/43, rollback 43/43; live HTTP health 200; no-token `record_memory` returned JSON-RPC `Forbidden`; bounded `search_memory` returned JSON-RPC result in 795 ms. |
-| Worktree summary | Intended changes are limited to `src/adapters/codex-mcp/http.js`, `tests/mcp-http.test.js`, and `.agent_board/*`; live validation performed one synthetic rejected mutation request and one bounded `search_memory` request; no provider call, config switch, push, tag, release, deploy, or readiness claim. |
+| Last action | Pushed HTTP no-token JSON-RPC rejection-shape fix to `origin/main`, then started A5 enablement obstacle clearance as a docs/board planning slice. |
+| Last validation | Previous fix validation passed: `node --test .\tests\mcp-http.test.js` 13/13, `npm run gate:mainline:strict` with tests 1601/1601, and bounded live MCP validation. Current A5 obstacle slice still needs docs validation and `git diff --check`. |
+| Worktree summary | Current intended changes are docs/board only: A5 enablement obstacle note plus status/truth-table/board reconciliation; no A5 execution, provider call, real memory broad scan, durable memory/audit write, config switch, push, tag, release, deploy, or readiness claim. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
-| Safe-push readiness | no push is authorized for this local fix; do not push automatically |
-| Next planned action | Review final diff and, if approved, create a guarded local commit for the HTTP JSON-RPC rejection-shape fix. 中文解释：下一步只适合在确认补丁范围和验证证据后本地提交，不能 push、release、deploy 或声明 RC/runtime ready。 |
+| Safe-push readiness | no push is authorized for this A5 obstacle-clearance slice; do not push automatically |
+| Next planned action | Validate and locally commit the A5 enablement obstacle-clearance docs/board slice, then request exact approval for `AUTH_WRITE_PATH_VALIDATION_001` if the user wants the next A5 unit. 中文解释：下一步只适合先把 A5 启动障碍和授权入口固定成文档/board 证据，不能直接执行 A5、写真实记忆、切配置、发布或声明 ready。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19
