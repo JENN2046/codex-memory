@@ -65,6 +65,18 @@ const {
   REQUIRED_READINESS_CLAIMS,
   evaluateValidationAggregatorReadinessOverclaimRejectionProof
 } = require('./ValidationAggregatorReadinessOverclaimRejectionProofContract');
+const {
+  EXPECTED_MANIFEST_VERSION: GOVERNANCE_LOOP_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: GOVERNANCE_LOOP_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: GOVERNANCE_LOOP_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: GOVERNANCE_LOOP_PUBLIC_MCP_TOOLS,
+  REQUIRED_APPROVAL_STATES,
+  REQUIRED_DISALLOWED_WORK,
+  REQUIRED_FAIL_CLOSED_CASES: GOVERNANCE_LOOP_REQUIRED_FAIL_CLOSED_CASES,
+  REQUIRED_RUNTIME_EVIDENCE_GROUPS,
+  REQUIRED_STAGE_IDS,
+  evaluateValidationAggregatorGovernanceRuntimeLoopGap
+} = require('./ValidationAggregatorGovernanceRuntimeLoopGapContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -595,6 +607,158 @@ function buildReadinessOverclaimRejectionProofInput(patch = {}) {
   };
 }
 
+function buildGovernanceRuntimeLoopGapProofInput(patch = {}) {
+  const stageAcceptanceCases = patch.stageAcceptanceCases ||
+    REQUIRED_STAGE_IDS.map(stageId => ({
+      id: stageId,
+      required: true,
+      inputMode: 'explicit_input',
+      expectedStatus: `blocked_${stageId}`,
+      canExecute: false,
+      requiresA5Approval: stageId !== 'review_packet_intake',
+      durableWriteAllowed: false
+    }));
+  const requiredRuntimeEvidenceGroups = patch.requiredRuntimeEvidenceGroups ||
+    REQUIRED_RUNTIME_EVIDENCE_GROUPS.map(groupId => ({
+      id: groupId,
+      required: true,
+      currentStatus: 'missing',
+      mustFailClosedWhenMissing: true
+    }));
+  const approvalStates = patch.approvalStates ||
+    REQUIRED_APPROVAL_STATES.map(stateId => ({
+      id: stateId,
+      acceptedForPlanning: stateId === 'reviewed_not_approved',
+      executionAllowed: false
+    }));
+
+  return {
+    schemaVersion: GOVERNANCE_LOOP_SCHEMA_VERSION,
+    policyVersion: GOVERNANCE_LOOP_POLICY_VERSION,
+    manifestVersion: GOVERNANCE_LOOP_MANIFEST_VERSION,
+    sourceMode: 'explicit_metadata_only',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    selectedGap: {
+      id: 'governance_review_approval_audit_runtime_loop_not_executed',
+      priority: 2,
+      currentStatus: 'open',
+      remainsOpenAfterThisPhase: true,
+      readinessAuthority: false,
+      requiresA5ApprovalBeforeRuntime: true
+    },
+    evidenceGroup: {
+      id: 'governance_runtime_loop_acceptance_contract',
+      currentStatus: 'acceptance_defined',
+      required: true,
+      remainsNonRuntime: true,
+      readinessAuthority: false,
+      mustFailClosedWhenMissing: true,
+      mustFailClosedWhenScopeMismatch: true,
+      mustFailClosedWhenApprovalMissing: true,
+      mustFailClosedWhenAuditRefsMissing: true,
+      mustFailClosedWhenDurableWriteClaimed: true,
+      mustFailClosedWhenRuntimeReadyClaimed: true
+    },
+    publicMcpTools: [...GOVERNANCE_LOOP_PUBLIC_MCP_TOOLS],
+    loopIdentityContract: {
+      loop_id: 'governance_loop_fixture_001',
+      action_id: 'governed_action_fixture_001',
+      review_packet_id: 'review_packet_fixture_001',
+      approval_packet_id: 'approval_packet_fixture_001',
+      pre_action_audit_event_id: 'audit_event_fixture_pre_001',
+      decision_audit_event_id: 'audit_event_fixture_decision_001',
+      post_action_audit_event_id: 'audit_event_fixture_post_001',
+      correlation_id: 'governance_correlation_fixture_001',
+      allRequired: true,
+      mustRemainStableAcrossStages: true,
+      mustFailClosedWhenMissingOrMismatched: true
+    },
+    scopeContract: {
+      project_ref: 'project_ref_fixture_alpha',
+      workspace_ref: 'workspace_ref_fixture_alpha',
+      client_ref: 'client_ref_fixture_alpha',
+      agent_ref: 'agent_ref_fixture_alpha',
+      task_ref: 'task_ref_fixture_alpha',
+      visibility: 'private',
+      scopeMustMatchAcrossReviewApprovalAuditAndExecution: true,
+      rawWorkspaceIdExposedInLowRiskSummary: false,
+      mustFailClosedWhenScopeMissingOrMismatched: true
+    },
+    authorityContract: {
+      approvalRequired: true,
+      approvalCurrentlyGranted: false,
+      approvalStatus: 'NOT_APPROVED',
+      a5ApprovalRequiredBeforeRuntime: true,
+      approvalMustNameActionId: true,
+      approvalMustMatchScope: true,
+      approvalMustNameDurableWriteIntent: true,
+      warningOnlyApprovalAllowed: false,
+      staleApprovalAllowed: false,
+      executionAllowedByFixture: false
+    },
+    auditRefContract: {
+      preActionAuditRefRequired: true,
+      decisionAuditRefRequired: true,
+      postActionAuditRefRequired: true,
+      auditRefsMustPreserveEventIdentity: true,
+      durableAuditWriteAllowedInFixture: false,
+      rawAuditPayloadAllowedInLowRiskSummary: false,
+      mustFailClosedWhenAuditRefsMissingOrMismatched: true
+    },
+    stageAcceptanceCases,
+    requiredRuntimeEvidenceGroups,
+    approvalStates,
+    failClosedCases: [...GOVERNANCE_LOOP_REQUIRED_FAIL_CLOSED_CASES],
+    disallowedWork: [...REQUIRED_DISALLOWED_WORK],
+    lowRiskSummary: {
+      rawWorkspaceIdExposed: false,
+      rawSecretExposed: false,
+      rawGovernancePayloadExposed: false
+    },
+    safety: {
+      noRuntimeImplementation: true,
+      noGovernanceLoopExecution: true,
+      noGovernedActionExecution: true,
+      noApprovalExecution: true,
+      noCommandExecution: true,
+      noGateExecution: true,
+      noRunnerExecution: true,
+      noServiceStart: true,
+      noProviderCall: true,
+      noConfigMutation: true,
+      noStartupWatchdogOperation: true,
+      noRealMemoryPreview: true,
+      noRealGovernancePacketRead: true,
+      noRealAuditLogRead: true,
+      noRuntimeStoreScan: true,
+      noDurableMemoryWrite: true,
+      noDurableAuditWrite: true,
+      noMigrationApply: true,
+      noImportExportApply: true,
+      noPublicMcpExpansion: true,
+      noPackageChange: true,
+      noSecretChange: true,
+      noRemoteWrite: true,
+      noTagReleaseDeploy: true
+    },
+    readiness: {
+      validationAggregatorFullImplementationReady: false,
+      governanceRuntimeLoopReady: false,
+      governanceRuntimeLoopExecuted: false,
+      approvalExecutionReady: false,
+      auditWriterReady: false,
+      durableWriteReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      cutoverReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -813,6 +977,37 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'governanceRuntimeLoopGapProof')) {
+    const result = evaluateValidationAggregatorGovernanceRuntimeLoopGap(
+      safeInputs.governanceRuntimeLoopGapProof
+    );
+    units.governanceRuntimeLoopGapProof = {
+      id: 'governance_runtime_loop_gap_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      summary: result.summary,
+      missingRequiredStages: result.missingRequiredStages,
+      stagesAllowingExecution: result.stagesAllowingExecution,
+      missingRequiredRuntimeEvidenceGroups: result.missingRequiredRuntimeEvidenceGroups,
+      runtimeEvidenceGroupsNotMissing: result.runtimeEvidenceGroupsNotMissing,
+      missingRequiredApprovalStates: result.missingRequiredApprovalStates,
+      approvalStatesAllowingExecution: result.approvalStatesAllowingExecution,
+      missingRequiredFailClosedCases: result.missingRequiredFailClosedCases,
+      missingRequiredDisallowedWork: result.missingRequiredDisallowedWork,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.governanceRuntimeLoopGapProof = buildNotSuppliedUnit(
+      'governance_runtime_loop_gap_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -848,6 +1043,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.noTouchBoundaryProof.accepted,
       readinessOverclaimRejectionProofAccepted:
         units.readinessOverclaimRejectionProof.accepted,
+      governanceRuntimeLoopGapProofAccepted:
+        units.governanceRuntimeLoopGapProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -878,6 +1075,7 @@ module.exports = {
   COLLECTOR_SCHEMA_VERSION,
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
+  buildGovernanceRuntimeLoopGapProofInput,
   buildMissingStaleEvidenceFailClosedProofInput,
   buildNoTouchBoundaryProofInput,
   buildReadinessOverclaimRejectionProofInput,
