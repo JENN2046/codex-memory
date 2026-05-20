@@ -99,7 +99,10 @@ function createForbiddenPayload(reason) {
 }
 
 function createForbiddenJsonRpcPayload(body, reason) {
-  return jsonRpcError(body?.id ?? null, -32000, 'Forbidden', reason);
+  return jsonRpcError(body?.id ?? null, -32001, 'Forbidden', {
+    code: 'NO_TOKEN_MUTATION_REJECTED',
+    reason
+  });
 }
 
 function parseHardeningNumber(spec, env = process.env) {

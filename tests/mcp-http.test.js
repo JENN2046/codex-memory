@@ -228,11 +228,34 @@ test('HTTP MCP should reject no-token mutation tool calls', async () => {
       assert.equal(response.status, 403);
       assert.equal(payload.jsonrpc, '2.0');
       assert.equal(payload.id, 5 + index);
-      assert.equal(payload.error.code, -32000);
+      assert.equal(payload.error.code, -32001);
       assert.equal(payload.error.message, 'Forbidden');
-      assert.match(payload.error.data, /no-token/i);
-      assert.match(payload.error.data, /mutation/i);
+      assert.equal(payload.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
+      assert.match(payload.error.data.reason, /no-token/i);
+      assert.match(payload.error.data.reason, /mutation/i);
     }
+
+    const responseWithoutId = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'tools/call',
+        params: mutationCalls[0]
+      })
+    });
+    const payloadWithoutId = await responseWithoutId.json();
+
+    assert.equal(responseWithoutId.status, 403);
+    assert.equal(payloadWithoutId.jsonrpc, '2.0');
+    assert.equal(payloadWithoutId.id, null);
+    assert.equal(payloadWithoutId.error.code, -32001);
+    assert.equal(payloadWithoutId.error.message, 'Forbidden');
+    assert.equal(payloadWithoutId.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
+    assert.match(payloadWithoutId.error.data.reason, /no-token/i);
+    assert.match(payloadWithoutId.error.data.reason, /mutation/i);
   });
 });
 
