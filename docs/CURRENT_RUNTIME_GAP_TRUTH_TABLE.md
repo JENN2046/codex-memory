@@ -3,8 +3,8 @@
 Status: CURRENT_RUNTIME_TRUTH_TABLE
 Decision: NOT_READY_BLOCKED
 Scope: authoritative current runtime gap dashboard
-Local baseline: `765ab1825535c8b66078e50ff43ac519488d25f8`
-Remote baseline: must be re-read before push, precheck, release, or cutover-sensitive work
+Local baseline: `c840d060970483295c6bda01068560032eccd148`
+Remote baseline: `c840d060970483295c6bda01068560032eccd148` after DOGFOOD_SUMMARY_001 post-push sync; must be re-read before push, precheck, release, or cutover-sensitive work
 
 ## Purpose
 
@@ -37,7 +37,8 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 1. Keep this table as the sole current runtime gap dashboard.
 2. Treat `docs/P66_RUNTIME_GAP_TRUTH_TABLE.md` as historical source/evidence detail, not the current map.
 3. Treat HTTP session TTL/cap/cleanup as local runtime hardening completed; future HTTP observe/precheck still requires exact approval.
-4. Refresh `RC_PRECHECK_001` only through exact approval lines; any pass remains precheck evidence, not readiness.
+4. Use `docs/RC_PRECHECK_002_PLAN.md` as a planning-only packet; do not execute `RC_PRECHECK_002` without future exact approval naming target and commands.
+5. Any precheck pass remains precheck evidence, not readiness.
 
 ## Hard Boundary
 
@@ -144,3 +145,18 @@ This table does not authorize:
 - VCP full parity is not claimed.
 - This summary does not change any `complete?` value in the truth table.
 - This summary does not authorize DOGFOOD_005/006/007, provider calls, real memory scans, durable memory/audit writes, config switch, migration/backup apply, public MCP expansion, push/tag/release/deploy, cutover, real rollback, or readiness claims.
+
+## RC_PRECHECK_002 Planning - 2026-05-20
+
+- Result: RC_PRECHECK_002_PLAN_READY_FOR_COMMIT.
+- Plan doc: `docs/RC_PRECHECK_002_PLAN.md`.
+- LOCAL_RC_CANDIDATE_CLOSEOUT_ACCEPTED.
+- DOGFOOD_001 through DOGFOOD_004 are completed and summarized.
+- DOGFOOD_SUMMARY_001 is remote-synced at `c840d06`.
+- real rollback remains A5 blocked.
+- RC remains NOT_READY_BLOCKED.
+- V8 is not implemented.
+- Target planning baseline: `c840d060970483295c6bda01068560032eccd148`.
+- Future precheck execution must re-read local HEAD, `origin/main`, and remote main and stop on drift unless a new exact approval updates the target.
+- This planning record does not change any `complete?` value in the truth table.
+- This planning record does not authorize RC_PRECHECK_002 execution, HTTP observe, compare/rollback, provider calls, real memory scans, durable memory/audit writes, config switch, migration/backup apply, public MCP expansion, push/tag/release/deploy, cutover, real rollback, or readiness claims.

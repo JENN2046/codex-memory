@@ -590,3 +590,33 @@ Recorded:
 Boundary preserved: no DOGFOOD_005/006/007, provider call, real memory scan, durable memory/audit write, config switch, migration/backup apply, public MCP expansion, push/tag/release/deploy/cutover, or readiness claim.
 
 Next safe action: stage and commit only this docs/board summary after validation passes. 中文解释：下一步只适合提交已验证的汇总记录，不能把四轮 dogfood 证据扩大成发布或 real rollback 授权。
+
+## RC_PRECHECK_002 planning
+
+Status: RC_PRECHECK_002_PLAN_READY_FOR_COMMIT
+Area: P0-mainline-health / P5-rollback-readiness / P10-observability-admin
+Risk: A4 docs/board planning only
+
+Plan doc: [docs/RC_PRECHECK_002_PLAN.md](/A:/codex-memory/docs/RC_PRECHECK_002_PLAN.md)
+
+Recorded:
+
+- `LOCAL_RC_CANDIDATE_CLOSEOUT_ACCEPTED`.
+- DOGFOOD_001 through DOGFOOD_004 are completed and summarized.
+- DOGFOOD_SUMMARY_001 is remote-synced at `c840d06`.
+- Real rollback remains A5 blocked.
+- RC remains `NOT_READY_BLOCKED`.
+- V8 is not implemented.
+- Future `RC_PRECHECK_002` requires exact approval naming target commit and command list.
+
+Defined:
+
+- allowed command candidates
+- forbidden actions
+- evidence output shape
+- stop conditions
+- target baseline and drift rule
+
+Boundary preserved: no RC_PRECHECK_002 execution, HTTP observe, compare/rollback, provider call, real memory scan, durable memory/audit write, config switch, migration/backup apply, public MCP expansion, src/tests/package modification, push/tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: validate and locally commit this planning-only packet after explicit authorization. 中文解释：下一步只适合把计划作为本地文档提交候选，不能执行 precheck 或把候选命令当成授权。
