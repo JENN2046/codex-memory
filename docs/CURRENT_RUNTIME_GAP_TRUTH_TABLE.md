@@ -3,7 +3,7 @@
 Status: CURRENT_RUNTIME_TRUTH_TABLE
 Decision: NOT_READY_BLOCKED
 Scope: authoritative current runtime gap dashboard
-Runtime change baseline: `a4fdaf85be21031901f35139129f68a1c521c2f2`
+Runtime change baseline: `846dd675313b098bc8cd0b29ad604398505a258d`
 Branch-head rule: latest local/remote branch head must be re-read with Git before push, precheck, release, or cutover-sensitive work; docs/board reconciliation commits after the runtime baseline do not change runtime readiness.
 
 ## Purpose
