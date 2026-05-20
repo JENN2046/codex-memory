@@ -77,6 +77,18 @@ const {
   REQUIRED_STAGE_IDS,
   evaluateValidationAggregatorGovernanceRuntimeLoopGap
 } = require('./ValidationAggregatorGovernanceRuntimeLoopGapContract');
+const {
+  EXPECTED_MANIFEST_VERSION: RECALL_ISOLATION_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: RECALL_ISOLATION_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: RECALL_ISOLATION_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: RECALL_ISOLATION_PUBLIC_MCP_TOOLS,
+  REQUIRED_DISALLOWED_WORK: RECALL_ISOLATION_REQUIRED_DISALLOWED_WORK,
+  REQUIRED_FAIL_CLOSED_CASES: RECALL_ISOLATION_REQUIRED_FAIL_CLOSED_CASES,
+  REQUIRED_ISOLATED_RECORD_FAMILIES,
+  REQUIRED_PROOF_SURFACES,
+  REQUIRED_RUNTIME_EVIDENCE_GROUPS: RECALL_ISOLATION_REQUIRED_RUNTIME_EVIDENCE_GROUPS,
+  evaluateValidationAggregatorRecallIsolationRuntimeProof
+} = require('./ValidationAggregatorRecallIsolationRuntimeProofContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -759,6 +771,164 @@ function buildGovernanceRuntimeLoopGapProofInput(patch = {}) {
   };
 }
 
+function buildRecallIsolationRecordFamilyCases(overrides = {}) {
+  return REQUIRED_ISOLATED_RECORD_FAMILIES.map(id => ({
+    id,
+    required: true,
+    currentStatus: 'acceptance_defined_not_runtime_executed',
+    mustBeExcludedFromAllProofSurfaces: true,
+    mustFailClosedWhenObserved: true,
+    ...overrides[id]
+  }));
+}
+
+function buildRecallIsolationProofSurfaceCases(overrides = {}) {
+  return REQUIRED_PROOF_SURFACES.map(id => ({
+    id,
+    required: true,
+    runtimeStoreReadAllowed: false,
+    contaminationAllowed: false,
+    syntheticEvidenceAllowed: true,
+    realDataEvidenceAllowed: false,
+    futureEvidenceRequired: true,
+    ...overrides[id]
+  }));
+}
+
+function buildRecallIsolationRuntimeEvidenceGroups(overrides = {}) {
+  return RECALL_ISOLATION_REQUIRED_RUNTIME_EVIDENCE_GROUPS.map(id => ({
+    id,
+    required: true,
+    currentStatus: 'missing',
+    mustFailClosedWhenMissing: true,
+    ...overrides[id]
+  }));
+}
+
+function buildRecallIsolationControlCases(overrides = {}) {
+  return [
+    {
+      id: 'active_in_scope_user_memory_positive_control',
+      recordFamily: 'active_in_scope_user_memory',
+      required: true,
+      mayEnterNormalRecall: true,
+      mayEnterVectorIndex: true,
+      mayEnterCandidateCache: true,
+      mayEnterRanking: true,
+      mayEnterProjection: true,
+      mayEnterUserVisibleAuditSummary: true,
+      mayEnterRecallAuditSummary: true,
+      ...overrides.positive
+    },
+    {
+      id: 'isolated_record_negative_controls',
+      recordFamilies: [...REQUIRED_ISOLATED_RECORD_FAMILIES],
+      required: true,
+      mayEnterNormalRecall: false,
+      mayEnterVectorIndex: false,
+      mayEnterCandidateCache: false,
+      mayEnterRanking: false,
+      mayEnterProjection: false,
+      mayEnterUserVisibleAuditSummary: false,
+      mayEnterRecallAuditSummary: false,
+      ...overrides.negative
+    }
+  ];
+}
+
+function buildRecallIsolationRuntimeProofInput(patch = {}) {
+  return {
+    schemaVersion: RECALL_ISOLATION_SCHEMA_VERSION,
+    policyVersion: RECALL_ISOLATION_POLICY_VERSION,
+    manifestVersion: RECALL_ISOLATION_MANIFEST_VERSION,
+    sourceMode: 'explicit_metadata_only',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    selectedGap: {
+      id: 'recall_isolation_runtime_proof_not_executed',
+      priority: 3,
+      currentStatus: 'open',
+      requiresA5ApprovalBeforeRuntime: true,
+      remainsOpenAfterThisPhase: true,
+      readinessAuthority: false
+    },
+    sourcePlan: {
+      phase: 'P66.42-validation-aggregator-recall-isolation-runtime-proof-gap-planning',
+      fixture: 'tests/fixtures/p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-v1.json',
+      test: 'tests/p66-validation-aggregator-recall-isolation-runtime-proof-gap-plan-fixture.test.js',
+      runtimeAuthority: false,
+      readinessAuthority: false
+    },
+    validationAggregatorFullImplementation: false,
+    recallIsolationRuntimeProofReady: false,
+    recallIsolationRuntimeProofExecuted: false,
+    contaminationReportReady: false,
+    contaminationReportProduced: false,
+    realMemoryScanned: false,
+    runtimeStoreScanned: false,
+    runtimeReady: false,
+    finalRcMatrixReady: false,
+    v1RcReady: false,
+    rcReady: false,
+    cutoverReady: false,
+    publicToolsFrozen: true,
+    publicTools: [...RECALL_ISOLATION_PUBLIC_MCP_TOOLS],
+    internalOnlyTools: ['validate_memory'],
+    isolatedRecordFamilyAcceptanceCases: buildRecallIsolationRecordFamilyCases(),
+    proofSurfaceAcceptanceCases: buildRecallIsolationProofSurfaceCases(),
+    controlCases: buildRecallIsolationControlCases(),
+    requiredRuntimeEvidenceGroups: buildRecallIsolationRuntimeEvidenceGroups(),
+    failClosedCases: [...RECALL_ISOLATION_REQUIRED_FAIL_CLOSED_CASES],
+    disallowedWork: [...RECALL_ISOLATION_REQUIRED_DISALLOWED_WORK],
+    safety: {
+      mutated: false,
+      fixtureOnly: true,
+      acceptanceContractOnly: true,
+      noRuntimeImplementation: true,
+      noRuntimeProofExecution: true,
+      noRecallExecution: true,
+      noRealMemoryRead: true,
+      noRealMemoryScan: true,
+      noDiaryScan: true,
+      noSqliteScan: true,
+      noVectorIndexScan: true,
+      noCandidateCacheScan: true,
+      noRecallAuditScan: true,
+      noRuntimeStoreScan: true,
+      noContaminationReportFromRealData: true,
+      noCommandExecution: true,
+      noGateExecution: true,
+      noRunnerExecution: true,
+      noServiceStart: true,
+      noProviderCall: true,
+      noConfigMutation: true,
+      noStartupWatchdogOperation: true,
+      noDurableMemoryWrite: true,
+      noDurableAuditWrite: true,
+      noMigrationApply: true,
+      noImportExportApply: true,
+      noBackupRestoreApply: true,
+      noPublicMcpExpansion: true,
+      noPackageChange: true,
+      noSecretChange: true,
+      noRemoteWrite: true,
+      noTagReleaseDeploy: true
+    },
+    readiness: {
+      validationAggregatorFullImplementationReady: false,
+      recallIsolationRuntimeProofReady: false,
+      recallIsolationRuntimeProofExecuted: false,
+      contaminationReportReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      cutoverReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -1008,6 +1178,43 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'recallIsolationRuntimeProof')) {
+    const result = evaluateValidationAggregatorRecallIsolationRuntimeProof(
+      safeInputs.recallIsolationRuntimeProof
+    );
+    units.recallIsolationRuntimeProof = {
+      id: 'recall_isolation_runtime_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      summary: result.summary,
+      missingIsolatedRecordFamilies: result.missingIsolatedRecordFamilies,
+      duplicateIsolatedRecordFamilies: result.duplicateIsolatedRecordFamilies,
+      unknownIsolatedRecordFamilies: result.unknownIsolatedRecordFamilies,
+      unsafeIsolatedRecordFamilies: result.unsafeIsolatedRecordFamilies,
+      missingProofSurfaces: result.missingProofSurfaces,
+      duplicateProofSurfaces: result.duplicateProofSurfaces,
+      unknownProofSurfaces: result.unknownProofSurfaces,
+      unsafeProofSurfaces: result.unsafeProofSurfaces,
+      missingRequiredRuntimeEvidence: result.missingRequiredRuntimeEvidence,
+      duplicateRuntimeEvidence: result.duplicateRuntimeEvidence,
+      unknownRuntimeEvidence: result.unknownRuntimeEvidence,
+      runtimeEvidenceNotMissing: result.runtimeEvidenceNotMissing,
+      missingRequiredFailClosedCases: result.missingRequiredFailClosedCases,
+      missingRequiredDisallowedWork: result.missingRequiredDisallowedWork,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.recallIsolationRuntimeProof = buildNotSuppliedUnit(
+      'recall_isolation_runtime_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -1045,6 +1252,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.readinessOverclaimRejectionProof.accepted,
       governanceRuntimeLoopGapProofAccepted:
         units.governanceRuntimeLoopGapProof.accepted,
+      recallIsolationRuntimeProofAccepted:
+        units.recallIsolationRuntimeProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -1078,6 +1287,7 @@ module.exports = {
   buildGovernanceRuntimeLoopGapProofInput,
   buildMissingStaleEvidenceFailClosedProofInput,
   buildNoTouchBoundaryProofInput,
+  buildRecallIsolationRuntimeProofInput,
   buildReadinessOverclaimRejectionProofInput,
   buildRuntimeEvidenceSummaryNormalizationProofInput,
   buildSourceRegistryProofInput,
