@@ -328,6 +328,16 @@ Reference docs:
 
 A4.8 is not unlimited permission. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview` unless a dedicated approved phase explicitly authorizes expansion. A5 hard stops remain manual, including real DB/memory mutation, SQLite migration, MCP public tool/schema expansion, provider calls, dependency changes, secrets/env edits, release/tag/deploy, destructive commands, and stale branch merge/rebase/cherry-pick.
 
+### 7.1.1 AGENTS v0.3.1 Compatibility Boundary
+
+AGENTS v0.3.1 concepts may be used selectively as wording and review aids. They do not replace this project `AGENTS.md`, weaken codex-memory gates, or change current status vocabulary.
+
+Current repository profile is `Standard`: `AGENTS.md` plus `.agent_board/`.
+
+Current BHA state is `BHA_ABSENT`: no `.bha/`, no `scripts/bha-run.js`, and no `scripts/bha-verify.js`.
+
+Therefore, Codex must not claim BHA-backed runtime proof, BHA-enforced closeout, or BHA authorization in this repository unless BHA runtime surfaces are later added and verified against current repository reality.
+
 ---
 
 ## 7.2 Push Authority Rule
@@ -445,6 +455,19 @@ For branch-sensitive, rollback-sensitive, migration-sensitive, release-like, or 
 git log --oneline --decorate -n 10
 ```
 
+### 10.1 Startup Fact Capsule
+
+For non-trivial repository work, report these startup facts when they materially affect scope, risk, validation, handoff, or push-readiness:
+
+- active profile: `Standard` unless BHA runtime surfaces are present and verified
+- BHA state: `BHA_ABSENT` unless BHA runtime surfaces are present and verified
+- current autonomy rail: A4 / A4.8 codex-memory rails
+- branch and worktree state
+- current goal source
+- next safe local task
+
+This capsule is an orientation aid only. It does not weaken hard stops, validation gates, project-specific status vocabulary, or `NOT_READY_BLOCKED`.
+
 ---
 
 ## 11. Sustained Execution Loop
@@ -492,6 +515,18 @@ Do not say tests passed if they were not run.
 Do not claim full validation if only targeted validation ran.
 
 If validation is unavailable, state why.
+
+### 12.1 Dry-Run Acceptance Wording
+
+Use precise acceptance wording:
+
+- `docs-only`: documentation or board state only
+- `fixture-only`: synthetic fixtures only, no real memory or runtime store
+- `no-mutation`: inspected or executed path produced no intended mutation
+- `read-only`: no write path, no service or config mutation, no durable state change
+- `live-runtime`: actual runtime or service evidence, never implied by docs-only or fixture-only work
+
+Do not treat docs-only, fixture-only, no-mutation, or read-only proof as runtime readiness, cutover readiness, production readiness, or `RC_READY`.
 
 ---
 
@@ -1130,6 +1165,26 @@ Required approval/action:
 Safe state:
 Next after approval:
 ```
+
+### 24.1 Optional Profile-Aware Closeout
+
+When profile or BHA state is relevant, include:
+
+```text
+Profile:
+BHA state:
+Mode:
+Evidence:
+Validation:
+Skipped:
+Blocked:
+Risk:
+Next:
+```
+
+If BHA is absent, write `BHA state: BHA_ABSENT`.
+
+This is reporting structure only, not BHA runtime proof.
 
 ---
 
