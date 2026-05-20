@@ -25,6 +25,14 @@ const {
   PUBLIC_MCP_TOOLS: RUNTIME_SUMMARY_PUBLIC_MCP_TOOLS,
   evaluateValidationAggregatorRuntimeEvidenceSummaryNormalizationProof
 } = require('./ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofContract');
+const {
+  EXPECTED_MANIFEST_VERSION: MISSING_STALE_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: MISSING_STALE_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: MISSING_STALE_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: MISSING_STALE_PUBLIC_MCP_TOOLS,
+  REQUIRED_EVIDENCE_GROUPS,
+  evaluateValidationAggregatorMissingStaleEvidenceFailClosedProof
+} = require('./ValidationAggregatorMissingStaleEvidenceFailClosedProofContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -301,6 +309,61 @@ function buildRuntimeEvidenceSummaryNormalizationProofInput(patch = {}) {
   };
 }
 
+function buildMissingStaleEvidenceFailClosedProofInput(patch = {}) {
+  const providedEvidenceGroups = patch.providedEvidenceGroups ||
+    [...REQUIRED_EVIDENCE_GROUPS];
+
+  return {
+    schemaVersion: MISSING_STALE_SCHEMA_VERSION,
+    policyVersion: MISSING_STALE_POLICY_VERSION,
+    manifestVersion: MISSING_STALE_MANIFEST_VERSION,
+    explicitInputOnly: true,
+    sourceMode: 'explicit_metadata_only',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    validationAggregatorFullImplementation: false,
+    publicMcpTools: [...MISSING_STALE_PUBLIC_MCP_TOOLS],
+    asOf: '2026-05-20T00:00:00.000Z',
+    freshnessWindowSeconds: 86400,
+    providedEvidenceGroups,
+    evidence: providedEvidenceGroups.map(group => ({
+      id: `${group}-evidence`,
+      group,
+      status: 'passed',
+      createdAt: '2026-05-19T23:55:00.000Z',
+      ageSeconds: 300,
+      stale: false
+    })),
+    lowRiskSummary: {
+      rawWorkspaceIdExposed: false,
+      rawSecretExposed: false,
+      rawEvidencePayloadExposed: false
+    },
+    safety: {
+      readsFiles: false,
+      refreshesEvidenceImplicitly: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      missingOrStaleEvidenceFailClosedProofReady: false,
+      validationAggregatorFullImplementationReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -406,6 +469,33 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'missingStaleEvidenceFailClosedProof')) {
+    const result = evaluateValidationAggregatorMissingStaleEvidenceFailClosedProof(
+      safeInputs.missingStaleEvidenceFailClosedProof
+    );
+    units.missingStaleEvidenceFailClosedProof = {
+      id: 'missing_or_stale_evidence_fail_closed_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      summary: result.summary,
+      missingRequiredEvidenceGroups: result.missingRequiredEvidenceGroups,
+      staleRequiredEvidenceGroups: result.staleRequiredEvidenceGroups,
+      duplicateEvidenceGroups: result.duplicateEvidenceGroups,
+      unknownEvidenceGroups: result.unknownEvidenceGroups,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.missingStaleEvidenceFailClosedProof = buildNotSuppliedUnit(
+      'missing_or_stale_evidence_fail_closed_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -433,6 +523,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
       baselineBindingProofAccepted: units.baselineBindingProof.accepted,
       runtimeEvidenceSummaryNormalizationProofAccepted:
         units.runtimeEvidenceSummaryNormalizationProof.accepted,
+      missingStaleEvidenceFailClosedProofAccepted:
+        units.missingStaleEvidenceFailClosedProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -463,6 +555,7 @@ module.exports = {
   COLLECTOR_SCHEMA_VERSION,
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
+  buildMissingStaleEvidenceFailClosedProofInput,
   buildRuntimeEvidenceSummaryNormalizationProofInput,
   buildSourceRegistryProofInput,
   collectValidationAggregatorRuntimeProofUnits
