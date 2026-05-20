@@ -41,6 +41,7 @@ A row can be treated as complete only when `complete?` is `yes`. Bounded evidenc
 5. Any precheck pass remains precheck evidence, not readiness.
 6. Use `docs/A5_ENABLEMENT_OBSTACLE_CLEARANCE_001.md` as the current A5 startup obstacle map; it does not execute A5 or close runtime gaps.
 7. Use `docs/CM-0557_JSONRPC_NO_TOKEN_MUTATION_REJECTION_PLAN.md` as the CM-0557 to CM-0559 repair runway entry point; it does not authorize true `record_memory`, true `search_memory`, real memory scans, durable writes, or readiness claims.
+8. Use `docs/CM-0559_SEARCH_MEMORY_TIMEOUT_READONLY_ANALYSIS.md` as the current search timeout analysis; it recommends CM-0560 and does not close recall reliability.
 
 ## Hard Boundary
 
@@ -190,4 +191,16 @@ This table does not authorize:
 - `record_memory` no-token rejection should keep HTTP 403 while returning a JSON-RPC error envelope.
 - `search_memory` timeout remains an independent read-only chain-analysis item.
 - No true `record_memory`, true `search_memory`, `.jsonl` read, real memory scan, durable write/audit write, provider call, config switch, migration/import/export/backup/restore apply, public MCP expansion, package change, push/tag/release/deploy/cutover, or readiness claim is authorized.
+- Controlling state remains RC_NOT_READY_BLOCKED.
+
+## CM-0559 Search Timeout Read-Only Analysis - 2026-05-20
+
+- Result: CM_0559_NEEDS_CM0560.
+- Analysis doc: `docs/CM-0559_SEARCH_MEMORY_TIMEOUT_READONLY_ANALYSIS.md`.
+- Allowed read-only Git and source-pattern inspection completed.
+- True `search_memory` was not called.
+- `.jsonl` audit files and real memory content were not read.
+- Timeout risk zones: app dispatch, recall pipeline, `shadowStore.listChunks`, vector embedding/query path, candidate cache, optional rerank, and recall audit append.
+- Write-like side-effect zones: candidate cache set/clear, embedding cache update, recall audit append, and read-policy summary append.
+- CM-0560 targeted runtime fix is recommended before any reliability claim.
 - Controlling state remains RC_NOT_READY_BLOCKED.

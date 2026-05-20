@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0557 JSON-RPC no-token mutation rejection plan |
+| Current task | CM-0559 search timeout read-only analysis |
 | Current area | P4-http-runtime / P10-observability-admin |
 | Last pushed baseline | `6758952` on `origin/main` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Started CM-0557-CM-0559 local repair runway and drafted CM-0557 plan for JSON-RPC no-token mutation rejection plus search timeout read-only analysis. |
-| Last validation | CM-0557 plan slice pending `git diff --check` and docs validation. Previous HTTP fix validation remains historical evidence only. |
-| Worktree summary | Current intended changes are docs/board only for CM-0557 plan; no true `record_memory`, true `search_memory`, `.jsonl` read, real memory scan, durable write/audit write, provider call, config switch, package change, push, tag, release, deploy, cutover, or readiness claim. |
+| Last action | Completed CM-0558 targeted JSON-RPC envelope patch locally, then ran CM-0559 allowed read-only source-pattern analysis for `search_memory` timeout. |
+| Last validation | CM-0558 validation passed: `node --check` for HTTP adapter/test, `node --test .\tests\mcp-http.test.js` 13/13, and `git diff --check`. CM-0559 docs validation is pending. |
+| Worktree summary | Current intended changes are docs/board only for CM-0559 analysis; no true `record_memory`, true `search_memory`, `.jsonl` read, real memory scan, durable write/audit write, provider call, config switch, package change, push, tag, release, deploy, cutover, or readiness claim. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | no push is authorized for this A5 obstacle-clearance slice; do not push automatically |
-| Next planned action | Validate and locally commit CM-0557 plan, then implement CM-0558 only in `src/adapters/codex-mcp/http.js` and `tests/mcp-http.test.js`. 中文解释：下一步只适合先提交计划，再做限定文件的小修和测试，不能调用真实记忆、扫描真实 store、push 或声明 ready。 |
+| Next planned action | Validate and locally commit CM-0559 analysis, then prepare CM-0560 as a separate targeted runtime-fix plan if requested. 中文解释：下一步只适合提交只读分析并单独规划 search timeout 修复，不能调用真实检索、读取真实记忆、push 或声明 ready。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19
