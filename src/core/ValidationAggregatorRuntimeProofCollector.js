@@ -89,6 +89,21 @@ const {
   REQUIRED_RUNTIME_EVIDENCE_GROUPS: RECALL_ISOLATION_REQUIRED_RUNTIME_EVIDENCE_GROUPS,
   evaluateValidationAggregatorRecallIsolationRuntimeProof
 } = require('./ValidationAggregatorRecallIsolationRuntimeProofContract');
+const {
+  DENIED_SOURCE_TYPES: MIGRATION_APPROVAL_DENIED_SOURCE_TYPES,
+  EXPECTED_MANIFEST_VERSION: MIGRATION_APPROVAL_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: MIGRATION_APPROVAL_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: MIGRATION_APPROVAL_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: MIGRATION_APPROVAL_PUBLIC_MCP_TOOLS,
+  REQUIRED_APPROVAL_EVIDENCE: MIGRATION_APPROVAL_REQUIRED_APPROVAL_EVIDENCE,
+  REQUIRED_APPROVAL_STATE_IDS: MIGRATION_APPROVAL_REQUIRED_APPROVAL_STATE_IDS,
+  REQUIRED_BLOCKED_ACTIONS: MIGRATION_APPROVAL_REQUIRED_BLOCKED_ACTIONS,
+  REQUIRED_FAIL_CLOSED_STATES: MIGRATION_APPROVAL_REQUIRED_FAIL_CLOSED_STATES,
+  REQUIRED_FRAMEWORK_STAGE_IDS: MIGRATION_APPROVAL_REQUIRED_FRAMEWORK_STAGE_IDS,
+  REQUIRED_SOURCE_EVIDENCE_IDS: MIGRATION_APPROVAL_REQUIRED_SOURCE_EVIDENCE_IDS,
+  SAFE_SOURCE_TYPES: MIGRATION_APPROVAL_SAFE_SOURCE_TYPES,
+  evaluateMigrationImportExportBackupRestoreApproval
+} = require('./MigrationImportExportBackupRestoreApprovalContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -929,6 +944,133 @@ function buildRecallIsolationRuntimeProofInput(patch = {}) {
   };
 }
 
+function buildMigrationApprovalSourceEvidence(overrides = {}) {
+  return MIGRATION_APPROVAL_REQUIRED_SOURCE_EVIDENCE_IDS.map(id => ({
+    id,
+    sourceType: 'synthetic_fixture',
+    artifactRefs: [`validation-aggregator:${id}`],
+    runtimeAuthority: false,
+    readinessAuthority: false,
+    executionAuthority: false,
+    ...overrides[id]
+  }));
+}
+
+function buildMigrationApprovalFrameworkStages(overrides = {}) {
+  return MIGRATION_APPROVAL_REQUIRED_FRAMEWORK_STAGE_IDS.map(id => ({
+    id,
+    operationFamily: id.replace(/_review$|_gate$/g, ''),
+    inputMode: 'explicit_input',
+    acceptedSources: id === 'source_scope_review'
+      ? [...MIGRATION_APPROVAL_SAFE_SOURCE_TYPES]
+      : [],
+    executionAllowed: false,
+    durableWriteAllowed: false,
+    requiresExplicitA5Approval: true,
+    ...overrides[id]
+  }));
+}
+
+function buildMigrationApprovalStates(overrides = {}) {
+  const planningStates = new Set([
+    'not_requested',
+    'reviewed_not_executable',
+    'approved_but_a5_blocked'
+  ]);
+
+  return MIGRATION_APPROVAL_REQUIRED_APPROVAL_STATE_IDS.map(id => ({
+    id,
+    acceptedForPlanning: planningStates.has(id),
+    executionAllowed: false,
+    ...overrides[id]
+  }));
+}
+
+function buildMigrationImportExportBackupRestoreApprovalProofInput(patch = {}) {
+  return {
+    schemaVersion: MIGRATION_APPROVAL_SCHEMA_VERSION,
+    policyVersion: MIGRATION_APPROVAL_POLICY_VERSION,
+    manifestVersion: MIGRATION_APPROVAL_MANIFEST_VERSION,
+    fixtureOnly: true,
+    synthetic: true,
+    localOnly: true,
+    dryRunOnly: true,
+    boundaryInventoryOnly: true,
+    runtimeIntegrated: false,
+    approvalFrameworkImplemented: false,
+    approvalExecutionReady: false,
+    approvalExecuted: false,
+    migrationFrameworkReady: false,
+    migrationApplyReady: false,
+    importExportFrameworkReady: false,
+    importExportApplyReady: false,
+    backupRestoreFrameworkReady: false,
+    backupRestoreApplyReady: false,
+    migrationApplied: false,
+    importApplied: false,
+    exportApplied: false,
+    backupCreated: false,
+    restorePerformed: false,
+    realMemoryScanned: false,
+    runtimeStoreScanned: false,
+    durableMemoryWritten: false,
+    durableAuditWritten: false,
+    publicMcpExpanded: false,
+    providerCalls: 0,
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    acceptedForPlanning: true,
+    publicMcpTools: [...MIGRATION_APPROVAL_PUBLIC_MCP_TOOLS],
+    allowedSourceTypes: [...MIGRATION_APPROVAL_SAFE_SOURCE_TYPES],
+    deniedSourceTypes: [...MIGRATION_APPROVAL_DENIED_SOURCE_TYPES],
+    sourceEvidence: buildMigrationApprovalSourceEvidence(),
+    frameworkStages: buildMigrationApprovalFrameworkStages(),
+    approvalStates: buildMigrationApprovalStates(),
+    requiredApprovalEvidence: [...MIGRATION_APPROVAL_REQUIRED_APPROVAL_EVIDENCE],
+    unsatisfiedApprovalEvidence: [...MIGRATION_APPROVAL_REQUIRED_APPROVAL_EVIDENCE],
+    failClosedStates: [...MIGRATION_APPROVAL_REQUIRED_FAIL_CLOSED_STATES],
+    blockedActions: [...MIGRATION_APPROVAL_REQUIRED_BLOCKED_ACTIONS],
+    forbiddenClaims: [
+      'migration-ready',
+      'import-export-ready',
+      'backup-restore-ready',
+      'runtime-ready',
+      'v1-rc-ready'
+    ],
+    safety: {
+      readsFilesImplicitly: false,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      localBoundaryInventoryReady: true,
+      approvalFrameworkReady: false,
+      approvalExecutionReady: false,
+      migrationFrameworkReady: false,
+      importExportFrameworkReady: false,
+      backupRestoreFrameworkReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      pushReady: false,
+      releaseReady: false,
+      deployReady: false,
+      configSwitchReady: false,
+      watchdogReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -1215,6 +1357,33 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'migrationImportExportBackupRestoreApprovalProof')) {
+    const result = evaluateMigrationImportExportBackupRestoreApproval(
+      safeInputs.migrationImportExportBackupRestoreApprovalProof
+    );
+    units.migrationImportExportBackupRestoreApprovalProof = {
+      id: 'migration_import_export_backup_restore_approval_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      sourceTypes: result.sourceTypes,
+      sourceEvidence: result.sourceEvidence,
+      frameworkStages: result.frameworkStages,
+      approvalStates: result.approvalStates,
+      approvalEvidence: result.approvalEvidence,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.migrationImportExportBackupRestoreApprovalProof = buildNotSuppliedUnit(
+      'migration_import_export_backup_restore_approval_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -1254,6 +1423,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.governanceRuntimeLoopGapProof.accepted,
       recallIsolationRuntimeProofAccepted:
         units.recallIsolationRuntimeProof.accepted,
+      migrationImportExportBackupRestoreApprovalProofAccepted:
+        units.migrationImportExportBackupRestoreApprovalProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -1285,6 +1456,7 @@ module.exports = {
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
   buildGovernanceRuntimeLoopGapProofInput,
+  buildMigrationImportExportBackupRestoreApprovalProofInput,
   buildMissingStaleEvidenceFailClosedProofInput,
   buildNoTouchBoundaryProofInput,
   buildRecallIsolationRuntimeProofInput,

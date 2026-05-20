@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0579 ValidationAggregator recall isolation runtime proof collector |
+| Current task | CM-0580 ValidationAggregator migration/import/export/backup/restore approval collector |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Last pushed runtime baseline | `a4fdaf85be21031901f35139129f68a1c521c2f2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Pushed CM-0579 commit `6a4df9c595e7b46413b48ab4b0c761b93e52d2dc` to `origin/main`; post-push reconciliation confirmed local `HEAD`, `origin/main`, and remote `refs/heads/main` aligned. |
-| Last validation | CM-0579 validation passed so far: relevant source/test `node --check`; collector tests 24/24; recall isolation helper tests 13/13; aggregator implementation tests 17/17; aggregator CLI tests 13/13; no-touch regression 4/4; final `npm test` 1633/1633; `git diff --check` passed with LF-normalization warnings only. |
-| Worktree summary | Current intended changes are this minimal CM-0579 post-push status reconciliation only. No provider, durable memory/audit write, true live `record_memory` or `search_memory`, `.jsonl` read, private memory content exposure, public MCP expansion, true recall/search execution, config/watchdog/startup change, migration/import/export/backup/restore apply, package change, tag, release, deploy, cutover, or readiness claim. |
+| Last action | Implemented CM-0580 locally: added eleventh explicit-input ValidationAggregator collector unit for migration/import/export/backup/restore approval-boundary proof; docs/board update is in progress. |
+| Last validation | CM-0580 validation passed so far: relevant source/test `node --check`; collector tests 26/26; migration approval helper tests 7/7; aggregator implementation tests 17/17; aggregator CLI tests 13/13; no-touch regression 4/4; final `npm test` 1635/1635. |
+| Worktree summary | Current intended changes are CM-0580 source/test plus minimal status/truth-table/board reconciliation only. No provider, durable memory/audit write, true live `record_memory` or `search_memory`, `.jsonl` read, private memory content exposure, public MCP expansion, true recall/search execution, config/watchdog/startup change, migration/import/export/backup/restore apply, package change, tag, release, deploy, cutover, or readiness claim. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; current goal also allows automatic push only after push-readiness preflight passes |
 | Safe-push readiness | CM-0579 push completed; post-push reconciliation confirmed `origin/main` at `6a4df9c595e7b46413b48ab4b0c761b93e52d2dc` before this status update. |
-| Next planned action | Continue Phase 3 with the next explicit-input, fail-closed ValidationAggregator collector unit or the next truth-table scoped runtime gap unit. 中文解释：继续补下一个 runtime gap 单元；不能声明 validation aggregator 完成或 RC 恢复。 |
+| Next planned action | Complete guarded local commit and safe push for CM-0580, then reconcile post-push state. 中文解释：先把这次第十一个 collector 单元安全提交并同步；仍不能声明 validation aggregator 完成或 RC 恢复。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19
