@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0570 ValidationAggregator evidence freshness collector |
-| Current area | P0-mainline-health / P10-observability-admin |
+| Current task | CM-0571 CM-0558/CM-0560 recovery review |
+| Current area | P4-http-runtime / P10-observability-admin |
 | Last pushed runtime baseline | `a4fdaf85be21031901f35139129f68a1c521c2f2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Pushed CM-0570 commit `f742737e8bc3a4252b2bc741873786f6537fc653` to `origin/main`; post-push reconciliation confirmed local HEAD, `origin/main`, and remote `refs/heads/main` aligned. |
-| Last validation | CM-0570 validation passed: `node --check` for touched source/test; collector tests 8/8; aggregator implementation tests 17/17; aggregator CLI tests 13/13; no-touch regression 4/4; full `npm test` 1615/1615. |
-| Worktree summary | Current intended changes are this minimal CM-0570 post-push status reconciliation only. No provider, durable memory/audit write, true live `record_memory` or `search_memory`, `.jsonl` read, private memory content exposure, public MCP expansion, config/watchdog/startup change, migration/import/export/backup/restore apply, package change, tag, release, deploy, cutover, or readiness claim. |
+| Last action | Reviewed CM-0558 actual diff, confirmed CM-0560 timeout plan/fix is already recorded, determined no new minimal runtime patch is needed, and blocked `RC_PRECHECK_003` rerun because no checked-in packet/command list exists. |
+| Last validation | CM-0571 targeted validation passed: relevant source `node --check`; HTTP MCP tests 13/13; MCP contract tests 9/9; Phase B passive recall tests 4/4; recall isolation/runtime tests 9/9. |
+| Worktree summary | Current intended changes are CM-0571 status/truth-table/board reconciliation only. No `src/`, `tests/`, provider, durable memory/audit write, true live `record_memory` or `search_memory`, `.jsonl` read, private memory content exposure, public MCP expansion, config/watchdog/startup change, migration/import/export/backup/restore apply, package change, tag, release, deploy, cutover, or readiness claim. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; current goal also allows automatic push only after push-readiness preflight passes |
 | Safe-push readiness | CM-0562 sync abort repair push completed; post-push reconciliation confirmed `origin/main` at `a4fdaf85be21031901f35139129f68a1c521c2f2` before this status update |
-| Next planned action | Continue Phase 3 by adding the next explicit-input, fail-closed ValidationAggregator collector unit, or prepare an exact A5 packet only if the next gap requires live evidence. 中文解释：下一步继续补齐 aggregator collector 单元；若需要真实运行证据，必须另走精确 A5 边界。 |
+| Next planned action | Prepare a scoped `RC_PRECHECK_003` packet only if the project needs that named precheck, otherwise continue Phase 3 with the next explicit-input, fail-closed ValidationAggregator collector unit. 中文解释：如果要跑 `RC_PRECHECK_003`，先补一个明确的计划/命令包；否则继续按 Phase 3 补 aggregator collector，不要直接声明 RC 恢复。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19
