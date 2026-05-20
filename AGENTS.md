@@ -1166,6 +1166,8 @@ Safe state:
 Next after approval:
 ```
 
+Whenever a report includes `Next:`, `Next safe step:`, `Next safe action:`, or `Next after approval:`, include one concise Simplified Chinese sentence explaining why that is the next safe action.
+
 ### 24.1 Optional Profile-Aware Closeout
 
 When profile or BHA state is relevant, include:
