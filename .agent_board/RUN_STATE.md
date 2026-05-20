@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | DOGFOOD_003 HTTP observe closeout notes |
-| Current area | P4-http-runtime / P10-observability-admin |
+| Current task | DOGFOOD_004 compare/rollback closeout notes |
+| Current area | P2-active-memory / P5-rollback-readiness / P10-observability-admin |
 | Last pushed baseline | `6c8bee0` on `origin/main`; local `main` has LOCAL_RC_CANDIDATE_001 recorded at `69d54cb` before this docs/board slice |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Executed approved DOGFOOD_003 HTTP observe only; result `DOGFOOD_003_HTTP_OBSERVE_COMPLETED_NOT_RC_READY`. |
-| Last validation | HTTP observe returned status ok, health 200, noProvider true, mutated false, migrationApplied false; closeout docs validation pending. |
-| Worktree summary | DOGFOOD_003 HTTP observe closeout notes pending validation; project remains `NOT_READY_BLOCKED`. |
+| Last action | Executed approved DOGFOOD_004 compare/rollback readiness checks; result `DOGFOOD_004_COMPARE_ROLLBACK_COMPLETED_NOT_RC_READY`. |
+| Last validation | Compare `43/43 matched`; rollback readiness `43/43 rollback-safe`; closeout docs validation pending. |
+| Worktree summary | DOGFOOD_004 compare/rollback closeout notes pending validation; project remains `NOT_READY_BLOCKED`. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; no push is authorized unless explicitly requested |
 | Safe-push readiness | still blocked: readonly precheck passed, but no push authorization and no RC/cutover readiness; do not push automatically |
-| Next planned action | Validate DOGFOOD_003 closeout notes; do not push, tag, release, deploy, cut over, or claim readiness. |
+| Next planned action | Validate DOGFOOD_004 closeout notes; do not push, tag, release, deploy, cut over, or claim readiness. |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19

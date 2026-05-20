@@ -927,3 +927,14 @@ Evidence recorded: endpoint `http://127.0.0.1:7605/health`; HTTP status `200`; s
 Not validated: service startup, compare/rollback, provider calls, real memory scan, durable memory/audit write, config switch, migration/backup apply, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, readiness.
 Remaining risk: HTTP observe is dogfood evidence only, not RC/runtime/production readiness; project remains NOT_READY_BLOCKED.
 Next safe step: staged review and local commit if requested; no push or readiness claim.
+
+## DOGFOOD_004 compare/rollback closeout handoff
+
+Goal: Record approved DOGFOOD_004 active-memory compare and rollback readiness evidence without performing real rollback or readiness transition.
+Status: DOGFOOD_004_COMPARE_ROLLBACK_COMPLETED_NOT_RC_READY.
+Changed files: STATUS.md; MAINTENANCE_BACKLOG.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; .agent_board/*
+Validation: git diff --check and docs validation for this closeout notes slice.
+Evidence recorded: compare `ok=true`, `43/43 matched`, `0 mismatched`; rollback readiness `ok=true`, `rollbackReady=true`, `43/43 rollback-safe`; SQLite ExperimentalWarning noted.
+Not validated: real rollback/reset/restore/revert, provider calls, real memory broad scan, durable memory/audit write, migration/backup apply, HTTP observe, config switch, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, readiness.
+Remaining risk: compare/rollback readiness is dogfood evidence only, not real rollback or RC/runtime/production readiness; project remains NOT_READY_BLOCKED.
+Next safe step: staged review and local commit if requested; no push or readiness claim.

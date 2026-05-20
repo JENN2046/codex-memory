@@ -120,3 +120,14 @@ This table does not authorize:
 - SQLite ExperimentalWarning noted.
 - final state: NOT_READY_BLOCKED.
 - This dogfood HTTP observe closeout does not change any `complete?` value in the truth table and does not establish runtime, production, cutover, or RC readiness.
+
+## DOGFOOD_004 Compare/Rollback Closeout - 2026-05-20
+
+- Result: DOGFOOD_004_COMPARE_ROLLBACK_COMPLETED_NOT_RC_READY.
+- compare: `ok=true`, `43/43 matched`, `0 mismatched`.
+- rollback readiness: `ok=true`, `rollbackReady=true`, `43/43 rollback-safe`.
+- SQLite ExperimentalWarning noted.
+- this was rollback readiness evidence only, not real rollback.
+- forbidden actions all remained `no`.
+- final state: NOT_READY_BLOCKED.
+- This dogfood compare/rollback closeout does not change any `complete?` value in the truth table and does not establish runtime, production, cutover, or RC readiness.

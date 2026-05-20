@@ -538,3 +538,20 @@ Recorded:
 - final state: NOT_READY_BLOCKED.
 
 Forbidden actions not touched: HTTP startup, provider call, real memory scan, durable memory/audit write, compare/rollback, config switch, migration/backup apply, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, and readiness claims.
+
+## DOGFOOD_004 compare/rollback closeout notes
+
+Status: DOGFOOD_004_COMPARE_ROLLBACK_COMPLETED_NOT_RC_READY
+Result: DOGFOOD_004_COMPARE_ROLLBACK_COMPLETED_NOT_RC_READY
+State: NOT_READY_BLOCKED
+
+Recorded:
+
+- compare: `ok=true`, `43/43 matched`, `0 mismatched`.
+- rollback readiness: `ok=true`, `rollbackReady=true`, `43/43 rollback-safe`.
+- SQLite ExperimentalWarning noted.
+- this was rollback readiness evidence only, not real rollback.
+- forbidden actions all remained `no`.
+- final state: NOT_READY_BLOCKED.
+
+Forbidden actions not touched: real rollback/reset/restore/revert, provider call, real memory broad scan, durable memory/audit write, migration/backup apply, HTTP observe, config switch, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, and readiness claims.
