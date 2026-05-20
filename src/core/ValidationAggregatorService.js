@@ -1,4 +1,7 @@
 const { TOOL_DEFINITIONS } = require('./constants');
+const {
+  collectValidationAggregatorRuntimeProofUnits
+} = require('./ValidationAggregatorRuntimeProofCollector');
 
 const DECISION_LABELS = [
   'READY_FOR_V1_0_RC',
@@ -1822,10 +1825,14 @@ function normalizeValidationEvidenceSources(sources = []) {
 function buildV1RcValidationAggregatorReport({
   generatedAt = new Date().toISOString(),
   validationEvidenceSources = [],
-  runtimeEvidenceSummary = null
+  runtimeEvidenceSummary = null,
+  runtimeProofInputs = null
 } = {}) {
   const validationEvidenceReader = normalizeValidationEvidenceSources(validationEvidenceSources);
   const runtimeEvidenceSummaryBridge = normalizeRuntimeEvidenceSummary(runtimeEvidenceSummary);
+  const runtimeProofCollector = collectValidationAggregatorRuntimeProofUnits(
+    runtimeProofInputs || {}
+  );
   const validationEvidenceFreshness = summarizeValidationEvidenceFreshness({
     acceptedSources: validationEvidenceReader.acceptedSources,
     generatedAt
@@ -1937,6 +1944,15 @@ function buildV1RcValidationAggregatorReport({
       runtimeEvidenceSummaryRemainingGapCount:
         runtimeEvidenceSummaryBridge.summary.remainingRuntimeGapCount,
       runtimeEvidenceSummaryCanClaimV1RcReady: false,
+      validationAggregatorRuntimeProofCollectorImplemented:
+        runtimeProofCollector.implemented,
+      validationAggregatorRuntimeProofCollectorStatus:
+        runtimeProofCollector.status,
+      validationAggregatorRuntimeProofCollectorAcceptedUnitCount:
+        runtimeProofCollector.summary.acceptedUnitCount,
+      validationAggregatorRuntimeProofCollectorExecutedUnitCount:
+        runtimeProofCollector.summary.executedUnitCount,
+      validationAggregatorRuntimeProofCollectorCanClaimV1RcReady: false,
       schemaVersionRuntimeEnforcementImplemented: true,
       schemaVersionRuntimeWriteBoundaryGuardImplemented: true,
       schemaVersionRuntimeWriteBoundaryRejectsMetadata: true,
@@ -3059,6 +3075,7 @@ function buildV1RcValidationAggregatorReport({
         canClaimFinalRcReady: false,
         canClaimV1RcReady: false
       },
+      p66ValidationAggregatorRuntimeProofCollector: runtimeProofCollector,
       p66ValidationAggregatorSourceRegistryProof: {
         status: 'static_helper_capability_added_not_executed',
         sourceMode: 'static_report_shape_only',
