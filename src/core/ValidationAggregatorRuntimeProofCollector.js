@@ -43,6 +43,17 @@ const {
   SUPPORTED_SOURCE_TYPES,
   evaluateValidationAggregatorUnsupportedSourceFailClosedProof
 } = require('./ValidationAggregatorUnsupportedSourceFailClosedProofContract');
+const {
+  EXPECTED_MANIFEST_VERSION: NO_TOUCH_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: NO_TOUCH_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: NO_TOUCH_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: NO_TOUCH_PUBLIC_MCP_TOOLS,
+  REQUIRED_DISALLOWED_IMPORTS,
+  REQUIRED_DISALLOWED_RUNTIME_CALLS,
+  REQUIRED_FAIL_CLOSED_CASES: NO_TOUCH_REQUIRED_FAIL_CLOSED_CASES,
+  REQUIRED_TARGET_FAMILIES,
+  evaluateValidationAggregatorNoTouchBoundaryProof
+} = require('./ValidationAggregatorNoTouchBoundaryProofContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -437,6 +448,63 @@ function buildUnsupportedSourceFailClosedProofInput(patch = {}) {
   };
 }
 
+function buildNoTouchBoundaryProofInput(patch = {}) {
+  const failClosedCases = patch.failClosedCases ||
+    NO_TOUCH_REQUIRED_FAIL_CLOSED_CASES.map(caseId => ({
+      id: caseId,
+      status: 'blocked',
+      decision: 'NOT_READY_BLOCKED',
+      blockedReason: `${caseId}_blocked`,
+      failClosed: true,
+      detected: true,
+      accepted: false,
+      readinessAuthority: false
+    }));
+
+  return {
+    schemaVersion: NO_TOUCH_SCHEMA_VERSION,
+    policyVersion: NO_TOUCH_POLICY_VERSION,
+    manifestVersion: NO_TOUCH_MANIFEST_VERSION,
+    explicitInputOnly: true,
+    sourceMode: 'explicit_metadata_only',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    validationAggregatorFullImplementation: false,
+    publicMcpTools: [...NO_TOUCH_PUBLIC_MCP_TOOLS],
+    targetFamilies: [...REQUIRED_TARGET_FAMILIES],
+    disallowedImports: [...REQUIRED_DISALLOWED_IMPORTS],
+    disallowedRuntimeCalls: [...REQUIRED_DISALLOWED_RUNTIME_CALLS],
+    failClosedCases,
+    lowRiskSummary: {
+      rawWorkspaceIdExposed: false,
+      rawSecretExposed: false,
+      rawSourcePayloadExposed: false
+    },
+    safety: {
+      scansSourceAtRuntime: false,
+      readsFiles: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      noTouchBoundaryProofReady: false,
+      validationAggregatorFullImplementationReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -598,6 +666,33 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'noTouchBoundaryProof')) {
+    const result = evaluateValidationAggregatorNoTouchBoundaryProof(
+      safeInputs.noTouchBoundaryProof
+    );
+    units.noTouchBoundaryProof = {
+      id: 'no_touch_boundary_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      summary: result.summary,
+      missingRequiredFailClosedCases: result.missingRequiredFailClosedCases,
+      duplicateFailClosedCases: result.duplicateFailClosedCases,
+      unknownFailClosedCases: result.unknownFailClosedCases,
+      unsafeCasesNotBlocked: result.unsafeCasesNotBlocked,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.noTouchBoundaryProof = buildNotSuppliedUnit(
+      'no_touch_boundary_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -629,6 +724,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.missingStaleEvidenceFailClosedProof.accepted,
       unsupportedSourceFailClosedProofAccepted:
         units.unsupportedSourceFailClosedProof.accepted,
+      noTouchBoundaryProofAccepted:
+        units.noTouchBoundaryProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -660,6 +757,7 @@ module.exports = {
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
   buildMissingStaleEvidenceFailClosedProofInput,
+  buildNoTouchBoundaryProofInput,
   buildRuntimeEvidenceSummaryNormalizationProofInput,
   buildSourceRegistryProofInput,
   buildUnsupportedSourceFailClosedProofInput,
