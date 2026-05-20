@@ -129,6 +129,17 @@ const {
   REQUIRED_SOURCE_EVIDENCE_IDS: EVIDENCE_RUNTIME_TRACE_REQUIRED_SOURCE_EVIDENCE_IDS,
   evaluateEvidenceRuntimeTrace
 } = require('./EvidenceRuntimeTraceContract');
+const {
+  BLOCKED_ACTIONS: EVIDENCE_MANIFEST_BLOCKED_ACTIONS,
+  CRITICAL_FAILURE_STATES: EVIDENCE_MANIFEST_CRITICAL_FAILURE_STATES,
+  EXPECTED_SCHEMA_VERSION: EVIDENCE_MANIFEST_SCHEMA_VERSION,
+  NO_SIDE_EFFECT_SAFETY_FLAGS: EVIDENCE_MANIFEST_NO_SIDE_EFFECT_SAFETY_FLAGS,
+  PUBLIC_MCP_TOOLS: EVIDENCE_MANIFEST_PUBLIC_MCP_TOOLS,
+  REQUIRED_FAIL_CLOSED_CASES: EVIDENCE_MANIFEST_REQUIRED_FAIL_CLOSED_CASES,
+  REQUIRED_SOURCE_EVIDENCE_IDS: EVIDENCE_MANIFEST_REQUIRED_SOURCE_EVIDENCE_IDS,
+  SAFE_SOURCE_TYPES: EVIDENCE_MANIFEST_SAFE_SOURCE_TYPES,
+  summarizeEvidenceManifestContract
+} = require('./EvidenceManifestContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -1303,6 +1314,125 @@ function buildEvidenceRuntimeTraceProofInput(patch = {}) {
   };
 }
 
+function buildEvidenceManifestSourceEvidence(overrides = {}) {
+  return EVIDENCE_MANIFEST_REQUIRED_SOURCE_EVIDENCE_IDS.map(id => ({
+    id,
+    phase: id.replace(/^p(\d+)_/, 'P$1-'),
+    sourceType: id === 'p39_synthetic_migration_dry_run'
+      ? 'synthetic_fixture'
+      : 'committed_fixture',
+    artifact: `tests/fixtures/${id.replaceAll('_', '-')}-v1.json`,
+    status: 'pass',
+    acceptedForPlanning: true,
+    runtimeReady: false,
+    ...overrides[id]
+  }));
+}
+
+function buildEvidenceManifestCriticalGateSemantics(overrides = {}) {
+  return {
+    pass: 'accepted_local_evidence_only',
+    ...Object.fromEntries(EVIDENCE_MANIFEST_CRITICAL_FAILURE_STATES.map(state => [
+      state,
+      'failure'
+    ])),
+    ...overrides
+  };
+}
+
+function buildEvidenceManifestFailClosedCases(overrides = {}) {
+  return EVIDENCE_MANIFEST_REQUIRED_FAIL_CLOSED_CASES.map(id => ({
+    id,
+    claim: id,
+    claimedValue: id.includes('claim') ? true : null,
+    acceptedForPlanning: false,
+    nonzeroFailurePath: true,
+    reasonCodes: [`${id}_blocked`],
+    ...overrides[id]
+  }));
+}
+
+function buildEvidenceManifestProofInput(patch = {}) {
+  return {
+    schemaVersion: EVIDENCE_MANIFEST_SCHEMA_VERSION,
+    phase: 'P41-evidence-manifest-contract',
+    fixtureOnly: true,
+    synthetic: true,
+    explicitInputOnly: true,
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    acceptedForPlanning: true,
+    runtimeReady: false,
+    finalRcMatrixReady: false,
+    pushReady: false,
+    releaseReady: false,
+    deployReady: false,
+    configSwitchReady: false,
+    watchdogReady: false,
+    rcReady: false,
+    publicToolsFrozen: true,
+    publicTools: [...EVIDENCE_MANIFEST_PUBLIC_MCP_TOOLS],
+    safeSourceTypes: [...EVIDENCE_MANIFEST_SAFE_SOURCE_TYPES],
+    acceptedSourceTypes: [...EVIDENCE_MANIFEST_SAFE_SOURCE_TYPES],
+    unsupportedSourceTypes: [],
+    sourceEvidence: buildEvidenceManifestSourceEvidence(),
+    criticalGateSemantics: buildEvidenceManifestCriticalGateSemantics(),
+    failClosedCases: buildEvidenceManifestFailClosedCases(),
+    blockedActions: [...EVIDENCE_MANIFEST_BLOCKED_ACTIONS],
+    safety: {
+      ...Object.fromEntries(EVIDENCE_MANIFEST_NO_SIDE_EFFECT_SAFETY_FLAGS.map(flag => [
+        flag,
+        true
+      ])),
+      rawSecretExposed: false,
+      rawWorkspaceIdExposed: false,
+      authorizationHeaderExposed: false,
+      apiKeyExposed: false,
+      callerFieldsPassthroughAllowed: false
+    },
+    requiredWording: [
+      'Evidence manifest proof is explicit-input only.',
+      'Critical warning-only, skipped, unknown, missing, ambiguous, unparsable, or unsupported evidence equals failure.',
+      'Manifest evidence does not claim runtime, final RC matrix, push, release, deploy, config, watchdog, or RC readiness.'
+    ],
+    forbiddenClaims: [
+      'evidence manifest authorizes runtime readiness',
+      'evidence manifest authorizes final RC matrix readiness',
+      'evidence manifest authorizes public MCP expansion',
+      'evidence manifest authorizes real memory scan'
+    ],
+    ...patch
+  };
+}
+
+function buildEvidenceManifestFailClosedReasons(result = {}) {
+  const reasons = [];
+
+  if (result.sourceContract?.safe !== true) {
+    reasons.push('unsupported_source_type_or_contract_drift');
+  }
+  if (result.sourceEvidence?.exact !== true || result.sourceEvidence?.safe !== true) {
+    reasons.push('source_evidence_not_exact_or_safe');
+  }
+  if (result.criticalGateSemantics?.failureStatesFailClosed !== true) {
+    reasons.push('critical_gate_semantics_not_fail_closed');
+  }
+  if (result.failClosedCases?.exact !== true || result.failClosedCases?.safe !== true) {
+    reasons.push('fail_closed_cases_not_exact_or_safe');
+  }
+  if (result.blockedActions?.exact !== true) {
+    reasons.push('blocked_actions_not_exact');
+  }
+  if (result.safety?.noSideEffects !== true) {
+    reasons.push('unsafe_no_touch_boundary');
+  }
+  if (result.acceptedForPlanning !== true && reasons.length === 0) {
+    reasons.push('evidence_manifest_rejected');
+  }
+
+  return reasons;
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -1667,6 +1797,41 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'evidenceManifestProof')) {
+    const result = summarizeEvidenceManifestContract(
+      safeInputs.evidenceManifestProof
+    );
+    units.evidenceManifestProof = {
+      id: 'evidence_manifest_proof',
+      status: result.acceptedForPlanning === true
+        ? 'evidence_manifest_accepted_runtime_still_blocked'
+        : result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: buildEvidenceManifestFailClosedReasons(result),
+      sourceContract: result.sourceContract,
+      sourceEvidence: result.sourceEvidence,
+      criticalGateSemantics: result.criticalGateSemantics,
+      failClosedCases: result.failClosedCases,
+      blockedActions: result.blockedActions,
+      safety: result.safety,
+      readiness: {
+        localEvidenceReportReady: result.localEvidenceReportReady,
+        runtimeReady: result.runtimeReady,
+        finalRcMatrixReady: result.finalRcMatrixReady,
+        v1RcReady: false,
+        rcReady: result.rcReady
+      },
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.evidenceManifestProof = buildNotSuppliedUnit(
+      'evidence_manifest_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -1712,6 +1877,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.httpRuntimeObservabilityOperationProof.accepted,
       evidenceRuntimeTraceProofAccepted:
         units.evidenceRuntimeTraceProof.accepted,
+      evidenceManifestProofAccepted:
+        units.evidenceManifestProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -1742,6 +1909,7 @@ module.exports = {
   COLLECTOR_SCHEMA_VERSION,
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
+  buildEvidenceManifestProofInput,
   buildEvidenceRuntimeTraceProofInput,
   buildGovernanceRuntimeLoopGapProofInput,
   buildHttpRuntimeObservabilityOperationProofInput,

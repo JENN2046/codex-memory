@@ -5,20 +5,20 @@
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
 | Branch | main |
-| Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0582 ValidationAggregator evidence runtime trace collector |
+| Mode | A5 Single-Window 4-Agent Compact Autopilot |
+| Current task | CM-0561 search_memory late-success race guard refresh |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Last pushed runtime baseline | `a4fdaf85be21031901f35139129f68a1c521c2f2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Implemented CM-0582 locally: added the thirteenth explicit-input ValidationAggregator collector unit, `evidenceRuntimeTraceProof`, and updated minimal status/board records. |
-| Last validation | CM-0582 validation passed before docs validation: relevant source/test `node --check`; collector tests 30/30; evidence runtime trace helper tests 6/6; aggregator implementation tests 17/17; aggregator CLI tests 13/13; no-touch regression 4/4; final `npm test` 1639/1639. |
-| Worktree summary | Current intended changes are CM-0582 source/test plus minimal docs/board status updates. No provider, durable memory/audit write, true live `record_memory` or `search_memory`, `.jsonl` read, private memory content exposure, public MCP expansion, true recall/search execution, final RC runner execution, HTTP start/observe, config/watchdog/startup change, migration/import/export/backup/restore apply, package change, tag, release, deploy, cutover, or readiness claim. |
+| Last action | Implemented CM-0561 late-success race guard locally: `runSearchMemoryWithTimeout` now rejects timeout before abort dispatch and double-guards operation success against `timedOut` / `signal.aborted`. |
+| Last validation | CM-0561 targeted validation passed so far: changed policy/test `node --check`; `node --test .\tests\search-memory-timeout-policy.test.js` 1/1; `node --test .\tests\mcp-contract.test.js` 9/9; `node --test .\tests\recall-isolation-classification-runtime.test.js` 11/11. Final `git diff --check` still pending. |
+| Worktree summary | Current worktree contains prior uncommitted CM-0583 source/test/docs/board changes plus this CM-0561 targeted policy/test/docs/board refresh. CM-0561 did not touch provider calls, durable memory/audit writes, true live `record_memory` or `search_memory`, `.jsonl`, private memory content, public MCP expansion, final RC runner execution, HTTP start/observe, config/watchdog/startup change, migration/import/export/backup/restore apply, package files, tag, release, deploy, cutover, or readiness claims. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; current goal also allows automatic push only after push-readiness preflight passes |
-| Safe-push readiness | Pending CM-0582 guarded local commit, push-readiness preflight, push, and post-push reconciliation. |
-| Next planned action | Finish CM-0582 docs validation, create the guarded local commit, run push-readiness, then synchronize if preflight remains clean. 中文解释：只同步这个小 collector 单元；不能声明 validation aggregator 完成或 RC 恢复。 |
+| Safe-push readiness | Blocked by mixed uncommitted worktree: prior CM-0583 changes are present alongside CM-0561 changes. No push in this slice. |
+| Next planned action | Finish CM-0561 validation and report without staging/commit/push unless the user explicitly authorizes how to handle the mixed worktree. 中文解释：先把超时竞态修稳，不把它和前序 CM-0583 工作混成一次发布。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19

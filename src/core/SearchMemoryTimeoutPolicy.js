@@ -33,14 +33,24 @@ async function runSearchMemoryWithTimeout(operation, { timeoutMs = DEFAULT_SEARC
   const boundedTimeoutMs = normalizeSearchMemoryTimeoutMs(timeoutMs);
   const controller = new AbortController();
   let timeout = null;
+  let timedOut = false;
 
   try {
     return await Promise.race([
-      Promise.resolve().then(() => operation({ signal: controller.signal })),
+      Promise.resolve()
+        .then(() => operation({ signal: controller.signal }))
+        .then(result => {
+          if (timedOut || controller.signal.aborted) {
+            throw new SearchMemoryTimeoutError(boundedTimeoutMs);
+          }
+          return result;
+        }),
       new Promise((_, reject) => {
         timeout = setTimeout(() => {
+          timedOut = true;
+          const error = new SearchMemoryTimeoutError(boundedTimeoutMs);
+          reject(error);
           controller.abort();
-          reject(new SearchMemoryTimeoutError(boundedTimeoutMs));
         }, boundedTimeoutMs);
       })
     ]);
