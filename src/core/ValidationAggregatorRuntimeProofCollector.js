@@ -12,6 +12,12 @@ const {
   EXPECTED_SCHEMA_VERSION: EVIDENCE_FRESHNESS_SCHEMA_VERSION,
   evaluateValidationAggregatorEvidenceFreshnessProof
 } = require('./ValidationAggregatorEvidenceFreshnessProofContract');
+const {
+  EXPECTED_MANIFEST_VERSION: BASELINE_BINDING_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: BASELINE_BINDING_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: BASELINE_BINDING_SCHEMA_VERSION,
+  evaluateValidationAggregatorBaselineBindingProof
+} = require('./ValidationAggregatorBaselineBindingProofContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -139,6 +145,71 @@ function buildEvidenceFreshnessProofInput(patch = {}) {
   };
 }
 
+function buildBaselineBindingProofInput(patch = {}) {
+  const targetCommit = patch.expectedTargetCommit ||
+    '0000000000000000000000000000000000000000';
+
+  return {
+    schemaVersion: BASELINE_BINDING_SCHEMA_VERSION,
+    policyVersion: BASELINE_BINDING_POLICY_VERSION,
+    manifestVersion: BASELINE_BINDING_MANIFEST_VERSION,
+    explicitInputOnly: true,
+    sourceMode: 'explicit_input',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    expectedTargetCommit: targetCommit,
+    validationAggregatorFullImplementation: false,
+    publicMcpTools: [...PUBLIC_MCP_TOOLS],
+    baselineBindings: [
+      {
+        evidence_id: 'validation-aggregator-baseline-binding-proof',
+        baseline_binding_id: 'validation-aggregator-baseline-binding-local',
+        target_commit: targetCommit,
+        target_commit_source: 'explicit_target_commit',
+        baseline_kind: 'local_validation_target_commit',
+        baseline_ref: 'validation-aggregator-runtime-proof-collector',
+        evidence_subject_commit: targetCommit,
+        validation_scope: 'validation-aggregator-runtime-proof-collector',
+        binding_observed_at: '2026-05-20T00:00:00.000Z',
+        binding_status: 'bound',
+        approval_request_commit: '',
+        current_main_head: '',
+        execution_checkout_commit: ''
+      }
+    ],
+    lowRiskSummary: {
+      rawWorkspaceIdExposed: false,
+      rawSecretExposed: false
+    },
+    safety: {
+      readsFiles: false,
+      scansDirectories: false,
+      executesCommands: false,
+      gitCheckout: false,
+      gitReset: false,
+      gitDetachHead: false,
+      gitRemoteLookup: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      baselineBindingProofReady: false,
+      validationAggregatorFullImplementationReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -200,6 +271,27 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     units.evidenceFreshnessProof = buildNotSuppliedUnit('evidence_freshness_proof');
   }
 
+  if (hasOwnObject(safeInputs, 'baselineBindingProof')) {
+    const result = evaluateValidationAggregatorBaselineBindingProof(
+      safeInputs.baselineBindingProof
+    );
+    units.baselineBindingProof = {
+      id: 'baseline_binding_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      baselineBinding: result.baselineBinding,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.baselineBindingProof = buildNotSuppliedUnit('baseline_binding_proof');
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -224,6 +316,7 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
       missingUnitCount,
       sourceRegistryProofAccepted: units.sourceRegistryProof.accepted,
       evidenceFreshnessProofAccepted: units.evidenceFreshnessProof.accepted,
+      baselineBindingProofAccepted: units.baselineBindingProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -252,6 +345,7 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
 
 module.exports = {
   COLLECTOR_SCHEMA_VERSION,
+  buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
   buildSourceRegistryProofInput,
   collectValidationAggregatorRuntimeProofUnits
