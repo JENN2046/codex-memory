@@ -1,6 +1,7 @@
 const crypto = require('node:crypto');
 
 const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
+const { throwIfSearchMemoryAborted } = require('../core/SearchMemoryTimeoutPolicy');
 
 class KnowledgeBaseSyncService {
   constructor({ config, diaryStore, shadowStore, vectorStore, chunkIndexingService, candidateCacheStore = null }) {
@@ -14,10 +15,15 @@ class KnowledgeBaseSyncService {
 
   async syncTarget(target = 'both', options = {}) {
     const force = !!options.force;
+    const signal = options.signal || null;
+
+    throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
     const diaryRecords = await this.diaryStore.listRecords({ target });
+    throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
     const existingRecords = this.config.enableShadowWrites
       ? await this.shadowStore.listRecords(target)
       : [];
+    throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
     const existingMap = new Map(existingRecords.map(record => [this.getRecordKey(record), record]));
 
     let sqliteWrites = 0;
@@ -29,6 +35,7 @@ class KnowledgeBaseSyncService {
     let isolatedRecords = 0;
 
     for (const record of diaryRecords) {
+      throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
       if (!record.memoryId) continue;
       const isolated = isRecallIsolated(record);
       if (isolated) isolatedRecords += 1;
@@ -38,6 +45,7 @@ class KnowledgeBaseSyncService {
       const hasCurrentFingerprintChunks = existing
         ? await this.hasCurrentFingerprintChunks(record)
         : false;
+      throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
       const needsRefresh = force || this.shouldRefreshRecord(existing, record) || (!isolated && !hasCurrentFingerprintChunks);
       const needsIsolationChunkClear = isolated && hasCurrentFingerprintChunks;
 
@@ -52,6 +60,7 @@ class KnowledgeBaseSyncService {
           record.retentionPolicy = record.retentionPolicy || existing.retentionPolicy || null;
         }
         await this.shadowStore.upsertRecord(record);
+        throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
         await this.shadowStore.clearReconcileTasks(record.memoryId, 'sqlite');
         if (needsRefresh) sqliteWrites += 1;
 
@@ -62,6 +71,7 @@ class KnowledgeBaseSyncService {
           } else {
             await this.chunkIndexingService.indexRecord(record);
           }
+          throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
           await this.shadowStore.clearReconcileTasks(record.memoryId, 'chunks');
           if (!isolated) chunkWrites += 1;
         }
@@ -75,6 +85,7 @@ class KnowledgeBaseSyncService {
         } else {
           await this.vectorStore.upsertRecord(record);
         }
+        throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
         await this.shadowStore.clearReconcileTasks(record.memoryId, 'vector');
         if (!isolated) vectorWrites += 1;
       }
@@ -84,11 +95,13 @@ class KnowledgeBaseSyncService {
       const activeMemoryIds = new Set(diaryRecords.map(record => record.memoryId).filter(Boolean));
 
       for (const existing of existingRecords) {
+        throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
         if (!existing.memoryId || activeMemoryIds.has(existing.memoryId)) {
           continue;
         }
 
         await this.shadowStore.deleteRecord(existing.memoryId);
+        throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
         await this.shadowStore.clearReconcileTasks(existing.memoryId);
         prunedRecords += 1;
 
@@ -100,15 +113,19 @@ class KnowledgeBaseSyncService {
 
     const changed = sqliteWrites > 0 || vectorWrites > 0 || chunkWrites > 0 || prunedRecords > 0 || isolationProjectionClears > 0;
     if (this.config.enableVectorIndex) {
+      throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
       diaryVectorWrites = await this.vectorStore.rebuildDiaryVectors(filterRecallIsolatedItems(diaryRecords));
+      throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
     }
     if (changed && this.candidateCacheStore) {
+      throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
       if (this.candidateCacheStore.clearCurrentFingerprint) {
         await this.candidateCacheStore.clearCurrentFingerprint();
       } else {
         await this.candidateCacheStore.clearAll();
       }
     }
+    throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
 
     return {
       recordCount: diaryRecords.length,

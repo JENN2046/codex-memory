@@ -90,7 +90,7 @@ class KnowledgeBaseRecallPipeline {
 
     throwIfSearchMemoryAborted(signal);
     const syncState = this.knowledgeBaseSyncService
-      ? await this.knowledgeBaseSyncService.syncTarget(target)
+      ? await this.knowledgeBaseSyncService.syncTarget(target, { signal })
       : { syncToken: '', changed: false };
 
     throwIfSearchMemoryAborted(signal);

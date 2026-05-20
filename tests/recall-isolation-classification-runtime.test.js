@@ -11,6 +11,7 @@ const {
 const { CandidateGenerator } = require('../src/recall/CandidateGenerator');
 const { ChunkIndexingService } = require('../src/recall/ChunkIndexingService');
 const { KnowledgeBaseRecallPipeline } = require('../src/recall/KnowledgeBaseRecallPipeline');
+const { KnowledgeBaseSyncService } = require('../src/recall/KnowledgeBaseSyncService');
 const { RecallAuditService } = require('../src/recall/RecallAuditService');
 const { VectorIndexStore } = require('../src/storage/VectorIndexStore');
 
@@ -244,6 +245,149 @@ test('candidate generator abort should skip candidate cache write side effect', 
     error => error?.code === 'SEARCH_MEMORY_TIMEOUT'
   );
   assert.equal(cacheSetCount, 0);
+});
+
+test('knowledge base sync abort after diary read should skip sync side effects', async () => {
+  const controller = new AbortController();
+  const calls = [];
+  const service = new KnowledgeBaseSyncService({
+    config: {
+      enableShadowWrites: true,
+      enableVectorIndex: true,
+      searchMemoryTimeoutMs: 5
+    },
+    diaryStore: {
+      async listRecords() {
+        controller.abort();
+        return [baseRecord({ memoryId: 'mem-normal' })];
+      }
+    },
+    shadowStore: {
+      async listRecords() {
+        calls.push('shadow-list');
+        return [];
+      },
+      async upsertRecord() {
+        calls.push('sqlite-upsert');
+      },
+      async clearReconcileTasks() {
+        calls.push('reconcile-clear');
+      },
+      async replaceChunksForRecord() {
+        calls.push('chunk-replace');
+      },
+      async deleteRecord() {
+        calls.push('sqlite-delete');
+      },
+      async countChunksForRecord() {
+        calls.push('chunk-count');
+        return 0;
+      }
+    },
+    vectorStore: {
+      async upsertRecord() {
+        calls.push('vector-upsert');
+      },
+      async deleteRecord() {
+        calls.push('vector-delete');
+        return true;
+      },
+      async rebuildDiaryVectors() {
+        calls.push('diary-vector-rebuild');
+        return 0;
+      }
+    },
+    chunkIndexingService: {
+      async indexRecord() {
+        calls.push('chunk-index');
+      }
+    },
+    candidateCacheStore: {
+      async clearCurrentFingerprint() {
+        calls.push('cache-clear');
+      }
+    }
+  });
+
+  await assert.rejects(
+    () => service.syncTarget('process', { signal: controller.signal }),
+    error => error?.code === 'SEARCH_MEMORY_TIMEOUT'
+  );
+  assert.deepEqual(calls, []);
+});
+
+test('recall pipeline passes abort signal into sync and stops before candidates', async () => {
+  const controller = new AbortController();
+  let receivedSignal = false;
+  let candidateGenerateCount = 0;
+  let auditRecordCount = 0;
+  const pipeline = new KnowledgeBaseRecallPipeline({
+    compatibilitySyntaxAdapter: {
+      parse() {
+        return { query: 'alpha', directives: {}, passiveBlocks: [], activeBlocks: [] };
+      }
+    },
+    timeExpressionParser: {
+      parse() {
+        return [];
+      }
+    },
+    tagMemoEngine: {
+      analyzeQuery() {
+        return { queryText: 'alpha', tokens: ['alpha'], timeRanges: [] };
+      }
+    },
+    contextVectorManager: null,
+    knowledgeBaseSyncService: {
+      async syncTarget(_target, options = {}) {
+        receivedSignal = options.signal === controller.signal;
+        controller.abort();
+        return { syncToken: '', changed: false };
+      }
+    },
+    candidateGenerator: {
+      async generate() {
+        candidateGenerateCount += 1;
+        return {
+          searchPlan: { finalLimit: 5, semanticPoolSize: 5, useTime: false, useRerank: false },
+          semanticCandidates: [],
+          timeCandidates: [],
+          allCandidates: []
+        };
+      }
+    },
+    rerankService: {
+      config: {}
+    },
+    recallAuditService: {
+      async record() {
+        auditRecordCount += 1;
+      }
+    },
+    recallEnhancer: {
+      enhance(results) {
+        return results;
+      }
+    },
+    shadowStore: {
+      async getRecordsByIds() {
+        return [];
+      }
+    }
+  });
+
+  await assert.rejects(
+    () => pipeline.search({
+      query: 'alpha',
+      target: 'process',
+      limit: 5,
+      signal: controller.signal
+    }),
+    error => error?.code === 'SEARCH_MEMORY_TIMEOUT'
+  );
+  assert.equal(receivedSignal, true);
+  assert.equal(candidateGenerateCount, 0);
+  assert.equal(auditRecordCount, 0);
 });
 
 test('vector index skips isolated records and excludes them from diary vectors', async () => {
