@@ -10,6 +10,7 @@ const {
   COLLECTOR_SCHEMA_VERSION,
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
+  buildRuntimeEvidenceSummaryNormalizationProofInput,
   buildSourceRegistryProofInput,
   collectValidationAggregatorRuntimeProofUnits
 } = require('../src/core/ValidationAggregatorRuntimeProofCollector');
@@ -24,13 +25,14 @@ test('runtime proof collector waits for explicit inputs without claiming readine
   assert.equal(report.fullImplementationComplete, false);
   assert.equal(report.status, 'runtime_proof_collector_waiting_for_explicit_evidence');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
-  assert.equal(report.summary.availableUnitCount, 3);
+  assert.equal(report.summary.availableUnitCount, 4);
   assert.equal(report.summary.executedUnitCount, 0);
   assert.equal(report.summary.acceptedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 3);
+  assert.equal(report.summary.missingUnitCount, 4);
   assert.equal(report.units.sourceRegistryProof.status, 'not_supplied');
   assert.equal(report.units.evidenceFreshnessProof.status, 'not_supplied');
   assert.equal(report.units.baselineBindingProof.status, 'not_supplied');
+  assert.equal(report.units.runtimeEvidenceSummaryNormalizationProof.status, 'not_supplied');
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
@@ -53,10 +55,11 @@ test('runtime proof collector executes source registry proof from explicit sanit
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 2);
+  assert.equal(report.summary.missingUnitCount, 3);
   assert.equal(report.summary.sourceRegistryProofAccepted, true);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryNormalizationProofAccepted, false);
   assert.equal(report.units.sourceRegistryProof.executed, true);
   assert.equal(report.units.sourceRegistryProof.accepted, true);
   assert.equal(report.units.sourceRegistryProof.status, 'source_registry_proof_accepted_runtime_still_blocked');
@@ -76,10 +79,11 @@ test('runtime proof collector executes evidence freshness proof from explicit sa
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 2);
+  assert.equal(report.summary.missingUnitCount, 3);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, true);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryNormalizationProofAccepted, false);
   assert.equal(report.units.evidenceFreshnessProof.executed, true);
   assert.equal(report.units.evidenceFreshnessProof.accepted, true);
   assert.equal(
@@ -102,10 +106,11 @@ test('runtime proof collector executes baseline binding proof from explicit sani
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 2);
+  assert.equal(report.summary.missingUnitCount, 3);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryNormalizationProofAccepted, false);
   assert.equal(report.units.baselineBindingProof.executed, true);
   assert.equal(report.units.baselineBindingProof.accepted, true);
   assert.equal(
@@ -119,23 +124,89 @@ test('runtime proof collector executes baseline binding proof from explicit sani
   assert.equal(report.canClaimV1RcReady, false);
 });
 
-test('runtime proof collector aggregates accepted explicit source registry freshness and baseline units', () => {
+test('runtime proof collector executes runtime evidence summary normalization proof from explicit sanitized input only', () => {
+  const report = collectValidationAggregatorRuntimeProofUnits({
+    runtimeEvidenceSummaryNormalizationProof:
+      buildRuntimeEvidenceSummaryNormalizationProofInput()
+  });
+
+  assert.equal(report.status, 'runtime_proof_collector_partial_evidence_accepted_not_ready');
+  assert.equal(report.summary.executedUnitCount, 1);
+  assert.equal(report.summary.acceptedUnitCount, 1);
+  assert.equal(report.summary.rejectedUnitCount, 0);
+  assert.equal(report.summary.missingUnitCount, 3);
+  assert.equal(report.summary.sourceRegistryProofAccepted, false);
+  assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
+  assert.equal(report.summary.baselineBindingProofAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryNormalizationProofAccepted, true);
+  assert.equal(report.units.runtimeEvidenceSummaryNormalizationProof.executed, true);
+  assert.equal(report.units.runtimeEvidenceSummaryNormalizationProof.accepted, true);
+  assert.equal(
+    report.units.runtimeEvidenceSummaryNormalizationProof.status,
+    'runtime_evidence_summary_normalization_accepted_runtime_still_blocked'
+  );
+  assert.equal(
+    report.units.runtimeEvidenceSummaryNormalizationProof.runtimeEvidenceSummary.remainingRuntimeGapCount,
+    7
+  );
+  assert.deepEqual(
+    report.units.runtimeEvidenceSummaryNormalizationProof.failClosedReasons,
+    []
+  );
+  assert.equal(report.canClaimRuntimeReady, false);
+  assert.equal(report.canClaimFinalRcReady, false);
+  assert.equal(report.canClaimV1RcReady, false);
+});
+
+test('runtime proof collector aggregates accepted explicit source registry freshness baseline and summary units', () => {
   const report = collectValidationAggregatorRuntimeProofUnits({
     sourceRegistryProof: buildSourceRegistryProofInput(),
     evidenceFreshnessProof: buildEvidenceFreshnessProofInput(),
-    baselineBindingProof: buildBaselineBindingProofInput()
+    baselineBindingProof: buildBaselineBindingProofInput(),
+    runtimeEvidenceSummaryNormalizationProof:
+      buildRuntimeEvidenceSummaryNormalizationProofInput()
   });
 
-  assert.equal(report.summary.availableUnitCount, 3);
-  assert.equal(report.summary.executedUnitCount, 3);
-  assert.equal(report.summary.acceptedUnitCount, 3);
+  assert.equal(report.summary.availableUnitCount, 4);
+  assert.equal(report.summary.executedUnitCount, 4);
+  assert.equal(report.summary.acceptedUnitCount, 4);
   assert.equal(report.summary.rejectedUnitCount, 0);
   assert.equal(report.summary.missingUnitCount, 0);
   assert.equal(report.summary.sourceRegistryProofAccepted, true);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, true);
   assert.equal(report.summary.baselineBindingProofAccepted, true);
+  assert.equal(report.summary.runtimeEvidenceSummaryNormalizationProofAccepted, true);
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.runtimeReady, false);
+  assert.equal(report.summary.v1RcReady, false);
+});
+
+test('runtime proof collector fails closed for unsafe runtime summary proof input', () => {
+  const report = collectValidationAggregatorRuntimeProofUnits({
+    runtimeEvidenceSummaryNormalizationProof:
+      buildRuntimeEvidenceSummaryNormalizationProofInput({
+        runtimeEvidenceSummary: {
+          ...buildRuntimeEvidenceSummaryNormalizationProofInput().runtimeEvidenceSummary,
+          safety: {
+            ...buildRuntimeEvidenceSummaryNormalizationProofInput().runtimeEvidenceSummary.safety,
+            providerCalls: 1
+          }
+        }
+      })
+  });
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.summary.executedUnitCount, 1);
+  assert.equal(report.summary.acceptedUnitCount, 0);
+  assert.equal(report.summary.rejectedUnitCount, 1);
+  assert.equal(report.units.runtimeEvidenceSummaryNormalizationProof.accepted, false);
+  assert.equal(
+    report.units.runtimeEvidenceSummaryNormalizationProof.failClosedReasons.includes(
+      'unsafe_summary_rejected'
+    ),
+    true
+  );
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.v1RcReady, false);
 });
 
@@ -249,7 +320,9 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
     runtimeProofInputs: {
       sourceRegistryProof: buildSourceRegistryProofInput(),
       evidenceFreshnessProof: buildEvidenceFreshnessProofInput(),
-      baselineBindingProof: buildBaselineBindingProofInput()
+      baselineBindingProof: buildBaselineBindingProofInput(),
+      runtimeEvidenceSummaryNormalizationProof:
+        buildRuntimeEvidenceSummaryNormalizationProofInput()
     }
   });
 
@@ -260,8 +333,8 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
     report.summary.validationAggregatorRuntimeProofCollectorStatus,
     'runtime_proof_collector_partial_evidence_accepted_not_ready'
   );
-  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorAcceptedUnitCount, 3);
-  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorExecutedUnitCount, 3);
+  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorAcceptedUnitCount, 4);
+  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorExecutedUnitCount, 4);
   assert.equal(report.summary.validationAggregatorRuntimeProofCollectorCanClaimV1RcReady, false);
   assert.equal(
     report.evidence.p66ValidationAggregatorRuntimeProofCollector.units.sourceRegistryProof.accepted,
@@ -273,6 +346,11 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
   );
   assert.equal(
     report.evidence.p66ValidationAggregatorRuntimeProofCollector.units.baselineBindingProof.accepted,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeProofCollector.units
+      .runtimeEvidenceSummaryNormalizationProof.accepted,
     true
   );
   assert.equal(report.summary.runtimeReady, false);
@@ -311,10 +389,12 @@ test('runtime proof collector does not perform fs, command, provider, or runtime
     const report = collectValidationAggregatorRuntimeProofUnits({
       sourceRegistryProof: buildSourceRegistryProofInput(),
       evidenceFreshnessProof: buildEvidenceFreshnessProofInput(),
-      baselineBindingProof: buildBaselineBindingProofInput()
+      baselineBindingProof: buildBaselineBindingProofInput(),
+      runtimeEvidenceSummaryNormalizationProof:
+        buildRuntimeEvidenceSummaryNormalizationProofInput()
     });
 
-    assert.equal(report.summary.acceptedUnitCount, 3);
+    assert.equal(report.summary.acceptedUnitCount, 4);
     assert.equal(report.safety.readsFiles, false);
     assert.equal(report.safety.executesCommands, false);
     assert.equal(report.safety.readsRealMemory, false);

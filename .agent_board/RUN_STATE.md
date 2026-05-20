@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0560 search_memory timeout targeted fix plan post-push reconciliation |
+| Current task | CM-0573 ValidationAggregator runtime evidence summary normalization collector |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Last pushed runtime baseline | `a4fdaf85be21031901f35139129f68a1c521c2f2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Pushed CM-0560 targeted fix plan commit `023613aa4e9933857daa0e2d7f9ac8f84452a198`; post-push reconciliation confirmed local `HEAD`, `origin/main`, and remote `refs/heads/main` aligned. |
-| Last validation | CM-0560 targeted fix plan docs validation passed: `git diff --check`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`. |
-| Worktree summary | Current intended changes are this minimal CM-0560 post-push status reconciliation only. No provider, durable memory/audit write, true live `record_memory` or `search_memory`, `.jsonl` read, private memory content exposure, public MCP expansion, config/watchdog/startup change, migration/import/export/backup/restore apply, package change, tag, release, deploy, cutover, or readiness claim. |
+| Last action | Added the fourth ValidationAggregator runtime proof collector unit locally: explicit sanitized runtime-evidence-summary-normalization proof. |
+| Last validation | CM-0573 validation passed: relevant source/test `node --check`; collector tests 12/12; runtime summary normalization helper tests 11/11; aggregator implementation tests 17/17; aggregator CLI tests 13/13; no-touch regression 4/4; full `npm test` 1619/1619. |
+| Worktree summary | Current intended changes are CM-0573 runtime proof collector source/test plus status/board reconciliation. No provider, durable memory/audit write, true live `record_memory` or `search_memory`, `.jsonl` read, private memory content exposure, public MCP expansion, config/watchdog/startup change, migration/import/export/backup/restore apply, package change, tag, release, deploy, cutover, or readiness claim. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; current goal also allows automatic push only after push-readiness preflight passes |
 | Safe-push readiness | CM-0560 targeted fix plan push completed; post-push reconciliation confirmed `origin/main` at `023613aa4e9933857daa0e2d7f9ac8f84452a198` before this status update |
-| Next planned action | Continue v1.0/Mainline Memory Spine Phase 3 by selecting the next scoped runtime-gap closure unit from the truth table, or review whether a CM-0560 implementation follow-up is still needed. 中文解释：下一步应继续按 truth table 逐项关 runtime gap，不能跳到 RC 或声明 ready。 |
+| Next planned action | Commit CM-0573 after diff/docs validation, then run push-readiness and push if clean. 中文解释：下一步只提交并发布已验证的小 collector；不能声明 ValidationAggregator full implementation 完成。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19

@@ -18,6 +18,13 @@ const {
   EXPECTED_SCHEMA_VERSION: BASELINE_BINDING_SCHEMA_VERSION,
   evaluateValidationAggregatorBaselineBindingProof
 } = require('./ValidationAggregatorBaselineBindingProofContract');
+const {
+  EXPECTED_MANIFEST_VERSION: RUNTIME_SUMMARY_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: RUNTIME_SUMMARY_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: RUNTIME_SUMMARY_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: RUNTIME_SUMMARY_PUBLIC_MCP_TOOLS,
+  evaluateValidationAggregatorRuntimeEvidenceSummaryNormalizationProof
+} = require('./ValidationAggregatorRuntimeEvidenceSummaryNormalizationProofContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -210,6 +217,90 @@ function buildBaselineBindingProofInput(patch = {}) {
   };
 }
 
+function buildRuntimeEvidenceSummaryNormalizationProofInput(patch = {}) {
+  return {
+    schemaVersion: RUNTIME_SUMMARY_SCHEMA_VERSION,
+    policyVersion: RUNTIME_SUMMARY_POLICY_VERSION,
+    manifestVersion: RUNTIME_SUMMARY_MANIFEST_VERSION,
+    explicitInputOnly: true,
+    sourceMode: 'explicit_sanitized_summary_only',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    validationAggregatorFullImplementation: false,
+    publicMcpTools: [...RUNTIME_SUMMARY_PUBLIC_MCP_TOOLS],
+    runtimeEvidenceSummary: {
+      status: 'passed',
+      decision: 'NOT_READY_BLOCKED',
+      runnerExecuted: true,
+      commandsExecuted: true,
+      localRuntimeEvidenceMatrixExecuted: true,
+      allowlistedFinalRcEvidenceRunnerExecuted: true,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      fullFinalRcMatrixExecuted: false,
+      v1RcReady: false,
+      rcReady: false,
+      criticalGates: {
+        total: 12,
+        passed: 12,
+        failed: 0,
+        allCriticalCommandsPassed: true
+      },
+      locallyEvidencedRuntimeGaps: [
+        'runtime_schema_version_enforcement_not_fully_proven',
+        'final_rc_matrix_runner_not_executed_as_real_matrix'
+      ],
+      remainingRuntimeGaps: [
+        'validation_aggregator_full_implementation_incomplete',
+        'governance_review_runtime_loop_not_executed',
+        'recall_isolation_runtime_proof_not_executed',
+        'migration_import_export_apply_not_approved',
+        'http_operation_readiness_not_refreshed',
+        'cutover_context_mainline_gate_not_executed',
+        'tag_release_deploy_not_approved'
+      ],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        migrationApplied: false,
+        importExportApplied: false,
+        configChanged: false,
+        watchdogStartupInstalled: false
+      }
+    },
+    lowRiskSummary: {
+      rawWorkspaceIdExposed: false,
+      rawSecretExposed: false
+    },
+    safety: {
+      readsFiles: false,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      runtimeEvidenceSummaryNormalizationProofReady: false,
+      validationAggregatorFullImplementationReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -292,6 +383,29 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     units.baselineBindingProof = buildNotSuppliedUnit('baseline_binding_proof');
   }
 
+  if (hasOwnObject(safeInputs, 'runtimeEvidenceSummaryNormalizationProof')) {
+    const result = evaluateValidationAggregatorRuntimeEvidenceSummaryNormalizationProof(
+      safeInputs.runtimeEvidenceSummaryNormalizationProof
+    );
+    units.runtimeEvidenceSummaryNormalizationProof = {
+      id: 'runtime_evidence_summary_normalization_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      runtimeEvidenceSummary: result.runtimeEvidenceSummary,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.runtimeEvidenceSummaryNormalizationProof = buildNotSuppliedUnit(
+      'runtime_evidence_summary_normalization_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -317,6 +431,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
       sourceRegistryProofAccepted: units.sourceRegistryProof.accepted,
       evidenceFreshnessProofAccepted: units.evidenceFreshnessProof.accepted,
       baselineBindingProofAccepted: units.baselineBindingProof.accepted,
+      runtimeEvidenceSummaryNormalizationProofAccepted:
+        units.runtimeEvidenceSummaryNormalizationProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -347,6 +463,7 @@ module.exports = {
   COLLECTOR_SCHEMA_VERSION,
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
+  buildRuntimeEvidenceSummaryNormalizationProofInput,
   buildSourceRegistryProofInput,
   collectValidationAggregatorRuntimeProofUnits
 };
