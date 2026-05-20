@@ -33,6 +33,16 @@ const {
   REQUIRED_EVIDENCE_GROUPS,
   evaluateValidationAggregatorMissingStaleEvidenceFailClosedProof
 } = require('./ValidationAggregatorMissingStaleEvidenceFailClosedProofContract');
+const {
+  EXPECTED_MANIFEST_VERSION: UNSUPPORTED_SOURCE_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: UNSUPPORTED_SOURCE_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: UNSUPPORTED_SOURCE_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: UNSUPPORTED_SOURCE_PUBLIC_MCP_TOOLS,
+  REQUIRED_FAIL_CLOSED_CASES: UNSUPPORTED_SOURCE_REQUIRED_FAIL_CLOSED_CASES,
+  SUPPORTED_SOURCE_CLASSES,
+  SUPPORTED_SOURCE_TYPES,
+  evaluateValidationAggregatorUnsupportedSourceFailClosedProof
+} = require('./ValidationAggregatorUnsupportedSourceFailClosedProofContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -364,6 +374,69 @@ function buildMissingStaleEvidenceFailClosedProofInput(patch = {}) {
   };
 }
 
+function buildUnsupportedSourceFailClosedProofInput(patch = {}) {
+  const failClosedCases = patch.failClosedCases ||
+    UNSUPPORTED_SOURCE_REQUIRED_FAIL_CLOSED_CASES.map(caseId => ({
+      id: caseId,
+      sourceType: caseId.includes('provider')
+        ? 'provider_smoke_result'
+        : 'unexpected_evidence_feed',
+      sourceClass: caseId.includes('runtime') || caseId.includes('provider')
+        ? 'runtime_evidence'
+        : 'unexpected_runtime_authority',
+      sourceKind: 'unsupported',
+      status: 'blocked',
+      decision: 'NOT_READY_BLOCKED',
+      blockedReason: `${caseId}_blocked`,
+      failClosed: true,
+      accepted: false,
+      downgradedToStatic: false,
+      a5Approved: false,
+      readinessAuthority: false
+    }));
+
+  return {
+    schemaVersion: UNSUPPORTED_SOURCE_SCHEMA_VERSION,
+    policyVersion: UNSUPPORTED_SOURCE_POLICY_VERSION,
+    manifestVersion: UNSUPPORTED_SOURCE_MANIFEST_VERSION,
+    explicitInputOnly: true,
+    sourceMode: 'explicit_metadata_only',
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    validationAggregatorFullImplementation: false,
+    publicMcpTools: [...UNSUPPORTED_SOURCE_PUBLIC_MCP_TOOLS],
+    supportedSourceTypes: [...SUPPORTED_SOURCE_TYPES],
+    supportedSourceClasses: [...SUPPORTED_SOURCE_CLASSES],
+    failClosedCases,
+    lowRiskSummary: {
+      rawWorkspaceIdExposed: false,
+      rawSecretExposed: false,
+      rawSourcePayloadExposed: false
+    },
+    safety: {
+      readsFiles: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableState: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      unsupportedSourceFailClosedProofReady: false,
+      validationAggregatorFullImplementationReady: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -496,6 +569,35 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'unsupportedSourceFailClosedProof')) {
+    const result = evaluateValidationAggregatorUnsupportedSourceFailClosedProof(
+      safeInputs.unsupportedSourceFailClosedProof
+    );
+    units.unsupportedSourceFailClosedProof = {
+      id: 'unsupported_source_fail_closed_proof',
+      status: result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      summary: result.summary,
+      missingRequiredFailClosedCases: result.missingRequiredFailClosedCases,
+      duplicateFailClosedCases: result.duplicateFailClosedCases,
+      unknownFailClosedCases: result.unknownFailClosedCases,
+      acceptedUnsupportedCases: result.acceptedUnsupportedCases,
+      downgradedUnsupportedCases: result.downgradedUnsupportedCases,
+      unblockedRuntimeCases: result.unblockedRuntimeCases,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.unsupportedSourceFailClosedProof = buildNotSuppliedUnit(
+      'unsupported_source_fail_closed_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -525,6 +627,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.runtimeEvidenceSummaryNormalizationProof.accepted,
       missingStaleEvidenceFailClosedProofAccepted:
         units.missingStaleEvidenceFailClosedProof.accepted,
+      unsupportedSourceFailClosedProofAccepted:
+        units.unsupportedSourceFailClosedProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -558,5 +662,6 @@ module.exports = {
   buildMissingStaleEvidenceFailClosedProofInput,
   buildRuntimeEvidenceSummaryNormalizationProofInput,
   buildSourceRegistryProofInput,
+  buildUnsupportedSourceFailClosedProofInput,
   collectValidationAggregatorRuntimeProofUnits
 };
