@@ -6,19 +6,19 @@
 | Git repository | yes |
 | Branch | main |
 | Mode | A4.8 Single-Window 4-Agent Compact Autopilot |
-| Current task | CM-0562 exact approval execution and bounded recall sync abort repair |
+| Current task | CM-0562 post-push reconciliation |
 | Current area | P4-http-runtime / P10-observability-admin |
-| Last pushed runtime baseline | `0805af782b7f2f9d88a5a34e69defcc863e1fc8f`; latest branch head must be verified with Git after docs/board reconciliation |
+| Last pushed runtime baseline | `a4fdaf85be21031901f35139129f68a1c521c2f2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
-| Last action | Executed CM-0562 exact approval once: one sanitized durable memory write accepted, one bounded `search_memory` validation query attempted but timed out externally; then repaired local sync abort propagation with fixture-only tests. |
+| Last action | Pushed CM-0562 sync abort repair to `origin/main`; post-push reconciliation confirmed local HEAD, `origin/main`, and remote `refs/heads/main` at `a4fdaf85be21031901f35139129f68a1c521c2f2`. |
 | Last validation | CM-0562 runtime repair validation passed: `node --check` for changed source/test files; `node --test .\tests\recall-isolation-classification-runtime.test.js` passed 9/9; `node --test .\tests\mcp-contract.test.js` passed 9/9; `npm test` passed 1607/1607; `git diff --check` passed; docs validation passed. |
-| Worktree summary | Current intended changes are CM-0562 runtime/test repair plus minimal status/board reconciliation. True `record_memory` and true `search_memory` approvals were consumed exactly once each; do not rerun either without fresh exact approval. No provider, broad scan, `.jsonl` read, private memory content exposure, public MCP expansion, config/watchdog/startup change, migration/import/export/backup/restore apply, tag, release, deploy, cutover, or readiness claim. |
+| Worktree summary | Current intended changes are this minimal post-push status reconciliation only. True `record_memory` and true `search_memory` approvals were consumed exactly once each; do not rerun either without fresh exact approval. No provider, broad scan, `.jsonl` read, private memory content exposure, public MCP expansion, config/watchdog/startup change, migration/import/export/backup/restore apply, tag, release, deploy, cutover, or readiness claim. |
 | Mainline assumption | `origin/main` is the development base; approval request commit is `1ad3477b0f46eceef55608c0bbd3243c15681f38`; fresh gate target is `7fd17de624c0da76751e863e97302bed0dbec905`. |
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; current goal also allows automatic push only after push-readiness preflight passes |
-| Safe-push readiness | CM-0561 push completed; post-push reconciliation confirmed `origin/main` at `0805af782b7f2f9d88a5a34e69defcc863e1fc8f` before this docs/board status update |
-| Next planned action | Finish final diff review and commit only after guarded local-commit conditions are satisfied or the user gives an explicit commit request. 中文解释：下一步只处理这次 CM-0562 本地修复的提交准备；不重复真实写入/检索，也不声明 ready。 |
+| Safe-push readiness | CM-0562 sync abort repair push completed; post-push reconciliation confirmed `origin/main` at `a4fdaf85be21031901f35139129f68a1c521c2f2` before this status update |
+| Next planned action | Request fresh exact approval only if the user wants another bounded `search_memory` validation after the sync abort repair. 中文解释：下一步不能自动重跑真实检索；需要新的精确授权，且仍不能声明 ready。 |
 
 
 ## MONTHLY_PLAN_2026_06 Baseline - 2026-05-19
