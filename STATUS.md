@@ -4,6 +4,7 @@
 
 ## 当前结论
 
+- 当前 AGENTS v0.3.1 compatibility note：已在 [AGENTS_V0_3_1_COMPATIBILITY_NOTE](/A:/codex-memory/docs/AGENTS_V0_3_1_COMPATIBILITY_NOTE.md) 记录 selective adoption 结论，并已推送到 `origin/main = ce36258`。该 note 不替换或削弱当前 `AGENTS.md`，profile 仍为 `Standard`，BHA state 仍为 `BHA_ABSENT`，当前执行仍走 A4/A4.8 codex-memory rails；未启动 HTTP、未读真实 memory/audit、未写 durable memory/audit、未调用 provider、未执行 migration/rebuild/cleanup/apply/confirm，项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F observability/admin review surface design draft：已在 [PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT](/A:/codex-memory/docs/PHASE_F_OBSERVABILITY_ADMIN_REVIEW_SURFACE_DESIGN_DRAFT.md) 完成 design-only 草案。public MCP tools 仍冻结为 `record_memory` / `search_memory` / `memory_overview`；未启动 HTTP、未读真实 memory/audit、未改 source/runtime；项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F TagMemo fixture pack closeout：已在 [PHASE_F_TAGMEMO_FIXTURE_PACK_LOCAL_CLOSEOUT_REVIEW](/A:/codex-memory/docs/PHASE_F_TAGMEMO_FIXTURE_PACK_LOCAL_CLOSEOUT_REVIEW.md) 完成本地 synthetic fixture pack 收口。目标 fixture test 最新为 `6/6`；下一步推荐 `CM-0534` observability/admin review surface design draft；项目继续保持 `NOT_READY_BLOCKED`。
 - 当前 Phase F deterministic ordering tie-breaker fixtures：已为 TagMemo synthetic fixture 增加 recency、topic specificity、no-random/provider-dependency ordering 场景。该切片只改 fixture/test/docs/board，不改 source/runtime、不读真实 memory store、不执行 recall/provider/A5；项目继续保持 `NOT_READY_BLOCKED`。
