@@ -8,6 +8,7 @@ const {
 } = require('../src/core/ValidationAggregatorService');
 const {
   COLLECTOR_SCHEMA_VERSION,
+  buildA5RuntimeAuthorizationPreconditionProofInput,
   buildBaselineBindingProofInput,
   buildEvidenceFreshnessProofInput,
   buildEvidenceManifestProofInput,
@@ -35,10 +36,10 @@ test('runtime proof collector waits for explicit inputs without claiming readine
   assert.equal(report.fullImplementationComplete, false);
   assert.equal(report.status, 'runtime_proof_collector_waiting_for_explicit_evidence');
   assert.equal(report.decision, 'NOT_READY_BLOCKED');
-  assert.equal(report.summary.availableUnitCount, 14);
+  assert.equal(report.summary.availableUnitCount, 15);
   assert.equal(report.summary.executedUnitCount, 0);
   assert.equal(report.summary.acceptedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 14);
+  assert.equal(report.summary.missingUnitCount, 15);
   assert.equal(report.units.sourceRegistryProof.status, 'not_supplied');
   assert.equal(report.units.evidenceFreshnessProof.status, 'not_supplied');
   assert.equal(report.units.baselineBindingProof.status, 'not_supplied');
@@ -65,6 +66,10 @@ test('runtime proof collector waits for explicit inputs without claiming readine
     report.units.evidenceManifestProof.status,
     'not_supplied'
   );
+  assert.equal(
+    report.units.a5RuntimeAuthorizationPreconditionProof.status,
+    'not_supplied'
+  );
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
@@ -87,7 +92,7 @@ test('runtime proof collector executes source registry proof from explicit sanit
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, true);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -116,7 +121,7 @@ test('runtime proof collector executes evidence freshness proof from explicit sa
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, true);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -148,7 +153,7 @@ test('runtime proof collector executes baseline binding proof from explicit sani
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, true);
@@ -181,7 +186,7 @@ test('runtime proof collector executes runtime evidence summary normalization pr
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -220,7 +225,7 @@ test('runtime proof collector executes missing stale evidence fail-closed proof 
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -256,7 +261,7 @@ test('runtime proof collector executes unsupported source fail-closed proof from
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -291,7 +296,7 @@ test('runtime proof collector executes no-touch boundary proof from explicit san
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -328,7 +333,7 @@ test('runtime proof collector executes readiness overclaim rejection proof from 
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -365,7 +370,7 @@ test('runtime proof collector executes governance runtime loop gap proof from ex
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -402,7 +407,7 @@ test('runtime proof collector executes recall isolation runtime proof from expli
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -440,7 +445,7 @@ test('runtime proof collector executes migration import export backup restore ap
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -481,7 +486,7 @@ test('runtime proof collector executes http runtime observability operation proo
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -520,7 +525,7 @@ test('runtime proof collector executes evidence runtime trace proof from explici
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -560,7 +565,7 @@ test('runtime proof collector executes evidence manifest proof from explicit san
   assert.equal(report.summary.executedUnitCount, 1);
   assert.equal(report.summary.acceptedUnitCount, 1);
   assert.equal(report.summary.rejectedUnitCount, 0);
-  assert.equal(report.summary.missingUnitCount, 13);
+  assert.equal(report.summary.missingUnitCount, 14);
   assert.equal(report.summary.sourceRegistryProofAccepted, false);
   assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
   assert.equal(report.summary.baselineBindingProofAccepted, false);
@@ -592,7 +597,55 @@ test('runtime proof collector executes evidence manifest proof from explicit san
   assert.equal(report.canClaimV1RcReady, false);
 });
 
-test('runtime proof collector aggregates accepted explicit source registry freshness baseline summary missing-stale unsupported-source no-touch overclaim governance recall isolation migration approval http observability evidence trace and evidence manifest units', () => {
+test('runtime proof collector executes A5 runtime authorization precondition proof from explicit sanitized input only', () => {
+  const report = collectValidationAggregatorRuntimeProofUnits({
+    a5RuntimeAuthorizationPreconditionProof:
+      buildA5RuntimeAuthorizationPreconditionProofInput()
+  });
+
+  assert.equal(report.status, 'runtime_proof_collector_partial_evidence_accepted_not_ready');
+  assert.equal(report.summary.executedUnitCount, 1);
+  assert.equal(report.summary.acceptedUnitCount, 1);
+  assert.equal(report.summary.rejectedUnitCount, 0);
+  assert.equal(report.summary.missingUnitCount, 14);
+  assert.equal(report.summary.sourceRegistryProofAccepted, false);
+  assert.equal(report.summary.evidenceFreshnessProofAccepted, false);
+  assert.equal(report.summary.baselineBindingProofAccepted, false);
+  assert.equal(report.summary.runtimeEvidenceSummaryNormalizationProofAccepted, false);
+  assert.equal(report.summary.missingStaleEvidenceFailClosedProofAccepted, false);
+  assert.equal(report.summary.unsupportedSourceFailClosedProofAccepted, false);
+  assert.equal(report.summary.noTouchBoundaryProofAccepted, false);
+  assert.equal(report.summary.readinessOverclaimRejectionProofAccepted, false);
+  assert.equal(report.summary.governanceRuntimeLoopGapProofAccepted, false);
+  assert.equal(report.summary.recallIsolationRuntimeProofAccepted, false);
+  assert.equal(report.summary.migrationImportExportBackupRestoreApprovalProofAccepted, false);
+  assert.equal(report.summary.httpRuntimeObservabilityOperationProofAccepted, false);
+  assert.equal(report.summary.evidenceRuntimeTraceProofAccepted, false);
+  assert.equal(report.summary.evidenceManifestProofAccepted, false);
+  assert.equal(report.summary.a5RuntimeAuthorizationPreconditionProofAccepted, true);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.executed, true);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.accepted, true);
+  assert.equal(
+    report.units.a5RuntimeAuthorizationPreconditionProof.status,
+    'a5_authorization_precondition_accepted_runtime_still_blocked'
+  );
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.publicMcpTools.exact, true);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.preAuthorizationEvidence.exact, true);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.authorizationActions.exact, true);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.bundledApprovals.exact, true);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.forbiddenClaims.exact, true);
+  assert.deepEqual(report.units.a5RuntimeAuthorizationPreconditionProof.failClosedReasons, []);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.readiness.authorizationGranted, false);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.readiness.runtimeReady, false);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.canClaimRuntimeReady, false);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.canClaimFinalRcReady, false);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.canClaimV1RcReady, false);
+  assert.equal(report.canClaimRuntimeReady, false);
+  assert.equal(report.canClaimFinalRcReady, false);
+  assert.equal(report.canClaimV1RcReady, false);
+});
+
+test('runtime proof collector aggregates accepted explicit source registry freshness baseline summary missing-stale unsupported-source no-touch overclaim governance recall isolation migration approval http observability evidence trace evidence manifest and A5 authorization precondition units', () => {
   const report = collectValidationAggregatorRuntimeProofUnits({
     sourceRegistryProof: buildSourceRegistryProofInput(),
     evidenceFreshnessProof: buildEvidenceFreshnessProofInput(),
@@ -617,12 +670,14 @@ test('runtime proof collector aggregates accepted explicit source registry fresh
     evidenceRuntimeTraceProof:
       buildEvidenceRuntimeTraceProofInput(),
     evidenceManifestProof:
-      buildEvidenceManifestProofInput()
+      buildEvidenceManifestProofInput(),
+    a5RuntimeAuthorizationPreconditionProof:
+      buildA5RuntimeAuthorizationPreconditionProofInput()
   });
 
-  assert.equal(report.summary.availableUnitCount, 14);
-  assert.equal(report.summary.executedUnitCount, 14);
-  assert.equal(report.summary.acceptedUnitCount, 14);
+  assert.equal(report.summary.availableUnitCount, 15);
+  assert.equal(report.summary.executedUnitCount, 15);
+  assert.equal(report.summary.acceptedUnitCount, 15);
   assert.equal(report.summary.rejectedUnitCount, 0);
   assert.equal(report.summary.missingUnitCount, 0);
   assert.equal(report.summary.sourceRegistryProofAccepted, true);
@@ -639,8 +694,41 @@ test('runtime proof collector aggregates accepted explicit source registry fresh
   assert.equal(report.summary.httpRuntimeObservabilityOperationProofAccepted, true);
   assert.equal(report.summary.evidenceRuntimeTraceProofAccepted, true);
   assert.equal(report.summary.evidenceManifestProofAccepted, true);
+  assert.equal(report.summary.a5RuntimeAuthorizationPreconditionProofAccepted, true);
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.runtimeReady, false);
+  assert.equal(report.summary.v1RcReady, false);
+});
+
+test('runtime proof collector fails closed when A5 authorization action is granted', () => {
+  const authorizationInput = buildA5RuntimeAuthorizationPreconditionProofInput();
+  const report = collectValidationAggregatorRuntimeProofUnits({
+    a5RuntimeAuthorizationPreconditionProof:
+      buildA5RuntimeAuthorizationPreconditionProofInput({
+        authorizationActions: authorizationInput.authorizationActions.map((action, index) =>
+          index === 0
+            ? { ...action, granted: true }
+            : action
+        )
+      })
+  });
+
+  assert.equal(report.decision, 'NOT_READY_BLOCKED');
+  assert.equal(report.summary.executedUnitCount, 1);
+  assert.equal(report.summary.acceptedUnitCount, 0);
+  assert.equal(report.summary.rejectedUnitCount, 1);
+  assert.equal(report.units.a5RuntimeAuthorizationPreconditionProof.accepted, false);
+  assert.equal(
+    report.units.a5RuntimeAuthorizationPreconditionProof.failClosedReasons.includes(
+      'authorization_action_granted_or_not_separate_a5'
+    ),
+    true
+  );
+  assert.equal(
+    report.units.a5RuntimeAuthorizationPreconditionProof.readiness.authorizationGranted,
+    false
+  );
+  assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.v1RcReady, false);
 });
 
@@ -1121,7 +1209,9 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
       evidenceRuntimeTraceProof:
         buildEvidenceRuntimeTraceProofInput(),
       evidenceManifestProof:
-        buildEvidenceManifestProofInput()
+        buildEvidenceManifestProofInput(),
+      a5RuntimeAuthorizationPreconditionProof:
+        buildA5RuntimeAuthorizationPreconditionProofInput()
     }
   });
 
@@ -1132,8 +1222,8 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
     report.summary.validationAggregatorRuntimeProofCollectorStatus,
     'runtime_proof_collector_partial_evidence_accepted_not_ready'
   );
-  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorAcceptedUnitCount, 14);
-  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorExecutedUnitCount, 14);
+  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorAcceptedUnitCount, 15);
+  assert.equal(report.summary.validationAggregatorRuntimeProofCollectorExecutedUnitCount, 15);
   assert.equal(report.summary.validationAggregatorRuntimeProofCollectorCanClaimV1RcReady, false);
   assert.equal(
     report.evidence.p66ValidationAggregatorRuntimeProofCollector.units.sourceRegistryProof.accepted,
@@ -1202,6 +1292,11 @@ test('ValidationAggregator report surfaces runtime proof collector without readi
       .evidenceManifestProof.accepted,
     true
   );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorRuntimeProofCollector.units
+      .a5RuntimeAuthorizationPreconditionProof.accepted,
+    true
+  );
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
   assert.equal(report.summary.rcReady, false);
@@ -1259,10 +1354,12 @@ test('runtime proof collector does not perform fs, command, provider, or runtime
       evidenceRuntimeTraceProof:
         buildEvidenceRuntimeTraceProofInput(),
       evidenceManifestProof:
-        buildEvidenceManifestProofInput()
+        buildEvidenceManifestProofInput(),
+      a5RuntimeAuthorizationPreconditionProof:
+        buildA5RuntimeAuthorizationPreconditionProofInput()
     });
 
-    assert.equal(report.summary.acceptedUnitCount, 14);
+    assert.equal(report.summary.acceptedUnitCount, 15);
     assert.equal(report.safety.readsFiles, false);
     assert.equal(report.safety.executesCommands, false);
     assert.equal(report.safety.readsRealMemory, false);

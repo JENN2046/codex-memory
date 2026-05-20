@@ -140,6 +140,19 @@ const {
   SAFE_SOURCE_TYPES: EVIDENCE_MANIFEST_SAFE_SOURCE_TYPES,
   summarizeEvidenceManifestContract
 } = require('./EvidenceManifestContract');
+const {
+  EXPECTED_MANIFEST_VERSION: A5_AUTHORIZATION_EXPECTED_MANIFEST_VERSION,
+  EXPECTED_POLICY_VERSION: A5_AUTHORIZATION_EXPECTED_POLICY_VERSION,
+  EXPECTED_SCHEMA_VERSION: A5_AUTHORIZATION_EXPECTED_SCHEMA_VERSION,
+  PUBLIC_MCP_TOOLS: A5_AUTHORIZATION_PUBLIC_MCP_TOOLS,
+  REQUIRED_AUTHORIZATION_ACTION_IDS: A5_AUTHORIZATION_REQUIRED_ACTION_IDS,
+  REQUIRED_FAIL_CLOSED_STATES: A5_AUTHORIZATION_REQUIRED_FAIL_CLOSED_STATES,
+  REQUIRED_FORBIDDEN_BUNDLED_APPROVALS: A5_AUTHORIZATION_REQUIRED_FORBIDDEN_BUNDLED_APPROVALS,
+  REQUIRED_FORBIDDEN_CLAIMS: A5_AUTHORIZATION_REQUIRED_FORBIDDEN_CLAIMS,
+  REQUIRED_PRE_AUTHORIZATION_EVIDENCE_IDS: A5_AUTHORIZATION_REQUIRED_PRE_AUTHORIZATION_EVIDENCE_IDS,
+  SAFE_ACCEPTED_EVIDENCE_TYPES: A5_AUTHORIZATION_SAFE_ACCEPTED_EVIDENCE_TYPES,
+  evaluateA5RuntimeAuthorizationPrecondition
+} = require('./A5RuntimeAuthorizationPreconditionContract');
 
 const COLLECTOR_SCHEMA_VERSION = 'validation-aggregator-runtime-proof-collector-v1';
 
@@ -1433,6 +1446,93 @@ function buildEvidenceManifestFailClosedReasons(result = {}) {
   return reasons;
 }
 
+function buildA5RuntimeAuthorizationPreAuthorizationEvidence(overrides = {}) {
+  const evidenceTypeBuckets = A5_AUTHORIZATION_REQUIRED_PRE_AUTHORIZATION_EVIDENCE_IDS.map(() => []);
+  A5_AUTHORIZATION_SAFE_ACCEPTED_EVIDENCE_TYPES.forEach((type, index) => {
+    evidenceTypeBuckets[
+      index % A5_AUTHORIZATION_REQUIRED_PRE_AUTHORIZATION_EVIDENCE_IDS.length
+    ].push(type);
+  });
+
+  return A5_AUTHORIZATION_REQUIRED_PRE_AUTHORIZATION_EVIDENCE_IDS.map((id, index) => ({
+    id,
+    required: true,
+    currentStatus: 'blocked_pending_exact_a5_evidence',
+    acceptedEvidenceTypes: evidenceTypeBuckets[index],
+    blockedBy: [`${id}_not_satisfied`],
+    ...overrides[id]
+  }));
+}
+
+function buildA5RuntimeAuthorizationActions(overrides = {}) {
+  return A5_AUTHORIZATION_REQUIRED_ACTION_IDS.map(id => ({
+    id,
+    risk: 'A5-hard-stop',
+    requiresSeparateExplicitApproval: true,
+    granted: false,
+    doesNotAuthorize: [
+      'runtime_ready',
+      'rc_ready',
+      'release_ready',
+      'deploy_ready',
+      'cutover_ready'
+    ],
+    ...overrides[id]
+  }));
+}
+
+function buildA5RuntimeAuthorizationPreconditionProofInput(patch = {}) {
+  return {
+    schemaVersion: A5_AUTHORIZATION_EXPECTED_SCHEMA_VERSION,
+    policyVersion: A5_AUTHORIZATION_EXPECTED_POLICY_VERSION,
+    manifestVersion: A5_AUTHORIZATION_EXPECTED_MANIFEST_VERSION,
+    phase: 'P62-a5-runtime-authorization-precondition-matrix',
+    localOnly: true,
+    readOnly: true,
+    fixtureOnly: true,
+    planningOnly: true,
+    status: 'blocked',
+    decision: 'NOT_READY_BLOCKED',
+    authorizationGranted: false,
+    acceptedForPlanning: true,
+    publicMcpTools: [...A5_AUTHORIZATION_PUBLIC_MCP_TOOLS],
+    preAuthorizationEvidence: buildA5RuntimeAuthorizationPreAuthorizationEvidence(),
+    authorizationActions: buildA5RuntimeAuthorizationActions(),
+    forbiddenBundledApprovals: [...A5_AUTHORIZATION_REQUIRED_FORBIDDEN_BUNDLED_APPROVALS],
+    failClosedStates: [...A5_AUTHORIZATION_REQUIRED_FAIL_CLOSED_STATES],
+    forbiddenClaims: [...A5_AUTHORIZATION_REQUIRED_FORBIDDEN_CLAIMS],
+    safety: {
+      readsFilesImplicitly: false,
+      scansDirectories: false,
+      executesCommands: false,
+      startsServices: false,
+      callsProviders: false,
+      readsRealMemory: false,
+      scansRuntimeStores: false,
+      writesDurableMemory: false,
+      writesDurableAudit: false,
+      expandsPublicMcp: false,
+      remoteWrites: false,
+      rawSensitiveOutputExposed: false
+    },
+    readiness: {
+      authorizationMatrixReady: true,
+      authorizationGranted: false,
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      cutoverReady: false,
+      pushReady: false,
+      tagReady: false,
+      releaseReady: false,
+      deployReady: false,
+      configSwitchReady: false,
+      watchdogReady: false
+    },
+    ...patch
+  };
+}
+
 function buildNotSuppliedUnit(id) {
   return {
     id,
@@ -1832,6 +1932,36 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
     );
   }
 
+  if (hasOwnObject(safeInputs, 'a5RuntimeAuthorizationPreconditionProof')) {
+    const result = evaluateA5RuntimeAuthorizationPrecondition(
+      safeInputs.a5RuntimeAuthorizationPreconditionProof
+    );
+    units.a5RuntimeAuthorizationPreconditionProof = {
+      id: 'a5_runtime_authorization_precondition_proof',
+      status: result.acceptedForPlanning === true
+        ? 'a5_authorization_precondition_accepted_runtime_still_blocked'
+        : result.status,
+      executed: true,
+      accepted: result.acceptedForPlanning === true,
+      failClosedReasons: result.failClosedReasons,
+      publicMcpTools: result.publicMcpTools,
+      preAuthorizationEvidence: result.preAuthorizationEvidence,
+      authorizationActions: result.authorizationActions,
+      bundledApprovals: result.bundledApprovals,
+      failClosedStates: result.failClosedStates,
+      forbiddenClaims: result.forbiddenClaims,
+      safety: result.safety,
+      readiness: result.readiness,
+      canClaimRuntimeReady: false,
+      canClaimFinalRcReady: false,
+      canClaimV1RcReady: false
+    };
+  } else {
+    units.a5RuntimeAuthorizationPreconditionProof = buildNotSuppliedUnit(
+      'a5_runtime_authorization_precondition_proof'
+    );
+  }
+
   const unitValues = Object.values(units);
   const executedUnitCount = unitValues.filter(unit => unit.executed).length;
   const acceptedUnitCount = unitValues.filter(unit => unit.accepted).length;
@@ -1879,6 +2009,8 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
         units.evidenceRuntimeTraceProof.accepted,
       evidenceManifestProofAccepted:
         units.evidenceManifestProof.accepted,
+      a5RuntimeAuthorizationPreconditionProofAccepted:
+        units.a5RuntimeAuthorizationPreconditionProof.accepted,
       validationAggregatorFullImplementation: false,
       runtimeReady: false,
       finalRcMatrixReady: false,
@@ -1908,6 +2040,7 @@ function collectValidationAggregatorRuntimeProofUnits(inputs = {}) {
 module.exports = {
   COLLECTOR_SCHEMA_VERSION,
   buildBaselineBindingProofInput,
+  buildA5RuntimeAuthorizationPreconditionProofInput,
   buildEvidenceFreshnessProofInput,
   buildEvidenceManifestProofInput,
   buildEvidenceRuntimeTraceProofInput,
