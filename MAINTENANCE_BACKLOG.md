@@ -487,3 +487,23 @@ Current boundary:
 - No RC ready claim.
 
 Next safe candidate: if requested, prepare or execute a separately confirmed local dogfood smoke checklist. Keep NOT_READY_BLOCKED until a separate approved process changes it.
+
+## DOGFOOD_001 closeout notes
+
+Status: DOGFOOD_COMPLETED_NOT_RC_READY
+Area: P0-mainline-health / P10-observability-admin
+Risk: approved read-only local scoped non-release checks
+
+Closeout facts:
+
+- git status: `main...origin/main [ahead 15]`.
+- HEAD: `b2a4cd1`.
+- `git diff --check` passed.
+- docs validation passed.
+- candidate document read confirmed.
+- dogfood plan document read confirmed.
+- current runtime gap truth table read confirmed.
+- forbidden actions all remained `no`.
+- final state: NOT_READY_BLOCKED.
+
+Boundary preserved: no push/tag/release/deploy, provider call, real memory scan, durable memory/audit write, HTTP observe, compare/rollback, src/tests/package change, or readiness claim.

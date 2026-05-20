@@ -475,3 +475,23 @@ Recorded:
 - RC remains NOT_READY_BLOCKED.
 
 Boundary: no dogfood execution, no Codex/Claude default config switch, no provider call, no real memory broad scan, no durable write, no migration/import/export/backup/restore apply, no public MCP expansion, no push/tag/release/deploy, and no RC ready/runtime readiness/final RC readiness/production readiness/cutover readiness claim.
+
+## DOGFOOD_001 closeout notes
+
+Status: DOGFOOD_COMPLETED_NOT_RC_READY
+Result: DOGFOOD_COMPLETED_NOT_RC_READY
+State: NOT_READY_BLOCKED
+
+Recorded:
+
+- git status: `main...origin/main [ahead 15]`.
+- HEAD: `b2a4cd1`.
+- `git diff --check` passed.
+- docs validation passed.
+- `docs/LOCAL_RC_CANDIDATE_001.md` read confirmed.
+- `docs/DOGFOOD_001_LOCAL_SCOPED_NON_RELEASE_PLAN.md` read confirmed.
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` read confirmed.
+- forbidden actions all remained `no`.
+- final state: NOT_READY_BLOCKED.
+
+Forbidden actions not touched: push/tag/release/deploy, provider call, real memory scan, durable memory/audit write, HTTP observe, compare/rollback, src/tests/package changes, and readiness claims.

@@ -75,3 +75,17 @@ This table does not authorize:
 - V8 is not implemented.
 - VCP full parity is not claimed.
 - This local candidate record does not change any `complete?` value in the truth table.
+
+## DOGFOOD_001 Closeout - 2026-05-20
+
+- Result: DOGFOOD_COMPLETED_NOT_RC_READY.
+- git status: `main...origin/main [ahead 15]`.
+- HEAD: `b2a4cd1`.
+- `git diff --check` passed.
+- docs validation passed.
+- `docs/LOCAL_RC_CANDIDATE_001.md` read confirmed.
+- `docs/DOGFOOD_001_LOCAL_SCOPED_NON_RELEASE_PLAN.md` read confirmed.
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` read confirmed.
+- forbidden actions all remained `no`.
+- final state: NOT_READY_BLOCKED.
+- This dogfood closeout does not change any `complete?` value in the truth table.

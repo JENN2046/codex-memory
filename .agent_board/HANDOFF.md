@@ -894,3 +894,14 @@ Validation: git diff --check and docs validation for this docs/board slice.
 Not validated: dogfood execution, smoke checks, Codex/Claude config switch, provider calls, real memory broad scan, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push/tag/release/deploy, RC readiness.
 Remaining risk: future smoke checks must be separately confirmed with exact command list and boundary.
 Next safe step: stop after plan validation or ask for separate smoke-check authorization.
+
+## DOGFOOD_001 closeout handoff
+
+Goal: Record approved read-only local scoped non-release dogfood checks without expanding into runtime or release work.
+Status: DOGFOOD_COMPLETED_NOT_RC_READY.
+Changed files: STATUS.md; MAINTENANCE_BACKLOG.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; .agent_board/*
+Validation: git diff --check and docs validation for this closeout notes slice.
+Evidence recorded: git status `main...origin/main [ahead 15]`; HEAD `b2a4cd1`; diff check passed; docs validation passed; three approved docs read confirmed; forbidden actions all no.
+Not validated: HTTP observe, compare/rollback, provider calls, real memory scan, durable memory/audit write, Codex/Claude default config switch, migration/import/export/backup/restore apply, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, readiness.
+Remaining risk: dogfood is not RC readiness; project remains NOT_READY_BLOCKED.
+Next safe step: staged review and local commit if requested; no push or readiness claim.
