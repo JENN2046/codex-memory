@@ -107,8 +107,25 @@ function extractTaskNumber(text = '') {
   return Number.isInteger(parsed) ? parsed : null;
 }
 
+function rowText(row) {
+  return `${row.scope} ${row.summary} ${row.followUp}`.toLowerCase();
+}
+
+function isLocalDashboardReviewShape(row) {
+  const text = rowText(row);
+  return (
+    text.includes('local dashboard') ||
+    text.includes('dashboard text') ||
+    text.includes('dashboard readiness') ||
+    text.includes('dashboard validation') ||
+    text.includes('dashboard output') ||
+    text.includes('real dashboard') ||
+    text.includes('targeted dashboard tests')
+  );
+}
+
 function inferLane(row) {
-  const text = `${row.scope} ${row.summary} ${row.followUp}`.toLowerCase();
+  const text = rowText(row);
   if (text.includes('no red stop') || text.includes('zero red stop')) return DEFAULT_MISSING_VALUE;
   if (text.includes('red stop') || text.includes('red gate stop') || row.result === 'BLOCKED') return 'Red';
   if (text.includes('green lane') || text.includes('no-amber') || text.includes('no amber')) return 'Green';
@@ -123,12 +140,13 @@ function inferLane(row) {
   if (text.includes('amber lane action') || text.includes('amber external action') || text.includes('amber write action')) {
     return 'Amber';
   }
+  if (isLocalDashboardReviewShape(row)) return 'Green';
   if (text.includes('green lane')) return 'Green';
   return DEFAULT_MISSING_VALUE;
 }
 
 function inferReceiptStatus(row) {
-  const text = `${row.scope} ${row.summary} ${row.followUp}`.toLowerCase();
+  const text = rowText(row);
   if (text.includes('not_required_no_amber_external_or_write_action')) {
     return 'not_required_no_amber_external_or_write_action';
   }
@@ -147,6 +165,7 @@ function inferReceiptStatus(row) {
   if (text.includes('receipt rollup')) return 'receipt_rollup_only';
   if (text.includes('fixture drift changelog') || text.includes('changelog')) return 'fixture_changelog_only';
   if (text.includes('parser contract')) return 'parser_contract_only';
+  if (isLocalDashboardReviewShape(row)) return 'local_review_shape_only';
   if (text.includes('dashboard receipt summary') || text.includes('dashboard summary')) {
     return 'local_review_shape_only';
   }
@@ -164,7 +183,7 @@ function countMarkers(text, markers) {
 
 function classifyRow(row) {
   if (!row.result) return 'parser_blocked_missing_result';
-  const text = `${row.scope} ${row.summary} ${row.followUp}`.toLowerCase();
+  const text = rowText(row);
   if (POSITIVE_READINESS_MARKERS.some((marker) => text.includes(marker))) {
     return 'parser_blocked_readiness_overclaim';
   }
@@ -173,7 +192,7 @@ function classifyRow(row) {
 }
 
 function isV3Row(row) {
-  const text = `${row.scope} ${row.summary} ${row.followUp}`.toLowerCase();
+  const text = rowText(row);
   const taskNumber = extractTaskNumber(row.scope);
   return (
     (Number.isInteger(taskNumber) && taskNumber >= 672) ||

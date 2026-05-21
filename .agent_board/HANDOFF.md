@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0723 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after parser/dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0723 started from local `HEAD = 784b7ff feat: add governance blocker text summary`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 20]`.
+
+Changed files: `src/core/SmartStandingAuthorizationV3ReceiptParser.js`; `tests/smart-standing-authorization-v3-receipts-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: `SmartStandingAuthorizationV3ReceiptParser` now classifies dashboard text/readiness/validation local review rows as Green local review shape. The real parser no longer reports latest `CM-0722 / CMV-0841` as missing lane/receipt status; it reports `latest_lane=Green` and `latest_receipt_status=local_review_shape_only`.
+
+Boundary: local read-only parser/test/docs/board only. No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\core\SmartStandingAuthorizationV3ReceiptParser.js`; `node --check tests\smart-standing-authorization-v3-receipts-cli.test.js`; `node --test tests\smart-standing-authorization-v3-receipts-cli.test.js` passed `10/10`; `node src\cli\smart-standing-authorization-v3-receipts.js --json`; `node --test tests\dashboard-cli.test.js` passed `19/19`; `node src\cli\dashboard.js --json --summary-only`; `npm test` passed `1962/1962`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed with `latest_task=CM-0723`; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push remains blocked without explicit authorization.
+
 ## CM-0722 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.

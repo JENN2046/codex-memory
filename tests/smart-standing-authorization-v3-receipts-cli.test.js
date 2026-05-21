@@ -90,6 +90,26 @@ test('v3 receipt parser treats latest Amber receipts as current v3 rows', () => 
   assert.equal(summary.latest_parser_status, 'parser_ok');
 });
 
+test('v3 receipt parser recognizes local dashboard text hardening rows as Green local review shape', () => {
+  const markdown = [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-0841 | `node src\\cli\\dashboard.js --summary-only` | P10 | CM-0722 dashboard governance blocker text summary | COMPLETED_VALIDATED | Dashboard text output now emits `GovBlk1..GovBlk5`; targeted dashboard tests passed `19/19`; full `npm test` passed `1961/1961`; `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` is preserved. | Push remains blocked pending explicit user authorization; continue governance fail-closed hardening, not readiness claim. | 2026-05-21 |',
+    '| CMV-0840 | `node src\\cli\\dashboard.js --json --summary-only` | P10 | CM-0721 dashboard governance blocker input placeholders | COMPLETED_VALIDATED | Dashboard readiness governance blocker details now include `inputResolutionMode` and `requiredInputPlaceholders`. | Continue governance fail-closed hardening. | 2026-05-21 |'
+  ].join('\n');
+  const summary = parseReceiptMarkdown(markdown, {
+    sourcePath: '.agent_board/VALIDATION_LOG.md',
+    workspaceRoot: process.cwd()
+  });
+
+  assert.equal(summary.latest_v3_task_id, 'CM-0722');
+  assert.equal(summary.latest_validation_id, 'CMV-0841');
+  assert.equal(summary.latest_lane, 'Green');
+  assert.equal(summary.latest_receipt_status, 'local_review_shape_only');
+  assert.equal(summary.latest_parser_status, 'parser_ok');
+  assert.equal(summary.next_auto_step_allowed, true);
+});
+
 test('v3 receipt parser core does not treat no-Amber or Red hard-stop wording as actions', () => {
   const markdown = [
     '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
