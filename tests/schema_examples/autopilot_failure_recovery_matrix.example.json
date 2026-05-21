@@ -1,0 +1,17 @@
+{
+  "failure_recovery_matrix": {
+    "decision": "NOT_READY_BLOCKED",
+    "repair_attempt_limit": 1,
+    "readiness_claim_allowed": false,
+    "failures": [
+      { "failure_type": "validation_fail", "stop_reason": "validation_failed_after_allowed_attempt", "safe_state": "preserve diff and validation output summary", "next_after_approval": "user decides repair direction or approves broader validation" },
+      { "failure_type": "scope_drift", "stop_reason": "scope_drift_detected", "safe_state": "stop before editing unrelated files", "next_after_approval": "user narrows or expands scope explicitly" },
+      { "failure_type": "budget_exhausted", "stop_reason": "autonomy_envelope_budget_exhausted", "safe_state": "record used budget and stop", "next_after_approval": "user grants a new exact envelope" },
+      { "failure_type": "red_gate", "stop_reason": "red_lane_condition_detected", "safe_state": "no Red action executed", "next_after_approval": "user gives explicit exact approval or cancels" },
+      { "failure_type": "dirty_worktree", "stop_reason": "unexpected_dirty_worktree", "safe_state": "protect user-owned changes", "next_after_approval": "user confirms ownership or asks for isolation" },
+      { "failure_type": "user_owned_change", "stop_reason": "user_owned_change_would_be_overwritten", "safe_state": "leave files untouched", "next_after_approval": "user authorizes overwrite or supplies merge direction" },
+      { "failure_type": "missing_evidence", "stop_reason": "required_evidence_missing", "safe_state": "mark task blocked, no readiness claim", "next_after_approval": "user approves evidence collection or narrows acceptance" },
+      { "failure_type": "non_obvious_repair", "stop_reason": "repair_requires_design_judgment", "safe_state": "stop after at most one obvious repair", "next_after_approval": "user decides design or approves a new task" }
+    ]
+  }
+}

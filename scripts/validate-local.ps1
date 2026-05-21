@@ -69,6 +69,50 @@ switch ($Area) {
       Run-Step "node --check .\scripts\validate_autopilot_goal_compiler.js" "node" @("--check", ".\scripts\validate_autopilot_goal_compiler.js")
       Run-Step "node .\scripts\validate_autopilot_goal_compiler.js" "node" @(".\scripts\validate_autopilot_goal_compiler.js")
     }
+    if (Test-Path ".\scripts\validate_autopilot_closed_loop.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_closed_loop.js" "node" @("--check", ".\scripts\validate_autopilot_closed_loop.js")
+      Run-Step "node .\scripts\validate_autopilot_closed_loop.js" "node" @(".\scripts\validate_autopilot_closed_loop.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_controller.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_controller.js" "node" @("--check", ".\scripts\validate_autopilot_controller.js")
+      Run-Step "node .\scripts\validate_autopilot_controller.js" "node" @(".\scripts\validate_autopilot_controller.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_state_store_draft.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_state_store_draft.js" "node" @("--check", ".\scripts\validate_autopilot_state_store_draft.js")
+      Run-Step "node .\scripts\validate_autopilot_state_store_draft.js" "node" @(".\scripts\validate_autopilot_state_store_draft.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_action_adapter_contract.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_action_adapter_contract.js" "node" @("--check", ".\scripts\validate_autopilot_action_adapter_contract.js")
+      Run-Step "node .\scripts\validate_autopilot_action_adapter_contract.js" "node" @(".\scripts\validate_autopilot_action_adapter_contract.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_validation_planner.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_validation_planner.js" "node" @("--check", ".\scripts\validate_autopilot_validation_planner.js")
+      Run-Step "node .\scripts\validate_autopilot_validation_planner.js" "node" @(".\scripts\validate_autopilot_validation_planner.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_replay_harness.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_replay_harness.js" "node" @("--check", ".\scripts\validate_autopilot_replay_harness.js")
+      Run-Step "node .\scripts\validate_autopilot_replay_harness.js" "node" @(".\scripts\validate_autopilot_replay_harness.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_operator_console.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_operator_console.js" "node" @("--check", ".\scripts\validate_autopilot_operator_console.js")
+      Run-Step "node .\scripts\validate_autopilot_operator_console.js" "node" @(".\scripts\validate_autopilot_operator_console.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_controlled_green_executor_entry.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_controlled_green_executor_entry.js" "node" @("--check", ".\scripts\validate_autopilot_controlled_green_executor_entry.js")
+      Run-Step "node .\scripts\validate_autopilot_controlled_green_executor_entry.js" "node" @(".\scripts\validate_autopilot_controlled_green_executor_entry.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_fixture_green_executor.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_fixture_green_executor.js" "node" @("--check", ".\scripts\validate_autopilot_fixture_green_executor.js")
+      Run-Step "node .\scripts\validate_autopilot_fixture_green_executor.js" "node" @(".\scripts\validate_autopilot_fixture_green_executor.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_green_file_write_boundary.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_green_file_write_boundary.js" "node" @("--check", ".\scripts\validate_autopilot_green_file_write_boundary.js")
+      Run-Step "node .\scripts\validate_autopilot_green_file_write_boundary.js" "node" @(".\scripts\validate_autopilot_green_file_write_boundary.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_green_file_write_executor_contract.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_green_file_write_executor_contract.js" "node" @("--check", ".\scripts\validate_autopilot_green_file_write_executor_contract.js")
+      Run-Step "node .\scripts\validate_autopilot_green_file_write_executor_contract.js" "node" @(".\scripts\validate_autopilot_green_file_write_executor_contract.js")
+    }
   }
   "test" {
     Run-NpmScript "test"

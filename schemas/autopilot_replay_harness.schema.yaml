@@ -1,0 +1,75 @@
+schema_id: autopilot_replay_harness
+version: 0
+status: draft_fixture_only
+decision: NOT_READY_BLOCKED
+readiness_claim_allowed: false
+description: >
+  Fixture-only contract for CM-0696 Checkpoint / Resume / Replay Harness.
+  This schema defines read-only replay result shape and fail-closed reasons.
+  It does not authorize real action replay, state writes, provider/API/MCP calls,
+  runtime probes, memory access, dependency changes, remote actions, or readiness claims.
+
+required_top_level:
+  - replay_harness
+
+replay_harness:
+  required_fields:
+    - harness_id
+    - read_only
+    - replays_real_actions
+    - writes_state
+    - dashboard_summary_only
+    - readiness_claim_allowed
+    - replay_scenarios
+  constants:
+    read_only: true
+    replays_real_actions: false
+    writes_state: false
+    readiness_claim_allowed: false
+  required_scenarios:
+    - cycle_checkpoint_ok
+    - attempt_replay_noop
+    - receipt_reconciliation_missing_receipt
+    - dirty_worktree_protection
+    - partial_attempt_recovery
+    - stale_board_detection
+    - resume_token_ok
+    - stop_reason_replay
+  required_fail_closed_reasons:
+    - dirty_worktree_detected
+    - missing_receipt_evidence
+    - stale_board_snapshot
+    - partial_attempt_without_checkpoint
+    - red_gate_event_replayed
+    - second_repair_attempt_replayed
+
+replay_scenario:
+  required_fields:
+    - scenario_id
+    - input_surface
+    - replay_mode
+    - expected_result
+    - resume_token
+    - fail_closed_reason
+    - mutated
+    - readiness_claim_allowed
+  allowed_expected_results:
+    - REPLAY_OK
+    - RECOVERABLE_READ_ONLY
+    - FAIL_CLOSED
+  constants:
+    mutated: false
+    readiness_claim_allowed: false
+
+hard_boundaries:
+  must_not:
+    - replay real actions
+    - write board or runtime state
+    - call provider/API/MCP
+    - read or write real memory store
+    - change dependencies
+    - change config/watchdog/startup
+    - push/PR/tag/release/deploy/cutover
+    - perform destructive action
+    - expose secrets
+    - claim runtime/cutover/production readiness

@@ -1,0 +1,93 @@
+schema_id: autopilot_operator_console
+version: 0
+status: draft_fixture_only
+decision: NOT_READY_BLOCKED
+readiness_claim_allowed: false
+description: >
+  Fixture-only operator console and eval matrix for CM-0697. This surface
+  summarizes controller, state-store draft, adapters, validation planner,
+  resume/replay, hard-stop inbox, next safe action, and coverage gaps without
+  running evals or performing side effects.
+
+required_top_level:
+  - operator_console
+
+operator_console:
+  required_fields:
+    - console_id
+    - read_only
+    - executes_eval
+    - writes_state
+    - readiness_claim_allowed
+    - next_safe_action
+    - red_gate_inbox_count
+    - coverage_gap_count
+    - approval_packet_template_ready
+    - controlled_green_executor_entry_conditions
+    - surfaces
+    - eval_matrix
+  constants:
+    read_only: true
+    executes_eval: false
+    writes_state: false
+    readiness_claim_allowed: false
+  required_surfaces:
+    - controller
+    - state_store_draft
+    - adapter_contract
+    - validation_planner
+    - resume_replay
+    - red_gate_inbox
+    - next_safe_action
+    - coverage_gaps
+  required_eval_cases:
+    - golden_trace
+    - failure_injection
+    - budget_exhaustion
+    - red_gate_bypass_rejection
+    - missing_evidence
+    - unknown_cost
+    - secret_access
+    - broad_memory_scan
+    - push_attempt
+    - readiness_overclaim_rejection
+
+surface:
+  required_fields:
+    - surface_id
+    - source
+    - status
+    - read_only
+    - mutated
+    - readiness_claim_allowed
+  constants:
+    read_only: true
+    mutated: false
+    readiness_claim_allowed: false
+
+eval_case:
+  required_fields:
+    - case_id
+    - injects_failure
+    - expected_result
+    - evidence_required
+    - executes_live_action
+    - readiness_claim_allowed
+  allowed_expected_results:
+    - ACCEPTED_FIXTURE_TRACE
+    - REJECTED_FAIL_CLOSED
+  constants:
+    executes_live_action: false
+    readiness_claim_allowed: false
+
+hard_boundaries:
+  must_not:
+    - run live evals
+    - execute provider/API/MCP
+    - read or write real memory
+    - change dependencies
+    - change config/watchdog/startup
+    - write state
+    - push/PR/tag/release/deploy/cutover
+    - expose secrets
+    - claim runtime/cutover/production readiness

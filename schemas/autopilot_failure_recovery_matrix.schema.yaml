@@ -1,0 +1,26 @@
+schema_id: autopilot_failure_recovery_matrix
+schema_version: 1
+required:
+  - failure_recovery_matrix
+properties:
+  failure_recovery_matrix:
+    required:
+      - decision
+      - repair_attempt_limit
+      - failures
+      - readiness_claim_allowed
+  failure:
+    required:
+      - failure_type
+      - stop_reason
+      - safe_state
+      - next_after_approval
+  failure_type_enum:
+    - validation_fail
+    - scope_drift
+    - budget_exhausted
+    - red_gate
+    - dirty_worktree
+    - user_owned_change
+    - missing_evidence
+    - non_obvious_repair

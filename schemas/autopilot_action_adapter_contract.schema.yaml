@@ -1,0 +1,94 @@
+title: Autopilot Action Adapter Contract
+version: 0.1.0
+status: draft_fixture_only
+description: >
+  Budget Enforcement / Action Adapter Contract for future Autopilot execution.
+  This is a fixture-only contract and does not connect or execute real actions.
+type: object
+required:
+  - action_adapter_contract
+properties:
+  action_adapter_contract:
+    type: object
+    required:
+      - contract_id
+      - runtime_actions_connected
+      - provider_calls_connected
+      - mcp_calls_connected
+      - readiness_claim_allowed
+      - adapters
+      - fail_closed_fixtures
+    properties:
+      contract_id:
+        type: string
+      runtime_actions_connected:
+        const: false
+      provider_calls_connected:
+        const: false
+      mcp_calls_connected:
+        const: false
+      readiness_claim_allowed:
+        const: false
+      adapters:
+        type: array
+        items:
+          type: object
+          required:
+            - adapter_id
+            - preflight
+            - lane_allowed
+            - budget_required
+            - budget_debit
+            - receipt_required
+            - rollback_or_cleanup
+            - red_gate_conditions
+            - forbidden_without_explicit_approval
+            - validation_required
+            - stop_reason
+          properties:
+            adapter_id:
+              enum:
+                - file_edit_adapter
+                - validation_command_adapter
+                - provider_call_adapter
+                - mcp_tool_adapter
+                - memory_read_adapter
+                - memory_write_adapter
+                - dependency_action_adapter
+                - runtime_probe_adapter
+                - git_remote_adapter
+                - approval_packet_adapter
+            lane_allowed:
+              type: array
+              items:
+                enum:
+                  - Green
+                  - Amber
+                  - Red
+            readiness_claim_allowed:
+              const: false
+      fail_closed_fixtures:
+        type: array
+        items:
+          type: object
+          required:
+            - fixture_id
+            - attempted_adapter
+            - expected_decision
+            - stop_reason
+            - mutated
+          properties:
+            fixture_id:
+              enum:
+                - budget_exhausted
+                - missing_receipt
+                - red_gate_attempted
+                - second_repair_attempted
+                - unknown_cost
+                - secret_access_attempted
+                - broad_memory_scan_attempted
+                - push_attempted
+            expected_decision:
+              const: BLOCKED_RED_OR_FAIL_CLOSED
+            mutated:
+              const: false

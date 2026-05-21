@@ -1,0 +1,56 @@
+{
+  "controller_cycle": {
+    "goal_id": "CM-0692",
+    "controller_cycle_id": "CTRL-CM-0692-READONLY-001",
+    "current_state": "continued_or_stopped",
+    "next_safe_task": "none_local_queue_empty",
+    "lane_decision": {
+      "lane": "none",
+      "decision": "NO_EXECUTABLE_TASK_AVAILABLE",
+      "reason": "local_queue_has_no_todo_or_in_progress_autopilot_task"
+    },
+    "execution_boundary": {
+      "mode": "read_only_noop_executor",
+      "dry_run_only": true,
+      "executes_tasks": false,
+      "writes_runtime_state": false,
+      "forbidden_actions": [
+        "provider/API/MCP calls",
+        "real memory scan/write",
+        "dependency/config changes",
+        "runtime probe",
+        "push/PR/tag/release/deploy/cutover",
+        "readiness claim"
+      ]
+    },
+    "validation_plan": {
+      "source": "controller_default_docs_gate",
+      "commands": [
+        "node --check src\\core\\AutopilotControllerReadOnly.js",
+        "node --check src\\cli\\autopilot-controller.js",
+        "node --test tests\\autopilot-controller-cli.test.js",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\validate-local.ps1 -Area docs",
+        "git diff --check"
+      ],
+      "stop_on_non_obvious_failure": true
+    },
+    "repair_once_available": true,
+    "receipt_requirement": {
+      "required": false,
+      "reason": "not_required_no_amber_external_or_write_action"
+    },
+    "checkpoint_requirement": {
+      "required": true,
+      "surface": ".agent_board/CHECKPOINT.md",
+      "mode": "local_board_checkpoint_only"
+    },
+    "stop_reason": "none",
+    "red_gate_status": {
+      "status": "active",
+      "blocked_red_count": 8,
+      "hard_stop_required_for_red": true
+    },
+    "readiness_claim_allowed": false,
+    "mutated": false
+  }
+}

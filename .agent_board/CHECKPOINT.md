@@ -1,5 +1,129 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0703 Green file-write executor code-level preflight tests - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added pure code-level preflight evaluator and targeted tests for the future real Green file-write executor while keeping implementation and activation blocked.
+- Preflight: `evaluateAutopilotGreenFileWritePreflight` accepts complete Green synthetic tasks only as `PREFLIGHT_ACCEPTED_NO_WRITE`; Amber, Red, unknown, mixed lane, missing write set, path violations, missing locks, user-owned diff conflicts, missing evidence, second repair, external side-effect, and readiness claim requests fail closed as `REJECTED_FAIL_CLOSED`.
+- Boundary: no executor implementation, executor activation, real file write, task execution, validator execution through executor, receipt/checkpoint write, provider/API/MCP call, real memory read/write, dependency/config change, runtime probe, public MCP expansion, remote action, or readiness claim occurred.
+- Next safe task: prepare implementation preflight packet without executor activation, or guarded local commit review if requested.
+
+## Checkpoint - CM-0702 Real Green file-write executor contract - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added design-contract / fixture-only / read-only Green file-write executor contract with docs, schema/example, helper/CLI, validator, targeted tests, and dashboard `autopilotGreenFileExecutorContract` rollup.
+- Contract: defines execution cycle, required task fields, allowed write operations, preflight gates, post-write gates, and fail-closed rejection cases.
+- Boundary: implementation, activation, real file writes, task execution, validator execution, receipt/checkpoint writes, provider/API/MCP calls, real memory read/write, dependency/config changes, runtime probes, public MCP expansion, remote actions, and readiness claims remain blocked.
+- Next safe task: prepare code-level preflight tests without executor implementation.
+
+## Checkpoint - CM-0701 Green file-write executor boundary review - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added design-boundary / fixture-only / read-only Green file-write executor boundary with docs, schema/example, helper/CLI, validator, targeted tests, and dashboard `autopilotGreenFileBoundary` rollup.
+- Decision: `GREEN_FILE_WRITE_EXECUTOR_DESIGN_ALLOWED_IMPLEMENTATION_BLOCKED`; design may proceed separately, but implementation, activation, real file writes, task execution, and readiness claims remain blocked.
+- Boundary: no provider/API/MCP call, real memory read/write, dependency/config change, runtime probe, public MCP expansion, remote action, or readiness claim occurred.
+- Next safe task: design the real Green file-write executor contract separately without implementation.
+
+## Checkpoint - CM-0700 Fixture-backed Green executor skeleton - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added fixture-only / read-only / no-op Green executor skeleton with docs, schema/example, helper/CLI, validator, targeted tests, and dashboard `autopilotGreenExecutor` rollup.
+- Skeleton: covers 6 Green-only task kinds, 4 no-op adapter kinds, 2 no-op execution plan fixtures, and 14 fail-closed fixtures.
+- Boundary: executor is not activated; no task execution, file write, validator execution by executor, receipt write, checkpoint write, provider/API/MCP call, real memory read/write, dependency/config change, runtime probe, public MCP expansion, remote action, or readiness claim occurred.
+- Next safe task: review whether a real Green file-write executor boundary can be designed separately.
+
+## Checkpoint - CM-0699 Controlled Green executor entry packet - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added prepared-not-activated controlled Green executor admission packet with docs, schema/example, read-only helper/CLI, validator, targeted tests, and dashboard `autopilotGreenEntry` rollup.
+- Admission: records 12 required conditions, 7 allowed Green-only scope classes, 10 preflight fields, and 11 fail-closed stop reasons.
+- Boundary: executor is not activated; no task execution, eval execution, state write, provider/API/MCP call, real memory read/write, dependency/config change, runtime probe, public MCP expansion, remote action, or readiness claim occurred.
+- Next safe task: fixture-backed Green executor skeleton only after separate local review.
+
+## Checkpoint - CM-0698 Autopilot local P2 hardening fixes - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: fixed controller CLI unknown flag handling and dashboard autopilotKernel long-term health checks.
+- Behavior: `autopilot-controller` now rejects unrecognized flags with exit code 2; dashboard autopilotKernel no longer depends on exact schema/example count or a fixed validation-id ladder.
+- Boundaries: no eval execution, no state write, no provider/API/MCP call, no real memory read/write, no dependency/config change, no runtime probe, no public MCP expansion, no remote action, and no readiness claim.
+- Next safe task: controlled Green executor entry packet.
+
+## Checkpoint - CM-0697 Operator Console Readiness Surface + Eval Matrix - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added fixture-only operator console and eval matrix docs, schema/example, read-only helper/CLI, validator, targeted CLI test, and dashboard `autopilotOperator` rollup.
+- Operator surface: controller, state-store draft, adapter contract, validation planner, resume/replay, hard-stop inbox, next safe action, and coverage gaps.
+- Eval matrix: golden trace, failure injection, budget exhaustion, hard-stop bypass rejection, missing evidence, unknown cost, secret access, broad memory scan, push attempt, and readiness overclaim rejection.
+- Boundaries: no eval execution, no state write, no provider/API/MCP call, no real memory read/write, no dependency/config change, no runtime probe, no public MCP expansion, no remote action, and no readiness claim.
+- Next safe task: controlled Green executor entry packet, or guarded local commit review if requested.
+
+## Checkpoint - CM-0696 Checkpoint / Resume / Replay Harness - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added fixture-only checkpoint/resume/replay harness docs, schema/example, read-only helper/CLI, validator, targeted CLI test, and dashboard `autopilotReplay` rollup.
+- Replay coverage: cycle checkpoint, no-op attempt replay, receipt reconciliation, dirty worktree protection, partial attempt recovery, stale board detection, resume token inspection, stop reason replay, and second repair replay.
+- Boundaries: no real action replay, no state write, no provider/API/MCP call, no real memory read/write, no dependency/config change, no runtime probe, no public MCP expansion, no remote action, and no readiness claim.
+- Next safe task: Week 6 Operator Console Readiness Surface + Eval Matrix.
+
+## Checkpoint - CM-0695 ValidationPlanner / RepairOnce Orchestrator - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: added fixture-only validation planner and repair-once orchestrator docs, schema/example, validator, read-only helper/CLI, targeted tests, and dashboard `autopilotValidation` rollup.
+- Surface: covers docs-only Green, schema/fixture Green, dashboard read-only Green, source helper Green, adapter contract fixture, Amber provider planned-only, and Red git remote blocked validation cases.
+- Repair-once coverage: obvious local reversible once, second failure stop, non-obvious repair stop, design judgment stop, Red gate stop, and user-owned change stop.
+- Boundary: `executes_validation=false`, `applies_repair=false`, `repair_attempt_limit=1`, and `readiness_claim_allowed=false`.
+- Validation: validation-planner helper/CLI/dashboard syntax checks; targeted validation planner CLI test; governance kernel validator; dashboard CLI test; docs validation; `git diff --check`.
+- Not run: validation command execution, repair application, provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, runtime probes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: Week 5 Checkpoint / Resume / Replay Harness, or optional guarded local commit review if requested.
+
+## Checkpoint - CM-0694 Budget Enforcement / Action Adapter Contract - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: added fixture-only adapter contract docs, schema/example, validator, read-only helper/CLI, targeted tests, and dashboard `autopilotAdapters` rollup.
+- Surface: covers `file_edit_adapter`, `validation_command_adapter`, `provider_call_adapter`, `mcp_tool_adapter`, `memory_read_adapter`, `memory_write_adapter`, `dependency_action_adapter`, `runtime_probe_adapter`, `git_remote_adapter`, and `approval_packet_adapter`.
+- Fail-closed coverage: `budget_exhausted`, `missing_receipt`, `red_gate_attempted`, `second_repair_attempted`, `unknown_cost`, `secret_access_attempted`, `broad_memory_scan_attempted`, and `push_attempted`.
+- Boundary: `runtime_actions_connected=false`, `provider_calls_connected=false`, `mcp_calls_connected=false`, `executes_adapters=false`, and `readiness_claim_allowed=false`.
+- Validation: adapter helper/CLI/dashboard syntax checks; targeted adapter CLI test; governance kernel validator; dashboard CLI test; docs validation; `git diff --check`.
+- Not run: adapter execution, provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, runtime probes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: Week 4 ValidationPlanner / RepairOnce Orchestrator, or optional guarded local commit review if requested.
+
+## Checkpoint - CM-0693 Autopilot Structured State Store Draft - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: added append-only structured state store draft docs, schema/example, validator, read-only helper/CLI, targeted tests, and dashboard `autopilotStateStore` rollup.
+- Surface: draft covers `goal`, `route_plan`, `task_queue_snapshot`, `task_attempt`, `lane_decision`, `action_preflight`, `budget_debit`, `execution_receipt`, `validation_run`, `repair_attempt`, `checkpoint`, `approval_packet`, `red_gate_event`, `stop_reason`, and `resume_token`.
+- Boundary: `no_migration=true`, `database_created=false`, `durable_write_enabled=false`, `board_migration_performed=false`, and `readiness_claim_allowed=false`.
+- Validation: state-store helper/CLI/dashboard syntax checks; targeted state-store CLI test; governance kernel validator; dashboard CLI test; docs validation; `git diff --check`.
+- Not run: provider calls, API calls, MCP tool calls, real memory reads/writes, database creation, board migration, durable state writes, dependency changes, config/watchdog/startup changes, runtime probes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: Week 3 Budget Enforcement / Action Adapter Contract, or optional guarded local commit review if requested.
+
+## Checkpoint - CM-0692 AutopilotController v0 read-only no-op executor - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: added read-only/no-op controller core, CLI, controller cycle schema/example, validator, targeted tests, docs, and dashboard `autopilotController` rollup.
+- Surface: controller cycle summary now exposes `goal_id`, `controller_cycle_id`, `current_state`, `next_safe_task`, `lane_decision`, `execution_boundary`, `validation_plan`, `repair_once_available`, `receipt_requirement`, `checkpoint_requirement`, `stop_reason`, `red_gate_status`, and `readiness_claim_allowed=false`.
+- Validation: targeted controller/dashboard checks, controller CLI test, dashboard CLI test, docs validation, and `git diff --check`.
+- Not run: provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, runtime probes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: Week 2 structured state store draft, or optional guarded local commit review if requested.
+
+## Checkpoint - CM-0691 Complete local autopilot closed-loop observability and recovery surface - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: added 12-state local closed-loop contract, failure recovery matrix, hardened goal-to-task queue fields, read-only dry-run helper/CLI, local completeness coverage summary, and dashboard `autopilotLoop` rollup.
+- Surface: `goal -> route_plan -> task_queue -> lane decision -> execution boundary -> validation -> repair-once -> receipt/ledger -> checkpoint -> next_safe_task` is now locally visible and fail-closed.
+- Validation: targeted helper/CLI/dashboard checks, closed-loop CLI test, dashboard CLI test, docs validation, and `git diff --check`.
+- Not run: provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: optional guarded local commit review if requested.
+
+## Checkpoint - CM-0685 Autopilot kernel control-surface integration - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: dashboard now exposes read-only `autopilotKernel` JSON, summary-only JSON, checks/recommendations, and text output.
+- Surface: profile exists, goal runtime exists, ledger exists, schema count, example count, validators, latest ledger goal/result, blocked Red count, validation status, and readiness claim false.
+- Validation: `node --check src\cli\dashboard.js` passed; targeted dashboard CLI test passed `18/18`; docs validation passed; `git diff --check` reported CRLF warnings only.
+- Not run: provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: optional guarded local commit review if requested.
+
 ## Checkpoint - CM-0684 Smart Standing Authorization v3 complete autopilot governance kernel - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

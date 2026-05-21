@@ -128,6 +128,18 @@ test('dashboard CLI should report all sections in json mode', async () => {
 
   assertKeySet(payload, [
     'audits',
+    'autopilotAdapters',
+    'autopilotController',
+    'autopilotGreenEntry',
+    'autopilotGreenExecutor',
+    'autopilotGreenFileBoundary',
+    'autopilotGreenFileExecutorContract',
+    'autopilotKernel',
+    'autopilotLoop',
+    'autopilotOperator',
+    'autopilotReplay',
+    'autopilotStateStore',
+    'autopilotValidation',
     'checks',
     'destructive',
     'gate',
@@ -234,6 +246,147 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.smartStandingAuthorizationV3.decision, 'NOT_READY_BLOCKED');
   assert.equal(payload.smartStandingAuthorizationV3.budget_used.provider, 0);
   assert.equal(payload.smartStandingAuthorizationV3.budget_used.memory_writes, 0);
+  assert.equal(payload.autopilotKernel.status, 'ok');
+  assert.equal(payload.autopilotKernel.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotKernel.evidenceClass, 'read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotKernel.schema_count >= 14, true);
+  assert.equal(payload.autopilotKernel.example_count >= 14, true);
+  assert.equal(payload.autopilotKernel.validators.governance_kernel, true);
+  assert.equal(payload.autopilotKernel.validators.goal_compiler, true);
+  assert.equal(payload.autopilotKernel.validators.state_store_draft, true);
+  assert.equal(payload.autopilotKernel.validators.action_adapter_contract, true);
+  assert.equal(payload.autopilotKernel.validators.validation_planner, true);
+  assert.equal(payload.autopilotKernel.validators.replay_harness, true);
+  assert.equal(payload.autopilotKernel.validators.operator_console, true);
+  assert.equal(payload.autopilotKernel.validators.controlled_green_entry, true);
+  assert.equal(payload.autopilotKernel.validators.fixture_green_executor, true);
+  assert.equal(payload.autopilotKernel.validators.green_file_write_boundary, true);
+  assert.equal(payload.autopilotKernel.validators.green_file_write_executor_contract, true);
+  assert.match(payload.autopilotKernel.latest_ledger_goal, /^CM-\d{4}$/);
+  assert.equal(payload.autopilotKernel.latest_ledger_result, 'completed_validated');
+  assert.match(payload.autopilotKernel.latest_validation_id, /^CMV-\d{4}$/);
+  assert.equal(payload.autopilotKernel.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotLoop.status, 'ok');
+  assert.equal(payload.autopilotLoop.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotLoop.evidenceClass, 'read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotLoop.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotLoop.dry_run_only, true);
+  assert.equal(payload.autopilotLoop.writes_performed, false);
+  assert.equal(payload.autopilotLoop.provider_calls_performed, false);
+  assert.equal(payload.autopilotController.status, 'ok');
+  assert.equal(payload.autopilotController.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotController.evidenceClass, 'read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotController.execution_boundary.mode, 'read_only_noop_executor');
+  assert.equal(payload.autopilotController.execution_boundary.executes_tasks, false);
+  assert.equal(payload.autopilotController.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotStateStore.status, 'ok');
+  assert.equal(payload.autopilotStateStore.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotStateStore.evidenceClass, 'fixture_only_read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotStateStore.append_only, true);
+  assert.equal(payload.autopilotStateStore.no_migration, true);
+  assert.equal(payload.autopilotStateStore.record_type_count, 15);
+  assert.equal(payload.autopilotStateStore.required_record_type_count, 15);
+  assert.equal(payload.autopilotStateStore.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotStateStore.mutated, false);
+  assert.equal(payload.autopilotAdapters.status, 'ok');
+  assert.equal(payload.autopilotAdapters.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotAdapters.evidenceClass, 'fixture_only_read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotAdapters.adapter_count, 10);
+  assert.equal(payload.autopilotAdapters.required_adapter_count, 10);
+  assert.equal(payload.autopilotAdapters.fail_closed_fixture_count, 8);
+  assert.equal(payload.autopilotAdapters.required_fail_closed_fixture_count, 8);
+  assert.equal(payload.autopilotAdapters.executes_adapters, false);
+  assert.equal(payload.autopilotAdapters.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotValidation.status, 'ok');
+  assert.equal(payload.autopilotValidation.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotValidation.evidenceClass, 'fixture_only_read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotValidation.validation_case_count, 7);
+  assert.equal(payload.autopilotValidation.required_validation_case_count, 7);
+  assert.equal(payload.autopilotValidation.repair_rule_count, 6);
+  assert.equal(payload.autopilotValidation.required_repair_rule_count, 6);
+  assert.equal(payload.autopilotValidation.executes_validation, false);
+  assert.equal(payload.autopilotValidation.applies_repair, false);
+  assert.equal(payload.autopilotValidation.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotReplay.status, 'ok');
+  assert.equal(payload.autopilotReplay.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotReplay.evidenceClass, 'fixture_only_read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotReplay.scenario_count, 9);
+  assert.equal(payload.autopilotReplay.required_scenario_count, 8);
+  assert.equal(payload.autopilotReplay.fail_closed_scenario_count, 5);
+  assert.equal(payload.autopilotReplay.recovery_scenario_count, 1);
+  assert.equal(payload.autopilotReplay.read_only, true);
+  assert.equal(payload.autopilotReplay.replays_real_actions, false);
+  assert.equal(payload.autopilotReplay.writes_state, false);
+  assert.equal(payload.autopilotReplay.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotOperator.status, 'ok');
+  assert.equal(payload.autopilotOperator.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotOperator.evidenceClass, 'fixture_only_read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotOperator.surface_count, 8);
+  assert.equal(payload.autopilotOperator.required_surface_count, 8);
+  assert.equal(payload.autopilotOperator.eval_case_count, 10);
+  assert.equal(payload.autopilotOperator.required_eval_case_count, 10);
+  assert.equal(payload.autopilotOperator.rejection_eval_count, 9);
+  assert.equal(payload.autopilotOperator.next_safe_action, 'review_controlled_green_executor_entry_packet_before_separate_skeleton_task');
+  assert.equal(payload.autopilotOperator.read_only, true);
+  assert.equal(payload.autopilotOperator.executes_eval, false);
+  assert.equal(payload.autopilotOperator.writes_state, false);
+  assert.equal(payload.autopilotOperator.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotGreenEntry.status, 'ok');
+  assert.equal(payload.autopilotGreenEntry.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotGreenEntry.evidenceClass, 'fixture_only_read_only_local_filesystem_summary');
+  assert.equal(payload.autopilotGreenEntry.entry_decision, 'GREEN_EXECUTOR_ENTRY_PACKET_PREPARED_NOT_ACTIVATED');
+  assert.equal(payload.autopilotGreenEntry.met_admission_condition_count, 12);
+  assert.equal(payload.autopilotGreenEntry.required_admission_condition_count, 12);
+  assert.equal(payload.autopilotGreenEntry.allowed_scope_count, 7);
+  assert.equal(payload.autopilotGreenEntry.required_allowed_scope_count, 7);
+  assert.equal(payload.autopilotGreenEntry.fail_closed_stop_reason_count, 11);
+  assert.equal(payload.autopilotGreenEntry.required_stop_reason_count, 11);
+  assert.equal(payload.autopilotGreenEntry.read_only, true);
+  assert.equal(payload.autopilotGreenEntry.executor_activated, false);
+  assert.equal(payload.autopilotGreenEntry.executes_tasks, false);
+  assert.equal(payload.autopilotGreenEntry.writes_runtime_state, false);
+  assert.equal(payload.autopilotGreenEntry.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotGreenExecutor.status, 'ok');
+  assert.equal(payload.autopilotGreenExecutor.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotGreenExecutor.evidenceClass, 'fixture_only_read_only_noop_local_filesystem_summary');
+  assert.equal(payload.autopilotGreenExecutor.skeleton_decision, 'GREEN_EXECUTOR_SKELETON_NOOP_READY');
+  assert.equal(payload.autopilotGreenExecutor.allowed_task_kind_count, 6);
+  assert.equal(payload.autopilotGreenExecutor.required_task_kind_count, 6);
+  assert.equal(payload.autopilotGreenExecutor.allowed_adapter_kind_count, 4);
+  assert.equal(payload.autopilotGreenExecutor.required_adapter_kind_count, 4);
+  assert.equal(payload.autopilotGreenExecutor.executable_task_fixture_count, 2);
+  assert.equal(payload.autopilotGreenExecutor.noop_execution_plan_count, 2);
+  assert.equal(payload.autopilotGreenExecutor.fail_closed_fixture_count, 14);
+  assert.equal(payload.autopilotGreenExecutor.required_fail_closed_fixture_count, 14);
+  assert.equal(payload.autopilotGreenExecutor.fixture_backed, true);
+  assert.equal(payload.autopilotGreenExecutor.noop_only, true);
+  assert.equal(payload.autopilotGreenExecutor.executor_activated, false);
+  assert.equal(payload.autopilotGreenExecutor.executes_tasks, false);
+  assert.equal(payload.autopilotGreenExecutor.writes_files, false);
+  assert.equal(payload.autopilotGreenExecutor.writes_runtime_state, false);
+  assert.equal(payload.autopilotGreenExecutor.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotGreenFileBoundary.status, 'ok');
+  assert.equal(payload.autopilotGreenFileBoundary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotGreenFileBoundary.evidenceClass, 'design_boundary_fixture_only_read_only_summary');
+  assert.equal(payload.autopilotGreenFileBoundary.boundary_decision, 'GREEN_FILE_WRITE_EXECUTOR_DESIGN_ALLOWED_IMPLEMENTATION_BLOCKED');
+  assert.equal(payload.autopilotGreenFileBoundary.design_allowed, true);
+  assert.equal(payload.autopilotGreenFileBoundary.implementation_allowed, false);
+  assert.equal(payload.autopilotGreenFileBoundary.executor_activation_allowed, false);
+  assert.equal(payload.autopilotGreenFileBoundary.read_only, true);
+  assert.equal(payload.autopilotGreenFileBoundary.writes_files, false);
+  assert.equal(payload.autopilotGreenFileBoundary.executes_tasks, false);
+  assert.equal(payload.autopilotGreenFileBoundary.readiness_claim_allowed, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.status, 'ok');
+  assert.equal(payload.autopilotGreenFileExecutorContract.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotGreenFileExecutorContract.evidenceClass, 'design_contract_fixture_only_read_only_summary');
+  assert.equal(payload.autopilotGreenFileExecutorContract.contract_decision, 'GREEN_FILE_WRITE_EXECUTOR_CONTRACT_READY_IMPLEMENTATION_BLOCKED');
+  assert.equal(payload.autopilotGreenFileExecutorContract.implementation_allowed, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.executor_activation_allowed, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.real_writes_allowed, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.read_only, true);
+  assert.equal(payload.autopilotGreenFileExecutorContract.writes_files, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.executes_tasks, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.readiness_claim_allowed, false);
 
   // Gate section
   assert.ok(payload.gate, 'should have gate section');
@@ -412,6 +565,345 @@ test('dashboard CLI should support --json --summary-only', async () => {
 
   assert.equal(payload.mode, 'memory-dashboard');
   assertKeySet(payload.governance, ['autoAuthorization', 'boundedRecallCloseout', 'boundedRecallPreparation', 'counts', 'reviewLevel', 'status', 'wideningAdoption', 'wideningReview'], 'dashboard summary-only governance');
+  assertKeySet(payload.autopilotKernel, [
+    'blocked_red_count',
+    'decision',
+    'evidenceClass',
+    'example_count',
+    'latest_ledger_goal',
+    'latest_ledger_result',
+    'latest_validation_id',
+    'readiness_claim_allowed',
+    'schema_count',
+    'status',
+    'stop_reason',
+    'validation_status',
+    'validators'
+  ], 'dashboard summary-only autopilot kernel');
+  assert.equal(payload.autopilotKernel.status, 'ok');
+  assert.equal(payload.autopilotKernel.schema_count >= 14, true);
+  assert.equal(payload.autopilotKernel.example_count >= 14, true);
+  assert.equal(payload.autopilotKernel.blocked_red_count >= 1, true);
+  assert.match(payload.autopilotKernel.latest_validation_id, /^CMV-\d{4}$/);
+  assert.equal(payload.autopilotKernel.validation_status, 'completed_validated');
+  assert.equal(payload.autopilotKernel.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotLoop, [
+    'blocked_red_count',
+    'decision',
+    'evidenceClass',
+    'latest_goal',
+    'latest_task',
+    'next_safe_task',
+    'readiness_claim_allowed',
+    'receipt_coverage',
+    'repair_once_remaining',
+    'status',
+    'stop_reason',
+    'validation_coverage'
+  ], 'dashboard summary-only autopilot loop');
+  assert.equal(payload.autopilotLoop.status, 'ok');
+  assert.equal(payload.autopilotLoop.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotLoop.readiness_claim_allowed, false);
+  assert.equal(typeof payload.autopilotLoop.latest_task, 'string');
+  assert.equal(typeof payload.autopilotLoop.next_safe_task, 'string');
+  assert.equal(typeof payload.autopilotLoop.receipt_coverage.covered_tasks, 'number');
+  assert.equal(typeof payload.autopilotLoop.validation_coverage.covered_tasks, 'number');
+  assertKeySet(payload.autopilotController, [
+    'checkpoint_requirement',
+    'controller_cycle_id',
+    'current_state',
+    'decision',
+    'evidenceClass',
+    'execution_boundary',
+    'goal_id',
+    'lane_decision',
+    'next_safe_task',
+    'readiness_claim_allowed',
+    'receipt_requirement',
+    'red_gate_status',
+    'repair_once_available',
+    'status',
+    'stop_reason',
+    'validation_plan'
+  ], 'dashboard summary-only autopilot controller');
+  assert.equal(payload.autopilotController.status, 'ok');
+  assert.equal(payload.autopilotController.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotController.execution_boundary.mode, 'read_only_noop_executor');
+  assert.equal(payload.autopilotController.execution_boundary.executes_tasks, false);
+  assert.equal(payload.autopilotController.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotStateStore, [
+    'append_only',
+    'decision',
+    'evidenceClass',
+    'missing_record_types',
+    'model_id',
+    'no_migration',
+    'readiness_claim_allowed',
+    'record_count',
+    'record_type_count',
+    'required_record_type_count',
+    'status',
+    'stop_reason'
+  ], 'dashboard summary-only autopilot state store');
+  assert.equal(payload.autopilotStateStore.status, 'ok');
+  assert.equal(payload.autopilotStateStore.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotStateStore.append_only, true);
+  assert.equal(payload.autopilotStateStore.no_migration, true);
+  assert.equal(payload.autopilotStateStore.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotAdapters, [
+    'adapter_count',
+    'complete_adapter_count',
+    'contract_id',
+    'decision',
+    'evidenceClass',
+    'executes_adapters',
+    'fail_closed_fixture_count',
+    'missing_adapters',
+    'missing_fail_closed_fixtures',
+    'readiness_claim_allowed',
+    'required_adapter_count',
+    'required_fail_closed_fixture_count',
+    'status',
+    'stop_reason'
+  ], 'dashboard summary-only autopilot adapters');
+  assert.equal(payload.autopilotAdapters.status, 'ok');
+  assert.equal(payload.autopilotAdapters.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotAdapters.adapter_count, 10);
+  assert.equal(payload.autopilotAdapters.fail_closed_fixture_count, 8);
+  assert.equal(payload.autopilotAdapters.executes_adapters, false);
+  assert.equal(payload.autopilotAdapters.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotValidation, [
+    'applies_repair',
+    'blocked_case_count',
+    'decision',
+    'evidenceClass',
+    'executes_validation',
+    'missing_repair_rules',
+    'missing_validation_cases',
+    'planner_id',
+    'readiness_claim_allowed',
+    'repair_attempt_limit',
+    'repair_rule_count',
+    'required_repair_rule_count',
+    'required_validation_case_count',
+    'status',
+    'stop_reason',
+    'validation_case_count'
+  ], 'dashboard summary-only autopilot validation');
+  assert.equal(payload.autopilotValidation.status, 'ok');
+  assert.equal(payload.autopilotValidation.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotValidation.validation_case_count, 7);
+  assert.equal(payload.autopilotValidation.repair_rule_count, 6);
+  assert.equal(payload.autopilotValidation.executes_validation, false);
+  assert.equal(payload.autopilotValidation.applies_repair, false);
+  assert.equal(payload.autopilotValidation.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotReplay, [
+    'decision',
+    'dirty_worktree_protection_supported',
+    'evidenceClass',
+    'fail_closed_scenario_count',
+    'harness_id',
+    'missing_fail_closed_reasons',
+    'missing_scenarios',
+    'read_only',
+    'readiness_claim_allowed',
+    'receipt_reconciliation_supported',
+    'recovery_scenario_count',
+    'replays_real_actions',
+    'required_fail_closed_reason_count',
+    'required_scenario_count',
+    'resume_token_supported',
+    'scenario_count',
+    'status',
+    'stop_reason',
+    'writes_state'
+  ], 'dashboard summary-only autopilot replay');
+  assert.equal(payload.autopilotReplay.status, 'ok');
+  assert.equal(payload.autopilotReplay.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotReplay.scenario_count, 9);
+  assert.equal(payload.autopilotReplay.required_scenario_count, 8);
+  assert.equal(payload.autopilotReplay.fail_closed_scenario_count, 5);
+  assert.equal(payload.autopilotReplay.read_only, true);
+  assert.equal(payload.autopilotReplay.replays_real_actions, false);
+  assert.equal(payload.autopilotReplay.writes_state, false);
+  assert.equal(payload.autopilotReplay.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotOperator, [
+    'approval_packet_template_ready',
+    'console_id',
+    'controlled_green_executor_entry_conditions_count',
+    'coverage_gap_count',
+    'decision',
+    'eval_case_count',
+    'evidenceClass',
+    'executes_eval',
+    'missing_eval_cases',
+    'missing_surfaces',
+    'next_safe_action',
+    'read_only',
+    'readiness_claim_allowed',
+    'red_gate_inbox_count',
+    'rejection_eval_count',
+    'required_eval_case_count',
+    'required_surface_count',
+    'status',
+    'stop_reason',
+    'surface_count',
+    'writes_state'
+  ], 'dashboard summary-only autopilot operator');
+  assert.equal(payload.autopilotOperator.status, 'ok');
+  assert.equal(payload.autopilotOperator.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotOperator.surface_count, 8);
+  assert.equal(payload.autopilotOperator.eval_case_count, 10);
+  assert.equal(payload.autopilotOperator.rejection_eval_count, 9);
+  assert.equal(payload.autopilotOperator.approval_packet_template_ready, true);
+  assert.equal(payload.autopilotOperator.executes_eval, false);
+  assert.equal(payload.autopilotOperator.writes_state, false);
+  assert.equal(payload.autopilotOperator.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotGreenEntry, [
+    'admission_condition_count',
+    'allowed_scope_count',
+    'decision',
+    'entry_decision',
+    'evidenceClass',
+    'executes_tasks',
+    'executor_activated',
+    'fail_closed_stop_reason_count',
+    'met_admission_condition_count',
+    'missing_admission_conditions',
+    'missing_allowed_scope',
+    'missing_stop_reasons',
+    'next_safe_action',
+    'packet_id',
+    'read_only',
+    'readiness_claim_allowed',
+    'required_admission_condition_count',
+    'required_allowed_scope_count',
+    'required_stop_reason_count',
+    'status',
+    'stop_reason',
+    'writes_runtime_state'
+  ], 'dashboard summary-only autopilot green entry');
+  assert.equal(payload.autopilotGreenEntry.status, 'ok');
+  assert.equal(payload.autopilotGreenEntry.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotGreenEntry.entry_decision, 'GREEN_EXECUTOR_ENTRY_PACKET_PREPARED_NOT_ACTIVATED');
+  assert.equal(payload.autopilotGreenEntry.met_admission_condition_count, 12);
+  assert.equal(payload.autopilotGreenEntry.allowed_scope_count, 7);
+  assert.equal(payload.autopilotGreenEntry.fail_closed_stop_reason_count, 11);
+  assert.equal(payload.autopilotGreenEntry.executor_activated, false);
+  assert.equal(payload.autopilotGreenEntry.executes_tasks, false);
+  assert.equal(payload.autopilotGreenEntry.writes_runtime_state, false);
+  assert.equal(payload.autopilotGreenEntry.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotGreenExecutor, [
+    'allowed_adapter_kind_count',
+    'allowed_task_kind_count',
+    'decision',
+    'evidenceClass',
+    'executable_task_fixture_count',
+    'executes_tasks',
+    'executor_activated',
+    'executor_id',
+    'fail_closed_coverage_count',
+    'fail_closed_fixture_count',
+    'fixture_backed',
+    'missing_adapter_kinds',
+    'missing_fail_closed_cases',
+    'missing_task_kinds',
+    'next_safe_action',
+    'noop_execution_plan_count',
+    'noop_only',
+    'readiness_claim_allowed',
+    'required_adapter_kind_count',
+    'required_fail_closed_fixture_count',
+    'required_task_kind_count',
+    'skeleton_decision',
+    'status',
+    'stop_reason',
+    'writes_files',
+    'writes_runtime_state'
+  ], 'dashboard summary-only autopilot green executor');
+  assert.equal(payload.autopilotGreenExecutor.status, 'ok');
+  assert.equal(payload.autopilotGreenExecutor.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotGreenExecutor.skeleton_decision, 'GREEN_EXECUTOR_SKELETON_NOOP_READY');
+  assert.equal(payload.autopilotGreenExecutor.noop_execution_plan_count, 2);
+  assert.equal(payload.autopilotGreenExecutor.fail_closed_fixture_count, 14);
+  assert.equal(payload.autopilotGreenExecutor.fixture_backed, true);
+  assert.equal(payload.autopilotGreenExecutor.noop_only, true);
+  assert.equal(payload.autopilotGreenExecutor.executor_activated, false);
+  assert.equal(payload.autopilotGreenExecutor.executes_tasks, false);
+  assert.equal(payload.autopilotGreenExecutor.writes_files, false);
+  assert.equal(payload.autopilotGreenExecutor.writes_runtime_state, false);
+  assert.equal(payload.autopilotGreenExecutor.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotGreenFileBoundary, [
+    'allowed_path_class_count',
+    'boundary_decision',
+    'boundary_id',
+    'decision',
+    'design_allowed',
+    'evidenceClass',
+    'executes_tasks',
+    'executor_activation_allowed',
+    'forbidden_path_class_count',
+    'hard_stop_count',
+    'implementation_allowed',
+    'missing_allowed_path_classes',
+    'missing_design_gates',
+    'missing_hard_stops',
+    'next_safe_action',
+    'read_only',
+    'readiness_claim_allowed',
+    'required_design_gate_count',
+    'status',
+    'stop_reason',
+    'writes_files'
+  ], 'dashboard summary-only autopilot green file boundary');
+  assert.equal(payload.autopilotGreenFileBoundary.status, 'ok');
+  assert.equal(payload.autopilotGreenFileBoundary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotGreenFileBoundary.boundary_decision, 'GREEN_FILE_WRITE_EXECUTOR_DESIGN_ALLOWED_IMPLEMENTATION_BLOCKED');
+  assert.equal(payload.autopilotGreenFileBoundary.design_allowed, true);
+  assert.equal(payload.autopilotGreenFileBoundary.implementation_allowed, false);
+  assert.equal(payload.autopilotGreenFileBoundary.executor_activation_allowed, false);
+  assert.equal(payload.autopilotGreenFileBoundary.read_only, true);
+  assert.equal(payload.autopilotGreenFileBoundary.writes_files, false);
+  assert.equal(payload.autopilotGreenFileBoundary.executes_tasks, false);
+  assert.equal(payload.autopilotGreenFileBoundary.readiness_claim_allowed, false);
+  assertKeySet(payload.autopilotGreenFileExecutorContract, [
+    'allowed_write_operation_count',
+    'contract_decision',
+    'contract_id',
+    'decision',
+    'evidenceClass',
+    'executes_tasks',
+    'execution_cycle_count',
+    'executor_activation_allowed',
+    'fail_closed_case_count',
+    'implementation_allowed',
+    'missing_execution_cycle',
+    'missing_fail_closed_cases',
+    'missing_post_write_gates',
+    'missing_preflight_gates',
+    'missing_task_fields',
+    'missing_write_operations',
+    'next_safe_action',
+    'post_write_gate_count',
+    'preflight_gate_count',
+    'read_only',
+    'readiness_claim_allowed',
+    'real_writes_allowed',
+    'required_task_field_count',
+    'status',
+    'stop_reason',
+    'writes_files'
+  ], 'dashboard summary-only autopilot green file executor contract');
+  assert.equal(payload.autopilotGreenFileExecutorContract.status, 'ok');
+  assert.equal(payload.autopilotGreenFileExecutorContract.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.autopilotGreenFileExecutorContract.contract_decision, 'GREEN_FILE_WRITE_EXECUTOR_CONTRACT_READY_IMPLEMENTATION_BLOCKED');
+  assert.equal(payload.autopilotGreenFileExecutorContract.implementation_allowed, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.executor_activation_allowed, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.real_writes_allowed, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.read_only, true);
+  assert.equal(payload.autopilotGreenFileExecutorContract.writes_files, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.executes_tasks, false);
+  assert.equal(payload.autopilotGreenFileExecutorContract.readiness_claim_allowed, false);
   assertKeySet(payload.smartStandingAuthorizationV3, [
     'budget_used',
     'decision',
@@ -519,6 +1011,9 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('GovRCNext'), 'should include governance bounded recall closeout next step line');
   assert.ok(text.includes('GovRCText'), 'should include governance bounded recall closeout text line');
   assert.ok(text.includes('V3Receipt'), 'should include v3 receipt line');
+  assert.ok(text.includes('Autopilot'), 'should include autopilot kernel line');
+  assert.ok(text.includes('AutoLoop'), 'should include autopilot loop line');
+  assert.ok(text.includes('AutoCtrl'), 'should include autopilot controller line');
   assert.ok(text.includes('CM-0677 / CMV-0801'), 'should include parsed v3 receipt identity');
   assert.ok(text.includes('bundle=assertion_record_only'), 'should include current bundle kind');
   assert.ok(text.includes('draft=cm0611AssertionRecord'), 'should include current rendered draft id');

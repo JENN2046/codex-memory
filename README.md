@@ -13,10 +13,44 @@
 
 当前项目已接入 Smart Standing Authorization v3 本地治理面。默认目标分解链路为 `goal -> route_plan -> task_queue -> Green / Amber / Red -> validation -> receipt/ledger -> checkpoint`。
 
+当前本地 autopilot closed-loop 观测链路为 `goal -> route_plan -> task_queue -> lane decision -> execution boundary -> validation -> repair-once -> receipt/ledger -> checkpoint -> next_safe_task`。它通过 read-only dry-run 和 dashboard `autopilotLoop` summary 暴露，不执行 provider/API/MCP、真实 memory 访问、依赖/config 改动、push/release/deploy 或 readiness claim。
+
+当前 structured state store 仍是 append-only draft：通过 schema/example/read-only helper/dashboard `autopilotStateStore` summary 暴露 goals、route plans、task queue snapshots、attempts、lane decisions、preflights、budget debits、receipts、validation runs、repair attempts、checkpoints、approval packets、Red gate events、stop reasons 和 resume tokens。它不创建数据库、不迁移 `.agent_board`、不写 durable state，也不构成 runtime readiness。
+
+当前 action adapter 仍是 fixture-only contract：通过 schema/example/read-only helper/dashboard `autopilotAdapters` summary 暴露 file edit、validation command、provider、MCP、memory read/write、dependency、runtime probe、git remote 和 approval packet adapter 的 preflight/budget/receipt/rollback/Red gate 边界。它不执行 adapter、不调用 provider/API/MCP、不读写真实 memory、不改依赖/config/runtime、不 push，也不构成 readiness。
+
+当前 validation planner / repair-once 仍是 fixture-only contract：通过 schema/example/read-only helper/dashboard `autopilotValidation` summary 暴露按 task area、changed path class、risk、lane、adapter type 选择最小 validation 的规则，以及一次明显、局部、可逆修复的 stop 条件。它不运行 validation、不应用 repair，也不构成 readiness。
+
+当前 checkpoint / resume / replay harness 仍是 fixture-only / read-only contract：通过 schema/example/read-only helper/dashboard `autopilotReplay` summary 暴露 cycle checkpoint、no-op attempt replay、receipt reconciliation、dirty worktree protection、partial attempt recovery、stale board detection、resume token 和 stop reason replay。它不回放真实动作、不写 state、不调用 provider/API/MCP、不读写真实 memory、不改依赖/config/runtime，也不构成 readiness。
+
+当前 operator console / eval matrix 仍是 fixture-only / read-only contract：通过 schema/example/read-only helper/dashboard `autopilotOperator` summary 汇总 controller、state store draft、adapter contract、validation planner、resume/replay、hard-stop inbox、next safe action 和 coverage gaps，并覆盖 golden trace、failure injection、budget exhaustion、hard-stop bypass rejection、missing evidence、unknown cost、secret access、broad memory scan、push attempt 和 readiness overclaim rejection。它不运行 eval、不写 state、不执行真实动作，也不构成 readiness。
+
+当前 controlled Green executor entry packet 仍是 prepared-not-activated / read-only contract：通过 schema/example/read-only helper/dashboard `autopilotGreenEntry` summary 暴露进入受控 Green executor 前必须满足的 admission conditions、Green-only scope、preflight required fields 和 fail-closed stop reasons。它不激活 executor、不执行任务、不写 state、不调用 provider/API/MCP、不读写真实 memory、不改依赖/config/runtime，也不构成 readiness。
+
+当前 fixture-backed Green executor skeleton 仍是 fixture-only / read-only / no-op contract：通过 schema/example/read-only helper/dashboard `autopilotGreenExecutor` summary 暴露 Green-only synthetic task kinds、no-op adapter kinds、no-op execution plans 和 fail-closed fixtures。它不执行任务、不写文件、不运行 validators、不写 receipt/checkpoint、不调用 provider/API/MCP、不读写真实 memory、不改依赖/config/runtime，也不构成 readiness。
+
+当前 Green file-write executor boundary 仍是 design-boundary / fixture-only / read-only contract：通过 schema/example/read-only helper/dashboard `autopilotGreenFileBoundary` summary 记录真实 Green file-write executor 可以进入设计，但 implementation、activation、真实写文件、执行任务和 readiness claim 仍保持 blocked。它只定义设计 gate、允许/禁止 path class 和 hard-stop reasons，不实现真实 executor。
+
+当前 real Green file-write executor contract 仍是 design-contract / fixture-only / read-only contract：通过 schema/example/read-only helper/dashboard `autopilotGreenFileExecutorContract` summary 定义未来真实 Green 写文件执行器的 execution cycle、required task fields、allowed write operations、preflight gates、post-write gates 和 fail-closed rejection cases。它不实现执行器、不写文件、不运行 validators、不写 receipt/checkpoint，也不构成 readiness。
+
+当前 Green file-write executor code-level preflight tests 仍是 no-write contract hardening：`evaluateAutopilotGreenFileWritePreflight` 只评估 synthetic task input，返回 `PREFLIGHT_ACCEPTED_NO_WRITE` 或 `REJECTED_FAIL_CLOSED`，并锁定 `writes_files=false`、`executes_tasks=false`、`validators_run_by_executor=false`、`receipts_written_by_executor=false`、`checkpoints_written_by_executor=false`、`readiness_claim_allowed=false`。它不实现执行器、不激活执行器、不执行真实写入。
+
 入口：
 
 - 项目 profile：[docs/AUTOPILOT_PROJECT_PROFILE.md](/A:/codex-memory/docs/AUTOPILOT_PROJECT_PROFILE.md)
 - 目标分解 runtime：[docs/AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md](/A:/codex-memory/docs/AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md)
+- 闭环状态机：[docs/AUTOPILOT_CLOSED_LOOP_STATE_MACHINE.md](/A:/codex-memory/docs/AUTOPILOT_CLOSED_LOOP_STATE_MACHINE.md)
+- checkpoint/resume/replay harness：[docs/AUTOPILOT_CHECKPOINT_RESUME_REPLAY_HARNESS.md](/A:/codex-memory/docs/AUTOPILOT_CHECKPOINT_RESUME_REPLAY_HARNESS.md)
+- operator console / eval matrix：[docs/AUTOPILOT_OPERATOR_CONSOLE_EVAL_MATRIX.md](/A:/codex-memory/docs/AUTOPILOT_OPERATOR_CONSOLE_EVAL_MATRIX.md)
+- controlled Green executor entry packet：[docs/AUTOPILOT_CONTROLLED_GREEN_EXECUTOR_ENTRY_PACKET.md](/A:/codex-memory/docs/AUTOPILOT_CONTROLLED_GREEN_EXECUTOR_ENTRY_PACKET.md)
+- fixture-backed Green executor skeleton：[docs/AUTOPILOT_FIXTURE_BACKED_GREEN_EXECUTOR_SKELETON.md](/A:/codex-memory/docs/AUTOPILOT_FIXTURE_BACKED_GREEN_EXECUTOR_SKELETON.md)
+- Green file-write executor boundary：[docs/AUTOPILOT_GREEN_FILE_WRITE_EXECUTOR_BOUNDARY.md](/A:/codex-memory/docs/AUTOPILOT_GREEN_FILE_WRITE_EXECUTOR_BOUNDARY.md)
+- real Green file-write executor contract：[docs/AUTOPILOT_GREEN_FILE_WRITE_EXECUTOR_CONTRACT.md](/A:/codex-memory/docs/AUTOPILOT_GREEN_FILE_WRITE_EXECUTOR_CONTRACT.md)
+- 只读控制器：[docs/AUTOPILOT_CONTROLLER_V0_READONLY.md](/A:/codex-memory/docs/AUTOPILOT_CONTROLLER_V0_READONLY.md)
+- 结构化状态存储草案：[docs/AUTOPILOT_STRUCTURED_STATE_STORE_DRAFT.md](/A:/codex-memory/docs/AUTOPILOT_STRUCTURED_STATE_STORE_DRAFT.md)
+- 动作适配器合同：[docs/AUTOPILOT_ACTION_ADAPTER_CONTRACT.md](/A:/codex-memory/docs/AUTOPILOT_ACTION_ADAPTER_CONTRACT.md)
+- 验证规划与一次修复合同：[docs/AUTOPILOT_VALIDATION_PLANNER_REPAIR_ONCE.md](/A:/codex-memory/docs/AUTOPILOT_VALIDATION_PLANNER_REPAIR_ONCE.md)
+- 失败恢复矩阵：[docs/AUTOPILOT_FAILURE_RECOVERY_MATRIX.md](/A:/codex-memory/docs/AUTOPILOT_FAILURE_RECOVERY_MATRIX.md)
 - 本地 ledger：[.agent_board/AUTOPILOT_LEDGER.md](/A:/codex-memory/.agent_board/AUTOPILOT_LEDGER.md)
 - 验证命令：`powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 

@@ -78,6 +78,9 @@ for (const task of executableTasks) {
   requireNonEmptyArray(task.forbidden_files_or_systems, `task ${task.id}.forbidden_files_or_systems`);
   requireNonEmptyArray(task.allowed_commands_or_operations, `task ${task.id}.allowed_commands_or_operations`);
   requireNonEmptyArray(task.validation, `task ${task.id}.validation`);
+  if (!task.scope) failures.push(`task ${task.id}.scope is required`);
+  if (!task.budget_expected) failures.push(`task ${task.id}.budget_expected is required`);
+  requireNonEmptyArray(task.stop_conditions, `task ${task.id}.stop_conditions`);
   if (task.lane === "Amber" && task.receipt_required !== true) failures.push(`Amber task ${task.id} requires a receipt`);
 }
 

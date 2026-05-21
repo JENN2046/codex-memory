@@ -11,6 +11,39 @@ const {
 const {
   parseReceiptMarkdown
 } = require('../core/SmartStandingAuthorizationV3ReceiptParser');
+const {
+  collectAutopilotClosedLoopSummary
+} = require('../core/AutopilotClosedLoopDryRun');
+const {
+  collectAutopilotControllerSummary
+} = require('../core/AutopilotControllerReadOnly');
+const {
+  collectAutopilotStateStoreDraft
+} = require('../core/AutopilotStateStoreDraft');
+const {
+  collectAutopilotActionAdapterContract
+} = require('../core/AutopilotActionAdapterContract');
+const {
+  collectAutopilotValidationPlanner
+} = require('../core/AutopilotValidationPlanner');
+const {
+  collectAutopilotReplayHarness
+} = require('../core/AutopilotReplayHarness');
+const {
+  collectAutopilotOperatorConsole
+} = require('../core/AutopilotOperatorConsole');
+const {
+  collectAutopilotControlledGreenExecutorEntry
+} = require('../core/AutopilotControlledGreenExecutorEntry');
+const {
+  collectAutopilotFixtureGreenExecutor
+} = require('../core/AutopilotFixtureGreenExecutor');
+const {
+  collectAutopilotGreenFileWriteBoundary
+} = require('../core/AutopilotGreenFileWriteBoundary');
+const {
+  collectAutopilotGreenFileWriteExecutorContract
+} = require('../core/AutopilotGreenFileWriteExecutorContract');
 
 function parseArgs(argv = []) {
   const options = {
@@ -491,7 +524,185 @@ function collectSmartStandingAuthorizationV3(options = {}) {
   }
 }
 
-function buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3) {
+function collectAutopilotKernel() {
+  const workspaceRoot = process.cwd();
+  const profilePath = path.join(workspaceRoot, 'docs', 'AUTOPILOT_PROJECT_PROFILE.md');
+  const runtimePath = path.join(workspaceRoot, 'docs', 'AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md');
+  const ledgerPath = path.join(workspaceRoot, '.agent_board', 'AUTOPILOT_LEDGER.md');
+  const validationLogPath = path.join(workspaceRoot, '.agent_board', 'VALIDATION_LOG.md');
+  const schemaDir = path.join(workspaceRoot, 'schemas');
+  const exampleDir = path.join(workspaceRoot, 'tests', 'schema_examples');
+  const governanceValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_governance_kernel.js');
+  const goalCompilerValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_goal_compiler.js');
+  const stateStoreValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_state_store_draft.js');
+  const actionAdapterValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_action_adapter_contract.js');
+  const validationPlannerValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_validation_planner.js');
+  const replayHarnessValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_replay_harness.js');
+  const operatorConsoleValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_operator_console.js');
+  const controlledGreenEntryValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_controlled_green_executor_entry.js');
+  const fixtureGreenExecutorValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_fixture_green_executor.js');
+  const greenFileWriteBoundaryValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_green_file_write_boundary.js');
+  const greenFileWriteExecutorContractValidatorPath = path.join(workspaceRoot, 'scripts', 'validate_autopilot_green_file_write_executor_contract.js');
+  const requiredSchemas = [
+    'autopilot_autonomy_envelope.schema.yaml',
+    'autopilot_action_adapter_contract.schema.yaml',
+    'autopilot_closed_loop_state.schema.yaml',
+    'autopilot_controller_cycle.schema.yaml',
+    'autopilot_execution_receipt.schema.yaml',
+    'autopilot_failure_recovery_matrix.schema.yaml',
+    'autopilot_receipt_registry.schema.yaml',
+    'autopilot_structured_state_store.schema.yaml',
+    'autopilot_goal.schema.yaml',
+    'autopilot_route_plan.schema.yaml',
+    'autopilot_task_queue.schema.yaml',
+    'autopilot_validation_planner.schema.yaml',
+    'autopilot_replay_harness.schema.yaml',
+    'autopilot_operator_console.schema.yaml',
+    'autopilot_controlled_green_executor_entry.schema.yaml',
+    'autopilot_fixture_green_executor.schema.yaml',
+    'autopilot_green_file_write_boundary.schema.yaml',
+    'autopilot_green_file_write_executor_contract.schema.yaml'
+  ];
+  const requiredExamples = requiredSchemas.map(name => name.replace('.schema.yaml', '.example.json'));
+
+  const listMatching = (dir, pattern) => {
+    try {
+      return fs.readdirSync(dir).filter(name => pattern.test(name)).sort();
+    } catch {
+      return [];
+    }
+  };
+
+  const schemaFiles = listMatching(schemaDir, /^autopilot_.*\.schema\.yaml$/);
+  const exampleFiles = listMatching(exampleDir, /^autopilot_.*\.example\.json$/);
+  const schemaFileSet = new Set(schemaFiles);
+  const exampleFileSet = new Set(exampleFiles);
+  const missingRequiredSchemas = requiredSchemas.filter(name => !schemaFileSet.has(name));
+  const missingRequiredExamples = requiredExamples.filter(name => !exampleFileSet.has(name));
+  const profileExists = fs.existsSync(profilePath);
+  const runtimeExists = fs.existsSync(runtimePath);
+  const ledgerExists = fs.existsSync(ledgerPath);
+  const validators = {
+    governance_kernel: fs.existsSync(governanceValidatorPath),
+    goal_compiler: fs.existsSync(goalCompilerValidatorPath),
+    state_store_draft: fs.existsSync(stateStoreValidatorPath),
+    action_adapter_contract: fs.existsSync(actionAdapterValidatorPath),
+    validation_planner: fs.existsSync(validationPlannerValidatorPath),
+    replay_harness: fs.existsSync(replayHarnessValidatorPath),
+    operator_console: fs.existsSync(operatorConsoleValidatorPath),
+    controlled_green_entry: fs.existsSync(controlledGreenEntryValidatorPath),
+    fixture_green_executor: fs.existsSync(fixtureGreenExecutorValidatorPath),
+    green_file_write_boundary: fs.existsSync(greenFileWriteBoundaryValidatorPath),
+    green_file_write_executor_contract: fs.existsSync(greenFileWriteExecutorContractValidatorPath)
+  };
+
+  const ledgerLines = countLinesIfExists(ledgerPath, 0);
+  const latestLedgerRow = [...ledgerLines].reverse().find(line => /^\| CM-\d+ /.test(line)) || '';
+  const latestLedgerCells = latestLedgerRow
+    ? latestLedgerRow.split('|').slice(1, -1).map(cell => cell.trim())
+    : [];
+  const blockedRedCount = (() => {
+    if (!ledgerExists) return 0;
+    const text = readFileSafe(ledgerPath);
+    const blockedSection = text.split('## Blocked Red Lane Items')[1] || '';
+    return blockedSection.split(/\r?\n/).filter(line => line.trim().startsWith('- ')).length;
+  })();
+  const validationLog = readFileSafe(validationLogPath);
+  const latestValidationRow = validationLog
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .find(line => /^\| CMV-\d{4} /.test(line) && line.includes('COMPLETED_VALIDATED'));
+  const latestValidationId = latestValidationRow
+    ? (latestValidationRow.match(/\| (CMV-\d{4}) /) || [])[1] || 'not_recorded'
+    : 'not_recorded';
+  const validationStatus = latestValidationId !== 'not_recorded'
+    ? 'completed_validated'
+    : 'not_recorded';
+
+  const status = profileExists
+    && runtimeExists
+    && ledgerExists
+    && missingRequiredSchemas.length === 0
+    && missingRequiredExamples.length === 0
+    && validators.governance_kernel
+    && validators.goal_compiler
+    && validationStatus === 'completed_validated'
+      ? 'ok'
+      : 'warn';
+
+  return {
+    status,
+    decision: 'NOT_READY_BLOCKED',
+    evidenceClass: 'read_only_local_filesystem_summary',
+    profile_exists: profileExists,
+    goal_runtime_exists: runtimeExists,
+    ledger_exists: ledgerExists,
+    schema_count: schemaFiles.length,
+    example_count: exampleFiles.length,
+    validators,
+    latest_ledger_goal: latestLedgerCells[0] || 'not_recorded',
+    latest_ledger_result: latestLedgerCells[9] || 'not_recorded',
+    blocked_red_count: blockedRedCount,
+    latest_validation_id: latestValidationId,
+    validation_status: validationStatus,
+    readiness_claim_allowed: false,
+    stop_reason: status === 'ok' ? 'none' : 'autopilot_kernel_surface_incomplete'
+  };
+}
+
+function readFileSafe(filePath) {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function collectAutopilotLoop() {
+  return collectAutopilotClosedLoopSummary({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotController() {
+  return collectAutopilotControllerSummary({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotStateStore() {
+  return collectAutopilotStateStoreDraft({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotAdapters() {
+  return collectAutopilotActionAdapterContract({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotValidation() {
+  return collectAutopilotValidationPlanner({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotReplay() {
+  return collectAutopilotReplayHarness({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotOperator() {
+  return collectAutopilotOperatorConsole({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotGreenEntry() {
+  return collectAutopilotControlledGreenExecutorEntry({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotGreenExecutor() {
+  return collectAutopilotFixtureGreenExecutor({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotGreenFileBoundary() {
+  return collectAutopilotGreenFileWriteBoundary({ workspaceRoot: process.cwd() });
+}
+
+function collectAutopilotGreenFileExecutorContract() {
+  return collectAutopilotGreenFileWriteExecutorContract({ workspaceRoot: process.cwd() });
+}
+
+function buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract) {
   const checks = [];
   checks.push({
     source: 'service', level: service.status,
@@ -669,10 +880,106 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance,
       ? `${smartStandingAuthorizationV3.latest_v3_task_id} / ${smartStandingAuthorizationV3.latest_validation_id}; receipt=${smartStandingAuthorizationV3.latest_receipt_status}; redStops=${smartStandingAuthorizationV3.red_stop_count}; next=${smartStandingAuthorizationV3.next_auto_step_allowed === true}`
       : `v3 receipt summary unavailable or blocked: ${smartStandingAuthorizationV3.stop_reason || 'unknown'}`
   });
+  checks.push({
+    source: 'autopilot-kernel',
+    level: autopilotKernel.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-kernel-summary',
+    message: autopilotKernel.status === 'ok'
+      ? `profile=${autopilotKernel.profile_exists}, runtime=${autopilotKernel.goal_runtime_exists}, schemas=${autopilotKernel.schema_count}, examples=${autopilotKernel.example_count}, ledger=${autopilotKernel.latest_ledger_goal}, red=${autopilotKernel.blocked_red_count}`
+      : `autopilot kernel incomplete: ${autopilotKernel.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-loop',
+    level: autopilotLoop.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-closed-loop-summary',
+    message: autopilotLoop.status === 'ok'
+      ? `latest=${autopilotLoop.latest_task}, next=${autopilotLoop.next_safe_task}, receipt=${autopilotLoop.receipt_coverage.covered_tasks}/${autopilotLoop.receipt_coverage.completed_tasks}, validation=${autopilotLoop.validation_coverage.covered_tasks}/${autopilotLoop.validation_coverage.completed_tasks}, red=${autopilotLoop.blocked_red_count}`
+      : `autopilot loop incomplete: ${autopilotLoop.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-controller',
+    level: autopilotController.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-controller-readonly-noop',
+    message: autopilotController.status === 'ok'
+      ? `${autopilotController.controller_cycle_id}; state=${autopilotController.current_state}; next=${autopilotController.next_safe_task}; lane=${autopilotController.lane_decision.lane}; boundary=${autopilotController.execution_boundary.mode}`
+      : `autopilot controller incomplete: ${autopilotController.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-state-store',
+    level: autopilotStateStore.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-state-store-draft',
+    message: autopilotStateStore.status === 'ok'
+      ? `model=${autopilotStateStore.model_id}; appendOnly=${autopilotStateStore.append_only}; records=${autopilotStateStore.record_count}; types=${autopilotStateStore.record_type_count}/${autopilotStateStore.required_record_type_count}; noMigration=${autopilotStateStore.no_migration}`
+      : `autopilot state store draft incomplete: ${autopilotStateStore.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-adapters',
+    level: autopilotAdapters.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-action-adapter-contract',
+    message: autopilotAdapters.status === 'ok'
+      ? `contract=${autopilotAdapters.contract_id}; adapters=${autopilotAdapters.adapter_count}/${autopilotAdapters.required_adapter_count}; failClosed=${autopilotAdapters.fail_closed_fixture_count}/${autopilotAdapters.required_fail_closed_fixture_count}; executes=${autopilotAdapters.executes_adapters}`
+      : `autopilot action adapter contract incomplete: ${autopilotAdapters.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-validation',
+    level: autopilotValidation.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-validation-planner',
+    message: autopilotValidation.status === 'ok'
+      ? `planner=${autopilotValidation.planner_id}; cases=${autopilotValidation.validation_case_count}/${autopilotValidation.required_validation_case_count}; repairs=${autopilotValidation.repair_rule_count}/${autopilotValidation.required_repair_rule_count}; executes=${autopilotValidation.executes_validation}; appliesRepair=${autopilotValidation.applies_repair}`
+      : `autopilot validation planner incomplete: ${autopilotValidation.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-replay',
+    level: autopilotReplay.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-checkpoint-resume-replay',
+    message: autopilotReplay.status === 'ok'
+      ? `harness=${autopilotReplay.harness_id}; scenarios=${autopilotReplay.scenario_count}/${autopilotReplay.required_scenario_count}; failClosed=${autopilotReplay.fail_closed_scenario_count}; readOnly=${autopilotReplay.read_only}; replays=${autopilotReplay.replays_real_actions}`
+      : `autopilot replay harness incomplete: ${autopilotReplay.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-operator',
+    level: autopilotOperator.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-operator-console-eval',
+    message: autopilotOperator.status === 'ok'
+      ? `console=${autopilotOperator.console_id}; surfaces=${autopilotOperator.surface_count}/${autopilotOperator.required_surface_count}; evals=${autopilotOperator.eval_case_count}/${autopilotOperator.required_eval_case_count}; next=${autopilotOperator.next_safe_action}`
+      : `autopilot operator console incomplete: ${autopilotOperator.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-green-entry',
+    level: autopilotGreenEntry.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-controlled-green-entry',
+    message: autopilotGreenEntry.status === 'ok'
+      ? `packet=${autopilotGreenEntry.packet_id}; conditions=${autopilotGreenEntry.met_admission_condition_count}/${autopilotGreenEntry.required_admission_condition_count}; activated=${autopilotGreenEntry.executor_activated}; executes=${autopilotGreenEntry.executes_tasks}`
+      : `autopilot controlled Green entry incomplete: ${autopilotGreenEntry.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-green-executor',
+    level: autopilotGreenExecutor.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-fixture-green-executor',
+    message: autopilotGreenExecutor.status === 'ok'
+      ? `executor=${autopilotGreenExecutor.executor_id}; noopPlans=${autopilotGreenExecutor.noop_execution_plan_count}/${autopilotGreenExecutor.executable_task_fixture_count}; failClosed=${autopilotGreenExecutor.fail_closed_fixture_count}/${autopilotGreenExecutor.required_fail_closed_fixture_count}; activated=${autopilotGreenExecutor.executor_activated}`
+      : `autopilot fixture Green executor incomplete: ${autopilotGreenExecutor.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-green-file-boundary',
+    level: autopilotGreenFileBoundary.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-green-file-write-boundary',
+    message: autopilotGreenFileBoundary.status === 'ok'
+      ? `boundary=${autopilotGreenFileBoundary.boundary_decision}; design=${autopilotGreenFileBoundary.design_allowed}; implementation=${autopilotGreenFileBoundary.implementation_allowed}; activation=${autopilotGreenFileBoundary.executor_activation_allowed}`
+      : `autopilot Green file-write boundary incomplete: ${autopilotGreenFileBoundary.stop_reason || 'unknown'}`
+  });
+  checks.push({
+    source: 'autopilot-green-file-contract',
+    level: autopilotGreenFileExecutorContract.status === 'ok' ? 'ok' : 'warn',
+    code: 'autopilot-green-file-write-executor-contract',
+    message: autopilotGreenFileExecutorContract.status === 'ok'
+      ? `contract=${autopilotGreenFileExecutorContract.contract_decision}; preflight=${autopilotGreenFileExecutorContract.preflight_gate_count}; postWrite=${autopilotGreenFileExecutorContract.post_write_gate_count}; writes=${autopilotGreenFileExecutorContract.real_writes_allowed}`
+      : `autopilot Green file-write executor contract incomplete: ${autopilotGreenFileExecutorContract.stop_reason || 'unknown'}`
+  });
   return checks;
 }
 
-function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3) {
+function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract) {
   const recs = [];
   const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
   const autoAuthorizationCommandSummary = formatAutoAuthorizationCommandSummary(governance.autoAuthorization);
@@ -690,6 +997,18 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   if (audits.recall.recentCount > 0 && audits.recall.scopedRecallCount === 0) recs.push('Recent recall activity is present, but none of it used scope filtering');
   if (readPolicy.status !== 'ok') recs.push('No recent lifecycle read-policy audit summary is available yet');
   if (smartStandingAuthorizationV3.status !== 'ok') recs.push('Smart Standing Authorization v3 receipt summary is unavailable or blocked; inspect local validation log parser input');
+  if (autopilotKernel.status !== 'ok') recs.push('Autopilot governance kernel summary is incomplete; run docs validation and inspect AUTOPILOT_LEDGER');
+  if (autopilotLoop.status !== 'ok') recs.push('Autopilot closed-loop summary is incomplete; run closed-loop validator and inspect local board evidence');
+  if (autopilotController.status !== 'ok') recs.push('AutopilotController v0 summary is incomplete; run controller validator and inspect local controller surfaces');
+  if (autopilotStateStore.status !== 'ok') recs.push('Autopilot structured state store draft is incomplete; run state-store validator and inspect fixture-only model');
+  if (autopilotAdapters.status !== 'ok') recs.push('Autopilot action adapter contract is incomplete; run adapter validator and inspect fail-closed fixtures');
+  if (autopilotValidation.status !== 'ok') recs.push('Autopilot validation planner is incomplete; run validation planner validator and inspect repair-once fixtures');
+  if (autopilotReplay.status !== 'ok') recs.push('Autopilot replay harness is incomplete; run replay harness validator and inspect checkpoint/resume fixtures');
+  if (autopilotOperator.status !== 'ok') recs.push('Autopilot operator console is incomplete; run operator console validator and inspect eval matrix fixtures');
+  if (autopilotGreenEntry.status !== 'ok') recs.push('Autopilot controlled Green executor entry packet is incomplete; run entry packet validator and inspect admission fixture');
+  if (autopilotGreenExecutor.status !== 'ok') recs.push('Autopilot fixture Green executor skeleton is incomplete; run skeleton validator and inspect no-op fixture plans');
+  if (autopilotGreenFileBoundary.status !== 'ok') recs.push('Autopilot Green file-write executor boundary is incomplete; run boundary validator before any real executor design work');
+  if (autopilotGreenFileExecutorContract.status !== 'ok') recs.push('Autopilot Green file-write executor contract is incomplete; run contract validator before any implementation preflight work');
   if (gate.status !== 'ok') recs.push('Mainline gate not passing — run gate:mainline for details');
   if (governance.counts.proposalCount > 0) recs.push(`${governance.counts.proposalCount} governance proposals are pending review`);
   if (governance.counts.stale90d > 0) recs.push(`${governance.counts.stale90d} active memories are stale >90d — schedule governance review`);
@@ -789,6 +1108,18 @@ function renderText(report, options = {}) {
   lines.push(`GovRCIss   ${report.governance.boundedRecallCloseout?.boundedRecallApprovalIssuanceRecordInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallApprovalIssuanceRecordInputTrace.sourceFileName : 'none'}`);
   lines.push(`GovRCEvd   ${report.governance.boundedRecallCloseout?.boundedRecallExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
   lines.push(`V3Receipt  ${pad(report.smartStandingAuthorizationV3.status)} ${report.smartStandingAuthorizationV3.latest_v3_task_id} / ${report.smartStandingAuthorizationV3.latest_validation_id}, receipt=${report.smartStandingAuthorizationV3.latest_receipt_status}, redStops=${report.smartStandingAuthorizationV3.red_stop_count}, next=${report.smartStandingAuthorizationV3.next_auto_step_allowed === true}`);
+  lines.push(`Autopilot  ${pad(report.autopilotKernel.status)} schemas=${report.autopilotKernel.schema_count}, examples=${report.autopilotKernel.example_count}, ledger=${report.autopilotKernel.latest_ledger_goal}, red=${report.autopilotKernel.blocked_red_count}, readyClaim=${report.autopilotKernel.readiness_claim_allowed === true}`);
+  lines.push(`AutoLoop   ${pad(report.autopilotLoop.status)} latest=${report.autopilotLoop.latest_task}, next=${report.autopilotLoop.next_safe_task}, receipt=${report.autopilotLoop.receipt_coverage.covered_tasks}/${report.autopilotLoop.receipt_coverage.completed_tasks}, validation=${report.autopilotLoop.validation_coverage.covered_tasks}/${report.autopilotLoop.validation_coverage.completed_tasks}, readyClaim=${report.autopilotLoop.readiness_claim_allowed === true}`);
+  lines.push(`AutoCtrl   ${pad(report.autopilotController.status)} cycle=${report.autopilotController.controller_cycle_id}, state=${report.autopilotController.current_state}, next=${report.autopilotController.next_safe_task}, lane=${report.autopilotController.lane_decision.lane}, readyClaim=${report.autopilotController.readiness_claim_allowed === true}`);
+  lines.push(`AutoState  ${pad(report.autopilotStateStore.status)} records=${report.autopilotStateStore.record_count}, types=${report.autopilotStateStore.record_type_count}/${report.autopilotStateStore.required_record_type_count}, appendOnly=${report.autopilotStateStore.append_only}, readyClaim=${report.autopilotStateStore.readiness_claim_allowed === true}`);
+  lines.push(`AutoAdapt  ${pad(report.autopilotAdapters.status)} adapters=${report.autopilotAdapters.adapter_count}/${report.autopilotAdapters.required_adapter_count}, failClosed=${report.autopilotAdapters.fail_closed_fixture_count}/${report.autopilotAdapters.required_fail_closed_fixture_count}, executes=${report.autopilotAdapters.executes_adapters}`);
+  lines.push(`AutoValid  ${pad(report.autopilotValidation.status)} cases=${report.autopilotValidation.validation_case_count}/${report.autopilotValidation.required_validation_case_count}, repairs=${report.autopilotValidation.repair_rule_count}/${report.autopilotValidation.required_repair_rule_count}, executes=${report.autopilotValidation.executes_validation}, repair=${report.autopilotValidation.applies_repair}`);
+  lines.push(`AutoReplay ${pad(report.autopilotReplay.status)} scenarios=${report.autopilotReplay.scenario_count}/${report.autopilotReplay.required_scenario_count}, failClosed=${report.autopilotReplay.fail_closed_scenario_count}, replays=${report.autopilotReplay.replays_real_actions}, writes=${report.autopilotReplay.writes_state}`);
+  lines.push(`AutoOper   ${pad(report.autopilotOperator.status)} surfaces=${report.autopilotOperator.surface_count}/${report.autopilotOperator.required_surface_count}, evals=${report.autopilotOperator.eval_case_count}/${report.autopilotOperator.required_eval_case_count}, next=${report.autopilotOperator.next_safe_action}`);
+  lines.push(`AutoGreen  ${pad(report.autopilotGreenEntry.status)} packet=${report.autopilotGreenEntry.packet_id}, conditions=${report.autopilotGreenEntry.met_admission_condition_count}/${report.autopilotGreenEntry.required_admission_condition_count}, activated=${report.autopilotGreenEntry.executor_activated}, executes=${report.autopilotGreenEntry.executes_tasks}`);
+  lines.push(`AutoExec   ${pad(report.autopilotGreenExecutor.status)} executor=${report.autopilotGreenExecutor.executor_id}, noop=${report.autopilotGreenExecutor.noop_execution_plan_count}/${report.autopilotGreenExecutor.executable_task_fixture_count}, failClosed=${report.autopilotGreenExecutor.fail_closed_fixture_count}/${report.autopilotGreenExecutor.required_fail_closed_fixture_count}, writes=${report.autopilotGreenExecutor.writes_files}`);
+  lines.push(`AutoWrite  ${pad(report.autopilotGreenFileBoundary.status)} boundary=${report.autopilotGreenFileBoundary.boundary_id}, design=${report.autopilotGreenFileBoundary.design_allowed}, implementation=${report.autopilotGreenFileBoundary.implementation_allowed}, activation=${report.autopilotGreenFileBoundary.executor_activation_allowed}`);
+  lines.push(`AutoWCon   ${pad(report.autopilotGreenFileExecutorContract.status)} contract=${report.autopilotGreenFileExecutorContract.contract_id}, preflight=${report.autopilotGreenFileExecutorContract.preflight_gate_count}, postWrite=${report.autopilotGreenFileExecutorContract.post_write_gate_count}, realWrites=${report.autopilotGreenFileExecutorContract.real_writes_allowed}`);
   lines.push(`Gate       ${pad(report.gate.status)} compare ${report.gate.compare ? report.gate.compare.matchedCases + '/' + report.gate.compare.totalCases : 'N/A'}, rollback ${report.gate.rollback ? report.gate.rollback.readyCases + '/' + report.gate.rollback.totalCases : 'N/A'}`);
   lines.push('');
   lines.push('Checks:');
@@ -884,13 +1215,25 @@ async function main() {
   const runtime = collectRuntime();
   const governance = collectGovernance(options);
   const smartStandingAuthorizationV3 = collectSmartStandingAuthorizationV3(options);
+  const autopilotKernel = collectAutopilotKernel();
+  const autopilotLoop = collectAutopilotLoop();
+  const autopilotController = collectAutopilotController();
+  const autopilotStateStore = collectAutopilotStateStore();
+  const autopilotAdapters = collectAutopilotAdapters();
+  const autopilotValidation = collectAutopilotValidation();
+  const autopilotReplay = collectAutopilotReplay();
+  const autopilotOperator = collectAutopilotOperator();
+  const autopilotGreenEntry = collectAutopilotGreenEntry();
+  const autopilotGreenExecutor = collectAutopilotGreenExecutor();
+  const autopilotGreenFileBoundary = collectAutopilotGreenFileBoundary();
+  const autopilotGreenFileExecutorContract = collectAutopilotGreenFileExecutorContract();
 
   const readPolicy = audits.readPolicy;
-  const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3);
-  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3);
+  const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
+  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
   const status = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
-    audits.bridge.status, audits.recall.status, governance.status, smartStandingAuthorizationV3.status, gate.status
+    audits.bridge.status, audits.recall.status, governance.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
   );
 
   const report = {
@@ -922,6 +1265,272 @@ async function main() {
           counts: governance.counts
         }
       : governance,
+    autopilotKernel: options.summaryOnly
+      ? {
+          status: autopilotKernel.status,
+          decision: autopilotKernel.decision,
+          evidenceClass: autopilotKernel.evidenceClass,
+          schema_count: autopilotKernel.schema_count,
+          example_count: autopilotKernel.example_count,
+          validators: autopilotKernel.validators,
+          latest_ledger_goal: autopilotKernel.latest_ledger_goal,
+          latest_ledger_result: autopilotKernel.latest_ledger_result,
+          blocked_red_count: autopilotKernel.blocked_red_count,
+          latest_validation_id: autopilotKernel.latest_validation_id,
+          validation_status: autopilotKernel.validation_status,
+          readiness_claim_allowed: autopilotKernel.readiness_claim_allowed,
+          stop_reason: autopilotKernel.stop_reason
+        }
+      : autopilotKernel,
+    autopilotLoop: options.summaryOnly
+      ? {
+          status: autopilotLoop.status,
+          decision: autopilotLoop.decision,
+          evidenceClass: autopilotLoop.evidenceClass,
+          latest_goal: autopilotLoop.latest_goal,
+          latest_task: autopilotLoop.latest_task,
+          next_safe_task: autopilotLoop.next_safe_task,
+          blocked_red_count: autopilotLoop.blocked_red_count,
+          receipt_coverage: autopilotLoop.receipt_coverage,
+          validation_coverage: autopilotLoop.validation_coverage,
+          repair_once_remaining: autopilotLoop.repair_once_remaining,
+          readiness_claim_allowed: autopilotLoop.readiness_claim_allowed,
+          stop_reason: autopilotLoop.stop_reason
+        }
+      : autopilotLoop,
+    autopilotController: options.summaryOnly
+      ? {
+          status: autopilotController.status,
+          decision: autopilotController.decision,
+          evidenceClass: autopilotController.evidenceClass,
+          goal_id: autopilotController.goal_id,
+          controller_cycle_id: autopilotController.controller_cycle_id,
+          current_state: autopilotController.current_state,
+          next_safe_task: autopilotController.next_safe_task,
+          lane_decision: autopilotController.lane_decision,
+          execution_boundary: autopilotController.execution_boundary,
+          validation_plan: autopilotController.validation_plan,
+          repair_once_available: autopilotController.repair_once_available,
+          receipt_requirement: autopilotController.receipt_requirement,
+          checkpoint_requirement: autopilotController.checkpoint_requirement,
+          stop_reason: autopilotController.stop_reason,
+          red_gate_status: autopilotController.red_gate_status,
+          readiness_claim_allowed: autopilotController.readiness_claim_allowed
+        }
+      : autopilotController,
+    autopilotStateStore: options.summaryOnly
+      ? {
+          status: autopilotStateStore.status,
+          decision: autopilotStateStore.decision,
+          evidenceClass: autopilotStateStore.evidenceClass,
+          model_id: autopilotStateStore.model_id,
+          append_only: autopilotStateStore.append_only,
+          no_migration: autopilotStateStore.no_migration,
+          record_type_count: autopilotStateStore.record_type_count,
+          required_record_type_count: autopilotStateStore.required_record_type_count,
+          missing_record_types: autopilotStateStore.missing_record_types,
+          record_count: autopilotStateStore.record_count,
+          readiness_claim_allowed: autopilotStateStore.readiness_claim_allowed,
+          stop_reason: autopilotStateStore.stop_reason
+        }
+      : autopilotStateStore,
+    autopilotAdapters: options.summaryOnly
+      ? {
+          status: autopilotAdapters.status,
+          decision: autopilotAdapters.decision,
+          evidenceClass: autopilotAdapters.evidenceClass,
+          contract_id: autopilotAdapters.contract_id,
+          adapter_count: autopilotAdapters.adapter_count,
+          required_adapter_count: autopilotAdapters.required_adapter_count,
+          missing_adapters: autopilotAdapters.missing_adapters,
+          complete_adapter_count: autopilotAdapters.complete_adapter_count,
+          fail_closed_fixture_count: autopilotAdapters.fail_closed_fixture_count,
+          required_fail_closed_fixture_count: autopilotAdapters.required_fail_closed_fixture_count,
+          missing_fail_closed_fixtures: autopilotAdapters.missing_fail_closed_fixtures,
+          readiness_claim_allowed: autopilotAdapters.readiness_claim_allowed,
+          executes_adapters: autopilotAdapters.executes_adapters,
+          stop_reason: autopilotAdapters.stop_reason
+        }
+      : autopilotAdapters,
+    autopilotValidation: options.summaryOnly
+      ? {
+          status: autopilotValidation.status,
+          decision: autopilotValidation.decision,
+          evidenceClass: autopilotValidation.evidenceClass,
+          planner_id: autopilotValidation.planner_id,
+          validation_case_count: autopilotValidation.validation_case_count,
+          required_validation_case_count: autopilotValidation.required_validation_case_count,
+          missing_validation_cases: autopilotValidation.missing_validation_cases,
+          repair_rule_count: autopilotValidation.repair_rule_count,
+          required_repair_rule_count: autopilotValidation.required_repair_rule_count,
+          missing_repair_rules: autopilotValidation.missing_repair_rules,
+          blocked_case_count: autopilotValidation.blocked_case_count,
+          executes_validation: autopilotValidation.executes_validation,
+          applies_repair: autopilotValidation.applies_repair,
+          repair_attempt_limit: autopilotValidation.repair_attempt_limit,
+          readiness_claim_allowed: autopilotValidation.readiness_claim_allowed,
+          stop_reason: autopilotValidation.stop_reason
+        }
+      : autopilotValidation,
+    autopilotReplay: options.summaryOnly
+      ? {
+          status: autopilotReplay.status,
+          decision: autopilotReplay.decision,
+          evidenceClass: autopilotReplay.evidenceClass,
+          harness_id: autopilotReplay.harness_id,
+          scenario_count: autopilotReplay.scenario_count,
+          required_scenario_count: autopilotReplay.required_scenario_count,
+          missing_scenarios: autopilotReplay.missing_scenarios,
+          fail_closed_scenario_count: autopilotReplay.fail_closed_scenario_count,
+          recovery_scenario_count: autopilotReplay.recovery_scenario_count,
+          required_fail_closed_reason_count: autopilotReplay.required_fail_closed_reason_count,
+          missing_fail_closed_reasons: autopilotReplay.missing_fail_closed_reasons,
+          read_only: autopilotReplay.read_only,
+          replays_real_actions: autopilotReplay.replays_real_actions,
+          writes_state: autopilotReplay.writes_state,
+          resume_token_supported: autopilotReplay.resume_token_supported,
+          receipt_reconciliation_supported: autopilotReplay.receipt_reconciliation_supported,
+          dirty_worktree_protection_supported: autopilotReplay.dirty_worktree_protection_supported,
+          readiness_claim_allowed: autopilotReplay.readiness_claim_allowed,
+          stop_reason: autopilotReplay.stop_reason
+        }
+      : autopilotReplay,
+    autopilotOperator: options.summaryOnly
+      ? {
+          status: autopilotOperator.status,
+          decision: autopilotOperator.decision,
+          evidenceClass: autopilotOperator.evidenceClass,
+          console_id: autopilotOperator.console_id,
+          surface_count: autopilotOperator.surface_count,
+          required_surface_count: autopilotOperator.required_surface_count,
+          missing_surfaces: autopilotOperator.missing_surfaces,
+          eval_case_count: autopilotOperator.eval_case_count,
+          required_eval_case_count: autopilotOperator.required_eval_case_count,
+          missing_eval_cases: autopilotOperator.missing_eval_cases,
+          rejection_eval_count: autopilotOperator.rejection_eval_count,
+          next_safe_action: autopilotOperator.next_safe_action,
+          red_gate_inbox_count: autopilotOperator.red_gate_inbox_count,
+          coverage_gap_count: autopilotOperator.coverage_gap_count,
+          controlled_green_executor_entry_conditions_count: autopilotOperator.controlled_green_executor_entry_conditions_count,
+          approval_packet_template_ready: autopilotOperator.approval_packet_template_ready,
+          read_only: autopilotOperator.read_only,
+          executes_eval: autopilotOperator.executes_eval,
+          writes_state: autopilotOperator.writes_state,
+          readiness_claim_allowed: autopilotOperator.readiness_claim_allowed,
+          stop_reason: autopilotOperator.stop_reason
+        }
+      : autopilotOperator,
+    autopilotGreenEntry: options.summaryOnly
+      ? {
+          status: autopilotGreenEntry.status,
+          decision: autopilotGreenEntry.decision,
+          evidenceClass: autopilotGreenEntry.evidenceClass,
+          packet_id: autopilotGreenEntry.packet_id,
+          entry_decision: autopilotGreenEntry.entry_decision,
+          admission_condition_count: autopilotGreenEntry.admission_condition_count,
+          required_admission_condition_count: autopilotGreenEntry.required_admission_condition_count,
+          met_admission_condition_count: autopilotGreenEntry.met_admission_condition_count,
+          missing_admission_conditions: autopilotGreenEntry.missing_admission_conditions,
+          allowed_scope_count: autopilotGreenEntry.allowed_scope_count,
+          required_allowed_scope_count: autopilotGreenEntry.required_allowed_scope_count,
+          missing_allowed_scope: autopilotGreenEntry.missing_allowed_scope,
+          fail_closed_stop_reason_count: autopilotGreenEntry.fail_closed_stop_reason_count,
+          required_stop_reason_count: autopilotGreenEntry.required_stop_reason_count,
+          missing_stop_reasons: autopilotGreenEntry.missing_stop_reasons,
+          next_safe_action: autopilotGreenEntry.next_safe_action,
+          read_only: autopilotGreenEntry.read_only,
+          executor_activated: autopilotGreenEntry.executor_activated,
+          executes_tasks: autopilotGreenEntry.executes_tasks,
+          writes_runtime_state: autopilotGreenEntry.writes_runtime_state,
+          readiness_claim_allowed: autopilotGreenEntry.readiness_claim_allowed,
+          stop_reason: autopilotGreenEntry.stop_reason
+        }
+      : autopilotGreenEntry,
+    autopilotGreenExecutor: options.summaryOnly
+      ? {
+          status: autopilotGreenExecutor.status,
+          decision: autopilotGreenExecutor.decision,
+          evidenceClass: autopilotGreenExecutor.evidenceClass,
+          executor_id: autopilotGreenExecutor.executor_id,
+          skeleton_decision: autopilotGreenExecutor.skeleton_decision,
+          allowed_task_kind_count: autopilotGreenExecutor.allowed_task_kind_count,
+          required_task_kind_count: autopilotGreenExecutor.required_task_kind_count,
+          missing_task_kinds: autopilotGreenExecutor.missing_task_kinds,
+          allowed_adapter_kind_count: autopilotGreenExecutor.allowed_adapter_kind_count,
+          required_adapter_kind_count: autopilotGreenExecutor.required_adapter_kind_count,
+          missing_adapter_kinds: autopilotGreenExecutor.missing_adapter_kinds,
+          executable_task_fixture_count: autopilotGreenExecutor.executable_task_fixture_count,
+          noop_execution_plan_count: autopilotGreenExecutor.noop_execution_plan_count,
+          fail_closed_fixture_count: autopilotGreenExecutor.fail_closed_fixture_count,
+          required_fail_closed_fixture_count: autopilotGreenExecutor.required_fail_closed_fixture_count,
+          missing_fail_closed_cases: autopilotGreenExecutor.missing_fail_closed_cases,
+          fail_closed_coverage_count: autopilotGreenExecutor.fail_closed_coverage_count,
+          next_safe_action: autopilotGreenExecutor.next_safe_action,
+          fixture_backed: autopilotGreenExecutor.fixture_backed,
+          noop_only: autopilotGreenExecutor.noop_only,
+          executor_activated: autopilotGreenExecutor.executor_activated,
+          executes_tasks: autopilotGreenExecutor.executes_tasks,
+          writes_files: autopilotGreenExecutor.writes_files,
+          writes_runtime_state: autopilotGreenExecutor.writes_runtime_state,
+          readiness_claim_allowed: autopilotGreenExecutor.readiness_claim_allowed,
+          stop_reason: autopilotGreenExecutor.stop_reason
+        }
+      : autopilotGreenExecutor,
+    autopilotGreenFileBoundary: options.summaryOnly
+      ? {
+          status: autopilotGreenFileBoundary.status,
+          decision: autopilotGreenFileBoundary.decision,
+          evidenceClass: autopilotGreenFileBoundary.evidenceClass,
+          boundary_id: autopilotGreenFileBoundary.boundary_id,
+          boundary_decision: autopilotGreenFileBoundary.boundary_decision,
+          design_allowed: autopilotGreenFileBoundary.design_allowed,
+          implementation_allowed: autopilotGreenFileBoundary.implementation_allowed,
+          executor_activation_allowed: autopilotGreenFileBoundary.executor_activation_allowed,
+          required_design_gate_count: autopilotGreenFileBoundary.required_design_gate_count,
+          missing_design_gates: autopilotGreenFileBoundary.missing_design_gates,
+          allowed_path_class_count: autopilotGreenFileBoundary.allowed_path_class_count,
+          missing_allowed_path_classes: autopilotGreenFileBoundary.missing_allowed_path_classes,
+          hard_stop_count: autopilotGreenFileBoundary.hard_stop_count,
+          missing_hard_stops: autopilotGreenFileBoundary.missing_hard_stops,
+          forbidden_path_class_count: autopilotGreenFileBoundary.forbidden_path_class_count,
+          next_safe_action: autopilotGreenFileBoundary.next_safe_action,
+          read_only: autopilotGreenFileBoundary.read_only,
+          readiness_claim_allowed: autopilotGreenFileBoundary.readiness_claim_allowed,
+          writes_files: autopilotGreenFileBoundary.writes_files,
+          executes_tasks: autopilotGreenFileBoundary.executes_tasks,
+          stop_reason: autopilotGreenFileBoundary.stop_reason
+        }
+      : autopilotGreenFileBoundary,
+    autopilotGreenFileExecutorContract: options.summaryOnly
+      ? {
+          status: autopilotGreenFileExecutorContract.status,
+          decision: autopilotGreenFileExecutorContract.decision,
+          evidenceClass: autopilotGreenFileExecutorContract.evidenceClass,
+          contract_id: autopilotGreenFileExecutorContract.contract_id,
+          contract_decision: autopilotGreenFileExecutorContract.contract_decision,
+          implementation_allowed: autopilotGreenFileExecutorContract.implementation_allowed,
+          executor_activation_allowed: autopilotGreenFileExecutorContract.executor_activation_allowed,
+          real_writes_allowed: autopilotGreenFileExecutorContract.real_writes_allowed,
+          read_only: autopilotGreenFileExecutorContract.read_only,
+          readiness_claim_allowed: autopilotGreenFileExecutorContract.readiness_claim_allowed,
+          execution_cycle_count: autopilotGreenFileExecutorContract.execution_cycle_count,
+          missing_execution_cycle: autopilotGreenFileExecutorContract.missing_execution_cycle,
+          required_task_field_count: autopilotGreenFileExecutorContract.required_task_field_count,
+          missing_task_fields: autopilotGreenFileExecutorContract.missing_task_fields,
+          allowed_write_operation_count: autopilotGreenFileExecutorContract.allowed_write_operation_count,
+          missing_write_operations: autopilotGreenFileExecutorContract.missing_write_operations,
+          preflight_gate_count: autopilotGreenFileExecutorContract.preflight_gate_count,
+          missing_preflight_gates: autopilotGreenFileExecutorContract.missing_preflight_gates,
+          post_write_gate_count: autopilotGreenFileExecutorContract.post_write_gate_count,
+          missing_post_write_gates: autopilotGreenFileExecutorContract.missing_post_write_gates,
+          fail_closed_case_count: autopilotGreenFileExecutorContract.fail_closed_case_count,
+          missing_fail_closed_cases: autopilotGreenFileExecutorContract.missing_fail_closed_cases,
+          next_safe_action: autopilotGreenFileExecutorContract.next_safe_action,
+          writes_files: autopilotGreenFileExecutorContract.writes_files,
+          executes_tasks: autopilotGreenFileExecutorContract.executes_tasks,
+          stop_reason: autopilotGreenFileExecutorContract.stop_reason
+        }
+      : autopilotGreenFileExecutorContract,
     smartStandingAuthorizationV3: options.summaryOnly
       ? {
           status: smartStandingAuthorizationV3.status,

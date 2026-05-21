@@ -1,0 +1,70 @@
+{
+  "green_file_write_boundary": {
+    "boundary_id": "CM-0701-green-file-write-executor-boundary-v0",
+    "boundary_decision": "GREEN_FILE_WRITE_EXECUTOR_DESIGN_ALLOWED_IMPLEMENTATION_BLOCKED",
+    "design_allowed": true,
+    "implementation_allowed": false,
+    "executor_activation_allowed": false,
+    "read_only": true,
+    "readiness_claim_allowed": false,
+    "required_design_gates": [
+      "exact_green_lane_only",
+      "workspace_root_write_only",
+      "allowed_path_classes_only",
+      "explicit_write_set",
+      "write_file_count_limit",
+      "user_owned_diff_detection",
+      "file_lock_check",
+      "pre_write_diff_snapshot",
+      "post_write_diff_review",
+      "validation_before_checkpoint",
+      "receipt_before_completion",
+      "checkpoint_after_validation",
+      "rollback_plan_required",
+      "second_repair_stop",
+      "readiness_claim_blocked"
+    ],
+    "allowed_path_classes": [
+      "docs",
+      "fixtures",
+      "tests",
+      "schemas",
+      "local_validators",
+      "read_only_helpers",
+      "dashboard_read_only_summaries",
+      ".agent_board",
+      "README.md",
+      "STATUS.md"
+    ],
+    "forbidden_path_classes": [
+      "package.json",
+      "package-lock.json",
+      ".env*",
+      "data/**",
+      "runs/**",
+      "reports/**",
+      "production/**",
+      "runtime durable data",
+      "external repositories",
+      "user Codex or Claude config files",
+      "public MCP tool contract"
+    ],
+    "implementation_hard_stops": [
+      "amber_or_red_lane",
+      "unknown_target_path",
+      "disallowed_target_path",
+      "dirty_worktree_ambiguity",
+      "user_owned_change_conflict",
+      "missing_file_lock_evidence",
+      "missing_pre_write_diff_snapshot",
+      "missing_validation_plan",
+      "validation_failure_requiring_judgment",
+      "second_repair_attempt",
+      "missing_receipt_or_checkpoint_plan",
+      "overwrite_without_explicit_allowance",
+      "external_side_effect_requested",
+      "readiness_or_cutover_claim"
+    ],
+    "next_safe_action": "design_real_green_file_write_executor_contract_without_implementation"
+  }
+}

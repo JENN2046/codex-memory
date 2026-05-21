@@ -1,0 +1,84 @@
+title: Autopilot ValidationPlanner RepairOnce
+version: 0.1.0
+status: draft_fixture_only
+description: >
+  Fixture-only ValidationPlanner / RepairOnce Orchestrator contract. It selects
+  validation plans and repair stop conditions without running validation or
+  applying repairs.
+type: object
+required:
+  - validation_planner
+properties:
+  validation_planner:
+    type: object
+    required:
+      - planner_id
+      - executes_validation
+      - applies_repair
+      - repair_attempt_limit
+      - readiness_claim_allowed
+      - validation_cases
+      - repair_once_rules
+    properties:
+      planner_id:
+        type: string
+      executes_validation:
+        const: false
+      applies_repair:
+        const: false
+      repair_attempt_limit:
+        const: 1
+      readiness_claim_allowed:
+        const: false
+      validation_cases:
+        type: array
+        items:
+          type: object
+          required:
+            - case_id
+            - task_area
+            - changed_path_class
+            - risk
+            - lane
+            - adapter_type
+            - minimum_validation
+            - escalate_when
+            - expected_decision
+            - readiness_claim_allowed
+          properties:
+            case_id:
+              enum:
+                - docs_only_green
+                - schema_fixture_green
+                - dashboard_readonly_green
+                - source_helper_green
+                - adapter_contract_fixture
+                - amber_provider_planned_only
+                - red_git_remote_blocked
+            readiness_claim_allowed:
+              const: false
+      repair_once_rules:
+        type: array
+        items:
+          type: object
+          required:
+            - rule_id
+            - repair_attempt_limit
+            - auto_apply_repair
+            - stop_reason
+            - readiness_claim_allowed
+          properties:
+            rule_id:
+              enum:
+                - obvious_local_reversible_once
+                - second_failure_stop
+                - non_obvious_repair_stop
+                - design_judgment_stop
+                - red_gate_stop
+                - user_owned_change_stop
+            repair_attempt_limit:
+              const: 1
+            auto_apply_repair:
+              const: false
+            readiness_claim_allowed:
+              const: false

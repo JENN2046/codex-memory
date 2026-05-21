@@ -1,0 +1,23 @@
+{
+  "closed_loop_state_machine": {
+    "model": "Smart Standing Authorization v3 - Budgeted Autonomy Envelope",
+    "decision": "NOT_READY_BLOCKED",
+    "evidence_class": "local_governance_contract",
+    "states": [
+      { "id": "intake", "input": "user_goal", "output": "normalized_goal", "allowed_local_action": "read current request and project rules", "red_gate": "ambiguous remote intent" },
+      { "id": "grounding", "input": "normalized_goal", "output": "repository_reality", "allowed_local_action": "read Git state and local files", "red_gate": "secret value read or external write" },
+      { "id": "goal_compiled", "input": "repository_reality", "output": "goal", "allowed_local_action": "validate local goal shape", "red_gate": "readiness claim" },
+      { "id": "route_planned", "input": "goal", "output": "route_plan", "allowed_local_action": "classify route steps", "red_gate": "Red step copied to executable queue" },
+      { "id": "task_selected", "input": "route_plan", "output": "next_safe_task", "allowed_local_action": "select Green or exact Amber task", "red_gate": "unbounded task" },
+      { "id": "lane_classified", "input": "next_safe_task", "output": "lane_decision", "allowed_local_action": "compare task with envelope", "red_gate": "Red condition" },
+      { "id": "executed", "input": "lane_decision", "output": "local_result", "allowed_local_action": "scoped local edit or read-only observation", "red_gate": "unapproved provider/runtime/memory/dependency/config action" },
+      { "id": "validated", "input": "local_result", "output": "validation_status", "allowed_local_action": "run targeted local validation", "red_gate": "non-obvious validation failure" },
+      { "id": "repair_attempted_once", "input": "validation_failure", "output": "repair_or_stop", "allowed_local_action": "one obvious local repair", "red_gate": "second failure or design judgment" },
+      { "id": "receipted", "input": "validation_status", "output": "receipt_or_no_amber_marker", "allowed_local_action": "record local evidence", "red_gate": "missing Amber receipt" },
+      { "id": "checkpointed", "input": "receipt_or_no_amber_marker", "output": "checkpoint", "allowed_local_action": "update local board", "red_gate": "overwrite user-owned work" },
+      { "id": "continued_or_stopped", "input": "checkpoint", "output": "next_safe_task_or_stop_reason", "allowed_local_action": "continue safe local task", "red_gate": "unsafe state" }
+    ],
+    "red_gates": ["push", "PR", "tag", "release", "deploy", "secret value read", "broad real memory scan", "public MCP expansion", "readiness claim"],
+    "readiness_claim_allowed": false
+  }
+}

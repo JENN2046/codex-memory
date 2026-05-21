@@ -1,0 +1,105 @@
+title: Autopilot Structured State Store Draft
+version: 0.1.0
+status: draft_fixture_only
+description: >
+  Append-only structured state store contract for the local product-grade
+  Autopilot control loop. This schema is fixture-only and does not create a
+  database, migrate .agent_board, or authorize durable writes.
+type: object
+required:
+  - structured_state_store_draft
+properties:
+  structured_state_store_draft:
+    type: object
+    required:
+      - model_id
+      - append_only
+      - no_migration
+      - database_created
+      - durable_write_enabled
+      - board_migration_performed
+      - readiness_claim_allowed
+      - record_types
+      - records
+    properties:
+      model_id:
+        type: string
+      append_only:
+        const: true
+      no_migration:
+        const: true
+      database_created:
+        const: false
+      durable_write_enabled:
+        const: false
+      board_migration_performed:
+        const: false
+      readiness_claim_allowed:
+        const: false
+      record_types:
+        type: array
+        items:
+          enum:
+            - goal
+            - route_plan
+            - task_queue_snapshot
+            - task_attempt
+            - lane_decision
+            - action_preflight
+            - budget_debit
+            - execution_receipt
+            - validation_run
+            - repair_attempt
+            - checkpoint
+            - approval_packet
+            - red_gate_event
+            - stop_reason
+            - resume_token
+      records:
+        type: array
+        items:
+          type: object
+          required:
+            - id
+            - created_at
+            - record_type
+            - goal_id
+            - task_id
+            - source_surface
+            - evidence_class
+            - mutation_boundary
+            - readiness_claim_allowed
+          properties:
+            id:
+              type: string
+            created_at:
+              type: string
+            record_type:
+              type: string
+            goal_id:
+              type: string
+            task_id:
+              type: string
+            source_surface:
+              type: string
+            evidence_class:
+              enum:
+                - docs_only
+                - fixture_only
+                - read_only
+                - no_op
+            mutation_boundary:
+              type: object
+              required:
+                - mutated
+                - allowed_future_mutation
+                - boundary
+              properties:
+                mutated:
+                  const: false
+                allowed_future_mutation:
+                  type: string
+                boundary:
+                  type: string
+            readiness_claim_allowed:
+              const: false

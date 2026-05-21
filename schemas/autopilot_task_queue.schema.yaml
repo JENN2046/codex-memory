@@ -15,11 +15,14 @@ properties:
       - lane
       - status
       - objective
+      - scope
       - allowed_files_or_systems
       - forbidden_files_or_systems
+      - budget_expected
       - allowed_commands_or_operations
       - validation
       - receipt_required
+      - stop_conditions
     lane_enum:
       - Green
       - Amber

@@ -1,0 +1,102 @@
+{
+  "replay_harness": {
+    "harness_id": "CM-0696-checkpoint-resume-replay-harness-v0",
+    "read_only": true,
+    "replays_real_actions": false,
+    "writes_state": false,
+    "dashboard_summary_only": true,
+    "readiness_claim_allowed": false,
+    "replay_scenarios": [
+      {
+        "scenario_id": "cycle_checkpoint_ok",
+        "input_surface": "fixture_cycle_checkpoint",
+        "replay_mode": "checkpoint_integrity_read_only",
+        "expected_result": "REPLAY_OK",
+        "resume_token": "resume://fixture/CM-0696/cycle-checkpoint-ok",
+        "fail_closed_reason": null,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "scenario_id": "attempt_replay_noop",
+        "input_surface": "fixture_task_attempt",
+        "replay_mode": "attempt_replay_noop",
+        "expected_result": "REPLAY_OK",
+        "resume_token": "resume://fixture/CM-0696/attempt-replay-noop",
+        "fail_closed_reason": null,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "scenario_id": "receipt_reconciliation_missing_receipt",
+        "input_surface": "fixture_receipt_ledger",
+        "replay_mode": "receipt_reconciliation_read_only",
+        "expected_result": "FAIL_CLOSED",
+        "resume_token": "resume://fixture/CM-0696/missing-receipt",
+        "fail_closed_reason": "missing_receipt_evidence",
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "scenario_id": "dirty_worktree_protection",
+        "input_surface": "fixture_git_snapshot",
+        "replay_mode": "dirty_worktree_preflight_read_only",
+        "expected_result": "FAIL_CLOSED",
+        "resume_token": "resume://fixture/CM-0696/dirty-worktree",
+        "fail_closed_reason": "dirty_worktree_detected",
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "scenario_id": "partial_attempt_recovery",
+        "input_surface": "fixture_partial_attempt",
+        "replay_mode": "partial_attempt_recovery_read_only",
+        "expected_result": "RECOVERABLE_READ_ONLY",
+        "resume_token": "resume://fixture/CM-0696/partial-attempt",
+        "fail_closed_reason": "partial_attempt_without_checkpoint",
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "scenario_id": "stale_board_detection",
+        "input_surface": "fixture_board_snapshot",
+        "replay_mode": "stale_board_detection_read_only",
+        "expected_result": "FAIL_CLOSED",
+        "resume_token": "resume://fixture/CM-0696/stale-board",
+        "fail_closed_reason": "stale_board_snapshot",
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "scenario_id": "resume_token_ok",
+        "input_surface": "fixture_resume_token",
+        "replay_mode": "resume_token_decode_read_only",
+        "expected_result": "REPLAY_OK",
+        "resume_token": "resume://fixture/CM-0696/resume-token-ok",
+        "fail_closed_reason": null,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "scenario_id": "stop_reason_replay",
+        "input_surface": "fixture_stop_reason_log",
+        "replay_mode": "stop_reason_replay_read_only",
+        "expected_result": "FAIL_CLOSED",
+        "resume_token": "resume://fixture/CM-0696/stop-reason",
+        "fail_closed_reason": "red_gate_event_replayed",
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "scenario_id": "second_repair_attempt_replay",
+        "input_surface": "fixture_repair_attempt_log",
+        "replay_mode": "repair_attempt_replay_read_only",
+        "expected_result": "FAIL_CLOSED",
+        "resume_token": "resume://fixture/CM-0696/second-repair",
+        "fail_closed_reason": "second_repair_attempt_replayed",
+        "mutated": false,
+        "readiness_claim_allowed": false
+      }
+    ]
+  }
+}

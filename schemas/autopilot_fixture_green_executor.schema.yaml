@@ -1,0 +1,98 @@
+schema_id: autopilot_fixture_green_executor
+version: 0
+status: draft_fixture_only
+decision: NOT_READY_BLOCKED
+readiness_claim_allowed: false
+description: >
+  Fixture-backed no-op Green executor skeleton for CM-0700. This schema
+  defines synthetic Green task fixtures, no-op adapter plans, and fail-closed
+  cases without activating a real executor.
+
+required_top_level:
+  - fixture_green_executor
+
+fixture_green_executor:
+  required_fields:
+    - executor_id
+    - skeleton_decision
+    - fixture_backed
+    - noop_only
+    - executor_activated
+    - executes_tasks
+    - writes_files
+    - writes_runtime_state
+    - readiness_claim_allowed
+    - allowed_task_kinds
+    - allowed_adapter_kinds
+    - executable_task_fixtures
+    - fail_closed_fixtures
+    - next_safe_action
+  constants:
+    skeleton_decision: GREEN_EXECUTOR_SKELETON_NOOP_READY
+    fixture_backed: true
+    noop_only: true
+    executor_activated: false
+    executes_tasks: false
+    writes_files: false
+    writes_runtime_state: false
+    readiness_claim_allowed: false
+  required_task_kinds:
+    - docs_update_fixture
+    - schema_fixture_update
+    - test_fixture_update
+    - board_status_update
+    - validator_local_update
+    - dashboard_summary_update
+  required_adapter_kinds:
+    - file_edit_adapter_noop
+    - validation_command_adapter_noop
+    - checkpoint_adapter_noop
+    - receipt_adapter_noop
+  required_fail_closed_cases:
+    - amber_lane_requested
+    - red_lane_requested
+    - disallowed_path_requested
+    - unknown_task_kind
+    - missing_validation_plan
+    - missing_checkpoint_plan
+    - write_requested
+    - provider_requested
+    - mcp_requested
+    - real_memory_requested
+    - dependency_requested
+    - runtime_probe_requested
+    - push_requested
+    - readiness_claim_requested
+
+executable_task_fixture:
+  required_fields:
+    - task_id
+    - lane
+    - task_kind
+    - target_files
+    - forbidden_files
+    - expected_write_count
+    - validation_plan
+    - checkpoint_required
+    - receipt_required
+    - rollback_or_cleanup_path
+    - hard_stop_conditions
+    - expected_noop_result
+  constants:
+    lane: Green
+    expected_noop_result: NOOP_EXECUTION_PLAN_READY
+
+hard_boundaries:
+  must_not:
+    - write files
+    - execute tasks
+    - run validators
+    - apply repairs
+    - write receipts
+    - write checkpoints
+    - call provider/API/MCP
+    - read or write real memory
+    - change dependencies
+    - change config/watchdog/startup
+    - push/PR/tag/release/deploy/cutover
+    - claim runtime/cutover/production readiness

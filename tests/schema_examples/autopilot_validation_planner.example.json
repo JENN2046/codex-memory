@@ -1,0 +1,145 @@
+{
+  "validation_planner": {
+    "planner_id": "CM-0695-validation-planner-repair-once-v0",
+    "executes_validation": false,
+    "applies_repair": false,
+    "repair_attempt_limit": 1,
+    "readiness_claim_allowed": false,
+    "validation_cases": [
+      {
+        "case_id": "docs_only_green",
+        "task_area": "P6-docs-drift",
+        "changed_path_class": "docs",
+        "risk": "A1",
+        "lane": "Green",
+        "adapter_type": "file_edit_adapter",
+        "minimum_validation": ["diff_inspection", "docs_validation_when_available", "git_diff_check"],
+        "escalate_when": ["commands_changed", "readiness_sensitive_wording", "source_contract_claimed"],
+        "expected_decision": "PLAN_ONLY_LOCAL_VALIDATION",
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "schema_fixture_green",
+        "task_area": "P10-observability-admin",
+        "changed_path_class": "schemas_and_examples",
+        "risk": "A2",
+        "lane": "Green",
+        "adapter_type": "validation_command_adapter",
+        "minimum_validation": ["node_check_validator", "schema_example_validator", "targeted_fixture_test"],
+        "escalate_when": ["schema_contract_expands_public_mcp", "runtime_data_referenced", "example_contains_secret"],
+        "expected_decision": "PLAN_ONLY_LOCAL_VALIDATION",
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "dashboard_readonly_green",
+        "task_area": "P10-observability-admin",
+        "changed_path_class": "dashboard_readonly_summary",
+        "risk": "A2",
+        "lane": "Green",
+        "adapter_type": "validation_command_adapter",
+        "minimum_validation": ["node_check_dashboard", "targeted_dashboard_test", "summary_json_smoke"],
+        "escalate_when": ["dashboard_writes_state", "dashboard_executes_validator", "dashboard_claims_readiness"],
+        "expected_decision": "PLAN_ONLY_LOCAL_VALIDATION",
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "source_helper_green",
+        "task_area": "P10-observability-admin",
+        "changed_path_class": "read_only_helper_cli",
+        "risk": "A2",
+        "lane": "Green",
+        "adapter_type": "validation_command_adapter",
+        "minimum_validation": ["node_check_helper_cli", "targeted_cli_test", "side_effect_flag_rejection_test"],
+        "escalate_when": ["helper_writes_files", "helper_calls_external_system", "helper_reads_real_memory"],
+        "expected_decision": "PLAN_ONLY_LOCAL_VALIDATION",
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "adapter_contract_fixture",
+        "task_area": "P10-observability-admin",
+        "changed_path_class": "adapter_contract_fixture",
+        "risk": "A2",
+        "lane": "Green",
+        "adapter_type": "approval_packet_adapter",
+        "minimum_validation": ["adapter_contract_validator", "fail_closed_fixture_coverage", "dashboard_summary_test"],
+        "escalate_when": ["adapter_executes_action", "budget_unknown", "receipt_missing_for_amber"],
+        "expected_decision": "PLAN_ONLY_LOCAL_VALIDATION",
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "amber_provider_planned_only",
+        "task_area": "P3-provider-profile",
+        "changed_path_class": "provider_plan",
+        "risk": "Amber",
+        "lane": "Amber",
+        "adapter_type": "provider_call_adapter",
+        "minimum_validation": ["preflight_only", "budget_known", "receipt_template_ready"],
+        "escalate_when": ["provider_call_would_execute", "unknown_cost", "secret_value_needed"],
+        "expected_decision": "BLOCKED_RED_OR_FAIL_CLOSED",
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "red_git_remote_blocked",
+        "task_area": "P10-observability-admin",
+        "changed_path_class": "git_remote",
+        "risk": "Red",
+        "lane": "Red",
+        "adapter_type": "git_remote_adapter",
+        "minimum_validation": ["push_safety_gate_preflight_only"],
+        "escalate_when": ["push_attempted", "pr_attempted", "tag_release_deploy_attempted"],
+        "expected_decision": "BLOCKED_RED_OR_FAIL_CLOSED",
+        "readiness_claim_allowed": false
+      }
+    ],
+    "repair_once_rules": [
+      {
+        "rule_id": "obvious_local_reversible_once",
+        "repair_attempt_limit": 1,
+        "auto_apply_repair": false,
+        "allowed_future_repair_shape": "single local obvious reversible patch after failed validation",
+        "stop_reason": "repair_once_available_but_not_executed_by_this_planner",
+        "readiness_claim_allowed": false
+      },
+      {
+        "rule_id": "second_failure_stop",
+        "repair_attempt_limit": 1,
+        "auto_apply_repair": false,
+        "allowed_future_repair_shape": "none",
+        "stop_reason": "second_validation_failure_requires_stop",
+        "readiness_claim_allowed": false
+      },
+      {
+        "rule_id": "non_obvious_repair_stop",
+        "repair_attempt_limit": 1,
+        "auto_apply_repair": false,
+        "allowed_future_repair_shape": "none",
+        "stop_reason": "non_obvious_repair_requires_human_judgment",
+        "readiness_claim_allowed": false
+      },
+      {
+        "rule_id": "design_judgment_stop",
+        "repair_attempt_limit": 1,
+        "auto_apply_repair": false,
+        "allowed_future_repair_shape": "none",
+        "stop_reason": "design_judgment_required",
+        "readiness_claim_allowed": false
+      },
+      {
+        "rule_id": "red_gate_stop",
+        "repair_attempt_limit": 1,
+        "auto_apply_repair": false,
+        "allowed_future_repair_shape": "none",
+        "stop_reason": "red_gate_requires_explicit_user_approval",
+        "readiness_claim_allowed": false
+      },
+      {
+        "rule_id": "user_owned_change_stop",
+        "repair_attempt_limit": 1,
+        "auto_apply_repair": false,
+        "allowed_future_repair_shape": "none",
+        "stop_reason": "user_owned_change_conflict_requires_stop",
+        "readiness_claim_allowed": false
+      }
+    ]
+  }
+}

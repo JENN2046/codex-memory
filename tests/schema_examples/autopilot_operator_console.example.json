@@ -1,0 +1,168 @@
+{
+  "operator_console": {
+    "console_id": "CM-0697-operator-console-eval-matrix-v0",
+    "read_only": true,
+    "executes_eval": false,
+    "writes_state": false,
+    "readiness_claim_allowed": false,
+    "next_safe_action": "review_controlled_green_executor_entry_packet_before_separate_skeleton_task",
+    "red_gate_inbox_count": 8,
+    "coverage_gap_count": 4,
+    "approval_packet_template_ready": true,
+    "controlled_green_executor_entry_conditions": [
+      "all_read_only_surfaces_ok",
+      "operator_console_eval_matrix_complete",
+      "red_gate_inbox_fail_closed",
+      "readiness_claim_allowed_false",
+      "green_executor_scope_docs_fixtures_tests_board_only"
+    ],
+    "surfaces": [
+      {
+        "surface_id": "controller",
+        "source": "autopilotController",
+        "status": "ok",
+        "read_only": true,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "surface_id": "state_store_draft",
+        "source": "autopilotStateStore",
+        "status": "ok",
+        "read_only": true,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "surface_id": "adapter_contract",
+        "source": "autopilotAdapters",
+        "status": "ok",
+        "read_only": true,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "surface_id": "validation_planner",
+        "source": "autopilotValidation",
+        "status": "ok",
+        "read_only": true,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "surface_id": "resume_replay",
+        "source": "autopilotReplay",
+        "status": "ok",
+        "read_only": true,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "surface_id": "red_gate_inbox",
+        "source": "blocked hard-stop items",
+        "status": "fail_closed",
+        "read_only": true,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "surface_id": "next_safe_action",
+        "source": "operator console next action",
+        "status": "planned_only",
+        "read_only": true,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "surface_id": "coverage_gaps",
+        "source": "operator console coverage rollup",
+        "status": "known_gaps",
+        "read_only": true,
+        "mutated": false,
+        "readiness_claim_allowed": false
+      }
+    ],
+    "eval_matrix": [
+      {
+        "case_id": "golden_trace",
+        "injects_failure": "none",
+        "expected_result": "ACCEPTED_FIXTURE_TRACE",
+        "evidence_required": "complete local fixture trace",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "failure_injection",
+        "injects_failure": "validation_failure",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "failed validation fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "budget_exhaustion",
+        "injects_failure": "budget_debit_exceeds_limit",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "budget exhaustion fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "red_gate_bypass_rejection",
+        "injects_failure": "hard_stop_bypass_attempt",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "hard-stop bypass fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "missing_evidence",
+        "injects_failure": "missing_validation_or_receipt",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "missing evidence fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "unknown_cost",
+        "injects_failure": "unknown external cost",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "unknown cost fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "secret_access",
+        "injects_failure": "secret value access attempted",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "secret access fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "broad_memory_scan",
+        "injects_failure": "broad memory scan attempted",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "broad memory scan fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "push_attempt",
+        "injects_failure": "push attempted",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "push attempt fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      },
+      {
+        "case_id": "readiness_overclaim_rejection",
+        "injects_failure": "readiness claim attempted",
+        "expected_result": "REJECTED_FAIL_CLOSED",
+        "evidence_required": "readiness overclaim fixture",
+        "executes_live_action": false,
+        "readiness_claim_allowed": false
+      }
+    ]
+  }
+}

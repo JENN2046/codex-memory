@@ -1,0 +1,32 @@
+schema_id: autopilot_closed_loop_state
+schema_version: 1
+required:
+  - closed_loop_state_machine
+properties:
+  closed_loop_state_machine:
+    required:
+      - model
+      - decision
+      - states
+      - red_gates
+      - readiness_claim_allowed
+  state:
+    required:
+      - id
+      - input
+      - output
+      - allowed_local_action
+      - red_gate
+  state_enum:
+    - intake
+    - grounding
+    - goal_compiled
+    - route_planned
+    - task_selected
+    - lane_classified
+    - executed
+    - validated
+    - repair_attempted_once
+    - receipted
+    - checkpointed
+    - continued_or_stopped

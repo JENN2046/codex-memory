@@ -1,0 +1,74 @@
+{
+  "controlled_green_executor_entry": {
+    "packet_id": "CM-0699-controlled-green-executor-entry-packet-v0",
+    "entry_decision": "GREEN_EXECUTOR_ENTRY_PACKET_PREPARED_NOT_ACTIVATED",
+    "read_only": true,
+    "executor_activated": false,
+    "executes_tasks": false,
+    "writes_runtime_state": false,
+    "readiness_claim_allowed": false,
+    "admission_conditions": [
+      { "condition_id": "v3_default_model_active", "status": "met", "evidence": "AGENTS.md and STATUS.md v3 default surfaces" },
+      { "condition_id": "read_only_controller_ok", "status": "met", "evidence": "autopilotController dashboard summary" },
+      { "condition_id": "closed_loop_summary_ok", "status": "met", "evidence": "autopilotLoop dashboard summary" },
+      { "condition_id": "operator_console_ok", "status": "met", "evidence": "autopilotOperator dashboard summary" },
+      { "condition_id": "action_adapter_contract_ok", "status": "met", "evidence": "autopilotAdapters dashboard summary" },
+      { "condition_id": "validation_planner_ok", "status": "met", "evidence": "autopilotValidation dashboard summary" },
+      { "condition_id": "replay_harness_ok", "status": "met", "evidence": "autopilotReplay dashboard summary" },
+      { "condition_id": "receipt_parser_ok", "status": "met", "evidence": "smartStandingAuthorizationV3 dashboard summary" },
+      { "condition_id": "dashboard_rollup_ok", "status": "met", "evidence": "dashboard summary-only smoke" },
+      { "condition_id": "red_gate_inbox_fail_closed", "status": "met", "evidence": "blocked hard-stop items remain blocked" },
+      { "condition_id": "readiness_claim_allowed_false", "status": "met", "evidence": "readiness_claim_allowed=false" },
+      { "condition_id": "executor_scope_green_only", "status": "met", "evidence": "allowed scope excludes external, runtime, memory, dependency, config, and remote actions" }
+    ],
+    "allowed_scope": [
+      "docs",
+      "fixtures",
+      "tests",
+      ".agent_board",
+      "local_validators",
+      "read_only_helpers",
+      "dashboard_read_only_summaries"
+    ],
+    "forbidden_boundaries": [
+      "provider/API/plugin/image generation",
+      "MCP tool call",
+      "real memory scan/read/write/import/export/migration",
+      "real VCPChat or VCPToolBox broad read/write",
+      "dependency add/remove/upgrade/audit-fix/package-manager switch",
+      "runtime startup/watchdog/config change",
+      "secret read/edit",
+      ".env modification",
+      "push/PR/tag/release/deploy/cutover",
+      "destructive filesystem or Git action",
+      "public MCP tool/schema expansion",
+      "readiness/cutover/production/RC_READY claim"
+    ],
+    "preflight_required_fields": [
+      "task_id",
+      "lane",
+      "exact_target_files",
+      "forbidden_files",
+      "expected_write_count",
+      "validation_plan",
+      "rollback_or_cleanup_path",
+      "receipt_requirement",
+      "checkpoint_requirement",
+      "hard_stop_conditions"
+    ],
+    "fail_closed_stop_reasons": [
+      "non_green_lane_requested",
+      "unknown_file_scope",
+      "disallowed_file_scope",
+      "missing_validation_plan",
+      "missing_checkpoint_plan",
+      "receipt_ambiguity",
+      "dirty_worktree_ambiguity",
+      "user_owned_change_conflict",
+      "second_repair_attempt",
+      "hard_stop_boundary_detected",
+      "readiness_overclaim_attempted"
+    ],
+    "next_safe_action": "implement_fixture_backed_green_executor_skeleton_only_after_separate_local_task_review"
+  }
+}

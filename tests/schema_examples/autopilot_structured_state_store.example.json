@@ -1,0 +1,255 @@
+{
+  "structured_state_store_draft": {
+    "model_id": "CM-0693-autopilot-structured-state-store-draft-v0",
+    "append_only": true,
+    "no_migration": true,
+    "database_created": false,
+    "durable_write_enabled": false,
+    "board_migration_performed": false,
+    "readiness_claim_allowed": false,
+    "record_types": [
+      "goal",
+      "route_plan",
+      "task_queue_snapshot",
+      "task_attempt",
+      "lane_decision",
+      "action_preflight",
+      "budget_debit",
+      "execution_receipt",
+      "validation_run",
+      "repair_attempt",
+      "checkpoint",
+      "approval_packet",
+      "red_gate_event",
+      "stop_reason",
+      "resume_token"
+    ],
+    "records": [
+      {
+        "id": "state-goal-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "goal",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": "goal_context",
+        "evidence_class": "docs_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_local_state_record_after_explicit_model_adoption",
+          "boundary": "no_database_no_migration_no_durable_write"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-route-plan-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "route_plan",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": ".agent_board/TASK_QUEUE.md",
+        "evidence_class": "fixture_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_route_plan_snapshot_only",
+          "boundary": "no_task_execution"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-task-queue-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "task_queue_snapshot",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": ".agent_board/TASK_QUEUE.md",
+        "evidence_class": "read_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_queue_snapshot_after_local_validation",
+          "boundary": "does_not_replace_agent_board"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-task-attempt-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "task_attempt",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": ".agent_board/AUTOPILOT_LEDGER.md",
+        "evidence_class": "fixture_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_attempt_record_after_executor_exists",
+          "boundary": "no_executor_side_effect"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-lane-decision-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "lane_decision",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": "src/core/AutopilotControllerReadOnly.js",
+        "evidence_class": "read_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_lane_decision_with_budget_receipt",
+          "boundary": "red_lane_hard_stop_preserved"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-action-preflight-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "action_preflight",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": "docs/AUTOPILOT_STRUCTURED_STATE_STORE_DRAFT.md",
+        "evidence_class": "docs_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_preflight_before_adapter_action",
+          "boundary": "preflight_does_not_execute_action"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-budget-debit-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "budget_debit",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": "docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md",
+        "evidence_class": "fixture_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_budget_debit_after_known_cost",
+          "boundary": "unknown_cost_is_red"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-execution-receipt-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "execution_receipt",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": ".agent_board/AUTOPILOT_LEDGER.md",
+        "evidence_class": "fixture_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_receipt_after_meaningful_amber_action",
+          "boundary": "no_amber_external_action_performed"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-validation-run-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "validation_run",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": ".agent_board/VALIDATION_LOG.md",
+        "evidence_class": "read_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_validation_result_after_local_gate",
+          "boundary": "validation_record_is_not_readiness_claim"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-repair-attempt-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "repair_attempt",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": "docs/AUTOPILOT_FAILURE_RECOVERY_MATRIX.md",
+        "evidence_class": "docs_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_repair_once_record",
+          "boundary": "second_repair_attempt_is_red_stop"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-checkpoint-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "checkpoint",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": ".agent_board/CHECKPOINT.md",
+        "evidence_class": "read_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_checkpoint_record",
+          "boundary": "checkpoint_does_not_resume_or_execute"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-approval-packet-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "approval_packet",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693-red",
+        "source_surface": "docs/SAFE_PUSH_POLICY.md",
+        "evidence_class": "docs_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_approval_packet_after_user_request",
+          "boundary": "approval_packet_does_not_grant_red_action"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-red-gate-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "red_gate_event",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693-red",
+        "source_surface": "AGENTS.md",
+        "evidence_class": "read_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_red_gate_event",
+          "boundary": "red_action_requires_explicit_user_approval"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-stop-reason-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "stop_reason",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": "docs/AUTOPILOT_FAILURE_RECOVERY_MATRIX.md",
+        "evidence_class": "fixture_only",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_stop_reason_record",
+          "boundary": "stop_reason_never_overrides_red_gate"
+        },
+        "readiness_claim_allowed": false
+      },
+      {
+        "id": "state-resume-token-CM-0693-001",
+        "created_at": "2026-05-21T00:00:00.000Z",
+        "record_type": "resume_token",
+        "goal_id": "CM-0693",
+        "task_id": "CM-0693",
+        "source_surface": ".agent_board/HANDOFF.md",
+        "evidence_class": "no_op",
+        "mutation_boundary": {
+          "mutated": false,
+          "allowed_future_mutation": "append_only_resume_token_after_checkpoint",
+          "boundary": "resume_token_does_not_execute_or_write_state"
+        },
+        "readiness_claim_allowed": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+schema_id: autopilot_controller_cycle
+schema_version: 1
+required:
+  - controller_cycle
+properties:
+  controller_cycle:
+    required:
+      - goal_id
+      - controller_cycle_id
+      - current_state
+      - next_safe_task
+      - lane_decision
+      - execution_boundary
+      - validation_plan
+      - repair_once_available
+      - receipt_requirement
+      - checkpoint_requirement
+      - stop_reason
+      - red_gate_status
+      - readiness_claim_allowed
+  execution_boundary:
+    required:
+      - mode
+      - dry_run_only
+      - executes_tasks
+      - writes_runtime_state
+  lane_decision:
+    required:
+      - lane
+      - decision
+      - reason
+  validation_plan:
+    required:
+      - source
+      - commands
+      - stop_on_non_obvious_failure
+  receipt_requirement:
+    required:
+      - required
+      - reason
+  red_gate_status:
+    required:
+      - status
+      - blocked_red_count
+      - hard_stop_required_for_red

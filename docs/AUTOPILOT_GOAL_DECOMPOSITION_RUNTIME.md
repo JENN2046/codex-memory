@@ -129,6 +129,7 @@ task_queue:
       lane: Green
       status: done
       objective: add project profile and goal runtime docs
+      scope: local docs only
       allowed_files_or_systems:
         - docs/AUTOPILOT_PROJECT_PROFILE.md
         - docs/AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md
@@ -136,6 +137,12 @@ task_queue:
         - .env*
         - data/**
         - remote repositories
+      budget_expected:
+        provider: 0
+        api: 0
+        mcp_tool: 0
+        memory_writes: 0
+        dependency_actions: 0
       allowed_commands_or_operations:
         - read files
         - edit local docs
@@ -143,10 +150,14 @@ task_queue:
       validation:
         - powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
       receipt_required: false
+      stop_conditions:
+        - Red Lane action required
+        - user-owned work would be overwritten
     - id: CM-0684-2
       lane: Green
       status: in_progress
       objective: add schemas, examples, validators, and ledger
+      scope: local schema/example/validator/ledger only
       allowed_files_or_systems:
         - schemas/**
         - tests/schema_examples/**
@@ -157,6 +168,12 @@ task_queue:
         - provider systems
         - real memory stores
         - dependency manifests
+      budget_expected:
+        provider: 0
+        api: 0
+        mcp_tool: 0
+        memory_writes: 0
+        dependency_actions: 0
       allowed_commands_or_operations:
         - node --check scripts\validate_autopilot_governance_kernel.js
         - node scripts\validate_autopilot_governance_kernel.js
@@ -165,6 +182,9 @@ task_queue:
       validation:
         - validators pass
       receipt_required: false
+      stop_conditions:
+        - validator requires external side effect
+        - Red Lane action required
   blocked_red_items:
     - id: CM-0684-R1
       reason: push/tag/release/deploy/readiness claim remains Red

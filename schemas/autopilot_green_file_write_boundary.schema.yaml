@@ -1,0 +1,75 @@
+schema_id: autopilot_green_file_write_boundary
+version: 0
+status: design_boundary_fixture_only
+decision: NOT_READY_BLOCKED
+readiness_claim_allowed: false
+description: >
+  Boundary packet for deciding whether a real Green file-write executor may
+  enter design. It allows design only and blocks implementation.
+
+required_top_level:
+  - green_file_write_boundary
+
+green_file_write_boundary:
+  required_fields:
+    - boundary_id
+    - boundary_decision
+    - design_allowed
+    - implementation_allowed
+    - executor_activation_allowed
+    - read_only
+    - readiness_claim_allowed
+    - required_design_gates
+    - allowed_path_classes
+    - forbidden_path_classes
+    - implementation_hard_stops
+    - next_safe_action
+  constants:
+    boundary_decision: GREEN_FILE_WRITE_EXECUTOR_DESIGN_ALLOWED_IMPLEMENTATION_BLOCKED
+    design_allowed: true
+    implementation_allowed: false
+    executor_activation_allowed: false
+    read_only: true
+    readiness_claim_allowed: false
+  required_design_gates:
+    - exact_green_lane_only
+    - workspace_root_write_only
+    - allowed_path_classes_only
+    - explicit_write_set
+    - write_file_count_limit
+    - user_owned_diff_detection
+    - file_lock_check
+    - pre_write_diff_snapshot
+    - post_write_diff_review
+    - validation_before_checkpoint
+    - receipt_before_completion
+    - checkpoint_after_validation
+    - rollback_plan_required
+    - second_repair_stop
+    - readiness_claim_blocked
+  required_allowed_path_classes:
+    - docs
+    - fixtures
+    - tests
+    - schemas
+    - local_validators
+    - read_only_helpers
+    - dashboard_read_only_summaries
+    - .agent_board
+    - README.md
+    - STATUS.md
+  required_hard_stops:
+    - amber_or_red_lane
+    - unknown_target_path
+    - disallowed_target_path
+    - dirty_worktree_ambiguity
+    - user_owned_change_conflict
+    - missing_file_lock_evidence
+    - missing_pre_write_diff_snapshot
+    - missing_validation_plan
+    - validation_failure_requiring_judgment
+    - second_repair_attempt
+    - missing_receipt_or_checkpoint_plan
+    - overwrite_without_explicit_allowance
+    - external_side_effect_requested
+    - readiness_or_cutover_claim

@@ -1,5 +1,156 @@
 # HANDOFF.md - codex-memory
 
+## CM-0703 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Changed files: `src/core/AutopilotGreenFileWriteExecutorContract.js`; `tests/autopilot-green-file-write-executor-preflight.test.js`; `scripts/validate_autopilot_green_file_write_executor_contract.js`; `docs/AUTOPILOT_GREEN_FILE_WRITE_EXECUTOR_CONTRACT.md`; `tests/schema_examples/autopilot_green_file_write_executor_contract.example.json`; `README.md`; `STATUS.md`; `.agent_board/*`.
+
+Validation to preserve: `node --check` for Green file-write executor contract helper/validator; `node scripts\validate_autopilot_green_file_write_executor_contract.js`; `node --test tests\autopilot-green-file-write-executor-preflight.test.js`; `node --test tests\autopilot-green-file-write-executor-contract-cli.test.js`; `node scripts\validate_autopilot_governance_kernel.js`; docs validation; `git diff --check`.
+
+Next safe task: prepare an implementation preflight packet without executor activation, or run guarded local commit review if requested. Do not implement or activate the real executor from these preflight tests alone.
+
+## CM-0702 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Changed files: `docs/AUTOPILOT_GREEN_FILE_WRITE_EXECUTOR_CONTRACT.md`; `schemas/autopilot_green_file_write_executor_contract.schema.yaml`; `tests/schema_examples/autopilot_green_file_write_executor_contract.example.json`; `src/core/AutopilotGreenFileWriteExecutorContract.js`; `src/cli/autopilot-green-file-write-executor-contract.js`; `scripts/validate_autopilot_green_file_write_executor_contract.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-green-file-write-executor-contract-cli.test.js`; `tests/dashboard-cli.test.js`; `README.md`; `STATUS.md`; `.agent_board/*`.
+
+Validation to preserve: `node --check` for Green file-write executor contract helper/CLI/validator/dashboard/governance validator; `node scripts\validate_autopilot_green_file_write_executor_contract.js`; `node scripts\validate_autopilot_governance_kernel.js`; `node --test tests\autopilot-green-file-write-executor-contract-cli.test.js`; `node --test tests\dashboard-cli.test.js`; docs validation; `git diff --check`.
+
+Next safe task: prepare code-level preflight tests without executor implementation; do not implement or activate the real executor from this contract alone.
+
+## CM-0701 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Changed files: `docs/AUTOPILOT_GREEN_FILE_WRITE_EXECUTOR_BOUNDARY.md`; `schemas/autopilot_green_file_write_boundary.schema.yaml`; `tests/schema_examples/autopilot_green_file_write_boundary.example.json`; `src/core/AutopilotGreenFileWriteBoundary.js`; `src/cli/autopilot-green-file-write-boundary.js`; `scripts/validate_autopilot_green_file_write_boundary.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-green-file-write-boundary-cli.test.js`; `tests/dashboard-cli.test.js`; `README.md`; `STATUS.md`; `.agent_board/*`.
+
+Validation to preserve: `node --check` for Green file-write boundary helper/CLI/validator/dashboard/governance validator; `node scripts\validate_autopilot_green_file_write_boundary.js`; `node scripts\validate_autopilot_governance_kernel.js`; `node --test tests\autopilot-green-file-write-boundary-cli.test.js`; `node --test tests\dashboard-cli.test.js`; docs validation; `git diff --check`.
+
+Next safe task: design the real Green file-write executor contract separately without implementation; do not activate executor behavior from this boundary packet alone.
+
+## CM-0700 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Changed files: `docs/AUTOPILOT_FIXTURE_BACKED_GREEN_EXECUTOR_SKELETON.md`; `schemas/autopilot_fixture_green_executor.schema.yaml`; `tests/schema_examples/autopilot_fixture_green_executor.example.json`; `src/core/AutopilotFixtureGreenExecutor.js`; `src/cli/autopilot-fixture-green-executor.js`; `scripts/validate_autopilot_fixture_green_executor.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-fixture-green-executor-cli.test.js`; `tests/dashboard-cli.test.js`; `README.md`; `STATUS.md`; `.agent_board/*`.
+
+Validation to preserve: `node --check` for fixture Green executor helper/CLI/validator/dashboard/governance validator; `node scripts\validate_autopilot_fixture_green_executor.js`; `node scripts\validate_autopilot_governance_kernel.js`; `node --test tests\autopilot-fixture-green-executor-cli.test.js`; `node --test tests\dashboard-cli.test.js`; docs validation; `git diff --check`.
+
+Next safe task: review whether a real Green file-write executor boundary can be designed separately; do not infer real execution permission from this no-op skeleton.
+
+## CM-0699 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Changed files: `docs/AUTOPILOT_CONTROLLED_GREEN_EXECUTOR_ENTRY_PACKET.md`; `schemas/autopilot_controlled_green_executor_entry.schema.yaml`; `tests/schema_examples/autopilot_controlled_green_executor_entry.example.json`; `src/core/AutopilotControlledGreenExecutorEntry.js`; `src/cli/autopilot-controlled-green-entry.js`; `scripts/validate_autopilot_controlled_green_executor_entry.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-controlled-green-entry-cli.test.js`; `tests/autopilot-operator-console-cli.test.js`; `tests/dashboard-cli.test.js`; `README.md`; `STATUS.md`; `.agent_board/*`.
+
+Validation to preserve: `node --check` for controlled Green entry helper/CLI/validator/dashboard/governance validator; `node scripts\validate_autopilot_controlled_green_executor_entry.js`; `node scripts\validate_autopilot_governance_kernel.js`; `node --test tests\autopilot-controlled-green-entry-cli.test.js`; `node --test tests\autopilot-operator-console-cli.test.js`; `node --test tests\dashboard-cli.test.js`; docs validation; `git diff --check`.
+
+Next safe task: fixture-backed Green executor skeleton only after separate local review; do not activate an executor from this packet alone.
+
+## CM-0698 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Changed files: `src/cli/autopilot-controller.js`; `src/cli/dashboard.js`; `tests/autopilot-controller-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+
+Validation to preserve: `node --check src\cli\autopilot-controller.js`; `node --check src\cli\dashboard.js`; `node --test tests\autopilot-controller-cli.test.js`; `node --test tests\dashboard-cli.test.js`; docs validation; `git diff --check`.
+
+Next safe task: controlled Green executor entry packet.
+
+## CM-0697 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Changed files: `docs/AUTOPILOT_OPERATOR_CONSOLE_EVAL_MATRIX.md`; `schemas/autopilot_operator_console.schema.yaml`; `tests/schema_examples/autopilot_operator_console.example.json`; `src/core/AutopilotOperatorConsole.js`; `src/cli/autopilot-operator-console.js`; `scripts/validate_autopilot_operator_console.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-operator-console-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+
+Validation to preserve: `node --check` for operator helper/CLI/validator/dashboard/governance validator; `node scripts\validate_autopilot_operator_console.js`; `node --test tests\autopilot-operator-console-cli.test.js`; `node scripts\validate_autopilot_governance_kernel.js`; `node --test tests\dashboard-cli.test.js`; docs validation; `git diff --check`.
+
+Next safe task: controlled Green executor entry packet, or guarded local commit review if requested.
+
+## CM-0696 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Changed files: `docs/AUTOPILOT_CHECKPOINT_RESUME_REPLAY_HARNESS.md`; `schemas/autopilot_replay_harness.schema.yaml`; `tests/schema_examples/autopilot_replay_harness.example.json`; `src/core/AutopilotReplayHarness.js`; `src/cli/autopilot-replay-harness.js`; `scripts/validate_autopilot_replay_harness.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-replay-harness-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+
+Validation to preserve: `node --check` for replay helper/CLI/validator/dashboard/governance validator; `node scripts\validate_autopilot_replay_harness.js`; `node --test tests\autopilot-replay-harness-cli.test.js`; `node scripts\validate_autopilot_governance_kernel.js`; `node --test tests\dashboard-cli.test.js`; docs validation; `git diff --check`.
+
+Next safe task: Week 6 Operator Console Readiness Surface + Eval Matrix.
+
+## CM-0695 Handoff
+
+Goal: define ValidationPlanner / RepairOnce Orchestrator as a fixture-only, read-only validation selection and stop-rule surface.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/AUTOPILOT_VALIDATION_PLANNER_REPAIR_ONCE.md`; `schemas/autopilot_validation_planner.schema.yaml`; `tests/schema_examples/autopilot_validation_planner.example.json`; `src/core/AutopilotValidationPlanner.js`; `src/cli/autopilot-validation-planner.js`; `scripts/validate_autopilot_validation_planner.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-validation-planner-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+Boundary: local docs/schema/example/read-only helper/CLI/test/dashboard/board only; no validation execution, repair application, provider, MCP, real memory, dependency, config, runtime, remote, or readiness action.
+Validation: validation-planner helper/CLI/dashboard syntax checks; targeted validation planner CLI test; governance kernel validator; targeted dashboard CLI test; docs validation; `git diff --check`.
+Remaining risk: this is a planner/orchestrator contract, not a validation runner, repair executor, provider connector, runtime probe, runtime readiness, cutover readiness, or public MCP expansion.
+Next safe step: Week 5 Checkpoint / Resume / Replay Harness, or optional guarded local commit review if requested.
+
+## CM-0694 Handoff
+
+Goal: define Budget Enforcement / Action Adapter Contract as a fixture-only, read-only future execution boundary.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/AUTOPILOT_ACTION_ADAPTER_CONTRACT.md`; `schemas/autopilot_action_adapter_contract.schema.yaml`; `tests/schema_examples/autopilot_action_adapter_contract.example.json`; `src/core/AutopilotActionAdapterContract.js`; `src/cli/autopilot-action-adapter-contract.js`; `scripts/validate_autopilot_action_adapter_contract.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-action-adapter-contract-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+Boundary: local docs/schema/example/read-only helper/CLI/test/dashboard/board only; no adapter execution, provider, MCP, real memory, dependency, config, runtime, remote, or readiness action.
+Validation: adapter helper/CLI/dashboard syntax checks; targeted adapter CLI test; governance kernel validator; targeted dashboard CLI test; docs validation; `git diff --check`.
+Remaining risk: this is a future adapter contract, not an executor, provider connector, MCP bridge, real memory path, dependency manager, runtime probe, Git remote automation, runtime readiness, cutover readiness, or public MCP expansion.
+Next safe step: Week 4 ValidationPlanner / RepairOnce Orchestrator, or optional guarded local commit review if requested.
+
+## CM-0693 Handoff
+
+Goal: define the Autopilot structured state store draft as an append-only, read-only/no-migration contract.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/AUTOPILOT_STRUCTURED_STATE_STORE_DRAFT.md`; `schemas/autopilot_structured_state_store.schema.yaml`; `tests/schema_examples/autopilot_structured_state_store.example.json`; `src/core/AutopilotStateStoreDraft.js`; `src/cli/autopilot-state-store-draft.js`; `scripts/validate_autopilot_state_store_draft.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-state-store-draft-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+Boundary: local docs/schema/example/read-only helper/CLI/test/dashboard/board only; no database creation, `.agent_board` migration, durable state write, task execution, provider, MCP, real memory, dependency, config, runtime, remote, or readiness action.
+Validation: state-store helper/CLI/dashboard syntax checks; targeted state-store CLI test; governance kernel validator; targeted dashboard CLI test; docs validation; `git diff --check`.
+Remaining risk: this is an append-only state model draft, not a durable state backend, real executor, product runtime autonomy, runtime readiness, cutover readiness, or public MCP expansion.
+Next safe step: Week 3 Budget Enforcement / Action Adapter Contract, or optional guarded local commit review if requested.
+
+## CM-0692 Handoff
+
+Goal: implement AutopilotController v0 as a read-only/no-op executor surface.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/AUTOPILOT_CONTROLLER_V0_READONLY.md`; `schemas/autopilot_controller_cycle.schema.yaml`; `tests/schema_examples/autopilot_controller_cycle.example.json`; `src/core/AutopilotControllerReadOnly.js`; `src/cli/autopilot-controller.js`; `scripts/validate_autopilot_controller.js`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-controller-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+Boundary: local read-only/no-op helper/CLI/docs/schema/test/dashboard/board only; no task execution, runtime execution, provider, MCP, real memory, dependency, config, remote, or readiness action.
+Validation: controller helper/CLI/dashboard syntax checks; targeted controller CLI test; targeted dashboard CLI test; docs validation; `git diff --check`.
+Remaining risk: this is controller observability and no-op orchestration only, not product runtime autonomy, Green executor authority, runtime readiness, cutover readiness, or public MCP expansion.
+Next safe step: Week 2 structured state store draft, or optional guarded local commit review if requested.
+
+## CM-0691 Handoff
+
+Goal: complete the local autopilot closed-loop observability and recovery surface.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/AUTOPILOT_CLOSED_LOOP_STATE_MACHINE.md`; `docs/AUTOPILOT_FAILURE_RECOVERY_MATRIX.md`; `schemas/autopilot_closed_loop_state.schema.yaml`; `schemas/autopilot_failure_recovery_matrix.schema.yaml`; `tests/schema_examples/autopilot_closed_loop_state.example.json`; `tests/schema_examples/autopilot_failure_recovery_matrix.example.json`; `src/core/AutopilotClosedLoopDryRun.js`; `src/cli/autopilot-closed-loop-dry-run.js`; `scripts/validate_autopilot_closed_loop.js`; `scripts/validate_autopilot_*.js`; `scripts/validate-local.ps1`; `src/cli/dashboard.js`; `tests/autopilot-closed-loop-dry-run-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+Boundary: local read-only helper/CLI/docs/schema/test/dashboard/board only; no runtime execution, provider, MCP, real memory, dependency, config, remote, or readiness action.
+Validation: closed-loop helper/CLI/dashboard syntax checks; targeted closed-loop CLI test; targeted dashboard CLI test; docs validation; `git diff --check`.
+Remaining risk: this is local governance/control-loop observability, not production autonomy, runtime readiness, cutover readiness, or public MCP expansion.
+Next safe step: optional guarded local commit review if requested.
+
+## CM-0685 Handoff
+
+Goal: expose the complete autopilot governance kernel through the existing dashboard as a read-only control surface.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/*`.
+Boundary: read-only dashboard source/test/docs/board only; no runtime, provider, MCP, real memory, dependency, config, remote, or readiness action.
+Validation: `node --check src\cli\dashboard.js` passed; targeted dashboard CLI test passed `18/18`; docs validation passed; `git diff --check` reported CRLF warnings only.
+Next safe step: optional guarded local commit review if requested.
+
 ## CM-0684 Handoff
 
 Goal: build the local Smart Standing Authorization v3 complete autopilot governance kernel.

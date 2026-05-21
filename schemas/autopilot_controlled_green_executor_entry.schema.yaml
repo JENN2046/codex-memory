@@ -1,0 +1,82 @@
+schema_id: autopilot_controlled_green_executor_entry
+version: 0
+status: draft_fixture_only
+decision: NOT_READY_BLOCKED
+readiness_claim_allowed: false
+description: >
+  Fixture-only controlled Green executor entry packet for CM-0699. This surface
+  records the admission conditions and hard boundaries required before any
+  future Green executor can be activated. It does not activate or execute an
+  executor.
+
+required_top_level:
+  - controlled_green_executor_entry
+
+controlled_green_executor_entry:
+  required_fields:
+    - packet_id
+    - entry_decision
+    - read_only
+    - executor_activated
+    - executes_tasks
+    - writes_runtime_state
+    - readiness_claim_allowed
+    - admission_conditions
+    - allowed_scope
+    - forbidden_boundaries
+    - preflight_required_fields
+    - fail_closed_stop_reasons
+    - next_safe_action
+  constants:
+    entry_decision: GREEN_EXECUTOR_ENTRY_PACKET_PREPARED_NOT_ACTIVATED
+    read_only: true
+    executor_activated: false
+    executes_tasks: false
+    writes_runtime_state: false
+    readiness_claim_allowed: false
+  required_admission_conditions:
+    - v3_default_model_active
+    - read_only_controller_ok
+    - closed_loop_summary_ok
+    - operator_console_ok
+    - action_adapter_contract_ok
+    - validation_planner_ok
+    - replay_harness_ok
+    - receipt_parser_ok
+    - dashboard_rollup_ok
+    - red_gate_inbox_fail_closed
+    - readiness_claim_allowed_false
+    - executor_scope_green_only
+  required_allowed_scope:
+    - docs
+    - fixtures
+    - tests
+    - .agent_board
+    - local_validators
+    - read_only_helpers
+    - dashboard_read_only_summaries
+  required_stop_reasons:
+    - non_green_lane_requested
+    - unknown_file_scope
+    - disallowed_file_scope
+    - missing_validation_plan
+    - missing_checkpoint_plan
+    - receipt_ambiguity
+    - dirty_worktree_ambiguity
+    - user_owned_change_conflict
+    - second_repair_attempt
+    - hard_stop_boundary_detected
+    - readiness_overclaim_attempted
+
+hard_boundaries:
+  must_not:
+    - activate executor
+    - execute tasks
+    - write runtime state
+    - call provider/API/MCP
+    - read or write real memory
+    - change dependencies
+    - change config/watchdog/startup
+    - push/PR/tag/release/deploy/cutover
+    - expand public MCP tools or schemas
+    - claim runtime/cutover/production readiness

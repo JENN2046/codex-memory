@@ -1,0 +1,74 @@
+{
+  "fixture_green_executor": {
+    "executor_id": "CM-0700-fixture-backed-green-executor-skeleton-v0",
+    "skeleton_decision": "GREEN_EXECUTOR_SKELETON_NOOP_READY",
+    "fixture_backed": true,
+    "noop_only": true,
+    "executor_activated": false,
+    "executes_tasks": false,
+    "writes_files": false,
+    "writes_runtime_state": false,
+    "readiness_claim_allowed": false,
+    "allowed_task_kinds": [
+      "docs_update_fixture",
+      "schema_fixture_update",
+      "test_fixture_update",
+      "board_status_update",
+      "validator_local_update",
+      "dashboard_summary_update"
+    ],
+    "allowed_adapter_kinds": [
+      "file_edit_adapter_noop",
+      "validation_command_adapter_noop",
+      "checkpoint_adapter_noop",
+      "receipt_adapter_noop"
+    ],
+    "executable_task_fixtures": [
+      {
+        "task_id": "GREEN-FIXTURE-DOCS-001",
+        "lane": "Green",
+        "task_kind": "docs_update_fixture",
+        "target_files": ["docs/example-green-task.md"],
+        "forbidden_files": ["package.json", "package-lock.json", ".env*", "data/**", "runs/**", "reports/**"],
+        "expected_write_count": 1,
+        "validation_plan": ["git diff --check", "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\validate-local.ps1 -Area docs"],
+        "checkpoint_required": true,
+        "receipt_required": false,
+        "rollback_or_cleanup_path": "revert exact docs fixture diff before commit",
+        "hard_stop_conditions": ["user_owned_change_conflict", "disallowed_file_scope", "readiness_claim_requested"],
+        "expected_noop_result": "NOOP_EXECUTION_PLAN_READY"
+      },
+      {
+        "task_id": "GREEN-FIXTURE-SCHEMA-001",
+        "lane": "Green",
+        "task_kind": "schema_fixture_update",
+        "target_files": ["schemas/example.schema.yaml", "tests/schema_examples/example.json"],
+        "forbidden_files": ["package.json", "package-lock.json", ".env*", "data/**", "runs/**", "reports/**"],
+        "expected_write_count": 2,
+        "validation_plan": ["node --check scripts\\validate_example.js", "node scripts\\validate_example.js"],
+        "checkpoint_required": true,
+        "receipt_required": false,
+        "rollback_or_cleanup_path": "revert exact schema fixture diff before commit",
+        "hard_stop_conditions": ["missing_validation_plan", "second_repair_attempt", "hard_stop_boundary_detected"],
+        "expected_noop_result": "NOOP_EXECUTION_PLAN_READY"
+      }
+    ],
+    "fail_closed_fixtures": [
+      { "case_id": "amber_lane_requested", "lane": "Amber", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "red_lane_requested", "lane": "Red", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "disallowed_path_requested", "lane": "Green", "target_files": ["package.json"], "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "unknown_task_kind", "lane": "Green", "task_kind": "unknown_kind", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "missing_validation_plan", "lane": "Green", "validation_plan": [], "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "missing_checkpoint_plan", "lane": "Green", "checkpoint_required": false, "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "write_requested", "requested_action": "write", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "provider_requested", "requested_action": "provider", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "mcp_requested", "requested_action": "mcp", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "real_memory_requested", "requested_action": "real_memory", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "dependency_requested", "requested_action": "dependency", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "runtime_probe_requested", "requested_action": "runtime_probe", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "push_requested", "requested_action": "push", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false },
+      { "case_id": "readiness_claim_requested", "requested_action": "readiness_claim", "expected_result": "REJECTED_FAIL_CLOSED", "mutated": false }
+    ],
+    "next_safe_action": "review_noop_skeleton_before_any_real_green_file_write_executor"
+  }
+}
