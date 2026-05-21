@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0709 Dashboard operational health split - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a read-only `operationalSummary` to `dashboard` so local service/store/profile/runtime/gate health is visible separately from governance/readiness warnings.
+- Behavior: `dashboard --json --summary-only` now keeps `summary.status=warn` for expected store freshness, read-policy, and governance fail-closed warnings, while `operationalSummary.status=ok` shows the local HTTP MCP, store, profile, runtime logs, compare, and rollback signals are currently healthy.
+- Boundary: `operationalSummary.readinessClaimAllowed=false`; this is not `RC_READY`, does not issue approval, and does not change governance fail-closed state.
+- Validation: dashboard syntax passed; targeted dashboard CLI tests passed; dashboard summary smoke showed `operationalSummary.status=ok`; full `npm test` passed; docs validation passed; `git diff --check` passed.
+- No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Next safe task: continue local-safe stabilization toward durable Codex/Claude memory mainline, or request explicit push authorization for local-ahead commits if remote sync is desired.
+
 ## Checkpoint - CM-0708 Autopilot closed-loop coverage normalization - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

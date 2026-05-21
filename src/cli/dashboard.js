@@ -996,6 +996,25 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance,
   return checks;
 }
 
+function buildOperationalSummary(service, store, profile, runtime, gate) {
+  const status = classifyStatus(service.status, store.status, profile.status, runtime.status, gate.status);
+  return {
+    status,
+    message: status === 'ok'
+      ? 'Local operational checks passed; governance readiness remains separate'
+      : status === 'warn'
+        ? 'Local operational checks returned warnings; inspect service/store/profile/runtime/gate sections'
+        : 'Local operational checks failed; inspect service/store/profile/runtime/gate sections',
+    scope: 'service_store_profile_runtime_gate',
+    serviceStatus: service.status,
+    storeStatus: store.status,
+    profileStatus: profile.status,
+    runtimeStatus: runtime.status,
+    gateStatus: gate.status,
+    readinessClaimAllowed: false
+  };
+}
+
 function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract) {
   const recs = [];
   const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
@@ -1090,6 +1109,7 @@ function renderText(report, options = {}) {
   lines.push(`Store      ${pad(report.store.status)} ${report.store.records} records, ${report.store.chunks} chunks`);
   lines.push(`Profile    ${pad(report.profile.status)} ${report.profile.fingerprint || 'N/A'}, ${report.profile.legacyChunks} legacy`);
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
+  lines.push(`Operational ${pad(report.operationalSummary.status)} ${report.operationalSummary.message}`);
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
   lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
   lines.push(`ReadPolicy ${pad(report.readPolicy.status)} lifecycle=${report.readPolicy.lifecyclePolicyEnabled}, soft=${report.readPolicy.softReadPolicyEnabled}, hidden=${report.readPolicy.recentHiddenByLifecycleCount}, stale=${report.readPolicy.recentStaleResultCount}, columns=${report.readPolicy.lifecycleColumnAvailable ?? 'unavailable'}`);
@@ -1251,6 +1271,7 @@ async function main() {
   const readPolicy = audits.readPolicy;
   const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
   const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
+  const operationalSummary = buildOperationalSummary(service, store, profile, runtime, gate);
   const sectionStatus = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
     audits.bridge.status, audits.recall.status, governance.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
@@ -1270,6 +1291,7 @@ async function main() {
           ? 'Some checks returned warnings — review checks section'
           : 'One or more critical checks failed'
     },
+    operationalSummary,
     service,
     store: options.summaryOnly ? { status: store.status, records: store.records, chunks: store.chunks } : store,
     profile: options.summaryOnly ? { status: profile.status, fingerprint: profile.fingerprint } : profile,

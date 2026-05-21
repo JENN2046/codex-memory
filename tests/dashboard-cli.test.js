@@ -146,6 +146,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'generatedAt',
     'governance',
     'mode',
+    'operationalSummary',
     'profile',
     'readPolicy',
     'recommendations',
@@ -156,9 +157,23 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'summary'
   ], 'dashboard top-level');
   assertKeySet(payload.summary, ['message', 'status'], 'dashboard summary');
+  assertKeySet(payload.operationalSummary, [
+    'gateStatus',
+    'message',
+    'profileStatus',
+    'readinessClaimAllowed',
+    'runtimeStatus',
+    'scope',
+    'serviceStatus',
+    'status',
+    'storeStatus'
+  ], 'dashboard operational summary');
   assert.equal(payload.mode, 'memory-dashboard');
   assert.equal(payload.destructive, false);
   assert.equal(typeof payload.summary.status, 'string');
+  assert.equal(typeof payload.operationalSummary.status, 'string');
+  assert.equal(payload.operationalSummary.scope, 'service_store_profile_runtime_gate');
+  assert.equal(payload.operationalSummary.readinessClaimAllowed, false);
 
   // Service section
   assert.ok(payload.service, 'should have service section');
@@ -611,6 +626,14 @@ test('dashboard CLI should support --json --summary-only', async () => {
   assert.deepEqual(payload.autopilotLoop.receipt_coverage.missing_tasks, []);
   assert.deepEqual(payload.autopilotLoop.validation_coverage.missing_tasks, []);
   assert.equal(payload.summary.status, 'warn');
+  assert.equal(payload.operationalSummary.status, 'ok');
+  assert.equal(payload.operationalSummary.serviceStatus, 'ok');
+  assert.equal(payload.operationalSummary.storeStatus, 'ok');
+  assert.equal(payload.operationalSummary.profileStatus, 'ok');
+  assert.equal(payload.operationalSummary.runtimeStatus, 'ok');
+  assert.equal(payload.operationalSummary.gateStatus, 'ok');
+  assert.equal(payload.operationalSummary.readinessClaimAllowed, false);
+  assert.match(payload.operationalSummary.message, /governance readiness remains separate/);
   assert.equal(payload.checks.some(check =>
     check.code === 'autopilot-closed-loop-summary'
     && /coverage incomplete/.test(check.message)
