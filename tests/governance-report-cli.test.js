@@ -108,18 +108,20 @@ async function seedGovernanceDb(dbPath) {
         updated_at, superseded_by, supersedes, task_id, retention_policy
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
+    const now = Date.now();
+    const daysAgo = days => new Date(now - days * 86400000).toISOString();
     insert.run('active-100d', 'active', 'codex-memory', 'project', 'codex', 1.0,
-      '2026-01-01T00:00:00.000Z', null, null, 'task-r3', 'permanent');
+      daysAgo(100), null, null, 'task-r3', 'permanent');
     insert.run('active-40d', 'active', 'codex-memory', 'shared', 'claude', 0.5,
-      '2026-04-01T00:00:00.000Z', null, null, '', 'ttl:30d');
+      daysAgo(40), null, null, '', 'ttl:30d');
     insert.run('proposal-1', 'proposal', 'codex-memory', 'shared', 'claude', 0.2,
-      '2026-05-11T00:00:00.000Z', null, null, null, 'ttl:7d');
+      daysAgo(10), null, null, null, 'ttl:7d');
     insert.run('tombstone-1', 'tombstoned', null, 'project', 'codex', 0.9,
-      '2026-05-10T00:00:00.000Z', null, null, null, 'permanent');
+      daysAgo(11), null, null, null, 'permanent');
     insert.run('superseded-1', 'superseded', 'agent-image-lab', 'project', 'codex', 0.7,
-      '2026-03-01T00:00:00.000Z', 'active-new', null, null, 'session');
+      daysAgo(20), 'active-new', null, null, 'session');
     insert.run('active-new', 'active', 'agent-image-lab', 'project', 'codex', null,
-      '2026-05-12T00:00:00.000Z', null, 'superseded-1', null, 'long-lived');
+      daysAgo(9), null, 'superseded-1', null, 'long-lived');
   } finally {
     db.close();
   }

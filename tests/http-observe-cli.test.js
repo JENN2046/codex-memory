@@ -180,7 +180,7 @@ async function seedRuntimeArtifacts(basePath) {
       retention_policy TEXT
     );
   `);
-  const now = new Date('2026-04-23T09:20:00.000Z');
+  const now = new Date();
   const stale45d = new Date(now.getTime() - 45 * 86400000).toISOString();
   const stale120d = new Date(now.getTime() - 120 * 86400000).toISOString();
   const fresh = new Date(now.getTime() - 2 * 86400000).toISOString();
