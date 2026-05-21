@@ -1202,6 +1202,8 @@ function buildGovernanceBlockerDetails(governance = {}, blockerCodes = []) {
 }
 
 function buildGovernanceAutoAuthorizationNextAction(autoAuthorization = {}) {
+  const commandPreviewBundle = autoAuthorization.commandPreviewBundle || {};
+  const primaryCommand = commandPreviewBundle.primaryCommand || 'unknown';
   return {
     status: 'blocked',
     source: 'governance',
@@ -1217,10 +1219,12 @@ function buildGovernanceAutoAuthorizationNextAction(autoAuthorization = {}) {
       ? autoAuthorization.operatorActionPlan.nextStepRefs
       : [],
     artifactBundleKind: autoAuthorization.artifactBundleDraft?.bundleKind || 'unknown',
-    commandBundleKind: autoAuthorization.commandPreviewBundle?.bundleKind || 'unknown',
-    commandPreviewUsableNow: autoAuthorization.commandPreviewBundle?.previewUsableNow === true,
-    primaryCommandId: autoAuthorization.commandPreviewBundle?.primaryCommandId || 'unknown',
-    primaryCommand: autoAuthorization.commandPreviewBundle?.primaryCommand || 'unknown',
+    commandBundleKind: commandPreviewBundle.bundleKind || 'unknown',
+    commandPreviewUsableNow: commandPreviewBundle.previewUsableNow === true,
+    inputResolutionMode: commandPreviewBundle.resolvedAssertionRecordPathMode || 'unknown',
+    requiredInputPlaceholders: extractCommandPlaceholders(commandPreviewBundle),
+    primaryCommandId: commandPreviewBundle.primaryCommandId || 'unknown',
+    primaryCommand,
     operatorPacketKind: autoAuthorization.operatorPacketDraft?.packetKind || 'unknown',
     readinessClaimAllowed: false
   };
@@ -1241,6 +1245,9 @@ function buildGovernanceReviewNextAction({
   operatorPacketKind
 } = {}) {
   const hasCommandPreviewBundle = commandPreviewBundle && typeof commandPreviewBundle === 'object';
+  const resolvedPrimaryCommand = hasCommandPreviewBundle
+    ? primaryCommand || commandPreviewBundle.primaryCommand || 'unknown'
+    : primaryCommand || 'not_applicable';
   return {
     status: 'blocked',
     source: 'governance',
@@ -1260,13 +1267,40 @@ function buildGovernanceReviewNextAction({
     commandPreviewUsableNow: hasCommandPreviewBundle
       ? commandPreviewBundle.previewUsableNow === true
       : false,
+    inputResolutionMode: hasCommandPreviewBundle
+      ? commandPreviewBundle.resolvedRecordPathMode
+        || commandPreviewBundle.resolvedAssertionRecordPathMode
+        || 'unknown'
+      : 'not_applicable',
+    requiredInputPlaceholders: extractCommandPlaceholders({
+      ...commandPreviewBundle,
+      primaryCommand: resolvedPrimaryCommand
+    }),
     primaryCommandId: primaryCommandId || commandPreviewBundle?.primaryCommandId || 'not_applicable',
-    primaryCommand: hasCommandPreviewBundle
-      ? primaryCommand || commandPreviewBundle.primaryCommand || 'unknown'
-      : primaryCommand || 'not_applicable',
+    primaryCommand: resolvedPrimaryCommand,
     operatorPacketKind: operatorPacketKind || 'not_applicable',
     readinessClaimAllowed: false
   };
+}
+
+function extractCommandPlaceholders(commandSurface = {}) {
+  const values = [];
+  if (typeof commandSurface === 'string') {
+    values.push(commandSurface);
+  } else if (commandSurface && typeof commandSurface === 'object') {
+    for (const [key, value] of Object.entries(commandSurface)) {
+      if (key.endsWith('Command') && typeof value === 'string') {
+        values.push(value);
+      }
+    }
+  }
+  const placeholders = new Set();
+  for (const value of values) {
+    for (const match of value.matchAll(/<[^>\r\n]+>/g)) {
+      placeholders.add(match[0]);
+    }
+  }
+  return [...placeholders].sort();
 }
 
 function buildReadinessNextAction({ reviewCandidate, operationalStatus, blockerSources = [], readPolicy = {} } = {}) {

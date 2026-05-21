@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0721 Dashboard governance blocker input placeholders - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added read-only `inputResolutionMode` and `requiredInputPlaceholders` fields to `dashboard.readinessSummary.governanceBlockerDetails`, without changing blocker calculation or `governanceNextAction` first-blocker semantics.
+- Current local signal: real `node src\cli\dashboard.js --json --summary-only` reports unresolved artifact path placeholders for auto-auth, widening adoption, bounded recall preparation, and bounded recall closeout; widening review currently has no command placeholder requirement in the summary.
+- Boundary: Green Lane local dashboard/test/docs/board only; no provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `19/19`; real dashboard JSON smoke showed input placeholders for governance blocker details; full `npm test` passed `1961/1961`; docs validation passed with `latest_task=CM-0721`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then continue governance fail-closed hardening; do not claim readiness.
+
 ## Checkpoint - CM-0720 Dashboard governance blocker command hints - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
