@@ -156,6 +156,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'service',
     'smartStandingAuthorizationV3',
     'store',
+    'storeFreshnessWritePreflight',
     'summary'
   ], 'dashboard top-level');
   assertKeySet(payload.summary, ['message', 'status'], 'dashboard summary');
@@ -216,6 +217,21 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.gitSync.readinessClaimAllowed, false);
   assert.equal(typeof payload.gitSync.ahead, 'number');
   assert.equal(typeof payload.gitSync.dirtyCount, 'number');
+  assertKeySet(payload.storeFreshnessWritePreflight, [
+    'approvalState',
+    'commandPreview',
+    'decision',
+    'memoryWrites',
+    'operatorApprovalLineAvailable',
+    'packetId',
+    'proposedMemoryWrites',
+    'readinessClaimAllowed',
+    'status'
+  ], 'dashboard store freshness write preflight');
+  assert.equal(payload.storeFreshnessWritePreflight.memoryWrites, 0);
+  assert.equal(payload.storeFreshnessWritePreflight.readinessClaimAllowed, false);
+  assert.equal(typeof payload.storeFreshnessWritePreflight.proposedMemoryWrites, 'number');
+  assert.match(payload.storeFreshnessWritePreflight.commandPreview, /store-freshness-write-preflight\.js --json/);
   assert.equal(payload.readinessSummary.status, 'blocked');
   assert.equal(payload.readinessSummary.decision, 'NOT_READY_BLOCKED');
   assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
@@ -830,6 +846,20 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
   assert.equal(payload.operationalSummary.runtimeStatus, 'ok');
   assert.equal(payload.operationalSummary.gateStatus, 'ok');
   assert.equal(payload.operationalSummary.readinessClaimAllowed, false);
+  assertKeySet(payload.storeFreshnessWritePreflight, [
+    'approvalState',
+    'commandPreview',
+    'decision',
+    'memoryWrites',
+    'operatorApprovalLineAvailable',
+    'packetId',
+    'proposedMemoryWrites',
+    'readinessClaimAllowed',
+    'status'
+  ], 'dashboard summary-only store freshness write preflight');
+  assert.equal(payload.storeFreshnessWritePreflight.memoryWrites, 0);
+  assert.equal(payload.storeFreshnessWritePreflight.readinessClaimAllowed, false);
+  assert.match(payload.storeFreshnessWritePreflight.commandPreview, /store-freshness-write-preflight\.js --json/);
   assert.match(payload.operationalSummary.message, /governance readiness remains separate/);
   assert.equal(payload.readinessSummary.status, 'blocked');
   assert.equal(payload.readinessSummary.decision, 'NOT_READY_BLOCKED');
@@ -1288,6 +1318,8 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Store'), 'should include Store section');
   assert.ok(text.includes('StoreFresh'), 'should include store freshness section');
   assert.match(text, /StoreFresh\s+(ok|warn)\s+\d+ in 24h, \d+ in 7d, \d+ in 30d/, 'should include store freshness age buckets and level');
+  assert.ok(text.includes('StoreWrite'), 'should include store freshness write preflight section');
+  assert.match(text, /StoreWrite\s+(ok|warn)\s+(NOT_APPROVED|none), proposed=\d+, writes=0/, 'should include store write approval state and zero actual writes');
   assert.ok(text.includes('Profile'), 'should include Profile section');
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
   assert.ok(text.includes('GitSync'), 'should include local git sync section');

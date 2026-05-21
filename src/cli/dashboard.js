@@ -426,6 +426,38 @@ async function collectStore() {
   }
 }
 
+async function collectStoreFreshnessWritePreflight() {
+  const commandPreview = 'node .\\src\\cli\\store-freshness-write-preflight.js --json';
+  const data = await spawnJson([path.join(process.cwd(), 'src', 'cli', 'store-freshness-write-preflight.js'), '--json']);
+  if (!data || typeof data !== 'object') {
+    return {
+      status: 'warn',
+      decision: 'unavailable',
+      approvalState: 'none',
+      packetId: 'none',
+      proposedMemoryWrites: 0,
+      memoryWrites: 0,
+      readinessClaimAllowed: false,
+      commandPreview,
+      operatorApprovalLineAvailable: false
+    };
+  }
+  const packet = data.approvalPacket && typeof data.approvalPacket === 'object'
+    ? data.approvalPacket
+    : {};
+  return {
+    status: data.status === 'ok' ? 'ok' : data.status === 'error' ? 'warn' : data.status || 'warn',
+    decision: data.decision || 'unavailable',
+    approvalState: packet.approvalState || 'none',
+    packetId: packet.packetId || 'none',
+    proposedMemoryWrites: Number(data.proposedMemoryWrites) || 0,
+    memoryWrites: Number(data.memoryWrites) || 0,
+    readinessClaimAllowed: data.readinessClaimAllowed === true,
+    commandPreview: data.commandPreview || commandPreview,
+    operatorApprovalLineAvailable: typeof packet.operatorApprovalLine === 'string' && packet.operatorApprovalLine.length > 0
+  };
+}
+
 async function collectProfile() {
   const data = await spawnJson([path.join(process.cwd(), 'src', 'cli', 'profile-health.js'), '--json']);
   if (!data) return { status: 'warn', fingerprint: null, legacyChunks: 0, message: 'Failed to read profile' };
@@ -1496,6 +1528,7 @@ function renderText(report, options = {}) {
   lines.push(`Service    ${pad(report.service.status)} ${report.service.url}  ${report.service.httpStatus}  ${report.service.version}`);
   lines.push(`Store      ${pad(report.store.status)} ${report.store.records} records, ${report.store.chunks} chunks`);
   lines.push(`StoreFresh ${pad(formatStoreFreshnessLevel(report))} ${formatStoreFreshnessText(report)}`);
+  lines.push(`StoreWrite ${pad(report.storeFreshnessWritePreflight.status)} ${report.storeFreshnessWritePreflight.approvalState}, proposed=${report.storeFreshnessWritePreflight.proposedMemoryWrites}, writes=${report.storeFreshnessWritePreflight.memoryWrites}, packet=${report.storeFreshnessWritePreflight.packetId}`);
   lines.push(`Profile    ${pad(report.profile.status)} ${report.profile.fingerprint || 'N/A'}, ${report.profile.legacyChunks} legacy`);
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`GitSync    ${pad(report.gitSync.status)} ${report.gitSync.branchSummary}, dirty=${report.gitSync.dirtyCount}, remoteAction=${report.gitSync.remoteActionsPerformed === true}`);
@@ -1654,9 +1687,10 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   const generatedAt = new Date().toISOString();
 
-  const [service, store, profile, audits, gate] = await Promise.all([
+  const [service, store, storeFreshnessWritePreflight, profile, audits, gate] = await Promise.all([
     collectService(),
     collectStore(),
+    collectStoreFreshnessWritePreflight(),
     collectProfile(),
     Promise.resolve().then(() => collectAudits()),
     collectGate()
@@ -1696,7 +1730,7 @@ async function main() {
   const readinessSummary = buildReadinessSummary(operationalSummary, governance, readPolicy, audits, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks);
   const sectionStatus = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
-    audits.bridge.status, audits.recall.status, governance.status, gitSync.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
+    audits.bridge.status, audits.recall.status, governance.status, gitSync.status, storeFreshnessWritePreflight.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
   );
   const checkStatus = classifyStatus(...checks.map(check => check.level));
   const status = classifyStatus(sectionStatus, checkStatus);
@@ -1717,6 +1751,7 @@ async function main() {
     readinessSummary,
     service,
     store: options.summaryOnly ? { status: store.status, records: store.records, chunks: store.chunks } : store,
+    storeFreshnessWritePreflight,
     profile: options.summaryOnly ? { status: profile.status, fingerprint: profile.fingerprint } : profile,
     runtime,
     gitSync,
