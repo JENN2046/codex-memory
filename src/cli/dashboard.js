@@ -1417,7 +1417,7 @@ function buildReadinessNextAction({ reviewCandidate, operationalStatus, blockerS
   return 'resolve_remaining_fail_closed_evidence_before_readiness_claim';
 }
 
-function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract) {
+function buildRecommendations(service, store, storeFreshnessWritePreflight, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract) {
   const recs = [];
   const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
   const autoAuthorizationCommandSummary = formatAutoAuthorizationCommandSummary(governance.autoAuthorization);
@@ -1427,6 +1427,9 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   if (store.status !== 'ok') recs.push('Store is empty or unreachable — check SQLite integrity');
   if (store.ageBreakdown?.last7d === 0) recs.push('No new memory written in 7 days — this may be expected during maintenance');
   else if (store.ageBreakdown?.last24h === 0) recs.push('No new memory written in 24h — run node .\\src\\cli\\store-freshness-write-preflight.js --json to prepare exact bounded write-path evidence before any approval or readiness claim');
+  if (storeFreshnessWritePreflight?.operatorApprovalLineAvailable === true) {
+    recs.push('Store freshness exact approval line is available as StoreWAsk — explicit user approval is still required before the one sanitized record_memory write; dashboard did not execute it');
+  }
   if (profile.legacyChunks > 0) recs.push(`${profile.legacyChunks} legacy chunks present — consider running cleanup`);
   if (profile.status === 'error') recs.push('Profile not ready — run rebuild-profile to regenerate');
   if (runtime.watchdogRecoveryCount > 10) recs.push(`Watchdog recovered ${runtime.watchdogRecoveryCount} times — consider investigating root cause of service instability`);
@@ -1725,7 +1728,7 @@ async function main() {
       message: `${gitSync.branchSummary}; dirty=${gitSync.dirtyCount}; remote action remains explicit-only`
     });
   }
-  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
+  const recommendations = buildRecommendations(service, store, storeFreshnessWritePreflight, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
   if (gitSync.ahead > 0 || gitSync.behind > 0 || gitSync.dirtyCount > 0) {
     recommendations.push(`Local git sync needs review — branch=${gitSync.branch}, upstream=${gitSync.upstream}, ahead=${gitSync.ahead}, behind=${gitSync.behind}, dirty=${gitSync.dirtyCount}; push remains blocked without explicit authorization`);
   }

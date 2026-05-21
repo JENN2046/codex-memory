@@ -1385,6 +1385,14 @@ test('dashboard CLI should emit text output by default', async () => {
     'should point store freshness warning to the exact write-evidence preflight'
   );
   assert.ok(
+    text.includes('Store freshness exact approval line is available as StoreWAsk'),
+    'should recommend the exact approval line without implying execution'
+  );
+  assert.ok(
+    text.includes('dashboard did not execute it'),
+    'should make the recommendation explicit that no write occurred'
+  );
+  assert.ok(
     text.includes('push remains blocked without explicit authorization') || text.includes('remoteAction=false'),
     'should keep git sync follow-up explicit-only'
   );
