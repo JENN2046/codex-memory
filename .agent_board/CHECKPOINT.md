@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0714 Dashboard structured governance next action - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after targeted dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a read-only `readinessSummary.governanceNextAction` object and text `GovNext` line to `dashboard`.
+- Current local signal: dashboard now identifies the first remaining governance blocker as `authorized-write-path-auto-auth`, blocker `external_token_assertion_not_accepted`, stage `await_cm0611_assertion_record`, next step `docs/CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE.md`, command bundle `assertion_record_command_bundle`, and primary command id `helper_assertion_record_review`.
+- Boundary: this is observability only; it does not accept an assertion, issue approval, execute write-path validation, mutate runtime/config, expand public MCP, or claim readiness.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard CLI tests passed `19/19`; real dashboard JSON/text smoke showed the new governance next-action surface; full `npm test` passed `1955/1955`.
+- Next safe task: continue local-safe governance chain hardening, or tackle the next non-Red runtime stability gap without claiming readiness.
+
 ## Checkpoint - CM-0713 Read-policy audit evidence collection and readiness next-action narrowing - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after targeted dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

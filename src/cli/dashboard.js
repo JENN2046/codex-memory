@@ -1058,6 +1058,107 @@ function buildReadinessSummary(operationalSummary, governance, readPolicy, smart
       blockerSources,
       readPolicy
     }),
+    governanceNextAction: buildGovernanceNextAction(governance, blockerCodes),
+    readinessClaimAllowed: false
+  };
+}
+
+function buildGovernanceNextAction(governance = {}, blockerCodes = []) {
+  const blockerSet = new Set(blockerCodes);
+  const autoAuthorization = governance.autoAuthorization || {};
+  if (blockerSet.has('authorized-write-path-auto-auth')
+    || autoAuthorization.decision === 'RC_NOT_READY_BLOCKED'
+    || autoAuthorization.allowedGovernanceOutput === 'NO_AUTO_APPROVAL_ISSUED') {
+    return {
+      status: 'blocked',
+      source: 'governance',
+      code: 'authorized-write-path-auto-auth',
+      decision: autoAuthorization.allowedGovernanceOutput || autoAuthorization.decision || 'unknown',
+      blocker: autoAuthorization.currentBlockedOn || 'unknown',
+      stage: autoAuthorization.operatorActionPlan?.currentStage || 'unknown',
+      reason: autoAuthorization.operatorActionPlan?.currentStageReason || 'unknown',
+      nextStepRef: autoAuthorization.operatorActionPlan?.nextStepRef
+        || autoAuthorization.assertionRecordPreview?.templateRef
+        || 'unknown',
+      nextStepRefs: Array.isArray(autoAuthorization.operatorActionPlan?.nextStepRefs)
+        ? autoAuthorization.operatorActionPlan.nextStepRefs
+        : [],
+      artifactBundleKind: autoAuthorization.artifactBundleDraft?.bundleKind || 'unknown',
+      commandBundleKind: autoAuthorization.commandPreviewBundle?.bundleKind || 'unknown',
+      primaryCommandId: autoAuthorization.commandPreviewBundle?.primaryCommandId || 'unknown',
+      operatorPacketKind: autoAuthorization.operatorPacketDraft?.packetKind || 'unknown',
+      readinessClaimAllowed: false
+    };
+  }
+  if (blockerSet.has('authorized-write-path-widening-review')) {
+    return buildGovernanceReviewNextAction({
+      code: 'authorized-write-path-widening-review',
+      decision: governance.wideningReview?.decision,
+      blocker: governance.wideningReview?.failClosedReasons?.[0],
+      nextStepRef: governance.wideningReview?.reviewRecordDraft?.nextBoundary || governance.wideningReview?.nextStep,
+      stage: 'widening_review',
+      reason: 'widening review remains fail-closed'
+    });
+  }
+  if (blockerSet.has('authorized-write-path-widening-adoption')) {
+    return buildGovernanceReviewNextAction({
+      code: 'authorized-write-path-widening-adoption',
+      decision: governance.wideningAdoption?.decision,
+      blocker: governance.wideningAdoption?.failClosedReasons?.[0],
+      nextStepRef: governance.wideningAdoption?.adoptionRecordDraft?.nextBoundary || governance.wideningAdoption?.nextStep,
+      stage: 'widening_adoption',
+      reason: 'widening adoption remains fail-closed'
+    });
+  }
+  if (blockerSet.has('authorized-write-path-bounded-recall-preparation')) {
+    return buildGovernanceReviewNextAction({
+      code: 'authorized-write-path-bounded-recall-preparation',
+      decision: governance.boundedRecallPreparation?.decision,
+      blocker: governance.boundedRecallPreparation?.failClosedReasons?.[0],
+      nextStepRef: governance.boundedRecallPreparation?.nextStep,
+      stage: 'bounded_recall_preparation',
+      reason: 'bounded recall preparation remains fail-closed'
+    });
+  }
+  if (blockerSet.has('authorized-write-path-bounded-recall-closeout')) {
+    return buildGovernanceReviewNextAction({
+      code: 'authorized-write-path-bounded-recall-closeout',
+      decision: governance.boundedRecallCloseout?.decision,
+      blocker: governance.boundedRecallCloseout?.failClosedReasons?.[0],
+      nextStepRef: governance.boundedRecallCloseout?.nextStep,
+      stage: 'bounded_recall_closeout',
+      reason: 'bounded recall closeout remains fail-closed'
+    });
+  }
+  return {
+    status: 'none',
+    source: 'governance',
+    code: 'none',
+    decision: 'none',
+    blocker: 'none',
+    stage: 'none',
+    reason: 'no governance blocker selected',
+    nextStepRef: 'none',
+    nextStepRefs: [],
+    readinessClaimAllowed: false
+  };
+}
+
+function buildGovernanceReviewNextAction({ code, decision, blocker, nextStepRef, stage, reason } = {}) {
+  return {
+    status: 'blocked',
+    source: 'governance',
+    code: code || 'governance',
+    decision: decision || 'unknown',
+    blocker: blocker || 'unknown',
+    stage: stage || 'unknown',
+    reason: reason || 'governance remains fail-closed',
+    nextStepRef: nextStepRef || 'unknown',
+    nextStepRefs: nextStepRef ? [nextStepRef] : [],
+    artifactBundleKind: 'not_applicable',
+    commandBundleKind: 'not_applicable',
+    primaryCommandId: 'not_applicable',
+    operatorPacketKind: 'not_applicable',
     readinessClaimAllowed: false
   };
 }
@@ -1176,6 +1277,7 @@ function renderText(report, options = {}) {
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`Operational ${pad(report.operationalSummary.status)} ${report.operationalSummary.message}`);
   lines.push(`Readiness ${pad(report.readinessSummary.status)} ${report.readinessSummary.decision}, blockers=${report.readinessSummary.blockerCount}, readyClaim=${report.readinessSummary.readinessClaimAllowed === true}`);
+  lines.push(`GovNext    ${report.readinessSummary.governanceNextAction?.code || 'none'} stage=${report.readinessSummary.governanceNextAction?.stage || 'none'}, next=${report.readinessSummary.governanceNextAction?.nextStepRef || 'none'}`);
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
   lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
   lines.push(`ReadPolicy ${pad(report.readPolicy.status)} lifecycle=${report.readPolicy.lifecyclePolicyEnabled}, soft=${report.readPolicy.softReadPolicyEnabled}, hidden=${report.readPolicy.recentHiddenByLifecycleCount}, stale=${report.readPolicy.recentStaleResultCount}, columns=${report.readPolicy.lifecycleColumnAvailable ?? 'unavailable'}`);

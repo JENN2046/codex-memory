@@ -176,6 +176,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'blockerSources',
     'decision',
     'governanceDecision',
+    'governanceNextAction',
     'latestTask',
     'nextAction',
     'operationalStatus',
@@ -195,6 +196,30 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.readinessSummary.decision, 'NOT_READY_BLOCKED');
   assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
   assert.ok(Array.isArray(payload.readinessSummary.blockerCodes));
+  assertKeySet(payload.readinessSummary.governanceNextAction, [
+    'artifactBundleKind',
+    'blocker',
+    'code',
+    'commandBundleKind',
+    'decision',
+    'nextStepRef',
+    'nextStepRefs',
+    'operatorPacketKind',
+    'primaryCommandId',
+    'readinessClaimAllowed',
+    'reason',
+    'source',
+    'stage',
+    'status'
+  ], 'dashboard readiness governance next action');
+  assert.equal(payload.readinessSummary.governanceNextAction.status, 'blocked');
+  assert.equal(payload.readinessSummary.governanceNextAction.code, 'authorized-write-path-auto-auth');
+  assert.equal(payload.readinessSummary.governanceNextAction.blocker, 'external_token_assertion_not_accepted');
+  assert.equal(payload.readinessSummary.governanceNextAction.stage, 'await_cm0611_assertion_record');
+  assert.equal(payload.readinessSummary.governanceNextAction.nextStepRef, 'docs/CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE.md');
+  assert.equal(payload.readinessSummary.governanceNextAction.commandBundleKind, 'assertion_record_command_bundle');
+  assert.equal(payload.readinessSummary.governanceNextAction.primaryCommandId, 'helper_assertion_record_review');
+  assert.equal(payload.readinessSummary.governanceNextAction.readinessClaimAllowed, false);
 
   // Service section
   assert.ok(payload.service, 'should have service section');
@@ -685,6 +710,11 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
   assert.ok(payload.readinessSummary.blockerSources.includes('governance'));
   assert.ok(payload.readinessSummary.blockerCodes.includes('authorized-write-path-auto-auth'));
   assert.equal(payload.readinessSummary.nextAction, 'resolve_read_policy_and_governance_fail_closed_evidence_before_readiness_claim');
+  assert.equal(payload.readinessSummary.governanceNextAction.code, 'authorized-write-path-auto-auth');
+  assert.equal(payload.readinessSummary.governanceNextAction.blocker, 'external_token_assertion_not_accepted');
+  assert.equal(payload.readinessSummary.governanceNextAction.stage, 'await_cm0611_assertion_record');
+  assert.equal(payload.readinessSummary.governanceNextAction.nextStepRef, 'docs/CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE.md');
+  assert.equal(payload.readinessSummary.governanceNextAction.readinessClaimAllowed, false);
   assert.equal(payload.checks.some(check =>
     check.code === 'autopilot-closed-loop-summary'
     && /coverage incomplete/.test(check.message)
@@ -1075,6 +1105,10 @@ test('dashboard readiness nextAction narrows to governance after read-policy evi
   assert.equal(payload.readinessSummary.blockerSources.includes('read-policy'), false);
   assert.ok(payload.readinessSummary.blockerSources.includes('governance'));
   assert.equal(payload.readinessSummary.nextAction, 'resolve_governance_fail_closed_evidence_before_readiness_claim');
+  assert.equal(payload.readinessSummary.governanceNextAction.code, 'authorized-write-path-auto-auth');
+  assert.equal(payload.readinessSummary.governanceNextAction.stage, 'await_cm0611_assertion_record');
+  assert.equal(payload.readinessSummary.governanceNextAction.nextStepRef, 'docs/CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE.md');
+  assert.equal(payload.readinessSummary.governanceNextAction.readinessClaimAllowed, false);
   assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
 });
 
@@ -1133,6 +1167,8 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Autopilot'), 'should include autopilot kernel line');
   assert.ok(text.includes('AutoLoop'), 'should include autopilot loop line');
   assert.ok(text.includes('AutoCtrl'), 'should include autopilot controller line');
+  assert.ok(text.includes('GovNext'), 'should include structured next governance action line');
+  assert.ok(text.includes('stage=await_cm0611_assertion_record'), 'should include current next governance stage');
   assert.ok(text.includes('CM-0677 / CMV-0801'), 'should include parsed v3 receipt identity');
   assert.ok(text.includes('bundle=assertion_record_only'), 'should include current bundle kind');
   assert.ok(text.includes('draft=cm0611AssertionRecord'), 'should include current rendered draft id');
