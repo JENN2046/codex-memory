@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0708 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0708 started from local `HEAD = a96496a test: warn on autopilot coverage gaps`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 5]`.
+
+Changed files: `src/core/AutopilotClosedLoopDryRun.js`; `src/core/SmartStandingAuthorizationV3ReceiptParser.js`; `scripts/validate_autopilot_ledger_consistency.js`; `tests/autopilot-closed-loop-dry-run-cli.test.js`; `tests/autopilot-ledger-consistency-validator.test.js`; `tests/smart-standing-authorization-v3-receipts-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`.
+
+Validation to preserve: `node --check src\core\AutopilotClosedLoopDryRun.js`; `node --check src\core\SmartStandingAuthorizationV3ReceiptParser.js`; `node --check scripts\validate_autopilot_ledger_consistency.js`; `node --test tests\autopilot-closed-loop-dry-run-cli.test.js`; `node --test tests\autopilot-ledger-consistency-validator.test.js`; `node --test tests\smart-standing-authorization-v3-receipts-cli.test.js`; `node --test tests\dashboard-cli.test.js`; `node src\cli\autopilot-closed-loop-dry-run.js --json`; `npm run dashboard -- --json --summary-only`; `npm test`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`.
+
+Boundary: local closed-loop parser/test/docs/board only. No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Next safe task: continue local-safe stabilization toward durable Codex/Claude memory mainline, or request explicit push authorization if remote sync is desired.
+
 ## CM-0707 Handoff
 
 Status: `COMPLETED_VALIDATED`.

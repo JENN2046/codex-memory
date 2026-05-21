@@ -48,6 +48,24 @@ test('v3 receipt parser core extracts latest local receipt summary', () => {
   assert.equal(summary.next_auto_step_allowed, true);
 });
 
+test('v3 receipt parser core keeps pipes inside inline code cells', () => {
+  const markdown = [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-0827 | `rg -n "Chinese Task Summary Closeout|任务总结" AGENTS.md` | P10 | CM-0708 Smart Standing Authorization v3 parser normalization | COMPLETED_VALIDATED | Green Lane not_required_no_amber_external_or_write_action; no readiness claim occurred. | Next local-safe step. | 2026-05-21 |'
+  ].join('\n');
+  const summary = parseReceiptMarkdown(markdown, {
+    sourcePath: '.agent_board/VALIDATION_LOG.md',
+    workspaceRoot: process.cwd()
+  });
+
+  assert.equal(summary.source_row_count, 1);
+  assert.equal(summary.latest_v3_task_id, 'CM-0708');
+  assert.equal(summary.latest_validation_id, 'CMV-0827');
+  assert.equal(summary.latest_lane, 'Green');
+  assert.equal(summary.latest_receipt_status, 'not_required_no_amber_external_or_write_action');
+});
+
 test('v3 receipt parser core does not treat no-Amber or Red hard-stop wording as actions', () => {
   const markdown = [
     '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',

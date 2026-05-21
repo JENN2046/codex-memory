@@ -70,7 +70,25 @@ function listMatching(workspaceRoot, relativeDir, pattern) {
 function splitMarkdownRow(line) {
   const trimmed = String(line || '').trim();
   if (!trimmed.startsWith('|') || !trimmed.endsWith('|')) return null;
-  const cells = trimmed.slice(1, -1).split('|').map(cell => cell.trim());
+  const body = trimmed.slice(1, -1);
+  const cells = [];
+  let current = '';
+  let inCode = false;
+  for (let index = 0; index < body.length; index += 1) {
+    const char = body[index];
+    if (char === '`') {
+      inCode = !inCode;
+      current += char;
+      continue;
+    }
+    if (char === '|' && !inCode && body[index - 1] !== '\\') {
+      cells.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+  cells.push(current.trim());
   if (cells.every(cell => /^:?-{3,}:?$/.test(cell))) return null;
   return cells;
 }
@@ -182,6 +200,15 @@ function computeCoverage(tasks, predicate) {
   };
 }
 
+function ledgerCoverageTasks(tasks, ledgerRows) {
+  const ledgerTaskNumbers = ledgerRows
+    .map(row => taskNumber(row.id))
+    .filter(number => number > 0);
+  if (ledgerTaskNumbers.length === 0) return tasks;
+  const firstLedgerTaskNumber = Math.min(...ledgerTaskNumbers);
+  return tasks.filter(task => taskNumber(task.id) >= firstLedgerTaskNumber);
+}
+
 function collectAutopilotClosedLoopSummary(options = {}) {
   const workspaceRoot = options.workspaceRoot || process.cwd();
   const taskQueueText = readFileSafe(path.join(workspaceRoot, '.agent_board', 'TASK_QUEUE.md'));
@@ -196,7 +223,7 @@ function collectAutopilotClosedLoopSummary(options = {}) {
   const latestGoal = ledgerRows[ledgerRows.length - 1] || latestTask || null;
   const nextSafeTask = tasks.find(task => task.status === 'todo' || task.status === 'in_progress') || null;
   const validationCoverage = computeCoverage(tasks, task => taskHasValidation(task, validationRows));
-  const receiptCoverage = computeCoverage(tasks, task => taskHasReceipt(task, ledgerRows, validationRows));
+  const receiptCoverage = computeCoverage(ledgerCoverageTasks(tasks, ledgerRows), task => taskHasReceipt(task, ledgerRows, validationRows));
 
   const schemas = listMatching(workspaceRoot, 'schemas', /^autopilot_.*\.schema\.yaml$/);
   const examples = listMatching(workspaceRoot, path.join('tests', 'schema_examples'), /^autopilot_.*\.example\.json$/);

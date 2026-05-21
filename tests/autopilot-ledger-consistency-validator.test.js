@@ -44,6 +44,19 @@ test('parseMarkdownTable returns row objects from a simple markdown table', () =
   assert.deepEqual(rows, [{ ID: 'CM-0705', Status: 'done' }]);
 });
 
+test('parseMarkdownTable preserves pipes inside inline code cells', () => {
+  const rows = parseMarkdownTable([
+    '| ID | Command / Check | Scope | Result |',
+    '|---|---|---|---|',
+    '| CMV-0827 | `rg -n "Chinese Task Summary Closeout|任务总结" AGENTS.md` | CM-0708 parser validation | COMPLETED_VALIDATED |'
+  ].join('\n'));
+
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].ID, 'CMV-0827');
+  assert.match(rows[0]['Command / Check'], /Closeout\|任务总结/);
+  assert.match(rows[0].Scope, /CM-0708/);
+});
+
 test('validator accepts matching latest task, validation scope, and ledger row', () => {
   const root = tempRoot();
   writeBoard(root);

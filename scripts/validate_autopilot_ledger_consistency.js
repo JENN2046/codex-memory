@@ -23,10 +23,25 @@ function parseMarkdownTable(text) {
   const rows = [];
 
   for (const line of lines) {
-    const cells = line
-      .slice(1, -1)
-      .split("|")
-      .map((cell) => cell.trim());
+    const body = line.slice(1, -1);
+    const cells = [];
+    let current = "";
+    let inCode = false;
+    for (let index = 0; index < body.length; index += 1) {
+      const char = body[index];
+      if (char === "`") {
+        inCode = !inCode;
+        current += char;
+        continue;
+      }
+      if (char === "|" && !inCode && body[index - 1] !== "\\") {
+        cells.push(current.trim());
+        current = "";
+        continue;
+      }
+      current += char;
+    }
+    cells.push(current.trim());
 
     if (!header) {
       header = cells;

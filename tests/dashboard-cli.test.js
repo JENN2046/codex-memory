@@ -608,15 +608,16 @@ test('dashboard CLI should support --json --summary-only', async () => {
   assert.equal(typeof payload.autopilotLoop.next_safe_task, 'string');
   assert.equal(typeof payload.autopilotLoop.receipt_coverage.covered_tasks, 'number');
   assert.equal(typeof payload.autopilotLoop.validation_coverage.covered_tasks, 'number');
+  assert.deepEqual(payload.autopilotLoop.receipt_coverage.missing_tasks, []);
+  assert.deepEqual(payload.autopilotLoop.validation_coverage.missing_tasks, []);
   assert.equal(payload.summary.status, 'warn');
-  assert.ok(payload.checks.some(check =>
+  assert.equal(payload.checks.some(check =>
     check.code === 'autopilot-closed-loop-summary'
-    && check.level === 'warn'
     && /coverage incomplete/.test(check.message)
-  ), 'summary-only should warn when autopilot loop coverage is incomplete');
-  assert.ok(payload.recommendations.some(text =>
+  ), false, 'summary-only should not warn about autopilot loop coverage when receipt and validation coverage have no missing tasks');
+  assert.equal(payload.recommendations.some(text =>
     /Autopilot closed-loop coverage is incomplete/.test(text)
-  ), 'summary-only should recommend reconciling incomplete autopilot loop coverage');
+  ), false, 'summary-only should not recommend reconciling complete autopilot loop coverage');
   assertKeySet(payload.autopilotController, [
     'checkpoint_requirement',
     'controller_cycle_id',

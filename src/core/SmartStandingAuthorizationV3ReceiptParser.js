@@ -39,7 +39,25 @@ const POSITIVE_READINESS_MARKERS = Object.freeze([
 function splitMarkdownRow(line) {
   const trimmed = String(line || '').trim();
   if (!trimmed.startsWith('|') || !trimmed.endsWith('|')) return null;
-  const cells = trimmed.slice(1, -1).split('|').map((cell) => cell.trim());
+  const body = trimmed.slice(1, -1);
+  const cells = [];
+  let current = '';
+  let inCode = false;
+  for (let index = 0; index < body.length; index += 1) {
+    const char = body[index];
+    if (char === '`') {
+      inCode = !inCode;
+      current += char;
+      continue;
+    }
+    if (char === '|' && !inCode && body[index - 1] !== '\\') {
+      cells.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+  cells.push(current.trim());
   if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) return null;
   return cells;
 }
