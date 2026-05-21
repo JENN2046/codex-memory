@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0707 Dashboard closed-loop coverage warning hardening - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: hardened `dashboard` so incomplete `autopilotLoop` receipt/validation coverage is visible as a warning in checks, recommendations, and the overall summary.
+- Behavior: `dashboard --json --summary-only` now reports `summary.status=warn` when warning-level checks exist, including `autopilot-closed-loop-summary` coverage gaps such as missing `CM-*` receipts or validations.
+- Validation: dashboard syntax passed; targeted dashboard CLI tests passed; summary-only dashboard smoke showed coverage-incomplete warning; full `npm test` passed; docs validation passed; `git diff --check` passed.
+- Boundary: local dashboard/test/docs/board only. No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Next safe task: continue local-safe stabilization toward durable Codex/Claude memory mainline, or request explicit push authorization for local-ahead commits if remote sync is desired.
+
 ## Checkpoint - CM-0706 Autopilot ledger consistency validator - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

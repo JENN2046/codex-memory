@@ -245,6 +245,19 @@ function classifyStatus(...levels) {
   return 'ok';
 }
 
+function isCoverageComplete(coverage) {
+  if (!coverage) return false;
+  return coverage.completed_tasks === coverage.covered_tasks
+    && Array.isArray(coverage.missing_tasks)
+    && coverage.missing_tasks.length === 0;
+}
+
+function formatMissingTasks(tasks = []) {
+  if (!Array.isArray(tasks) || tasks.length === 0) return 'none';
+  const preview = tasks.slice(0, 5).join(',');
+  return tasks.length > 5 ? `${preview},+${tasks.length - 5}` : preview;
+}
+
 function pickLaterTimestamp(current, candidate) {
   if (!candidate) return current;
   if (!current) return candidate;
@@ -888,13 +901,17 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance,
       ? `profile=${autopilotKernel.profile_exists}, runtime=${autopilotKernel.goal_runtime_exists}, schemas=${autopilotKernel.schema_count}, examples=${autopilotKernel.example_count}, ledger=${autopilotKernel.latest_ledger_goal}, red=${autopilotKernel.blocked_red_count}`
       : `autopilot kernel incomplete: ${autopilotKernel.stop_reason || 'unknown'}`
   });
+  const autopilotLoopCoverageComplete = isCoverageComplete(autopilotLoop.receipt_coverage)
+    && isCoverageComplete(autopilotLoop.validation_coverage);
   checks.push({
     source: 'autopilot-loop',
-    level: autopilotLoop.status === 'ok' ? 'ok' : 'warn',
+    level: autopilotLoop.status === 'ok' && autopilotLoopCoverageComplete ? 'ok' : 'warn',
     code: 'autopilot-closed-loop-summary',
-    message: autopilotLoop.status === 'ok'
-      ? `latest=${autopilotLoop.latest_task}, next=${autopilotLoop.next_safe_task}, receipt=${autopilotLoop.receipt_coverage.covered_tasks}/${autopilotLoop.receipt_coverage.completed_tasks}, validation=${autopilotLoop.validation_coverage.covered_tasks}/${autopilotLoop.validation_coverage.completed_tasks}, red=${autopilotLoop.blocked_red_count}`
-      : `autopilot loop incomplete: ${autopilotLoop.stop_reason || 'unknown'}`
+    message: autopilotLoop.status !== 'ok'
+      ? `autopilot loop incomplete: ${autopilotLoop.stop_reason || 'unknown'}`
+      : autopilotLoopCoverageComplete
+        ? `latest=${autopilotLoop.latest_task}, next=${autopilotLoop.next_safe_task}, receipt=${autopilotLoop.receipt_coverage.covered_tasks}/${autopilotLoop.receipt_coverage.completed_tasks}, validation=${autopilotLoop.validation_coverage.covered_tasks}/${autopilotLoop.validation_coverage.completed_tasks}, red=${autopilotLoop.blocked_red_count}`
+        : `coverage incomplete: latest=${autopilotLoop.latest_task}, receipt=${autopilotLoop.receipt_coverage.covered_tasks}/${autopilotLoop.receipt_coverage.completed_tasks} missing=${formatMissingTasks(autopilotLoop.receipt_coverage.missing_tasks)}, validation=${autopilotLoop.validation_coverage.covered_tasks}/${autopilotLoop.validation_coverage.completed_tasks} missing=${formatMissingTasks(autopilotLoop.validation_coverage.missing_tasks)}`
   });
   checks.push({
     source: 'autopilot-controller',
@@ -999,6 +1016,9 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   if (smartStandingAuthorizationV3.status !== 'ok') recs.push('Smart Standing Authorization v3 receipt summary is unavailable or blocked; inspect local validation log parser input');
   if (autopilotKernel.status !== 'ok') recs.push('Autopilot governance kernel summary is incomplete; run docs validation and inspect AUTOPILOT_LEDGER');
   if (autopilotLoop.status !== 'ok') recs.push('Autopilot closed-loop summary is incomplete; run closed-loop validator and inspect local board evidence');
+  else if (!isCoverageComplete(autopilotLoop.receipt_coverage) || !isCoverageComplete(autopilotLoop.validation_coverage)) {
+    recs.push(`Autopilot closed-loop coverage is incomplete; receipt missing=${formatMissingTasks(autopilotLoop.receipt_coverage.missing_tasks)}, validation missing=${formatMissingTasks(autopilotLoop.validation_coverage.missing_tasks)}`);
+  }
   if (autopilotController.status !== 'ok') recs.push('AutopilotController v0 summary is incomplete; run controller validator and inspect local controller surfaces');
   if (autopilotStateStore.status !== 'ok') recs.push('Autopilot structured state store draft is incomplete; run state-store validator and inspect fixture-only model');
   if (autopilotAdapters.status !== 'ok') recs.push('Autopilot action adapter contract is incomplete; run adapter validator and inspect fail-closed fixtures');
@@ -1231,10 +1251,12 @@ async function main() {
   const readPolicy = audits.readPolicy;
   const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
   const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
-  const status = classifyStatus(
+  const sectionStatus = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
     audits.bridge.status, audits.recall.status, governance.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
   );
+  const checkStatus = classifyStatus(...checks.map(check => check.level));
+  const status = classifyStatus(sectionStatus, checkStatus);
 
   const report = {
     generatedAt,
