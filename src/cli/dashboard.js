@@ -10,12 +10,107 @@ const {
 } = require('./governance-report');
 
 function parseArgs(argv = []) {
-  const options = { json: false, summaryOnly: false, skipTests: true };
+  const options = {
+    json: false,
+    summaryOnly: false,
+    skipTests: true,
+    showRenderedOperatorArtifactText: false,
+    showRenderedOperatorPacketText: false,
+    showRenderedOperatorBriefText: false,
+    showRenderedWideningReviewText: false,
+    showRenderedWideningAdoptionText: false,
+    showRenderedBoundedRecallText: false,
+    showRenderedBoundedRecallCloseoutText: false,
+    autoAuthorizationAssertionRecordPath: '',
+    autoAuthorizationLatestReboundOutcomeClass: '',
+    wideningReviewFixturePath: '',
+    wideningReviewRoutingOutcomeRecordPath: '',
+    wideningAdoptionFixturePath: '',
+    wideningAdoptionReviewRecordPath: '',
+    wideningAdoptionRecordPath: '',
+    boundedRecallPreparationFixturePath: '',
+    boundedRecallCloseoutFixturePath: '',
+    cm0595IssuanceRecordPath: '',
+    cm0595ExecutionEvidenceRecordPath: '',
+    boundedRecallIssuanceRecordPath: '',
+    boundedRecallExecutionEvidenceRecordPath: ''
+  };
   for (let i = 0; i < argv.length; i += 1) {
     const t = argv[i];
     if (t === '--json') { options.json = true; continue; }
     if (t === '--summary-only') { options.summaryOnly = true; continue; }
     if (t === '--with-tests') { options.skipTests = false; continue; }
+    if (t === '--rendered-operator-artifact-text') { options.showRenderedOperatorArtifactText = true; continue; }
+    if (t === '--rendered-operator-packet-text') { options.showRenderedOperatorPacketText = true; continue; }
+    if (t === '--rendered-operator-brief-text') { options.showRenderedOperatorBriefText = true; continue; }
+    if (t === '--rendered-widening-review-text') { options.showRenderedWideningReviewText = true; continue; }
+    if (t === '--rendered-widening-adoption-text') { options.showRenderedWideningAdoptionText = true; continue; }
+    if (t === '--rendered-bounded-recall-text') { options.showRenderedBoundedRecallText = true; continue; }
+    if (t === '--rendered-bounded-recall-closeout-text') { options.showRenderedBoundedRecallCloseoutText = true; continue; }
+    if (t === '--auto-auth-assertion-record') {
+      options.autoAuthorizationAssertionRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--widening-review-fixture') {
+      options.wideningReviewFixturePath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--widening-review-routing-outcome-record') {
+      options.wideningReviewRoutingOutcomeRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--widening-adoption-fixture') {
+      options.wideningAdoptionFixturePath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--widening-adoption-review-record') {
+      options.wideningAdoptionReviewRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--widening-adoption-record') {
+      options.wideningAdoptionRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--bounded-recall-preparation-fixture') {
+      options.boundedRecallPreparationFixturePath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--bounded-recall-closeout-fixture') {
+      options.boundedRecallCloseoutFixturePath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--cm0595-issuance-record') {
+      options.cm0595IssuanceRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--cm0595-execution-evidence-record') {
+      options.cm0595ExecutionEvidenceRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--bounded-recall-issuance-record') {
+      options.boundedRecallIssuanceRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--bounded-recall-execution-evidence-record') {
+      options.boundedRecallExecutionEvidenceRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--auto-auth-latest-rebound-outcome-class') {
+      options.autoAuthorizationLatestReboundOutcomeClass = String(argv[i + 1] || '').trim();
+      i += 1;
+    }
   }
   return options;
 }
@@ -314,8 +409,22 @@ async function collectGate() {
   };
 }
 
-function collectGovernance() {
-  const report = collectGovernanceReport();
+function collectGovernance(options = {}) {
+  const report = collectGovernanceReport({
+    autoAuthorizationAssertionRecordPath: options.autoAuthorizationAssertionRecordPath,
+    autoAuthorizationLatestReboundOutcomeClass: options.autoAuthorizationLatestReboundOutcomeClass,
+    wideningReviewFixturePath: options.wideningReviewFixturePath,
+    wideningReviewRoutingOutcomeRecordPath: options.wideningReviewRoutingOutcomeRecordPath,
+    wideningAdoptionFixturePath: options.wideningAdoptionFixturePath,
+    wideningAdoptionReviewRecordPath: options.wideningAdoptionReviewRecordPath,
+    wideningAdoptionRecordPath: options.wideningAdoptionRecordPath,
+    boundedRecallPreparationFixturePath: options.boundedRecallPreparationFixturePath,
+    boundedRecallCloseoutFixturePath: options.boundedRecallCloseoutFixturePath,
+    cm0595IssuanceRecordPath: options.cm0595IssuanceRecordPath,
+    cm0595ExecutionEvidenceRecordPath: options.cm0595ExecutionEvidenceRecordPath,
+    boundedRecallIssuanceRecordPath: options.boundedRecallIssuanceRecordPath,
+    boundedRecallExecutionEvidenceRecordPath: options.boundedRecallExecutionEvidenceRecordPath
+  });
   const summary = buildGovernanceSurface(report, { tolerateUnavailable: true });
   return {
     ...summary,
@@ -424,11 +533,86 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance,
     code: 'governance-stale-active',
     message: `${governance.counts.stale30d} active records stale >30d, ${governance.counts.stale90d} stale >90d`
   });
+  const autoAuthorizationLevel = governance.autoAuthorization?.allowedGovernanceOutput === 'AUTO_REUSE_CM0601_LINE_ONLY'
+    ? 'ok'
+    : governance.autoAuthorization?.allowedGovernanceOutput === 'ESCALATE_FOR_FUTURE_WIDENING_REVIEW'
+      ? 'warn'
+      : 'warn';
+  const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
+  const autoAuthorizationCommandSummary = formatAutoAuthorizationCommandSummary(governance.autoAuthorization);
+  const autoAuthorizationPacketSummary = formatAutoAuthorizationPacketSummary(governance.autoAuthorization);
+  const autoAuthorizationInputSummary = formatAutoAuthorizationInputTraceSummary(governance.autoAuthorization);
+  checks.push({
+    source: 'governance',
+    level: autoAuthorizationLevel,
+    code: 'authorized-write-path-auto-auth',
+    message: governance.autoAuthorization
+      ? `${governance.autoAuthorization.allowedGovernanceOutput} (${governance.autoAuthorization.currentBlockedOn || 'no-blocker'}; ${autoAuthorizationBundleSummary}; ${autoAuthorizationCommandSummary}; ${autoAuthorizationPacketSummary}; ${autoAuthorizationInputSummary})`
+      : 'auto-authorization surface unavailable'
+  });
+  const wideningReviewLevel = governance.wideningReview?.decision === 'WIDENING_REVIEW_PASSED_PROCEED_TO_CM0607'
+    ? 'ok'
+    : governance.wideningReview?.decision === 'WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED'
+      ? 'warn'
+      : 'warn';
+  checks.push({
+    source: 'governance',
+    level: wideningReviewLevel,
+    code: 'authorized-write-path-widening-review',
+    message: governance.wideningReview
+      ? `${governance.wideningReview.decision} (${governance.wideningReview.failClosedReasons?.[0] || 'no-blocker'}; next=${governance.wideningReview.reviewRecordDraft?.nextBoundary || governance.wideningReview.nextStep || 'none'})`
+      : 'widening-review surface unavailable'
+  });
+  const wideningAdoptionLevel = governance.wideningAdoption?.decision === 'WIDENING_ADOPTION_GRANTED_CM0595_ONLY'
+    ? 'ok'
+    : governance.wideningAdoption?.decision === 'WIDENING_ADOPTION_DENIED'
+      ? 'warn'
+      : 'warn';
+  checks.push({
+    source: 'governance',
+    level: wideningAdoptionLevel,
+    code: 'authorized-write-path-widening-adoption',
+    message: governance.wideningAdoption
+      ? `${governance.wideningAdoption.decision} (${governance.wideningAdoption.failClosedReasons?.[0] || 'no-blocker'}; next=${governance.wideningAdoption.adoptionRecordDraft?.nextBoundary || governance.wideningAdoption.nextStep || 'none'}; cm0595=${governance.wideningAdoption.cm0595ApprovalLinePreview?.previewUsableNow === true ? 'ready' : 'not-ready'})`
+      : 'widening-adoption surface unavailable'
+  });
+  const boundedRecallPreparationLevel =
+    governance.boundedRecallPreparation?.decision === 'BOUNDED_RECALL_APPROVAL_PREPARED_EXACT_ONLY'
+      ? 'ok'
+      : governance.boundedRecallPreparation?.decision === 'BOUNDED_RECALL_APPROVAL_ABORTED_DRIFT'
+        ? 'warn'
+        : 'warn';
+  checks.push({
+    source: 'governance',
+    level: boundedRecallPreparationLevel,
+    code: 'authorized-write-path-bounded-recall-preparation',
+    message: governance.boundedRecallPreparation
+      ? `${governance.boundedRecallPreparation.decision} (${governance.boundedRecallPreparation.failClosedReasons?.[0] || 'no-blocker'}; next=${governance.boundedRecallPreparation.nextStep || 'none'}; prepared=${governance.boundedRecallPreparation.boundedRecallApprovalPrepared === true ? 'yes' : 'no'})`
+      : 'bounded-recall-preparation surface unavailable'
+  });
+  const boundedRecallCloseoutLevel =
+    governance.boundedRecallCloseout?.decision === 'BOUNDED_RECALL_CLOSEOUT_RECORDED_PREPARED_LATER_APPROVAL_ONLY'
+      ? 'ok'
+      : governance.boundedRecallCloseout?.decision === 'BOUNDED_RECALL_CLOSEOUT_ABORTED_DRIFT'
+        ? 'warn'
+        : 'warn';
+  checks.push({
+    source: 'governance',
+    level: boundedRecallCloseoutLevel,
+    code: 'authorized-write-path-bounded-recall-closeout',
+    message: governance.boundedRecallCloseout
+      ? `${governance.boundedRecallCloseout.decision} (${governance.boundedRecallCloseout.failClosedReasons?.[0] || 'no-blocker'}; next=${governance.boundedRecallCloseout.nextStep || 'none'}; ready=${governance.boundedRecallCloseout.boundedRecallCloseoutReady === true ? 'yes' : 'no'})`
+      : 'bounded-recall-closeout surface unavailable'
+  });
   return checks;
 }
 
 function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy) {
   const recs = [];
+  const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
+  const autoAuthorizationCommandSummary = formatAutoAuthorizationCommandSummary(governance.autoAuthorization);
+  const autoAuthorizationPacketSummary = formatAutoAuthorizationPacketSummary(governance.autoAuthorization);
+  const autoAuthorizationInputSummary = formatAutoAuthorizationInputTraceSummary(governance.autoAuthorization);
   if (service.status !== 'ok') recs.push('Service health check failed — verify HTTP MCP is running');
   if (store.status !== 'ok') recs.push('Store is empty or unreachable — check SQLite integrity');
   if (store.ageBreakdown?.last7d === 0) recs.push('No new memory written in 7 days — this may be expected during maintenance');
@@ -449,12 +633,51 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   }
   if (governance.counts.tombstonedCount > 0) recs.push('Tombstoned records are visible in governance summary — confirm retention policy remains intentional');
   if (governance.sourceStatus !== 'ok') recs.push('Governance snapshot unavailable — verify local SQLite path before relying on governance totals');
+  if (governance.autoAuthorization?.allowedGovernanceOutput === 'NO_AUTO_APPROVAL_ISSUED') {
+    recs.push(`Authorized write-path auto-authorization remains fail-closed — blocker: ${governance.autoAuthorization.currentBlockedOn || 'unspecified'}; ${autoAuthorizationBundleSummary}; ${autoAuthorizationCommandSummary}; ${autoAuthorizationPacketSummary}; ${autoAuthorizationInputSummary}`);
+  } else if (governance.autoAuthorization?.allowedGovernanceOutput === 'AUTO_REUSE_CM0601_LINE_ONLY') {
+    recs.push(`Authorized write-path governance may auto-reuse the exact CM-0601 line only; CM-0595 remains out of scope; ${autoAuthorizationBundleSummary}; ${autoAuthorizationCommandSummary}; ${autoAuthorizationPacketSummary}; ${autoAuthorizationInputSummary}`);
+  } else if (governance.autoAuthorization?.allowedGovernanceOutput === 'ESCALATE_FOR_FUTURE_WIDENING_REVIEW') {
+    recs.push(`Authorized write-path governance is ready to escalate into future widening review, but not to auto-authorize CM-0595; ${autoAuthorizationBundleSummary}; ${autoAuthorizationCommandSummary}; ${autoAuthorizationPacketSummary}; ${autoAuthorizationInputSummary}`);
+  }
+  if (governance.wideningReview?.decision === 'WIDENING_REVIEW_NOT_READY') {
+    recs.push(`Authorized write-path widening review remains fail-closed — blocker: ${governance.wideningReview.failClosedReasons?.[0] || 'unspecified'}; next=${governance.wideningReview.reviewRecordDraft?.nextBoundary || governance.wideningReview.nextStep || 'none'}`);
+  } else if (governance.wideningReview?.decision === 'WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED') {
+    recs.push('Authorized write-path widening review passed the CM-0604 gate, but adoption is still not granted; CM-0595 remains out of scope.');
+  } else if (governance.wideningReview?.decision === 'WIDENING_REVIEW_PASSED_PROCEED_TO_CM0607') {
+    recs.push('Authorized write-path widening review passed through CM-0604 and may proceed only to CM-0607 adoption record; CM-0595 remains out of scope.');
+  }
+  if (governance.wideningAdoption?.decision === 'WIDENING_ADOPTION_NOT_READY') {
+    recs.push(`Authorized write-path widening adoption remains fail-closed — blocker: ${governance.wideningAdoption.failClosedReasons?.[0] || 'unspecified'}; next=${governance.wideningAdoption.adoptionRecordDraft?.nextBoundary || governance.wideningAdoption.nextStep || 'none'}`);
+  } else if (governance.wideningAdoption?.decision === 'WIDENING_ADOPTION_DENIED') {
+    recs.push('Authorized write-path widening adoption has been explicitly reviewed and remains not granted; CM-0595 stays out of scope.');
+  } else if (governance.wideningAdoption?.decision === 'WIDENING_ADOPTION_GRANTED_CM0595_ONLY') {
+    recs.push(`Authorized write-path widening adoption has been granted only toward CM-0595; exact future line preview is ${governance.wideningAdoption.cm0595ApprovalLinePreview?.previewUsableNow === true ? 'ready' : 'not-ready'} and runtime execution still requires the later narrow boundary, not direct execution here.`);
+  }
+  if (governance.boundedRecallPreparation?.decision === 'BOUNDED_RECALL_APPROVAL_NOT_READY') {
+    recs.push(`Authorized write-path bounded recall preparation remains fail-closed — blocker: ${governance.boundedRecallPreparation.failClosedReasons?.[0] || 'unspecified'}; next=${governance.boundedRecallPreparation.nextStep || 'none'}`);
+  } else if (governance.boundedRecallPreparation?.decision === 'BOUNDED_RECALL_APPROVAL_ABORTED_DRIFT') {
+    recs.push('Authorized write-path bounded recall preparation hit drift and remains blocked; do not enter bounded recall.');
+  } else if (governance.boundedRecallPreparation?.decision === 'BOUNDED_RECALL_APPROVAL_PREPARED_EXACT_ONLY') {
+    recs.push('Authorized write-path bounded recall preparation is governance-ready for a future exact approval only; execution remains blocked until a separate bounded-recall approval is granted.');
+  }
+  if (governance.boundedRecallCloseout?.decision === 'BOUNDED_RECALL_CLOSEOUT_NOT_READY') {
+    recs.push(`Authorized write-path bounded recall closeout remains fail-closed — blocker: ${governance.boundedRecallCloseout.failClosedReasons?.[0] || 'unspecified'}; next=${governance.boundedRecallCloseout.nextStep || 'none'}`);
+  } else if (governance.boundedRecallCloseout?.decision === 'BOUNDED_RECALL_CLOSEOUT_ABORTED_DRIFT') {
+    recs.push('Authorized write-path bounded recall closeout hit drift and remains blocked; do not prepare runtime bounded recall approval.');
+  } else if (governance.boundedRecallCloseout?.decision === 'BOUNDED_RECALL_CLOSEOUT_RECORDED_PREPARED_LATER_APPROVAL_ONLY') {
+    recs.push('Authorized write-path bounded recall closeout is recorded as prepared-later-approval-only; the next step can only be a future exact bounded-recall runtime approval preparation, not execution.');
+  }
   if (recs.length === 0) recs.push('All systems nominal');
   return recs;
 }
 
-function renderText(report) {
+function renderText(report, options = {}) {
   const lines = [];
+  const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(report.governance.autoAuthorization);
+  const autoAuthorizationCommandSummary = formatAutoAuthorizationCommandSummary(report.governance.autoAuthorization);
+  const autoAuthorizationPacketSummary = formatAutoAuthorizationPacketSummary(report.governance.autoAuthorization);
+  const autoAuthorizationInputSummary = formatAutoAuthorizationInputTraceSummary(report.governance.autoAuthorization);
   lines.push(`Memory Dashboard — ${report.generatedAt}`);
   lines.push('─'.repeat(60));
   lines.push('');
@@ -465,7 +688,40 @@ function renderText(report) {
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
   lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
   lines.push(`ReadPolicy ${pad(report.readPolicy.status)} lifecycle=${report.readPolicy.lifecyclePolicyEnabled}, soft=${report.readPolicy.softReadPolicyEnabled}, hidden=${report.readPolicy.recentHiddenByLifecycleCount}, stale=${report.readPolicy.recentStaleResultCount}, columns=${report.readPolicy.lifecycleColumnAvailable ?? 'unavailable'}`);
-  lines.push(`Governance ${pad(report.governance.status)} ${report.governance.counts.proposalCount} proposals, ${report.governance.counts.stale90d} stale>90d, review ${report.governance.reviewLevel}`);
+  lines.push(`Governance ${pad(report.governance.status)} ${report.governance.counts.proposalCount} proposals, ${report.governance.counts.stale90d} stale>90d, review ${report.governance.reviewLevel}, auto-auth ${report.governance.autoAuthorization?.allowedGovernanceOutput || 'unavailable'}, stage ${report.governance.autoAuthorization?.operatorActionPlan?.currentStage || 'unknown'}, bundle ${report.governance.autoAuthorization?.artifactBundleDraft?.bundleKind || 'unknown'}`);
+  lines.push(`GovBundle  ${autoAuthorizationBundleSummary}`);
+  lines.push(`GovCmd     ${autoAuthorizationCommandSummary}`);
+  lines.push(`GovPacket  ${autoAuthorizationPacketSummary}`);
+  lines.push(`GovDraft   ${report.governance.autoAuthorization?.renderedArtifactTextSurface?.selectedDraftId || 'unknown'}`);
+  lines.push(`GovPktTxt  ${report.governance.autoAuthorization?.renderedOperatorPacketTextSurface?.packetKind || 'unknown'}`);
+  lines.push(`GovBrief   ${report.governance.autoAuthorization?.renderedOperatorBriefTextSurface?.briefKind || 'unknown'}`);
+  lines.push(`GovInput   ${autoAuthorizationInputSummary}`);
+  lines.push(`GovWiden   ${report.governance.wideningReview?.decision || 'unknown'} (${report.governance.wideningReview?.status || 'unknown'})`);
+  lines.push(`GovWNext   ${report.governance.wideningReview?.reviewRecordDraft?.nextBoundary || report.governance.wideningReview?.nextStep || 'none'}`);
+  lines.push(`GovWText   ${report.governance.wideningReview?.renderedReviewTextSurface?.reviewKind || 'unknown'}`);
+  lines.push(`GovAdopt   ${report.governance.wideningAdoption?.decision || 'unknown'} (${report.governance.wideningAdoption?.status || 'unknown'})`);
+  lines.push(`GovANext   ${report.governance.wideningAdoption?.adoptionRecordDraft?.nextBoundary || report.governance.wideningAdoption?.nextStep || 'none'}`);
+  lines.push(`GovAText   ${report.governance.wideningAdoption?.renderedAdoptionTextSurface?.adoptionKind || 'unknown'}`);
+  lines.push(`GovACm59  ${report.governance.wideningAdoption?.cm0595ApprovalLinePreview?.previewUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.wideningAdoption?.cm0595OperatorPacketDraft?.packetKind || 'unknown'})`);
+  lines.push(`GovACm59I ${report.governance.wideningAdoption?.cm0595IssuanceRecordDraft?.draftUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.wideningAdoption?.cm0595IssuanceRecordDraft?.draftKind || 'unknown'})`);
+  lines.push(`GovACm59E ${report.governance.wideningAdoption?.cm0595ExecutionEvidenceDraft?.draftUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.wideningAdoption?.cm0595ExecutionEvidenceDraft?.draftKind || 'unknown'})`);
+  lines.push(`GovACm59R ${report.governance.wideningAdoption?.cm0595IssuanceRecordInputTrace?.traceAvailable === true ? report.governance.wideningAdoption.cm0595IssuanceRecordInputTrace.sourceFileName : 'none'}`);
+  lines.push(`GovACm59X ${report.governance.wideningAdoption?.cm0595ExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.wideningAdoption.cm0595ExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
+  lines.push(`GovRecall  ${report.governance.boundedRecallPreparation?.decision || 'unknown'} (${report.governance.boundedRecallPreparation?.status || 'unknown'})`);
+  lines.push(`GovRNext   ${report.governance.boundedRecallPreparation?.nextStep || 'none'}`);
+  lines.push(`GovRText   ${report.governance.boundedRecallPreparation?.renderedBoundedRecallTextSurface?.previewKind || 'unknown'}`);
+  lines.push(`GovRPack   ${report.governance.boundedRecallPreparation?.boundedRecallOperatorPacketDraft?.status || 'unknown'}`);
+  lines.push(`GovRCmd    ${report.governance.boundedRecallPreparation?.boundedRecallCommandPreviewBundle?.bundleKind || 'unknown'} (${report.governance.boundedRecallPreparation?.boundedRecallCommandPreviewBundle?.resolvedRecordPathMode || 'unknown'})`);
+  lines.push(`GovRIssue  ${report.governance.boundedRecallPreparation?.boundedRecallApprovalIssuanceRecordDraft?.draftUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.boundedRecallPreparation?.boundedRecallApprovalIssuanceRecordDraft?.draftKind || 'unknown'})`);
+  lines.push(`GovRExec   ${report.governance.boundedRecallPreparation?.boundedRecallExecutionEvidenceDraft?.draftUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.boundedRecallPreparation?.boundedRecallExecutionEvidenceDraft?.draftKind || 'unknown'})`);
+  lines.push(`GovRIss    ${report.governance.boundedRecallPreparation?.cm0595IssuanceRecordInputTrace?.traceAvailable === true ? report.governance.boundedRecallPreparation.cm0595IssuanceRecordInputTrace.sourceFileName : 'none'}`);
+  lines.push(`GovREvd    ${report.governance.boundedRecallPreparation?.cm0595ExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.boundedRecallPreparation.cm0595ExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
+  lines.push(`GovRClose  ${report.governance.boundedRecallCloseout?.decision || 'unknown'} (${report.governance.boundedRecallCloseout?.status || 'unknown'})`);
+  lines.push(`GovRCNext  ${report.governance.boundedRecallCloseout?.nextStep || 'none'}`);
+  lines.push(`GovRCText  ${report.governance.boundedRecallCloseout?.renderedCloseoutTextSurface?.closeoutKind || 'unknown'}`);
+  lines.push(`GovRCReady ${report.governance.boundedRecallCloseout?.boundedRecallCloseoutReady === true ? 'ready' : 'not-ready'} (${report.governance.boundedRecallCloseout?.closeoutRecordDraft?.status || 'unknown'})`);
+  lines.push(`GovRCIss   ${report.governance.boundedRecallCloseout?.boundedRecallApprovalIssuanceRecordInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallApprovalIssuanceRecordInputTrace.sourceFileName : 'none'}`);
+  lines.push(`GovRCEvd   ${report.governance.boundedRecallCloseout?.boundedRecallExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
   lines.push(`Gate       ${pad(report.gate.status)} compare ${report.gate.compare ? report.gate.compare.matchedCases + '/' + report.gate.compare.totalCases : 'N/A'}, rollback ${report.gate.rollback ? report.gate.rollback.readyCases + '/' + report.gate.rollback.totalCases : 'N/A'}`);
   lines.push('');
   lines.push('Checks:');
@@ -477,12 +733,74 @@ function renderText(report) {
   for (const r of report.recommendations) {
     lines.push(`  - ${r}`);
   }
+  if (options.showRenderedOperatorArtifactText === true && report.governance.autoAuthorization?.renderedArtifactTextSurface?.selectedDraftMarkdown) {
+    lines.push('');
+    lines.push('[rendered-operator-artifact-text]');
+    lines.push(report.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftMarkdown.trimEnd());
+  }
+  if (options.showRenderedOperatorPacketText === true && report.governance.autoAuthorization?.renderedOperatorPacketTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-operator-packet-text]');
+    lines.push(report.governance.autoAuthorization.renderedOperatorPacketTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedOperatorBriefText === true && report.governance.autoAuthorization?.renderedOperatorBriefTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-operator-brief-text]');
+    lines.push(report.governance.autoAuthorization.renderedOperatorBriefTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedWideningReviewText === true && report.governance.wideningReview?.renderedReviewTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-widening-review-text]');
+    lines.push(report.governance.wideningReview.renderedReviewTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedWideningAdoptionText === true && report.governance.wideningAdoption?.renderedAdoptionTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-widening-adoption-text]');
+    lines.push(report.governance.wideningAdoption.renderedAdoptionTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedBoundedRecallText === true && report.governance.boundedRecallPreparation?.renderedBoundedRecallTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-bounded-recall-text]');
+    lines.push(report.governance.boundedRecallPreparation.renderedBoundedRecallTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedBoundedRecallCloseoutText === true && report.governance.boundedRecallCloseout?.renderedCloseoutTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-bounded-recall-closeout-text]');
+    lines.push(report.governance.boundedRecallCloseout.renderedCloseoutTextSurface.markdown.trimEnd());
+  }
   return lines.join('\n') + '\n';
 }
 
 function pad(level) {
   const s = String(level);
   return (s + '   ').slice(0, 4);
+}
+
+function formatAutoAuthorizationBundleSummary(autoAuthorization) {
+  const bundleKind = autoAuthorization?.artifactBundleDraft?.bundleKind || 'unknown';
+  const nextStepRef = autoAuthorization?.operatorActionPlan?.nextStepRef || 'none';
+  const draftId = autoAuthorization?.renderedArtifactTextSurface?.selectedDraftId || 'unknown';
+  return `bundle=${bundleKind}, draft=${draftId}, next=${nextStepRef}`;
+}
+
+function formatAutoAuthorizationCommandSummary(autoAuthorization) {
+  const commandKind = autoAuthorization?.commandPreviewBundle?.bundleKind || 'unknown';
+  const primaryCommandId = autoAuthorization?.commandPreviewBundle?.primaryCommandId || 'none';
+  return `cmd=${commandKind}, primary=${primaryCommandId}`;
+}
+
+function formatAutoAuthorizationPacketSummary(autoAuthorization) {
+  const packetKind = autoAuthorization?.operatorPacketDraft?.packetKind || 'unknown';
+  const currentStage = autoAuthorization?.operatorPacketDraft?.currentStage || 'unknown';
+  return `packet=${packetKind}, stage=${currentStage}`;
+}
+
+function formatAutoAuthorizationInputTraceSummary(autoAuthorization) {
+  const trace = autoAuthorization?.assertionRecordInputTrace;
+  if (!trace || trace.traceAvailable !== true) {
+    return 'input=default_fixture_only';
+  }
+  return `input=${trace.sourceFormat || 'unknown'}, file=${trace.sourceFileName || 'unknown'}, c6Accepted=${trace.assertionAcceptedForC6 === true}`;
 }
 
 async function main() {
@@ -497,7 +815,7 @@ async function main() {
     collectGate()
   ]);
   const runtime = collectRuntime();
-  const governance = collectGovernance();
+  const governance = collectGovernance(options);
 
   const readPolicy = audits.readPolicy;
   const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy);
@@ -526,6 +844,11 @@ async function main() {
     audits,
     governance: options.summaryOnly
       ? {
+          autoAuthorization: governance.autoAuthorization,
+          boundedRecallCloseout: governance.boundedRecallCloseout,
+          boundedRecallPreparation: governance.boundedRecallPreparation,
+          wideningReview: governance.wideningReview,
+          wideningAdoption: governance.wideningAdoption,
           status: governance.status,
           reviewLevel: governance.reviewLevel,
           counts: governance.counts
@@ -540,7 +863,7 @@ async function main() {
   if (options.json) {
     process.stdout.write(`${JSON.stringify(report)}\n`);
   } else {
-    process.stdout.write(renderText(report));
+    process.stdout.write(renderText(report, options));
   }
 
   if (status === 'error') process.exitCode = 1;

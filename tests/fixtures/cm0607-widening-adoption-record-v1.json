@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "cm607-widening-adoption-record-v1",
+  "decision": "WIDENING_ADOPTION_GRANTED",
+  "mapAuthority": "docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md",
+  "controllingState": "RC_NOT_READY_BLOCKED",
+  "sameBaselineEndpointStartupEvidenceDoc": "docs/CM-0592_AUTHORIZED_PUBLIC_WRITE_PATH_COMBINED_MINIMAL_ENABLEMENT_EVIDENCE.md",
+  "sameBaselineEndpointStartupEvidenceResult": "accepted",
+  "sameBaselineTokenPresenceEvidenceDoc": "docs/CM-0603_future_token_present_same_baseline_record.md",
+  "sameBaselineTokenPresenceEvidenceResult": "accepted",
+  "cm0604Satisfied": true,
+  "cm0605RoutedOutcome": "ESCALATE_FOR_FUTURE_WIDENING_REVIEW",
+  "writeUnitStillNarrowestNextProof": true,
+  "futureAutoAuthorizationWideningAdopted": true,
+  "scopeStillLimitedToCm0595": true,
+  "forbiddenActionsStillForbidden": true,
+  "resultingAllowance": "future auto-authorization may issue CM-0595 only",
+  "status": "DRAFT_ADOPTION_GRANTED_CM0595_ONLY",
+  "date": "2026-05-21"
+}

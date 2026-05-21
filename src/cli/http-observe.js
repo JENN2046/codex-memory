@@ -17,13 +17,61 @@ function parseArgs(argv = []) {
     json: false,
     healthUrl: '',
     logTail: 20,
-    auditTail: 5
+    auditTail: 5,
+    showRenderedOperatorArtifactText: false,
+    showRenderedOperatorPacketText: false,
+    showRenderedOperatorBriefText: false,
+    showRenderedWideningReviewText: false,
+    showRenderedWideningAdoptionText: false,
+    showRenderedBoundedRecallText: false,
+    showRenderedBoundedRecallCloseoutText: false,
+    autoAuthorizationAssertionRecordPath: '',
+    autoAuthorizationLatestReboundOutcomeClass: '',
+    wideningReviewFixturePath: '',
+    wideningReviewRoutingOutcomeRecordPath: '',
+    wideningAdoptionFixturePath: '',
+    wideningAdoptionReviewRecordPath: '',
+    wideningAdoptionRecordPath: '',
+    boundedRecallPreparationFixturePath: '',
+    boundedRecallCloseoutFixturePath: '',
+    cm0595IssuanceRecordPath: '',
+    cm0595ExecutionEvidenceRecordPath: '',
+    boundedRecallIssuanceRecordPath: '',
+    boundedRecallExecutionEvidenceRecordPath: ''
   };
 
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
     if (token === '--json') {
       options.json = true;
+      continue;
+    }
+    if (token === '--rendered-operator-artifact-text') {
+      options.showRenderedOperatorArtifactText = true;
+      continue;
+    }
+    if (token === '--rendered-operator-packet-text') {
+      options.showRenderedOperatorPacketText = true;
+      continue;
+    }
+    if (token === '--rendered-operator-brief-text') {
+      options.showRenderedOperatorBriefText = true;
+      continue;
+    }
+    if (token === '--rendered-widening-review-text') {
+      options.showRenderedWideningReviewText = true;
+      continue;
+    }
+    if (token === '--rendered-widening-adoption-text') {
+      options.showRenderedWideningAdoptionText = true;
+      continue;
+    }
+    if (token === '--rendered-bounded-recall-text') {
+      options.showRenderedBoundedRecallText = true;
+      continue;
+    }
+    if (token === '--rendered-bounded-recall-closeout-text') {
+      options.showRenderedBoundedRecallCloseoutText = true;
       continue;
     }
     if (token === '--health-url') {
@@ -38,6 +86,71 @@ function parseArgs(argv = []) {
     }
     if (token === '--audit-tail') {
       options.auditTail = normalizePositiveInteger(argv[index + 1], options.auditTail);
+      index += 1;
+      continue;
+    }
+    if (token === '--auto-auth-assertion-record') {
+      options.autoAuthorizationAssertionRecordPath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--widening-review-fixture') {
+      options.wideningReviewFixturePath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--widening-review-routing-outcome-record') {
+      options.wideningReviewRoutingOutcomeRecordPath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--widening-adoption-fixture') {
+      options.wideningAdoptionFixturePath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--widening-adoption-review-record') {
+      options.wideningAdoptionReviewRecordPath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--widening-adoption-record') {
+      options.wideningAdoptionRecordPath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--bounded-recall-preparation-fixture') {
+      options.boundedRecallPreparationFixturePath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--bounded-recall-closeout-fixture') {
+      options.boundedRecallCloseoutFixturePath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--cm0595-issuance-record') {
+      options.cm0595IssuanceRecordPath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--cm0595-execution-evidence-record') {
+      options.cm0595ExecutionEvidenceRecordPath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--bounded-recall-issuance-record') {
+      options.boundedRecallIssuanceRecordPath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--bounded-recall-execution-evidence-record') {
+      options.boundedRecallExecutionEvidenceRecordPath = path.resolve(argv[index + 1] || '');
+      index += 1;
+      continue;
+    }
+    if (token === '--auto-auth-latest-rebound-outcome-class') {
+      options.autoAuthorizationLatestReboundOutcomeClass = String(argv[index + 1] || '').trim();
       index += 1;
     }
   }
@@ -264,8 +377,22 @@ function summarizeRecallAudit(entries = []) {
   };
 }
 
-function collectGovernance() {
-  const report = collectGovernanceReport();
+function collectGovernance(options = {}) {
+  const report = collectGovernanceReport({
+    autoAuthorizationAssertionRecordPath: options.autoAuthorizationAssertionRecordPath,
+    autoAuthorizationLatestReboundOutcomeClass: options.autoAuthorizationLatestReboundOutcomeClass,
+    wideningReviewFixturePath: options.wideningReviewFixturePath,
+    wideningReviewRoutingOutcomeRecordPath: options.wideningReviewRoutingOutcomeRecordPath,
+    wideningAdoptionFixturePath: options.wideningAdoptionFixturePath,
+    wideningAdoptionReviewRecordPath: options.wideningAdoptionReviewRecordPath,
+    wideningAdoptionRecordPath: options.wideningAdoptionRecordPath,
+    boundedRecallPreparationFixturePath: options.boundedRecallPreparationFixturePath,
+    boundedRecallCloseoutFixturePath: options.boundedRecallCloseoutFixturePath,
+    cm0595IssuanceRecordPath: options.cm0595IssuanceRecordPath,
+    cm0595ExecutionEvidenceRecordPath: options.cm0595ExecutionEvidenceRecordPath,
+    boundedRecallIssuanceRecordPath: options.boundedRecallIssuanceRecordPath,
+    boundedRecallExecutionEvidenceRecordPath: options.boundedRecallExecutionEvidenceRecordPath
+  });
   return {
     ...buildGovernanceSurface(report, { tolerateUnavailable: true }),
     sourceStatus: report.error ? 'unavailable' : 'ok',
@@ -276,6 +403,10 @@ function collectGovernance() {
 function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, governance, readPolicy }) {
   const hints = [];
   let status = 'ok';
+  const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
+  const autoAuthorizationCommandSummary = formatAutoAuthorizationCommandSummary(governance.autoAuthorization);
+  const autoAuthorizationPacketSummary = formatAutoAuthorizationPacketSummary(governance.autoAuthorization);
+  const autoAuthorizationInputSummary = formatAutoAuthorizationInputTraceSummary(governance.autoAuthorization);
 
   if (health.status !== 'ok') {
     status = 'error';
@@ -327,6 +458,42 @@ function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, g
     hints.push('治理快照里存在 tombstone/supersession 留痕，可继续保持只读跟踪。');
   }
 
+  if (governance.autoAuthorization?.allowedGovernanceOutput === 'NO_AUTO_APPROVAL_ISSUED') {
+    hints.push(`authorized write-path auto-authorization 仍是 fail-closed：${governance.autoAuthorization.currentBlockedOn || 'unspecified'}；${autoAuthorizationBundleSummary}；${autoAuthorizationCommandSummary}；${autoAuthorizationPacketSummary}；${autoAuthorizationInputSummary}`);
+  } else if (governance.autoAuthorization?.allowedGovernanceOutput === 'AUTO_REUSE_CM0601_LINE_ONLY') {
+    hints.push(`authorized write-path auto-authorization 最多只允许复用精确 CM-0601 line，仍不触达 CM-0595；${autoAuthorizationBundleSummary}；${autoAuthorizationCommandSummary}；${autoAuthorizationPacketSummary}；${autoAuthorizationInputSummary}。`);
+  } else if (governance.autoAuthorization?.allowedGovernanceOutput === 'ESCALATE_FOR_FUTURE_WIDENING_REVIEW') {
+    hints.push(`authorized write-path auto-authorization 已可进入 widening review，但仍不自动授权 CM-0595；${autoAuthorizationBundleSummary}；${autoAuthorizationCommandSummary}；${autoAuthorizationPacketSummary}；${autoAuthorizationInputSummary}。`);
+  }
+  if (governance.wideningReview?.decision === 'WIDENING_REVIEW_NOT_READY') {
+    hints.push(`authorized write-path widening review 仍是 fail-closed：${governance.wideningReview.failClosedReasons?.[0] || 'unspecified'}。`);
+  } else if (governance.wideningReview?.decision === 'WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED') {
+    hints.push('authorized write-path widening review 已通过 CM-0604 gate，但 adoption 尚未 granted。');
+  } else if (governance.wideningReview?.decision === 'WIDENING_REVIEW_PASSED_PROCEED_TO_CM0607') {
+    hints.push('authorized write-path widening review 已通过并只可继续到 CM-0607 adoption record，仍不自动授权 CM-0595。');
+  }
+  if (governance.wideningAdoption?.decision === 'WIDENING_ADOPTION_NOT_READY') {
+    hints.push(`authorized write-path widening adoption 仍是 fail-closed：${governance.wideningAdoption.failClosedReasons?.[0] || 'unspecified'}。`);
+  } else if (governance.wideningAdoption?.decision === 'WIDENING_ADOPTION_DENIED') {
+    hints.push('authorized write-path widening adoption 已进入显式审查，但当前仍未 granted。');
+  } else if (governance.wideningAdoption?.decision === 'WIDENING_ADOPTION_GRANTED_CM0595_ONLY') {
+    hints.push(`authorized write-path widening adoption 已 granted，但仍只允许 future CM-0595 narrow boundary；preview=${governance.wideningAdoption.cm0595ApprovalLinePreview?.previewUsableNow === true ? 'ready' : 'not-ready'}。`);
+  }
+  if (governance.boundedRecallPreparation?.decision === 'BOUNDED_RECALL_APPROVAL_NOT_READY') {
+    hints.push(`authorized write-path bounded recall preparation 仍是 fail-closed：${governance.boundedRecallPreparation.failClosedReasons?.[0] || 'unspecified'}。`);
+  } else if (governance.boundedRecallPreparation?.decision === 'BOUNDED_RECALL_APPROVAL_ABORTED_DRIFT') {
+    hints.push('authorized write-path bounded recall preparation 已因 drift fail-closed，仍不得进入 bounded recall。');
+  } else if (governance.boundedRecallPreparation?.decision === 'BOUNDED_RECALL_APPROVAL_PREPARED_EXACT_ONLY') {
+    hints.push('authorized write-path bounded recall preparation 仅已准备 future exact approval；当前仍不得执行 bounded recall 或 runtime。');
+  }
+  if (governance.boundedRecallCloseout?.decision === 'BOUNDED_RECALL_CLOSEOUT_NOT_READY') {
+    hints.push(`authorized write-path bounded recall closeout 仍是 fail-closed：${governance.boundedRecallCloseout.failClosedReasons?.[0] || 'unspecified'}。`);
+  } else if (governance.boundedRecallCloseout?.decision === 'BOUNDED_RECALL_CLOSEOUT_ABORTED_DRIFT') {
+    hints.push('authorized write-path bounded recall closeout 已因 drift fail-closed，仍不得准备 future runtime bounded recall approval。');
+  } else if (governance.boundedRecallCloseout?.decision === 'BOUNDED_RECALL_CLOSEOUT_RECORDED_PREPARED_LATER_APPROVAL_ONLY') {
+    hints.push('authorized write-path bounded recall closeout 已记录为 prepared-later-approval-only；当前仍只可准备 future exact bounded-recall runtime approval。');
+  }
+
   if (hints.length === 0) {
     hints.push('运行态没有看到明显异常信号。');
   }
@@ -361,11 +528,32 @@ function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, g
     governanceProposalCount: governance.counts.proposalCount,
     governanceStale30d: governance.counts.stale30d,
     governanceStale90d: governance.counts.stale90d,
+    governanceAutoAuthorizationOutput: governance.autoAuthorization?.allowedGovernanceOutput || 'NO_AUTO_APPROVAL_ISSUED',
+    governanceAutoAuthorizationBlockedOn: governance.autoAuthorization?.currentBlockedOn || null,
+    governanceCm0601LineReusable: governance.autoAuthorization?.exactCm0601LineReusable === true,
+    governanceWideningReviewDecision: governance.wideningReview?.decision || 'WIDENING_REVIEW_NOT_READY',
+    governanceWideningReviewBlockedOn: governance.wideningReview?.failClosedReasons?.[0] || null,
+    governanceWideningReviewProceedToCm0607: governance.wideningReview?.proceedToCm0607AdoptionRecord === true,
+    governanceWideningAdoptionDecision: governance.wideningAdoption?.decision || 'WIDENING_ADOPTION_NOT_READY',
+    governanceWideningAdoptionBlockedOn: governance.wideningAdoption?.failClosedReasons?.[0] || null,
+    governanceCm0595AutoAuthorizationReady: governance.wideningAdoption?.canAutoAuthorizeCm0595 === true,
+    governanceBoundedRecallPreparationDecision:
+      governance.boundedRecallPreparation?.decision || 'BOUNDED_RECALL_APPROVAL_NOT_READY',
+    governanceBoundedRecallPreparationBlockedOn:
+      governance.boundedRecallPreparation?.failClosedReasons?.[0] || null,
+    governanceBoundedRecallPrepared:
+      governance.boundedRecallPreparation?.boundedRecallApprovalPrepared === true,
+    governanceBoundedRecallCloseoutDecision:
+      governance.boundedRecallCloseout?.decision || 'BOUNDED_RECALL_CLOSEOUT_NOT_READY',
+    governanceBoundedRecallCloseoutBlockedOn:
+      governance.boundedRecallCloseout?.failClosedReasons?.[0] || null,
+    governanceBoundedRecallCloseoutReady:
+      governance.boundedRecallCloseout?.boundedRecallCloseoutReady === true,
     hints
   };
 }
 
-function formatTextReport(report) {
+function formatTextReport(report, options = {}) {
   const lines = [
     `status: ${report.summary.status}`,
     report.summary.message,
@@ -434,6 +622,51 @@ function formatTextReport(report) {
   lines.push(`  stale90d: ${report.governance.counts.stale90d}`);
   lines.push(`  tombstoned: ${report.governance.counts.tombstonedCount}`);
   lines.push(`  superseded: ${report.governance.counts.supersededCount}`);
+  lines.push(`  autoAuthorization: ${report.governance.autoAuthorization?.allowedGovernanceOutput || 'NO_AUTO_APPROVAL_ISSUED'}`);
+  lines.push(`  autoAuthorizationStage: ${report.governance.autoAuthorization?.operatorActionPlan?.currentStage || 'unknown'}`);
+  lines.push(`  autoAuthorizationBlockedOn: ${report.governance.autoAuthorization?.currentBlockedOn || 'none'}`);
+  lines.push(`  autoAuthorizationBundle: ${report.governance.autoAuthorization?.artifactBundleDraft?.bundleKind || 'unknown'}`);
+  lines.push(`  autoAuthorizationCommand: ${report.governance.autoAuthorization?.commandPreviewBundle?.bundleKind || 'unknown'}`);
+  lines.push(`  autoAuthorizationPacket: ${report.governance.autoAuthorization?.operatorPacketDraft?.packetKind || 'unknown'}`);
+  lines.push(`  autoAuthorizationDraft: ${report.governance.autoAuthorization?.renderedArtifactTextSurface?.selectedDraftId || 'unknown'}`);
+  lines.push(`  autoAuthorizationPacketText: ${report.governance.autoAuthorization?.renderedOperatorPacketTextSurface?.packetKind || 'unknown'}`);
+  lines.push(`  autoAuthorizationBrief: ${report.governance.autoAuthorization?.renderedOperatorBriefTextSurface?.briefKind || 'unknown'}`);
+  lines.push(`  autoAuthorizationInput: ${formatAutoAuthorizationInputTraceSummary(report.governance.autoAuthorization)}`);
+  lines.push(`  autoAuthorizationNextStep: ${report.governance.autoAuthorization?.operatorActionPlan?.nextStepRef || 'none'}`);
+  lines.push(`  wideningReview: ${report.governance.wideningReview?.decision || 'unknown'}`);
+  lines.push(`  wideningReviewStatus: ${report.governance.wideningReview?.status || 'unknown'}`);
+  lines.push(`  wideningReviewBlockedOn: ${report.governance.wideningReview?.failClosedReasons?.[0] || 'none'}`);
+  lines.push(`  wideningReviewNext: ${report.governance.wideningReview?.reviewRecordDraft?.nextBoundary || report.governance.wideningReview?.nextStep || 'none'}`);
+  lines.push(`  wideningReviewText: ${report.governance.wideningReview?.renderedReviewTextSurface?.reviewKind || 'unknown'}`);
+  lines.push(`  wideningAdoption: ${report.governance.wideningAdoption?.decision || 'unknown'}`);
+  lines.push(`  wideningAdoptionStatus: ${report.governance.wideningAdoption?.status || 'unknown'}`);
+  lines.push(`  wideningAdoptionBlockedOn: ${report.governance.wideningAdoption?.failClosedReasons?.[0] || 'none'}`);
+  lines.push(`  wideningAdoptionNext: ${report.governance.wideningAdoption?.adoptionRecordDraft?.nextBoundary || report.governance.wideningAdoption?.nextStep || 'none'}`);
+  lines.push(`  wideningAdoptionText: ${report.governance.wideningAdoption?.renderedAdoptionTextSurface?.adoptionKind || 'unknown'}`);
+  lines.push(`  wideningAdoptionCm0595: ${report.governance.wideningAdoption?.cm0595ApprovalLinePreview?.previewUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.wideningAdoption?.cm0595OperatorPacketDraft?.packetKind || 'unknown'})`);
+  lines.push(`  wideningAdoptionCm0595Issue: ${report.governance.wideningAdoption?.cm0595IssuanceRecordDraft?.draftUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.wideningAdoption?.cm0595IssuanceRecordDraft?.draftKind || 'unknown'})`);
+  lines.push(`  wideningAdoptionCm0595Exec: ${report.governance.wideningAdoption?.cm0595ExecutionEvidenceDraft?.draftUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.wideningAdoption?.cm0595ExecutionEvidenceDraft?.draftKind || 'unknown'})`);
+  lines.push(`  wideningAdoptionCm0595Record: ${report.governance.wideningAdoption?.cm0595IssuanceRecordInputTrace?.traceAvailable === true ? report.governance.wideningAdoption.cm0595IssuanceRecordInputTrace.sourceFileName : 'none'}`);
+  lines.push(`  wideningAdoptionCm0595Evidence: ${report.governance.wideningAdoption?.cm0595ExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.wideningAdoption.cm0595ExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
+  lines.push(`  boundedRecallPreparation: ${report.governance.boundedRecallPreparation?.decision || 'unknown'}`);
+  lines.push(`  boundedRecallPreparationStatus: ${report.governance.boundedRecallPreparation?.status || 'unknown'}`);
+  lines.push(`  boundedRecallPreparationBlockedOn: ${report.governance.boundedRecallPreparation?.failClosedReasons?.[0] || 'none'}`);
+  lines.push(`  boundedRecallPreparationNext: ${report.governance.boundedRecallPreparation?.nextStep || 'none'}`);
+  lines.push(`  boundedRecallPreparationText: ${report.governance.boundedRecallPreparation?.renderedBoundedRecallTextSurface?.previewKind || 'unknown'}`);
+  lines.push(`  boundedRecallPreparationPacket: ${report.governance.boundedRecallPreparation?.boundedRecallOperatorPacketDraft?.status || 'unknown'}`);
+  lines.push(`  boundedRecallPreparationCommand: ${report.governance.boundedRecallPreparation?.boundedRecallCommandPreviewBundle?.bundleKind || 'unknown'} (${report.governance.boundedRecallPreparation?.boundedRecallCommandPreviewBundle?.resolvedRecordPathMode || 'unknown'})`);
+  lines.push(`  boundedRecallPreparationIssueDraft: ${report.governance.boundedRecallPreparation?.boundedRecallApprovalIssuanceRecordDraft?.draftUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.boundedRecallPreparation?.boundedRecallApprovalIssuanceRecordDraft?.draftKind || 'unknown'})`);
+  lines.push(`  boundedRecallPreparationExecDraft: ${report.governance.boundedRecallPreparation?.boundedRecallExecutionEvidenceDraft?.draftUsableNow === true ? 'ready' : 'not-ready'} (${report.governance.boundedRecallPreparation?.boundedRecallExecutionEvidenceDraft?.draftKind || 'unknown'})`);
+  lines.push(`  boundedRecallPreparationIssue: ${report.governance.boundedRecallPreparation?.cm0595IssuanceRecordInputTrace?.traceAvailable === true ? report.governance.boundedRecallPreparation.cm0595IssuanceRecordInputTrace.sourceFileName : 'none'}`);
+  lines.push(`  boundedRecallPreparationEvidence: ${report.governance.boundedRecallPreparation?.cm0595ExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.boundedRecallPreparation.cm0595ExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
+  lines.push(`  boundedRecallCloseout: ${report.governance.boundedRecallCloseout?.decision || 'unknown'}`);
+  lines.push(`  boundedRecallCloseoutStatus: ${report.governance.boundedRecallCloseout?.status || 'unknown'}`);
+  lines.push(`  boundedRecallCloseoutBlockedOn: ${report.governance.boundedRecallCloseout?.failClosedReasons?.[0] || 'none'}`);
+  lines.push(`  boundedRecallCloseoutNext: ${report.governance.boundedRecallCloseout?.nextStep || 'none'}`);
+  lines.push(`  boundedRecallCloseoutText: ${report.governance.boundedRecallCloseout?.renderedCloseoutTextSurface?.closeoutKind || 'unknown'}`);
+  lines.push(`  boundedRecallCloseoutReady: ${report.governance.boundedRecallCloseout?.boundedRecallCloseoutReady === true ? 'ready' : 'not-ready'} (${report.governance.boundedRecallCloseout?.closeoutRecordDraft?.status || 'unknown'})`);
+  lines.push(`  boundedRecallCloseoutIssue: ${report.governance.boundedRecallCloseout?.boundedRecallApprovalIssuanceRecordInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallApprovalIssuanceRecordInputTrace.sourceFileName : 'none'}`);
+  lines.push(`  boundedRecallCloseoutEvidence: ${report.governance.boundedRecallCloseout?.boundedRecallExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
   lines.push(`  hints: ${JSON.stringify(report.governance.hints)}`);
   lines.push('');
 
@@ -442,7 +675,70 @@ function formatTextReport(report) {
     lines.push(`  - ${hint}`);
   }
 
+  if (options.showRenderedOperatorArtifactText === true && report.governance.autoAuthorization?.renderedArtifactTextSurface?.selectedDraftMarkdown) {
+    lines.push('');
+    lines.push('[rendered-operator-artifact-text]');
+    lines.push(report.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftMarkdown.trimEnd());
+  }
+  if (options.showRenderedOperatorPacketText === true && report.governance.autoAuthorization?.renderedOperatorPacketTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-operator-packet-text]');
+    lines.push(report.governance.autoAuthorization.renderedOperatorPacketTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedOperatorBriefText === true && report.governance.autoAuthorization?.renderedOperatorBriefTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-operator-brief-text]');
+    lines.push(report.governance.autoAuthorization.renderedOperatorBriefTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedWideningReviewText === true && report.governance.wideningReview?.renderedReviewTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-widening-review-text]');
+    lines.push(report.governance.wideningReview.renderedReviewTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedWideningAdoptionText === true && report.governance.wideningAdoption?.renderedAdoptionTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-widening-adoption-text]');
+    lines.push(report.governance.wideningAdoption.renderedAdoptionTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedBoundedRecallText === true && report.governance.boundedRecallPreparation?.renderedBoundedRecallTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-bounded-recall-text]');
+    lines.push(report.governance.boundedRecallPreparation.renderedBoundedRecallTextSurface.markdown.trimEnd());
+  }
+  if (options.showRenderedBoundedRecallCloseoutText === true && report.governance.boundedRecallCloseout?.renderedCloseoutTextSurface?.markdown) {
+    lines.push('');
+    lines.push('[rendered-bounded-recall-closeout-text]');
+    lines.push(report.governance.boundedRecallCloseout.renderedCloseoutTextSurface.markdown.trimEnd());
+  }
+
   return `${lines.join('\n')}\n`;
+}
+
+function formatAutoAuthorizationBundleSummary(autoAuthorization) {
+  const bundleKind = autoAuthorization?.artifactBundleDraft?.bundleKind || 'unknown';
+  const nextStepRef = autoAuthorization?.operatorActionPlan?.nextStepRef || 'none';
+  const draftId = autoAuthorization?.renderedArtifactTextSurface?.selectedDraftId || 'unknown';
+  return `bundle=${bundleKind}, draft=${draftId}, next=${nextStepRef}`;
+}
+
+function formatAutoAuthorizationCommandSummary(autoAuthorization) {
+  const commandKind = autoAuthorization?.commandPreviewBundle?.bundleKind || 'unknown';
+  const primaryCommandId = autoAuthorization?.commandPreviewBundle?.primaryCommandId || 'none';
+  return `cmd=${commandKind}, primary=${primaryCommandId}`;
+}
+
+function formatAutoAuthorizationPacketSummary(autoAuthorization) {
+  const packetKind = autoAuthorization?.operatorPacketDraft?.packetKind || 'unknown';
+  const currentStage = autoAuthorization?.operatorPacketDraft?.currentStage || 'unknown';
+  return `packet=${packetKind}, stage=${currentStage}`;
+}
+
+function formatAutoAuthorizationInputTraceSummary(autoAuthorization) {
+  const trace = autoAuthorization?.assertionRecordInputTrace;
+  if (!trace || trace.traceAvailable !== true) {
+    return 'input=default_fixture_only';
+  }
+  return `input=${trace.sourceFormat || 'unknown'}, file=${trace.sourceFileName || 'unknown'}, c6Accepted=${trace.assertionAcceptedForC6 === true}`;
 }
 
 async function main() {
@@ -476,7 +772,7 @@ async function main() {
     lastModified: recallStats.lastModified,
     ...summarizeRecallAudit(recallEntries)
   };
-  const governance = collectGovernance();
+  const governance = collectGovernance(options);
   const readPolicy = buildReadPolicySurface({
     config,
     recallEntries
@@ -517,7 +813,7 @@ async function main() {
   if (options.json) {
     process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   } else {
-    process.stdout.write(formatTextReport(report));
+    process.stdout.write(formatTextReport(report, options));
   }
 
   if (summary.status === 'error') {

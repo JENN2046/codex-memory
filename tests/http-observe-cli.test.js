@@ -7,6 +7,55 @@ const http = require('node:http');
 const { spawn } = require('node:child_process');
 const { DatabaseSync } = require('node:sqlite');
 
+const REPO_ASSERTION_RECORD_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'external-token-material-assertion-record-v1.json'
+);
+const REPO_ASSERTION_RECORD_MARKDOWN_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'external-token-material-assertion-record-v1.md'
+);
+const REPO_WIDENING_REVIEW_FIXTURE_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'authorized-write-path-widening-review-v1.json'
+);
+const REPO_ROUTING_OUTCOME_RECORD_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'cm0605-routing-outcome-record-v1.md'
+);
+const REPO_WIDENING_ADOPTION_REVIEW_RECORD_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'cm0616-widening-review-outcome-record-v1.md'
+);
+const REPO_WIDENING_ADOPTION_RECORD_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'cm0607-widening-adoption-record-v1.md'
+);
+const REPO_CM0595_ISSUANCE_RECORD_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'cm0649-cm0595-approval-issuance-record-v1.md'
+);
+const REPO_CM0595_EXECUTION_EVIDENCE_RECORD_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'cm0650-cm0595-execution-evidence-record-v1.md'
+);
+
 async function startHealthServer() {
   const server = http.createServer((req, res) => {
     if (req.url === '/health') {
@@ -213,11 +262,26 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     ], 'http-observe top-level');
     assertKeySet(payload.summary, [
       'bridgeRecentCount',
+      'governanceAutoAuthorizationBlockedOn',
+      'governanceAutoAuthorizationOutput',
+      'governanceBoundedRecallCloseoutBlockedOn',
+      'governanceBoundedRecallCloseoutDecision',
+      'governanceBoundedRecallCloseoutReady',
+      'governanceBoundedRecallPreparationBlockedOn',
+      'governanceBoundedRecallPreparationDecision',
+      'governanceBoundedRecallPrepared',
+      'governanceCm0595AutoAuthorizationReady',
+      'governanceCm0601LineReusable',
       'governanceProposalCount',
       'governanceReviewLevel',
       'governanceStale30d',
       'governanceStale90d',
       'governanceStatus',
+      'governanceWideningAdoptionBlockedOn',
+      'governanceWideningAdoptionDecision',
+      'governanceWideningReviewBlockedOn',
+      'governanceWideningReviewDecision',
+      'governanceWideningReviewProceedToCm0607',
       'healthStatus',
       'hiddenByLifecycleCount',
       'hints',
@@ -345,6 +409,16 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     assert.equal(payload.summary.governanceStatus, 'warn');
     assert.equal(payload.summary.governanceReviewLevel, 'needs-review');
     assert.equal(payload.summary.governanceProposalCount, 1);
+    assert.equal(payload.summary.governanceAutoAuthorizationOutput, 'NO_AUTO_APPROVAL_ISSUED');
+    assert.equal(payload.summary.governanceAutoAuthorizationBlockedOn, 'external_token_assertion_not_accepted');
+    assert.equal(payload.summary.governanceCm0601LineReusable, false);
+    assert.equal(payload.summary.governanceWideningReviewDecision, 'WIDENING_REVIEW_NOT_READY');
+    assert.equal(payload.summary.governanceWideningAdoptionDecision, 'WIDENING_ADOPTION_NOT_READY');
+    assert.equal(payload.summary.governanceWideningReviewBlockedOn, 'routing_outcome_not_escalated');
+    assert.equal(payload.summary.governanceWideningReviewProceedToCm0607, false);
+    assert.equal(payload.summary.governanceBoundedRecallCloseoutDecision, 'BOUNDED_RECALL_CLOSEOUT_NOT_READY');
+    assert.equal(payload.summary.governanceBoundedRecallCloseoutBlockedOn, 'bounded_recall_issuance_record_not_proven');
+    assert.equal(payload.summary.governanceBoundedRecallCloseoutReady, false);
     assert.equal(payload.summary.governanceStale30d, 2);
     assert.equal(payload.summary.governanceStale90d, 1);
     assert.equal(payload.audits.recall.scopedRecallCount, 1);
@@ -393,6 +467,9 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     assert.equal(payload.readPolicy.migrationApplied, false);
     assert.equal(payload.governance.status, 'warn');
     assertKeySet(payload.governance, [
+      'autoAuthorization',
+      'boundedRecallCloseout',
+      'boundedRecallPreparation',
       'counts',
       'hints',
       'message',
@@ -402,8 +479,41 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       'reviewLevel',
       'sourceStatus',
       'status',
-      'statusDistribution'
+      'statusDistribution',
+      'wideningAdoption',
+      'wideningReview'
     ], 'http-observe governance');
+    assertKeySet(payload.governance.autoAuthorization, [
+      'allowedGovernanceOutput',
+      'approvalLinePreview',
+      'artifactBundleDraft',
+      'assertionRecordInputTrace',
+      'assertionRecordPreview',
+      'canAutoAuthorizeCm0595',
+      'checklistFailures',
+      'checklistPassed',
+      'commandPreviewBundle',
+      'currentBlockedOn',
+      'decision',
+      'exactCm0601LineReusable',
+      'externalAssertionAccepted',
+      'issuanceRecordPreview',
+      'mutated',
+      'nextStep',
+      'operatorActionPlan',
+      'operatorPacketDraft',
+      'publicMcpExpanded',
+      'readsRealMemory',
+      'recordDrafts',
+      'renderedArtifactTextSurface',
+      'renderedOperatorBriefTextSurface',
+      'renderedOperatorPacketTextSurface',
+      'routingOutcomePreview',
+      'source',
+      'status',
+      'wideningReviewPreview',
+      'writesDurableState'
+    ].sort(), 'http-observe governance auto-authorization');
     assertKeySet(payload.governance.counts, [
       'proposalCount',
       'stale30d',
@@ -421,9 +531,302 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     assert.equal(payload.governance.counts.supersessionInitiated, 1);
     assert.equal(payload.governance.counts.stale30d, 2);
     assert.equal(payload.governance.counts.stale90d, 1);
+    assert.equal(payload.governance.autoAuthorization.allowedGovernanceOutput, 'NO_AUTO_APPROVAL_ISSUED');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace, null);
+    assert.equal(payload.governance.autoAuthorization.operatorActionPlan.currentStage, 'await_cm0611_assertion_record');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordPreview.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.assertionRecordPreview.previewUsableNow, true);
+    assert.equal(payload.governance.autoAuthorization.approvalLinePreview.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.approvalLinePreview.previewUsableNow, false);
+    assert.equal(payload.governance.autoAuthorization.issuanceRecordPreview.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.issuanceRecordPreview.previewUsableNow, false);
+    assert.equal(payload.governance.autoAuthorization.routingOutcomePreview.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.routingOutcomePreview.previewUsableNow, false);
+    assert.equal(payload.governance.autoAuthorization.wideningReviewPreview.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.wideningReviewPreview.previewUsableNow, false);
+    assert.equal(payload.governance.autoAuthorization.recordDrafts.cm0614Issuance.draftAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.recordDrafts.cm0614Issuance.draftUsableNow, false);
+    assert.equal(payload.governance.autoAuthorization.renderedArtifactTextSurface.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftId, 'cm0611AssertionRecord');
+    assert.equal(payload.governance.autoAuthorization.renderedOperatorPacketTextSurface.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.renderedOperatorPacketTextSurface.packetKind, 'assertion_record_operator_packet');
+    assert.equal(payload.governance.autoAuthorization.renderedOperatorPacketTextSurface.selectedDraftId, 'cm0611AssertionRecord');
+    assert.equal(payload.governance.autoAuthorization.artifactBundleDraft.bundleKind, 'assertion_record_only');
+    assert.equal(payload.governance.autoAuthorization.commandPreviewBundle.bundleKind, 'assertion_record_command_bundle');
+    assert.equal(payload.governance.autoAuthorization.operatorPacketDraft.packetKind, 'assertion_record_operator_packet');
+    assert.equal(payload.governance.autoAuthorization.currentBlockedOn, 'external_token_assertion_not_accepted');
+    assert.equal(payload.governance.autoAuthorization.exactCm0601LineReusable, false);
+    assert.equal(payload.governance.wideningReview.decision, 'WIDENING_REVIEW_NOT_READY');
+    assert.equal(payload.governance.wideningAdoption.decision, 'WIDENING_ADOPTION_NOT_READY');
+    assert.equal(payload.governance.wideningReview.renderedReviewTextSurface.previewAvailable, true);
+    assert.equal(payload.governance.wideningAdoption.cm0595ApprovalLinePreview.previewAvailable, true);
+    assert.equal(payload.governance.wideningAdoption.cm0595ApprovalLinePreview.previewUsableNow, false);
+    assert.equal(payload.governance.wideningAdoption.cm0595OperatorPacketDraft.packetKind, 'cm0595_operator_packet_blocked');
+    assert.equal(payload.governance.wideningAdoption.cm0595IssuanceRecordDraft.draftUsableNow, false);
+    assert.equal(payload.governance.wideningAdoption.cm0595ExecutionEvidenceDraft.draftUsableNow, false);
+    assert.equal(payload.governance.wideningAdoption.cm0595IssuanceRecordInputTrace, null);
+    assert.equal(payload.governance.wideningAdoption.cm0595ExecutionEvidenceInputTrace, null);
+    assert.equal(payload.governance.boundedRecallPreparation.decision, 'BOUNDED_RECALL_APPROVAL_NOT_READY');
+    assert.equal(payload.governance.boundedRecallPreparation.renderedBoundedRecallTextSurface.previewAvailable, true);
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallApprovalPrepared, false);
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallCommandPreviewBundle.bundleKind, 'bounded_recall_review_command_bundle_blocked');
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallApprovalIssuanceRecordDraft.draftKind, 'bounded_recall_approval_issuance_record_draft_blocked');
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallExecutionEvidenceDraft.draftKind, 'bounded_recall_execution_evidence_draft_blocked');
+    assert.equal(payload.governance.boundedRecallPreparation.cm0595IssuanceRecordInputTrace, null);
+    assert.equal(payload.governance.boundedRecallPreparation.cm0595ExecutionEvidenceInputTrace, null);
+    assert.equal(payload.governance.boundedRecallCloseout.decision, 'BOUNDED_RECALL_CLOSEOUT_NOT_READY');
+    assert.equal(payload.governance.boundedRecallCloseout.renderedCloseoutTextSurface.previewAvailable, true);
+    assert.equal(payload.governance.boundedRecallCloseout.boundedRecallCloseoutReady, false);
+    assert.equal(payload.governance.boundedRecallCloseout.closeoutRecordDraft.draftUsableNow, false);
+    assert.equal(
+      payload.governance.boundedRecallCloseout.boundedRecallPreparationCommandPreviewBundle.bundleKind,
+      'bounded_recall_preparation_command_bundle_blocked'
+    );
+    assert.equal(
+      payload.governance.boundedRecallCloseout.boundedRecallPreparationOperatorPacketDraft.draftUsableNow,
+      false
+    );
+    assert.equal(
+      payload.governance.boundedRecallCloseout.renderedBoundedRecallPreparationPacketTextSurface.previewAvailable,
+      true
+    );
+    assert.equal(payload.governance.boundedRecallCloseout.boundedRecallApprovalIssuanceRecordInputTrace, null);
+    assert.equal(payload.governance.boundedRecallCloseout.boundedRecallExecutionEvidenceInputTrace, null);
     assert.ok(Array.isArray(payload.governance.hints));
+    assert.ok(
+      payload.summary.hints.some(
+        hint => hint.includes('bundle=assertion_record_only')
+          && hint.includes('cmd=assertion_record_command_bundle')
+          && hint.includes('packet=assertion_record_operator_packet')
+          && hint.includes('input=default_fixture_only')
+          && hint.includes('CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE.md')
+      ),
+      'summary hints should include current bundle and next artifact'
+    );
     assert.equal(payload.audits.recall.rawWorkspaceId, undefined);
     assert.equal(JSON.stringify(payload).includes('workspace_id'), false);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should emit text output with auto-authorization bundle summary by default', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-text-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /\[governance\]/);
+    assert.match(result.stdout, /autoAuthorizationBundle: assertion_record_only/);
+    assert.match(result.stdout, /autoAuthorizationCommand: assertion_record_command_bundle/);
+    assert.match(result.stdout, /autoAuthorizationPacket: assertion_record_operator_packet/);
+    assert.match(result.stdout, /autoAuthorizationDraft: cm0611AssertionRecord/);
+    assert.match(result.stdout, /autoAuthorizationPacketText: assertion_record_operator_packet/);
+    assert.match(result.stdout, /autoAuthorizationBrief: assertion_record_only__assertion_record_operator_packet/);
+    assert.match(result.stdout, /autoAuthorizationInput: input=default_fixture_only/);
+    assert.match(result.stdout, /autoAuthorizationNextStep: .*CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE\.md/);
+    assert.match(result.stdout, /wideningReview: WIDENING_REVIEW_NOT_READY/);
+    assert.match(result.stdout, /wideningReviewBlockedOn: routing_outcome_not_escalated/);
+    assert.match(result.stdout, /wideningReviewText: widening_review_not_ready/);
+    assert.match(result.stdout, /boundedRecallCloseout: BOUNDED_RECALL_CLOSEOUT_NOT_READY/);
+    assert.match(result.stdout, /boundedRecallCloseoutBlockedOn: bounded_recall_issuance_record_not_proven/);
+    assert.match(result.stdout, /boundedRecallCloseoutText: bounded_recall_closeout_not_ready/);
+    assert.equal(result.stdout.includes('workspace_id'), false);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should render current operator packet text when requested', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-text-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--rendered-operator-packet-text'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /\[rendered-operator-packet-text\]/);
+    assert.match(result.stdout, /^Status: RC_NOT_READY_BLOCKED/m);
+    assert.match(result.stdout, /## Command Preview/);
+    assert.match(result.stdout, /Current stage: await_cm0611_assertion_record/);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should render current operator artifact text when requested', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-text-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--rendered-operator-artifact-text'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /\[rendered-operator-artifact-text\]/);
+    assert.match(result.stdout, /^Status: DRAFT_ASSERTION_NOT_RECORDED/m);
+    assert.match(result.stdout, /## Assertion Summary/);
+    assert.match(result.stdout, /## Command Preview/);
+    assert.match(result.stdout, /assertionClass: <fill>/);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should render current operator brief text when requested', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-text-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--rendered-operator-brief-text'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /\[rendered-operator-brief-text\]/);
+    assert.match(result.stdout, /^Status: RC_NOT_READY_BLOCKED/m);
+    assert.match(result.stdout, /## Current Operator Packet/);
+    assert.match(result.stdout, /## Selected Artifact Draft/);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should render widening review text when requested', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-text-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--rendered-widening-review-text'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /\[rendered-widening-review-text\]/);
+    assert.match(result.stdout, /^Status: DRAFT_REVIEW_NOT_READY/m);
+    assert.match(result.stdout, /## CM-0604 gate review/);
+    assert.match(result.stdout, /## Review Checklist/);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should render bounded recall text when requested', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-text-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--rendered-bounded-recall-text'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /\[rendered-bounded-recall-text\]/);
+    assert.match(result.stdout, /^Status: DRAFT_BOUNDED_RECALL_APPROVAL_NOT_READY/m);
+    assert.match(result.stdout, /## Preparation snapshot/);
+    assert.match(result.stdout, /## Bounded Recall Checklist/);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should render bounded recall closeout text when requested', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-text-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--rendered-bounded-recall-closeout-text'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    assert.match(result.stdout, /\[rendered-bounded-recall-closeout-text\]/);
+    assert.match(result.stdout, /^Status: DRAFT_BOUNDED_RECALL_CLOSEOUT_NOT_READY/m);
+    assert.match(result.stdout, /## Closeout snapshot/);
+    assert.match(result.stdout, /## Closeout Checklist/);
   } finally {
     await server.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });
@@ -453,6 +856,400 @@ test('http-observe CLI should fail when health is unavailable', async () => {
     assert.match(payload.summary.hints[0], /start:http:ensure/);
     assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
   } finally {
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should pass explicit assertion-record input through governance summary', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: [
+        '--json',
+        '--auto-auth-assertion-record',
+        REPO_ASSERTION_RECORD_PATH,
+        '--auto-auth-latest-rebound-outcome-class',
+        'token_present'
+      ],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.summary.governanceAutoAuthorizationOutput, 'ESCALATE_FOR_FUTURE_WIDENING_REVIEW');
+    assert.equal(payload.summary.governanceAutoAuthorizationBlockedOn, null);
+    assert.equal(payload.summary.governanceCm0601LineReusable, false);
+    assert.equal(payload.summary.governanceWideningReviewDecision, 'WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED');
+    assert.equal(payload.governance.autoAuthorization.allowedGovernanceOutput, 'ESCALATE_FOR_FUTURE_WIDENING_REVIEW');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.sourceFormat, 'json_assertion_record_v1');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.sourceFileName, 'external-token-material-assertion-record-v1.json');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.usedLatestReboundOutcomeOverride, true);
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.latestReboundOutcomeOverride, 'token_present');
+    assert.equal(payload.governance.autoAuthorization.operatorActionPlan.currentStage, 'cm0604_widening_review_ready');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordPreview.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.assertionRecordPreview.previewUsableNow, false);
+    assert.equal(payload.governance.autoAuthorization.approvalLinePreview.previewAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.approvalLinePreview.previewUsableNow, false);
+    assert.equal(payload.governance.autoAuthorization.issuanceRecordPreview.previewUsableNow, false);
+    assert.equal(payload.governance.autoAuthorization.routingOutcomePreview.previewUsableNow, true);
+    assert.equal(payload.governance.autoAuthorization.wideningReviewPreview.previewUsableNow, true);
+    assert.equal(payload.governance.autoAuthorization.recordDrafts.cm0616WideningReview.draftUsableNow, true);
+    assert.equal(payload.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftId, 'cm0616WideningReview');
+    assert.match(
+      payload.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftMarkdown,
+      /source workspace-relative path: `\.\\tests\\fixtures\\external-token-material-assertion-record-v1\.json`/
+    );
+    assert.match(
+      payload.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftMarkdown,
+      /http-observe command: `node \.\\src\\cli\\http-observe\.js --json --auto-auth-assertion-record \.\\tests\\fixtures\\external-token-material-assertion-record-v1\.json --auto-auth-latest-rebound-outcome-class token_present`/
+    );
+    assert.equal(payload.governance.autoAuthorization.renderedOperatorPacketTextSurface.packetKind, 'widening_review_operator_packet');
+    assert.equal(payload.governance.autoAuthorization.renderedOperatorPacketTextSurface.selectedDraftId, 'cm0616WideningReview');
+    assert.equal(payload.governance.autoAuthorization.artifactBundleDraft.bundleKind, 'widening_review_ready_bundle');
+    assert.equal(payload.governance.autoAuthorization.commandPreviewBundle.bundleKind, 'widening_review_review_command_bundle');
+    assert.equal(payload.governance.autoAuthorization.commandPreviewBundle.resolvedAssertionRecordPathMode, 'workspace_relative');
+    assert.equal(
+      payload.governance.autoAuthorization.commandPreviewBundle.resolvedAssertionRecordPath,
+      '.\\tests\\fixtures\\external-token-material-assertion-record-v1.json'
+    );
+    assert.match(
+      payload.governance.autoAuthorization.commandPreviewBundle.primaryCommand,
+      /governance-report\.js --json --auto-auth-assertion-record \.\\tests\\fixtures\\external-token-material-assertion-record-v1\.json --auto-auth-latest-rebound-outcome-class token_present/
+    );
+    assert.match(
+      payload.governance.autoAuthorization.renderedOperatorPacketTextSurface.markdown,
+      /governance-report command: `node \.\\src\\cli\\governance-report\.js --json --auto-auth-assertion-record \.\\tests\\fixtures\\external-token-material-assertion-record-v1\.json --auto-auth-latest-rebound-outcome-class token_present`/
+    );
+    assert.equal(payload.governance.autoAuthorization.operatorPacketDraft.packetKind, 'widening_review_operator_packet');
+    assert.equal(payload.governance.autoAuthorization.exactCm0601LineReusable, false);
+    assert.equal(payload.governance.autoAuthorization.externalAssertionAccepted, true);
+    assert.equal(payload.governance.autoAuthorization.canAutoAuthorizeCm0595, false);
+    assert.equal(payload.governance.autoAuthorization.source, 'cm0622_explicit_input_fixture_plus_assertion_record_v1');
+    assert.equal(payload.governance.wideningReview.source, 'cm0662_explicit_input_fixture_plus_auto_authorization_escalation_bridge_v1');
+    assert.equal(payload.governance.wideningReview.decision, 'WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED');
+    assert.equal(payload.governance.wideningReview.status, 'passed_adoption_not_granted');
+    assert.equal(payload.governance.wideningReview.cm0604Satisfied, true);
+    assert.equal(payload.governance.wideningReview.cm0606BridgeActivated, false);
+    assert.equal(payload.governance.wideningReview.proceedToCm0607AdoptionRecord, false);
+    assert.equal(payload.governance.wideningReview.routingOutcomeRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.wideningReview.routingOutcomeRecordInputTrace.sourceFormat, 'cm0662_auto_authorization_escalation_bridge_v1');
+    assert.equal(payload.governance.wideningReview.reviewChecklist.W4.passed, true);
+    assert.equal(payload.governance.wideningReview.reviewChecklist.W6.passed, true);
+    assert.equal(payload.governance.wideningReview.reviewChecklist.W10.passed, false);
+    assert.ok(payload.governance.wideningReview.failClosedReasons.includes('bounded_durable_write_crossing_not_granted'));
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should accept a filled CM-0611 markdown record through governance summary', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-md-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--json', '--auto-auth-assertion-record', REPO_ASSERTION_RECORD_MARKDOWN_PATH],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.governance.autoAuthorization.allowedGovernanceOutput, 'AUTO_REUSE_CM0601_LINE_ONLY');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.sourceFormat, 'cm0611_markdown_record_v1');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.sourceFileName, 'external-token-material-assertion-record-v1.md');
+    assert.equal(payload.governance.autoAuthorization.assertionRecordInputTrace.sourceArtifactRef, 'docs/CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE.md');
+    assert.equal(payload.governance.autoAuthorization.commandPreviewBundle.resolvedAssertionRecordPathMode, 'workspace_relative');
+    assert.equal(
+      payload.governance.autoAuthorization.commandPreviewBundle.resolvedAssertionRecordPath,
+      '.\\tests\\fixtures\\external-token-material-assertion-record-v1.md'
+    );
+    assert.match(
+      payload.governance.autoAuthorization.renderedOperatorPacketTextSurface.markdown,
+      /governance-report command: `node \.\\src\\cli\\governance-report\.js --json --auto-auth-assertion-record \.\\tests\\fixtures\\external-token-material-assertion-record-v1\.md`/
+    );
+    assert.equal(payload.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftId, 'cm0614Issuance');
+    assert.match(
+      payload.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftMarkdown,
+      /source workspace-relative path: `\.\\tests\\fixtures\\external-token-material-assertion-record-v1\.md`/
+    );
+    assert.match(
+      payload.governance.autoAuthorization.renderedArtifactTextSurface.selectedDraftMarkdown,
+      /governance-report command: `node \.\\src\\cli\\governance-report\.js --json --auto-auth-assertion-record \.\\tests\\fixtures\\external-token-material-assertion-record-v1\.md`/
+    );
+    assert.equal(payload.governance.autoAuthorization.renderedOperatorPacketTextSurface.packetKind, 'cm0601_reuse_operator_packet');
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should pass explicit widening-review fixture through governance summary', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-widening-'));
+  const wideningFixturePath = path.join(tempBasePath, 'authorized-write-path-widening-review-pass.json');
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const fixture = JSON.parse(await fs.readFile(REPO_WIDENING_REVIEW_FIXTURE_PATH, 'utf8'));
+    Object.assign(fixture, {
+      routingOutcomeRecordAvailable: true,
+      routingOutcomeDecision: 'CM0605_ROUTED_ESCALATE_FOR_FUTURE_WIDENING_REVIEW',
+      routingOutcomeRecordId: 'docs/CM-0615_CM0605_ROUTING_OUTCOME_RECORD_TEMPLATE.md',
+      sameBaselineEndpointStartupEvidenceAvailable: true,
+      endpointStartupEvidenceId: 'docs/CM-0592_AUTHORIZED_PUBLIC_WRITE_PATH_COMBINED_MINIMAL_ENABLEMENT_EVIDENCE.md',
+      sameBaselineTokenPresentEvidenceAvailable: true,
+      tokenPresentEvidenceSameBaseline: true,
+      latestTokenPresentEvidenceId: 'docs/CM-0601_CURRENT_SESSION_TOKEN_PRESENCE_REBOUND_PACKET.md',
+      noProviderConfigStartupPersistenceDriftSinceEvidence: true,
+      packetFamilyDriftDetected: false,
+      noBroadScanJsonlReadOrAdditionalWriteNeeded: true,
+      currentWritePathStillNotValidated: true,
+      narrowestNextProofStillOneSanitizedWriteValidation: true,
+      governanceMayCrossIntoOneBoundedDurableWriteProof: true
+    });
+    await fs.writeFile(wideningFixturePath, JSON.stringify(fixture), 'utf8');
+
+    const result = await runCli({
+      args: ['--json', '--widening-review-fixture', wideningFixturePath],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.summary.governanceWideningReviewDecision, 'WIDENING_REVIEW_PASSED_PROCEED_TO_CM0607');
+    assert.equal(payload.summary.governanceWideningReviewBlockedOn, null);
+    assert.equal(payload.summary.governanceWideningReviewProceedToCm0607, true);
+    assert.equal(payload.governance.wideningReview.decision, 'WIDENING_REVIEW_PASSED_PROCEED_TO_CM0607');
+    assert.equal(payload.governance.wideningReview.cm0604Satisfied, true);
+    assert.equal(payload.governance.wideningReview.cm0606BridgeActivated, true);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should pass explicit widening-review routing-outcome record through governance summary', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-route-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--json', '--widening-review-routing-outcome-record', REPO_ROUTING_OUTCOME_RECORD_PATH],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.governance.wideningReview.source, 'cm0645_explicit_input_fixture_plus_routing_outcome_record_v1');
+    assert.equal(payload.governance.wideningReview.routingOutcomeRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.wideningReview.reviewChecklist.W4.passed, true);
+    assert.equal(payload.governance.wideningReview.reviewChecklist.W6.passed, false);
+    assert.equal(payload.summary.governanceWideningReviewDecision, 'WIDENING_REVIEW_NOT_READY');
+    assert.equal(payload.summary.governanceWideningReviewBlockedOn, 'token_present_same_baseline_evidence_missing');
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should pass explicit widening-review outcome record through widening-adoption summary', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-adopt-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: ['--json', '--widening-adoption-review-record', REPO_WIDENING_ADOPTION_REVIEW_RECORD_PATH],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.summary.governanceWideningAdoptionDecision, 'WIDENING_ADOPTION_NOT_READY');
+    assert.equal(payload.governance.wideningAdoption.wideningReviewRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.wideningAdoption.adoptionChecklist.A4.passed, true);
+    assert.equal(payload.governance.wideningAdoption.adoptionChecklist.A6.passed, false);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should pass explicit widening-adoption record through widening-adoption summary', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-adopt-grant-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: [
+        '--json',
+        '--widening-adoption-review-record',
+        REPO_WIDENING_ADOPTION_REVIEW_RECORD_PATH,
+        '--widening-adoption-record',
+        REPO_WIDENING_ADOPTION_RECORD_PATH
+      ],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.summary.governanceWideningAdoptionDecision, 'WIDENING_ADOPTION_GRANTED_CM0595_ONLY');
+    assert.equal(payload.governance.wideningAdoption.wideningReviewRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.wideningAdoption.wideningAdoptionRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.wideningAdoption.adoptionChecklist.A10.passed, true);
+    assert.equal(payload.governance.wideningAdoption.cm0595ApprovalLinePreview.previewUsableNow, true);
+    assert.equal(payload.governance.wideningAdoption.cm0595CommandPreviewBundle.resolvedRecordPathMode, 'workspace_relative_pair');
+    assert.equal(payload.governance.wideningAdoption.cm0595OperatorPacketDraft.packetKind, 'cm0595_auto_authorization_operator_packet');
+    assert.equal(payload.governance.wideningAdoption.cm0595IssuanceRecordDraft.draftUsableNow, true);
+    assert.equal(payload.governance.wideningAdoption.cm0595ExecutionEvidenceDraft.draftUsableNow, true);
+    assert.match(payload.governance.wideningAdoption.renderedCm0595OperatorPacketTextSurface.markdown, /授权执行 CM-0595/);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should pass explicit CM-0649 issuance record through widening-adoption summary', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-cm0649-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: [
+        '--json',
+        '--widening-adoption-review-record',
+        REPO_WIDENING_ADOPTION_REVIEW_RECORD_PATH,
+        '--widening-adoption-record',
+        REPO_WIDENING_ADOPTION_RECORD_PATH,
+        '--cm0595-issuance-record',
+        REPO_CM0595_ISSUANCE_RECORD_PATH
+      ],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.governance.wideningAdoption.cm0595IssuanceRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.wideningAdoption.cm0595IssuanceRecordInputTrace.sourceFileName, 'cm0649-cm0595-approval-issuance-record-v1.md');
+    assert.match(payload.governance.wideningAdoption.renderedCm0595OperatorPacketTextSurface.markdown, /issued CM-0595 record path: `\.\\tests\\fixtures\\cm0649-cm0595-approval-issuance-record-v1\.md`/);
+  } finally {
+    await server.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
+});
+
+test('http-observe CLI should pass explicit CM-0650 execution evidence record through widening-adoption summary', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-cm0650-'));
+  const server = await startHealthServer();
+  await seedRuntimeArtifacts(tempBasePath);
+
+  try {
+    const result = await runCli({
+      args: [
+        '--json',
+        '--widening-adoption-review-record',
+        REPO_WIDENING_ADOPTION_REVIEW_RECORD_PATH,
+        '--widening-adoption-record',
+        REPO_WIDENING_ADOPTION_RECORD_PATH,
+        '--cm0595-issuance-record',
+        REPO_CM0595_ISSUANCE_RECORD_PATH,
+        '--cm0595-execution-evidence-record',
+        REPO_CM0595_EXECUTION_EVIDENCE_RECORD_PATH
+      ],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_LOGS_DIR: 'logs',
+        CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+        CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+        CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+        CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+        CODEX_MEMORY_HTTP_PORT: String(new URL(server.healthUrl).port)
+      }
+    });
+
+    assert.equal(result.code, 0, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    assert.equal(payload.governance.wideningAdoption.cm0595ExecutionEvidenceInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.wideningAdoption.cm0595ExecutionEvidenceInputTrace.sourceFileName, 'cm0650-cm0595-execution-evidence-record-v1.md');
+    assert.equal(payload.governance.wideningAdoption.cm0595ExecutionEvidenceInputTrace.durableMemoryWriteCount, 1);
+    assert.match(payload.governance.wideningAdoption.renderedCm0595OperatorPacketTextSurface.markdown, /CM-0595 execution evidence path: `\.\\tests\\fixtures\\cm0650-cm0595-execution-evidence-record-v1\.md`/);
+    assert.equal(payload.governance.boundedRecallPreparation.decision, 'BOUNDED_RECALL_APPROVAL_PREPARED_EXACT_ONLY');
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallApprovalPrepared, true);
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallCommandPreviewBundle.bundleKind, 'bounded_recall_exact_approval_review_command_bundle');
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallCommandPreviewBundle.resolvedRecordPathMode, 'workspace_relative_triple');
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallApprovalIssuanceRecordDraft.draftUsableNow, true);
+    assert.equal(payload.governance.boundedRecallPreparation.boundedRecallExecutionEvidenceDraft.draftUsableNow, true);
+    assert.equal(payload.governance.boundedRecallPreparation.cm0595IssuanceRecordInputTrace.traceAvailable, true);
+    assert.equal(payload.governance.boundedRecallPreparation.cm0595ExecutionEvidenceInputTrace.traceAvailable, true);
+    assert.match(payload.governance.boundedRecallPreparation.renderedBoundedRecallTextSurface.markdown, /## Next Record Drafts/);
+  } finally {
+    await server.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
 });

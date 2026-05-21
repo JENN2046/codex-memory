@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "cm616-widening-review-outcome-record-v1",
+  "decision": "WIDENING_REVIEW_PASSED_PROCEED_TO_CM0607",
+  "targetBaseline": "017eda4930c5add4b824c162c46868f75c91ea0f",
+  "reviewSource": "CM-0604",
+  "routingOutcomeRecord": "docs/CM-0615_CM0605_ROUTING_OUTCOME_RECORD_TEMPLATE.md",
+  "cm0604Satisfied": true,
+  "cm0606BridgeActivated": true,
+  "proceedToCm0607AdoptionRecord": true,
+  "nextBoundary": "docs/CM-0607_AUTHORIZED_WRITE_PATH_AUTO_AUTHORIZATION_WIDENING_ADOPTION_RECORD_TEMPLATE.md",
+  "outOfScopeActionsExecuted": "none",
+  "status": "DRAFT_REVIEW_PASSED_PROCEED_TO_CM0607",
+  "date": "2026-05-21"
+}

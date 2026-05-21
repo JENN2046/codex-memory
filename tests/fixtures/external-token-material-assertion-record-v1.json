@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "cm61-external-token-assertion-record-v1",
+  "unit": "CURRENT_SESSION_TOKEN_PRESENCE_REBOUND_001",
+  "decision": "EXTERNAL_TOKEN_ASSERTION_ACCEPTED_FOR_C6_REVIEW",
+  "contractVerdict": "accepted",
+  "assertionClass": "OPERATOR_EXPLICIT_CURRENT_SESSION_ASSERTION",
+  "assertedCurrentSessionOnly": true,
+  "assertedIndependentOfPacket": true,
+  "assertedNoBindingRequested": true,
+  "assertedNoPersistenceRequested": true,
+  "assertedScopeStillCm0601Only": true,
+  "assertedNoStartupHealthWriteRecallRequested": true,
+  "assertedAt": "2026-05-20T12:00:00.000Z"
+}

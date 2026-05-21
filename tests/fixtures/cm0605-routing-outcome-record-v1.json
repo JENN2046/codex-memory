@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "cm615-routing-outcome-record-v1",
+  "status": "RECORDED_ROUTE_ESCALATED",
+  "decision": "CM0605_ROUTED_ESCALATE_FOR_FUTURE_WIDENING_REVIEW",
+  "date": "2026-05-21",
+  "targetBaseline": "017eda4930c5add4b824c162c46868f75c91ea0f",
+  "routingSource": "CM-0605",
+  "routingCase": "5",
+  "routingOutcome": "ESCALATE_FOR_FUTURE_WIDENING_REVIEW",
+  "preRoutingEvidence": "docs/CM-0614_CM0601_AUTO_REUSE_APPROVAL_ISSUANCE_RECORD_TEMPLATE.md; docs/CM-0609_CM0601_AUTO_REUSE_EXECUTION_EVIDENCE_TEMPLATE.md",
+  "tokenPresenceResult": "token_present",
+  "wideningGateSatisfied": false,
+  "wideningAdopted": false,
+  "nextBoundary": "docs/CM-0604_AUTHORIZED_WRITE_PATH_AUTO_AUTHORIZATION_WIDENING_GATE.md",
+  "outOfScopeActionsExecuted": "none"
+}

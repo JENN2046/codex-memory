@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "cm659-bounded-recall-execution-evidence-record-v1",
+  "status": "RECORDED_PREPARED_LATER_APPROVAL_ONLY",
+  "decision": "BOUNDED_RECALL_PREPARATION_EXECUTED_APPROVAL_LINE_ONLY",
+  "date": "2026-05-21",
+  "targetBaseline": "017eda4930c5add4b824c162c46868f75c91ea0f",
+  "executionRoute": "CM-0607 -> CM-0649 -> CM-0650 -> CM-0654 -> CM-0655 -> CM-0657 -> CM-0658 -> CM-0659",
+  "issuanceRecord": "docs/CM-0658_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_APPROVAL_ISSUANCE_RECORD_TEMPLATE.md",
+  "observedBranchHead": "017eda4930c5add4b824c162c46868f75c91ea0f",
+  "preparedLaterApprovalLineCount": 1,
+  "boundedRecallExecutionCount": 0,
+  "observedPreparationOutcome": "prepared_one_later_exact_bounded_recall_runtime_approval_line_only",
+  "outOfScopeActionsExecuted": "none"
+}

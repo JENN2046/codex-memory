@@ -22,14 +22,20 @@ Current preparation baseline:
 
 ```text
 branch: main
-prep HEAD: 77dec659d9a16b9795eab7fb1e9bf88798bcdc7c
+prep HEAD: 017eda4930c5add4b824c162c46868f75c91ea0f
 current status: RC_NOT_READY_BLOCKED
 ```
 
 Current refresh note:
 
 ```text
-docs/CM-0565_FOUNDATION_RELIABILITY_EXACT_APPROVAL_BASELINE_REFRESH.md
+docs/CM-0585_FOUNDATION_RELIABILITY_EXACT_APPROVAL_PACKET_REFRESH.md
+```
+
+Current narrow write-only execution evidence:
+
+```text
+docs/CM-0587_AUTH_WRITE_PATH_VALIDATION_001_EXECUTION_EVIDENCE.md
 ```
 
 Baseline rule:
@@ -52,6 +58,34 @@ This packet requests future exact approval for two bounded units:
 These units may be approved together only if the approval line names both units, the target baseline, and the allowed commands.
 
 If only one unit is named, execute only that unit.
+
+Before any future second write-path attempt, keep the prerequisite enablement chain in view:
+
+```text
+docs/CM-0590_AUTHORIZED_PUBLIC_WRITE_PATH_COMBINED_MINIMAL_ENABLEMENT_PACKET.md
+```
+
+CM-0590 exists because CM-0587 failed closed and CM-0589 classified three concurrent blockers in front of `AUTH_WRITE_PATH_VALIDATION_001`.
+
+Current external prerequisite after later exact-approved fail-closed token attempts:
+
+```text
+token material must first independently exist in the current session
+then docs/CM-0601_CURRENT_SESSION_TOKEN_PRESENCE_REBOUND_PACKET.md may be used as the fresh exact-approved presence-only recheck boundary
+only after successful fresh same-baseline token evidence should docs/CM-0595_AUTHORIZED_WRITE_PATH_VALIDATION_AFTER_SPLIT_ENABLEMENT_PACKET.md become the next write-validation candidate
+```
+
+If the user wants the narrower default path for write-only validation, use:
+
+```text
+docs/CM-0586_AUTH_WRITE_PATH_VALIDATION_001_SINGLE_UNIT_APPROVAL_PACKET.md
+```
+
+Current state of that narrower path:
+
+```text
+CM-0586 approval was consumed by CM-0587 and failed closed before any durable write because no authorized public record_memory write path was currently available.
+```
 
 ## Unit 1: AUTH_WRITE_PATH_VALIDATION_001
 
@@ -242,4 +276,4 @@ controlling status: RC_NOT_READY_BLOCKED
 
 ## Next Safe Action
 
-Wait for exact approval or continue with fixture-only side-effect isolation tests.
+Wait for exact approval, treat CM-0590 as historical prerequisite-chain context, treat CM-0599 as a consumed historical presence-only recheck boundary, wait until token material independently exists in the current session before preparing any fresh presence-only recheck, use CM-0586 only as the historical narrower write-only path after prerequisites are established, or continue with fixture-only side-effect isolation tests.

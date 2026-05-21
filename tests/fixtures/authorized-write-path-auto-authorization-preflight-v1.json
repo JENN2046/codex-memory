@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "cm61-authorized-write-path-auto-authorization-preflight-v1",
+  "mode": "cm0601_auto_reuse_preflight",
+  "controllingMap": "docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md",
+  "operatorFacingState": "RC_NOT_READY_BLOCKED",
+  "targetBaseline": "017eda4930c5add4b824c162c46868f75c91ea0f",
+  "reboundBaselineRecorded": false,
+  "sameBaselineEndpointStartupEvidenceAvailable": true,
+  "endpointStartupEvidenceId": "docs/CM-0592_AUTHORIZED_PUBLIC_WRITE_PATH_COMBINED_MINIMAL_ENABLEMENT_EVIDENCE.md",
+  "latestReboundEvidenceAvailable": true,
+  "latestReboundEvidenceEquivalentOrLater": true,
+  "latestReboundEvidenceId": "docs/CM-0603_CURRENT_SESSION_TOKEN_PRESENCE_REBOUND_EXECUTION_EVIDENCE.md",
+  "latestReboundOutcomeClass": "token_missing",
+  "contradictoryWritePathDrift": false,
+  "externalAssertion": {
+    "asserted": false,
+    "assertionClass": "",
+    "assertedCurrentSessionOnly": false,
+    "assertedIndependentOfPacket": false,
+    "assertedNoBindingRequested": false,
+    "assertedNoPersistenceRequested": false,
+    "assertedScopeStillCm0601Only": false,
+    "assertedAt": ""
+  },
+  "intendedAutomaticOutput": "AUTO_REUSE_CM0601_LINE_ONLY",
+  "stillOutOfScopeActions": [
+    "CM-0595",
+    "record_memory",
+    "search_memory",
+    "provider_call",
+    "config_mutation",
+    "startup_persistence",
+    "public_mcp_expansion",
+    "durable_write",
+    "readiness_claim"
+  ]
+}
