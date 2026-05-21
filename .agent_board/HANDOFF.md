@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0718 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0718 started from local `HEAD = c6ca823 fix: refresh v3 amber receipt parsing`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 15]`.
+
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: `readinessSummary` now carries `recallScopeStatus`, `recallScopeEvidenceState`, `recallScopeNextAction`, and `recallScopeReadinessClaimAllowed`. Real dashboard summary reports `recallScopeStatus=ok`, `recallScopeEvidenceState=recent_strict_scoped_recall`, `recallScopeNextAction=none`, and `recallScopeReadinessClaimAllowed=false`, while preserving `NOT_READY_BLOCKED`, governance-only blockers, and no readiness claim.
+
+Boundary: local read-only dashboard/test/docs/board only. No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js` passed `19/19`; `node src\cli\dashboard.js --json --summary-only`; `npm test` passed `1961/1961`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed with `latest_task=CM-0718`; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push remains blocked without explicit authorization.
+
 ## CM-0717 Handoff
 
 Status: `COMPLETED_VALIDATED`.

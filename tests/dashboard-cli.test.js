@@ -184,6 +184,10 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'readPolicyNextEvidenceAction',
     'readPolicyStatus',
     'readinessClaimAllowed',
+    'recallScopeEvidenceState',
+    'recallScopeNextAction',
+    'recallScopeReadinessClaimAllowed',
+    'recallScopeStatus',
     'status'
   ], 'dashboard readiness summary');
   assert.equal(payload.mode, 'memory-dashboard');
@@ -195,6 +199,10 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.readinessSummary.status, 'blocked');
   assert.equal(payload.readinessSummary.decision, 'NOT_READY_BLOCKED');
   assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
+  assert.equal(typeof payload.readinessSummary.recallScopeStatus, 'string');
+  assert.equal(typeof payload.readinessSummary.recallScopeEvidenceState, 'string');
+  assert.equal(typeof payload.readinessSummary.recallScopeNextAction, 'string');
+  assert.equal(payload.readinessSummary.recallScopeReadinessClaimAllowed, false);
   assert.ok(Array.isArray(payload.readinessSummary.blockerCodes));
   assertKeySet(payload.readinessSummary.governanceNextAction, [
     'artifactBundleKind',
@@ -1110,6 +1118,10 @@ test('dashboard readiness nextAction narrows to governance after read-policy evi
   assert.equal(payload.readinessSummary.readPolicyStatus, 'ok');
   assert.equal(payload.readinessSummary.readPolicyEvidenceState, 'config_and_recent_audit');
   assert.equal(payload.readinessSummary.readPolicyNextEvidenceAction, 'none');
+  assert.equal(payload.readinessSummary.recallScopeStatus, payload.audits.recall.scopeStatus);
+  assert.equal(payload.readinessSummary.recallScopeEvidenceState, payload.audits.recall.scopeEvidenceState);
+  assert.equal(payload.readinessSummary.recallScopeNextAction, payload.audits.recall.scopeNextAction);
+  assert.equal(payload.readinessSummary.recallScopeReadinessClaimAllowed, false);
   assert.equal(payload.readinessSummary.blockerSources.includes('read-policy'), false);
   assert.ok(payload.readinessSummary.blockerSources.includes('governance'));
   assert.equal(payload.readinessSummary.nextAction, 'resolve_governance_fail_closed_evidence_before_readiness_claim');

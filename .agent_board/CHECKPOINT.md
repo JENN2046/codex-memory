@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0718 Dashboard readiness recall-scope rollup - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added read-only recall scope fields to `dashboard.readinessSummary` and updated dashboard tests to lock the new summary shape.
+- Current local signal: real `node src\cli\dashboard.js --json --summary-only` reports `recallScopeStatus=ok`, `recallScopeEvidenceState=recent_strict_scoped_recall`, `recallScopeNextAction=none`, and `recallScopeReadinessClaimAllowed=false`.
+- Boundary: Green Lane local dashboard/test/docs/board only; no provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `19/19`; real dashboard JSON smoke showed the new readiness rollup fields; full `npm test` passed `1961/1961`; docs validation passed with `latest_task=CM-0718`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then continue governance fail-closed hardening; do not claim readiness.
+
 ## Checkpoint - CM-0717 Smart Standing Authorization v3 Amber receipt parser freshness - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after parser/dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

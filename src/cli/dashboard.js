@@ -1063,10 +1063,11 @@ const READINESS_BLOCKER_SOURCES = new Set([
   'autopilot-controller'
 ]);
 
-function buildReadinessSummary(operationalSummary, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks) {
+function buildReadinessSummary(operationalSummary, governance, readPolicy, audits, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks) {
   const blockerChecks = checks.filter(check => check.level !== 'ok' && READINESS_BLOCKER_SOURCES.has(check.source));
   const blockerCodes = [...new Set(blockerChecks.map(check => check.code))];
   const blockerSources = [...new Set(blockerChecks.map(check => check.source))];
+  const recallScope = audits?.recall || {};
   const reviewCandidate = operationalSummary.status === 'ok'
     && readPolicy.status === 'ok'
     && governance.autoAuthorization?.decision !== 'RC_NOT_READY_BLOCKED'
@@ -1082,6 +1083,10 @@ function buildReadinessSummary(operationalSummary, governance, readPolicy, smart
     readPolicyStatus: readPolicy.status,
     readPolicyEvidenceState: readPolicy.evidenceState || 'unknown',
     readPolicyNextEvidenceAction: readPolicy.nextEvidenceAction || 'unknown',
+    recallScopeStatus: recallScope.scopeStatus || 'unknown',
+    recallScopeEvidenceState: recallScope.scopeEvidenceState || 'unknown',
+    recallScopeNextAction: recallScope.scopeNextAction || 'unknown',
+    recallScopeReadinessClaimAllowed: recallScope.scopeReadinessClaimAllowed === true,
     autopilotDecision: autopilotLoop.decision || autopilotKernel.decision || 'unknown',
     latestTask: autopilotLoop.latest_task || autopilotKernel.latest_ledger_goal || 'unknown',
     blockerCount: blockerCodes.length,
@@ -1478,7 +1483,7 @@ async function main() {
   const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
   const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
   const operationalSummary = buildOperationalSummary(service, store, profile, runtime, gate);
-  const readinessSummary = buildReadinessSummary(operationalSummary, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks);
+  const readinessSummary = buildReadinessSummary(operationalSummary, governance, readPolicy, audits, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks);
   const sectionStatus = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
     audits.bridge.status, audits.recall.status, governance.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
