@@ -1267,6 +1267,8 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Memory Dashboard'), 'should include title');
   assert.ok(text.includes('Service'), 'should include Service section');
   assert.ok(text.includes('Store'), 'should include Store section');
+  assert.ok(text.includes('StoreFresh'), 'should include store freshness section');
+  assert.match(text, /StoreFresh\s+\d+ in 24h, \d+ in 7d, \d+ in 30d/, 'should include store freshness age buckets');
   assert.ok(text.includes('Profile'), 'should include Profile section');
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
   assert.ok(text.includes('ReadPolicy'), 'should include ReadPolicy section');
@@ -1317,6 +1319,16 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Checks'), 'should include Checks section');
   assert.ok(text.includes('Recommendations'), 'should include Recommendations');
   assert.equal(text.includes('workspace_id'), false);
+});
+
+test('dashboard CLI should backfill text store freshness in summary-only mode', async () => {
+  const result = await runDashboard({ args: ['--summary-only'] });
+  assert.equal(result.code, 0, formatFailure(result));
+  assert.match(
+    result.stdout,
+    /StoreFresh\s+\d+ in 24h, \d+ in 7d, 30d unavailable/,
+    'summary-only text should backfill store freshness from checks'
+  );
 });
 
 test('dashboard CLI should render current operator packet text when requested', async () => {

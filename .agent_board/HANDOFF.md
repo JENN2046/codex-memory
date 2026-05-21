@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0727 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0727 started from local `HEAD = 58a42e7 feat: show dashboard governance next command`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 24]`.
+
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: dashboard text output now includes `StoreFresh`, making recent memory store activity visible near the top of the operator surface. Summary-only text backfills from the existing `store-freshness` check when `store.ageBreakdown` is omitted.
+
+Boundary: local read-only dashboard text/test/docs/board only. No JSON contract change, store freshness calculation change, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js` passed `20/20`; `node src\cli\dashboard.js --summary-only`; `npm test` passed `1964/1964`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed with `latest_task=CM-0727`; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push remains blocked without explicit authorization.
+
 ## CM-0726 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
