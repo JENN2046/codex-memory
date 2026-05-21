@@ -1,0 +1,44 @@
+{
+  "route_plan": {
+    "goal_id": "CM-0684",
+    "current_state_summary": "v3 policy, parser, dashboard, and board basics exist; complete schema/validator/ledger layer is missing",
+    "target_state_summary": "local complete autopilot governance kernel exists and validates without external side effects",
+    "route_steps": [
+      {
+        "id": "CM-0684-1",
+        "lane": "Green",
+        "purpose": "add project profile and goal runtime docs",
+        "target_files_or_systems": [
+          "docs/AUTOPILOT_PROJECT_PROFILE.md",
+          "docs/AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md"
+        ],
+        "validation": ["docs validation"],
+        "receipt_required": false,
+        "stop_conditions": ["Red Lane action required"]
+      },
+      {
+        "id": "CM-0684-2",
+        "lane": "Green",
+        "purpose": "add schemas, examples, validators, and local ledger",
+        "target_files_or_systems": [
+          "schemas/autopilot_*.schema.yaml",
+          "tests/schema_examples/autopilot_*.example.json",
+          "scripts/validate_autopilot_*.js",
+          ".agent_board/AUTOPILOT_LEDGER.md"
+        ],
+        "validation": ["validator checks"],
+        "receipt_required": false,
+        "stop_conditions": ["validator requires external side effect"]
+      },
+      {
+        "id": "CM-0684-R1",
+        "lane": "Red",
+        "purpose": "publish, push, release, deploy, or claim readiness",
+        "target_files_or_systems": ["origin/main", "release artifacts"],
+        "validation": ["not executable under this goal"],
+        "receipt_required": true,
+        "stop_conditions": ["always blocked without explicit approval"]
+      }
+    ]
+  }
+}

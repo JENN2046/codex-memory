@@ -9,6 +9,19 @@
 - 以源码行为为准，文档只做补充，不覆盖真实实现
 - 默认推荐 HTTP MCP 入口，优先保证 Codex Desktop 启动稳定性
 
+## Smart Standing Authorization v3
+
+当前项目已接入 Smart Standing Authorization v3 本地治理面。默认目标分解链路为 `goal -> route_plan -> task_queue -> Green / Amber / Red -> validation -> receipt/ledger -> checkpoint`。
+
+入口：
+
+- 项目 profile：[docs/AUTOPILOT_PROJECT_PROFILE.md](/A:/codex-memory/docs/AUTOPILOT_PROJECT_PROFILE.md)
+- 目标分解 runtime：[docs/AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md](/A:/codex-memory/docs/AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md)
+- 本地 ledger：[.agent_board/AUTOPILOT_LEDGER.md](/A:/codex-memory/.agent_board/AUTOPILOT_LEDGER.md)
+- 验证命令：`powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Red Lane 仍硬停止：push、PR、tag、release、deploy、secret、destructive action、broad real memory scan/export、public MCP expansion、config/watchdog/startup change、unscoped dependency change、readiness/cutover claim 都不自动执行。
+
 ## 当前能力
 
 - 独立 `stdio MCP` 与 `HTTP MCP` 双入口

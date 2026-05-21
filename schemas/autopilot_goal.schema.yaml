@@ -1,0 +1,17 @@
+schema_id: autopilot_goal
+schema_version: 1
+required:
+  - goal
+properties:
+  goal:
+    required:
+      - id
+      - objective
+      - scope
+      - success_criteria
+      - validation_required
+      - stop_conditions
+  scope:
+    required:
+      - allowed_areas
+      - forbidden_areas

@@ -2,7 +2,7 @@
 
 Purpose: project-specific operating constitution for Codex/agents working inside the existing `codex-memory` repository.
 
-Default mode: `A4-Sustained Local Autopilot`.
+Default mode: `Smart Standing Authorization v3 - Budgeted Autonomy Envelope`.
 
 This file adapts the universal sustained local autopilot pattern to the real `codex-memory` project. It is not a blank-project scaffold. It is a continuation rail for an existing, mature `vcp_codex_memory` runtime.
 
@@ -285,36 +285,37 @@ New code should fit the existing four-layer map unless source evidence and user 
 
 ---
 
-## 7. Default Autonomy: A4-Sustained Local Autopilot
+## 7. Default Autonomy: Smart Standing Authorization v3
 
 Default mode:
 
 ```text
-A4-Sustained Local Autopilot
+Smart Standing Authorization v3 - Budgeted Autonomy Envelope
 ```
 
 Meaning:
 
-Codex may perform long-running local work when the goal is clear and the work remains:
+Codex starts every project startup, resume, and Autopilot Rule Intake from the Smart Standing Authorization v3 model.
 
-- local
-- inside workspace root for writes
-- reversible
-- non-destructive
-- non-production
-- non-secret-bearing
-- not dependency-changing
-- not remote-writing
-- not overwriting user-owned work
-- compatible with existing gates
+Standing owner authorization grants Codex a bounded autonomy envelope. Within that envelope, Codex must not ask for step-by-step approval. Codex should plan, execute, validate, repair once when safe, record receipts, and continue until the goal is complete or a Red condition appears.
+
+Default movement is lane-based:
+
+- Green Lane: direct local work with after-the-fact recording, including docs, fixtures, tests, board updates, read-only checks, local validation, and small reversible repairs that do not touch external services, true memory, dependencies, secrets, config, watchdog, startup, production, or remote state.
+- Amber Lane: continuous automatic work inside the envelope without step-by-step approval, only when the goal is clear, scope is exact, budget remains, validation is obvious, and every meaningful external/write action records a receipt.
+- Red Lane: hard stop and explicit user approval required.
 
 Codex should not stop for ordinary implementation details.
 
-Codex should stop only for hard stops, unsafe state, unclear goal that cannot be safely narrowed, or validation/design failure requiring human decision.
+Codex should stop only for Red conditions, unsafe state, unclear goal that cannot be safely narrowed, or validation/design failure requiring human decision.
 
-### 7.1 A4.8 Safe Project Operator Rail
+### 7.1 A4.8 Legacy Local-Safe Rail And Green Lane Substrate
 
-When explicitly activated, `A4.8 Safe Project Operator Rail` lets Codex select the next safe local phase from the roadmap/backlog/board, split work into planning / fixture / dry-run / runtime / gate / observability subphases, run validation selection automatically, create guarded commits, run push readiness, and safe-push only when the safe-push policy fully passes.
+`A4.8 Safe Project Operator Rail` remains available, but it is no longer the default authority model.
+
+A4.8 is now the legacy local-safe rail and Green Lane substrate for v3. It supplies the existing local inspection, roadmap/backlog/board selection, validation selection, guarded commit, push-readiness, and safe-push mechanics. It does not replace the v3 lane model, budget envelope, receipt rule, or Red Lane hard stops.
+
+When used as the Green Lane substrate, A4.8 lets Codex select the next safe local phase from the roadmap/backlog/board, split work into planning / fixture / dry-run / runtime / gate / observability subphases, run validation selection automatically, create guarded commits, run push readiness, and safe-push only when the safe-push policy fully passes.
 
 Fail-closed rule: if any safe-push requirement is unmet, unknown, stale, contradicted by Git state, blocked by A5 hard stops, or missing evidence, Codex must stop before push. Push-readiness checks are allowed under A4.8; actual push is allowed only when the safe-push policy applies completely or the user gives explicit push authorization.
 
@@ -327,7 +328,7 @@ Reference docs:
 - [VALIDATION_SELECTION_MATRIX.md](/A:/codex-memory/docs/VALIDATION_SELECTION_MATRIX.md)
 - [AUTOPILOT_FAILURE_RECOVERY.md](/A:/codex-memory/docs/AUTOPILOT_FAILURE_RECOVERY.md)
 
-A4.8 is not unlimited permission. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview` unless a dedicated approved phase explicitly authorizes expansion. Smart Standing Authorization v3 may allow exact, budgeted, receipted Amber work, but Red Lane remains manual, including broad real-memory scan/export, raw private data exposure, public MCP tool/schema expansion, secrets/env edits, config/watchdog/startup changes, release/tag/deploy, destructive commands, and stale branch merge/rebase/cherry-pick.
+A4.8 is not unlimited permission and is not a separate override above v3. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview` unless a dedicated approved phase explicitly authorizes expansion. Smart Standing Authorization v3 may allow exact, budgeted, receipted Amber work, but Red Lane remains manual, including broad real-memory scan/export, raw private data exposure, public MCP tool/schema expansion, secrets/env edits, config/watchdog/startup changes, release/tag/deploy, destructive commands, and stale branch merge/rebase/cherry-pick.
 
 ### 7.1.1 Smart Standing Authorization v3
 
@@ -517,7 +518,8 @@ For non-trivial repository work, report these startup facts when they materially
 
 - active profile: `Standard` unless BHA runtime surfaces are present and verified
 - BHA state: `BHA_ABSENT` unless BHA runtime surfaces are present and verified
-- current autonomy rail: A4 / A4.8 codex-memory rails
+- current autonomy model: Smart Standing Authorization v3 - Budgeted Autonomy Envelope
+- A4.8 status: legacy local-safe rail and Green Lane substrate
 - branch and worktree state
 - current goal source
 - next safe local task
@@ -1248,6 +1250,18 @@ Next:
 If BHA is absent, write `BHA state: BHA_ABSENT`.
 
 This is reporting structure only, not BHA runtime proof.
+
+### 24.2 Chinese Task Summary Closeout
+
+Every final user-facing reply must end with one concise Simplified Chinese task summary.
+
+Use this format:
+
+```text
+任务总结：<one short Chinese sentence>
+```
+
+The summary must be factual, brief, and not overclaim. Mention the main completed action, current blocker, or next safe state. Keep code, commands, paths, identifiers, branch names, commit hashes, logs, errors, and test names in their original language.
 
 ---
 

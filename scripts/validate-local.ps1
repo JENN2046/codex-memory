@@ -61,6 +61,14 @@ switch ($Area) {
   "docs" {
     Write-Step "Docs validation"
     Write-Host "Docs-only validation requires diff inspection by the agent."
+    if (Test-Path ".\scripts\validate_autopilot_governance_kernel.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_governance_kernel.js" "node" @("--check", ".\scripts\validate_autopilot_governance_kernel.js")
+      Run-Step "node .\scripts\validate_autopilot_governance_kernel.js" "node" @(".\scripts\validate_autopilot_governance_kernel.js")
+    }
+    if (Test-Path ".\scripts\validate_autopilot_goal_compiler.js") {
+      Run-Step "node --check .\scripts\validate_autopilot_goal_compiler.js" "node" @("--check", ".\scripts\validate_autopilot_goal_compiler.js")
+      Run-Step "node .\scripts\validate_autopilot_goal_compiler.js" "node" @(".\scripts\validate_autopilot_goal_compiler.js")
+    }
   }
   "test" {
     Run-NpmScript "test"

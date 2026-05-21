@@ -1,5 +1,39 @@
 # HANDOFF.md - codex-memory
 
+## CM-0684 Handoff
+
+Goal: build the local Smart Standing Authorization v3 complete autopilot governance kernel.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/AUTOPILOT_PROJECT_PROFILE.md`; `docs/AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md`; `schemas/autopilot_*.schema.yaml`; `tests/schema_examples/autopilot_*.example.json`; `scripts/validate_autopilot_governance_kernel.js`; `scripts/validate_autopilot_goal_compiler.js`; `scripts/validate-local.ps1`; `.agent_board/AUTOPILOT_LEDGER.md`; `README.md`; `STATUS.md`; `.agent_board/*`.
+Boundary: local docs/schema/examples/scripts/board only; no runtime, provider, MCP, real memory, dependency, config, remote, or readiness action.
+Validation: governance kernel validator passed; goal compiler validator passed; docs validation passed; `git diff --check` reported normalization warnings only.
+Remaining risk: this is a local governance kernel, not runtime autonomy, live Amber evidence, readiness, cutover, or public MCP expansion.
+Next safe step: optional guarded local commit if requested.
+
+## CM-0683 Handoff
+
+Goal: require a concise Simplified Chinese task summary at the end of final Codex replies.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `AGENTS.md`; `STATUS.md`; `.agent_board/*`.
+Boundary: docs/board/policy-only; no runtime, provider, MCP, real memory, dependency, config, remote, or readiness action.
+Validation: docs validation passed; `git diff --check` passed with CRLF warnings only; wording scan found the `Chinese Task Summary Closeout` rule and `任务总结` sync points.
+Next safe step: optional guarded local commit if requested.
+
+## CM-0682 Handoff
+
+Goal: make Smart Standing Authorization v3 the default model for project startup, resume, and Autopilot Rule Intake.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `AGENTS.md`; `docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md`; `docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md`; `docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md`; `STATUS.md`; `.agent_board/*`.
+Boundary: docs/board/policy-only; no runtime, provider, MCP, real memory, dependency, config, remote, or readiness action.
+Validation: docs validation passed; `git diff --check` passed with CRLF warnings only; wording scan confirmed v3 default plus A4.8 legacy substrate language in active rule entrypoints.
+Next safe step: optional guarded local commit if requested.
+
 ## CM-0681 Handoff
 
 Goal: review the Smart Standing Authorization v3 local package before any possible commit.

@@ -1,0 +1,36 @@
+schema_id: autopilot_execution_receipt
+schema_version: 1
+required:
+  - task_id
+  - lane
+  - envelope_id
+  - action_performed
+  - target_systems
+  - calls_used
+  - files_read
+  - files_written
+  - dependency_actions_used
+  - cost
+  - validation_run
+  - validation_result
+  - rollback
+  - next_auto_step_allowed
+  - stop_reason
+properties:
+  lane:
+    enum:
+      - Green
+      - Amber
+      - Red
+  cost:
+    required:
+      - amount
+      - currency
+      - known
+  rollback:
+    required:
+      - rollback_or_cleanup_available
+      - rollback_or_cleanup_plan
+      - files_to_revert
+      - cleanup_targets
+      - irreversible_actions_performed

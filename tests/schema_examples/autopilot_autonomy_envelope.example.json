@@ -1,0 +1,27 @@
+{
+  "envelope_id": "default_autonomy_envelope",
+  "model": "Smart Standing Authorization v3 - Budgeted Autonomy Envelope",
+  "budgets": {
+    "max_provider_calls": 3,
+    "max_plugin_calls": 0,
+    "max_api_calls": 5,
+    "max_image_candidates": 0,
+    "max_external_read_files": 20,
+    "max_write_files": 10,
+    "max_dependency_actions": 2,
+    "max_runtime_probe_minutes": 10,
+    "max_retry_per_transient_failure": 1,
+    "max_cost_amount": 0,
+    "max_cost_currency": "USD",
+    "cost_tracking_required": true,
+    "cost_unknown_is_red": true
+  },
+  "permissions": {
+    "overwrite_existing_files_allowed": false,
+    "secret_value_read_allowed": false,
+    "raw_private_data_print_allowed": false,
+    "push_allowed": false,
+    "tag_release_deploy_allowed": false,
+    "destructive_action_allowed": false
+  }
+}

@@ -1,0 +1,20 @@
+schema_id: autopilot_receipt_registry
+schema_version: 1
+required:
+  - registry_id
+  - envelope_id
+  - receipts
+  - blocked_red_items
+properties:
+  registry_id:
+    type: string
+  envelope_id:
+    type: string
+  receipts:
+    item_schema: autopilot_execution_receipt
+  blocked_red_items:
+    item_required:
+      - id
+      - lane
+      - reason
+      - executable

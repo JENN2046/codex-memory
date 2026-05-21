@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0684 Smart Standing Authorization v3 complete autopilot governance kernel - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: added project profile, goal decomposition runtime, six local schema files, six local-only schema examples, two read-only validators, `.agent_board/AUTOPILOT_LEDGER.md`, README short entry, and docs validation integration.
+- Scope: local docs/schema/examples/scripts/board only.
+- Validation: governance kernel validator passed with `schemas=6 examples=6`; goal compiler validator passed with `goal=CM-0684 route_steps=3 executable_tasks=2 blocked_red_items=1`; `scripts\validate-local.ps1 -Area docs` passed; `git diff --check` reported normalization warnings only.
+- Not run: provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: optional guarded local commit if requested.
+
+## Checkpoint - CM-0683 Final Simplified Chinese task-summary closeout rule - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: updated `AGENTS.md` so every final user-facing reply must end with `任务总结：<one short Chinese sentence>`.
+- Rule boundary: the summary must be factual, brief, and non-overclaiming; code, commands, paths, identifiers, branch names, commit hashes, logs, errors, and test names remain in original language.
+- Validation: docs validation passed; `git diff --check` passed with CRLF warnings only; wording scan found the new rule in `AGENTS.md` and synced status/board surfaces.
+- Not run: provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: optional guarded local commit if requested.
+
+## Checkpoint - CM-0682 Smart Standing Authorization v3 default startup/resume/intake model switch - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: updated `AGENTS.md`, v3 policy, Supreme Commander protocol, A4.8 rail doc, `STATUS.md`, and `.agent_board` wording so v3 is the default startup/resume/Autopilot Rule Intake model.
+- A4.8 role: retained as `legacy local-safe rail and Green Lane substrate`.
+- Validation: docs validation passed; `git diff --check` passed with CRLF warnings only; default-mode wording scan found no authoritative A4/A4.8 default in the active rule entrypoints.
+- Not run: provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next: optional guarded local commit if requested.
+
 ## Checkpoint - CM-0681 Smart Standing Authorization v3 local closeout and commit-readiness review - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

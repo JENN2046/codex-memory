@@ -6,9 +6,11 @@ Updated: 2026-05-21
 
 The A4.8 Safe Project Operator Rail lets Codex keep moving through safe, validated project work toward VCP memory practical parity without turning autonomy into unlimited permission.
 
-A4.8 is an operating rail for `codex-memory`, not a release mode and not production authority.
+Default project startup, resume, and Autopilot Rule Intake now use [Smart Standing Authorization v3 - Budgeted Autonomy Envelope](/A:/codex-memory/docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md), not A4.8.
 
-A4.8 now uses [Smart Standing Authorization v3 - Budgeted Autonomy Envelope](/A:/codex-memory/docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md) for standing owner authorization. Green work runs directly, Amber work may run continuously inside exact budgets with receipts, and Red work still stops for explicit user approval.
+A4.8 is retained as a legacy local-safe rail and Green Lane substrate for `codex-memory`. It is not the top-level default model, not a release mode, not production authority, and not a bypass around v3 budgets, receipts, or Red Lane.
+
+Under v3, Green work runs directly, Amber work may run continuously inside exact budgets with receipts, and Red work still stops for explicit user approval. A4.8 supplies the historical local-safe mechanics used by Green Lane: roadmap/board selection, validation selection, guarded commits, push-readiness, and fail-closed safe-push.
 
 ## Rail Ladder
 
@@ -22,6 +24,7 @@ A4.8 now uses [Smart Standing Authorization v3 - Budgeted Autonomy Envelope](/A:
 ### A4.8 Safe Project Operator Rail
 
 - project operator rail
+- legacy local-safe substrate under v3
 - can read roadmap/backlog/board
 - can choose next safe phase
 - can split large phases into planning -> fixture -> dry-run -> runtime -> gate -> observability
@@ -46,15 +49,15 @@ A4.8 now uses [Smart Standing Authorization v3 - Budgeted Autonomy Envelope](/A:
 
 `A4.6` is a guarded autopilot: it can sustain a known safe task, validate it, and create guarded local commits. It usually expects the user or a written phase contract to name the next phase.
 
-`A4.8` is a safe project operator: it may inspect the roadmap, backlog, `STATUS.md`, and `.agent_board`, select the next safe local phase, split work into risk-shaped subphases, run the appropriate validation, create guarded commits, run push readiness, and safe-push validated low-risk work when the safe-push policy passes.
+`A4.8` is a safe project operator rail retained under v3: it may inspect the roadmap, backlog, `STATUS.md`, and `.agent_board`, select the next safe local phase, split work into risk-shaped subphases, run the appropriate validation, create guarded commits, run push readiness, and safe-push validated low-risk work when the safe-push policy passes.
 
-In short, A4.8 can auto-plan, auto-execute, auto-validate, auto-commit, auto-readiness, and safe-push when the work remains inside the safe-push policy.
+In short, A4.8 can provide Green Lane auto-plan, auto-execute, auto-validate, auto-commit, auto-readiness, and safe-push mechanics when the work remains inside v3 and the safe-push policy.
 
 `A5` / Red Lane is not implied by A4.8. Red includes high-risk or externally side-effectful work such as broad real durable mutation, migrations, public MCP tool expansion, provider calls outside the envelope, releases, tags, deploys, destructive operations, dependency changes without an exact package/action list, or secret/config edits. Red always requires explicit user approval.
 
 `Smart Standing Authorization v3` adds a bounded Amber envelope: exact provider probes, exact runtime probes, exact MCP memory calls, exact sanitized one-record memory writes, exact external reads, and exact small dependency actions may proceed without step-by-step approval only when they are task-scoped, budgeted, validated, and receipted.
 
-## What A4.8 May Do
+## What A4.8 May Do As v3 Green Lane Substrate
 
 - inspect code, docs, fixtures, tests, scripts, and `.agent_board`
 - read the roadmap/backlog/board and choose the next safe local phase
@@ -71,7 +74,7 @@ In short, A4.8 can auto-plan, auto-execute, auto-validate, auto-commit, auto-rea
 
 The [Supreme Commander Autopilot Protocol](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md) is the current top-level application of this rail.
 
-It names the controlling A4.8 role that reconciles repository reality, chooses the next safe local task, writes Worker contracts, runs validation, updates `.agent_board`, records Amber receipts, and stops at Red boundaries with an approval packet instead of executing the blocked action.
+It names the controlling v3 project-operator role that reconciles repository reality, chooses the next safe local task, writes Worker contracts, runs validation, updates `.agent_board`, records Amber receipts, and stops at Red boundaries with an approval packet instead of executing the blocked action. A4.8 supplies the legacy local-safe mechanics underneath that role.
 
 ## What A4.8 Must Not Do
 

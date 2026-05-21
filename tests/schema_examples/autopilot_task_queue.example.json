@@ -1,0 +1,50 @@
+{
+  "task_queue": {
+    "goal_id": "CM-0684",
+    "executable_tasks": [
+      {
+        "id": "CM-0684-1",
+        "lane": "Green",
+        "status": "done",
+        "objective": "add project profile and goal runtime docs",
+        "allowed_files_or_systems": [
+          "docs/AUTOPILOT_PROJECT_PROFILE.md",
+          "docs/AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md"
+        ],
+        "forbidden_files_or_systems": [".env*", "data/**", "remote repositories"],
+        "allowed_commands_or_operations": ["read files", "edit local docs", "docs validation"],
+        "validation": ["powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\validate-local.ps1 -Area docs"],
+        "receipt_required": false
+      },
+      {
+        "id": "CM-0684-2",
+        "lane": "Green",
+        "status": "in_progress",
+        "objective": "add schemas, examples, validators, and ledger",
+        "allowed_files_or_systems": [
+          "schemas/**",
+          "tests/schema_examples/**",
+          "scripts/validate_autopilot_governance_kernel.js",
+          "scripts/validate_autopilot_goal_compiler.js",
+          ".agent_board/AUTOPILOT_LEDGER.md"
+        ],
+        "forbidden_files_or_systems": ["provider systems", "real memory stores", "dependency manifests"],
+        "allowed_commands_or_operations": [
+          "node --check scripts\\validate_autopilot_governance_kernel.js",
+          "node scripts\\validate_autopilot_governance_kernel.js",
+          "node --check scripts\\validate_autopilot_goal_compiler.js",
+          "node scripts\\validate_autopilot_goal_compiler.js"
+        ],
+        "validation": ["validators pass"],
+        "receipt_required": false
+      }
+    ],
+    "blocked_red_items": [
+      {
+        "id": "CM-0684-R1",
+        "reason": "push/tag/release/deploy/readiness claim remains Red"
+      }
+    ],
+    "next_safe_task": "CM-0684-2"
+  }
+}

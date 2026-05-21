@@ -1,0 +1,30 @@
+schema_id: autopilot_task_queue
+schema_version: 1
+required:
+  - task_queue
+properties:
+  task_queue:
+    required:
+      - goal_id
+      - executable_tasks
+      - blocked_red_items
+      - next_safe_task
+  executable_task:
+    required:
+      - id
+      - lane
+      - status
+      - objective
+      - allowed_files_or_systems
+      - forbidden_files_or_systems
+      - allowed_commands_or_operations
+      - validation
+      - receipt_required
+    lane_enum:
+      - Green
+      - Amber
+    status_enum:
+      - todo
+      - in_progress
+      - done
+      - blocked

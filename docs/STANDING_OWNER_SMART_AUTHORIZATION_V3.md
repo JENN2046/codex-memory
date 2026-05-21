@@ -6,6 +6,10 @@ Updated: 2026-05-21
 
 Smart Standing Authorization v3 gives Codex a bounded autonomy envelope for `codex-memory`.
 
+It is the default model for project startup, resume, and Autopilot Rule Intake.
+
+A4.8 remains available only as the legacy local-safe rail and Green Lane substrate. It provides the old local-safe mechanics for planning, validation, guarded commits, push readiness, and safe-push, but it does not replace v3 budgets, receipts, lane decisions, or Red hard stops.
+
 It preserves standing owner authorization and continuous automatic progress, but makes that progress budgeted, receipt-backed, and fail-closed at Red conditions.
 
 Core rule:

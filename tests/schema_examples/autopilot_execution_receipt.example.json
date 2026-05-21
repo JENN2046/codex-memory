@@ -1,0 +1,45 @@
+{
+  "task_id": "CM-0684-2",
+  "lane": "Green",
+  "envelope_id": "default_autonomy_envelope",
+  "action_performed": "add local schema examples and validators",
+  "target_systems": ["local filesystem"],
+  "calls_used": {
+    "provider": 0,
+    "plugin": 0,
+    "api": 0,
+    "mcp": 0,
+    "runtime_probe_minutes": 0
+  },
+  "files_read": [
+    "AGENTS.md",
+    "STATUS.md",
+    ".agent_board/RUN_STATE.md"
+  ],
+  "files_written": [
+    "schemas/autopilot_autonomy_envelope.schema.yaml",
+    "tests/schema_examples/autopilot_autonomy_envelope.example.json"
+  ],
+  "dependency_actions_used": 0,
+  "cost": {
+    "amount": 0,
+    "currency": "USD",
+    "known": true
+  },
+  "validation_run": [
+    "node scripts/validate_autopilot_governance_kernel.js"
+  ],
+  "validation_result": "pending",
+  "rollback": {
+    "rollback_or_cleanup_available": true,
+    "rollback_or_cleanup_plan": "revert the local files listed in files_written",
+    "files_to_revert": [
+      "schemas/autopilot_autonomy_envelope.schema.yaml",
+      "tests/schema_examples/autopilot_autonomy_envelope.example.json"
+    ],
+    "cleanup_targets": [],
+    "irreversible_actions_performed": false
+  },
+  "next_auto_step_allowed": true,
+  "stop_reason": "none"
+}

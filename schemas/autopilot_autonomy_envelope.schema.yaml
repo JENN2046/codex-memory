@@ -1,0 +1,35 @@
+schema_id: autopilot_autonomy_envelope
+schema_version: 1
+required:
+  - envelope_id
+  - model
+  - budgets
+  - permissions
+properties:
+  envelope_id:
+    type: string
+  model:
+    const: Smart Standing Authorization v3 - Budgeted Autonomy Envelope
+  budgets:
+    required:
+      - max_provider_calls
+      - max_plugin_calls
+      - max_api_calls
+      - max_image_candidates
+      - max_external_read_files
+      - max_write_files
+      - max_dependency_actions
+      - max_runtime_probe_minutes
+      - max_retry_per_transient_failure
+      - max_cost_amount
+      - max_cost_currency
+      - cost_tracking_required
+      - cost_unknown_is_red
+  permissions:
+    required:
+      - overwrite_existing_files_allowed
+      - secret_value_read_allowed
+      - raw_private_data_print_allowed
+      - push_allowed
+      - tag_release_deploy_allowed
+      - destructive_action_allowed

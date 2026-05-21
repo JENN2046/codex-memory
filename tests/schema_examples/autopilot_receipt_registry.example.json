@@ -1,0 +1,19 @@
+{
+  "registry_id": "autopilot_registry_cm_0684",
+  "envelope_id": "default_autonomy_envelope",
+  "receipts": [
+    {
+      "task_id": "CM-0684-2",
+      "lane": "Green",
+      "receipt_ref": "tests/schema_examples/autopilot_execution_receipt.example.json"
+    }
+  ],
+  "blocked_red_items": [
+    {
+      "id": "CM-0684-R1",
+      "lane": "Red",
+      "reason": "push, release, deploy, and readiness claims are outside this local goal",
+      "executable": false
+    }
+  ]
+}

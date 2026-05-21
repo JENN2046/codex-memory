@@ -1,0 +1,24 @@
+schema_id: autopilot_route_plan
+schema_version: 1
+required:
+  - route_plan
+properties:
+  route_plan:
+    required:
+      - goal_id
+      - current_state_summary
+      - target_state_summary
+      - route_steps
+  route_step:
+    required:
+      - id
+      - lane
+      - purpose
+      - target_files_or_systems
+      - validation
+      - receipt_required
+      - stop_conditions
+    lane_enum:
+      - Green
+      - Amber
+      - Red

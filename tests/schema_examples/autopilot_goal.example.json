@@ -1,0 +1,42 @@
+{
+  "goal": {
+    "id": "CM-0684",
+    "objective": "Build the local Smart Standing Authorization v3 complete autopilot governance kernel",
+    "scope": {
+      "allowed_areas": [
+        "docs",
+        "schemas",
+        "tests/schema_examples",
+        "scripts validators",
+        ".agent_board"
+      ],
+      "forbidden_areas": [
+        "provider calls",
+        "real MCP memory writes",
+        "real memory broad scans",
+        "dependency changes",
+        "config changes",
+        "push/tag/release/deploy",
+        "readiness claims"
+      ]
+    },
+    "success_criteria": [
+      "project profile exists",
+      "goal decomposition runtime exists",
+      "schemas and examples exist",
+      "validators pass",
+      ".agent_board records current route and blocked Red items"
+    ],
+    "validation_required": [
+      "node scripts/validate_autopilot_governance_kernel.js",
+      "node scripts/validate_autopilot_goal_compiler.js",
+      "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\validate-local.ps1 -Area docs",
+      "git diff --check"
+    ],
+    "stop_conditions": [
+      "Red Lane action required",
+      "validation failure requiring non-obvious judgment",
+      "user-owned uncommitted change would be overwritten"
+    ]
+  }
+}

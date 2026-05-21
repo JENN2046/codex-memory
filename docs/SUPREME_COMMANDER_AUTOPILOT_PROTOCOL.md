@@ -10,7 +10,9 @@ It lets one controlling session keep the project moving through safe, validated 
 
 It is not a daemon, background service, release mode, production authority, remote-write permission, or A5 bypass.
 
-It uses [Smart Standing Authorization v3 - Budgeted Autonomy Envelope](/A:/codex-memory/docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md): Green work runs directly, Amber work may run continuously inside exact budgets with receipts, and Red work stops for explicit user approval.
+Default project startup, resume, and Autopilot Rule Intake use [Smart Standing Authorization v3 - Budgeted Autonomy Envelope](/A:/codex-memory/docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md): Green work runs directly, Amber work may run continuously inside exact budgets with receipts, and Red work stops for explicit user approval.
+
+A4.8 is retained only as the legacy local-safe rail and Green Lane substrate under v3. It supplies local planning, validation, board, guarded commit, push-readiness, and safe-push mechanics, but it is no longer the top-level default authority model.
 
 ## Authority
 
@@ -21,7 +23,7 @@ This protocol is below:
 3. current repository reality and observed command output
 4. source behavior
 5. `AGENTS.md`
-6. the A4.8 Safe Project Operator Rail
+6. the A4.8 legacy local-safe rail as v3 Green Lane substrate
 
 If this protocol conflicts with those sources, this protocol loses.
 
@@ -29,7 +31,7 @@ If this protocol conflicts with those sources, this protocol loses.
 
 `Supreme Commander` is not a fifth worker.
 
-It is the Commander operating under A4.8 project-operator authority with explicit responsibility for the whole local execution loop:
+It is the Commander operating under Smart Standing Authorization v3 with explicit responsibility for the whole local execution loop. A4.8 mechanics may be used as the Green Lane substrate:
 
 - read Git, docs, source, tests, scripts, and `.agent_board`
 - reconcile stale board or status claims against repository reality
