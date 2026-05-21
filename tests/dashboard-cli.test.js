@@ -256,7 +256,11 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'recallTypeBreakdown',
     'recentCount',
     'scopeDimensionBreakdown',
+    'scopeEvidenceState',
     'scopeModeBreakdown',
+    'scopeNextAction',
+    'scopeReadinessClaimAllowed',
+    'scopeStatus',
     'scopedRecallCount',
     'status',
     'strictScopedRecallCount',
@@ -266,6 +270,10 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(typeof payload.audits.recall.strictScopedRecallCount, 'number');
   assert.equal(typeof payload.audits.recall.scopeModeBreakdown, 'object');
   assert.equal(typeof payload.audits.recall.scopeDimensionBreakdown, 'object');
+  assert.equal(typeof payload.audits.recall.scopeStatus, 'string');
+  assert.equal(typeof payload.audits.recall.scopeEvidenceState, 'string');
+  assert.equal(typeof payload.audits.recall.scopeNextAction, 'string');
+  assert.equal(payload.audits.recall.scopeReadinessClaimAllowed, false);
   assert.equal(payload.audits.recall.rawWorkspaceId, undefined);
 
   assertKeySet(payload.readPolicy, [
@@ -1148,6 +1156,7 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Profile'), 'should include Profile section');
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
   assert.ok(text.includes('ReadPolicy'), 'should include ReadPolicy section');
+  assert.ok(text.includes('RecallScope'), 'should include recall scope section');
   assert.ok(text.includes('Governance'), 'should include Governance section');
   assert.ok(text.includes('auto-auth'), 'should include governance auto-auth summary');
   assert.ok(text.includes('GovBundle'), 'should include governance bundle line');
@@ -1283,6 +1292,8 @@ test('dashboard CLI should tolerate clean CI runner warnings', async () => {
   assert.equal(payload.governance.autoAuthorization.currentBlockedOn, 'external_token_assertion_not_accepted');
   assert.notEqual(payload.gate.status, 'error', formatFailure(result));
   assert.equal(typeof payload.audits.recall.scopedRecallCount, 'number');
+  assert.equal(typeof payload.audits.recall.scopeEvidenceState, 'string');
+  assert.equal(payload.audits.recall.scopeReadinessClaimAllowed, false);
   assert.equal(payload.readPolicy.rawWorkspaceIdExposed, false);
 });
 

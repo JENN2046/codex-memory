@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0715 Dashboard recall scope evidence state - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after targeted dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added read-only recall scope evidence fields to `dashboard.audits.recall` and a text `RecallScope` line.
+- Current local signal: dashboard now reports `scopeStatus=warn`, `scopeEvidenceState=recent_recall_without_scope`, `scopeNextAction=collect_recent_scoped_recall_audit_evidence_before_client_scope_claim`, and `scopeReadinessClaimAllowed=false`.
+- Boundary: this is observability only; it does not run recall/search, does not read raw memory content, does not mutate runtime/config, and does not claim Codex/Claude client-scope readiness.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard CLI tests passed `19/19`; real dashboard JSON/text smoke showed the new scope evidence surface; full `npm test` passed `1955/1955`.
+- Next safe task: implement a bounded scoped-recall evidence probe, or continue governance fail-closed hardening.
+
 ## Checkpoint - CM-0714 Dashboard structured governance next action - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after targeted dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

@@ -311,7 +311,42 @@ function buildRecallScopeSummary(entries = []) {
     }
   }
 
+  const scopeState = buildRecallScopeEvidenceState(entries.length, summary);
+  Object.assign(summary, scopeState);
   return summary;
+}
+
+function buildRecallScopeEvidenceState(recentRecallCount, summary) {
+  if (recentRecallCount === 0) {
+    return {
+      scopeStatus: 'warn',
+      scopeEvidenceState: 'no_recent_recall_audit',
+      scopeNextAction: 'collect_recent_scoped_recall_audit_evidence_before_client_scope_claim',
+      scopeReadinessClaimAllowed: false
+    };
+  }
+  if (summary.scopedRecallCount === 0) {
+    return {
+      scopeStatus: 'warn',
+      scopeEvidenceState: 'recent_recall_without_scope',
+      scopeNextAction: 'collect_recent_scoped_recall_audit_evidence_before_client_scope_claim',
+      scopeReadinessClaimAllowed: false
+    };
+  }
+  if (summary.strictScopedRecallCount === 0) {
+    return {
+      scopeStatus: 'warn',
+      scopeEvidenceState: 'scoped_recall_without_strict_scope',
+      scopeNextAction: 'collect_recent_strict_scoped_recall_audit_evidence_before_client_scope_claim',
+      scopeReadinessClaimAllowed: false
+    };
+  }
+  return {
+    scopeStatus: 'ok',
+    scopeEvidenceState: 'recent_strict_scoped_recall',
+    scopeNextAction: 'none',
+    scopeReadinessClaimAllowed: false
+  };
 }
 
 async function collectService() {
@@ -1196,7 +1231,9 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   if (runtime.httpLogErrorCount > 0) recs.push(`${runtime.httpLogErrorCount} HTTP errors detected — review logs`);
   if (audits.bridge.recentCount === 0) recs.push('No recent bridge entries — memory may not be writing');
   if (audits.recall.recentCount === 0) recs.push('No recent recall entries — search may not be active');
-  if (audits.recall.recentCount > 0 && audits.recall.scopedRecallCount === 0) recs.push('Recent recall activity is present, but none of it used scope filtering');
+  if (audits.recall.scopeStatus !== 'ok') {
+    recs.push(`${audits.recall.scopeNextAction || 'Collect recent scoped recall audit evidence'}; scopeEvidenceState=${audits.recall.scopeEvidenceState || 'unknown'}, scoped=${audits.recall.scopedRecallCount ?? 'unknown'}/${audits.recall.recentCount ?? 'unknown'}`);
+  }
   if (readPolicy.status !== 'ok') recs.push(`${readPolicy.nextEvidenceAction || 'Collect recent lifecycle read-policy audit evidence'}; inspected=${readPolicy.auditedEntryCount ?? 'unknown'}/${readPolicy.auditTailLimit ?? 'unknown'} recall audit entries`);
   if (smartStandingAuthorizationV3.status !== 'ok') recs.push('Smart Standing Authorization v3 receipt summary is unavailable or blocked; inspect local validation log parser input');
   if (autopilotKernel.status !== 'ok') recs.push('Autopilot governance kernel summary is incomplete; run docs validation and inspect AUTOPILOT_LEDGER');
@@ -1280,6 +1317,7 @@ function renderText(report, options = {}) {
   lines.push(`GovNext    ${report.readinessSummary.governanceNextAction?.code || 'none'} stage=${report.readinessSummary.governanceNextAction?.stage || 'none'}, next=${report.readinessSummary.governanceNextAction?.nextStepRef || 'none'}`);
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
   lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
+  lines.push(`RecallScope ${pad(report.audits.recall.scopeStatus || 'unknown')} ${report.audits.recall.scopeEvidenceState || 'unknown'}, next=${report.audits.recall.scopeNextAction || 'unknown'}`);
   lines.push(`ReadPolicy ${pad(report.readPolicy.status)} lifecycle=${report.readPolicy.lifecyclePolicyEnabled}, soft=${report.readPolicy.softReadPolicyEnabled}, hidden=${report.readPolicy.recentHiddenByLifecycleCount}, stale=${report.readPolicy.recentStaleResultCount}, columns=${report.readPolicy.lifecycleColumnAvailable ?? 'unavailable'}`);
   lines.push(`Governance ${pad(report.governance.status)} ${report.governance.counts.proposalCount} proposals, ${report.governance.counts.stale90d} stale>90d, review ${report.governance.reviewLevel}, auto-auth ${report.governance.autoAuthorization?.allowedGovernanceOutput || 'unavailable'}, stage ${report.governance.autoAuthorization?.operatorActionPlan?.currentStage || 'unknown'}, bundle ${report.governance.autoAuthorization?.artifactBundleDraft?.bundleKind || 'unknown'}`);
   lines.push(`GovBundle  ${autoAuthorizationBundleSummary}`);
