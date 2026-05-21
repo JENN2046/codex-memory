@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0734 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, v3 parser smoke, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0734 started from local `HEAD = 5f6bd59 feat: surface store freshness approval packet`, with `main...origin/main [ahead 31]`.
+
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: dashboard now exposes the exact store freshness operator approval line as JSON `operatorApprovalLine` and text `StoreWAsk`, while keeping `approvalState=NOT_APPROVED`, `proposedMemoryWrites=1`, `memoryWrites=0`, and `readinessClaimAllowed=false`.
+
+Boundary: local read-only dashboard/test/docs/board only. No `record_memory`, `search_memory`, provider/API/MCP call, durable memory write, config/runtime mutation, public MCP expansion, remote action, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js` passed `20/20`; `node src\cli\dashboard.js --summary-only`; `node src\cli\dashboard.js --json --summary-only`; `npm test` passed `1970/1970`; docs validation passed with `latest_task=CM-0734`; `node src\cli\smart-standing-authorization-v3-receipts.js --json` reported `CM-0734 / CMV-0853`, `Green / local_review_shape_only`, and `memory_writes=0`; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push and actual memory write remain blocked without explicit authorization.
+
 ## CM-0733 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, v3 parser smoke, and diff check; guarded local commit is the remaining closeout step for this slice.

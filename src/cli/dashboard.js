@@ -439,6 +439,7 @@ async function collectStoreFreshnessWritePreflight() {
       memoryWrites: 0,
       readinessClaimAllowed: false,
       commandPreview,
+      operatorApprovalLine: '',
       operatorApprovalLineAvailable: false
     };
   }
@@ -454,6 +455,7 @@ async function collectStoreFreshnessWritePreflight() {
     memoryWrites: Number(data.memoryWrites) || 0,
     readinessClaimAllowed: data.readinessClaimAllowed === true,
     commandPreview: data.commandPreview || commandPreview,
+    operatorApprovalLine: typeof packet.operatorApprovalLine === 'string' ? packet.operatorApprovalLine : '',
     operatorApprovalLineAvailable: typeof packet.operatorApprovalLine === 'string' && packet.operatorApprovalLine.length > 0
   };
 }
@@ -1529,6 +1531,7 @@ function renderText(report, options = {}) {
   lines.push(`Store      ${pad(report.store.status)} ${report.store.records} records, ${report.store.chunks} chunks`);
   lines.push(`StoreFresh ${pad(formatStoreFreshnessLevel(report))} ${formatStoreFreshnessText(report)}`);
   lines.push(`StoreWrite ${pad(report.storeFreshnessWritePreflight.status)} ${report.storeFreshnessWritePreflight.approvalState}, proposed=${report.storeFreshnessWritePreflight.proposedMemoryWrites}, writes=${report.storeFreshnessWritePreflight.memoryWrites}, packet=${report.storeFreshnessWritePreflight.packetId}`);
+  lines.push(`StoreWAsk ${report.storeFreshnessWritePreflight.operatorApprovalLine || 'none'}`);
   lines.push(`Profile    ${pad(report.profile.status)} ${report.profile.fingerprint || 'N/A'}, ${report.profile.legacyChunks} legacy`);
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`GitSync    ${pad(report.gitSync.status)} ${report.gitSync.branchSummary}, dirty=${report.gitSync.dirtyCount}, remoteAction=${report.gitSync.remoteActionsPerformed === true}`);

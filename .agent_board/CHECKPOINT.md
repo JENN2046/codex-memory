@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0734 Dashboard store freshness approval line surface - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: surfaced the existing store freshness operator approval line in dashboard JSON/text as `operatorApprovalLine` and `StoreWAsk`.
+- Current local signal: real `node src\cli\dashboard.js --summary-only` shows `StoreWAsk Approve exactly one sanitized record_memory write...`; real JSON shows `operatorApprovalLineAvailable=true`, `memoryWrites=0`, `proposedMemoryWrites=1`, and `readinessClaimAllowed=false`.
+- Boundary: Green Lane local dashboard/test/docs/board only; no `record_memory`, `search_memory`, provider/API/MCP call, durable memory write, config/runtime mutation, public MCP expansion, remote action, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `20/20`; real dashboard text/JSON smoke showed the approval line; full `npm test` passed `1970/1970`; docs validation passed with `latest_task=CM-0734`; v3 parser smoke reported `CM-0734 / CMV-0853`, `Green / local_review_shape_only`, and `memory_writes=0`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean; do not push or execute the approval line without explicit authorization.
+
 ## Checkpoint - CM-0733 Dashboard store freshness approval packet surface - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

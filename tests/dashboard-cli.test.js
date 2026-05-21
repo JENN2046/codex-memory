@@ -222,6 +222,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'commandPreview',
     'decision',
     'memoryWrites',
+    'operatorApprovalLine',
     'operatorApprovalLineAvailable',
     'packetId',
     'proposedMemoryWrites',
@@ -231,6 +232,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.storeFreshnessWritePreflight.memoryWrites, 0);
   assert.equal(payload.storeFreshnessWritePreflight.readinessClaimAllowed, false);
   assert.equal(typeof payload.storeFreshnessWritePreflight.proposedMemoryWrites, 'number');
+  assert.equal(typeof payload.storeFreshnessWritePreflight.operatorApprovalLine, 'string');
   assert.match(payload.storeFreshnessWritePreflight.commandPreview, /store-freshness-write-preflight\.js --json/);
   assert.equal(payload.readinessSummary.status, 'blocked');
   assert.equal(payload.readinessSummary.decision, 'NOT_READY_BLOCKED');
@@ -851,6 +853,7 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
     'commandPreview',
     'decision',
     'memoryWrites',
+    'operatorApprovalLine',
     'operatorApprovalLineAvailable',
     'packetId',
     'proposedMemoryWrites',
@@ -859,6 +862,7 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
   ], 'dashboard summary-only store freshness write preflight');
   assert.equal(payload.storeFreshnessWritePreflight.memoryWrites, 0);
   assert.equal(payload.storeFreshnessWritePreflight.readinessClaimAllowed, false);
+  assert.equal(typeof payload.storeFreshnessWritePreflight.operatorApprovalLine, 'string');
   assert.match(payload.storeFreshnessWritePreflight.commandPreview, /store-freshness-write-preflight\.js --json/);
   assert.match(payload.operationalSummary.message, /governance readiness remains separate/);
   assert.equal(payload.readinessSummary.status, 'blocked');
@@ -1320,6 +1324,8 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.match(text, /StoreFresh\s+(ok|warn)\s+\d+ in 24h, \d+ in 7d, \d+ in 30d/, 'should include store freshness age buckets and level');
   assert.ok(text.includes('StoreWrite'), 'should include store freshness write preflight section');
   assert.match(text, /StoreWrite\s+(ok|warn)\s+(NOT_APPROVED|none), proposed=\d+, writes=0/, 'should include store write approval state and zero actual writes');
+  assert.ok(text.includes('StoreWAsk'), 'should include store freshness write approval line surface');
+  assert.ok(text.includes('Approve exactly one sanitized record_memory write') || text.includes('StoreWAsk none'), 'should include exact store freshness approval boundary');
   assert.ok(text.includes('Profile'), 'should include Profile section');
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
   assert.ok(text.includes('GitSync'), 'should include local git sync section');
