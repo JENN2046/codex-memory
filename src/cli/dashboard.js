@@ -1052,11 +1052,32 @@ function buildReadinessSummary(operationalSummary, governance, readPolicy, smart
     blockerCount: blockerCodes.length,
     blockerSources,
     blockerCodes,
-    nextAction: reviewCandidate
-      ? 'run_separate_completion_audit_before_any_readiness_claim'
-      : 'resolve_read_policy_and_governance_fail_closed_evidence_before_readiness_claim',
+    nextAction: buildReadinessNextAction({
+      reviewCandidate,
+      operationalStatus: operationalSummary.status,
+      blockerSources,
+      readPolicy
+    }),
     readinessClaimAllowed: false
   };
+}
+
+function buildReadinessNextAction({ reviewCandidate, operationalStatus, blockerSources = [], readPolicy = {} } = {}) {
+  if (reviewCandidate) return 'run_separate_completion_audit_before_any_readiness_claim';
+  if (operationalStatus !== 'ok') return 'restore_operational_health_before_readiness_claim';
+
+  const hasReadPolicyBlocker = readPolicy.status !== 'ok' || blockerSources.includes('read-policy');
+  const hasGovernanceBlocker = blockerSources.includes('governance');
+  if (hasReadPolicyBlocker && hasGovernanceBlocker) {
+    return 'resolve_read_policy_and_governance_fail_closed_evidence_before_readiness_claim';
+  }
+  if (hasReadPolicyBlocker) {
+    return readPolicy.nextEvidenceAction || 'collect_recent_read_policy_audit_evidence_before_readiness_claim';
+  }
+  if (hasGovernanceBlocker) {
+    return 'resolve_governance_fail_closed_evidence_before_readiness_claim';
+  }
+  return 'resolve_remaining_fail_closed_evidence_before_readiness_claim';
 }
 
 function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract) {

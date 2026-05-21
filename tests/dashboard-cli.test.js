@@ -603,8 +603,16 @@ test('dashboard CLI should report all sections in json mode', async () => {
   );
 });
 
-test('dashboard CLI should support --json --summary-only', async () => {
-  const result = await runDashboard({ args: ['--json', '--summary-only'] });
+test('dashboard CLI should support --json --summary-only', async (t) => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-dashboard-summary-'));
+  const logsDir = path.join(tempBasePath, 'logs');
+  t.after(() => fs.rm(tempBasePath, { recursive: true, force: true }));
+  await fs.mkdir(logsDir, { recursive: true });
+
+  const result = await runDashboard({
+    args: ['--json', '--summary-only'],
+    env: { CODEX_MEMORY_LOGS_DIR: logsDir }
+  });
   assert.equal(result.code, 0, formatFailure(result));
   const payload = parseJsonOutput(result.stdout);
 
@@ -1033,6 +1041,41 @@ test('dashboard CLI should support --json --summary-only', async () => {
   assert.equal(payload.governance.wideningReview.decision, 'WIDENING_REVIEW_NOT_READY');
   assert.equal(payload.governance.boundedRecallCloseout.decision, 'BOUNDED_RECALL_CLOSEOUT_NOT_READY');
   assert.equal(payload.governance.hints, undefined);
+});
+
+test('dashboard readiness nextAction narrows to governance after read-policy evidence is present', async (t) => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-dashboard-read-policy-ok-'));
+  const logsDir = path.join(tempBasePath, 'logs');
+  const recallLogPath = path.join(logsDir, 'codex-memory-recall.jsonl');
+  t.after(() => fs.rm(tempBasePath, { recursive: true, force: true }));
+  await fs.mkdir(logsDir, { recursive: true });
+  await fs.writeFile(recallLogPath, `${JSON.stringify({
+    timestamp: new Date().toISOString(),
+    recallType: 'read-policy',
+    readPolicyApplied: true,
+    lifecyclePolicyApplied: true,
+    hiddenByLifecycleCount: 1,
+    staleResultCount: 0,
+    lifecycleColumnAvailable: false,
+    scopeWorkspacePresent: false,
+    resultCount: 0
+  })}\n`, 'utf8');
+
+  const result = await runDashboard({
+    args: ['--json', '--summary-only'],
+    env: { CODEX_MEMORY_LOGS_DIR: logsDir }
+  });
+  assert.equal(result.code, 0, formatFailure(result));
+  const payload = parseJsonOutput(result.stdout);
+
+  assert.equal(payload.readinessSummary.status, 'blocked');
+  assert.equal(payload.readinessSummary.readPolicyStatus, 'ok');
+  assert.equal(payload.readinessSummary.readPolicyEvidenceState, 'config_and_recent_audit');
+  assert.equal(payload.readinessSummary.readPolicyNextEvidenceAction, 'none');
+  assert.equal(payload.readinessSummary.blockerSources.includes('read-policy'), false);
+  assert.ok(payload.readinessSummary.blockerSources.includes('governance'));
+  assert.equal(payload.readinessSummary.nextAction, 'resolve_governance_fail_closed_evidence_before_readiness_claim');
+  assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
 });
 
 test('dashboard CLI should include v3 receipt summary from explicit validation log', async () => {

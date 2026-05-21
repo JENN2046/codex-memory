@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0713 Read-policy audit evidence collection and readiness next-action narrowing - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after targeted dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: executed one bounded read-policy evidence probe against the current local memory read path, then updated dashboard readiness nextAction and tests.
+- Amber receipt: `realMemoryReadQueryCount=1`, `memoryWrites=0`, provider/API/external MCP calls `0`, runtime probe minutes `0`, dependency actions `0`; one local recall-audit append was written as read-policy evidence.
+- Behavior: current dashboard summary now reports `readPolicyStatus=ok`, `readPolicyEvidenceState=config_and_recent_audit`, `readPolicyNextEvidenceAction=none`, blocker sources narrowed to `governance`, and `nextAction=resolve_governance_fail_closed_evidence_before_readiness_claim`.
+- Boundary: no raw query or raw memory content was returned or printed; no memory write, provider call, config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard CLI tests passed `19/19`; real dashboard summary smoke showed read-policy evidence `ok` and governance-only next action; full `npm test` passed `1955/1955`.
+- Next safe task: continue local-safe authorized write-path governance fail-closed evidence hardening; do not claim readiness.
+
 ## Checkpoint - CM-0712 Read-policy evidence probe CLI - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after docs validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0713 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0713 started from local `HEAD = 40359c6 feat: add read policy evidence probe`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 10]`.
+
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CM-0713_RECEIPT.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`.
+
+Validation to preserve: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js`; `node src\cli\dashboard.js --json --summary-only`; `npm test`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`.
+
+Boundary: one Amber bounded local read-policy evidence probe executed against the current memory read path with sanitized output only. It used `realMemoryReadQueryCount=1`, wrote one local recall-audit evidence append, kept `memoryWrites=0`, did not return raw query/content, and did not call provider/API/external MCP. Dashboard now narrows readiness next action to governance-only, but `readinessClaimAllowed=false` and the project remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Next safe task: continue local-safe hardening of authorized write-path governance fail-closed blockers, or request explicit push authorization if remote sync is desired.
+
 ## CM-0712 Handoff
 
 Status: `COMPLETED_VALIDATED`.
