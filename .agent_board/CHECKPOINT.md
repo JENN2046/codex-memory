@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0728 Dashboard store freshness severity text - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added read-only severity text to the dashboard `StoreFresh` line, using the existing `store-freshness` check `level` when available and falling back to `store.ageBreakdown.last24h` for full reports without that check.
+- Current local signal: real `node src\cli\dashboard.js --summary-only` shows `StoreFresh warn 0 in 24h, 3 in 7d, 30d unavailable`, while the existing `store-freshness` warning remains visible in Checks.
+- Boundary: Green Lane local dashboard text/test/docs/board only; no JSON contract change, store freshness calculation change, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `20/20`; real dashboard text smoke showed `StoreFresh warn`; full `npm test` passed `1964/1964`; docs validation passed with `latest_task=CM-0728`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then continue runtime/readiness evidence hardening; do not claim readiness.
+
 ## Checkpoint - CM-0727 Dashboard store freshness text summary - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

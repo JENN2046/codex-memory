@@ -1416,6 +1416,13 @@ function formatStoreFreshnessText(report) {
   return 'unavailable';
 }
 
+function formatStoreFreshnessLevel(report) {
+  const freshnessCheck = (report.checks || []).find(check => check.code === 'store-freshness');
+  if (freshnessCheck?.level) return freshnessCheck.level;
+  if (report.store.ageBreakdown) return report.store.ageBreakdown.last24h > 0 ? 'ok' : 'warn';
+  return 'unknown';
+}
+
 function renderText(report, options = {}) {
   const lines = [];
   const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(report.governance.autoAuthorization);
@@ -1427,7 +1434,7 @@ function renderText(report, options = {}) {
   lines.push('');
   lines.push(`Service    ${pad(report.service.status)} ${report.service.url}  ${report.service.httpStatus}  ${report.service.version}`);
   lines.push(`Store      ${pad(report.store.status)} ${report.store.records} records, ${report.store.chunks} chunks`);
-  lines.push(`StoreFresh ${formatStoreFreshnessText(report)}`);
+  lines.push(`StoreFresh ${pad(formatStoreFreshnessLevel(report))} ${formatStoreFreshnessText(report)}`);
   lines.push(`Profile    ${pad(report.profile.status)} ${report.profile.fingerprint || 'N/A'}, ${report.profile.legacyChunks} legacy`);
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`Operational ${pad(report.operationalSummary.status)} ${report.operationalSummary.message}`);
