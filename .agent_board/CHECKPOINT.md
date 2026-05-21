@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0710 Dashboard readiness blocker summary - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a read-only `readinessSummary` to `dashboard` so remaining readiness blockers are visible separately from runnable operational health.
+- Behavior: `dashboard --json --summary-only` now reports `operationalSummary.status=ok` and `readinessSummary.status=blocked`, with blocker sources/codes for read-policy and authorized write-path governance.
+- Boundary: `readinessSummary.readinessClaimAllowed=false`; this is not `RC_READY`, does not issue approval, and does not change governance fail-closed state.
+- Validation: dashboard syntax passed; targeted dashboard CLI tests passed; dashboard summary smoke showed explicit readiness blockers; full `npm test` passed; docs validation passed; `git diff --check` passed.
+- No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Next safe task: continue local-safe stabilization toward durable Codex/Claude memory mainline, with read-policy audit evidence and governance fail-closed blockers as the visible next readiness work.
+
 ## Checkpoint - CM-0709 Dashboard operational health split - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

@@ -1015,6 +1015,44 @@ function buildOperationalSummary(service, store, profile, runtime, gate) {
   };
 }
 
+const READINESS_BLOCKER_SOURCES = new Set([
+  'read-policy',
+  'governance',
+  'smart-standing-authorization-v3',
+  'autopilot-kernel',
+  'autopilot-loop',
+  'autopilot-controller'
+]);
+
+function buildReadinessSummary(operationalSummary, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks) {
+  const blockerChecks = checks.filter(check => check.level !== 'ok' && READINESS_BLOCKER_SOURCES.has(check.source));
+  const blockerCodes = [...new Set(blockerChecks.map(check => check.code))];
+  const blockerSources = [...new Set(blockerChecks.map(check => check.source))];
+  const reviewCandidate = operationalSummary.status === 'ok'
+    && readPolicy.status === 'ok'
+    && governance.autoAuthorization?.decision !== 'RC_NOT_READY_BLOCKED'
+    && smartStandingAuthorizationV3.decision !== 'NOT_READY_BLOCKED'
+    && autopilotKernel.readiness_claim_allowed === true
+    && autopilotLoop.readiness_claim_allowed === true
+    && blockerCodes.length === 0;
+  return {
+    status: reviewCandidate ? 'review_required' : 'blocked',
+    decision: reviewCandidate ? 'READY_REVIEW_REQUIRED' : 'NOT_READY_BLOCKED',
+    operationalStatus: operationalSummary.status,
+    governanceDecision: governance.autoAuthorization?.decision || 'unknown',
+    readPolicyStatus: readPolicy.status,
+    autopilotDecision: autopilotLoop.decision || autopilotKernel.decision || 'unknown',
+    latestTask: autopilotLoop.latest_task || autopilotKernel.latest_ledger_goal || 'unknown',
+    blockerCount: blockerCodes.length,
+    blockerSources,
+    blockerCodes,
+    nextAction: reviewCandidate
+      ? 'run_separate_completion_audit_before_any_readiness_claim'
+      : 'resolve_read_policy_and_governance_fail_closed_evidence_before_readiness_claim',
+    readinessClaimAllowed: false
+  };
+}
+
 function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract) {
   const recs = [];
   const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
@@ -1110,6 +1148,7 @@ function renderText(report, options = {}) {
   lines.push(`Profile    ${pad(report.profile.status)} ${report.profile.fingerprint || 'N/A'}, ${report.profile.legacyChunks} legacy`);
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`Operational ${pad(report.operationalSummary.status)} ${report.operationalSummary.message}`);
+  lines.push(`Readiness ${pad(report.readinessSummary.status)} ${report.readinessSummary.decision}, blockers=${report.readinessSummary.blockerCount}, readyClaim=${report.readinessSummary.readinessClaimAllowed === true}`);
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
   lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
   lines.push(`ReadPolicy ${pad(report.readPolicy.status)} lifecycle=${report.readPolicy.lifecyclePolicyEnabled}, soft=${report.readPolicy.softReadPolicyEnabled}, hidden=${report.readPolicy.recentHiddenByLifecycleCount}, stale=${report.readPolicy.recentStaleResultCount}, columns=${report.readPolicy.lifecycleColumnAvailable ?? 'unavailable'}`);
@@ -1272,6 +1311,7 @@ async function main() {
   const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
   const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
   const operationalSummary = buildOperationalSummary(service, store, profile, runtime, gate);
+  const readinessSummary = buildReadinessSummary(operationalSummary, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks);
   const sectionStatus = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
     audits.bridge.status, audits.recall.status, governance.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
@@ -1292,6 +1332,7 @@ async function main() {
           : 'One or more critical checks failed'
     },
     operationalSummary,
+    readinessSummary,
     service,
     store: options.summaryOnly ? { status: store.status, records: store.records, chunks: store.chunks } : store,
     profile: options.summaryOnly ? { status: profile.status, fingerprint: profile.fingerprint } : profile,

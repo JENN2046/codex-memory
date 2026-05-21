@@ -149,6 +149,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'operationalSummary',
     'profile',
     'readPolicy',
+    'readinessSummary',
     'recommendations',
     'runtime',
     'service',
@@ -168,12 +169,30 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'status',
     'storeStatus'
   ], 'dashboard operational summary');
+  assertKeySet(payload.readinessSummary, [
+    'autopilotDecision',
+    'blockerCodes',
+    'blockerCount',
+    'blockerSources',
+    'decision',
+    'governanceDecision',
+    'latestTask',
+    'nextAction',
+    'operationalStatus',
+    'readPolicyStatus',
+    'readinessClaimAllowed',
+    'status'
+  ], 'dashboard readiness summary');
   assert.equal(payload.mode, 'memory-dashboard');
   assert.equal(payload.destructive, false);
   assert.equal(typeof payload.summary.status, 'string');
   assert.equal(typeof payload.operationalSummary.status, 'string');
   assert.equal(payload.operationalSummary.scope, 'service_store_profile_runtime_gate');
   assert.equal(payload.operationalSummary.readinessClaimAllowed, false);
+  assert.equal(payload.readinessSummary.status, 'blocked');
+  assert.equal(payload.readinessSummary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
+  assert.ok(Array.isArray(payload.readinessSummary.blockerCodes));
 
   // Service section
   assert.ok(payload.service, 'should have service section');
@@ -634,6 +653,17 @@ test('dashboard CLI should support --json --summary-only', async () => {
   assert.equal(payload.operationalSummary.gateStatus, 'ok');
   assert.equal(payload.operationalSummary.readinessClaimAllowed, false);
   assert.match(payload.operationalSummary.message, /governance readiness remains separate/);
+  assert.equal(payload.readinessSummary.status, 'blocked');
+  assert.equal(payload.readinessSummary.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.readinessSummary.operationalStatus, 'ok');
+  assert.equal(payload.readinessSummary.governanceDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(payload.readinessSummary.readPolicyStatus, 'config_only_no_recent_audit');
+  assert.equal(payload.readinessSummary.autopilotDecision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
+  assert.ok(payload.readinessSummary.blockerCount >= 1);
+  assert.ok(payload.readinessSummary.blockerSources.includes('governance'));
+  assert.ok(payload.readinessSummary.blockerCodes.includes('authorized-write-path-auto-auth'));
+  assert.equal(payload.readinessSummary.nextAction, 'resolve_read_policy_and_governance_fail_closed_evidence_before_readiness_claim');
   assert.equal(payload.checks.some(check =>
     check.code === 'autopilot-closed-loop-summary'
     && /coverage incomplete/.test(check.message)
