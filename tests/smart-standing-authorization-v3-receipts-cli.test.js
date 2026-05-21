@@ -130,6 +130,25 @@ test('v3 receipt parser keeps local dashboard rows Green when zero Red stops are
   assert.equal(summary.next_auto_step_allowed, true);
 });
 
+test('v3 receipt parser recognizes local preflight rows with zero writes as Green local review shape', () => {
+  const markdown = [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-0850 | `node src\\cli\\store-freshness-write-preflight.js --json` | P10 | CM-0731 Store freshness write-evidence preflight | COMPLETED_VALIDATED | Added a read-only store freshness write-evidence preflight. Real output reports `STORE_FRESHNESS_EVIDENCE_PREPARED_EXACT_ONLY`, `memoryWrites=0`, `proposedMemoryWrites=1`, sanitized `record_memory` args, and `readinessClaimAllowed=false`; targeted preflight tests passed `3/3`. | If exact write-path freshness evidence is still needed, request explicit approval for one sanitized `record_memory` write using the preflight payload. | 2026-05-22 |'
+  ].join('\n');
+  const summary = parseReceiptMarkdown(markdown, {
+    sourcePath: '.agent_board/VALIDATION_LOG.md',
+    workspaceRoot: process.cwd()
+  });
+
+  assert.equal(summary.latest_v3_task_id, 'CM-0731');
+  assert.equal(summary.latest_validation_id, 'CMV-0850');
+  assert.equal(summary.latest_lane, 'Green');
+  assert.equal(summary.latest_receipt_status, 'local_review_shape_only');
+  assert.equal(summary.latest_parser_status, 'parser_ok');
+  assert.equal(summary.next_auto_step_allowed, true);
+});
+
 test('v3 receipt parser core does not treat no-Amber or Red hard-stop wording as actions', () => {
   const markdown = [
     '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',

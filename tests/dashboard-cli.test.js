@@ -1343,6 +1343,10 @@ test('dashboard CLI should emit text output by default', async () => {
     'should recommend an explicit follow-up for 24h store freshness warning'
   );
   assert.ok(
+    text.includes('store-freshness-write-preflight.js --json'),
+    'should point store freshness warning to the exact write-evidence preflight'
+  );
+  assert.ok(
     text.includes('push remains blocked without explicit authorization') || text.includes('remoteAction=false'),
     'should keep git sync follow-up explicit-only'
   );

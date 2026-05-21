@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0731 Store freshness write-evidence preflight - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED` after preflight/dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a read-only `store-freshness-write-preflight` CLI and dashboard recommendation pointer for the current `StoreFresh warn 0 in 24h` gap.
+- Current local signal: real `node src\cli\store-freshness-write-preflight.js --json` reports `last24h=0`, `last7d=3`, `STORE_FRESHNESS_EVIDENCE_PREPARED_EXACT_ONLY`, `memoryWrites=0`, `proposedMemoryWrites=1`, sanitized `record_memory` proposed args, and `readinessClaimAllowed=false`.
+- Boundary: Green Lane local preflight/dashboard/test/docs/board only; no `record_memory`, `search_memory`, provider/API/MCP call, durable memory write, config/runtime mutation, public MCP expansion, remote action, release, deploy, cutover, or readiness claim occurred.
+- Validation: preflight/dashboard/parser syntax passed; targeted preflight tests passed `3/3`; targeted dashboard tests passed `20/20`; targeted v3 parser tests passed `12/12`; real preflight/dashboard/parser smoke passed; full `npm test` passed `1968/1968`; docs validation passed; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then either request exact approval for one sanitized freshness evidence write or continue governance fail-closed closeout; do not push without explicit authorization.
+
 ## Checkpoint - CM-0730 Dashboard local git sync surface - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

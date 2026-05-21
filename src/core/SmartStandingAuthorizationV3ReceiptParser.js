@@ -124,6 +124,24 @@ function isLocalDashboardReviewShape(row) {
   );
 }
 
+function isLocalPreflightReviewShape(row) {
+  const text = rowText(row);
+  return (
+    text.includes('read-only') &&
+    (
+      text.includes('preflight/dashboard') ||
+      text.includes('targeted preflight tests') ||
+      text.includes('store freshness write-evidence preflight') ||
+      text.includes('store_freshness_evidence_prepared_exact_only')
+    ) &&
+    (
+      text.includes('memorywrites=0') ||
+      text.includes('memory_writes=0') ||
+      text.includes('zero writes')
+    )
+  );
+}
+
 function inferLane(row) {
   const text = rowText(row);
   const hasNoRedStopMarker = text.includes('no red stop') || text.includes('zero red stop');
@@ -142,6 +160,7 @@ function inferLane(row) {
     return 'Amber';
   }
   if (isLocalDashboardReviewShape(row)) return 'Green';
+  if (isLocalPreflightReviewShape(row)) return 'Green';
   if (text.includes('green lane')) return 'Green';
   return DEFAULT_MISSING_VALUE;
 }
@@ -167,6 +186,7 @@ function inferReceiptStatus(row) {
   if (text.includes('fixture drift changelog') || text.includes('changelog')) return 'fixture_changelog_only';
   if (text.includes('parser contract')) return 'parser_contract_only';
   if (isLocalDashboardReviewShape(row)) return 'local_review_shape_only';
+  if (isLocalPreflightReviewShape(row)) return 'local_review_shape_only';
   if (text.includes('dashboard receipt summary') || text.includes('dashboard summary')) {
     return 'local_review_shape_only';
   }

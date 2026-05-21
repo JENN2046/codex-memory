@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0731 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after preflight/dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0731 started from local `HEAD = bb1401b feat: show dashboard git sync status`, with `main...origin/main [ahead 28]`.
+
+Changed files: `src/cli/store-freshness-write-preflight.js`; `src/cli/dashboard.js`; `src/core/SmartStandingAuthorizationV3ReceiptParser.js`; `tests/store-freshness-write-preflight-cli.test.js`; `tests/dashboard-cli.test.js`; `tests/smart-standing-authorization-v3-receipts-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: the current `StoreFresh warn 0 in 24h` gap now has an exact read-only preflight command that prepares one sanitized future `record_memory` payload while performing zero writes and preserving `readinessClaimAllowed=false`.
+
+Boundary: local read-only preflight/dashboard/test/docs/board only. No `record_memory`, `search_memory`, provider/API/MCP call, durable memory write, config/runtime mutation, public MCP expansion, remote action, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\store-freshness-write-preflight.js`; `node --check src\cli\dashboard.js`; `node --check src\core\SmartStandingAuthorizationV3ReceiptParser.js`; `node --check tests\store-freshness-write-preflight-cli.test.js`; `node --check tests\dashboard-cli.test.js`; `node --check tests\smart-standing-authorization-v3-receipts-cli.test.js`; `node --test tests\store-freshness-write-preflight-cli.test.js` passed `3/3`; `node --test tests\dashboard-cli.test.js` passed `20/20`; `node --test tests\smart-standing-authorization-v3-receipts-cli.test.js` passed `12/12`; `node src\cli\store-freshness-write-preflight.js --json`; `node src\cli\dashboard.js --summary-only`; `node src\cli\smart-standing-authorization-v3-receipts.js --json` showed `CM-0731 / CMV-0850`, `Green / local_review_shape_only`; `npm test` passed `1968/1968`; docs validation passed; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push remains blocked without explicit authorization.
+
 ## CM-0730 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
