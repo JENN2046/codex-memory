@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0705 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0705 started from local `HEAD = f3aa777 docs: record governance stale fixture recovery`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 2]`.
+
+Changed files: `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`.
+
+Validation to preserve: `git diff --check`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`.
+
+Boundary: docs/board-only ledger recovery-state reconciliation. No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Next safe task: request explicit push authorization if remote sync is desired, or continue local-safe stabilization toward durable Codex/Claude memory mainline.
+
 ## CM-0704 Handoff
 
 Status: `COMPLETED_VALIDATED`.

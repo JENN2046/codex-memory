@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0705 Autopilot ledger recovery-state reconciliation - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: reconciled docs/board state after CM-0704 by adding missing `AUTOPILOT_LEDGER.md` receipts for `CM-0704` and `CM-0705`, refreshing `RUN_STATE.md`, and updating status/queue/validation/handoff surfaces.
+- Git facts: CM-0705 started from local `HEAD = f3aa777 docs: record governance stale fixture recovery`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 2]`.
+- Validation: `git diff --check` passed; docs validation passed.
+- Boundary: docs/board-only Green Lane work. No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Next safe task: either request explicit push authorization for the local-ahead commits, or continue local-safe stabilization toward durable Codex/Claude memory mainline.
+
 ## Checkpoint - CM-0704 Governance stale fixture time-drift stabilization - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
