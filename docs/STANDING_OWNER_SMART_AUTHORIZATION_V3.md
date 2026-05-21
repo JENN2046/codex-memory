@@ -208,6 +208,59 @@ readiness_claim_allowed_automatically: false
 recommended_next: pending_human_push_or_next_autonomous_envelope_task
 ```
 
+## Dashboard And Recorder Surface
+
+The first local dashboard/recorder contract is:
+
+```text
+docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md
+tests/fixtures/smart-standing-authorization-v3-dashboard-recorder-v1.json
+tests/smart-standing-authorization-v3-dashboard-recorder-fixture.test.js
+```
+
+The dashboard surface tracks policy version, project state, current lane, envelope id, budget limit/used/remaining, receipt status, last validation, Red gate status, next automatic step, and stop reason.
+
+The recorder surface tracks Green no-Amber receipts, Amber external/write receipts, validation results, and Red stop events. It is a local review shape only; it does not implement a runtime dashboard, CLI recorder, provider call, MCP tool call, real memory read/write, dependency change, config change, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+
+The first read-only parser contract is:
+
+```text
+docs/SMART_STANDING_AUTHORIZATION_V3_READONLY_RECEIPT_PARSER.md
+tests/fixtures/smart-standing-authorization-v3-readonly-receipt-parser-v1.json
+tests/smart-standing-authorization-v3-readonly-receipt-parser-fixture.test.js
+```
+
+It parses local board/docs receipt rows into the dashboard summary shape and fails closed on missing validation result, readiness overclaim, Red stop, malformed rows, or fields that would require guessing.
+
+The scoped read-only CLI/parser implementation is:
+
+```text
+src/core/SmartStandingAuthorizationV3ReceiptParser.js
+src/cli/smart-standing-authorization-v3-receipts.js
+tests/smart-standing-authorization-v3-receipts-cli.test.js
+```
+
+The existing memory dashboard consumes the parser summary read-only and exposes it as `smartStandingAuthorizationV3` in JSON plus `V3Receipt` in text output:
+
+```text
+src/cli/dashboard.js
+tests/dashboard-cli.test.js
+```
+
+This dashboard integration is local Markdown parsing only. It is not a receipt writer, provider/API/MCP call, real memory read, runtime probe, config/dependency change, remote action, cutover evidence, or readiness claim.
+
+It reads `.agent_board/VALIDATION_LOG.md` by default, supports `--validation-log <workspace-relative path>`, emits JSON with `--json`, and rejects side-effectful flags such as `--write`, `--provider`, `--mcp-call`, `--record-memory`, `--push`, and `--readiness-claim`.
+
+The first receipt rollup contract is:
+
+```text
+docs/SMART_STANDING_AUTHORIZATION_V3_RECEIPT_ROLLUP.md
+tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json
+tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js
+```
+
+It rolls up the local Green Lane receipt posture from `CM-0673` through `CM-0676`, keeps all external/write budget counters at `0`, and preserves Red gates for push, release, deploy, public MCP expansion, real memory, provider, dependency, config, and readiness actions.
+
 ## Non-Claim Boundary
 
 This policy does not by itself execute any Amber action.

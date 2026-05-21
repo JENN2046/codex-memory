@@ -1,5 +1,116 @@
 # HANDOFF.md - codex-memory
 
+## CM-0681 Handoff
+
+Goal: review the Smart Standing Authorization v3 local package before any possible commit.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/SMART_STANDING_AUTHORIZATION_V3_LOCAL_CLOSEOUT_REVIEW.md`; `STATUS.md`; `.agent_board/*`.
+Reviewed package: `CM-0673` through `CM-0680`.
+Validation/review: git status/diff path review completed; disallowed path scan found no package/lock/env/config/runtime-data target files; secret scan found no secret values; readiness wording remained denial/non-claim/blocked context; prior v3/dashboard validation evidence remains attached in `CMV-0797` through `CMV-0804`.
+Commit-readiness: `ELIGIBLE_AFTER_EXPLICIT_USER_COMMIT_APPROVAL`.
+Not validated: no commit was created; no push was performed.
+Remaining risks: CRLF normalization warnings remain on several board/monthly docs when running `git diff --check`; these are warnings, not whitespace errors.
+Next safe step: if the user explicitly approves, run final pre-commit checks and create one guarded local v3 commit.
+
+## CM-0680 Handoff
+
+Goal: harden the Smart Standing Authorization v3 dashboard summary-only output shape.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md`; `STATUS.md`; `docs/MONTHLY_PLAN_2026_06.md`; `.agent_board/*`.
+Validation: `node --check src\cli\dashboard.js` passed; targeted dashboard CLI test passed `18/18`.
+Not validated: write-capable recorder, provider/API/MCP calls, real memory stores, durable writes, dependency changes, config changes, public MCP expansion, push/tag/release/deploy, cutover, readiness.
+Remaining risks: summary-only shape remains a local dashboard review surface; it is not runtime readiness, live Amber evidence, or receipt write proof.
+Next safe step: next Phase F synthetic guard or v3 parser/dashboard read-only hardening.
+
+## CM-0679 Handoff
+
+Goal: wire the Smart Standing Authorization v3 parser summary into the existing dashboard output without adding writes or external actions.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md`; `docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md`; `STATUS.md`; `docs/MONTHLY_PLAN_2026_06.md`; `.agent_board/*`.
+Validation: `node --check src\core\SmartStandingAuthorizationV3ReceiptParser.js` and `node --check src\cli\dashboard.js` passed; targeted dashboard CLI test passed `18/18`; parser CLI regression passed `7/7`.
+Not validated: write-capable recorder, provider/API/MCP calls, real memory stores, durable writes, dependency changes, config changes, public MCP expansion, push/tag/release/deploy, cutover, readiness.
+Remaining risks: dashboard summary is intentionally limited to local Markdown validation-log parsing; it is not live Amber execution evidence or runtime readiness proof.
+Next safe step: next Phase F synthetic guard or v3 parser/dashboard read-only hardening.
+
+## CM-0678 Handoff
+
+Goal: implement a scoped read-only CLI/parser for Smart Standing Authorization v3 receipt rows.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `src/core/SmartStandingAuthorizationV3ReceiptParser.js`; `src/cli/smart-standing-authorization-v3-receipts.js`; `tests/fixtures/smart-standing-authorization-v3-validation-log-sample.md`; `tests/smart-standing-authorization-v3-receipts-cli.test.js`; v3 parser/rollup docs and fixtures; v3 policy; `STATUS.md`; `docs/MONTHLY_PLAN_2026_06.md`; `.agent_board/*`.
+Validation: changed source `node --check` passed; targeted CLI/parser test passed `7/7`; v3 dashboard/recorder/parser/rollup regression passed `26/26`; live local validation-log parse returned latest `CM-0678 / CMV-0802`, zero budget usage, zero Red stop count, and `next_auto_step_allowed=true`; docs validation passed; `git diff --check` passed.
+Not validated: dashboard integration, runtime recorder, provider/API/MCP calls, real memory stores, durable writes, dependency changes, config changes, public MCP expansion, push/tag/release/deploy, cutover, readiness.
+Remaining risks: parser is intentionally heuristic for local Markdown rows and fail-closed on missing/ambiguous fields; it is not a runtime receipt ledger or write-capable recorder.
+Next safe step: next Phase F synthetic guard or optional parser integration into existing dashboard text/json surfaces.
+
+## CM-0677 Handoff
+
+Goal: add the first Smart Standing Authorization v3 receipt rollup for local Green Lane receipt surfaces.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/SMART_STANDING_AUTHORIZATION_V3_RECEIPT_ROLLUP.md`; `tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json`; `tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js`; v3 policy doc; validation surface; integration index; cross-pack dependency map fixture/test/docs; drift changelog fixture/test/docs; wording guard fixture; `STATUS.md`; `docs/MONTHLY_PLAN_2026_06.md`; `.agent_board/*`.
+Validation: targeted receipt rollup fixture test passed `6/6`; fixture drift changelog regression passed `5/5`; cross-pack dependency map regression passed `6/6`; wording guard passed `4/4`; combined Phase F fixture tests passed `72/72`; v3 dashboard/recorder/parser/rollup regression passed `19/19`; docs validation passed; `git diff --check` passed.
+Not validated: runtime receipt recorder, CLI receipt rollup, live MCP schema, provider/API/MCP calls, real memory stores, durable writes, dependency changes, config changes, public MCP expansion, push/tag/release/deploy, cutover, readiness.
+Remaining risks: this is a local synthetic receipt rollup only. It does not prove runtime receipt recording, CLI parsing, Amber execution, provider evidence, memory evidence, or readiness.
+Next safe step: separate scoped read-only CLI/parser implementation or next Phase F synthetic guard.
+
+## CM-0676 Handoff
+
+Goal: add a synthetic Phase F fixture drift changelog for the recent v3 Green Lane fixture tasks.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/PHASE_F_FIXTURE_DRIFT_CHANGELOG.md`; `tests/fixtures/phase-f-fixture-drift-changelog-v1.json`; `tests/phase-f-fixture-drift-changelog-fixture.test.js`; validation surface; integration index; cross-pack dependency map fixture/test/docs; wording guard fixture; `STATUS.md`; `docs/MONTHLY_PLAN_2026_06.md`; `.agent_board/*`.
+Validation: targeted drift changelog fixture test passed `5/5`; cross-pack dependency map regression passed `6/6`; wording guard passed `4/4`; combined Phase F fixture tests passed `66/66`; v3 dashboard/recorder plus parser regression passed `13/13`; docs validation passed; `git diff --check` passed.
+Not validated: release notes, runtime implementation, live MCP schema, provider/API/MCP calls, real memory stores, durable writes, dependency changes, config changes, public MCP expansion, push/tag/release/deploy, cutover, readiness.
+Remaining risks: this is a local synthetic changelog only. It does not prove runtime behavior, release readiness, or public MCP readiness.
+Next safe step: v3 receipt rollup or a separately scoped read-only CLI/parser implementation.
+
+## CM-0675 Handoff
+
+Goal: add a read-only parser contract for Smart Standing Authorization v3 receipt-like board rows.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/SMART_STANDING_AUTHORIZATION_V3_READONLY_RECEIPT_PARSER.md`; `tests/fixtures/smart-standing-authorization-v3-readonly-receipt-parser-v1.json`; `tests/smart-standing-authorization-v3-readonly-receipt-parser-fixture.test.js`; `docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md`; `docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md`; `STATUS.md`; `docs/MONTHLY_PLAN_2026_06.md`; `.agent_board/*`.
+Validation: targeted parser fixture test passed `6/6`; dashboard/recorder regression plus wording guard passed `17/17`; docs validation passed; `git diff --check` passed.
+Not validated: CLI parser implementation, live board scan, runtime dashboard/recorder, provider/API/MCP calls, real memory stores, durable writes, dependency changes, config changes, public MCP expansion, push/tag/release/deploy, cutover, readiness.
+Remaining risks: this is a local synthetic parser contract only. A real read-only CLI/parser would need a fresh scoped implementation task.
+Next safe step: optional fixture drift changelog, or a separate scoped read-only CLI/parser implementation if a command entrypoint is desired.
+
+## CM-0674 Handoff
+
+Goal: install the Smart Standing Authorization v3 dashboard and recorder local review surface.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Changed files: `docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md`; `tests/fixtures/smart-standing-authorization-v3-dashboard-recorder-v1.json`; `tests/smart-standing-authorization-v3-dashboard-recorder-fixture.test.js`; `docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md`; `STATUS.md`; `docs/MONTHLY_PLAN_2026_06.md`; `.agent_board/*`.
+Validation: targeted dashboard/recorder fixture test passed `7/7`; public MCP rollup regression passed `6/6`; wording guard passed `4/4`; docs validation passed; `git diff --check` passed.
+Not validated: runtime dashboard implementation, CLI recorder implementation, provider/API/MCP calls, real memory stores, durable writes, dependency changes, config changes, public MCP expansion, push/tag/release/deploy, cutover, readiness.
+Remaining risks: this is a local synthetic contract only; future runtime/CLI implementation would need a fresh scoped task and validation.
+Next safe step: add a read-only receipt parser for `.agent_board/VALIDATION_LOG.md`, or keep the recorder docs/fixture-only and continue the fixture drift changelog.
+
+## CM-0673 Handoff
+
+Goal: enter the first Smart Standing Authorization v3 trial task by adding a Phase F public MCP freeze rollup.
+Status: COMPLETED_VALIDATED.
+Workspace: `A:\codex-memory`.
+Branch: `main`.
+Head reality at task start: `HEAD = origin/main = 552917d68da27f5637198c836ca563ac84650f1a`; worktree was clean before this slice.
+Changed files: `docs/PHASE_F_PUBLIC_MCP_FREEZE_ROLLUP.md`; `tests/fixtures/phase-f-public-mcp-freeze-rollup-v1.json`; `tests/phase-f-public-mcp-freeze-rollup-fixture.test.js`; cross-pack map fixture/test/docs; readiness wording guard fixture; validation surface; integration index; `STATUS.md`; `docs/MONTHLY_PLAN_2026_06.md`; `.agent_board/*`.
+Validation: targeted public MCP freeze rollup fixture test passed `6/6`; targeted cross-pack dependency map fixture test passed `6/6`; wording guard passed `4/4`; combined Phase F fixture tests passed `61/61`; docs validation passed; `git diff --check` passed.
+Not validated: live MCP schema, runtime public tool list, runtime behavior, provider behavior, real memory stores, durable writes, dependency changes, config changes, push/tag/release/deploy, cutover, readiness.
+Remaining risks: this is synthetic local evidence only; it must not be treated as runtime MCP proof or public MCP expansion readiness.
+Next safe step: choose `CM-0674+ Phase F fixture drift changelog` or v3 receipt rollup, because CM-0673 closed the public MCP freeze rollup without crossing any Red gate.
+
 ## Local State Sync - 2026-05-21
 
 - Workspace: `A:\codex-memory`.

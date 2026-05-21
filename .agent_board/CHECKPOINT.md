@@ -1,5 +1,96 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0681 Smart Standing Authorization v3 local closeout and commit-readiness review - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: reviewed `CM-0673` through `CM-0680` as one local v3 work package.
+- Artifact: `docs/SMART_STANDING_AUTHORIZATION_V3_LOCAL_CLOSEOUT_REVIEW.md`.
+- Scope review: changed/untracked paths stay in docs, fixtures, tests, board, read-only parser source, and dashboard output shape; no package/lock/env/config/runtime-data target files observed.
+- Boundary review: no secret values found; Red gates remain closed; public MCP tools remain `record_memory`, `search_memory`, `memory_overview`.
+- Commit-readiness: `ELIGIBLE_AFTER_EXPLICIT_USER_COMMIT_APPROVAL`.
+- Not run: commit, push, tag, release, deploy, PR, provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, cutover, or readiness claim.
+- Next safe step: explicit user approval for one guarded local v3 commit, or continue local-safe Phase F work without committing.
+
+## Checkpoint - CM-0680 Smart Standing Authorization v3 dashboard summary-only shape hardening - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: hardened the dashboard `--json --summary-only` v3 receipt summary shape.
+- Artifacts: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md`.
+- Shape: compact `smartStandingAuthorizationV3` now keeps `budget_used`, `latest_parser_status`, `evidenceClass`, task/validation ids, receipt status, validation result, Red stop count, next-auto-step flag, and stop reason.
+- Validation: `node --check src\cli\dashboard.js` passed; targeted dashboard CLI test passed `18/18`.
+- Not run: receipt writes, provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: next Phase F synthetic guard or v3 parser/dashboard read-only hardening.
+
+## Checkpoint - CM-0679 Smart Standing Authorization v3 dashboard receipt summary integration - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: wired the scoped read-only v3 parser summary into the existing dashboard JSON/text output.
+- Artifacts: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md`; `docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md`.
+- Dashboard: JSON includes `smartStandingAuthorizationV3`; text includes `V3Receipt`; parser warning status feeds dashboard checks/recommendations and overall status.
+- Validation: `node --check src\core\SmartStandingAuthorizationV3ReceiptParser.js` and `node --check src\cli\dashboard.js` passed; targeted dashboard CLI test passed `18/18`; parser CLI regression passed `7/7`.
+- Not run: receipt writes, provider calls, API calls, MCP tool calls, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: next Phase F synthetic guard or v3 parser/dashboard read-only hardening.
+
+## Checkpoint - CM-0678 Smart Standing Authorization v3 scoped read-only CLI/parser - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Completed: added a pure parser core and read-only CLI for local v3 receipt rows.
+- Artifacts: `src/core/SmartStandingAuthorizationV3ReceiptParser.js`; `src/cli/smart-standing-authorization-v3-receipts.js`; `tests/fixtures/smart-standing-authorization-v3-validation-log-sample.md`; `tests/smart-standing-authorization-v3-receipts-cli.test.js`.
+- CLI: `node src\cli\smart-standing-authorization-v3-receipts.js --json`.
+- Validation: changed source `node --check` passed; targeted CLI/parser test passed `7/7`; v3 dashboard/recorder/parser/rollup regression passed `26/26`; live local validation-log parse returned latest `CM-0678 / CMV-0802`, zero budget usage, zero Red stop count, and `next_auto_step_allowed=true`; docs validation passed; `git diff --check` passed.
+- Not run: board writes, runtime recorder, provider calls, API calls, MCP tool calls, runtime probes, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: next Phase F synthetic guard or optional parser integration into existing dashboard text/json surfaces.
+
+## Checkpoint - CM-0677 Smart Standing Authorization v3 receipt rollup - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Lane: `Smart Standing Authorization v3` Green Lane.
+- Completed: added a synthetic receipt rollup for `CM-0673` through `CM-0676`, with exact validation ids, receipt status, aggregate budget usage, Red gate status, and non-claims.
+- Artifacts: `docs/SMART_STANDING_AUTHORIZATION_V3_RECEIPT_ROLLUP.md`; `tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json`; `tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js`.
+- Validation: targeted receipt rollup fixture test passed `6/6`; fixture drift changelog regression passed `5/5`; cross-pack dependency map regression passed `6/6`; wording guard passed `4/4`; combined Phase F fixture tests passed `72/72`; v3 dashboard/recorder/parser/rollup regression passed `19/19`; docs validation passed; `git diff --check` passed.
+- Not run: runtime receipt recorder, CLI receipt rollup, provider calls, API calls, MCP tool calls, runtime probes, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: separate scoped read-only CLI/parser implementation or next Phase F synthetic guard, because the first v3 receipt rollup now exists without crossing Red gates.
+
+## Checkpoint - CM-0676 Phase F fixture drift changelog - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Lane: `Smart Standing Authorization v3` Green Lane.
+- Completed: added a synthetic changelog for recent Phase F/v3 fixture drift keyed by CM id, validation id, pack id, validation count, lane, and receipt status.
+- Artifacts: `docs/PHASE_F_FIXTURE_DRIFT_CHANGELOG.md`; `tests/fixtures/phase-f-fixture-drift-changelog-v1.json`; `tests/phase-f-fixture-drift-changelog-fixture.test.js`.
+- Validation: targeted drift changelog fixture test passed `5/5`; cross-pack dependency map regression passed `6/6`; wording guard passed `4/4`; combined Phase F fixture tests passed `66/66`; v3 dashboard/recorder plus parser regression passed `13/13`; docs validation passed; `git diff --check` passed.
+- Not run: release note creation, runtime implementation, provider calls, API calls, MCP tool calls, runtime probes, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: v3 receipt rollup or a separately scoped read-only CLI/parser implementation, because the changelog now closes the recent local fixture drift trail without crossing Red gates.
+
+## Checkpoint - CM-0675 Smart Standing Authorization v3 read-only receipt parser - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Lane: `Smart Standing Authorization v3` Green Lane.
+- Completed: added a local synthetic parser contract for receipt-like board rows and dashboard summary output.
+- Artifacts: `docs/SMART_STANDING_AUTHORIZATION_V3_READONLY_RECEIPT_PARSER.md`; `tests/fixtures/smart-standing-authorization-v3-readonly-receipt-parser-v1.json`; `tests/smart-standing-authorization-v3-readonly-receipt-parser-fixture.test.js`.
+- Validation: targeted parser fixture test passed `6/6`; dashboard/recorder regression plus wording guard passed `17/17`; docs validation passed; `git diff --check` passed.
+- Not run: CLI parser implementation, live board scan, runtime dashboard/recorder, provider calls, API calls, MCP tool calls, runtime probes, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: optional fixture drift changelog, or a separate scoped read-only CLI/parser implementation if a command entrypoint is desired.
+
+## Checkpoint - CM-0674 Smart Standing Authorization v3 dashboard and recorder - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Lane: `Smart Standing Authorization v3` Green Lane.
+- Completed: installed local synthetic dashboard and recorder contracts for policy state, lane, envelope, budget, receipt, validation, Red stop, next-step, and stop-reason fields.
+- Artifacts: `docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md`; `tests/fixtures/smart-standing-authorization-v3-dashboard-recorder-v1.json`; `tests/smart-standing-authorization-v3-dashboard-recorder-fixture.test.js`.
+- Validation: targeted dashboard/recorder fixture test passed `7/7`; public MCP rollup regression passed `6/6`; wording guard passed `4/4`; docs validation passed; `git diff --check` passed.
+- Not run: runtime dashboard implementation, CLI recorder implementation, provider calls, API calls, MCP tool calls, runtime probes, real memory reads/writes, dependency changes, config/watchdog/startup changes, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: either add a read-only parser for `.agent_board/VALIDATION_LOG.md` receipts, or stay docs/fixture-only and continue the fixture drift changelog.
+
+## Checkpoint - CM-0673 Phase F public MCP freeze rollup - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Lane: `Smart Standing Authorization v3` Green Lane trial.
+- Completed: added a synthetic public MCP freeze rollup fixture/test/doc, updated cross-pack dependency map, validation surface, integration index, wording guard, STATUS, monthly plan, and board.
+- V3 receipt: no Amber external/write action occurred, so `receipt_required=false` and `receipt_status=not_required_no_amber_external_or_write_action`.
+- Validation: targeted public MCP freeze rollup fixture test passed `6/6`; targeted cross-pack dependency map fixture test passed `6/6`; wording guard passed `4/4`; combined Phase F fixture tests passed `61/61`; docs validation passed; `git diff --check` passed.
+- Not run: provider calls, API calls, MCP tool calls, runtime probes, real memory reads/writes, dependency changes, config/watchdog/startup changes, live MCP schema inspection, public MCP expansion, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: `CM-0674+ Phase F fixture drift changelog` or v3 receipt rollup, because the first v3 Green Lane trial is validated and still leaves Red gates intact.
+
 ## Checkpoint - Local state sync after fast-forward pull - 2026-05-21
 
 - Status: `LOCAL_STATUS_FACTS_REFRESHED`; project decision remains `RC_NOT_READY_BLOCKED`.

@@ -17,12 +17,10 @@ const REQUIRED_PACKS = [
   'query_quality_dry_run_refresh',
   'admin_review_schema_hardening',
   'fixture_pack_validation_surface',
-  'readiness_boundary_wording_guard'
-];
-const REQUIRED_FUTURE_CONTRACTS = [
+  'readiness_boundary_wording_guard',
   'public_mcp_freeze_rollup',
   'fixture_drift_changelog',
-  'cross_pack_dependency_map'
+  'v3_receipt_rollup'
 ];
 const FORBIDDEN_READY_CLAIMS = ['RC_READY', 'runtimeReady=true', 'finalRcMatrixReady=true', 'rcReady=true'];
 
@@ -45,12 +43,16 @@ test('phase f cross-pack dependency map has exact pack ids', () => {
 
 test('phase f cross-pack dependencies reference known packs or future docs only', () => {
   const ids = new Set(fixture.packs.map((pack) => pack.id));
+  const futureIds = new Set(fixture.futureSyntheticContracts.map((contract) => contract.id));
   for (const pack of fixture.packs) {
     for (const upstream of pack.upstream) {
       assert.ok(ids.has(upstream), `${pack.id} unknown upstream ${upstream}`);
     }
     for (const downstream of pack.downstream) {
-      assert.ok(ids.has(downstream) || downstream === 'future_phase_f_docs', `${pack.id} unknown downstream ${downstream}`);
+      assert.ok(
+        ids.has(downstream) || futureIds.has(downstream) || downstream === 'future_phase_f_docs',
+        `${pack.id} unknown downstream ${downstream}`
+      );
     }
   }
 });
@@ -63,10 +65,28 @@ test('phase f cross-pack map records review surfaces after eight fixture packs',
   const wordingGuard = byId.get('readiness_boundary_wording_guard');
   assert.ok(wordingGuard.upstream.includes('fixture_pack_validation_surface'));
   assert.ok(wordingGuard.downstream.includes('future_phase_f_docs'));
+
+  const publicMcpFreeze = byId.get('public_mcp_freeze_rollup');
+  assert.ok(publicMcpFreeze.upstream.includes('fixture_pack_validation_surface'));
+  assert.ok(publicMcpFreeze.upstream.includes('readiness_boundary_wording_guard'));
+  assert.ok(publicMcpFreeze.downstream.includes('fixture_drift_changelog'));
+  assert.ok(publicMcpFreeze.nonClaims.includes('runtime public MCP schema proof'));
+
+  const driftChangelog = byId.get('fixture_drift_changelog');
+  assert.ok(driftChangelog.upstream.includes('fixture_pack_validation_surface'));
+  assert.ok(driftChangelog.upstream.includes('public_mcp_freeze_rollup'));
+  assert.ok(driftChangelog.downstream.includes('v3_receipt_rollup'));
+  assert.ok(driftChangelog.nonClaims.includes('release note claim'));
+
+  const receiptRollup = byId.get('v3_receipt_rollup');
+  assert.ok(receiptRollup.upstream.includes('public_mcp_freeze_rollup'));
+  assert.ok(receiptRollup.upstream.includes('fixture_drift_changelog'));
+  assert.ok(receiptRollup.nonClaims.includes('runtime receipt recorder implemented'));
+  assert.ok(receiptRollup.nonClaims.includes('CLI receipt rollup implemented'));
 });
 
 test('phase f cross-pack map records future synthetic contracts and blocked actions', () => {
-  assert.deepEqual(fixture.futureSyntheticContracts.map((contract) => contract.id), REQUIRED_FUTURE_CONTRACTS);
+  assert.deepEqual(fixture.futureSyntheticContracts.map((contract) => contract.id), []);
   for (const contract of fixture.futureSyntheticContracts) {
     assert.ok(Array.isArray(contract.dependsOn), `${contract.id} dependsOn missing`);
     assert.ok(contract.safeShape, `${contract.id} safeShape missing`);

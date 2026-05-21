@@ -8,7 +8,7 @@ Anchor commit: `748a0b3`
 
 ## Purpose
 
-Index the completed local-safe Phase F fixture packs into one review map. This document links TagMemo parity hardening, observability/admin review surface, memory-governance proposal, LightMemo directory semantics, EPA/ResidualPyramid chain metadata, memory lifecycle proposal states, query-quality dry-run refresh, and admin review schema hardening fixtures without changing runtime behavior or claiming VCP parity completion.
+Index the completed local-safe Phase F fixture packs into one review map. This document links TagMemo parity hardening, observability/admin review surface, memory-governance proposal, LightMemo directory semantics, EPA/ResidualPyramid chain metadata, memory lifecycle proposal states, query-quality dry-run refresh, admin review schema hardening, public MCP freeze rollup, fixture drift changelog, and v3 receipt rollup fixtures without changing runtime behavior or claiming VCP parity completion.
 
 ## Integrated Fixture Packs
 
@@ -22,6 +22,9 @@ Index the completed local-safe Phase F fixture packs into one review map. This d
 | Memory lifecycle proposal states | `P8-memory-governance` | synthetic fixture/test-only | `tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js` | `docs/PHASE_F_MEMORY_LIFECYCLE_PROPOSAL_STATES_FIXTURE_TESTS.md` |
 | Query-quality dry-run refresh | `P7-vcp-parity-hardening` | synthetic fixture/test-only | `tests/phase-f-query-quality-dry-run-refresh-fixture.test.js` | `docs/PHASE_F_QUERY_QUALITY_DRY_RUN_REFRESH_FIXTURE_TESTS.md` |
 | Admin review schema hardening | `P10-observability-admin` | synthetic fixture/test-only | `tests/phase-f-admin-review-schema-hardening-fixture.test.js` | `docs/PHASE_F_ADMIN_REVIEW_SCHEMA_HARDENING_FIXTURE_TESTS.md` |
+| Public MCP freeze rollup | `P7-vcp-parity-hardening / P10-observability-admin` | synthetic fixture/test-only | `tests/phase-f-public-mcp-freeze-rollup-fixture.test.js` | `docs/PHASE_F_PUBLIC_MCP_FREEZE_ROLLUP.md` |
+| Fixture drift changelog | `P6-docs-drift` | synthetic fixture/test-only | `tests/phase-f-fixture-drift-changelog-fixture.test.js` | `docs/PHASE_F_FIXTURE_DRIFT_CHANGELOG.md` |
+| V3 receipt rollup | `P6-docs-drift / P10-observability-admin` | synthetic fixture/test-only | `tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js` | `docs/SMART_STANDING_AUTHORIZATION_V3_RECEIPT_ROLLUP.md` |
 
 ## Artifact Map
 
@@ -100,12 +103,36 @@ tests/fixtures/phase-f-admin-review-schema-hardening-v1.json
 tests/phase-f-admin-review-schema-hardening-fixture.test.js
 ```
 
+### Public MCP freeze rollup
+
+```text
+docs/PHASE_F_PUBLIC_MCP_FREEZE_ROLLUP.md
+tests/fixtures/phase-f-public-mcp-freeze-rollup-v1.json
+tests/phase-f-public-mcp-freeze-rollup-fixture.test.js
+```
+
+### Fixture drift changelog
+
+```text
+docs/PHASE_F_FIXTURE_DRIFT_CHANGELOG.md
+tests/fixtures/phase-f-fixture-drift-changelog-v1.json
+tests/phase-f-fixture-drift-changelog-fixture.test.js
+```
+
+### V3 receipt rollup
+
+```text
+docs/SMART_STANDING_AUTHORIZATION_V3_RECEIPT_ROLLUP.md
+tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json
+tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js
+```
+
 ## Combined Local Fixture Validation
 
 The integration index expects these targeted fixture tests to pass together:
 
 ```powershell
-node --test tests\phase-f-tagmemo-semantic-association-fixture.test.js tests\phase-f-observability-admin-review-surface-fixture.test.js tests\phase-f-memory-governance-proposal-fixture.test.js tests\phase-f-lightmemo-directory-semantics-fixture.test.js tests\phase-f-epa-residualpyramid-chain-metadata-fixture.test.js tests\phase-f-memory-lifecycle-proposal-states-fixture.test.js tests\phase-f-query-quality-dry-run-refresh-fixture.test.js tests\phase-f-admin-review-schema-hardening-fixture.test.js
+node --test tests\phase-f-tagmemo-semantic-association-fixture.test.js tests\phase-f-observability-admin-review-surface-fixture.test.js tests\phase-f-memory-governance-proposal-fixture.test.js tests\phase-f-lightmemo-directory-semantics-fixture.test.js tests\phase-f-epa-residualpyramid-chain-metadata-fixture.test.js tests\phase-f-memory-lifecycle-proposal-states-fixture.test.js tests\phase-f-query-quality-dry-run-refresh-fixture.test.js tests\phase-f-admin-review-schema-hardening-fixture.test.js tests\phase-f-readiness-boundary-wording-guard-fixture.test.js tests\phase-f-cross-pack-dependency-map-fixture.test.js tests\phase-f-public-mcp-freeze-rollup-fixture.test.js tests\phase-f-fixture-drift-changelog-fixture.test.js tests\smart-standing-authorization-v3-receipt-rollup-fixture.test.js
 ```
 
 This command validates only synthetic fixture contracts. It does not run mainline gates, HTTP observe, governance report, provider calls, real memory scans, migrations, durable writes, or release/cutover actions.
@@ -120,6 +147,15 @@ tests/fixtures/phase-f-readiness-boundary-wording-guard-v1.json
 tests/phase-f-readiness-boundary-wording-guard-fixture.test.js
 tests/fixtures/phase-f-cross-pack-dependency-map-v1.json
 tests/phase-f-cross-pack-dependency-map-fixture.test.js
+docs/PHASE_F_PUBLIC_MCP_FREEZE_ROLLUP.md
+tests/fixtures/phase-f-public-mcp-freeze-rollup-v1.json
+tests/phase-f-public-mcp-freeze-rollup-fixture.test.js
+docs/PHASE_F_FIXTURE_DRIFT_CHANGELOG.md
+tests/fixtures/phase-f-fixture-drift-changelog-v1.json
+tests/phase-f-fixture-drift-changelog-fixture.test.js
+docs/SMART_STANDING_AUTHORIZATION_V3_RECEIPT_ROLLUP.md
+tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json
+tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js
 ```
 
 The wording guard command is:
@@ -137,6 +173,30 @@ node --test tests\phase-f-cross-pack-dependency-map-fixture.test.js
 ```
 
 It validates a synthetic graph of pack relationships and non-claims. It does not prove runtime dependency, implementation order, or readiness.
+
+The public MCP freeze rollup command is:
+
+```powershell
+node --test tests\phase-f-public-mcp-freeze-rollup-fixture.test.js
+```
+
+It validates only a structure-only local fixture for the frozen public MCP tool names and the v3 Green Lane no-Amber trial receipt. It does not inspect live MCP schema, start runtime, or prove public MCP readiness.
+
+The fixture drift changelog command is:
+
+```powershell
+node --test tests\phase-f-fixture-drift-changelog-fixture.test.js
+```
+
+It validates only a docs/fixture/test changelog keyed by CM id, validation id, pack id, validation count, and explicit non-claims. It does not create release notes, tag, push, start runtime, or claim readiness.
+
+The v3 receipt rollup command is:
+
+```powershell
+node --test tests\smart-standing-authorization-v3-receipt-rollup-fixture.test.js
+```
+
+It validates only a synthetic receipt rollup for Green Lane local tasks, aggregate zero external/write budgets, and Red gate preservation. It does not execute Amber actions, implement a CLI receipt rollup, call providers, read or write real memory, or claim readiness.
 
 ## What This Index Proves
 
@@ -183,14 +243,14 @@ Still blocked without exact approval:
 ## Recommended Next Local-Safe Lane
 
 ```text
-CM-0672+ Phase F public MCP freeze rollup
+CM-0678+ scoped read-only CLI/parser implementation or next Phase F synthetic guard
 ```
 
 Suggested scope:
 
-- structure-only fixture asserting protected public tool names across pack fixtures and docs
-- no live MCP schema inspection or service start
-- no runtime/source changes unless separately planned
+- separate scoped read-only CLI/parser implementation, or next Phase F synthetic guard
+- no provider call, real memory scan, durable write, config change, public MCP expansion, or readiness claim
+- no push/tag/release/deploy unless explicitly authorized
 - no A5 action
 
 Current closeout and next-candidate surface:

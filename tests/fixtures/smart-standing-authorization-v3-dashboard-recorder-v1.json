@@ -1,0 +1,188 @@
+{
+  "version": "smart-standing-authorization-v3-dashboard-recorder-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "mcpToolCalled": false,
+  "realMemoryStoreRead": false,
+  "durableStateMutated": false,
+  "configChanged": false,
+  "dependencyChanged": false,
+  "remoteActionExecuted": false,
+  "dashboard": {
+    "name": "Smart Standing Authorization v3 Dashboard",
+    "status": "active_blocked_not_ready",
+    "requiredFields": [
+      "policy_version",
+      "project_state",
+      "current_task_id",
+      "current_lane",
+      "envelope_id",
+      "budget_limit",
+      "budget_used",
+      "budget_remaining",
+      "receipt_status",
+      "last_validation",
+      "red_gate_status",
+      "next_auto_step_allowed",
+      "stop_reason"
+    ],
+    "policyVersion": "Smart Standing Authorization v3 - Budgeted Autonomy Envelope",
+    "projectState": "NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED",
+    "allowedLanes": ["Green", "Amber", "Red"],
+    "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+    "forbiddenSummaryFlags": {
+      "pushAllowedAutomatically": false,
+      "tagReleaseDeployAllowedAutomatically": false,
+      "secretValueAccessAllowedAutomatically": false,
+      "destructiveActionAllowedAutomatically": false,
+      "publicMcpExpansionAllowedAutomatically": false,
+      "readinessClaimAllowedAutomatically": false
+    }
+  },
+  "defaultEnvelope": {
+    "maxProviderCalls": 3,
+    "maxApiCalls": 5,
+    "maxMcpToolCalls": 5,
+    "maxRuntimeProbeMinutes": 10,
+    "maxExternalReadFiles": 20,
+    "maxRealMemoryReadQueries": 5,
+    "maxMemoryWrites": 1,
+    "maxWriteFiles": 10,
+    "maxDependencyActions": 2,
+    "maxRetryPerTransientFailure": 1,
+    "overwriteExistingFilesAllowed": false,
+    "secretValueReadAllowed": false,
+    "rawPrivateDataPrintAllowed": false,
+    "broadRealMemoryScanAllowed": false,
+    "publicMcpExpansionAllowed": false,
+    "configWatchdogStartupChangeAllowed": false,
+    "pushAllowed": false,
+    "tagReleaseDeployAllowed": false,
+    "destructiveActionAllowed": false
+  },
+  "recorder": {
+    "name": "Smart Standing Authorization v3 Recorder",
+    "mode": "local_append_only_receipt_surface",
+    "requiredReceiptFields": [
+      "task_id",
+      "lane",
+      "envelope_id",
+      "action_performed",
+      "target_systems",
+      "calls_used",
+      "files_read",
+      "files_written",
+      "memory_queries_used",
+      "memory_writes_used",
+      "dependency_actions_used",
+      "validation_run",
+      "validation_result",
+      "rollback_or_cleanup_available",
+      "next_auto_step_allowed",
+      "stop_reason"
+    ],
+    "eventTypes": [
+      "green_local_step",
+      "green_no_amber_receipt",
+      "amber_external_action_receipt",
+      "amber_write_action_receipt",
+      "validation_result",
+      "red_gate_stop"
+    ],
+    "storageSurfaces": [
+      "task_doc",
+      "STATUS.md",
+      ".agent_board/VALIDATION_LOG.md",
+      ".agent_board/CHECKPOINT.md",
+      ".agent_board/HANDOFF.md"
+    ],
+    "redGateStopFields": [
+      "red_condition",
+      "required_user_approval",
+      "safe_state",
+      "next_after_approval"
+    ]
+  },
+  "sampleRecords": [
+    {
+      "task_id": "CM-0673",
+      "lane": "Green",
+      "envelope_id": "V3-GREEN-CM-0673",
+      "event_type": "green_no_amber_receipt",
+      "action_performed": "phase_f_public_mcp_freeze_rollup",
+      "target_systems": ["local_docs", "local_fixtures", "local_tests", "agent_board"],
+      "calls_used": {
+        "provider": 0,
+        "api": 0,
+        "mcp_tool": 0,
+        "runtime_probe_minutes": 0
+      },
+      "files_read": [],
+      "files_written": [
+        "docs/PHASE_F_PUBLIC_MCP_FREEZE_ROLLUP.md",
+        "tests/fixtures/phase-f-public-mcp-freeze-rollup-v1.json",
+        "tests/phase-f-public-mcp-freeze-rollup-fixture.test.js"
+      ],
+      "memory_queries_used": 0,
+      "memory_writes_used": 0,
+      "dependency_actions_used": 0,
+      "validation_run": [
+        "node --test tests\\phase-f-public-mcp-freeze-rollup-fixture.test.js",
+        "node --test tests\\phase-f-readiness-boundary-wording-guard-fixture.test.js",
+        "git diff --check",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\validate-local.ps1 -Area docs"
+      ],
+      "validation_result": "COMPLETED_VALIDATED",
+      "rollback_or_cleanup_available": true,
+      "next_auto_step_allowed": true,
+      "stop_reason": "none"
+    },
+    {
+      "task_id": "example-red-stop",
+      "lane": "Red",
+      "envelope_id": "V3-RED-STOP-EXAMPLE",
+      "event_type": "red_gate_stop",
+      "action_performed": "public_mcp_expansion_requested",
+      "target_systems": ["public_mcp_contract"],
+      "calls_used": {
+        "provider": 0,
+        "api": 0,
+        "mcp_tool": 0,
+        "runtime_probe_minutes": 0
+      },
+      "files_read": [],
+      "files_written": [],
+      "memory_queries_used": 0,
+      "memory_writes_used": 0,
+      "dependency_actions_used": 0,
+      "validation_run": [],
+      "validation_result": "BLOCKED",
+      "rollback_or_cleanup_available": true,
+      "next_auto_step_allowed": false,
+      "stop_reason": "red_condition_requires_user_approval",
+      "red_condition": "public_mcp_expansion",
+      "required_user_approval": "explicit exact approval before public MCP tool or schema expansion",
+      "safe_state": "NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED",
+      "next_after_approval": "prepare exact scoped plan and validation path"
+    }
+  ],
+  "nonClaims": [
+    "runtime dashboard implemented",
+    "CLI recorder implemented",
+    "live Amber action executed",
+    "provider evidence captured",
+    "real memory evidence captured",
+    "readiness achieved"
+  ],
+  "forbiddenDefaults": [
+    "RC_READY",
+    "runtimeReady=true",
+    "public MCP expansion approved",
+    "provider call executed",
+    "real memory store read",
+    "durable write completed",
+    "push executed automatically"
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "version": "smart-standing-authorization-v3-receipt-rollup-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "apiCalled": false,
+  "mcpToolCalled": false,
+  "realMemoryStoreRead": false,
+  "durableStateMutated": false,
+  "configChanged": false,
+  "dependencyChanged": false,
+  "remoteActionExecuted": false,
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "rollup": {
+    "taskId": "CM-0677",
+    "rollupId": "V3-RECEIPT-ROLLUP-CM-0677",
+    "sourceSurfaces": [
+      "docs/PHASE_F_PUBLIC_MCP_FREEZE_ROLLUP.md",
+      "docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md",
+      "docs/SMART_STANDING_AUTHORIZATION_V3_READONLY_RECEIPT_PARSER.md",
+      "docs/PHASE_F_FIXTURE_DRIFT_CHANGELOG.md",
+      ".agent_board/VALIDATION_LOG.md",
+      ".agent_board/CHECKPOINT.md",
+      ".agent_board/HANDOFF.md"
+    ],
+    "requiredRollupFields": [
+      "task_id",
+      "validation_id",
+      "lane",
+      "envelope_id",
+      "receipt_status",
+      "action_performed",
+      "budget_used",
+      "validation_result",
+      "next_auto_step_allowed",
+      "stop_reason",
+      "non_claims"
+    ],
+    "sourceTaskIds": ["CM-0673", "CM-0674", "CM-0675", "CM-0676"],
+    "sourceValidationIds": ["CMV-0797", "CMV-0798", "CMV-0799", "CMV-0800"]
+  },
+  "receiptRows": [
+    {
+      "task_id": "CM-0673",
+      "validation_id": "CMV-0797",
+      "lane": "Green",
+      "envelope_id": "V3-GREEN-CM-0673",
+      "receipt_status": "not_required_no_amber_external_or_write_action",
+      "action_performed": "phase_f_public_mcp_freeze_rollup",
+      "budget_used": {
+        "provider": 0,
+        "api": 0,
+        "mcp_tool": 0,
+        "runtime_probe_minutes": 0,
+        "real_memory_read_queries": 0,
+        "memory_writes": 0,
+        "dependency_actions": 0
+      },
+      "validation_result": "COMPLETED_VALIDATED",
+      "next_auto_step_allowed": true,
+      "stop_reason": "none",
+      "non_claims": ["live MCP schema inspected", "runtime public tool list verified", "RC readiness"]
+    },
+    {
+      "task_id": "CM-0674",
+      "validation_id": "CMV-0798",
+      "lane": "Green",
+      "envelope_id": "V3-GREEN-CM-0674",
+      "receipt_status": "local_review_shape_only",
+      "action_performed": "v3_dashboard_recorder_synthetic_contract",
+      "budget_used": {
+        "provider": 0,
+        "api": 0,
+        "mcp_tool": 0,
+        "runtime_probe_minutes": 0,
+        "real_memory_read_queries": 0,
+        "memory_writes": 0,
+        "dependency_actions": 0
+      },
+      "validation_result": "COMPLETED_VALIDATED",
+      "next_auto_step_allowed": true,
+      "stop_reason": "none",
+      "non_claims": ["runtime dashboard implemented", "CLI recorder implemented", "readiness achieved"]
+    },
+    {
+      "task_id": "CM-0675",
+      "validation_id": "CMV-0799",
+      "lane": "Green",
+      "envelope_id": "V3-GREEN-CM-0675",
+      "receipt_status": "parser_contract_only",
+      "action_performed": "v3_readonly_receipt_parser_synthetic_contract",
+      "budget_used": {
+        "provider": 0,
+        "api": 0,
+        "mcp_tool": 0,
+        "runtime_probe_minutes": 0,
+        "real_memory_read_queries": 0,
+        "memory_writes": 0,
+        "dependency_actions": 0
+      },
+      "validation_result": "COMPLETED_VALIDATED",
+      "next_auto_step_allowed": true,
+      "stop_reason": "none",
+      "non_claims": ["CLI parser implemented", "live board scan executed", "readiness achieved"]
+    },
+    {
+      "task_id": "CM-0676",
+      "validation_id": "CMV-0800",
+      "lane": "Green",
+      "envelope_id": "V3-GREEN-CM-0676",
+      "receipt_status": "fixture_changelog_only",
+      "action_performed": "phase_f_fixture_drift_changelog",
+      "budget_used": {
+        "provider": 0,
+        "api": 0,
+        "mcp_tool": 0,
+        "runtime_probe_minutes": 0,
+        "real_memory_read_queries": 0,
+        "memory_writes": 0,
+        "dependency_actions": 0
+      },
+      "validation_result": "COMPLETED_VALIDATED",
+      "next_auto_step_allowed": true,
+      "stop_reason": "none",
+      "non_claims": ["release note claim", "runtime implementation claim", "readiness claim"]
+    }
+  ],
+  "aggregateBudgetUsed": {
+    "provider": 0,
+    "api": 0,
+    "mcp_tool": 0,
+    "runtime_probe_minutes": 0,
+    "real_memory_read_queries": 0,
+    "memory_writes": 0,
+    "dependency_actions": 0
+  },
+  "redGateSummary": {
+    "red_stop_count": 0,
+    "red_lane_required_for": [
+      "push",
+      "tag",
+      "release",
+      "deploy",
+      "secret value read",
+      "destructive action",
+      "broad real memory scan",
+      "public MCP expansion",
+      "readiness claim"
+    ],
+    "next_auto_step_allowed": true,
+    "next_auto_step_scope": "Green docs/fixture/test/board only or exact in-envelope Amber with receipt",
+    "stop_reason": "none"
+  },
+  "blockedActions": [
+    "Amber external action without receipt",
+    "provider call",
+    "API call",
+    "MCP tool call",
+    "runtime probe",
+    "real memory read",
+    "real memory write",
+    "dependency change",
+    "config change",
+    "public MCP expansion",
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "readiness claim"
+  ],
+  "nonClaims": [
+    "runtime receipt recorder implemented",
+    "CLI receipt rollup writes performed",
+    "live Amber action executed",
+    "provider evidence captured",
+    "real memory evidence captured",
+    "durable write completed",
+    "readiness achieved"
+  ],
+  "forbiddenDefaults": [
+    "RC_READY",
+    "runtimeReady=true",
+    "public MCP expansion approved",
+    "provider call executed",
+    "real memory store read",
+    "durable write completed",
+    "push executed automatically"
+  ]
+}

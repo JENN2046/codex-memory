@@ -1,0 +1,154 @@
+{
+  "version": "smart-standing-authorization-v3-readonly-receipt-parser-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "mcpToolCalled": false,
+  "realMemoryStoreRead": false,
+  "durableStateMutated": false,
+  "configChanged": false,
+  "dependencyChanged": false,
+  "remoteActionExecuted": false,
+  "parser": {
+    "name": "Smart Standing Authorization v3 read-only receipt parser",
+    "mode": "read_only_local_markdown_table_parser",
+    "allowedInputSurfaces": [
+      ".agent_board/VALIDATION_LOG.md",
+      ".agent_board/CHECKPOINT.md",
+      ".agent_board/HANDOFF.md",
+      "task_doc",
+      "STATUS.md"
+    ],
+    "primaryInputSurface": ".agent_board/VALIDATION_LOG.md",
+    "writesAllowed": false,
+    "runtimeIntegrationAllowed": false,
+    "requiredOutputFields": [
+      "source_surface",
+      "latest_v3_task_id",
+      "latest_validation_id",
+      "latest_lane",
+      "latest_envelope_id",
+      "latest_receipt_status",
+      "latest_validation_result",
+      "budget_used",
+      "red_stop_count",
+      "next_auto_step_allowed",
+      "stop_reason",
+      "non_claims"
+    ],
+    "knownReceiptMarkers": [
+      "Green Lane",
+      "no-Amber",
+      "no Amber",
+      "receipt",
+      "Red-stop",
+      "Red stop",
+      "COMPLETED_VALIDATED",
+      "BLOCKED"
+    ],
+    "knownForbiddenActionMarkers": [
+      "provider",
+      "MCP call",
+      "real memory read/write",
+      "dependency/config change",
+      "public MCP expansion",
+      "remote action",
+      "readiness claim"
+    ]
+  },
+  "sampleValidationLogRows": [
+    {
+      "id": "CMV-0798",
+      "scope": "CM-0674 Smart Standing Authorization v3 dashboard and recorder local synthetic surface",
+      "result": "COMPLETED_VALIDATED",
+      "summary": "Targeted dashboard/recorder fixture test passed 7/7. This installs only local review shapes for dashboard fields and receipt/Red-stop recorder fields; no runtime dashboard, CLI recorder, provider, MCP call, real memory read/write, dependency/config change, public MCP expansion, remote action, or readiness claim occurred.",
+      "followUp": "Next local-safe candidate: make the recorder consume .agent_board/VALIDATION_LOG.md as a read-only parser, or keep it docs/fixture-only and continue fixture drift changelog."
+    },
+    {
+      "id": "CMV-0797",
+      "scope": "CM-0673 Phase F public MCP freeze rollup and first v3 Green Lane trial",
+      "result": "COMPLETED_VALIDATED",
+      "summary": "Targeted rollup test passed 6/6. v3 trial lane was Green with no Amber external/write action, so no Amber receipt was required.",
+      "followUp": "Next local-safe candidate: CM-0674+ Phase F fixture drift changelog or v3 receipt rollup."
+    }
+  ],
+  "expectedParsedSummary": {
+    "source_surface": ".agent_board/VALIDATION_LOG.md",
+    "latest_v3_task_id": "CM-0674",
+    "latest_validation_id": "CMV-0798",
+    "latest_lane": "not_recorded_in_validation_log",
+    "latest_envelope_id": "not_recorded_in_validation_log",
+    "latest_receipt_status": "local_review_shape_only",
+    "latest_validation_result": "COMPLETED_VALIDATED",
+    "budget_used": {
+      "provider": 0,
+      "api": 0,
+      "mcp_tool": 0,
+      "runtime_probe_minutes": 0,
+      "memory_queries": 0,
+      "memory_writes": 0,
+      "dependency_actions": 0
+    },
+    "red_stop_count": 0,
+    "next_auto_step_allowed": true,
+    "stop_reason": "none",
+    "non_claims": [
+      "runtime recorder implemented",
+      "live Amber action executed",
+      "provider evidence captured",
+      "real memory evidence captured",
+      "readiness achieved"
+    ]
+  },
+  "negativeCases": [
+    {
+      "name": "missing_validation_result",
+      "row": {
+        "id": "CMV-X",
+        "scope": "CM-9999 Smart Standing Authorization v3 missing result",
+        "result": "",
+        "summary": "Green Lane receipt exists."
+      },
+      "expectedStatus": "parser_blocked_missing_result"
+    },
+    {
+      "name": "positive_readiness_marker",
+      "row": {
+        "id": "CMV-Y",
+        "scope": "CM-9998 Smart Standing Authorization v3 bad claim",
+        "result": "COMPLETED_VALIDATED",
+        "summary": "runtimeReady=true and readiness achieved."
+      },
+      "expectedStatus": "parser_blocked_readiness_overclaim"
+    },
+    {
+      "name": "red_stop_detected",
+      "row": {
+        "id": "CMV-Z",
+        "scope": "CM-9997 Smart Standing Authorization v3 red stop",
+        "result": "BLOCKED",
+        "summary": "Red stop: public MCP expansion requires explicit user approval."
+      },
+      "expectedStatus": "parser_detected_red_stop"
+    }
+  ],
+  "nonClaims": [
+    "runtime recorder implemented",
+    "CLI parser writes performed",
+    "runtime parser integration executed",
+    "live Amber action executed",
+    "provider evidence captured",
+    "real memory evidence captured",
+    "readiness achieved"
+  ],
+  "forbiddenDefaults": [
+    "RC_READY",
+    "runtimeReady=true",
+    "public MCP expansion approved",
+    "provider call executed",
+    "real memory store read",
+    "durable write completed",
+    "push executed automatically"
+  ]
+}

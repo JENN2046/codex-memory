@@ -19,6 +19,15 @@ This map is a local review aid only. It does not prove runtime dependencies, run
 ```text
 tests/fixtures/phase-f-cross-pack-dependency-map-v1.json
 tests/phase-f-cross-pack-dependency-map-fixture.test.js
+tests/fixtures/phase-f-public-mcp-freeze-rollup-v1.json
+tests/phase-f-public-mcp-freeze-rollup-fixture.test.js
+docs/PHASE_F_PUBLIC_MCP_FREEZE_ROLLUP.md
+tests/fixtures/phase-f-fixture-drift-changelog-v1.json
+tests/phase-f-fixture-drift-changelog-fixture.test.js
+docs/PHASE_F_FIXTURE_DRIFT_CHANGELOG.md
+tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json
+tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js
+docs/SMART_STANDING_AUTHORIZATION_V3_RECEIPT_ROLLUP.md
 ```
 
 ## Pack Relationship Summary
@@ -32,17 +41,18 @@ tests/phase-f-cross-pack-dependency-map-fixture.test.js
 | EPA/ResidualPyramid chain metadata | TagMemo | query-quality refresh | real recall-chain observation |
 | Memory lifecycle proposal states | memory governance proposal | admin schema hardening, query-quality refresh | durable lifecycle implementation |
 | Query-quality dry-run refresh | TagMemo, LightMemo, EPA/ResidualPyramid, lifecycle | validation surface | real query quality |
-| Admin review schema hardening | observability/admin, governance, lifecycle | validation surface, wording guard | admin production readiness |
+| Admin review schema hardening | observability/admin, governance, lifecycle | validation surface, wording guard | not admin production readiness |
 | Fixture pack validation surface | all eight fixture packs | wording guard | runtime validation |
-| Readiness boundary wording guard | observability/admin, admin schema, validation surface | future Phase F docs | runtime readiness |
+| Readiness boundary wording guard | observability/admin, admin schema, validation surface | public MCP freeze rollup, future Phase F docs | runtime readiness |
+| Public MCP freeze rollup | validation surface, wording guard | fixture drift changelog, future Phase F docs | runtime public MCP schema proof |
+| Fixture drift changelog | validation surface, public MCP freeze rollup | v3 receipt rollup, future Phase F docs | release note claim |
+| V3 receipt rollup | public MCP freeze rollup, fixture drift changelog | future Phase F docs | runtime receipt recorder implementation |
 
 ## Next Synthetic Contract Candidates
 
 | Candidate | Depends On | Safe Shape | Blocked Actions |
 |---|---|---|---|
-| Public MCP freeze rollup | validation surface, wording guard | structure-only fixture asserting protected public tool names across pack fixtures and docs | live MCP schema inspection, public MCP expansion, runtime service start |
-| Fixture drift changelog | validation surface, dependency map | docs-only changelog keyed by CM id, pack id, and validation count | release note claim, tag, push |
-| Cross-pack dependency map | validation surface | synthetic graph of local fixture pack relationships and non-claims | runtime dependency claim, readiness claim, provider call |
+| Next synthetic guard | v3 receipt rollup | docs/fixture-only guard selected by the next local-safe objective | readiness claim, provider call, public MCP expansion |
 
 ## Validation
 
@@ -52,7 +62,7 @@ Targeted validation:
 node --test tests\phase-f-cross-pack-dependency-map-fixture.test.js
 ```
 
-Combined local fixture validation should include the eight Phase F fixture packs, the readiness wording guard, and this dependency map test.
+Combined local fixture validation should include the eight Phase F fixture packs, the readiness wording guard, this dependency map test, the public MCP freeze rollup test, the fixture drift changelog test, and the v3 receipt rollup test.
 
 ## Boundary
 

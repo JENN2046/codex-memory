@@ -47,6 +47,12 @@ const REPO_CM0595_EXECUTION_EVIDENCE_RECORD_PATH = path.join(
   'fixtures',
   'cm0650-cm0595-execution-evidence-record-v1.md'
 );
+const REPO_V3_RECEIPT_VALIDATION_LOG_PATH = path.join(
+  process.cwd(),
+  'tests',
+  'fixtures',
+  'smart-standing-authorization-v3-validation-log-sample.md'
+);
 
 function mainlineGateFixtureEnv() {
   const comparePayload = {
@@ -133,6 +139,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'recommendations',
     'runtime',
     'service',
+    'smartStandingAuthorizationV3',
     'store',
     'summary'
   ], 'dashboard top-level');
@@ -222,6 +229,11 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.readPolicy.mutated, false);
   assert.equal(payload.readPolicy.migrationApplied, false);
   assert.equal(JSON.stringify(payload).includes('workspace_id'), false);
+
+  assert.equal(payload.smartStandingAuthorizationV3.mode, 'smart-standing-authorization-v3-receipt-parser');
+  assert.equal(payload.smartStandingAuthorizationV3.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.provider, 0);
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.memory_writes, 0);
 
   // Gate section
   assert.ok(payload.gate, 'should have gate section');
@@ -400,6 +412,29 @@ test('dashboard CLI should support --json --summary-only', async () => {
 
   assert.equal(payload.mode, 'memory-dashboard');
   assertKeySet(payload.governance, ['autoAuthorization', 'boundedRecallCloseout', 'boundedRecallPreparation', 'counts', 'reviewLevel', 'status', 'wideningAdoption', 'wideningReview'], 'dashboard summary-only governance');
+  assertKeySet(payload.smartStandingAuthorizationV3, [
+    'budget_used',
+    'decision',
+    'evidenceClass',
+    'latest_parser_status',
+    'latest_receipt_status',
+    'latest_v3_task_id',
+    'latest_validation_id',
+    'latest_validation_result',
+    'next_auto_step_allowed',
+    'red_stop_count',
+    'source_surface',
+    'status',
+    'stop_reason'
+  ], 'dashboard summary-only v3 receipt summary');
+  assert.equal(payload.smartStandingAuthorizationV3.decision, 'NOT_READY_BLOCKED');
+  assert.equal(payload.smartStandingAuthorizationV3.evidenceClass, 'read_only_local_markdown_parse');
+  assert.equal(payload.smartStandingAuthorizationV3.latest_parser_status, 'parser_ok');
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.provider, 0);
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.api, 0);
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.mcp_tool, 0);
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.memory_writes, 0);
+  assert.equal(payload.smartStandingAuthorizationV3.red_stop_count, 0);
   // Summary-only should have compact store/profile
   assert.equal(typeof payload.store.records, 'number');
   assert.ok(payload.store.records >= 0, 'records should be non-negative');
@@ -432,8 +467,34 @@ test('dashboard CLI should support --json --summary-only', async () => {
   assert.equal(payload.governance.hints, undefined);
 });
 
+test('dashboard CLI should include v3 receipt summary from explicit validation log', async () => {
+  const result = await runDashboard({
+    args: ['--json', '--v3-receipts-validation-log', REPO_V3_RECEIPT_VALIDATION_LOG_PATH]
+  });
+  assert.equal(result.code, 0, formatFailure(result));
+  const payload = parseJsonOutput(result.stdout);
+
+  assert.equal(
+    payload.smartStandingAuthorizationV3.source_surface,
+    'tests/fixtures/smart-standing-authorization-v3-validation-log-sample.md'
+  );
+  assert.equal(payload.smartStandingAuthorizationV3.latest_v3_task_id, 'CM-0677');
+  assert.equal(payload.smartStandingAuthorizationV3.latest_validation_id, 'CMV-0801');
+  assert.equal(payload.smartStandingAuthorizationV3.latest_receipt_status, 'receipt_rollup_only');
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.provider, 0);
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.mcp_tool, 0);
+  assert.equal(payload.smartStandingAuthorizationV3.budget_used.memory_writes, 0);
+  assert.ok(
+    payload.checks.some(check => check.code === 'v3-receipt-summary'
+      && check.message.includes('CM-0677 / CMV-0801')),
+    'dashboard checks should include v3 receipt summary'
+  );
+});
+
 test('dashboard CLI should emit text output by default', async () => {
-  const result = await runDashboard();
+  const result = await runDashboard({
+    args: ['--v3-receipts-validation-log', REPO_V3_RECEIPT_VALIDATION_LOG_PATH]
+  });
   assert.equal(result.code, 0, formatFailure(result));
   const text = result.stdout;
   assert.ok(text.includes('Memory Dashboard'), 'should include title');
@@ -457,6 +518,8 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('GovRClose'), 'should include governance bounded recall closeout line');
   assert.ok(text.includes('GovRCNext'), 'should include governance bounded recall closeout next step line');
   assert.ok(text.includes('GovRCText'), 'should include governance bounded recall closeout text line');
+  assert.ok(text.includes('V3Receipt'), 'should include v3 receipt line');
+  assert.ok(text.includes('CM-0677 / CMV-0801'), 'should include parsed v3 receipt identity');
   assert.ok(text.includes('bundle=assertion_record_only'), 'should include current bundle kind');
   assert.ok(text.includes('draft=cm0611AssertionRecord'), 'should include current rendered draft id');
   assert.ok(text.includes('cmd=assertion_record_command_bundle'), 'should include current command bundle kind');

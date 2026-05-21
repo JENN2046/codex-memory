@@ -1,0 +1,85 @@
+{
+  "version": "phase-f-public-mcp-freeze-rollup-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "realMemoryStoreRead": false,
+  "durableStateMutated": false,
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "v3Trial": {
+    "taskId": "CM-0673",
+    "lane": "Green",
+    "envelopeId": "V3-GREEN-CM-0673",
+    "meaningfulAmberExternalOrWriteAction": false,
+    "receiptRequired": false,
+    "receiptStatus": "not_required_no_amber_external_or_write_action",
+    "budgetUsed": {
+      "providerCalls": 0,
+      "apiCalls": 0,
+      "mcpToolCalls": 0,
+      "runtimeProbeMinutes": 0,
+      "externalReadFiles": 0,
+      "realMemoryReadQueries": 0,
+      "memoryWrites": 0,
+      "dependencyActions": 0,
+      "transientRetries": 0
+    },
+    "redConditionsEncountered": []
+  },
+  "protectedPublicMcpTools": [
+    {
+      "name": "record_memory",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "exact_sanitized_memory_write_only_inside_v3_envelope"
+    },
+    {
+      "name": "search_memory",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "exact_query_only_no_broad_scan_or_raw_private_data"
+    },
+    {
+      "name": "memory_overview",
+      "expectedPublic": true,
+      "expansionAllowed": false,
+      "schemaChangeAllowed": false,
+      "requiredBoundary": "exact_overview_only_no_public_schema_expansion"
+    }
+  ],
+  "blockedPublicMcpChanges": [
+    "add validate_memory as public MCP",
+    "add admin_review as public MCP",
+    "rename record_memory",
+    "remove search_memory",
+    "change public schema without exact approval",
+    "expose raw private memory content",
+    "treat docs-only fixture evidence as runtime MCP proof"
+  ],
+  "sourceSurfaces": [
+    "AGENTS.md",
+    "docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md",
+    "docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md",
+    "docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md"
+  ],
+  "nonClaims": [
+    "live MCP schema inspected",
+    "runtime public tool list verified",
+    "public MCP expansion readiness",
+    "RC readiness",
+    "cutover readiness"
+  ],
+  "forbiddenDefaults": [
+    "public MCP expansion approved",
+    "validate_memory public tool added",
+    "runtime tool list proven",
+    "RC_READY",
+    "runtimeReady=true",
+    "provider call executed",
+    "real memory store read",
+    "durable write completed"
+  ]
+}

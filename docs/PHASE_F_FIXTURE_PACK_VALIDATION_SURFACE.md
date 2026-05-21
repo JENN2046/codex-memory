@@ -27,17 +27,20 @@ This document is a local review surface only. It does not add a package script, 
 | `query_quality_dry_run_refresh` | `P7-vcp-parity-hardening` | `tests/fixtures/phase-f-query-quality-dry-run-refresh-v1.json` | `tests/phase-f-query-quality-dry-run-refresh-fixture.test.js` |
 | `admin_review_schema_hardening` | `P10-observability-admin` | `tests/fixtures/phase-f-admin-review-schema-hardening-v1.json` | `tests/phase-f-admin-review-schema-hardening-fixture.test.js` |
 | `cross_pack_dependency_map` | `P7-vcp-parity-hardening / P10-observability-admin` | `tests/fixtures/phase-f-cross-pack-dependency-map-v1.json` | `tests/phase-f-cross-pack-dependency-map-fixture.test.js` |
+| `public_mcp_freeze_rollup` | `P7-vcp-parity-hardening / P10-observability-admin` | `tests/fixtures/phase-f-public-mcp-freeze-rollup-v1.json` | `tests/phase-f-public-mcp-freeze-rollup-fixture.test.js` |
+| `fixture_drift_changelog` | `P6-docs-drift` | `tests/fixtures/phase-f-fixture-drift-changelog-v1.json` | `tests/phase-f-fixture-drift-changelog-fixture.test.js` |
+| `v3_receipt_rollup` | `P6-docs-drift / P10-observability-admin` | `tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json` | `tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js` |
 
 ## Combined Fixture Command
 
 ```powershell
-node --test tests\phase-f-tagmemo-semantic-association-fixture.test.js tests\phase-f-observability-admin-review-surface-fixture.test.js tests\phase-f-memory-governance-proposal-fixture.test.js tests\phase-f-lightmemo-directory-semantics-fixture.test.js tests\phase-f-epa-residualpyramid-chain-metadata-fixture.test.js tests\phase-f-memory-lifecycle-proposal-states-fixture.test.js tests\phase-f-query-quality-dry-run-refresh-fixture.test.js tests\phase-f-admin-review-schema-hardening-fixture.test.js tests\phase-f-cross-pack-dependency-map-fixture.test.js
+node --test tests\phase-f-tagmemo-semantic-association-fixture.test.js tests\phase-f-observability-admin-review-surface-fixture.test.js tests\phase-f-memory-governance-proposal-fixture.test.js tests\phase-f-lightmemo-directory-semantics-fixture.test.js tests\phase-f-epa-residualpyramid-chain-metadata-fixture.test.js tests\phase-f-memory-lifecycle-proposal-states-fixture.test.js tests\phase-f-query-quality-dry-run-refresh-fixture.test.js tests\phase-f-admin-review-schema-hardening-fixture.test.js tests\phase-f-readiness-boundary-wording-guard-fixture.test.js tests\phase-f-cross-pack-dependency-map-fixture.test.js tests\phase-f-public-mcp-freeze-rollup-fixture.test.js tests\phase-f-fixture-drift-changelog-fixture.test.js tests\smart-standing-authorization-v3-receipt-rollup-fixture.test.js
 ```
 
 Expected current result:
 
 ```text
-51/51 passing
+72/72 passing
 ```
 
 ## Boundary Wording Guard Command
@@ -64,6 +67,11 @@ git diff --check
 | `CMV-0793` | lifecycle/query-quality/admin schema packs | `COMPLETED_VALIDATED` |
 | `CMV-0794` | coverage review, validation surface, wording guard | `COMPLETED_VALIDATED` |
 | `CMV-0795` | cross-pack dependency map | `COMPLETED_VALIDATED` |
+| `CMV-0797` | public MCP freeze rollup v3 Green trial | `COMPLETED_VALIDATED` |
+| `CMV-0798` | Smart Standing Authorization v3 dashboard/recorder | `COMPLETED_VALIDATED` |
+| `CMV-0799` | Smart Standing Authorization v3 read-only receipt parser | `COMPLETED_VALIDATED` |
+| `CMV-0800` | fixture drift changelog | `COMPLETED_VALIDATED` |
+| `CMV-0801` | Smart Standing Authorization v3 receipt rollup | `COMPLETED_VALIDATED` |
 
 ## Non-Claims
 

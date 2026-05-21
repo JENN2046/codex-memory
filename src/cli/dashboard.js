@@ -8,6 +8,9 @@ const {
   buildGovernanceSurface,
   buildReadPolicySurface
 } = require('./governance-report');
+const {
+  parseReceiptMarkdown
+} = require('../core/SmartStandingAuthorizationV3ReceiptParser');
 
 function parseArgs(argv = []) {
   const options = {
@@ -33,7 +36,8 @@ function parseArgs(argv = []) {
     cm0595IssuanceRecordPath: '',
     cm0595ExecutionEvidenceRecordPath: '',
     boundedRecallIssuanceRecordPath: '',
-    boundedRecallExecutionEvidenceRecordPath: ''
+    boundedRecallExecutionEvidenceRecordPath: '',
+    v3ReceiptsValidationLogPath: path.resolve('.agent_board', 'VALIDATION_LOG.md')
   };
   for (let i = 0; i < argv.length; i += 1) {
     const t = argv[i];
@@ -104,6 +108,11 @@ function parseArgs(argv = []) {
     }
     if (t === '--bounded-recall-execution-evidence-record') {
       options.boundedRecallExecutionEvidenceRecordPath = path.resolve(argv[i + 1] || '');
+      i += 1;
+      continue;
+    }
+    if (t === '--v3-receipts-validation-log') {
+      options.v3ReceiptsValidationLogPath = path.resolve(argv[i + 1] || '');
       i += 1;
       continue;
     }
@@ -434,7 +443,55 @@ function collectGovernance(options = {}) {
   };
 }
 
-function buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy) {
+function collectSmartStandingAuthorizationV3(options = {}) {
+  const workspaceRoot = process.cwd();
+  const validationLogPath = path.resolve(options.v3ReceiptsValidationLogPath || path.join('.agent_board', 'VALIDATION_LOG.md'));
+  const relative = path.relative(workspaceRoot, validationLogPath);
+  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
+    return {
+      status: 'warn',
+      decision: 'NOT_READY_BLOCKED',
+      evidenceClass: 'read_only_local_markdown_parse',
+      source_surface: 'outside_workspace_rejected',
+      latest_v3_task_id: 'not_recorded_in_validation_log',
+      latest_validation_id: 'not_recorded_in_validation_log',
+      latest_receipt_status: 'not_recorded_in_validation_log',
+      latest_validation_result: 'not_recorded_in_validation_log',
+      red_stop_count: 0,
+      next_auto_step_allowed: false,
+      stop_reason: 'validation_log_path_outside_workspace'
+    };
+  }
+
+  try {
+    const markdown = fs.readFileSync(validationLogPath, 'utf8');
+    const summary = parseReceiptMarkdown(markdown, {
+      sourcePath: validationLogPath,
+      workspaceRoot
+    });
+    return {
+      status: summary.latest_parser_status === 'parser_ok' ? 'ok' : 'warn',
+      ...summary
+    };
+  } catch (error) {
+    return {
+      status: 'warn',
+      decision: 'NOT_READY_BLOCKED',
+      evidenceClass: 'read_only_local_markdown_parse',
+      source_surface: relative.split(path.sep).join('/'),
+      latest_v3_task_id: 'not_recorded_in_validation_log',
+      latest_validation_id: 'not_recorded_in_validation_log',
+      latest_receipt_status: 'not_recorded_in_validation_log',
+      latest_validation_result: 'not_recorded_in_validation_log',
+      red_stop_count: 0,
+      next_auto_step_allowed: false,
+      stop_reason: `receipt_parse_unavailable:${error.code || 'read_failed'}`,
+      error: error.message
+    };
+  }
+}
+
+function buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3) {
   const checks = [];
   checks.push({
     source: 'service', level: service.status,
@@ -604,10 +661,18 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance,
       ? `${governance.boundedRecallCloseout.decision} (${governance.boundedRecallCloseout.failClosedReasons?.[0] || 'no-blocker'}; next=${governance.boundedRecallCloseout.nextStep || 'none'}; ready=${governance.boundedRecallCloseout.boundedRecallCloseoutReady === true ? 'yes' : 'no'})`
       : 'bounded-recall-closeout surface unavailable'
   });
+  checks.push({
+    source: 'smart-standing-authorization-v3',
+    level: smartStandingAuthorizationV3.status === 'ok' ? 'ok' : 'warn',
+    code: 'v3-receipt-summary',
+    message: smartStandingAuthorizationV3.status === 'ok'
+      ? `${smartStandingAuthorizationV3.latest_v3_task_id} / ${smartStandingAuthorizationV3.latest_validation_id}; receipt=${smartStandingAuthorizationV3.latest_receipt_status}; redStops=${smartStandingAuthorizationV3.red_stop_count}; next=${smartStandingAuthorizationV3.next_auto_step_allowed === true}`
+      : `v3 receipt summary unavailable or blocked: ${smartStandingAuthorizationV3.stop_reason || 'unknown'}`
+  });
   return checks;
 }
 
-function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy) {
+function buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3) {
   const recs = [];
   const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
   const autoAuthorizationCommandSummary = formatAutoAuthorizationCommandSummary(governance.autoAuthorization);
@@ -624,6 +689,7 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   if (audits.recall.recentCount === 0) recs.push('No recent recall entries — search may not be active');
   if (audits.recall.recentCount > 0 && audits.recall.scopedRecallCount === 0) recs.push('Recent recall activity is present, but none of it used scope filtering');
   if (readPolicy.status !== 'ok') recs.push('No recent lifecycle read-policy audit summary is available yet');
+  if (smartStandingAuthorizationV3.status !== 'ok') recs.push('Smart Standing Authorization v3 receipt summary is unavailable or blocked; inspect local validation log parser input');
   if (gate.status !== 'ok') recs.push('Mainline gate not passing — run gate:mainline for details');
   if (governance.counts.proposalCount > 0) recs.push(`${governance.counts.proposalCount} governance proposals are pending review`);
   if (governance.counts.stale90d > 0) recs.push(`${governance.counts.stale90d} active memories are stale >90d — schedule governance review`);
@@ -722,6 +788,7 @@ function renderText(report, options = {}) {
   lines.push(`GovRCReady ${report.governance.boundedRecallCloseout?.boundedRecallCloseoutReady === true ? 'ready' : 'not-ready'} (${report.governance.boundedRecallCloseout?.closeoutRecordDraft?.status || 'unknown'})`);
   lines.push(`GovRCIss   ${report.governance.boundedRecallCloseout?.boundedRecallApprovalIssuanceRecordInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallApprovalIssuanceRecordInputTrace.sourceFileName : 'none'}`);
   lines.push(`GovRCEvd   ${report.governance.boundedRecallCloseout?.boundedRecallExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
+  lines.push(`V3Receipt  ${pad(report.smartStandingAuthorizationV3.status)} ${report.smartStandingAuthorizationV3.latest_v3_task_id} / ${report.smartStandingAuthorizationV3.latest_validation_id}, receipt=${report.smartStandingAuthorizationV3.latest_receipt_status}, redStops=${report.smartStandingAuthorizationV3.red_stop_count}, next=${report.smartStandingAuthorizationV3.next_auto_step_allowed === true}`);
   lines.push(`Gate       ${pad(report.gate.status)} compare ${report.gate.compare ? report.gate.compare.matchedCases + '/' + report.gate.compare.totalCases : 'N/A'}, rollback ${report.gate.rollback ? report.gate.rollback.readyCases + '/' + report.gate.rollback.totalCases : 'N/A'}`);
   lines.push('');
   lines.push('Checks:');
@@ -816,13 +883,14 @@ async function main() {
   ]);
   const runtime = collectRuntime();
   const governance = collectGovernance(options);
+  const smartStandingAuthorizationV3 = collectSmartStandingAuthorizationV3(options);
 
   const readPolicy = audits.readPolicy;
-  const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy);
-  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy);
+  const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3);
+  const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3);
   const status = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
-    audits.bridge.status, audits.recall.status, governance.status, gate.status
+    audits.bridge.status, audits.recall.status, governance.status, smartStandingAuthorizationV3.status, gate.status
   );
 
   const report = {
@@ -854,6 +922,23 @@ async function main() {
           counts: governance.counts
         }
       : governance,
+    smartStandingAuthorizationV3: options.summaryOnly
+      ? {
+          status: smartStandingAuthorizationV3.status,
+          decision: smartStandingAuthorizationV3.decision,
+          source_surface: smartStandingAuthorizationV3.source_surface,
+          latest_v3_task_id: smartStandingAuthorizationV3.latest_v3_task_id,
+          latest_validation_id: smartStandingAuthorizationV3.latest_validation_id,
+          latest_receipt_status: smartStandingAuthorizationV3.latest_receipt_status,
+          latest_validation_result: smartStandingAuthorizationV3.latest_validation_result,
+          latest_parser_status: smartStandingAuthorizationV3.latest_parser_status,
+          evidenceClass: smartStandingAuthorizationV3.evidenceClass,
+          budget_used: smartStandingAuthorizationV3.budget_used,
+          red_stop_count: smartStandingAuthorizationV3.red_stop_count,
+          next_auto_step_allowed: smartStandingAuthorizationV3.next_auto_step_allowed,
+          stop_reason: smartStandingAuthorizationV3.stop_reason
+        }
+      : smartStandingAuthorizationV3,
     readPolicy,
     gate,
     checks: options.summaryOnly ? checks.filter(c => c.level !== 'ok') : checks,

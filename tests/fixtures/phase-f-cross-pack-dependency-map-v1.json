@@ -117,30 +117,41 @@
         "admin_review_schema_hardening",
         "fixture_pack_validation_surface"
       ],
-      "downstream": ["future_phase_f_docs"],
+      "downstream": ["public_mcp_freeze_rollup", "future_phase_f_docs"],
       "nonClaims": ["runtime readiness", "RC readiness", "production readiness"]
-    }
-  ],
-  "futureSyntheticContracts": [
+    },
     {
       "id": "public_mcp_freeze_rollup",
-      "dependsOn": ["fixture_pack_validation_surface", "readiness_boundary_wording_guard"],
-      "safeShape": "structure-only fixture asserting protected public tool names across pack fixtures and docs",
-      "blockedActions": ["live MCP schema inspection", "public MCP expansion", "runtime service start"]
+      "area": "P7-vcp-parity-hardening / P10-observability-admin",
+      "fixture": "tests/fixtures/phase-f-public-mcp-freeze-rollup-v1.json",
+      "test": "tests/phase-f-public-mcp-freeze-rollup-fixture.test.js",
+      "upstream": [
+        "fixture_pack_validation_surface",
+        "readiness_boundary_wording_guard"
+      ],
+      "downstream": ["fixture_drift_changelog", "future_phase_f_docs"],
+      "nonClaims": ["runtime public MCP schema proof", "public MCP expansion readiness", "RC readiness"]
     },
     {
       "id": "fixture_drift_changelog",
-      "dependsOn": ["fixture_pack_validation_surface", "cross_pack_dependency_map"],
-      "safeShape": "docs-only changelog keyed by CM id, pack id, and validation count",
-      "blockedActions": ["release note claim", "tag", "push"]
+      "area": "P6-docs-drift",
+      "fixture": "tests/fixtures/phase-f-fixture-drift-changelog-v1.json",
+      "test": "tests/phase-f-fixture-drift-changelog-fixture.test.js",
+      "upstream": ["fixture_pack_validation_surface", "public_mcp_freeze_rollup"],
+      "downstream": ["v3_receipt_rollup", "future_phase_f_docs"],
+      "nonClaims": ["release note claim", "runtime implementation claim", "readiness claim"]
     },
     {
-      "id": "cross_pack_dependency_map",
-      "dependsOn": ["fixture_pack_validation_surface"],
-      "safeShape": "synthetic graph of local fixture pack relationships and non-claims",
-      "blockedActions": ["runtime dependency claim", "readiness claim", "provider call"]
+      "id": "v3_receipt_rollup",
+      "area": "P6-docs-drift / P10-observability-admin",
+      "fixture": "tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json",
+      "test": "tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js",
+      "upstream": ["public_mcp_freeze_rollup", "fixture_drift_changelog"],
+      "downstream": ["future_phase_f_docs"],
+      "nonClaims": ["runtime receipt recorder implemented", "CLI receipt rollup implemented", "readiness claim"]
     }
   ],
+  "futureSyntheticContracts": [],
   "forbiddenDefaults": [
     "RC_READY",
     "runtimeReady=true",

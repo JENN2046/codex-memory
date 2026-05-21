@@ -379,6 +379,152 @@ Boundary: docs/fixture/test/board only; no runtime dependency proof, runtime mut
 
 Validation: targeted cross-pack dependency map fixture test passed `6/6`; combined Phase F fixture, wording guard, and dependency map tests passed `55/55`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
 
+## CM-0673 Phase F Public MCP Freeze Rollup
+
+Status: COMPLETED_VALIDATED
+Week: Phase F local safety continuation / Smart Standing Authorization v3 trial
+Scope: add a synthetic public MCP freeze rollup while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+docs/PHASE_F_PUBLIC_MCP_FREEZE_ROLLUP.md
+tests/fixtures/phase-f-public-mcp-freeze-rollup-v1.json
+tests/phase-f-public-mcp-freeze-rollup-fixture.test.js
+```
+
+Boundary: Green Lane docs/fixture/test/board only; no provider call, API call, MCP tool call, runtime probe, real memory read/write, dependency change, public MCP expansion, config change, push, release, deploy, cutover, or readiness claim.
+
+Validation: targeted public MCP freeze rollup fixture test passed `6/6`; targeted cross-pack dependency map fixture test passed `6/6`; wording guard passed `4/4`; combined Phase F fixture, wording guard, dependency map, and public MCP freeze tests passed `61/61`; docs validation and `git diff --check` passed.
+
+## CM-0674 Smart Standing Authorization v3 Dashboard And Recorder
+
+Status: COMPLETED_VALIDATED
+Week: Smart Standing Authorization v3 local safety continuation
+Scope: install local synthetic dashboard and recorder contracts for the v3 autonomy envelope.
+
+Deliverables:
+
+```text
+docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md
+tests/fixtures/smart-standing-authorization-v3-dashboard-recorder-v1.json
+tests/smart-standing-authorization-v3-dashboard-recorder-fixture.test.js
+```
+
+Boundary: docs/fixture/test/board only; no runtime dashboard, no CLI recorder, no provider call, no API call, no MCP tool call, no runtime probe, no real memory read/write, no dependency change, no config change, no public MCP expansion, no push, release, deploy, cutover, or readiness claim.
+
+Validation: targeted v3 dashboard/recorder fixture test passed `7/7`; public MCP rollup regression passed `6/6`; wording guard passed `4/4`; docs validation and `git diff --check` passed.
+
+## CM-0675 Smart Standing Authorization v3 Read-Only Receipt Parser
+
+Status: COMPLETED_VALIDATED
+Week: Smart Standing Authorization v3 local safety continuation
+Scope: add a synthetic read-only parser contract for local receipt-like board rows.
+
+Deliverables:
+
+```text
+docs/SMART_STANDING_AUTHORIZATION_V3_READONLY_RECEIPT_PARSER.md
+tests/fixtures/smart-standing-authorization-v3-readonly-receipt-parser-v1.json
+tests/smart-standing-authorization-v3-readonly-receipt-parser-fixture.test.js
+```
+
+Boundary: docs/fixture/test only; no CLI parser implementation, no live board scan, no provider call, no API call, no MCP tool call, no runtime probe, no real memory read/write, no dependency change, no config change, no public MCP expansion, no push, release, deploy, cutover, or readiness claim.
+
+Validation: targeted v3 read-only receipt parser fixture test passed `6/6`; dashboard/recorder regression plus wording guard passed `17/17`; docs validation and `git diff --check` passed.
+
+## CM-0676 Phase F Fixture Drift Changelog
+
+Status: COMPLETED_VALIDATED
+Week: Phase F local safety continuation / Smart Standing Authorization v3 trial closeout
+Scope: add a synthetic changelog for recent Phase F/v3 fixture drift while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+docs/PHASE_F_FIXTURE_DRIFT_CHANGELOG.md
+tests/fixtures/phase-f-fixture-drift-changelog-v1.json
+tests/phase-f-fixture-drift-changelog-fixture.test.js
+```
+
+Boundary: docs/fixture/test/board only; no release note claim, runtime implementation, provider call, API call, MCP tool call, runtime probe, real memory read/write, dependency change, config change, public MCP expansion, push, release, deploy, cutover, or readiness claim.
+
+Validation: targeted fixture drift changelog fixture test passed `5/5`; cross-pack dependency map regression passed `6/6`; wording guard passed `4/4`; combined Phase F fixture command passed `66/66`; v3 dashboard/recorder plus parser regression passed `13/13`; docs validation and `git diff --check` passed.
+
+## CM-0677 Smart Standing Authorization v3 Receipt Rollup
+
+Status: COMPLETED_VALIDATED
+Week: Smart Standing Authorization v3 local safety continuation
+Scope: roll up the first v3 Green Lane receipt surfaces while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+docs/SMART_STANDING_AUTHORIZATION_V3_RECEIPT_ROLLUP.md
+tests/fixtures/smart-standing-authorization-v3-receipt-rollup-v1.json
+tests/smart-standing-authorization-v3-receipt-rollup-fixture.test.js
+```
+
+Boundary: docs/fixture/test/board only; no runtime receipt recorder, no CLI rollup command, no provider call, no API call, no MCP tool call, no runtime probe, no real memory read/write, no dependency change, no config change, no public MCP expansion, no push, release, deploy, cutover, or readiness claim.
+
+Validation: targeted v3 receipt rollup fixture test passed `6/6`; fixture drift changelog regression passed `5/5`; cross-pack dependency map regression passed `6/6`; wording guard passed `4/4`; combined Phase F fixture command passed `72/72`; v3 dashboard/recorder/parser/rollup regression passed `19/19`; docs validation and `git diff --check` passed.
+
+## CM-0678 Smart Standing Authorization v3 Scoped Read-Only CLI Parser
+
+Status: COMPLETED_VALIDATED
+Week: Smart Standing Authorization v3 local safety continuation
+Scope: implement a scoped read-only CLI/parser for local v3 receipt rows while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+src/core/SmartStandingAuthorizationV3ReceiptParser.js
+src/cli/smart-standing-authorization-v3-receipts.js
+tests/fixtures/smart-standing-authorization-v3-validation-log-sample.md
+tests/smart-standing-authorization-v3-receipts-cli.test.js
+```
+
+Boundary: read-only local parser/CLI only; no board writes, no runtime recorder, no provider call, no API call, no MCP tool call, no runtime probe, no real memory read/write, no dependency change, no config change, no public MCP expansion, no push, release, deploy, cutover, or readiness claim.
+
+Validation: changed source `node --check` passed; targeted CLI/parser test passed `7/7`; v3 dashboard/recorder/parser/rollup regression passed `26/26`; live local validation-log parse returned latest `CM-0678 / CMV-0802`, zero budget usage, zero Red stop count, and `next_auto_step_allowed=true`; docs validation and `git diff --check` passed.
+
+## CM-0679 Smart Standing Authorization v3 Dashboard Receipt Summary Integration
+
+Status: COMPLETED_VALIDATED
+Week: Smart Standing Authorization v3 local safety continuation
+Scope: wire the read-only v3 parser summary into the existing dashboard JSON/text surfaces while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+src/cli/dashboard.js
+tests/dashboard-cli.test.js
+docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md
+docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md
+```
+
+Boundary: read-only local validation-log parsing only; no receipt write, no provider call, no API call, no MCP tool call, no real memory read/write, no dependency change, no config change, no public MCP expansion, no push, release, deploy, cutover, or readiness claim.
+
+Validation: changed parser/dashboard source `node --check` passed; targeted dashboard CLI test passed `18/18`; parser CLI regression passed `7/7`. Dashboard JSON now exposes `smartStandingAuthorizationV3`; text output now includes `V3Receipt`.
+
+## CM-0680 Smart Standing Authorization v3 Dashboard Summary-Only Shape Hardening
+
+Status: COMPLETED_VALIDATED
+Week: Smart Standing Authorization v3 local safety continuation
+Scope: harden the dashboard `--json --summary-only` v3 receipt summary shape while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+src/cli/dashboard.js
+tests/dashboard-cli.test.js
+docs/SMART_STANDING_AUTHORIZATION_V3_DASHBOARD_RECORDER.md
+```
+
+Boundary: read-only dashboard output shape hardening only; no receipt write, no provider call, no API call, no MCP tool call, no real memory read/write, no dependency change, no config change, no public MCP expansion, no push, release, deploy, cutover, or readiness claim.
+
+Validation: changed dashboard source `node --check` passed; targeted dashboard CLI test passed `18/18`. Summary-only `smartStandingAuthorizationV3` now keeps `budget_used`, `latest_parser_status`, and `evidenceClass` alongside task/validation/receipt/Red-gate fields.
+
 ## CM-0548 Current runtime gap truth table consolidation
 
 Status: COMPLETED_VALIDATED
