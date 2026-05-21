@@ -215,10 +215,12 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'blocker',
     'code',
     'commandBundleKind',
+    'commandPreviewUsableNow',
     'decision',
     'nextStepRef',
     'nextStepRefs',
     'operatorPacketKind',
+    'primaryCommand',
     'primaryCommandId',
     'readinessClaimAllowed',
     'reason',
@@ -242,10 +244,12 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'blocker',
     'code',
     'commandBundleKind',
+    'commandPreviewUsableNow',
     'decision',
     'nextStepRef',
     'nextStepRefs',
     'operatorPacketKind',
+    'primaryCommand',
     'primaryCommandId',
     'readinessClaimAllowed',
     'reason',
@@ -259,12 +263,44 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.readinessSummary.governanceNextAction.stage, 'await_cm0611_assertion_record');
   assert.equal(payload.readinessSummary.governanceNextAction.nextStepRef, 'docs/CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE.md');
   assert.equal(payload.readinessSummary.governanceNextAction.commandBundleKind, 'assertion_record_command_bundle');
+  assert.equal(payload.readinessSummary.governanceNextAction.commandPreviewUsableNow, true);
   assert.equal(payload.readinessSummary.governanceNextAction.primaryCommandId, 'helper_assertion_record_review');
+  assert.match(
+    payload.readinessSummary.governanceNextAction.primaryCommand,
+    /authorized-write-path-auto-authorization\.js/
+  );
   assert.equal(payload.readinessSummary.governanceNextAction.readinessClaimAllowed, false);
   assert.equal(payload.readinessSummary.governanceBlockerDetails[1].stage, 'widening_review');
   assert.equal(payload.readinessSummary.governanceBlockerDetails[2].stage, 'widening_adoption');
   assert.equal(payload.readinessSummary.governanceBlockerDetails[3].stage, 'bounded_recall_preparation');
   assert.equal(payload.readinessSummary.governanceBlockerDetails[4].stage, 'bounded_recall_closeout');
+  assert.equal(payload.readinessSummary.governanceBlockerDetails[1].primaryCommandId, 'helper_widening_review');
+  assert.match(
+    payload.readinessSummary.governanceBlockerDetails[1].primaryCommand,
+    /authorized-write-path-widening-review\.js/
+  );
+  assert.equal(payload.readinessSummary.governanceBlockerDetails[2].commandBundleKind, 'cm0595_review_command_bundle');
+  assert.match(
+    payload.readinessSummary.governanceBlockerDetails[2].primaryCommand,
+    /authorized-write-path-widening-adoption-review\.js/
+  );
+  assert.equal(
+    payload.readinessSummary.governanceBlockerDetails[3].commandBundleKind,
+    'bounded_recall_review_command_bundle_blocked'
+  );
+  assert.match(
+    payload.readinessSummary.governanceBlockerDetails[3].primaryCommand,
+    /authorized-write-path-bounded-recall-preparation-review\.js/
+  );
+  assert.equal(
+    payload.readinessSummary.governanceBlockerDetails[4].commandBundleKind,
+    'bounded_recall_preparation_command_bundle_blocked'
+  );
+  assert.match(
+    payload.readinessSummary.governanceBlockerDetails[4].primaryCommand,
+    /authorized-write-path-bounded-recall-closeout-review\.js/
+  );
+  assert.equal(payload.readinessSummary.governanceBlockerDetails[4].commandPreviewUsableNow, false);
 
   // Service section
   assert.ok(payload.service, 'should have service section');

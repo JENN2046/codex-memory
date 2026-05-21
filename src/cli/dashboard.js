@@ -1139,8 +1139,14 @@ function buildGovernanceBlockerDetails(governance = {}, blockerCodes = []) {
       decision: governance.wideningReview?.decision,
       blocker: governance.wideningReview?.failClosedReasons?.[0],
       nextStepRef: governance.wideningReview?.reviewRecordDraft?.nextBoundary || governance.wideningReview?.nextStep,
+      nextStepRefs: Object.values(governance.wideningReview?.refs || {}),
       stage: 'widening_review',
-      reason: 'widening review remains fail-closed'
+      reason: 'widening review remains fail-closed',
+      artifactBundleKind: governance.wideningReview?.reviewRecordDraft?.status
+        || governance.wideningReview?.renderedReviewTextSurface?.reviewKind,
+      primaryCommandId: 'helper_widening_review',
+      primaryCommand: 'node .\\src\\cli\\authorized-write-path-widening-review.js --json',
+      operatorPacketKind: governance.wideningReview?.renderedReviewTextSurface?.reviewKind
     }));
   }
   if (blockerSet.has('authorized-write-path-widening-adoption')) {
@@ -1149,8 +1155,14 @@ function buildGovernanceBlockerDetails(governance = {}, blockerCodes = []) {
       decision: governance.wideningAdoption?.decision,
       blocker: governance.wideningAdoption?.failClosedReasons?.[0],
       nextStepRef: governance.wideningAdoption?.adoptionRecordDraft?.nextBoundary || governance.wideningAdoption?.nextStep,
+      nextStepRefs: Object.values(governance.wideningAdoption?.refs || {}),
       stage: 'widening_adoption',
-      reason: 'widening adoption remains fail-closed'
+      reason: 'widening adoption remains fail-closed',
+      artifactBundleKind: governance.wideningAdoption?.adoptionRecordDraft?.status
+        || governance.wideningAdoption?.renderedAdoptionTextSurface?.adoptionKind,
+      commandPreviewBundle: governance.wideningAdoption?.cm0595CommandPreviewBundle,
+      primaryCommandId: 'helper_widening_adoption_review',
+      operatorPacketKind: governance.wideningAdoption?.cm0595OperatorPacketDraft?.packetKind
     }));
   }
   if (blockerSet.has('authorized-write-path-bounded-recall-preparation')) {
@@ -1159,8 +1171,14 @@ function buildGovernanceBlockerDetails(governance = {}, blockerCodes = []) {
       decision: governance.boundedRecallPreparation?.decision,
       blocker: governance.boundedRecallPreparation?.failClosedReasons?.[0],
       nextStepRef: governance.boundedRecallPreparation?.nextStep,
+      nextStepRefs: Object.values(governance.boundedRecallPreparation?.refs || {}),
       stage: 'bounded_recall_preparation',
-      reason: 'bounded recall preparation remains fail-closed'
+      reason: 'bounded recall preparation remains fail-closed',
+      artifactBundleKind: governance.boundedRecallPreparation?.boundedRecallApprovalIssuanceRecordDraft?.draftKind
+        || governance.boundedRecallPreparation?.renderedBoundedRecallTextSurface?.previewKind,
+      commandPreviewBundle: governance.boundedRecallPreparation?.boundedRecallCommandPreviewBundle,
+      primaryCommandId: 'helper_bounded_recall_preparation_review',
+      operatorPacketKind: governance.boundedRecallPreparation?.boundedRecallOperatorPacketDraft?.status
     }));
   }
   if (blockerSet.has('authorized-write-path-bounded-recall-closeout')) {
@@ -1169,8 +1187,15 @@ function buildGovernanceBlockerDetails(governance = {}, blockerCodes = []) {
       decision: governance.boundedRecallCloseout?.decision,
       blocker: governance.boundedRecallCloseout?.failClosedReasons?.[0],
       nextStepRef: governance.boundedRecallCloseout?.nextStep,
+      nextStepRefs: Object.values(governance.boundedRecallCloseout?.refs || {}),
       stage: 'bounded_recall_closeout',
-      reason: 'bounded recall closeout remains fail-closed'
+      reason: 'bounded recall closeout remains fail-closed',
+      artifactBundleKind: governance.boundedRecallCloseout?.closeoutRecordDraft?.status
+        || governance.boundedRecallCloseout?.renderedCloseoutTextSurface?.closeoutKind,
+      commandPreviewBundle: governance.boundedRecallCloseout?.boundedRecallPreparationCommandPreviewBundle,
+      primaryCommandId: 'helper_bounded_recall_closeout_review',
+      primaryCommand: 'node .\\src\\cli\\authorized-write-path-bounded-recall-closeout-review.js --json',
+      operatorPacketKind: governance.boundedRecallCloseout?.boundedRecallPreparationOperatorPacketDraft?.status
     }));
   }
   return details;
@@ -1193,13 +1218,29 @@ function buildGovernanceAutoAuthorizationNextAction(autoAuthorization = {}) {
       : [],
     artifactBundleKind: autoAuthorization.artifactBundleDraft?.bundleKind || 'unknown',
     commandBundleKind: autoAuthorization.commandPreviewBundle?.bundleKind || 'unknown',
+    commandPreviewUsableNow: autoAuthorization.commandPreviewBundle?.previewUsableNow === true,
     primaryCommandId: autoAuthorization.commandPreviewBundle?.primaryCommandId || 'unknown',
+    primaryCommand: autoAuthorization.commandPreviewBundle?.primaryCommand || 'unknown',
     operatorPacketKind: autoAuthorization.operatorPacketDraft?.packetKind || 'unknown',
     readinessClaimAllowed: false
   };
 }
 
-function buildGovernanceReviewNextAction({ code, decision, blocker, nextStepRef, stage, reason } = {}) {
+function buildGovernanceReviewNextAction({
+  code,
+  decision,
+  blocker,
+  nextStepRef,
+  nextStepRefs,
+  stage,
+  reason,
+  artifactBundleKind,
+  commandPreviewBundle,
+  primaryCommandId,
+  primaryCommand,
+  operatorPacketKind
+} = {}) {
+  const hasCommandPreviewBundle = commandPreviewBundle && typeof commandPreviewBundle === 'object';
   return {
     status: 'blocked',
     source: 'governance',
@@ -1209,11 +1250,21 @@ function buildGovernanceReviewNextAction({ code, decision, blocker, nextStepRef,
     stage: stage || 'unknown',
     reason: reason || 'governance remains fail-closed',
     nextStepRef: nextStepRef || 'unknown',
-    nextStepRefs: nextStepRef ? [nextStepRef] : [],
-    artifactBundleKind: 'not_applicable',
-    commandBundleKind: 'not_applicable',
-    primaryCommandId: 'not_applicable',
-    operatorPacketKind: 'not_applicable',
+    nextStepRefs: Array.isArray(nextStepRefs) && nextStepRefs.length > 0
+      ? nextStepRefs
+      : nextStepRef ? [nextStepRef] : [],
+    artifactBundleKind: artifactBundleKind || 'not_applicable',
+    commandBundleKind: hasCommandPreviewBundle
+      ? commandPreviewBundle.bundleKind || 'unknown'
+      : 'not_applicable',
+    commandPreviewUsableNow: hasCommandPreviewBundle
+      ? commandPreviewBundle.previewUsableNow === true
+      : false,
+    primaryCommandId: primaryCommandId || commandPreviewBundle?.primaryCommandId || 'not_applicable',
+    primaryCommand: hasCommandPreviewBundle
+      ? primaryCommand || commandPreviewBundle.primaryCommand || 'unknown'
+      : primaryCommand || 'not_applicable',
+    operatorPacketKind: operatorPacketKind || 'not_applicable',
     readinessClaimAllowed: false
   };
 }

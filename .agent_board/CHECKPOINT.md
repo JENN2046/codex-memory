@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0720 Dashboard governance blocker command hints - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added read-only command-hint fields to `dashboard.readinessSummary.governanceBlockerDetails`, without changing blocker calculation or `governanceNextAction` first-blocker semantics.
+- Current local signal: real `node src\cli\dashboard.js --json --summary-only` reports all five governance blocker details with `commandPreviewUsableNow` and `primaryCommand`; auto-auth is currently command-preview usable, while widening/adoption/bounded-recall blockers remain blocked/fail-closed.
+- Boundary: Green Lane local dashboard/test/docs/board only; no provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `19/19`; real dashboard JSON smoke showed command hints for all five governance blocker details; full `npm test` passed `1961/1961`; docs validation passed with `latest_task=CM-0720`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then continue governance fail-closed hardening; do not claim readiness.
+
 ## Checkpoint - CM-0719 Dashboard governance blocker details rollup - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
