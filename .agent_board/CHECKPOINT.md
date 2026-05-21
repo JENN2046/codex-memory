@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0722 Dashboard governance blocker text summary - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added text-only `GovBlk1..GovBlk5` lines to dashboard output, reusing existing `readinessSummary.governanceBlockerDetails` so all governance blocker command ids and missing artifact placeholders are visible without parsing JSON.
+- Current local signal: real `node src\cli\dashboard.js --summary-only` shows each remaining governance blocker with `stage`, `cmd`, `input`, and `missing` fields, while `Readiness` remains blocked and `readyClaim=false`.
+- Boundary: Green Lane local dashboard text/test/docs/board only; no JSON contract change, blocker calculation change, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `19/19`; real dashboard text smoke showed `GovBlk1..GovBlk5`; full `npm test` passed `1961/1961`; docs validation passed with `latest_task=CM-0722`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then continue governance fail-closed hardening; do not claim readiness.
+
 ## Checkpoint - CM-0721 Dashboard governance blocker input placeholders - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

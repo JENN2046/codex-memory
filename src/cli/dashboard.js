@@ -1420,6 +1420,9 @@ function renderText(report, options = {}) {
   lines.push(`Operational ${pad(report.operationalSummary.status)} ${report.operationalSummary.message}`);
   lines.push(`Readiness ${pad(report.readinessSummary.status)} ${report.readinessSummary.decision}, blockers=${report.readinessSummary.blockerCount}, readyClaim=${report.readinessSummary.readinessClaimAllowed === true}`);
   lines.push(`GovNext    ${report.readinessSummary.governanceNextAction?.code || 'none'} stage=${report.readinessSummary.governanceNextAction?.stage || 'none'}, next=${report.readinessSummary.governanceNextAction?.nextStepRef || 'none'}`);
+  for (const line of formatGovernanceBlockerTextLines(report.readinessSummary.governanceBlockerDetails)) {
+    lines.push(line);
+  }
   lines.push(`Bridge     ${pad(report.audits.bridge.status)} ${report.audits.bridge.recentCount} recent, ${report.audits.bridge.acceptedCount} accepted, ${report.audits.bridge.rejectedCount} rejected`);
   lines.push(`Recall     ${pad(report.audits.recall.status)} ${report.audits.recall.recentCount} recent, ${report.audits.recall.scopedRecallCount} scoped, ${report.audits.recall.strictScopedRecallCount} strict`);
   lines.push(`RecallScope ${pad(report.audits.recall.scopeStatus || 'unknown')} ${report.audits.recall.scopeEvidenceState || 'unknown'}, next=${report.audits.recall.scopeNextAction || 'unknown'}`);
@@ -1550,6 +1553,18 @@ function formatAutoAuthorizationInputTraceSummary(autoAuthorization) {
     return 'input=default_fixture_only';
   }
   return `input=${trace.sourceFormat || 'unknown'}, file=${trace.sourceFileName || 'unknown'}, c6Accepted=${trace.assertionAcceptedForC6 === true}`;
+}
+
+function formatGovernanceBlockerTextLines(governanceBlockerDetails = []) {
+  if (!Array.isArray(governanceBlockerDetails) || governanceBlockerDetails.length === 0) {
+    return ['GovBlk0   none'];
+  }
+  return governanceBlockerDetails.map((detail, index) => {
+    const missing = Array.isArray(detail.requiredInputPlaceholders) && detail.requiredInputPlaceholders.length > 0
+      ? detail.requiredInputPlaceholders.join('|')
+      : 'none';
+    return `GovBlk${index + 1}   ${detail.code || 'unknown'} stage=${detail.stage || 'unknown'}, cmd=${detail.primaryCommandId || 'unknown'}, input=${detail.inputResolutionMode || 'unknown'}, missing=${missing}`;
+  });
 }
 
 async function main() {

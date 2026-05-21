@@ -1277,6 +1277,15 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('GovPktTxt'), 'should include governance rendered packet text line');
   assert.ok(text.includes('GovBrief'), 'should include governance rendered brief line');
   assert.ok(text.includes('GovInput'), 'should include governance input line');
+  assert.ok(text.includes('GovBlk1'), 'should include first governance blocker text line');
+  assert.ok(text.includes('GovBlk5'), 'should include final governance blocker text line');
+  assert.ok(text.includes('cmd=helper_assertion_record_review'), 'should include first governance blocker command id');
+  assert.ok(text.includes('input=placeholder_only'), 'should include governance blocker input resolution mode');
+  assert.ok(text.includes('missing=<CM0611_assertion_record_path>'), 'should include first missing governance input placeholder');
+  assert.ok(
+    text.includes('missing=<CM0658_bounded_recall_issuance_record_path>|<CM0659_bounded_recall_execution_evidence_record_path>'),
+    'should include bounded recall closeout missing placeholders'
+  );
   assert.ok(text.includes('GovWiden'), 'should include governance widening review line');
   assert.ok(text.includes('GovWNext'), 'should include governance widening review next step line');
   assert.ok(text.includes('GovWText'), 'should include governance widening review text line');
