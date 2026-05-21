@@ -1561,6 +1561,10 @@ function formatStoreFreshnessText(report) {
   if (report.store.ageBreakdown) {
     return `${report.store.ageBreakdown.last24h} in 24h, ${report.store.ageBreakdown.last7d} in 7d, ${report.store.ageBreakdown.last30d} in 30d`;
   }
+  if (report.storeFreshnessWritePreflight?.store?.ageBreakdown) {
+    const ageBreakdown = report.storeFreshnessWritePreflight.store.ageBreakdown;
+    return `${ageBreakdown.last24h} in 24h, ${ageBreakdown.last7d} in 7d, ${ageBreakdown.last30d} in 30d`;
+  }
   const freshnessCheck = (report.checks || []).find(check => check.code === 'store-freshness');
   const match = String(freshnessCheck?.message || '').match(/(\d+) records in last 24h, (\d+) in last 7d/);
   if (match) return `${match[1]} in 24h, ${match[2]} in 7d, 30d unavailable`;
@@ -1570,6 +1574,9 @@ function formatStoreFreshnessText(report) {
 function formatStoreFreshnessLevel(report) {
   const freshnessCheck = (report.checks || []).find(check => check.code === 'store-freshness');
   if (freshnessCheck?.level) return freshnessCheck.level;
+  if (report.storeFreshnessWritePreflight?.store?.ageBreakdown) {
+    return report.storeFreshnessWritePreflight.store.ageBreakdown.last24h > 0 ? 'ok' : 'warn';
+  }
   if (report.store.ageBreakdown) return report.store.ageBreakdown.last24h > 0 ? 'ok' : 'warn';
   return 'unknown';
 }
@@ -1815,7 +1822,7 @@ async function main() {
     goalReadiness,
     readinessSummary,
     service,
-    store: options.summaryOnly ? { status: store.status, records: store.records, chunks: store.chunks } : store,
+    store: options.summaryOnly ? { status: store.status, records: store.records, chunks: store.chunks, ageBreakdown: store.ageBreakdown } : store,
     storeFreshnessWritePreflight,
     profile: options.summaryOnly ? { status: profile.status, fingerprint: profile.fingerprint } : profile,
     runtime,

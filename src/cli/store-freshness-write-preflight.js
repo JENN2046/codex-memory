@@ -92,9 +92,10 @@ function collectStoreFreshness(dbPath) {
 function buildProposedRecordMemoryArguments(store) {
   return {
     target: 'process',
-    title: 'codex-memory local mainline freshness evidence',
+    title: 'Checkpoint: codex-memory local mainline freshness evidence',
     content: [
       'Type: local-mainline-write-path-evidence',
+      'Checkpoint: bounded freshness evidence for codex-memory local mainline stability.',
       'Purpose: bounded freshness evidence for codex-memory local mainline stability.',
       'Boundary: exactly one sanitized record_memory write after explicit authorization only.',
       'No provider call, broad memory scan, config change, public MCP expansion, push, deploy, or readiness claim.'

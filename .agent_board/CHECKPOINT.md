@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0737 StoreWAsk rejected-attempt preflight repair - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED` after the second approved StoreWAsk execution and validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: executed the first user-approved `StoreWAsk` once through authorized HTTP MCP `record_memory`, observed a rejected runtime result, repaired preflight proposed arguments so process payloads include a required `Checkpoint:` signal, then executed the second separately approved repaired `StoreWAsk` once.
+- Current local signal: first approved call returned HTTP `200` with tool `decision=rejected`, `memoryId=null`, `mcpToolCalls=1`, `memoryWritesAttempted=1`, accepted memory writes `0`, provider/API/remote actions `0`, and readiness claim `false`. Read-only audit tail shows the rejection reason: `process memory must include checkpoint, risk, todo, pending, or stage-conclusion.` Second approved repaired call returned HTTP `200`, `decision=accepted`, `memoryId=codex-process-1ef539a197d747e199e12fe1c0d69731`, and `shadowWrite.status=ok`.
+- Repair/freshness signal: real `node src\cli\store-freshness-write-preflight.js --json` now reports `STORE_FRESHNESS_EVIDENCE_NOT_REQUIRED`, `records=4`, `chunks=9`, `last24h=1`, and `last7d=4`; dashboard `goalReadiness.blockers` no longer includes `store_freshness_evidence_not_written`. Targeted tests validate the repaired proposed args with `validateProcessEntry()`.
+- Boundary: only the two separately user-approved `record_memory` calls occurred; no `search_memory`, provider/API call, config/startup change, public MCP expansion, remote action, additional write beyond the approved accepted write, release, deploy, cutover, or readiness claim occurred.
+- Validation: preflight syntax passed; preflight test syntax passed; targeted preflight tests passed `4/4`; real preflight/dashboard/audit smoke showed repaired proposed arguments, accepted write evidence, and remaining `NOT_READY_BLOCKED` state; `npm test` passed `1970/1970`; docs validation passed; v3 parser smoke passed; `git diff --check` passed.
+- Next safe task: inspect diff/status, then create guarded local commit if scope remains clean.
+
 ## Checkpoint - CM-0736 Dashboard long-term goal readiness rollup - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

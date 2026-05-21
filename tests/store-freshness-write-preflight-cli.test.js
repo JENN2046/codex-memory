@@ -5,6 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { DatabaseSync } = require('node:sqlite');
+const { validateProcessEntry } = require('../src/core/MemoryWriteService');
 
 const cliPath = path.join('src', 'cli', 'store-freshness-write-preflight.js');
 
@@ -60,6 +61,7 @@ test('store freshness write preflight prepares exact-only payload when no record
     assert.equal(report.proposedMemoryWrites, 1);
     assert.equal(report.proposedTool, 'record_memory');
     assert.equal(report.proposedArguments.target, 'process');
+    assert.equal(validateProcessEntry(report.proposedArguments.title, report.proposedArguments.content), null);
     assert.equal(report.proposedArguments.sensitivity, 'none');
     assert.equal(report.proposedArguments.client_id, 'codex');
     assert.equal(report.approvalPacket.packetId, 'CM-0732-store-freshness-write-evidence-approval-packet-v0');

@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0737 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after the second approved StoreWAsk execution, full validation, docs validation, v3 parser smoke, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0737 started from local `HEAD = 591bab4 feat: summarize memory mainline goal readiness`, with `main...origin/main [ahead 34]`.
+
+Changed files so far: `src/cli/store-freshness-write-preflight.js`; `src/cli/dashboard.js`; `tests/store-freshness-write-preflight-cli.test.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: first user-approved `StoreWAsk` was executed exactly once through authorized HTTP MCP `record_memory`, but runtime rejected the generated process payload because it lacked a checkpoint/risk/todo/pending/stage-conclusion signal. Preflight was repaired so proposed process payloads include `Checkpoint:` and targeted tests validate them with `validateProcessEntry()`. The user then separately approved the repaired `StoreWAsk`, and the second exact `record_memory` call succeeded with `memoryId=codex-process-1ef539a197d747e199e12fe1c0d69731` and `shadowWrite.status=ok`.
+
+Boundary: two separately user-approved MCP `record_memory` attempts used; first rejected, second accepted. No `search_memory`, provider/API call, config/startup change, public MCP expansion, remote action, additional write beyond the approved accepted write, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\store-freshness-write-preflight.js`; `node --check tests\store-freshness-write-preflight-cli.test.js`; `node --test tests\store-freshness-write-preflight-cli.test.js` passed `4/4`; real preflight smoke now shows `STORE_FRESHNESS_EVIDENCE_NOT_REQUIRED`, `records=4`, `chunks=9`, `last24h=1`, `last7d=4`; dashboard smoke shows goal blockers no longer include store freshness evidence; `npm test` passed `1970/1970`; docs validation passed with `latest_task=CM-0737`; v3 parser smoke reported `CM-0737 / CMV-0856`, `Amber / amber_receipt_recorded`, and `memory_writes=1`; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Continue governance fail-closed closeout; do not claim readiness.
+
 ## CM-0736 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, v3 parser smoke, and diff check; guarded local commit is the remaining closeout step for this slice.
