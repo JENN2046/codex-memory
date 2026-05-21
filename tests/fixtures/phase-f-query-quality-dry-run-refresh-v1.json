@@ -1,0 +1,65 @@
+{
+  "version": "phase-f-query-quality-dry-run-refresh-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "realMemoryStoreRead": false,
+  "durableMemoryWritten": false,
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "queryAssertions": [
+    {
+      "id": "qq-refresh-001",
+      "area": "lifecycle-proposal-state",
+      "query": "Which lifecycle fixture keeps proposal review separate from durable mutation?",
+      "target": "memory_lifecycle_proposal_states",
+      "mustContain": ["proposal", "review-ready", "durable mutation"],
+      "mustNotContain": ["RC_READY", "providerCalled=true", "real memory store read"]
+    },
+    {
+      "id": "qq-refresh-002",
+      "area": "forget-flow-boundary",
+      "query": "Which fixture blocks forget flow from direct deletion without exact approval?",
+      "target": "memory_lifecycle_forget_flow_boundary",
+      "mustContain": ["forget", "exact approval", "audit"],
+      "mustNotContain": ["destructive deletion already applied", "durable write completed"]
+    },
+    {
+      "id": "qq-refresh-003",
+      "area": "admin-review-schema",
+      "query": "Which admin review surface reports fixture pack status without claiming readiness?",
+      "target": "admin_review_schema_hardening",
+      "mustContain": ["fixture pack status", "schema snapshot", "NOT_READY_BLOCKED"],
+      "mustNotContain": ["production readiness", "cutover readiness", "RC_READY"]
+    }
+  ],
+  "dryRunReportShape": {
+    "requiredTopLevelFields": [
+      "status",
+      "caseCount",
+      "fixtureOnlyCount",
+      "assertedCount",
+      "passedCount",
+      "failedCount",
+      "mutated",
+      "providerCalls",
+      "durableMemoryTouched"
+    ],
+    "forbiddenTopLevelFields": [
+      "hitRate",
+      "qualityScore",
+      "providerLatency",
+      "realMemorySample"
+    ]
+  },
+  "forbiddenDefaults": [
+    "RC_READY",
+    "runtimeReady=true",
+    "finalRcMatrixReady=true",
+    "rcReady=true",
+    "provider call executed",
+    "real memory store read",
+    "durable memory already written",
+    "public MCP expansion approved"
+  ]
+}

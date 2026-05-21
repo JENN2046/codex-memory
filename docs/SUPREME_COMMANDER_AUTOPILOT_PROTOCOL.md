@@ -1,14 +1,16 @@
 # Supreme Commander Autopilot Protocol
 
-Updated: 2026-05-19
+Updated: 2026-05-21
 
 ## Purpose
 
-The Supreme Commander protocol is the top-level local project-operator pattern for `codex-memory`.
+The Supreme Commander protocol is the top-level project-operator pattern for `codex-memory`.
 
-It lets one controlling session keep the project moving through safe, validated local work by selecting the next task, assigning bounded work, validating results, and stopping at hard boundaries.
+It lets one controlling session keep the project moving through safe, validated work by selecting the next task, assigning bounded work, validating results, recording receipts, and stopping at hard boundaries.
 
 It is not a daemon, background service, release mode, production authority, remote-write permission, or A5 bypass.
+
+It uses [Smart Standing Authorization v3 - Budgeted Autonomy Envelope](/A:/codex-memory/docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md): Green work runs directly, Amber work may run continuously inside exact budgets with receipts, and Red work stops for explicit user approval.
 
 ## Authority
 
@@ -39,8 +41,9 @@ It is the Commander operating under A4.8 project-operator authority with explici
 - request or run read-only verification
 - run validation selected from the project validation matrix
 - update `.agent_board`
+- record receipts after meaningful Amber external/write actions
 - create guarded local commits only when all commit conditions pass
-- prepare A5 approval packets instead of executing A5 work
+- prepare Red approval packets instead of executing Red work
 
 ## Operating Loop
 
@@ -51,16 +54,17 @@ It is the Commander operating under A4.8 project-operator authority with explici
 5. Validation: run targeted validation first, then broader gates when risk requires them.
 6. Verification: perform a read-only review of diff scope, hard stops, secrets/dependencies, and board freshness.
 7. Board update: record status, validation, changed files, remaining risks, and next safe action.
-8. Commit readiness: create a guarded local commit only when all guarded commit conditions pass.
-9. Continue or stop: continue only while the next step remains local, reversible, inside scope, and below A5.
+8. Receipt: after meaningful Amber external/write action, record budget use, validation, rollback/cleanup, next step, and stop reason.
+9. Commit readiness: create a guarded local commit only when all guarded commit conditions pass.
+10. Continue or stop: continue only while the next step remains Green or in-envelope Amber; stop at Red.
 
 ## Stop Conditions
 
-The Supreme Commander must stop and request explicit approval before:
+The Supreme Commander must stop and request explicit approval before Red actions:
 
-- provider or external model calls
-- real memory content scan, preview, export, import, or migration
-- durable memory, audit, diary, SQLite, vector, candidate, or recall-store mutation
+- provider or external model calls outside the v3 envelope
+- broad real memory content scan, preview, export, import, or migration
+- broad durable memory, audit, diary, SQLite, vector, candidate, or recall-store mutation
 - migration/import/export/backup/restore apply
 - public MCP tool or schema expansion
 - service/watchdog/startup install or config switch
@@ -70,6 +74,8 @@ The Supreme Commander must stop and request explicit approval before:
 - stale branch merge/rebase/cherry-pick
 - user-owned uncommitted work overwrite
 - readiness, cutover, or `RC_READY` claim without complete runtime evidence
+
+Exact `search_memory`, `memory_overview`, sanitized `record_memory`, provider probes, runtime probes, external reads, and small dependency actions may be Amber only when they fit the v3 envelope, stay within budget, have exact scope, and leave receipts.
 
 ## Default Output
 

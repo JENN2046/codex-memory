@@ -4,69 +4,48 @@ Status: `COVERAGE_GAP_REVIEW_COMPLETE`
 
 Decision: `NOT_READY_BLOCKED`
 
-Anchor commit: `1922b34`
+Scope: docs-only review of the current eight Phase F synthetic fixture packs
+
+Date: 2026-05-21
 
 ## Purpose
 
-Review the completed Phase F local-safe fixture packs and identify the next fixture-only VCP parity hardening target. This review is docs-only and does not change runtime behavior, source code, public MCP tools, durable memory, audit logs, or project readiness state.
+Review the completed Phase F local-safe fixture packs and identify the next synthetic contracts worth adding.
 
-## Current Fixture Coverage
+This review is docs-only. It does not change runtime behavior, source code, public MCP tools, durable memory, audit logs, provider configuration, real memory stores, remote state, or project readiness state.
 
-| Coverage Area | Current Pack | Local Evidence | Covered Boundary |
+## Current Eight-Pack Coverage
+
+| Pack | Current Evidence | Strongest Covered Boundary | Remaining Gap |
 |---|---|---|---|
-| TagMemo semantic association | TagMemo fixture pack | synthetic fixture + structure-only test | association grouping, controlled expansion negatives, deterministic ordering, readiness overclaim rejection |
-| Observability/admin review surface | Observability fixture pack | synthetic fixture + structure-only test | review surface shape, public MCP freeze, hard-stop visibility, local-safe next action |
-| Memory governance proposal | Governance fixture pack | synthetic fixture + structure-only test | proposal states, approval requirements, no default durable mutation, authority/readiness overclaim rejection |
+| TagMemo semantic association | `tests/phase-f-tagmemo-semantic-association-fixture.test.js` | association grouping, controlled expansion negatives, deterministic ordering, readiness overclaim rejection | no fixture-pack-level drift summary across future TagMemo variants |
+| Observability/admin review surface | `tests/phase-f-observability-admin-review-surface-fixture.test.js` | review surface shape, public MCP freeze, hard-stop visibility, local-safe next action | schema consistency can still drift across newer admin surfaces |
+| Memory governance proposal | `tests/phase-f-memory-governance-proposal-fixture.test.js` | proposal objects, approval requirements, no default durable mutation, authority/readiness overclaim rejection | lifecycle transition edge cases needed a separate matrix and are now covered by the lifecycle pack |
+| LightMemo directory semantics | `tests/phase-f-lightmemo-directory-semantics-fixture.test.js` | `maid`, `folder`, alias, excluded-folder, all-KB explicit-only behavior | no runtime LightMemo recall proof; this remains intentionally blocked |
+| EPA/ResidualPyramid chain metadata | `tests/phase-f-epa-residualpyramid-chain-metadata-fixture.test.js` | bounded EPA metadata, pruning metadata, ResidualPyramid layer metadata, chain handoff, fail-closed missing metadata | no real recall-chain observation; this remains intentionally blocked |
+| Memory lifecycle proposal states | `tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js` | proposal, supersession, tombstone, forget-flow transitions and blocked direct apply | no durable lifecycle implementation proof; this remains intentionally blocked |
+| Query-quality dry-run refresh | `tests/phase-f-query-quality-dry-run-refresh-fixture.test.js` | fixture-only query assertions, dry-run report shape, fake-score rejection | no real query quality proof or provider quality proof; this remains intentionally blocked |
+| Admin review schema hardening | `tests/phase-f-admin-review-schema-hardening-fixture.test.js` | schema snapshot, local-safe action matrix, fixture pack status, hard stops | needs stable validation surface and wording guard to resist docs drift |
 
-## Coverage Gaps Still Open
+## Next Synthetic Contract Candidates
 
-| Gap | Why It Matters | Safe Fixture-Only Shape | Risk If Misread |
+| Candidate | Why It Matters | Safe Fixture-Only Shape | Stop Boundary |
 |---|---|---|---|
-| LightMemo directory semantics | VCP compatibility depends on stable `maid`, `folder`, alias, excluded-folder, and all-knowledge-base behavior. | synthetic query/fixture matrix for directory intent and forbidden broadening | could be mistaken as real directory recall validation |
-| EPA / ResidualPyramid chain metadata | Recall-chain parity needs explicit metadata boundaries before runtime proof. | fixture with explicit chain inputs, rejected inferred metadata, and no provider score dependency | could imply actual recall quality proof |
-| Memory lifecycle proposal states | Governance fixture covers proposal basics but not lifecycle transition matrix depth. | synthetic transition table for proposal/supersede/tombstone/forget state movement | could be mistaken as durable lifecycle implementation |
-| Active-memory rollback evidence linking | Current packs do not connect fixture-only parity evidence to compare/rollback evidence classes. | docs/fixture index mapping local fixture evidence versus approved compare/rollback evidence | could imply rollback readiness update without approved evidence |
-| Public MCP freeze regression index | Public MCP freeze appears in each pack, but no single regression index records exact protected surface across packs. | static docs/fixture index only | could imply schema inspection or MCP runtime execution |
+| Fixture pack validation surface cleanup | The `45/45` validation command is long and easy to copy incorrectly. | docs index that lists pack map, stable command, validation evidence class, and expected result labels | do not add runtime command wrappers or package scripts without separate scope |
+| Readiness / boundary wording guard | Phase F docs intentionally mention readiness words only as blocked/denial examples. | fixture listing watched docs, sensitive terms, and allowed denial markers; structure-only test scans Markdown text | do not treat wording scan as runtime readiness proof |
+| Cross-pack dependency map | Some packs depend conceptually on earlier packs, but no local map shows ordering. | synthetic map from pack id to upstream/downstream docs/tests and non-claims | do not imply implementation dependency or runtime contract |
+| Public MCP freeze rollup | Every pack repeats the protected three tools, but no single rollup guards all pack fixtures together. | structure-only fixture asserting each pack still lists `record_memory`, `search_memory`, `memory_overview` when applicable | do not inspect or mutate live MCP schema |
+| Fixture drift changelog | The pack set is growing; future agents need a compact local history of when packs were added. | docs-only changelog keyed by CM id, pack id, and validation count | do not claim release notes or shipped capability |
 
-## Recommended Next Target
+## Recommended Next Three
 
-Recommended next local-safe task:
+The next local-safe batch should be:
 
-```text
-CM-0543 Phase F LightMemo directory semantics fixture plan
-```
+1. `Phase F Fixture Pack Validation Surface Cleanup`
+2. `Phase F Readiness Boundary Wording Guard`
+3. `Phase F Cross-Pack Dependency Map`
 
-Reason:
-
-- It is directly tied to VCP parity compatibility.
-- It can remain synthetic fixture/test-only.
-- It does not require real memory scans, providers, runtime service starts, migrations, or public MCP changes.
-- It complements the completed TagMemo pack by moving from semantic association to directory/query-scope behavior.
-
-## Proposed CM-0543 Scope
-
-Docs-only fixture plan for future synthetic LightMemo directory semantics tests:
-
-- `maid`
-- `folder`
-- `maid AND (folder1 OR folder2)`
-- `search_all_knowledge_bases=true`
-- excluded folders
-- directory alias map
-- forbidden over-broad cross-directory recall
-- no real memory store read
-- no provider call
-- no runtime recall proof
-
-## Alternative Local-Safe Candidates
-
-If LightMemo is deferred, next candidates are:
-
-1. `CM-0544 Phase F EPA/ResidualPyramid chain metadata fixture plan`
-2. `CM-0545 Phase F memory lifecycle transition fixture plan`
-3. `CM-0546 Phase F public MCP freeze regression index`
-
-These should stay docs/fixture/test-only unless separately planned and validated.
+The first two are selected now because the user asked for validation-surface cleanup and readiness/boundary wording guard. The cross-pack dependency map remains the next best candidate after this batch.
 
 ## Explicit Non-Claims
 
@@ -76,7 +55,10 @@ This review does not prove:
 - real LightMemo recall behavior
 - real EPA/ResidualPyramid recall quality
 - durable memory lifecycle implementation
-- active-memory rollback readiness beyond existing approved evidence
+- real query quality
+- provider/profile quality
+- live admin surface readiness
+- active-memory rollback readiness beyond separately approved evidence
 - public MCP schema execution
 - production readiness
 - RC readiness
@@ -84,10 +66,11 @@ This review does not prove:
 ## Required Validation For This Slice
 
 ```powershell
-node --test tests\phase-f-tagmemo-semantic-association-fixture.test.js tests\phase-f-observability-admin-review-surface-fixture.test.js tests\phase-f-memory-governance-proposal-fixture.test.js
 git diff --check
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs
 ```
+
+When fixture/test changes are made in the same batch, run the Phase F combined fixture command from `docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md`.
 
 ## Result
 
@@ -95,4 +78,5 @@ The current Phase F fixture packs are useful and locally validated, but they rem
 
 ```text
 NOT_READY_BLOCKED
+RC_NOT_READY_BLOCKED
 ```

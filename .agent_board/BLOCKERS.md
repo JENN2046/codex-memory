@@ -43,6 +43,18 @@ Stop before:
 - writing outside workspace root
 - overwriting user-owned uncommitted changes
 
+## CMB-0012 - Red Lane remains hard stop under Smart Standing Authorization v3
+
+Status: OPEN_RED_LANE_BOUNDARY
+
+Area: P6-docs-drift / P10-observability-admin
+
+Reason: Smart Standing Authorization v3 grants a bounded Amber autonomy envelope, but it does not authorize Red actions.
+
+Required approval/action: explicit user approval remains required for push/PR/tag/release/deploy, force/history rewrite, destructive actions, secret read/edit, raw private data exposure, broad real memory scan/export, real VCP memory import/migration, wide VCPChat/VCPToolBox write, public MCP expansion, Codex/Claude config change, watchdog/startup changes, dependency changes without exact package/action list, audit-fix/batch upgrade/package-manager switch, unbounded cost/loops, overwrite without explicit allowance, non-obvious validation failure repair, and readiness/cutover/RC_READY claims.
+
+Safe state: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`; v3 policy/status only; no real Amber action executed by CM-0672.
+
 ## CMB-0007 - Monthly plan remains local-safe until A5 approval
 
 Status: `OPEN_AFTER_READONLY_PRECHECK`\r\n\r\nArea: P6-docs-drift / P10-observability-admin\r\n\r\nReason: `A5-RC-PRECHECK-READONLY` has executed, but recall observation, A5-GAP-6 aggregation execution, push, release, deploy, cutover, and readiness claims still require separate exact approval or fully passing A4.8 safe-push policy where applicable.

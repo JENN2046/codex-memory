@@ -1,10 +1,22 @@
 # HANDOFF.md - codex-memory
 
+## Local State Sync - 2026-05-21
+
+- Workspace: `A:\codex-memory`.
+- Branch/head reality: `main`, `HEAD = origin/main = 36cc96b8a67ff61884a67278b53ec78eb4d1e219`.
+- Sync action: `git pull --ff-only` fast-forwarded local `main` from `017eda4930c5add4b824c162c46868f75c91ea0f` to `36cc96b8a67ff61884a67278b53ec78eb4d1e219`.
+- Worktree: Git pointers are synchronized; tracked worktree currently has local docs/board status-reconciliation edits pending and no source/runtime edits in this slice.
+- Scope: docs/board status reconciliation only after remote update and current fact refresh; no source/runtime behavior was changed locally in this slice.
+- Validation: `git status --short --branch`, `git log --oneline --decorate -n 3`, `git rev-parse HEAD`, `git rev-parse origin/main`, `git diff --check`, `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`, and docs/board diff inspection.
+- Not run: tests, strict gate, HTTP observe, provider calls, real memory scan, durable write, commit, push, tag, release, deploy, cutover, or readiness claim.
+- Current controlling state: `RC_NOT_READY_BLOCKED`; the latest bridge still stops at `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED` with `canExecuteRuntimeNow=false`.
+- Next safe step: continue local-safe docs/board or targeted fixture/test work only; this is safe because it preserves the synchronized Git baseline and avoids A5/runtime boundaries.
+
 ## Current Goal Refresh - 2026-05-20
 
 - Active map: [docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md).
 - Controlling state: `RC_NOT_READY_BLOCKED` for the current authorized public write-path chain; broader truth-table vocabulary remains `NOT_READY_BLOCKED`.
-- Current branch/head reality: `main`, `HEAD = origin/main = remote main = 017eda4930c5add4b824c162c46868f75c91ea0f`.
+- Current branch/head reality: superseded by the 2026-05-21 local sync above; previous record was `main`, `HEAD = origin/main = remote main = 017eda4930c5add4b824c162c46868f75c91ea0f`.
 - Latest code-only bridge result: the same explicit `CM-0611` assertion-record plus `token_present` rebound-outcome input now bridges auto-authorization escalation directly into widening-review without first hand-assembling a separate `CM-0615` record; current read-only helper/control surfaces now reach `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED / RC_NOT_READY_BLOCKED`, with `W1-W9=yes`, `W10=no`, and `canExecuteRuntimeNow=false`.
 - Current CM-0661 result: [docs/CM-0661_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_CLOSEOUT_REVIEW_EVALUATOR.md](/A:/codex-memory/docs/CM-0661_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_CLOSEOUT_REVIEW_EVALUATOR.md) now adds one standalone governance-only bounded-recall closeout evaluator plus later `CM-0658/0659` input bridges. Default state stays `BOUNDED_RECALL_CLOSEOUT_NOT_READY / RC_NOT_READY_BLOCKED`; explicit later `CM-0658 + CM-0659` inputs can now reach `BOUNDED_RECALL_CLOSEOUT_RECORDED_PREPARED_LATER_APPROVAL_ONLY`, but the helper still keeps `canExecuteBoundedRecallNow=false` and `canExecuteRuntimeNow=false`, so runtime remains blocked.
 - Current CM-0660 result: [docs/CM-0660_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_RECORD_DRAFT_SURFACES.md](/A:/codex-memory/docs/CM-0660_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_RECORD_DRAFT_SURFACES.md) plus [docs/CM-0658_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_APPROVAL_ISSUANCE_RECORD_TEMPLATE.md](/A:/codex-memory/docs/CM-0658_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_APPROVAL_ISSUANCE_RECORD_TEMPLATE.md) and [docs/CM-0659_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_EXECUTION_EVIDENCE_TEMPLATE.md](/A:/codex-memory/docs/CM-0659_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_EXECUTION_EVIDENCE_TEMPLATE.md) now expose the future bounded-recall issuance/evidence bookkeeping as governance-only draft surfaces. With explicit later `CM-0607 + CM-0649 + CM-0650` inputs, helper and normal read-only control surfaces can now also surface those bounded-recall record drafts, but they still keep `canExecuteBoundedRecallNow=false` and `canExecuteRuntimeNow=false`, so runtime remains blocked.
@@ -1044,3 +1056,63 @@ Evidence recorded: compare `ok=true`, `43/43 matched`, `0 mismatched`; rollback 
 Not validated: real rollback/reset/restore/revert, provider calls, real memory broad scan, durable memory/audit write, migration/backup apply, HTTP observe, config switch, public MCP expansion, src/tests/package changes, push/tag/release/deploy/cutover, readiness.
 Remaining risk: compare/rollback readiness is dogfood evidence only, not real rollback or RC/runtime/production readiness; project remains NOT_READY_BLOCKED.
 Next safe step: staged review and local commit if requested; no push or readiness claim.
+
+## CM-0547 Handoff
+
+Goal: add Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract.
+Status: COMPLETED_VALIDATED.
+Changed files: tests/fixtures/phase-f-epa-residualpyramid-chain-metadata-v1.json; tests/phase-f-epa-residualpyramid-chain-metadata-fixture.test.js; docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_TESTS.md; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; STATUS.md; docs/MONTHLY_PLAN_2026_06.md; .agent_board/*.
+Validation: targeted EPA/ResidualPyramid fixture test passed `6/6`; combined Phase F fixture tests passed `28/28`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+Not validated: runtime EPA/ResidualPyramid recall, real memory stores, provider, HTTP observe, public MCP schema, durable writes, push, cutover, readiness.
+Remaining risks: fixture evidence must not be treated as runtime recall-chain parity proof.
+Next safe step: choose the next local-safe fixture/docs candidate from memory lifecycle proposal states, query-quality dry-run refresh, or admin review schema hardening.
+
+## CM-0664 Handoff
+
+Goal: close the active three-week Phase F local-safe goal as docs/fixtures/tests/board evidence and record the next three-week candidate lane.
+Status: COMPLETED_VALIDATED.
+Changed files: docs/PHASE_F_THREE_WEEK_LOCAL_SAFE_CLOSEOUT_AND_NEXT_CANDIDATES.md; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; STATUS.md; docs/MONTHLY_PLAN_2026_06.md; .agent_board/*.
+Validation: combined Phase F fixture tests passed `28/28`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+Not validated: runtime behavior, real memory stores, provider, HTTP observe, public MCP schema, durable writes, config/watchdog/startup changes, push, cutover, readiness.
+Remaining risks: next-candidate lane is a plan only and must not be treated as authorization for runtime or remote work.
+Next safe step: perform completion audit for the active three-week goal, then choose the next local-safe fixture/docs candidate.
+
+## CM-0665/CM-0666/CM-0667 Handoff
+
+Goal: complete the next three-week Phase F local-safe candidate lane as docs/fixtures/tests/board evidence.
+Status: COMPLETED_VALIDATED.
+Changed files: tests/fixtures/phase-f-memory-lifecycle-proposal-states-v1.json; tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js; docs/PHASE_F_MEMORY_LIFECYCLE_PROPOSAL_STATES_FIXTURE_TESTS.md; tests/fixtures/phase-f-query-quality-dry-run-refresh-v1.json; tests/phase-f-query-quality-dry-run-refresh-fixture.test.js; docs/PHASE_F_QUERY_QUALITY_DRY_RUN_REFRESH_FIXTURE_TESTS.md; tests/fixtures/phase-f-admin-review-schema-hardening-v1.json; tests/phase-f-admin-review-schema-hardening-fixture.test.js; docs/PHASE_F_ADMIN_REVIEW_SCHEMA_HARDENING_FIXTURE_TESTS.md; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; STATUS.md; docs/MONTHLY_PLAN_2026_06.md; .agent_board/*.
+Validation: targeted lifecycle fixture test passed `6/6`; targeted query-quality refresh fixture test passed `5/5`; targeted admin review schema fixture test passed `6/6`; combined Phase F fixture tests passed `45/45`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+Not validated: runtime behavior, real memory stores, real query execution, provider, HTTP observe, public MCP schema, durable writes, config/watchdog/startup changes, push, cutover, readiness.
+Remaining risks: fixture evidence must not be treated as runtime governance, real query quality, admin production, or RC readiness proof.
+Next safe step: perform active goal completion audit.
+
+## CM-0668/CM-0669/CM-0670 Handoff
+
+Goal: complete Phase F fixture coverage review, validation surface cleanup, and readiness/boundary wording guard as local docs/fixtures/tests/board evidence.
+Status: COMPLETED_VALIDATED.
+Changed files: docs/PHASE_F_VCP_PARITY_FIXTURE_COVERAGE_GAP_REVIEW.md; docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md; tests/fixtures/phase-f-readiness-boundary-wording-guard-v1.json; tests/phase-f-readiness-boundary-wording-guard-fixture.test.js; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; STATUS.md; docs/MONTHLY_PLAN_2026_06.md; .agent_board/*.
+Validation: wording guard targeted test passed `4/4`; combined Phase F fixture plus wording guard tests passed `49/49`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+Not validated: runtime behavior, real memory stores, real query execution, provider, HTTP observe, public MCP schema, durable writes, config/watchdog/startup changes, push, cutover, readiness.
+Remaining risks: wording guard is a docs-only signal and must not be treated as runtime readiness proof.
+Next safe step: select the next local-safe synthetic contract, currently `CM-0671+ Phase F cross-pack dependency map`.
+
+## CM-0671 Handoff
+
+Goal: add Phase F cross-pack dependency map as local docs/fixture/test/board evidence.
+Status: COMPLETED_VALIDATED.
+Changed files: tests/fixtures/phase-f-cross-pack-dependency-map-v1.json; tests/phase-f-cross-pack-dependency-map-fixture.test.js; docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md; docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; STATUS.md; docs/MONTHLY_PLAN_2026_06.md; .agent_board/*.
+Validation: targeted dependency map fixture test passed `6/6`; combined Phase F fixture, wording guard, and dependency map tests passed `55/55`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+Not validated: runtime behavior, runtime dependency proof, real memory stores, real query execution, provider, HTTP observe, public MCP schema, durable writes, config/watchdog/startup changes, push, cutover, readiness.
+Remaining risks: dependency map is a synthetic review graph and must not be treated as implementation dependency proof.
+Next safe step: select `CM-0672+ Phase F public MCP freeze rollup`.
+
+## CM-0672 Handoff
+
+Goal: upgrade codex-memory standing owner authorization policy to Smart Standing Authorization v3 - Budgeted Autonomy Envelope.
+Status: COMPLETED_VALIDATED.
+Changed files: AGENTS.md; docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md; docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md; docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md; docs/SAFE_PUSH_POLICY.md; docs/VALIDATION_SELECTION_MATRIX.md; STATUS.md; .agent_board/*.
+Validation: `git status --short --branch` inspected; `git diff --check` passed; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+Not validated: runtime behavior, provider, MCP memory tools, real memory stores, dependency changes, config/watchdog/startup, public MCP expansion, push/tag/release/deploy/PR, readiness.
+Remaining risks: v3 is policy authorization only; future Amber actions still need exact scope, budget, validation, and receipt, and Red conditions remain hard stops.
+Next safe step: pending human push or next autonomous envelope task; this is safe because the current task did not execute real Amber actions and left Red gates intact.

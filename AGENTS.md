@@ -322,13 +322,69 @@ Reference docs:
 
 - [SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md](/A:/codex-memory/docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md)
 - [A4_8_SAFE_PROJECT_OPERATOR_RAIL.md](/A:/codex-memory/docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md)
+- [STANDING_OWNER_SMART_AUTHORIZATION_V3.md](/A:/codex-memory/docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md)
 - [SAFE_PUSH_POLICY.md](/A:/codex-memory/docs/SAFE_PUSH_POLICY.md)
 - [VALIDATION_SELECTION_MATRIX.md](/A:/codex-memory/docs/VALIDATION_SELECTION_MATRIX.md)
 - [AUTOPILOT_FAILURE_RECOVERY.md](/A:/codex-memory/docs/AUTOPILOT_FAILURE_RECOVERY.md)
 
-A4.8 is not unlimited permission. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview` unless a dedicated approved phase explicitly authorizes expansion. A5 hard stops remain manual, including real DB/memory mutation, SQLite migration, MCP public tool/schema expansion, provider calls, dependency changes, secrets/env edits, release/tag/deploy, destructive commands, and stale branch merge/rebase/cherry-pick.
+A4.8 is not unlimited permission. Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview` unless a dedicated approved phase explicitly authorizes expansion. Smart Standing Authorization v3 may allow exact, budgeted, receipted Amber work, but Red Lane remains manual, including broad real-memory scan/export, raw private data exposure, public MCP tool/schema expansion, secrets/env edits, config/watchdog/startup changes, release/tag/deploy, destructive commands, and stale branch merge/rebase/cherry-pick.
 
-### 7.1.1 AGENTS v0.3.1 Compatibility Boundary
+### 7.1.1 Smart Standing Authorization v3
+
+Default standing owner authorization grants Codex a bounded autonomy envelope:
+
+```text
+Smart Standing Authorization v3 - Budgeted Autonomy Envelope
+```
+
+Core rule:
+
+```text
+Standing owner authorization grants Codex a bounded autonomy envelope.
+Within that envelope, Codex must not ask for step-by-step approval.
+Codex should plan, execute, validate, repair once when safe, record receipts, and continue until the goal is complete or a Red condition appears.
+```
+
+Lane model:
+
+- Green Lane: direct local work with after-the-fact recording, including docs, fixtures, tests, board updates, read-only checks, local validation, and small reversible repairs that do not touch external services, true memory, dependencies, secrets, config, watchdog, startup, production, or remote state.
+- Amber Lane: continuous automatic work inside the envelope without step-by-step approval, only when the goal is clear, scope is exact, budget remains, validation is obvious, and every meaningful external/write action records a receipt.
+- Red Lane: hard stop and explicit user approval required.
+
+Codex-memory Amber examples include bounded provider smoke/benchmark only when task-relevant, bounded runtime observe/local probe without config or startup change, exact `search_memory` / `memory_overview`, exact sanitized `record_memory` with default maximum one write, exact real-memory read query without broad scan/export, exact VCPChat/VCPToolBox read, exact small dependency action with package/action list, and local code/docs/tests/fixtures edits inside project gates.
+
+Red Lane includes push, PR, tag, release, deploy, force push, history rewrite, destructive action, secret value read/edit, raw private data or raw chat history exposure, broad real memory scan/export, real VCP memory import/migration, wide VCPChat/VCPToolBox write, public MCP expansion, Codex/Claude config change, watchdog/startup install/update/remove, dependency change without exact package/action list, audit fix, batch upgrade, package manager switch, uncapped cost, unbounded loops, overwrite without explicit allowance, non-obvious validation failure, and readiness/cutover/`RC_READY` claim without required evidence.
+
+Default autonomy envelope:
+
+```yaml
+default_autonomy_envelope:
+  max_provider_calls: 3
+  max_api_calls: 5
+  max_mcp_tool_calls: 5
+  max_runtime_probe_minutes: 10
+  max_external_read_files: 20
+  max_real_memory_read_queries: 5
+  max_memory_writes: 1
+  max_write_files: 10
+  max_dependency_actions: 2
+  max_retry_per_transient_failure: 1
+  overwrite_existing_files_allowed: false
+  secret_value_read_allowed: false
+  raw_private_data_print_allowed: false
+  broad_real_memory_scan_allowed: false
+  public_mcp_expansion_allowed: false
+  config_watchdog_startup_change_allowed: false
+  push_allowed: false
+  tag_release_deploy_allowed: false
+  destructive_action_allowed: false
+```
+
+Each meaningful Amber external or write action must record at least: `task_id`, `lane`, `envelope_id`, `action_performed`, `target_systems`, `calls_used`, `files_read`, `files_written`, `memory_queries_used`, `memory_writes_used`, `dependency_actions_used`, `validation_run`, `validation_result`, `rollback_or_cleanup_available`, `next_auto_step_allowed`, and `stop_reason`.
+
+This policy does not create readiness. It preserves `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`, keeps docs-only and fixture-only evidence separate from runtime readiness, and does not expand public MCP tools.
+
+### 7.1.2 AGENTS v0.3.1 Compatibility Boundary
 
 AGENTS v0.3.1 concepts may be used selectively as wording and review aids. They do not replace this project `AGENTS.md`, weaken codex-memory gates, or change current status vocabulary.
 
@@ -760,7 +816,7 @@ All must be true:
 6. Only intended files inside workspace root changed.
 7. No secrets in diff.
 8. No `.env` or secret file changed.
-9. No dependency manifest/lockfile changed unless explicitly approved.
+9. No dependency manifest/lockfile changed unless explicitly approved or covered by an exact Smart Standing Authorization v3 Amber dependency action with package/action list, remaining budget, validation, and receipt.
 10. No real migration, profile confirm, cleanup apply, or config switch occurred.
 11. No watchdog/scheduled task/HKCU Run modification occurred.
 12. No user-owned uncommitted changes are included.
@@ -805,7 +861,7 @@ Never automatically:
 - force push
 - commit secrets
 - commit user-owned work
-- commit dependency changes without approval
+- commit dependency changes without explicit approval or exact v3 Amber dependency receipt
 
 ---
 
@@ -826,7 +882,7 @@ Stop and request explicit approval before:
 - modifying HKCU Run startup entry
 - editing `.env`
 - editing real secrets or provider keys
-- adding/upgrading/removing dependencies
+- adding/upgrading/removing dependencies without exact package/action list, remaining v3 budget, validation, and receipt
 - changing package manager
 - running `rebuild-profile --confirm`
 - running cleanup non-dry-run/apply/confirm
@@ -1044,15 +1100,20 @@ For future Codex/Claude memory-governance work:
 
 ## 21. Dependency Policy
 
-Dependency changes are hard stop.
+Dependency changes are Red by default, with one v3 Amber exception for exact small dependency actions.
 
-Do not automatically:
+Do not automatically without exact package/action list, remaining v3 budget, validation, and receipt:
 
 - add dependency
 - remove dependency
 - upgrade dependency
 - downgrade dependency
+
+Always stop before:
+
 - change package manager
+- audit fix
+- batch upgrade
 - intentionally change lockfile
 
 Allowed only for local validation setup when safe:

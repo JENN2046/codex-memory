@@ -5,16 +5,36 @@
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
 | Branch | main |
-| Mode | A5 Single-Window 4-Agent Compact Autopilot |
-| Current task | Docs/board closeout after the latest code-only bridge moved the explicit-input authorized write-path chain to `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED / RC_NOT_READY_BLOCKED` while still keeping `canExecuteRuntimeNow=false`. |
-| Current area | P0-mainline-health / P10-observability-admin |
+| Local HEAD | `36cc96b8a67ff61884a67278b53ec78eb4d1e219` |
+| Remote baseline | `origin/main = 36cc96b8a67ff61884a67278b53ec78eb4d1e219` |
+| Worktree | `main...origin/main` is synchronized at `36cc96b8a67ff61884a67278b53ec78eb4d1e219`; tracked worktree currently has local docs/board status-reconciliation edits pending. |
+| Mode | A4.8 + Smart Standing Authorization v3 - Budgeted Autonomy Envelope |
+| Current task | CM-0672 standing owner smart authorization v3 policy/status upgrade; preserve `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` and do not execute real Amber/provider/memory/dependency/config/remote actions in this docs/status slice. |
+| Current area | P6-docs-drift / P10-observability-admin |
+| Standing owner smart authorization v3 active | true |
+| Autonomy envelope active | true |
+| Green lane direct | true |
+| Amber lane autonomous with budget and receipts | true |
+| Red lane requires user | true |
+| Bounded provider calls allowed | true, only inside exact v3 envelope and not executed by this task |
+| Bounded runtime probe allowed | true, only inside exact v3 envelope and not executed by this task |
+| Bounded memory read allowed | true, only inside exact v3 envelope and not executed by this task |
+| Bounded sanitized exact memory write allowed | true, default maximum one write inside exact v3 envelope and not executed by this task |
+| Exact external read allowed | true, only inside exact v3 envelope and not executed by this task |
+| Exact small dependency change allowed | true, only with exact package/action list and not executed by this task |
+| Push/tag/release/deploy allowed automatically | false |
+| Secret value access allowed automatically | false |
+| Destructive action allowed automatically | false |
+| Public MCP expansion allowed automatically | false |
+| Readiness claim allowed automatically | false |
+| Recommended next | pending_human_push_or_next_autonomous_envelope_task |
 | Last pushed runtime baseline | `a4fdaf85be21031901f35139129f68a1c521c2f2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
 | Current CM-0661 result | Added one standalone governance-only bounded-recall closeout evaluator plus later `CM-0658/0659` input bridges, so filled bounded-recall issuance/execution artifacts can now be reviewed as one fail-closed closeout state; default state stays `BOUNDED_RECALL_CLOSEOUT_NOT_READY / RC_NOT_READY_BLOCKED`, while explicit later artifacts can now reach `BOUNDED_RECALL_CLOSEOUT_RECORDED_PREPARED_LATER_APPROVAL_ONLY`, but the helper still keeps `canExecuteBoundedRecallNow=false`, `canExecuteRuntimeNow=false`, and preserves `RC_NOT_READY_BLOCKED`. |
 | Latest widening-review bridge result | The same explicit `CM-0611` assertion-record plus `token_present` rebound-outcome input now bridges auto-authorization escalation directly into widening-review without first hand-assembling a separate `CM-0615` record; current helper/control surfaces reach `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED`, with `W1-W9=yes`, `W10=no`, and `canExecuteRuntimeNow=false`. |
 | Current CM-0655/CM-0656/CM-0657 result | Added `CM-0655` so later `CM-0607 + CM-0649 + CM-0650` artifacts can feed one governance-only future bounded-recall preparation evaluator, added `CM-0656` so the same bounded-recall preparation result now also surfaces through `governance-report`, `dashboard`, and `http-observe`, and added `CM-0657` so the same future bounded-recall exact-approval review path now exposes one reusable command family, packet payload, and rendered command preview; default state stays `BOUNDED_RECALL_APPROVAL_NOT_READY / RC_NOT_READY_BLOCKED`, while explicit later artifacts can now reach `BOUNDED_RECALL_APPROVAL_PREPARED_EXACT_ONLY`, but the helper and normal control surfaces still keep `canExecuteBoundedRecallNow=false`, `canExecuteRuntimeNow=false`, and preserve `RC_NOT_READY_BLOCKED`. |
 | Current CM-0658/CM-0659/CM-0660 result | Added `CM-0658` and `CM-0659` as ready-to-fill bounded-recall issuance/evidence templates, and added `CM-0660` so the same later `CM-0607 + CM-0649 + CM-0650` artifacts now surface `boundedRecallApprovalIssuanceRecordDraft` plus `boundedRecallExecutionEvidenceDraft` through the standalone helper and the normal read-only control surfaces; default state stays `BOUNDED_RECALL_APPROVAL_NOT_READY / RC_NOT_READY_BLOCKED`, while explicit later artifacts can now reach `BOUNDED_RECALL_APPROVAL_PREPARED_EXACT_ONLY` with record drafts prefilled, but the helper and normal control surfaces still keep `canExecuteBoundedRecallNow=false`, `canExecuteRuntimeNow=false`, and preserve `RC_NOT_READY_BLOCKED`. |
-| Last action | Closed the code-only bridge that feeds auto-authorization escalation directly into widening-review from the same explicit `CM-0611` assertion-record plus `token_present` rebound-outcome input, confirmed the bridged read-only result is `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED / RC_NOT_READY_BLOCKED`, and reconciled docs/board so the current blocker is recorded as adoption-not-granted rather than default token-missing or hand-built `CM-0615` routing. |
+| Last action | Confirmed current Git pointer facts: `HEAD = origin/main = 36cc96b8a67ff61884a67278b53ec78eb4d1e219`; local docs/board status-reconciliation files remain modified in the tracked worktree and no runtime/source behavior was changed by this fact refresh. |
 | Latest CM-0657 validation | `node --check` changed core/CLIs; targeted bounded-recall helper/CLI/governance/dashboard/http-observe tests; bounded-recall spot checks; full `npm test`; `git diff --check`; docs validation all passed. |
 | Latest CM-0661 validation | `node --check` changed core/CLI; targeted bounded-recall issuance/evidence adapter tests; targeted bounded-recall closeout helper/CLI tests; bounded-recall closeout spot checks; full `npm test`; `git diff --check`; docs validation all passed. |
 | Latest CM-0660 validation | `node --check` changed core/CLIs; targeted bounded-recall helper/CLI/governance/dashboard/http-observe tests; full `npm test`; `git diff --check`; docs validation all passed. |
@@ -24,7 +44,7 @@
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; current goal also allows automatic push only after push-readiness preflight passes |
-| Safe-push readiness | Completed for `846dd675313b098bc8cd0b29ad604398505a258d`; current branch is synchronized with `origin/main`. |
+| Safe-push readiness | Not evaluated for this local status sync; no push is needed because local `main` is synchronized with `origin/main`, and the tracked worktree still contains local docs/board edits. |
 | Next planned action | Stay at `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED / RC_NOT_READY_BLOCKED`, treat explicit widening adoption as the next real blocker, and do not advance to `CM-0595` or any runtime execution until adoption is explicitly granted. |
 
 
@@ -46,7 +66,7 @@
 - Completion boundary records: `CMB-0005`, `CMD-0012`, and `RR-0004` are controlling records for resume; completion audit fixtures still require `objectiveComplete=true`, zero runtime gaps, and zero A5 hard stops before any completion claim.
 - Release state: `P34_GOVERNANCE_REVIEW_SURFACE_REPORT_SHAPE_ADDED_RUNTIME_STILL_BLOCKED`; helper output safety is hardened without changing runtime readiness.
 - Superseded artifact path: `docs/P22_RELEASE_CANDIDATE_ARTIFACT_806cc847.md`.
-- Current user authorization: persistent local A4/A4.8 execution is active for the P51-P62 Runtime-Enforced Governed Memory Spine Completion goal. Push/tag/release/deploy, provider calls, real memory content read/preview/export/import/scan, diary/SQLite/vector/candidate/recall-audit scans, SQLite migration apply, backup/restore, watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edits, dependency changes, durable writes, runtime mutation implementation, and production deploy remain blocked unless separately explicit.
+- Current user authorization: persistent A4/A4.8 plus Smart Standing Authorization v3 execution is active. Green work and exact in-envelope Amber work may continue with budgets and receipts, but push/tag/release/deploy, provider calls outside the v3 envelope, broad real memory content read/preview/export/import/scan, diary/SQLite/vector/candidate/recall-audit broad scans, SQLite migration apply, backup/restore, watchdog/startup install, Codex/Claude config switch, public MCP expansion, `.env`/secret edits, dependency changes without exact package/action list, unreceipted durable writes, runtime mutation implementation outside exact scope, and production deploy remain blocked unless separately explicit.
 - Backup creation and restore remain blocked.
 - Live HTTP MCP startup, startup/watchdog installation, and HKCU Run edits remain blocked.
 - Config mutation for Codex or Claude remains blocked.
@@ -246,6 +266,54 @@ Handoff: report to Commander in conversation; do not edit files.
 - Decision: NOT_READY_BLOCKED.
 - Boundary: docs/board planning only; no runtime recall-chain execution, no real EPA/ResidualPyramid observation, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
 - Next safe task: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract.
+
+## CM-0547 current-state record
+
+- Current state: Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract added and validated locally.
+- Decision: NOT_READY_BLOCKED.
+- Evidence: targeted EPA/ResidualPyramid fixture test passed `6/6`; combined Phase F fixture tests passed `28/28`.
+- Boundary: fixture/test/docs/board only; no runtime recall-chain execution, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no migration/apply, no push, no cutover, no readiness claim.
+- Next safe task: select the next local-safe fixture/docs candidate from memory lifecycle proposal states, query-quality dry-run refresh, or admin review schema hardening.
+
+## CM-0664 current-state record
+
+- Current state: Phase F three-week local-safe closeout and next-candidate matrix completed and validated locally.
+- Decision: NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+- Deliverable: docs/PHASE_F_THREE_WEEK_LOCAL_SAFE_CLOSEOUT_AND_NEXT_CANDIDATES.md.
+- Boundary: docs/board closeout only; no runtime execution, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no config/watchdog/startup change, no push, no tag/release/deploy/cutover, no readiness claim.
+- Validation: combined Phase F fixture tests passed `28/28`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+- Next safe task: complete the active three-week goal audit, then choose the next local-safe fixture/docs candidate.
+
+## CM-0665/CM-0666/CM-0667 current-state record
+
+- Current state: Phase F next three-week candidate lane completed locally as synthetic fixture/test/docs/board evidence.
+- Decision: NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+- Week 1: CM-0665 memory lifecycle proposal states covers proposal, supersession, tombstone, forget-flow, lifecycle state transitions, blocked direct apply, and readiness-overclaim rejection.
+- Week 2: CM-0666 query-quality dry-run refresh covers fixture-only query assertions and dry-run report shape without provider calls or real memory-store reads.
+- Week 3: CM-0667 admin review schema hardening covers schema snapshot, local-safe action matrix, fixture pack status, hard stops, validation fields, and report-shape review.
+- Boundary: docs/fixtures/tests/board only; no runtime execution, no real memory scan, no provider, no HTTP observe, no durable write, no config/watchdog/startup change, no public MCP expansion, no push, no tag/release/deploy/cutover, no readiness claim.
+- Validation: targeted fixture tests passed `6/6`, `5/5`, and `6/6`; combined Phase F fixture tests passed `45/45`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+- Next safe task: active goal completion audit.
+
+## CM-0668/CM-0669/CM-0670 current-state record
+
+- Current state: Phase F fixture coverage gap review, validation surface cleanup, and readiness/boundary wording guard completed locally.
+- Decision: NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+- CM-0668: refreshed the eight-pack coverage gap review and selected the next synthetic contract candidates.
+- CM-0669: added one stable validation surface for the `45/45` combined command, pack map, log anchors, wording guard command, and closeout checks.
+- CM-0670: added a docs-only wording guard fixture/test that scans watched Phase F Markdown docs for readiness-sensitive terms and requires denial/non-claim/blocked context.
+- Boundary: docs/fixtures/tests/board only; no runtime execution, no real memory scan, no provider, no HTTP observe, no durable write, no config/watchdog/startup change, no public MCP expansion, no push, no tag/release/deploy/cutover, no readiness claim.
+- Validation: wording guard targeted test passed `4/4`; combined Phase F fixture plus wording guard tests passed `49/49`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+- Next safe task: select the next local-safe synthetic contract, currently `CM-0671+ Phase F cross-pack dependency map`.
+
+## CM-0671 current-state record
+
+- Current state: Phase F cross-pack dependency map completed locally as synthetic fixture/test/docs/board evidence.
+- Decision: NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+- Evidence: `tests/fixtures/phase-f-cross-pack-dependency-map-v1.json`, `tests/phase-f-cross-pack-dependency-map-fixture.test.js`, and `docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md`.
+- Boundary: docs/fixtures/tests/board only; no runtime dependency proof, no runtime execution, no real memory scan, no provider, no HTTP observe, no durable write, no config/watchdog/startup change, no public MCP expansion, no push, no tag/release/deploy/cutover, no readiness claim.
+- Validation: targeted dependency map fixture test passed `6/6`; combined Phase F fixture, wording guard, and dependency map tests passed `55/55`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+- Next safe task: select `CM-0672+ Phase F public MCP freeze rollup`.
 
 ## CM-0548 current runtime truth table consolidation
 

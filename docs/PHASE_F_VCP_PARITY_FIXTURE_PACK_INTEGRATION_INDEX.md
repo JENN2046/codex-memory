@@ -8,7 +8,7 @@ Anchor commit: `748a0b3`
 
 ## Purpose
 
-Index the completed local-safe Phase F fixture packs into one review map. This document links TagMemo parity hardening, observability/admin review surface, and memory-governance proposal fixtures without changing runtime behavior or claiming VCP parity completion.
+Index the completed local-safe Phase F fixture packs into one review map. This document links TagMemo parity hardening, observability/admin review surface, memory-governance proposal, LightMemo directory semantics, EPA/ResidualPyramid chain metadata, memory lifecycle proposal states, query-quality dry-run refresh, and admin review schema hardening fixtures without changing runtime behavior or claiming VCP parity completion.
 
 ## Integrated Fixture Packs
 
@@ -17,6 +17,11 @@ Index the completed local-safe Phase F fixture packs into one review map. This d
 | TagMemo semantic association | `P7-vcp-parity-hardening` | synthetic fixture/test-only | `tests/phase-f-tagmemo-semantic-association-fixture.test.js` | `docs/PHASE_F_TAGMEMO_FIXTURE_PACK_LOCAL_CLOSEOUT_REVIEW.md` |
 | Observability/admin review surface | `P10-observability-admin` | synthetic fixture/test-only | `tests/phase-f-observability-admin-review-surface-fixture.test.js` | `docs/PHASE_F_GOVERNANCE_OBSERVABILITY_FIXTURE_PACK_CLOSEOUT_REVIEW.md` |
 | Memory governance proposal | `P8-memory-governance` | synthetic fixture/test-only | `tests/phase-f-memory-governance-proposal-fixture.test.js` | `docs/PHASE_F_GOVERNANCE_OBSERVABILITY_FIXTURE_PACK_CLOSEOUT_REVIEW.md` |
+| LightMemo directory semantics | `P7-vcp-parity-hardening` | synthetic fixture/test-only | `tests/phase-f-lightmemo-directory-semantics-fixture.test.js` | `docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_PACK_CLOSEOUT_REVIEW.md` |
+| EPA/ResidualPyramid chain metadata | `P7-vcp-parity-hardening` | synthetic fixture/test-only | `tests/phase-f-epa-residualpyramid-chain-metadata-fixture.test.js` | `docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_TESTS.md` |
+| Memory lifecycle proposal states | `P8-memory-governance` | synthetic fixture/test-only | `tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js` | `docs/PHASE_F_MEMORY_LIFECYCLE_PROPOSAL_STATES_FIXTURE_TESTS.md` |
+| Query-quality dry-run refresh | `P7-vcp-parity-hardening` | synthetic fixture/test-only | `tests/phase-f-query-quality-dry-run-refresh-fixture.test.js` | `docs/PHASE_F_QUERY_QUALITY_DRY_RUN_REFRESH_FIXTURE_TESTS.md` |
+| Admin review schema hardening | `P10-observability-admin` | synthetic fixture/test-only | `tests/phase-f-admin-review-schema-hardening-fixture.test.js` | `docs/PHASE_F_ADMIN_REVIEW_SCHEMA_HARDENING_FIXTURE_TESTS.md` |
 
 ## Artifact Map
 
@@ -52,15 +57,86 @@ tests/fixtures/phase-f-memory-governance-proposal-v1.json
 tests/phase-f-memory-governance-proposal-fixture.test.js
 ```
 
+### LightMemo directory semantics
+
+```text
+docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_PLAN.md
+docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_TESTS.md
+docs/PHASE_F_LIGHTMEMO_DIRECTORY_SEMANTICS_FIXTURE_PACK_CLOSEOUT_REVIEW.md
+tests/fixtures/phase-f-lightmemo-directory-semantics-v1.json
+tests/phase-f-lightmemo-directory-semantics-fixture.test.js
+```
+
+### EPA/ResidualPyramid chain metadata
+
+```text
+docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_PLAN.md
+docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_TESTS.md
+tests/fixtures/phase-f-epa-residualpyramid-chain-metadata-v1.json
+tests/phase-f-epa-residualpyramid-chain-metadata-fixture.test.js
+```
+
+### Memory lifecycle proposal states
+
+```text
+docs/PHASE_F_MEMORY_LIFECYCLE_PROPOSAL_STATES_FIXTURE_TESTS.md
+tests/fixtures/phase-f-memory-lifecycle-proposal-states-v1.json
+tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js
+```
+
+### Query-quality dry-run refresh
+
+```text
+docs/PHASE_F_QUERY_QUALITY_DRY_RUN_REFRESH_FIXTURE_TESTS.md
+tests/fixtures/phase-f-query-quality-dry-run-refresh-v1.json
+tests/phase-f-query-quality-dry-run-refresh-fixture.test.js
+```
+
+### Admin review schema hardening
+
+```text
+docs/PHASE_F_ADMIN_REVIEW_SCHEMA_HARDENING_FIXTURE_TESTS.md
+tests/fixtures/phase-f-admin-review-schema-hardening-v1.json
+tests/phase-f-admin-review-schema-hardening-fixture.test.js
+```
+
 ## Combined Local Fixture Validation
 
 The integration index expects these targeted fixture tests to pass together:
 
 ```powershell
-node --test tests\phase-f-tagmemo-semantic-association-fixture.test.js tests\phase-f-observability-admin-review-surface-fixture.test.js tests\phase-f-memory-governance-proposal-fixture.test.js
+node --test tests\phase-f-tagmemo-semantic-association-fixture.test.js tests\phase-f-observability-admin-review-surface-fixture.test.js tests\phase-f-memory-governance-proposal-fixture.test.js tests\phase-f-lightmemo-directory-semantics-fixture.test.js tests\phase-f-epa-residualpyramid-chain-metadata-fixture.test.js tests\phase-f-memory-lifecycle-proposal-states-fixture.test.js tests\phase-f-query-quality-dry-run-refresh-fixture.test.js tests\phase-f-admin-review-schema-hardening-fixture.test.js
 ```
 
 This command validates only synthetic fixture contracts. It does not run mainline gates, HTTP observe, governance report, provider calls, real memory scans, migrations, durable writes, or release/cutover actions.
+
+## Companion Review Surfaces
+
+```text
+docs/PHASE_F_VCP_PARITY_FIXTURE_COVERAGE_GAP_REVIEW.md
+docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md
+docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md
+tests/fixtures/phase-f-readiness-boundary-wording-guard-v1.json
+tests/phase-f-readiness-boundary-wording-guard-fixture.test.js
+tests/fixtures/phase-f-cross-pack-dependency-map-v1.json
+tests/phase-f-cross-pack-dependency-map-fixture.test.js
+```
+
+The wording guard command is:
+
+```powershell
+node --test tests\phase-f-readiness-boundary-wording-guard-fixture.test.js
+```
+
+It scans watched Phase F Markdown docs for readiness-sensitive terms and requires each hit to appear in denial, non-claim, hard-stop, or blocked context.
+
+The cross-pack dependency map command is:
+
+```powershell
+node --test tests\phase-f-cross-pack-dependency-map-fixture.test.js
+```
+
+It validates a synthetic graph of pack relationships and non-claims. It does not prove runtime dependency, implementation order, or readiness.
 
 ## What This Index Proves
 
@@ -107,15 +183,21 @@ Still blocked without exact approval:
 ## Recommended Next Local-Safe Lane
 
 ```text
-CM-0542 Phase F VCP parity fixture coverage gap review
+CM-0672+ Phase F public MCP freeze rollup
 ```
 
 Suggested scope:
 
-- docs-only review of fixture coverage gaps across current Phase F packs
-- identify whether next local-safe pack should target LightMemo directory semantics, EPA/ResidualPyramid chain metadata, or memory lifecycle proposal states
+- structure-only fixture asserting protected public tool names across pack fixtures and docs
+- no live MCP schema inspection or service start
 - no runtime/source changes unless separately planned
 - no A5 action
+
+Current closeout and next-candidate surface:
+
+```text
+docs/PHASE_F_THREE_WEEK_LOCAL_SAFE_CLOSEOUT_AND_NEXT_CANDIDATES.md
+```
 
 ## Result
 

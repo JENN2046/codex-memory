@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - Local state sync after fast-forward pull - 2026-05-21
+
+- Status: `LOCAL_STATUS_FACTS_REFRESHED`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Sync action: `git pull --ff-only`.
+- Previous local baseline: `017eda4930c5add4b824c162c46868f75c91ea0f`.
+- Current synchronized baseline: `36cc96b8a67ff61884a67278b53ec78eb4d1e219`.
+- Completed: confirmed current `HEAD = origin/main`, corrected local status/board records so pointer synchronization is no longer described as a fully clean tracked worktree, and kept the scope docs/board-only.
+- Validation: `git status --short --branch`, `git log --oneline --decorate -n 3`, `git rev-parse HEAD`, `git rev-parse origin/main`, `git diff --check`, `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`, and docs/board diff inspection.
+- Not run: tests, strict gate, HTTP observe, provider calls, real memory scan, durable write, commit, push, tag, release, deploy, cutover, or readiness claim.
+- Next safe step: keep work local and scoped to the next explicit docs/fixture/test task, because synchronized Git pointer facts are now recorded while runtime/A5 boundaries remain blocked.
+
 ## Checkpoint - Phase F observability/admin review surface design draft - 2026-05-19
 
 - Status: `DESIGN_DRAFT_COMPLETE`; project decision remains `NOT_READY_BLOCKED`.
@@ -749,6 +760,66 @@ Changed files: docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_PLAN.md; 
 Validation: docs validation passed; git diff --check passed; readiness scan returned historical entries plus intended denial/boundary wording only
 Boundary: no runtime source change, no real recall-chain observation, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no push, no cutover, no readiness claim
 Next: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract
+
+## CM-0547 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P7-vcp-parity-hardening
+Scope: synthetic EPA/ResidualPyramid chain metadata fixture/test contract plus Phase F fixture index update
+Changed files: tests/fixtures/phase-f-epa-residualpyramid-chain-metadata-v1.json; tests/phase-f-epa-residualpyramid-chain-metadata-fixture.test.js; docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_TESTS.md; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: targeted EPA/ResidualPyramid fixture test passed `6/6`; combined Phase F fixture tests passed `28/28`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only
+Boundary: no runtime source change, no real recall-chain observation, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no push, no cutover, no readiness claim
+Next: select the next local-safe fixture/docs candidate from memory lifecycle proposal states, query-quality dry-run refresh, or admin review schema hardening
+
+## CM-0664 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P7-vcp-parity-hardening / P6-docs-drift
+Scope: Phase F three-week local-safe closeout and next-candidate matrix
+Changed files: docs/PHASE_F_THREE_WEEK_LOCAL_SAFE_CLOSEOUT_AND_NEXT_CANDIDATES.md; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: combined Phase F fixture tests passed `28/28`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only
+Boundary: no runtime source change, no real recall-chain observation, no real memory scan, no provider, no HTTP observe, no public MCP expansion, no durable write, no config/watchdog/startup change, no push, no cutover, no readiness claim
+Next: audit active goal completion, then select the next local-safe fixture/docs candidate
+
+## CM-0665/CM-0666/CM-0667 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P7-vcp-parity-hardening / P10-observability-admin / P6-docs-drift
+Scope: Phase F next three-week candidate lane synthetic fixture packs
+Changed files: tests/fixtures/phase-f-memory-lifecycle-proposal-states-v1.json; tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js; docs/PHASE_F_MEMORY_LIFECYCLE_PROPOSAL_STATES_FIXTURE_TESTS.md; tests/fixtures/phase-f-query-quality-dry-run-refresh-v1.json; tests/phase-f-query-quality-dry-run-refresh-fixture.test.js; docs/PHASE_F_QUERY_QUALITY_DRY_RUN_REFRESH_FIXTURE_TESTS.md; tests/fixtures/phase-f-admin-review-schema-hardening-v1.json; tests/phase-f-admin-review-schema-hardening-fixture.test.js; docs/PHASE_F_ADMIN_REVIEW_SCHEMA_HARDENING_FIXTURE_TESTS.md; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: targeted lifecycle fixture test passed `6/6`; targeted query-quality refresh fixture test passed `5/5`; targeted admin review schema fixture test passed `6/6`; combined Phase F fixture tests passed `45/45`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only
+Boundary: no runtime source change, no real query execution, no real memory scan/store read, no provider, no HTTP observe, no durable write, no config/watchdog/startup change, no public MCP expansion, no push, no cutover, no readiness claim
+Next: active goal completion audit
+
+## CM-0668/CM-0669/CM-0670 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P7-vcp-parity-hardening / P10-observability-admin / P6-docs-drift
+Scope: Phase F coverage review, validation surface cleanup, and readiness/boundary wording guard
+Changed files: docs/PHASE_F_VCP_PARITY_FIXTURE_COVERAGE_GAP_REVIEW.md; docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md; tests/fixtures/phase-f-readiness-boundary-wording-guard-v1.json; tests/phase-f-readiness-boundary-wording-guard-fixture.test.js; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: wording guard targeted test passed `4/4`; combined Phase F fixture plus wording guard tests passed `49/49`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only
+Boundary: no runtime source change, no real query execution, no real memory scan/store read, no provider, no HTTP observe, no durable write, no config/watchdog/startup change, no public MCP expansion, no push, no cutover, no readiness claim
+Next: select the next local-safe synthetic contract, currently `CM-0671+ Phase F cross-pack dependency map`
+
+## CM-0671 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P7-vcp-parity-hardening / P10-observability-admin / P6-docs-drift
+Scope: Phase F cross-pack dependency map
+Changed files: tests/fixtures/phase-f-cross-pack-dependency-map-v1.json; tests/phase-f-cross-pack-dependency-map-fixture.test.js; docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md; docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md; docs/PHASE_F_VCP_PARITY_FIXTURE_PACK_INTEGRATION_INDEX.md; .agent_board; STATUS.md; docs/MONTHLY_PLAN_2026_06.md
+Validation: targeted dependency map fixture test passed `6/6`; combined Phase F fixture, wording guard, and dependency map tests passed `55/55`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only
+Boundary: no runtime source change, no runtime dependency proof, no real query execution, no real memory scan/store read, no provider, no HTTP observe, no durable write, no config/watchdog/startup change, no public MCP expansion, no push, no cutover, no readiness claim
+Next: select `CM-0672+ Phase F public MCP freeze rollup`
+
+## CM-0672 policy checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P6-docs-drift / P10-observability-admin
+Scope: Smart Standing Authorization v3 policy/status upgrade
+Changed files: AGENTS.md; docs/STANDING_OWNER_SMART_AUTHORIZATION_V3.md; docs/SUPREME_COMMANDER_AUTOPILOT_PROTOCOL.md; docs/A4_8_SAFE_PROJECT_OPERATOR_RAIL.md; docs/SAFE_PUSH_POLICY.md; docs/VALIDATION_SELECTION_MATRIX.md; STATUS.md; .agent_board/*
+Validation: `git status --short --branch` inspected; `git diff --check` passed; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed
+Boundary: policy/docs/status only; no provider call, no MCP memory write, no real memory scan/broad export, no dependency change, no config/watchdog/startup change, no public MCP expansion, no push/tag/release/deploy/PR, no readiness or cutover claim
+Next: pending human push or next autonomous envelope task; this is safe because v3 policy is now recorded while Red gates remain explicit.
 
 ## CM-0548 validation checkpoint
 

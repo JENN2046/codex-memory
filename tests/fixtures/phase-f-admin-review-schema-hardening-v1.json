@@ -1,0 +1,115 @@
+{
+  "version": "phase-f-admin-review-schema-hardening-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "realMemoryStoreRead": false,
+  "durableStateMutated": false,
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "schemaSnapshot": {
+    "name": "phase_f_admin_review_local_safe_report_shape",
+    "requiredTopLevelFields": [
+      "status",
+      "decision",
+      "fixturePackStatus",
+      "localSafeActionMatrix",
+      "hardStops",
+      "validation",
+      "nextSafeAction"
+    ],
+    "requiredFixturePackFields": [
+      "packId",
+      "area",
+      "evidenceClass",
+      "primaryFixture",
+      "primaryTest",
+      "status",
+      "mustNotClaim"
+    ],
+    "requiredValidationFields": [
+      "command",
+      "result",
+      "evidenceClass",
+      "notValidated"
+    ]
+  },
+  "fixturePackStatus": [
+    {
+      "packId": "memory_lifecycle_proposal_states",
+      "area": "P8-memory-governance",
+      "evidenceClass": "synthetic_fixture_only",
+      "primaryFixture": "tests/fixtures/phase-f-memory-lifecycle-proposal-states-v1.json",
+      "primaryTest": "tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js",
+      "status": "local_fixture_validatable",
+      "mustNotClaim": ["runtime governance readiness", "durable mutation applied"]
+    },
+    {
+      "packId": "query_quality_dry_run_refresh",
+      "area": "P7-vcp-parity-hardening",
+      "evidenceClass": "synthetic_fixture_only",
+      "primaryFixture": "tests/fixtures/phase-f-query-quality-dry-run-refresh-v1.json",
+      "primaryTest": "tests/phase-f-query-quality-dry-run-refresh-fixture.test.js",
+      "status": "local_fixture_validatable",
+      "mustNotClaim": ["real query quality proven", "provider quality proven"]
+    },
+    {
+      "packId": "admin_review_schema_hardening",
+      "area": "P10-observability-admin",
+      "evidenceClass": "synthetic_fixture_only",
+      "primaryFixture": "tests/fixtures/phase-f-admin-review-schema-hardening-v1.json",
+      "primaryTest": "tests/phase-f-admin-review-schema-hardening-fixture.test.js",
+      "status": "local_fixture_validatable",
+      "mustNotClaim": ["admin surface production ready", "cutover readiness"]
+    }
+  ],
+  "hardStops": [
+    "push",
+    "tag",
+    "release",
+    "deploy",
+    "cutover",
+    "provider",
+    "real_memory_scan",
+    "durable_write",
+    "config_change",
+    "public_mcp_expansion",
+    "readiness_claim"
+  ],
+  "localSafeActionMatrix": [
+    {
+      "action": "docs",
+      "defaultStatus": "allowed",
+      "condition": "inside workspace and no readiness overclaim"
+    },
+    {
+      "action": "fixtures",
+      "defaultStatus": "allowed",
+      "condition": "synthetic data only"
+    },
+    {
+      "action": "structure_only_tests",
+      "defaultStatus": "allowed",
+      "condition": "no runtime module import or provider call"
+    },
+    {
+      "action": "real_memory_scan",
+      "defaultStatus": "blocked",
+      "condition": "requires exact approval"
+    },
+    {
+      "action": "durable_write",
+      "defaultStatus": "blocked",
+      "condition": "requires exact approval"
+    }
+  ],
+  "forbiddenClaims": [
+    "RC_READY",
+    "runtimeReady=true",
+    "finalRcMatrixReady=true",
+    "rcReady=true",
+    "production readiness",
+    "cutover readiness",
+    "public MCP expansion approved"
+  ]
+}

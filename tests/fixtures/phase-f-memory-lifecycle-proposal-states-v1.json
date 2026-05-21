@@ -1,0 +1,159 @@
+{
+  "version": "phase-f-memory-lifecycle-proposal-states-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "evidenceClass": "synthetic_fixture_only",
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "runtimeExecuted": false,
+  "providerCalled": false,
+  "realMemoryStoreRead": false,
+  "durableMemoryWritten": false,
+  "durableAuditWritten": false,
+  "states": [
+    "PROPOSAL_DRAFT",
+    "PROPOSAL_REVIEW_READY",
+    "PROPOSAL_REJECTED",
+    "PROPOSAL_APPROVED_FOR_EXACT_ACTION",
+    "SUPERSESSION_PROPOSED",
+    "SUPERSESSION_REVIEW_READY",
+    "SUPERSESSION_APPLIED_WITH_AUDIT",
+    "TOMBSTONE_PROPOSED",
+    "TOMBSTONE_REVIEW_READY",
+    "TOMBSTONE_APPLIED_WITH_AUDIT",
+    "FORGET_REQUESTED",
+    "FORGET_REVIEW_READY",
+    "FORGET_APPLIED_WITH_AUDIT"
+  ],
+  "transitions": [
+    {
+      "id": "proposal-to-review",
+      "object": "proposal",
+      "from": "PROPOSAL_DRAFT",
+      "to": "PROPOSAL_REVIEW_READY",
+      "requiresExactApproval": false,
+      "requiresReviewRecord": true,
+      "durableMutation": false,
+      "auditRequiredBeforeApply": false
+    },
+    {
+      "id": "proposal-to-rejected",
+      "object": "proposal",
+      "from": "PROPOSAL_REVIEW_READY",
+      "to": "PROPOSAL_REJECTED",
+      "requiresExactApproval": false,
+      "requiresReviewRecord": true,
+      "durableMutation": false,
+      "auditRequiredBeforeApply": false
+    },
+    {
+      "id": "proposal-to-approved-exact",
+      "object": "proposal",
+      "from": "PROPOSAL_REVIEW_READY",
+      "to": "PROPOSAL_APPROVED_FOR_EXACT_ACTION",
+      "requiresExactApproval": true,
+      "requiresReviewRecord": true,
+      "durableMutation": false,
+      "auditRequiredBeforeApply": true
+    },
+    {
+      "id": "supersession-to-review",
+      "object": "supersession",
+      "from": "SUPERSESSION_PROPOSED",
+      "to": "SUPERSESSION_REVIEW_READY",
+      "requiresExactApproval": false,
+      "requiresReviewRecord": true,
+      "durableMutation": false,
+      "auditRequiredBeforeApply": false
+    },
+    {
+      "id": "supersession-apply",
+      "object": "supersession",
+      "from": "SUPERSESSION_REVIEW_READY",
+      "to": "SUPERSESSION_APPLIED_WITH_AUDIT",
+      "requiresExactApproval": true,
+      "requiresReviewRecord": true,
+      "durableMutation": true,
+      "auditRequiredBeforeApply": true
+    },
+    {
+      "id": "tombstone-to-review",
+      "object": "tombstone",
+      "from": "TOMBSTONE_PROPOSED",
+      "to": "TOMBSTONE_REVIEW_READY",
+      "requiresExactApproval": false,
+      "requiresReviewRecord": true,
+      "durableMutation": false,
+      "auditRequiredBeforeApply": false
+    },
+    {
+      "id": "tombstone-apply",
+      "object": "tombstone",
+      "from": "TOMBSTONE_REVIEW_READY",
+      "to": "TOMBSTONE_APPLIED_WITH_AUDIT",
+      "requiresExactApproval": true,
+      "requiresReviewRecord": true,
+      "durableMutation": true,
+      "auditRequiredBeforeApply": true
+    },
+    {
+      "id": "forget-to-review",
+      "object": "forget-flow",
+      "from": "FORGET_REQUESTED",
+      "to": "FORGET_REVIEW_READY",
+      "requiresExactApproval": false,
+      "requiresReviewRecord": true,
+      "durableMutation": false,
+      "auditRequiredBeforeApply": false
+    },
+    {
+      "id": "forget-apply",
+      "object": "forget-flow",
+      "from": "FORGET_REVIEW_READY",
+      "to": "FORGET_APPLIED_WITH_AUDIT",
+      "requiresExactApproval": true,
+      "requiresReviewRecord": true,
+      "durableMutation": true,
+      "auditRequiredBeforeApply": true
+    }
+  ],
+  "blockedTransitions": [
+    {
+      "id": "proposal-direct-apply",
+      "from": "PROPOSAL_DRAFT",
+      "to": "SUPERSESSION_APPLIED_WITH_AUDIT",
+      "reason": "draft proposal cannot apply durable mutation without review and exact approval"
+    },
+    {
+      "id": "forget-direct-delete",
+      "from": "FORGET_REQUESTED",
+      "to": "FORGET_APPLIED_WITH_AUDIT",
+      "reason": "forget request cannot apply deletion or suppression without review, exact approval, and audit"
+    },
+    {
+      "id": "tombstone-runtime-claim",
+      "from": "TOMBSTONE_REVIEW_READY",
+      "to": "RC_READY",
+      "reason": "fixture state transition cannot claim runtime or RC readiness"
+    }
+  ],
+  "requiredReviewFields": [
+    "targetMemoryId",
+    "requestedAction",
+    "requestedBy",
+    "reason",
+    "scope",
+    "exactApprovalReference",
+    "auditPlan",
+    "forbiddenSideEffects"
+  ],
+  "forbiddenDefaults": [
+    "RC_READY",
+    "runtimeReady=true",
+    "finalRcMatrixReady=true",
+    "rcReady=true",
+    "durable memory already written",
+    "destructive deletion already applied",
+    "provider call executed",
+    "real memory store read",
+    "public MCP expansion approved"
+  ]
+}

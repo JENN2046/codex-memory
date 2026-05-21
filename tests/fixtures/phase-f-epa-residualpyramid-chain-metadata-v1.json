@@ -1,0 +1,153 @@
+{
+  "fixtureId": "phase-f-epa-residualpyramid-chain-metadata-v1",
+  "decision": "NOT_READY_BLOCKED",
+  "status": "synthetic_fixture_only",
+  "evidenceClass": "fixture_contract_only",
+  "publicMcpTools": ["record_memory", "search_memory", "memory_overview"],
+  "runtimeParityClaimed": false,
+  "realRecallObserved": false,
+  "providerCalled": false,
+  "durableStateMutated": false,
+  "publicMcpExpanded": false,
+  "realMemoryStoreRead": false,
+  "scenarios": [
+    {
+      "id": "epa-expansion-bounded-scope",
+      "chainFamily": "EPA",
+      "stage": "expansion",
+      "inputMetadata": {
+        "sourceCandidateId": "candidate-alpha",
+        "priorStageId": "candidate_generation",
+        "queryIntent": "semantic association checkpoint"
+      },
+      "expectedMetadata": {
+        "stageId": "epa_expansion",
+        "sourceCandidateId": "candidate-alpha",
+        "expansionReason": "explicit_semantic_axis_overlap",
+        "boundedExpansionScope": ["axis:governance", "axis:checkpoint"],
+        "candidateCountBefore": 1,
+        "candidateCountAfter": 3
+      },
+      "blockedClaims": [
+        "provider_score_required",
+        "implicit_global_expansion",
+        "real EPA recall observed",
+        "runtime parity"
+      ],
+      "failureMode": "fail_closed_when_expansion_scope_missing"
+    },
+    {
+      "id": "epa-pruning-deterministic-stage",
+      "chainFamily": "EPA",
+      "stage": "pruning",
+      "inputMetadata": {
+        "sourceCandidateId": "candidate-beta",
+        "priorStageId": "epa_expansion",
+        "candidateCountBefore": 5
+      },
+      "expectedMetadata": {
+        "stageId": "epa_pruning",
+        "prunedCandidateId": "candidate-beta",
+        "pruningReason": "outside_bounded_axis_scope",
+        "candidateCountAfter": 4,
+        "providerDependency": false
+      },
+      "blockedClaims": [
+        "hidden_provider_dependency",
+        "non_deterministic_pruning",
+        "real recall quality proof"
+      ],
+      "failureMode": "fail_closed_when_pruning_reason_missing"
+    },
+    {
+      "id": "residual-layer-ordering-signal",
+      "chainFamily": "ResidualPyramid",
+      "stage": "layer_metadata",
+      "inputMetadata": {
+        "parentCandidateId": "candidate-gamma",
+        "priorStageId": "epa_pruning",
+        "residualSignalClass": "novelty"
+      },
+      "expectedMetadata": {
+        "stageId": "residual_layer",
+        "layerId": "residual-layer-1",
+        "parentCandidateId": "candidate-gamma",
+        "residualSignalClass": "novelty",
+        "orderingTieBreakSignal": "higher_specificity_then_stable_id"
+      },
+      "blockedClaims": [
+        "random_ordering",
+        "provider_score_required",
+        "runtime ResidualPyramid parity"
+      ],
+      "failureMode": "fail_closed_when_layer_or_parent_missing"
+    },
+    {
+      "id": "chain-handoff-linkage-required",
+      "chainFamily": "EPA+ResidualPyramid",
+      "stage": "handoff",
+      "inputMetadata": {
+        "priorStageId": "epa_pruning",
+        "nextStageId": "residual_layer",
+        "candidateCountBefore": 4
+      },
+      "expectedMetadata": {
+        "stageId": "chain_handoff",
+        "priorStageId": "epa_pruning",
+        "nextStageId": "residual_layer",
+        "candidateCountBefore": 4,
+        "candidateCountAfter": 4,
+        "handoffReason": "metadata_complete_no_recall_execution"
+      },
+      "blockedClaims": [
+        "missing_stage_linkage_accepted",
+        "candidate_count_implicit",
+        "real recall chain executed"
+      ],
+      "failureMode": "fail_closed_when_stage_linkage_missing"
+    },
+    {
+      "id": "metadata-omission-negative",
+      "chainFamily": "EPA+ResidualPyramid",
+      "stage": "negative_missing_metadata",
+      "inputMetadata": {
+        "priorStageId": "",
+        "nextStageId": "residual_layer"
+      },
+      "expectedMetadata": {
+        "stageId": "metadata_omission_guard",
+        "accepted": false,
+        "missingFields": ["priorStageId", "candidateCountBefore", "candidateCountAfter"]
+      },
+      "blockedClaims": [
+        "metadata_omission_is_safe",
+        "inferred_stage_linkage",
+        "fixture proves runtime readiness"
+      ],
+      "failureMode": "fail_closed_missing_required_chain_metadata"
+    },
+    {
+      "id": "readiness-overclaim-rejected",
+      "chainFamily": "safety",
+      "stage": "overclaim_guard",
+      "inputMetadata": {
+        "evidenceClass": "synthetic_fixture_only"
+      },
+      "expectedMetadata": {
+        "stageId": "readiness_overclaim_guard",
+        "runtimeParityClaimed": false,
+        "realRecallObserved": false,
+        "rcReady": false
+      },
+      "blockedClaims": [
+        "runtimeReady=true",
+        "finalRcMatrixReady=true",
+        "rcReady=true",
+        "RC_READY",
+        "real EPA recall observed",
+        "real ResidualPyramid recall observed"
+      ],
+      "failureMode": "fail_closed_on_readiness_or_runtime_parity_claim"
+    }
+  ]
+}

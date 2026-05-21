@@ -4,6 +4,8 @@
 
 ## 当前结论
 
+- 当前 standing owner authorization 已升级为 `Smart Standing Authorization v3 - Budgeted Autonomy Envelope` 策略面：保留连续自动推进，但改为 Green / Amber / Red lane、默认预算、receipt 和 Red hard-stop 约束。状态面同步为 `standing_owner_smart_authorization_v3_active: true`、`autonomy_envelope_active: true`、`amber_lane_autonomous_with_budget_and_receipts: true`；项目仍保持 `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`，没有执行 provider、MCP memory write、real memory scan、dependency change、config change、push/tag/release/deploy/PR，也没有 readiness/cutover claim。
+- 本地状态事实：2026-05-21 观察到当前 `HEAD = origin/main = 36cc96b8a67ff61884a67278b53ec78eb4d1e219`，`main...origin/main` 指针同步；tracked worktree 当前仍有本地 docs/board 状态记录修改待处理（`STATUS.md` 与 `.agent_board/*`），因此不能再记为全干净。该事实刷新只更新本地 Git 基线与状态记录；没有运行 runtime、provider、real memory scan、durable write、commit、push、tag、release、deploy、cutover 或 readiness claim。
 - 当前 latest code-only authorized write-path bridge：已把 auto-authorization 的 escalation 结果直接桥接进 widening-review，不再要求先手工拼一份 `CM-0615` record。现在 `authorized-write-path-widening-review` 与 `governance-report` / `dashboard` / `http-observe` 都支持基于同一份显式 `CM-0611` assertion-record 再叠加 `token_present` rebound outcome 做 widening-review；当前实测结果已经可以到 `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED / RC_NOT_READY_BLOCKED`，其中 widening-review technical gates `W1-W9=yes`、`W10=no`，同时仍然保持 `canExecuteRuntimeNow=false`。这仍然只是 governance-only read-only bridge：不会签发 approval，不会执行 `CM-0601`，不会执行 `CM-0595`，不会执行 `record_memory`。当前真实下一 blocker 已从“token 缺失默认态”推进成“adoption 未 granted”。
 - 当前 CM-0661 authorized write-path bounded recall closeout review evaluator：已新增 [CM-0661 Authorized Write-Path Bounded Recall Closeout Review Evaluator](/A:/codex-memory/docs/CM-0661_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_CLOSEOUT_REVIEW_EVALUATOR.md)，并补了 later `CM-0658/0659` 的 `.json` / Markdown input bridge adapters，把 future bounded-recall issuance/evidence artifacts 之后的 closeout 层推进成显式输入、只读、fail-closed helper/CLI。现在 `authorized-write-path-bounded-recall-closeout-review` 可以直接给出 `BOUNDED_RECALL_CLOSEOUT_NOT_READY`、`BOUNDED_RECALL_CLOSEOUT_RECORDED_PREPARED_LATER_APPROVAL_ONLY`、`BOUNDED_RECALL_CLOSEOUT_ABORTED_DRIFT`，并同时暴露 closeout checklist、fail-closed reasons、closeout record draft、rendered closeout text、`boundedRecallApprovalIssuanceRecordInputTrace`、`boundedRecallExecutionEvidenceInputTrace`。默认真实结果仍是 `BOUNDED_RECALL_CLOSEOUT_NOT_READY / RC_NOT_READY_BLOCKED`；即使在显式 later `CM-0658 + CM-0659` artifacts 下，它也只会把链路推进到“future bounded-recall later-approval-only closeout 已记录、可单独准备下一条 future exact bounded-recall runtime-approval boundary”，仍然保持 `canExecuteBoundedRecallNow=false`、`canExecuteRuntimeNow=false`。这仍然只是 governance-only closeout evaluator：不会证明 token 已存在，不会签发 runtime approval，不会执行 bounded recall，不会执行 `search_memory`，不会执行 `record_memory`。当前控制状态仍保持 `RC_NOT_READY_BLOCKED`。
 - 当前 CM-0660 authorized write-path bounded recall record draft surfaces：已新增 [CM-0658 Authorized Write-Path Bounded Recall Approval Issuance Record Template](/A:/codex-memory/docs/CM-0658_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_APPROVAL_ISSUANCE_RECORD_TEMPLATE.md)、[CM-0659 Authorized Write-Path Bounded Recall Execution Evidence Template](/A:/codex-memory/docs/CM-0659_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_EXECUTION_EVIDENCE_TEMPLATE.md) 和 [CM-0660 Authorized Write-Path Bounded Recall Record Draft Surfaces](/A:/codex-memory/docs/CM-0660_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_RECORD_DRAFT_SURFACES.md)，把 `CM-0655/0656/0657` 之后 future bounded recall exact-approval path 仍隐含的 issuance/evidence 记账层也推进成了 governance-only draft surface。现在 `authorized-write-path-bounded-recall-preparation-review`、`governance-report`、`dashboard`、`http-observe` 不只会暴露 `boundedRecallCommandPreviewBundle`，还会直接暴露 `boundedRecallApprovalIssuanceRecordDraft` 与 `boundedRecallExecutionEvidenceDraft`，且 rendered bounded-recall text 自带 `## Next Record Drafts`。默认真实结果仍是 `BOUNDED_RECALL_APPROVAL_NOT_READY / RC_NOT_READY_BLOCKED`；即使在显式 later `CM-0607 + CM-0649 + CM-0650` artifacts 下，它也只会把链路推进到“future bounded recall exact approval 可准备、issuance/evidence drafts 可预填、但不能执行”，仍然保持 `canExecuteBoundedRecallNow=false`、`canExecuteRuntimeNow=false`。这仍然只是 governance-only record-draft surface：不会证明 token 已存在，不会签发 runtime approval，不会执行 bounded recall，不会执行 `search_memory`，不会执行 `record_memory`。当前控制状态仍保持 `RC_NOT_READY_BLOCKED`。
@@ -333,6 +335,99 @@ Local docs-only fixture plan has been prepared for Phase F EPA/ResidualPyramid c
 This does not claim runtime parity, real EPA/ResidualPyramid recall validation, RC readiness, or cutover readiness.
 
 Next safe task: CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract.
+
+## CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract
+
+Status: COMPLETED_VALIDATED
+Result: COMPLETED_VALIDATED
+State: NOT_READY_BLOCKED
+
+Local synthetic fixture/test artifacts have been added and validated for Phase F EPA/ResidualPyramid chain metadata semantics. They cover EPA bounded expansion, EPA deterministic pruning, ResidualPyramid layer metadata, chain handoff linkage, missing metadata fail-closed behavior, and readiness-overclaim rejection.
+
+This does not claim runtime parity, real EPA/ResidualPyramid recall validation, provider/profile quality, RC readiness, or cutover readiness.
+
+Validation passed: targeted EPA/ResidualPyramid fixture test `6/6`; combined Phase F fixture tests `28/28`.
+
+Next safe task: select the next local-safe fixture/docs candidate from memory lifecycle proposal states, query-quality dry-run refresh, or admin review schema hardening.
+
+## Phase F three-week local-safe closeout and next candidates
+
+Status: COMPLETED_VALIDATED
+Result: COMPLETED_VALIDATED
+State: NOT_READY_BLOCKED
+
+The three-week Phase F local-safe goal now has a closeout and next-candidate surface in [docs/PHASE_F_THREE_WEEK_LOCAL_SAFE_CLOSEOUT_AND_NEXT_CANDIDATES.md](/A:/codex-memory/docs/PHASE_F_THREE_WEEK_LOCAL_SAFE_CLOSEOUT_AND_NEXT_CANDIDATES.md).
+
+It records the completed LightMemo fixture lane, completed EPA/ResidualPyramid fixture lane, current fixture pack map, local-safe action matrix, and next three-week candidates: memory lifecycle proposal states, query-quality dry-run refresh, and admin review schema hardening.
+
+This does not claim runtime parity, real recall validation, provider/profile quality, RC readiness, production readiness, or cutover readiness.
+
+Validation passed: combined Phase F fixture tests `28/28`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+
+## Phase F next three-week candidate lane
+
+Status: COMPLETED_VALIDATED
+Result: COMPLETED_VALIDATED
+State: NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED
+
+The next three-week Phase F local-safe candidate lane has been represented as three synthetic fixture packs:
+
+```text
+docs/PHASE_F_MEMORY_LIFECYCLE_PROPOSAL_STATES_FIXTURE_TESTS.md
+docs/PHASE_F_QUERY_QUALITY_DRY_RUN_REFRESH_FIXTURE_TESTS.md
+docs/PHASE_F_ADMIN_REVIEW_SCHEMA_HARDENING_FIXTURE_TESTS.md
+```
+
+Week 1 covers memory lifecycle proposal states for proposal, supersession, tombstone, forget-flow, and lifecycle state transitions. Week 2 refreshes query-quality dry-run assertions as fixture-only contracts without provider calls or real memory-store reads. Week 3 hardens the admin review schema snapshot, local-safe action matrix, and report-shape review fixture.
+
+This does not claim runtime parity, real query quality, real memory governance readiness, provider/profile quality, RC readiness, production readiness, or cutover readiness.
+
+Validation passed: targeted lifecycle fixture test `6/6`; targeted query-quality refresh fixture test `5/5`; targeted admin review schema fixture test `6/6`; combined Phase F fixture tests `45/45`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+
+## Phase F fixture coverage review, validation surface, and wording guard
+
+Status: COMPLETED_VALIDATED
+Result: COMPLETED_VALIDATED
+State: NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED
+
+The current eight Phase F fixture packs have been reviewed in [docs/PHASE_F_VCP_PARITY_FIXTURE_COVERAGE_GAP_REVIEW.md](/A:/codex-memory/docs/PHASE_F_VCP_PARITY_FIXTURE_COVERAGE_GAP_REVIEW.md). The review records current pack coverage, remaining gaps, and the next best synthetic contract candidates.
+
+The `45/45` combined fixture command, pack map, validation log anchors, and closeout checks are now centralized in [docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md](/A:/codex-memory/docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md).
+
+A docs-only readiness/boundary wording guard has been added:
+
+```text
+tests/fixtures/phase-f-readiness-boundary-wording-guard-v1.json
+tests/phase-f-readiness-boundary-wording-guard-fixture.test.js
+```
+
+This guard scans watched Phase F Markdown docs and requires readiness-sensitive terms to appear only in denial, non-claim, hard-stop, or blocked context.
+
+This does not claim runtime parity, real query quality, real memory governance readiness, provider/profile quality, RC readiness, production readiness, or cutover readiness.
+
+Validation passed: wording guard fixture test `4/4`; combined Phase F fixture plus wording guard tests `49/49`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+
+## Phase F cross-pack dependency map
+
+Status: COMPLETED_VALIDATED
+Result: COMPLETED_VALIDATED
+State: NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED
+
+The Phase F cross-pack dependency map has been added in [docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md](/A:/codex-memory/docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md).
+
+It records upstream/downstream relationships between the eight current fixture packs plus the validation surface and readiness boundary wording guard. It also records non-claims and future synthetic contract candidates.
+
+Added artifacts:
+
+```text
+tests/fixtures/phase-f-cross-pack-dependency-map-v1.json
+tests/phase-f-cross-pack-dependency-map-fixture.test.js
+docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md
+```
+
+This does not claim runtime dependency proof, runtime parity, real query quality, real memory governance readiness, provider/profile quality, RC readiness, production readiness, or cutover readiness.
+
+Validation passed: targeted cross-pack dependency map fixture test `6/6`; combined Phase F fixture, wording guard, and dependency map tests `55/55`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
 
 ## CM-0548 Current runtime gap truth table consolidation
 

@@ -282,6 +282,103 @@ Deliverable: `docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_PLAN.md`
 
 Boundary: docs/board planning only; no runtime mutation, real recall observation, provider call, public MCP expansion, push, release, deploy, cutover, or readiness claim.
 
+## CM-0547 Phase F EPA/ResidualPyramid chain metadata synthetic fixture contract
+
+Status: COMPLETED_VALIDATED
+Week: Phase F local safety work
+Scope: add synthetic EPA/ResidualPyramid chain metadata fixture/test artifacts and preserve NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+tests/fixtures/phase-f-epa-residualpyramid-chain-metadata-v1.json
+tests/phase-f-epa-residualpyramid-chain-metadata-fixture.test.js
+docs/PHASE_F_EPA_RESIDUALPYRAMID_CHAIN_METADATA_FIXTURE_TESTS.md
+```
+
+Boundary: fixture/test/docs only; no runtime mutation, real recall observation, provider call, public MCP expansion, push, release, deploy, cutover, or readiness claim.
+
+Validation: targeted EPA/ResidualPyramid fixture test passed `6/6`; combined Phase F fixture tests passed `28/28`.
+
+## Phase F Three-Week Local-Safe Closeout And Next Candidates
+
+Status: COMPLETED_VALIDATED
+Week: Phase F local safety closeout
+Scope: organize fixture pack, local-safe action matrix, and next three-week candidates while preserving NOT_READY_BLOCKED.
+
+Deliverable: `docs/PHASE_F_THREE_WEEK_LOCAL_SAFE_CLOSEOUT_AND_NEXT_CANDIDATES.md`
+
+Next three-week candidates:
+
+- memory lifecycle proposal states
+- query-quality dry-run refresh
+- admin review schema hardening
+
+Boundary: docs/board closeout only; no runtime mutation, real recall observation, provider call, public MCP expansion, push, release, deploy, cutover, or readiness claim.
+
+Validation: combined Phase F fixture tests passed `28/28`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+
+## Phase F Next Three-Week Candidate Lane
+
+Status: COMPLETED_VALIDATED
+Week: Phase F local safety continuation
+Scope: complete the next local-safe candidate lane as docs/fixtures/tests/board evidence while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+docs/PHASE_F_MEMORY_LIFECYCLE_PROPOSAL_STATES_FIXTURE_TESTS.md
+docs/PHASE_F_QUERY_QUALITY_DRY_RUN_REFRESH_FIXTURE_TESTS.md
+docs/PHASE_F_ADMIN_REVIEW_SCHEMA_HARDENING_FIXTURE_TESTS.md
+tests/fixtures/phase-f-memory-lifecycle-proposal-states-v1.json
+tests/fixtures/phase-f-query-quality-dry-run-refresh-v1.json
+tests/fixtures/phase-f-admin-review-schema-hardening-v1.json
+tests/phase-f-memory-lifecycle-proposal-states-fixture.test.js
+tests/phase-f-query-quality-dry-run-refresh-fixture.test.js
+tests/phase-f-admin-review-schema-hardening-fixture.test.js
+```
+
+Boundary: fixture/test/docs/board only; no runtime mutation, real query execution, real memory-store read, provider call, public MCP expansion, config change, push, release, deploy, cutover, or readiness claim.
+
+Validation: targeted lifecycle fixture test passed `6/6`; targeted query-quality refresh fixture test passed `5/5`; targeted admin review schema fixture test passed `6/6`; combined Phase F fixture tests passed `45/45`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+
+## Phase F Fixture Coverage Review, Validation Surface, And Wording Guard
+
+Status: COMPLETED_VALIDATED
+Week: Phase F local safety continuation
+Scope: complete coverage-gap review, validation-surface cleanup, and readiness/boundary wording guard while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+docs/PHASE_F_VCP_PARITY_FIXTURE_COVERAGE_GAP_REVIEW.md
+docs/PHASE_F_FIXTURE_PACK_VALIDATION_SURFACE.md
+tests/fixtures/phase-f-readiness-boundary-wording-guard-v1.json
+tests/phase-f-readiness-boundary-wording-guard-fixture.test.js
+```
+
+Boundary: docs/fixture/test/board only; no runtime mutation, real query execution, real memory-store read, provider call, public MCP expansion, config change, push, release, deploy, cutover, or readiness claim.
+
+Validation: wording guard fixture test passed `4/4`; combined Phase F fixture plus wording guard tests passed `49/49`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+
+## Phase F Cross-Pack Dependency Map
+
+Status: COMPLETED_VALIDATED
+Week: Phase F local safety continuation
+Scope: add a synthetic cross-pack dependency map while preserving NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED.
+
+Deliverables:
+
+```text
+docs/PHASE_F_CROSS_PACK_DEPENDENCY_MAP.md
+tests/fixtures/phase-f-cross-pack-dependency-map-v1.json
+tests/phase-f-cross-pack-dependency-map-fixture.test.js
+```
+
+Boundary: docs/fixture/test/board only; no runtime dependency proof, runtime mutation, real query execution, real memory-store read, provider call, public MCP expansion, config change, push, release, deploy, cutover, or readiness claim.
+
+Validation: targeted cross-pack dependency map fixture test passed `6/6`; combined Phase F fixture, wording guard, and dependency map tests passed `55/55`; docs validation passed; `git diff --check` passed; readiness scan returned historical entries plus intended denial/boundary wording only.
+
 ## CM-0548 Current runtime gap truth table consolidation
 
 Status: COMPLETED_VALIDATED

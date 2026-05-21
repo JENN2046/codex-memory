@@ -1,10 +1,12 @@
 # Safe Push Policy
 
-Updated: 2026-05-14
+Updated: 2026-05-21
 
 ## Purpose
 
 Safe-push lets A4.8 publish validated low-risk work to `origin/main` without treating push permission as permission for high-risk work.
+
+Under Smart Standing Authorization v3, push remains Red unless the existing safe-push policy fully passes or the user explicitly authorizes the exact push. The autonomy envelope does not make push, tag, release, deploy, or PR work automatic.
 
 Safe-push is allowed only when every condition below passes.
 
@@ -17,6 +19,7 @@ Safe-push is allowed only when every condition below passes.
 - no `.env`, secrets, credentials, provider keys, cookies, bearer tokens, private keys, or password values changed
 - no dependency manifest, lockfile, or package-manager change
 - no provider-smoke or provider-benchmark was run
+- no Amber external/write receipt is missing
 - no `rebuild-profile --confirm`
 - no SQLite migration or `ALTER TABLE`
 - no real DB/memory mutation
