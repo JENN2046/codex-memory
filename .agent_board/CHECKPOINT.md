@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0704 Governance stale fixture time-drift stabilization - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: stabilized `http-observe` and `governance-report` stale governance fixtures by using relative dates instead of fixed 2026-04 timestamps.
+- Commit: local guarded commit `8ec5efd test: stabilize governance stale fixtures`; local `main` is ahead of `origin/main` by 1 and has not been pushed.
+- Health: local HTTP MCP was restored with `npm run start:http:ensure`; `/health` returned `200` during `npm run gate:mainline`.
+- Validation: targeted `http-observe` and `governance-report` tests passed; `git diff --check` passed; full `npm test` passed `1941/1941`; `npm run gate:mainline` passed with compare `43/43 matched` and rollback `43/43 rollback-ready`.
+- Boundary: no provider/API/MCP memory call, real memory read/write, dependency/config change, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Next safe task: either request explicit push authorization for `8ec5efd`, or continue local-safe stabilization from current clean ahead-1 state.
+
 ## Checkpoint - CM-0703 Green file-write executor code-level preflight tests - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0704 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`, local `HEAD = 8ec5efd test: stabilize governance stale fixtures`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`; local branch is ahead by 1 and has not been pushed.
+
+Changed files: `tests/http-observe-cli.test.js`; `tests/governance-report-cli.test.js`; `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`.
+
+Validation to preserve: `node --test tests\http-observe-cli.test.js`; `node --test tests\governance-report-cli.test.js`; `git diff --check`; `npm test` (`1941/1941`); `npm run gate:mainline` (health `200`, compare `43/43`, rollback `43/43`).
+
+Boundary: local test/docs/board stabilization only. `npm run start:http:ensure` was used to restore local `/health`; no provider/API/MCP memory call, real memory read/write, dependency/config change, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Next safe task: request explicit push authorization for `8ec5efd` if remote sync is desired, or continue local-safe stabilization from the clean ahead-1 state.
+
 ## CM-0703 Handoff
 
 Status: `COMPLETED_VALIDATED`.
