@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0726 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0726 started from local `HEAD = 1415099 fix: preserve v3 lane after zero red stops`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 23]`.
+
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: dashboard text output now includes `GovNextCmd`, carrying the current first governance blocker `primaryCommand` directly in the value surface. Real text dashboard shows the current assertion-record review command without requiring JSON parsing.
+
+Boundary: local read-only dashboard text/test/docs/board only. No JSON contract change, blocker calculation change, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js` passed `19/19`; `node src\cli\dashboard.js --summary-only`; `npm test` passed `1963/1963`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed with `latest_task=CM-0726`; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push remains blocked without explicit authorization.
+
 ## CM-0725 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after parser/dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.

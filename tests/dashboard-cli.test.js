@@ -1301,6 +1301,11 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('AutoLoop'), 'should include autopilot loop line');
   assert.ok(text.includes('AutoCtrl'), 'should include autopilot controller line');
   assert.ok(text.includes('GovNext'), 'should include structured next governance action line');
+  assert.ok(text.includes('GovNextCmd'), 'should include structured next governance command line');
+  assert.ok(
+    text.includes('node .\\src\\cli\\authorized-write-path-auto-authorization.js --json --assertion-record <CM0611_assertion_record_path>'),
+    'should include copyable next governance command'
+  );
   assert.ok(text.includes('stage=await_cm0611_assertion_record'), 'should include current next governance stage');
   assert.ok(text.includes('CM-0677 / CMV-0801'), 'should include parsed v3 receipt identity');
   assert.ok(text.includes('bundle=assertion_record_only'), 'should include current bundle kind');

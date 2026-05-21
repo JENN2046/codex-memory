@@ -1422,6 +1422,7 @@ function renderText(report, options = {}) {
   lines.push(`Operational ${pad(report.operationalSummary.status)} ${report.operationalSummary.message}`);
   lines.push(`Readiness ${pad(report.readinessSummary.status)} ${report.readinessSummary.decision}, blockers=${report.readinessSummary.blockerCount}, readyClaim=${report.readinessSummary.readinessClaimAllowed === true}`);
   lines.push(`GovNext    ${report.readinessSummary.governanceNextAction?.code || 'none'} stage=${report.readinessSummary.governanceNextAction?.stage || 'none'}, next=${report.readinessSummary.governanceNextAction?.nextStepRef || 'none'}`);
+  lines.push(`GovNextCmd ${report.readinessSummary.governanceNextAction?.primaryCommand || 'none'}`);
   for (const line of formatGovernanceBlockerTextLines(report.readinessSummary.governanceBlockerDetails)) {
     lines.push(line);
   }

@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0726 Dashboard governance next command text surface - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a read-only `GovNextCmd` line to dashboard text output, sourced from `readinessSummary.governanceNextAction.primaryCommand`.
+- Current local signal: real `node src\cli\dashboard.js --summary-only` shows `GovNextCmd node .\src\cli\authorized-write-path-auto-authorization.js --json --assertion-record <CM0611_assertion_record_path>` while preserving `Readiness NOT_READY_BLOCKED`, five blockers, and `readyClaim=false`.
+- Boundary: Green Lane local dashboard text/test/docs/board only; no JSON contract change, blocker calculation change, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `19/19`; real dashboard text smoke showed `GovNextCmd`; full `npm test` passed `1963/1963`; docs validation passed with `latest_task=CM-0726`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then continue governance fail-closed hardening; do not claim readiness.
+
 ## Checkpoint - CM-0725 Smart Standing Authorization v3 zero-Red-stop lane inference - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after parser/dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
