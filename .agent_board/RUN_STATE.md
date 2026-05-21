@@ -5,13 +5,13 @@
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
 | Branch | main |
-| Local HEAD at CM-0705 start | `f3aa777 docs: record governance stale fixture recovery` |
+| Local HEAD at CM-0706 start | `bd8bb11 docs: reconcile autopilot ledger recovery state` |
 | Remote baseline | `origin/main = 4997db5 feat: add local autopilot control loop surfaces` |
-| Worktree at CM-0705 start | `main...origin/main [ahead 2]`; tracked worktree was clean before this ledger recovery-state reconciliation. |
+| Worktree at CM-0706 start | `main...origin/main [ahead 3]`; tracked worktree was clean before this ledger consistency validator slice. |
 | Mode | Smart Standing Authorization v3 - Budgeted Autonomy Envelope |
 | A4.8 role | legacy local-safe rail and Green Lane substrate |
-| Current task | CM-0705 autopilot ledger recovery-state reconciliation; preserve `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. |
-| Current area | P0-mainline-health / P10-observability-admin |
+| Current task | CM-0706 autopilot ledger consistency validator; preserve `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. |
+| Current area | P6-docs-drift / P10-observability-admin |
 | Standing owner smart authorization v3 active | true |
 | Autonomy envelope active | true |
 | Green lane direct | true |
@@ -28,14 +28,15 @@
 | Destructive action allowed automatically | false |
 | Public MCP expansion allowed automatically | false |
 | Readiness claim allowed automatically | false |
-| Recommended next | Request explicit push authorization for local commits `8ec5efd` and `f3aa777` plus any later guarded reconciliation commit if remote sync is desired, or continue local-safe stabilization from the current local-ahead state. |
+| Recommended next | Request explicit push authorization for local-ahead commits if remote sync is desired, or continue local-safe stabilization from the current local-ahead state. |
 | Last pushed runtime baseline | `a4fdaf85be21031901f35139129f68a1c521c2f2` |
 | Latest runtime safety baseline | `41a5630 fix: add validate memory two phase audit` |
 | Current CM-0661 result | Added one standalone governance-only bounded-recall closeout evaluator plus later `CM-0658/0659` input bridges, so filled bounded-recall issuance/execution artifacts can now be reviewed as one fail-closed closeout state; default state stays `BOUNDED_RECALL_CLOSEOUT_NOT_READY / RC_NOT_READY_BLOCKED`, while explicit later artifacts can now reach `BOUNDED_RECALL_CLOSEOUT_RECORDED_PREPARED_LATER_APPROVAL_ONLY`, but the helper still keeps `canExecuteBoundedRecallNow=false`, `canExecuteRuntimeNow=false`, and preserves `RC_NOT_READY_BLOCKED`. |
 | Latest widening-review bridge result | The same explicit `CM-0611` assertion-record plus `token_present` rebound-outcome input now bridges auto-authorization escalation directly into widening-review without first hand-assembling a separate `CM-0615` record; current helper/control surfaces reach `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED`, with `W1-W9=yes`, `W10=no`, and `canExecuteRuntimeNow=false`. |
 | Current CM-0655/CM-0656/CM-0657 result | Added `CM-0655` so later `CM-0607 + CM-0649 + CM-0650` artifacts can feed one governance-only future bounded-recall preparation evaluator, added `CM-0656` so the same bounded-recall preparation result now also surfaces through `governance-report`, `dashboard`, and `http-observe`, and added `CM-0657` so the same future bounded-recall exact-approval review path now exposes one reusable command family, packet payload, and rendered command preview; default state stays `BOUNDED_RECALL_APPROVAL_NOT_READY / RC_NOT_READY_BLOCKED`, while explicit later artifacts can now reach `BOUNDED_RECALL_APPROVAL_PREPARED_EXACT_ONLY`, but the helper and normal control surfaces still keep `canExecuteBoundedRecallNow=false`, `canExecuteRuntimeNow=false`, and preserve `RC_NOT_READY_BLOCKED`. |
 | Current CM-0658/CM-0659/CM-0660 result | Added `CM-0658` and `CM-0659` as ready-to-fill bounded-recall issuance/evidence templates, and added `CM-0660` so the same later `CM-0607 + CM-0649 + CM-0650` artifacts now surface `boundedRecallApprovalIssuanceRecordDraft` plus `boundedRecallExecutionEvidenceDraft` through the standalone helper and the normal read-only control surfaces; default state stays `BOUNDED_RECALL_APPROVAL_NOT_READY / RC_NOT_READY_BLOCKED`, while explicit later artifacts can now reach `BOUNDED_RECALL_APPROVAL_PREPARED_EXACT_ONLY` with record drafts prefilled, but the helper and normal control surfaces still keep `canExecuteBoundedRecallNow=false`, `canExecuteRuntimeNow=false`, and preserve `RC_NOT_READY_BLOCKED`. |
-| Last action | Completed guarded local commit `f3aa777 docs: record governance stale fixture recovery`, then started CM-0705 to reconcile the missing `AUTOPILOT_LEDGER.md` receipt and reduce resume drift. |
+| Last action | Completed guarded local commit `bd8bb11 docs: reconcile autopilot ledger recovery state`, then started CM-0706 to turn ledger/task/validation drift into a docs-gate failure. |
+| Latest CM-0706 validation | `node --check scripts\validate_autopilot_ledger_consistency.js` passed; `node scripts\validate_autopilot_ledger_consistency.js` passed; `node --test tests\autopilot-ledger-consistency-validator.test.js` passed `4/4`; `npm test` passed `1945/1945`; docs validation passed; `git diff --check` passed. |
 | Latest CM-0705 validation | `git diff --check` passed; docs validation passed. |
 | Latest CM-0704 validation | `node --test tests\http-observe-cli.test.js` passed `17/17`; `node --test tests\governance-report-cli.test.js` passed `21/21`; `git diff --check` passed; `npm test` passed `1941/1941`; `npm run gate:mainline` passed with health `200`, compare `43/43 matched`, rollback `43/43 rollback-ready`. |
 | Latest CM-0657 validation | `node --check` changed core/CLIs; targeted bounded-recall helper/CLI/governance/dashboard/http-observe tests; bounded-recall spot checks; full `npm test`; `git diff --check`; docs validation all passed. |
@@ -47,7 +48,7 @@
 | P22 status | Fresh gate refresh passed; security-fix RC artifact created as local Markdown only; tag `p22-rc-7fd17de` created and pushed; GitHub prerelease created; local HTTP MCP deploy/validation evidence chain recorded and closed; production deploy remains blocked pending separate A5 authorization. |
 | P23/P24 status | v1.0 Memory Kernel planning baseline through P23.3 are committed locally in `a3b2d77`; P23.4 is committed locally in `0e3e25b`; P23.5 is committed locally in `de64428`; P23.6 is committed locally in `9889378`; P23.7 is committed locally in `82fb28c`; P23.8 is committed locally in `d5f70b7`; P23.9 is committed locally in `0aa02fa`; P23.10 is committed locally in `56bc568`; P23.11 is committed locally in `e9971b8`; P23.12 is committed locally in `54586b8`; P24 validation aggregator implementation plan is committed locally in `a584e4e`; P24.1 fixture shape tests are committed locally in `e79bb1e`; P24.2 minimal aggregator skeleton is committed locally in `8fe5b58`; P24.3 CLI wiring is committed locally in `220ffa6`; P24.4 decision/exit-code semantics is committed locally in `dc6196d`; P24.5 evidence-source map is committed locally in `ca6e3ee`; P24.6/P24.7 rejected report hardening batch is committed locally in `d4f966d`; post-commit checkpoints are committed locally through `a835031` plus this final board-state update. |
 | Guarded auto-commit allowed | yes for local commits when scoped and validated; push still requires explicit user authorization or a separately active safe-push packet that fully passes |
-| Safe-push readiness | Not evaluated for CM-0704/CM-0705; push still requires explicit user authorization or a separately passing safe-push packet. |
+| Safe-push readiness | Not evaluated for CM-0704/CM-0705/CM-0706; push still requires explicit user authorization or a separately passing safe-push packet. |
 | Next planned action | Preserve local-ahead state, then either push on explicit authorization or select the next local-safe stabilization slice toward durable Codex/Claude memory mainline. |
 
 

@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0706 Autopilot ledger consistency validator - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a local ledger consistency validator and targeted tests, then wired the validator into `scripts\validate-local.ps1 -Area docs`.
+- Guard: docs validation now fails if latest done task, latest completed validation scope, and latest completed ledger receipt do not point at the same `CM-*`, or if a ledger row references a missing `CMV-*`.
+- Validation: validator syntax passed; live board validator run passed with `latest_task=CM-0706`; targeted validator tests passed `4/4`; full `npm test` passed `1945/1945`; docs validation passed; `git diff --check` passed.
+- Boundary: local validator/test/docs/board only. No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Next safe task: continue local-safe stabilization toward durable Codex/Claude memory mainline, or request explicit push authorization for local-ahead commits if remote sync is desired.
+
 ## Checkpoint - CM-0705 Autopilot ledger recovery-state reconciliation - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

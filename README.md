@@ -53,6 +53,7 @@
 - 失败恢复矩阵：[docs/AUTOPILOT_FAILURE_RECOVERY_MATRIX.md](/A:/codex-memory/docs/AUTOPILOT_FAILURE_RECOVERY_MATRIX.md)
 - 本地 ledger：[.agent_board/AUTOPILOT_LEDGER.md](/A:/codex-memory/.agent_board/AUTOPILOT_LEDGER.md)
 - 验证命令：`powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+- ledger 一致性防线：docs validation 会运行 `scripts\validate_autopilot_ledger_consistency.js`，确认最新 done task、最新 validation scope 和最新 ledger receipt 指向同一个 `CM-*`，避免恢复/交接时漏记最新本地切片。
 
 Red Lane 仍硬停止：push、PR、tag、release、deploy、secret、destructive action、broad real memory scan/export、public MCP expansion、config/watchdog/startup change、unscoped dependency change、readiness/cutover claim 都不自动执行。
 

@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0706 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0706 started from local `HEAD = bd8bb11 docs: reconcile autopilot ledger recovery state`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 3]`.
+
+Changed files: `scripts/validate_autopilot_ledger_consistency.js`; `scripts/validate-local.ps1`; `tests/autopilot-ledger-consistency-validator.test.js`; `README.md`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`.
+
+Validation to preserve: `node --check scripts\validate_autopilot_ledger_consistency.js`; `node scripts\validate_autopilot_ledger_consistency.js`; `node --test tests\autopilot-ledger-consistency-validator.test.js`; `npm test` (`1945/1945`); `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`.
+
+Boundary: local validator/test/docs/board only. No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Next safe task: continue local-safe stabilization toward durable Codex/Claude memory mainline, or request explicit push authorization if remote sync is desired.
+
 ## CM-0705 Handoff
 
 Status: `COMPLETED_VALIDATED`.
