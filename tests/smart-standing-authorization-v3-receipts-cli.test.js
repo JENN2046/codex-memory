@@ -66,6 +66,30 @@ test('v3 receipt parser core keeps pipes inside inline code cells', () => {
   assert.equal(summary.latest_receipt_status, 'not_required_no_amber_external_or_write_action');
 });
 
+test('v3 receipt parser treats latest Amber receipts as current v3 rows', () => {
+  const markdown = [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-0835 | `node src\\cli\\scoped-recall-evidence-probe.js --json --execute --allow-local-state-writes --limit 1` | P9 | CM-0716 scoped recall evidence probe and bounded evidence collection | COMPLETED_VALIDATED | Added a fail-closed probe. Current workspace execution used `realMemoryReadQueryCount=1`, wrote one local recall-audit append, kept `memoryWrites=0`, provider/API/MCP=0, and returned no raw memory content. | Push remains blocked; continue governance fail-closed hardening. | 2026-05-21 |',
+    '| CMV-0831 | `node --check src\\cli\\read-policy-evidence-probe.js` | P8 | CM-0712 read-policy evidence probe CLI | COMPLETED_VALIDATED | Green Lane not_required_no_amber_external_or_write_action; no readiness claim occurred. | Next local-safe step. | 2026-05-21 |'
+  ].join('\n');
+  const summary = parseReceiptMarkdown(markdown, {
+    sourcePath: '.agent_board/VALIDATION_LOG.md',
+    workspaceRoot: process.cwd()
+  });
+
+  assert.equal(summary.latest_v3_task_id, 'CM-0716');
+  assert.equal(summary.latest_validation_id, 'CMV-0835');
+  assert.equal(summary.latest_lane, 'Amber');
+  assert.equal(summary.latest_receipt_status, 'amber_receipt_recorded');
+  assert.equal(summary.budget_used.memory_queries, 1);
+  assert.equal(summary.budget_used.memory_writes, 0);
+  assert.equal(summary.budget_used.provider, 0);
+  assert.equal(summary.budget_used.api, 0);
+  assert.equal(summary.budget_used.mcp_tool, 0);
+  assert.equal(summary.latest_parser_status, 'parser_ok');
+});
+
 test('v3 receipt parser core does not treat no-Amber or Red hard-stop wording as actions', () => {
   const markdown = [
     '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',

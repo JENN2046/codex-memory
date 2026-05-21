@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0717 Smart Standing Authorization v3 Amber receipt parser freshness - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after parser/dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: fixed `src\core\SmartStandingAuthorizationV3ReceiptParser.js` and expanded parser tests so newer Amber receipt rows remain visible in dashboard `smartStandingAuthorizationV3`.
+- Behavior: parser now treats default v3-era `CM-0672+` validation rows as candidates, recognizes bounded Amber evidence via `realMemoryReadQueryCount` / recall-audit append wording, and extracts latest-row memory query/write budget.
+- Current local signal: parser/dashboard now report `latest_v3_task_id=CM-0716`, `latest_validation_id=CMV-0835`, `latest_lane=Amber`, `latest_receipt_status=amber_receipt_recorded`, `budget_used.memory_queries=1`, and `budget_used.memory_writes=0`.
+- Boundary: read-only parser/dashboard freshness only; no new real memory query, durable write, provider call, config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: parser syntax passed; parser test syntax passed; targeted parser CLI tests passed `9/9`; parser smoke and dashboard smoke showed CM-0716 freshness; dashboard tests passed; full `npm test` passed.
+- Next safe task: continue governance fail-closed hardening; do not claim readiness.
+
 ## Checkpoint - CM-0716 Scoped recall evidence probe and bounded evidence collection - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after targeted probe validation, bounded local execution, dashboard smoke, and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

@@ -100,11 +100,26 @@ function extractTaskId(text = '') {
   return match ? match[0] : DEFAULT_MISSING_VALUE;
 }
 
+function extractTaskNumber(text = '') {
+  const taskId = extractTaskId(text);
+  if (taskId === DEFAULT_MISSING_VALUE) return null;
+  const parsed = Number.parseInt(taskId.slice(3), 10);
+  return Number.isInteger(parsed) ? parsed : null;
+}
+
 function inferLane(row) {
   const text = `${row.scope} ${row.summary} ${row.followUp}`.toLowerCase();
   if (text.includes('no red stop') || text.includes('zero red stop')) return DEFAULT_MISSING_VALUE;
   if (text.includes('red stop') || text.includes('red gate stop') || row.result === 'BLOCKED') return 'Red';
   if (text.includes('green lane') || text.includes('no-amber') || text.includes('no amber')) return 'Green';
+  if (
+    text.includes('amber') ||
+    text.includes('recall-audit append') ||
+    text.includes('realmemoryreadquerycount') ||
+    text.includes('real_memory_read_queries')
+  ) {
+    return 'Amber';
+  }
   if (text.includes('amber lane action') || text.includes('amber external action') || text.includes('amber write action')) {
     return 'Amber';
   }
@@ -118,6 +133,17 @@ function inferReceiptStatus(row) {
     return 'not_required_no_amber_external_or_write_action';
   }
   if (text.includes('no amber receipt was required')) return 'not_required_no_amber_external_or_write_action';
+  if (
+    inferLane(row) === 'Amber' &&
+    (
+      text.includes('recall-audit append') ||
+      text.includes('realmemoryreadquerycount') ||
+      text.includes('real_memory_read_queries') ||
+      text.includes('amber receipt')
+    )
+  ) {
+    return 'amber_receipt_recorded';
+  }
   if (text.includes('receipt rollup')) return 'receipt_rollup_only';
   if (text.includes('fixture drift changelog') || text.includes('changelog')) return 'fixture_changelog_only';
   if (text.includes('parser contract')) return 'parser_contract_only';
@@ -148,13 +174,63 @@ function classifyRow(row) {
 
 function isV3Row(row) {
   const text = `${row.scope} ${row.summary} ${row.followUp}`.toLowerCase();
+  const taskNumber = extractTaskNumber(row.scope);
   return (
+    (Number.isInteger(taskNumber) && taskNumber >= 672) ||
     text.includes('smart standing authorization v3') ||
     text.includes('v3 receipt') ||
     text.includes('v3 dashboard') ||
     text.includes('green lane') ||
     ['CM-0673', 'CM-0674', 'CM-0675', 'CM-0676', 'CM-0677'].includes(extractTaskId(row.scope))
   );
+}
+
+function extractFirstInteger(text = '', patterns = []) {
+  for (const pattern of patterns) {
+    const match = String(text).match(pattern);
+    if (!match) continue;
+    const parsed = Number.parseInt(match[1], 10);
+    if (Number.isInteger(parsed)) return parsed;
+  }
+  return null;
+}
+
+function inferBudgetUsed(row) {
+  const text = `${row.scope} ${row.summary} ${row.followUp}`;
+  const lower = text.toLowerCase();
+  const budget = { ...DEFAULT_BUDGET_USED };
+
+  if (lower.includes('provider/api/mcp=0') || lower.includes('provider/api/external mcp calls `0`')) {
+    budget.provider = 0;
+    budget.api = 0;
+    budget.mcp_tool = 0;
+  }
+
+  const memoryQueries = extractFirstInteger(text, [
+    /realMemoryReadQueryCount`?=?`?(\d+)/i,
+    /real_memory_read_queries`?[:=]`?(\d+)/i,
+    /memory_queries`?[:=]`?(\d+)/i
+  ]);
+  if (memoryQueries !== null) budget.memory_queries = memoryQueries;
+
+  const memoryWrites = extractFirstInteger(text, [
+    /memoryWrites`?=?`?(\d+)/i,
+    /memory_writes`?[:=]`?(\d+)/i
+  ]);
+  if (memoryWrites !== null) budget.memory_writes = memoryWrites;
+
+  const runtimeProbeMinutes = extractFirstInteger(text, [
+    /runtime_probe_minutes`?[:=]`?(\d+)/i
+  ]);
+  if (runtimeProbeMinutes !== null) budget.runtime_probe_minutes = runtimeProbeMinutes;
+
+  const dependencyActions = extractFirstInteger(text, [
+    /dependency_actions`?[:=]`?(\d+)/i,
+    /dependency actions`?:? `?(\d+)/i
+  ]);
+  if (dependencyActions !== null) budget.dependency_actions = dependencyActions;
+
+  return budget;
 }
 
 function normalizeSourcePath(sourcePath, workspaceRoot = process.cwd()) {
@@ -184,6 +260,7 @@ function buildReceiptSummaryFromRows(rows = [], options = {}) {
   const latestText = latest ? `${latest.scope} ${latest.summary} ${latest.followUp}` : '';
   const latestStatus = latest ? classifyRow(latest) : 'parser_blocked_no_v3_rows';
   const latestResult = latest ? latest.result || DEFAULT_MISSING_VALUE : DEFAULT_MISSING_VALUE;
+  const budgetUsed = latest ? inferBudgetUsed(latest) : { ...DEFAULT_BUDGET_USED };
   const nextAutoStepAllowed =
     latestStatus === 'parser_ok' &&
     latestResult === 'COMPLETED_VALIDATED' &&
@@ -203,7 +280,7 @@ function buildReceiptSummaryFromRows(rows = [], options = {}) {
     latest_receipt_status: latest ? inferReceiptStatus(latest) : DEFAULT_MISSING_VALUE,
     latest_validation_result: latestResult,
     latest_parser_status: latestStatus,
-    budget_used: { ...DEFAULT_BUDGET_USED },
+    budget_used: budgetUsed,
     forbidden_action_marker_count: countMarkers(latestText, FORBIDDEN_ACTION_MARKERS),
     red_stop_count: redStopCount,
     next_auto_step_allowed: nextAutoStepAllowed,
@@ -231,6 +308,8 @@ module.exports = {
   buildReceiptSummaryFromRows,
   classifyRow,
   extractTaskId,
+  extractTaskNumber,
+  inferBudgetUsed,
   inferLane,
   inferReceiptStatus,
   parseReceiptMarkdown,
