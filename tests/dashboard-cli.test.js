@@ -179,6 +179,8 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'latestTask',
     'nextAction',
     'operationalStatus',
+    'readPolicyEvidenceState',
+    'readPolicyNextEvidenceAction',
     'readPolicyStatus',
     'readinessClaimAllowed',
     'status'
@@ -243,13 +245,18 @@ test('dashboard CLI should report all sections in json mode', async () => {
 
   assertKeySet(payload.readPolicy, [
     'auditEvidenceAvailable',
+    'auditTailLimit',
+    'auditedEntryCount',
     'configEvidenceAvailable',
+    'evidenceState',
+    'latestReadPolicyAuditAt',
     'lifecycleColumnAvailable',
     'lifecycleExcludedStatuses',
     'lifecycleIncludedStatuses',
     'lifecyclePolicyEnabled',
     'migrationApplied',
     'mutated',
+    'nextEvidenceAction',
     'noProvider',
     'rawWorkspaceIdExposed',
     'readPolicyConfigured',
@@ -274,6 +281,10 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.readPolicy.noProvider, true);
   assert.equal(payload.readPolicy.mutated, false);
   assert.equal(payload.readPolicy.migrationApplied, false);
+  assert.equal(typeof payload.readPolicy.auditedEntryCount, 'number');
+  assert.equal(payload.readPolicy.auditTailLimit, 20);
+  assert.match(payload.readPolicy.evidenceState, /config_/);
+  assert.equal(typeof payload.readPolicy.nextEvidenceAction, 'string');
   assert.equal(JSON.stringify(payload).includes('workspace_id'), false);
 
   assert.equal(payload.smartStandingAuthorizationV3.mode, 'smart-standing-authorization-v3-receipt-parser');
@@ -658,6 +669,8 @@ test('dashboard CLI should support --json --summary-only', async () => {
   assert.equal(payload.readinessSummary.operationalStatus, 'ok');
   assert.equal(payload.readinessSummary.governanceDecision, 'RC_NOT_READY_BLOCKED');
   assert.equal(payload.readinessSummary.readPolicyStatus, 'config_only_no_recent_audit');
+  assert.equal(payload.readinessSummary.readPolicyEvidenceState, 'config_only_missing_recent_audit');
+  assert.equal(payload.readinessSummary.readPolicyNextEvidenceAction, 'collect_recent_read_policy_audit_evidence_before_readiness_claim');
   assert.equal(payload.readinessSummary.autopilotDecision, 'NOT_READY_BLOCKED');
   assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
   assert.ok(payload.readinessSummary.blockerCount >= 1);

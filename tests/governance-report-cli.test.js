@@ -217,8 +217,13 @@ test('governance-report CLI should summarize proposal/tombstone/supersession/sta
     assert.equal(payload.summary.status, 'ok');
     assert.equal(payload.readPolicy.status, 'config_only_no_recent_audit');
     assert.equal(payload.readPolicy.source, 'config-only-no-recent-audit');
+    assert.equal(payload.readPolicy.evidenceState, 'config_only_missing_recent_audit');
     assert.equal(payload.readPolicy.configEvidenceAvailable, true);
     assert.equal(payload.readPolicy.auditEvidenceAvailable, false);
+    assert.equal(payload.readPolicy.auditedEntryCount, 0);
+    assert.equal(payload.readPolicy.auditTailLimit, 20);
+    assert.equal(payload.readPolicy.latestReadPolicyAuditAt, null);
+    assert.equal(payload.readPolicy.nextEvidenceAction, 'collect_recent_read_policy_audit_evidence_before_readiness_claim');
     assert.equal(payload.readPolicy.readPolicyConfigured, false);
     assert.equal(payload.readPolicy.lifecyclePolicyEnabled, false);
     assert.equal(payload.readPolicy.softReadPolicyEnabled, false);
@@ -386,6 +391,7 @@ test('governance-report CLI should surface recent read-policy audit evidence whe
     await seedGovernanceDb(dbPath);
     await fs.mkdir(path.dirname(recallLogPath), { recursive: true });
     await fs.writeFile(recallLogPath, `${JSON.stringify({
+      timestamp: '2026-04-23T09:12:00.000Z',
       recallType: 'read-policy',
       readPolicyApplied: true,
       lifecyclePolicyApplied: true,
@@ -408,8 +414,13 @@ test('governance-report CLI should surface recent read-policy audit evidence whe
     const payload = JSON.parse(result.stdout);
     assert.equal(payload.readPolicy.status, 'ok');
     assert.equal(payload.readPolicy.source, 'config-and-recent-recall-audit');
+    assert.equal(payload.readPolicy.evidenceState, 'config_and_recent_audit');
     assert.equal(payload.readPolicy.configEvidenceAvailable, true);
     assert.equal(payload.readPolicy.auditEvidenceAvailable, true);
+    assert.equal(payload.readPolicy.auditedEntryCount, 1);
+    assert.equal(payload.readPolicy.auditTailLimit, 20);
+    assert.equal(payload.readPolicy.latestReadPolicyAuditAt, '2026-04-23T09:12:00.000Z');
+    assert.equal(payload.readPolicy.nextEvidenceAction, 'none');
     assert.equal(payload.readPolicy.recentReadPolicyAuditCount, 1);
     assert.equal(payload.readPolicy.recentReadPolicyAppliedCount, 1);
     assert.equal(payload.readPolicy.recentLifecyclePolicyAppliedCount, 1);
@@ -1137,6 +1148,8 @@ test('governance-report CLI should fail cleanly when the database is missing', a
     assert.equal(payload.review.readPolicy.status, 'config_only_no_recent_audit');
     assert.equal(payload.review.readPolicy.configEvidenceAvailable, true);
     assert.equal(payload.review.readPolicy.auditEvidenceAvailable, false);
+    assert.equal(payload.review.readPolicy.evidenceState, 'config_only_missing_recent_audit');
+    assert.equal(payload.review.readPolicy.nextEvidenceAction, 'collect_recent_read_policy_audit_evidence_before_readiness_claim');
     assert.equal(payload.review.readPolicy.rawWorkspaceIdExposed, false);
     assert.equal(payload.review.autoAuthorization.allowedGovernanceOutput, 'NO_AUTO_APPROVAL_ISSUED');
     assert.equal(payload.review.autoAuthorization.assertionRecordInputTrace, null);

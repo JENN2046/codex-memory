@@ -273,7 +273,15 @@ function sumNumeric(entries, field) {
   return entries.reduce((total, entry) => total + Number(entry?.[field] || 0), 0);
 }
 
-function buildReadPolicySurface({ config = null, recallEntries = [] } = {}) {
+function latestTimestamp(entries) {
+  return entries
+    .map(entry => entry?.timestamp)
+    .filter(value => typeof value === 'string' && value.trim())
+    .sort()
+    .at(-1) || null;
+}
+
+function buildReadPolicySurface({ config = null, recallEntries = [], auditTailLimit = null } = {}) {
   const effectiveConfig = config || createConfig();
   const entries = Array.isArray(recallEntries) ? recallEntries.filter(Boolean) : [];
   const policyEntries = entries.filter(entry => (
@@ -290,12 +298,22 @@ function buildReadPolicySurface({ config = null, recallEntries = [] } = {}) {
   const hasRecentAuditEvidence = policyEntries.length > 0;
   const lifecyclePolicyEnabled = !!effectiveConfig.enableLifecycleReadPolicy;
   const softReadPolicyEnabled = !!effectiveConfig.enableSoftReadPolicy;
+  const evidenceState = hasRecentAuditEvidence
+    ? 'config_and_recent_audit'
+    : 'config_only_missing_recent_audit';
 
   return {
     status: hasRecentAuditEvidence ? 'ok' : 'config_only_no_recent_audit',
     source: hasRecentAuditEvidence ? 'config-and-recent-recall-audit' : 'config-only-no-recent-audit',
+    evidenceState,
     configEvidenceAvailable: true,
     auditEvidenceAvailable: hasRecentAuditEvidence,
+    auditedEntryCount: entries.length,
+    auditTailLimit,
+    latestReadPolicyAuditAt: latestTimestamp(policyEntries),
+    nextEvidenceAction: hasRecentAuditEvidence
+      ? 'none'
+      : 'collect_recent_read_policy_audit_evidence_before_readiness_claim',
     readPolicyConfigured: lifecyclePolicyEnabled || softReadPolicyEnabled,
     lifecyclePolicyEnabled,
     softReadPolicyEnabled,
@@ -323,7 +341,8 @@ function collectReadPolicySurface() {
   const config = createConfig();
   return buildReadPolicySurface({
     config,
-    recallEntries: readRecentJsonlEntriesSync(config.recallLogPath, READ_POLICY_AUDIT_TAIL)
+    recallEntries: readRecentJsonlEntriesSync(config.recallLogPath, READ_POLICY_AUDIT_TAIL),
+    auditTailLimit: READ_POLICY_AUDIT_TAIL
   });
 }
 

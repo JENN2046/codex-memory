@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0711 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0711 started from local `HEAD = 2970b54 feat: summarize dashboard readiness blockers`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 8]`.
+
+Changed files: `src/cli/governance-report.js`; `src/cli/dashboard.js`; `src/cli/http-observe.js`; `tests/governance-report-cli.test.js`; `tests/dashboard-cli.test.js`; `tests/http-observe-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`.
+
+Validation to preserve: `node --check src\cli\governance-report.js`; `node --check src\cli\dashboard.js`; `node --check src\cli\http-observe.js`; `node --test tests\governance-report-cli.test.js`; `node --test tests\dashboard-cli.test.js`; `node --test tests\http-observe-cli.test.js`; `node src\cli\dashboard.js --json --summary-only`; `npm test`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`.
+
+Boundary: local read-only surface/test/docs/board only. No real search/recall was executed for evidence collection; read-policy blocker remains visible. `readinessSummary.readinessClaimAllowed=false`; no provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Next safe task: either prepare a separately bounded read-policy audit evidence path, or continue local-safe hardening of the authorized write-path governance fail-closed chain.
+
 ## CM-0710 Handoff
 
 Status: `COMPLETED_VALIDATED`.

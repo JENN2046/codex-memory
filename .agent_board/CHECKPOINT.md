@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0711 Read-policy evidence-state metadata - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added read-only read-policy evidence metadata across `governance-report`, `dashboard`, and `http-observe`.
+- Behavior: read-policy surfaces now expose `evidenceState`, `auditedEntryCount`, `auditTailLimit`, `latestReadPolicyAuditAt`, and `nextEvidenceAction`.
+- Current local signal: `dashboard --json --summary-only` reports `readPolicyEvidenceState=config_only_missing_recent_audit`, `readPolicyNextEvidenceAction=collect_recent_read_policy_audit_evidence_before_readiness_claim`, inspected `1/20` recall audit entries, and `latestReadPolicyAuditAt=null`.
+- Boundary: `readinessSummary.readinessClaimAllowed=false`; this does not clear the read-policy blocker, does not execute search/recall, and does not claim readiness.
+- Validation: changed CLI syntax checks passed; targeted governance/dashboard/http-observe CLI tests passed; dashboard summary smoke showed the new evidence metadata; full `npm test` passed; docs validation passed; `git diff --check` passed.
+- No provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Next safe task: design or execute a separately authorized bounded read-policy audit evidence path, or continue reducing authorized write-path governance fail-closed blockers.
+
 ## Checkpoint - CM-0710 Dashboard readiness blocker summary - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

@@ -45,6 +45,8 @@ const {
   collectAutopilotGreenFileWriteExecutorContract
 } = require('../core/AutopilotGreenFileWriteExecutorContract');
 
+const READ_POLICY_DASHBOARD_AUDIT_TAIL = 20;
+
 function parseArgs(argv = []) {
   const options = {
     json: false,
@@ -411,6 +413,7 @@ function collectAudits() {
   const recallPath = path.join(logDir, 'codex-memory-recall.jsonl');
   const bridgeEntries = parseJsonLinesIfExists(bridgePath, 5);
   const recallEntries = parseJsonLinesIfExists(recallPath, 5);
+  const readPolicyRecallEntries = parseJsonLinesIfExists(recallPath, READ_POLICY_DASHBOARD_AUDIT_TAIL);
   const bridgeAccepted = bridgeEntries.filter(e => e.decision === 'accepted').length;
   const bridgeRejected = bridgeEntries.filter(e => e.decision === 'rejected').length;
   const recallScopeSummary = buildRecallScopeSummary(recallEntries);
@@ -435,7 +438,8 @@ function collectAudits() {
     },
     readPolicy: buildReadPolicySurface({
       config: createConfig(),
-      recallEntries
+      recallEntries: readPolicyRecallEntries,
+      auditTailLimit: READ_POLICY_DASHBOARD_AUDIT_TAIL
     })
   };
 }
@@ -1041,6 +1045,8 @@ function buildReadinessSummary(operationalSummary, governance, readPolicy, smart
     operationalStatus: operationalSummary.status,
     governanceDecision: governance.autoAuthorization?.decision || 'unknown',
     readPolicyStatus: readPolicy.status,
+    readPolicyEvidenceState: readPolicy.evidenceState || 'unknown',
+    readPolicyNextEvidenceAction: readPolicy.nextEvidenceAction || 'unknown',
     autopilotDecision: autopilotLoop.decision || autopilotKernel.decision || 'unknown',
     latestTask: autopilotLoop.latest_task || autopilotKernel.latest_ledger_goal || 'unknown',
     blockerCount: blockerCodes.length,
@@ -1069,7 +1075,7 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   if (audits.bridge.recentCount === 0) recs.push('No recent bridge entries — memory may not be writing');
   if (audits.recall.recentCount === 0) recs.push('No recent recall entries — search may not be active');
   if (audits.recall.recentCount > 0 && audits.recall.scopedRecallCount === 0) recs.push('Recent recall activity is present, but none of it used scope filtering');
-  if (readPolicy.status !== 'ok') recs.push('No recent lifecycle read-policy audit summary is available yet');
+  if (readPolicy.status !== 'ok') recs.push(`${readPolicy.nextEvidenceAction || 'Collect recent lifecycle read-policy audit evidence'}; inspected=${readPolicy.auditedEntryCount ?? 'unknown'}/${readPolicy.auditTailLimit ?? 'unknown'} recall audit entries`);
   if (smartStandingAuthorizationV3.status !== 'ok') recs.push('Smart Standing Authorization v3 receipt summary is unavailable or blocked; inspect local validation log parser input');
   if (autopilotKernel.status !== 'ok') recs.push('Autopilot governance kernel summary is incomplete; run docs validation and inspect AUTOPILOT_LEDGER');
   if (autopilotLoop.status !== 'ok') recs.push('Autopilot closed-loop summary is incomplete; run closed-loop validator and inspect local board evidence');

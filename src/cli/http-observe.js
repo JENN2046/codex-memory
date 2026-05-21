@@ -775,7 +775,8 @@ async function main() {
   const governance = collectGovernance(options);
   const readPolicy = buildReadPolicySurface({
     config,
-    recallEntries
+    recallEntries,
+    auditTailLimit: options.auditTail
   });
 
   const summary = buildSummary({

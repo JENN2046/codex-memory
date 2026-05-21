@@ -432,13 +432,18 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     });
     assertKeySet(payload.readPolicy, [
       'auditEvidenceAvailable',
+      'auditTailLimit',
+      'auditedEntryCount',
       'configEvidenceAvailable',
+      'evidenceState',
+      'latestReadPolicyAuditAt',
       'lifecycleColumnAvailable',
       'lifecycleExcludedStatuses',
       'lifecycleIncludedStatuses',
       'lifecyclePolicyEnabled',
       'migrationApplied',
       'mutated',
+      'nextEvidenceAction',
       'noProvider',
       'rawWorkspaceIdExposed',
       'readPolicyConfigured',
@@ -456,6 +461,11 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     assert.deepEqual(payload.readPolicy.lifecycleExcludedStatuses, ['proposal', 'rejected', 'superseded', 'tombstoned']);
     assert.equal(payload.readPolicy.configEvidenceAvailable, true);
     assert.equal(payload.readPolicy.auditEvidenceAvailable, true);
+    assert.equal(payload.readPolicy.evidenceState, 'config_and_recent_audit');
+    assert.equal(payload.readPolicy.auditedEntryCount, 1);
+    assert.equal(payload.readPolicy.auditTailLimit, 5);
+    assert.equal(payload.readPolicy.latestReadPolicyAuditAt, '2026-04-23T09:12:00.000Z');
+    assert.equal(payload.readPolicy.nextEvidenceAction, 'none');
     assert.equal(typeof payload.readPolicy.readPolicyConfigured, 'boolean');
     assert.equal(payload.readPolicy.recentHiddenByLifecycleCount, 3);
     assert.equal(payload.readPolicy.recentStaleResultCount, 1);
