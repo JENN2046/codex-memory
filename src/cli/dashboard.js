@@ -1417,6 +1417,59 @@ function buildReadinessNextAction({ reviewCandidate, operationalStatus, blockerS
   return 'resolve_remaining_fail_closed_evidence_before_readiness_claim';
 }
 
+function buildGoalReadiness(operationalSummary, readinessSummary, storeFreshnessWritePreflight, gitSync, gate) {
+  const blockers = [];
+  if (operationalSummary.status !== 'ok') blockers.push('operational_health_not_ok');
+  if (gate.status !== 'ok') blockers.push('mainline_gate_not_ok');
+  if (
+    storeFreshnessWritePreflight?.approvalState === 'NOT_APPROVED'
+    && Number(storeFreshnessWritePreflight?.proposedMemoryWrites || 0) > 0
+    && Number(storeFreshnessWritePreflight?.memoryWrites || 0) === 0
+  ) {
+    blockers.push('store_freshness_evidence_not_written');
+  }
+  const governanceBlockerCount = Number(readinessSummary.governanceBlockerDetails?.length || 0);
+  if (governanceBlockerCount > 0) blockers.push('governance_blockers_present');
+  if (readinessSummary.readinessClaimAllowed !== true) blockers.push('readiness_claim_not_allowed');
+  if (Number(gitSync.ahead || 0) > 0) blockers.push('local_commits_not_pushed_explicit_only');
+  if (Number(gitSync.behind || 0) > 0) blockers.push('remote_updates_not_integrated');
+  if (Number(gitSync.dirtyCount || 0) > 0) blockers.push('dirty_worktree_present');
+
+  let nextAction = 'run_completion_audit_before_readiness_claim';
+  if (blockers.includes('operational_health_not_ok') || blockers.includes('mainline_gate_not_ok')) {
+    nextAction = 'restore_operational_health_before_goal_readiness_claim';
+  } else if (blockers.includes('store_freshness_evidence_not_written')) {
+    nextAction = 'explicitly_approve_storewask_or_continue_governance_closeout';
+  } else if (blockers.includes('governance_blockers_present')) {
+    nextAction = 'resolve_governance_fail_closed_evidence_before_readiness_claim';
+  } else if (blockers.includes('local_commits_not_pushed_explicit_only') || blockers.includes('remote_updates_not_integrated')) {
+    nextAction = 'review_git_sync_with_explicit_remote_authorization';
+  }
+
+  return {
+    status: blockers.length === 0 ? 'candidate' : 'blocked',
+    decision: blockers.length === 0
+      ? 'LOCAL_MEMORY_MAINLINE_READY_CANDIDATE_REQUIRES_COMPLETION_AUDIT'
+      : 'LOCAL_MEMORY_MAINLINE_NOT_READY',
+    objective: 'codex_claude_local_memory_mainline',
+    operationalStatus: operationalSummary.status,
+    gateStatus: gate.status,
+    readinessDecision: readinessSummary.decision,
+    readinessClaimAllowed: false,
+    governanceBlockerCount,
+    storeFreshnessApprovalState: storeFreshnessWritePreflight?.approvalState || 'unknown',
+    storeFreshnessMemoryWrites: Number(storeFreshnessWritePreflight?.memoryWrites || 0),
+    storeFreshnessProposedMemoryWrites: Number(storeFreshnessWritePreflight?.proposedMemoryWrites || 0),
+    gitAhead: Number(gitSync.ahead || 0),
+    gitBehind: Number(gitSync.behind || 0),
+    gitDirtyCount: Number(gitSync.dirtyCount || 0),
+    remoteActionRequired: false,
+    remoteActionsPerformed: gitSync.remoteActionsPerformed === true,
+    nextAction,
+    blockers
+  };
+}
+
 function buildRecommendations(service, store, storeFreshnessWritePreflight, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract) {
   const recs = [];
   const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
@@ -1539,6 +1592,7 @@ function renderText(report, options = {}) {
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
   lines.push(`GitSync    ${pad(report.gitSync.status)} ${report.gitSync.branchSummary}, dirty=${report.gitSync.dirtyCount}, remoteAction=${report.gitSync.remoteActionsPerformed === true}`);
   lines.push(`Operational ${pad(report.operationalSummary.status)} ${report.operationalSummary.message}`);
+  lines.push(`GoalReady ${pad(report.goalReadiness.status)} ${report.goalReadiness.decision}, blockers=${report.goalReadiness.blockers.length}, next=${report.goalReadiness.nextAction}`);
   lines.push(`Readiness ${pad(report.readinessSummary.status)} ${report.readinessSummary.decision}, blockers=${report.readinessSummary.blockerCount}, readyClaim=${report.readinessSummary.readinessClaimAllowed === true}`);
   lines.push(`GovNext    ${report.readinessSummary.governanceNextAction?.code || 'none'} stage=${report.readinessSummary.governanceNextAction?.stage || 'none'}, next=${report.readinessSummary.governanceNextAction?.nextStepRef || 'none'}`);
   lines.push(`GovNextCmd ${report.readinessSummary.governanceNextAction?.primaryCommand || 'none'}`);
@@ -1734,6 +1788,10 @@ async function main() {
   }
   const operationalSummary = buildOperationalSummary(service, store, profile, runtime, gate);
   const readinessSummary = buildReadinessSummary(operationalSummary, governance, readPolicy, audits, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks);
+  const goalReadiness = buildGoalReadiness(operationalSummary, readinessSummary, storeFreshnessWritePreflight, gitSync, gate);
+  if (goalReadiness.status !== 'candidate') {
+    recommendations.push(`Long-term Codex/Claude local memory mainline remains ${goalReadiness.decision} — blockers=${goalReadiness.blockers.join('|') || 'none'}; next=${goalReadiness.nextAction}`);
+  }
   const sectionStatus = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
     audits.bridge.status, audits.recall.status, governance.status, gitSync.status, storeFreshnessWritePreflight.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
@@ -1754,6 +1812,7 @@ async function main() {
           : 'One or more critical checks failed'
     },
     operationalSummary,
+    goalReadiness,
     readinessSummary,
     service,
     store: options.summaryOnly ? { status: store.status, records: store.records, chunks: store.chunks } : store,

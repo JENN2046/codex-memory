@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0736 Dashboard long-term goal readiness rollup - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added dashboard JSON `goalReadiness` and text `GoalReady`, separating long-term Codex/Claude local memory mainline readiness from local operational health.
+- Current local signal: real `node src\cli\dashboard.js --summary-only` shows `GoalReady bloc LOCAL_MEMORY_MAINLINE_NOT_READY`; real JSON shows `operationalStatus=ok`, `gateStatus=ok`, `readinessDecision=NOT_READY_BLOCKED`, `readinessClaimAllowed=false`, `storeFreshnessApprovalState=NOT_APPROVED`, `storeFreshnessMemoryWrites=0`, `storeFreshnessProposedMemoryWrites=1`, `governanceBlockerCount=5`, and local git sync blockers while this edit is still dirty.
+- Boundary: Green Lane local dashboard/test/docs/board only; no `record_memory`, `search_memory`, provider/API/MCP call, durable memory write, config/runtime mutation, public MCP expansion, remote action, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `20/20`; real dashboard text/JSON smoke showed the new goal readiness rollup and recommendation; full `npm test` passed `1970/1970`; docs validation passed with `latest_task=CM-0736`; v3 parser smoke reported `CM-0736 / CMV-0855`, `Green / local_review_shape_only`, and `memory_writes=0`; `git diff --check` passed.
+- Next safe task: inspect diff/status, then create guarded local commit if scope remains clean; do not push or execute the approval line without explicit authorization.
+
 ## Checkpoint - CM-0735 Dashboard store freshness approval recommendation - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

@@ -145,6 +145,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'gate',
     'generatedAt',
     'gitSync',
+    'goalReadiness',
     'governance',
     'mode',
     'operationalSummary',
@@ -171,6 +172,37 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'status',
     'storeStatus'
   ], 'dashboard operational summary');
+  assertKeySet(payload.goalReadiness, [
+    'blockers',
+    'decision',
+    'gateStatus',
+    'gitAhead',
+    'gitBehind',
+    'gitDirtyCount',
+    'governanceBlockerCount',
+    'nextAction',
+    'objective',
+    'operationalStatus',
+    'readinessClaimAllowed',
+    'readinessDecision',
+    'remoteActionRequired',
+    'remoteActionsPerformed',
+    'status',
+    'storeFreshnessApprovalState',
+    'storeFreshnessMemoryWrites',
+    'storeFreshnessProposedMemoryWrites'
+  ], 'dashboard goal readiness');
+  assert.equal(payload.goalReadiness.status, 'blocked');
+  assert.equal(payload.goalReadiness.decision, 'LOCAL_MEMORY_MAINLINE_NOT_READY');
+  assert.equal(payload.goalReadiness.objective, 'codex_claude_local_memory_mainline');
+  assert.equal(payload.goalReadiness.operationalStatus, payload.operationalSummary.status);
+  assert.equal(payload.goalReadiness.readinessDecision, payload.readinessSummary.decision);
+  assert.equal(payload.goalReadiness.readinessClaimAllowed, false);
+  assert.equal(payload.goalReadiness.remoteActionRequired, false);
+  assert.equal(payload.goalReadiness.remoteActionsPerformed, false);
+  assert.ok(Array.isArray(payload.goalReadiness.blockers));
+  assert.ok(payload.goalReadiness.blockers.includes('governance_blockers_present'));
+  assert.ok(payload.goalReadiness.blockers.includes('readiness_claim_not_allowed'));
   assertKeySet(payload.readinessSummary, [
     'autopilotDecision',
     'blockerCodes',
@@ -848,6 +880,15 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
   assert.equal(payload.operationalSummary.runtimeStatus, 'ok');
   assert.equal(payload.operationalSummary.gateStatus, 'ok');
   assert.equal(payload.operationalSummary.readinessClaimAllowed, false);
+  assert.equal(payload.goalReadiness.status, 'blocked');
+  assert.equal(payload.goalReadiness.decision, 'LOCAL_MEMORY_MAINLINE_NOT_READY');
+  assert.equal(payload.goalReadiness.objective, 'codex_claude_local_memory_mainline');
+  assert.equal(payload.goalReadiness.operationalStatus, 'ok');
+  assert.equal(payload.goalReadiness.readinessClaimAllowed, false);
+  assert.equal(payload.goalReadiness.remoteActionRequired, false);
+  assert.equal(payload.goalReadiness.remoteActionsPerformed, false);
+  assert.ok(payload.goalReadiness.blockers.includes('governance_blockers_present'));
+  assert.ok(payload.goalReadiness.blockers.includes('readiness_claim_not_allowed'));
   assertKeySet(payload.storeFreshnessWritePreflight, [
     'approvalState',
     'commandPreview',
@@ -1329,6 +1370,9 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('Profile'), 'should include Profile section');
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
   assert.ok(text.includes('GitSync'), 'should include local git sync section');
+  assert.ok(text.includes('GoalReady'), 'should include long-term goal readiness section');
+  assert.ok(text.includes('LOCAL_MEMORY_MAINLINE_NOT_READY'), 'should keep long-term goal readiness separate from operational health');
+  assert.ok(text.includes('next=explicitly_approve_storewask_or_continue_governance_closeout') || text.includes('next=resolve_governance_fail_closed_evidence_before_readiness_claim'), 'should expose the next safe long-term goal action');
   assert.ok(text.includes('ReadPolicy'), 'should include ReadPolicy section');
   assert.ok(text.includes('RecallScope'), 'should include recall scope section');
   assert.ok(text.includes('Governance'), 'should include Governance section');
@@ -1391,6 +1435,10 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(
     text.includes('dashboard did not execute it'),
     'should make the recommendation explicit that no write occurred'
+  );
+  assert.ok(
+    text.includes('Long-term Codex/Claude local memory mainline remains LOCAL_MEMORY_MAINLINE_NOT_READY'),
+    'should recommend against treating operational health as long-term goal readiness'
   );
   assert.ok(
     text.includes('push remains blocked without explicit authorization') || text.includes('remoteAction=false'),
