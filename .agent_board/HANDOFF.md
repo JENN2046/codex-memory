@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0724 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0724 started from local `HEAD = 7da3567 fix: classify local dashboard receipt rows`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 21]`.
+
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: dashboard summary-only now includes `smartStandingAuthorizationV3.latest_lane`, and text dashboard `V3Receipt` includes `lane=Green`, so operators can see the latest v3 lane without running the parser CLI separately.
+
+Boundary: local read-only dashboard/test/docs/board only. No parser decision change, blocker calculation change, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js` passed `19/19`; `node src\cli\dashboard.js --json --summary-only`; `node src\cli\dashboard.js --summary-only`; `npm test` passed `1962/1962`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed with `latest_task=CM-0724`; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push remains blocked without explicit authorization.
+
 ## CM-0723 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after parser/dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.

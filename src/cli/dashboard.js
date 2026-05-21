@@ -540,6 +540,7 @@ function collectSmartStandingAuthorizationV3(options = {}) {
       source_surface: 'outside_workspace_rejected',
       latest_v3_task_id: 'not_recorded_in_validation_log',
       latest_validation_id: 'not_recorded_in_validation_log',
+      latest_lane: 'not_recorded_in_validation_log',
       latest_receipt_status: 'not_recorded_in_validation_log',
       latest_validation_result: 'not_recorded_in_validation_log',
       red_stop_count: 0,
@@ -566,6 +567,7 @@ function collectSmartStandingAuthorizationV3(options = {}) {
       source_surface: relative.split(path.sep).join('/'),
       latest_v3_task_id: 'not_recorded_in_validation_log',
       latest_validation_id: 'not_recorded_in_validation_log',
+      latest_lane: 'not_recorded_in_validation_log',
       latest_receipt_status: 'not_recorded_in_validation_log',
       latest_validation_result: 'not_recorded_in_validation_log',
       red_stop_count: 0,
@@ -929,7 +931,7 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance,
     level: smartStandingAuthorizationV3.status === 'ok' ? 'ok' : 'warn',
     code: 'v3-receipt-summary',
     message: smartStandingAuthorizationV3.status === 'ok'
-      ? `${smartStandingAuthorizationV3.latest_v3_task_id} / ${smartStandingAuthorizationV3.latest_validation_id}; receipt=${smartStandingAuthorizationV3.latest_receipt_status}; redStops=${smartStandingAuthorizationV3.red_stop_count}; next=${smartStandingAuthorizationV3.next_auto_step_allowed === true}`
+      ? `${smartStandingAuthorizationV3.latest_v3_task_id} / ${smartStandingAuthorizationV3.latest_validation_id}; lane=${smartStandingAuthorizationV3.latest_lane || 'unknown'}; receipt=${smartStandingAuthorizationV3.latest_receipt_status}; redStops=${smartStandingAuthorizationV3.red_stop_count}; next=${smartStandingAuthorizationV3.next_auto_step_allowed === true}`
       : `v3 receipt summary unavailable or blocked: ${smartStandingAuthorizationV3.stop_reason || 'unknown'}`
   });
   checks.push({
@@ -1461,7 +1463,7 @@ function renderText(report, options = {}) {
   lines.push(`GovRCReady ${report.governance.boundedRecallCloseout?.boundedRecallCloseoutReady === true ? 'ready' : 'not-ready'} (${report.governance.boundedRecallCloseout?.closeoutRecordDraft?.status || 'unknown'})`);
   lines.push(`GovRCIss   ${report.governance.boundedRecallCloseout?.boundedRecallApprovalIssuanceRecordInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallApprovalIssuanceRecordInputTrace.sourceFileName : 'none'}`);
   lines.push(`GovRCEvd   ${report.governance.boundedRecallCloseout?.boundedRecallExecutionEvidenceInputTrace?.traceAvailable === true ? report.governance.boundedRecallCloseout.boundedRecallExecutionEvidenceInputTrace.sourceFileName : 'none'}`);
-  lines.push(`V3Receipt  ${pad(report.smartStandingAuthorizationV3.status)} ${report.smartStandingAuthorizationV3.latest_v3_task_id} / ${report.smartStandingAuthorizationV3.latest_validation_id}, receipt=${report.smartStandingAuthorizationV3.latest_receipt_status}, redStops=${report.smartStandingAuthorizationV3.red_stop_count}, next=${report.smartStandingAuthorizationV3.next_auto_step_allowed === true}`);
+  lines.push(`V3Receipt  ${pad(report.smartStandingAuthorizationV3.status)} ${report.smartStandingAuthorizationV3.latest_v3_task_id} / ${report.smartStandingAuthorizationV3.latest_validation_id}, lane=${report.smartStandingAuthorizationV3.latest_lane || 'unknown'}, receipt=${report.smartStandingAuthorizationV3.latest_receipt_status}, redStops=${report.smartStandingAuthorizationV3.red_stop_count}, next=${report.smartStandingAuthorizationV3.next_auto_step_allowed === true}`);
   lines.push(`Autopilot  ${pad(report.autopilotKernel.status)} schemas=${report.autopilotKernel.schema_count}, examples=${report.autopilotKernel.example_count}, ledger=${report.autopilotKernel.latest_ledger_goal}, red=${report.autopilotKernel.blocked_red_count}, readyClaim=${report.autopilotKernel.readiness_claim_allowed === true}`);
   lines.push(`AutoLoop   ${pad(report.autopilotLoop.status)} latest=${report.autopilotLoop.latest_task}, next=${report.autopilotLoop.next_safe_task}, receipt=${report.autopilotLoop.receipt_coverage.covered_tasks}/${report.autopilotLoop.receipt_coverage.completed_tasks}, validation=${report.autopilotLoop.validation_coverage.covered_tasks}/${report.autopilotLoop.validation_coverage.completed_tasks}, readyClaim=${report.autopilotLoop.readiness_claim_allowed === true}`);
   lines.push(`AutoCtrl   ${pad(report.autopilotController.status)} cycle=${report.autopilotController.controller_cycle_id}, state=${report.autopilotController.current_state}, next=${report.autopilotController.next_safe_task}, lane=${report.autopilotController.lane_decision.lane}, readyClaim=${report.autopilotController.readiness_claim_allowed === true}`);
@@ -1910,6 +1912,7 @@ async function main() {
           source_surface: smartStandingAuthorizationV3.source_surface,
           latest_v3_task_id: smartStandingAuthorizationV3.latest_v3_task_id,
           latest_validation_id: smartStandingAuthorizationV3.latest_validation_id,
+          latest_lane: smartStandingAuthorizationV3.latest_lane,
           latest_receipt_status: smartStandingAuthorizationV3.latest_receipt_status,
           latest_validation_result: smartStandingAuthorizationV3.latest_validation_result,
           latest_parser_status: smartStandingAuthorizationV3.latest_parser_status,

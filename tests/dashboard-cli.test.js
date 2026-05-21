@@ -1137,6 +1137,7 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
     'budget_used',
     'decision',
     'evidenceClass',
+    'latest_lane',
     'latest_parser_status',
     'latest_receipt_status',
     'latest_v3_task_id',
@@ -1151,6 +1152,7 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
   assert.equal(payload.smartStandingAuthorizationV3.decision, 'NOT_READY_BLOCKED');
   assert.equal(payload.smartStandingAuthorizationV3.evidenceClass, 'read_only_local_markdown_parse');
   assert.equal(payload.smartStandingAuthorizationV3.latest_parser_status, 'parser_ok');
+  assert.equal(typeof payload.smartStandingAuthorizationV3.latest_lane, 'string');
   assert.equal(payload.smartStandingAuthorizationV3.budget_used.provider, 0);
   assert.equal(payload.smartStandingAuthorizationV3.budget_used.api, 0);
   assert.equal(payload.smartStandingAuthorizationV3.budget_used.mcp_tool, 0);
@@ -1244,6 +1246,7 @@ test('dashboard CLI should include v3 receipt summary from explicit validation l
   );
   assert.equal(payload.smartStandingAuthorizationV3.latest_v3_task_id, 'CM-0677');
   assert.equal(payload.smartStandingAuthorizationV3.latest_validation_id, 'CMV-0801');
+  assert.equal(payload.smartStandingAuthorizationV3.latest_lane, 'Green');
   assert.equal(payload.smartStandingAuthorizationV3.latest_receipt_status, 'receipt_rollup_only');
   assert.equal(payload.smartStandingAuthorizationV3.budget_used.provider, 0);
   assert.equal(payload.smartStandingAuthorizationV3.budget_used.mcp_tool, 0);
@@ -1293,6 +1296,7 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('GovRCNext'), 'should include governance bounded recall closeout next step line');
   assert.ok(text.includes('GovRCText'), 'should include governance bounded recall closeout text line');
   assert.ok(text.includes('V3Receipt'), 'should include v3 receipt line');
+  assert.ok(text.includes('lane=Green'), 'should include v3 receipt latest lane');
   assert.ok(text.includes('Autopilot'), 'should include autopilot kernel line');
   assert.ok(text.includes('AutoLoop'), 'should include autopilot loop line');
   assert.ok(text.includes('AutoCtrl'), 'should include autopilot controller line');

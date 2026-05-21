@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0724 Dashboard v3 receipt latest lane passthrough - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added read-only `latest_lane` passthrough to dashboard `smartStandingAuthorizationV3` compact summary and text `V3Receipt` line, using the existing parser value.
+- Current local signal: real `node src\cli\dashboard.js --json --summary-only` reports `latest_v3_task_id=CM-0723`, `latest_validation_id=CMV-0842`, `latest_lane=Green`, `latest_receipt_status=local_review_shape_only`, zero budget use, and `next_auto_step_allowed=true`; text dashboard shows `V3Receipt ... lane=Green`.
+- Boundary: Green Lane local dashboard/test/docs/board only; no parser decision change, blocker calculation change, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `19/19`; real dashboard JSON/text smoke showed lane passthrough; full `npm test` passed `1962/1962`; docs validation passed with `latest_task=CM-0724`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then continue governance fail-closed hardening; do not claim readiness.
+
 ## Checkpoint - CM-0723 Smart Standing Authorization v3 local dashboard receipt classification - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after parser/dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
