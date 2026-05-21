@@ -1318,6 +1318,10 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(text.includes('CM-0611_EXTERNAL_TOKEN_MATERIAL_ASSERTION_RECORD_TEMPLATE.md'), 'should include next artifact ref');
   assert.ok(text.includes('Checks'), 'should include Checks section');
   assert.ok(text.includes('Recommendations'), 'should include Recommendations');
+  assert.ok(
+    text.includes('No new memory written in 24h'),
+    'should recommend an explicit follow-up for 24h store freshness warning'
+  );
   assert.equal(text.includes('workspace_id'), false);
 });
 

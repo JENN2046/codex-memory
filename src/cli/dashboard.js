@@ -1332,6 +1332,7 @@ function buildRecommendations(service, store, profile, runtime, audits, gate, go
   if (service.status !== 'ok') recs.push('Service health check failed — verify HTTP MCP is running');
   if (store.status !== 'ok') recs.push('Store is empty or unreachable — check SQLite integrity');
   if (store.ageBreakdown?.last7d === 0) recs.push('No new memory written in 7 days — this may be expected during maintenance');
+  else if (store.ageBreakdown?.last24h === 0) recs.push('No new memory written in 24h — confirm expected quiet period or collect bounded write-path evidence before readiness claim');
   if (profile.legacyChunks > 0) recs.push(`${profile.legacyChunks} legacy chunks present — consider running cleanup`);
   if (profile.status === 'error') recs.push('Profile not ready — run rebuild-profile to regenerate');
   if (runtime.watchdogRecoveryCount > 10) recs.push(`Watchdog recovered ${runtime.watchdogRecoveryCount} times — consider investigating root cause of service instability`);
