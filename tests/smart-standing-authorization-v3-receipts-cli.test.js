@@ -110,6 +110,26 @@ test('v3 receipt parser recognizes local dashboard text hardening rows as Green 
   assert.equal(summary.next_auto_step_allowed, true);
 });
 
+test('v3 receipt parser keeps local dashboard rows Green when zero Red stops are reported', () => {
+  const markdown = [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-0843 | `node src\\cli\\dashboard.js --json --summary-only` | P10 | CM-0724 dashboard v3 receipt latest lane passthrough | COMPLETED_VALIDATED | Dashboard compact `smartStandingAuthorizationV3` summary now includes `latest_lane`, and text `V3Receipt` includes `lane=...`. Real dashboard summary reports latest `CM-0723 / CMV-0842`, `latest_lane=Green`, `latest_receipt_status=local_review_shape_only`, zero budget use, zero Red stops, and `next_auto_step_allowed=true`, while preserving `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`. Targeted dashboard tests passed `19/19`; full `npm test` passed `1962/1962`. | Push remains blocked pending explicit user authorization; continue governance fail-closed hardening, not readiness claim. | 2026-05-21 |'
+  ].join('\n');
+  const summary = parseReceiptMarkdown(markdown, {
+    sourcePath: '.agent_board/VALIDATION_LOG.md',
+    workspaceRoot: process.cwd()
+  });
+
+  assert.equal(summary.latest_v3_task_id, 'CM-0724');
+  assert.equal(summary.latest_validation_id, 'CMV-0843');
+  assert.equal(summary.latest_lane, 'Green');
+  assert.equal(summary.latest_receipt_status, 'local_review_shape_only');
+  assert.equal(summary.latest_parser_status, 'parser_ok');
+  assert.equal(summary.red_stop_count, 0);
+  assert.equal(summary.next_auto_step_allowed, true);
+});
+
 test('v3 receipt parser core does not treat no-Amber or Red hard-stop wording as actions', () => {
   const markdown = [
     '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',

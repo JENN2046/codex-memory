@@ -126,8 +126,9 @@ function isLocalDashboardReviewShape(row) {
 
 function inferLane(row) {
   const text = rowText(row);
-  if (text.includes('no red stop') || text.includes('zero red stop')) return DEFAULT_MISSING_VALUE;
-  if (text.includes('red stop') || text.includes('red gate stop') || row.result === 'BLOCKED') return 'Red';
+  const hasNoRedStopMarker = text.includes('no red stop') || text.includes('zero red stop');
+  if (row.result === 'BLOCKED') return 'Red';
+  if (!hasNoRedStopMarker && (text.includes('red stop') || text.includes('red gate stop'))) return 'Red';
   if (text.includes('green lane') || text.includes('no-amber') || text.includes('no amber')) return 'Green';
   if (
     text.includes('amber') ||
