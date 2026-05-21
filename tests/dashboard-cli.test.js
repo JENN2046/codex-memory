@@ -175,6 +175,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'blockerCount',
     'blockerSources',
     'decision',
+    'governanceBlockerDetails',
     'governanceDecision',
     'governanceNextAction',
     'latestTask',
@@ -204,6 +205,38 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(typeof payload.readinessSummary.recallScopeNextAction, 'string');
   assert.equal(payload.readinessSummary.recallScopeReadinessClaimAllowed, false);
   assert.ok(Array.isArray(payload.readinessSummary.blockerCodes));
+  assert.ok(Array.isArray(payload.readinessSummary.governanceBlockerDetails));
+  assert.equal(
+    payload.readinessSummary.governanceBlockerDetails.length,
+    payload.readinessSummary.blockerCodes.filter(code => code.startsWith('authorized-write-path-')).length
+  );
+  assertKeySet(payload.readinessSummary.governanceBlockerDetails[0], [
+    'artifactBundleKind',
+    'blocker',
+    'code',
+    'commandBundleKind',
+    'decision',
+    'nextStepRef',
+    'nextStepRefs',
+    'operatorPacketKind',
+    'primaryCommandId',
+    'readinessClaimAllowed',
+    'reason',
+    'source',
+    'stage',
+    'status'
+  ], 'dashboard readiness governance blocker detail');
+  assert.deepEqual(payload.readinessSummary.governanceNextAction, payload.readinessSummary.governanceBlockerDetails[0]);
+  assert.deepEqual(
+    payload.readinessSummary.governanceBlockerDetails.map(detail => detail.code),
+    [
+      'authorized-write-path-auto-auth',
+      'authorized-write-path-widening-review',
+      'authorized-write-path-widening-adoption',
+      'authorized-write-path-bounded-recall-preparation',
+      'authorized-write-path-bounded-recall-closeout'
+    ]
+  );
   assertKeySet(payload.readinessSummary.governanceNextAction, [
     'artifactBundleKind',
     'blocker',
@@ -228,6 +261,10 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.readinessSummary.governanceNextAction.commandBundleKind, 'assertion_record_command_bundle');
   assert.equal(payload.readinessSummary.governanceNextAction.primaryCommandId, 'helper_assertion_record_review');
   assert.equal(payload.readinessSummary.governanceNextAction.readinessClaimAllowed, false);
+  assert.equal(payload.readinessSummary.governanceBlockerDetails[1].stage, 'widening_review');
+  assert.equal(payload.readinessSummary.governanceBlockerDetails[2].stage, 'widening_adoption');
+  assert.equal(payload.readinessSummary.governanceBlockerDetails[3].stage, 'bounded_recall_preparation');
+  assert.equal(payload.readinessSummary.governanceBlockerDetails[4].stage, 'bounded_recall_closeout');
 
   // Service section
   assert.ok(payload.service, 'should have service section');

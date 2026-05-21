@@ -1098,77 +1098,20 @@ function buildReadinessSummary(operationalSummary, governance, readPolicy, audit
       blockerSources,
       readPolicy
     }),
+    governanceBlockerDetails: buildGovernanceBlockerDetails(governance, blockerCodes),
     governanceNextAction: buildGovernanceNextAction(governance, blockerCodes),
     readinessClaimAllowed: false
   };
 }
 
 function buildGovernanceNextAction(governance = {}, blockerCodes = []) {
-  const blockerSet = new Set(blockerCodes);
+  const blockerDetails = buildGovernanceBlockerDetails(governance, blockerCodes);
+  if (blockerDetails.length > 0) return blockerDetails[0];
+
   const autoAuthorization = governance.autoAuthorization || {};
-  if (blockerSet.has('authorized-write-path-auto-auth')
-    || autoAuthorization.decision === 'RC_NOT_READY_BLOCKED'
+  if (autoAuthorization.decision === 'RC_NOT_READY_BLOCKED'
     || autoAuthorization.allowedGovernanceOutput === 'NO_AUTO_APPROVAL_ISSUED') {
-    return {
-      status: 'blocked',
-      source: 'governance',
-      code: 'authorized-write-path-auto-auth',
-      decision: autoAuthorization.allowedGovernanceOutput || autoAuthorization.decision || 'unknown',
-      blocker: autoAuthorization.currentBlockedOn || 'unknown',
-      stage: autoAuthorization.operatorActionPlan?.currentStage || 'unknown',
-      reason: autoAuthorization.operatorActionPlan?.currentStageReason || 'unknown',
-      nextStepRef: autoAuthorization.operatorActionPlan?.nextStepRef
-        || autoAuthorization.assertionRecordPreview?.templateRef
-        || 'unknown',
-      nextStepRefs: Array.isArray(autoAuthorization.operatorActionPlan?.nextStepRefs)
-        ? autoAuthorization.operatorActionPlan.nextStepRefs
-        : [],
-      artifactBundleKind: autoAuthorization.artifactBundleDraft?.bundleKind || 'unknown',
-      commandBundleKind: autoAuthorization.commandPreviewBundle?.bundleKind || 'unknown',
-      primaryCommandId: autoAuthorization.commandPreviewBundle?.primaryCommandId || 'unknown',
-      operatorPacketKind: autoAuthorization.operatorPacketDraft?.packetKind || 'unknown',
-      readinessClaimAllowed: false
-    };
-  }
-  if (blockerSet.has('authorized-write-path-widening-review')) {
-    return buildGovernanceReviewNextAction({
-      code: 'authorized-write-path-widening-review',
-      decision: governance.wideningReview?.decision,
-      blocker: governance.wideningReview?.failClosedReasons?.[0],
-      nextStepRef: governance.wideningReview?.reviewRecordDraft?.nextBoundary || governance.wideningReview?.nextStep,
-      stage: 'widening_review',
-      reason: 'widening review remains fail-closed'
-    });
-  }
-  if (blockerSet.has('authorized-write-path-widening-adoption')) {
-    return buildGovernanceReviewNextAction({
-      code: 'authorized-write-path-widening-adoption',
-      decision: governance.wideningAdoption?.decision,
-      blocker: governance.wideningAdoption?.failClosedReasons?.[0],
-      nextStepRef: governance.wideningAdoption?.adoptionRecordDraft?.nextBoundary || governance.wideningAdoption?.nextStep,
-      stage: 'widening_adoption',
-      reason: 'widening adoption remains fail-closed'
-    });
-  }
-  if (blockerSet.has('authorized-write-path-bounded-recall-preparation')) {
-    return buildGovernanceReviewNextAction({
-      code: 'authorized-write-path-bounded-recall-preparation',
-      decision: governance.boundedRecallPreparation?.decision,
-      blocker: governance.boundedRecallPreparation?.failClosedReasons?.[0],
-      nextStepRef: governance.boundedRecallPreparation?.nextStep,
-      stage: 'bounded_recall_preparation',
-      reason: 'bounded recall preparation remains fail-closed'
-    });
-  }
-  if (blockerSet.has('authorized-write-path-bounded-recall-closeout')) {
-    return buildGovernanceReviewNextAction({
-      code: 'authorized-write-path-bounded-recall-closeout',
-      decision: governance.boundedRecallCloseout?.decision,
-      blocker: governance.boundedRecallCloseout?.failClosedReasons?.[0],
-      nextStepRef: governance.boundedRecallCloseout?.nextStep,
-      stage: 'bounded_recall_closeout',
-      reason: 'bounded recall closeout remains fail-closed'
-    });
+    return buildGovernanceAutoAuthorizationNextAction(autoAuthorization);
   }
   return {
     status: 'none',
@@ -1180,6 +1123,78 @@ function buildGovernanceNextAction(governance = {}, blockerCodes = []) {
     reason: 'no governance blocker selected',
     nextStepRef: 'none',
     nextStepRefs: [],
+    readinessClaimAllowed: false
+  };
+}
+
+function buildGovernanceBlockerDetails(governance = {}, blockerCodes = []) {
+  const blockerSet = new Set(blockerCodes);
+  const details = [];
+  if (blockerSet.has('authorized-write-path-auto-auth')) {
+    details.push(buildGovernanceAutoAuthorizationNextAction(governance.autoAuthorization || {}));
+  }
+  if (blockerSet.has('authorized-write-path-widening-review')) {
+    details.push(buildGovernanceReviewNextAction({
+      code: 'authorized-write-path-widening-review',
+      decision: governance.wideningReview?.decision,
+      blocker: governance.wideningReview?.failClosedReasons?.[0],
+      nextStepRef: governance.wideningReview?.reviewRecordDraft?.nextBoundary || governance.wideningReview?.nextStep,
+      stage: 'widening_review',
+      reason: 'widening review remains fail-closed'
+    }));
+  }
+  if (blockerSet.has('authorized-write-path-widening-adoption')) {
+    details.push(buildGovernanceReviewNextAction({
+      code: 'authorized-write-path-widening-adoption',
+      decision: governance.wideningAdoption?.decision,
+      blocker: governance.wideningAdoption?.failClosedReasons?.[0],
+      nextStepRef: governance.wideningAdoption?.adoptionRecordDraft?.nextBoundary || governance.wideningAdoption?.nextStep,
+      stage: 'widening_adoption',
+      reason: 'widening adoption remains fail-closed'
+    }));
+  }
+  if (blockerSet.has('authorized-write-path-bounded-recall-preparation')) {
+    details.push(buildGovernanceReviewNextAction({
+      code: 'authorized-write-path-bounded-recall-preparation',
+      decision: governance.boundedRecallPreparation?.decision,
+      blocker: governance.boundedRecallPreparation?.failClosedReasons?.[0],
+      nextStepRef: governance.boundedRecallPreparation?.nextStep,
+      stage: 'bounded_recall_preparation',
+      reason: 'bounded recall preparation remains fail-closed'
+    }));
+  }
+  if (blockerSet.has('authorized-write-path-bounded-recall-closeout')) {
+    details.push(buildGovernanceReviewNextAction({
+      code: 'authorized-write-path-bounded-recall-closeout',
+      decision: governance.boundedRecallCloseout?.decision,
+      blocker: governance.boundedRecallCloseout?.failClosedReasons?.[0],
+      nextStepRef: governance.boundedRecallCloseout?.nextStep,
+      stage: 'bounded_recall_closeout',
+      reason: 'bounded recall closeout remains fail-closed'
+    }));
+  }
+  return details;
+}
+
+function buildGovernanceAutoAuthorizationNextAction(autoAuthorization = {}) {
+  return {
+    status: 'blocked',
+    source: 'governance',
+    code: 'authorized-write-path-auto-auth',
+    decision: autoAuthorization.allowedGovernanceOutput || autoAuthorization.decision || 'unknown',
+    blocker: autoAuthorization.currentBlockedOn || 'unknown',
+    stage: autoAuthorization.operatorActionPlan?.currentStage || 'unknown',
+    reason: autoAuthorization.operatorActionPlan?.currentStageReason || 'unknown',
+    nextStepRef: autoAuthorization.operatorActionPlan?.nextStepRef
+      || autoAuthorization.assertionRecordPreview?.templateRef
+      || 'unknown',
+    nextStepRefs: Array.isArray(autoAuthorization.operatorActionPlan?.nextStepRefs)
+      ? autoAuthorization.operatorActionPlan.nextStepRefs
+      : [],
+    artifactBundleKind: autoAuthorization.artifactBundleDraft?.bundleKind || 'unknown',
+    commandBundleKind: autoAuthorization.commandPreviewBundle?.bundleKind || 'unknown',
+    primaryCommandId: autoAuthorization.commandPreviewBundle?.primaryCommandId || 'unknown',
+    operatorPacketKind: autoAuthorization.operatorPacketDraft?.packetKind || 'unknown',
     readinessClaimAllowed: false
   };
 }
