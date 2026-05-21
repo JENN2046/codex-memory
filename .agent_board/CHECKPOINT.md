@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0716 Scoped recall evidence probe and bounded evidence collection - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after targeted probe validation, bounded local execution, dashboard smoke, and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added `src\cli\scoped-recall-evidence-probe.js` and `tests\scoped-recall-evidence-probe-cli.test.js`, then executed one strict scoped local probe to append sanitized recall audit evidence.
+- Amber receipt: `realMemoryReadQueryCount=1`, `memoryWrites=0`, provider/API/external MCP calls `0`, runtime probe minutes `0`, dependency actions `0`; one local recall-audit append was written as scoped recall evidence.
+- Behavior: CLI default mode is `dry_run`, reads only recent recall audit surface, does not execute search, and does not return raw query or raw scope values. Execute mode requires `--execute --allow-local-state-writes`, rejects provider/content/record-memory/readiness/config/watchdog/startup/workspace flags, and forces `include_content=false`.
+- Current local signal: dashboard now reports `scopeStatus=ok`, `scopeEvidenceState=recent_strict_scoped_recall`, `scopedRecallCount=1`, `strictScopedRecallCount=1`, `scopeNextAction=none`, and `scopeReadinessClaimAllowed=false`.
+- Boundary: no raw query, raw memory content, or raw scope values were returned or printed; no memory write, provider call, config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Validation: probe syntax passed; probe test syntax passed; dry-run smoke passed; targeted probe CLI tests passed `5/5`; bounded execute probe returned sanitized success; real dashboard JSON smoke showed strict scoped recall evidence; full `npm test` passed `1960/1960`.
+- Next safe task: continue governance fail-closed hardening; do not claim readiness.
+
 ## Checkpoint - CM-0715 Dashboard recall scope evidence state - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED` after targeted dashboard validation and full test suite; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

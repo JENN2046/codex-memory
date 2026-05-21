@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0716 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0716 started from local `HEAD = 239fdfb feat: expose recall scope evidence`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 13]`.
+
+Changed files: `src/cli/scoped-recall-evidence-probe.js`; `tests/scoped-recall-evidence-probe-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CM-0716_RECEIPT.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`.
+
+Validation to preserve: `node --check src\cli\scoped-recall-evidence-probe.js`; `node --check tests\scoped-recall-evidence-probe-cli.test.js`; `node src\cli\scoped-recall-evidence-probe.js --json`; `node --test tests\scoped-recall-evidence-probe-cli.test.js`; `node src\cli\scoped-recall-evidence-probe.js --json --execute --allow-local-state-writes --limit 1`; `node src\cli\dashboard.js --json --summary-only`; `npm test`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`.
+
+Boundary: one Amber bounded local scoped recall evidence probe executed against the current memory read path with sanitized output only. It used `realMemoryReadQueryCount=1`, wrote one local recall-audit evidence append, kept `memoryWrites=0`, did not return raw query/content/scope values, and did not call provider/API/external MCP. Dashboard now reports `scopeEvidenceState=recent_strict_scoped_recall`, but `readinessClaimAllowed=false` and the project remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Next safe task: continue local-safe governance fail-closed hardening, or request explicit push authorization if remote sync is desired.
+
 ## CM-0715 Handoff
 
 Status: `COMPLETED_VALIDATED`.
