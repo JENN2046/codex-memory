@@ -127,11 +127,14 @@ function isLocalDashboardReviewShape(row) {
 function isLocalPreflightReviewShape(row) {
   const text = rowText(row);
   return (
-    text.includes('read-only') &&
     (
+      text.includes('read-only') ||
       text.includes('preflight/dashboard') ||
       text.includes('targeted preflight tests') ||
       text.includes('store freshness write-evidence preflight') ||
+      text.includes('store freshness preflight') ||
+      text.includes('approvalstate=not_approved') ||
+      text.includes('approval packet') ||
       text.includes('store_freshness_evidence_prepared_exact_only')
     ) &&
     (
@@ -254,8 +257,8 @@ function inferBudgetUsed(row) {
   if (memoryQueries !== null) budget.memory_queries = memoryQueries;
 
   const memoryWrites = extractFirstInteger(text, [
-    /memoryWrites`?=?`?(\d+)/i,
-    /memory_writes`?[:=]`?(\d+)/i
+    /(?:^|[^A-Za-z])memoryWrites`?=?`?(\d+)/i,
+    /(?:^|[^A-Za-z])memory_writes`?[:=]`?(\d+)/i
   ]);
   if (memoryWrites !== null) budget.memory_writes = memoryWrites;
 

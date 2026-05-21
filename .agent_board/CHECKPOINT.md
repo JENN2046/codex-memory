@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0732 Store freshness approval packet surface - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED` after preflight validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a `NOT_APPROVED` approval packet surface to `store-freshness-write-preflight` so future one-write freshness evidence has exact action, budget, forbidden action, post-evidence, cleanup, and approval-line boundaries.
+- Current local signal: real `node src\cli\store-freshness-write-preflight.js --json` reports `approvalPacket.packetId=CM-0732-store-freshness-write-evidence-approval-packet-v0`, `approvalState=NOT_APPROVED`, `memoryWrites=0`, `proposedMemoryWrites=1`, `maxMemoryWrites=1`, provider/API/remote budgets 0, and `readinessClaimAllowed=false`.
+- Boundary: Green Lane local preflight/test/docs/board only; no `record_memory`, `search_memory`, provider/API/MCP call, durable memory write, config/runtime mutation, public MCP expansion, remote action, release, deploy, cutover, or readiness claim occurred.
+- Validation: preflight/parser syntax passed; targeted preflight tests passed `4/4`; targeted parser tests passed `13/13`; targeted dashboard tests passed `20/20`; real preflight/parser smoke passed; full `npm test` passed `1970/1970`; docs validation passed; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then either request explicit approval for the operator approval line or continue governance fail-closed closeout; do not push without explicit authorization.
+
 ## Checkpoint - CM-0731 Store freshness write-evidence preflight - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED` after preflight/dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

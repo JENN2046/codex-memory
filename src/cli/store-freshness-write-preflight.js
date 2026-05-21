@@ -110,6 +110,54 @@ function buildProposedRecordMemoryArguments(store) {
   };
 }
 
+function buildApprovalPacket(store, proposedArguments) {
+  return {
+    packetId: 'CM-0732-store-freshness-write-evidence-approval-packet-v0',
+    approvalState: 'NOT_APPROVED',
+    decision: 'APPROVAL_REQUIRED_BEFORE_WRITE',
+    exactAction: 'Execute exactly one sanitized record_memory write for local store freshness evidence.',
+    proposedTool: 'record_memory',
+    proposedArguments,
+    budget: {
+      maxMemoryWrites: 1,
+      maxMcpToolCalls: 1,
+      maxProviderCalls: 0,
+      maxApiCalls: 0,
+      maxRemoteActions: 0
+    },
+    currentEvidence: {
+      storeRecords: store.records,
+      storeChunks: store.chunks,
+      last24h: store.ageBreakdown.last24h,
+      last7d: store.ageBreakdown.last7d,
+      last30d: store.ageBreakdown.last30d
+    },
+    forbiddenActions: [
+      'search_memory',
+      'memory_overview broad scan',
+      'provider call',
+      'config change',
+      'watchdog/startup change',
+      'public MCP expansion',
+      'additional durable write',
+      'push',
+      'release',
+      'deploy',
+      'cutover',
+      'readiness claim'
+    ],
+    requiredPostExecutionEvidence: [
+      'record_memory response decision is accepted',
+      'exactly one memory write was attempted',
+      'write audit side effect is the only expected durable side effect',
+      'dashboard StoreFresh is rechecked after execution',
+      'readiness remains NOT_READY_BLOCKED unless all governance blockers are separately closed'
+    ],
+    rollbackOrCleanup: 'Do not delete evidence automatically. If the future evidence write is wrong, use an explicitly approved lifecycle governance action such as validate/supersede/tombstone; this preflight performs no cleanup.',
+    operatorApprovalLine: 'Approve exactly one sanitized record_memory write using this approvalPacket.proposedArguments; no search_memory, provider/API call, config/startup change, remote action, additional write, or readiness claim is authorized.'
+  };
+}
+
 function buildRejectedFlagReport(rejectedFlag) {
   return {
     status: 'error',
@@ -153,6 +201,9 @@ function buildReport(options = {}) {
     ? 'STORE_FRESHNESS_EVIDENCE_PREPARED_EXACT_ONLY'
     : 'STORE_FRESHNESS_EVIDENCE_NOT_REQUIRED';
 
+  const proposedArguments = needsEvidence ? buildProposedRecordMemoryArguments(store) : null;
+  const approvalPacket = needsEvidence ? buildApprovalPacket(store, proposedArguments) : null;
+
   return {
     status: needsEvidence ? 'warn' : 'ok',
     decision,
@@ -170,7 +221,8 @@ function buildReport(options = {}) {
     approvalRequired: needsEvidence,
     explicitApprovalRequired: needsEvidence,
     proposedTool: needsEvidence ? 'record_memory' : null,
-    proposedArguments: needsEvidence ? buildProposedRecordMemoryArguments(store) : null,
+    proposedArguments,
+    approvalPacket,
     memoryWrites: 0,
     proposedMemoryWrites: needsEvidence ? 1 : 0,
     providerCalls: 0,
@@ -212,6 +264,10 @@ function renderText(report) {
     lines.push(`proposedTool: ${report.proposedTool}`);
     lines.push(`approvalRequired: ${report.approvalRequired}`);
   }
+  if (report.approvalPacket) {
+    lines.push(`approvalPacket: ${report.approvalPacket.packetId}/${report.approvalPacket.approvalState}`);
+    lines.push(`operatorApprovalLine: ${report.approvalPacket.operatorApprovalLine}`);
+  }
   if (report.error) lines.push(`error: ${report.error}`);
   lines.push(`nextStep: ${report.nextStep}`);
   return `${lines.join('\n')}\n`;
@@ -230,6 +286,7 @@ if (require.main === module) {
 
 module.exports = {
   buildReport,
+  buildApprovalPacket,
   buildProposedRecordMemoryArguments,
   collectStoreFreshness,
   parseArgs

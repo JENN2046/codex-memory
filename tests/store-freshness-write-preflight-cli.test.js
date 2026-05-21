@@ -62,6 +62,13 @@ test('store freshness write preflight prepares exact-only payload when no record
     assert.equal(report.proposedArguments.target, 'process');
     assert.equal(report.proposedArguments.sensitivity, 'none');
     assert.equal(report.proposedArguments.client_id, 'codex');
+    assert.equal(report.approvalPacket.packetId, 'CM-0732-store-freshness-write-evidence-approval-packet-v0');
+    assert.equal(report.approvalPacket.approvalState, 'NOT_APPROVED');
+    assert.equal(report.approvalPacket.budget.maxMemoryWrites, 1);
+    assert.equal(report.approvalPacket.budget.maxProviderCalls, 0);
+    assert.equal(report.approvalPacket.proposedArguments.title, report.proposedArguments.title);
+    assert.ok(report.approvalPacket.forbiddenActions.includes('readiness claim'));
+    assert.match(report.approvalPacket.operatorApprovalLine, /exactly one sanitized record_memory write/);
     assert.equal(report.readinessClaimAllowed, false);
     assert.equal(report.safety.noMcpToolCall, true);
     assert.equal(report.safety.noDurableMemoryWrite, true);
@@ -84,7 +91,22 @@ test('store freshness write preflight does not propose a write when freshness is
     assert.equal(report.proposedMemoryWrites, 0);
     assert.equal(report.proposedTool, null);
     assert.equal(report.proposedArguments, null);
+    assert.equal(report.approvalPacket, null);
     assert.equal(report.readinessClaimAllowed, false);
+  });
+});
+
+test('store freshness write preflight text renders approval packet without authorizing execution', async () => {
+  await withTempDb(async ({ db, dbPath }) => {
+    const updatedAt = new Date(Date.now() - 2 * 86400000).toISOString();
+    db.prepare('INSERT INTO memory_records (memory_id, target, title, content, updated_at) VALUES (?, ?, ?, ?, ?)')
+      .run('mem-3', 'process', 'Older checkpoint', 'No fresh write', updatedAt);
+
+    const result = runCli(['--db', dbPath]);
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /approvalPacket: CM-0732-store-freshness-write-evidence-approval-packet-v0\/NOT_APPROVED/);
+    assert.match(result.stdout, /operatorApprovalLine: Approve exactly one sanitized record_memory write/);
+    assert.match(result.stdout, /memoryWrites: 0/);
   });
 });
 

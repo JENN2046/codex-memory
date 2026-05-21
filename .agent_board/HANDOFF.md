@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0732 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after preflight validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0732 started from local `HEAD = 6c99c0f feat: add store freshness write preflight`, with `main...origin/main [ahead 29]`.
+
+Changed files: `src/cli/store-freshness-write-preflight.js`; `src/core/SmartStandingAuthorizationV3ReceiptParser.js`; `tests/store-freshness-write-preflight-cli.test.js`; `tests/smart-standing-authorization-v3-receipts-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: store freshness preflight now emits one `NOT_APPROVED` approval packet with exact one-write action, max one memory write, provider/API/remote budgets 0, forbidden actions, post-execution evidence requirements, cleanup boundary, and operator approval line.
+
+Boundary: local read-only preflight/test/docs/board only. No `record_memory`, `search_memory`, provider/API/MCP call, durable memory write, config/runtime mutation, public MCP expansion, remote action, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\store-freshness-write-preflight.js`; `node --check src\core\SmartStandingAuthorizationV3ReceiptParser.js`; `node --check tests\store-freshness-write-preflight-cli.test.js`; `node --check tests\smart-standing-authorization-v3-receipts-cli.test.js`; `node --test tests\store-freshness-write-preflight-cli.test.js` passed `4/4`; `node --test tests\smart-standing-authorization-v3-receipts-cli.test.js` passed `13/13`; `node --test tests\dashboard-cli.test.js` passed `20/20`; `node src\cli\store-freshness-write-preflight.js --json`; `node src\cli\smart-standing-authorization-v3-receipts.js --json` showed `CM-0732 / CMV-0851`, `Green / local_review_shape_only`, and `memory_writes=0`; `npm test` passed `1970/1970`; docs validation passed; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push and actual memory write remain blocked without explicit authorization.
+
 ## CM-0731 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after preflight/dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.

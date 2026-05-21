@@ -149,6 +149,25 @@ test('v3 receipt parser recognizes local preflight rows with zero writes as Gree
   assert.equal(summary.next_auto_step_allowed, true);
 });
 
+test('v3 receipt parser recognizes not-approved approval packet preflight rows as Green local review shape', () => {
+  const markdown = [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-0851 | `node src\\cli\\store-freshness-write-preflight.js --json` | P10 | CM-0732 Store freshness approval packet surface | COMPLETED_VALIDATED | Store freshness preflight now emits `approvalPacket` with `approvalState=NOT_APPROVED`, exact one-write action, budget `maxMemoryWrites=1`, real output still reports `memoryWrites=0`, `proposedMemoryWrites=1`, and `readinessClaimAllowed=false`. | If exact write-path freshness evidence is still needed, the user can explicitly approve the operator approval line. | 2026-05-22 |'
+  ].join('\n');
+  const summary = parseReceiptMarkdown(markdown, {
+    sourcePath: '.agent_board/VALIDATION_LOG.md',
+    workspaceRoot: process.cwd()
+  });
+
+  assert.equal(summary.latest_v3_task_id, 'CM-0732');
+  assert.equal(summary.latest_validation_id, 'CMV-0851');
+  assert.equal(summary.latest_lane, 'Green');
+  assert.equal(summary.latest_receipt_status, 'local_review_shape_only');
+  assert.equal(summary.latest_parser_status, 'parser_ok');
+  assert.equal(summary.budget_used.memory_writes, 0);
+});
+
 test('v3 receipt parser core does not treat no-Amber or Red hard-stop wording as actions', () => {
   const markdown = [
     '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
