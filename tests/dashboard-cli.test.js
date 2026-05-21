@@ -144,6 +144,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
     'destructive',
     'gate',
     'generatedAt',
+    'gitSync',
     'governance',
     'mode',
     'operationalSummary',
@@ -197,6 +198,24 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(typeof payload.operationalSummary.status, 'string');
   assert.equal(payload.operationalSummary.scope, 'service_store_profile_runtime_gate');
   assert.equal(payload.operationalSummary.readinessClaimAllowed, false);
+  assertKeySet(payload.gitSync, [
+    'ahead',
+    'behind',
+    'branch',
+    'branchSummary',
+    'dirtyCount',
+    'message',
+    'readinessClaimAllowed',
+    'remoteActionRequired',
+    'remoteActionsPerformed',
+    'status',
+    'upstream'
+  ], 'dashboard git sync');
+  assert.equal(payload.gitSync.remoteActionRequired, false);
+  assert.equal(payload.gitSync.remoteActionsPerformed, false);
+  assert.equal(payload.gitSync.readinessClaimAllowed, false);
+  assert.equal(typeof payload.gitSync.ahead, 'number');
+  assert.equal(typeof payload.gitSync.dirtyCount, 'number');
   assert.equal(payload.readinessSummary.status, 'blocked');
   assert.equal(payload.readinessSummary.decision, 'NOT_READY_BLOCKED');
   assert.equal(payload.readinessSummary.readinessClaimAllowed, false);
@@ -1271,6 +1290,7 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.match(text, /StoreFresh\s+(ok|warn)\s+\d+ in 24h, \d+ in 7d, \d+ in 30d/, 'should include store freshness age buckets and level');
   assert.ok(text.includes('Profile'), 'should include Profile section');
   assert.ok(text.includes('Runtime'), 'should include Runtime section');
+  assert.ok(text.includes('GitSync'), 'should include local git sync section');
   assert.ok(text.includes('ReadPolicy'), 'should include ReadPolicy section');
   assert.ok(text.includes('RecallScope'), 'should include recall scope section');
   assert.ok(text.includes('Governance'), 'should include Governance section');
@@ -1321,6 +1341,10 @@ test('dashboard CLI should emit text output by default', async () => {
   assert.ok(
     text.includes('No new memory written in 24h'),
     'should recommend an explicit follow-up for 24h store freshness warning'
+  );
+  assert.ok(
+    text.includes('push remains blocked without explicit authorization') || text.includes('remoteAction=false'),
+    'should keep git sync follow-up explicit-only'
   );
   assert.equal(text.includes('workspace_id'), false);
 });

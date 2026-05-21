@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0730 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0730 started from local `HEAD = 0e46e65 feat: recommend store freshness followup`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 27]`.
+
+Changed files: `src/cli/dashboard.js`; `tests/dashboard-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: dashboard now exposes local Git sync state as JSON `gitSync` and text `GitSync`, warning when local commits or dirty tracked files are present while keeping push explicit-only.
+
+Boundary: local read-only dashboard git-sync/test/docs/board only. No fetch, pull, push, checkout, reset, remote write, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, release, deploy, cutover, or readiness claim occurred.
+
+Validation run: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js` passed `20/20`; `node src\cli\dashboard.js --summary-only`; `node src\cli\dashboard.js --json --summary-only`; `npm test` passed `1964/1964`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed with `latest_task=CM-0730`; `git diff --check` passed.
+
+Next safe action: inspect diff/status, then create guarded local commit if scope remains clean. Push remains blocked without explicit authorization.
+
 ## CM-0729 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after dashboard validation, full test suite, docs validation, and diff check; guarded local commit is the remaining closeout step for this slice.

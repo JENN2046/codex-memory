@@ -198,6 +198,23 @@ function spawnJson(args, env = {}) {
   });
 }
 
+function spawnText(command, args = []) {
+  return new Promise(resolve => {
+    const child = spawn(command, args, {
+      cwd: process.cwd(),
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+      timeout: 30000
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', d => { stdout += d; });
+    child.stderr.on('data', d => { stderr += d; });
+    child.on('close', code => resolve({ code, stdout, stderr }));
+    child.on('error', err => resolve({ code: null, stdout: '', stderr: err.message }));
+  });
+}
+
 async function httpGet(url) {
   try {
     const controller = new AbortController();
@@ -500,6 +517,49 @@ async function collectGate() {
       coreMismatch: rollbackSummary.coreMismatchCountTotal ?? -1,
       extendedMismatch: rollbackSummary.extendedMismatchCountTotal ?? -1
     }
+  };
+}
+
+async function collectGitSync() {
+  const result = await spawnText('git', ['status', '--short', '--branch']);
+  if (result.code !== 0) {
+    return {
+      status: 'warn',
+      branch: 'unknown',
+      upstream: 'unknown',
+      ahead: 0,
+      behind: 0,
+      dirtyCount: 0,
+      branchSummary: 'unavailable',
+      remoteActionRequired: false,
+      remoteActionsPerformed: false,
+      readinessClaimAllowed: false,
+      message: 'local git status unavailable'
+    };
+  }
+
+  const lines = result.stdout.trim().split(/\r?\n/).filter(Boolean);
+  const branchSummary = lines[0]?.replace(/^##\s*/, '') || 'unknown';
+  const dirtyCount = Math.max(0, lines.length - 1);
+  const ahead = Number.parseInt(branchSummary.match(/ahead\s+(\d+)/)?.[1] || '0', 10);
+  const behind = Number.parseInt(branchSummary.match(/behind\s+(\d+)/)?.[1] || '0', 10);
+  const branch = branchSummary.split(/\s|\.\.\./)[0] || 'unknown';
+  const upstream = branchSummary.includes('...') ? branchSummary.split('...')[1].split(/\s|\[/)[0] : 'none';
+  const status = ahead > 0 || behind > 0 || dirtyCount > 0 ? 'warn' : 'ok';
+  return {
+    status,
+    branch,
+    upstream,
+    ahead,
+    behind,
+    dirtyCount,
+    branchSummary,
+    remoteActionRequired: false,
+    remoteActionsPerformed: false,
+    readinessClaimAllowed: false,
+    message: status === 'ok'
+      ? 'local git branch is clean and aligned with tracked upstream'
+      : 'local git branch has unsynced or dirty state; remote action remains explicit-only'
   };
 }
 
@@ -1438,6 +1498,7 @@ function renderText(report, options = {}) {
   lines.push(`StoreFresh ${pad(formatStoreFreshnessLevel(report))} ${formatStoreFreshnessText(report)}`);
   lines.push(`Profile    ${pad(report.profile.status)} ${report.profile.fingerprint || 'N/A'}, ${report.profile.legacyChunks} legacy`);
   lines.push(`Runtime    ${pad(report.runtime.status)} watchdog ${report.runtime.watchdogRecoveryCount} recoveries, ${report.runtime.httpLogErrorCount} HTTP errors`);
+  lines.push(`GitSync    ${pad(report.gitSync.status)} ${report.gitSync.branchSummary}, dirty=${report.gitSync.dirtyCount}, remoteAction=${report.gitSync.remoteActionsPerformed === true}`);
   lines.push(`Operational ${pad(report.operationalSummary.status)} ${report.operationalSummary.message}`);
   lines.push(`Readiness ${pad(report.readinessSummary.status)} ${report.readinessSummary.decision}, blockers=${report.readinessSummary.blockerCount}, readyClaim=${report.readinessSummary.readinessClaimAllowed === true}`);
   lines.push(`GovNext    ${report.readinessSummary.governanceNextAction?.code || 'none'} stage=${report.readinessSummary.governanceNextAction?.stage || 'none'}, next=${report.readinessSummary.governanceNextAction?.nextStepRef || 'none'}`);
@@ -1600,6 +1661,7 @@ async function main() {
     Promise.resolve().then(() => collectAudits()),
     collectGate()
   ]);
+  const gitSync = await collectGitSync();
   const runtime = collectRuntime();
   const governance = collectGovernance(options);
   const smartStandingAuthorizationV3 = collectSmartStandingAuthorizationV3(options);
@@ -1618,12 +1680,23 @@ async function main() {
 
   const readPolicy = audits.readPolicy;
   const checks = buildChecks(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
+  if (gitSync.status !== 'ok') {
+    checks.push({
+      source: 'git',
+      level: 'warn',
+      code: 'git-sync-local-ahead',
+      message: `${gitSync.branchSummary}; dirty=${gitSync.dirtyCount}; remote action remains explicit-only`
+    });
+  }
   const recommendations = buildRecommendations(service, store, profile, runtime, audits, gate, governance, readPolicy, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, autopilotController, autopilotStateStore, autopilotAdapters, autopilotValidation, autopilotReplay, autopilotOperator, autopilotGreenEntry, autopilotGreenExecutor, autopilotGreenFileBoundary, autopilotGreenFileExecutorContract);
+  if (gitSync.ahead > 0 || gitSync.behind > 0 || gitSync.dirtyCount > 0) {
+    recommendations.push(`Local git sync needs review — branch=${gitSync.branch}, upstream=${gitSync.upstream}, ahead=${gitSync.ahead}, behind=${gitSync.behind}, dirty=${gitSync.dirtyCount}; push remains blocked without explicit authorization`);
+  }
   const operationalSummary = buildOperationalSummary(service, store, profile, runtime, gate);
   const readinessSummary = buildReadinessSummary(operationalSummary, governance, readPolicy, audits, smartStandingAuthorizationV3, autopilotKernel, autopilotLoop, checks);
   const sectionStatus = classifyStatus(
     service.status, store.status, profile.status, runtime.status,
-    audits.bridge.status, audits.recall.status, governance.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
+    audits.bridge.status, audits.recall.status, governance.status, gitSync.status, smartStandingAuthorizationV3.status, autopilotKernel.status, autopilotLoop.status, autopilotController.status, autopilotStateStore.status, autopilotAdapters.status, autopilotValidation.status, autopilotReplay.status, autopilotOperator.status, autopilotGreenEntry.status, autopilotGreenExecutor.status, autopilotGreenFileBoundary.status, autopilotGreenFileExecutorContract.status, gate.status
   );
   const checkStatus = classifyStatus(...checks.map(check => check.level));
   const status = classifyStatus(sectionStatus, checkStatus);
@@ -1646,6 +1719,7 @@ async function main() {
     store: options.summaryOnly ? { status: store.status, records: store.records, chunks: store.chunks } : store,
     profile: options.summaryOnly ? { status: profile.status, fingerprint: profile.fingerprint } : profile,
     runtime,
+    gitSync,
     audits,
     governance: options.summaryOnly
       ? {

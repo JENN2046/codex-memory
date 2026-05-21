@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0730 Dashboard local git sync surface - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a read-only local `gitSync` dashboard summary and text `GitSync` line, sourced from local `git status --short --branch`.
+- Current local signal: real `node src\cli\dashboard.js --summary-only` shows `GitSync warn main...origin/main [ahead 27], dirty=2, remoteAction=false` during this slice, and the JSON surface keeps `remoteActionRequired=false`, `remoteActionsPerformed=false`, and `readinessClaimAllowed=false`.
+- Boundary: Green Lane local dashboard git-sync/test/docs/board only; no fetch, pull, push, checkout, reset, remote write, provider/API/MCP memory call, real memory read/write, dependency/config/runtime mutation, public MCP expansion, release, deploy, cutover, or readiness claim occurred.
+- Validation: dashboard syntax passed; dashboard test syntax passed; targeted dashboard tests passed `20/20`; real dashboard text/JSON smoke showed `gitSync`; full `npm test` passed `1964/1964`; docs validation passed with `latest_task=CM-0730`; `git diff --check` passed.
+- Next safe task: create guarded local commit if scope remains clean, then continue runtime/readiness evidence hardening; do not push without explicit authorization.
+
 ## Checkpoint - CM-0729 Dashboard store freshness recommendation - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED` after dashboard validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
