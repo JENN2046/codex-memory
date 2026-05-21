@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0712 Read-policy evidence probe CLI - 2026-05-21
+
+- Status: `COMPLETED_VALIDATED` after docs validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added `src\cli\read-policy-evidence-probe.js` and `tests\read-policy-evidence-probe-cli.test.js`.
+- Behavior: default CLI mode is `dry_run`, reads only the current read-policy surface, does not execute search, does not return raw query or memory content, and keeps `mutated=false`.
+- Guard: execute mode requires `--execute --allow-local-state-writes`, rejects external embedding/rerank provider configuration, forces `include_content=false`, and emits only sanitized count/read-policy audit summary fields.
+- Boundary: the current workspace did not run the execute path against real memory; execute was validated only in a temporary test workspace. This does not clear the read-policy blocker and does not authorize readiness.
+- Validation: probe syntax passed; targeted probe CLI tests passed `5/5`; lifecycle read-policy runtime tests passed `6/6`; probe dry-run smoke passed; full `npm test` passed `1954/1954`; docs validation passed; `git diff --check` passed.
+- No provider/API/external MCP call, real current-memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+- Next safe task: either run the bounded execute path as a separately receipted Amber action if explicitly selected, or continue local-safe hardening of authorized write-path governance blockers.
+
 ## Checkpoint - CM-0711 Read-policy evidence-state metadata - 2026-05-21
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

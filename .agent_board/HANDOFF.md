@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0712 Handoff
+
+Status: `COMPLETED_VALIDATED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; CM-0712 started from local `HEAD = b58c483 feat: expose read policy evidence state`, `origin/main = 4997db5 feat: add local autopilot control loop surfaces`, with `main...origin/main [ahead 9]`.
+
+Changed files: `src/cli/read-policy-evidence-probe.js`; `tests/read-policy-evidence-probe-cli.test.js`; `STATUS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`.
+
+Validation to preserve: `node --check src\cli\read-policy-evidence-probe.js`; `node --check tests\read-policy-evidence-probe-cli.test.js`; `node src\cli\read-policy-evidence-probe.js --json`; `node --test tests\read-policy-evidence-probe-cli.test.js`; `node --test tests\lifecycle-read-policy-runtime.test.js`; `npm test`; `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`; `git diff --check`.
+
+Boundary: current workspace action stayed Green/dry-run for real memory. The CLI's execute path was validated only in temporary test workspaces; it requires explicit `--allow-local-state-writes`, rejects provider config, keeps `include_content=false`, and emits sanitized audit summary only. `readinessClaimAllowed=false`; no provider/API/external MCP call, real current-memory read/write, dependency/config/runtime mutation, public MCP expansion, push, release, deploy, cutover, or readiness claim occurred.
+
+Next safe task: choose whether to run the bounded read-policy execute path as a separately receipted Amber action, or continue local-safe hardening of authorized write-path governance fail-closed blockers.
+
 ## CM-0711 Handoff
 
 Status: `COMPLETED_VALIDATED`.
