@@ -58,7 +58,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | real rollback apply | exact approval required | No real rollback apply, restore, real config switch, or cutover has occurred; CM-0788 keeps `mainline-rollback` as planning/patch text only. | no | Separate exact approval required before any real rollback/config-switch action. |
 | migration / import / export / backup / restore apply | exact approval required | CM-0788 confirms current evidence is fixture/dry-run/no-touch approval-boundary evidence only; apply remains blocked. | no | Separate exact approval must name one real action and target before apply/import/export/backup/restore. |
 | live HTTP operation readiness | bounded evidence only | Historical endpoint-bound loopback evidence and local hardening exist; production/runtime readiness is not proven. | no | Future HTTP observe/precheck must be target-bound and separately authorized when required. |
-| RC_PRECHECK / current-head strict gate | bounded evidence only | RC_PRECHECK_003 repaired rerun, RC_PRECHECK_004, and RC_PRECHECK_005 passed as precheck evidence. RC_PRECHECK_005 covered `git diff --check`, docs validation, `gate:mainline:strict` with health ok / contract `25/25` / tests `1989/1989` / compare `43/43` / rollback `43/43`, standalone `observe:http` summary ok with watchdog recovery `0`, standalone compare `43/43`, and standalone rollback `43/43`. This is not cutover, release, runtime readiness, RC readiness, production readiness, memory reliability, real rollback apply, or restore evidence. | no | Day 13 may prepare the final RC review package using this precheck evidence while preserving `RC_NOT_READY_BLOCKED` and no readiness claim. |
+| RC_PRECHECK / current-head strict gate | bounded evidence only | RC_PRECHECK_003 repaired rerun, RC_PRECHECK_004, RC_PRECHECK_005, and RC_PRECHECK_006 passed as precheck evidence. RC_PRECHECK_006 covered `git diff --check`, docs validation, `gate:mainline:strict` with health ok / contract `25/25` / tests `1989/1989` / compare `43/43` / rollback `43/43`, standalone `observe:http` summary ok with watchdog recovery `0`, HTTP errors `0`, governance stale30d/stale90d `0`, standalone compare `43/43`, and standalone rollback `43/43`. This is not cutover, release, runtime readiness, RC readiness, production readiness, memory reliability, real rollback apply, or restore evidence. | no | Day 13 may prepare the blocker closure round 2 package using this precheck evidence while preserving `RC_NOT_READY_BLOCKED` and no readiness claim. |
 | runtime / RC / production / release / cutover readiness | blocked | Open runtime gaps remain, hard stops remain, and no release/cutover authorization exists. | no | Remain `RC_NOT_READY_BLOCKED`; do not claim ready. |
 | public MCP expansion | blocked | Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`. | no | No public MCP expansion in this review package path. |
 | config / watchdog / startup change | blocked | Config/watchdog/startup changes remain hard-stop actions. | no | Require separate explicit approval and are outside this RC review-package path. |
@@ -119,6 +119,27 @@ Allowed command set:
 - docs validation: passed.
 - `npm run gate:mainline:strict`: passed with health `ok`, contract `25/25`, tests `1989/1989`, compare `43/43`, and rollback `43/43`.
 - `npm run observe:http -- --json`: passed with summary `status=ok`, health `ok`, HTTP log errors `0`, watchdog recovery `0`, watchdog ensure failures `0`, governance stale30d `0`, and governance stale90d `0`.
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`: passed with `43/43` matched.
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`: passed with `43/43` harness rollback-ready.
+
+Warnings: Node SQLite `ExperimentalWarning` appeared in observe/compare/rollback command output. Full observe and fixture JSON output was not copied into this record; only summary counts/statuses are recorded.
+
+Boundary: this precheck did not execute true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness/reliability claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
+## RC_PRECHECK_006 Plan And Execution - 2026-05-22
+
+Result: `RC_PRECHECK_006_PASSED_SYNCED_NOT_READY`.
+
+Artifact: `docs/RC_PRECHECK_006_PLAN_AND_EXECUTION.md`.
+
+Allowed command set:
+
+- `git diff --check`: passed.
+- docs validation: passed.
+- `npm run gate:mainline:strict`: passed with health `ok`, contract `25/25`, tests `1989/1989`, compare `43/43`, and rollback `43/43`.
+- `npm run observe:http -- --json`: passed with summary `status=ok`, health `ok`, HTTP log errors `0`, watchdog recovery `0`, watchdog ensure failures `0`, governance status `ok`, governance stale30d `0`, and governance stale90d `0`.
 - `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`: passed with `43/43` matched.
 - `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`: passed with `43/43` harness rollback-ready.
 

@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0795 Handoff
+
+Status: `RC_PRECHECK_006_PASSED_SYNCED_NOT_READY`; blocker closure round 2 Day 12 precheck passed and project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/RC_PRECHECK_006_PLAN_AND_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Validation: `git diff --check` passed; docs validation passed; `npm run gate:mainline:strict` passed with health ok, contract `25/25`, tests `1989/1989`, compare `43/43`, rollback `43/43`; `npm run observe:http -- --json` passed with summary ok, HTTP log errors `0`, watchdog recovery `0`, governance stale30d/stale90d `0`; standalone compare matched `43/43`; standalone rollback was harness-ready `43/43`.
+
+Warning: Node SQLite `ExperimentalWarning` appeared in observe/compare/rollback output. Raw observe/audit and fixture payload details were not copied into docs.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Remaining risk: this is bounded precheck evidence only; no truth-table row changes to `complete? = yes`.
+
+Next safe action: continue `V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_PACKAGE`.
+
 ## CM-0794 Handoff
 
 Status: `RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_004_COMPLETED_SYNCED_NOT_READY`; blocker closure round 2 hard classification is refreshed and project decision remains `RC_NOT_READY_BLOCKED`.
