@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0811 Handoff
+
+Status: `RECALL_PRECISION_HARDENING_LIVE_PROOF_READY_FOR_EXACT_APPROVAL_RECHECK_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/RECALL_PRECISION_HARDENING_LIVE_PROOF_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Recheck verdict: CM-0809 bounded implementation plus CM-0810 bounded review are sufficient to wait for a future exact approval gate for post-hardening live negative-control proof. The future proof must preserve exactly four stricter negative-control queries, expected zero results for NC1-NC4, sanitized output only, complete zero side-effect counters, proof no-result mode, no raw memory, no direct `.jsonl`, no provider/API, no durable memory/audit write, no memory write, and no readiness/reliability wording.
+
+Next safe action: wait for a separate exact approval decision before any live proof execution. Do not execute live `search_memory` without that approval.
+
+Boundary: no true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. `memory recall reliable` is not claimed and truth table remains `complete? = no`.
+
 ## CM-0810 Handoff
 
 Status: `RECALL_PRECISION_HARDENING_BOUNDED_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

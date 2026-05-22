@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0811 recall precision hardening live proof recheck - 2026-05-23
+
+- Status: `RECALL_PRECISION_HARDENING_LIVE_PROOF_READY_FOR_EXACT_APPROVAL_RECHECK_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: exact-approval recheck docs/status/board/truth-table only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/RECALL_PRECISION_HARDENING_LIVE_PROOF_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Recheck verdict: CM-0809 plus CM-0810 are sufficient to wait for a future exact approval gate for post-hardening live negative-control proof.
+- Future boundary: exactly four stricter negative-control queries, NC1-NC4 expected `resultCount=0`, sanitized output only, complete zero side-effect counters, proof no-result mode, no raw memory, no direct `.jsonl`, no provider/API, no durable memory/audit write, and no memory write.
+- Boundary: this is not execution approval, not live proof execution, not `memory recall reliable`, and not truth-table completion.
+
 ## Checkpoint - CM-0810 bounded recall precision hardening review - 2026-05-23
 
 - Status: `RECALL_PRECISION_HARDENING_BOUNDED_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
