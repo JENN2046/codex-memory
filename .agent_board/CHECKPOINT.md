@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0770 Day 10 V1 Mainline Memory Spine RC go/no-go review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: go/no-go review docs/status/board/truth-table only.
+- Start baseline: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `2cf445194e81304b09ba8519805f01f2e840f7d2`; worktree was clean.
+- Changed files: `docs/V1_MAINLINE_RC_GO_NO_GO_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Decision: `RC_REVIEW_READY_NOT_RELEASE_READY`.
+- Final closeout: `V1_MAINLINE_MEMORY_SPINE_RC_REVIEW_READY_NOT_RELEASE_READY`.
+- Interpretation: the V1 Mainline Memory Spine RC review package is ready for operator review only; it is not release/cutover/runtime/RC/production readiness.
+- Boundary: no true live `record_memory`, no true live `search_memory`, no provider/model/API call, no real memory broad scan, no `.jsonl` or durable memory content read, no durable memory/audit write, no migration/import/export/backup/restore apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+
 ## Checkpoint - CM-0769 Day 9 V1 Mainline Memory Spine RC review package - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

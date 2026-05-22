@@ -1,5 +1,27 @@
 # HANDOFF.md - codex-memory
 
+## CM-0770 Handoff
+
+Status: `COMPLETED_VALIDATED`; Day 10 V1 Mainline Memory Spine RC go/no-go review completed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; go/no-go start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `2cf445194e81304b09ba8519805f01f2e840f7d2`.
+
+Changed files: `docs/V1_MAINLINE_RC_GO_NO_GO_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Decision: `RC_REVIEW_READY_NOT_RELEASE_READY`.
+
+Final closeout: `V1_MAINLINE_MEMORY_SPINE_RC_REVIEW_READY_NOT_RELEASE_READY`.
+
+Meaning: the V1 Mainline Memory Spine RC review package is ready for operator review only. This is not release/deploy/cutover/production/runtime/RC readiness.
+
+Remaining blockers: `memory recall reliable`, `memory write reliable`, ValidationAggregator full implementation, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup changes, V8 implementation, and VCP full parity remain unclosed or future.
+
+Boundary: no true live `record_memory`, no true live `search_memory`, no provider/model/API call, no real memory broad scan, no `.jsonl` or durable memory content read, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+
+Next safe action after final sync: only operator review of the package or a separately scoped next bounded evidence phase; do not release, deploy, cut over, or make readiness claims.
+
 ## CM-0769 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; Day 9 V1 Mainline Memory Spine RC review package completed, but project decision remains `RC_NOT_READY_BLOCKED`.

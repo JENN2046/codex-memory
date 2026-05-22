@@ -130,6 +130,36 @@ Package interpretation:
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## V1 Mainline Memory Spine RC Go/No-Go Review - 2026-05-22
+
+Result: `V1_MAINLINE_MEMORY_SPINE_RC_REVIEW_READY_NOT_RELEASE_READY`.
+
+Go/no-go review artifact: `docs/V1_MAINLINE_RC_GO_NO_GO_REVIEW.md`.
+
+Decision: `RC_REVIEW_READY_NOT_RELEASE_READY`.
+
+Decision boundary:
+
+- The V1 Mainline Memory Spine RC review package is ready for human/operator review only.
+- This is not a release, deploy, cutover, production, runtime, or RC readiness transition.
+- No current active runtime/readiness gap is promoted to `complete`.
+- No truth-table row changes to `complete? = yes`.
+
+Remaining blockers:
+
+- `memory recall reliable` is not claimed.
+- `memory write reliable` is not claimed.
+- ValidationAggregator full implementation remains incomplete.
+- Real rollback apply remains blocked.
+- Migration/import/export/backup/restore apply remains blocked.
+- Public MCP expansion remains blocked.
+- Config/watchdog/startup changes remain blocked.
+- Runtime, RC, production, release, deploy, and cutover readiness remain blocked.
+- V8 is not implemented.
+- VCP full parity is not claimed.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`.
+
 ## Memory Recall Temp Workspace Evidence Review Sync - 2026-05-22
 
 Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_SYNCED_NOT_READY`.
