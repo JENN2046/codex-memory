@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-22
+更新时间：2026-05-23
 
 ## Purpose
 
@@ -10,6 +10,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
+- Current recall precision hardening plan review: `CM-0808` records `RECALL_PRECISION_HARDENING_PLAN_REVIEW_COMPLETED_SYNCED_NOT_READY` in `docs/RECALL_PRECISION_HARDENING_PLAN_REVIEW.md`. The review confirms CM-0807 is already synced and sufficient to proceed to bounded implementation/tests. Next safe scope is a minimal internal precision policy / no-result mode / exact negative-control reject policy with unit, fixture, pipeline/enhancer, runner/adapter, and temp/local bounded tests before any future exact-approved live proof. Do not execute a third live query directly. Keep `memory recall reliable` not claimed, `complete? = no`, and `RC_NOT_READY_BLOCKED`.
 - Current recall precision hardening plan: `CM-0807` records `RECALL_PRECISION_HARDENING_PLAN_COMPLETED_SYNCED_NOT_READY` in `docs/RECALL_PRECISION_HARDENING_PLAN.md`. The plan is based on sanitized evidence and read-only source review only. It defines retrieval threshold strategy, negative-control gating, minimum score policy, sanitized score distribution review, no-result mode, stricter filter / exact negative-control reject policy, fixture/temp/local bounded tests, future exact-approved live proof conditions, and no-readiness wording. Next safe scope is bounded implementation/tests, not a third live query. Keep `memory recall reliable` not claimed, `complete? = no`, and `RC_NOT_READY_BLOCKED`.
 - Current second negative-control failure review: `CM-0806` records `CM0774_RECALL_PRECISION_HARDENING_REQUIRED` in `docs/CM0774_SECOND_NEGATIVE_CONTROL_FAILURE_REVIEW.md`. The review analyzes sanitized evidence only and confirms NC1=3, NC2=2, NC3=3, and NC4=2 while runner/adapter/side-effect boundaries passed with rawContentReturned=false and complete zero counters. Classify this as negative-control suppression failure and a recall precision blocker, not a runner boundary failure. Do not run a third live query next; first plan retrieval threshold, negative-control gating, minimum score policy, sanitized score distribution review, no-result mode, stricter filter, and exact negative-control reject policy. Keep `memory recall reliable` not claimed, `complete? = no`, and `RC_NOT_READY_BLOCKED`.
 - Current second negative-control proof execution: `CM-0805` records `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_FAILED_NOT_READY` in `docs/CM0774_SECOND_NEGATIVE_CONTROL_PROOF_EXECUTION.md`. The exact-approved internal runner/approved adapter path executed exactly four stricter negative-control queries with sanitized output only, rawContentReturned=false, and complete zero side-effect counters. The proof failed the CM-0803 zero-result criteria because NC1=3, NC2=2, NC3=3, and NC4=2 sanitized results. This is not a runner boundary failure or raw leakage, but it keeps the recall blocker open. Keep `memory recall reliable` at bounded evidence only, `complete? = no`, and preserve `RC_NOT_READY_BLOCKED`.
