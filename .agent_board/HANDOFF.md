@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0793 Handoff
+
+Status: `V1_MAINLINE_MEMORY_SPINE_FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`; final RC review package is ready for human/operator review and remains not release ready. Project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/POST_GO_NO_GO_REMOTE_SYNC_AND_HANDOFF.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Sync verdict: pre-handoff Git checks confirmed `HEAD == origin/main == remote refs/heads/main == 037a839886a6a1f5cd60e6a1a71d6187c50603c0` with a clean worktree. The final conversation closeout records the post-push handoff commit hash.
+
+Final verdict: the CM-0780 through CM-0793 chain reaches `V1_MAINLINE_MEMORY_SPINE_FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`. This means operator-review-package readiness only; it does not approve runtime, RC, production, release, cutover, memory recall/write reliability, V8, or VCP parity claims.
+
+Remaining blockers: CM-0774 true live recall proof still requires separate exact approval; the CM-0786 bounded write proof surface still requires separate exact approval; ValidationAggregator full implementation remains no-touch evidence only; real rollback apply and migration/import/export/backup/restore apply remain exact approval required; runtime/RC/production/release/cutover readiness remains blocked.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: choose one separately exact-approved blocker closure path if further progress is desired; do not infer readiness from this handoff.
+
 ## CM-0792 Handoff
 
 Status: `FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`; final RC review package is ready for human/operator review only, but project decision remains `RC_NOT_READY_BLOCKED`.
