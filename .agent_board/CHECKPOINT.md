@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0769 Day 9 V1 Mainline Memory Spine RC review package - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review package docs/status/board/truth-table only.
+- Start baseline: local `HEAD` and tracking `origin/main` equaled `0a01c00c3e43e3bed8d3afb13f528e3350584702`; first remote `ls-remote` hit a transient TLS handshake failure, retry confirmed remote `refs/heads/main` at the same hash; worktree was clean.
+- Changed files: `docs/V1_MAINLINE_RC_REVIEW_PACKAGE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Package coverage: capabilities, evidence summary, unresolved blockers, hard stops, rollback posture, recall/write evidence ladder, ValidationAggregator state, `RC_PRECHECK_004_PASSED_SYNCED_NOT_READY`, and no-overclaim status.
+- Interpretation: the package is sufficient input for Day 10 go/no-go review, not a release/cutover/readiness decision.
+- Boundary: no true live `record_memory`, no true live `search_memory`, no provider/model/API call, no real memory broad scan, no `.jsonl` or durable memory content read, no durable memory/audit write, no migration/import/export/backup/restore apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+
 ## Checkpoint - CM-0768 Day 8 RC_PRECHECK_004 - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

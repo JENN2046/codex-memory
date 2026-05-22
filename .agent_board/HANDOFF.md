@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0769 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; Day 9 V1 Mainline Memory Spine RC review package completed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; package start baseline was local `HEAD` and tracking `origin/main` at `0a01c00c3e43e3bed8d3afb13f528e3350584702`. The first remote read hit a transient TLS handshake failure; retry confirmed remote `refs/heads/main` at `0a01c00c3e43e3bed8d3afb13f528e3350584702`.
+
+Changed files: `docs/V1_MAINLINE_RC_REVIEW_PACKAGE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Package verdict: `docs/V1_MAINLINE_RC_REVIEW_PACKAGE.md` is prepared as Day 10 go/no-go review input. It summarizes capabilities, evidence, unresolved blockers, hard stops, rollback posture, recall/write evidence ladder, ValidationAggregator state, `RC_PRECHECK_004_PASSED_SYNCED_NOT_READY`, and no-overclaim status.
+
+Remaining blockers: `memory recall reliable`, `memory write reliable`, ValidationAggregator full implementation, real rollback apply, migration/import/export/backup/restore apply, runtime/RC/production/release/cutover readiness, public MCP expansion, config/watchdog/startup changes, V8 implementation, and VCP full parity remain unclosed or future.
+
+Boundary: no true live `record_memory`, no true live `search_memory`, no provider/model/API call, no real memory broad scan, no `.jsonl` or durable memory content read, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+
+Next safe action: Day 10 generate `docs/V1_MAINLINE_RC_GO_NO_GO_REVIEW.md`; use only one of the user-authorized go/no-go decision values and avoid standalone readiness labels.
+
 ## CM-0768 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; Day 8 `RC_PRECHECK_004` completed, but project decision remains `RC_NOT_READY_BLOCKED`.
