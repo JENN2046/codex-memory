@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0783 True live recall executor adapter review - 2026-05-22
+
+- Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review CM-0782 internal adapter/wrapper, targeted tests, and docs/status/board/truth-table sync.
+- Changed files: `docs/TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Review verdict: adapter is accepted for Day 4 execution authorization review, not execution. It is internal-only, rejects invalid proof context before app execution, binds to `app.callTool('search_memory')` with `include_content=false` and `noTokenReadOnly=true`, produces complete counters via fail-closed instrumentation, projects app results into no-raw runner-safe shape, and leaves runner raw-leakage fail-closed as a second boundary.
+- Review note: adapter does not forward the runner outer abort `signal`, but current app search creates its own bounded timeout signal; Day 4 should not customize timeout behavior without fresh review.
+- Validation: adapter targeted test passed `5/5`; internal proof runner regression passed `6/6`; source/test `node --check`, docs validation, and `git diff --check` are required for closeout.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory recall reliable`.
+- Remaining blocker: CM-0774 execution still requires a separate exact approval and current synced clean Git state; `memory recall reliable` remains not claimed.
+
 ## Checkpoint - CM-0782 True live recall executor adapter implementation - 2026-05-22
 
 - Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

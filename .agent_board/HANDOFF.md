@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0783 Handoff
+
+Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_REVIEW_COMPLETED_SYNCED_NOT_READY`; internal adapter/wrapper reviewed for Day 4 authorization review, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Review verdict: CM-0782 adapter is accepted as sufficient to proceed to Day 4 `CM0774_TRUE_LIVE_PROOF_EXECUTION_AUTHORIZATION_REVIEW`, not execution. It remains internal-only, verifies proof context and exact query count before app execution, binds to `app.callTool('search_memory')` with `include_content=false` and `noTokenReadOnly=true`, instruments provider/audit/sync/cache/vector/write surfaces for complete counters and fail-closed behavior, projects ordinary app results to runner-safe no-raw shape, and relies on runner raw-leakage fail-closed as a second boundary.
+
+Validation run: adapter test `5/5`; runner regression `6/6`; source/test `node --check`. Docs validation and `git diff --check` are required for final closeout.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: Day 4 `CM0774_TRUE_LIVE_PROOF_EXECUTION_AUTHORIZATION_REVIEW`; do not execute true memory search until separately exact-approved.
+
 ## CM-0782 Handoff
 
 Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTED_SYNCED_NOT_READY`; internal adapter/wrapper implemented with synthetic tests, but project decision remains `RC_NOT_READY_BLOCKED`.
