@@ -1,5 +1,26 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0743 Mainline spine scope-freeze closeout - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board closeout only after `MAINLINE_SPINE_SCOPE_FREEZE_REVIEW_READY`.
+- Current local signal: `MAINLINE_SPINE_SCOPE_FREEZE_REVIEW_ACCEPTED`; new autopilot / authorization / green executor documentation surfaces are frozen; Mainline Memory Spine runtime gaps must remain foregrounded.
+- Boundary conclusions: `CM-0737` exact-approved write remains exact-approval-only; no-token read-only search remains targeted side-effect boundary evidence; search timeout guard remains targeted evidence; V8 is not implemented; VCP full parity is not claimed.
+- Changed files: `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0743`, `latest_ledger=CM-0743`, and `latest_validation=CMV-0862`.
+- Boundary: no new governance surface, no source/test/package edit, no true `record_memory`/`search_memory`, no provider, no real memory scan, no durable write/audit write, no public MCP expansion, no push/tag/release/deploy, and no readiness claim.
+- Next safe task: guarded local commit is allowed if desired; push remains explicit-only.
+
+## Checkpoint - CM-0742 RC_PRECHECK_003 planning - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: added planning-only `docs/RC_PRECHECK_003_PLAN.md` and synchronized truth table, status, backlog, and board surfaces.
+- Current local signal: `MAINLINE_SPINE_SURFACE_CONSOLIDATION_REVIEW_ACCEPTED`; DOGFOOD_001-004 summarized; CM-0558, CM-0561, CM-0738, and CM-0739 accepted as bounded evidence; CM-0737 remains exact-approval-only; autopilot / authorization surface growth should freeze.
+- Changed files: `docs/RC_PRECHECK_003_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0742`, `latest_ledger=CM-0742`, and `latest_validation=CMV-0861`.
+- Boundary: no RC_PRECHECK_003 execution, HTTP observe, compare/rollback, true `record_memory`/`search_memory`, provider, real memory scan, durable write/audit write, config switch, migration/backup apply, public MCP expansion, source/test/package edit, push/tag/release/deploy/cutover, or readiness claim.
+- Next safe task: guarded local commit is allowed if desired; push remains explicit-only.
+
 ## Checkpoint - CM-0741 Mainline spine truth-table refresh - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

@@ -1,5 +1,37 @@
 # HANDOFF.md - codex-memory
 
+## CM-0743 Handoff
+
+Status: `COMPLETED_VALIDATED`; guarded local commit is the remaining closeout step if desired.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; worktree contains intentional CM-0742 plus CM-0743 docs/board edits.
+
+Changed files: `docs/RC_PRECHECK_003_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: `MAINLINE_SPINE_SCOPE_FREEZE_CLOSEOUT_READY_FOR_COMMIT`. The closeout records `MAINLINE_SPINE_SCOPE_FREEZE_REVIEW_ACCEPTED`, freezes new autopilot / authorization / green executor surface growth, keeps `CM-0737` exact-approved write as exact-approval-only, keeps no-token read-only search and search timeout guard as targeted evidence only, notes V8 is not implemented and VCP full parity is not claimed, and preserves `RC_NOT_READY_BLOCKED`.
+
+Validation run: `git diff --check` passed; docs validation passed with `latest_task=CM-0743`, `latest_ledger=CM-0743`, and `latest_validation=CMV-0862`.
+
+Boundary: no new governance surface, source/test/package edit, true `record_memory`/`search_memory`, provider, real memory scan, durable write/audit write, public MCP expansion, push/tag/release/deploy, or readiness claim.
+
+## CM-0742 Handoff
+
+Status: `COMPLETED_VALIDATED`; guarded local commit is the remaining closeout step if desired.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; worktree contains intentional CM-0742 docs/board edits only.
+
+Changed files: `docs/RC_PRECHECK_003_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: `RC_PRECHECK_003_PLAN_READY_FOR_COMMIT`. The plan is planning-only, records accepted mainline spine consolidation inputs, freezes governance surface growth, defines future exact-approved command candidates and evidence shape, and keeps `RC_NOT_READY_BLOCKED`.
+
+Validation run: `git diff --check` passed; docs validation passed with `latest_task=CM-0742`, `latest_ledger=CM-0742`, and `latest_validation=CMV-0861`.
+
+Boundary: no RC_PRECHECK_003 execution, HTTP observe, compare/rollback, true `record_memory`/`search_memory`, provider, real memory scan, durable write/audit write, config switch, migration/backup apply, public MCP expansion, source/test/package edit, push/tag/release/deploy/cutover, or readiness claim.
+
 ## CM-0741 Handoff
 
 Status: `COMPLETED_VALIDATED`; guarded local commit is the remaining closeout step if desired.
