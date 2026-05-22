@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0816 Handoff
+
+Status: `ROUND_3_REMOTE_SYNC_AND_STATE_REFRESH_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/POST_CM0815_REMOTE_SYNC_AND_STATE_REFRESH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Sync verdict: current `HEAD == origin/main == remote refs/heads/main == 56e7b72...` and `main...origin/main` is clean, so the CM-0812 through CM-0815 batch is now locally and remotely aligned.
+
+Next safe action: if future work continues, scope a separate review or broader recall-quality evidence task. Do not overclaim CM-0814 as synced-main proof just because the batch is now pushed.
+
+Boundary: no true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. CM-0814 remains execution-time local-head bounded evidence; truth table remains `complete? = no`; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-0815 Handoff
 
 Status: `RECALL_BLOCKER_ROUND_3_NEGATIVE_CONTROL_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

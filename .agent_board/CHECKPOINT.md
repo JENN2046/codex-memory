@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0816 round 3 remote sync and state refresh - 2026-05-23
+
+- Status: `ROUND_3_REMOTE_SYNC_AND_STATE_REFRESH_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: post-push docs/status/board/truth-table refresh only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/POST_CM0815_REMOTE_SYNC_AND_STATE_REFRESH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Sync verdict: current `HEAD == origin/main == remote main == 56e7b72...` and `main...origin/main` is clean.
+- Boundary: this sync does not retroactively convert CM-0814 into synced-main proof; `memory recall reliable` is not claimed; truth table remains `complete? = no`; `RC_NOT_READY_BLOCKED` remains.
+
 ## Checkpoint - CM-0815 post-hardening live negative-control proof review - 2026-05-23
 
 - Status: `RECALL_BLOCKER_ROUND_3_NEGATIVE_CONTROL_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
