@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0787 ValidationAggregator full gap review - 2026-05-22
+
+- Status: `VALIDATION_AGGREGATOR_FULL_GAP_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review collector inventory versus full maturity only; no runtime proof, true memory action, provider call, durable write, or readiness transition.
+- Changed files: `docs/VALIDATION_AGGREGATOR_FULL_GAP_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Review verdict: 15 explicit-input/no-touch collector units are implemented and useful, but source/tests still keep `validationAggregatorFullImplementation=false`, `fullImplementationComplete=false`, and all readiness flags false.
+- Remaining blocker: automatic runtime evidence ingestion, current-head freshness/baseline binding, approved RC precheck capture, final RC matrix authority, live evidence handoff, stale-evidence invalidation, exact-approved durable audit/write reliability, and production/cutover evidence remain unproven.
+- Next safe action: continue Day 10 rollback/migration/backup boundary review unless a separate exact approval changes the safe scope.
+
 ## Checkpoint - CM-0786 memory write proof surface plan - 2026-05-22
 
 - Status: `MEMORY_WRITE_PROOF_SURFACE_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
