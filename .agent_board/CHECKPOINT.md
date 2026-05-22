@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0753 Memory recall reliability bounded evidence plan - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board/status/truth-table planning only.
+- Changed files: `docs/MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_PLAN.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Plan verdict: first-stage bounded recall evidence plan is defined for the selected `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`.
+- Evidence boundary: future execution must use exact fixture/sandbox/local temp workspace commands, exact query count, bounded timeout, sanitized output, no real memory content, no `.jsonl` audit content, no provider calls, no durable memory/audit writes, and no readiness wording.
+- Boundary: this task did not execute runtime recall validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup changes, source/test/package edits, tag/release/deploy/cutover, or readiness claims.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0753`, `latest_ledger=CM-0753`, and `latest_validation=CMV-0872`.
+
 ## Checkpoint - CM-0752 V1 Mainline Candidate review remote reconciliation - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

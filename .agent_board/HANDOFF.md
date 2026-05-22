@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0753 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; memory recall reliability bounded evidence plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; plan start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all at `93b2be92ae5f3198cc7773fcf2df16ded9ccbeaf`; worktree was clean.
+
+Changed files: `docs/MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_PLAN.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Plan verdict: first-stage planning only for `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`; it defines allowed command candidates, forbidden actions, evidence output shape, real memory exclusion, provider exclusion, durable write exclusion, pass/fail criteria, and no-readiness wording.
+
+Boundary: no runtime recall validation, true live `record_memory`/`search_memory`, real memory content read, `.jsonl` audit read, provider call, broad real memory scan, durable memory/audit write, public MCP expansion, migration/import/export/backup/restore apply, source/test/package/config change, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: run `git diff --check`, docs validation, push-readiness, safe push, and post-push remote-state review if scope remains allowed.
+
 ## CM-0752 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; V1 Mainline Candidate review remote reconciliation closeout recorded, but project decision remains `RC_NOT_READY_BLOCKED`.
