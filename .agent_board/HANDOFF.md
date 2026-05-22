@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0765 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; Day 6 rollback / migration / backup boundary reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; review start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `dbf489eb989f3c243aa7d6317d8c7154542cd406`; worktree was clean.
+
+Changed files: `docs/MEMORY_ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Review verdict: rollback posture is reviewable as harness readiness evidence, and migration/import/export/backup/restore approval-boundary evidence is accepted as no-touch / fixture / explicit-input evidence only.
+
+Remaining gap: real rollback apply, production rollback proof, config switch, migration/import/export/backup/restore apply, real backup creation, and real restore apply remain blocked unless separately exact-approved.
+
+Boundary: no true live `record_memory`, no true live `search_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider/model/API call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no real rollback apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: Day 7 hard truth-table convergence: every runtime gap must be classified as complete, bounded evidence only, no-touch evidence only, exact approval required, blocked, or future VCP/V8 without marking gaps complete when runtime evidence is missing.
+
 ## CM-0764 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; Day 5 ValidationAggregator gap reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.

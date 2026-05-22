@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0765 Rollback / migration / backup boundary review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: Day 6 review/docs/board/status/truth-table update across rollback harness posture, mainline rollback planning, migration readiness, and migration/import/export/backup/restore approval boundary.
+- Changed files: `docs/MEMORY_ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Review verdict: compare/rollback `43/43` and rollback-active-memory evidence make rollback posture reviewable as harness readiness evidence only.
+- Remaining gap: real rollback apply, production-proven rollback, config switch, migration/import/export/backup/restore apply, real backup creation, and real restore apply remain blocked unless separately exact-approved.
+- Boundary: no true live `record_memory`, true live `search_memory`, real memory content read, `.jsonl` audit/durable memory read, provider/model/API call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: targeted rollback/migration boundary tests passed `44/44`; `git diff --check` passed; docs validation passed with `latest_task=CM-0765`, `latest_ledger=CM-0765`, and `latest_validation=CMV-0884`.
+
 ## Checkpoint - CM-0764 ValidationAggregator gap review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
