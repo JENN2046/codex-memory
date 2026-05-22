@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0784 Handoff
+
+Status: `CM0774_TRUE_LIVE_PROOF_EXECUTION_AUTHORIZATION_REVIEW_COMPLETED_SYNCED_NOT_READY`; exact future execution boundary prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/CM0774_TRUE_LIVE_PROOF_EXECUTION_AUTHORIZATION_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Authorization verdict: Day 5 may execute CM-0774 only after the separate exact approval line is supplied on a fresh clean synced `main`. This slice prepared the exact approval line, four literal queries, sanitized output shape, counter requirements, and execution preconditions; it did not execute true live `search_memory`.
+
+Exact future queries: Q1 `current project status mainline memory spine state`; Q2 `memory recall evidence ladder bounded evidence progression`; Q3 `blocker not-ready no-overclaim status`; Q4 `negative-control-zeta-7194-nonexistent-memory-spine-token`.
+
+Validation run: targeted runner/adapter source checks and tests are required, plus docs validation and `git diff --check`.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: Day 5 execution only if the exact approval line is supplied; otherwise do not execute true memory search.
+
 ## CM-0783 Handoff
 
 Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_REVIEW_COMPLETED_SYNCED_NOT_READY`; internal adapter/wrapper reviewed for Day 4 authorization review, but project decision remains `RC_NOT_READY_BLOCKED`.

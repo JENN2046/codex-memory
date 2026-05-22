@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0784 CM0774 true live proof execution authorization review - 2026-05-22
+
+- Status: `CM0774_TRUE_LIVE_PROOF_EXECUTION_AUTHORIZATION_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: exact authorization review docs/status/board/truth-table sync only; no true live proof execution.
+- Changed files: `docs/CM0774_TRUE_LIVE_PROOF_EXECUTION_AUTHORIZATION_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Authorization verdict: future CM-0774 execution may only proceed after separate exact approval on a fresh clean synced `main`; this slice does not approve or execute it.
+- Exact future queries: Q1 `current project status mainline memory spine state`; Q2 `memory recall evidence ladder bounded evidence progression`; Q3 `blocker not-ready no-overclaim status`; Q4 `negative-control-zeta-7194-nonexistent-memory-spine-token`.
+- Output boundary: sanitized counts/booleans/hash-or-opaque-id/safe metadata keys/complete zero side-effect counters only; raw leakage and bad counters fail closed.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory recall reliable`.
+- Remaining blocker: Day 5 execution still requires the exact approval line and fresh execution-time preflight.
+
 ## Checkpoint - CM-0783 True live recall executor adapter review - 2026-05-22
 
 - Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
