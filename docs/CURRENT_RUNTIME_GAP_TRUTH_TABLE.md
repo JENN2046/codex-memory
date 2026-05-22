@@ -28,6 +28,19 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## ValidationAggregator Gap Review - 2026-05-22
+
+Result: `MEMORY_VALIDATION_AGGREGATOR_GAP_REVIEW_COMPLETED_NOT_READY`.
+
+- `docs/MEMORY_VALIDATION_AGGREGATOR_GAP_REVIEW.md` reviews the current ValidationAggregator collector chain and no-touch boundaries.
+- Accepted evidence: `ValidationAggregatorRuntimeProofCollector` exposes 15 available explicit-input units, and targeted validation passed `68/68` across collector, aggregator implementation, CLI, and no-touch regression tests.
+- Accepted evidence: the collector can accept sanitized explicit input for source registry, evidence freshness, baseline binding, runtime evidence summary normalization, missing/stale fail-closed, unsupported source fail-closed, no-touch boundary, readiness-overclaim rejection, governance runtime loop gap, recall isolation runtime proof, migration/import/export/backup/restore approval, HTTP runtime observability operation, evidence runtime trace, evidence manifest, and A5 runtime authorization precondition proof units.
+- Accepted boundary: collector/report surfaces keep `fullImplementationComplete=false`, `canClaimRuntimeReady=false`, `canClaimFinalRcReady=false`, `canClaimV1RcReady=false`, and `decision=NOT_READY_BLOCKED`.
+- This remains no-touch explicit-input evidence only. Collector count does not prove maturity and does not prove automatic runtime evidence ingestion, current baseline/freshness binding, approved precheck evidence capture, final RC matrix authoritative integration, live HTTP/compare/rollback/recall/write/migration evidence handoff, end-to-end stale evidence invalidation, durable audit/write reliability, production behavior, or cutover behavior.
+- This review did not execute true live `record_memory`, true live `search_memory`, real memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, broad real memory scans, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, or readiness claims.
+- `ValidationAggregator full implementation`, memory write reliable, memory recall reliable, runtime ready, RC ready, and production ready are not claimed.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Memory Write Evidence Review - 2026-05-22
 
 Result: `MEMORY_WRITE_EVIDENCE_REVIEW_COMPLETED_NOT_READY`.

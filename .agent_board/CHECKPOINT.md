@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0764 ValidationAggregator gap review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: Day 5 review/docs/board/status/truth-table update across current ValidationAggregator collector progress, no-touch evidence, and remaining full implementation gaps.
+- Changed files: `docs/MEMORY_VALIDATION_AGGREGATOR_GAP_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Review verdict: current collector progress exposes 15 explicit-input/no-touch units and targeted validation passed `68/68`, but this is no-touch explicit-input evidence only, not full implementation.
+- Remaining gap: automatic runtime evidence ingestion, current baseline/freshness binding, approved RC precheck evidence capture, final RC matrix authoritative integration, live HTTP/compare/rollback/recall/write/migration evidence handoff, stale-evidence invalidation, durable audit/write reliability, production behavior, and cutover behavior remain unproven.
+- Boundary: no true live `record_memory`, true live `search_memory`, real memory content read, `.jsonl` audit/durable memory read, provider/model/API call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: targeted ValidationAggregator/no-touch tests passed `68/68`; `git diff --check` passed; docs validation passed with `latest_task=CM-0764`, `latest_ledger=CM-0764`, and `latest_validation=CMV-0883`.
+
 ## Checkpoint - CM-0763 Memory write evidence review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

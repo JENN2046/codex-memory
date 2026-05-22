@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0764 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; Day 5 ValidationAggregator gap reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; review start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `35e201ae74727768133015286f40b60d4bfb0447`; worktree was clean.
+
+Changed files: `docs/MEMORY_VALIDATION_AGGREGATOR_GAP_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Review verdict: ValidationAggregator currently has 15 explicit-input/no-touch collector units and targeted tests passed `68/68`. The evidence proves sanitized explicit-input collection, unsafe-input fail-closed behavior, public MCP freeze, and no-touch boundaries.
+
+Remaining gap: `ValidationAggregator full implementation` remains blocked. Collector count does not prove automatic runtime evidence ingestion, current baseline/freshness binding, approved RC precheck evidence capture, final RC matrix authoritative integration, live HTTP/compare/rollback/recall/write/migration evidence handoff, durable audit/write reliability, production behavior, or cutover behavior.
+
+Boundary: no true live `record_memory`, no true live `search_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider/model/API call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: Day 6 rollback / migration / backup boundary review; keep real rollback apply and migration/import/export/backup/restore apply blocked unless separately exact-approved.
+
 ## CM-0763 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; Day 4 memory write evidence reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
