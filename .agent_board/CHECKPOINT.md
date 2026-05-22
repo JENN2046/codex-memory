@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0773 Memory recall limited local real-path evidence review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/status/board/truth-table review only for CM-0772 evidence.
+- Changed files: `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_EVIDENCE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Review verdict: CM-0772 is sufficient to downgrade the `memory recall reliable` blocker from missing limited local real-path bounded evidence to missing true live real-store recall reliability proof.
+- Boundary: blocker is not closed; `memory recall reliable` remains not claimed; truth-table classification remains `bounded evidence only`, `complete? = no`; `RC_NOT_READY_BLOCKED` remains.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0773`, `latest_ledger=CM-0773`, and `latest_validation=CMV-0892`.
+
 ## Checkpoint - CM-0772 Memory recall limited local real-path evidence execution - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

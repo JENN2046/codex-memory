@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0773 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; CM-0772 limited local real-path recall evidence reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_EVIDENCE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: CM-0772 is sufficient to downgrade the `memory recall reliable` blocker from missing limited local real-path bounded evidence to missing true live real-store recall reliability proof. The blocker is not closed.
+
+Boundary: no true live `search_memory` against real user store, no true live `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider/model/API call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+
+Next safe action: after post-push remote-state review, choose only a separately scoped next recall-reliability proof or planning step; do not claim `memory recall reliable`.
+
 ## CM-0772 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; limited local real-path recall evidence executed, but project decision remains `RC_NOT_READY_BLOCKED`.
