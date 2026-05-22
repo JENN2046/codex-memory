@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0776 True live recall internal proof runner plan - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/status/board/truth-table plan only; source was read-only review input.
+- Changed files: `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Plan verdict: next surface should be an internal runner / CLI / helper, not public MCP schema expansion.
+- Required runner boundary: exact approval, exact query count `4`, sealed `readOnly/noProvider/noAudit/sanitizedOutput/includeContent=false` context, no raw memory text, no direct `.jsonl`, no durable memory/audit write, no provider call, no sync/cache/vector flush side effects, and bounded timeout/error handling.
+- Why blocked: CM-0774 still cannot execute because the internal runner is only planned, not implemented, tested, reviewed, or separately exact-approved for execution.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory recall reliable`.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0776`, `latest_ledger=CM-0776`, and `latest_validation=CMV-0895`.
+
 ## Checkpoint - CM-0775 True live recall read-only execution surface gap plan - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

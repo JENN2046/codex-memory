@@ -50,7 +50,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
-| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning evidence only. CM-0773 downgrades the blocker from missing local-path bounded evidence to missing true live real-store reliability proof; CM-0775 adds that the current `search_memory` surface cannot yet prove no-provider/no-audit/read-only execution for that proof. | no | Implement and review an exact read-only/no-provider/no-audit/sanitized execution surface before any future true live proof; then require separate exact approval for the proof. No `.jsonl`, provider, broad real-memory scan, durable write, or readiness claim may be inferred. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning evidence only. CM-0773 downgrades the blocker from missing local-path bounded evidence to missing true live real-store reliability proof; CM-0775 adds that the current `search_memory` surface cannot yet prove no-provider/no-audit/read-only execution for that proof; CM-0776 defines an internal runner plan that avoids public MCP expansion but is not implemented. | no | Implement and review the internal exact-approved runner with `readOnly/noProvider/noAudit/sanitizedOutput/exactQueryCount=4`; then require separate exact approval for the true live proof. No `.jsonl`, provider, broad real-memory scan, durable write, public MCP expansion, or readiness claim may be inferred. |
 | memory write reliable | exact approval required | CM-0737 proves only separately exact-approved rejected and accepted `record_memory` attempts, with one accepted durable write under explicit approval. | no | Any further write proof requires a separate exact approval; default unattended write reliability remains unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. | no | Do not count collectors as maturity; close only after automatic ingestion, freshness/baseline binding, approved evidence capture, and final RC matrix integration are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
@@ -83,6 +83,26 @@ Planning conclusion:
 - Source review identified potential provider and side-effect paths in embedding, rerank, knowledge-base sync, candidate cache, embedding cache, recall audit, and read-policy audit code.
 - Existing no-token HTTP readOnly evidence remains useful targeted boundary evidence, but it is not an exact-approved true-live proof surface for CM-0774.
 - Next minimal implementation should provide an internal proof runner or separately approved controlled schema change with `readOnly/noProvider/noAudit/sanitizedOutput/exactQueryCount=4` and targeted fail-closed tests.
+
+This plan did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
+## True Live Recall Internal Proof Runner Plan - 2026-05-22
+
+Result: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PLAN_COMPLETED_SYNCED_NOT_READY`.
+
+Artifact: `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PLAN.md`.
+
+Planning conclusion:
+
+- The next surface should be an internal runner / CLI / helper, not a public MCP tool or public `search_memory` schema expansion.
+- The runner must require separate exact approval and build a sealed internal proof context with `readOnly=true`, `noProvider=true`, `noAudit=true`, `sanitizedOutput=true`, `includeContent=false`, and `exactQueryCount=4`.
+- The runner must reject missing, partial, contradictory, generated, broad, or public-argument-supplied proof controls.
+- The runner must prove provider, audit, sync, candidate-cache write/flush, vector flush, embedding-cache write, durable memory write, and durable audit write counters remain zero.
+- The runner must sanitize away raw `content`, `text`, `snippet`, raw memory text, raw chat history, raw `.jsonl`, secrets, and broad result dumps.
+- Required targeted tests cover exact approval, exact query count, no public MCP schema expansion dependency, provider/audit/cache/sync/vector side-effect blocks, sanitized evidence shape, and bounded timeout/error behavior.
+- CM-0774 still cannot execute because this runner is only planned, not implemented or reviewed.
 
 This plan did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 

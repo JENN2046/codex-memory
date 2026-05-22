@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0776 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; true live recall internal proof runner plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Plan verdict: implement the next proof surface as an internal runner / CLI / helper, not as public MCP schema expansion. The runner must enforce exact approval, exact query count `4`, `readOnly=true`, `noProvider=true`, `noAudit=true`, `sanitizedOutput=true`, no raw memory text output, no direct `.jsonl`, no durable memory/audit write, no provider call, no cache/sync/vector flush side effects, and bounded timeout/error handling.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real memory read, `.jsonl` read, provider call, broad real memory scan, durable memory/audit write, package/config/watchdog/startup change, public MCP expansion, release/deploy/cutover, or readiness claim occurred.
+
+Next safe action: implement targeted internal runner and tests under a separately scoped implementation batch; after implementation review, CM-0774 still requires a separate exact approval before any true live proof run.
+
 ## CM-0775 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; true live recall read-only execution surface gap plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
