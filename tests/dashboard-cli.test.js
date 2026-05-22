@@ -517,7 +517,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.autopilotKernel.validators.green_file_write_boundary, true);
   assert.equal(payload.autopilotKernel.validators.green_file_write_executor_contract, true);
   assert.match(payload.autopilotKernel.latest_ledger_goal, /^CM-\d{4}$/);
-  assert.equal(payload.autopilotKernel.latest_ledger_result, 'completed_validated');
+  assert.match(payload.autopilotKernel.latest_ledger_result, /^completed/);
   assert.match(payload.autopilotKernel.latest_validation_id, /^CMV-\d{4}$/);
   assert.equal(payload.autopilotKernel.readiness_claim_allowed, false);
   assert.equal(payload.autopilotLoop.status, 'ok');
@@ -847,7 +847,7 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
   assert.equal(payload.autopilotKernel.example_count >= 14, true);
   assert.equal(payload.autopilotKernel.blocked_red_count >= 1, true);
   assert.match(payload.autopilotKernel.latest_validation_id, /^CMV-\d{4}$/);
-  assert.equal(payload.autopilotKernel.validation_status, 'completed_validated');
+  assert.match(payload.autopilotKernel.validation_status, /^completed/);
   assert.equal(payload.autopilotKernel.readiness_claim_allowed, false);
   assertKeySet(payload.autopilotLoop, [
     'blocked_red_count',

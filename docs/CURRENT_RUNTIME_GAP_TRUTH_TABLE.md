@@ -120,6 +120,34 @@ Forbidden action review:
 
 Controlling state remains `RC_NOT_READY_BLOCKED`. `memory write reliable` is not claimed. `memory recall reliable` is not claimed. V8 is not implemented. VCP full parity is not claimed. No row changes to `complete? = yes`.
 
+## RC_PRECHECK_003 Failure Diagnosis And Repair - 2026-05-22
+
+Result: `RC_PRECHECK_003_REPAIR_READY_FOR_PUSH_AND_RERUN_NOT_READY`.
+
+Failure classification:
+
+- Primary classification: D `gate:mainline:strict failure`.
+- Not classified as A/B/C/F/G/H/I/J: docs validation and `git diff --check` were passing; compare and rollback were passing; no scope drift, hard-stop boundary, or unknown failure was found.
+- E `HTTP observe warn` remained a warning only, from historical watchdog recovery count; it was not the blocking failure.
+
+Exact repair scope and reason:
+
+- `src\cli\dashboard.js`: dashboard `autopilotKernel` now reads the latest `COMPLETED*` validation row instead of only `COMPLETED_VALIDATED`, preserves the actual lowercase completed-family validation status, and treats completed-family rows as a readable kernel surface.
+- `tests\dashboard-cli.test.js`: dashboard assertions now accept completed-family ledger and validation states instead of hardcoding `completed_validated`.
+- Reason: `CM-0745` intentionally recorded failed-not-ready evidence as `completed_failed_not_ready` / `COMPLETED_FAILED_NOT_READY` so docs validation could recognize a completed evidence record while preserving the failed-not-ready decision. The dashboard test incorrectly treated that valid closeout state as a test failure.
+
+Repair validation:
+
+- `node --check src\cli\dashboard.js`: passed.
+- `node --check tests\dashboard-cli.test.js`: passed.
+- `node --test tests\dashboard-cli.test.js`: passed `20/20`.
+- `npm run gate:mainline:strict`: passed; health ok, contract `25/25`, test `1974/1974`, compare `43/43 matched`, rollback `43/43 rollback-ready`.
+
+Boundary:
+
+- No provider call, true live `record_memory` / `search_memory`, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile change, config/watchdog/startup change, force push, tag, release, deploy, cutover, or readiness claim occurred.
+- This repairs the strict-gate test blocker only. `RC_NOT_READY_BLOCKED` remains controlling until the repaired state is pushed, remotely reviewed, and RC_PRECHECK_003 allowed commands are rerun.
+
 ## Truth Table
 
 | gap | current evidence | runtime touched? | A4/A5 | complete? | next minimal action |
@@ -129,7 +157,7 @@ Controlling state remains `RC_NOT_READY_BLOCKED`. `memory write reliable` is not
 | recall isolation runtime proof | A4 explicit projection isolation exists; A5 no-mutation scan and sanitized positive-control write/projection proof exist. Broad real-memory isolation and future sample coverage remain incomplete. | yes, bounded approved stores and one sanitized positive-control write | A4 plus A5 bounded evidence | no | If needed, request exact approval for the next bounded recall isolation proof; no broad scan or backfill by default. |
 | migration / import / export / backup / restore execution | Fixture-only migration-readiness dry-run evidence exists and remains blocked for real apply/import/export/backup/restore. | fixture-only dry-run; no real data apply | A5 dry-run only | no | Create a separate exact A5 packet naming one real action and one target before any apply/import/export/backup/restore action. |
 | live HTTP operation readiness | Endpoint-bound historical HTTP evidence exists for loopback `7605`, with no config/watchdog/startup change. HTTP session TTL/cap/cleanup hardening is completed locally in `16538ea`; closeout recorded in `765ab18`; targeted HTTP tests passed `13/13`. | yes, local runtime hardening only; no fresh observe for current packet target; no config/watchdog/startup change | A4/CM-0550 local hardening plus historical A5 endpoint evidence | no | Future HTTP observe/precheck requires exact approval bound to current target and endpoint. Do not infer production readiness from local hardening alone. |
-| current-head strict gate for cutover | Readonly RC_PRECHECK_001 evidence passed at local HEAD `638325a` with strict gate ok, tests `1601/1601`, compare `43/43`, rollback `43/43`, and HTTP observe ok. RC_PRECHECK_003 later failed at current head `78f34cd`: strict mainline gate health/contract/compare/rollback were ok, but test gate reported `1974 total / 1973 pass / 1 fail`; independent observe was `warn`, compare matched `43/43`, and rollback was `43/43 rollback-ready`. This is failed precheck evidence, not cutover or readiness evidence. | yes for older target-bound gates and current failed precheck commands; not current cutover | A5 target-bound precheck evidence | no | Investigate the single strict-gate test failure under a separate source/test task if authorized; do not infer readiness from compare/rollback pass while the strict gate test blocker remains. |
+| current-head strict gate for cutover | Readonly RC_PRECHECK_001 evidence passed at local HEAD `638325a` with strict gate ok, tests `1601/1601`, compare `43/43`, rollback `43/43`, and HTTP observe ok. RC_PRECHECK_003 later failed at current head `78f34cd`: strict mainline gate health/contract/compare/rollback were ok, but test gate reported `1974 total / 1973 pass / 1 fail`; independent observe was `warn`, compare matched `43/43`, and rollback was `43/43 rollback-ready`. CM-0746 diagnosed the failing test as dashboard kernel status handling for valid `completed_failed_not_ready` evidence and repaired `src\cli\dashboard.js` plus `tests\dashboard-cli.test.js`; post-repair strict gate passed with tests `1974/1974`, compare `43/43`, and rollback `43/43`. This remains precheck/repair evidence, not cutover or readiness evidence. | yes for older target-bound gates and current failed precheck/repair commands; not current cutover | A5 target-bound precheck evidence plus targeted repair | no | Push the repair only after push-readiness passes, then rerun RC_PRECHECK_003 allowed commands and record the post-push evidence; do not infer readiness from a repaired strict gate alone. |
 | RC cutover | No RC cutover, tag, release, deploy, production transition, or readiness transition has been executed. | no | A5 required | no | Execute only after zero open runtime gaps, fresh approved gates, explicit release boundary approval, and final human authorization. |
 
 ## Current Minimal Backlog

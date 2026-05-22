@@ -781,12 +781,19 @@ function collectAutopilotKernel() {
   const latestValidationRow = validationLog
     .split(/\r?\n/)
     .map(line => line.trim())
-    .find(line => /^\| CMV-\d{4} /.test(line) && line.includes('COMPLETED_VALIDATED'));
+    .find(line => {
+      if (!/^\| CMV-\d{4} /.test(line)) return false;
+      const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
+      return String(cells[4] || '').startsWith('COMPLETED');
+    });
+  const latestValidationCells = latestValidationRow
+    ? latestValidationRow.split('|').slice(1, -1).map(cell => cell.trim())
+    : [];
   const latestValidationId = latestValidationRow
     ? (latestValidationRow.match(/\| (CMV-\d{4}) /) || [])[1] || 'not_recorded'
     : 'not_recorded';
   const validationStatus = latestValidationId !== 'not_recorded'
-    ? 'completed_validated'
+    ? String(latestValidationCells[4] || 'completed').toLowerCase()
     : 'not_recorded';
 
   const status = profileExists
@@ -796,7 +803,7 @@ function collectAutopilotKernel() {
     && missingRequiredExamples.length === 0
     && validators.governance_kernel
     && validators.goal_compiler
-    && validationStatus === 'completed_validated'
+    && validationStatus.startsWith('completed')
       ? 'ok'
       : 'warn';
 

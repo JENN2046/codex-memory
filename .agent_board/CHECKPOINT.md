@@ -1,5 +1,17 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0746 RC_PRECHECK_003 failure diagnosis and targeted repair - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: targeted dashboard source/test repair plus docs/board closeout.
+- Changed files: `src\cli\dashboard.js`; `tests\dashboard-cli.test.js`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Failure class: D `gate:mainline:strict failure`.
+- Cause: dashboard test expected latest autopilot kernel ledger result to equal `completed_validated`, but CM-0745 correctly recorded failed-not-ready evidence as `completed_failed_not_ready` / `COMPLETED_FAILED_NOT_READY`.
+- Repair: dashboard now reads latest `COMPLETED*` validation rows and preserves completed-family status; dashboard tests accept completed-family status while preserving `readiness_claim_allowed=false`.
+- Validation: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js` passed `20/20`; `npm run gate:mainline:strict` passed with health ok, contract `25/25`, test `1974/1974`, compare `43/43`, rollback `43/43`.
+- Boundary: no provider, true live `record_memory`/`search_memory`, real memory scan, durable memory/audit write, migration/backup apply, public MCP expansion, package/lockfile/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+- Next safe task: run `git diff --check`, docs validation, push-readiness, safe push, post-push review, then rerun RC_PRECHECK_003 allowed commands.
+
 ## Checkpoint - CM-0745 RC_PRECHECK_003 execution - 2026-05-22
 
 - Status: `FAILED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

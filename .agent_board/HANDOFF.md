@@ -1,5 +1,29 @@
 # HANDOFF.md - codex-memory
 
+## CM-0746 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; targeted repair prepared for push and RC_PRECHECK_003 rerun.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Failure class: D `gate:mainline:strict failure`.
+
+Root cause: dashboard/autopilot kernel tests assumed latest ledger/validation status must be `completed_validated`, but CM-0745 legitimately recorded failed precheck evidence as `completed_failed_not_ready` / `COMPLETED_FAILED_NOT_READY`.
+
+Changed files: `src\cli\dashboard.js`; `tests\dashboard-cli.test.js`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Repair: `src\cli\dashboard.js` now reads latest `COMPLETED*` validation rows, keeps the actual completed-family status, and treats completed-family rows as an observable kernel surface; `tests\dashboard-cli.test.js` now accepts completed-family status while preserving no-readiness assertions.
+
+Validation run: `node --check src\cli\dashboard.js`; `node --check tests\dashboard-cli.test.js`; `node --test tests\dashboard-cli.test.js` passed `20/20`; `npm run gate:mainline:strict` passed with health ok, contract `25/25`, test `1974/1974`, compare `43/43`, rollback `43/43`.
+
+Not validated yet: post-push RC_PRECHECK_003 rerun after remote sync.
+
+Boundary: no provider, true live `record_memory`/`search_memory`, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: run diff/docs validation, commit, push-readiness, safe push, post-push remote review, then rerun RC_PRECHECK_003 allowed commands and record the final synced-not-ready evidence.
+
 ## CM-0745 Handoff
 
 Status: `FAILED_NOT_READY`; docs/board evidence record only.
