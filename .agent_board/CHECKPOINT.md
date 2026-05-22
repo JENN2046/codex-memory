@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0801 CM0774 true live proof execution - 2026-05-22
+
+- Status: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: exact-approved true live real-store recall proof through internal runner/adapter only; no true live `record_memory`, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/CM0774_TRUE_LIVE_REAL_STORE_PROOF_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Proof verdict: runner returned `TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY`; exactly four queries executed; result counts were Q1=3, Q2=3, Q3=2, Q4=2; raw content returned false; complete side-effect counters were all zero.
+- Boundary: Q4 negative-control returning 2 sanitized results requires follow-up proof review and prevents claiming `memory recall reliable` from this execution alone.
+
 ## Checkpoint - CM-0800 CM0774 exact approval recheck - 2026-05-22
 
 - Status: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_READY_FOR_EXACT_APPROVAL`; project decision remains `RC_NOT_READY_BLOCKED`.

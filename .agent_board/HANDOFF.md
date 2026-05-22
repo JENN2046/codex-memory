@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0801 Handoff
+
+Status: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/CM0774_TRUE_LIVE_REAL_STORE_PROOF_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Proof verdict: the exact-approved internal runner/adapter path executed exactly four true live real-store recall queries and returned `TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY`.
+
+Sanitized evidence: result counts Q1=3, Q2=3, Q3=2, Q4=2; raw content returned false; top ids are opaque hashes only; complete side-effect counters are all zero, including provider calls, direct `.jsonl` reads, durable memory writes, durable audit writes, sync/cache/vector/embedding writes, raw memory content reads, and public MCP expansion.
+
+Important review signal: Q4 negative-control returned 2 sanitized results. This does not violate runner/adapter boundaries, but it must be reviewed before closing or downgrading the recall blocker. Do not claim `memory recall reliable` from CM-0801 alone.
+
+Boundary: no true live `record_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: perform `TRUE_LIVE_RECALL_PROOF_REVIEW` or equivalent CM-0801 evidence review, preserving `RC_NOT_READY_BLOCKED` unless the truth table is explicitly updated by fresh evidence.
+
 ## CM-0800 Handoff
 
 Status: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_READY_FOR_EXACT_APPROVAL`; project decision remains `RC_NOT_READY_BLOCKED`.
