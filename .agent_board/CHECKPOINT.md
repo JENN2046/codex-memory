@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0771 Memory recall limited local real-path readiness plan sync - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/status/board/truth-table sync only for the existing CM-0760 planning packet.
+- Start baseline: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `54f35d810a28d03302a003b2d0cc33b258402204`; worktree was clean.
+- Changed files: `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Sync verdict: CM-0760 now carries exact closeout `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN_COMPLETED_SYNCED_NOT_READY`.
+- Interpretation: the plan remains planning-only between temp-workspace synthetic evidence and any true live real-store `search_memory`.
+- Boundary: no true live `search_memory` against real store, no true live `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider/model/API call, no real memory broad scan, no durable memory/audit write, no migration/import/export/backup/restore apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0771`, `latest_ledger=CM-0771`, and `latest_validation=CMV-0890`.
+
 ## Checkpoint - CM-0770 Day 10 V1 Mainline Memory Spine RC go/no-go review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `RC_NOT_READY_BLOCKED`.

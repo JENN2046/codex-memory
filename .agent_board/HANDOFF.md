@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0771 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; CM-0760 limited local real-path recall readiness plan synced, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; sync start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `54f35d810a28d03302a003b2d0cc33b258402204`; worktree was clean.
+
+Changed files: `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Sync verdict: `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN.md` now records `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN_COMPLETED_SYNCED_NOT_READY`.
+
+Plan boundary: planning-only bridge from temp-workspace synthetic evidence to a future limited local real-path bounded evidence packet. It allows planning use of real repository recall-path modules only against synthetic local files in an isolated temp root; it forbids true user memory, `.jsonl`, provider calls, durable writes, and readiness claims.
+
+Boundary: no true live `search_memory` against real store, no true live `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider/model/API call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+
+Next safe action: only post-push remote-state review for this sync commit, or a separately scoped next bounded evidence phase; do not claim `memory recall reliable`.
+
 ## CM-0770 Handoff
 
 Status: `COMPLETED_VALIDATED`; Day 10 V1 Mainline Memory Spine RC go/no-go review completed, but project decision remains `RC_NOT_READY_BLOCKED`.

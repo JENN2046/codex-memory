@@ -160,6 +160,18 @@ Remaining blockers:
 
 Controlling state remains `RC_NOT_READY_BLOCKED`.
 
+## Memory Recall Limited Local Real-Path Readiness Plan Sync - 2026-05-22
+
+Result: `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN_COMPLETED_SYNCED_NOT_READY`.
+
+- `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN.md` now carries the synced closeout label for the CM-0760 plan.
+- The plan remains planning-only. It does not execute true live `search_memory` against the real store and does not read real memory content.
+- The limited local real-path boundary remains: real repository recall-path modules may be planned for use only against synthetic local files in an isolated temp root, with no true user memory, no `.jsonl`, no provider, and no durable memory/audit write.
+- Exact plan controls remain: allowed temp path root, exactly four synthetic records, exactly four bounded local recall-path checks, expected-result criteria, irrelevant suppression criteria, folder/freshness criteria, timeout/error criteria, sanitized output, cleanup verification, and no-readiness wording.
+- This sync does not change any truth-table row to `complete? = yes`.
+- `memory recall reliable`, runtime ready, RC ready, production ready, V8 implemented, and VCP full parity remain not claimed.
+- Controlling state remains `RC_NOT_READY_BLOCKED`.
+
 ## Memory Recall Temp Workspace Evidence Review Sync - 2026-05-22
 
 Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_SYNCED_NOT_READY`.
