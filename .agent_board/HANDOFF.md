@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0758 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; memory recall temp workspace evidence executed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; execution start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `17a718532450c9c080c8fa8bf8fb5ec276240119`; worktree was clean.
+
+Changed files: `tests/memory-recall-temp-workspace-evidence.test.js`; `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_EXECUTION.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Evidence: targeted temp-workspace test passed `1/1`; it creates an isolated run-specific temp root, writes exactly four synthetic `.json` seed records, executes exactly four bounded recall queries, returns `temp-recall-expected-current`, suppresses irrelevant synthetic records from accepted output, covers freshness ordering and alpha folder scope, returns bounded `SEARCH_MEMORY_TIMEOUT` / JSON-RPC `-32002`, constructs sanitized evidence output, and verifies cleanup.
+
+Boundary: no true live `search_memory` against real store, no real memory content read, no `.jsonl` audit/durable memory read, no provider call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: review CM-0758 evidence before any true live real-store recall step; `memory recall reliable` remains not claimed and `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-0757 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; memory recall temp workspace evidence plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.

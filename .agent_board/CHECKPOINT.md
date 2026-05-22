@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0758 Memory recall temp workspace evidence execution - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: targeted temp-workspace synthetic recall test plus docs/board/status/truth-table evidence record.
+- Changed files: `tests/memory-recall-temp-workspace-evidence.test.js`; `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_EXECUTION.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Evidence: targeted test passed `1/1`; the test creates an isolated temp root, writes exactly four synthetic `.json` seed records, executes exactly four bounded recall queries, returns `temp-recall-expected-current`, suppresses irrelevant records from accepted output, covers freshness and alpha folder scope, returns `SEARCH_MEMORY_TIMEOUT` / `-32002`, emits sanitized evidence, and verifies cleanup.
+- Boundary: no true live `search_memory` against real store, real memory content read, `.jsonl` audit/durable memory read, provider call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: `node --test tests\memory-recall-temp-workspace-evidence.test.js` passed `1/1`; `git diff --check` passed; docs validation passed with `latest_task=CM-0758`, `latest_ledger=CM-0758`, and `latest_validation=CMV-0877`.
+
 ## Checkpoint - CM-0757 Memory recall temp workspace evidence plan - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
