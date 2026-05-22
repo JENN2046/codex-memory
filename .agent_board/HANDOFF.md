@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0803 Handoff
+
+Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/CM0774_SECOND_NEGATIVE_CONTROL_PROOF_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Plan verdict: CM-0801 Q4 returned `2` sanitized results, so irrelevant-query suppression is not proven and `memory recall reliable` remains blocked. The second proof plan defines exactly four stricter negative-control queries, avoids project-domain terms, requires `resultCount=0` for every slot, and treats any nonzero sanitized result as `FAILED_NOT_READY`.
+
+Next safe action: wait for separate exact approval before any execution. Future execution must use the approved internal runner/adapter path, sanitized output only, complete zero side-effect counters, no raw memory, no direct `.jsonl`, no provider/model/API call, no durable memory/audit write, and no readiness or reliability claim.
+
+Boundary: this task did not execute true live `search_memory` or `record_memory`, did not read raw memory or durable content, did not call providers, did not write durable memory/audit, and did not change package/config/watchdog/startup, public MCP, rollback/migration/apply, release/cutover, or readiness state.
+
 ## CM-0802 Handoff
 
 Status: `TRUE_LIVE_RECALL_PROOF_REVIEW_NEEDS_SECOND_NEGATIVE_CONTROL`; project decision remains `RC_NOT_READY_BLOCKED`.
