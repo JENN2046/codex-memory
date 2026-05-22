@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0749 V1 Mainline Candidate package review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board/status review only.
+- Changed files: `docs/V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Review verdict: candidate package is complete for the current evidence set and no overclaim was found.
+- Remaining blocker order: `memory recall reliable` not claimed; `memory write reliable` not claimed; ValidationAggregator full implementation incomplete; real rollback A5 blocked; migration/import/export/backup/restore apply A5 blocked; runtime/RC/production/release/cutover readiness blocked; V8/VCP parity not claimed.
+- Selected next executable gap: separately exact-approved `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`.
+- Boundary: no src/tests/package/config change, true live `record_memory`/`search_memory` validation, provider call, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, tag/release/deploy/cutover, or readiness claim.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0749`, `latest_ledger=CM-0749`, and `latest_validation=CMV-0868`.
+
 ## Checkpoint - CM-0748 V1 Mainline Candidate review package - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

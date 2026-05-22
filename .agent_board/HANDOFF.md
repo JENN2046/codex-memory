@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0749 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; v1 Mainline Candidate package review completed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; review start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all at `50e45ec9bc3346acc9b65d07fc81a5679bbc03d0`.
+
+Changed files: `docs/V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Review verdict: `docs/V1_MAINLINE_CANDIDATE_PACKAGE.md` is complete for the current evidence set and no overclaim was found.
+
+Remaining blocker order: `memory recall reliable` not claimed; `memory write reliable` not claimed; ValidationAggregator full implementation incomplete; real rollback A5 blocked; migration/import/export/backup/restore apply A5 blocked; runtime/RC/production/release/cutover readiness blocked; V8/VCP parity not claimed.
+
+Selected next executable gap: separately exact-approved `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`, with bounded queries, sanitized output, no provider call, no broad scan, no durable memory/audit write unless separately named, and no readiness claim.
+
+Boundary: no src/tests/package/config change, true live `record_memory`/`search_memory` validation, provider call, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: run `git diff --check`, docs validation, push-readiness, safe push, and post-push remote-state review if scope remains allowed.
+
 ## CM-0748 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; v1 Mainline Candidate review package prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
