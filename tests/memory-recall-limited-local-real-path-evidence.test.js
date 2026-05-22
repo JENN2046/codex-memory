@@ -74,6 +74,11 @@ function assertInsideTempParent(tempRoot) {
     resolvedRoot.startsWith(`${resolvedParent}${path.sep}`),
     `temp root must stay under expected parent: ${resolvedRoot}`
   );
+  assert.equal(
+    path.dirname(resolvedRoot),
+    resolvedParent,
+    `temp root must be a direct child of the allowed parent: ${resolvedRoot}`
+  );
 }
 
 async function pathExists(targetPath) {
@@ -438,7 +443,7 @@ test('limited local real-path recall evidence uses temp-root local vector path a
     assert.equal(counters.durableAuditWrites, 0);
 
     const evidence = {
-      taskId: 'MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_BOUNDED_EVIDENCE_EXECUTION',
+      taskId: 'MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_EVIDENCE_EXECUTION',
       baseline: '3f42bb5f59e262e14b48c07cf7e1b0f33c5dadd7',
       evidenceClass: 'limited_local_real_path_bounded_recall',
       tempRootSanitized: '<repo>/tmp/memory-recall-limited-local-real-path-evidence/CM-0761-<run-id>',

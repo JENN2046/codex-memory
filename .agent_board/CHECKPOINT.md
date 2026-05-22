@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0772 Memory recall limited local real-path evidence execution - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: targeted synthetic local-path test plus docs/status/board/truth-table evidence record.
+- Start baseline: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `9b0c8658d89e4412e82db086fda43417c3e4c78f`; worktree was clean.
+- Changed files: `tests/memory-recall-limited-local-real-path-evidence.test.js`; `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_EVIDENCE_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Evidence: targeted test passed `1/1`; the test uses synthetic `.json` local files only, requires the temp root to be a direct child of the exact allowlist parent, executes exactly four bounded checks, returns expected current result, suppresses irrelevant results, covers freshness and alpha folder scope, returns bounded timeout/error shape, emits sanitized evidence, verifies cleanup, and keeps provider / real memory / `.jsonl` / durable memory / durable audit side-effect counters at `0`.
+- Boundary: no true live `search_memory` against real user store, no true live `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider/model/API call, no real memory broad scan, no durable memory/audit write, no migration/import/export/backup/restore apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+- Validation: `node --test tests\memory-recall-limited-local-real-path-evidence.test.js` passed `1/1`; `git diff --check` passed; docs validation passed with `latest_task=CM-0772`, `latest_ledger=CM-0772`, and `latest_validation=CMV-0891`.
+
 ## Checkpoint - CM-0771 Memory recall limited local real-path readiness plan sync - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

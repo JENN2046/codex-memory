@@ -50,7 +50,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
-| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761 limited local real-path, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root evidence only. | no | Future true live real-store `search_memory` remains blocked unless separately exact-approved; no `.jsonl`, provider, broad real-memory scan, or durable write may be inferred. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root evidence only. | no | Future true live real-store `search_memory` remains blocked unless separately exact-approved; no `.jsonl`, provider, broad real-memory scan, or durable write may be inferred. |
 | memory write reliable | exact approval required | CM-0737 proves only separately exact-approved rejected and accepted `record_memory` attempts, with one accepted durable write under explicit approval. | no | Any further write proof requires a separate exact approval; default unattended write reliability remains unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. | no | Do not count collectors as maturity; close only after automatic ingestion, freshness/baseline binding, approved evidence capture, and final RC matrix integration are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
@@ -171,6 +171,19 @@ Result: `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN_COMPLETED_SYNCED_N
 - This sync does not change any truth-table row to `complete? = yes`.
 - `memory recall reliable`, runtime ready, RC ready, production ready, V8 implemented, and VCP full parity remain not claimed.
 - Controlling state remains `RC_NOT_READY_BLOCKED`.
+
+## Memory Recall Limited Local Real-Path Evidence Execution - 2026-05-22
+
+Result: `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_EVIDENCE_COMPLETED_SYNCED_NOT_READY`.
+
+- `tests/memory-recall-limited-local-real-path-evidence.test.js` passed `1/1`.
+- `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_EVIDENCE_EXECUTION.md` records the sanitized evidence packet.
+- The run root is restricted to a direct child of `<repo>/tmp/memory-recall-limited-local-real-path-evidence`.
+- The packet writes exactly four synthetic local `.json` files, executes exactly four bounded local recall checks, returns the expected current result before the older expected result, suppresses same-folder and other-folder irrelevant records, covers alpha folder scope, covers freshness ordering, returns bounded `SEARCH_MEMORY_TIMEOUT` / JSON-RPC `-32002`, emits sanitized output, and verifies cleanup.
+- Side-effect counters remain zero for provider calls, real memory reads, `.jsonl` reads, durable memory writes, and durable audit writes.
+- This remains bounded synthetic local-path evidence only. It does not execute true live `search_memory` against the real user store, read real memory content, read `.jsonl` audit or durable memory content, call providers, broad scan real memory, write durable memory/audit state, apply migration/import/export/backup/restore, expand public MCP, change config/watchdog/startup, change package/lockfile, tag/release/deploy/cutover, or claim readiness.
+- `memory recall reliable`, runtime ready, RC ready, production ready, V8 implemented, and VCP full parity remain not claimed.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
 ## Memory Recall Temp Workspace Evidence Review Sync - 2026-05-22
 
