@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0754 Bounded recall plan remote reconciliation - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board/status/truth-table remote reconciliation closeout only.
+- Read-only reconciliation before update: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `1e9b20210e794ff74f20278c4cb8e0df0eef7b30`; worktree was clean.
+- Finding: exact string `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_PLAN_COMPLETED_SYNCED_NOT_READY` was missing from the allowed docs/board/status scan.
+- Changed files: `docs/MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_PLAN.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Closeout recorded: only bounded recall evidence plan completed; no true `search_memory`, no real memory / `.jsonl` read, no provider call, no durable memory/audit write; `memory recall reliable` not claimed; `RC_NOT_READY_BLOCKED` remains.
+- Boundary: no source/test/package change, runtime recall validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, public MCP expansion, migration/backup apply, tag/release/deploy/cutover, or readiness claims.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0754`, `latest_ledger=CM-0754`, and `latest_validation=CMV-0873`.
+
 ## Checkpoint - CM-0753 Memory recall reliability bounded evidence plan - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

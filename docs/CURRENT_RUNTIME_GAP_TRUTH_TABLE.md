@@ -273,6 +273,17 @@ Result: `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_PLAN_COMPLETED_NOT_READY`.
 - `memory recall reliable` is not claimed. `memory write reliable`, runtime ready, RC ready, production ready, V8 implementation, and VCP full parity are not claimed.
 - Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## Memory Recall Reliability Bounded Evidence Plan Remote Reconciliation - 2026-05-22
+
+Result: `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_PLAN_COMPLETED_SYNCED_NOT_READY`.
+
+- Remote reconciliation confirmed local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all at `1e9b20210e794ff74f20278c4cb8e0df0eef7b30`.
+- Worktree was clean and `git diff --check` passed before this closeout update.
+- The exact synced closeout string was missing from the allowed docs/board/status scan, so this section records it explicitly.
+- This closeout only confirms the bounded recall evidence plan exists on local `main`, `origin/main`, and remote `refs/heads/main`.
+- The plan is still planning only. It did not execute true `search_memory`, did not read real memory content or `.jsonl` audit/durable memory content, did not call providers, and did not write durable memory or durable audit state.
+- `memory recall reliable` is not claimed. `RC_NOT_READY_BLOCKED` remains; no row changes to `complete? = yes`.
+
 ## Truth Table
 
 | gap | current evidence | runtime touched? | A4/A5 | complete? | next minimal action |
