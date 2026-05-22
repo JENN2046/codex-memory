@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0807 recall precision hardening plan - 2026-05-22
+
+- Status: `RECALL_PRECISION_HARDENING_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: planning-only docs/status/board/truth-table plus source read-only review; no new true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/RECALL_PRECISION_HARDENING_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Plan verdict: hardening must start with bounded fixture/temp/local tests for retrieval threshold, negative-control gating, minimum score policy, sanitized score distribution, no-result mode, stricter filter, and exact negative-control reject policy.
+- Boundary: direct third-round live query is still blocked until bounded hardening evidence exists; `memory recall reliable` is not claimed; truth table remains `complete? = no`; `RC_NOT_READY_BLOCKED` remains.
+
 ## Checkpoint - CM-0806 second negative-control failure review - 2026-05-22
 
 - Status: `CM0774_RECALL_PRECISION_HARDENING_REQUIRED`; project decision remains `RC_NOT_READY_BLOCKED`.

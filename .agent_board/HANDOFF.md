@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0807 Handoff
+
+Status: `RECALL_PRECISION_HARDENING_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/RECALL_PRECISION_HARDENING_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Plan verdict: next safe scope is bounded implementation/tests for recall precision hardening. Start with fixture/temp/local evidence for retrieval threshold, negative-control gating, minimum score policy, sanitized score distribution, no-result mode, stricter filter, and exact negative-control reject policy.
+
+Next safe action: implement bounded precision policy and targeted tests without live query, raw memory, `.jsonl`, provider, durable write, public MCP expansion, package/config change, or readiness claim.
+
+Boundary: no new true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
 ## CM-0806 Handoff
 
 Status: `CM0774_RECALL_PRECISION_HARDENING_REQUIRED`; project decision remains `RC_NOT_READY_BLOCKED`.
