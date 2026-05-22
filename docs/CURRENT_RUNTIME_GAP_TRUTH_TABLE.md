@@ -248,6 +248,19 @@ Result: `V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW_COMPLETED_NOT_READY`.
 - This re-review did not execute runtime validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, migration/backup apply, public MCP expansion, config/watchdog/startup changes, source/test/package changes, release/cutover actions, or readiness claims.
 - Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## V1 Mainline Candidate Review Remote Reconciliation - 2026-05-22
+
+Result: `V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW_COMPLETED_SYNCED_NOT_READY`.
+
+- Remote reconciliation confirmed local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all at `af87cedaae71f04918013d6d843f6ab3ae4dcaff`.
+- Worktree was clean and `git diff --check` passed before this closeout update.
+- The exact synced closeout string was missing from the allowed docs/board scan, so this section records it explicitly.
+- Package reviewed, no overclaim found.
+- Remaining blockers remain ordered: `memory recall reliable` not claimed; `memory write reliable` not claimed; ValidationAggregator full implementation incomplete; real rollback A5 blocked; migration/import/export/backup/restore apply A5 blocked; runtime/RC/production/release/cutover readiness blocked; V8 not implemented and VCP full parity not claimed.
+- Next runtime/readiness gap selection remains required before any execution; the current unique selected candidate is `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`, separately exact-approved A5 only.
+- This reconciliation did not execute runtime validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, public MCP expansion, migration/backup apply, source/test/package changes, release/cutover actions, or readiness claims.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Truth Table
 
 | gap | current evidence | runtime touched? | A4/A5 | complete? | next minimal action |

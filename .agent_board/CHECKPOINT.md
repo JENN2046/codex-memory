@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0752 V1 Mainline Candidate review remote reconciliation - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board/status remote reconciliation closeout only.
+- Read-only reconciliation before update: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `af87cedaae71f04918013d6d843f6ab3ae4dcaff`; worktree was clean.
+- Finding: exact string `V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW_COMPLETED_SYNCED_NOT_READY` was missing from the allowed docs/board scan.
+- Changed files: `docs/V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Closeout recorded: package reviewed, no overclaim found, remaining blockers ordered, next runtime/readiness gap selection remains separately exact-approved `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`, and `RC_NOT_READY_BLOCKED` remains.
+- Boundary: no source/test/package change, runtime validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, public MCP expansion, migration/backup apply, tag/release/deploy/cutover, or readiness claims.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0752`, `latest_ledger=CM-0752`, and `latest_validation=CMV-0871`.
+
 ## Checkpoint - CM-0751 V1 Mainline Candidate package re-review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

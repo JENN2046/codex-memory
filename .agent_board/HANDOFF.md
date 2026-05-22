@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0752 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; V1 Mainline Candidate review remote reconciliation closeout recorded, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; reconciliation start facts: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `af87cedaae71f04918013d6d843f6ab3ae4dcaff`; worktree was clean.
+
+Finding: exact closeout string `V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW_COMPLETED_SYNCED_NOT_READY` was missing from the allowed docs/board scan, even though the commit itself existed locally and remotely.
+
+Changed files: `docs/V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Closeout: package reviewed, no overclaim found; remaining blockers ordered; next runtime/readiness gap selection remains separately exact-approved `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`; `RC_NOT_READY_BLOCKED` remains.
+
+Boundary: no source/test/package change, runtime validation, true live `record_memory`/`search_memory`, provider call, real memory scan, durable memory/audit write, public MCP expansion, migration/backup apply, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: run `git diff --check`, docs validation, push-readiness, safe push, and post-push remote-state review if scope remains allowed.
+
 ## CM-0751 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; v1 Mainline Candidate package re-review completed, but project decision remains `RC_NOT_READY_BLOCKED`.
