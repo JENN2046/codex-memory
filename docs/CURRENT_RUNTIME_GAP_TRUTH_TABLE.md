@@ -198,7 +198,7 @@ Final round 2 boundary:
 - The project remains not runtime ready, not RC ready, not production ready, and not cutover ready.
 - `RC_NOT_READY_BLOCKED` remains the controlling operator state.
 
-Fresh pre-handoff Git check confirmed Day 14 was synchronized at `HEAD == origin/main == remote refs/heads/main == dfb0d3ae280049ef545eea8d2b59bc781817f657` with a clean worktree.
+Fresh pre-handoff Git check confirmed Day 14 was synchronized at `HEAD == origin/main == remote refs/heads/main == dfb0d3ae280049ef545eea8d2b59bc781817f657` with a clean worktree. Final post-push remote-state review for the CM-0798 handoff commit confirmed `HEAD == origin/main == remote refs/heads/main == 85302a81c69e84aa1772b54191b71dd15353072b` with a clean worktree.
 
 This handoff did not execute true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness/reliability claims.
 
