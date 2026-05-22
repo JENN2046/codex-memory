@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0790 RC_PRECHECK_005 plan and execution - 2026-05-22
+
+- Status: `RC_PRECHECK_005_PASSED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: execute only the Day 12 allowed precheck commands and record warnings/status; no true memory action, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, or readiness transition.
+- Changed files: `docs/RC_PRECHECK_005_PLAN_AND_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Validation verdict: `git diff --check` passed; docs validation passed; strict gate passed with health ok, contract `25/25`, tests `1989/1989`, compare `43/43`, rollback `43/43`; standalone observe passed with summary ok and watchdog recovery `0`; standalone compare matched `43/43`; standalone rollback was harness-ready `43/43`.
+- Warning: Node SQLite `ExperimentalWarning` appeared in observe/compare/rollback output; summary records only sanitized counts/statuses.
+- Next safe action: continue Day 13 `V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE` without claiming readiness.
+
 ## Checkpoint - CM-0789 runtime gap truth-table hard closeout 002 - 2026-05-22
 
 - Status: `RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_002_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
