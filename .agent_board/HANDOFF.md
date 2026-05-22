@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0777 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; true live recall internal proof runner implemented with targeted synthetic tests, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/core/TrueLiveRecallReadonlyProofRunner.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_IMPLEMENTATION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Implementation verdict: runner is internal-only and does not expand public MCP schema. It requires exact CM-0774 approval, exactly four ordered query slots, sealed `readOnly/noProvider/noAudit/sanitizedOutput/includeContent=false` proof context, sanitized output, and zero side-effect counters for provider/direct `.jsonl`/durable memory/durable audit/cache/sync/vector/embedding/public MCP surfaces.
+
+Validation: targeted runner test passed `4/4`; docs validation and `git diff --check` passed.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real memory read, `.jsonl` read, provider call, broad real memory scan, durable memory/audit write, package/config/watchdog/startup change, public MCP expansion, release/deploy/cutover, or readiness claim occurred.
+
+Next safe action: review the CM-0777 internal runner implementation. Any true live CM-0774 proof still requires a separate exact approval and must emit sanitized evidence only.
+
 ## CM-0776 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; true live recall internal proof runner plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.

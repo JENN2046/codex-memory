@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0777 True live recall internal proof runner implementation - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: minimal internal runner implementation, targeted synthetic tests, and docs/status/board/truth-table sync.
+- Changed files: `src/core/TrueLiveRecallReadonlyProofRunner.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_IMPLEMENTATION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Implementation verdict: internal runner exists without public MCP schema expansion. It enforces exact approval, exact query count `4`, sealed `readOnly/noProvider/noAudit/sanitizedOutput/includeContent=false` proof context, broad-scan rejection, sanitized output, zero side-effect counters, and bounded timeout/error reporting.
+- Validation: `node --check src\core\TrueLiveRecallReadonlyProofRunner.js`; `node --check tests\true-live-recall-internal-proof-runner.test.js`; `node --test tests\true-live-recall-internal-proof-runner.test.js` passed `4/4`; `git diff --check` passed; docs validation passed with `latest_task=CM-0777`, `latest_ledger=CM-0777`, and `latest_validation=CMV-0896`.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory recall reliable`.
+- Remaining blocker: CM-0774 true live proof still requires separate exact approval and must remain `RC_NOT_READY_BLOCKED` until a later approved proof/review changes evidence without overclaim.
+
 ## Checkpoint - CM-0776 True live recall internal proof runner plan - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

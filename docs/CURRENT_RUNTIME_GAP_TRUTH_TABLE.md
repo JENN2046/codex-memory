@@ -50,7 +50,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
-| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning evidence only. CM-0773 downgrades the blocker from missing local-path bounded evidence to missing true live real-store reliability proof; CM-0775 adds that the current `search_memory` surface cannot yet prove no-provider/no-audit/read-only execution for that proof; CM-0776 defines an internal runner plan that avoids public MCP expansion but is not implemented. | no | Implement and review the internal exact-approved runner with `readOnly/noProvider/noAudit/sanitizedOutput/exactQueryCount=4`; then require separate exact approval for the true live proof. No `.jsonl`, provider, broad real-memory scan, durable write, public MCP expansion, or readiness claim may be inferred. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner evidence only. CM-0777 implements the internal sealed runner and targeted synthetic tests, but it does not execute true live real-store recall. | no | Review CM-0777, then require separate exact approval before any true live proof. No `.jsonl`, provider, broad real-memory scan, durable write, public MCP expansion, or readiness claim may be inferred. |
 | memory write reliable | exact approval required | CM-0737 proves only separately exact-approved rejected and accepted `record_memory` attempts, with one accepted durable write under explicit approval. | no | Any further write proof requires a separate exact approval; default unattended write reliability remains unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. | no | Do not count collectors as maturity; close only after automatic ingestion, freshness/baseline binding, approved evidence capture, and final RC matrix integration are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
@@ -107,6 +107,36 @@ Planning conclusion:
 This plan did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
+## True Live Recall Internal Proof Runner Implementation - 2026-05-22
+
+Result: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_IMPLEMENTED_SYNCED_NOT_READY`.
+
+Artifact: `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_IMPLEMENTATION.md`.
+
+Implementation summary:
+
+- Added internal-only `src/core/TrueLiveRecallReadonlyProofRunner.js`.
+- Added targeted synthetic tests in `tests/true-live-recall-internal-proof-runner.test.js`.
+- Did not add public MCP tools and did not expand the public `search_memory` schema.
+- Runner requires exact approval, exact query count `4`, ordered query slots `Q1-Q4`, sealed `readOnly/noProvider/noAudit/sanitizedOutput/includeContent=false` proof context, and broad-scan rejection.
+- Runner fails closed when provider, direct `.jsonl`, durable memory, durable audit, candidate cache write/flush, sync, vector flush, embedding cache write, raw memory read, or public MCP expansion counters are non-zero.
+- Runner emits sanitized evidence only, hashing top result ids and excluding raw `content`, `text`, `snippet`, raw memory text, raw chat history, and raw `.jsonl`.
+- Timeout is recorded as bounded `SEARCH_MEMORY_TIMEOUT` failed-not-ready evidence.
+
+Validation:
+
+```text
+node --check src\core\TrueLiveRecallReadonlyProofRunner.js
+node --check tests\true-live-recall-internal-proof-runner.test.js
+node --test tests\true-live-recall-internal-proof-runner.test.js
+```
+
+Targeted test result: `4/4`.
+
+This implementation did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+CM-0774 true live proof still requires separate exact approval. Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
 ## RC_PRECHECK_004 - 2026-05-22
 
