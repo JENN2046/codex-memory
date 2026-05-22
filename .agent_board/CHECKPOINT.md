@@ -5,7 +5,7 @@
 - Status: `V1_MAINLINE_MEMORY_SPINE_FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
 - Scope: Day 15 final remote sync and handoff only; no runtime proof, true memory action, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
 - Changed files: `docs/POST_GO_NO_GO_REMOTE_SYNC_AND_HANDOFF.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
-- Sync verdict: pre-handoff Git checks confirmed `HEAD == origin/main == remote refs/heads/main == 037a839886a6a1f5cd60e6a1a71d6187c50603c0`; post-push final closeout must confirm the handoff commit.
+- Sync verdict: pre-handoff Git checks confirmed `HEAD == origin/main == remote refs/heads/main == 037a839886a6a1f5cd60e6a1a71d6187c50603c0`; post-push remote-state review confirmed the handoff commit at `HEAD == origin/main == remote refs/heads/main == 9ba871b96ce7888b257800f6599cedbe2b2d1898`.
 - Final verdict: final RC review package is ready for human/operator review and remains not release ready.
 - Remaining blocker: no active readiness/reliability row is complete; `RC_NOT_READY_BLOCKED` remains.
 - Next safe action: only a separately exact-approved blocker closure path should continue.

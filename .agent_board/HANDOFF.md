@@ -10,7 +10,7 @@ Branch: `main`.
 
 Changed files: `docs/POST_GO_NO_GO_REMOTE_SYNC_AND_HANDOFF.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
 
-Sync verdict: pre-handoff Git checks confirmed `HEAD == origin/main == remote refs/heads/main == 037a839886a6a1f5cd60e6a1a71d6187c50603c0` with a clean worktree. The final conversation closeout records the post-push handoff commit hash.
+Sync verdict: pre-handoff Git checks confirmed `HEAD == origin/main == remote refs/heads/main == 037a839886a6a1f5cd60e6a1a71d6187c50603c0` with a clean worktree. Post-push remote-state review confirmed the handoff commit at `HEAD == origin/main == remote refs/heads/main == 9ba871b96ce7888b257800f6599cedbe2b2d1898`.
 
 Final verdict: the CM-0780 through CM-0793 chain reaches `V1_MAINLINE_MEMORY_SPINE_FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`. This means operator-review-package readiness only; it does not approve runtime, RC, production, release, cutover, memory recall/write reliability, V8, or VCP parity claims.
 
