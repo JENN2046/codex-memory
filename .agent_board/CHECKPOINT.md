@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0800 CM0774 exact approval recheck - 2026-05-22
+
+- Status: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_READY_FOR_EXACT_APPROVAL`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: exact approval readiness recheck only; no true live `search_memory`, true live `record_memory`, real memory content read, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/CM0774_TRUE_LIVE_REAL_STORE_PROOF_EXACT_APPROVAL_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Recheck verdict: CM-0774 approval packet remains valid as a future packet; runner patch review remains accepted; CM-0781/0782/0783/0784 adapter and authorization chain is sufficient for exact-approval readiness; exactly four literal query slots and sanitized output/counter boundaries are clear.
+- Boundary: this is not execution approval by itself, not proof execution, not `memory recall reliable`, and not runtime/RC/production/release/cutover readiness.
+
 ## Checkpoint - CM-0799 next blocker closure scope selection - 2026-05-22
 
 - Status: `NEXT_BLOCKER_CLOSURE_SCOPE_SELECTION_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

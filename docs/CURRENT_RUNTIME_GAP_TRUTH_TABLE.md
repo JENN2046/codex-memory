@@ -69,6 +69,25 @@ Day 7 boundary: this classification did not execute true live `record_memory`, t
 
 Controlling state remains `RC_NOT_READY_BLOCKED`.
 
+## CM0774 True Live Real Store Proof Exact Approval Recheck - 2026-05-22
+
+Result: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_READY_FOR_EXACT_APPROVAL`.
+
+Artifact: `docs/CM0774_TRUE_LIVE_REAL_STORE_PROOF_EXACT_APPROVAL_RECHECK.md`.
+
+Recheck verdict:
+
+- CM-0774 approval packet remains valid as a future exact approval packet, but it does not approve execution by itself.
+- Internal proof runner patch review remains accepted for complete side-effect counter presence and fail-closed handling of missing, partial, malformed, non-finite, negative, required-nonzero, unknown-positive counters, and raw executor leakage before sanitization.
+- Current status/backlog/truth-table/board evidence records CM-0781/CM-0782/CM-0783/CM-0784 as the concrete adapter/wrapper plan, implementation, review, and exact authorization review chain sufficient for exact-approval readiness.
+- Future execution still requires a fresh clean synced `main`, the exact approval line, and execution-time preflight. This recheck does not execute true live `search_memory`.
+- The exact four-query set remains Q1 `current project status mainline memory spine state`, Q2 `memory recall evidence ladder bounded evidence progression`, Q3 `blocker not-ready no-overclaim status`, and Q4 `negative-control-zeta-7194-nonexistent-memory-spine-token`.
+- Future output remains limited to sanitized counts, booleans, hashes or opaque ids, metadata keys, and complete zero side-effect counters.
+
+Boundary: this recheck did not execute true live `record_memory`, true live `search_memory`, real memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## Runtime Gap Truth Table Hard Closeout 002 - 2026-05-22
 
 Result: `RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_002_COMPLETED_SYNCED_NOT_READY`.

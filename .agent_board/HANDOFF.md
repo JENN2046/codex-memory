@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0800 Handoff
+
+Status: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_READY_FOR_EXACT_APPROVAL`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/CM0774_TRUE_LIVE_REAL_STORE_PROOF_EXACT_APPROVAL_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Recheck verdict: CM-0774 is ready for a future exact approval line and execution-time preflight only. The approval packet remains valid as a future packet, runner fail-closed patch review remains accepted, and CM-0781/0782/0783/0784 record the adapter/wrapper and authorization-review chain as sufficient for exact-approval readiness.
+
+Future execution boundary: use exactly four query slots: Q1 `current project status mainline memory spine state`, Q2 `memory recall evidence ladder bounded evidence progression`, Q3 `blocker not-ready no-overclaim status`, Q4 `negative-control-zeta-7194-nonexistent-memory-spine-token`. Output only sanitized counts, booleans, hashes or opaque ids, metadata keys, and complete zero side-effect counters.
+
+Remaining blockers: no true live proof has executed; `memory recall reliable` is not claimed; user exact approval is still required; execution-time fresh clean synced `main` preflight is still required; `memory write reliable`, ValidationAggregator full implementation, real rollback apply, migration/import/export/backup/restore apply, and runtime/RC/production/release/cutover readiness remain unclosed.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
 ## CM-0799 Handoff
 
 Status: `NEXT_BLOCKER_CLOSURE_SCOPE_SELECTION_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
