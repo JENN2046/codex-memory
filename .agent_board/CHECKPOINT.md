@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0779 True live recall internal proof runner patch - 2026-05-22
+
+- Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCHED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: targeted runner/test patch plus docs/status/board/truth-table sync.
+- Changed files: `src/core/TrueLiveRecallReadonlyProofRunner.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Patch verdict: missing/partial/malformed side-effect counter evidence now fails closed; unknown positive side-effect counters fail closed; raw executor `content`, `text`, `snippet`, `title`, and related fields fail closed before sanitization.
+- Validation: `node --check src\core\TrueLiveRecallReadonlyProofRunner.js`; `node --check tests\true-live-recall-internal-proof-runner.test.js`; `node --test tests\true-live-recall-internal-proof-runner.test.js` passed `6/6`; `git diff --check` and docs validation are required for closeout.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory recall reliable`.
+- Remaining blocker: CM-0774 true live proof still requires separate exact approval and execution-time concrete internal executor adapter or equivalent wrapper.
+
 ## Checkpoint - CM-0778 True live recall internal proof runner review - 2026-05-22
 
 - Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_NEEDS_PATCH`; project decision remains `RC_NOT_READY_BLOCKED`.

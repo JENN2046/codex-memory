@@ -7,6 +7,8 @@ const {
   EXACT_APPROVAL_LINE,
   EXACT_QUERY_COUNT,
   PROOF_MODE,
+  REQUIRED_SIDE_EFFECT_COUNTER_KEYS,
+  ZERO_SIDE_EFFECT_COUNTERS,
   TrueLiveRecallReadonlyProofRunner
 } = require('../src/core/TrueLiveRecallReadonlyProofRunner');
 
@@ -40,6 +42,13 @@ function assertBoundaryError(error, reason) {
   assert.equal(error.code, 'TRUE_LIVE_RECALL_PROOF_BOUNDARY_VIOLATION');
   assert.equal(error.details.reason, reason);
   return true;
+}
+
+function createZeroSideEffectCounters(overrides = {}) {
+  return {
+    ...ZERO_SIDE_EFFECT_COUNTERS,
+    ...overrides
+  };
 }
 
 test('internal proof runner rejects missing approval and non-exact query count', async () => {
@@ -92,26 +101,10 @@ test('internal proof runner seals read-only proof context and emits sanitized ev
       return {
         results: [{
           memoryId: `private-memory-${request.proofContext.proofRunId}-${calls.length}`,
-          title: 'private title that must be hashed',
           score: 0.987654321,
-          matchedTags: ['safe-tag'],
-          content: 'RAW PRIVATE CONTENT MUST NOT APPEAR',
-          text: 'RAW PRIVATE TEXT MUST NOT APPEAR',
-          snippet: 'RAW PRIVATE SNIPPET MUST NOT APPEAR'
+          matchedTags: ['safe-tag']
         }],
-        sideEffectCounters: {
-          providerCalls: 0,
-          directJsonlReads: 0,
-          durableMemoryWrites: 0,
-          durableAuditWrites: 0,
-          candidateCacheWrites: 0,
-          candidateCacheFlushes: 0,
-          syncCalls: 0,
-          vectorFlushes: 0,
-          embeddingCacheWrites: 0,
-          rawMemoryContentReads: 0,
-          publicMcpExpansion: 0
-        }
+        sideEffectCounters: createZeroSideEffectCounters()
       };
     }
   });
@@ -140,15 +133,71 @@ test('internal proof runner seals read-only proof context and emits sanitized ev
   assert.equal(report.sideEffectCounters.candidateCacheWrites, 0);
   assert.equal(report.sideEffectCounters.vectorFlushes, 0);
 
-  const serialized = JSON.stringify(report);
-  assert.equal(serialized.includes('RAW PRIVATE CONTENT MUST NOT APPEAR'), false);
-  assert.equal(serialized.includes('RAW PRIVATE TEXT MUST NOT APPEAR'), false);
-  assert.equal(serialized.includes('RAW PRIVATE SNIPPET MUST NOT APPEAR'), false);
-  assert.equal(serialized.includes('private title that must be hashed'), false);
   assert.equal(report.perQuery[0].matchedMetadataKeysOnly.includes('content'), false);
   assert.equal(report.perQuery[0].matchedMetadataKeysOnly.includes('text'), false);
   assert.equal(report.perQuery[0].matchedMetadataKeysOnly.includes('snippet'), false);
+  assert.equal(report.perQuery[0].matchedMetadataKeysOnly.includes('title'), false);
   assert.match(report.perQuery[0].topResultIdHashOrStableOpaqueId, /^[a-f0-9]{16}$/);
+});
+
+test('internal proof runner requires complete finite zero side-effect counters', async () => {
+  const counterCases = [
+    {
+      name: 'missing counters',
+      sideEffectCounters: undefined,
+      reason: 'side_effect_counters_missing'
+    },
+    {
+      name: 'partial counters',
+      sideEffectCounters: Object.fromEntries(
+        REQUIRED_SIDE_EFFECT_COUNTER_KEYS
+          .filter(key => key !== 'providerCalls')
+          .map(key => [key, 0])
+      ),
+      reason: 'side_effect_counter_missing'
+    },
+    {
+      name: 'string counter',
+      sideEffectCounters: createZeroSideEffectCounters({ providerCalls: '0' }),
+      reason: 'side_effect_counter_malformed'
+    },
+    {
+      name: 'negative counter',
+      sideEffectCounters: createZeroSideEffectCounters({ providerCalls: -1 }),
+      reason: 'side_effect_counter_malformed'
+    },
+    {
+      name: 'nan counter',
+      sideEffectCounters: createZeroSideEffectCounters({ providerCalls: Number.NaN }),
+      reason: 'side_effect_counter_malformed'
+    },
+    {
+      name: 'unknown positive counter',
+      sideEffectCounters: createZeroSideEffectCounters({ unreviewedWriteCounter: 1 }),
+      reason: 'side_effect_counter_unknown_nonzero'
+    }
+  ];
+
+  for (const counterCase of counterCases) {
+    const runner = new TrueLiveRecallReadonlyProofRunner({
+      async searchExecutor() {
+        return {
+          results: [],
+          sideEffectCounters: counterCase.sideEffectCounters
+        };
+      }
+    });
+
+    await assert.rejects(
+      () => runner.run({
+        approvalLine: EXACT_APPROVAL_LINE,
+        queries: createQueries(),
+        proofRunId: `counter-${counterCase.name}`
+      }),
+      error => assertBoundaryError(error, counterCase.reason),
+      counterCase.name
+    );
+  }
 });
 
 test('internal proof runner fails closed on provider cache sync audit write side effects', async () => {
@@ -171,7 +220,7 @@ test('internal proof runner fails closed on provider cache sync audit write side
       async searchExecutor() {
         return {
           results: [],
-          sideEffectCounters: { [key]: 1 }
+          sideEffectCounters: createZeroSideEffectCounters({ [key]: 1 })
         };
       }
     });
@@ -185,6 +234,40 @@ test('internal proof runner fails closed on provider cache sync audit write side
       error => {
         assertBoundaryError(error, 'side_effect_counter_nonzero');
         assert.deepEqual(error.details.nonZero, [{ key, value: 1 }]);
+        return true;
+      },
+      key
+    );
+  }
+});
+
+test('internal proof runner fails closed on raw executor leakage before sanitizing output', async () => {
+  const rawFields = ['content', 'text', 'snippet', 'title'];
+
+  for (const key of rawFields) {
+    const runner = new TrueLiveRecallReadonlyProofRunner({
+      async searchExecutor() {
+        return {
+          results: [{
+            memoryId: `raw-${key}`,
+            score: 0.5,
+            [key]: 'RAW PRIVATE VALUE MUST FAIL CLOSED'
+          }],
+          sideEffectCounters: createZeroSideEffectCounters()
+        };
+      }
+    });
+
+    await assert.rejects(
+      () => runner.run({
+        approvalLine: EXACT_APPROVAL_LINE,
+        queries: createQueries(),
+        proofRunId: `raw-leakage-${key}`
+      }),
+      error => {
+        assertBoundaryError(error, 'raw_executor_leakage_detected');
+        assert.deepEqual(error.details.leaked, [{ index: 0, key }]);
+        assert.equal(JSON.stringify(error).includes('RAW PRIVATE VALUE MUST FAIL CLOSED'), false);
         return true;
       },
       key

@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0779 Handoff
+
+Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCHED_SYNCED_NOT_READY`; CM-0778 runner-local findings patched, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/core/TrueLiveRecallReadonlyProofRunner.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Patch verdict: side-effect counters now require complete presence and exact zero values; missing, partial, malformed, non-finite, negative, required-nonzero, and unknown-positive counters fail closed. Raw executor `content`, `text`, `snippet`, `title`, and related raw fields fail closed before sanitized output.
+
+Validation: targeted runner test passed `6/6`; docs validation and `git diff --check` are required for final closeout.
+
+Next safe action: review CM-0779 patch. Any CM-0774 true live proof still requires separate exact approval and execution-time concrete internal executor adapter or equivalent wrapper; do not execute true memory search or claim memory recall reliability.
+
 ## CM-0778 Handoff
 
 Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_NEEDS_PATCH`; CM-0777 internal proof runner reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.

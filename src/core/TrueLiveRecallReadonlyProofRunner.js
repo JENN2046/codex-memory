@@ -35,6 +35,7 @@ const ZERO_SIDE_EFFECT_COUNTERS = {
 const FORBIDDEN_OUTPUT_KEYS = new Set([
   'content',
   'text',
+  'title',
   'snippet',
   'rawText',
   'formattedWindow',
@@ -42,6 +43,8 @@ const FORBIDDEN_OUTPUT_KEYS = new Set([
   'chatHistory',
   'jsonlLine'
 ]);
+
+const REQUIRED_SIDE_EFFECT_COUNTER_KEYS = Object.keys(ZERO_SIDE_EFFECT_COUNTERS);
 
 function createProofBoundaryError(message, details = {}) {
   const error = new Error(message);
@@ -147,7 +150,7 @@ function sanitizeResult(result) {
     };
   }
 
-  const idSource = result.memoryId || result.memory_id || result.id || result.sourceFile || result.title;
+  const idSource = result.memoryId || result.memory_id || result.id || result.sourceFile;
   return {
     topResultIdHashOrStableOpaqueId: hashOpaqueId(idSource),
     topResultScoreIfAvailable: numberOrNull(result.score ?? result.baseScore ?? result.rerankScore),
@@ -155,14 +158,56 @@ function sanitizeResult(result) {
   };
 }
 
-function normalizeCounters(counters = {}) {
+function normalizeZeroCounters() {
   return Object.fromEntries(
-    Object.entries(ZERO_SIDE_EFFECT_COUNTERS).map(([key]) => [key, Number(counters[key] || 0)])
+    REQUIRED_SIDE_EFFECT_COUNTER_KEYS.map(key => [key, 0])
   );
 }
 
-function assertZeroSideEffects(counters = {}) {
-  const normalized = normalizeCounters(counters);
+function assertZeroSideEffects(counters) {
+  if (!counters || typeof counters !== 'object' || Array.isArray(counters)) {
+    throw createProofBoundaryError('true live recall proof runner requires explicit side-effect counters', {
+      reason: 'side_effect_counters_missing'
+    });
+  }
+
+  const missing = REQUIRED_SIDE_EFFECT_COUNTER_KEYS.filter(
+    key => !Object.prototype.hasOwnProperty.call(counters, key)
+  );
+  if (missing.length > 0) {
+    throw createProofBoundaryError('true live recall proof runner side-effect counters must be complete', {
+      reason: 'side_effect_counter_missing',
+      missing
+    });
+  }
+
+  const malformed = REQUIRED_SIDE_EFFECT_COUNTER_KEYS
+    .filter((key) => {
+      const value = counters[key];
+      return typeof value !== 'number' || !Number.isFinite(value) || value < 0;
+    })
+    .map(key => ({ key, value: counters[key] }));
+  if (malformed.length > 0) {
+    throw createProofBoundaryError('true live recall proof runner side-effect counters must be finite non-negative numbers', {
+      reason: 'side_effect_counter_malformed',
+      malformed
+    });
+  }
+
+  const unknownNonZero = Object.entries(counters)
+    .filter(([key]) => !Object.prototype.hasOwnProperty.call(ZERO_SIDE_EFFECT_COUNTERS, key))
+    .map(([key, value]) => ({ key, value: Number(value) }))
+    .filter(({ value }) => Number.isFinite(value) && value > 0);
+  if (unknownNonZero.length > 0) {
+    throw createProofBoundaryError('true live recall proof runner unknown side-effect counters must remain zero', {
+      reason: 'side_effect_counter_unknown_nonzero',
+      unknownNonZero
+    });
+  }
+
+  const normalized = Object.fromEntries(
+    REQUIRED_SIDE_EFFECT_COUNTER_KEYS.map(key => [key, counters[key]])
+  );
   const nonZero = Object.entries(normalized)
     .filter(([, value]) => value !== 0)
     .map(([key, value]) => ({ key, value }));
@@ -175,6 +220,26 @@ function assertZeroSideEffects(counters = {}) {
   }
 
   return normalized;
+}
+
+function assertNoRawExecutorLeakage(results = []) {
+  const leaked = [];
+  for (let index = 0; index < results.length; index += 1) {
+    const result = results[index];
+    if (!result || typeof result !== 'object') continue;
+    for (const key of FORBIDDEN_OUTPUT_KEYS) {
+      if (Object.prototype.hasOwnProperty.call(result, key)) {
+        leaked.push({ index, key });
+      }
+    }
+  }
+
+  if (leaked.length > 0) {
+    throw createProofBoundaryError('true live recall proof runner raw executor output must fail closed', {
+      reason: 'raw_executor_leakage_detected',
+      leaked
+    });
+  }
 }
 
 function createSealedProofContext({ baselineCommit = 'unknown', proofRunId = null } = {}) {
@@ -260,6 +325,7 @@ class TrueLiveRecallReadonlyProofRunner {
             ? response
             : [];
         const counters = assertZeroSideEffects(response?.sideEffectCounters);
+        assertNoRawExecutorLeakage(results);
         const top = sanitizeResult(results[0]);
 
         entry.resultCount = results.length;
@@ -271,7 +337,7 @@ class TrueLiveRecallReadonlyProofRunner {
         if (error?.code === 'SEARCH_MEMORY_TIMEOUT') {
           decision = RESULT_LABELS.failed;
           entry.errorCodeIfAny = 'SEARCH_MEMORY_TIMEOUT';
-          entry.sideEffectCounters = normalizeCounters();
+          entry.sideEffectCounters = normalizeZeroCounters();
         } else {
           throw error;
         }
@@ -317,11 +383,11 @@ class TrueLiveRecallReadonlyProofRunner {
 }
 
 function mergeSideEffectCounters(perQuery = []) {
-  const merged = normalizeCounters();
+  const merged = normalizeZeroCounters();
   for (const query of perQuery) {
-    const counters = normalizeCounters(query.sideEffectCounters);
+    const counters = query.sideEffectCounters || normalizeZeroCounters();
     for (const key of Object.keys(merged)) {
-      merged[key] += counters[key];
+      merged[key] += Number(counters[key] || 0);
     }
   }
   return merged;
@@ -333,8 +399,10 @@ module.exports = {
   PROOF_MODE,
   REQUIRED_QUERY_SLOTS,
   RESULT_LABELS,
+  REQUIRED_SIDE_EFFECT_COUNTER_KEYS,
   ZERO_SIDE_EFFECT_COUNTERS,
   TrueLiveRecallReadonlyProofRunner,
+  assertNoRawExecutorLeakage,
   assertExactApproval,
   assertZeroSideEffects,
   createProofBoundaryError,
