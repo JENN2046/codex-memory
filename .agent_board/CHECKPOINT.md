@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0802 true live recall proof review - 2026-05-22
+
+- Status: `TRUE_LIVE_RECALL_PROOF_REVIEW_NEEDS_SECOND_NEGATIVE_CONTROL`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review CM-0801 sanitized evidence only; no new true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/TRUE_LIVE_RECALL_PROOF_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Review verdict: Q1/Q2/Q3 support expected recall at sanitized evidence level; Q4 negative-control returning 2 sanitized results is medium risk and cannot be classified more narrowly without forbidden raw evidence.
+- Boundary: `memory recall reliable` is not claimed; truth table remains `bounded evidence only` and `complete? = no`; second exact-approved stricter negative-control proof is needed.
+
 ## Checkpoint - CM-0801 CM0774 true live proof execution - 2026-05-22
 
 - Status: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

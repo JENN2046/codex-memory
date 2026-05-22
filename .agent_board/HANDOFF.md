@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0802 Handoff
+
+Status: `TRUE_LIVE_RECALL_PROOF_REVIEW_NEEDS_SECOND_NEGATIVE_CONTROL`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/TRUE_LIVE_RECALL_PROOF_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: CM-0801 Q1/Q2/Q3 support expected recall at sanitized evidence level, and the runner/adapter boundary remained healthy with complete zero side-effect counters. Q4 negative-control returned `2` sanitized results and is classified as medium risk.
+
+Q4 interpretation: this review cannot isolate tokenizer behavior, semantic broad matching, query design, or recall precision without forbidden raw memory/content/tokenization evidence. Treat it as a combined negative-control criteria / query-design / recall-precision gap.
+
+Next safe action: prepare a separately exact-approved stricter negative-control proof. The negative-control query should avoid project-domain terms such as `memory`, `spine`, `recall`, `proof`, and `blocker`, and should require resultCount `0` or fail-not-ready if nonzero.
+
+Boundary: no new true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
 ## CM-0801 Handoff
 
 Status: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
