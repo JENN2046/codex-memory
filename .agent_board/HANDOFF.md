@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0766 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; CM-0758 / CM-0759 temp workspace recall evidence review synced, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; sync start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `f8dae8155d3d90b99d118c04da593798aac706e0`; worktree was clean.
+
+Changed files: `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Review verdict: CM-0758 remains sufficient bounded synthetic temp-workspace evidence for limited local real-path recall readiness planning.
+
+Remaining gap: `memory recall reliable` remains not claimed because this evidence does not execute true live `search_memory`, read real memory content, read `.jsonl`, call providers, prove real corpus quality/freshness/folder behavior, prove VCP parity, or provide real-store recall reliability proof.
+
+Boundary: no true live `search_memory` against real store, no true live `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider/model/API call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: Day 7 hard truth-table convergence remains the broader next step; do not mark gaps complete without direct runtime evidence.
+
 ## CM-0765 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; Day 6 rollback / migration / backup boundary reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.

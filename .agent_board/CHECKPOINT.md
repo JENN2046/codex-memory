@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0766 Memory recall temp workspace evidence review sync - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review/docs/board/status/truth-table sync only for CM-0758 / CM-0759 temp workspace recall evidence review.
+- Changed files: `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Review verdict: CM-0758 remains sufficient bounded synthetic temp-workspace evidence for the next limited local real-path recall readiness planning layer.
+- Accepted coverage: isolated temp root, exactly four synthetic `.json` seed records, exactly four bounded recall queries, expected current result, irrelevant suppression, freshness ordering, alpha folder scope, timeout/error boundary, sanitized evidence output, cleanup verification, and zero provider / real memory / `.jsonl` / durable memory / durable audit side effects.
+- Remaining gap: CM-0758 / CM-0759 still do not execute true live `search_memory`, read real memory content, read `.jsonl`, call providers, prove real corpus precision/recall/freshness/folder behavior, prove VCP full parity, or justify `memory recall reliable`.
+- Boundary: no true live `search_memory` against real store, no true live `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider call, no real memory broad scan, no durable memory/audit write, no migration/import/export/backup/restore apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0766`, `latest_ledger=CM-0766`, and `latest_validation=CMV-0885`.
+
 ## Checkpoint - CM-0765 Rollback / migration / backup boundary review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

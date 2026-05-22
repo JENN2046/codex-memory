@@ -1,6 +1,6 @@
 # Memory Recall Temp Workspace Evidence Review
 
-Status: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_NOT_READY`
+Status: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_SYNCED_NOT_READY`
 Date: 2026-05-22
 Scope: review of CM-0758 temp workspace recall evidence
 Baseline: `4ca7795ffbe8966795df94b9571662e97fdd3a3b`
@@ -293,4 +293,6 @@ This next step must be planning-only unless separately authorized otherwise.
 
 `RC_NOT_READY_BLOCKED` remains.
 
-Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_NOT_READY`.
+Remote-sync closeout: this review is confirmed as a synced docs/board/status/truth-table closeout on the current mainline history. The conclusion remains not-ready and bounded-only.
+
+Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_SYNCED_NOT_READY`.

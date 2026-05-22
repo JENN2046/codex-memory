@@ -28,6 +28,17 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## Memory Recall Temp Workspace Evidence Review Sync - 2026-05-22
+
+Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_SYNCED_NOT_READY`.
+
+- `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW.md` remains the current CM-0758 review packet and now carries the synced closeout label.
+- Accepted coverage remains unchanged: isolated temp root, exactly four synthetic `.json` seed records, exactly four bounded recall queries, expected current result, irrelevant-result suppression, freshness ordering, alpha folder scope, timeout/error boundary, sanitized evidence output, cleanup verification, and zero provider / real memory / `.jsonl` / durable memory / durable audit side effects.
+- This is still bounded synthetic temp-workspace evidence only. It does not execute true live `search_memory` against the real store, read real memory content, read `.jsonl` audit or durable memory content, call providers, broad scan real memory, write durable memory/audit state, apply migration/import/export/backup/restore, expand public MCP, change config/watchdog/startup, change package/lockfile, tag/release/deploy/cutover, or claim readiness.
+- The review is sufficient to support a limited local real-path recall readiness plan, but it is not sufficient to claim `memory recall reliable`.
+- `memory recall reliable`, `memory write reliable`, runtime ready, RC ready, production ready, V8 implemented, and VCP full parity are not claimed.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Rollback Migration Backup Boundary Review - 2026-05-22
 
 Result: `MEMORY_ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW_COMPLETED_NOT_READY`.
@@ -416,7 +427,7 @@ Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_COMPLETED_NOT_READY`.
 
 ## Memory Recall Temp Workspace Evidence Review - 2026-05-22
 
-Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_NOT_READY`.
+Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_SYNCED_NOT_READY`.
 
 - Added `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW.md`.
 - Review accepts CM-0758 as sufficient bounded evidence for a next limited local real-path recall readiness plan.
