@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0745 Handoff
+
+Status: `FAILED_NOT_READY`; docs/board evidence record only.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; RC_PRECHECK_003 started from clean `main...origin/main` at `78f34cd docs: record scope freeze post-push sync`.
+
+Result: `RC_PRECHECK_003_FAILED_NOT_READY`. Strict mainline gate failed because its test gate reported `1974 total / 1973 pass / 1 fail`. Health, contract, compare, and rollback portions of the strict gate were ok. Independent HTTP observe exited 0 with `status=warn` from historical watchdog recoveries; independent compare passed `43/43 matched`; independent rollback passed `43/43 rollback-ready`.
+
+Validation run: approved RC_PRECHECK_003 command set plus docs evidence validation.
+
+Boundary: no true `record_memory`/`search_memory` live validation, provider call, real memory scan, durable memory/audit write, migration/backup apply, public MCP expansion, package/lockfile/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: investigate the single strict-gate test failure under a separately authorized source/test task; keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-0744 Handoff
 
 Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`.

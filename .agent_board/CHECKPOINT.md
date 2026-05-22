@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0745 RC_PRECHECK_003 execution - 2026-05-22
+
+- Status: `FAILED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: executed the approved RC_PRECHECK_003 command set and recorded evidence only.
+- Baseline: `main...origin/main` clean; `HEAD=78f34cd docs: record scope freeze post-push sync`.
+- Passing checks: `git diff --check`; docs validation; independent compare `43/43 matched`; independent rollback `43/43 rollback-ready`.
+- Failed check: `npm run gate:mainline:strict` failed because the test gate reported `1974 total / 1973 pass / 1 fail`, despite health ok, contract `25/25`, compare `43/43 matched`, and rollback `43/43 rollback-ready`.
+- Warnings: `npm run observe:http -- --json` exited 0 with `status=warn`, health ok, HTTP log errors `0`, watchdog recovery count `9`, and governance fail-closed; SQLite ExperimentalWarning appeared in observe/compare/rollback.
+- Boundary: no true `record_memory`/`search_memory` live validation, provider call, real memory scan, durable memory/audit write, migration/backup apply, public MCP expansion, package/lockfile/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+- Next safe task: investigate the single strict-gate test failure under a separately authorized source/test task; do not claim RC readiness.
+
 ## Checkpoint - CM-0744 Mainline spine scope-freeze post-push sync - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

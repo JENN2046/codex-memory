@@ -86,6 +86,40 @@ Result: `MAINLINE_SPINE_SCOPE_FREEZE_CLOSEOUT_PUSHED_SYNCED_NOT_READY`.
 - `memory write reliable` is not claimed. `memory recall reliable` is not claimed.
 - V8 is not implemented, VCP full parity is not claimed, and controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## RC_PRECHECK_003 Execution - 2026-05-22
+
+Result: `RC_PRECHECK_003_FAILED_NOT_READY`.
+
+Target baseline:
+
+- local `HEAD`: `78f34cd docs: record scope freeze post-push sync`
+- branch state before execution: `main...origin/main`
+- worktree before execution: clean
+
+Executed command outcomes:
+
+- `git status -sb`: clean, aligned with `origin/main`.
+- `git log --oneline --decorate -n 20`: current head was `78f34cd`.
+- `git diff --check`: passed.
+- docs validation: passed.
+- `npm run gate:mainline:strict`: failed. Health was ok, contract was `25/25`, compare was `43/43 matched`, rollback was `43/43 rollback-ready`, but the test gate reported `1974 total / 1973 pass / 1 fail`.
+- `npm run observe:http -- --json`: exited 0 with `status=warn`; health was ok, HTTP log errors were `0`, watchdog recovery count was `9`, and governance remained fail-closed.
+- `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match`: passed with `43/43 matched`; SQLite ExperimentalWarning observed.
+- `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready`: passed with `43/43 rollback-ready`; SQLite ExperimentalWarning observed.
+
+Warning / blocker handling:
+
+- Blocking: strict mainline gate test failure (`1` failing test) blocks RC_PRECHECK_003 pass.
+- Warning: HTTP observe `warn` from historical watchdog recoveries is not readiness evidence.
+- Warning: SQLite ExperimentalWarning in observe/compare/rollback is recorded as warning, not readiness evidence.
+
+Forbidden action review:
+
+- No true `record_memory` or true `search_memory` live validation was executed.
+- No provider call, real memory scan, durable memory write, durable audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile change, config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim occurred.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`. `memory write reliable` is not claimed. `memory recall reliable` is not claimed. V8 is not implemented. VCP full parity is not claimed. No row changes to `complete? = yes`.
+
 ## Truth Table
 
 | gap | current evidence | runtime touched? | A4/A5 | complete? | next minimal action |
@@ -95,7 +129,7 @@ Result: `MAINLINE_SPINE_SCOPE_FREEZE_CLOSEOUT_PUSHED_SYNCED_NOT_READY`.
 | recall isolation runtime proof | A4 explicit projection isolation exists; A5 no-mutation scan and sanitized positive-control write/projection proof exist. Broad real-memory isolation and future sample coverage remain incomplete. | yes, bounded approved stores and one sanitized positive-control write | A4 plus A5 bounded evidence | no | If needed, request exact approval for the next bounded recall isolation proof; no broad scan or backfill by default. |
 | migration / import / export / backup / restore execution | Fixture-only migration-readiness dry-run evidence exists and remains blocked for real apply/import/export/backup/restore. | fixture-only dry-run; no real data apply | A5 dry-run only | no | Create a separate exact A5 packet naming one real action and one target before any apply/import/export/backup/restore action. |
 | live HTTP operation readiness | Endpoint-bound historical HTTP evidence exists for loopback `7605`, with no config/watchdog/startup change. HTTP session TTL/cap/cleanup hardening is completed locally in `16538ea`; closeout recorded in `765ab18`; targeted HTTP tests passed `13/13`. | yes, local runtime hardening only; no fresh observe for current packet target; no config/watchdog/startup change | A4/CM-0550 local hardening plus historical A5 endpoint evidence | no | Future HTTP observe/precheck requires exact approval bound to current target and endpoint. Do not infer production readiness from local hardening alone. |
-| current-head strict gate for cutover | Readonly RC_PRECHECK_001 evidence passed at local HEAD `638325a` with strict gate ok, tests `1601/1601`, compare `43/43`, rollback `43/43`, and HTTP observe ok. This is precheck evidence only, not cutover or readiness evidence. | yes for older target-bound gates; not current cutover | A5 target-bound gate evidence | no | For cutover evidence, request separate exact A5 approval; do not infer readiness from readonly precheck pass. |
+| current-head strict gate for cutover | Readonly RC_PRECHECK_001 evidence passed at local HEAD `638325a` with strict gate ok, tests `1601/1601`, compare `43/43`, rollback `43/43`, and HTTP observe ok. RC_PRECHECK_003 later failed at current head `78f34cd`: strict mainline gate health/contract/compare/rollback were ok, but test gate reported `1974 total / 1973 pass / 1 fail`; independent observe was `warn`, compare matched `43/43`, and rollback was `43/43 rollback-ready`. This is failed precheck evidence, not cutover or readiness evidence. | yes for older target-bound gates and current failed precheck commands; not current cutover | A5 target-bound precheck evidence | no | Investigate the single strict-gate test failure under a separate source/test task if authorized; do not infer readiness from compare/rollback pass while the strict gate test blocker remains. |
 | RC cutover | No RC cutover, tag, release, deploy, production transition, or readiness transition has been executed. | no | A5 required | no | Execute only after zero open runtime gaps, fresh approved gates, explicit release boundary approval, and final human authorization. |
 
 ## Current Minimal Backlog
