@@ -69,6 +69,41 @@ Day 7 boundary: this classification did not execute true live `record_memory`, t
 
 Controlling state remains `RC_NOT_READY_BLOCKED`.
 
+## RC_PRECHECK_004 - 2026-05-22
+
+Result: `RC_PRECHECK_004_PASSED_SYNCED_NOT_READY`.
+
+Baseline:
+
+- local `HEAD`: `9a1aa5b35a4526b710546219a0175757f6973e00`
+- local tracking `origin/main`: `9a1aa5b35a4526b710546219a0175757f6973e00`
+- remote `refs/heads/main`: `9a1aa5b35a4526b710546219a0175757f6973e00`
+- worktree at precheck start: clean `main...origin/main`
+
+Allowed command evidence:
+
+| command | result | evidence boundary |
+|---|---|---|
+| `git status -sb` | pass | Start state was clean `main...origin/main`. |
+| `git log --oneline --decorate -n 20` | pass | Current head lineage included Day 1-7 commits through `9a1aa5b docs: classify runtime gap truth table`. |
+| `git diff --check` | pass | No whitespace/error diff issue. |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` | pass | Docs validation passed; ledger consistency still reported `latest_task=CM-0767`, `latest_ledger=CM-0767`, and `latest_validation=CMV-0886` before this status-sync commit. |
+| `npm run gate:mainline:strict` | pass | Health ok, contract `25/25`, test `1978/1978`, compare `43/43 matched`, rollback `43/43 rollback-ready`. |
+| `npm run observe:http -- --json` | warning recorded | Exit code `0`, health ok, HTTP log errors `0`, but summary `status=warn` because recent logs show recoverable anomalies: watchdog recovery count `9`; governance surfaces remain fail-closed. |
+| `npm run compare-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-match` | pass | Standard suite matched `43/43`; no drift reported. |
+| `npm run rollback-active-memory -- --suite .\benchmarks\active-memory-suite\standard-suite.json --json --require-ready` | pass | Standard suite rollback posture reported `43/43 rollback-safe`. |
+
+Precheck interpretation:
+
+- The strict gate and independent compare/rollback evidence are accepted as current-head precheck evidence.
+- The HTTP observe warning is not ignored: runtime health is ok, but watchdog recovery history remains a recorded warning.
+- Compare/rollback success remains rollback harness posture, not real rollback apply and not production-proven rollback.
+- `RC_PRECHECK_004` does not close `memory recall reliable`, `memory write reliable`, ValidationAggregator full implementation, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup changes, V8 implementation, VCP full parity, runtime readiness, RC readiness, production readiness, release readiness, or cutover readiness.
+- `observe:http` was executed only as an explicitly allowed Day 8 command; no standalone `.jsonl` or durable memory content read was performed outside that allowed observe summary.
+- No true live `record_memory`, true live `search_memory`, provider/model/API call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile change, config/watchdog/startup change, tag/release/deploy/cutover, force push, branch rewrite, or readiness claim occurred.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Memory Recall Temp Workspace Evidence Review Sync - 2026-05-22
 
 Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_SYNCED_NOT_READY`.

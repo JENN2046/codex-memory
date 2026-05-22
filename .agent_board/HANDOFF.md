@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0768 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; Day 8 `RC_PRECHECK_004` completed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; precheck start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `9a1aa5b35a4526b710546219a0175757f6973e00`; worktree was clean.
+
+Changed files: `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Evidence summary: strict mainline gate passed with health ok, contract `25/25`, test `1978/1978`, compare `43/43 matched`, and rollback `43/43 rollback-ready`; independent compare matched `43/43`; independent rollback was `43/43 rollback-ready`; docs validation and `git diff --check` passed.
+
+Warning summary: HTTP observe exited `0` but remained `status=warn` because recent logs retain recoverable watchdog recovery history count `9`; health was ok, HTTP log errors were `0`, and governance surfaces remained fail-closed.
+
+Remaining blockers: `memory recall reliable`, `memory write reliable`, ValidationAggregator full implementation, real rollback apply, migration/import/export/backup/restore apply, runtime/RC/production/release/cutover readiness, public MCP expansion, config/watchdog/startup changes, V8 implementation, and VCP full parity remain unclosed or future.
+
+Boundary: no true live `record_memory`, no true live `search_memory`, no provider/model/API call, no real memory broad scan, no standalone `.jsonl` or durable memory content read outside allowed observe output, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: Day 9 generate `docs/V1_MAINLINE_RC_REVIEW_PACKAGE.md` as a review package only, carrying forward `RC_PRECHECK_004_PASSED_SYNCED_NOT_READY` and `RC_NOT_READY_BLOCKED`.
+
 ## CM-0767 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; Day 7 hard runtime gap classification completed, but project decision remains `RC_NOT_READY_BLOCKED`.

@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0768 Day 8 RC_PRECHECK_004 - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: allowed RC_PRECHECK_004 command set plus docs/status/board/truth-table sync only.
+- Start baseline: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `9a1aa5b35a4526b710546219a0175757f6973e00`; worktree was clean.
+- Changed files: `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Validation: `git diff --check` passed; docs validation passed; `npm run gate:mainline:strict` passed with health ok, contract `25/25`, test `1978/1978`, compare `43/43 matched`, rollback `43/43 rollback-ready`; independent compare matched `43/43`; independent rollback was `43/43 rollback-ready`.
+- Warning recorded: `npm run observe:http -- --json` exited `0` but summary remained `status=warn` because health was ok and HTTP log errors were `0` while watchdog recovery history count stayed `9`; governance surfaces remained fail-closed.
+- Interpretation: accepted as current-head precheck evidence only. It is not runtime readiness, RC readiness, production readiness, release readiness, cutover readiness, memory write reliability, memory recall reliability, V8 implementation, or VCP full parity.
+- Boundary: no true live `record_memory`, no true live `search_memory`, no provider/model/API call, no real memory broad scan, no standalone `.jsonl` or durable memory content read outside the allowed observe summary, no durable memory/audit write, no migration/import/export/backup/restore apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, no force push, no branch rewrite, and no readiness claim.
+
 ## Checkpoint - CM-0767 Day 7 runtime gap truth-table hard classification - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
