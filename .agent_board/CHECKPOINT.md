@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0756 Memory recall bounded evidence review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review/docs/board/status/truth-table only.
+- Changed files: `docs/MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Review verdict: CM-0755 sufficiently covers expected synthetic result, irrelevant-result suppression, no-token/readOnly zero side effects, and timeout/error boundary for fixture-boundary evidence.
+- Remaining gap: CM-0755 remains synthetic fixture-only and does not execute true live `search_memory`, read real memory content, read `.jsonl`, call providers, prove real corpus quality/freshness/folder behavior, or justify `memory recall reliable`.
+- Next recommended gap: separately exact-approved `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_PLAN`, planning first.
+- Boundary: no true live `search_memory` against real store, real memory content read, `.jsonl` audit/durable memory read, provider call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0756`, `latest_ledger=CM-0756`, and `latest_validation=CMV-0875`.
+
 ## Checkpoint - CM-0755 Memory recall reliability bounded fixture evidence execution - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
