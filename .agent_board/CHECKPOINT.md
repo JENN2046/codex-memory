@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0755 Memory recall reliability bounded fixture evidence execution - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: targeted fixture-only recall test plus docs/board/status/truth-table evidence record.
+- Changed files: `tests/memory-recall-reliability-bounded-evidence.test.js`; `docs/MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_EXECUTION.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Evidence: synthetic in-memory bounded recall returned expected id `synthetic-bounded-recall-expected`; irrelevant id `synthetic-bounded-recall-irrelevant` was suppressed; no-token/readOnly sandbox sync/cache/audit/durable side-effect counters stayed zero; timeout returned `SEARCH_MEMORY_TIMEOUT` with JSON-RPC `-32002`.
+- Boundary: no true live `search_memory` against real store, real memory content read, `.jsonl` audit/durable memory read, provider call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: `node --test tests\memory-recall-reliability-bounded-evidence.test.js` passed `2/2`; `git diff --check` passed; docs validation passed with `latest_task=CM-0755`, `latest_ledger=CM-0755`, and `latest_validation=CMV-0874`.
+
 ## Checkpoint - CM-0754 Bounded recall plan remote reconciliation - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
