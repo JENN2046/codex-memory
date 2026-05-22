@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0761 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; limited local real-path bounded evidence executed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; execution start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `3f42bb5f59e262e14b48c07cf7e1b0f33c5dadd7`; worktree was clean.
+
+Changed files: `tests/memory-recall-limited-local-real-path-evidence.test.js`; `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_BOUNDED_EVIDENCE_EXECUTION.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Evidence: targeted local temp-root test passed `1/1`; it uses exactly four synthetic `.json` seed records, exactly four bounded local recall-path checks, temp-root `VectorIndexStore`, `CandidateGenerator`, `KnowledgeBaseRecallPipeline`, `RecallEnhancer`, and timeout policy. It verifies expected current result, irrelevant suppression, freshness ordering, alpha folder scope, bounded timeout/error shape, sanitized output, cleanup, and zero provider / real memory / `.jsonl` / durable memory / durable audit side effects.
+
+Boundary: no true live `search_memory` against real store, no true live `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: Day 3 recall evidence ladder review across fixture evidence, temp workspace evidence, and limited local real-path evidence; keep `memory recall reliable` not claimed.
+
 ## CM-0760 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; limited local real-path recall readiness plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.

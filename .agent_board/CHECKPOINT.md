@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0761 Memory recall limited local real-path bounded evidence execution - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: targeted fixture/temp-root/local-only recall-path test plus docs/board/status/truth-table evidence record.
+- Changed files: `tests/memory-recall-limited-local-real-path-evidence.test.js`; `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_BOUNDED_EVIDENCE_EXECUTION.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Evidence: targeted test passed `1/1`; the test creates an isolated run-specific temp root, writes exactly four synthetic `.json` seed records, exercises temp-root `VectorIndexStore` local-hash index plus `CandidateGenerator`, `KnowledgeBaseRecallPipeline`, `RecallEnhancer`, and timeout policy, executes exactly four bounded checks, returns `local-realpath-expected-current`, suppresses irrelevant records from accepted output, covers freshness ordering and alpha folder scope, returns `SEARCH_MEMORY_TIMEOUT` / `-32002`, emits sanitized evidence, and verifies cleanup.
+- Boundary: no true live `search_memory` against real store, true live `record_memory`, real memory content read, `.jsonl` audit/durable memory read, provider call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: `node --test tests\memory-recall-limited-local-real-path-evidence.test.js` passed `1/1`; `git diff --check` passed; docs validation passed with `latest_task=CM-0761`, `latest_ledger=CM-0761`, and `latest_validation=CMV-0880`.
+
 ## Checkpoint - CM-0760 Memory recall limited local real-path readiness plan - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

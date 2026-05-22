@@ -28,6 +28,19 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## Memory Recall Limited Local Real-Path Bounded Evidence Execution - 2026-05-22
+
+Result: `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_BOUNDED_EVIDENCE_COMPLETED_NOT_READY`.
+
+- `tests/memory-recall-limited-local-real-path-evidence.test.js` and `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_BOUNDED_EVIDENCE_EXECUTION.md` execute the CM-0760 bounded plan.
+- The targeted test uses a run-specific temp root under `<repo>/tmp/memory-recall-limited-local-real-path-evidence/CM-0761-<run-id>`.
+- The test writes exactly four synthetic `.json` records and executes exactly four bounded local recall-path checks.
+- Checked-in local recall-path modules exercised: `VectorIndexStore` with temp-root local-hash vector index, `CandidateGenerator`, `KnowledgeBaseRecallPipeline`, `RecallEnhancer`, and `runSearchMemoryWithTimeout()`.
+- Accepted evidence covers expected current result, irrelevant-result suppression, freshness ordering, alpha folder scope, timeout/error boundary, sanitized evidence output, cleanup verification, and zero provider / real memory / `.jsonl` / durable memory / durable audit side effects.
+- This remains bounded synthetic local temp-root evidence only. It does not execute true live `search_memory` against the real store, true live `record_memory`, real memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, broad real memory scans, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, or readiness claims.
+- This does not claim `memory recall reliable`, `memory write reliable`, runtime ready, RC ready, production ready, V8 implemented, or VCP full parity.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Memory Recall Limited Local Real-Path Readiness Plan - 2026-05-22
 
 Result: `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN_COMPLETED_NOT_READY`.
