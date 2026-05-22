@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0804 Handoff
+
+Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_READY_FOR_EXACT_APPROVAL`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/CM0774_SECOND_NEGATIVE_CONTROL_PROOF_EXACT_APPROVAL_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Recheck verdict: the CM-0803 second negative-control plan remains valid for future exact approval. Exact query count is `4`; NC1-NC4 each require `resultCount=0`; output shape is sanitized only; complete zero side-effect counters are required; no raw memory, direct `.jsonl`, provider/model/API, or durable memory/audit write is allowed.
+
+Next safe action: wait for a separate exact approval line before any execution. A future execution must recheck fresh clean synced `main`, unchanged runner/adapter path, unchanged query set, unchanged counter/output requirements, and no hard-stop drift.
+
+Boundary: this task did not execute true live `search_memory` or `record_memory`, did not read raw memory or durable content, did not call providers, did not write durable memory/audit, and did not change package/config/watchdog/startup, public MCP, rollback/migration/apply, release/cutover, or readiness state.
+
 ## CM-0803 Handoff
 
 Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

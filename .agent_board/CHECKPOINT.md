@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0804 second negative-control exact approval recheck - 2026-05-22
+
+- Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_READY_FOR_EXACT_APPROVAL`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: exact approval readiness recheck only; no true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/CM0774_SECOND_NEGATIVE_CONTROL_PROOF_EXACT_APPROVAL_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Recheck verdict: CM-0803 plan remains valid for future exact approval; exact query count is `4`; NC1-NC4 each require `resultCount=0`; sanitized output and complete zero side-effect counters are explicit.
+- Boundary: this is not execution approval by itself, not proof execution, not `memory recall reliable`, and not runtime/RC/production/release/cutover readiness.
+
 ## Checkpoint - CM-0803 second negative-control proof plan - 2026-05-22
 
 - Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
