@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0788 Handoff
+
+Status: `ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW_COMPLETED_SYNCED_NOT_READY`; rollback/migration/backup boundaries are refreshed, but apply-level actions remain blocked and project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Review verdict: compare/rollback `43/43` and rollback-active-memory evidence remain bounded harness posture only; `mainline-rollback` remains planning/patch text only; migration readiness and migration/import/export dry-run gates remain fixture/dry-run/no-touch evidence; backup/restore remains exact approval required.
+
+Boundary: no real rollback apply, migration/import/export/backup/restore apply, true live `record_memory`, true live `search_memory`, real memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: continue Day 11 `RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_002` unless a separately exact-approved action changes the scope.
+
 ## CM-0787 Handoff
 
 Status: `VALIDATION_AGGREGATOR_FULL_GAP_REVIEW_COMPLETED_SYNCED_NOT_READY`; ValidationAggregator collector inventory is reviewed, but full implementation remains incomplete and project decision remains `RC_NOT_READY_BLOCKED`.

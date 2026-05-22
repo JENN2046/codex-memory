@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0788 rollback/migration/backup boundary review - 2026-05-22
+
+- Status: `ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: refresh rollback/migration/import/export/backup/restore boundary only; no real rollback apply, migration/import/export/backup/restore apply, true memory action, provider call, durable write, config change, or readiness transition.
+- Changed files: `docs/ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Review verdict: rollback posture remains bounded harness evidence only; `mainline-rollback` remains planning/patch text; migration/import/export/backup/restore remains fixture/dry-run/no-touch approval-boundary evidence.
+- Remaining blocker: real rollback apply, config switch, real backup creation, restore apply, migration/import/export apply, runtime ready, RC ready, production ready, release ready, and cutover ready remain unproven and not claimed.
+- Next safe action: continue Day 11 `RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_002` unless a separate exact approval changes the safe scope.
+
 ## Checkpoint - CM-0787 ValidationAggregator full gap review - 2026-05-22
 
 - Status: `VALIDATION_AGGREGATOR_FULL_GAP_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

@@ -54,9 +54,9 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | memory write reliable | exact approval required | CM-0737 / CM-0763 / CM-0785 prove only separately exact-approved write-path evidence: one rejected `record_memory` attempt, one preflight repair / exact-only approval packet surface, one accepted repaired `record_memory` attempt with `memory_writes=1`, and no-token mutation rejection as bounded boundary evidence. CM-0786 plans the next safe proof surface only; it does not execute or approve a write. | no | Any further write proof requires a separate exact approval; default unattended write reliability, broad `record_memory` reliability, production behavior, rollback cleanup, and long-run durability remain unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 and CM-0787 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. Current inventory is 15 explicit-input collector units; source/tests still keep `validationAggregatorFullImplementation=false` and `fullImplementationComplete=false`. | no | Do not count collectors as maturity; close only after automatic runtime evidence ingestion, current-head freshness/baseline binding, approved RC precheck evidence capture, final RC matrix integration, live evidence handoff, stale-evidence invalidation, and exact-approved durable/write/runtime evidence are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
-| rollback posture | bounded evidence only | Compare/rollback `43/43`, rollback-active-memory, and CM-0765 make rollback posture reviewable as harness readiness evidence only. | no | Do not treat harness readiness as real rollback apply or production rollback proof. |
-| real rollback apply | exact approval required | No real rollback apply, restore, config switch, or cutover has occurred. | no | Separate exact approval required before any real rollback/config-switch action. |
-| migration / import / export / backup / restore apply | exact approval required | Current evidence is fixture/dry-run/no-touch approval-boundary evidence only; apply remains blocked. | no | Separate exact approval must name one real action and target before apply/import/export/backup/restore. |
+| rollback posture | bounded evidence only | Compare/rollback `43/43`, rollback-active-memory, CM-0765, and CM-0788 make rollback posture reviewable as harness readiness evidence only. | no | Do not treat harness readiness as real rollback apply or production rollback proof. |
+| real rollback apply | exact approval required | No real rollback apply, restore, real config switch, or cutover has occurred; CM-0788 keeps `mainline-rollback` as planning/patch text only. | no | Separate exact approval required before any real rollback/config-switch action. |
+| migration / import / export / backup / restore apply | exact approval required | CM-0788 confirms current evidence is fixture/dry-run/no-touch approval-boundary evidence only; apply remains blocked. | no | Separate exact approval must name one real action and target before apply/import/export/backup/restore. |
 | live HTTP operation readiness | bounded evidence only | Historical endpoint-bound loopback evidence and local hardening exist; production/runtime readiness is not proven. | no | Future HTTP observe/precheck must be target-bound and separately authorized when required. |
 | RC_PRECHECK / current-head strict gate | bounded evidence only | RC_PRECHECK_003 repaired rerun passed as precheck evidence; it is not cutover or readiness evidence. | no | Day 8 may execute RC_PRECHECK_004 under the allowed command set; still no readiness claim. |
 | runtime / RC / production / release / cutover readiness | blocked | Open runtime gaps remain, hard stops remain, and no release/cutover authorization exists. | no | Remain `RC_NOT_READY_BLOCKED`; do not claim ready. |
@@ -518,6 +518,19 @@ Artifact: `docs/VALIDATION_AGGREGATOR_FULL_GAP_REVIEW.md`.
 Collector count remains useful inventory evidence only; it is not maturity.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
+## Rollback Migration Backup Boundary Review - 2026-05-22
+
+Result: `ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW_COMPLETED_SYNCED_NOT_READY`.
+
+Artifact: `docs/ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW.md`.
+
+- Rollback posture remains bounded evidence only: compare/rollback `43/43` and rollback-active-memory evidence are harness posture, not real rollback apply, config switch, restore, cutover, or production rollback proof.
+- `mainline-rollback` remains a planning/patch text surface. Generated patch text is not a config write and not authorization to switch real Codex/Claude config.
+- Migration readiness and migration/import/export dry-run gates remain fixture/dry-run/no-touch evidence. They reject apply-style flags and report `mutated=false`, but do not prove real migration/import/export/backup/restore behavior.
+- Backup/restore remains exact approval required. Approval-boundary helpers fail closed on backup/restore/readiness overclaims, but no real backup creation or restore apply is proven.
+- No true live `record_memory`, true live `search_memory`, real memory content read, `.jsonl` audit/durable memory read, provider/model/API call, durable memory/audit write, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup change, tag/release/deploy/cutover, force push, branch rewrite, or readiness claim occurred.
+- `RC_NOT_READY_BLOCKED` remains; no row changes to `complete? = yes`.
 
 ## Memory Write Evidence Review - 2026-05-22
 
