@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0744 Mainline spine scope-freeze post-push sync - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: post-push remote-state review and status sync for the mainline spine scope-freeze closeout batch.
+- Push signal: first push moved `origin/main` through `c3dc28f`, `9071a91`, and `6a541be`.
+- Remote-state review: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `6a541bea098651bd26ea1d44a5db08824eec11a3`; worktree was clean after review.
+- Status sync: recorded that `memory write reliable` is not claimed, `memory recall reliable` is not claimed, V8 is not implemented, VCP full parity is not claimed, and `RC_NOT_READY_BLOCKED` remains controlling.
+- Boundary: no true `record_memory`/`search_memory`, provider, real memory scan, durable write/audit write, migration/backup apply, public MCP expansion, source/test/package edit, tag/release/deploy/cutover, or readiness claim.
+- Next safe task: future runtime/precheck work still requires exact approval; no readiness transition occurred.
+
 ## Checkpoint - CM-0743 Mainline spine scope-freeze closeout - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `RC_NOT_READY_BLOCKED`.

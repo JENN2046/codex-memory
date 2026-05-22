@@ -75,6 +75,17 @@ Result: `MAINLINE_SPINE_SCOPE_FREEZE_CLOSEOUT_READY_FOR_COMMIT` after docs valid
 - V8 is not implemented, VCP full parity is not claimed, and public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
 - Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## Mainline Spine Scope Freeze Post-Push Sync - 2026-05-22
+
+Result: `MAINLINE_SPINE_SCOPE_FREEZE_CLOSEOUT_PUSHED_SYNCED_NOT_READY`.
+
+- The mainline spine truth-table refresh, RC_PRECHECK_003 planning packet, and scope-freeze closeout were pushed to `origin/main`.
+- Post-push remote-state review confirmed local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equal `6a541bea098651bd26ea1d44a5db08824eec11a3`.
+- Worktree was clean after the first push review.
+- This is remote-state sync evidence only. It does not execute runtime proofs, true `record_memory`, true `search_memory`, provider calls, real memory scans, durable writes, public MCP expansion, migration/backup apply, tag, release, deploy, cutover, or readiness transition.
+- `memory write reliable` is not claimed. `memory recall reliable` is not claimed.
+- V8 is not implemented, VCP full parity is not claimed, and controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Truth Table
 
 | gap | current evidence | runtime touched? | A4/A5 | complete? | next minimal action |

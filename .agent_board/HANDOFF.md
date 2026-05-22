@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0744 Handoff
+
+Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; first post-push remote-state review confirmed local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all at `6a541bea098651bd26ea1d44a5db08824eec11a3`.
+
+Result: `MAINLINE_SPINE_SCOPE_FREEZE_CLOSEOUT_PUSHED_SYNCED_NOT_READY`. The mainline spine truth-table refresh, RC_PRECHECK_003 planning packet, and scope-freeze closeout were pushed and reviewed remotely. Status sync records that `RC_NOT_READY_BLOCKED` remains controlling, `memory write reliable` is not claimed, `memory recall reliable` is not claimed, V8 is not implemented, and VCP full parity is not claimed.
+
+Validation run: `git diff --check`; docs validation; push-readiness checks; `git push origin main`; post-push remote-state review.
+
+Boundary: no true `record_memory`/`search_memory`, provider, real memory scan, durable write/audit write, migration/backup apply, public MCP expansion, source/test/package edit, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: future runtime/precheck work still requires exact approval; no readiness transition occurred.
+
 ## CM-0743 Handoff
 
 Status: `COMPLETED_VALIDATED`; guarded local commit is the remaining closeout step if desired.
