@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0797 blocker closure round 2 go/no-go review - 2026-05-22
+
+- Status: `BLOCKER_CLOSURE_ROUND_2_REVIEW_READY_NOT_RELEASE_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: Day 14 go/no-go review only; no runtime proof, true memory action, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/V1_MAINLINE_BLOCKER_CLOSURE_GO_NO_GO_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Decision verdict: the blocker closure round 2 package is ready for operator review only. This is not runtime, RC, production, release, or cutover readiness.
+- Next safe action: continue `POST_ROUND_2_REMOTE_SYNC_AND_HANDOFF`.
+
 ## Checkpoint - CM-0796 blocker closure round 2 package - 2026-05-22
 
 - Status: `V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_PACKAGE_PREPARED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0797 Handoff
+
+Status: `BLOCKER_CLOSURE_ROUND_2_REVIEW_READY_NOT_RELEASE_READY`; blocker closure round 2 evidence package is ready for operator review only and project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/V1_MAINLINE_BLOCKER_CLOSURE_GO_NO_GO_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Decision verdict: Day 14 selected `BLOCKER_CLOSURE_ROUND_2_REVIEW_READY_NOT_RELEASE_READY`, not `NEEDS_ONE_MORE_EVIDENCE_ROUND` or `RC_REVIEW_BLOCKED`. The decision means the round 2 package can be reviewed by an operator; it does not approve runtime, RC, production, release, cutover, memory recall/write reliability, V8, or VCP parity claims.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: continue `POST_ROUND_2_REMOTE_SYNC_AND_HANDOFF` and confirm local/remote refs after push.
+
 ## CM-0796 Handoff
 
 Status: `V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_PACKAGE_PREPARED_SYNCED_NOT_READY`; blocker closure round 2 Day 13 package is prepared and project decision remains `RC_NOT_READY_BLOCKED`.
