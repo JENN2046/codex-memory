@@ -1,5 +1,20 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0767 Day 7 runtime gap truth-table hard classification - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/status/board/truth-table classification only.
+- Changed files: `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Classification rule: every active runtime/readiness gap now uses only `complete`, `bounded evidence only`, `no-touch evidence only`, `exact approval required`, `blocked`, or `future VCP/V8`.
+- Current result: no active runtime/readiness gap is classified `complete`.
+- Bounded evidence only: CM-0558 no-token mutation rejection, CM-0561 timeout guard, CM-0738/CM-0739 no-token readOnly boundary, memory recall ladder, rollback posture, live HTTP posture, and RC precheck evidence.
+- No-touch evidence only: ValidationAggregator full implementation.
+- Exact approval required: memory write reliability, real rollback apply, and migration/import/export/backup/restore apply.
+- Blocked: runtime/RC/production/release/cutover readiness, public MCP expansion, and config/watchdog/startup changes.
+- Future VCP/V8: V8 implementation and VCP full parity.
+- Boundary: no true live `record_memory`, no true live `search_memory`, no provider/model/API call, no real memory broad scan, no real memory content read, no `.jsonl` or durable memory content read, no durable memory/audit write, no migration/import/export/backup/restore apply, no public MCP expansion, no package/lockfile change, no config/watchdog/startup change, no tag/release/deploy/cutover, and no readiness claim.
+- Validation: `git diff --check` passed; classification token check passed; docs validation passed with `latest_task=CM-0767`, `latest_ledger=CM-0767`, and `latest_validation=CMV-0886`.
+
 ## Checkpoint - CM-0766 Memory recall temp workspace evidence review sync - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

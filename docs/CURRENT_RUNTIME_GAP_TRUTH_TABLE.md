@@ -28,6 +28,47 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## Day 7 Hard Runtime Gap Classification - 2026-05-22
+
+Result: `RUNTIME_GAP_TRUTH_TABLE_HARD_CLASSIFICATION_COMPLETED_NOT_READY`.
+
+This section is the current hard classification layer for active runtime/readiness gaps. When older prose is ambiguous, use this section first.
+
+Allowed category vocabulary:
+
+- `complete`
+- `bounded evidence only`
+- `no-touch evidence only`
+- `exact approval required`
+- `blocked`
+- `future VCP/V8`
+
+No current active runtime/readiness gap is promoted to `complete` by this Day 7 classification. A gap may become `complete` only after direct current runtime evidence proves that exact gap and no open blocker or hard-stop dependency remains.
+
+| gap | classification | evidence boundary | complete? | next minimal gate |
+|---|---|---|---|---|
+| CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
+| CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
+| CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761 limited local real-path, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root evidence only. | no | Future true live real-store `search_memory` remains blocked unless separately exact-approved; no `.jsonl`, provider, broad real-memory scan, or durable write may be inferred. |
+| memory write reliable | exact approval required | CM-0737 proves only separately exact-approved rejected and accepted `record_memory` attempts, with one accepted durable write under explicit approval. | no | Any further write proof requires a separate exact approval; default unattended write reliability remains unproven. |
+| ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. | no | Do not count collectors as maturity; close only after automatic ingestion, freshness/baseline binding, approved evidence capture, and final RC matrix integration are proven. |
+| governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
+| rollback posture | bounded evidence only | Compare/rollback `43/43`, rollback-active-memory, and CM-0765 make rollback posture reviewable as harness readiness evidence only. | no | Do not treat harness readiness as real rollback apply or production rollback proof. |
+| real rollback apply | exact approval required | No real rollback apply, restore, config switch, or cutover has occurred. | no | Separate exact approval required before any real rollback/config-switch action. |
+| migration / import / export / backup / restore apply | exact approval required | Current evidence is fixture/dry-run/no-touch approval-boundary evidence only; apply remains blocked. | no | Separate exact approval must name one real action and target before apply/import/export/backup/restore. |
+| live HTTP operation readiness | bounded evidence only | Historical endpoint-bound loopback evidence and local hardening exist; production/runtime readiness is not proven. | no | Future HTTP observe/precheck must be target-bound and separately authorized when required. |
+| RC_PRECHECK / current-head strict gate | bounded evidence only | RC_PRECHECK_003 repaired rerun passed as precheck evidence; it is not cutover or readiness evidence. | no | Day 8 may execute RC_PRECHECK_004 under the allowed command set; still no readiness claim. |
+| runtime / RC / production / release / cutover readiness | blocked | Open runtime gaps remain, hard stops remain, and no release/cutover authorization exists. | no | Remain `RC_NOT_READY_BLOCKED`; do not claim ready. |
+| public MCP expansion | blocked | Public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`. | no | No public MCP expansion in this review package path. |
+| config / watchdog / startup change | blocked | Config/watchdog/startup changes remain hard-stop actions. | no | Require separate explicit approval and are outside this RC review-package path. |
+| V8 implementation | future VCP/V8 | V8 is not implemented. | no | Future VCP/V8 phase only. |
+| VCP full parity | future VCP/V8 | VCP full parity is not claimed. | no | Future VCP/V8 parity hardening only. |
+
+Day 7 boundary: this classification did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`.
+
 ## Memory Recall Temp Workspace Evidence Review Sync - 2026-05-22
 
 Result: `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW_COMPLETED_SYNCED_NOT_READY`.
