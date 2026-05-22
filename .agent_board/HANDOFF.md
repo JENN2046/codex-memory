@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0741 Handoff
+
+Status: `COMPLETED_VALIDATED`; guarded local commit is the remaining closeout step if desired.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; worktree contains intentional CM-0741 docs/board edits only.
+
+Changed files: `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: `MAINLINE_SPINE_TRUTH_TABLE_REFRESH_READY_FOR_COMMIT`. The refresh summarizes CM-0558/CM-0561/CM-0738/CM-0739/CM-0740, marks no-token search readOnly strengthened, records CM-0561 targeted search-timeout side-effect guard evidence, clarifies exact authorized write execution is not memory write reliability, and keeps autopilot / authorization surface expansion stopped.
+
+Validation run: `git diff --check` passed; docs validation passed with `latest_task=CM-0741`, `latest_ledger=CM-0741`, and `latest_validation=CMV-0860`; post-refresh re-review found no actionable issue in the changed docs/board scope.
+
+Boundary: no true `record_memory` / `search_memory`, provider, real memory scan, durable write/audit write, migration/backup apply, public MCP expansion, source/test/package edit, push, tag, release, deploy, or readiness claim.
+
 ## CM-0740 Handoff
 
 Status: `COMPLETED_VALIDATED` docs-only rule update; guarded local commit is the remaining closeout step if desired.

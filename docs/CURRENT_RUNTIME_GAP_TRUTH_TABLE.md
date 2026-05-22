@@ -28,6 +28,26 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## Mainline Spine Truth Table Refresh - 2026-05-22
+
+Result: `MAINLINE_SPINE_TRUTH_TABLE_REFRESH_READY_FOR_COMMIT` after docs validation.
+
+Latest review rollup:
+
+- `CM-0558`: latest recovery review keeps the actual diff scoped to the no-token mutation JSON-RPC rejection shape plus HTTP tests. It does not prove authorized write-path reliability, does not expand public MCP tools, and does not change any `complete?` value.
+- `CM-0561`: search timeout side-effect guard has targeted evidence. Cooperative abort now protects awaited rerank, aggregate record lookup, and recall audit append; timeout races return sanitized `SEARCH_MEMORY_TIMEOUT`; candidate cache post-abort writes remain blocked by existing coverage. This is targeted runtime hardening evidence, not true `search_memory` reliability.
+- `CM-0738`: no-token `search_memory` now carries a read-only boundary through HTTP/app/recall paths and suppresses local maintenance/provider/cache/audit side effects; CRLF diary parsing and dashboard cleanup were also repaired. Validation passed in the targeted repair slice.
+- `CM-0739`: no-token read-only provider boundary was further tightened: cache-disabled embedding stays on local hash and read-only rerank skips remote rerank providers. Targeted HTTP evidence passed.
+- `CM-0740`: post-fix re-review is now a required closeout gate for executed repairs; actionable findings require another fix/validation/re-review loop before stopping.
+
+Boundary conclusions:
+
+- No-token search readOnly boundary is strengthened after CM-0738 and CM-0739.
+- Search timeout side-effect guard has passed targeted evidence through CM-0561.
+- Authorized write path happened only under exact approval: CM-0737 had two separately approved `record_memory` attempts, the first rejected and the second accepted. That proves only exact approved bounded execution occurred; it does not prove `memory write reliable`.
+- Autopilot / authorization surfaces should consolidate and should not keep expanding. Current governance surfaces remain fail-closed; public MCP tools remain frozen at `record_memory`, `search_memory`, and `memory_overview`.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`; no readiness, production, cutover, release, tag, deploy, or push claim is made here.
+
 ## Truth Table
 
 | gap | current evidence | runtime touched? | A4/A5 | complete? | next minimal action |

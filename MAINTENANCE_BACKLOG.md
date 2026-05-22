@@ -1,6 +1,6 @@
 # Maintenance Backlog
 
-更新时间：2026-05-21
+更新时间：2026-05-22
 
 ## Purpose
 
@@ -10,6 +10,7 @@ Use this file for current queue selection only. Use `.agent_board/TASK_QUEUE.md`
 
 ## Current Baseline
 
+- Current mainline spine truth-table refresh: `CM-0741` records the latest review rollup for `CM-0558 / CM-0561 / CM-0738 / CM-0739 / CM-0740`. The no-token search readOnly boundary is strengthened, the search timeout side-effect guard has targeted evidence, and the `CM-0737` authorized write path is only exact-approval evidence, not `memory write reliable`. Autopilot / authorization surfaces should not keep expanding; project state remains `RC_NOT_READY_BLOCKED`.
 - Current latest code-only authorized write-path bridge: the auto-authorization escalation result can now feed widening-review directly from the same explicit `CM-0611` assertion-record plus `token_present` rebound-outcome input, without first hand-assembling a separate `CM-0615` record. The widening-review helper and the normal read-only control surfaces now reach `WIDENING_REVIEW_PASSED_ADOPTION_NOT_GRANTED / RC_NOT_READY_BLOCKED` under that explicit-input path, with `W1-W9=yes`, `W10=no`, and `canExecuteRuntimeNow=false`. This still does not prove default runtime readiness, does not grant adoption, does not authorize `CM-0595`, and does not execute `record_memory`.
 - Current CM-0661 result: [CM-0661 Authorized Write-Path Bounded Recall Closeout Review Evaluator](/A:/codex-memory/docs/CM-0661_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_CLOSEOUT_REVIEW_EVALUATOR.md) now adds one standalone governance-only closeout evaluator plus later `CM-0658/0659` input bridges for the bounded-recall side of the chain. Default real state stays `BOUNDED_RECALL_CLOSEOUT_NOT_READY / RC_NOT_READY_BLOCKED`; explicit later `CM-0658 + CM-0659` inputs can now yield `BOUNDED_RECALL_CLOSEOUT_RECORDED_PREPARED_LATER_APPROVAL_ONLY`, but the helper still keeps `canExecuteBoundedRecallNow=false` and `canExecuteRuntimeNow=false`.
 - Current CM-0660 result: [CM-0660 Authorized Write-Path Bounded Recall Record Draft Surfaces](/A:/codex-memory/docs/CM-0660_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_RECORD_DRAFT_SURFACES.md) plus [CM-0658](/A:/codex-memory/docs/CM-0658_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_APPROVAL_ISSUANCE_RECORD_TEMPLATE.md) and [CM-0659](/A:/codex-memory/docs/CM-0659_AUTHORIZED_WRITE_PATH_BOUNDED_RECALL_EXECUTION_EVIDENCE_TEMPLATE.md) now turn the future bounded-recall exact-approval path into a fuller governance-only artifact family. The helper CLI and the normal read-only control surfaces now expose `boundedRecallApprovalIssuanceRecordDraft` and `boundedRecallExecutionEvidenceDraft`, and rendered bounded-recall text now carries `Next Record Drafts`. This still keeps `canExecuteBoundedRecallNow=false`, `canExecuteRuntimeNow=false`, does not prove token presence, does not issue runtime approval, and does not execute bounded recall, `CM-0595`, or `record_memory`.

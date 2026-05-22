@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0741 Mainline spine truth-table refresh - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: refreshed the current runtime gap truth table, status, maintenance backlog, and board surfaces with the latest CM-0558/CM-0561/CM-0738/CM-0739/CM-0740 review conclusions.
+- Current local signal: no-token search readOnly boundary is marked strengthened; CM-0561 search timeout side-effect guard is recorded as targeted evidence; CM-0737 exact authorized write execution is explicitly not treated as `memory write reliable`; autopilot / authorization surfaces should not continue expanding.
+- Changed files: `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0741`, `latest_ledger=CM-0741`, and `latest_validation=CMV-0860`; post-refresh re-review found no actionable issue in the changed docs/board scope.
+- Boundary: no true `record_memory` / `search_memory`, provider, real memory scan, durable write/audit write, migration/backup apply, public MCP expansion, source/test/package edit, push, tag, release, deploy, or readiness claim.
+- Next safe task: guarded local commit is allowed if desired; push remains explicit-only.
+
 ## Checkpoint - CM-0740 Mandatory post-fix re-review rule - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
