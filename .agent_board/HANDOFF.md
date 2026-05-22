@@ -1,5 +1,37 @@
 # HANDOFF.md - codex-memory
 
+## CM-0815 Handoff
+
+Status: `RECALL_BLOCKER_ROUND_3_NEGATIVE_CONTROL_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/RECALL_PRECISION_POST_HARDENING_LIVE_NEGATIVE_CONTROL_PROOF_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: CM-0814 fresh sanitized live evidence downgrades the prior exact NC1-NC4 negative-control suppression blocker for this narrow proof shape, but `memory recall reliable` remains bounded evidence only and unclaimed.
+
+Next safe action: if future work continues, scope a separate review or broader recall-quality evidence task. Do not reuse CM-0814 approval automatically, and do not describe CM-0814 as synced-main proof.
+
+Boundary: no new true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. Truth table remains `complete? = no` and `RC_NOT_READY_BLOCKED` remains.
+
+## CM-0814 Handoff
+
+Status: `RECALL_PRECISION_POST_HARDENING_LIVE_NEGATIVE_CONTROL_PROOF_COMPLETED_LOCAL_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/RECALL_PRECISION_POST_HARDENING_LIVE_NEGATIVE_CONTROL_PROOF_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Execution verdict: exactly four stricter negative-control queries executed through the internal proof runner / approved adapter path with `precisionPolicyContext.enabled=true` and `proofNoResultMode=true`; NC1=0, NC2=0, NC3=0, NC4=0; `rawContentReturned=false`; complete side-effect counters all zero.
+
+Next safe action: review the sanitized proof evidence and decide whether the prior negative-control suppression blocker is downgraded while preserving no-overclaim wording.
+
+Boundary: no true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. The run was on clean local `main [ahead 1]`, not synced-main evidence. `memory recall reliable` is not claimed and truth table remains `complete? = no`.
+
 ## CM-0813 Handoff
 
 Status: `RECALL_BLOCKER_ROUND_3_EVIDENCE_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

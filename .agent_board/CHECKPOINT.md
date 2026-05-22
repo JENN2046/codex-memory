@@ -1,5 +1,21 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0815 post-hardening live negative-control proof review - 2026-05-23
+
+- Status: `RECALL_BLOCKER_ROUND_3_NEGATIVE_CONTROL_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: sanitized proof review docs/status/board/truth-table only; no new true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/RECALL_PRECISION_POST_HARDENING_LIVE_NEGATIVE_CONTROL_PROOF_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Review verdict: CM-0814 fresh sanitized live evidence downgrades the prior exact NC1-NC4 negative-control suppression blocker for this narrow proof shape.
+- Boundary: this batch does not claim `memory recall reliable`, does not change truth-table completion, and does not change `RC_NOT_READY_BLOCKED`.
+
+## Checkpoint - CM-0814 post-hardening live negative-control proof execution - 2026-05-23
+
+- Status: `RECALL_PRECISION_POST_HARDENING_LIVE_NEGATIVE_CONTROL_PROOF_COMPLETED_LOCAL_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: exact-approved live proof execution plus docs/status/board/truth-table recording only; no true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/RECALL_PRECISION_POST_HARDENING_LIVE_NEGATIVE_CONTROL_PROOF_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Execution verdict: exactly four stricter negative-control queries executed through the internal runner / approved adapter path with `precisionPolicyContext.enabled=true` and `proofNoResultMode=true`; NC1=0, NC2=0, NC3=0, NC4=0; `rawContentReturned=false`; complete side-effect counters all zero.
+- Boundary: this is clean local `main [ahead 1]` evidence only, not synced-main evidence; `memory recall reliable` is not claimed; truth table remains `complete? = no`; `RC_NOT_READY_BLOCKED` remains.
+
 ## Checkpoint - CM-0813 post-hardening exact approval recheck - 2026-05-23
 
 - Status: `RECALL_BLOCKER_ROUND_3_EVIDENCE_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
