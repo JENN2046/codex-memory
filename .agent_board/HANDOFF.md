@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0798 Handoff
+
+Status: `V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_REVIEW_READY_NOT_RELEASE_READY`; blocker closure round 2 evidence set is ready for operator review only and project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Pre-handoff sync: Day 14 post-push remote-state review confirmed `HEAD == origin/main == remote refs/heads/main == dfb0d3ae280049ef545eea8d2b59bc781817f657` with clean worktree.
+
+Changed files: `docs/POST_ROUND_2_REMOTE_SYNC_AND_HANDOFF.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Final verdict: the round 2 evidence set is ready for operator review only. This is not release/cutover/runtime/RC/production readiness, and it does not approve memory recall/write reliability, V8, or VCP parity claims.
+
+Remaining blockers: CM-0774 true live real-store recall proof is not executed; `memory recall reliable` is not claimed; `memory write reliable` remains exact approval required; ValidationAggregator full implementation remains incomplete; real rollback apply and migration/import/export/backup/restore apply remain exact approval required; runtime/RC/production/release/cutover readiness remains blocked; public MCP expansion and config/watchdog/startup remain blocked; V8 and VCP full parity remain future scope.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next exact scope: separately exact-approved CM-0774 true live recall proof, separately exact-approved bounded exactly-one write proof, ValidationAggregator full implementation work, or rollback/migration/apply boundary planning.
+
 ## CM-0797 Handoff
 
 Status: `BLOCKER_CLOSURE_ROUND_2_REVIEW_READY_NOT_RELEASE_READY`; blocker closure round 2 evidence package is ready for operator review only and project decision remains `RC_NOT_READY_BLOCKED`.
