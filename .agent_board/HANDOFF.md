@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0806 Handoff
+
+Status: `CM0774_RECALL_PRECISION_HARDENING_REQUIRED`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/CM0774_SECOND_NEGATIVE_CONTROL_FAILURE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: CM-0805 failure is a sanitized recall precision / negative-control suppression blocker. NC1=3, NC2=2, NC3=3, NC4=2. Runner/adapter/side-effect boundary passed, rawContentReturned=false, and complete counters were all zero.
+
+Next safe action: create a recall precision hardening plan covering retrieval threshold, negative-control gating, minimum score policy, sanitized score distribution review, no-result mode, stricter filter, and exact negative-control reject policy. Do not execute a third live query first.
+
+Boundary: no new true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
 ## CM-0805 Handoff
 
 Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_FAILED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
