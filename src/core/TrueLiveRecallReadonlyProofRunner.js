@@ -104,6 +104,20 @@ function normalizeQueries(queries) {
   });
 }
 
+function normalizePrecisionPolicyContext(value) {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw createProofBoundaryError('true live recall proof runner precision policy context must be an object', {
+      reason: 'precision_policy_context_invalid'
+    });
+  }
+
+  return { ...value };
+}
+
 function isBroadScanQuery(text) {
   const normalized = String(text || '').trim().toLowerCase();
   if (!normalized || normalized === '*' || normalized === 'all') return true;
@@ -278,6 +292,7 @@ class TrueLiveRecallReadonlyProofRunner {
     queries,
     baselineCommit = 'unknown',
     proofRunId = null,
+    precisionPolicyContextFactory = null,
     target = 'both',
     limit = 5
   } = {}) {
@@ -302,9 +317,21 @@ class TrueLiveRecallReadonlyProofRunner {
       };
 
       try {
+        const precisionPolicyContext = normalizePrecisionPolicyContext(
+          typeof precisionPolicyContextFactory === 'function'
+            ? precisionPolicyContextFactory({
+              slot: query.slot,
+              family: query.family,
+              text: query.text,
+              proofContext
+            })
+            : null
+        );
         const response = await runSearchMemoryWithTimeout(
           ({ signal }) => this.searchExecutor({
             query: query.text,
+            querySlot: query.slot,
+            queryFamily: query.family,
             target,
             limit,
             includeContent: false,
@@ -313,6 +340,7 @@ class TrueLiveRecallReadonlyProofRunner {
             noProvider: true,
             noAudit: true,
             sanitizedOutput: true,
+            precisionPolicyContext,
             proofContext,
             signal
           }),

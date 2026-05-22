@@ -92,6 +92,17 @@ function assertProofRequest(request = {}) {
       });
     }
   }
+
+  if (
+    request.precisionPolicyContext !== undefined
+    && request.precisionPolicyContext !== null
+    && (
+      typeof request.precisionPolicyContext !== 'object'
+      || Array.isArray(request.precisionPolicyContext)
+    )
+  ) {
+    throw boundaryViolation('true live recall executor adapter precision policy context must be an object', 'executor_adapter_precision_policy_context_invalid');
+  }
 }
 
 function assertApp(app) {
@@ -256,7 +267,8 @@ function createTrueLiveRecallExecutorAdapter({ app } = {}) {
       }, {
         noTokenReadOnly: true,
         executionContext: {
-          requestSource: EXPECTED_SOURCE
+          requestSource: EXPECTED_SOURCE,
+          precisionPolicyContext: request.precisionPolicyContext || null
         }
       });
 

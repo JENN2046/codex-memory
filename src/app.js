@@ -141,6 +141,75 @@ function inferRequestClientId(requestContext = {}, scope = null) {
   return 'codex';
 }
 
+const INTERNAL_TRUE_LIVE_RECALL_SOURCE = 'internal-true-live-recall-readonly-proof-runner';
+const INTERNAL_PRECISION_POLICY_ALLOWED_KEYS = new Set([
+  'enabled',
+  'queryFamily',
+  'proofNoResultMode',
+  'minimumScore',
+  'highConfidenceScore'
+]);
+
+function normalizeInternalPrecisionPolicyContext(requestContext = {}) {
+  const executionContext = requestContext.executionContext || {};
+  if (!Object.prototype.hasOwnProperty.call(executionContext, 'precisionPolicyContext')) {
+    return null;
+  }
+
+  if (
+    requestContext.noTokenReadOnly !== true
+    || executionContext.requestSource !== INTERNAL_TRUE_LIVE_RECALL_SOURCE
+  ) {
+    throw new Error('internal precision policy context requires the approved true live recall runner path');
+  }
+
+  const context = executionContext.precisionPolicyContext;
+  if (context === null) {
+    return null;
+  }
+  if (!context || typeof context !== 'object' || Array.isArray(context)) {
+    throw new Error('internal precision policy context must be an object');
+  }
+
+  const unknownKeys = Object.keys(context).filter(key => !INTERNAL_PRECISION_POLICY_ALLOWED_KEYS.has(key));
+  if (unknownKeys.length > 0) {
+    throw new Error(`internal precision policy context has unsupported keys: ${unknownKeys.join(', ')}`);
+  }
+  if (context.enabled !== true) {
+    throw new Error('internal precision policy context must enable the precision policy');
+  }
+
+  const normalized = {
+    enabled: true
+  };
+
+  if (Object.prototype.hasOwnProperty.call(context, 'queryFamily')) {
+    const queryFamily = String(context.queryFamily || '').trim();
+    if (!queryFamily) {
+      throw new Error('internal precision policy context queryFamily must be a non-empty string');
+    }
+    normalized.queryFamily = queryFamily;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(context, 'proofNoResultMode')) {
+    if (typeof context.proofNoResultMode !== 'boolean') {
+      throw new Error('internal precision policy context proofNoResultMode must be boolean');
+    }
+    normalized.proofNoResultMode = context.proofNoResultMode;
+  }
+
+  for (const numericField of ['minimumScore', 'highConfidenceScore']) {
+    if (!Object.prototype.hasOwnProperty.call(context, numericField)) continue;
+    const value = Number(context[numericField]);
+    if (!Number.isFinite(value) || value < 0) {
+      throw new Error(`internal precision policy context ${numericField} must be a finite non-negative number`);
+    }
+    normalized[numericField] = value;
+  }
+
+  return Object.freeze(normalized);
+}
+
 async function applySoftReadPolicy(results, { config, shadowStore, requestContext = {}, scope = null } = {}) {
   if (!config?.enableSoftReadPolicy || !Array.isArray(results) || results.length === 0) {
     return results;
@@ -368,6 +437,7 @@ function createCodexMemoryApplication(overrides = {}) {
   async function executeSearchMemory(args = {}, requestContext = {}, { signal = null } = {}) {
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const readOnly = requestContext.noTokenReadOnly === true;
+    const precisionPolicyContext = normalizeInternalPrecisionPolicyContext(requestContext);
     const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
     const scopeAudit = buildScopeAuditContext(scopeFilter);
     const searchResults = await passiveRecallService.search({
@@ -382,7 +452,8 @@ function createCodexMemoryApplication(overrides = {}) {
         scope: scopeAudit
       },
       signal,
-      readOnly
+      readOnly,
+      precisionPolicyContext
     });
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const filtered = (scopeFilter && searchResults && searchResults.length)

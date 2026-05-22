@@ -200,6 +200,50 @@ test('internal proof runner requires complete finite zero side-effect counters',
   }
 });
 
+test('internal proof runner forwards precision policy context factory output per query', async () => {
+  const calls = [];
+  const runner = new TrueLiveRecallReadonlyProofRunner({
+    async searchExecutor(request) {
+      calls.push(request);
+      return {
+        results: [],
+        sideEffectCounters: createZeroSideEffectCounters()
+      };
+    }
+  });
+
+  const report = await runner.run({
+    approvalLine: EXACT_APPROVAL_LINE,
+    queries: createQueries(),
+    proofRunId: 'CM-0812-precision-policy-pass-through',
+    precisionPolicyContextFactory: ({ slot, family, text, proofContext }) => ({
+      enabled: true,
+      queryFamily: `${slot}:${family}`,
+      proofNoResultMode: true,
+      minimumScore: 0.12,
+      highConfidenceScore: 0.62,
+      queryTextEchoLength: text.length,
+      proofRunIdEcho: proofContext.proofRunId
+    })
+  });
+
+  assert.equal(report.queryCount, EXACT_QUERY_COUNT);
+  assert.equal(calls.length, EXACT_QUERY_COUNT);
+  assert.equal(calls[0].querySlot, 'Q1');
+  assert.equal(calls[0].queryFamily, 'current project status / mainline memory spine state');
+  assert.deepEqual(calls[0].precisionPolicyContext, {
+    enabled: true,
+    queryFamily: 'Q1:current project status / mainline memory spine state',
+    proofNoResultMode: true,
+    minimumScore: 0.12,
+    highConfidenceScore: 0.62,
+    queryTextEchoLength: 'current project status mainline memory spine state'.length,
+    proofRunIdEcho: 'CM-0812-precision-policy-pass-through'
+  });
+  assert.equal(calls[3].precisionPolicyContext.queryFamily, 'Q4:deliberately unlikely negative-control phrase selected by the operator');
+  assert.equal(calls[3].precisionPolicyContext.proofRunIdEcho, 'CM-0812-precision-policy-pass-through');
+});
+
 test('internal proof runner fails closed on provider cache sync audit write side effects', async () => {
   const sideEffectKeys = [
     'providerCalls',

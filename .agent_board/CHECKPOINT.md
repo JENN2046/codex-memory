@@ -1,5 +1,22 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0813 post-hardening exact approval recheck - 2026-05-23
+
+- Status: `RECALL_BLOCKER_ROUND_3_EVIDENCE_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: exact-approval recheck docs/status/board/truth-table only; source/test changed-scope review only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/RECALL_PRECISION_POST_HARDENING_EXACT_APPROVAL_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Recheck verdict: CM-0812 closes the internal execution path, so the post-hardening path is now execution-ready for a future separately exact-approved CM-0814 proof.
+- Boundary: this batch does not provide that exact approval, does not execute CM-0814 or CM-0815, does not claim `memory recall reliable`, and does not change truth-table completion.
+
+## Checkpoint - CM-0812 recall precision execution-path pass-through closeout - 2026-05-23
+
+- Status: `RECALL_PRECISION_EXECUTION_PATH_PASS_THROUGH_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: targeted source/test/docs/status/board/truth-table closeout only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `src/app.js`; `src/core/TrueLiveRecallExecutorAdapter.js`; `src/core/TrueLiveRecallReadonlyProofRunner.js`; `tests/true-live-recall-executor-adapter.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `docs/RECALL_PRECISION_EXECUTION_PATH_PASS_THROUGH_CLOSEOUT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Closeout verdict: `precisionPolicyContext` / `proofNoResultMode` now pass from the internal runner to the adapter, approved app path, passive recall search, and bounded precision policy path without widening the public contract.
+- Validation: `git diff --check`; changed `node --check`; targeted tests `6/6`, `2/2`, `7/7`, `5/5`, and `9/9` passed.
+- Boundary: this is local bounded evidence only; `memory recall reliable` is not claimed; truth table remains `complete? = no`; `RC_NOT_READY_BLOCKED` remains.
+
 ## Checkpoint - CM-0811 recall precision hardening live proof recheck - 2026-05-23
 
 - Status: `RECALL_PRECISION_HARDENING_LIVE_PROOF_READY_FOR_EXACT_APPROVAL_RECHECK_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

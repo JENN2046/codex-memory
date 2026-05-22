@@ -1,5 +1,37 @@
 # HANDOFF.md - codex-memory
 
+## CM-0813 Handoff
+
+Status: `RECALL_BLOCKER_ROUND_3_EVIDENCE_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/RECALL_PRECISION_POST_HARDENING_EXACT_APPROVAL_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Recheck verdict: CM-0812 closes the internal proof execution path, so the post-hardening live negative-control path is now execution-ready for a future separately exact-approved CM-0814 proof. This batch does not include that approval, so CM-0814 and CM-0815 were not executed.
+
+Next safe action: wait for a separate exact approval decision before any live proof execution. Do not execute live `search_memory` without that approval.
+
+Boundary: no true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. `memory recall reliable` is not claimed and truth table remains `complete? = no`.
+
+## CM-0812 Handoff
+
+Status: `RECALL_PRECISION_EXECUTION_PATH_PASS_THROUGH_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/app.js`; `src/core/TrueLiveRecallExecutorAdapter.js`; `src/core/TrueLiveRecallReadonlyProofRunner.js`; `tests/true-live-recall-executor-adapter.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `docs/RECALL_PRECISION_EXECUTION_PATH_PASS_THROUGH_CLOSEOUT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Closeout verdict: `precisionPolicyContext` and `proofNoResultMode` now pass explicitly from the internal proof runner through the executor adapter and approved app path into passive recall search and the bounded precision policy path. Public/non-approved injected precision context fails closed.
+
+Next safe action: perform the post-hardening exact-approval recheck, then stop for separate exact approval before any live proof execution.
+
+Boundary: no true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. `memory recall reliable` is not claimed and truth table remains `complete? = no`.
+
 ## CM-0811 Handoff
 
 Status: `RECALL_PRECISION_HARDENING_LIVE_PROOF_READY_FOR_EXACT_APPROVAL_RECHECK_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

@@ -207,6 +207,30 @@ test('executor adapter binds search_memory to no-token read-only context and ret
   assert.equal(Object.prototype.hasOwnProperty.call(response.results[0], 'snippet'), false);
 });
 
+test('executor adapter forwards internal precision policy context only through executionContext', async () => {
+  const app = createSurfaceApp(() => ({ results: [] }));
+  const adapter = createTrueLiveRecallExecutorAdapter({ app });
+
+  await adapter(createRequest({
+    precisionPolicyContext: {
+      enabled: true,
+      queryFamily: 'stricter_negative_control',
+      proofNoResultMode: true,
+      minimumScore: 0.12,
+      highConfidenceScore: 0.62
+    }
+  }));
+
+  assert.equal(app.calls.length, 1);
+  assert.deepEqual(app.calls[0].requestContext.executionContext.precisionPolicyContext, {
+    enabled: true,
+    queryFamily: 'stricter_negative_control',
+    proofNoResultMode: true,
+    minimumScore: 0.12,
+    highConfidenceScore: 0.62
+  });
+});
+
 test('executor adapter blocks forbidden side-effect surfaces before execution', async () => {
   const cases = [
     {
@@ -327,6 +351,13 @@ test('proof runner can use executor adapter with synthetic app without raw leaka
   const report = await runner.run({
     approvalLine: EXACT_APPROVAL_LINE,
     queries: createQueries(),
+    precisionPolicyContextFactory: ({ family }) => ({
+      enabled: true,
+      queryFamily: family,
+      proofNoResultMode: true,
+      minimumScore: 0.12,
+      highConfidenceScore: 0.62
+    }),
     proofRunId: 'CM-0782-synthetic-adapter'
   });
 
@@ -342,5 +373,7 @@ test('proof runner can use executor adapter with synthetic app without raw leaka
   assert.equal(report.sideEffectCounters.syncCalls, 0);
   assert.equal(report.memoryRecallReliableClaimed, false);
   assert.equal(report.rcNotReadyBlocked, true);
+  assert.equal(app.calls[0].requestContext.executionContext.precisionPolicyContext.proofNoResultMode, true);
+  assert.equal(app.calls[0].requestContext.executionContext.precisionPolicyContext.queryFamily.includes('current project status'), true);
   assert.equal(JSON.stringify(report).includes('RAW TITLE MUST NOT REACH RUNNER'), false);
 });
