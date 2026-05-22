@@ -50,7 +50,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
-| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner evidence only. CM-0779 closes the runner-local missing/partial/malformed counter and raw-leakage fail-closed findings with targeted tests `6/6`, but it still does not execute true live real-store recall. | no | CM-0774 still requires separate exact approval and a concrete internal executor adapter or equivalent wrapper at execution time. No `.jsonl`, provider, broad real-memory scan, durable write, public MCP expansion, or readiness claim may be inferred. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`, but it still does not execute true live real-store recall. | no | CM-0774 still requires separate exact approval and a concrete internal executor adapter or equivalent wrapper at execution time. No `.jsonl`, provider, broad real-memory scan, durable write, public MCP expansion, or readiness claim may be inferred. |
 | memory write reliable | exact approval required | CM-0737 proves only separately exact-approved rejected and accepted `record_memory` attempts, with one accepted durable write under explicit approval. | no | Any further write proof requires a separate exact approval; default unattended write reliability remains unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. | no | Do not count collectors as maturity; close only after automatic ingestion, freshness/baseline binding, approved evidence capture, and final RC matrix integration are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
@@ -174,6 +174,26 @@ Patch conclusion:
 - CM-0774 true live execution still requires separate exact approval and a concrete internal executor adapter or equivalent wrapper at execution time.
 
 This patch did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
+## True Live Recall Internal Proof Runner Patch Review - 2026-05-22
+
+Result: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH_REVIEW_COMPLETED_SYNCED_NOT_READY`.
+
+Artifact: `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH_REVIEW.md`.
+
+Review conclusion:
+
+- CM-0779 is accepted as closing the CM-0778 runner-local findings.
+- Complete side-effect counter presence is required; missing and partial counters fail closed.
+- Malformed, non-finite, negative, required non-zero, and unknown-positive counters fail closed.
+- Raw executor `content`, `text`, `snippet`, `title`, and related raw fields fail closed before sanitization.
+- Targeted tests remain `6/6` and cover the core counter and raw-leakage risks.
+- A concrete live executor adapter or equivalent wrapper has still not been reviewed for trustworthy complete side-effect counters.
+- CM-0774 true live execution may not occur in this slice and still requires separate exact approval.
+
+This review did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 

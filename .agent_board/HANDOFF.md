@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0780 Handoff
+
+Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH_REVIEW_COMPLETED_SYNCED_NOT_READY`; CM-0779 runner-local patch reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Review verdict: CM-0779 closes the CM-0778 runner-local findings. Complete side-effect counters are required and missing, partial, malformed, non-finite, negative, required-nonzero, and unknown-positive counters fail closed. Raw executor `content`, `text`, `snippet`, `title`, and related raw fields fail closed before sanitization.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Validation run: targeted runner tests remain `6/6`; docs validation and `git diff --check` passed for the review slice; push-readiness, safe push, and post-push remote-state review are part of final closeout.
+
+Next safe action: only after a separate exact approval may CM-0774 execution be prepared; before that, review or implement a concrete internal executor adapter/equivalent wrapper with trustworthy complete side-effect counters. Do not execute true memory search or claim memory recall reliability.
+
 ## CM-0779 Handoff
 
 Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCHED_SYNCED_NOT_READY`; CM-0778 runner-local findings patched, but project decision remains `RC_NOT_READY_BLOCKED`.

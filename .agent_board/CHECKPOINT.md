@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0780 True live recall internal proof runner patch review - 2026-05-22
+
+- Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review CM-0779 patch plus docs/status/board/truth-table sync.
+- Changed files: `docs/TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Review verdict: CM-0779 closes the runner-local counter and raw leakage findings from CM-0778. Complete counter presence is now required; missing, partial, malformed, non-finite, negative, required-nonzero, and unknown-positive counters fail closed; raw executor `content`, `text`, `snippet`, `title`, and related raw fields fail closed before sanitization.
+- Validation: targeted runner test remains `6/6`; `node --check` runner/test, `git diff --check`, docs validation, push-readiness, safe push, and post-push remote-state review are required for closeout.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory recall reliable`.
+- Remaining blocker: CM-0774 true live proof still requires separate exact approval and execution-time concrete internal executor adapter or equivalent wrapper.
+
 ## Checkpoint - CM-0779 True live recall internal proof runner patch - 2026-05-22
 
 - Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCHED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
