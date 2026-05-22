@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0757 Memory recall temp workspace evidence plan - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: plan-only docs/board/status/truth-table update.
+- Changed files: `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_PLAN.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Plan verdict: temp workspace recall evidence is now designed as the next bounded layer between fixture-only CM-0755 evidence and any true live real-store `search_memory`.
+- Defined controls: isolated temp workspace root policy; four synthetic seed records; exact query count `4`; expected-result, irrelevant suppression, freshness/folder, and timeout/error criteria; no-provider, no-real-memory, no-.jsonl-read, cleanup, evidence output, pass/fail labels, and no-readiness wording.
+- Boundary: no true `search_memory`, real memory content read, `.jsonl` audit/durable memory read, provider call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0757`, `latest_ledger=CM-0757`, and `latest_validation=CMV-0876`.
+
 ## Checkpoint - CM-0756 Memory recall bounded evidence review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

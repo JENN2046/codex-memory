@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0757 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; memory recall temp workspace evidence plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; plan start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `3d6100aff0520d2863a4c21e33ee9db7fbef7fd5`; worktree was clean.
+
+Changed files: `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_PLAN.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Plan verdict: CM-0757 defines the next bounded temp workspace evidence layer between fixture-only in-memory validation and any true live real-store `search_memory`.
+
+Defined controls: isolated run-specific temp root, four synthetic seed records, exact query count `4`, expected-result criteria, irrelevant suppression criteria, freshness/folder behavior criteria, timeout/error criteria, no-provider, no-real-memory, no-.jsonl-read, cleanup expectation, sanitized evidence output shape, pass/fail labels, and no-readiness wording.
+
+Boundary: no true `search_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: if separately exact-approved, execute `MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_EXECUTION` using this plan's exact temp root, four synthetic seeds, exactly four queries, sanitized output, cleanup verification, and no-readiness wording.
+
 ## CM-0756 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; CM-0755 bounded fixture recall evidence reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
