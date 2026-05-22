@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0786 Handoff
+
+Status: `MEMORY_WRITE_PROOF_SURFACE_PLAN_COMPLETED_SYNCED_NOT_READY`; future write proof surface is planned, but no write is approved or executed and project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_WRITE_PROOF_SURFACE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Plan verdict: future execution must be separately exact-approved, tied to fresh synced `main`, limited to exactly one sanitized subject-bound `record_memory` call, use the deterministic process payload in the plan, emit complete coherent counters, and output only sanitized decision/hash/opaque-id/write-summary evidence.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: do not execute the write proof unless the exact approval line is supplied. If approval is absent, continue with Day 9 ValidationAggregator full gap review or another non-mutating evidence review.
+
 ## CM-0785 Handoff
 
 Status: `MEMORY_WRITE_RELIABILITY_BOUNDED_REVIEW_COMPLETED_SYNCED_NOT_READY`; write evidence remains exact-approval-only and project decision remains `RC_NOT_READY_BLOCKED`.

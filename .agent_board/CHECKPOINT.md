@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0786 memory write proof surface plan - 2026-05-22
+
+- Status: `MEMORY_WRITE_PROOF_SURFACE_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: plan a future exact-approved bounded write proof surface only; no true live `record_memory` execution.
+- Changed files: `docs/MEMORY_WRITE_PROOF_SURFACE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Plan verdict: a future proof should be one-time, separately exact-approved, subject-bound, sanitized, exactly-one `record_memory`, with deterministic process payload, complete counters, sanitized output, and fail-closed scope/approval drift behavior.
+- Boundary: this slice did not execute true live `record_memory`, true live `search_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory write reliable`.
+- Remaining blocker: even a future accepted proof can only be `MEMORY_WRITE_BOUNDED_PROOF_PASSED_NOT_READY`; broad write reliability remains unproven until later evidence review proves it.
+- Next safe action: future execution requires separate exact approval; otherwise continue non-mutating evidence reviews.
+
 ## Checkpoint - CM-0785 memory write reliability bounded review - 2026-05-22
 
 - Status: `MEMORY_WRITE_RELIABILITY_BOUNDED_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
