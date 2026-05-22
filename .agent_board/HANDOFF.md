@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0750 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; next runtime gap selection completed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; selection start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all at `08d13685c7c0375ae4e562d0e1de311eec956698`.
+
+Changed files: `docs/NEXT_RUNTIME_GAP_SELECTION.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Selected unique next gap: separately exact-approved `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`.
+
+Remaining blocker order: `memory recall reliable` not claimed; `memory write reliable` not claimed; ValidationAggregator full implementation incomplete; real rollback A5 blocked; migration/import/export/backup/restore apply A5 blocked; runtime/RC/production/release/cutover readiness blocked; V8/VCP parity not claimed.
+
+Reason not to expand governance/autopilot surface: current surfaces are already frozen and sufficient for operator boundaries; the next useful work is bounded recall reliability evidence for the Mainline Memory Spine.
+
+Boundary: no runtime validation, true live `record_memory`/`search_memory`, provider call, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile/config/watchdog/startup change, source/test/package edit, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: run `git diff --check`, docs validation, push-readiness, safe push, and post-push remote-state review if scope remains allowed.
+
 ## CM-0749 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; v1 Mainline Candidate package review completed, but project decision remains `RC_NOT_READY_BLOCKED`.

@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0750 Next runtime gap selection - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board/status selection and planning only.
+- Changed files: `docs/NEXT_RUNTIME_GAP_SELECTION.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Selected unique next gap: separately exact-approved `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`.
+- Remaining blocker order: `memory recall reliable` not claimed; `memory write reliable` not claimed; ValidationAggregator full implementation incomplete; real rollback A5 blocked; migration/import/export/backup/restore apply A5 blocked; runtime/RC/production/release/cutover readiness blocked; V8/VCP parity not claimed.
+- Boundary: this task did not execute runtime validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup changes, source/test/package edits, tag/release/deploy/cutover, or readiness claims.
+- Governance/autopilot surface growth remains frozen because the next useful movement is bounded Mainline Memory Spine recall evidence, not another governance surface.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0750`, `latest_ledger=CM-0750`, and `latest_validation=CMV-0869`.
+
 ## Checkpoint - CM-0749 V1 Mainline Candidate package review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
