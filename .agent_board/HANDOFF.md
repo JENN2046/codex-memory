@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0762 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; Day 3 memory recall evidence ladder reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; review start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `14ca6038fcd0dfea338c4365b02c1e33605ddae2`; worktree was clean.
+
+Changed files: `docs/MEMORY_RECALL_EVIDENCE_LADDER_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Review verdict: CM-0755 fixture-only evidence, CM-0758 temp workspace evidence, and CM-0761 limited local real-path evidence form a coherent bounded recall evidence ladder. The ladder proves bounded expected-result behavior, irrelevant suppression, no-token/readOnly zero side effects, timeout/error shape, isolated temp root, exact seed/query counts, freshness ordering, alpha folder scope, sanitized output, cleanup verification, and temp-root local module coverage.
+
+Remaining gap: `memory recall reliable` remains not claimed because the ladder does not execute true live `search_memory` against the real store, read or evaluate real memory content, read `.jsonl` / durable memory content, call providers, measure real corpus quality, prove production behavior, or prove VCP full parity.
+
+Boundary: no true live `search_memory` against real store, no true live `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider/model/API call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: Day 4 memory write evidence review across exact-approved write, rejected attempt, and preflight repair evidence; do not call `record_memory` unless separately exact-approved.
+
 ## CM-0761 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; limited local real-path bounded evidence executed, but project decision remains `RC_NOT_READY_BLOCKED`.

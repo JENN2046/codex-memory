@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0762 Memory recall evidence ladder review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: Day 3 review/docs/board/status/truth-table update across CM-0755 fixture evidence, CM-0758 temp workspace evidence, and CM-0761 limited local real-path evidence.
+- Changed files: `docs/MEMORY_RECALL_EVIDENCE_LADDER_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Review verdict: the ladder proves bounded synthetic expected result, irrelevant suppression, no-token/readOnly zero side effects, timeout/error shape, isolated temp root, exact seed/query counts, freshness ordering, alpha folder scope, sanitized output, cleanup verification, and temp-root local recall-path module coverage.
+- Remaining gap: the ladder does not prove true live real-store `search_memory`, real memory content quality, `.jsonl` / durable store behavior, provider-backed quality, real corpus precision/recall/freshness/folder behavior, production behavior, V8 implementation, or VCP full parity.
+- Boundary: no true live `search_memory` against real store, true live `record_memory`, real memory content read, `.jsonl` audit/durable memory read, provider/model/API call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: targeted bounded recall tests passed `4/4`; `git diff --check` passed; docs validation passed with `latest_task=CM-0762`, `latest_ledger=CM-0762`, and `latest_validation=CMV-0881`.
+
 ## Checkpoint - CM-0761 Memory recall limited local real-path bounded evidence execution - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

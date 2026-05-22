@@ -28,6 +28,17 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## Memory Recall Evidence Ladder Review - 2026-05-22
+
+Result: `MEMORY_RECALL_EVIDENCE_LADDER_REVIEW_COMPLETED_NOT_READY`.
+
+- `docs/MEMORY_RECALL_EVIDENCE_LADDER_REVIEW.md` reviews the current recall evidence ladder: CM-0755 fixture-only bounded recall evidence, CM-0758 temp workspace bounded recall evidence, and CM-0761 limited local real-path bounded recall evidence.
+- Accepted bounded proof now covers expected synthetic result, irrelevant suppression, no-token/readOnly zero side effects, timeout/error shape, isolated temp root, exact seed/query counts, freshness ordering, alpha folder scope, sanitized output, cleanup verification, and CM-0761 temp-root local recall-path modules.
+- The ladder remains bounded evidence only. It does not execute true live `search_memory` against the real store, true live `record_memory`, real memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, broad real memory scans, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, or readiness claims.
+- It does not prove real corpus precision, recall, freshness, ranking quality, directory/folder parity, production behavior, V8 implementation, or VCP full parity.
+- `memory recall reliable`, `memory write reliable`, runtime ready, RC ready, and production ready are not claimed.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Memory Recall Limited Local Real-Path Bounded Evidence Execution - 2026-05-22
 
 Result: `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_BOUNDED_EVIDENCE_COMPLETED_NOT_READY`.
