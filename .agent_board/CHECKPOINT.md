@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0789 runtime gap truth-table hard closeout 002 - 2026-05-22
+
+- Status: `RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_002_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: hard classify active runtime/readiness gaps only; no runtime proof, true memory action, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, or readiness transition.
+- Changed files: `docs/RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_002.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Classification verdict: no active gap is `complete`; recall remains bounded evidence only; write/real rollback/migration apply remain exact approval required; ValidationAggregator remains no-touch evidence only; runtime/RC/production/release/cutover remains blocked; V8/VCP parity remain future scope.
+- Next safe action: continue Day 12 `RC_PRECHECK_005_PLAN_AND_EXECUTION` using only the allowed command set.
+
 ## Checkpoint - CM-0788 rollback/migration/backup boundary review - 2026-05-22
 
 - Status: `ROLLBACK_MIGRATION_BACKUP_BOUNDARY_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
