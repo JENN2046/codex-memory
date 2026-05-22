@@ -51,7 +51,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
 | memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0782 executor adapter implementation, CM-0783 executor adapter review, CM-0784 execution authorization review, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner/authorization evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan; CM-0782 implements an internal-only adapter with synthetic tests `5/5` plus runner regression `6/6`, complete counters, fail-closed instrumentation, and runner-safe result projection; CM-0783 accepts the adapter for Day 4 execution authorization review; CM-0784 defines the exact approval line, exactly four literal queries, sanitized output shape, and execution preconditions, but does not execute. | no | Day 5 may execute CM-0774 only after separate exact approval on a fresh clean synced head. No `.jsonl`, provider, broad real-memory scan, durable write, public MCP expansion, or readiness claim may be inferred. |
-| memory write reliable | exact approval required | CM-0737 proves only separately exact-approved rejected and accepted `record_memory` attempts, with one accepted durable write under explicit approval. | no | Any further write proof requires a separate exact approval; default unattended write reliability remains unproven. |
+| memory write reliable | exact approval required | CM-0737 / CM-0763 / CM-0785 prove only separately exact-approved write-path evidence: one rejected `record_memory` attempt, one preflight repair / exact-only approval packet surface, one accepted repaired `record_memory` attempt with `memory_writes=1`, and no-token mutation rejection as bounded boundary evidence. | no | Any further write proof requires a separate exact approval; default unattended write reliability, broad `record_memory` reliability, production behavior, rollback cleanup, and long-run durability remain unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. | no | Do not count collectors as maturity; close only after automatic ingestion, freshness/baseline binding, approved evidence capture, and final RC matrix integration are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
 | rollback posture | bounded evidence only | Compare/rollback `43/43`, rollback-active-memory, and CM-0765 make rollback posture reviewable as harness readiness evidence only. | no | Do not treat harness readiness as real rollback apply or production rollback proof. |
@@ -266,6 +266,24 @@ Review conclusion:
 - Targeted tests remain adapter `5/5` and runner regression `6/6`.
 
 This review did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
+## Memory Write Reliability Bounded Review - 2026-05-22
+
+Result: `MEMORY_WRITE_RELIABILITY_BOUNDED_REVIEW_COMPLETED_SYNCED_NOT_READY`.
+
+Artifact: `docs/MEMORY_WRITE_RELIABILITY_BOUNDED_REVIEW.md`.
+
+Review conclusion:
+
+- Current write evidence remains exact-approval-only.
+- CM-0737 proves one separately exact-approved rejected `StoreWAsk` attempt and one separately exact-approved accepted repaired `StoreWAsk` attempt.
+- CM-0737 / CM-0763 also prove local preflight repair and exact-only approval packet behavior, including mutation flag rejection before write execution.
+- CM-0558 no-token JSON-RPC mutation rejection remains bounded boundary evidence only.
+- The evidence does not prove default unattended write reliability, broad `record_memory` reliability, multi-client write reliability, production behavior, rollback cleanup, migration/import/export/backup/restore behavior, or long-run durability.
+
+This review did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 

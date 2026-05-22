@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0785 memory write reliability bounded review - 2026-05-22
+
+- Status: `MEMORY_WRITE_RELIABILITY_BOUNDED_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review existing write evidence only; no true live `record_memory` execution.
+- Changed files: `docs/MEMORY_WRITE_RELIABILITY_BOUNDED_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Review verdict: CM-0737 / CM-0763 remain exact-approval-only evidence: one rejected exact-approved attempt, one preflight repair / exact-only approval packet surface, one accepted exact-approved repaired write with `memory_writes=1`, and no-token mutation rejection as bounded boundary evidence.
+- Remaining blocker: default unattended write reliability, broad `record_memory` reliability, multi-client or production behavior, rollback cleanup, migration/import/export/backup/restore behavior, and long-run durability remain unproven.
+- Boundary: this slice did not execute true live `record_memory`, true live `search_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory write reliable`.
+- Next safe action: Day 8 should plan a safe bounded write proof surface if needed; any durable write still requires separate exact approval.
+
 ## Checkpoint - CM-0784 CM0774 true live proof execution authorization review - 2026-05-22
 
 - Status: `CM0774_TRUE_LIVE_PROOF_EXECUTION_AUTHORIZATION_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

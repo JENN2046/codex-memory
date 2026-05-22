@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0785 Handoff
+
+Status: `MEMORY_WRITE_RELIABILITY_BOUNDED_REVIEW_COMPLETED_SYNCED_NOT_READY`; write evidence remains exact-approval-only and project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_WRITE_RELIABILITY_BOUNDED_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Review verdict: CM-0737 / CM-0763 prove only one separately exact-approved rejected `StoreWAsk` attempt, one preflight repair / exact-only approval packet surface, one separately exact-approved accepted repaired write with `memory_writes=1`, and no-token mutation rejection as bounded boundary evidence.
+
+Remaining gap: `memory write reliable` remains not claimed because current evidence does not prove default unattended write reliability, broad `record_memory` reliability, multi-client or production behavior, rollback cleanup, migration/import/export/backup/restore behavior, or long-run durability.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: Day 8 should plan a safe bounded write proof surface if the write gap still needs narrowing; do not call `record_memory` unless separately exact-approved. CM-0774 true live recall proof also remains blocked unless its exact approval line is supplied.
+
 ## CM-0784 Handoff
 
 Status: `CM0774_TRUE_LIVE_PROOF_EXECUTION_AUTHORIZATION_REVIEW_COMPLETED_SYNCED_NOT_READY`; exact future execution boundary prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
