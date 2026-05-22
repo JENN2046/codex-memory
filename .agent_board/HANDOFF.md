@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0748 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; v1 Mainline Candidate review package prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; package start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all at `58ff820fe0cbe73419040e9e5375dd6d3ab9e213`.
+
+Changed files: `docs/V1_MAINLINE_CANDIDATE_PACKAGE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Result: package summarizes Foundation Reliability, Mainline Memory Spine acceptance, Runtime Gap Closure, `RC_PRECHECK_003_REPAIRED_PASSED_SYNCED_NOT_READY`, remaining blockers, A5 hard stops, rollback posture, and no-overclaim status.
+
+Boundary conclusions: no-token JSON-RPC mutation rejection fixed; no-token readOnly search boundary accepted; search timeout side-effect guard accepted; exact-approved write remains exact-approval-only; ValidationAggregator collector progress accepted without full implementation claim; autopilot / authorization surface growth frozen; real rollback remains A5 blocked unless separately approved.
+
+No-overclaim state: `memory write reliable`, `memory recall reliable`, `runtime ready`, `RC ready`, and `production ready` are not claimed; V8 is not implemented; VCP full parity is not claimed.
+
+Boundary: no src/tests/package/config change, true live `record_memory`/`search_memory` validation, provider call, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: run `git diff --check`, docs validation, push-readiness, safe push, and post-push remote-state review if scope remains allowed.
+
 ## CM-0747 Handoff
 
 Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`; repaired RC_PRECHECK_003 evidence is synced, but project decision remains `RC_NOT_READY_BLOCKED`.

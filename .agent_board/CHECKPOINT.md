@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0748 V1 Mainline Candidate review package - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board/status review package only.
+- Changed files: `docs/V1_MAINLINE_CANDIDATE_PACKAGE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Package records: `RC_PRECHECK_003_REPAIRED_PASSED_SYNCED_NOT_READY`; no-token JSON-RPC mutation rejection fixed; no-token readOnly search boundary accepted; search timeout side-effect guard accepted; exact-approved write remains exact-approval-only; ValidationAggregator collector progress accepted without full implementation claim; autopilot / authorization surface growth frozen; real rollback A5-blocked unless separately approved.
+- No-overclaim: `memory write reliable`, `memory recall reliable`, `runtime ready`, `RC ready`, and `production ready` are not claimed; V8 is not implemented; VCP full parity is not claimed.
+- Boundary: no src/tests/package/config change, true live `record_memory`/`search_memory` validation, provider call, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, tag/release/deploy/cutover, or readiness claim.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0748`, `latest_ledger=CM-0748`, and `latest_validation=CMV-0867`.
+
 ## Checkpoint - CM-0747 RC_PRECHECK_003 repair post-push rerun - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
