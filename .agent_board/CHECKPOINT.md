@@ -1,5 +1,17 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0751 V1 Mainline Candidate package re-review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board/status re-review only.
+- Changed files: `docs/V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Re-review verdict: candidate package coverage remains complete for the current review purpose; no overclaim was found.
+- CM-0750 relationship: consistent follow-on selection/planning evidence, not new runtime evidence and not a readiness transition.
+- Remaining blocker order and A5 hard stops are unchanged.
+- Selected unique next gap remains separately exact-approved `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`.
+- Boundary: no runtime validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup changes, source/test/package edits, tag/release/deploy/cutover, or readiness claims.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0751`, `latest_ledger=CM-0751`, and `latest_validation=CMV-0870`.
+
 ## Checkpoint - CM-0750 Next runtime gap selection - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

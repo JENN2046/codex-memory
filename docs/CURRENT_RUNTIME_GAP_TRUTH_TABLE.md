@@ -233,6 +233,21 @@ Result: `NEXT_RUNTIME_GAP_SELECTION_COMPLETED_NOT_READY`.
 - This selection did not execute runtime validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, migration/backup apply, public MCP expansion, config/watchdog/startup changes, source/test/package changes, release/cutover actions, or readiness claims.
 - Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## V1 Mainline Candidate Package Re-Review - 2026-05-22
+
+Result: `V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW_COMPLETED_NOT_READY`.
+
+- `docs/V1_MAINLINE_CANDIDATE_PACKAGE_REVIEW.md` was refreshed at synced baseline `a85c91b1f814a7c2d292719ec44b940334477d7f`.
+- Candidate package coverage remains complete for the current review purpose.
+- `CM-0750` is consistent follow-on selection/planning evidence; it does not add runtime proof and does not make the candidate package stale.
+- No overclaim was found.
+- Remaining blocker order is unchanged: `memory recall reliable` not claimed; `memory write reliable` not claimed; ValidationAggregator full implementation incomplete; real rollback A5 blocked; migration/import/export/backup/restore apply A5 blocked; runtime/RC/production/release/cutover readiness blocked; V8 not implemented and VCP full parity not claimed.
+- A5 hard stops remain unchanged.
+- Selected unique next gap remains `MEMORY_RECALL_RELIABILITY_BOUNDED_EVIDENCE_BATCH`, separately exact-approved A5 only.
+- New governance/autopilot surface growth remains frozen.
+- This re-review did not execute runtime validation, true `record_memory` / `search_memory`, provider calls, real memory scans, durable memory/audit writes, migration/backup apply, public MCP expansion, config/watchdog/startup changes, source/test/package changes, release/cutover actions, or readiness claims.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Truth Table
 
 | gap | current evidence | runtime touched? | A4/A5 | complete? | next minimal action |
