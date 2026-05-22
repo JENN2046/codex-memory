@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0747 RC_PRECHECK_003 repair post-push rerun - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board evidence sync after repair commit push and RC_PRECHECK_003 allowed-command rerun.
+- Remote-state review: local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all equaled `74c3e283b3a282dcd2799db9d91b84d6f6276f83`; worktree was clean.
+- Passing checks: `git diff --check`; docs validation; strict mainline gate health ok, contract `25/25`, test `1974/1974`, compare `43/43`, rollback `43/43`; independent compare `43/43`; independent rollback `43/43`.
+- Warning: HTTP observe exited 0 with `status=warn` from historical watchdog recovery count `9`; health ok and HTTP log errors `0`; SQLite ExperimentalWarning remained in observe/compare/rollback output.
+- Boundary: no provider, true live `record_memory`/`search_memory`, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+- Result label: `RC_PRECHECK_003_REPAIRED_PASSED_SYNCED_NOT_READY`.
+- Next safe task: choose a separately authorized runtime/readiness gap; do not treat precheck pass as RC readiness.
+
 ## Checkpoint - CM-0746 RC_PRECHECK_003 failure diagnosis and targeted repair - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

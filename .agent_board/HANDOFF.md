@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0747 Handoff
+
+Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`; repaired RC_PRECHECK_003 evidence is synced, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; repair commit `74c3e28 fix: accept failed precheck dashboard status` was pushed and post-push review confirmed local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` all at `74c3e283b3a282dcd2799db9d91b84d6f6276f83`.
+
+Result: `RC_PRECHECK_003_REPAIRED_PASSED_SYNCED_NOT_READY`. After the targeted dashboard repair, the approved RC_PRECHECK_003 command set was rerun: `git diff --check` passed; docs validation passed; strict mainline gate passed with health ok, contract `25/25`, test `1974/1974`, compare `43/43`, and rollback `43/43`; independent compare passed `43/43`; independent rollback passed `43/43`.
+
+Warning: HTTP observe exited 0 with `status=warn` from historical watchdog recovery count `9`; health ok and HTTP log errors `0`. SQLite ExperimentalWarning remained in observe/compare/rollback output.
+
+Boundary: no provider, true live `record_memory`/`search_memory`, real memory scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+
+Next safe action: continue only with a separately authorized runtime/readiness gap; do not treat this repaired precheck pass as RC readiness.
+
 ## CM-0746 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; targeted repair prepared for push and RC_PRECHECK_003 rerun.
