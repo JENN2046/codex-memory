@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0805 second negative-control proof execution - 2026-05-22
+
+- Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_FAILED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: exact-approved stricter negative-control true live recall proof through internal runner/adapter only; no true live `record_memory`, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/CM0774_SECOND_NEGATIVE_CONTROL_PROOF_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Proof verdict: runner boundary returned `TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY` with rawContentReturned=false and complete zero side-effect counters, but the CM-0803 zero-result criteria failed because NC1=3, NC2=2, NC3=3, NC4=2.
+- Boundary: `memory recall reliable` is not claimed; truth table remains `bounded evidence only` and `complete? = no`; `RC_NOT_READY_BLOCKED` remains.
+
 ## Checkpoint - CM-0804 second negative-control exact approval recheck - 2026-05-22
 
 - Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_READY_FOR_EXACT_APPROVAL`; project decision remains `RC_NOT_READY_BLOCKED`.

@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0805 Handoff
+
+Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_FAILED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/CM0774_SECOND_NEGATIVE_CONTROL_PROOF_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Proof verdict: the exact-approved internal runner/adapter path executed exactly four stricter negative-control queries and returned sanitized evidence only. Runner boundary decision was `TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY`; rawContentReturned=false; complete side-effect counters were all zero.
+
+Failure reason: the CM-0803 acceptance criterion required every negative-control slot to return `resultCount=0`, but the actual sanitized result counts were NC1=3, NC2=2, NC3=3, and NC4=2. This keeps the recall blocker open.
+
+Next safe action: perform a proof review / recall precision investigation without raw memory unless separately exact-approved. Do not claim `memory recall reliable`; keep `RC_NOT_READY_BLOCKED`.
+
+Boundary: no true live `record_memory`, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
 ## CM-0804 Handoff
 
 Status: `CM0774_SECOND_NEGATIVE_CONTROL_PROOF_READY_FOR_EXACT_APPROVAL`; project decision remains `RC_NOT_READY_BLOCKED`.
