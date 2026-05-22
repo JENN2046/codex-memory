@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0791 Handoff
+
+Status: `V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE_PREPARED_SYNCED_NOT_READY`; final RC review package is prepared as Day 14 input, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Package verdict: package consolidates current capabilities, recall/write evidence ladder, remaining blockers, hard stops, rollback posture, ValidationAggregator status, truth-table status, and `RC_PRECHECK_005` into one Day 14 review input. It does not make the go/no-go decision.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: continue Day 14 `V1_MAINLINE_FINAL_GO_NO_GO_REVIEW`; allowed decisions remain `FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`, `NEEDS_ONE_MORE_EVIDENCE_ROUND`, or `RC_REVIEW_BLOCKED`, with forbidden `RC_READY`, `RELEASE_READY`, and `PRODUCTION_READY` claims.
+
 ## CM-0790 Handoff
 
 Status: `RC_PRECHECK_005_PASSED_SYNCED_NOT_READY`; allowed precheck commands passed, but project decision remains `RC_NOT_READY_BLOCKED`.

@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0791 V1 mainline final RC review package - 2026-05-22
+
+- Status: `V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE_PREPARED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: Day 13 review package only; no runtime proof, true memory action, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Package verdict: current capabilities, evidence ladder, blockers, hard stops, rollback posture, recall/write proof status, ValidationAggregator status, truth-table status, and `RC_PRECHECK_005` are consolidated as Day 14 input only.
+- Remaining blocker: no active readiness/reliability row is complete; `RC_NOT_READY_BLOCKED` remains.
+- Next safe action: continue Day 14 `V1_MAINLINE_FINAL_GO_NO_GO_REVIEW` with only allowed decision vocabulary.
+
 ## Checkpoint - CM-0790 RC_PRECHECK_005 plan and execution - 2026-05-22
 
 - Status: `RC_PRECHECK_005_PASSED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

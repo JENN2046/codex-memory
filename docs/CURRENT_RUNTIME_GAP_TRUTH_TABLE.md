@@ -109,6 +109,26 @@ Boundary: this precheck did not execute true live `record_memory`, true live `se
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## V1 Mainline Final RC Review Package - 2026-05-22
+
+Result: `V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE_PREPARED_SYNCED_NOT_READY`.
+
+Artifact: `docs/V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE.md`.
+
+Package scope:
+
+- Current capabilities were summarized as reviewable capabilities only.
+- Recall evidence remains bounded evidence only; CM-0774 true live proof is still not executed.
+- Write evidence remains exact-approval-only; CM-0786 is planning only.
+- ValidationAggregator remains no-touch evidence only and not full implementation.
+- Rollback posture remains bounded harness evidence only; real rollback apply remains exact approval required.
+- Migration/import/export/backup/restore apply remains exact approval required.
+- `RC_PRECHECK_005` is included as passed-not-ready precheck evidence only.
+
+This package did not execute true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness/reliability claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## True Live Recall Read-Only Execution Surface Gap Plan - 2026-05-22
 
 Result: `TRUE_LIVE_RECALL_READONLY_EXECUTION_SURFACE_GAP_PLAN_COMPLETED_SYNCED_NOT_READY`.
