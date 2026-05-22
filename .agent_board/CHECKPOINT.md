@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0775 True live recall read-only execution surface gap plan - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/status/board/truth-table gap plan only; source/tests were read-only review inputs.
+- Changed files: `docs/TRUE_LIVE_RECALL_READONLY_EXECUTION_SURFACE_GAP_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Plan verdict: current `search_memory` cannot yet execute CM-0774 because `include_content=false` does not prove no-provider/no-audit/read-only/no-durable-side-effect behavior, and the schema lacks explicit proof controls.
+- Required next surface: internal proof runner or separately approved controlled schema change with `readOnly/noProvider/noAudit/sanitizedOutput/exactQueryCount=4`, plus targeted tests for provider, sync, cache, vector flush, audit, sanitized output, and timeout/error fail-closed behavior.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory recall reliable`.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0775`, `latest_ledger=CM-0775`, and `latest_validation=CMV-0894`.
+
 ## Checkpoint - CM-0774 Memory recall true live real-store proof approval packet - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

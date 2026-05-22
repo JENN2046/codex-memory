@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0775 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; true live recall read-only execution surface gap plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/TRUE_LIVE_RECALL_READONLY_EXECUTION_SURFACE_GAP_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Plan verdict: CM-0774 still cannot execute because current `search_memory` exposes `include_content=false` but no explicit proof-mode controls for `read_only`, `no_provider`, `no_audit`, `sanitized_output`, or exact query count. Source review identified provider, sync, cache, vector flush, recall audit, and read-policy audit surfaces that must be fail-closed before a true live proof.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real memory read, `.jsonl` read, provider call, broad real memory scan, durable memory/audit write, package/config/watchdog/startup change, public MCP expansion, release/deploy/cutover, or readiness claim occurred.
+
+Next safe action: implement and review a minimal exact proof surface with `readOnly/noProvider/noAudit/sanitizedOutput/exactQueryCount=4`; only after that may a separately exact-approved CM-0774 execution be reconsidered.
+
 ## CM-0774 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; true live real-store recall proof approval packet prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
