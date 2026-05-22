@@ -50,7 +50,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
-| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan for trustworthy complete counters and sanitized runner-safe app result projection, but it still does not implement the adapter or execute true live real-store recall. | no | Day 2 must implement the internal executor adapter/wrapper with targeted synthetic tests; Day 3 must review it; CM-0774 still requires separate exact approval before any execution. No `.jsonl`, provider, broad real-memory scan, durable write, public MCP expansion, or readiness claim may be inferred. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0782 executor adapter implementation, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan; CM-0782 implements an internal-only adapter with synthetic tests `5/5` plus runner regression `6/6`, complete counters, fail-closed instrumentation, and runner-safe result projection, but it still does not execute true live real-store recall and has not yet had Day 3 adapter review. | no | Day 3 must review the internal executor adapter/wrapper; CM-0774 still requires separate exact approval before any execution. No `.jsonl`, provider, broad real-memory scan, durable write, public MCP expansion, or readiness claim may be inferred. |
 | memory write reliable | exact approval required | CM-0737 proves only separately exact-approved rejected and accepted `record_memory` attempts, with one accepted durable write under explicit approval. | no | Any further write proof requires a separate exact approval; default unattended write reliability remains unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. | no | Do not count collectors as maturity; close only after automatic ingestion, freshness/baseline binding, approved evidence capture, and final RC matrix integration are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
@@ -213,6 +213,38 @@ Planning conclusion:
 - Day 2 implementation and Day 3 adapter review remain required before a separately exact-approved `CM-0774` execution authorization review.
 
 This plan did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
+## True Live Recall Executor Adapter Implementation - 2026-05-22
+
+Result: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTED_SYNCED_NOT_READY`.
+
+Artifact: `docs/TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTATION.md`.
+
+Implementation summary:
+
+- Added internal-only `src/core/TrueLiveRecallExecutorAdapter.js`.
+- Added targeted synthetic tests in `tests/true-live-recall-executor-adapter.test.js`.
+- Did not add public MCP tools, did not expand the public `search_memory` schema, and did not add package scripts.
+- Adapter rejects invalid source, missing/invalid proof context, non-`4` exact query count, non-read-only request flags, `includeContent=true`, missing `noProvider/noAudit/sanitizedOutput`, or source drift before app execution.
+- Adapter binds the runner to `app.callTool('search_memory', ..., { noTokenReadOnly: true })` with `include_content=false`.
+- Adapter instruments provider, durable write, recall/read-policy audit, audit append, sync, candidate-cache write/flush, vector flush, and embedding-cache write surfaces; forbidden surface touch increments the matching counter and fails closed before original execution.
+- Adapter projects ordinary app results into a runner-safe no-raw shape before returning to `TrueLiveRecallReadonlyProofRunner`.
+- Wrappers restore in `finally` after success and failure.
+
+Validation:
+
+```text
+node --check src\core\TrueLiveRecallExecutorAdapter.js
+node --check tests\true-live-recall-executor-adapter.test.js
+node --test tests\true-live-recall-executor-adapter.test.js
+node --test tests\true-live-recall-internal-proof-runner.test.js
+```
+
+Targeted results: adapter `5/5`; runner regression `6/6`.
+
+This implementation did not execute true live `search_memory`, true live `record_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 

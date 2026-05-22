@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0782 True live recall executor adapter implementation - 2026-05-22
+
+- Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: minimal internal adapter/wrapper implementation, targeted synthetic tests, and docs/status/board/truth-table sync.
+- Changed files: `src/core/TrueLiveRecallExecutorAdapter.js`; `tests/true-live-recall-executor-adapter.test.js`; `docs/TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTATION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Implementation verdict: adapter is internal-only and does not expand public MCP schema. It verifies runner source, sealed proof context, `exactQueryCount=4`, `readOnly/noProvider/noAudit/sanitizedOutput/includeContent=false`, binds to `app.callTool('search_memory')` with `noTokenReadOnly=true`, instruments provider/audit/sync/cache/vector/write surfaces for complete counters, fails closed before forbidden side effects, projects ordinary app results into runner-safe no-raw shape, and restores wrappers in `finally`.
+- Validation: adapter targeted test passed `5/5`; internal proof runner regression passed `6/6`; source/test `node --check` passed.
+- Re-review: no actionable findings in changed scope; no true memory call, provider/API call, durable write, public MCP expansion, package/config/watchdog/startup change, or readiness claim.
+- Remaining blocker: Day 3 adapter review is still required before any separately exact-approved `CM-0774` execution authorization review.
+
 ## Checkpoint - CM-0781 True live recall executor adapter plan - 2026-05-22
 
 - Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

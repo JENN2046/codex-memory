@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0782 Handoff
+
+Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTED_SYNCED_NOT_READY`; internal adapter/wrapper implemented with synthetic tests, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/core/TrueLiveRecallExecutorAdapter.js`; `tests/true-live-recall-executor-adapter.test.js`; `docs/TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTATION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Implementation verdict: adapter is internal-only. It verifies proof request flags and sealed proof context before app execution, calls `app.callTool('search_memory')` with `include_content=false` and `noTokenReadOnly=true`, instruments provider/audit/sync/cache/vector/write surfaces for complete counters and fail-closed behavior, projects ordinary app results to no-raw runner-safe shape, and restores wrappers after success/failure.
+
+Validation run: `node --check src\core\TrueLiveRecallExecutorAdapter.js`; `node --check tests\true-live-recall-executor-adapter.test.js`; adapter test `5/5`; runner regression `6/6`. Docs validation and `git diff --check` are required for final closeout.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: Day 3 `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_REVIEW`; do not execute true memory search or claim memory recall reliability.
+
 ## CM-0781 Handoff
 
 Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_PLAN_COMPLETED_SYNCED_NOT_READY`; concrete adapter/wrapper plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
