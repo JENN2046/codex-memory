@@ -28,6 +28,19 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## Memory Write Evidence Review - 2026-05-22
+
+Result: `MEMORY_WRITE_EVIDENCE_REVIEW_COMPLETED_NOT_READY`.
+
+- `docs/MEMORY_WRITE_EVIDENCE_REVIEW.md` reviews CM-0737 write-path evidence and distinguishes exact-approved write evidence from default write reliability.
+- Accepted evidence: one separately user-approved `record_memory` attempt returned `decision=rejected`; the rejected payload lacked the required checkpoint/risk/todo/pending/stage-conclusion signal.
+- Accepted evidence: preflight repair now emits a `Checkpoint:` process-memory signal, prepares an exact-only approval packet, and rejects mutation-style flags in targeted tests.
+- Accepted evidence: one separately user-approved repaired `record_memory` attempt returned `decision=accepted`, recorded `memoryId=codex-process-1ef539a197d747e199e12fe1c0d69731`, recorded `shadowWrite.status=ok`, and v3 receipt parsing recorded `memory_writes=1`.
+- This remains exact-approval-only bounded evidence. It does not leave implicit write authorization, does not prove default unattended write reliability, and does not prove broad `record_memory` reliability across payloads, clients, provider states, migrations, production use, or rollback cleanup.
+- This review did not execute true live `record_memory`, true live `search_memory`, real memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, broad real memory scans, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, or readiness claims.
+- `memory write reliable`, `memory recall reliable`, runtime ready, RC ready, and production ready are not claimed.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Memory Recall Evidence Ladder Review - 2026-05-22
 
 Result: `MEMORY_RECALL_EVIDENCE_LADDER_REVIEW_COMPLETED_NOT_READY`.

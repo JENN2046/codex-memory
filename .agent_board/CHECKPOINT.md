@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0763 Memory write evidence review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: Day 4 review/docs/board/status/truth-table update across CM-0737 exact-approved write, rejected attempt, and preflight repair evidence.
+- Changed files: `docs/MEMORY_WRITE_EVIDENCE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Review verdict: CM-0737 proves one separately approved rejected attempt, one preflight repair that emits exact-only approval packets and rejects mutation flags, and one separately approved accepted repaired write with `memory_writes=1`.
+- Remaining gap: CM-0737 does not prove default unattended write reliability, broad `record_memory` reliability, production behavior, rollback cleanup behavior, runtime readiness, RC readiness, or production readiness.
+- Boundary: no true live `record_memory`, true live `search_memory`, real memory content read, `.jsonl` audit/durable memory read, provider/model/API call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: targeted preflight/receipt tests passed `17/17`; `git diff --check` passed; docs validation passed with `latest_task=CM-0763`, `latest_ledger=CM-0763`, and `latest_validation=CMV-0882`.
+
 ## Checkpoint - CM-0762 Memory recall evidence ladder review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
