@@ -191,8 +191,26 @@ function spawnJson(args, env = {}) {
     child.stdout.on('data', d => { stdout += d; });
     child.stderr.on('data', d => { stderr += d; });
     child.on('close', code => {
-      try { resolve(JSON.parse(stdout || stderr || 'null')); }
-      catch { resolve(null); }
+      let payload = null;
+      try { payload = JSON.parse(stdout || stderr || 'null'); } catch { payload = null; }
+      if (code !== 0) {
+        if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+          resolve({
+            ...payload,
+            childExitCode: code,
+            childError: stderr.trim() || `child exited with code ${code}`
+          });
+          return;
+        }
+        resolve({
+          status: 'error',
+          exitCode: code,
+          error: stderr.trim() || `child exited with code ${code}`,
+          payload
+        });
+        return;
+      }
+      resolve(payload);
     });
     child.on('error', () => resolve(null));
   });
@@ -381,13 +399,14 @@ async function collectService() {
 }
 
 async function collectStore() {
+  let db = null;
   try {
     const { DatabaseSync } = require('node:sqlite');
     const dbPath = resolveDbPath();
     if (!fs.existsSync(dbPath)) {
       return { status: 'warn', records: 0, chunks: 0, vectors: 0, message: `Database not found: ${dbPath}` };
     }
-    const db = new DatabaseSync(dbPath);
+    db = new DatabaseSync(dbPath);
     const recordCount = db.prepare('SELECT COUNT(*) as cnt FROM memory_records').get().cnt;
     const chunkCount = db.prepare('SELECT COUNT(*) as cnt FROM memory_chunks').get().cnt;
     let targets = [];
@@ -412,7 +431,6 @@ async function collectStore() {
     } catch { /* ignore */ }
     const records = Number(recordCount) || 0;
     const chunks = Number(chunkCount) || 0;
-    db.close();
     return {
       status: records > 0 ? 'ok' : 'warn',
       records,
@@ -423,6 +441,10 @@ async function collectStore() {
     };
   } catch (err) {
     return { status: 'error', records: 0, chunks: 0, error: err.message };
+  } finally {
+    if (db) {
+      try { db.close(); } catch { /* ignore close failures in diagnostics */ }
+    }
   }
 }
 
@@ -889,8 +911,7 @@ function buildChecks(service, store, profile, runtime, audits, gate, governance,
       ? `${runtime.httpLogErrorCount} HTTP errors in log`
       : 'No HTTP errors in log'
   });
-  const watchdogLevel = runtime.watchdogRecoveryCount > 20 ? 'error'
-    : runtime.watchdogRecoveryCount > 5 ? 'warn' : 'ok';
+  const watchdogLevel = runtime.watchdogRecoveryCount > 0 ? 'warn' : 'ok';
   checks.push({
     source: 'runtime', level: watchdogLevel,
     code: 'watchdog-stable',

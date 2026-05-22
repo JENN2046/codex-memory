@@ -539,14 +539,15 @@ Continue until done or hard-stopped:
 5. Inspect diff.
 6. Run targeted validation.
 7. Run gate-level validation if subsystem requires it.
-8. If validation passes, mark task `done`.
-9. If validation fails and fix is obvious, attempt one narrow fix.
-10. Rerun validation.
-11. If still failing, mark `blocked`.
-12. Update `.agent_board`.
-13. Create checkpoint.
-14. Consider Guarded Auto-Commit.
-15. Continue to next safe task.
+8. If validation passes after a repair, perform the Post-Fix Re-review Gate before marking task `done`.
+9. If validation passes and any required Post-Fix Re-review Gate has no actionable findings, mark task `done`.
+10. If validation fails and fix is obvious, attempt one narrow fix.
+11. Rerun validation.
+12. If still failing, mark `blocked`.
+13. Update `.agent_board`.
+14. Create checkpoint.
+15. Consider Guarded Auto-Commit.
+16. Continue to next safe task.
 
 Do not batch unrelated changes.
 
@@ -573,6 +574,25 @@ Do not say tests passed if they were not run.
 Do not claim full validation if only targeted validation ran.
 
 If validation is unavailable, state why.
+
+### 12.0 Post-Fix Re-review Gate
+
+After every executed repair, Codex must perform at least one re-review pass before stopping.
+
+This gate applies after bug fixes, security fixes, review-finding fixes, validation-failure repairs, and follow-up fixes produced by a previous re-review.
+
+The re-review pass must:
+
+- inspect the final diff and the changed source/test/docs context
+- check whether the repair introduced regressions, side effects, contract drift, unsafe authorization changes, provider/API calls, secret exposure, data mutation, readiness overclaims, or other vulnerabilities inside the changed scope
+- verify that tests or validation evidence cover the repaired boundary, or state the validation gap plainly
+- record the re-review result in the final report and in `.agent_board` when sustained work is active
+
+If re-review finds an actionable issue that is safe and inside scope, Codex should fix it, rerun relevant validation, and perform another re-review pass.
+
+Codex may stop only when the re-review has no actionable findings in the changed scope, or when a hard stop / human decision blocker is reached.
+
+Do not overclaim global safety. Say "no actionable findings in the changed scope" unless broader audited evidence exists.
 
 ### 12.1 Dry-Run Acceptance Wording
 

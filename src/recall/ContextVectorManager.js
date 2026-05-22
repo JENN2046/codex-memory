@@ -16,7 +16,7 @@ class ContextVectorManager {
     this.fuzzyThreshold = 0.85;
   }
 
-  async buildQueryContext({ queryText = '', contextText = '', activeBlocks = [], messages = [], queryAnalysis = {} } = {}) {
+  async buildQueryContext({ queryText = '', contextText = '', activeBlocks = [], messages = [], queryAnalysis = {}, readOnly = false } = {}) {
     const sourceKinds = [];
     const vectors = [];
 
@@ -26,7 +26,7 @@ class ContextVectorManager {
     ].map(fragment => compactText(fragment)).filter(Boolean);
 
     if (inlineFragments.length > 0) {
-      const inlineVectors = await this.vectorStore.getBatchEmbeddingsCached(inlineFragments);
+      const inlineVectors = await this.vectorStore.getBatchEmbeddingsCached(inlineFragments, { inputKind: 'query-context', readOnly });
       inlineVectors.filter(Boolean).forEach(vector => vectors.push(vector));
       if (contextText) sourceKinds.push('context-text');
       if (activeBlocks.length > 0) sourceKinds.push('active-block');
@@ -34,7 +34,7 @@ class ContextVectorManager {
 
     let segmentCount = 0;
     if (Array.isArray(messages) && messages.length > 0) {
-      await this.updateContext(messages);
+      await this.updateContext(messages, { readOnly });
       const userVector = this.aggregateContext('user');
       const assistantVector = this.aggregateContext('assistant');
       if (userVector) vectors.push(userVector);
@@ -84,7 +84,7 @@ class ContextVectorManager {
     };
   }
 
-  async updateContext(messages = []) {
+  async updateContext(messages = [], options = {}) {
     if (!Array.isArray(messages) || messages.length === 0) return;
 
     const lastUserIndex = this.findLastIndex(messages, message => message?.role === 'user');
@@ -111,7 +111,10 @@ class ContextVectorManager {
         vector = await this.vectorStore.getEmbeddingFromCacheOnly(content);
       }
       if (!vector) {
-        vector = await this.vectorStore.getSingleEmbeddingCached(content);
+        vector = await this.vectorStore.getSingleEmbeddingCached(content, {
+          inputKind: 'query-context',
+          readOnly: options.readOnly === true
+        });
       }
       if (!vector) continue;
 

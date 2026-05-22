@@ -498,7 +498,8 @@ function createStreamableHttpServer({
       const result = await mcpServer.handleJsonRpc(body, {
         ...baseRequestContext,
         sessionId: requestSessionId || undefined,
-        executionContext: defaultExecutionContext
+        executionContext: defaultExecutionContext,
+        noTokenReadOnly: !bearerToken
       });
 
       if (result.sessionId) {

@@ -1,5 +1,55 @@
 # HANDOFF.md - codex-memory
 
+## CM-0740 Handoff
+
+Status: `COMPLETED_VALIDATED` docs-only rule update; guarded local commit is the remaining closeout step if desired.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; worktree contains intentional CM-0738, CM-0739, and CM-0740 edits.
+
+Changed files: `AGENTS.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`, plus prior CM-0738/CM-0739 repair files.
+
+Result: `AGENTS.md` now requires a Post-Fix Re-review Gate after every executed repair. A repair may stop only after at least one re-review pass finds no actionable issue in the changed scope, or after a hard stop/human decision blocker is reached. The rule also requires scoped wording instead of global safety overclaims.
+
+Validation run: docs validation passed; `git diff --check` passed; post-fix re-review found no actionable issue in the changed docs/board scope after tightening execution-loop wording to "any required" gate.
+
+Boundary: no source/runtime/provider/API/MCP/config/dependency/secret/remote/readiness action occurred for CM-0740.
+
+## CM-0739 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after targeted tests, full `npm test`, strict mainline gate, HTTP ensure/observe, docs validation, and diff check; guarded local commit is the remaining closeout step if desired.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; worktree contains the intentional CM-0738 and CM-0739 source/test/board edits.
+
+Changed files: `src/cli/dashboard.js`; `src/adapters/codex-mcp/http.js`; `src/app.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/recall/CandidateGenerator.js`; `src/recall/ContextVectorManager.js`; `src/recall/RerankService.js`; `src/storage/VectorIndexStore.js`; `src/storage/DiaryStore.js`; `tests/dashboard-cli.test.js`; `tests/mcp-http.test.js`; `tests/diary-store-read-record.test.js`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: CM-0738 repaired dashboard diagnostics, HTTP no-token read-only search side-effect suppression, CRLF diary parsing, and dashboard SQLite cleanup. CM-0739 closed the follow-up provider gaps: cache-disabled read-only embeddings now return local hash vectors without `embedTextAdaptive()`, and read-only rerank forces local rerank instead of remote provider calls. HTTP regression tests now cover no-token search maintenance writes, cache-disabled embedding provider suppression, and remote rerank provider suppression.
+
+Validation run: changed runtime/test syntax checks passed; `node --test tests\mcp-http.test.js tests\diary-store-read-record.test.js tests\dashboard-cli.test.js` passed `37/37`; full `npm test` passed `1974/1974`; `npm run gate:mainline:strict` passed with contract `25/25`, compare `43/43`, and rollback `43/43`; `npm run start:http:ensure` reported healthy; `npm run observe:http -- --json` returned `warn` from historical watchdog recoveries while health was ok and HTTP log errors were 0; docs validation passed; `git diff --check` passed.
+
+Boundary: no provider/API call, no true MCP memory tool call against real memory, no dependency/config/watchdog/startup change, no public MCP expansion, no remote action, no push, no readiness claim.
+
+## CM-0738 Handoff
+
+Status: `COMPLETED_VALIDATED` locally after targeted tests, full `npm test`, strict mainline gate, HTTP ensure/observe, docs validation, and diff check; guarded local commit is the remaining closeout step if desired.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; worktree contains the intentional CM-0738 source/test/board edits.
+
+Changed files: `src/cli/dashboard.js`; `src/adapters/codex-mcp/http.js`; `src/app.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/recall/CandidateGenerator.js`; `src/recall/ContextVectorManager.js`; `src/storage/VectorIndexStore.js`; `src/storage/DiaryStore.js`; `tests/dashboard-cli.test.js`; `tests/mcp-http.test.js`; `tests/diary-store-read-record.test.js`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Result: dashboard now treats watchdog recoveries as warnings rather than critical failures, preserves child helper nonzero exit metadata while keeping parseable JSON, closes dashboard SQLite handles in `finally`, and its tests tolerate local warning states without requiring a particular real profile. HTTP no-token `search_memory` now passes a read-only flag through the app/recall path, skipping sync, candidate-cache writes, recall/read-policy audit writes, embedding cache flushes, and provider-backed adaptive embedding calls. `DiaryStore.readRecord()` now parses CRLF `Content`/`Evidence` sections and normalizes them to LF.
+
+Validation run: `node --test tests\dashboard-cli.test.js` passed `20/20`; `node --test tests\mcp-http.test.js tests\diary-store-read-record.test.js` passed `15/15`; syntax checks for changed runtime/test files passed; full `npm test` passed `1972/1972`; `npm run gate:mainline:strict` passed; `npm run start:http:ensure` reported healthy; `npm run observe:http -- --json` returned `warn` from recoverable watchdog recovery history while health was ok and HTTP log errors were 0; docs validation passed; `git diff --check` passed.
+
+Boundary: no provider/API call, no true MCP memory tool call against real memory, no dependency/config/watchdog/startup change, no public MCP expansion, no remote action, no push, no readiness claim.
+
+Next safe action: inspect final diff/status and optionally make a guarded local commit. Push remains explicit-only.
+
 ## CM-0737 Handoff
 
 Status: `COMPLETED_VALIDATED` locally after the second approved StoreWAsk execution, full validation, docs validation, v3 parser smoke, and diff check; guarded local commit is the remaining closeout step for this slice.

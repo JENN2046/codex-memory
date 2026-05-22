@@ -252,11 +252,11 @@ class DiaryStore {
     const conversationId = this.matchSingleLine(headerBlock, /^Conversation-ID:\s*(.+)$/mi) || null;
     const visibility = this.matchSingleLine(headerBlock, /^Visibility:\s*(.+)$/mi) || null;
     const retentionPolicy = this.matchSingleLine(headerBlock, /^Retention-Policy:\s*(.+)$/mi) || null;
-    const contentMatch = withoutHeader.match(/\nContent:\n([\s\S]*?)\n\nEvidence:\n/);
-    const evidenceMatch = withoutHeader.match(/\nEvidence:\n([\s\S]*?)(?:\n\nTag:\s*(.+))?$/);
+    const contentMatch = withoutHeader.match(/\r?\nContent:\r?\n([\s\S]*?)\r?\n\r?\nEvidence:\r?\n/);
+    const evidenceMatch = withoutHeader.match(/\r?\nEvidence:\r?\n([\s\S]*?)(?:\r?\n\r?\nTag:\s*(.+))?$/);
     const tagsLine = evidenceMatch?.[2] || '';
-    const content = contentMatch ? contentMatch[1].trim() : '';
-    const evidence = evidenceMatch ? evidenceMatch[1].trim() : '';
+    const content = contentMatch ? contentMatch[1].replace(/\r\n/g, '\n').trim() : '';
+    const evidence = evidenceMatch ? evidenceMatch[1].replace(/\r\n/g, '\n').trim() : '';
     const tags = normalizeTags(tagsLine);
     const cleanedText = stripMemoryMarkers(withoutHeader);
     const semanticDate = this.extractSemanticDate(rawText, filePath, stats);

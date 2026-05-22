@@ -25,7 +25,7 @@ class RerankService {
       retrieval_rank: document.retrieval_rank || index + 1
     }));
 
-    if (this.isRemoteConfigured() && !this.isCircuitOpen()) {
+    if (options.readOnly !== true && this.isRemoteConfigured() && !this.isCircuitOpen()) {
       const remote = await this.remoteRerank(query, prepared, originalK, options);
       if (remote) {
         if (options.geodesicRerank) {

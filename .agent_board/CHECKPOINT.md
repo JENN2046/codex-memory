@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0740 Mandatory post-fix re-review rule - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: added a durable `AGENTS.md` rule that every executed repair must receive a post-fix re-review pass before stopping; actionable findings require another fix, validation, and re-review.
+- Changed files: `AGENTS.md`; `.agent_board/*`.
+- Validation: docs validation passed; `git diff --check` passed; post-fix re-review found no actionable issue in the changed docs/board scope after tightening execution-loop wording to "any required" gate.
+- Boundary: no source/runtime/provider/API/MCP/config/dependency/secret/remote/readiness action occurred.
+- Next safe task: inspect final diff/status and optionally make a guarded local commit for CM-0738 through CM-0740; push remains explicit-only.
+
+## Checkpoint - CM-0739 No-token read-only provider-boundary follow-up - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: repaired two re-review findings after CM-0738: cache-disabled `readOnly` embedding now stays on local hash, and `readOnly` rerank skips remote rerank provider calls.
+- Changed files: `src/storage/VectorIndexStore.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/recall/RerankService.js`; `tests/mcp-http.test.js`; `.agent_board/*`.
+- Validation: changed runtime/test syntax checks passed; targeted HTTP/CRLF/dashboard tests passed `37/37`; full `npm test` passed `1974/1974`; strict mainline gate passed with contract `25/25`, compare `43/43`, and rollback `43/43`; HTTP ensure reported healthy; HTTP observe returned `warn` from historical watchdog recoveries while health was ok and HTTP log errors were 0.
+- Boundary: no provider/API call, no true MCP memory tool call against real memory, no dependency change, no config/watchdog/startup change, no secret access/edit, no public MCP expansion, no remote action, no push, no readiness claim.
+- Next safe task: inspect diff/status and optionally make a guarded local commit; push remains explicit-only.
+
+## Checkpoint - CM-0738 Full-review repair - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED`; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- Scope: repaired dashboard diagnostic/test stability, child helper nonzero-exit evidence preservation, HTTP no-token `search_memory` read-only side-effect boundary, CRLF diary import parsing, and dashboard SQLite close-on-error handling.
+- Changed files: `src/cli/dashboard.js`; `src/adapters/codex-mcp/http.js`; `src/app.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/recall/CandidateGenerator.js`; `src/recall/ContextVectorManager.js`; `src/storage/VectorIndexStore.js`; `src/storage/DiaryStore.js`; `tests/dashboard-cli.test.js`; `tests/mcp-http.test.js`; `tests/diary-store-read-record.test.js`; `.agent_board/*`.
+- Validation: targeted dashboard tests passed `20/20`; targeted HTTP/CRLF tests passed `15/15`; syntax checks for changed runtime/test files passed; full `npm test` passed `1972/1972`; strict mainline gate passed; HTTP ensure reported healthy; HTTP observe returned `warn` from recoverable watchdog recovery history while health was ok and HTTP log errors were 0; docs validation passed; `git diff --check` passed.
+- Boundary: no provider/API call, no true MCP memory tool call against real memory, no dependency change, no config/watchdog/startup change, no secret access/edit, no public MCP expansion, no remote action, no push, no readiness claim.
+- Next safe task: inspect diff/status and optionally make a guarded local commit; push remains explicit-only.
+
 ## Checkpoint - CM-0737 StoreWAsk rejected-attempt preflight repair - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED` after the second approved StoreWAsk execution and validation; project decision remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.

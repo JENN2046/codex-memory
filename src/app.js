@@ -367,6 +367,7 @@ function createCodexMemoryApplication(overrides = {}) {
 
   async function executeSearchMemory(args = {}, requestContext = {}, { signal = null } = {}) {
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
+    const readOnly = requestContext.noTokenReadOnly === true;
     const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
     const scopeAudit = buildScopeAuditContext(scopeFilter);
     const searchResults = await passiveRecallService.search({
@@ -380,7 +381,8 @@ function createCodexMemoryApplication(overrides = {}) {
       auditContext: {
         scope: scopeAudit
       },
-      signal
+      signal,
+      readOnly
     });
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const filtered = (scopeFilter && searchResults && searchResults.length)
@@ -399,7 +401,7 @@ function createCodexMemoryApplication(overrides = {}) {
       scope: scopeFilter
     });
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
-    if (config.enableLifecycleReadPolicy) {
+    if (config.enableLifecycleReadPolicy && !readOnly) {
       const statusByMemoryId = lifecycleFiltered.audit.statusByMemoryId || new Map();
       const policyAudit = {
         ...lifecycleFiltered.audit,

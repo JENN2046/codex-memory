@@ -55,7 +55,7 @@ class CandidateGenerator {
     };
   }
 
-  async generate({ target = 'both', queryText, queryAnalysis, directives = {}, limit, syncToken = '', contextState = null, candidateFilters = {}, signal = null }) {
+  async generate({ target = 'both', queryText, queryAnalysis, directives = {}, limit, syncToken = '', contextState = null, candidateFilters = {}, signal = null, readOnly = false }) {
     throwIfSearchMemoryAborted(signal);
     const searchPlan = this.buildSearchPlan({
       limit,
@@ -88,7 +88,10 @@ class CandidateGenerator {
       await this.shadowStore.listChunks(target, candidateFilters)
     );
     throwIfSearchMemoryAborted(signal);
-    const queryVector = await this.vectorStore.getSingleEmbeddingCached(queryText);
+    const queryVector = await this.vectorStore.getSingleEmbeddingCached(queryText, {
+      inputKind: 'query',
+      readOnly
+    });
     throwIfSearchMemoryAborted(signal);
     const activeQueryVector = this.buildActiveQueryVector(queryVector, contextState);
     const semanticCandidates = this.rankChunks({
@@ -124,7 +127,7 @@ class CandidateGenerator {
       fromCache: false
     };
 
-    if (this.candidateCacheStore) {
+    if (this.candidateCacheStore && !readOnly) {
       throwIfSearchMemoryAborted(signal);
       await this.candidateCacheStore.set(cacheKey, {
         searchPlan,

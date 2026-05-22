@@ -60,7 +60,8 @@ class KnowledgeBaseRecallPipeline {
     contextMessages = [],
     candidateFilters = {},
     auditContext = {},
-    signal = null
+    signal = null,
+    readOnly = false
   }) {
     if (typeof query !== 'string' || !query.trim()) {
       throw new Error('query must be a non-empty string');
@@ -84,12 +85,13 @@ class KnowledgeBaseRecallPipeline {
         contextText,
         activeBlocks: parsed.activeBlocks || [],
         messages: contextMessages,
-        queryAnalysis
+        queryAnalysis,
+        readOnly
       })
       : { available: false };
 
     throwIfSearchMemoryAborted(signal);
-    const syncState = this.knowledgeBaseSyncService
+    const syncState = this.knowledgeBaseSyncService && !readOnly
       ? await this.knowledgeBaseSyncService.syncTarget(target, { signal })
       : { syncToken: '', changed: false };
 
@@ -103,7 +105,8 @@ class KnowledgeBaseRecallPipeline {
       syncToken: syncState.syncToken || '',
       contextState,
       candidateFilters,
-      signal
+      signal,
+      readOnly
     });
 
     throwIfSearchMemoryAborted(signal);
@@ -112,6 +115,7 @@ class KnowledgeBaseRecallPipeline {
       directives,
       queryAnalysis,
       candidateState,
+      readOnly,
       signal
     });
 
@@ -130,23 +134,25 @@ class KnowledgeBaseRecallPipeline {
     });
 
     throwIfSearchMemoryAborted(signal);
-    await this.recordAudit({
-      target,
-      finalResults,
-      queryAnalysis,
-      directives,
-      candidateState,
-      contextState,
-      rerankMeta: rerankState.meta,
-      source,
-      auditContext,
-      signal
-    });
+    if (!readOnly) {
+      await this.recordAudit({
+        target,
+        finalResults,
+        queryAnalysis,
+        directives,
+        candidateState,
+        contextState,
+        rerankMeta: rerankState.meta,
+        source,
+        auditContext,
+        signal
+      });
+    }
 
     return finalResults;
   }
 
-  async finalizeChunkCandidates({ queryText, directives, queryAnalysis = {}, candidateState, signal = null }) {
+  async finalizeChunkCandidates({ queryText, directives, queryAnalysis = {}, candidateState, readOnly = false, signal = null }) {
     throwIfSearchMemoryAborted(signal);
     const { searchPlan, semanticCandidates, timeCandidates } = candidateState;
     const useRerank = searchPlan.useRerank;
@@ -157,7 +163,8 @@ class KnowledgeBaseRecallPipeline {
       rrfAlpha: directives.rerankplus,
       geodesicRerank: !!directives.geodesicrerank,
       geodesicConfig: this.rerankService.config?.geodesicRerank || {},
-      queryAnalysis
+      queryAnalysis,
+      readOnly
     };
 
     if (searchPlan.useTime) {

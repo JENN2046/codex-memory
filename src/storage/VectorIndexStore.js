@@ -129,23 +129,32 @@ class VectorIndexStore {
   }
 
   async getSingleEmbeddingCached(text, options = {}) {
+    const readOnly = options.readOnly === true;
+    const normalizedText = this.normalizeEmbeddingText(text);
+    if (!normalizedText) return null;
+
     if (!this.config.enableEmbeddingCache) {
-      return this.embedTextAdaptive(text, options);
+      return readOnly
+        ? this.embedText(normalizedText)
+        : this.embedTextAdaptive(normalizedText, options);
     }
 
     await this.ensureReady();
-    const normalizedText = this.normalizeEmbeddingText(text);
-    if (!normalizedText) return null;
 
     const cacheKey = this.createEmbeddingCacheKey(normalizedText, options);
     const cached = this.index.embeddingCache[cacheKey];
     if (cached && Array.isArray(cached.vector)) {
-      cached.lastAccessedAt = new Date().toISOString();
+      if (!readOnly) {
+        cached.lastAccessedAt = new Date().toISOString();
+      }
       this.stats.embeddingHits += 1;
       return cached.vector;
     }
 
     this.stats.embeddingMisses += 1;
+    if (readOnly) {
+      return this.embedText(normalizedText);
+    }
     const vector = await this.embedTextAdaptive(normalizedText, options);
     this.index.embeddingCache[cacheKey] = {
       text: normalizedText,

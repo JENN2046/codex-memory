@@ -7,14 +7,15 @@ const path = require('node:path');
 const { createCodexMemoryApplication } = require('../src/app');
 const { createStreamableHttpServer, SESSION_HEADER, createSessionHardeningConfig } = require('../src/adapters/codex-mcp/http');
 
-async function withHttpServer(handler, serverOptions = {}) {
+async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
   const app = createCodexMemoryApplication({
     projectBasePath: tempBasePath,
     dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
     logsDir: path.join(tempBasePath, 'logs'),
     dataDir: path.join(tempBasePath, 'data'),
-    httpPort: 0
+    httpPort: 0,
+    ...appOverrides
   });
 
   await app.initialize();
@@ -256,6 +257,203 @@ test('HTTP MCP should reject no-token mutation tool calls', async () => {
     assert.equal(payloadWithoutId.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
     assert.match(payloadWithoutId.error.data.reason, /no-token/i);
     assert.match(payloadWithoutId.error.data.reason, /mutation/i);
+  });
+});
+
+test('HTTP MCP no-token search_memory should avoid local maintenance writes', async () => {
+  await withHttpServer(async ({ app, address }) => {
+    await app.callTool('record_memory', {
+      target: 'process',
+      title: 'HTTP no-token read-only search fixture',
+      content: 'Type: checkpoint\nread-only search should not maintain local stores',
+      evidence: 'http no-token read-only search contract test',
+      validated: true,
+      reusable: false,
+      sensitivity: 'none'
+    }, {
+      executionContext: {
+        agentAlias: 'Codex',
+        agentId: 'codex-memory-http-test',
+        requestSource: 'http-no-token-read-only-search-test'
+      }
+    });
+
+    const originalSyncTarget = app.recall.knowledgeBaseSyncService.syncTarget;
+    const originalCacheSet = app.stores.candidateCacheStore.set;
+    const originalAuditRecord = app.recall.recallAuditService.record;
+    const originalReadPolicyAudit = app.recall.recallAuditService.recordReadPolicySummary;
+    const originalVectorFlush = app.recall.candidateGenerator.vectorStore.flush;
+    const originalEmbedTextAdaptive = app.recall.candidateGenerator.vectorStore.embedTextAdaptive;
+
+    app.recall.knowledgeBaseSyncService.syncTarget = async () => {
+      throw new Error('no-token search must not sync local stores');
+    };
+    app.stores.candidateCacheStore.set = async () => {
+      throw new Error('no-token search must not write candidate cache');
+    };
+    app.recall.recallAuditService.record = async () => {
+      throw new Error('no-token search must not write recall audit');
+    };
+    app.recall.recallAuditService.recordReadPolicySummary = async () => {
+      throw new Error('no-token search must not write read-policy audit');
+    };
+    app.recall.candidateGenerator.vectorStore.flush = async () => {
+      throw new Error('no-token search must not flush embedding cache');
+    };
+    app.recall.candidateGenerator.vectorStore.embedTextAdaptive = async () => {
+      throw new Error('no-token search must not call external embedding providers');
+    };
+
+    try {
+      const response = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 7,
+          method: 'tools/call',
+          params: {
+            name: 'search_memory',
+            arguments: {
+              query: 'read-only no-token local maintenance writes',
+              target: 'process',
+              limit: 3,
+              include_content: false
+            }
+          }
+        })
+      });
+      const payload = await response.json();
+
+      assert.equal(response.status, 200);
+      assert.equal(payload.jsonrpc, '2.0');
+      assert.equal(payload.id, 7);
+      assert.ok(Array.isArray(payload.result.structuredContent.results));
+    } finally {
+      app.recall.knowledgeBaseSyncService.syncTarget = originalSyncTarget;
+      app.stores.candidateCacheStore.set = originalCacheSet;
+      app.recall.recallAuditService.record = originalAuditRecord;
+      app.recall.recallAuditService.recordReadPolicySummary = originalReadPolicyAudit;
+      app.recall.candidateGenerator.vectorStore.flush = originalVectorFlush;
+      app.recall.candidateGenerator.vectorStore.embedTextAdaptive = originalEmbedTextAdaptive;
+    }
+  });
+});
+
+test('HTTP MCP no-token search_memory should not call external embedding when cache is disabled', async () => {
+  await withHttpServer(async ({ app, address }) => {
+    await app.callTool('record_memory', {
+      target: 'process',
+      title: 'HTTP no-token cache-disabled fixture',
+      content: 'Type: checkpoint\ncache-disabled read-only search must use local hash embeddings',
+      evidence: 'http no-token cache-disabled embedding boundary test',
+      validated: true,
+      reusable: false,
+      sensitivity: 'none'
+    }, {
+      executionContext: {
+        agentAlias: 'Codex',
+        agentId: 'codex-memory-http-test',
+        requestSource: 'http-no-token-cache-disabled-search-test'
+      }
+    });
+
+    const originalEmbedTextAdaptive = app.recall.candidateGenerator.vectorStore.embedTextAdaptive;
+    app.recall.candidateGenerator.vectorStore.embedTextAdaptive = async () => {
+      throw new Error('no-token cache-disabled search must not call external embedding providers');
+    };
+
+    try {
+      const response = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 8,
+          method: 'tools/call',
+          params: {
+            name: 'search_memory',
+            arguments: {
+              query: 'cache-disabled read-only search local hash embeddings',
+              target: 'process',
+              limit: 3,
+              include_content: false
+            }
+          }
+        })
+      });
+      const payload = await response.json();
+
+      assert.equal(response.status, 200);
+      assert.equal(payload.jsonrpc, '2.0');
+      assert.equal(payload.id, 8);
+      assert.ok(Array.isArray(payload.result.structuredContent.results));
+    } finally {
+      app.recall.candidateGenerator.vectorStore.embedTextAdaptive = originalEmbedTextAdaptive;
+    }
+  }, {}, { enableEmbeddingCache: false });
+});
+
+test('HTTP MCP no-token search_memory should not call external rerank provider', async () => {
+  await withHttpServer(async ({ app, address }) => {
+    await app.callTool('record_memory', {
+      target: 'process',
+      title: 'HTTP no-token rerank fixture',
+      content: 'Type: checkpoint\nread-only rerank search must stay local',
+      evidence: 'http no-token read-only rerank provider boundary test',
+      validated: true,
+      reusable: false,
+      sensitivity: 'none'
+    }, {
+      executionContext: {
+        agentAlias: 'Codex',
+        agentId: 'codex-memory-http-test',
+        requestSource: 'http-no-token-rerank-search-test'
+      }
+    });
+
+    const originalIsConfigured = app.recall.externalRerankAdapter.isConfigured;
+    const originalRerank = app.recall.externalRerankAdapter.rerank;
+    app.recall.externalRerankAdapter.isConfigured = () => true;
+    app.recall.externalRerankAdapter.rerank = async () => {
+      throw new Error('no-token search must not call external rerank providers');
+    };
+
+    try {
+      const response = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 9,
+          method: 'tools/call',
+          params: {
+            name: 'search_memory',
+            arguments: {
+              query: 'read-only rerank search must stay local ::rerank',
+              target: 'process',
+              limit: 3,
+              include_content: false
+            }
+          }
+        })
+      });
+      const payload = await response.json();
+
+      assert.equal(response.status, 200);
+      assert.equal(payload.jsonrpc, '2.0');
+      assert.equal(payload.id, 9);
+      assert.ok(Array.isArray(payload.result.structuredContent.results));
+    } finally {
+      app.recall.externalRerankAdapter.isConfigured = originalIsConfigured;
+      app.recall.externalRerankAdapter.rerank = originalRerank;
+    }
   });
 });
 
