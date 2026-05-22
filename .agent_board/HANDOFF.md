@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0792 Handoff
+
+Status: `FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`; final RC review package is ready for human/operator review only, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/V1_MAINLINE_FINAL_GO_NO_GO_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Decision verdict: Day 14 selected `FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`, not `NEEDS_ONE_MORE_EVIDENCE_ROUND` or `RC_REVIEW_BLOCKED`. The decision means the package can be reviewed by an operator; it does not approve runtime, RC, production, release, cutover, memory recall/write reliability, V8, or VCP parity claims.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: continue Day 15 `POST_GO_NO_GO_REMOTE_SYNC_AND_HANDOFF`; confirm local `HEAD`, `origin/main`, and remote `refs/heads/main` alignment and finalize handoff without readiness/release overclaim.
+
 ## CM-0791 Handoff
 
 Status: `V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE_PREPARED_SYNCED_NOT_READY`; final RC review package is prepared as Day 14 input, but project decision remains `RC_NOT_READY_BLOCKED`.

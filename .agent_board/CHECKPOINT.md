@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0792 V1 mainline final go/no-go review - 2026-05-22
+
+- Status: `FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: Day 14 final go/no-go review only; no runtime proof, true memory action, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/V1_MAINLINE_FINAL_GO_NO_GO_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Decision verdict: the final RC review package is ready for human/operator review only. This is not runtime, RC, production, release, or cutover readiness.
+- Remaining blocker: no active readiness/reliability row is complete; `RC_NOT_READY_BLOCKED` remains.
+- Next safe action: continue Day 15 `POST_GO_NO_GO_REMOTE_SYNC_AND_HANDOFF`.
+
 ## Checkpoint - CM-0791 V1 mainline final RC review package - 2026-05-22
 
 - Status: `V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE_PREPARED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
