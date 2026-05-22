@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0799 next blocker closure scope selection - 2026-05-22
+
+- Status: `NEXT_BLOCKER_CLOSURE_SCOPE_SELECTION_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: next blocker selection only; no runtime proof, true memory action, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/NEXT_BLOCKER_CLOSURE_SCOPE_SELECTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Selection verdict: choose `CM-0774 true live recall proof / executor adapter path` as the unique next scope, with `CM0774_TRUE_LIVE_REAL_STORE_PROOF_EXACT_APPROVAL_RECHECK` before any execution.
+- Boundary: no true live proof or write was executed; this is not runtime, RC, production, release, cutover, memory recall reliability, or memory write reliability.
+
 ## Checkpoint - CM-0798 post round 2 remote sync and handoff - 2026-05-22
 
 - Status: `V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_REVIEW_READY_NOT_RELEASE_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

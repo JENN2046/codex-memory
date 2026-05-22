@@ -204,6 +204,28 @@ This handoff did not execute true live `record_memory`, true live `search_memory
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## Next Blocker Closure Scope Selection - 2026-05-22
+
+Result: `NEXT_BLOCKER_CLOSURE_SCOPE_SELECTION_COMPLETED_SYNCED_NOT_READY`.
+
+Artifact: `docs/NEXT_BLOCKER_CLOSURE_SCOPE_SELECTION.md`.
+
+Selection:
+
+- Unique recommended next scope: `CM-0774 true live recall proof / executor adapter path`.
+- Recommended next action: `CM0774_TRUE_LIVE_REAL_STORE_PROOF_EXACT_APPROVAL_RECHECK`.
+- Rationale: runner patch, adapter implementation, adapter review, authorization review, exact four-query set, sanitized output shape, and complete counter fail-closed requirements already exist, so this is the closest blocker to a bounded evidence closure.
+
+Scope comparison:
+
+- Bounded exactly-one write proof remains higher risk because it requires a durable `record_memory` write and separate exact approval.
+- ValidationAggregator full implementation remains broader implementation work and still cannot close runtime evidence gaps without later approved evidence.
+- Rollback/migration/apply boundary planning can clarify apply blockers but cannot close real rollback or migration/import/export/backup/restore apply evidence without exact approval.
+
+This selection did not execute true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness/reliability claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## V1 Mainline Final RC Review Package - 2026-05-22
 
 Result: `V1_MAINLINE_FINAL_RC_REVIEW_PACKAGE_PREPARED_SYNCED_NOT_READY`.
