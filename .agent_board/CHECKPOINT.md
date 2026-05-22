@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0759 Memory recall temp workspace evidence review - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: review/docs/board/status/truth-table only.
+- Changed files: `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Review verdict: CM-0758 sufficiently covers isolated temp root, exactly four synthetic `.json` seed records, exactly four bounded recall queries, expected current result, irrelevant suppression, freshness ordering, alpha folder scope, timeout/error boundary, sanitized evidence output, cleanup verification, and zero provider / real memory / `.jsonl` / durable memory / durable audit side effects.
+- Remaining gap: CM-0758 remains synthetic temp-workspace evidence and does not execute true live `search_memory`, read real memory content, read `.jsonl`, call providers, prove real corpus precision/recall/freshness/folder behavior, or justify `memory recall reliable`.
+- Next recommended gap: separately exact-approved planning-only `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN`.
+- Boundary: no true live `search_memory` against real store, real memory content read, `.jsonl` audit/durable memory read, provider call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0759`, `latest_ledger=CM-0759`, and `latest_validation=CMV-0878`.
+
 ## Checkpoint - CM-0758 Memory recall temp workspace evidence execution - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

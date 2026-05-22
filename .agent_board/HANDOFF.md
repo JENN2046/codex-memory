@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0759 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; CM-0758 temp workspace recall evidence reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; review start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `4ca7795ffbe8966795df94b9571662e97fdd3a3b`; worktree was clean.
+
+Changed files: `docs/MEMORY_RECALL_TEMP_WORKSPACE_EVIDENCE_REVIEW.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Review verdict: CM-0758 sufficiently covers isolated temp root, exactly four synthetic `.json` seed records, exactly four bounded recall queries, expected current result, irrelevant suppression, freshness ordering, alpha folder scope, timeout/error boundary, sanitized evidence output, cleanup verification, and zero provider / real memory / `.jsonl` / durable memory / durable audit side effects.
+
+Remaining gap: `memory recall reliable` remains not claimed because CM-0758 is synthetic temp-workspace evidence only and does not execute true live `search_memory`, read real memory content, read `.jsonl`, call providers, prove real corpus quality/freshness/folder behavior, or provide real-store recall reliability proof.
+
+Next safe action: if separately exact-approved, prepare planning-only `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN`.
+
+Boundary: no true live `search_memory` against real store, no real memory content read, no `.jsonl` audit/durable memory read, no provider call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
 ## CM-0758 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; memory recall temp workspace evidence executed, but project decision remains `RC_NOT_READY_BLOCKED`.
