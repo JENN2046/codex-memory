@@ -1,5 +1,16 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0781 True live recall executor adapter plan - 2026-05-22
+
+- Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_PLAN_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: plan concrete internal executor adapter/wrapper for `CM-0774`; no true live proof execution.
+- Changed files: `docs/TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Plan verdict: current ordinary `search_memory` app output is not runner-safe by itself because it can include raw-bearing `title`, `snippet`, and `text`, and it does not produce complete `sideEffectCounters`. Day 2 should add an internal-only adapter/wrapper that binds the runner to the in-process local `search_memory` path with `noTokenReadOnly=true`, instruments forbidden side-effect surfaces, and returns runner-safe projected results.
+- Required adapter boundary: sealed proof context, `exactQueryCount=4`, `readOnly=true`, `noProvider=true`, `noAudit=true`, `sanitizedOutput=true`, `includeContent=false`, complete counters, fail-closed provider/audit/sync/cache/vector/write wrappers, no direct `.jsonl` or durable store file reads, and no raw result fields crossing the executor boundary.
+- Validation: `git diff --check`, docs validation, push-readiness, safe push, and post-push remote-state review are required for closeout.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, change package/config/watchdog/startup, expand public MCP, or claim `memory recall reliable`.
+- Remaining blocker: Day 2 implementation and Day 3 adapter review are still required before any separately exact-approved `CM-0774` execution can be considered.
+
 ## Checkpoint - CM-0780 True live recall internal proof runner patch review - 2026-05-22
 
 - Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

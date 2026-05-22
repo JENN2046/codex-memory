@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0781 Handoff
+
+Status: `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_PLAN_COMPLETED_SYNCED_NOT_READY`; concrete adapter/wrapper plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Plan verdict: implement an internal-only executor adapter/wrapper next. It should bind `TrueLiveRecallReadonlyProofRunner` to the existing in-process local `search_memory` path using `app.callTool('search_memory', ..., { noTokenReadOnly: true })`, verify sealed proof context and `exactQueryCount=4`, instrument provider/audit/sync/cache/vector/write surfaces for complete counters, fail closed before forbidden side effects execute, and return runner-safe projected results without raw `content`, `text`, `snippet`, `title`, path, chat-history, or `.jsonl` fields.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Validation run: docs validation and `git diff --check` are required for this plan slice; push-readiness, safe push, and post-push remote-state review are part of final closeout.
+
+Next safe action: Day 2 `TRUE_LIVE_RECALL_EXECUTOR_ADAPTER_IMPLEMENTATION` may implement `src/core/TrueLiveRecallExecutorAdapter.js` and targeted synthetic tests only. Do not execute true memory search or claim memory recall reliability.
+
 ## CM-0780 Handoff
 
 Status: `TRUE_LIVE_RECALL_INTERNAL_PROOF_RUNNER_PATCH_REVIEW_COMPLETED_SYNCED_NOT_READY`; CM-0779 runner-local patch reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
