@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0796 blocker closure round 2 package - 2026-05-22
+
+- Status: `V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_PACKAGE_PREPARED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: Day 13 package only; no runtime proof, true memory action, direct `.jsonl` content read, provider call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_PACKAGE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Package verdict: recall remains bounded evidence only; write remains exact approval required; ValidationAggregator remains no-touch evidence only; rollback posture remains bounded harness evidence only; real rollback/apply and migration/import/export/backup/restore apply remain exact approval required; `RC_PRECHECK_006` is passed-not-ready precheck evidence only.
+- Next safe action: continue `V1_MAINLINE_BLOCKER_CLOSURE_GO_NO_GO_REVIEW`.
+
 ## Checkpoint - CM-0795 RC_PRECHECK_006 plan and execution - 2026-05-22
 
 - Status: `RC_PRECHECK_006_PASSED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

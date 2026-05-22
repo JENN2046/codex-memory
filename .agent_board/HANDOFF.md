@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0796 Handoff
+
+Status: `V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_PACKAGE_PREPARED_SYNCED_NOT_READY`; blocker closure round 2 Day 13 package is prepared and project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/V1_MAINLINE_BLOCKER_CLOSURE_ROUND_2_PACKAGE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Package verdict: recall proof path remains not executed for CM-0774; write proof path remains exact approval required; ValidationAggregator full implementation remains no-touch evidence only; rollback posture remains bounded harness evidence only; real rollback/apply and migration/import/export/backup/restore apply remain exact approval required; `RC_PRECHECK_006` is passed-not-ready evidence only.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Remaining risk: this is Day 14 input only, not go/no-go decision; no truth-table row changes to `complete? = yes`.
+
+Next safe action: continue `V1_MAINLINE_BLOCKER_CLOSURE_GO_NO_GO_REVIEW` with allowed decisions only.
+
 ## CM-0795 Handoff
 
 Status: `RC_PRECHECK_006_PASSED_SYNCED_NOT_READY`; blocker closure round 2 Day 12 precheck passed and project decision remains `RC_NOT_READY_BLOCKED`.
