@@ -1,5 +1,14 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0774 Memory recall true live real-store proof approval packet - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: approval packet docs/status/board/truth-table only; no true live recall execution.
+- Changed files: `docs/MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_APPROVAL_PACKET.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Packet verdict: future true live `search_memory` proof is allowed only after separate exact approval naming the packet; exact future query count is `4`; output must be sanitized; direct `.jsonl` read, provider calls, durable writes, migration/apply/config/release actions, and readiness claims are forbidden.
+- Boundary: this slice did not execute true live `search_memory`, read real memory, read `.jsonl`, call providers, write durable memory/audit, or claim `memory recall reliable`.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0774`, `latest_ledger=CM-0774`, and `latest_validation=CMV-0893`.
+
 ## Checkpoint - CM-0773 Memory recall limited local real-path evidence review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

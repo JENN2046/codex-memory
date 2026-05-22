@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0774 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; true live real-store recall proof approval packet prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_APPROVAL_PACKET.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Packet verdict: future true live `search_memory` proof remains blocked until a separate exact approval names this packet and the exact one-time execution. The packet defines exact query count `4`, query-family slots, current local real-store `search_memory` tool-path boundary, sanitized output, no direct `.jsonl` read, no provider, no durable memory/audit write, no migration/apply/config/release action, and no readiness wording.
+
+Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, read real memory, read `.jsonl`, call providers, scan real memory broadly, write durable memory/audit, change config/watchdog/startup, change package/lockfile, expand public MCP, release/deploy/cutover, or claim readiness.
+
+Next safe action: only a separately exact-approved execution packet may run true live real-store proof; otherwise keep `memory recall reliable` not claimed.
+
 ## CM-0773 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; CM-0772 limited local real-path recall evidence reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.
