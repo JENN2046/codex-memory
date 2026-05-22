@@ -88,6 +88,25 @@ This closeout did not execute true live `record_memory`, true live `search_memor
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
 
+## Runtime Gap Truth Table Hard Closeout 004 - 2026-05-22
+
+Result: `RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_004_COMPLETED_SYNCED_NOT_READY`.
+
+Artifact: `docs/RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_004.md`.
+
+Round 2 hard classification:
+
+- `complete`: no active runtime/readiness gap currently qualifies.
+- `bounded evidence only`: `memory recall reliable`, rollback posture, and RC_PRECHECK/current-head strict gate remain bounded evidence only.
+- `no-touch evidence only`: `ValidationAggregator full implementation`.
+- `exact approval required`: `memory write reliable`, real rollback apply, and migration/import/export/backup/restore apply.
+- `blocked`: runtime/RC/production/release/cutover readiness, public MCP expansion, and config/watchdog/startup changes.
+- `future VCP/V8`: V8 implementation and VCP full parity.
+
+This closeout did not execute true live `record_memory`, true live `search_memory`, real memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`. The next allowed round 2 step is `RC_PRECHECK_006_PLAN_AND_EXECUTION`.
+
 ## RC_PRECHECK_005 Plan And Execution - 2026-05-22
 
 Result: `RC_PRECHECK_005_PASSED_SYNCED_NOT_READY`.

@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0794 Handoff
+
+Status: `RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_004_COMPLETED_SYNCED_NOT_READY`; blocker closure round 2 hard classification is refreshed and project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/RUNTIME_GAP_TRUTH_TABLE_HARD_CLOSEOUT_004.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md`.
+
+Classification verdict: no active runtime/readiness gap is `complete`; `memory recall reliable` remains bounded evidence only; `memory write reliable`, real rollback apply, and migration/import/export/backup/restore apply remain exact approval required; ValidationAggregator full implementation remains no-touch evidence only; runtime/RC/production/release/cutover readiness remains blocked; V8 implementation and VCP full parity remain future VCP/V8.
+
+Boundary: no true live `record_memory`, true live `search_memory`, direct `.jsonl` or durable memory content read, provider call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
+Next safe action: continue `RC_PRECHECK_006_PLAN_AND_EXECUTION` with only the allowed command set; do not infer readiness from this closeout.
+
 ## CM-0793 Handoff
 
 Status: `V1_MAINLINE_MEMORY_SPINE_FINAL_RC_REVIEW_READY_NOT_RELEASE_READY`; final RC review package is ready for human/operator review and remains not release ready. Project decision remains `RC_NOT_READY_BLOCKED`.
