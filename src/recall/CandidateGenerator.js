@@ -289,7 +289,22 @@ class CandidateGenerator {
       tagMemoSurfaceScore: tagMemo.surfaceScore || 0,
       structuralBias: Number(structuralBias.toFixed(6)),
       contextBlendWeight: contextState?.blendWeight || 0,
-      source
+      source,
+      precision: {
+        score,
+        baseScore: score,
+        rerankScore: null,
+        vectorScore: Number(vectorScore.toFixed(6)),
+        lexicalScore: Number(lexical.score.toFixed(6)),
+        tagMemoScore: tagMemo.normalizedScore,
+        matchedTags: uniqueTokens([...(lexical.matchedTags || []), ...(tagMemo.matchedTags || [])]),
+        coreTagsMatched: uniqueTokens(tagMemo.matchedCoreTags || []),
+        titleHitCount: tagMemo.titleHitCount || 0,
+        tagHitCount: tagMemo.tagHitCount || 0,
+        contentHitCount: tagMemo.contentHitCount || 0,
+        evidenceHitCount: tagMemo.evidenceHitCount || 0,
+        exactCoreTagCount: tagMemo.exactCoreTagCount || 0
+      }
     };
   }
 

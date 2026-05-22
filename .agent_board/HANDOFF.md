@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0809 Handoff
+
+Status: `RECALL_PRECISION_HARDENING_BOUNDED_IMPLEMENTED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/recall/RecallPrecisionPolicy.js`; `src/recall/CandidateGenerator.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `tests/recall-precision-hardening-bounded.test.js`; `docs/RECALL_PRECISION_HARDENING_BOUNDED_IMPLEMENTATION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Implementation verdict: bounded internal hardening exists behind optional `precisionPolicyContext`. Default public behavior remains disabled. Targeted tests prove positive-control retention, negative-control zero-result behavior, sanitized score distribution, and fail-closed missing/raw/high-confidence negative-control cases.
+
+Next safe action: perform a bounded implementation review and decide whether evidence is sufficient to prepare a future exact approval recheck. Do not execute live `search_memory` without separate exact approval.
+
+Boundary: no new true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred.
+
 ## CM-0808 Handoff
 
 Status: `RECALL_PRECISION_HARDENING_PLAN_REVIEW_COMPLETED_SYNCED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

@@ -2,6 +2,7 @@ const { getDiaryNamesForTarget, getTargetForDiaryName } = require('../core/const
 const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
 const { throwIfSearchMemoryAborted } = require('../core/SearchMemoryTimeoutPolicy');
 const { stripMemoryMarkers } = require('../storage/DiaryStore');
+const { RecallPrecisionPolicy } = require('./RecallPrecisionPolicy');
 const { compactText, uniqueTokens } = require('./text');
 
 function sortByPrimaryScore(items) {
@@ -35,7 +36,8 @@ class KnowledgeBaseRecallPipeline {
     recallEnhancer,
     shadowStore,
     knowledgeBaseSyncService,
-    contextVectorManager = null
+    contextVectorManager = null,
+    recallPrecisionPolicy = null
   }) {
     this.compatibilitySyntaxAdapter = compatibilitySyntaxAdapter;
     this.timeExpressionParser = timeExpressionParser;
@@ -47,6 +49,7 @@ class KnowledgeBaseRecallPipeline {
     this.shadowStore = shadowStore;
     this.knowledgeBaseSyncService = knowledgeBaseSyncService;
     this.contextVectorManager = contextVectorManager;
+    this.recallPrecisionPolicy = recallPrecisionPolicy || new RecallPrecisionPolicy();
   }
 
   async search({
@@ -61,7 +64,8 @@ class KnowledgeBaseRecallPipeline {
     candidateFilters = {},
     auditContext = {},
     signal = null,
-    readOnly = false
+    readOnly = false,
+    precisionPolicyContext = null
   }) {
     if (typeof query !== 'string' || !query.trim()) {
       throw new Error('query must be a non-empty string');
@@ -119,9 +123,11 @@ class KnowledgeBaseRecallPipeline {
       signal
     });
 
+    const precisionState = this.applyPrecisionPolicy(rerankState.results, precisionPolicyContext);
+
     throwIfSearchMemoryAborted(signal);
     const aggregated = await this.aggregateCandidates({
-      candidates: rerankState.results,
+      candidates: precisionState.results,
       includeContent,
       signal
     });
@@ -142,7 +148,10 @@ class KnowledgeBaseRecallPipeline {
         directives,
         candidateState,
         contextState,
-        rerankMeta: rerankState.meta,
+        rerankMeta: {
+          ...rerankState.meta,
+          precisionPolicy: precisionState.meta
+        },
         source,
         auditContext,
         signal
@@ -150,6 +159,35 @@ class KnowledgeBaseRecallPipeline {
     }
 
     return finalResults;
+  }
+
+  applyPrecisionPolicy(candidates = [], precisionPolicyContext = null) {
+    if (!precisionPolicyContext?.enabled) {
+      return {
+        results: candidates,
+        meta: { decision: 'policy_disabled' }
+      };
+    }
+
+    const policyCandidates = candidates.map(candidate => ({
+      ...candidate,
+      precision: {
+        ...(candidate.precision || {}),
+        score: candidate.score,
+        baseScore: candidate.baseScore ?? candidate.precision?.baseScore,
+        rerankScore: candidate.rerank_score ?? candidate.rerankScore ?? candidate.precision?.rerankScore ?? null
+      }
+    }));
+    const evaluation = this.recallPrecisionPolicy.evaluateCandidates(policyCandidates, precisionPolicyContext);
+    return {
+      results: evaluation.accepted,
+      meta: {
+        decision: evaluation.decision,
+        acceptedCount: evaluation.accepted.length,
+        rejectedCount: evaluation.rejected.length,
+        distribution: evaluation.distribution
+      }
+    };
   }
 
   async finalizeChunkCandidates({ queryText, directives, queryAnalysis = {}, candidateState, readOnly = false, signal = null }) {
