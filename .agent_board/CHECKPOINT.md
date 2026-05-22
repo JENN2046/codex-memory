@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0760 Memory recall limited local real-path readiness plan - 2026-05-22
+
+- Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: planning-only docs/board/status/truth-table update.
+- Changed files: `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+- Plan verdict: limited local real-path bounded evidence is now defined as the next layer after CM-0755 fixture evidence and CM-0758 temp workspace evidence, but before any true live real-store `search_memory`.
+- Defined controls: run-specific temp root; exactly four synthetic records; exactly four bounded local recall-path checks; expected result, irrelevant suppression, alpha folder scope, freshness ordering, timeout/error boundary, sanitized output, cleanup verification, pass/fail labels, hard-stop boundaries, and no-readiness wording.
+- Boundary: no true live `search_memory` against real store, true `record_memory`, real memory content read, `.jsonl` audit/durable memory read, provider call, real memory broad scan, durable memory/audit write, migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup change, package/lockfile change, tag/release/deploy/cutover, or readiness claim.
+- Validation: `git diff --check` passed; docs validation passed with `latest_task=CM-0760`, `latest_ledger=CM-0760`, and `latest_validation=CMV-0879`.
+
 ## Checkpoint - CM-0759 Memory recall temp workspace evidence review - 2026-05-22
 
 - Status: `COMPLETED_VALIDATED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

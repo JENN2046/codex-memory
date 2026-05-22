@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0760 Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`; limited local real-path recall readiness plan prepared, but project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; plan start baseline was local `HEAD`, tracking `origin/main`, and remote `refs/heads/main` at `a408ae4fcaa60792ca663d58da2f056185dccad8`; worktree was clean.
+
+Changed files: `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Plan verdict: CM-0760 defines a future limited local real-path bounded evidence packet using a run-specific temp root, exactly four synthetic records, exactly four bounded local recall-path checks, sanitized output, cleanup verification, and no-readiness wording.
+
+Boundary: no true live `search_memory` against real store, no true `record_memory`, no real memory content read, no `.jsonl` audit/durable memory read, no provider call, no broad real memory scan, no durable memory/audit write, no migration/backup apply, no public MCP expansion, no config/watchdog/startup change, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.
+
+Next safe action: execute `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_BOUNDED_EVIDENCE_EXECUTION` only as a separately scoped fixture/temp-root/local-only packet with the CM-0760 boundaries preserved.
+
 ## CM-0759 Handoff
 
 Status: `COMPLETED_VALIDATED_NOT_READY`; CM-0758 temp workspace recall evidence reviewed, but project decision remains `RC_NOT_READY_BLOCKED`.

@@ -28,6 +28,18 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## Memory Recall Limited Local Real-Path Readiness Plan - 2026-05-22
+
+Result: `MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN_COMPLETED_NOT_READY`.
+
+- `docs/MEMORY_RECALL_LIMITED_LOCAL_REAL_PATH_READINESS_PLAN.md` defines the next bounded planning layer after CM-0755 fixture evidence and CM-0758 temp workspace evidence.
+- The future evidence packet is limited to a run-specific temp root under `<repo>/tmp/memory-recall-limited-local-real-path-evidence/CM-0761-<run-id>`.
+- The plan defines exactly four synthetic records and exactly four bounded local recall-path checks: expected-result, irrelevant-suppression, alpha folder-scope, and timeout/error-boundary.
+- Future output must be sanitized and must record seed/query counts, expected result IDs, suppressed result IDs, folder/freshness behavior, timeout shape, side-effect counters, cleanup verification, forbidden actions, and no-overclaim status.
+- The plan keeps true live `search_memory` against the real store, true `record_memory`, real memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, broad real memory scans, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, and readiness claims blocked.
+- This is planning-only evidence. It does not claim `memory recall reliable`, `memory write reliable`, runtime ready, RC ready, production ready, V8 implemented, or VCP full parity.
+- Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
 ## Mainline Spine Truth Table Refresh - 2026-05-22
 
 Result: `MAINLINE_SPINE_TRUTH_TABLE_REFRESH_READY_FOR_COMMIT` after docs validation.
