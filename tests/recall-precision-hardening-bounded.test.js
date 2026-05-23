@@ -486,6 +486,32 @@ test('sqlite isolation metadata derives only explicit line-start family hints', 
       updatedAt: '2026-05-23T00:00:00.000Z'
     });
     await store.upsertRecord({
+      memoryId: 'deep-indented-marker-memory',
+      target: 'process',
+      title: 'Deep indented marker memory',
+      content: ' \t      isolation-family: blocked_memory\nbounded fixture content',
+      evidence: '',
+      tags: [],
+      validated: true,
+      reusable: true,
+      sensitivity: 'none',
+      createdAt: '2026-05-23T00:00:00.000Z',
+      updatedAt: '2026-05-23T00:00:00.000Z'
+    });
+    await store.upsertRecord({
+      memoryId: 'wildcard-lookalike-family-memory',
+      target: 'process',
+      title: 'Wildcard lookalike family memory',
+      content: 'isolation-family: blockedXmemory\nbounded fixture content',
+      evidence: '',
+      tags: [],
+      validated: true,
+      reusable: true,
+      sensitivity: 'none',
+      createdAt: '2026-05-23T00:00:00.000Z',
+      updatedAt: '2026-05-23T00:00:00.000Z'
+    });
+    await store.upsertRecord({
       memoryId: 'ordinary-keyword-memory',
       target: 'process',
       title: 'Ordinary keyword memory',
@@ -503,12 +529,16 @@ test('sqlite isolation metadata derives only explicit line-start family hints', 
       'explicit-marker-memory',
       'inline-marker-example-memory',
       'indented-marker-memory',
+      'deep-indented-marker-memory',
+      'wildcard-lookalike-family-memory',
       'ordinary-keyword-memory'
     ]);
 
     assert.deepEqual(isolationMap.get('explicit-marker-memory').tags, ['isolation:blocked_memory']);
     assert.deepEqual(isolationMap.get('inline-marker-example-memory').tags, []);
     assert.deepEqual(isolationMap.get('indented-marker-memory').tags, ['isolation:blocked_memory']);
+    assert.deepEqual(isolationMap.get('deep-indented-marker-memory').tags, ['isolation:blocked_memory']);
+    assert.deepEqual(isolationMap.get('wildcard-lookalike-family-memory').tags, []);
     assert.deepEqual(isolationMap.get('ordinary-keyword-memory').tags, []);
   } finally {
     await store.close();

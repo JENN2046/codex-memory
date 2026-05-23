@@ -2,178 +2,41 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 
-const RECORD_ISOLATION_TEXT_PATTERNS = Object.freeze({
-  governance_records: [
-    'isolation-family: governance_records',
-    'isolation_family: governance_records',
-    'record-family: governance_records',
-    'record_family: governance_records',
-    'classification-family: governance_records',
-    'classification_family: governance_records',
-    'recall-classification: governance_records',
-    'recall_classification: governance_records',
-    'isolation-family:governance_records',
-    'isolation_family:governance_records',
-    'record-family:governance_records',
-    'record_family:governance_records',
-    'classification-family:governance_records',
-    'classification_family:governance_records',
-    'recall-classification:governance_records',
-    'recall_classification:governance_records'
-  ],
-  validation_transcripts: [
-    'isolation-family: validation_transcripts',
-    'isolation_family: validation_transcripts',
-    'record-family: validation_transcripts',
-    'record_family: validation_transcripts',
-    'classification-family: validation_transcripts',
-    'classification_family: validation_transcripts',
-    'recall-classification: validation_transcripts',
-    'recall_classification: validation_transcripts',
-    'isolation-family:validation_transcripts',
-    'isolation_family:validation_transcripts',
-    'record-family:validation_transcripts',
-    'record_family:validation_transcripts',
-    'classification-family:validation_transcripts',
-    'classification_family:validation_transcripts',
-    'recall-classification:validation_transcripts',
-    'recall_classification:validation_transcripts'
-  ],
-  redaction_samples: [
-    'isolation-family: redaction_samples',
-    'isolation_family: redaction_samples',
-    'record-family: redaction_samples',
-    'record_family: redaction_samples',
-    'classification-family: redaction_samples',
-    'classification_family: redaction_samples',
-    'recall-classification: redaction_samples',
-    'recall_classification: redaction_samples',
-    'isolation-family:redaction_samples',
-    'isolation_family:redaction_samples',
-    'record-family:redaction_samples',
-    'record_family:redaction_samples',
-    'classification-family:redaction_samples',
-    'classification_family:redaction_samples',
-    'recall-classification:redaction_samples',
-    'recall_classification:redaction_samples'
-  ],
-  policy_decisions: [
-    'isolation-family: policy_decisions',
-    'isolation_family: policy_decisions',
-    'record-family: policy_decisions',
-    'record_family: policy_decisions',
-    'classification-family: policy_decisions',
-    'classification_family: policy_decisions',
-    'recall-classification: policy_decisions',
-    'recall_classification: policy_decisions',
-    'isolation-family:policy_decisions',
-    'isolation_family:policy_decisions',
-    'record-family:policy_decisions',
-    'record_family:policy_decisions',
-    'classification-family:policy_decisions',
-    'classification_family:policy_decisions',
-    'recall-classification:policy_decisions',
-    'recall_classification:policy_decisions'
-  ],
-  readiness_reports: [
-    'isolation-family: readiness_reports',
-    'isolation_family: readiness_reports',
-    'record-family: readiness_reports',
-    'record_family: readiness_reports',
-    'classification-family: readiness_reports',
-    'classification_family: readiness_reports',
-    'recall-classification: readiness_reports',
-    'recall_classification: readiness_reports',
-    'isolation-family:readiness_reports',
-    'isolation_family:readiness_reports',
-    'record-family:readiness_reports',
-    'record_family:readiness_reports',
-    'classification-family:readiness_reports',
-    'classification_family:readiness_reports',
-    'recall-classification:readiness_reports',
-    'recall_classification:readiness_reports'
-  ],
-  migration_metadata: [
-    'isolation-family: migration_metadata',
-    'isolation_family: migration_metadata',
-    'record-family: migration_metadata',
-    'record_family: migration_metadata',
-    'classification-family: migration_metadata',
-    'classification_family: migration_metadata',
-    'recall-classification: migration_metadata',
-    'recall_classification: migration_metadata',
-    'isolation-family:migration_metadata',
-    'isolation_family:migration_metadata',
-    'record-family:migration_metadata',
-    'record_family:migration_metadata',
-    'classification-family:migration_metadata',
-    'classification_family:migration_metadata',
-    'recall-classification:migration_metadata',
-    'recall_classification:migration_metadata'
-  ],
-  blocked_memory: [
-    'isolation-family: blocked_memory',
-    'isolation_family: blocked_memory',
-    'record-family: blocked_memory',
-    'record_family: blocked_memory',
-    'classification-family: blocked_memory',
-    'classification_family: blocked_memory',
-    'recall-classification: blocked_memory',
-    'recall_classification: blocked_memory',
-    'isolation-family:blocked_memory',
-    'isolation_family:blocked_memory',
-    'record-family:blocked_memory',
-    'record_family:blocked_memory',
-    'classification-family:blocked_memory',
-    'classification_family:blocked_memory',
-    'recall-classification:blocked_memory',
-    'recall_classification:blocked_memory'
-  ],
-  tombstoned_memory: [
-    'isolation-family: tombstoned_memory',
-    'isolation_family: tombstoned_memory',
-    'record-family: tombstoned_memory',
-    'record_family: tombstoned_memory',
-    'classification-family: tombstoned_memory',
-    'classification_family: tombstoned_memory',
-    'recall-classification: tombstoned_memory',
-    'recall_classification: tombstoned_memory',
-    'isolation-family:tombstoned_memory',
-    'isolation_family:tombstoned_memory',
-    'record-family:tombstoned_memory',
-    'record_family:tombstoned_memory',
-    'classification-family:tombstoned_memory',
-    'classification_family:tombstoned_memory',
-    'recall-classification:tombstoned_memory',
-    'recall_classification:tombstoned_memory'
-  ]
-});
-const RECORD_ISOLATION_LINE_PREFIXES = Object.freeze([
-  '\n',
-  '\n ',
-  '\n  ',
-  '\n   ',
-  '\n    ',
-  '\n\t',
-  '\n\t\t'
+const RECORD_ISOLATION_HINT_FAMILIES = Object.freeze([
+  'governance_records',
+  'validation_transcripts',
+  'redaction_samples',
+  'policy_decisions',
+  'readiness_reports',
+  'migration_metadata',
+  'blocked_memory',
+  'tombstoned_memory',
+  'out_of_scope_memory'
 ]);
+const RECORD_ISOLATION_HEADER_PATTERN = /(?:^|\n)\s*(?:isolation-family|isolation_family|record-family|record_family|classification-family|classification_family|recall-classification|recall_classification)\s*:\s*([a-z0-9_-]+)/gi;
 
-function buildIsolationHintSql() {
-  const haystack = "lower(char(10) || coalesce(title, '') || char(10) || coalesce(content, '') || char(10) || coalesce(evidence, '') || char(10) || coalesce(tags_json, ''))";
-  const params = [];
-  const fragments = Object.entries(RECORD_ISOLATION_TEXT_PATTERNS).map(([family, patterns]) => {
-    const checks = patterns.flatMap(pattern =>
-      RECORD_ISOLATION_LINE_PREFIXES.map(prefix => {
-        params.push(`%${prefix}${pattern}%`);
-        return `${haystack} LIKE ?`;
-      })
-    ).join(' OR ');
-    return `CASE WHEN ${checks} THEN '${family}|' ELSE '' END`;
-  });
-  return {
-    expression: fragments.join(' || '),
-    params
-  };
+function normalizeIsolationFamily(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function deriveIsolationFamilyHints(...fields) {
+  const text = fields
+    .map(value => String(value || '').trim().toLowerCase())
+    .filter(Boolean)
+    .join('\n');
+  const families = new Set();
+  let match;
+  while ((match = RECORD_ISOLATION_HEADER_PATTERN.exec(text)) !== null) {
+    const family = normalizeIsolationFamily(match[1]);
+    if (RECORD_ISOLATION_HINT_FAMILIES.includes(family)) {
+      families.add(family);
+    }
+  }
+  return [...families].join('|');
 }
 
 class SqliteShadowStore {
@@ -187,6 +50,8 @@ class SqliteShadowStore {
     if (this.db) return;
     await fs.mkdir(path.dirname(this.config.dbPath), { recursive: true });
     this.db = new DatabaseSync(this.config.dbPath);
+    this.db.function('codex_memory_isolation_family_hints', { deterministic: true }, (title, content, evidence, tagsJson) =>
+      deriveIsolationFamilyHints(title, content, evidence, tagsJson));
     this.db.exec(`
       PRAGMA foreign_keys = ON;
       PRAGMA journal_mode = WAL;
@@ -492,12 +357,11 @@ class SqliteShadowStore {
     this.refreshMemoryRecordColumnInfo();
     const hasStatus = this.hasMemoryRecordColumn('status');
     const placeholders = uniqueIds.map(() => '?').join(',');
-    const isolationHintSql = buildIsolationHintSql();
     const rows = this.db.prepare(`
       SELECT memory_id, tags_json, project_id, workspace_id, client_id, visibility${hasStatus ? ', status' : ''},
-        ${isolationHintSql.expression} AS isolation_family_hints
+        codex_memory_isolation_family_hints(title, content, evidence, tags_json) AS isolation_family_hints
       FROM memory_records WHERE memory_id IN (${placeholders})
-    `).all(...isolationHintSql.params, ...uniqueIds);
+    `).all(...uniqueIds);
 
     const result = new Map();
     for (const row of rows) {
