@@ -473,6 +473,19 @@ test('sqlite isolation metadata derives only explicit line-start family hints', 
       updatedAt: '2026-05-23T00:00:00.000Z'
     });
     await store.upsertRecord({
+      memoryId: 'indented-marker-memory',
+      target: 'process',
+      title: 'Indented marker memory',
+      content: '  isolation-family: blocked_memory\nbounded fixture content',
+      evidence: '',
+      tags: [],
+      validated: true,
+      reusable: true,
+      sensitivity: 'none',
+      createdAt: '2026-05-23T00:00:00.000Z',
+      updatedAt: '2026-05-23T00:00:00.000Z'
+    });
+    await store.upsertRecord({
       memoryId: 'ordinary-keyword-memory',
       target: 'process',
       title: 'Ordinary keyword memory',
@@ -489,11 +502,13 @@ test('sqlite isolation metadata derives only explicit line-start family hints', 
     const isolationMap = await store.getRecordsIsolationMap([
       'explicit-marker-memory',
       'inline-marker-example-memory',
+      'indented-marker-memory',
       'ordinary-keyword-memory'
     ]);
 
     assert.deepEqual(isolationMap.get('explicit-marker-memory').tags, ['isolation:blocked_memory']);
     assert.deepEqual(isolationMap.get('inline-marker-example-memory').tags, []);
+    assert.deepEqual(isolationMap.get('indented-marker-memory').tags, ['isolation:blocked_memory']);
     assert.deepEqual(isolationMap.get('ordinary-keyword-memory').tags, []);
   } finally {
     await store.close();

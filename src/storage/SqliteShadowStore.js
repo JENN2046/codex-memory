@@ -148,15 +148,26 @@ const RECORD_ISOLATION_TEXT_PATTERNS = Object.freeze({
     'recall_classification:tombstoned_memory'
   ]
 });
+const RECORD_ISOLATION_LINE_PREFIXES = Object.freeze([
+  '\n',
+  '\n ',
+  '\n  ',
+  '\n   ',
+  '\n    ',
+  '\n\t',
+  '\n\t\t'
+]);
 
 function buildIsolationHintSql() {
   const haystack = "lower(char(10) || coalesce(title, '') || char(10) || coalesce(content, '') || char(10) || coalesce(evidence, '') || char(10) || coalesce(tags_json, ''))";
   const params = [];
   const fragments = Object.entries(RECORD_ISOLATION_TEXT_PATTERNS).map(([family, patterns]) => {
-    const checks = patterns.map(pattern => {
-      params.push(`%\n${pattern}%`);
-      return `${haystack} LIKE ?`;
-    }).join(' OR ');
+    const checks = patterns.flatMap(pattern =>
+      RECORD_ISOLATION_LINE_PREFIXES.map(prefix => {
+        params.push(`%${prefix}${pattern}%`);
+        return `${haystack} LIKE ?`;
+      })
+    ).join(' OR ');
     return `CASE WHEN ${checks} THEN '${family}|' ELSE '' END`;
   });
   return {
