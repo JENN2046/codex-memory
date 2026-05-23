@@ -2,6 +2,96 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 
+const RECORD_ISOLATION_TEXT_PATTERNS = Object.freeze({
+  governance_records: [
+    'governance-record',
+    'branch-governance-record',
+    'isolation:governance_records',
+    'isolation-family: governance_records',
+    'isolation_family: governance_records',
+    'record-family: governance_records',
+    'record_family: governance_records',
+    'classification-family: governance_records',
+    'classification_family: governance_records',
+    'recall-classification: governance_records',
+    'recall_classification: governance_records'
+  ],
+  validation_transcripts: [
+    'validation-transcript',
+    'ci-transcript',
+    'gate-transcript',
+    'isolation:validation_transcripts',
+    'isolation-family: validation_transcripts',
+    'isolation_family: validation_transcripts',
+    'record-family: validation_transcripts',
+    'record_family: validation_transcripts',
+    'classification-family: validation_transcripts',
+    'classification_family: validation_transcripts',
+    'recall-classification: validation_transcripts',
+    'recall_classification: validation_transcripts'
+  ],
+  redaction_samples: [
+    'redaction-sample',
+    'redact-sample',
+    'isolation:redaction_samples',
+    'isolation-family: redaction_samples',
+    'isolation_family: redaction_samples'
+  ],
+  policy_decisions: [
+    'policy-decision',
+    'isolation:policy_decisions',
+    'isolation-family: policy_decisions',
+    'isolation_family: policy_decisions'
+  ],
+  readiness_reports: [
+    'readiness-report',
+    'preflight-report',
+    'isolation:readiness_reports',
+    'isolation-family: readiness_reports',
+    'isolation_family: readiness_reports'
+  ],
+  migration_metadata: [
+    'migration-metadata',
+    'import-metadata',
+    'export-metadata',
+    'backup-metadata',
+    'restore-metadata',
+    'isolation:migration_metadata',
+    'isolation-family: migration_metadata',
+    'isolation_family: migration_metadata'
+  ],
+  blocked_memory: [
+    'blocked-memory',
+    'rejected-memory',
+    'isolation:blocked_memory',
+    'isolation-family: blocked_memory',
+    'isolation_family: blocked_memory'
+  ],
+  tombstoned_memory: [
+    'tombstoned-memory',
+    'superseded-memory',
+    'isolation:tombstoned_memory',
+    'isolation-family: tombstoned_memory',
+    'isolation_family: tombstoned_memory'
+  ]
+});
+
+function buildIsolationHintSql() {
+  const haystack = "lower(coalesce(title, '') || char(10) || coalesce(content, '') || char(10) || coalesce(evidence, '') || char(10) || coalesce(tags_json, ''))";
+  const params = [];
+  const fragments = Object.entries(RECORD_ISOLATION_TEXT_PATTERNS).map(([family, patterns]) => {
+    const checks = patterns.map(pattern => {
+      params.push(`%${pattern}%`);
+      return `${haystack} LIKE ?`;
+    }).join(' OR ');
+    return `CASE WHEN ${checks} THEN '${family}|' ELSE '' END`;
+  });
+  return {
+    expression: fragments.join(' || '),
+    params
+  };
+}
+
 class SqliteShadowStore {
   constructor(config) {
     this.config = config;
@@ -318,10 +408,12 @@ class SqliteShadowStore {
     this.refreshMemoryRecordColumnInfo();
     const hasStatus = this.hasMemoryRecordColumn('status');
     const placeholders = uniqueIds.map(() => '?').join(',');
+    const isolationHintSql = buildIsolationHintSql();
     const rows = this.db.prepare(`
-      SELECT memory_id, tags_json, project_id, workspace_id, client_id, visibility${hasStatus ? ', status' : ''}
+      SELECT memory_id, tags_json, project_id, workspace_id, client_id, visibility${hasStatus ? ', status' : ''},
+        ${isolationHintSql.expression} AS isolation_family_hints
       FROM memory_records WHERE memory_id IN (${placeholders})
-    `).all(...uniqueIds);
+    `).all(...isolationHintSql.params, ...uniqueIds);
 
     const result = new Map();
     for (const row of rows) {
@@ -331,9 +423,15 @@ class SqliteShadowStore {
       } catch {
         tags = [];
       }
+      const textDerivedFamilies = String(row.isolation_family_hints || '')
+        .split('|')
+        .map(value => value.trim())
+        .filter(Boolean);
+      const isolationTags = textDerivedFamilies.map(family => `isolation:${family}`);
       result.set(row.memory_id, {
         memoryId: row.memory_id,
-        tags: Array.isArray(tags) ? tags : [],
+        tags: [...new Set([...(Array.isArray(tags) ? tags : []), ...isolationTags])],
+        isolationFamily: textDerivedFamilies[0] || null,
         status: hasStatus ? (row.status || null) : null,
         lifecycleStatus: hasStatus ? (row.status || null) : null,
         projectId: row.project_id || null,

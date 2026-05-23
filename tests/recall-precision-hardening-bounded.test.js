@@ -80,6 +80,18 @@ function createPipeline({ generatedCandidates }) {
       visibility: 'project',
       createdAt: '2026-05-23T00:00:00.000Z',
       updatedAt: '2026-05-23T00:00:00.000Z'
+    }],
+    ['text-isolated-memory', {
+      memoryId: 'text-isolated-memory',
+      target: 'process',
+      title: 'Text isolated synthetic record',
+      rawText: 'isolation-family: blocked_memory\ntext isolated bounded fixture content',
+      content: 'isolation-family: blocked_memory\ntext isolated bounded fixture content',
+      tags: [],
+      status: 'active',
+      visibility: 'project',
+      createdAt: '2026-05-23T00:00:00.000Z',
+      updatedAt: '2026-05-23T00:00:00.000Z'
     }]
   ]);
 
@@ -147,13 +159,19 @@ function createPipeline({ generatedCandidates }) {
         return new Map(ids
           .map(id => records.get(id))
           .filter(Boolean)
-          .map(record => [record.memoryId, {
-            memoryId: record.memoryId,
-            tags: record.tags || [],
-            status: record.status || null,
-            lifecycleStatus: record.status || null,
-            visibility: record.visibility || null
-          }]));
+          .map(record => {
+            const textDerivedTags = String(record.content || '').includes('isolation-family: blocked_memory')
+              ? ['isolation:blocked_memory']
+              : [];
+            return [record.memoryId, {
+              memoryId: record.memoryId,
+              tags: [...new Set([...(record.tags || []), ...textDerivedTags])],
+              isolationFamily: textDerivedTags.length > 0 ? 'blocked_memory' : null,
+              status: record.status || null,
+              lifecycleStatus: record.status || null,
+              visibility: record.visibility || null
+            }];
+          }));
       }
     },
     knowledgeBaseSyncService: {
@@ -307,6 +325,48 @@ test('pipeline noRawContentRead proof mode preserves record-level isolation via 
 
   const results = await pipeline.search({
     query: 'bounded alpha fixture metadata only blocked isolation',
+    target: 'process',
+    limit: 3,
+    includeContent: false,
+    readOnly: true,
+    noRawContentRead: true,
+    precisionPolicyContext: {
+      enabled: true,
+      queryFamily: 'bounded_positive_control_metadata_only',
+      minimumScore: 0.12
+    }
+  });
+
+  assert.deepEqual(results.map(result => result.memoryId), ['positive-memory']);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'content'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'text'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'title'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'snippet'), false);
+  assert.equal(sideEffects.recordReads, 0);
+  assert.equal(sideEffects.isolationMetadataReads, 2);
+  assert.equal(sideEffects.syncCalls, 0);
+  assert.equal(sideEffects.auditWrites, 0);
+});
+
+test('pipeline noRawContentRead proof mode preserves text-derived isolation hints without raw record fetch', async () => {
+  const textIsolated = candidate('text-isolated-memory', metadata({
+    score: 0.52,
+    baseScore: 0.52,
+    lexicalScore: 0.6,
+    matchedTags: ['bounded-alpha'],
+    contentHitCount: 1
+  }));
+  const positive = candidate('positive-memory', metadata({
+    score: 0.24,
+    baseScore: 0.24,
+    lexicalScore: 0.4,
+    matchedTags: ['bounded-alpha'],
+    contentHitCount: 1
+  }));
+  const { pipeline, sideEffects } = createPipeline({ generatedCandidates: [textIsolated, positive] });
+
+  const results = await pipeline.search({
+    query: 'bounded alpha fixture metadata only text isolation',
     target: 'process',
     limit: 3,
     includeContent: false,
