@@ -1,6 +1,10 @@
 const crypto = require('node:crypto');
 
 const { VisibilityPolicy, Namespace, createShadowWriteStatus } = require('./types');
+const {
+  computeCanonicalWriteHash,
+  summarizeMemoryWriteLifecycleDedupSuppressionPreflight
+} = require('./MemoryWriteLifecycleDedupSuppressionPreflight');
 const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
 
 const HIGH_RISK_SENSITIVITY_PATTERN = /\b(secret|unsafe|credential|credentials|password|passwd|token|api[-_ ]?key|access[-_ ]?key|private[-_ ]?key|secret[-_ ]?key)\b/i;
@@ -33,6 +37,57 @@ function normalizeTags(value) {
   }
 
   return [];
+}
+
+function normalizeScopeField(payload = {}, executionContext = {}, camelKey, snakeKey) {
+  return normalizeString(
+    executionContext[camelKey] ||
+    executionContext[snakeKey] ||
+    payload[snakeKey] ||
+    payload[camelKey]
+  );
+}
+
+function buildWritePreflightAllowedScope(payload = {}, executionContext = {}) {
+  return {
+    projectId: normalizeScopeField(payload, executionContext, 'projectId', 'project_id'),
+    workspaceId: normalizeScopeField(payload, executionContext, 'workspaceId', 'workspace_id'),
+    clientId: normalizeScopeField(payload, executionContext, 'clientId', 'client_id'),
+    taskId: normalizeScopeField(payload, executionContext, 'taskId', 'task_id'),
+    conversationId: normalizeScopeField(payload, executionContext, 'conversationId', 'conversation_id'),
+    visibility: normalizeScopeField(payload, executionContext, 'visibility', 'visibility'),
+    retentionPolicy: normalizeScopeField(payload, executionContext, 'retentionPolicy', 'retention_policy')
+  };
+}
+
+function buildWritePreflightProposedWrite(payload = {}, normalized = {}) {
+  return {
+    ...payload,
+    target: normalized.target,
+    title: normalized.title,
+    content: normalized.content,
+    evidence: normalized.evidence,
+    sensitivity: normalized.sensitivity,
+    tags: normalized.tags,
+    validated: normalized.validated,
+    reusable: normalized.reusable
+  };
+}
+
+function buildWritePreflightFailure(decision, error) {
+  const message = error && error.message ? error.message : null;
+
+  return {
+    decision,
+    acceptedForWritePreflight: false,
+    canonicalHash: null,
+    blockers: message ? [`${decision}:${message}`] : [decision],
+    matchedCandidateIds: [],
+    scopeMismatches: [],
+    runtimeIntegrated: true,
+    mutated: false,
+    publicMcpExpanded: false
+  };
 }
 
 function generateMemoryId(target) {
@@ -90,7 +145,18 @@ function getSensitivityRejectionReason(target, sensitivity) {
 }
 
 class MemoryWriteService {
-  constructor({ config, diaryStore, shadowStore, vectorStore, auditLogStore, executionContextResolver, chunkIndexingService }) {
+  constructor({
+    config,
+    diaryStore,
+    shadowStore,
+    vectorStore,
+    auditLogStore,
+    executionContextResolver,
+    chunkIndexingService,
+    writePreflight = summarizeMemoryWriteLifecycleDedupSuppressionPreflight,
+    writePreflightCandidateProvider = null,
+    writePreflightEnabled = false
+  }) {
     this.config = config;
     this.diaryStore = diaryStore;
     this.shadowStore = shadowStore;
@@ -98,6 +164,9 @@ class MemoryWriteService {
     this.auditLogStore = auditLogStore;
     this.executionContextResolver = executionContextResolver;
     this.chunkIndexingService = chunkIndexingService;
+    this.writePreflight = writePreflight;
+    this.writePreflightCandidateProvider = writePreflightCandidateProvider;
+    this.writePreflightEnabled = writePreflightEnabled === true;
   }
 
   buildRejectedResult(reason, executionContext, target = null) {
@@ -115,6 +184,63 @@ class MemoryWriteService {
       target,
       shadowWrite: createShadowWriteStatus('skipped')
     };
+  }
+
+  async runWritePreflight({ payload, normalizedPayload, executionContext }) {
+    if (!this.writePreflightEnabled) {
+      return null;
+    }
+
+    const proposedWrite = buildWritePreflightProposedWrite(payload, normalizedPayload);
+    const allowedScope = buildWritePreflightAllowedScope(payload, executionContext);
+    const canonicalHash = computeCanonicalWriteHash(proposedWrite);
+    let existingCandidates = [];
+
+    try {
+      if (typeof this.writePreflightCandidateProvider === 'function') {
+        existingCandidates = await this.writePreflightCandidateProvider({
+          proposedWrite,
+          allowedScope,
+          canonicalHash,
+          executionContext
+        });
+      } else if (
+        this.writePreflightCandidateProvider &&
+        typeof this.writePreflightCandidateProvider.getCandidates === 'function'
+      ) {
+        existingCandidates = await this.writePreflightCandidateProvider.getCandidates({
+          proposedWrite,
+          allowedScope,
+          canonicalHash,
+          executionContext
+        });
+      }
+    } catch (error) {
+      return buildWritePreflightFailure('write_preflight_candidate_provider_failed', error);
+    }
+
+    if (!Array.isArray(existingCandidates)) {
+      return buildWritePreflightFailure('write_preflight_candidate_provider_malformed');
+    }
+
+    let summary;
+    try {
+      summary = this.writePreflight({
+        proposedWrite,
+        allowedScope,
+        existingCandidates,
+        exactApproval: executionContext.writePreflightExactApproval === true ||
+          executionContext.exactApproval === true
+      });
+    } catch (error) {
+      return buildWritePreflightFailure('write_preflight_failed', error);
+    }
+
+    if (!summary || summary.acceptedForWritePreflight !== true) {
+      return summary || buildWritePreflightFailure('write_preflight_failed_closed');
+    }
+
+    return null;
   }
 
   async record(payload, requestContext = {}) {
@@ -187,6 +313,37 @@ class MemoryWriteService {
         await this.writeAudit(result);
         return result;
       }
+    }
+
+    const writePreflightResult = await this.runWritePreflight({
+      payload,
+      normalizedPayload: {
+        target,
+        title,
+        content,
+        evidence,
+        sensitivity,
+        tags,
+        validated,
+        reusable
+      },
+      executionContext
+    });
+    if (writePreflightResult) {
+      const decision = normalizeString(writePreflightResult.decision) || 'write_preflight_rejected';
+      result = this.buildRejectedResult(`write preflight rejected: ${decision}.`, executionContext, target);
+      result.writePreflight = {
+        decision,
+        canonicalHash: writePreflightResult.canonicalHash || null,
+        matchedCandidateCount: Array.isArray(writePreflightResult.matchedCandidateIds)
+          ? writePreflightResult.matchedCandidateIds.length
+          : 0,
+        scopeMismatchCount: Array.isArray(writePreflightResult.scopeMismatches)
+          ? writePreflightResult.scopeMismatches.length
+          : 0
+      };
+      await this.writeAudit(result);
+      return result;
     }
 
     const createdAt = new Date().toISOString();

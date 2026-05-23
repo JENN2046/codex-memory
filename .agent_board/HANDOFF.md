@@ -1,5 +1,359 @@
 # HANDOFF.md - codex-memory
 
+## CM-0850 Handoff
+
+Status: `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATED_BOUNDED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/app.js`; `src/core/MemoryLifecycleScopeGovernanceContract.js`; `src/storage/SqliteShadowStore.js`; `tests/memory-lifecycle-scope-runtime-integration.test.js`; `docs/MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0849 files and CM-0838 source/test files.
+
+Implementation verdict: added internal/default-disabled post-result lifecycle/scope governance bridge for `search_memory`. It is enabled only by internal execution context, performs exact memoryId metadata lookup for lifecycle/scope fields, reuses CM-0844/CM-0845 filtering, preserves public `search_memory` args and public MCP tools, and emits sanitized suppressed metadata without raw fields.
+
+Validation: `node --test tests\memory-lifecycle-scope-runtime-integration.test.js` passed `3/3`; adjacent lifecycle/read-policy regression passed `20/20`; changed source/test syntax checks passed.
+
+Repair/re-review: first targeted test run failed because malformed runtime metadata was not forwarded and because one test used public `args.scope`, triggering old `applyScopeFilter()` before the new bridge. Both were repaired narrowly; final changed-scope re-review found no actionable finding.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, default-on runtime governance, or readiness/reliability claim occurred.
+
+Next safe action: run final diff/docs validation and no-overclaim scan. Then review CM-0850 or plan candidate-cache invalidation / durable governance state; keep live proof exact-approval gated.
+
+## CM-0849 Handoff
+
+Status: `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_CANDIDATE_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_CANDIDATE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0848 files and CM-0838 source/test files.
+
+Review verdict: current `search_memory` runtime already has an older optional lifecycle read-policy path, but it is narrower than CM-0844/CM-0845. It filters final results by a limited lifecycle status set and scope subset; it does not yet provide full lifecycle/scope governance metadata, full scope tuple enforcement, cache invalidation proof, or sanitized suppressed-candidate evidence shape.
+
+Candidate verdict: next smallest implementation candidate is a default-disabled internal post-result lifecycle/scope read-policy bridge before `applySoftReadPolicy()`, reusing or adapting `filterRecallCandidatesByLifecycleScope()` and leaving public MCP unchanged.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, runtime governance implementation, runtime read-policy integration, or readiness/reliability claim occurred.
+
+Next safe action: run final diff/docs validation and changed-scope no-overclaim review. Then proceed only to `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_PLAN_OR_IMPLEMENTATION` with targeted tests, or split to plan if the bridge scope expands.
+
+## CM-0848 Handoff
+
+Status: `MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0847 files and CM-0838 source/test files.
+
+Review verdict: CM-0847 is accepted as bounded synthetic temp-local lifecycle/scope read-policy evidence sufficient to enter `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_CANDIDATE_REVIEW`. It proves isolated temp root, synthetic JSON input, cleanup verification, exact bounded check count `4`, lifecycle/scope suppression, sanitized metadata, raw-field exclusion, and zero side-effect counters.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, runtime governance implementation, runtime read-policy integration, or readiness/reliability claim occurred.
+
+Next safe action: run final diff/docs validation and changed-scope no-overclaim review. Then continue with read-only `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_CANDIDATE_REVIEW`.
+
+## CM-0847 Handoff
+
+Status: `MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `tests/memory-lifecycle-scope-temp-local-evidence.test.js`; `docs/MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_EXECUTION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0846 files and CM-0838 source/test files.
+
+Evidence verdict: targeted synthetic temp-local tests passed `2/2`. The execution creates an isolated temp root, writes/reads only a synthetic `synthetic-records.json`, runs exactly four bounded lifecycle/scope read-policy checks, accepts only the active exact-scope record, suppresses proposal/tombstoned/preflight-rejected/out-of-scope/folder-mismatched/malformed-scope records, preserves sanitized mismatch/blocker metadata, excludes raw synthetic fields from evidence output, verifies cleanup, and keeps side-effect counters zero.
+
+Validation: `node --check tests\memory-lifecycle-scope-temp-local-evidence.test.js` passed; `node --test tests\memory-lifecycle-scope-temp-local-evidence.test.js` passed `2/2`.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, runtime governance implementation, runtime read-policy integration, or readiness/reliability claim occurred.
+
+Next safe action: run final diff/docs validation and changed-scope no-overclaim review. Then continue with `MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_REVIEW` before any runtime integration candidate review.
+
+## CM-0846 Handoff
+
+Status: `MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_PLAN_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0845 files and CM-0838 source/test files.
+
+Plan verdict: CM-0846 defines the next governance-closure evidence layer after CM-0845. The future execution must use an isolated temp root, synthetic lifecycle/scope records only, exact bounded check count `4`, sanitized output, cleanup verification, and zero real-memory/provider/.jsonl/durable-write/apply side effects.
+
+Boundary: no temp-local evidence execution, true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, runtime governance implementation, runtime read-policy integration, or readiness/reliability claim occurred.
+
+Next safe action: run final diff/docs validation and changed-scope no-overclaim review. Then execute `MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_EXECUTION` only as targeted synthetic temp-local tests.
+
+## CM-0845 Handoff
+
+Status: `MEMORY_LIFECYCLE_SCOPE_READ_POLICY_FIXTURE_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/core/MemoryLifecycleScopeGovernanceContract.js`; `tests/memory-lifecycle-scope-read-policy-fixture.test.js`; `docs/MEMORY_LIFECYCLE_SCOPE_READ_POLICY_FIXTURE_EVIDENCE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0844 files and CM-0838 source/test files.
+
+Evidence verdict: targeted fixture tests passed `14/14`. The read-policy fixture accepts only active exact-scope candidates, suppresses inactive/out-of-scope/malformed/unresolved candidates, preserves sanitized blocker/mismatch metadata, omits raw candidate content/text/title/snippet from suppressed metadata, fails closed on incomplete current scope, and keeps all side-effect counters at zero.
+
+Validation: `node --check src\core\MemoryLifecycleScopeGovernanceContract.js` passed; `node --check tests\memory-lifecycle-scope-read-policy-fixture.test.js` passed; `node --test tests\memory-lifecycle-scope-governance-contract.test.js tests\memory-lifecycle-scope-read-policy-fixture.test.js` passed `14/14`.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, runtime read-policy integration, or readiness/reliability claim occurred.
+
+Next safe action: run final diff/docs validation and changed-scope re-review. Then continue with `MEMORY_LIFECYCLE_SCOPE_TEMP_LOCAL_EVIDENCE_PLAN` before temp-local lifecycle evidence or any exact-approved controlled live packet.
+
+## CM-0844 Handoff
+
+Status: `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_FIXTURE_CONTRACT_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/core/MemoryLifecycleScopeGovernanceContract.js`; `tests/memory-lifecycle-scope-governance-contract.test.js`; `docs/MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_FIXTURE_CONTRACT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0843 files and CM-0838 source/test files.
+
+Evidence verdict: targeted fixture-only test passed `8/8`. The contract includes active exact-scope records, excludes inactive/out-of-scope/malformed/unresolved records, reports exact scope mismatches, requires exact approval and full receipt fields for governance transitions, requires replacement id for supersession, and keeps accepted transition fixtures append-only/non-destructive.
+
+Validation: `node --check src\core\MemoryLifecycleScopeGovernanceContract.js` passed; `node --check tests\memory-lifecycle-scope-governance-contract.test.js` passed; `node --test tests\memory-lifecycle-scope-governance-contract.test.js` passed `8/8`.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, lifecycle/scope runtime governance implementation, or readiness/reliability claim occurred.
+
+Next safe action: run final diff/docs validation and changed-scope re-review. Then continue with `MEMORY_LIFECYCLE_SCOPE_READ_POLICY_FIXTURE_EVIDENCE` before temp-local lifecycle evidence or any exact-approved controlled live packet.
+
+## CM-0843 Handoff
+
+Status: `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_PLAN_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0842 files and CM-0838 source/test files.
+
+Plan verdict: CM-0843 starts the governance-closure layer after CM-0842. It defines proposal, approval, supersession, tombstone, forget/exclusion, correction, user/project/workspace/client/agent/task/conversation/folder/visibility/retention scope binding, and default normal-recall exclusion rules for rejected, preflight-rejected, proposal-only, superseded, tombstoned, forgotten/excluded, stale, out-of-scope, unresolved remediation, or malformed records.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, lifecycle governance implementation, or readiness/reliability claim occurred.
+
+Next safe action: implement `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_FIXTURE_CONTRACT` as a pure helper/fixture test, then read-policy fixture evidence and temp-local lifecycle evidence before any exact-approved controlled live packet.
+
+## CM-0842 Handoff
+
+Status: `MEMORY_WRITE_ROLLBACK_CLEANUP_BOUNDED_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `tests/memory-write-rollback-cleanup-bounded-evidence.test.js`; `docs/MEMORY_WRITE_ROLLBACK_CLEANUP_BOUNDED_EVIDENCE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0841 files and CM-0838 source/test files.
+
+Evidence verdict: fixture-only targeted test passed `4/4`. Rejected validation and CM-0838 preflight-rejected duplicate writes stop before projection and leave normal rejected audit only. Accepted writes expose diary/SQLite/vector/chunk/audit accounting. Degraded accepted writes expose vector/chunk failure and reconcile enqueue accounting. Simulated cleanup is explicitly `partial_cleanup_only` and does not hide diary/audit/reconcile residual posture.
+
+Validation: `node --check tests\memory-write-rollback-cleanup-bounded-evidence.test.js` passed; `node --test tests\memory-write-rollback-cleanup-bounded-evidence.test.js` passed `4/4`. `git diff --check` and docs validation need final rerun after docs/board updates.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, real durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+Next safe action: run final diff/docs validation and changed-scope re-review. Then continue with `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_PLAN`, candidate-provider source review, optional temp-local rollback cleanup planning/evidence, or separately exact-approved live write proof later.
+
+## CM-0841 Handoff
+
+Status: `MEMORY_WRITE_ROLLBACK_CLEANUP_BOUNDED_EVIDENCE_PLAN_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_WRITE_ROLLBACK_CLEANUP_BOUNDED_EVIDENCE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0840 files and CM-0838 source/test files.
+
+Plan verdict: future bounded evidence should prove rejected validation and CM-0838 preflight-rejected writes leave no diary / SQLite shadow / vector / chunk projection, accepted and degraded writes expose projection/reconcile accounting, SQLite/vector cleanup remains partial, diary/audit/reconcile/cache residual posture is explicit, and audit remains append-only. The plan allows only fixture/temp-local evidence and forbids real cleanup/rollback apply, true live memory actions, real memory reads, direct `.jsonl` reads, provider calls, and readiness/reliability claims.
+
+Next safe action: run final diff/docs validation and no-overclaim scan for CM-0841. Then execute `MEMORY_WRITE_ROLLBACK_CLEANUP_BOUNDED_EVIDENCE` with fixture/temp-local tests, or continue parallel `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_PLAN`.
+
+Boundary: no test execution, true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0840 Handoff
+
+Status: `MEMORY_WRITE_ROLLBACK_CLEANUP_POSTURE_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_WRITE_ROLLBACK_CLEANUP_POSTURE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0839 files and CM-0838 source/test files.
+
+Review verdict: validation-rejected and CM-0838 preflight-rejected writes are clean from durable memory projection perspective. Accepted writes are not atomically rollbackable because diary writes happen before SQLite shadow/vector/chunk projections and degraded projection can leave partial state plus reconcile tasks. SQLite/vector delete helpers are partial cleanup primitives only. Diary cleanup is not encapsulated, audit is append-only, and reconcile/cache cleanup remains unproven.
+
+Next safe action: run final diff/docs validation and no-overclaim scan for CM-0840. Then continue with `MEMORY_WRITE_ROLLBACK_CLEANUP_BOUNDED_EVIDENCE_PLAN`, `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_PLAN`, candidate-provider source review, or separately exact-approved live write proof later.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0839 Handoff
+
+Status: `MEMORY_WRITE_PREFLIGHT_RUNTIME_INTEGRATION_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_WRITE_PREFLIGHT_RUNTIME_INTEGRATION_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0838 files.
+
+Review verdict: CM-0838 is accepted as bounded internal runtime integration evidence. It is sufficient to proceed to rollback/cleanup posture review and lifecycle/scope runtime governance planning/review. It is not sufficient to claim `memory write reliable`, default unattended write reliability, production behavior, real rollback cleanup, long-run durability, or readiness.
+
+Next safe action: run final diff/docs validation and no-overclaim scan for CM-0839. Then continue with `MEMORY_WRITE_ROLLBACK_CLEANUP_POSTURE_REVIEW`, parallel `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_PLAN`, candidate-provider source review, or separately exact-approved live write proof later.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0838 Handoff
+
+Status: `MEMORY_WRITE_PREFLIGHT_RUNTIME_INTEGRATED_BOUNDED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/core/MemoryWriteService.js`; `src/core/MemoryWriteLifecycleDedupSuppressionPreflight.js`; `tests/memory-write-preflight-runtime-integration.test.js`; `docs/MEMORY_WRITE_PREFLIGHT_RUNTIME_INTEGRATION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0837 files.
+
+Evidence verdict: CM-0838 implements the CM-0836 helper as a default-disabled internal runtime preflight gate. Disabled behavior preserves current accepted writes. Enabled behavior uses only injected bounded candidate-provider summaries and rejects active duplicates, scope drift, candidate provider failure, malformed provider output, and lifecycle actions without internal exact approval before diary/shadow/vector/chunk projection. Rejections use normal rejected result plus normal write audit.
+
+Validation: CM-0836 helper test passed `8/8`; CM-0838 integration test passed `6/6`; existing write matrix/temp-local regression passed `9/9`. `git diff --check` and docs validation still need final rerun after docs/board updates in this turn.
+
+Next safe action: run final diff/docs validation and changed-scope re-review. After that, continue with CM-0838 integration review, rollback/cleanup posture, lifecycle/scope runtime governance, or separately exact-approved live write proof.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0837 Handoff
+
+Status: `MEMORY_WRITE_PREFLIGHT_RUNTIME_INTEGRATION_CANDIDATE_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_WRITE_PREFLIGHT_RUNTIME_INTEGRATION_CANDIDATE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0836 files.
+
+Review verdict: CM-0836 is accepted only as a future minimal optional runtime integration candidate. Future integration must remain internal/optional, derive allowed scope from resolved runtime context, use exact bounded duplicate summaries instead of broad real-memory scan, fail closed before diary/shadow/vector/chunk writes, map rejection through normal rejected write audit, and preserve existing behavior when disabled.
+
+Next safe action: CM-0838 minimal optional runtime integration with bounded candidate-provider stubs and fail-closed tests, or separately exact-approved live write proof if explicitly authorized. Do not claim `memory write reliable`.
+
+Boundary: no runtime write-path integration, true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0836 Handoff
+
+Status: `MEMORY_WRITE_LIFECYCLE_DEDUP_SUPPRESSION_PREFLIGHT_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/core/MemoryWriteLifecycleDedupSuppressionPreflight.js`; `tests/memory-write-lifecycle-dedup-suppression-preflight.test.js`; `docs/MEMORY_WRITE_LIFECYCLE_DEDUP_SUPPRESSION_PREFLIGHT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0835 files.
+
+Evidence verdict: fixture-only explicit-input preflight now covers clean synthetic write acceptance, same-scope active duplicate suppression, terminal lifecycle duplicate review rejection, exact scope mismatch rejection, synthetic secret-like pollution rejection, schema/version metadata rejection, tag noise normalization, lifecycle action exact approval gating, and no implicit filesystem read / real memory scan / provider call / durable memory write / audit write / public MCP expansion / readiness claim. Targeted test passed `8/8`.
+
+Limit: helper is not integrated into runtime `record_memory`; it is preflight contract evidence only and does not prove runtime idempotence or `memory write reliable`.
+
+Next safe action: review whether CM-0836 can safely become a runtime integration candidate, then continue rollback/cleanup posture and lifecycle/scope runtime governance. Any true live write remains separately exact-approved.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0835 Handoff
+
+Status: `MEMORY_WRITE_RELIABILITY_SCOPE_DUPLICATE_POLLUTION_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `tests/memory-write-reliability-temp-local-evidence.test.js`; `docs/MEMORY_WRITE_RELIABILITY_SCOPE_DUPLICATE_POLLUTION_EVIDENCE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 through CM-0834 files.
+
+Evidence verdict: synthetic temp-local write evidence now covers scope metadata projection, duplicate payload behavior, secret-like pollution rejection before projection, existing bad-memory rejection, and cleanup verification. Targeted test passed `4/4`. Duplicate synthetic payloads currently create distinct records and audit events, so idempotence / duplicate handling remains an open reliability gap.
+
+Next safe action: continue with lifecycle governance, scope-aware suppression, idempotence/dedup design, and rollback/cleanup posture. Any true live write remains separately exact-approved.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0834 Handoff
+
+Status: `MEMORY_WRITE_RELIABILITY_TEMP_LOCAL_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `tests/memory-write-reliability-temp-local-evidence.test.js`; `docs/MEMORY_WRITE_RELIABILITY_TEMP_LOCAL_EVIDENCE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830/CM-0831/CM-0832/CM-0833 files.
+
+Evidence verdict: synthetic temp-local write evidence now covers isolated temp root, accepted process payload through real local diary/SQLite shadow/vector/audit/chunk path, projection accounting, rejected synthetic bad knowledge payload before projection, and cleanup verification. Targeted test passed `2/2`.
+
+Next safe action: continue write reliability evidence for idempotence/duplicate handling, lifecycle/scope behavior, pollution prevention, and rollback/cleanup posture. Any true live write remains separately exact-approved.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct real `.jsonl` or durable memory read, provider/API call, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0833 Handoff
+
+Status: `MEMORY_WRITE_RELIABILITY_FIXTURE_MATRIX_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `tests/memory-write-reliability-proof-matrix-fixture.test.js`; `docs/MEMORY_WRITE_RELIABILITY_FIXTURE_MATRIX_EVIDENCE.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830/CM-0831/CM-0832 files.
+
+Evidence verdict: fixture-only in-memory `MemoryWriteService` evidence now covers malformed process payload rejection before write paths, sanitized accepted in-memory projection, visible shadow/vector degraded accounting, chunk projection failure after SQLite shadow readiness, and schema metadata rejection before write paths. Targeted test passed `5/5`.
+
+Next safe action: continue temp-local write matrix evidence for idempotence/duplicate handling, scope/lifecycle behavior, pollution prevention, and rollback/cleanup posture. Any live write remains separately exact-approved.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0832 Handoff
+
+Status: `MEMORY_WRITE_RELIABILITY_PROOF_MATRIX_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/MEMORY_WRITE_RELIABILITY_PROOF_MATRIX.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830/CM-0831 files.
+
+Matrix verdict: write reliability is now split into reviewable evidence dimensions instead of a single future accepted-write event. The required dimensions are exact approval enforcement, validation rejection, accepted sanitized write, audit/projection/accounting, idempotence, failure handling, rollback/cleanup posture, lifecycle governance, scope-aware writes, and bad-memory pollution prevention.
+
+Next safe action: produce fixture/temp-local write matrix evidence, or execute a future exactly-one live write only under separate exact approval. Do not claim `memory write reliable`.
+
+Boundary: no true live `record_memory`, true live `search_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0831 Handoff
+
+Status: `CM0831_MAINLINE_PATCHED_METADATA_BOUNDARY_RECONCILED_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`; current `HEAD == origin/main == eb1d09d8a0b49b07c70276a732e37c83e7aa6070`.
+
+Changed files: `docs/CM0831_MAINLINE_PATCHED_METADATA_BOUNDARY_RECONCILIATION.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`; plus prior uncommitted CM-0830 roadmap files.
+
+Reconciliation verdict: PR #4 has merged the CM-0820 patched metadata-only recall boundary into `main`; the stale CM-0829 statement that `CM-0820` was not integrated into `main` is superseded. Targeted metadata-only boundary tests passed `33/33` on current `main`.
+
+Next safe action: CM-0825 patched true live proof still requires the separate CM-0824 exact approval line. Without that approval, continue bounded recall-quality regression expansion or prepare the write reliability proof matrix.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
+## CM-0830 Handoff
+
+Status: `LONG_TERM_ROADMAP_ACTIVE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/LONG_TERM_LOCAL_FIRST_MEMORY_RUNTIME_ROADMAP.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Roadmap verdict: the long-term objective is now anchored as making `codex-memory` default-usable, auditable, rollback-ready, governable, VCP-compatible, and local-first. The next two large phases are reliability closure and governance closure. Reliability closure covers `memory recall reliable`, `memory write reliable`, and bounded-to-controlled-live evidence progression. Governance closure covers memory proposal / approval / supersession / tombstone / forget lifecycle, user/project/agent/task/client/workspace scope, and pollution prevention.
+
+Next safe action: continue Phase 1 reliability closure by reconciling the merged PR #4 patched metadata-only boundary into current docs/truth-table state, then proceed to CM-0825 only if a separate exact approval line is provided. In parallel, prepare a write reliability proof matrix before any future exact-approved write proof.
+
+Boundary: this was planning/docs/board only. No true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, merge, or readiness/reliability claim occurred.
+
 ## CM-0829 Handoff
 
 Status: `CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT_PARTIAL_HARD_GATES_REMAIN_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

@@ -28,6 +28,53 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-0849 Lifecycle/Scope Runtime Integration Candidate Review - 2026-05-23
+
+Result: `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_CANDIDATE_REVIEW_COMPLETED_NOT_READY`.
+
+CM-0849 reviewed the current `search_memory` / recall candidate path after CM-0848 accepted bounded temp-local lifecycle/scope evidence.
+
+Findings:
+
+- Current runtime already has an older optional lifecycle read-policy surface behind `CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY`.
+- That surface is useful but narrower than the CM-0844/CM-0845 lifecycle/scope governance contract.
+- The current lifecycle filter covers `active/stale` include and `proposal/rejected/superseded/tombstoned` exclude, but not the full CM-0844/CM-0845 status set.
+- The current scope filter covers project/workspace/client/visibility, but not the full user/project/workspace/client/agent/task/conversation/folder/visibility/retention tuple.
+- The next smallest candidate is a default-disabled internal post-result lifecycle/scope read-policy bridge before any deeper candidate-generator rewiring.
+
+Boundary: CM-0849 is read-only review/docs/status/board/truth-table evidence. It does not execute true live `record_memory`, true live `search_memory`, real memory reads, direct real `.jsonl` reads, provider calls, durable memory/audit writes, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup changes, release/cutover, or readiness/reliability claims.
+
+Truth-table effect: governance review / approval / audit runtime loop remains `bounded evidence only`, `complete? = no`; `memory recall reliable` and `memory write reliable` remain unclaimed; `RC_NOT_READY_BLOCKED` remains.
+
+## CM-0850 Lifecycle/Scope Runtime Integration - 2026-05-23
+
+Result: `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATED_BOUNDED_NOT_READY`.
+
+CM-0850 implements the minimal CM-0849 candidate as an internal/default-disabled post-result lifecycle/scope governance bridge.
+
+Implementation:
+
+- `src/app.js` adds `applyLifecycleScopeGovernanceReadPolicy()`.
+- `src/core/MemoryLifecycleScopeGovernanceContract.js` now supports caller-provided `requiredScopeFields` while preserving the default full-scope fail-closed behavior.
+- `src/storage/SqliteShadowStore.js` adds metadata-only `getRecordsLifecycleScopeGovernanceMap()`.
+- `tests/memory-lifecycle-scope-runtime-integration.test.js` adds targeted bridge coverage.
+
+Validation:
+
+- `node --test tests\memory-lifecycle-scope-runtime-integration.test.js`: passed `3/3`.
+- `node --test tests\memory-lifecycle-scope-governance-contract.test.js tests\memory-lifecycle-scope-read-policy-fixture.test.js tests\lifecycle-read-policy-runtime.test.js`: passed `20/20`.
+
+Boundary:
+
+- public `search_memory` arguments unchanged;
+- public MCP tools unchanged;
+- bridge default-disabled unless internal execution context explicitly enables it;
+- metadata lookup is exact `memoryId` and metadata-only;
+- suppressed metadata excludes raw content/text/title/snippet/sourceFile/.jsonl fields;
+- no true live memory action, provider call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, or readiness/reliability claim.
+
+Truth-table effect: governance review / approval / audit runtime loop remains `bounded evidence only`, `complete? = no`; memory recall/write reliability remains unclaimed; this is not full runtime governance because durable governance state, user/agent/folder projection, candidate-cache invalidation proof, and controlled live governance proof remain open.
+
 ## Day 7 Hard Runtime Gap Classification - 2026-05-22
 
 Result: `RUNTIME_GAP_TRUTH_TABLE_HARD_CLASSIFICATION_COMPLETED_NOT_READY`.
@@ -50,10 +97,10 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
-| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0782 executor adapter implementation, CM-0783 executor adapter review, CM-0784 execution authorization review, CM-0800 exact approval recheck, CM-0801 true live proof execution, CM-0802 proof review, CM-0803 second negative-control proof plan, CM-0804 second negative-control exact approval recheck, CM-0805 second negative-control proof execution, CM-0806 second negative-control failure review, CM-0807 recall precision hardening plan, CM-0808 hardening plan review, CM-0809 bounded hardening implementation, CM-0810 bounded hardening review, CM-0811 live proof recheck, CM-0812 execution-path pass-through closeout, CM-0813 post-hardening exact-approval recheck, CM-0814 post-hardening live negative-control proof execution, CM-0815 post-hardening live negative-control proof review, CM-0819 bounded regression expansion, CM-0820 raw-read boundary patch, CM-0821 feature-branch review, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner/authorization/execution/review/plan/recheck/fixture/local-patch/review evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan; CM-0782 implements an internal-only adapter with synthetic tests `5/5` plus runner regression `6/6`, complete counters, fail-closed instrumentation, and runner-safe result projection; CM-0783 accepts the adapter for Day 4 execution authorization review; CM-0784 defines the exact approval line, exactly four literal queries, sanitized output shape, and execution preconditions; CM-0801 executes exactly four true live real-store recall queries with sanitized output and complete zero side-effect counters; CM-0802 accepts Q1/Q2/Q3 as expected-recall signals at sanitized evidence level but classifies Q4 negative-control returning `2` sanitized results as a medium-risk negative-control criteria / query-design / recall-precision gap; CM-0803 defines the next separately exact-approved stricter negative-control plan with exactly four negative-control slots and expected zero results; CM-0804 confirms that plan is ready for future exact approval only; CM-0805 executes the stricter negative-control proof and fails the zero-result criteria with NC1=3, NC2=2, NC3=3, NC4=2 sanitized results despite complete zero side-effect counters; CM-0806 classifies that failure as a recall precision / negative-control suppression blocker requiring hardening before any third live query; CM-0807 defines the planning-only hardening path for thresholding, negative-control gating, score distribution review, no-result mode, stricter filters, and exact reject policy; CM-0808 reviews that plan and selects bounded implementation/tests as the next safe step; CM-0809 implements an internal optional precision policy and targeted bounded tests, default disabled, with no live proof; CM-0810 accepts CM-0809 as sufficient to enter a future exact approval recheck, not live proof execution or reliability; CM-0811 confirms the post-hardening path is ready to wait for a future exact approval gate, not execution; CM-0812 closes the internal precision-policy pass-through from runner to adapter to app to passive recall to the bounded precision policy path without widening the public contract; CM-0813 confirms that the post-hardening path is now execution-ready for a future separately exact-approved CM-0814 proof, but still not execution-approved and not reliable evidence by itself; CM-0814 executes exactly four post-hardening stricter negative-control queries with `precisionPolicyContext.enabled=true`, `proofNoResultMode=true`, sanitized output only, and complete zero side-effect counters, returning NC1=0, NC2=0, NC3=0, and NC4=0 on clean local `main` head `17500cf...`; CM-0815 accepts that fresh evidence as sufficient to downgrade the prior exact negative-control suppression blocker for this narrow proof shape, while still preserving bounded-evidence-only classification, `complete? = no`, and `RC_NOT_READY_BLOCKED`; CM-0819 expands bounded regression coverage for malformed precision metadata and approved-path context; CM-0820 patches the executor raw-read boundary so upstream raw fields fail closed before sanitization and future proofs can use a metadata-only `noRawContentRead=true` path; CM-0821 reviews feature branch `f9e7e13` as PR-ready / explicit mainline integration candidate while preserving no-reliability and no-readiness boundaries. | no | Do not infer `memory recall reliable`, RC readiness, release readiness, or `complete? = yes` from CM-0801 through CM-0821. Treat CM-0801/CM-0814 `rawMemoryContentReads=0` as pre-patch sanitized-output boundary evidence; future proof must use the CM-0820 metadata-only path before that counter can support stronger no-raw-content-read evidence. The exact post-hardening NC1-NC4 blocker is downgraded, but broader recall reliability remains unproven and any next scope must treat CM-0814 as clean local-head bounded evidence, not synced-main proof. |
-| memory write reliable | exact approval required | CM-0737 / CM-0763 / CM-0785 prove only separately exact-approved write-path evidence: one rejected `record_memory` attempt, one preflight repair / exact-only approval packet surface, one accepted repaired `record_memory` attempt with `memory_writes=1`, and no-token mutation rejection as bounded boundary evidence. CM-0786 plans the next safe proof surface only; it does not execute or approve a write. | no | Any further write proof requires a separate exact approval; default unattended write reliability, broad `record_memory` reliability, production behavior, rollback cleanup, and long-run durability remain unproven. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0782 executor adapter implementation, CM-0783 executor adapter review, CM-0784 execution authorization review, CM-0800 exact approval recheck, CM-0801 true live proof execution, CM-0802 proof review, CM-0803 second negative-control proof plan, CM-0804 second negative-control exact approval recheck, CM-0805 second negative-control proof execution, CM-0806 second negative-control failure review, CM-0807 recall precision hardening plan, CM-0808 hardening plan review, CM-0809 bounded hardening implementation, CM-0810 bounded hardening review, CM-0811 live proof recheck, CM-0812 execution-path pass-through closeout, CM-0813 post-hardening exact-approval recheck, CM-0814 post-hardening live negative-control proof execution, CM-0815 post-hardening live negative-control proof review, CM-0819 bounded regression expansion, CM-0820 raw-read boundary patch, CM-0821 feature-branch review, CM-0831 mainline patched metadata boundary reconciliation, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner/authorization/execution/review/plan/recheck/fixture/local-patch/mainline-reconciliation evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan; CM-0782 implements an internal-only adapter with synthetic tests `5/5` plus runner regression `6/6`, complete counters, fail-closed instrumentation, and runner-safe result projection; CM-0783 accepts the adapter for Day 4 execution authorization review; CM-0784 defines the exact approval line, exactly four literal queries, sanitized output shape, and execution preconditions; CM-0801 executes exactly four true live real-store recall queries with sanitized output and complete zero side-effect counters; CM-0802 accepts Q1/Q2/Q3 as expected-recall signals at sanitized evidence level but classifies Q4 negative-control returning `2` sanitized results as a medium-risk negative-control criteria / query-design / recall-precision gap; CM-0803 defines the next separately exact-approved stricter negative-control plan with exactly four negative-control slots and expected zero results; CM-0804 confirms that plan is ready for future exact approval only; CM-0805 executes the stricter negative-control proof and fails the zero-result criteria with NC1=3, NC2=2, NC3=3, NC4=2 sanitized results despite complete zero side-effect counters; CM-0806 classifies that failure as a recall precision / negative-control suppression blocker requiring hardening before any third live query; CM-0807 defines the planning-only hardening path for thresholding, negative-control gating, score distribution review, no-result mode, stricter filters, and exact reject policy; CM-0808 reviews that plan and selects bounded implementation/tests as the next safe step; CM-0809 implements an internal optional precision policy and targeted bounded tests, default disabled, with no live proof; CM-0810 accepts CM-0809 as sufficient to enter a future exact approval recheck, not live proof execution or reliability; CM-0811 confirms the post-hardening path is ready to wait for a future exact approval gate, not execution; CM-0812 closes the internal precision-policy pass-through from runner to adapter to app to passive recall to the bounded precision policy path without widening the public contract; CM-0813 confirms that the post-hardening path is now execution-ready for a future separately exact-approved CM-0814 proof, but still not execution-approved and not reliable evidence by itself; CM-0814 executes exactly four post-hardening stricter negative-control queries with `precisionPolicyContext.enabled=true`, `proofNoResultMode=true`, sanitized output only, and complete zero side-effect counters, returning NC1=0, NC2=0, NC3=0, and NC4=0 on clean local `main` head `17500cf...`; CM-0815 accepts that fresh evidence as sufficient to downgrade the prior exact negative-control suppression blocker for this narrow proof shape, while still preserving bounded-evidence-only classification, `complete? = no`, and `RC_NOT_READY_BLOCKED`; CM-0819 expands bounded regression coverage for malformed precision metadata and approved-path context; CM-0820 patches the executor raw-read boundary so upstream raw fields fail closed before sanitization and future proofs can use a metadata-only `noRawContentRead=true` path; CM-0821 reviews feature branch `f9e7e13` as PR-ready / explicit mainline integration candidate while preserving no-reliability and no-readiness boundaries; CM-0831 confirms PR #4 is now merged into `main` at `eb1d09d8a0b49b07c70276a732e37c83e7aa6070`, `HEAD == origin/main`, and targeted metadata-only boundary tests passed `33/33` on current `main`. | no | Do not infer `memory recall reliable`, RC readiness, release readiness, or `complete? = yes` from CM-0801 through CM-0831. Treat CM-0801/CM-0814 `rawMemoryContentReads=0` as pre-patch sanitized-output boundary evidence; future proof must use the now-mainline CM-0820 metadata-only path before that counter can support stronger no-raw-content-read evidence. The exact post-hardening NC1-NC4 blocker is downgraded and the patched metadata-only boundary is now integrated into main, but broader recall reliability remains unproven and CM-0825 still requires separate exact approval before any true live proof. |
+| memory write reliable | exact approval required | CM-0737 / CM-0763 / CM-0785 prove only separately exact-approved write-path evidence: one rejected `record_memory` attempt, one preflight repair / exact-only approval packet surface, one accepted repaired `record_memory` attempt with `memory_writes=1`, and no-token mutation rejection as bounded boundary evidence. CM-0786 plans the next safe exactly-one proof surface only; it does not execute or approve a write. CM-0832 defines the fuller write reliability proof matrix across unauthorized rejection, exact approval enforcement, payload validation, accepted sanitized write, durable audit accounting, shadow/vector/cache projection, idempotence, failure handling, rollback/cleanup posture, lifecycle governance, scope-aware writes, and bad-memory pollution prevention. CM-0833 adds fixture-only MemoryWriteService matrix evidence: malformed process payload rejection before diary/shadow/vector/chunk writes, sanitized accepted in-memory projection, visible shadow/vector/chunk degraded accounting, and schema metadata rejection before write paths; targeted test passed `5/5`. CM-0834 adds synthetic temp-local evidence using isolated temp root and real local diary/SQLite shadow/vector/audit/chunk store classes; targeted test passed `2/2`, covering accepted synthetic process write, projection accounting, rejected synthetic bad knowledge write before projection, and cleanup verification. CM-0835 extends the temp-local evidence to scope metadata projection, duplicate payload behavior, and secret-like pollution rejection; targeted test passed `4/4`. Duplicate synthetic payloads currently create distinct records and audit events, so idempotence remains open. CM-0836 adds a fixture-only explicit-input lifecycle/dedup/suppression preflight helper; targeted test passed `8/8`, covering same-scope active duplicate suppression, terminal lifecycle duplicate review rejection, exact scope mismatch rejection, synthetic secret-like pollution rejection, schema/version metadata rejection, tag noise normalization, lifecycle action exact-approval gating, and no implicit filesystem read / real memory scan / provider call / durable write / audit write / public MCP expansion / readiness claim. CM-0837 reviews CM-0836 as a viable runtime integration candidate only if it remains internal/optional, derives allowed scope from runtime context, uses exact bounded duplicate summaries, fails closed before diary/shadow/vector/chunk writes, maps rejection through normal write audit, and preserves existing behavior when disabled. CM-0838 implements that minimal optional runtime integration: `MemoryWriteService` now has a default-disabled internal `writePreflightEnabled` gate, imports the helper without circular dependency, uses injected bounded candidate providers only, derives allowed scope from runtime context, rejects active duplicate/scope drift/provider failure/malformed provider return/lifecycle action without exact approval before durable projection, and maps rejection to normal rejected write audit. Targeted validation passed CM-0836 helper `8/8`, CM-0838 integration `6/6`, and existing write matrix/temp-local regression `9/9`. CM-0839 reviews CM-0838 and accepts it as a bounded internal runtime integration layer sufficient for rollback/cleanup posture review and lifecycle/scope runtime governance planning/review, while explicitly preserving the no-reliability/no-readiness boundary. CM-0840 reviews rollback/cleanup posture and finds rejected/preflight-rejected writes clean from durable projection perspective, accepted writes not atomically rollbackable, SQLite/vector delete helpers partial only, diary cleanup not encapsulated by a helper, reconcile/cache cleanup not proven, and audit append-only/non-destructive by default. CM-0841 converts that posture into a fixture/temp-local bounded evidence plan. CM-0842 executes fixture-only bounded evidence `4/4`: validation-rejected and preflight-rejected duplicate writes stop before diary/SQLite/vector/chunk/reconcile/cache projection, accepted writes expose projection accounting, degraded accepted writes expose vector/chunk failure and reconcile enqueue accounting, and SQLite/vector/cache cleanup simulation is classified as `partial_cleanup_only` while diary/audit/reconcile residual posture remains explicit. CM-0843 defines a planning-only lifecycle/scope governance layer for proposal, approval, supersession, tombstone, forget/exclusion, correction, scope binding, and normal-recall pollution prevention. CM-0844 implements the first fixture-only lifecycle/scope governance contract; targeted test passed `8/8`, covering normal-recall inclusion for active exact-scope records, exclusion for proposal/rejected/preflight-rejected/superseded/tombstoned/forgotten/excluded/stale/quarantined records, out-of-scope and malformed fail-closed behavior, exact approval/receipt gating for transitions, supersession replacement id requirement, and append-only/non-destructive accepted transition fixtures. CM-0845 extends that helper with fixture-only normal-recall read-policy filtering; targeted tests passed `14/14`, accepting only active exact-scope candidates, suppressing inactive/out-of-scope/malformed/unresolved candidates, keeping sanitized blocker/mismatch metadata without raw content/text/title/snippet, failing closed on incomplete current scope, and keeping side-effect counters zero. CM-0846 adds a planning-only isolated temp-local lifecycle/scope evidence plan with synthetic records, exact bounded check count `4`, sanitized output, cleanup verification, and no-real-memory/no-provider/no-durable-write/no-apply boundaries. CM-0847 executes that bounded synthetic temp-local evidence with test `2/2`: isolated temp root and synthetic JSON only, exact bounded check count `4`, active exact-scope accepted, proposal/tombstoned/preflight-rejected/out-of-scope/folder-mismatched/malformed-scope records suppressed, sanitized mismatch/blocker metadata retained, raw content/text/title/snippet/sourceFile/jsonlLine absent from evidence output, cleanup verified, and side-effect counters zero. CM-0848 reviews and accepts CM-0847 as sufficient bounded evidence to proceed to runtime integration candidate review, not implementation. CM-0844/CM-0845/CM-0847/CM-0848 do not integrate runtime governance or execute durable real writes. This is bounded fixture/temp-local/planning/review evidence only, not true live write reliability. | no | Any further live write proof requires a separate exact approval. Next safe write-side steps are read-only `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_CANDIDATE_REVIEW`, candidate-provider source review, optional runtime integration candidate review, and only later a separately exact-approved exactly-one live write proof. Default unattended write reliability, broad `record_memory` reliability, production behavior, real rollback cleanup/apply, and long-run durability remain unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 and CM-0787 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. Current inventory is 15 explicit-input collector units; source/tests still keep `validationAggregatorFullImplementation=false` and `fullImplementationComplete=false`. | no | Do not count collectors as maturity; close only after automatic runtime evidence ingestion, current-head freshness/baseline binding, approved RC precheck evidence capture, final RC matrix integration, live evidence handoff, stale-evidence invalidation, and exact-approved durable/write/runtime evidence are proven. |
-| governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
+| governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. CM-0843 adds a planning-only lifecycle/scope governance layer after CM-0842: proposal, approval, supersession, tombstone, forget/exclusion, correction, user/project/workspace/client/agent/task/conversation/folder/visibility/retention scope binding, and default normal-recall exclusion for rejected, preflight-rejected, proposal-only, superseded, tombstoned, forgotten/excluded, stale, out-of-scope, unresolved-remediation, or malformed records. CM-0844 adds fixture-only contract evidence `8/8` for active exact-scope recall eligibility, inactive/out-of-scope/malformed/unresolved exclusion, exact approval/receipt gating, supersession replacement id requirement, and append-only/non-destructive transition fixtures. CM-0845 adds fixture-only read-policy evidence `14/14` for normal-recall candidate filtering and sanitized suppressed metadata without raw content leakage. CM-0846 adds a planning-only isolated temp-root evidence design for synthetic lifecycle/scope records, exact bounded check count `4`, expected-result and irrelevant-suppression criteria, freshness/folder behavior, timeout/error handling, sanitized output, cleanup verification, and no-readiness wording. CM-0847 executes the synthetic temp-local layer with targeted tests `2/2`, proving isolated temp root creation/cleanup, synthetic JSON-only input, exact bounded check count `4`, lifecycle and scope suppression, sanitized metadata, raw-field leakage suppression, and zero side-effect counters. CM-0848 accepts CM-0847 as sufficient to proceed to read-only runtime integration candidate review. CM-0844/CM-0845/CM-0847/CM-0848 are not runtime governance implementation and perform no true live memory action or durable governance write. | no | Next minimal gate is read-only `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_CANDIDATE_REVIEW`; future full governance runtime loop or controlled live packet requires separately exact-approved bounded scope. |
 | rollback posture | bounded evidence only | Compare/rollback `43/43`, rollback-active-memory, CM-0765, and CM-0788 make rollback posture reviewable as harness readiness evidence only. | no | Do not treat harness readiness as real rollback apply or production rollback proof. |
 | real rollback apply | exact approval required | No real rollback apply, restore, real config switch, or cutover has occurred; CM-0788 keeps `mainline-rollback` as planning/patch text only. | no | Separate exact approval required before any real rollback/config-switch action. |
 | migration / import / export / backup / restore apply | exact approval required | CM-0788 confirms current evidence is fixture/dry-run/no-touch approval-boundary evidence only; apply remains blocked. | no | Separate exact approval must name one real action and target before apply/import/export/backup/restore. |
@@ -126,6 +173,24 @@ Audit verdict:
 - The only material next moves are explicit mainline integration authorization or exact CM-0825 approval.
 
 Boundary: this audit did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, push, PR, merge, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0831 Mainline Patched Metadata Boundary Reconciliation - 2026-05-23
+
+Result: `CM0831_MAINLINE_PATCHED_METADATA_BOUNDARY_RECONCILED_NOT_RELIABLE_NOT_READY`.
+
+Artifact: `docs/CM0831_MAINLINE_PATCHED_METADATA_BOUNDARY_RECONCILIATION.md`.
+
+Reconciliation verdict:
+
+- PR #4 merged the CM-0820 patched metadata-only recall boundary into `main`.
+- Current `HEAD == origin/main == eb1d09d8a0b49b07c70276a732e37c83e7aa6070`.
+- The prior CM-0829 statement that `CM-0820` is not integrated into `main` is now stale and superseded by this reconciliation.
+- Targeted metadata-only boundary tests passed `33/33` on current `main`.
+- This satisfies the mainline reconciliation precondition, but does not execute CM-0825 and does not review actual CM-0825 proof evidence.
+
+Boundary: this reconciliation did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, push, PR, merge, tag/release/deploy/cutover, or make a readiness claim.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
@@ -1046,6 +1111,111 @@ Planning conclusion:
 This plan did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; no row changes to `complete? = yes`.
+
+## CM-0832 Memory Write Reliability Proof Matrix - 2026-05-23
+
+Result: `MEMORY_WRITE_RELIABILITY_PROOF_MATRIX_COMPLETED_NOT_READY`.
+
+Artifact: `docs/MEMORY_WRITE_RELIABILITY_PROOF_MATRIX.md`.
+
+Matrix verdict:
+
+- The current write evidence remains exact-approval-only bounded evidence.
+- CM-0832 separates unauthorized no-token mutation rejection from authorized write reliability.
+- The future write path must cover approval enforcement, validation rejection, accepted sanitized write, durable audit accounting, shadow/vector/cache projection, idempotence, failure handling, rollback/cleanup posture, lifecycle governance, scope-aware writes, and bad-memory pollution prevention.
+- A future exactly-one accepted write can be useful evidence, but cannot by itself prove `memory write reliable`.
+
+Boundary: this matrix did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, direct `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory write reliable` remains exact approval required, and no row changes to `complete? = yes`.
+
+## CM-0834 Memory Write Reliability Temp-Local Evidence - 2026-05-23
+
+Result: `MEMORY_WRITE_RELIABILITY_TEMP_LOCAL_EVIDENCE_COMPLETED_NOT_READY`.
+
+Artifact: `docs/MEMORY_WRITE_RELIABILITY_TEMP_LOCAL_EVIDENCE.md`.
+
+Evidence verdict:
+
+- Added `tests/memory-write-reliability-temp-local-evidence.test.js`.
+- Targeted temp-local validation passed `2/2`.
+- Covered rows include isolated temp root, accepted synthetic process payload through real local diary/SQLite shadow/vector/audit/chunk path, projection accounting, rejected synthetic bad knowledge payload before projection, and cleanup verification.
+- This evidence uses synthetic local temp files only and does not touch real memory stores.
+
+Boundary: this evidence did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, direct real `.jsonl` or durable memory content reads, public MCP expansion, migration/import/export/backup/restore apply, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Re-review: initial targeted test run exposed an over-strong cache-count assertion because the temp-local config had not enabled embedding cache. The test was repaired to explicitly enable temp-local cache. Final changed-scope re-review found no actionable findings.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory write reliable` remains exact approval required, and no row changes to `complete? = yes`.
+
+## CM-0835 Memory Write Reliability Scope Duplicate Pollution Evidence - 2026-05-23
+
+Result: `MEMORY_WRITE_RELIABILITY_SCOPE_DUPLICATE_POLLUTION_EVIDENCE_COMPLETED_NOT_READY`.
+
+Artifact: `docs/MEMORY_WRITE_RELIABILITY_SCOPE_DUPLICATE_POLLUTION_EVIDENCE.md`.
+
+Evidence verdict:
+
+- Extended `tests/memory-write-reliability-temp-local-evidence.test.js`.
+- Targeted temp-local validation passed `4/4`.
+- Covered rows include accepted synthetic scope metadata projection, repeated identical synthetic payload behavior, secret-like pollution rejection before projection, existing bad-memory rejection, and cleanup verification.
+- Duplicate synthetic payloads currently create distinct records and audit events. This is evidence of current behavior, not idempotence proof.
+
+Boundary: this evidence did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, direct real `.jsonl` or durable memory content reads, public MCP expansion, migration/import/export/backup/restore apply, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory write reliable` remains exact approval required, idempotence / duplicate handling remains open, and no row changes to `complete? = yes`.
+
+## CM-0836 Memory Write Lifecycle Dedup Suppression Preflight - 2026-05-23
+
+Result: `MEMORY_WRITE_LIFECYCLE_DEDUP_SUPPRESSION_PREFLIGHT_COMPLETED_NOT_READY`.
+
+Artifact: `docs/MEMORY_WRITE_LIFECYCLE_DEDUP_SUPPRESSION_PREFLIGHT.md`.
+
+Evidence verdict:
+
+- Added `src/core/MemoryWriteLifecycleDedupSuppressionPreflight.js`.
+- Added `tests/memory-write-lifecycle-dedup-suppression-preflight.test.js`.
+- Targeted fixture-only explicit-input validation passed `8/8`.
+- Covered rows include clean synthetic write preflight, same-scope active duplicate suppression, terminal lifecycle duplicate review rejection, exact scope mismatch rejection, synthetic secret-like pollution rejection, schema/version metadata rejection, tag noise normalization, supersede/tombstone/forget exact approval gating, and no implicit filesystem read / real memory scan / provider call / durable write / audit write / public MCP expansion / readiness claim.
+- The helper is not integrated into runtime `record_memory`; this is preflight contract evidence only, not runtime idempotence proof.
+
+Boundary: this evidence did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, direct real `.jsonl` or durable memory content reads, durable memory/audit writes, public MCP expansion, migration/import/export/backup/restore apply, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory write reliable` remains exact approval required, runtime idempotence remains open, and no row changes to `complete? = yes`.
+
+## CM-0837 Memory Write Preflight Runtime Integration Candidate Review - 2026-05-23
+
+Result: `MEMORY_WRITE_PREFLIGHT_RUNTIME_INTEGRATION_CANDIDATE_REVIEW_COMPLETED_NOT_READY`.
+
+Artifact: `docs/MEMORY_WRITE_PREFLIGHT_RUNTIME_INTEGRATION_CANDIDATE_REVIEW.md`.
+
+Review verdict:
+
+- Source read-only review covered `MemoryWriteService.record()`, CM-0836 helper/tests, current write matrix/temp-local tests, and `record_memory` app wiring.
+- CM-0836 is accepted only as a future minimal runtime integration candidate.
+- Future integration must be internal/optional, derive allowed scope from resolved runtime context, use exact bounded candidate summaries rather than broad real-memory scan, fail closed before diary/shadow/vector/chunk writes, map rejection through normal rejected write audit, and preserve existing behavior when disabled.
+- This review did not modify `MemoryWriteService` and did not execute any true live write.
+
+Boundary: this review did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, direct real `.jsonl` or durable memory content reads, durable memory/audit writes, public MCP expansion, migration/import/export/backup/restore apply, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory write reliable` remains exact approval required, runtime idempotence remains open, and no row changes to `complete? = yes`.
+
+## CM-0833 Memory Write Reliability Fixture Matrix Evidence - 2026-05-23
+
+Result: `MEMORY_WRITE_RELIABILITY_FIXTURE_MATRIX_EVIDENCE_COMPLETED_NOT_READY`.
+
+Artifact: `docs/MEMORY_WRITE_RELIABILITY_FIXTURE_MATRIX_EVIDENCE.md`.
+
+Evidence verdict:
+
+- Added `tests/memory-write-reliability-proof-matrix-fixture.test.js`.
+- Targeted fixture validation passed `5/5`.
+- Covered rows include malformed process payload rejection before durable write paths, accepted sanitized in-memory projection, visible shadow/vector degraded accounting, chunk projection failure after SQLite shadow readiness, and schema metadata rejection before durable write paths.
+- This evidence uses in-memory stubs only and does not touch real durable stores.
+
+Boundary: this evidence did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, direct `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory write reliable` remains exact approval required, and no row changes to `complete? = yes`.
 
 ## Memory Write Reliability Bounded Review - 2026-05-22
 

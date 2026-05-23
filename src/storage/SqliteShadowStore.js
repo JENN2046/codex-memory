@@ -420,6 +420,44 @@ class SqliteShadowStore {
     return result;
   }
 
+  async getRecordsLifecycleScopeGovernanceMap(memoryIds = []) {
+    await this.ensureReady();
+    const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
+    const result = {
+      lifecycleColumnAvailable: false,
+      records: new Map()
+    };
+    if (uniqueIds.length === 0) {
+      return result;
+    }
+
+    this.refreshMemoryRecordColumnInfo();
+    const hasStatus = this.hasMemoryRecordColumn('status');
+    result.lifecycleColumnAvailable = hasStatus;
+    const placeholders = uniqueIds.map(() => '?').join(',');
+    const rows = this.db.prepare(`
+      SELECT memory_id, project_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy${hasStatus ? ', status' : ''}
+      FROM memory_records WHERE memory_id IN (${placeholders})
+    `).all(...uniqueIds);
+
+    for (const row of rows) {
+      result.records.set(row.memory_id, {
+        memoryId: row.memory_id,
+        lifecycleStatus: hasStatus ? (row.status || null) : null,
+        scope: {
+          projectId: row.project_id || null,
+          workspaceId: row.workspace_id || null,
+          clientId: row.client_id || null,
+          taskId: row.task_id || null,
+          conversationId: row.conversation_id || null,
+          visibility: row.visibility || null,
+          retentionPolicy: row.retention_policy || null
+        }
+      });
+    }
+    return result;
+  }
+
   async getRecordValidationPolicy(memoryId) {
     await this.ensureReady();
     this.refreshMemoryRecordColumnInfo();

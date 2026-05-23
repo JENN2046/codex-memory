@@ -33,6 +33,10 @@ const { RerankService } = require('./recall/RerankService');
 const { RecallAuditService } = require('./recall/RecallAuditService');
 const { KnowledgeBaseSyncService } = require('./recall/KnowledgeBaseSyncService');
 const { KnowledgeBaseRecallPipeline } = require('./recall/KnowledgeBaseRecallPipeline');
+const {
+  filterRecallCandidatesByLifecycleScope,
+  normalizeScopeFields
+} = require('./core/MemoryLifecycleScopeGovernanceContract');
 
 function normalizeScopeVisibility(value) {
   if (Array.isArray(value)) {
@@ -141,6 +145,16 @@ function inferRequestClientId(requestContext = {}, scope = null) {
   return 'codex';
 }
 
+const LIFECYCLE_SCOPE_GOVERNANCE_SUPPORTED_FIELDS = Object.freeze([
+  'projectId',
+  'workspaceId',
+  'clientId',
+  'taskId',
+  'conversationId',
+  'visibility',
+  'retentionPolicy'
+]);
+
 const INTERNAL_TRUE_LIVE_RECALL_SOURCE = 'internal-true-live-recall-readonly-proof-runner';
 const INTERNAL_PRECISION_POLICY_ALLOWED_KEYS = new Set([
   'enabled',
@@ -227,6 +241,111 @@ function normalizeInternalNoRawContentRead(requestContext = {}) {
     throw new Error('internal noRawContentRead context must be true');
   }
   return true;
+}
+
+function normalizeScopeValue(value) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function firstScopeValue(...values) {
+  for (const value of values) {
+    const normalized = normalizeScopeValue(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function buildLifecycleScopeGovernanceCurrentScope(requestContext = {}, scope = null) {
+  const executionContext = requestContext.executionContext || {};
+  const safeScope = scope && typeof scope === 'object' ? scope : {};
+
+  return {
+    userId: firstScopeValue(safeScope.user_id, safeScope.userId, executionContext.userId, executionContext.user_id),
+    projectId: firstScopeValue(safeScope.project_id, safeScope.projectId, executionContext.projectId, executionContext.project_id),
+    workspaceId: firstScopeValue(safeScope.workspace_id, safeScope.workspaceId, executionContext.workspaceId, executionContext.workspace_id),
+    clientId: firstScopeValue(safeScope.client_id, safeScope.clientId, executionContext.clientId, executionContext.client_id, inferRequestClientId(requestContext, scope)),
+    agentId: firstScopeValue(safeScope.agent_id, safeScope.agentId, executionContext.agentId, executionContext.agent_id),
+    taskId: firstScopeValue(safeScope.task_id, safeScope.taskId, executionContext.taskId, executionContext.task_id),
+    conversationId: firstScopeValue(safeScope.conversation_id, safeScope.conversationId, executionContext.conversationId, executionContext.conversation_id),
+    folder: firstScopeValue(safeScope.folder, executionContext.folder),
+    visibility: firstScopeValue(safeScope.visibility, executionContext.visibility),
+    retentionPolicy: firstScopeValue(safeScope.retention_policy, safeScope.retentionPolicy, executionContext.retentionPolicy, executionContext.retention_policy)
+  };
+}
+
+function lifecycleScopeGovernanceReadPolicyEnabled(requestContext = {}) {
+  return requestContext.executionContext?.lifecycleScopeGovernanceReadPolicy === true;
+}
+
+async function applyLifecycleScopeGovernanceReadPolicy(results, { requestContext = {}, scope = null, shadowStore } = {}) {
+  const baseAudit = {
+    lifecycleScopeGovernancePolicyApplied: lifecycleScopeGovernanceReadPolicyEnabled(requestContext),
+    acceptedCount: Array.isArray(results) ? results.length : 0,
+    suppressedCount: 0,
+    lifecycleColumnAvailable: false,
+    sanitizedAuditMetadata: [],
+    rawContentExposed: false,
+    durableMutationExecuted: false,
+    publicMcpExpanded: false
+  };
+
+  if (!baseAudit.lifecycleScopeGovernancePolicyApplied || !Array.isArray(results)) {
+    return {
+      results,
+      audit: {
+        ...baseAudit,
+        lifecycleScopeGovernancePolicyApplied: false
+      }
+    };
+  }
+
+  if (results.length === 0) {
+    return {
+      results,
+      audit: baseAudit
+    };
+  }
+
+  const memoryIds = [...new Set(results.map(item => item.memoryId || item.memory_id).filter(Boolean))];
+  const metadata = memoryIds.length > 0 && shadowStore?.getRecordsLifecycleScopeGovernanceMap
+    ? await shadowStore.getRecordsLifecycleScopeGovernanceMap(memoryIds)
+    : { lifecycleColumnAvailable: false, records: new Map() };
+  const metadataRecords = metadata.records || new Map();
+  const currentScope = buildLifecycleScopeGovernanceCurrentScope(requestContext, scope);
+  const requiredScopeFields = normalizeScopeFields(LIFECYCLE_SCOPE_GOVERNANCE_SUPPORTED_FIELDS);
+  const candidates = results.map(item => {
+    const memoryId = item.memoryId || item.memory_id;
+    const record = metadataRecords.get(memoryId) || {};
+    return {
+      memoryId,
+      lifecycleStatus: metadata.lifecycleColumnAvailable ? record.lifecycleStatus : null,
+      scope: record.scope || {},
+      malformedLifecycle: record.malformedLifecycle === true,
+      malformedScope: record.malformedScope === true,
+      unresolvedRemediation: record.unresolvedRemediation === true
+    };
+  });
+  const filtered = filterRecallCandidatesByLifecycleScope({
+    currentScope,
+    requiredScopeFields,
+    candidates
+  });
+  const acceptedIds = new Set(filtered.acceptedCandidates.map(item => item.memoryId).filter(Boolean));
+
+  return {
+    results: results.filter(item => acceptedIds.has(item.memoryId || item.memory_id)),
+    audit: {
+      ...baseAudit,
+      acceptedCount: filtered.acceptedCount,
+      suppressedCount: filtered.suppressedCount,
+      lifecycleColumnAvailable: !!metadata.lifecycleColumnAvailable,
+      requiredScopeFields,
+      sanitizedAuditMetadata: filtered.sanitizedAuditMetadata,
+      rawContentExposed: filtered.rawContentExposed,
+      durableMutationExecuted: filtered.durableMutationExecuted,
+      publicMcpExpanded: filtered.publicMcpExpanded
+    }
+  };
 }
 
 async function applySoftReadPolicy(results, { config, shadowStore, requestContext = {}, scope = null } = {}) {
@@ -486,7 +605,13 @@ function createCodexMemoryApplication(overrides = {}) {
       shadowStore
     });
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
-    const policyFiltered = await applySoftReadPolicy(lifecycleFiltered.results, {
+    const governanceFiltered = await applyLifecycleScopeGovernanceReadPolicy(lifecycleFiltered.results, {
+      requestContext,
+      scope: scopeFilter,
+      shadowStore
+    });
+    throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
+    const policyFiltered = await applySoftReadPolicy(governanceFiltered.results, {
       config,
       shadowStore,
       requestContext,
@@ -614,6 +739,7 @@ function createCodexMemoryApplication(overrides = {}) {
 
 module.exports = {
   applyLifecycleReadPolicy,
+  applyLifecycleScopeGovernanceReadPolicy,
   applySoftReadPolicy,
   inferRequestClientId,
   createCodexMemoryApplication

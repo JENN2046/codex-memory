@@ -1,0 +1,245 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+
+const {
+  computeCanonicalWriteHash
+} = require('../src/core/MemoryWriteLifecycleDedupSuppressionPreflight');
+const { MemoryWriteService } = require('../src/core/MemoryWriteService');
+
+const runtimeScope = Object.freeze({
+  projectId: 'codex-memory',
+  workspaceId: 'cm-0838-runtime-preflight-workspace',
+  clientId: 'codex',
+  taskId: 'CM-0838',
+  conversationId: 'write-preflight-runtime-integration',
+  visibility: 'project',
+  retentionPolicy: 'keep'
+});
+
+function createHarness(overrides = {}) {
+  const events = {
+    candidateProviderCalls: [],
+    diaryWrites: [],
+    shadowUpserts: [],
+    vectorUpserts: [],
+    chunkIndexes: [],
+    auditWrites: []
+  };
+  const executionContext = {
+    agentAlias: 'Codex',
+    agentId: 'cm-0838-fixture-agent',
+    requestSource: 'cm-0838-runtime-test',
+    ...runtimeScope,
+    ...overrides.executionContext
+  };
+  const candidateProvider = overrides.candidateProvider || (async () => []);
+
+  const service = new MemoryWriteService({
+    config: {
+      defaultRequestSource: 'cm-0838-runtime-test',
+      enableShadowWrites: true,
+      enableVectorIndex: true,
+      ...overrides.config
+    },
+    executionContextResolver: {
+      resolve: () => executionContext,
+      isWritableByCodex: () => true
+    },
+    writePreflightEnabled: overrides.writePreflightEnabled === true,
+    writePreflightCandidateProvider: async request => {
+      events.candidateProviderCalls.push(request);
+      return candidateProvider(request);
+    },
+    diaryStore: {
+      async writeRecord(record) {
+        events.diaryWrites.push(record);
+        return {
+          filePath: '<cm-0838-fixture-diary-path>',
+          relativePath: '<cm-0838-fixture-relative-path>',
+          fileContent: '<cm-0838-fixture-raw-content-redacted>'
+        };
+      }
+    },
+    shadowStore: {
+      async upsertRecord(record) {
+        events.shadowUpserts.push(record);
+      },
+      async clearReconcileTasks() {},
+      async enqueueReconcileTask() {
+        throw new Error('unexpected reconcile task in CM-0838 fixture');
+      }
+    },
+    vectorStore: {
+      async upsertRecord(record) {
+        events.vectorUpserts.push(record);
+      }
+    },
+    chunkIndexingService: {
+      async indexRecord(record) {
+        events.chunkIndexes.push(record);
+      }
+    },
+    auditLogStore: {
+      async appendWriteAudit(event) {
+        events.auditWrites.push(event);
+      }
+    }
+  });
+
+  return { service, events, executionContext };
+}
+
+function validProcessPayload(overrides = {}) {
+  return {
+    target: 'process',
+    title: 'Checkpoint: CM-0838 runtime write preflight',
+    content: [
+      'Checkpoint: bounded runtime write preflight integration fixture.',
+      'Purpose: reject duplicate or out-of-scope synthetic writes before durable projection.',
+      'Boundary: local fixture only; no real memory scan, no provider, no readiness claim.'
+    ].join('\n'),
+    evidence: 'CM-0838 bounded candidate-provider stub evidence.',
+    tags: ['cm-0838', 'write-preflight'],
+    sensitivity: 'none',
+    validated: true,
+    reusable: false,
+    project_id: runtimeScope.projectId,
+    workspace_id: runtimeScope.workspaceId,
+    client_id: runtimeScope.clientId,
+    task_id: runtimeScope.taskId,
+    conversation_id: runtimeScope.conversationId,
+    visibility: runtimeScope.visibility,
+    retention_policy: runtimeScope.retentionPolicy,
+    ...overrides
+  };
+}
+
+test('CM-0838 keeps write preflight default-disabled and preserves current write path', async () => {
+  const { service, events } = createHarness({
+    writePreflightEnabled: false,
+    candidateProvider: async () => {
+      throw new Error('candidate provider must not run when preflight is disabled');
+    }
+  });
+
+  const result = await service.record(validProcessPayload());
+
+  assert.equal(result.decision, 'accepted');
+  assert.equal(events.candidateProviderCalls.length, 0);
+  assert.equal(events.diaryWrites.length, 1);
+  assert.equal(events.shadowUpserts.length, 1);
+  assert.equal(events.vectorUpserts.length, 1);
+  assert.equal(events.chunkIndexes.length, 1);
+  assert.equal(events.auditWrites.length, 1);
+  assert.equal(events.auditWrites[0].decision, 'accepted');
+});
+
+test('CM-0838 rejects active same-scope duplicate before durable write projection', async () => {
+  const payload = validProcessPayload();
+  const { service, events } = createHarness({
+    writePreflightEnabled: true,
+    candidateProvider: async request => [
+      {
+        memoryId: 'cm-0838-active-duplicate',
+        lifecycleStatus: 'active',
+        canonicalHash: request.canonicalHash,
+        ...payload
+      }
+    ]
+  });
+
+  const result = await service.record(payload);
+
+  assert.equal(result.decision, 'rejected');
+  assert.match(result.reason, /write preflight rejected: duplicate_suppressed/i);
+  assert.equal(result.writePreflight.decision, 'duplicate_suppressed');
+  assert.equal(result.writePreflight.matchedCandidateCount, 1);
+  assert.equal(events.candidateProviderCalls.length, 1);
+  assert.equal(events.diaryWrites.length, 0);
+  assert.equal(events.shadowUpserts.length, 0);
+  assert.equal(events.vectorUpserts.length, 0);
+  assert.equal(events.chunkIndexes.length, 0);
+  assert.equal(events.auditWrites.length, 1);
+  assert.equal(events.auditWrites[0].decision, 'rejected');
+});
+
+test('CM-0838 derives allowed scope from runtime context and rejects payload scope drift', async () => {
+  const { service, events } = createHarness({
+    writePreflightEnabled: true
+  });
+
+  const result = await service.record(validProcessPayload({
+    project_id: 'other-project',
+    task_id: 'CM-OTHER'
+  }));
+
+  assert.equal(result.decision, 'rejected');
+  assert.match(result.reason, /write preflight rejected: scope_mismatch_rejected/i);
+  assert.equal(result.writePreflight.scopeMismatchCount, 2);
+  assert.equal(events.candidateProviderCalls.length, 1);
+  assert.equal(events.candidateProviderCalls[0].allowedScope.projectId, runtimeScope.projectId);
+  assert.equal(events.diaryWrites.length, 0);
+  assert.equal(events.shadowUpserts.length, 0);
+  assert.equal(events.vectorUpserts.length, 0);
+  assert.equal(events.chunkIndexes.length, 0);
+  assert.equal(events.auditWrites.length, 1);
+});
+
+test('CM-0838 fails closed when bounded candidate provider throws', async () => {
+  const { service, events } = createHarness({
+    writePreflightEnabled: true,
+    candidateProvider: async () => {
+      throw new Error('synthetic candidate provider unavailable');
+    }
+  });
+
+  const result = await service.record(validProcessPayload());
+
+  assert.equal(result.decision, 'rejected');
+  assert.match(result.reason, /write_preflight_candidate_provider_failed/i);
+  assert.equal(events.diaryWrites.length, 0);
+  assert.equal(events.shadowUpserts.length, 0);
+  assert.equal(events.vectorUpserts.length, 0);
+  assert.equal(events.chunkIndexes.length, 0);
+  assert.equal(events.auditWrites.length, 1);
+});
+
+test('CM-0838 requires internal exact approval for lifecycle actions before write projection', async () => {
+  const { service, events } = createHarness({
+    writePreflightEnabled: true
+  });
+
+  const result = await service.record(validProcessPayload({
+    lifecycleAction: 'tombstone',
+    reason: 'synthetic stale memory cleanup',
+    tombstoneMemoryId: 'cm-0838-old-memory'
+  }));
+
+  assert.equal(result.decision, 'rejected');
+  assert.match(result.reason, /write preflight rejected: exact_approval_required/i);
+  assert.equal(events.diaryWrites.length, 0);
+  assert.equal(events.shadowUpserts.length, 0);
+  assert.equal(events.vectorUpserts.length, 0);
+  assert.equal(events.chunkIndexes.length, 0);
+  assert.equal(events.auditWrites.length, 1);
+});
+
+test('CM-0838 passes canonical hash and bounded scope to candidate provider', async () => {
+  let capturedRequest = null;
+  const payload = validProcessPayload();
+  const { service } = createHarness({
+    writePreflightEnabled: true,
+    candidateProvider: async request => {
+      capturedRequest = request;
+      return [];
+    }
+  });
+
+  const result = await service.record(payload);
+
+  assert.equal(result.decision, 'accepted');
+  assert.equal(capturedRequest.canonicalHash, computeCanonicalWriteHash(payload));
+  assert.deepEqual(capturedRequest.allowedScope, runtimeScope);
+  assert.equal(capturedRequest.proposedWrite.content, payload.content);
+  assert.equal(capturedRequest.executionContext.projectId, runtimeScope.projectId);
+});
