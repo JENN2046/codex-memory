@@ -1,6 +1,9 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
 const test = require('node:test');
 
 const { KnowledgeBaseRecallPipeline } = require('../src/recall/KnowledgeBaseRecallPipeline');
@@ -8,6 +11,7 @@ const {
   RecallPrecisionPolicy,
   summarizeScoreDistribution
 } = require('../src/recall/RecallPrecisionPolicy');
+const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 
 function metadata(overrides = {}) {
   return {
@@ -92,6 +96,18 @@ function createPipeline({ generatedCandidates }) {
       visibility: 'project',
       createdAt: '2026-05-23T00:00:00.000Z',
       updatedAt: '2026-05-23T00:00:00.000Z'
+    }],
+    ['ordinary-blocked-term-memory', {
+      memoryId: 'ordinary-blocked-term-memory',
+      target: 'process',
+      title: 'Ordinary blocked-memory term record',
+      rawText: 'ordinary bounded fixture content mentions blocked-memory as plain text',
+      content: 'ordinary bounded fixture content mentions blocked-memory as plain text',
+      tags: [],
+      status: 'active',
+      visibility: 'project',
+      createdAt: '2026-05-23T00:00:00.000Z',
+      updatedAt: '2026-05-23T00:00:00.000Z'
     }]
   ]);
 
@@ -160,7 +176,7 @@ function createPipeline({ generatedCandidates }) {
           .map(id => records.get(id))
           .filter(Boolean)
           .map(record => {
-            const textDerivedTags = String(record.content || '').includes('isolation-family: blocked_memory')
+            const textDerivedTags = /(?:^|\n)\s*isolation-family:\s*blocked_memory/i.test(String(record.content || ''))
               ? ['isolation:blocked_memory']
               : [];
             return [record.memoryId, {
@@ -388,6 +404,101 @@ test('pipeline noRawContentRead proof mode preserves text-derived isolation hint
   assert.equal(sideEffects.isolationMetadataReads, 2);
   assert.equal(sideEffects.syncCalls, 0);
   assert.equal(sideEffects.auditWrites, 0);
+});
+
+test('pipeline noRawContentRead proof mode does not isolate ordinary keyword mentions', async () => {
+  const ordinary = candidate('ordinary-blocked-term-memory', metadata({
+    score: 0.52,
+    baseScore: 0.52,
+    lexicalScore: 0.6,
+    matchedTags: ['bounded-alpha'],
+    contentHitCount: 1
+  }));
+  const { pipeline, sideEffects } = createPipeline({ generatedCandidates: [ordinary] });
+
+  const results = await pipeline.search({
+    query: 'bounded alpha ordinary keyword mention',
+    target: 'process',
+    limit: 3,
+    includeContent: false,
+    readOnly: true,
+    noRawContentRead: true,
+    precisionPolicyContext: {
+      enabled: true,
+      queryFamily: 'bounded_positive_control_metadata_only',
+      minimumScore: 0.12
+    }
+  });
+
+  assert.deepEqual(results.map(result => result.memoryId), ['ordinary-blocked-term-memory']);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'content'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'text'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'title'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'snippet'), false);
+  assert.equal(sideEffects.recordReads, 0);
+  assert.equal(sideEffects.isolationMetadataReads, 1);
+  assert.equal(sideEffects.syncCalls, 0);
+  assert.equal(sideEffects.auditWrites, 0);
+});
+
+test('sqlite isolation metadata derives only explicit line-start family hints', async () => {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-isolation-map-'));
+  const store = new SqliteShadowStore({ dbPath: path.join(tempDir, 'shadow.db') });
+
+  try {
+    await store.upsertRecord({
+      memoryId: 'explicit-marker-memory',
+      target: 'process',
+      title: 'Explicit marker memory',
+      content: 'isolation-family: blocked_memory\nbounded fixture content',
+      evidence: '',
+      tags: [],
+      validated: true,
+      reusable: true,
+      sensitivity: 'none',
+      createdAt: '2026-05-23T00:00:00.000Z',
+      updatedAt: '2026-05-23T00:00:00.000Z'
+    });
+    await store.upsertRecord({
+      memoryId: 'inline-marker-example-memory',
+      target: 'process',
+      title: 'Inline marker example memory',
+      content: 'ordinary content describes isolation-family: blocked_memory as an example',
+      evidence: '',
+      tags: [],
+      validated: true,
+      reusable: true,
+      sensitivity: 'none',
+      createdAt: '2026-05-23T00:00:00.000Z',
+      updatedAt: '2026-05-23T00:00:00.000Z'
+    });
+    await store.upsertRecord({
+      memoryId: 'ordinary-keyword-memory',
+      target: 'process',
+      title: 'Ordinary keyword memory',
+      content: 'ordinary content mentions blocked-memory as plain text',
+      evidence: '',
+      tags: [],
+      validated: true,
+      reusable: true,
+      sensitivity: 'none',
+      createdAt: '2026-05-23T00:00:00.000Z',
+      updatedAt: '2026-05-23T00:00:00.000Z'
+    });
+
+    const isolationMap = await store.getRecordsIsolationMap([
+      'explicit-marker-memory',
+      'inline-marker-example-memory',
+      'ordinary-keyword-memory'
+    ]);
+
+    assert.deepEqual(isolationMap.get('explicit-marker-memory').tags, ['isolation:blocked_memory']);
+    assert.deepEqual(isolationMap.get('inline-marker-example-memory').tags, []);
+    assert.deepEqual(isolationMap.get('ordinary-keyword-memory').tags, []);
+  } finally {
+    await store.close();
+    await fs.rm(tempDir, { recursive: true, force: true });
+  }
 });
 
 test('pipeline noRawContentRead proof mode requires read-only metadata-only execution', async () => {
