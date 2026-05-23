@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0828 Handoff
+
+Status: `CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET_READY_NOT_APPROVED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Packet verdict: Phase F.1 now has a clear non-executing unblock map. Mainline integration route requires explicit remote / PR / merge authorization before CM-0822. Proof execution route requires the CM-0824 exact CM-0825 approval line before any live proof. Actual CM-0826 and CM-0827 remain downstream of proof evidence.
+
+Next safe action: wait for explicit operator input for either mainline integration or CM-0825 exact proof execution. Do not infer approval from this packet.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, push/PR/merge, release/cutover, tag, or readiness claim occurred.
+
 ## CM-0827 Handoff
 
 Status: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

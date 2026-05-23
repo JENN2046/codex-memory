@@ -109,6 +109,25 @@ Boundary: this review did not merge `main`, create a PR, execute true live `sear
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
+## CM-0828 Phase F.1 Recall Requalification Unblock Packet - 2026-05-23
+
+Result: `CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET_READY_NOT_APPROVED_NOT_READY`.
+
+Artifact: `docs/CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET.md`.
+
+Unblock verdict:
+
+- Phase F.1 still has two hard-gated routes.
+- Mainline integration route requires separate explicit remote / PR / merge authorization before any CM-0822 reconciliation.
+- Proof execution route requires the separate exact CM-0825 approval line defined by CM-0824 before any true live proof.
+- Actual CM-0826 evidence review remains waiting on CM-0825 proof evidence.
+- Actual CM-0827 next runtime gap selection remains waiting on CM-0826 actual evidence review.
+- This packet is not approval, not execution, not mainline reconciliation, not true live proof, and not blocker downgrade.
+
+Boundary: this packet did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, push, PR, merge, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## CM-0827 Next Runtime Gap Selection Precondition Review - 2026-05-23
 
 Result: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_READY`.

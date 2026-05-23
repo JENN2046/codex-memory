@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0828 Phase F.1 recall requalification unblock packet - 2026-05-23
+
+- Status: `CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET_READY_NOT_APPROVED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: docs/status/board/truth-table unblock packet only; no push, PR, merge, CM-0825 execution, actual CM-0826 proof evidence review, true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Packet verdict: remaining Phase F.1 movement requires either separate mainline integration authorization followed by CM-0822, or CM-0824's exact CM-0825 approval line followed by proof execution and actual CM-0826/CM-0827 review.
+- Next safe step: wait for explicit operator input for one of those hard-gated routes.
+
 ## Checkpoint - CM-0827 next runtime gap selection precondition review - 2026-05-23
 
 - Status: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
