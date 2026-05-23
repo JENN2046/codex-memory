@@ -2,11 +2,13 @@
 
 ## CM-0820 Handoff
 
-Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCHED_LOCAL_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH_PUSHED_BRANCH_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
 
 Workspace: `A:\codex-memory`.
 
 Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Remote branch: `refs/heads/codex/true-live-recall-raw-read-boundary = 5a86869d530e035da516b85e31f6f21ae0d6ccd5`; `origin/main` and remote `refs/heads/main` remain `20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
 
 Changed files: `src/core/TrueLiveRecallExecutorAdapter.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/app.js`; `tests/true-live-recall-executor-adapter.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `tests/recall-precision-hardening-bounded.test.js`; `docs/TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
 
@@ -14,9 +16,9 @@ Patch verdict: upstream raw result fields now fail closed before adapter sanitiz
 
 Validation: targeted source/test syntax checks passed; adapter test passed `7/7`; approved app-path test passed `5/5`; internal runner test passed `8/8`; bounded precision pipeline test passed `9/9`. Full docs validation and final commit/push-readiness are still required for final closeout.
 
-Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, push, or readiness claim occurred.
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred. Remote action was limited to pushing this feature branch.
 
-Next safe action: run final `git diff --check`, docs validation, no-overclaim scan, staged review, local commit, and push-readiness. Do not push unless explicitly authorized later.
+Next safe action: open/review the feature branch or prepare a separately exact-approved next proof plan; do not claim `memory recall reliable`.
 
 ## Next Goal Handoff
 

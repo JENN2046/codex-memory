@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0820 remote branch push review - 2026-05-23
+
+- Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH_PUSHED_BRANCH_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Local HEAD: `5a86869d530e035da516b85e31f6f21ae0d6ccd5`.
+- Remote branch: `refs/heads/codex/true-live-recall-raw-read-boundary = 5a86869d530e035da516b85e31f6f21ae0d6ccd5`.
+- Mainline reference unchanged: `origin/main = remote refs/heads/main = 20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+- Worktree was clean after push review.
+- Boundary: branch push only; no true live `search_memory`, true live `record_memory`, raw memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+
 ## Checkpoint - CM-0820 true live recall executor raw-read boundary patch - 2026-05-23
 
 - Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCHED_LOCAL_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
