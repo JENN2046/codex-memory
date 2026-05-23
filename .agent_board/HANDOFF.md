@@ -1,5 +1,73 @@
 # HANDOFF.md - codex-memory
 
+## Next Goal Handoff
+
+Status: next-goal summary recorded; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Goal: keep `RC_NOT_READY_BLOCKED` and avoid readiness / reliability overclaim while moving `codex-memory` from “`memory recall reliable` still bounded evidence only with multiple active runtime/write/governance gaps” toward “narrower blockers, clearer next minimal gates, and `P16 TagMemo / semantic association parity` entering executable backlog.”
+
+Priority shape:
+
+- Continue recall blocker narrowing and produce the next recall closure plan / next minimal gate packet without upgrading current bounded evidence into a reliability claim.
+- Prepare at least two active runtime/write/governance gaps as clearer next minimal gates so operator approval wording, execution boundaries, and acceptance wording become directly reusable.
+- Strengthen `ValidationAggregator` evidence discipline without reporting complete, and move `P16` into fixture-first executable backlog.
+
+Non-goals: do not pursue `RC_READY`; do not execute release/deploy/cutover; do not expand public MCP; do not apply migration/import/export/backup/restore; do not make provider-backed runtime validation the default path.
+
+Next safe action: continue local-safe docs/test/board narrowing for recall and next-minimal-gate preparation. Do not describe CM-0814 as synced-main proof, and do not claim `memory recall reliable`, runtime ready, or RC ready.
+
+## CM-0819 Handoff
+
+Status: `RECALL_RELIABILITY_BOUNDED_REGRESSION_EXPANDED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `tests/recall-precision-hardening-bounded.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `docs/RECALL_RELIABILITY_BOUNDED_REGRESSION_EXPANSION_CLOSEOUT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Closeout verdict: bounded regression coverage is now stronger around malformed precision metadata and malformed approved-path precision context, reducing dependence on one exact-approved live run as the only signal for those boundary classes.
+
+Next safe action: continue with bounded regression expansion or closure wording refinement. Do not overclaim `memory recall reliable`, and do not describe CM-0814 as synced-main proof.
+
+Boundary: no true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. Truth table remains `complete? = no`; `memory recall reliable` remains bounded evidence only; `RC_NOT_READY_BLOCKED` remains.
+
+## CM-0818 Handoff
+
+Status: `RECALL_RELIABILITY_TRACEABILITY_NORMALIZED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `src/core/TrueLiveRecallReadonlyProofRunner.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `docs/RECALL_RELIABILITY_TRACEABILITY_NORMALIZATION_CLOSEOUT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Closeout verdict: the internal true-live recall proof context no longer advertises misleading legacy `CM-0774` approval labeling. It now exposes neutral `approvalReference` traceability with optional narrowed override, while keeping exact approval, exactly-four-query, sanitized output, and zero side-effect boundaries unchanged.
+
+Next safe action: expand bounded recall-quality regression evidence. Do not overclaim `memory recall reliable`, and do not describe CM-0814 as synced-main proof.
+
+Boundary: no true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. Truth table remains `complete? = no`; `memory recall reliable` remains bounded evidence only; `RC_NOT_READY_BLOCKED` remains.
+
+## CM-0817 Handoff
+
+Status: `RECALL_RELIABILITY_NEXT_MINIMAL_GATE_PREPARED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `main`.
+
+Changed files: `docs/RECALL_RELIABILITY_NEXT_MINIMAL_GATE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Planning verdict: the current accepted recall evidence remains one exact-approved post-hardening sanitized live negative-control proof shape plus a narrow blocker downgrade only. The remaining recall blocker is now narrowed to proof-shape narrowness, legacy `CM-0774` traceability drift, CM-0814 clean local-head rather than synced-main execution classification, and a still-thin bounded recall-quality regression surface.
+
+Next safe action: either scope a local-safe traceability normalization patch for the internal proof context labeling, or scope a bounded recall-quality regression expansion slice. Do not overclaim `memory recall reliable` and do not describe CM-0814 as synced-main proof.
+
+Boundary: no true live `search_memory`, true live `record_memory`, raw memory content read, direct `.jsonl` or durable memory content read, provider/model/API call, durable memory/audit write, real rollback apply, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness claim occurred. Truth table remains `complete? = no`; `memory recall reliable` remains bounded evidence only; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-0816 Handoff
 
 Status: `ROUND_3_REMOTE_SYNC_AND_STATE_REFRESH_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
