@@ -291,13 +291,18 @@ class KnowledgeBaseRecallPipeline {
       groups.get(key).push(candidate);
     }
 
+    const memoryIds = [...new Set(candidates.map(candidate => candidate.memoryId).filter(Boolean))];
     const recordMap = new Map();
+    let isolationMap = new Map();
     if (!noRawContentRead) {
-      const memoryIds = [...new Set(candidates.map(candidate => candidate.memoryId).filter(Boolean))];
       throwIfSearchMemoryAborted(signal);
       for (const record of await this.shadowStore.getRecordsByIds(memoryIds)) {
         recordMap.set(record.memoryId, record);
       }
+      throwIfSearchMemoryAborted(signal);
+    } else if (typeof this.shadowStore.getRecordsIsolationMap === 'function') {
+      throwIfSearchMemoryAborted(signal);
+      isolationMap = await this.shadowStore.getRecordsIsolationMap(memoryIds);
       throwIfSearchMemoryAborted(signal);
     }
 
@@ -308,6 +313,12 @@ class KnowledgeBaseRecallPipeline {
         const record = best.memoryId ? recordMap.get(best.memoryId) : null;
         if (record && isRecallIsolated(record)) {
           return null;
+        }
+        if (noRawContentRead && best.memoryId) {
+          const isolationSubject = isolationMap.get(best.memoryId);
+          if (isolationSubject && isRecallIsolated(isolationSubject)) {
+            return null;
+          }
         }
         if (noRawContentRead) {
           return {

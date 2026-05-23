@@ -310,6 +310,41 @@ class SqliteShadowStore {
     ]));
   }
 
+  async getRecordsIsolationMap(memoryIds = []) {
+    await this.ensureReady();
+    const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
+    if (uniqueIds.length === 0) return new Map();
+
+    this.refreshMemoryRecordColumnInfo();
+    const hasStatus = this.hasMemoryRecordColumn('status');
+    const placeholders = uniqueIds.map(() => '?').join(',');
+    const rows = this.db.prepare(`
+      SELECT memory_id, tags_json, project_id, workspace_id, client_id, visibility${hasStatus ? ', status' : ''}
+      FROM memory_records WHERE memory_id IN (${placeholders})
+    `).all(...uniqueIds);
+
+    const result = new Map();
+    for (const row of rows) {
+      let tags = [];
+      try {
+        tags = JSON.parse(row.tags_json || '[]');
+      } catch {
+        tags = [];
+      }
+      result.set(row.memory_id, {
+        memoryId: row.memory_id,
+        tags: Array.isArray(tags) ? tags : [],
+        status: hasStatus ? (row.status || null) : null,
+        lifecycleStatus: hasStatus ? (row.status || null) : null,
+        projectId: row.project_id || null,
+        workspaceId: row.workspace_id || null,
+        clientId: row.client_id || null,
+        visibility: row.visibility || null
+      });
+    }
+    return result;
+  }
+
   async getRecordsLifecycleStatusMap(memoryIds = []) {
     await this.ensureReady();
     const uniqueIds = [...new Set(memoryIds.filter(Boolean))];
