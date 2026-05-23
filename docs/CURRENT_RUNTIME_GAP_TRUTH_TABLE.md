@@ -174,7 +174,7 @@ Execution verdict:
 - Sanitized result counts were NC1=`0`, NC2=`0`, NC3=`0`, and NC4=`0`.
 - `rawContentReturned=false`; no metadata keys were emitted because no results were returned.
 - Complete side-effect counters were zero: provider calls, direct `.jsonl` reads, durable memory writes, durable audit writes, candidate cache writes/flushes, sync calls, vector flushes, embedding cache writes, raw memory content reads, and public MCP expansion all remained `0`.
-- The proof context still reports legacy internal `approvalPacket = CM-0774`; this is existing internal token labeling, not broader execution scope.
+- At CM-0814 execution time, the proof context still reported legacy internal `approvalPacket = CM-0774`; that was execution-time token labeling, not broader execution scope. The internal traceability surface is later normalized locally by CM-0818.
 
 Boundary: this execution did not execute true live `record_memory`, direct `.jsonl` or durable memory content reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 
@@ -213,6 +213,59 @@ Sync verdict:
 - CM-0815 remains the current review conclusion for that evidence.
 
 Boundary: this state refresh did not execute true live `search_memory`, true live `record_memory`, raw memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## Recall Reliability Next Minimal Gate Plan - 2026-05-23
+
+Result: `RECALL_RELIABILITY_NEXT_MINIMAL_GATE_PREPARED_NOT_READY`.
+
+Artifact: `docs/RECALL_RELIABILITY_NEXT_MINIMAL_GATE_PLAN.md`.
+
+Plan verdict:
+
+- CM-0814 plus CM-0815 plus CM-0816 are sufficient to narrow the remaining recall blocker into a more explicit next-gate sequence.
+- The currently accepted live evidence is still one exact-approved sanitized post-hardening negative-control proof shape only.
+- The remaining recall blocker is now treated as four narrower items: proof-shape narrowness, legacy `CM-0774` traceability drift, CM-0814 clean local-head rather than synced-main execution classification, and a still-thin bounded recall-quality regression surface.
+- The next minimal gate sequence is: traceability normalization first, bounded recall-quality regression expansion second, and only then any future separately exact-approved live proof attempt to support a broader reliability argument.
+
+Boundary: this planning step did not execute true live `search_memory`, true live `record_memory`, raw memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## Recall Reliability Traceability Normalization Closeout - 2026-05-23
+
+Result: `RECALL_RELIABILITY_TRACEABILITY_NORMALIZED_NOT_READY`.
+
+Artifact: `docs/RECALL_RELIABILITY_TRACEABILITY_NORMALIZATION_CLOSEOUT.md`.
+
+Closeout verdict:
+
+- The internal proof runner no longer advertises legacy `CM-0774` approval labeling inside its sealed proof context.
+- The proof context now uses `approvalReference`, with neutral default `operator_exact_approval_required`.
+- Future separately exact-approved runs may pass a narrower explicit `approvalReference` without widening approval scope.
+- Exact approval, exactly four ordered queries, sanitized output only, and complete zero side-effect counter boundaries are unchanged.
+- The remaining recall blocker is now treated as three narrower items: proof-shape narrowness, CM-0814 clean local-head rather than synced-main execution classification, and a still-thin bounded recall-quality regression surface.
+
+Boundary: this closeout did not execute true live `search_memory`, true live `record_memory`, raw memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## Recall Reliability Bounded Regression Expansion Closeout - 2026-05-23
+
+Result: `RECALL_RELIABILITY_BOUNDED_REGRESSION_EXPANDED_NOT_READY`.
+
+Artifact: `docs/RECALL_RELIABILITY_BOUNDED_REGRESSION_EXPANSION_CLOSEOUT.md`.
+
+Closeout verdict:
+
+- The bounded recall-quality regression surface now explicitly covers pipeline fail-closed behavior for raw/path-like precision metadata before record read.
+- The bounded recall-quality regression surface now explicitly covers pipeline fail-closed behavior for malformed precision metadata before record read.
+- The approved internal app path now has explicit regression coverage for unsupported precision policy keys failing closed before passive recall search.
+- The approved internal app path now has explicit regression coverage for malformed precision policy values failing closed before passive recall search.
+- This strengthens bounded evidence around precision metadata drift and approved-path context drift without adding a new live proof shape.
+
+Boundary: this closeout did not execute true live `search_memory`, true live `record_memory`, raw memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 

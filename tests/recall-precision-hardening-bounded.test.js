@@ -249,6 +249,62 @@ test('pipeline no-result mode returns zero negative-control results without reco
   assert.equal(sideEffects.auditWrites, 0);
 });
 
+test('pipeline fail-closes on raw or path-like precision metadata before record read', async () => {
+  const negative = candidate('negative-memory', metadata({
+    score: 0.21,
+    baseScore: 0.21,
+    filePath: 'A:\\private\\memory.txt'
+  }));
+  const { pipeline, sideEffects } = createPipeline({ generatedCandidates: [negative] });
+
+  await assert.rejects(
+    () => pipeline.search({
+      query: 'synthetic malformed precision metadata',
+      target: 'process',
+      limit: 3,
+      includeContent: false,
+      readOnly: true,
+      precisionPolicyContext: {
+        enabled: true,
+        queryFamily: 'malformed_precision_metadata'
+      }
+    }),
+    error => error.code === 'RECALL_PRECISION_POLICY_RAW_FIELD'
+  );
+
+  assert.equal(sideEffects.recordReads, 0);
+  assert.equal(sideEffects.syncCalls, 0);
+  assert.equal(sideEffects.auditWrites, 0);
+});
+
+test('pipeline fail-closes on malformed precision metadata arrays before record read', async () => {
+  const negative = candidate('negative-memory', metadata({
+    score: 0.21,
+    baseScore: 0.21,
+    matchedTags: 'not-an-array'
+  }));
+  const { pipeline, sideEffects } = createPipeline({ generatedCandidates: [negative] });
+
+  await assert.rejects(
+    () => pipeline.search({
+      query: 'synthetic malformed matchedTags metadata',
+      target: 'process',
+      limit: 3,
+      includeContent: false,
+      readOnly: true,
+      precisionPolicyContext: {
+        enabled: true,
+        queryFamily: 'malformed_precision_metadata'
+      }
+    }),
+    error => error.code === 'RECALL_PRECISION_POLICY_METADATA_INVALID' && error.field === 'matchedTags'
+  );
+
+  assert.equal(sideEffects.recordReads, 0);
+  assert.equal(sideEffects.syncCalls, 0);
+  assert.equal(sideEffects.auditWrites, 0);
+});
+
 test('sanitized score distribution exposes counts and metadata keys without raw fields', () => {
   const distribution = summarizeScoreDistribution([
     { precision: metadata({ score: 0.018801, baseScore: 0.018801 }) },

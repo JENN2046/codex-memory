@@ -90,3 +90,87 @@ test('public or non-approved search path rejects injected precision policy conte
     );
   });
 });
+
+test('internal runner path rejects unsupported precision policy context keys before passive recall search', async () => {
+  await withApp(async ({ app }) => {
+    let capturedOptions = null;
+    app.services.passiveRecallService.search = async (options) => {
+      capturedOptions = options;
+      return [];
+    };
+
+    await assert.rejects(
+      () => app.callTool('search_memory', {
+        query: 'should fail closed before passive recall',
+        target: 'both',
+        limit: 1,
+        include_content: false
+      }, {
+        noTokenReadOnly: true,
+        executionContext: {
+          requestSource: 'internal-true-live-recall-readonly-proof-runner',
+          precisionPolicyContext: {
+            enabled: true,
+            queryFamily: 'stricter_negative_control',
+            unsupportedKey: true
+          }
+        }
+      }),
+      /unsupported keys: unsupportedKey/
+    );
+
+    assert.equal(capturedOptions, null);
+  });
+});
+
+test('internal runner path rejects malformed precision policy values before passive recall search', async () => {
+  await withApp(async ({ app }) => {
+    let capturedOptions = null;
+    app.services.passiveRecallService.search = async (options) => {
+      capturedOptions = options;
+      return [];
+    };
+
+    await assert.rejects(
+      () => app.callTool('search_memory', {
+        query: 'should reject malformed proofNoResultMode',
+        target: 'both',
+        limit: 1,
+        include_content: false
+      }, {
+        noTokenReadOnly: true,
+        executionContext: {
+          requestSource: 'internal-true-live-recall-readonly-proof-runner',
+          precisionPolicyContext: {
+            enabled: true,
+            queryFamily: 'stricter_negative_control',
+            proofNoResultMode: 'true'
+          }
+        }
+      }),
+      /proofNoResultMode must be boolean/
+    );
+
+    await assert.rejects(
+      () => app.callTool('search_memory', {
+        query: 'should reject malformed minimumScore',
+        target: 'both',
+        limit: 1,
+        include_content: false
+      }, {
+        noTokenReadOnly: true,
+        executionContext: {
+          requestSource: 'internal-true-live-recall-readonly-proof-runner',
+          precisionPolicyContext: {
+            enabled: true,
+            queryFamily: 'stricter_negative_control',
+            minimumScore: -0.1
+          }
+        }
+      }),
+      /minimumScore must be a finite non-negative number/
+    );
+
+    assert.equal(capturedOptions, null);
+  });
+});

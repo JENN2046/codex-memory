@@ -118,6 +118,8 @@ test('internal proof runner seals read-only proof context and emits sanitized ev
 
   assert.equal(calls.length, EXACT_QUERY_COUNT);
   assert.equal(report.queryCount, EXACT_QUERY_COUNT);
+  assert.equal(report.proofContext.approvalReference, 'operator_exact_approval_required');
+  assert.equal(Object.prototype.hasOwnProperty.call(report.proofContext, 'approvalPacket'), false);
   assert.equal(report.proofContext.readOnly, true);
   assert.equal(report.proofContext.noProvider, true);
   assert.equal(report.proofContext.noAudit, true);
@@ -138,6 +140,27 @@ test('internal proof runner seals read-only proof context and emits sanitized ev
   assert.equal(report.perQuery[0].matchedMetadataKeysOnly.includes('snippet'), false);
   assert.equal(report.perQuery[0].matchedMetadataKeysOnly.includes('title'), false);
   assert.match(report.perQuery[0].topResultIdHashOrStableOpaqueId, /^[a-f0-9]{16}$/);
+});
+
+test('internal proof runner allows a narrowed approval reference override without reviving legacy packet labeling', async () => {
+  const runner = new TrueLiveRecallReadonlyProofRunner({
+    async searchExecutor() {
+      return {
+        results: [],
+        sideEffectCounters: createZeroSideEffectCounters()
+      };
+    }
+  });
+
+  const report = await runner.run({
+    approvalLine: EXACT_APPROVAL_LINE,
+    approvalReference: 'CM-0814-exact-approved-live-proof',
+    queries: createQueries(),
+    proofRunId: 'CM-0818-traceability-normalization'
+  });
+
+  assert.equal(report.proofContext.approvalReference, 'CM-0814-exact-approved-live-proof');
+  assert.equal(Object.prototype.hasOwnProperty.call(report.proofContext, 'approvalPacket'), false);
 });
 
 test('internal proof runner requires complete finite zero side-effect counters', async () => {

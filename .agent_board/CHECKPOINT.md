@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0819 recall reliability bounded regression expansion closeout - 2026-05-23
+
+- Status: `RECALL_RELIABILITY_BOUNDED_REGRESSION_EXPANDED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: local test/docs/status/board/truth-table closeout only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `tests/recall-precision-hardening-bounded.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `docs/RECALL_RELIABILITY_BOUNDED_REGRESSION_EXPANSION_CLOSEOUT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Closeout verdict: bounded regression coverage now locks pipeline fail-closed behavior for malformed precision metadata and approved-path fail-closed behavior for malformed internal precision context before downstream recall work runs.
+- Remaining blocker map: proof-shape narrowness, CM-0814 local-head-not-synced-main execution classification, and broader recall reliability still lacking more than one exact-approved live proof shape.
+- Next safe step: continue widening bounded regression and closure wording discipline without overclaiming readiness or reliability.
+
+## Checkpoint - CM-0818 recall reliability traceability normalization closeout - 2026-05-23
+
+- Status: `RECALL_RELIABILITY_TRACEABILITY_NORMALIZED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: local source/test/docs/status/board/truth-table closeout only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `src/core/TrueLiveRecallReadonlyProofRunner.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `docs/RECALL_RELIABILITY_TRACEABILITY_NORMALIZATION_CLOSEOUT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Closeout verdict: the internal proof context no longer advertises legacy `CM-0774` approval labeling; it now uses neutral `approvalReference` with optional narrowed override for future separately exact-approved runs.
+- Remaining blocker map: proof-shape narrowness, CM-0814 local-head-not-synced-main execution classification, and a still-thin bounded recall-quality regression surface.
+- Next safe step: expand bounded recall-quality regression evidence before any future separately exact-approved live proof attempt.
+
+## Checkpoint - CM-0817 recall reliability next minimal gate plan - 2026-05-23
+
+- Status: `RECALL_RELIABILITY_NEXT_MINIMAL_GATE_PREPARED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: recall blocker narrowing docs/status/board/truth-table planning only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, real rollback apply, migration/import/export/backup/restore apply, config change, release/cutover, or readiness transition.
+- Changed files: `docs/RECALL_RELIABILITY_NEXT_MINIMAL_GATE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Planning verdict: the remaining recall blocker is narrowed to proof-shape narrowness, legacy `CM-0774` traceability drift, CM-0814 local-head-not-synced-main execution classification, and a still-thin bounded recall-quality regression surface.
+- Next minimal gate sequence: traceability normalization first, bounded recall-quality regression expansion second, and only then any future separately exact-approved live proof attempt.
+
 ## Checkpoint - CM-0816 round 3 remote sync and state refresh - 2026-05-23
 
 - Status: `ROUND_3_REMOTE_SYNC_AND_STATE_REFRESH_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

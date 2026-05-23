@@ -58,6 +58,11 @@ function normalizeApprovalLine(value) {
   return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
+function normalizeApprovalReference(value) {
+  const normalized = String(value || '').trim();
+  return normalized || 'operator_exact_approval_required';
+}
+
 function assertExactApproval(approvalLine) {
   if (normalizeApprovalLine(approvalLine) !== EXACT_APPROVAL_LINE) {
     throw createProofBoundaryError('exact approval required for true live recall proof runner', {
@@ -256,10 +261,14 @@ function assertNoRawExecutorLeakage(results = []) {
   }
 }
 
-function createSealedProofContext({ baselineCommit = 'unknown', proofRunId = null } = {}) {
+function createSealedProofContext({
+  baselineCommit = 'unknown',
+  proofRunId = null,
+  approvalReference = null
+} = {}) {
   return Object.freeze({
     mode: PROOF_MODE,
-    approvalPacket: 'CM-0774',
+    approvalReference: normalizeApprovalReference(approvalReference),
     exactApprovalRequired: true,
     exactQueryCount: EXACT_QUERY_COUNT,
     readOnly: true,
@@ -292,13 +301,18 @@ class TrueLiveRecallReadonlyProofRunner {
     queries,
     baselineCommit = 'unknown',
     proofRunId = null,
+    approvalReference = null,
     precisionPolicyContextFactory = null,
     target = 'both',
     limit = 5
   } = {}) {
     assertExactApproval(approvalLine);
     const normalizedQueries = normalizeQueries(queries);
-    const proofContext = createSealedProofContext({ baselineCommit, proofRunId });
+    const proofContext = createSealedProofContext({
+      baselineCommit,
+      proofRunId,
+      approvalReference
+    });
     const perQuery = [];
     let decision = RESULT_LABELS.passed;
 
@@ -387,7 +401,7 @@ class TrueLiveRecallReadonlyProofRunner {
       })),
       proofContext: {
         mode: proofContext.mode,
-        approvalPacket: proofContext.approvalPacket,
+        approvalReference: proofContext.approvalReference,
         exactApprovalRequired: proofContext.exactApprovalRequired,
         exactQueryCount: proofContext.exactQueryCount,
         readOnly: proofContext.readOnly,
