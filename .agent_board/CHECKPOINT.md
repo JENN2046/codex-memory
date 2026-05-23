@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0827 next runtime gap selection precondition review - 2026-05-23
+
+- Status: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: precondition review only; no unique next runtime gap selected, no CM-0825 execution, no actual CM-0826 proof evidence review, no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, or readiness transition.
+- Review verdict: CM-0827 actual selection is premature because CM-0825 has not executed and CM-0826 only prepared criteria.
+- Next safe step: obtain separate CM-0825 exact approval before live proof, then run actual CM-0826 evidence review; only then reconsider CM-0827 next runtime gap selection.
+
 ## Checkpoint - CM-0826 recall reliability blocker review criteria - 2026-05-23
 
 - Status: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

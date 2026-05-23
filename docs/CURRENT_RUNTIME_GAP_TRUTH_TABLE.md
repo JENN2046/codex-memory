@@ -109,6 +109,25 @@ Boundary: this review did not merge `main`, create a PR, execute true live `sear
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
+## CM-0827 Next Runtime Gap Selection Precondition Review - 2026-05-23
+
+Result: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_READY`.
+
+Artifact: `docs/CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW.md`.
+
+Precondition verdict:
+
+- Actual `CM-0827 NEXT_RUNTIME_GAP_SELECTION_AFTER_RECALL` is premature.
+- CM-0825 has not executed because separate exact approval is still absent.
+- CM-0826 prepared review criteria only; it did not review actual CM-0825 proof evidence.
+- The recall blocker has not been further downgraded after CM-0826.
+- Candidate gaps remain `memory write reliable`, `ValidationAggregator full implementation`, `real rollback apply`, and `migration/import/export/backup apply`, but no unique next gap is selected in this review.
+- Future selection may resume only after a future CM-0825 proof exists and CM-0826 performs an actual evidence review.
+
+Boundary: this precondition review did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, push, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## CM-0826 Recall Reliability Blocker Review Criteria - 2026-05-23
 
 Result: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`.
