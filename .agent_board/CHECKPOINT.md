@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0826 recall reliability blocker review criteria - 2026-05-23
+
+- Status: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: criteria preparation only; no CM-0825 proof evidence reviewed, no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Criteria verdict: future CM-0826 review requires CM-0825 execution evidence and can only decide blocked/no-proof, approval drift, query drift, boundary failure, expected-result failure, negative-control failure, or narrow blocker downgrade not-ready.
+- Next safe step: CM-0825 still requires separate exact approval; CM-0827 remains premature until CM-0825 evidence exists and CM-0826 reviews it.
+
 ## Checkpoint - CM-0825 patched true live recall proof pre-execution recheck - 2026-05-23
 
 - Status: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

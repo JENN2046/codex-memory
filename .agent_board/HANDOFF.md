@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0826 Handoff
+
+Status: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Criteria verdict: future CM-0826 review criteria are fixed, but no actual CM-0825 evidence was reviewed because CM-0825 has not executed. Any future blocker downgrade is narrow and not a reliability/readiness claim.
+
+Next safe action: wait for the exact CM-0825 approval line before executing live proof. Without CM-0825 evidence, CM-0827 next runtime gap selection is premature.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
 ## CM-0825 Handoff
 
 Status: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

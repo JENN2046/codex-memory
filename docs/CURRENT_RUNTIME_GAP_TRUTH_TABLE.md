@@ -109,6 +109,25 @@ Boundary: this review did not merge `main`, create a PR, execute true live `sear
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
+## CM-0826 Recall Reliability Blocker Review Criteria - 2026-05-23
+
+Result: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`.
+
+Artifact: `docs/CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA.md`.
+
+Criteria verdict:
+
+- CM-0826 criteria are prepared for a future review of CM-0825 evidence.
+- This slice does not review CM-0825 evidence because CM-0825 has not executed.
+- Future review requires exact approval evidence, exact query count and text, patched metadata-only path evidence, sanitized output, complete zero side-effect counters, no raw output, no direct `.jsonl`, no provider/API, no durable memory/audit write, and no readiness/reliability claim.
+- Future decisions are constrained to blocked/no-proof, approval drift, query drift, boundary failed, expected-result failure, negative-control failure, or narrow blocker-downgraded not-ready.
+- Any future downgrade can only narrow the CM-0825 patched proof-shape ambiguity around no-raw-content-read semantics; it cannot claim broad `memory recall reliable`, runtime readiness, RC readiness, production readiness, release readiness, cutover readiness, V8 implementation, or VCP full parity.
+- CM-0827 next runtime gap selection remains premature unless future CM-0825 evidence exists and CM-0826 separately reviews it.
+
+Boundary: this criteria packet did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## CM-0825 Patched True Live Recall Proof Pre-Execution Recheck - 2026-05-23
 
 Result: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`.
