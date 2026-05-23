@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0823 patched metadata-only proof path review - 2026-05-23
+
+- Status: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Local review head: `8e8155a7449218c3dd1ccffab8a1db55cc39d7b0`.
+- Scope: local source/test read-only review plus docs/status/board/truth-table update; no merge, PR creation, push, true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness transition.
+- Review verdict: runner -> adapter -> app -> pipeline `noRawContentRead=true` is now an end-to-end metadata-only proof path for future approval-packet drafting, not an isolated adapter flag.
+- Validation: runner `8/8`, adapter `7/7`, approved app path `5/5`, and bounded pipeline `9/9` passed.
+- Next safe step: CM-0824 exact approval packet drafting; any live proof remains separately exact-approved and must use the patched metadata-only path.
+
 ## Checkpoint - CM-0821 feature branch review and mainline integration plan - 2026-05-23
 
 - Status: `CM0821_FEATURE_BRANCH_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

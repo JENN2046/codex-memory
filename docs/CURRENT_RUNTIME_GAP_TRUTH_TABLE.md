@@ -109,6 +109,26 @@ Boundary: this review did not merge `main`, create a PR, execute true live `sear
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
+## CM-0823 Patched Metadata-Only Proof Path Review - 2026-05-23
+
+Result: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`.
+
+Artifact: `docs/CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW.md`.
+
+Review verdict:
+
+- Reviewed path: `TrueLiveRecallReadonlyProofRunner -> TrueLiveRecallExecutorAdapter -> search_memory approved app path -> KnowledgeBaseRecallPipeline`.
+- The path is sufficient for CM-0824 approval-packet drafting, not for reliability or readiness claims.
+- Runner evidence keeps sealed `readOnly/noProvider/noAudit/sanitizedOutput/includeContent=false` proof context.
+- Adapter evidence confirms `include_content=false`, `noTokenReadOnly=true`, approved `requestSource`, and `noRawContentRead=true` are forwarded to the app path.
+- App evidence confirms public or non-approved `noRawContentRead` injection fails closed before passive recall search.
+- Pipeline evidence confirms `noRawContentRead=true` requires read-only metadata-only execution, skips `shadowStore.getRecordsByIds`, emits no raw-derived `content` / `text` / `title` / `snippet` / `sourceFile`, and leaves record reads, sync, and audit writes at `0` in targeted fixture coverage.
+- Targeted validation passed: internal runner `8/8`, executor adapter `7/7`, approved app path `5/5`, and bounded pipeline `9/9`.
+
+Boundary: this review did not merge `main`, create a PR, execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## Recall Precision Hardening Bounded Implementation - 2026-05-23
 
 Result: `RECALL_PRECISION_HARDENING_BOUNDED_IMPLEMENTED_SYNCED_NOT_READY`.

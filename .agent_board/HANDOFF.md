@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0823 Handoff
+
+Status: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Local review head: `8e8155a7449218c3dd1ccffab8a1db55cc39d7b0`; remote feature branch remains `f9e7e13fbccbd46b6483863d4b966d653d5f755b`; `origin/main` and remote `refs/heads/main` remain `20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+
+Changed files: `docs/CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: the patched metadata-only path from runner to adapter to approved app path to pipeline is coherent enough for CM-0824 approval-packet drafting. This is not true live proof, not synced-main proof, not `memory recall reliable`, and not readiness.
+
+Validation: targeted syntax checks passed for runner, adapter, app, pipeline, and related tests. Targeted tests passed runner `8/8`, adapter `7/7`, approved app path `5/5`, and bounded pipeline `9/9`.
+
+Next safe action: draft CM-0824 exact approval packet. Do not execute true live proof unless a future message gives separate exact approval.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
 ## CM-0821 Handoff
 
 Status: `CM0821_FEATURE_BRANCH_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
