@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-0821 Handoff
+
+Status: `CM0821_FEATURE_BRANCH_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Reviewed branch head: `f9e7e13fbccbd46b6483863d4b966d653d5f755b`; `origin/main` and remote `refs/heads/main` remain `20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+
+Changed files: `docs/CM0821_FEATURE_BRANCH_REVIEW_AND_MAINLINE_INTEGRATION_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: no blocking finding was found in the CM-0820 branch changed scope. The feature branch is PR-ready / explicit mainline integration candidate, but this review does not merge mainline, create a PR, execute a true live proof, or claim `memory recall reliable`.
+
+Validation: branch changed-scope review, `git diff --check`, docs validation, and no-overclaim scan completed for CM-0821.
+
+Next safe action: if mainline integration is separately approved and completed, run CM-0822 post-CM0820 mainline reconciliation; otherwise run CM-0823 patched metadata-only proof path review before preparing any new proof packet.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
 ## CM-0820 Handoff
 
 Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH_PUSHED_BRANCH_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
@@ -8,7 +28,7 @@ Workspace: `A:\codex-memory`.
 
 Branch: `codex/true-live-recall-raw-read-boundary`.
 
-Remote branch: `refs/heads/codex/true-live-recall-raw-read-boundary = 5a86869d530e035da516b85e31f6f21ae0d6ccd5`; `origin/main` and remote `refs/heads/main` remain `20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+Remote branch: `refs/heads/codex/true-live-recall-raw-read-boundary = f9e7e13fbccbd46b6483863d4b966d653d5f755b`; `origin/main` and remote `refs/heads/main` remain `20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
 
 Changed files: `src/core/TrueLiveRecallExecutorAdapter.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/app.js`; `tests/true-live-recall-executor-adapter.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `tests/recall-precision-hardening-bounded.test.js`; `docs/TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
 

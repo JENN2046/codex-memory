@@ -1,11 +1,21 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0821 feature branch review and mainline integration plan - 2026-05-23
+
+- Status: `CM0821_FEATURE_BRANCH_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Reviewed branch head: `f9e7e13fbccbd46b6483863d4b966d653d5f755b`.
+- Mainline reference unchanged: `origin/main = remote refs/heads/main = 20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+- Scope: docs/status/board/truth-table review only; no merge, PR creation, push, true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness transition.
+- Review verdict: no blocking finding was found in the changed scope; the branch is PR-ready / explicit mainline integration candidate, but it is not live proof and not reliability evidence by itself.
+- Next safe step: if integration is separately approved and completed, run CM-0822 post-CM0820 mainline reconciliation; otherwise continue with CM-0823 patched metadata-only proof path review.
+
 ## Checkpoint - CM-0820 remote branch push review - 2026-05-23
 
 - Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH_PUSHED_BRANCH_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
 - Branch: `codex/true-live-recall-raw-read-boundary`.
-- Local HEAD: `5a86869d530e035da516b85e31f6f21ae0d6ccd5`.
-- Remote branch: `refs/heads/codex/true-live-recall-raw-read-boundary = 5a86869d530e035da516b85e31f6f21ae0d6ccd5`.
+- Local HEAD: `f9e7e13fbccbd46b6483863d4b966d653d5f755b`.
+- Remote branch: `refs/heads/codex/true-live-recall-raw-read-boundary = f9e7e13fbccbd46b6483863d4b966d653d5f755b`.
 - Mainline reference unchanged: `origin/main = remote refs/heads/main = 20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
 - Worktree was clean after push review.
 - Boundary: branch push only; no true live `search_memory`, true live `record_memory`, raw memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
