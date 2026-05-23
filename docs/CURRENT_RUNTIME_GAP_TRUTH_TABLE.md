@@ -50,7 +50,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
-| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0782 executor adapter implementation, CM-0783 executor adapter review, CM-0784 execution authorization review, CM-0800 exact approval recheck, CM-0801 true live proof execution, CM-0802 proof review, CM-0803 second negative-control proof plan, CM-0804 second negative-control exact approval recheck, CM-0805 second negative-control proof execution, CM-0806 second negative-control failure review, CM-0807 recall precision hardening plan, CM-0808 hardening plan review, CM-0809 bounded hardening implementation, CM-0810 bounded hardening review, CM-0811 live proof recheck, CM-0812 execution-path pass-through closeout, CM-0813 post-hardening exact-approval recheck, CM-0814 post-hardening live negative-control proof execution, CM-0815 post-hardening live negative-control proof review, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner/authorization/execution/review/plan/recheck/fixture implementation evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan; CM-0782 implements an internal-only adapter with synthetic tests `5/5` plus runner regression `6/6`, complete counters, fail-closed instrumentation, and runner-safe result projection; CM-0783 accepts the adapter for Day 4 execution authorization review; CM-0784 defines the exact approval line, exactly four literal queries, sanitized output shape, and execution preconditions; CM-0801 executes exactly four true live real-store recall queries with sanitized output and complete zero side-effect counters; CM-0802 accepts Q1/Q2/Q3 as expected-recall signals at sanitized evidence level but classifies Q4 negative-control returning `2` sanitized results as a medium-risk negative-control criteria / query-design / recall-precision gap; CM-0803 defines the next separately exact-approved stricter negative-control plan with exactly four negative-control slots and expected zero results; CM-0804 confirms that plan is ready for future exact approval only; CM-0805 executes the stricter negative-control proof and fails the zero-result criteria with NC1=3, NC2=2, NC3=3, NC4=2 sanitized results despite complete zero side-effect counters; CM-0806 classifies that failure as a recall precision / negative-control suppression blocker requiring hardening before any third live query; CM-0807 defines the planning-only hardening path for thresholding, negative-control gating, score distribution review, no-result mode, stricter filters, and exact reject policy; CM-0808 reviews that plan and selects bounded implementation/tests as the next safe step; CM-0809 implements an internal optional precision policy and targeted bounded tests, default disabled, with no live proof; CM-0810 accepts CM-0809 as sufficient to enter a future exact approval recheck, not live proof execution or reliability; CM-0811 confirms the post-hardening path is ready to wait for a future exact approval gate, not execution; CM-0812 closes the internal precision-policy pass-through from runner to adapter to app to passive recall to the bounded precision policy path without widening the public contract; CM-0813 confirms that the post-hardening path is now execution-ready for a future separately exact-approved CM-0814 proof, but still not execution-approved and not reliable evidence by itself; CM-0814 executes exactly four post-hardening stricter negative-control queries with `precisionPolicyContext.enabled=true`, `proofNoResultMode=true`, sanitized output only, and complete zero side-effect counters, returning NC1=0, NC2=0, NC3=0, and NC4=0 on clean local `main` head `17500cf...`; CM-0815 accepts that fresh evidence as sufficient to downgrade the prior exact negative-control suppression blocker for this narrow proof shape, while still preserving bounded-evidence-only classification, `complete? = no`, and `RC_NOT_READY_BLOCKED`. | no | Do not infer `memory recall reliable`, RC readiness, release readiness, or `complete? = yes` from CM-0801 through CM-0815. The exact post-hardening NC1-NC4 blocker is downgraded, but broader recall reliability remains unproven and any next scope must treat CM-0814 as clean local-head bounded evidence, not synced-main proof. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0782 executor adapter implementation, CM-0783 executor adapter review, CM-0784 execution authorization review, CM-0800 exact approval recheck, CM-0801 true live proof execution, CM-0802 proof review, CM-0803 second negative-control proof plan, CM-0804 second negative-control exact approval recheck, CM-0805 second negative-control proof execution, CM-0806 second negative-control failure review, CM-0807 recall precision hardening plan, CM-0808 hardening plan review, CM-0809 bounded hardening implementation, CM-0810 bounded hardening review, CM-0811 live proof recheck, CM-0812 execution-path pass-through closeout, CM-0813 post-hardening exact-approval recheck, CM-0814 post-hardening live negative-control proof execution, CM-0815 post-hardening live negative-control proof review, CM-0819 bounded regression expansion, CM-0820 raw-read boundary patch, CM-0821 feature-branch review, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner/authorization/execution/review/plan/recheck/fixture/local-patch/review evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan; CM-0782 implements an internal-only adapter with synthetic tests `5/5` plus runner regression `6/6`, complete counters, fail-closed instrumentation, and runner-safe result projection; CM-0783 accepts the adapter for Day 4 execution authorization review; CM-0784 defines the exact approval line, exactly four literal queries, sanitized output shape, and execution preconditions; CM-0801 executes exactly four true live real-store recall queries with sanitized output and complete zero side-effect counters; CM-0802 accepts Q1/Q2/Q3 as expected-recall signals at sanitized evidence level but classifies Q4 negative-control returning `2` sanitized results as a medium-risk negative-control criteria / query-design / recall-precision gap; CM-0803 defines the next separately exact-approved stricter negative-control plan with exactly four negative-control slots and expected zero results; CM-0804 confirms that plan is ready for future exact approval only; CM-0805 executes the stricter negative-control proof and fails the zero-result criteria with NC1=3, NC2=2, NC3=3, NC4=2 sanitized results despite complete zero side-effect counters; CM-0806 classifies that failure as a recall precision / negative-control suppression blocker requiring hardening before any third live query; CM-0807 defines the planning-only hardening path for thresholding, negative-control gating, score distribution review, no-result mode, stricter filters, and exact reject policy; CM-0808 reviews that plan and selects bounded implementation/tests as the next safe step; CM-0809 implements an internal optional precision policy and targeted bounded tests, default disabled, with no live proof; CM-0810 accepts CM-0809 as sufficient to enter a future exact approval recheck, not live proof execution or reliability; CM-0811 confirms the post-hardening path is ready to wait for a future exact approval gate, not execution; CM-0812 closes the internal precision-policy pass-through from runner to adapter to app to passive recall to the bounded precision policy path without widening the public contract; CM-0813 confirms that the post-hardening path is now execution-ready for a future separately exact-approved CM-0814 proof, but still not execution-approved and not reliable evidence by itself; CM-0814 executes exactly four post-hardening stricter negative-control queries with `precisionPolicyContext.enabled=true`, `proofNoResultMode=true`, sanitized output only, and complete zero side-effect counters, returning NC1=0, NC2=0, NC3=0, and NC4=0 on clean local `main` head `17500cf...`; CM-0815 accepts that fresh evidence as sufficient to downgrade the prior exact negative-control suppression blocker for this narrow proof shape, while still preserving bounded-evidence-only classification, `complete? = no`, and `RC_NOT_READY_BLOCKED`; CM-0819 expands bounded regression coverage for malformed precision metadata and approved-path context; CM-0820 patches the executor raw-read boundary so upstream raw fields fail closed before sanitization and future proofs can use a metadata-only `noRawContentRead=true` path; CM-0821 reviews feature branch `f9e7e13` as PR-ready / explicit mainline integration candidate while preserving no-reliability and no-readiness boundaries. | no | Do not infer `memory recall reliable`, RC readiness, release readiness, or `complete? = yes` from CM-0801 through CM-0821. Treat CM-0801/CM-0814 `rawMemoryContentReads=0` as pre-patch sanitized-output boundary evidence; future proof must use the CM-0820 metadata-only path before that counter can support stronger no-raw-content-read evidence. The exact post-hardening NC1-NC4 blocker is downgraded, but broader recall reliability remains unproven and any next scope must treat CM-0814 as clean local-head bounded evidence, not synced-main proof. |
 | memory write reliable | exact approval required | CM-0737 / CM-0763 / CM-0785 prove only separately exact-approved write-path evidence: one rejected `record_memory` attempt, one preflight repair / exact-only approval packet surface, one accepted repaired `record_memory` attempt with `memory_writes=1`, and no-token mutation rejection as bounded boundary evidence. CM-0786 plans the next safe proof surface only; it does not execute or approve a write. | no | Any further write proof requires a separate exact approval; default unattended write reliability, broad `record_memory` reliability, production behavior, rollback cleanup, and long-run durability remain unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 and CM-0787 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. Current inventory is 15 explicit-input collector units; source/tests still keep `validationAggregatorFullImplementation=false` and `fullImplementationComplete=false`. | no | Do not count collectors as maturity; close only after automatic runtime evidence ingestion, current-head freshness/baseline binding, approved RC precheck evidence capture, final RC matrix integration, live evidence handoff, stale-evidence invalidation, and exact-approved durable/write/runtime evidence are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. | no | Future full governance runtime loop requires separately exact-approved bounded scope. |
@@ -68,6 +68,182 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 Day 7 boundary: this classification did not execute true live `record_memory`, true live `search_memory`, provider/model/API calls, real memory broad scans, real memory content reads, `.jsonl` or durable memory content reads, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/lockfile changes, config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
 
 Controlling state remains `RC_NOT_READY_BLOCKED`.
+
+## True Live Recall Executor Raw Read Boundary Patch - 2026-05-23
+
+Result: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCHED_LOCAL_NOT_READY`.
+
+Artifact: `docs/TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH.md`.
+
+Patch verdict:
+
+- CM-0820 patches `src/core/TrueLiveRecallExecutorAdapter.js`, `src/recall/KnowledgeBaseRecallPipeline.js`, `src/app.js`, and targeted tests.
+- The executor adapter now fails closed if upstream `search_memory` results contain raw `content`, `text`, `title`, `snippet`, `rawText`, `sourceFile`, `jsonlLine`, or path-like fields before sanitization.
+- The approved internal runner path now carries `executionContext.noRawContentRead=true`.
+- `src/app.js` accepts `noRawContentRead` only for the approved internal runner path with `noTokenReadOnly=true`; public/non-approved injection fails closed before passive recall search.
+- `KnowledgeBaseRecallPipeline` now supports metadata-only aggregation under `noRawContentRead=true`, skips `shadowStore.getRecordsByIds`, avoids `record.rawText` / `record.content`, and omits raw-derived `title`, `sourceFile`, `snippet`, `text`, and `content`.
+- CM-0801 and CM-0814 `rawMemoryContentReads=0` wording should be interpreted as pre-patch sanitized-output boundary evidence, not as fully verified no-raw-content-read proof.
+- Future exact-approved true live proof must use this patched metadata-only path before `rawMemoryContentReads=0` can support stronger no-raw-content-read evidence.
+
+Boundary: this patch did not execute true live `search_memory`, true live `record_memory`, raw memory content reads, `.jsonl` audit/durable memory reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, real rollback apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, force push, branch rewrite, or readiness claims.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0821 Feature Branch Review And Mainline Integration Plan - 2026-05-23
+
+Result: `CM0821_FEATURE_BRANCH_REVIEW_READY_NOT_RELIABLE_NOT_READY`.
+
+Artifact: `docs/CM0821_FEATURE_BRANCH_REVIEW_AND_MAINLINE_INTEGRATION_PLAN.md`.
+
+Review verdict:
+
+- Reviewed branch: `codex/true-live-recall-raw-read-boundary`.
+- Reviewed branch head: `f9e7e13fbccbd46b6483863d4b966d653d5f755b`.
+- Mainline baseline remains `origin/main = remote refs/heads/main = 20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+- No blocking finding was found in the changed scope.
+- The branch is PR-ready / explicit mainline integration review-ready, but not automatically merged.
+- The branch remains a boundary patch and branch review, not true live proof replay.
+- CM-0801 / CM-0814 `rawMemoryContentReads=0` remains pre-patch sanitized-output boundary evidence until a future exact-approved proof uses the CM-0820 metadata-only path.
+
+Boundary: this review did not merge `main`, create a PR, execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0829 Phase F.1 Recall Requalification Completion Audit - 2026-05-23
+
+Result: `CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT_PARTIAL_HARD_GATES_REMAIN_NOT_READY`.
+
+Artifact: `docs/CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT.md`.
+
+Audit verdict:
+
+- Phase F.1 is partially complete, not fully complete.
+- Formal feature-branch review, patched metadata-only path review, future proof packet, future review criteria, premature-selection review, and unblock packet are complete.
+- `CM-0820` is not integrated into `main`, so `CM-0822` cannot run.
+- `CM-0825` has not executed because exact approval is absent.
+- Actual `CM-0826` evidence review cannot run without CM-0825 evidence.
+- Actual `CM-0827` next runtime gap selection cannot run without actual CM-0826 evidence review.
+- The only material next moves are explicit mainline integration authorization or exact CM-0825 approval.
+
+Boundary: this audit did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, push, PR, merge, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0828 Phase F.1 Recall Requalification Unblock Packet - 2026-05-23
+
+Result: `CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET_READY_NOT_APPROVED_NOT_READY`.
+
+Artifact: `docs/CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET.md`.
+
+Unblock verdict:
+
+- Phase F.1 still has two hard-gated routes.
+- Mainline integration route requires separate explicit remote / PR / merge authorization before any CM-0822 reconciliation.
+- Proof execution route requires the separate exact CM-0825 approval line defined by CM-0824 before any true live proof.
+- Actual CM-0826 evidence review remains waiting on CM-0825 proof evidence.
+- Actual CM-0827 next runtime gap selection remains waiting on CM-0826 actual evidence review.
+- This packet is not approval, not execution, not mainline reconciliation, not true live proof, and not blocker downgrade.
+
+Boundary: this packet did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, push, PR, merge, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0827 Next Runtime Gap Selection Precondition Review - 2026-05-23
+
+Result: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_READY`.
+
+Artifact: `docs/CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW.md`.
+
+Precondition verdict:
+
+- Actual `CM-0827 NEXT_RUNTIME_GAP_SELECTION_AFTER_RECALL` is premature.
+- CM-0825 has not executed because separate exact approval is still absent.
+- CM-0826 prepared review criteria only; it did not review actual CM-0825 proof evidence.
+- The recall blocker has not been further downgraded after CM-0826.
+- Candidate gaps remain `memory write reliable`, `ValidationAggregator full implementation`, `real rollback apply`, and `migration/import/export/backup apply`, but no unique next gap is selected in this review.
+- Future selection may resume only after a future CM-0825 proof exists and CM-0826 performs an actual evidence review.
+
+Boundary: this precondition review did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, push, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0826 Recall Reliability Blocker Review Criteria - 2026-05-23
+
+Result: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`.
+
+Artifact: `docs/CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA.md`.
+
+Criteria verdict:
+
+- CM-0826 criteria are prepared for a future review of CM-0825 evidence.
+- This slice does not review CM-0825 evidence because CM-0825 has not executed.
+- Future review requires exact approval evidence, exact query count and text, patched metadata-only path evidence, sanitized output, complete zero side-effect counters, no raw output, no direct `.jsonl`, no provider/API, no durable memory/audit write, and no readiness/reliability claim.
+- Future decisions are constrained to blocked/no-proof, approval drift, query drift, boundary failed, expected-result failure, negative-control failure, or narrow blocker-downgraded not-ready.
+- Any future downgrade can only narrow the CM-0825 patched proof-shape ambiguity around no-raw-content-read semantics; it cannot claim broad `memory recall reliable`, runtime readiness, RC readiness, production readiness, release readiness, cutover readiness, V8 implementation, or VCP full parity.
+- CM-0827 next runtime gap selection remains premature unless future CM-0825 evidence exists and CM-0826 separately reviews it.
+
+Boundary: this criteria packet did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0825 Patched True Live Recall Proof Pre-Execution Recheck - 2026-05-23
+
+Result: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`.
+
+Artifact: `docs/CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PRE_EXECUTION_RECHECK.md`.
+
+Recheck verdict:
+
+- CM-0824 approval packet exists and defines the future CM-0825 execution standard.
+- CM-0824 is not execution approval by itself.
+- The current instruction stream does not contain the exact approval line required by CM-0824.
+- CM-0825 therefore must not execute in this slice.
+- Future execution still requires a fresh preflight, exactly four fixed queries, the CM-0820 patched metadata-only `noRawContentRead=true` path, sanitized output only, complete zero side-effect counters, no raw memory output, no direct `.jsonl` read, no provider/API, no durable memory/audit write, and no readiness/reliability claim.
+- CM-0826 review remains required after any future exact-approved CM-0825 execution before any blocker downgrade.
+
+Boundary: this recheck did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0824 True Live Recall Patched Proof Approval Packet - 2026-05-23
+
+Result: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`.
+
+Artifact: `docs/CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET.md`.
+
+Packet verdict:
+
+- CM-0824 defines the future CM-0825 execution standard only; it is not execution approval and does not execute true live `search_memory`.
+- Future CM-0825 requires a separate exact approval line naming `CM0825_EXACT_APPROVED_PATCHED_TRUE_LIVE_RECALL_PROOF_ONCE`.
+- Future execution must use `TrueLiveRecallReadonlyProofRunner -> TrueLiveRecallExecutorAdapter -> approved search_memory app path -> KnowledgeBaseRecallPipeline`.
+- Future execution must pass `noRawContentRead=true` through the approved internal path and use metadata-only aggregation.
+- Exact query count is `4`, with fixed ordered query texts: three positive metadata-only recall slots and one stricter negative-control slot.
+- Future output must be sanitized only, with complete zero side-effect counters and no raw memory output, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, tag/release/deploy/cutover, or readiness/reliability claim.
+- Even a future passed CM-0825 proof would still require CM-0826 review before any blocker downgrade.
+
+Boundary: this packet did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-0823 Patched Metadata-Only Proof Path Review - 2026-05-23
+
+Result: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`.
+
+Artifact: `docs/CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW.md`.
+
+Review verdict:
+
+- Reviewed path: `TrueLiveRecallReadonlyProofRunner -> TrueLiveRecallExecutorAdapter -> search_memory approved app path -> KnowledgeBaseRecallPipeline`.
+- The path is sufficient for CM-0824 approval-packet drafting, not for reliability or readiness claims.
+- Runner evidence keeps sealed `readOnly/noProvider/noAudit/sanitizedOutput/includeContent=false` proof context.
+- Adapter evidence confirms `include_content=false`, `noTokenReadOnly=true`, approved `requestSource`, and `noRawContentRead=true` are forwarded to the app path.
+- App evidence confirms public or non-approved `noRawContentRead` injection fails closed before passive recall search.
+- Pipeline evidence confirms `noRawContentRead=true` requires read-only metadata-only execution, skips `shadowStore.getRecordsByIds`, emits no raw-derived `content` / `text` / `title` / `snippet` / `sourceFile`, and leaves record reads, sync, and audit writes at `0` in targeted fixture coverage.
+- Targeted validation passed: internal runner `8/8`, executor adapter `7/7`, approved app path `5/5`, and bounded pipeline `9/9`.
+
+Boundary: this review did not merge `main`, create a PR, execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
 ## Recall Precision Hardening Bounded Implementation - 2026-05-23
 

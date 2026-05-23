@@ -2,6 +2,43 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 
+const RECORD_ISOLATION_HINT_FAMILIES = Object.freeze([
+  'governance_records',
+  'validation_transcripts',
+  'redaction_samples',
+  'policy_decisions',
+  'readiness_reports',
+  'migration_metadata',
+  'blocked_memory',
+  'tombstoned_memory',
+  'out_of_scope_memory'
+]);
+const RECORD_ISOLATION_HEADER_PATTERN = /(?:^|\n)\s*(?:isolation-family|isolation_family|record-family|record_family|classification-family|classification_family|recall-classification|recall_classification)\s*:\s*([a-z0-9_-]+)/gi;
+
+function normalizeIsolationFamily(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function deriveIsolationFamilyHints(...fields) {
+  const text = fields
+    .map(value => String(value || '').trim().toLowerCase())
+    .filter(Boolean)
+    .join('\n');
+  const families = new Set();
+  let match;
+  while ((match = RECORD_ISOLATION_HEADER_PATTERN.exec(text)) !== null) {
+    const family = normalizeIsolationFamily(match[1]);
+    if (RECORD_ISOLATION_HINT_FAMILIES.includes(family)) {
+      families.add(family);
+    }
+  }
+  return [...families].join('|');
+}
+
 class SqliteShadowStore {
   constructor(config) {
     this.config = config;
@@ -13,6 +50,8 @@ class SqliteShadowStore {
     if (this.db) return;
     await fs.mkdir(path.dirname(this.config.dbPath), { recursive: true });
     this.db = new DatabaseSync(this.config.dbPath);
+    this.db.function('codex_memory_isolation_family_hints', { deterministic: true }, (title, content, evidence, tagsJson) =>
+      deriveIsolationFamilyHints(title, content, evidence, tagsJson));
     this.db.exec(`
       PRAGMA foreign_keys = ON;
       PRAGMA journal_mode = WAL;
@@ -308,6 +347,48 @@ class SqliteShadowStore {
         visibility: row.visibility || null
       }
     ]));
+  }
+
+  async getRecordsIsolationMap(memoryIds = []) {
+    await this.ensureReady();
+    const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
+    if (uniqueIds.length === 0) return new Map();
+
+    this.refreshMemoryRecordColumnInfo();
+    const hasStatus = this.hasMemoryRecordColumn('status');
+    const placeholders = uniqueIds.map(() => '?').join(',');
+    const rows = this.db.prepare(`
+      SELECT memory_id, tags_json, project_id, workspace_id, client_id, visibility${hasStatus ? ', status' : ''},
+        codex_memory_isolation_family_hints(title, content, evidence, tags_json) AS isolation_family_hints
+      FROM memory_records WHERE memory_id IN (${placeholders})
+    `).all(...uniqueIds);
+
+    const result = new Map();
+    for (const row of rows) {
+      let tags = [];
+      try {
+        tags = JSON.parse(row.tags_json || '[]');
+      } catch {
+        tags = [];
+      }
+      const textDerivedFamilies = String(row.isolation_family_hints || '')
+        .split('|')
+        .map(value => value.trim())
+        .filter(Boolean);
+      const isolationTags = textDerivedFamilies.map(family => `isolation:${family}`);
+      result.set(row.memory_id, {
+        memoryId: row.memory_id,
+        tags: [...new Set([...(Array.isArray(tags) ? tags : []), ...isolationTags])],
+        isolationFamily: textDerivedFamilies[0] || null,
+        status: hasStatus ? (row.status || null) : null,
+        lifecycleStatus: hasStatus ? (row.status || null) : null,
+        projectId: row.project_id || null,
+        workspaceId: row.workspace_id || null,
+        clientId: row.client_id || null,
+        visibility: row.visibility || null
+      });
+    }
+    return result;
   }
 
   async getRecordsLifecycleStatusMap(memoryIds = []) {

@@ -1,5 +1,161 @@
 # HANDOFF.md - codex-memory
 
+## CM-0829 Handoff
+
+Status: `CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT_PARTIAL_HARD_GATES_REMAIN_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Audit verdict: Phase F.1 is partially complete. CM-0820 feature-branch review, CM-0823 metadata-only path review, CM-0824 packet, CM-0826 criteria, CM-0827 precondition review, and CM-0828 unblock packet exist. Phase F.1 is not fully complete because CM-0820 is not integrated into `main`, CM-0825 has not executed, actual CM-0826 cannot review proof evidence, and actual CM-0827 cannot select a next gap.
+
+Next safe action: wait for explicit operator input for either mainline integration or CM-0825 exact proof execution. Do not infer approval from this audit.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, push/PR/merge, release/cutover, tag, or readiness claim occurred.
+
+## CM-0828 Handoff
+
+Status: `CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET_READY_NOT_APPROVED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Packet verdict: Phase F.1 now has a clear non-executing unblock map. Mainline integration route requires explicit remote / PR / merge authorization before CM-0822. Proof execution route requires the CM-0824 exact CM-0825 approval line before any live proof. Actual CM-0826 and CM-0827 remain downstream of proof evidence.
+
+Next safe action: wait for explicit operator input for either mainline integration or CM-0825 exact proof execution. Do not infer approval from this packet.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, push/PR/merge, release/cutover, tag, or readiness claim occurred.
+
+## CM-0827 Handoff
+
+Status: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: actual `CM-0827 NEXT_RUNTIME_GAP_SELECTION_AFTER_RECALL` is premature. CM-0825 has not executed, and CM-0826 prepared criteria only rather than reviewing proof evidence, so the recall blocker has not been further downgraded.
+
+Next safe action: CM-0825 requires the separate exact approval line from CM-0824 before any live proof. After future CM-0825 evidence exists, run actual CM-0826 evidence review before selecting the next runtime gap.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, or readiness claim occurred.
+
+## CM-0826 Handoff
+
+Status: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Criteria verdict: future CM-0826 review criteria are fixed, but no actual CM-0825 evidence was reviewed because CM-0825 has not executed. Any future blocker downgrade is narrow and not a reliability/readiness claim.
+
+Next safe action: wait for the exact CM-0825 approval line before executing live proof. Without CM-0825 evidence, CM-0827 next runtime gap selection is premature.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
+## CM-0825 Handoff
+
+Status: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PRE_EXECUTION_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Recheck verdict: CM-0824 defines the future execution standard, but the required separate exact approval line is absent from the current instruction stream. CM-0825 did not execute.
+
+Next safe action: execute CM-0825 only if the operator provides the exact approval line from CM-0824. Otherwise continue only with non-execution review/planning.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
+## CM-0824 Handoff
+
+Status: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Packet verdict: CM-0824 defines a future CM-0825 exact-approved patched true live recall proof. It fixes exact query count `4`, exact query text, CM-0820 patched metadata-only `noRawContentRead=true` path, sanitized output only, complete zero side-effect counters, pass/fail labels, and no-readiness wording.
+
+Next safe action: wait for a separate exact approval before CM-0825. Without that approval, do not execute true live `search_memory`; continue only with review/planning work.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
+## CM-0823 Handoff
+
+Status: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Local review head: `8e8155a7449218c3dd1ccffab8a1db55cc39d7b0`; remote feature branch remains `f9e7e13fbccbd46b6483863d4b966d653d5f755b`; `origin/main` and remote `refs/heads/main` remain `20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+
+Changed files: `docs/CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: the patched metadata-only path from runner to adapter to approved app path to pipeline is coherent enough for CM-0824 approval-packet drafting. This is not true live proof, not synced-main proof, not `memory recall reliable`, and not readiness.
+
+Validation: targeted syntax checks passed for runner, adapter, app, pipeline, and related tests. Targeted tests passed runner `8/8`, adapter `7/7`, approved app path `5/5`, and bounded pipeline `9/9`.
+
+Next safe action: draft CM-0824 exact approval packet. Do not execute true live proof unless a future message gives separate exact approval.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
+## CM-0821 Handoff
+
+Status: `CM0821_FEATURE_BRANCH_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Reviewed branch head: `f9e7e13fbccbd46b6483863d4b966d653d5f755b`; `origin/main` and remote `refs/heads/main` remain `20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+
+Changed files: `docs/CM0821_FEATURE_BRANCH_REVIEW_AND_MAINLINE_INTEGRATION_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Review verdict: no blocking finding was found in the CM-0820 branch changed scope. The feature branch is PR-ready / explicit mainline integration candidate, but this review does not merge mainline, create a PR, execute a true live proof, or claim `memory recall reliable`.
+
+Validation: branch changed-scope review, `git diff --check`, docs validation, and no-overclaim scan completed for CM-0821.
+
+Next safe action: if mainline integration is separately approved and completed, run CM-0822 post-CM0820 mainline reconciliation; otherwise run CM-0823 patched metadata-only proof path review before preparing any new proof packet.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
+## CM-0820 Handoff
+
+Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH_PUSHED_BRANCH_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Remote branch: `refs/heads/codex/true-live-recall-raw-read-boundary = f9e7e13fbccbd46b6483863d4b966d653d5f755b`; `origin/main` and remote `refs/heads/main` remain `20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+
+Changed files: `src/core/TrueLiveRecallExecutorAdapter.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/app.js`; `tests/true-live-recall-executor-adapter.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `tests/recall-precision-hardening-bounded.test.js`; `docs/TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Patch verdict: upstream raw result fields now fail closed before adapter sanitization, and the approved internal runner path now has `noRawContentRead=true` metadata-only aggregation so future proof runs can avoid `shadowStore.getRecordsByIds`, `record.rawText`, `record.content`, and raw-derived result fields.
+
+Validation: targeted source/test syntax checks passed; adapter test passed `7/7`; approved app-path test passed `5/5`; internal runner test passed `8/8`; bounded precision pipeline test passed `9/9`. Full docs validation and final commit/push-readiness are still required for final closeout.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred. Remote action was limited to pushing this feature branch.
+
+Next safe action: open/review the feature branch or prepare a separately exact-approved next proof plan; do not claim `memory recall reliable`.
+
 ## Next Goal Handoff
 
 Status: next-goal summary recorded; project decision remains `RC_NOT_READY_BLOCKED`.

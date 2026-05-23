@@ -174,13 +174,7 @@ test('executor adapter binds search_memory to no-token read-only context and ret
       updatedAt: '2026-05-23T01:02:03.000Z',
       sourceKinds: ['time', 'rag'],
       matchedTags: ['one', 'two'],
-      coreTags: ['core'],
-      content: 'RAW CONTENT MUST NOT CROSS ADAPTER',
-      text: 'RAW TEXT MUST NOT CROSS ADAPTER',
-      title: 'RAW TITLE MUST NOT CROSS ADAPTER',
-      snippet: 'RAW SNIPPET MUST NOT CROSS ADAPTER',
-      sourceFile: 'private/path.json',
-      jsonlLine: '{"raw":true}'
+      coreTags: ['core']
     }]
   }));
   const adapter = createTrueLiveRecallExecutorAdapter({ app });
@@ -191,20 +185,42 @@ test('executor adapter binds search_memory to no-token read-only context and ret
   assert.equal(app.calls[0].args.include_content, false);
   assert.equal(app.calls[0].requestContext.noTokenReadOnly, true);
   assert.equal(app.calls[0].requestContext.executionContext.requestSource, EXPECTED_SOURCE);
+  assert.equal(app.calls[0].requestContext.executionContext.noRawContentRead, true);
   assert.deepEqual(Object.keys(response.sideEffectCounters).sort(), [...REQUIRED_SIDE_EFFECT_COUNTER_KEYS].sort());
   assert.equal(Object.values(response.sideEffectCounters).every(value => value === 0), true);
 
   const serialized = JSON.stringify(response);
-  assert.equal(serialized.includes('RAW CONTENT MUST NOT CROSS ADAPTER'), false);
-  assert.equal(serialized.includes('RAW TEXT MUST NOT CROSS ADAPTER'), false);
-  assert.equal(serialized.includes('RAW TITLE MUST NOT CROSS ADAPTER'), false);
-  assert.equal(serialized.includes('RAW SNIPPET MUST NOT CROSS ADAPTER'), false);
-  assert.equal(serialized.includes('private/path.json'), false);
   assert.equal(serialized.includes('jsonlLine'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(response.results[0], 'content'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(response.results[0], 'text'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(response.results[0], 'title'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(response.results[0], 'snippet'), false);
+});
+
+test('executor adapter fails closed when upstream returns raw result fields before sanitization', async () => {
+  const rawFields = ['content', 'text', 'title', 'snippet', 'rawText', 'sourceFile', 'jsonlLine', 'fullPath'];
+
+  for (const key of rawFields) {
+    const app = createSurfaceApp(() => ({
+      results: [{
+        memoryId: `raw-${key}`,
+        score: 0.5,
+        [key]: 'RAW VALUE MUST FAIL CLOSED'
+      }]
+    }));
+    const adapter = createTrueLiveRecallExecutorAdapter({ app });
+
+    await assert.rejects(
+      () => adapter(createRequest()),
+      error => {
+        assertBoundaryError(error, 'executor_adapter_sanitization_failed');
+        assert.deepEqual(error.details.leaked, [{ index: 0, key }]);
+        assert.equal(JSON.stringify(error).includes('RAW VALUE MUST FAIL CLOSED'), false);
+        return true;
+      },
+      key
+    );
+  }
 });
 
 test('executor adapter forwards internal precision policy context only through executionContext', async () => {
@@ -334,10 +350,6 @@ test('proof runner can use executor adapter with synthetic app without raw leaka
     results: [{
       memoryId: 'synthetic-runner-memory',
       score: 0.9,
-      title: 'RAW TITLE MUST NOT REACH RUNNER',
-      snippet: 'RAW SNIPPET MUST NOT REACH RUNNER',
-      text: 'RAW TEXT MUST NOT REACH RUNNER',
-      content: 'RAW CONTENT MUST NOT REACH RUNNER',
       matchedTags: ['safe'],
       coreTags: ['core']
     }]
@@ -375,5 +387,6 @@ test('proof runner can use executor adapter with synthetic app without raw leaka
   assert.equal(report.rcNotReadyBlocked, true);
   assert.equal(app.calls[0].requestContext.executionContext.precisionPolicyContext.proofNoResultMode, true);
   assert.equal(app.calls[0].requestContext.executionContext.precisionPolicyContext.queryFamily.includes('current project status'), true);
+  assert.equal(app.calls[0].requestContext.executionContext.noRawContentRead, true);
   assert.equal(JSON.stringify(report).includes('RAW TITLE MUST NOT REACH RUNNER'), false);
 });

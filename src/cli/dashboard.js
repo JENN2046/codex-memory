@@ -400,18 +400,19 @@ async function collectService() {
 
 async function collectStore() {
   let db = null;
+  const emptyAgeBreakdown = { last24h: 0, last7d: 0, last30d: 0, older30d: 0 };
   try {
     const { DatabaseSync } = require('node:sqlite');
     const dbPath = resolveDbPath();
     if (!fs.existsSync(dbPath)) {
-      return { status: 'warn', records: 0, chunks: 0, vectors: 0, message: `Database not found: ${dbPath}` };
+      return { status: 'warn', records: 0, chunks: 0, vectors: 0, ageBreakdown: emptyAgeBreakdown, message: `Database not found: ${dbPath}` };
     }
     db = new DatabaseSync(dbPath);
     const recordCount = db.prepare('SELECT COUNT(*) as cnt FROM memory_records').get().cnt;
     const chunkCount = db.prepare('SELECT COUNT(*) as cnt FROM memory_chunks').get().cnt;
     let targets = [];
     let sensitivityBreakdown = {};
-    let ageBreakdown = { last24h: 0, last7d: 0, last30d: 0, older30d: 0 };
+    let ageBreakdown = { ...emptyAgeBreakdown };
     try {
       targets = db.prepare('SELECT DISTINCT target FROM memory_records').all().map(r => r.target);
     } catch { /* ignore */ }
@@ -440,7 +441,7 @@ async function collectStore() {
       ageBreakdown
     };
   } catch (err) {
-    return { status: 'error', records: 0, chunks: 0, error: err.message };
+    return { status: 'error', records: 0, chunks: 0, ageBreakdown: emptyAgeBreakdown, error: err.message };
   } finally {
     if (db) {
       try { db.close(); } catch { /* ignore close failures in diagnostics */ }
@@ -1507,7 +1508,7 @@ function buildRecommendations(service, store, storeFreshnessWritePreflight, prof
   if (service.status !== 'ok') recs.push('Service health check failed — verify HTTP MCP is running');
   if (store.status !== 'ok') recs.push('Store is empty or unreachable — check SQLite integrity');
   if (store.ageBreakdown?.last7d === 0) recs.push('No new memory written in 7 days — this may be expected during maintenance');
-  else if (store.ageBreakdown?.last24h === 0) recs.push('No new memory written in 24h — run node .\\src\\cli\\store-freshness-write-preflight.js --json to prepare exact bounded write-path evidence before any approval or readiness claim');
+  if (store.ageBreakdown?.last24h === 0) recs.push('No new memory written in 24h — run node .\\src\\cli\\store-freshness-write-preflight.js --json to prepare exact bounded write-path evidence before any approval or readiness claim');
   if (storeFreshnessWritePreflight?.operatorApprovalLineAvailable === true) {
     recs.push('Store freshness exact approval line is available as StoreWAsk — explicit user approval is still required before the one sanitized record_memory write; dashboard did not execute it');
   }

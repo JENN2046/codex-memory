@@ -150,18 +150,24 @@ const INTERNAL_PRECISION_POLICY_ALLOWED_KEYS = new Set([
   'highConfidenceScore'
 ]);
 
+function assertInternalTrueLiveRecallContext(requestContext = {}, fieldName = 'internal execution context') {
+  const executionContext = requestContext.executionContext || {};
+  if (
+    requestContext.noTokenReadOnly !== true
+    || executionContext.requestSource !== INTERNAL_TRUE_LIVE_RECALL_SOURCE
+  ) {
+    throw new Error(`${fieldName} requires the approved true live recall runner path`);
+  }
+  return executionContext;
+}
+
 function normalizeInternalPrecisionPolicyContext(requestContext = {}) {
   const executionContext = requestContext.executionContext || {};
   if (!Object.prototype.hasOwnProperty.call(executionContext, 'precisionPolicyContext')) {
     return null;
   }
 
-  if (
-    requestContext.noTokenReadOnly !== true
-    || executionContext.requestSource !== INTERNAL_TRUE_LIVE_RECALL_SOURCE
-  ) {
-    throw new Error('internal precision policy context requires the approved true live recall runner path');
-  }
+  assertInternalTrueLiveRecallContext(requestContext, 'internal precision policy context');
 
   const context = executionContext.precisionPolicyContext;
   if (context === null) {
@@ -208,6 +214,19 @@ function normalizeInternalPrecisionPolicyContext(requestContext = {}) {
   }
 
   return Object.freeze(normalized);
+}
+
+function normalizeInternalNoRawContentRead(requestContext = {}) {
+  const executionContext = requestContext.executionContext || {};
+  if (!Object.prototype.hasOwnProperty.call(executionContext, 'noRawContentRead')) {
+    return false;
+  }
+
+  assertInternalTrueLiveRecallContext(requestContext, 'internal noRawContentRead context');
+  if (executionContext.noRawContentRead !== true) {
+    throw new Error('internal noRawContentRead context must be true');
+  }
+  return true;
 }
 
 async function applySoftReadPolicy(results, { config, shadowStore, requestContext = {}, scope = null } = {}) {
@@ -438,6 +457,7 @@ function createCodexMemoryApplication(overrides = {}) {
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const readOnly = requestContext.noTokenReadOnly === true;
     const precisionPolicyContext = normalizeInternalPrecisionPolicyContext(requestContext);
+    const noRawContentRead = normalizeInternalNoRawContentRead(requestContext);
     const scopeFilter = args.scope && typeof args.scope === 'object' ? args.scope : null;
     const scopeAudit = buildScopeAuditContext(scopeFilter);
     const searchResults = await passiveRecallService.search({
@@ -453,7 +473,8 @@ function createCodexMemoryApplication(overrides = {}) {
       },
       signal,
       readOnly,
-      precisionPolicyContext
+      precisionPolicyContext,
+      noRawContentRead
     });
     throwIfSearchMemoryAborted(signal, config.searchMemoryTimeoutMs);
     const filtered = (scopeFilter && searchResults && searchResults.length)

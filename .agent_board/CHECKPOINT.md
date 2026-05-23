@@ -1,5 +1,93 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0829 Phase F.1 recall requalification completion audit - 2026-05-23
+
+- Status: `CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT_PARTIAL_HARD_GATES_REMAIN_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: docs/status/board/truth-table completion audit only; no push, PR, merge, CM-0825 execution, actual CM-0826 proof evidence review, true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Audit verdict: review/packet/criteria/precondition/unblock preparation is complete, but Phase F.1 is not fully complete because mainline integration and CM-0825 proof execution remain unperformed hard-gated routes.
+- Next safe step: wait for explicit operator input for mainline integration or CM-0825 exact proof execution.
+
+## Checkpoint - CM-0828 Phase F.1 recall requalification unblock packet - 2026-05-23
+
+- Status: `CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET_READY_NOT_APPROVED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: docs/status/board/truth-table unblock packet only; no push, PR, merge, CM-0825 execution, actual CM-0826 proof evidence review, true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Packet verdict: remaining Phase F.1 movement requires either separate mainline integration authorization followed by CM-0822, or CM-0824's exact CM-0825 approval line followed by proof execution and actual CM-0826/CM-0827 review.
+- Next safe step: wait for explicit operator input for one of those hard-gated routes.
+
+## Checkpoint - CM-0827 next runtime gap selection precondition review - 2026-05-23
+
+- Status: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: precondition review only; no unique next runtime gap selected, no CM-0825 execution, no actual CM-0826 proof evidence review, no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, push, or readiness transition.
+- Review verdict: CM-0827 actual selection is premature because CM-0825 has not executed and CM-0826 only prepared criteria.
+- Next safe step: obtain separate CM-0825 exact approval before live proof, then run actual CM-0826 evidence review; only then reconsider CM-0827 next runtime gap selection.
+
+## Checkpoint - CM-0826 recall reliability blocker review criteria - 2026-05-23
+
+- Status: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: criteria preparation only; no CM-0825 proof evidence reviewed, no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Criteria verdict: future CM-0826 review requires CM-0825 execution evidence and can only decide blocked/no-proof, approval drift, query drift, boundary failure, expected-result failure, negative-control failure, or narrow blocker downgrade not-ready.
+- Next safe step: CM-0825 still requires separate exact approval; CM-0827 remains premature until CM-0825 evidence exists and CM-0826 reviews it.
+
+## Checkpoint - CM-0825 patched true live recall proof pre-execution recheck - 2026-05-23
+
+- Status: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: pre-execution recheck only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Recheck verdict: CM-0824 packet exists, but no separate exact approval line is present; CM-0825 remains blocked and must not execute.
+- Next safe step: wait for exact approval before execution, or continue with non-execution review/planning.
+
+## Checkpoint - CM-0824 true live recall patched proof approval packet - 2026-05-23
+
+- Status: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: approval packet only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Packet verdict: future CM-0825 execution requires separate exact approval, exactly four ordered queries, CM-0820 patched metadata-only `noRawContentRead=true` path, sanitized output only, and complete zero side-effect counters.
+- Next safe step: stop before CM-0825 unless the operator gives the exact approval line in `docs/CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET.md`.
+
+## Checkpoint - CM-0823 patched metadata-only proof path review - 2026-05-23
+
+- Status: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Local review head: `8e8155a7449218c3dd1ccffab8a1db55cc39d7b0`.
+- Scope: local source/test read-only review plus docs/status/board/truth-table update; no merge, PR creation, push, true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness transition.
+- Review verdict: runner -> adapter -> app -> pipeline `noRawContentRead=true` is now an end-to-end metadata-only proof path for future approval-packet drafting, not an isolated adapter flag.
+- Validation: runner `8/8`, adapter `7/7`, approved app path `5/5`, and bounded pipeline `9/9` passed.
+- Next safe step: CM-0824 exact approval packet drafting; any live proof remains separately exact-approved and must use the patched metadata-only path.
+
+## Checkpoint - CM-0821 feature branch review and mainline integration plan - 2026-05-23
+
+- Status: `CM0821_FEATURE_BRANCH_REVIEW_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Reviewed branch head: `f9e7e13fbccbd46b6483863d4b966d653d5f755b`.
+- Mainline reference unchanged: `origin/main = remote refs/heads/main = 20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+- Scope: docs/status/board/truth-table review only; no merge, PR creation, push, true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable write, public MCP expansion, package/config/watchdog/startup change, release/cutover, or readiness transition.
+- Review verdict: no blocking finding was found in the changed scope; the branch is PR-ready / explicit mainline integration candidate, but it is not live proof and not reliability evidence by itself.
+- Next safe step: if integration is separately approved and completed, run CM-0822 post-CM0820 mainline reconciliation; otherwise continue with CM-0823 patched metadata-only proof path review.
+
+## Checkpoint - CM-0820 remote branch push review - 2026-05-23
+
+- Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH_PUSHED_BRANCH_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Local HEAD: `f9e7e13fbccbd46b6483863d4b966d653d5f755b`.
+- Remote branch: `refs/heads/codex/true-live-recall-raw-read-boundary = f9e7e13fbccbd46b6483863d4b966d653d5f755b`.
+- Mainline reference unchanged: `origin/main = remote refs/heads/main = 20e7a9d7b26b0f5cabb70a908c0ea7ce83c50712`.
+- Worktree was clean after push review.
+- Boundary: branch push only; no true live `search_memory`, true live `record_memory`, raw memory content read, `.jsonl` read, provider call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, tag/release/deploy/cutover, or readiness claim.
+
+## Checkpoint - CM-0820 true live recall executor raw-read boundary patch - 2026-05-23
+
+- Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCHED_LOCAL_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary` from `origin/main`.
+- Scope: local source/test/docs/status/board/truth-table patch only; no push yet.
+- Changed files: `src/core/TrueLiveRecallExecutorAdapter.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/app.js`; `tests/true-live-recall-executor-adapter.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `tests/recall-precision-hardening-bounded.test.js`; `docs/TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Patch verdict: upstream raw executor fields now fail closed before adapter sanitization; approved internal path now carries `noRawContentRead=true`; pipeline metadata-only aggregation skips raw record fetch and raw-derived result fields.
+- Evidence correction: CM-0801 / CM-0814 `rawMemoryContentReads=0` should be treated as pre-patch sanitized-output boundary evidence unless a future exact-approved proof runs through the patched metadata-only path.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, raw memory content reads, direct `.jsonl` or durable memory content reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, push, or readiness claims.
+
 ## Checkpoint - CM-0819 recall reliability bounded regression expansion closeout - 2026-05-23
 
 - Status: `RECALL_RELIABILITY_BOUNDED_REGRESSION_EXPANDED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

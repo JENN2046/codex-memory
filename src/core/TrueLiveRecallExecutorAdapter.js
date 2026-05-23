@@ -268,12 +268,14 @@ function createTrueLiveRecallExecutorAdapter({ app } = {}) {
         noTokenReadOnly: true,
         executionContext: {
           requestSource: EXPECTED_SOURCE,
+          noRawContentRead: true,
           precisionPolicyContext: request.precisionPolicyContext || null
         }
       });
 
-      const results = normalizeResults(response).map(sanitizeResultForRunner);
-      assertSanitizedResults(results);
+      const rawResults = normalizeResults(response);
+      assertSanitizedResults(rawResults);
+      const results = rawResults.map(sanitizeResultForRunner);
 
       return {
         results,

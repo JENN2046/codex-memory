@@ -65,10 +65,20 @@ class KnowledgeBaseRecallPipeline {
     auditContext = {},
     signal = null,
     readOnly = false,
-    precisionPolicyContext = null
+    precisionPolicyContext = null,
+    noRawContentRead = false
   }) {
     if (typeof query !== 'string' || !query.trim()) {
       throw new Error('query must be a non-empty string');
+    }
+    if (typeof noRawContentRead !== 'boolean') {
+      throw new Error('noRawContentRead must be a boolean');
+    }
+    if (noRawContentRead && readOnly !== true) {
+      throw new Error('noRawContentRead requires readOnly recall path');
+    }
+    if (noRawContentRead && includeContent) {
+      throw new Error('noRawContentRead cannot include raw content');
     }
 
     throwIfSearchMemoryAborted(signal);
@@ -129,6 +139,7 @@ class KnowledgeBaseRecallPipeline {
     const aggregated = await this.aggregateCandidates({
       candidates: precisionState.results,
       includeContent,
+      noRawContentRead,
       signal
     });
 
@@ -268,7 +279,7 @@ class KnowledgeBaseRecallPipeline {
     };
   }
 
-  async aggregateCandidates({ candidates = [], includeContent = false, signal = null }) {
+  async aggregateCandidates({ candidates = [], includeContent = false, noRawContentRead = false, signal = null }) {
     throwIfSearchMemoryAborted(signal);
     const groups = new Map();
 
@@ -281,12 +292,19 @@ class KnowledgeBaseRecallPipeline {
     }
 
     const memoryIds = [...new Set(candidates.map(candidate => candidate.memoryId).filter(Boolean))];
-    throwIfSearchMemoryAborted(signal);
-    const recordMap = new Map(
-      (await this.shadowStore.getRecordsByIds(memoryIds))
-        .map(record => [record.memoryId, record])
-    );
-    throwIfSearchMemoryAborted(signal);
+    const recordMap = new Map();
+    let isolationMap = new Map();
+    if (!noRawContentRead) {
+      throwIfSearchMemoryAborted(signal);
+      for (const record of await this.shadowStore.getRecordsByIds(memoryIds)) {
+        recordMap.set(record.memoryId, record);
+      }
+      throwIfSearchMemoryAborted(signal);
+    } else if (typeof this.shadowStore.getRecordsIsolationMap === 'function') {
+      throwIfSearchMemoryAborted(signal);
+      isolationMap = await this.shadowStore.getRecordsIsolationMap(memoryIds);
+      throwIfSearchMemoryAborted(signal);
+    }
 
     return [...groups.entries()]
       .map(([key, group]) => {
@@ -295,6 +313,33 @@ class KnowledgeBaseRecallPipeline {
         const record = best.memoryId ? recordMap.get(best.memoryId) : null;
         if (record && isRecallIsolated(record)) {
           return null;
+        }
+        if (noRawContentRead && best.memoryId) {
+          const isolationSubject = isolationMap.get(best.memoryId);
+          if (isolationSubject && isRecallIsolated(isolationSubject)) {
+            return null;
+          }
+        }
+        if (noRawContentRead) {
+          return {
+            target: best.target,
+            memoryId: best.memoryId || null,
+            score: best.score,
+            baseScore: best.baseScore,
+            rerankScore: best.rerank_score ?? null,
+            matchedTags: uniqueTokens(group.flatMap(item => item.matchedTags || [])),
+            coreTags: uniqueTokens(group.flatMap(item => item.coreTagsMatched || [])),
+            titleHitCount: Math.max(...group.map(item => item.titleHitCount || 0)),
+            tagHitCount: Math.max(...group.map(item => item.tagHitCount || 0)),
+            contentHitCount: Math.max(...group.map(item => item.contentHitCount || 0)),
+            evidenceHitCount: Math.max(...group.map(item => item.evidenceHitCount || 0)),
+            exactCoreTagCount: Math.max(...group.map(item => item.exactCoreTagCount || 0)),
+            tagMemoSurfaceScore: Number(Math.max(...group.map(item => item.tagMemoSurfaceScore || 0)).toFixed(6)),
+            dynamicCoreWeight: Number(Math.max(...group.map(item => item.dynamicCoreWeight || 0)).toFixed(6)),
+            createdAt: best.createdAt,
+            updatedAt: best.updatedAt,
+            sourceKinds: [...new Set(group.map(item => item.source).filter(Boolean))]
+          };
         }
         const cleanContent = record
           ? stripMemoryMarkers(record.rawText || record.content || '')
