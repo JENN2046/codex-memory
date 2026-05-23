@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0829 Phase F.1 recall requalification completion audit - 2026-05-23
+
+- Status: `CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT_PARTIAL_HARD_GATES_REMAIN_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: docs/status/board/truth-table completion audit only; no push, PR, merge, CM-0825 execution, actual CM-0826 proof evidence review, true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Audit verdict: review/packet/criteria/precondition/unblock preparation is complete, but Phase F.1 is not fully complete because mainline integration and CM-0825 proof execution remain unperformed hard-gated routes.
+- Next safe step: wait for explicit operator input for mainline integration or CM-0825 exact proof execution.
+
 ## Checkpoint - CM-0828 Phase F.1 recall requalification unblock packet - 2026-05-23
 
 - Status: `CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET_READY_NOT_APPROVED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

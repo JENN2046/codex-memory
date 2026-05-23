@@ -109,6 +109,26 @@ Boundary: this review did not merge `main`, create a PR, execute true live `sear
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
+## CM-0829 Phase F.1 Recall Requalification Completion Audit - 2026-05-23
+
+Result: `CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT_PARTIAL_HARD_GATES_REMAIN_NOT_READY`.
+
+Artifact: `docs/CM0829_PHASE_F1_RECALL_REQUALIFICATION_COMPLETION_AUDIT.md`.
+
+Audit verdict:
+
+- Phase F.1 is partially complete, not fully complete.
+- Formal feature-branch review, patched metadata-only path review, future proof packet, future review criteria, premature-selection review, and unblock packet are complete.
+- `CM-0820` is not integrated into `main`, so `CM-0822` cannot run.
+- `CM-0825` has not executed because exact approval is absent.
+- Actual `CM-0826` evidence review cannot run without CM-0825 evidence.
+- Actual `CM-0827` next runtime gap selection cannot run without actual CM-0826 evidence review.
+- The only material next moves are explicit mainline integration authorization or exact CM-0825 approval.
+
+Boundary: this audit did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, push, PR, merge, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## CM-0828 Phase F.1 Recall Requalification Unblock Packet - 2026-05-23
 
 Result: `CM0828_PHASE_F1_RECALL_REQUALIFICATION_UNBLOCK_PACKET_READY_NOT_APPROVED_NOT_READY`.
