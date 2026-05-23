@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0824 true live recall patched proof approval packet - 2026-05-23
+
+- Status: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: approval packet only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Packet verdict: future CM-0825 execution requires separate exact approval, exactly four ordered queries, CM-0820 patched metadata-only `noRawContentRead=true` path, sanitized output only, and complete zero side-effect counters.
+- Next safe step: stop before CM-0825 unless the operator gives the exact approval line in `docs/CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET.md`.
+
 ## Checkpoint - CM-0823 patched metadata-only proof path review - 2026-05-23
 
 - Status: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

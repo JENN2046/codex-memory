@@ -109,6 +109,26 @@ Boundary: this review did not merge `main`, create a PR, execute true live `sear
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
+## CM-0824 True Live Recall Patched Proof Approval Packet - 2026-05-23
+
+Result: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`.
+
+Artifact: `docs/CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET.md`.
+
+Packet verdict:
+
+- CM-0824 defines the future CM-0825 execution standard only; it is not execution approval and does not execute true live `search_memory`.
+- Future CM-0825 requires a separate exact approval line naming `CM0825_EXACT_APPROVED_PATCHED_TRUE_LIVE_RECALL_PROOF_ONCE`.
+- Future execution must use `TrueLiveRecallReadonlyProofRunner -> TrueLiveRecallExecutorAdapter -> approved search_memory app path -> KnowledgeBaseRecallPipeline`.
+- Future execution must pass `noRawContentRead=true` through the approved internal path and use metadata-only aggregation.
+- Exact query count is `4`, with fixed ordered query texts: three positive metadata-only recall slots and one stricter negative-control slot.
+- Future output must be sanitized only, with complete zero side-effect counters and no raw memory output, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, tag/release/deploy/cutover, or readiness/reliability claim.
+- Even a future passed CM-0825 proof would still require CM-0826 review before any blocker downgrade.
+
+Boundary: this packet did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## CM-0823 Patched Metadata-Only Proof Path Review - 2026-05-23
 
 Result: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`.

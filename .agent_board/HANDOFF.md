@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0824 Handoff
+
+Status: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Packet verdict: CM-0824 defines a future CM-0825 exact-approved patched true live recall proof. It fixes exact query count `4`, exact query text, CM-0820 patched metadata-only `noRawContentRead=true` path, sanitized output only, complete zero side-effect counters, pass/fail labels, and no-readiness wording.
+
+Next safe action: wait for a separate exact approval before CM-0825. Without that approval, do not execute true live `search_memory`; continue only with review/planning work.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
 ## CM-0823 Handoff
 
 Status: `CM0823_PATCHED_METADATA_ONLY_PROOF_PATH_REVIEW_READY_FOR_PACKET_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
