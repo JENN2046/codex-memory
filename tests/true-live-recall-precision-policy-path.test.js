@@ -45,6 +45,7 @@ test('internal runner path forwards precision policy context into passive recall
       noTokenReadOnly: true,
       executionContext: {
         requestSource: 'internal-true-live-recall-readonly-proof-runner',
+        noRawContentRead: true,
         precisionPolicyContext: {
           enabled: true,
           queryFamily: 'stricter_negative_control',
@@ -58,6 +59,7 @@ test('internal runner path forwards precision policy context into passive recall
     assert.deepEqual(response, { results: [] });
     assert.ok(capturedOptions);
     assert.equal(capturedOptions.readOnly, true);
+    assert.equal(capturedOptions.noRawContentRead, true);
     assert.deepEqual(capturedOptions.precisionPolicyContext, {
       enabled: true,
       queryFamily: 'stricter_negative_control',
@@ -79,11 +81,31 @@ test('public or non-approved search path rejects injected precision policy conte
       }, {
         executionContext: {
           requestSource: 'codex-memory-test',
+          noRawContentRead: true,
           precisionPolicyContext: {
             enabled: true,
             queryFamily: 'stricter_negative_control',
             proofNoResultMode: true
           }
+        }
+      }),
+      /approved true live recall runner path/
+    );
+  });
+});
+
+test('public or non-approved search path rejects injected noRawContentRead without precision policy context', async () => {
+  await withApp(async ({ app }) => {
+    await assert.rejects(
+      () => app.callTool('search_memory', {
+        query: 'should fail closed on noRawContentRead injection',
+        target: 'both',
+        limit: 1,
+        include_content: false
+      }, {
+        executionContext: {
+          requestSource: 'codex-memory-test',
+          noRawContentRead: true
         }
       }),
       /approved true live recall runner path/

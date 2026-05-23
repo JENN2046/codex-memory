@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-0820 Handoff
+
+Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCHED_LOCAL_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `src/core/TrueLiveRecallExecutorAdapter.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/app.js`; `tests/true-live-recall-executor-adapter.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `tests/recall-precision-hardening-bounded.test.js`; `docs/TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Patch verdict: upstream raw result fields now fail closed before adapter sanitization, and the approved internal runner path now has `noRawContentRead=true` metadata-only aggregation so future proof runs can avoid `shadowStore.getRecordsByIds`, `record.rawText`, `record.content`, and raw-derived result fields.
+
+Validation: targeted source/test syntax checks passed; adapter test passed `7/7`; approved app-path test passed `5/5`; internal runner test passed `8/8`; bounded precision pipeline test passed `9/9`. Full docs validation and final commit/push-readiness are still required for final closeout.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, push, or readiness claim occurred.
+
+Next safe action: run final `git diff --check`, docs validation, no-overclaim scan, staged review, local commit, and push-readiness. Do not push unless explicitly authorized later.
+
 ## Next Goal Handoff
 
 Status: next-goal summary recorded; project decision remains `RC_NOT_READY_BLOCKED`.

@@ -223,6 +223,85 @@ test('pipeline precision context keeps positive bounded record and suppresses ne
   assert.equal(sideEffects.auditWrites, 0);
 });
 
+test('pipeline noRawContentRead proof mode returns metadata-only results without raw record fetch', async () => {
+  const positive = candidate('positive-memory', metadata({
+    score: 0.24,
+    baseScore: 0.24,
+    lexicalScore: 0.4,
+    matchedTags: ['bounded-alpha'],
+    contentHitCount: 1
+  }));
+  const negative = candidate('negative-memory', metadata({
+    score: 0.075486,
+    baseScore: 0.075486
+  }));
+  const { pipeline, sideEffects } = createPipeline({ generatedCandidates: [positive, negative] });
+
+  const results = await pipeline.search({
+    query: 'bounded alpha fixture metadata only',
+    target: 'process',
+    limit: 3,
+    includeContent: false,
+    readOnly: true,
+    noRawContentRead: true,
+    precisionPolicyContext: {
+      enabled: true,
+      queryFamily: 'bounded_positive_control_metadata_only',
+      minimumScore: 0.12
+    }
+  });
+
+  assert.deepEqual(results.map(result => result.memoryId), ['positive-memory']);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'content'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'text'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'title'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'snippet'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(results[0], 'sourceFile'), false);
+  assert.equal(sideEffects.recordReads, 0);
+  assert.equal(sideEffects.syncCalls, 0);
+  assert.equal(sideEffects.auditWrites, 0);
+});
+
+test('pipeline noRawContentRead proof mode requires read-only metadata-only execution', async () => {
+  const { pipeline, sideEffects } = createPipeline({ generatedCandidates: [] });
+
+  await assert.rejects(
+    () => pipeline.search({
+      query: 'invalid no raw content read type',
+      target: 'process',
+      limit: 1,
+      noRawContentRead: 'true'
+    }),
+    /noRawContentRead must be a boolean/
+  );
+
+  await assert.rejects(
+    () => pipeline.search({
+      query: 'invalid no raw content read write path',
+      target: 'process',
+      limit: 1,
+      noRawContentRead: true
+    }),
+    /noRawContentRead requires readOnly recall path/
+  );
+
+  await assert.rejects(
+    () => pipeline.search({
+      query: 'invalid no raw content include content',
+      target: 'process',
+      limit: 1,
+      includeContent: true,
+      readOnly: true,
+      noRawContentRead: true
+    }),
+    /noRawContentRead cannot include raw content/
+  );
+
+  assert.equal(sideEffects.recordReads, 0);
+  assert.equal(sideEffects.syncCalls, 0);
+  assert.equal(sideEffects.auditWrites, 0);
+});
+
 test('pipeline no-result mode returns zero negative-control results without record read or durable side effects', async () => {
   const negativeCandidates = [
     candidate('negative-memory', metadata({ score: 0.098152, baseScore: 0.098152 })),

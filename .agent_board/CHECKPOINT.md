@@ -1,5 +1,15 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0820 true live recall executor raw-read boundary patch - 2026-05-23
+
+- Status: `TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCHED_LOCAL_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary` from `origin/main`.
+- Scope: local source/test/docs/status/board/truth-table patch only; no push yet.
+- Changed files: `src/core/TrueLiveRecallExecutorAdapter.js`; `src/recall/KnowledgeBaseRecallPipeline.js`; `src/app.js`; `tests/true-live-recall-executor-adapter.test.js`; `tests/true-live-recall-precision-policy-path.test.js`; `tests/recall-precision-hardening-bounded.test.js`; `docs/TRUE_LIVE_RECALL_EXECUTOR_RAW_READ_BOUNDARY_PATCH.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+- Patch verdict: upstream raw executor fields now fail closed before adapter sanitization; approved internal path now carries `noRawContentRead=true`; pipeline metadata-only aggregation skips raw record fetch and raw-derived result fields.
+- Evidence correction: CM-0801 / CM-0814 `rawMemoryContentReads=0` should be treated as pre-patch sanitized-output boundary evidence unless a future exact-approved proof runs through the patched metadata-only path.
+- Boundary: this slice did not execute true live `search_memory`, true live `record_memory`, raw memory content reads, direct `.jsonl` or durable memory content reads, provider/model/API calls, durable memory/audit writes, migration/import/export/backup/restore apply, public MCP expansion, package/config/watchdog/startup changes, tag/release/deploy/cutover, push, or readiness claims.
+
 ## Checkpoint - CM-0819 recall reliability bounded regression expansion closeout - 2026-05-23
 
 - Status: `RECALL_RELIABILITY_BOUNDED_REGRESSION_EXPANDED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
