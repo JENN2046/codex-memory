@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-0825 Handoff
+
+Status: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `codex/true-live-recall-raw-read-boundary`.
+
+Changed files: `docs/CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PRE_EXECUTION_RECHECK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `MAINTENANCE_BACKLOG.md`; `.agent_board/*`.
+
+Recheck verdict: CM-0824 defines the future execution standard, but the required separate exact approval line is absent from the current instruction stream. CM-0825 did not execute.
+
+Next safe action: execute CM-0825 only if the operator provides the exact approval line from CM-0824. Otherwise continue only with non-execution review/planning.
+
+Boundary: no true live `search_memory`, true live `record_memory`, real/raw memory content read, direct `.jsonl` or durable memory read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness claim occurred.
+
 ## CM-0824 Handoff
 
 Status: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

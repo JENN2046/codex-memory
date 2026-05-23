@@ -1,5 +1,13 @@
 # CHECKPOINT.md - codex-memory
 
+## Checkpoint - CM-0825 patched true live recall proof pre-execution recheck - 2026-05-23
+
+- Status: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Branch: `codex/true-live-recall-raw-read-boundary`.
+- Scope: pre-execution recheck only; no true live `search_memory`, true live `record_memory`, raw memory read, direct `.jsonl` read, provider/API call, durable memory/audit write, public MCP expansion, package/config/watchdog/startup change, release/cutover, tag, or readiness transition.
+- Recheck verdict: CM-0824 packet exists, but no separate exact approval line is present; CM-0825 remains blocked and must not execute.
+- Next safe step: wait for exact approval before execution, or continue with non-execution review/planning.
+
 ## Checkpoint - CM-0824 true live recall patched proof approval packet - 2026-05-23
 
 - Status: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.

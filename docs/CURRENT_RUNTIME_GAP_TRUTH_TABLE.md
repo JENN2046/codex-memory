@@ -109,6 +109,25 @@ Boundary: this review did not merge `main`, create a PR, execute true live `sear
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
+## CM-0825 Patched True Live Recall Proof Pre-Execution Recheck - 2026-05-23
+
+Result: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_BLOCKED_EXACT_APPROVAL_REQUIRED_NOT_READY`.
+
+Artifact: `docs/CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PRE_EXECUTION_RECHECK.md`.
+
+Recheck verdict:
+
+- CM-0824 approval packet exists and defines the future CM-0825 execution standard.
+- CM-0824 is not execution approval by itself.
+- The current instruction stream does not contain the exact approval line required by CM-0824.
+- CM-0825 therefore must not execute in this slice.
+- Future execution still requires a fresh preflight, exactly four fixed queries, the CM-0820 patched metadata-only `noRawContentRead=true` path, sanitized output only, complete zero side-effect counters, no raw memory output, no direct `.jsonl` read, no provider/API, no durable memory/audit write, and no readiness/reliability claim.
+- CM-0826 review remains required after any future exact-approved CM-0825 execution before any blocker downgrade.
+
+Boundary: this recheck did not execute true live `search_memory`, execute true live `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## CM-0824 True Live Recall Patched Proof Approval Packet - 2026-05-23
 
 Result: `CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET_READY_NOT_RELIABLE_NOT_READY`.
