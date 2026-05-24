@@ -1,5 +1,41 @@
 # HANDOFF.md — codex-memory
 
+## CM-1030 Public Default Search Lifecycle Supersede Cache-Mutation Temp-Local Evidence Handoff
+
+Goal: verify default public `search_memory` with lifecycle read policy returns only the replacement private Codex-scoped record after candidate-cache population and approved temp internal supersede mutation, without claiming broad reliability/readiness.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_SUPERSEDE_CACHE_MUTATION_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1030_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_SUPERSEDE_CACHE_MUTATION_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/public-default-search-lifecycle-supersede-cache-mutation-temp-local-evidence.test.js`.
+- Two temp-local private Codex records shared the same marker phrase.
+- Records were marked active and proposal in temp-local lifecycle columns.
+- Default public scoped search returned only the old active record before supersede.
+- The proposal replacement was hidden by lifecycle read policy before supersede.
+- Candidate cache was enabled, populated, and located under the temp root.
+- The old active record was superseded through the approved internal supersede runtime entry.
+- The same Codex-scoped default search returned only the replacement record after supersede.
+- The superseded old record was not returned after supersede.
+- Read-policy audit applied and did not print the raw workspace value.
+- CM-1030 test passed `1/1`.
+- Lifecycle supersede-cache/validate-cache/cache/matrix/stale/rejected/validate/tombstone/supersede/MCP regression bundle passed `24/24`.
+- Supersede/validate/write-temp-local adjacent bundle passed `42/42`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local lifecycle supersede cache-mutation evidence, not broad real-store, long-run, rollback, governance-ready, or production durability proof.
+- The proof uses the approved internal supersede runtime entry inside an isolated temp app; it does not expand public MCP or prove public mutation tooling.
+- The proof does not distinguish whether the second search used a candidate-cache hit or was protected by governance-state cache invalidation; it proves the user-facing result was refreshed after supersede mutation.
+- The proof does not make public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1029 Public Default Search Lifecycle Validate Cache-Mutation Temp-Local Evidence Handoff
 
 Goal: verify default public `search_memory` with lifecycle read policy returns a formerly hidden private Codex-scoped proposal record after candidate-cache population and approved temp internal validate mutation to active, without claiming broad reliability/readiness.

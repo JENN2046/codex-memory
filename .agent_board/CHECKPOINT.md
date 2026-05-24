@@ -1,5 +1,42 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1030 Public Default Search Lifecycle Supersede Cache-Mutation Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_SUPERSEDE_CACHE_MUTATION_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1030_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_SUPERSEDE_CACHE_MUTATION_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local lifecycle supersede cache-mutation evidence for private Codex-scoped default public search.
+- Wrote two temp records with the same marker, same project/workspace, `visibility=private`, and `client_id=codex`.
+- Marked the old record active and replacement record proposal in temp-local lifecycle columns.
+- Verified default public scoped search returned only the old active record before supersede.
+- Verified the proposal replacement was hidden by lifecycle read policy before supersede.
+- Verified candidate cache was enabled, populated, and located under the temp root.
+- Superseded the old record through the approved internal supersede runtime entry.
+- Verified the same default public scoped search returned only the replacement record after supersede.
+- Verified the superseded old record was not returned after supersede.
+- Verified read-policy audit was applied and did not print the raw workspace value.
+
+Validation:
+- CM-1030 test syntax check passed.
+- CM-1030 temp-local lifecycle supersede cache-mutation test passed `1/1`.
+- Lifecycle supersede-cache/validate-cache/cache/matrix/stale/rejected/validate/tombstone/supersede/MCP regression bundle passed `24/24`.
+- Supersede/validate/write-temp-local adjacent bundle passed `42/42`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Boundary:
+- Temp-local app paths only.
+- Lifecycle status marking and approved supersede mutation occurred only in isolated temp-local state.
+- Candidate-cache population occurred only under the temp root.
+- No real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, rollback readiness claim, or real cleanup.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, lifecycle supersede cache-mutation boundary, or public MCP boundary.
+
+Next:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, public/default search reliability, real-store durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1029 Public Default Search Lifecycle Validate Cache-Mutation Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_VALIDATE_CACHE_MUTATION_NOT_RELIABLE_NOT_READY`

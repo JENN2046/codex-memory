@@ -28,6 +28,52 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1030 Public Default Search Lifecycle Supersede Cache-Mutation Temp-Local Evidence - 2026-05-25
+
+Result: `CM1030_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_SUPERSEDE_CACHE_MUTATION_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1030 records isolated temp-local lifecycle supersede cache-mutation evidence for private Codex-scoped default public `search_memory`:
+
+- two private Codex-scoped temp records with the same marker were written under an isolated temp root
+- the old record was marked active and the replacement record was marked proposal in temp-local lifecycle columns
+- default public scoped search returned only the old active record before supersede
+- the proposal replacement was hidden by lifecycle read policy before supersede
+- candidate cache was enabled, populated, and located under the temp root
+- the old record was superseded through the approved internal supersede runtime entry
+- the same default public `search_memory` with `include_content=false`, `enableLifecycleReadPolicy=true`, and explicit private Codex scope returned only the replacement record after supersede
+- the superseded old record was not returned after supersede
+- read-policy audit was applied and raw workspace value was not printed
+
+Validation:
+
+- CM-1030 test `1/1` passed
+- lifecycle supersede-cache/validate-cache/cache/matrix/stale/rejected/validate/tombstone/supersede/MCP regression bundle `24/24` passed
+- supersede/validate/write-temp-local adjacent bundle `42/42` passed
+
+Boundary:
+
+```text
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+package/config/watchdog/startup change = false
+real cleanup = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens lifecycle/cache visibility-refresh evidence around public/default scoped recall after approved internal supersede mutation.
+- This is cache-present lifecycle supersede mutation evidence; it does not distinguish cache-hit filtering from governance-state cache invalidation.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, public search reliability, governance closure, and rollback readiness remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1029 Public Default Search Lifecycle Validate Cache-Mutation Temp-Local Evidence - 2026-05-25
 
 Result: `CM1029_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_VALIDATE_CACHE_MUTATION_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
