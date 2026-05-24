@@ -1,4 +1,1458 @@
-# CHECKPOINT.md - codex-memory
+# CHECKPOINT.md — codex-memory
+
+## CM-0995 Deferred Governance App Runtime Readiness Boundary Binding Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+
+Commit: `9c35361 test: bind app runtime review to boundary`
+
+Scope:
+- `src/core/DeferredGovernanceAppRuntimeEntryReadinessReviewPolicy.js`
+- `tests/deferred-governance-app-runtime-entry-readiness-review-policy.test.js`
+- `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_APP_RUNTIME_ENTRY_READINESS_REVIEW_POLICY.md`
+
+Completed:
+- Added an explicit-input app runtime-entry readiness review hardening that requires the CM-0992 closure evidence boundary.
+- Added a fail-closed test proving uncommitted app runtime evidence blocks review acceptance.
+- Ran targeted syntax checks, target test, CM-0992 boundary regression, adjacent app/adapter/runtime-readiness/planning regressions, public MCP/no-overclaim scans, docs validation, staged diff inspection, local commit, and post-commit Git inspection.
+
+Validation:
+- `node --check src\core\DeferredGovernanceAppRuntimeEntryReadinessReviewPolicy.js`
+- `node --check tests\deferred-governance-app-runtime-entry-readiness-review-policy.test.js`
+- `node --test tests\deferred-governance-app-runtime-entry-readiness-review-policy.test.js` passed `6/6`
+- `node --test tests\deferred-governance-closure-evidence-boundary-policy.test.js` passed `5/5`
+- `node --test tests\deferred-governance-app-runtime-entry.test.js` passed `7/7`
+- `node --test tests\deferred-governance-runtime-entry-adapter.test.js` passed `12/12`
+- `node --test tests\deferred-governance-runtime-readiness-review-policy.test.js` passed `5/5`
+- `node --test tests\deferred-governance-mutation-planning-service.test.js` passed `7/7`
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces.
+- readiness/no-overclaim scan showed only denial/boundary wording and negative test input.
+- staged diff contained exactly the three CM-0995 files.
+
+Boundary:
+- No app/runtime wiring change, runtime mount, service start, live proof, durable mutation, public MCP expansion, provider/API call, config/watchdog/startup edit, push, readiness claim, or reliability claim.
+
+## CM-0994 Deferred Governance App Preview Readiness Boundary Binding Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+
+Commit: `af2d5de test: bind app preview review to boundary`
+
+Scope:
+- `src/core/DeferredGovernanceAppApplyPlanPreviewReadinessReviewPolicy.js`
+- `tests/deferred-governance-app-apply-plan-preview-readiness-review-policy.test.js`
+- `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_APP_APPLY_PLAN_PREVIEW_READINESS_REVIEW_POLICY.md`
+
+Completed:
+- Added an explicit-input app preview readiness review hardening that requires the CM-0992 closure evidence boundary.
+- Added a fail-closed test proving uncommitted app preview evidence blocks review acceptance.
+- Ran targeted syntax checks, target test, CM-0992 boundary regression, CM-0993 closure regression, adjacent app/adapter/preview regressions, public MCP/no-overclaim scans, docs validation, staged diff inspection, local commit, and post-commit Git inspection.
+
+Validation:
+- `node --check src\core\DeferredGovernanceAppApplyPlanPreviewReadinessReviewPolicy.js`
+- `node --check tests\deferred-governance-app-apply-plan-preview-readiness-review-policy.test.js`
+- `node --test tests\deferred-governance-app-apply-plan-preview-readiness-review-policy.test.js` passed `6/6`
+- `node --test tests\deferred-governance-closure-evidence-boundary-policy.test.js` passed `5/5`
+- `node --test tests\deferred-governance-preview-closure-review-policy.test.js` passed `6/6`
+- `node --test tests\deferred-governance-app-runtime-entry.test.js` passed `7/7`
+- `node --test tests\deferred-governance-runtime-entry-adapter.test.js` passed `12/12`
+- `node --test tests\deferred-governance-bounded-apply-plan-preview.test.js` passed `6/6`
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces.
+- readiness/no-overclaim scan showed only denial/boundary wording and negative test input.
+- staged diff contained exactly the three CM-0994 files.
+
+Boundary:
+- No app/runtime wiring, runtime mount, service start, live proof, durable mutation, public MCP expansion, provider/API call, config/watchdog/startup edit, push, readiness claim, or reliability claim.
+
+## CM-0993 Deferred Governance Preview Closure Boundary Binding Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+
+Commit: `5d78dc3 test: bind preview closure to boundary`
+
+Scope:
+- `src/core/DeferredGovernancePreviewClosureReviewPolicy.js`
+- `tests/deferred-governance-preview-closure-review-policy.test.js`
+- `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_PREVIEW_CLOSURE_REVIEW_POLICY.md`
+
+Completed:
+- Added an explicit-input preview closure review policy hardening that requires the CM-0992 closure evidence boundary.
+- Added a fail-closed test proving uncommitted app/runtime evidence blocks preview closure.
+- Ran targeted syntax checks, target test, CM-0992 boundary regression, CM-0932 adjacent regression, public MCP/no-overclaim scans, docs validation, staged diff inspection, local commit, and post-commit Git inspection.
+
+Validation:
+- `node --check src\core\DeferredGovernancePreviewClosureReviewPolicy.js`
+- `node --check tests\deferred-governance-preview-closure-review-policy.test.js`
+- `node --test tests\deferred-governance-preview-closure-review-policy.test.js` passed `6/6`
+- `node --test tests\deferred-governance-closure-evidence-boundary-policy.test.js` passed `5/5`
+- `node --test tests\deferred-governance-app-apply-plan-preview-readiness-review-policy.test.js` passed `5/5`
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces.
+- readiness/no-overclaim scan showed only denial/boundary wording and negative test input.
+- staged diff contained exactly the three CM-0993 files.
+
+Boundary:
+- No app/runtime wiring, runtime mount, service start, live proof, durable mutation, public MCP expansion, provider/API call, config/watchdog/startup edit, push, readiness claim, or reliability claim.
+
+## CM-0992 Deferred Governance Closure Evidence Boundary Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+
+Commit: `c073ccd test: add deferred governance closure boundary`
+
+Scope:
+- `src/core/DeferredGovernanceClosureEvidenceBoundaryPolicy.js`
+- `tests/deferred-governance-closure-evidence-boundary-policy.test.js`
+- `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_CLOSURE_EVIDENCE_BOUNDARY_POLICY.md`
+
+Completed:
+- Added an explicit-input boundary helper that blocks uncommitted or unsafe app/runtime evidence from deferred governance closure.
+- Ran targeted syntax checks and targeted boundary policy test.
+- Ran public MCP/no-overclaim scans, docs validation, staged diff inspection, local commit, and post-commit Git inspection.
+
+Validation:
+- `node --check src\core\DeferredGovernanceClosureEvidenceBoundaryPolicy.js`
+- `node --check tests\deferred-governance-closure-evidence-boundary-policy.test.js`
+- `node --test tests\deferred-governance-closure-evidence-boundary-policy.test.js` passed `5/5`
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces.
+- readiness/no-overclaim scan showed only denial/boundary wording and negative test input.
+- staged diff contained exactly the three CM-0992 files.
+
+Boundary:
+- No app/runtime wiring, runtime mount, service start, live proof, durable mutation, public MCP expansion, provider/API call, config/watchdog/startup edit, push, readiness claim, or reliability claim.
+
+## CM-0991 Supersede Shadow-Seam Candidate Helper Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+
+Commit: `4f247f1 test: add supersede seam candidate helper`
+
+Scope:
+- `src/core/MemorySupersedeShadowSeamCandidateHelper.js`
+- `tests/memory-supersede-shadow-seam-candidate-helper.test.js`
+- `tests/fixtures/memory-supersede-shadow-seam-candidate-request-v1.json`
+- `docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_SHADOW_SEAM_CANDIDATE_HELPER.md`
+
+Completed:
+- Confirmed CM-0990 runtime-prep helper and its dependencies are committed.
+- Rebased doc/test/fixture wording from old CM-0882 wording onto the current CM-0991 chain.
+- Ran targeted syntax checks and targeted shadow-seam candidate helper test.
+- Ran public MCP/no-overclaim scans, docs validation, staged diff inspection, local commit, and post-commit Git inspection.
+
+Validation:
+- `node --check src\core\MemorySupersedeShadowSeamCandidateHelper.js`
+- `node --check tests\memory-supersede-shadow-seam-candidate-helper.test.js`
+- `node --test tests\memory-supersede-shadow-seam-candidate-helper.test.js` passed `6/6`
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces.
+- readiness/no-overclaim scan showed only denial/boundary wording.
+- staged diff contained exactly the four CM-0991 files.
+
+Boundary:
+- No seam implementation, runtime mount, audit writer, runtime apply, durable mutation, live proof, public MCP expansion, provider/API call, config/watchdog/startup edit, push, readiness claim, or reliability claim.
+
+## CM-0990 Supersede Runtime-Prep Helper Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+
+Commit: `eb4978a test: add supersede runtime prep helper`
+
+Scope:
+- `src/core/MemorySupersedeRuntimePrepHelper.js`
+- `tests/memory-supersede-runtime-prep-helper.test.js`
+- `tests/fixtures/memory-supersede-runtime-prep-request-v1.json`
+- `docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_RUNTIME_PREP.md`
+
+Completed:
+- Confirmed CM-0988 pair-outcome helper and CM-0989 shadow-seam contract dependencies are committed.
+- Rebased doc/test/fixture wording from old CM-0881 wording onto the current CM-0990 chain.
+- Ran targeted syntax checks and targeted runtime-prep helper test.
+- Ran public MCP/no-overclaim scans, docs validation, staged diff inspection, local commit, and post-commit Git inspection.
+
+Validation:
+- `node --check src\core\MemorySupersedeRuntimePrepHelper.js`
+- `node --check tests\memory-supersede-runtime-prep-helper.test.js`
+- `node --test tests\memory-supersede-runtime-prep-helper.test.js` passed `6/6`
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces.
+- readiness/no-overclaim scan showed only denial/boundary wording.
+- staged diff contained exactly the four CM-0990 files.
+
+Boundary:
+- No runtime mount, seam implementation, audit writer, runtime apply, durable mutation, live proof, public MCP expansion, provider/API call, config/watchdog/startup edit, push, readiness claim, or reliability claim.
+
+## CM-0989 Supersede Shadow-Seam Contract Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+
+Commit: `0fa90ec test: add supersede shadow seam contract`
+
+Scope:
+- `src/core/MemorySupersedeShadowSeamContract.js`
+- `tests/memory-supersede-shadow-seam-contract.test.js`
+- `tests/fixtures/memory-supersede-shadow-seam-v1.json`
+- `docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_SHADOW_SEAM_CONTRACT.md`
+
+Completed:
+- Confirmed the seam-contract candidate is untracked and is the missing prerequisite for the runtime-prep helper candidate.
+- Rebased doc/test/fixture wording from old CM-0878 wording onto the current CM-0989 chain.
+- Ran targeted syntax checks and targeted seam-contract test.
+- Ran public MCP/no-overclaim scans, docs validation, staged diff inspection, local commit, and post-commit Git inspection.
+
+Validation:
+- `node --check src\core\MemorySupersedeShadowSeamContract.js`
+- `node --check tests\memory-supersede-shadow-seam-contract.test.js`
+- `node --test tests\memory-supersede-shadow-seam-contract.test.js` passed `8/8`
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces.
+- readiness/no-overclaim scan showed only forbidden-claim and denial/boundary wording.
+- staged diff contained exactly the four CM-0989 files.
+
+Boundary:
+- No seam implementation, audit writer, runtime-prep mount, runtime apply, durable mutation, live proof, public MCP expansion, provider/API call, config/watchdog/startup edit, push, readiness claim, or reliability claim.
+
+## CM-0988 Supersede Pair-Outcome Helper Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+
+Commit: `e949211 test: add supersede pair outcome helper`
+
+Scope:
+- `src/core/MemorySupersedePairOutcomeHelper.js`
+- `tests/memory-supersede-pair-outcome-helper.test.js`
+- `tests/fixtures/memory-supersede-pair-outcome-helper-request-v1.json`
+- `docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_PAIR_OUTCOME_HELPER.md`
+
+Completed:
+- Confirmed the helper candidate is untracked and depends only on committed helper/fixture dependencies plus CM-0987's committed pair contract.
+- Rebased doc/test/fixture wording from old CM-0880 wording onto the current CM-0988 / CM-0987 chain.
+- Ran targeted syntax checks and targeted helper test.
+- Ran public MCP/no-overclaim scans, docs validation, staged diff inspection, local commit, and post-commit Git inspection.
+
+Validation:
+- `node --check src\core\MemorySupersedePairOutcomeHelper.js`
+- `node --check tests\memory-supersede-pair-outcome-helper.test.js`
+- `node --test tests\memory-supersede-pair-outcome-helper.test.js` passed `6/6`
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces.
+- readiness/no-overclaim scan showed only denial/boundary wording.
+- staged diff contained exactly the four CM-0988 files.
+
+Boundary:
+- No audit writer, runtime-prep helper, runtime mount, durable mutation, live proof, public MCP expansion, provider/API call, config/watchdog/startup edit, push, readiness claim, or reliability claim.
+
+## CM-0983 deferred governance prerequisite closure review policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `e92cd36 test: add deferred governance closure policy` for deferred `memory_exclude` / `memory_forget` prerequisite closure review contract
+Changed files: src/core/DeferredGovernancePrerequisiteClosureReviewPolicy.js; tests/deferred-governance-prerequisite-closure-review-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_PREREQUISITE_CLOSURE_REVIEW_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-prerequisite-closure-review-policy.test.js` (`5/5`); readiness/no-overclaim scan; public MCP freeze scan; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 10`, `git show --stat --oneline --name-status HEAD`, and clean cached diff inspection.
+Boundary: explicit-input policy helper only. No runtime apply, runtime integration, service start, live recall proof, live write proof, durable real memory/audit write, candidate-cache clear, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `e92cd36`; committed diff contains only the three CM-0983 files. Candidate creates a machine-checkable closure review for the CM-0972 through CM-0982 prerequisite evidence chain while still forcing `runtimeReady=false` and blocking runtime/live-proof/provider/config/public-MCP/readiness actions.
+Next: current deferred governance prerequisite policy-closure slice is locally committed and validated. Continue with a separate runtime-entry/app preview candidate only after fresh inspection, or resolve dirty baseline before any live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0982 deferred governance runtime-readiness review policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `f15cbd6 test: add deferred governance readiness policy` for deferred `memory_exclude` / `memory_forget` runtime-readiness review contract
+Changed files: src/core/DeferredGovernanceRuntimeReadinessReviewPolicy.js; tests/deferred-governance-runtime-readiness-review-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_RUNTIME_READINESS_REVIEW_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-runtime-readiness-review-policy.test.js` (`5/5`); readiness/no-overclaim scan; public MCP freeze scan; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 8`, `git show --stat --oneline --name-status HEAD`, and clean cached diff inspection.
+Boundary: explicit-input policy helper only. No runtime integration, service start, runtime probe, live recall proof, live write proof, durable real memory/audit write, candidate-cache clear, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `f15cbd6`; committed diff contains only the three CM-0982 files. Candidate fixes one deferred governance prerequisite: future `memory_exclude` / `memory_forget` runtime review must inspect exact prerequisite refs, deny runtime/live-proof/provider/config/public-MCP actions, preserve dirty-baseline blockers, and keep decision state `not_runtime_ready`.
+Next: inspect prerequisite-closure review as a separate scoped policy review. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0981 deferred governance revision policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `efb2c03 test: add deferred governance revision policy` for deferred `memory_exclude` / `memory_forget` governance revision contract
+Changed files: src/core/DeferredGovernanceRevisionPolicy.js; tests/deferred-governance-revision-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_REVISION_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-revision-policy.test.js` (`5/5`); readiness/no-overclaim scan; public MCP freeze scan; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 8`, `git show --stat --oneline --name-status HEAD`, and clean cached diff inspection.
+Boundary: explicit-input policy helper only. No revision emitter implementation, broad real-memory scan, candidate-cache clear, durable projection apply, execution approval, runtime apply, live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `efb2c03`; committed diff contains only the three CM-0981 files. Candidate fixes one deferred governance prerequisite: future `memory_exclude` / `memory_forget` runtime review must require deterministic revision inputs/outputs, audit/projection/changed-id/cache/read-suppression parity, rollback/cleanup revision refs, stale revision rejection, no provider/broad scan, and public MCP freeze.
+Next: inspect the runtime-readiness review policy as the next smallest scoped governance prerequisite before any prerequisite-closure review. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0980 deferred governance shadow projection policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `0eba0e0 test: add deferred governance projection policy` for deferred `memory_exclude` / `memory_forget` shadow projection contract
+Changed files: src/core/DeferredGovernanceShadowProjectionPolicy.js; tests/deferred-governance-shadow-projection-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_SHADOW_PROJECTION_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-shadow-projection-policy.test.js` (`5/5`); readiness/no-overclaim scan; public MCP freeze scan; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 8`, `git show --stat --oneline --name-status HEAD`, and clean cached diff inspection.
+Boundary: explicit-input policy helper only. No projection implementation, durable projection apply, audit writer implementation, execution approval, runtime apply, live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, broad store scan, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `0eba0e0`; committed diff contains only the three CM-0980 files. Candidate fixes one deferred governance prerequisite: future `memory_exclude` / `memory_forget` runtime review must require explicit projection inputs/outputs, SQLite projection columns, before/after field previews, changed memory ids, governance and candidate-cache revisions, read suppression state, scope verification, rollback/cleanup, and public MCP freeze.
+Next: continue with another scoped governance prerequisite or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0976 deferred governance bounded runtime-prep policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `b8595d8 test: add deferred governance runtime prep policy` for deferred `memory_exclude` / `memory_forget` bounded runtime-prep contract
+Changed files: src/core/DeferredGovernanceBoundedRuntimePrepPolicy.js; tests/deferred-governance-bounded-runtime-prep-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_BOUNDED_RUNTIME_PREP_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-bounded-runtime-prep-policy.test.js` (`5/5`); readiness/no-overclaim scan; targeted `git diff --check`; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 10`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: explicit-input policy helper only. No execution approval, runtime entry function implementation, real apply plan, runtime apply, live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, broad store scan, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `b8595d8`; committed diff contains only the three CM-0976 files. Candidate fixes one deferred governance prerequisite: future `memory_exclude` / `memory_forget` runtime-prep must stay dry-run-only, bind approved context and exact approval, and require explicit audit/projection/changed-id/cache/read-suppression/rollback previews before runtime review.
+Next: continue with another scoped governance prerequisite or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0975 deferred governance approved-context gate policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `b5378a3 test: add deferred governance context policy` for deferred `memory_exclude` / `memory_forget` approved-context gate contract
+Changed files: src/core/DeferredGovernanceApprovedContextGatePolicy.js; tests/deferred-governance-approved-context-gate-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_APPROVED_CONTEXT_GATE_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-approved-context-gate-policy.test.js` (`5/5`); readiness/no-overclaim scan; targeted `git diff --check`; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 10`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: explicit-input policy helper only. No execution approval, runtime entry function implementation, runtime apply, live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, broad store scan, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `b5378a3`; committed diff contains only the three CM-0975 files. Candidate fixes one deferred governance prerequisite: future `memory_exclude` / `memory_forget` runtime review must inherit default-disabled internal context gates with exact request source, context flag, actor, approval, audit correlation, scope binding, and rejection of public/stale/missing context.
+Next: continue with another scoped governance prerequisite or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0974 deferred governance exact execution approval policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `8842ec9 test: add deferred governance approval policy` for deferred `memory_exclude` / `memory_forget` exact execution approval contract
+Changed files: src/core/DeferredGovernanceExactExecutionApprovalPolicy.js; tests/deferred-governance-exact-execution-approval-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_EXACT_EXECUTION_APPROVAL_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-exact-execution-approval-policy.test.js` (`5/5`); readiness/no-overclaim scan; targeted `git diff --check`; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 10`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: explicit-input policy helper only. No execution approval, runtime apply, live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, broad store scan, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `8842ec9`; committed diff contains only the three CM-0974 files. Candidate fixes one deferred governance prerequisite: future `memory_exclude` / `memory_forget` execution cannot rely on ambient standing authorization, blanket go-ahead, dirty-worktree inference, stale packets, runtime defaults, or public MCP calls.
+Next: continue with another scoped governance prerequisite or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0973 deferred governance changed-id and candidate-cache policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `3295f11 test: add deferred governance cache policies` for deferred `memory_exclude` / `memory_forget` changed-memory-id and candidate-cache invalidation contracts
+Changed files: src/core/DeferredGovernanceCandidateCacheInvalidationPolicy.js; tests/deferred-governance-candidate-cache-invalidation-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_CANDIDATE_CACHE_INVALIDATION_POLICY.md; src/core/DeferredGovernanceChangedMemoryIdsPolicy.js; tests/deferred-governance-changed-memory-ids-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_CHANGED_MEMORY_IDS_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-candidate-cache-invalidation-policy.test.js` (`5/5`); `node --test tests\deferred-governance-changed-memory-ids-policy.test.js` (`5/5`); public MCP freeze exactly `memory_overview`, `record_memory`, `search_memory`; readiness/no-overclaim scan; targeted `git diff --check`; scoped phase commit review `candidate_ready`; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 10`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: explicit-input policy helpers only. No runtime apply, runtime changed-id emitter, real candidate-cache clear, live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, broad store scan, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `3295f11`; committed diff contains only the six CM-0973 files. Candidate fixes two deferred governance prerequisites: future deferred families must declare exact changed-memory-id plans with audit/projection/cache invalidation parity, and stale suppressed candidate-cache reuse must be blocked via changed ids, governance revision, target-family fallback, and cache-hit projection recheck.
+Next: continue with another scoped governance prerequisite or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0972 deferred governance no-hard-delete and scope-pollution policy checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped source/test/docs governance policy packet committed locally as `0b8b9da test: add deferred governance safety policies` for deferred `memory_exclude` / `memory_forget` no-hard-delete defaults and scope/pollution read suppression
+Changed files: src/core/DeferredGovernanceNoHardDeletePolicy.js; tests/deferred-governance-no-hard-delete-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_NO_HARD_DELETE_POLICY.md; src/core/DeferredGovernanceScopePollutionReadPolicy.js; tests/deferred-governance-scope-pollution-read-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_SCOPE_POLLUTION_READ_POLICY.md
+Validation: source/test syntax checks; `node --test tests\deferred-governance-no-hard-delete-policy.test.js` (`5/5`); `node --test tests\deferred-governance-scope-pollution-read-policy.test.js` (`5/5`); public MCP freeze exactly `memory_overview`, `record_memory`, `search_memory`; readiness/no-overclaim scan; targeted `git diff --check`; scoped phase commit review `candidate_ready`; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 8`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: explicit-input policy helpers only. No runtime apply, live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, broad store scan, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `0b8b9da`; committed diff contains only the six CM-0972 files. Candidate fixes two deferred governance prerequisites: hard delete cannot be default for `memory_exclude` / `memory_forget`, and suppressed/excluded/forgotten/governance-suppressed states must stay blocked from normal recall, candidate generation, and cache-hit projection except governance-only review contexts.
+Next: continue with another scoped governance prerequisite or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0971 write proof-consumption docs packet checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P8-memory-governance
+Scope: scoped docs-only write proof-consumption packet committed locally as `ecb5cbb docs: add write proof consumption packets`, covering CM-0890, CM-0894, CM-0895, CM-0896, and CM-0897
+Changed files: docs/MEMORY_WRITE_PREFLIGHT_CANDIDATE_SOURCE_REVIEW.md; docs/MEMORY_WRITE_PREFLIGHT_INTERNAL_ONLY_BOUNDARY_REVIEW.md; docs/MEMORY_WRITE_PREFLIGHT_LIVE_WRITE_PROOF_CONSUMPTION_PACKET.md; docs/MEMORY_WRITE_PREFLIGHT_DUPLICATE_BASIS_BINDING_REVIEW.md; docs/MEMORY_WRITE_PREFLIGHT_CM0737_CANDIDATE_REBIND_PACKET.md
+Validation: referenced-file existence check over cited write service/store/app/test/proof docs; no-overclaim scan; public MCP freeze; targeted `git diff --check`; scoped phase commit review `candidate_ready`; docs validation; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 7`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: docs-only guidance. No live write proof, live recall proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, broad store scan, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `ecb5cbb`; committed diff contains only the five CM-0971 docs. Packet set keeps future write proof internal-only, opt-in, exact-approved, prebound, one-write-only, sanitized/no-raw, no-provider/no-broad-scan, and not readiness-bearing. `CM-0737` remains a candidate-family anchor only.
+Next: continue governance closure only through another scoped candidate, or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0970 recall proof-consumption docs packet checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P8-memory-governance
+Scope: scoped docs-only recall proof-consumption packet committed locally as `c7167f2 docs: add recall proof consumption packets`, covering CM-0898 through CM-0903 plus phase handoff
+Changed files: docs/RECALL_PRECISION_LIVE_PROOF_CONSUMPTION_PACKET.md; docs/RECALL_PRECISION_CM0814_CANDIDATE_REBIND_PACKET.md; docs/RECALL_PRECISION_INTERNAL_ONLY_BOUNDARY_REVIEW.md; docs/RECALL_PRECISION_QUERY_FAMILY_BASIS_BINDING_REVIEW.md; docs/RECALL_PRECISION_CM0814_EXACT_BASIS_APPROVAL_PACKET.md; docs/MEMORY_RELIABILITY_PROOF_CONSUMPTION_PHASE_HANDOFF.md
+Validation: referenced-file existence check over cited runner/adapter/app/pipeline and proof docs; no-overclaim scan; public MCP freeze; targeted `git diff --check`; docs validation; scoped phase commit review `candidate_ready`; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 6`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: docs-only guidance. No live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `c7167f2`; committed diff contains only the six CM-0970 docs. Packet set keeps future recall proof internal-only, exact-approved, prebound, one-run-only, sanitized/no-raw, no-provider/no-durable-write, and not readiness-bearing. `CM-0814` remains a candidate-family anchor only.
+Next: continue with a scoped write-side proof-consumption packet or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0969 reliability baseline isolation-review helper/CLI checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P8-memory-governance
+Scope: scoped read-only reliability baseline isolation-review helper/CLI committed locally as `041c1af test: add reliability baseline isolation review`
+Changed files: src/core/MemoryReliabilityProofBaselineIsolationReview.js; src/cli/memory-reliability-proof-baseline-isolation-review.js; tests/memory-reliability-proof-baseline-isolation-review.test.js; tests/memory-reliability-proof-baseline-isolation-review-cli.test.js; docs/MEMORY_RELIABILITY_PROOF_BASELINE_ISOLATION_REVIEW_CLI.md
+Validation: `node --check` for helper/CLI/tests; `node --test tests\memory-reliability-proof-baseline-isolation-review.test.js` (`5/5`); `node --test tests\memory-reliability-proof-baseline-isolation-review-cli.test.js` (`4/4`); adjacent CM-0968 regression (`9/9`); current dirty-baseline isolation-review smoke; public MCP freeze; readiness/no-overclaim scan; scoped phase commit review `candidate_ready`; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 6`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: read-only isolation review only. No stage/commit inside CLI, no live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `041c1af`; committed diff contains only the five CM-0969 files. Candidate returns `isolationReviewAccepted=true`, `safeForLiveProof=false`, `safeForCommit=false`, `dirtyBaselineBlocked=true`, and `unscopedCommitBlocked=true` for the current mixed dirty baseline.
+Next: continue only with another scoped reliability/governance candidate or resolve dirty baseline before live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0968 reliability baseline blocker-plan helper/CLI checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P8-memory-governance
+Scope: scoped read-only reliability baseline blocker-plan helper/CLI committed locally as `d1b6553 test: add reliability baseline blocker plan`
+Changed files: src/core/MemoryReliabilityProofBaselineBlockerPlan.js; src/cli/memory-reliability-proof-baseline-blocker-plan.js; tests/memory-reliability-proof-baseline-blocker-plan.test.js; tests/memory-reliability-proof-baseline-blocker-plan-cli.test.js; docs/MEMORY_RELIABILITY_PROOF_BASELINE_BLOCKER_PLAN.md; docs/MEMORY_RELIABILITY_PROOF_BASELINE_BLOCKER_PLAN_CLI.md
+Validation: `node --check` for helper/CLI/tests; `node --test tests\memory-reliability-proof-baseline-blocker-plan.test.js` (`5/5`); `node --test tests\memory-reliability-proof-baseline-blocker-plan-cli.test.js` (`4/4`); adjacent CM-0967/CM-0966 readiness regression (`11/11`); current dirty-baseline blocker-plan smoke; public MCP freeze; readiness/no-overclaim scan; scoped phase commit review `candidate_ready`; staged `git diff --cached --check`; post-commit `git status --short`, `git log --oneline --decorate -n 5`, and `git show --stat --oneline --name-status HEAD`.
+Boundary: read-only blocker planning only. No live recall proof, live write proof, true `record_memory`, true `search_memory`, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `d1b6553`; committed diff contains only the six CM-0968 files. Candidate returns `blockerPlanAccepted=true`, `baselineReadyForLiveProof=false`, `dirtyBaselineBlocked=true`, `unscopedCommitBlocked=true`, and blocker ids `CMB-0013` / `CMB-0014` for the current dirty baseline.
+Next: continue isolation-review CLI chain before any live proof. Keep push deferred until dirty tree and push-readiness are resolved.
+
+## CM-0961 durable governance mutation dry-run helper local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped CM-0862 explicit-input durable governance mutation dry-run helper committed locally as `aad87e9 feat: add durable governance dry-run helper`
+Changed files: src/core/DurableGovernanceMutationDryRunHelper.js; tests/fixtures/durable-governance-mutation-dry-run-request-v1.json; tests/durable-governance-mutation-dry-run-helper.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_MUTATION_DRY_RUN_HELPER.md
+Validation: `node --check src\core\DurableGovernanceMutationDryRunHelper.js`; `node --check tests\durable-governance-mutation-dry-run-helper.test.js`; `node --test tests\durable-governance-mutation-dry-run-helper.test.js` (`8/8`); public MCP freeze scan; targeted `git diff --check`; staged `git diff --cached --check`; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short`, `git log --oneline --decorate -n 8`, and `git show --stat --oneline --name-only HEAD`
+Boundary: explicit-input no-side-effect governance dry-run preview only. No runtime apply, public MCP expansion, live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `aad87e9`; worktree remains dirty outside this committed four-file scope, including app/runtime-surface candidates and board/status receipts.
+Next: isolate projection preview or another leaf governance helper with committed dependencies before app/runtime wiring; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0960 durable governance mutation packet contract local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped CM-0861 fixture-only durable governance mutation packet contract committed locally as `1f0cccd feat: add durable governance packet contract`
+Changed files: src/core/DurableGovernanceMutationPacketContract.js; tests/fixtures/durable-governance-mutation-packet-v1.json; tests/durable-governance-mutation-packet-fixture.test.js; tests/durable-governance-mutation-packet-helper.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_MUTATION_PACKET_CONTRACT.md
+Validation: `node --check src\core\DurableGovernanceMutationPacketContract.js`; `node --check tests\durable-governance-mutation-packet-helper.test.js`; `node --check tests\durable-governance-mutation-packet-fixture.test.js`; `node --test tests\durable-governance-mutation-packet-helper.test.js tests\durable-governance-mutation-packet-fixture.test.js` (`22/22`); public MCP freeze scan; staged `git diff --cached --check`; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short`, `git log --oneline --decorate -n 5`, and `git show --stat --oneline --name-only HEAD`
+Boundary: fixture-only explicit-input governance packet contract. No runtime apply, public MCP expansion, live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `1f0cccd`; worktree remains dirty outside this committed five-file scope, including app/runtime-surface candidates and board/status receipts.
+Next: isolate another leaf governance helper or an internal app/runtime wiring bundle only after verifying clean committed dependencies; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0959 internal runtime-entry gate helper local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped helper-only internal runtime-entry gate contract committed locally as `a796d60 feat: add internal runtime entry gate`
+Changed files: src/core/InternalRuntimeEntryGate.js; tests/internal-runtime-entry-gate.test.js; docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_GATE_CONTRACT.md
+Validation: `node --check src\core\InternalRuntimeEntryGate.js`; `node --check tests\internal-runtime-entry-gate.test.js`; `node --test tests\internal-runtime-entry-gate.test.js` (`4/4`); public MCP freeze scan; staged `git diff --cached --check`; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short` and `git log --oneline --decorate -n 8`
+Boundary: helper-only internal runtime-entry payload contract. No app wiring, runtime entry mounting, public MCP expansion, live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `a796d60`; `origin/main` remains `a6782e3`; worktree remains dirty outside this committed three-file scope, including app/runtime-surface candidates and board/status receipts.
+Next: isolate internal app/runtime wiring or another proof-precondition packet with scoped review; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0958 tombstone temp-local evidence local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped CM-0869 tombstone temp-local evidence committed locally as `3a3824d test: add tombstone temp-local evidence`
+Changed files: tests/tombstone-memory-temp-local-evidence.test.js; docs/MEMORY_LIFECYCLE_SCOPE_TOMBSTONE_TEMP_LOCAL_EVIDENCE.md
+Validation: `node --check tests\tombstone-memory-temp-local-evidence.test.js`; `node --test tests\tombstone-memory-temp-local-evidence.test.js` (`2/2`); public MCP freeze scan; staged `git diff --cached --check`; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short` and `git log --oneline --decorate -n 8`
+Boundary: isolated synthetic temp-local evidence only. No app wiring, runtime entry, public MCP expansion, live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write outside isolated temp tests, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `3a3824d`; `origin/main` remains `a6782e3`; worktree remains dirty outside this committed two-file scope, including app/runtime-surface candidates and board/status receipts.
+Next: isolate internal app/runtime wiring or another proof-precondition packet with scoped review; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0957 tombstone mutation service local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped CM-0868 internal tombstone mutation service committed locally as `27cd5d1 feat: add tombstone mutation service`
+Changed files: src/core/TombstoneMemoryService.js; tests/tombstone-memory-runtime.test.js; docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_TOMBSTONE_MUTATION_SERVICE.md
+Validation: `node --check src\core\TombstoneMemoryService.js`; `node --check tests\tombstone-memory-runtime.test.js`; `node --test tests\tombstone-memory-runtime.test.js` (`14/14`); public MCP freeze scan; staged `git diff --cached --check`; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short` and `git log --oneline --decorate -n 7`
+Boundary: internal dry-run-first service and targeted runtime coverage only. No app wiring, runtime entry, public MCP expansion, temp-local or live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write outside tests, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `27cd5d1`; `origin/main` remains `a6782e3`; worktree remains dirty outside this committed three-file scope, including app/runtime-surface candidates and board/status receipts.
+Next: isolate tombstone temp-local evidence, internal app/runtime wiring, or another proof-precondition packet with scoped review; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0956 supersede temp-local evidence local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped CM-0885 supersede temp-local evidence committed locally as `bae33d2 test: add supersede temp-local evidence`
+Changed files: tests/supersede-memory-temp-local-evidence.test.js; docs/MEMORY_LIFECYCLE_SCOPE_SUPERSEDE_TEMP_LOCAL_EVIDENCE.md
+Validation: `node --check tests\supersede-memory-temp-local-evidence.test.js`; `node --test tests\supersede-memory-temp-local-evidence.test.js` (`2/2`); public MCP freeze scan; staged `git diff --cached --check`; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short` and `git log --oneline --decorate -n 6`
+Boundary: isolated synthetic temp-local evidence only. No app wiring, runtime entry, public MCP expansion, live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write outside isolated temp tests, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `bae33d2`; `origin/main` remains `a6782e3`; worktree remains dirty outside this committed two-file scope, including app/runtime-surface candidates and board/status receipts.
+Next: isolate internal app/runtime wiring or another proof-precondition packet with scoped review; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0955 supersede mutation service local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped internal supersede mutation service committed locally as `5872f80 feat: add supersede mutation service`
+Changed files: src/core/SupersedeMemoryService.js; tests/supersede-memory-runtime.test.js; docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_SUPERSEDE_MUTATION_SERVICE.md
+Validation: `git diff --cached --check`; staged `src/core/SupersedeMemoryService.js` syntax; staged `tests\supersede-memory-runtime.test.js` syntax; `node --test tests\supersede-memory-runtime.test.js` (`10/10`); public MCP freeze scan; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short` and `git log --oneline --decorate -n 5`
+Boundary: internal dry-run-first service and targeted runtime coverage only. No app wiring, runtime entry, public MCP expansion, temp-local or live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write outside tests, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `5872f80`; `origin/main` remains `a6782e3`; worktree remains dirty outside this committed three-file scope, including app/runtime-surface candidates and board/status receipts.
+Next: isolate supersede temp-local evidence or internal app/runtime wiring with scoped review; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0954 supersede shadow-store seam local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped CM-0883 internal supersede shadow-store pair seam committed locally as `5923880 feat: add supersede shadow seam`
+Changed files: src/storage/SqliteShadowStore.js; tests/validate-memory-runtime.test.js; docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_SHADOW_STORE_SEAM_IMPLEMENTATION_CANDIDATE.md
+Validation: `git diff --cached --check`; staged `src/storage/SqliteShadowStore.js` syntax; staged `tests\validate-memory-runtime.test.js` syntax; `node --test tests\validate-memory-runtime.test.js` (`19/19`); public MCP freeze scan; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short` and `git log --oneline --decorate -n 6`
+Boundary: internal storage seam and targeted runtime coverage only. No internal supersede service, runtime entry, public MCP expansion, live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write outside tests, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `5923880`; `origin/main` remains `a6782e3`; worktree remains dirty outside this committed three-file scope, including app/service/runtime-surface candidates and board/status receipts.
+Next: isolate the supersede mutation service/temp-local evidence bundle or a proof-precondition packet with scoped review; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0953 tombstone reason lifecycle seam local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: scoped CM-0867 single-record tombstone reason lifecycle seam committed locally as `8c4765a feat: add tombstone reason lifecycle seam`
+Changed files: src/storage/SqliteShadowStore.js; tests/validate-memory-runtime.test.js; docs/MEMORY_LIFECYCLE_SCOPE_TOMBSTONE_REASON_RUNTIME_SEAM.md
+Validation: `git diff --cached --check`; staged `src/storage/SqliteShadowStore.js` syntax; staged `tests\validate-memory-runtime.test.js` syntax; `node --test tests\validate-memory-runtime.test.js` (`19/19` on current worktree superset, including staged tombstone seam coverage); public MCP freeze scan; scoped phase commit review `candidate_ready`; docs validation; post-commit `git status --short` and `git log --oneline --decorate -n 5`
+Boundary: single-record storage seam and targeted runtime coverage only. No durable governance apply, supersede seam commit, live governance proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable real memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, write-reliability claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `8c4765a`; `origin/main` remains `a6782e3`; worktree remains dirty outside this committed three-file scope, including separate supersede/runtime-surface candidates.
+Next: isolate the remaining supersede shadow-store seam or a proof-precondition packet with scoped review; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+
+## CM-0950 recall proof current-facts preflight local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P10-observability-admin
+Scope: scoped CM-0906 read-only recall proof current Git facts preflight CLI/docs/test committed locally as `61b0917 feat: add recall proof current facts preflight`
+Changed files: src/cli/recall-proof-current-facts-preflight.js; tests/recall-proof-current-facts-preflight-cli.test.js; docs/RECALL_PROOF_CURRENT_FACTS_PREFLIGHT_CLI.md
+Validation: `node --check` changed CLI/test; `node --test tests\recall-proof-current-facts-preflight-cli.test.js` (`6/6`); current-facts CLI smoke; public MCP freeze scan; scoped phase commit review; staged diff check; post-commit `git status --short` and `git log --oneline --decorate -n 7`
+Boundary: read-only local Git facts preflight only. No live recall proof, true `search_memory`, true `record_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `61b0917`; `origin/main` remains `a6782e3`; current-facts smoke blocks on `local_origin_head_mismatch` and `dirty_worktree`.
+Next: treat recall preflight helper/CLI/current-facts subphase as locally closed, but keep live recall proof blocked until a clean synced baseline exists; continue with write app-wiring or governance bundle only after scoped review.
+
+## CM-0949 recall proof execution preflight CLI local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P10-observability-admin
+Scope: scoped CM-0905 non-executing recall proof execution preflight CLI/docs/fixture/test committed locally as `a77f12e feat: add recall proof preflight cli`
+Changed files: src/cli/recall-proof-execution-preflight.js; tests/fixtures/recall-proof-execution-preflight-v1.json; tests/recall-proof-execution-preflight-cli.test.js; docs/RECALL_PROOF_EXECUTION_PREFLIGHT_CLI.md
+Validation: `node --check` changed CLI/test; `node --test tests\recall-proof-execution-preflight-cli.test.js` (`5/5`); helper regression `node --test tests\recall-proof-execution-preflight.test.js` (`5/5`); default CLI smoke; public MCP freeze scan; scoped phase commit review; staged diff check; post-commit `git status --short` and `git log --oneline --decorate -n 6`
+Boundary: explicit-input fixture CLI only. No live recall proof, true `search_memory`, true `record_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `a77f12e`; `origin/main` remains `a6782e3`; default fixture reports `RECALL_PROOF_EXECUTION_PREFLIGHT_BLOCKED_NOT_EXECUTED` with `dirty_worktree`.
+Next: isolate the recall current-facts packet, write app-wiring packet, or governance bundle with scoped review; keep push deferred until dirty tree and push-readiness evidence are coherent.
+
+## CM-0948 recall proof execution preflight helper local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P10-observability-admin
+Scope: scoped CM-0904 explicit-input recall proof execution preflight helper/docs/test committed locally as `9a202af feat: add recall proof execution preflight`
+Changed files: src/core/RecallProofExecutionPreflight.js; tests/recall-proof-execution-preflight.test.js; docs/RECALL_PROOF_EXECUTION_PREFLIGHT_HELPER.md
+Validation: `node --check` changed source/test; `node --test tests\recall-proof-execution-preflight.test.js` (`5/5`); public MCP freeze scan; scoped phase commit review; staged diff check; post-commit `git status --short` and `git log --oneline --decorate -n 5`
+Boundary: explicit-input preflight helper only. No live recall proof, true `search_memory`, true `record_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, or recall-reliability claim occurred.
+Current observed result: `HEAD` is `9a202af`; `origin/main` remains `a6782e3`; worktree remains dirty outside the committed three-file scope.
+Next: isolate the recall CLI/current-facts packet, write app-wiring packet, or governance bundle with scoped review; keep push deferred until dirty tree and push-readiness evidence are coherent.
+
+## CM-0947 write proof current-facts preflight local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance
+Scope: scoped CM-0908 read-only current Git facts preflight CLI/docs/test committed locally as `537496d feat: add write proof current facts preflight`
+Changed files: src/cli/write-proof-current-facts-preflight.js; tests/write-proof-current-facts-preflight-cli.test.js; docs/WRITE_PROOF_CURRENT_FACTS_PREFLIGHT_CLI.md
+Validation: `node --check` changed CLI/test; `node --test tests\write-proof-current-facts-preflight-cli.test.js` (`6/6`); `node src\cli\write-proof-current-facts-preflight.js --json --pretty`; public MCP freeze scan; scoped phase commit review; staged diff check; post-commit `git status --short` and `git log --oneline --decorate -n 6`
+Boundary: read-only local Git facts preflight only. No live write proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, or write-reliability claim occurred.
+Current observed result: `HEAD` is `537496d`; `origin/main` remains `a6782e3`; current-facts smoke blocks on local-ahead and dirty-worktree facts.
+Next: isolate the next write app-wiring or governance bundle with scoped review; keep push deferred until dirty tree and push-readiness evidence are coherent.
+
+## CM-0946 write proof execution preflight local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance
+Scope: scoped CM-0907 write proof execution preflight helper/CLI/docs/tests committed locally as `e89231a feat: add write proof execution preflight`
+Changed files: src/core/WriteProofExecutionPreflight.js; src/cli/write-proof-execution-preflight.js; tests/write-proof-execution-preflight.test.js; tests/write-proof-execution-preflight-cli.test.js; tests/fixtures/write-proof-execution-preflight-v1.json; docs/WRITE_PROOF_EXECUTION_PREFLIGHT_CLI.md
+Validation: `node --check` changed helper/CLI/tests; `node --test tests\write-proof-execution-preflight.test.js` (`5/5`); `node --test tests\write-proof-execution-preflight-cli.test.js` (`5/5`); `node src\cli\write-proof-execution-preflight.js --json --pretty`; public MCP freeze scan; scoped phase commit review; staged diff check; post-commit `git status --short` and `git log --oneline --decorate -n 5`
+Boundary: explicit-input preflight only. No live write proof, true `record_memory`, true `search_memory`, service start, provider/API call, raw memory or `.jsonl` read, durable memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, push, readiness claim, or write-reliability claim occurred.
+Current observed result: `HEAD` is `e89231a`; `origin/main` remains `a6782e3`; worktree remains dirty outside the committed six-file scope.
+Next: isolate the next write current-facts preflight or write app-wiring bundle with scoped review; keep push deferred until dirty tree and push-readiness evidence are coherent.
+
+## CM-0945 post-commit reconciliation checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_RECONCILIATION_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P8-memory-governance / P6-docs-drift
+Scope: board-only reconciliation after local commit `518751b feat: add governance-aware recall cache invalidation`
+Changed files: .agent_board/TASK_QUEUE.md; .agent_board/VALIDATION_LOG.md; .agent_board/AUTOPILOT_LEDGER.md; .agent_board/CHECKPOINT.md; .agent_board/HANDOFF.md; .agent_board/RUN_STATE.md
+Validation: `git status --short`; `git log --oneline --decorate -n 5`; `git diff --check`; docs validation
+Boundary: CM-0944 source/test behavior is already committed locally as `518751b`; this checkpoint changes board state only. No push, live recall/write proof, true `record_memory`, true `search_memory`, raw memory or `.jsonl` read, provider/API call, durable memory/audit/projection write, public MCP expansion, package/config/watchdog/startup change, or readiness/reliability claim occurred.
+Current observed result: `HEAD` is `518751b`; `origin/main` remains `a6782e3`; worktree remains dirty outside the committed six-file scope.
+Next: keep push deferred until a coherent push-readiness review exists; continue with the next isolated write reliability/governance bundle or a separate board/status receipt commit only after scoped review.
+
+## CM-0941 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime
+Scope: read-only scoped candidate mode for the memory reliability phase commit review helper/CLI
+Changed files: src/core/MemoryReliabilityPhaseCommitReview.js; src/cli/memory-reliability-phase-commit-review.js; tests/memory-reliability-phase-commit-review.test.js; tests/memory-reliability-phase-commit-review-cli.test.js; docs/MEMORY_RELIABILITY_PHASE_COMMIT_REVIEW_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/CLI/tests; targeted helper test `node --test tests\memory-reliability-phase-commit-review.test.js` (`7/7`); targeted CLI test `node --test tests\memory-reliability-phase-commit-review-cli.test.js` (`6/6`); default current CM-0939 CLI run; scoped current candidate review run; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: scoped candidate mode only reviews explicit proposed/verified dirty paths and preserves unrelated dirty paths; no stage, no commit, no push, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit/projection write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no readiness or reliability claim
+Current observed result: default real CLI still returned `status=blocked` and `dirtyStatusLineCount=226`; scoped real CLI over five CM-0941 helper/CLI/test/doc paths returned `status=candidate_ready`, `decision=MEMORY_RELIABILITY_PHASE_COMMIT_REVIEW_CANDIDATE_READY_NOT_EXECUTED`, `safeToStage=false`, `safeToCommit=false`, and `safeToPush=false`
+Next: use scoped candidate mode to prepare an exact guarded local phase commit only after validation and staged diff inspection; do not treat scoped candidate-ready as Git execution or runtime readiness
+
+## CM-0940 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime
+Scope: read-only candidate-path dry-run extension for the CM-0939 phase commit review CLI
+Changed files: src/cli/memory-reliability-phase-commit-review.js; tests/memory-reliability-phase-commit-review-cli.test.js; docs/MEMORY_RELIABILITY_PHASE_COMMIT_REVIEW_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed CLI/test; targeted CLI test `node --test tests\memory-reliability-phase-commit-review-cli.test.js` (`5/5`); helper regression `node --test tests\memory-reliability-phase-commit-review.test.js` (`5/5`); current CM-0939 CLI run; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: CLI candidate flags are review-only; no stage, no commit, no push, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit/projection write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no readiness or reliability claim
+Current observed result: real CLI default run still returned `status=blocked`, `commitCandidateReady=false`, `safeToStage=false`, `safeToCommit=false`, `safeToPush=false`, `proposedCommitPathCount=0`, `verifiedIntendedPathCount=0`, and `dirtyStatusLineCount=226`
+Next: use explicit candidate-path flags only after ownership and shared-state hunks are verified; any future Git stage/commit remains a separate guarded action after validation and staged diff inspection
+
+## CM-0939 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime
+Scope: read-only memory reliability phase commit candidate review CLI for stage/commit/push blocking evidence
+Changed files: src/core/MemoryReliabilityPhaseCommitReview.js; src/cli/memory-reliability-phase-commit-review.js; tests/memory-reliability-phase-commit-review.test.js; tests/memory-reliability-phase-commit-review-cli.test.js; docs/MEMORY_RELIABILITY_PHASE_COMMIT_REVIEW_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/CLI/tests; targeted helper test `node --test tests\memory-reliability-phase-commit-review.test.js` (`5/5`); targeted CLI test `node --test tests\memory-reliability-phase-commit-review-cli.test.js` (`4/4`); CM-0938 helper regression (`5/5`); CM-0938 CLI regression (`4/4`); current CM-0939 CLI run; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Repair note: first targeted helper test exposed that underscore-style `RECALL_PROOF` / `WRITE_PROOF` path names were not classified as reliability preflight paths. CM-0939 repaired that classification boundary and reran targeted validation.
+Boundary: CLI only runs CM-0938 read-only isolation review path and `git status --short`; no stage, no commit, no push, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit/projection write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no cutover, no readiness or reliability claim
+Current observed result: CM-0939 real CLI returned `status=blocked`, `commitCandidateReady=false`, `safeToStage=false`, `safeToCommit=false`, `safeToPush=false`, `dirtyStatusLineCount=226`, `trackedModifiedCount=20`, `untrackedCount=206`, and blockers `worktree_ownership_not_verified`, `shared_state_hunks_not_isolated`, `proposed_commit_does_not_cover_dirty_paths`, `proposed_paths_not_all_verified`, `unrelated_dirty_paths_present`
+Next: keep stage/commit/push blocked until verified intended scope is isolated, exact proposed commit paths are supplied, shared-state hunks are isolated, and CM-0939 is rerun successfully
+
+## CM-0938 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime
+Scope: read-only dirty-baseline isolation review CLI for live-proof and local-commit blocking evidence
+Changed files: src/core/MemoryReliabilityProofBaselineIsolationReview.js; src/cli/memory-reliability-proof-baseline-isolation-review.js; tests/memory-reliability-proof-baseline-isolation-review.test.js; tests/memory-reliability-proof-baseline-isolation-review-cli.test.js; docs/MEMORY_RELIABILITY_PROOF_BASELINE_ISOLATION_REVIEW_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/CLI/tests; targeted helper test `node --test tests\memory-reliability-proof-baseline-isolation-review.test.js` (`5/5`); targeted CLI test `node --test tests\memory-reliability-proof-baseline-isolation-review-cli.test.js` (`4/4`); CM-0936 helper regression (`5/5`); CM-0937 CLI regression (`4/4`); current CM-0938 CLI run; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: CLI only runs CM-0937 read-only blocker-plan path and `git status --short`; no stage, no commit, no push, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit/projection write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no cutover, no readiness or reliability claim
+Current observed result: CM-0938 real CLI returned `status=blocked`, `isolationReviewAccepted=true`, `safeForLiveProof=false`, `safeForCommit=false`, `dirtyBaselineBlocked=true`, `unscopedCommitBlocked=true`, and `dirtyStatusLineCount=221` before board closeout edits
+Next: keep live proof and local commit blocked until verified intended scope is isolated or safely committed, then rerun CM-0937 and CM-0938 from a clean synced baseline before any separate live proof
+
+## CM-0936 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime
+Scope: explicit-input blocker resolution plan for current CM-0935 dirty-baseline result
+Changed files: src/core/MemoryReliabilityProofBaselineBlockerPlan.js; tests/memory-reliability-proof-baseline-blocker-plan.test.js; docs/MEMORY_RELIABILITY_PROOF_BASELINE_BLOCKER_PLAN.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\memory-reliability-proof-baseline-blocker-plan.test.js` (`5/5`); CM-0935 CLI regression (`5/5`); CM-0934 policy regression (`5/5`); current CM-0935->CM-0936 smoke; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Repair note: first targeted test exposed that ownership safety was reported but not included in the acceptance gate. CM-0936 repaired the gate so a packet that marks mixed/unverified worktree ownership as isolated no longer passes.
+Boundary: helper is pure explicit-input and consumes CM-0935 report shape only; no commands, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit/projection write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no unscoped commit authorization, no push, no cutover, no readiness or reliability claim
+Current observed result: CM-0935->CM-0936 smoke returned `blockerPlanAccepted=true`, `dirtyBaselineBlocked=true`, `unscopedCommitBlocked=true`, `baselineReadyForLiveProof=false`, and lane dirty counts `213/213`
+Next: isolate or commit only verified intended changes, rerun CM-0935, and require a clean synced baseline before any separate live proof
+
+## CM-0935 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime
+Scope: read-only combined recall/write current-facts baseline readiness CLI for future live proof gates
+Changed files: src/cli/memory-reliability-proof-baseline-readiness.js; tests/memory-reliability-proof-baseline-readiness-cli.test.js; docs/MEMORY_RELIABILITY_PROOF_BASELINE_READINESS_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed CLI/test; targeted CLI test `node --test tests\memory-reliability-proof-baseline-readiness-cli.test.js` (`5/5`); CM-0934 policy regression (`5/5`); recall current-facts CLI regression (`6/6`); write current-facts CLI regression (`6/6`); current dirty-baseline CLI run; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: CLI uses the existing current-facts collectors and CM-0934 policy only; no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit/projection write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Current observed result: read-only CLI returned blocked on dirty baseline with `dirtyStatusLineCount=210`, `baselineReadyForLiveProof=false`, and blockers `CMB-0013` / `CMB-0014`
+Next: resolve dirty-baseline blockers before live proof, or continue local reliability work below live proof/durable mutation boundaries
+
+## CM-0934 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime / P8-memory-governance
+Scope: explicit-input combined recall/write current-facts baseline readiness policy for future live proof gates
+Changed files: src/core/MemoryReliabilityProofBaselineReadinessPolicy.js; tests/memory-reliability-proof-baseline-readiness-policy.test.js; docs/MEMORY_RELIABILITY_PROOF_BASELINE_READINESS_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\memory-reliability-proof-baseline-readiness-policy.test.js` (`5/5`); recall/write preflight regressions; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper is pure explicit-input and consumes current-facts preflight reports only; no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit/projection write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: resolve dirty-baseline blockers before live proof, or continue local reliability work below live proof/durable mutation boundaries
+
+## CM-0933 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: explicit-input fail-closed closure review policy for CM-0929 through CM-0932 deferred governance preview-only evidence
+Changed files: src/core/DeferredGovernancePreviewClosureReviewPolicy.js; tests/deferred-governance-preview-closure-review-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_PREVIEW_CLOSURE_REVIEW_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-preview-closure-review-policy.test.js` (`5/5`); CM-0932 app-preview readiness regression; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper is pure explicit-input and accepts the current preview-only evidence chain only when it remains internal-only, preview-only, public-MCP-frozen, no-apply, no-execution-approval, no-durable-write/projection, no-cache-clear, and no-readiness/reliability; no public `callTool()` widening, no durable apply, no service start, no runtime probe, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit/projection write, no candidate-cache clear, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: return to proof preflight only after dirty-baseline blockers are resolved, or continue governance below durable apply/runtime-readiness boundaries
+
+## CM-0932 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: explicit-input fail-closed readiness review policy for app-level deferred governance apply-plan preview entries
+Changed files: src/core/DeferredGovernanceAppApplyPlanPreviewReadinessReviewPolicy.js; tests/deferred-governance-app-apply-plan-preview-readiness-review-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_APP_APPLY_PLAN_PREVIEW_READINESS_REVIEW_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-app-apply-plan-preview-readiness-review-policy.test.js` (`5/5`); CM-0931 app-entry regression (`7/7`); CM-0930 adapter preview regression (`12/12`); CM-0929 preview helper regression (`6/6`); public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper is pure explicit-input and accepts app-preview evidence only when it remains internal-only, preview-only, public-MCP-frozen, default-disabled, adapter-routed, no-apply, no-durable-write, no-cache-clear, and no-readiness; no public `callTool()` widening, no durable apply, no service start, no runtime probe, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep deferred governance in preview-only/no-apply closure, or return to proof preflight only after dirty-baseline blockers are resolved
+
+## CM-0931 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: default-disabled app-level internal methods for deferred governance apply-plan preview
+Changed files: src/app.js; tests/deferred-governance-app-runtime-entry.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_APP_APPLY_PLAN_PREVIEW_ENTRY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed app/test; targeted app-entry regression `node --test tests\deferred-governance-app-runtime-entry.test.js` (`7/7`); adapter preview regression (`12/12`); CM-0929 preview helper regression (`6/6`); public MCP freeze scan; targeted `git diff --check`; docs validation; changed-scope re-review
+Boundary: app exposes default-disabled `previewInternalMemoryExcludeApplyPlan` and `previewInternalMemoryForgetApplyPlan` methods that route to the CM-0930 adapter preview path; no public `callTool()` widening, no durable apply, no service start, no runtime probe, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: add an explicit app-preview readiness review policy, or stop before live proof while dirty baseline remains
+
+## CM-0930 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: default-disabled internal adapter methods for deferred governance bounded apply-plan preview
+Changed files: src/core/DeferredGovernanceRuntimeEntryAdapter.js; tests/deferred-governance-runtime-entry-adapter.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_ADAPTER_APPLY_PLAN_PREVIEW.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed adapter/test; targeted adapter regression `node --test tests\deferred-governance-runtime-entry-adapter.test.js` (`12/12`); CM-0929 preview helper regression (`6/6`); CM-0927 app-entry regression (`5/5`); public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: adapter exposes default-disabled `previewInternalMemoryExcludeApplyPlan` and `previewInternalMemoryForgetApplyPlan` only inside the adapter service; no app-level preview method, no public `callTool()` widening, no durable apply, no service start, no runtime probe, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: decide whether app-level preview exposure is warranted without public MCP expansion, or continue no-apply governance closure with explicit runtime-surface reviews
+
+## CM-0929 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: explicit-input bounded apply-plan preview for deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceBoundedApplyPlanPreview.js; tests/deferred-governance-bounded-apply-plan-preview.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_BOUNDED_APPLY_PLAN_PREVIEW.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-bounded-apply-plan-preview.test.js` (`6/6`); CM-0924 planning regression (`7/7`); CM-0927 app-entry regression (`5/5`); public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Repair note: first targeted test exposed that exported normalized preview input preserved raw `dryRunPayload` strings. The repair keeps raw dry-run payloads for CM-0924 secret scanning but redacts normalized/reporting output, then targeted validation passed.
+Boundary: helper consumes caller-provided objects and CM-0924 dry-run planning only; no durable apply, no runtime apply, no service start, no runtime probe, no live recall/write proof, no public `callTool()` widening, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep this as preview-only evidence; future temp-local/internal proof still needs clean-baseline facts and must not claim readiness without live evidence
+
+## CM-0928 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: explicit-input readiness-review policy for app-level deferred `memory_exclude` / `memory_forget` entries
+Changed files: src/core/DeferredGovernanceAppRuntimeEntryReadinessReviewPolicy.js; tests/deferred-governance-app-runtime-entry-readiness-review-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_APP_RUNTIME_ENTRY_READINESS_REVIEW_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-app-runtime-entry-readiness-review-policy.test.js` (`5/5`); CM-0927 app-entry regression (`5/5`); CM-0922 runtime-readiness policy regression (`5/5`); public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper consumes explicit input only and accepts only evidence that app-level exclude/forget entries are default-disabled, approved-context-bound, dry-run-only, public-callTool-unknown, backed by CM-0924..CM-0927 evidence, and not runtime-ready; no service start, no runtime probe, no live recall/write proof, no public `callTool()` widening, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: decide whether deferred governance can move from dry-run planning toward a bounded apply-plan preview without durable apply, or return to recall/write proof preflight only after clean-baseline facts exist
+
+## CM-0927 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: default-disabled app-level internal runtime entries for deferred `memory_exclude` / `memory_forget`
+Changed files: src/app.js; tests/deferred-governance-app-runtime-entry.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_APP_RUNTIME_ENTRY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed app/test; targeted app entry test `node --test tests\deferred-governance-app-runtime-entry.test.js` (`5/5`); adapter regression `8/8`; CM-0924 planning regression `7/7`; phase-a services `8/8`; validate/tombstone/supersede runtime-entry regressions `4/4` each; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: app exposes default-disabled `executeInternalMemoryExclude` / `executeInternalMemoryForget` and `services.deferredGovernanceRuntimeEntryAdapter`; approved calls remain dry-run planning only; no service start, no runtime probe, no live recall/write proof, no public `callTool()` widening, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: review whether app-level dry-run entries need an explicit runtime-readiness review packet, or return to recall/write proof preflight only after clean-baseline facts exist
+
+## CM-0926 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: shared-gate adoption for the unmounted internal deferred `memory_exclude` / `memory_forget` adapter candidate
+Changed files: src/core/DeferredGovernanceRuntimeEntryAdapter.js; tests/deferred-governance-runtime-entry-adapter.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_SHARED_GATE_ADAPTER.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed adapter/test; targeted adapter test `node --test tests\deferred-governance-runtime-entry-adapter.test.js` (`8/8`); shared gate regression `node --test tests\internal-runtime-entry-gate.test.js` (`4/4`); CM-0924 planning service regression `node --test tests\deferred-governance-mutation-planning-service.test.js` (`7/7`); entrypoint freeze scan; docs validation; changed-scope re-review
+Boundary: adapter reuses `InternalRuntimeEntryGate` for default-disabled, approved-context, actor fallback, scalar aliases, and `dry_run` / `confirm`, but remains unmounted; no runtime apply, no app wiring, no runtime entry mounting, no service start, no runtime probe, no live recall/write proof, no `src/app.js` change, no `callTool()` widening, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: decide whether another unmounted source-level exclude/forget prerequisite remains useful, or return to recall/write proof preflight only after clean-baseline facts exist
+
+## CM-0925 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: source-level unmounted internal runtime-entry adapter candidate for deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceRuntimeEntryAdapter.js; tests/deferred-governance-runtime-entry-adapter.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_RUNTIME_ENTRY_ADAPTER.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed adapter/test; targeted adapter test `node --test tests\deferred-governance-runtime-entry-adapter.test.js` (`7/7`); CM-0924 planning service regression `node --test tests\deferred-governance-mutation-planning-service.test.js` (`7/7`); `git diff --check`; docs validation; changed-scope re-review
+Repair note: first targeted adapter test exposed raw scope id leakage in exported normalized adapter payload; the repair redacts scope id fields at adapter normalization time, then targeted validation passed.
+Boundary: candidate reads only caller-provided objects; no runtime apply, no app wiring, no runtime entry mounting, no service start, no runtime probe, no live recall/write proof, no `src/app.js` change, no `callTool()` widening, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: review whether exclude/forget can share the existing app-level `InternalRuntimeEntryGate` without mounting entries, or return to proof preflight only after clean-baseline facts exist
+
+## CM-0924 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: source-level internal dry-run-only planning service candidate for deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceMutationPlanningService.js; tests/deferred-governance-mutation-planning-service.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_MUTATION_PLANNING_SERVICE.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed service/test; targeted service test `node --test tests\deferred-governance-mutation-planning-service.test.js` (`7/7`); `git diff --check`; docs validation; changed-scope re-review
+Repair note: first targeted test pass exposed that the candidate scanned secret-like fields after redaction; the repair moved secret scanning to raw payload fields while keeping normalized output redacted, then targeted validation passed.
+Boundary: candidate reads only caller-provided objects; no runtime apply, no runtime entry wiring, no service start, no runtime probe, no live recall/write proof, no `src/app.js` change, no `callTool()` widening, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: review whether a similarly unmounted internal runtime-entry adapter candidate is warranted, or return to proof preflight only after clean-baseline facts exist
+
+## CM-0923 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for prerequisite closure review policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernancePrerequisiteClosureReviewPolicy.js; tests/deferred-governance-prerequisite-closure-review-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_PREREQUISITE_CLOSURE_REVIEW_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-prerequisite-closure-review-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime apply, no runtime entry/service implementation, no service start, no runtime probe, no live recall/write proof, no `src/app.js` change, no `callTool()` widening, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; review whether a source-level implementation candidate can be designed without runtime apply or public tools
+
+## CM-0922 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for runtime-readiness review policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceRuntimeReadinessReviewPolicy.js; tests/deferred-governance-runtime-readiness-review-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_RUNTIME_READINESS_REVIEW_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-runtime-readiness-review-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime entry/service implementation, no service start, no runtime probe, no live recall/write proof, no `src/app.js` change, no `callTool()` widening, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; review remaining governance closure gaps without runtime apply
+
+## CM-0921 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for governance revision policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceRevisionPolicy.js; tests/deferred-governance-revision-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_REVISION_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-revision-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no revision emitter implementation, no provider-backed revision generation, no broad real-memory scan, no candidate-cache clear, no projection apply implementation, no runtime entry implementation, no `src/app.js` change, no `callTool()` widening, no runtime service implementation, no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no real apply plan, no approval execution, no durable projection/audit/memory write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add runtime-readiness review evidence without runtime apply
+
+## CM-0920 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for changed-memory-ids policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceChangedMemoryIdsPolicy.js; tests/deferred-governance-changed-memory-ids-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_CHANGED_MEMORY_IDS_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-changed-memory-ids-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no changed-id emitter implementation, no broad real-memory scan, no candidate-cache clear, no projection apply implementation, no runtime entry implementation, no `src/app.js` change, no `callTool()` widening, no runtime service implementation, no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no real apply plan, no approval execution, no durable projection/audit/memory write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add default governance revision / runtime-readiness review evidence without runtime apply
+
+## CM-0919 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for shadow projection policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceShadowProjectionPolicy.js; tests/deferred-governance-shadow-projection-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_SHADOW_PROJECTION_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-shadow-projection-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no projection apply implementation, no runtime entry implementation, no `src/app.js` change, no `callTool()` widening, no runtime service implementation, no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no real apply plan, no approval execution, no durable projection/audit/memory write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add changed-memory-ids policy evidence without runtime apply
+
+## CM-0918 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for append-only audit plan policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceAppendOnlyAuditPlanPolicy.js; tests/deferred-governance-append-only-audit-plan-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_APPEND_ONLY_AUDIT_PLAN_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-append-only-audit-plan-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no audit writer implementation, no runtime entry implementation, no `src/app.js` change, no `callTool()` widening, no runtime service implementation, no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no real apply plan, no approval execution, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add shadow projection policy or changed-memory-ids policy evidence without runtime apply
+
+## CM-0917 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for internal runtime-entry surface policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceInternalRuntimeEntrySurfacePolicy.js; tests/deferred-governance-internal-runtime-entry-surface-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_INTERNAL_RUNTIME_ENTRY_SURFACE_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-internal-runtime-entry-surface-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime entry implementation, no `src/app.js` change, no `callTool()` widening, no runtime service implementation, no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no real apply plan, no approval execution, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add append-only audit plan, shadow projection policy, or changed-memory-ids policy evidence without runtime apply
+
+## CM-0916 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for internal service surface policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceInternalServiceSurfacePolicy.js; tests/deferred-governance-internal-service-surface-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_INTERNAL_SERVICE_SURFACE_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-internal-service-surface-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime service implementation, no runtime integration, no runtime entry addition, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no real apply plan, no approval execution, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add an internal runtime-entry surface contract or append-only audit / shadow projection policy evidence without runtime apply
+
+## CM-0915 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for bounded runtime-prep policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceBoundedRuntimePrepPolicy.js; tests/deferred-governance-bounded-runtime-prep-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_BOUNDED_RUNTIME_PREP_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-bounded-runtime-prep-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime integration, no runtime entry addition, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no real apply plan, no approval execution, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add an internal service implementation candidate or runtime-entry surface contract without runtime apply
+
+## CM-0914 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for approved-context gate policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceApprovedContextGatePolicy.js; tests/deferred-governance-approved-context-gate-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_APPROVED_CONTEXT_GATE_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-approved-context-gate-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime integration, no runtime entry addition, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add bounded runtime-prep evidence without runtime apply
+
+## CM-0913 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for exact execution approval policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceExactExecutionApprovalPolicy.js; tests/deferred-governance-exact-execution-approval-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_EXACT_EXECUTION_APPROVAL_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-exact-execution-approval-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no approval execution, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add approved-context gate evidence or bounded runtime-prep evidence without runtime apply
+
+## CM-0912 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for candidate-cache invalidation policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceCandidateCacheInvalidationPolicy.js; tests/deferred-governance-candidate-cache-invalidation-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_CANDIDATE_CACHE_INVALIDATION_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-candidate-cache-invalidation-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no real candidate-cache clear, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add bounded runtime-prep evidence or exact approval gating evidence without runtime apply
+
+## CM-0911 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for scope/pollution read policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceScopePollutionReadPolicy.js; tests/deferred-governance-scope-pollution-read-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_SCOPE_POLLUTION_READ_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-scope-pollution-read-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add candidate-cache invalidation evidence or bounded runtime-prep evidence without runtime apply
+
+## CM-0910 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for no-hard-delete default policy on deferred `memory_exclude` / `memory_forget`
+Changed files: src/core/DeferredGovernanceNoHardDeletePolicy.js; tests/deferred-governance-no-hard-delete-policy.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_NO_HARD_DELETE_POLICY.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-no-hard-delete-policy.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no hard delete, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred; a future local-safe slice may add scope/pollution read-policy evidence or cache-invalidation evidence without runtime apply
+
+## CM-0909 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P8-memory-governance / P9-codex-claude-client-scope
+Scope: pure explicit-input helper/test/docs contract for deferred `memory_exclude` / `memory_forget` internal re-entry review
+Changed files: src/core/DeferredGovernanceFamilyReentryContract.js; tests/deferred-governance-family-reentry-contract.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_FAMILY_REENTRY_CONTRACT.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/test; targeted helper test `node --test tests\deferred-governance-family-reentry-contract.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper reads only caller-provided objects; no runtime integration, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no hard delete, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep `memory_exclude` and `memory_forget` deferred until exact internal service/prep/entry/audit/projection/cache/pollution evidence exists; do not implement hard delete or public tools as a shortcut
+
+## CM-0908 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: read-only current Git facts collector CLI/test/docs wrapper for the CM-0907 write proof execution preflight boundary
+Changed files: src/cli/write-proof-current-facts-preflight.js; tests/write-proof-current-facts-preflight-cli.test.js; docs/WRITE_PROOF_CURRENT_FACTS_PREFLIGHT_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed CLI/test; targeted CLI test `node --test tests\write-proof-current-facts-preflight-cli.test.js` (`6/6`); current-facts CLI smoke returned blocked dirty-worktree/not-executed; `git diff --check`; docs validation; changed-scope re-review
+Boundary: CLI collects only read-only local Git facts, then uses the existing CM-0907 preflight evaluator; no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep this CLI as the current-facts preflight gate for any later clean-baseline write proof review, or continue governance closure work; do not run live write proof while `CMB-0014` remains open
+
+## CM-0907 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: explicit-input helper/CLI/test/docs wrapper for the CM-0737 write proof execution preflight boundary
+Changed files: src/core/WriteProofExecutionPreflight.js; src/cli/write-proof-execution-preflight.js; tests/fixtures/write-proof-execution-preflight-v1.json; tests/write-proof-execution-preflight.test.js; tests/write-proof-execution-preflight-cli.test.js; docs/WRITE_PROOF_EXECUTION_PREFLIGHT_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/CLI/tests; targeted helper test `node --test tests\write-proof-execution-preflight.test.js` (`5/5`); targeted CLI test `node --test tests\write-proof-execution-preflight-cli.test.js` (`5/5`); default CLI smoke returned blocked dirty-worktree/not-executed; `git diff --check`; docs validation; changed-scope re-review
+Boundary: CLI reads explicit JSON only; default fixture models the current dirty-worktree blocker; rejected flags include execution, live-proof, record/search/provider, mutation, apply, and service-start flags; no Git command execution inside the CLI, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep this CLI as the mandatory non-executing operator preflight surface for any later clean-baseline write proof review, or add a read-only current-facts collector around it; do not run live write proof while dirty-worktree baseline ambiguity remains open
+
+## CM-0906 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime / P10-observability-admin
+Scope: read-only current Git facts collector CLI/test/docs wrapper for the CM-0904/CM-0905 recall proof execution preflight boundary
+Changed files: src/cli/recall-proof-current-facts-preflight.js; tests/recall-proof-current-facts-preflight-cli.test.js; docs/RECALL_PROOF_CURRENT_FACTS_PREFLIGHT_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed CLI/test; targeted CLI test `node --test tests\recall-proof-current-facts-preflight-cli.test.js` (`6/6`); current-facts CLI smoke returned blocked dirty-worktree/not-executed; `git diff --check`; docs validation; changed-scope re-review
+Boundary: CLI collects only read-only Git facts, then uses the existing preflight evaluator; no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep this CLI as the current-facts preflight gate for any later clean-baseline recall proof review, or continue write/governance closure work; do not run live proof while `CMB-0013` remains open
+
+## CM-0905 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime / P10-observability-admin
+Scope: non-executing operator CLI/test/docs wrapper for the CM-0904 explicit-input recall proof execution preflight helper
+Changed files: src/cli/recall-proof-execution-preflight.js; tests/fixtures/recall-proof-execution-preflight-v1.json; tests/recall-proof-execution-preflight-cli.test.js; docs/RECALL_PROOF_EXECUTION_PREFLIGHT_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed helper/CLI/tests; helper regression `node --test tests\recall-proof-execution-preflight.test.js` (`5/5`); targeted CLI test `node --test tests\recall-proof-execution-preflight-cli.test.js` (`5/5`); default CLI smoke returned blocked dirty-worktree/not-executed; `git diff --check`; docs validation; changed-scope re-review
+Boundary: CLI reads explicit JSON only; default fixture models the current dirty-worktree blocker; rejected flags include execution, live-proof, search/write/provider, mutation, apply, and service-start flags; no Git command execution inside the CLI, no service startup, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no public MCP expansion, no package/config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: keep this CLI as the mandatory non-executing operator preflight surface for any later clean-baseline recall proof review, or continue write/governance closure work; do not run live proof while `CMB-0013` remains open
+
+## CM-0904 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime / P10-observability-admin
+Scope: explicit-input source/test/docs helper for future `CM-0814` recall proof execution preflight
+Changed files: src/core/RecallProofExecutionPreflight.js; tests/recall-proof-execution-preflight.test.js; docs/RECALL_PROOF_EXECUTION_PREFLIGHT_HELPER.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed source/test; `node --test tests\recall-proof-execution-preflight.test.js` (`5/5`); `git diff --check`; docs validation; changed-scope re-review
+Boundary: helper is explicit-input only; no runtime source integration, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no public MCP expansion, no config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: either add a non-executing operator preflight command around this helper, or continue governance closure work; do not run live proof while dirty-worktree baseline blocker remains open
+
+## CM-0903 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime / P10-observability-admin
+Scope: docs/board/status packet binding `CM-0814` into one exact recall query-family basis without executing live proof
+Changed files: docs/RECALL_PRECISION_CM0814_EXACT_BASIS_APPROVAL_PACKET.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `git diff --check`; docs validation; changed-scope re-review
+Boundary: no runtime source/test change, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no public MCP expansion, no config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: if recall live proof is attempted later, rebind clean current Git/runtime facts first and consume only the exact four `CM-0814` negative-control queries through the internal runner/adapter/app seam; otherwise continue governance closure work
+
+## CM-0902 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P8-memory-governance / P10-observability-admin
+Scope: docs/board/status handoff for combined write/recall proof-consumption boundaries after CM-0895..CM-0901
+Changed files: docs/MEMORY_RELIABILITY_PROOF_CONSUMPTION_PHASE_HANDOFF.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `git diff --check`; docs validation; changed-scope re-review
+Boundary: no runtime source/test change, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit write, no public MCP expansion, no config/watchdog/startup change, no push, no cutover, no readiness or reliability claim
+Next: either prepare a separately exact basis-bound approval packet for one live proof lane, or continue internal-only governance closure; do not discover proof basis through live exploration
+
+## Checkpoint - CM-0901 recall query-family basis binding review - 2026-05-24
+
+- Status: `RECALL_PRECISION_QUERY_FAMILY_BASIS_BINDING_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source/doc review plus docs/board/status/truth-table only; no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: any future separately exact-approved live recall proof must use one exact prebound query-family / baseline basis. Acceptable basis families are limited in principle to one prior accepted bounded negative-control family, one separately supplied exact operator query family, or one prebound canonical proof packet family. `CM-0814` remains the strongest current candidate family, but only as a candidate-family anchor. Ad hoc query discovery, direct public `search_memory`, `dashboard`, `governance-report`, `http-observe`, broad runtime exploration, and mixed historical slot inheritance are not acceptable basis selection paths.
+- Validation: source/doc basis-binding review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at basis-binding review. It did not grant execution approval, did not bind a future exact query family, did not bind a future exact baseline, did not widen public `callTool()`, did not add public MCP tools, and did not start true live recall proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no future exact query-family/baseline rebind execution, no new exact-approved live recall run, and no readiness/reliability claim path yet.
+- Next safe step: keep this seam internal-only until a separately exact-approved live recall proof explicitly chooses one exact prebound query-family / baseline basis, rebinds it, and either executes once or stays blocked.
+
+## Checkpoint - CM-0900 recall internal-only boundary review - 2026-05-24
+
+- Status: `RECALL_PRECISION_INTERNAL_ONLY_BOUNDARY_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source read-only review plus docs/board/status/truth-table only; no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the current recall precision proof seam should still be treated as internal-only in operational meaning. It is stronger than direct public `search_memory`, but only because it depends on the internal runner/adapter path plus internal proof context: internal runner request source, `noTokenReadOnly=true`, `noRawContentRead=true`, `precisionPolicyContext.enabled=true`, `proofNoResultMode=true`, and sanitized output only. That makes it a bounded future exact-approved proof seam, not ambient runtime behavior and not `memory recall reliable`.
+- Validation: source/doc boundary review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at interpretation-boundary review. It did not grant execution approval, did not bind a future exact query family, did not bind a future exact baseline, did not widen public `callTool()`, did not add public MCP tools, and did not start true live recall proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no future exact query-family/baseline rebind execution, no new exact-approved live recall run, and no readiness/reliability claim path yet.
+- Next safe step: keep this seam internal-only until a separately exact-approved live recall proof explicitly chooses and rebinds one exact query family and baseline, reuses this seam, and either executes once or stays blocked.
+
+## Checkpoint - CM-0899 recall CM-0814 candidate rebind packet - 2026-05-24
+
+- Status: `RECALL_PRECISION_CM0814_CANDIDATE_REBIND_PACKET_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source/doc packet plus docs/board/status/truth-table only; no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the strongest current recall candidate family, `CM-0814`, may remain only a candidate-family anchor. Any future separately exact-approved live recall proof that chooses it must explicitly rebind fresh baseline, future approval line/reference, exact proof seam, exact four-slot query family, exact ordered query texts, exact expected result-count rule, exact branch-state assumptions, exact nonzero-slot interpretation, and exact one-run-only boundary. The `CM-0814` local baseline, the earlier `CM-0801` synced baseline, legacy `CM-0774` approval labeling, historical query texts, historical pass/fail interpretation, and historical approval lines must not be inherited implicitly.
+- Validation: source/doc packet review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at candidate-family rebind guidance. It did not grant execution approval, did not bind a future exact query family, did not bind a future exact baseline, did not widen public `callTool()`, did not add public MCP tools, and did not start true live recall proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no future exact query-family/baseline rebind, no new exact-approved live recall execution, and no readiness/reliability claim path yet.
+- Next safe step: keep this seam internal-only until a separately exact-approved live recall proof explicitly chooses and rebinds one exact query family and baseline, reuses this seam, and either executes once or stays blocked.
+
+## Checkpoint - CM-0898 recall live-proof consumption packet - 2026-05-24
+
+- Status: `RECALL_PRECISION_LIVE_PROOF_CONSUMPTION_PACKET_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source/doc packet plus docs/board/status/truth-table only; no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future live recall proof seam is now fixed. Any future separately exact-approved live recall proof should consume the existing internal `TrueLiveRecallReadonlyProofRunner -> createTrueLiveRecallExecutorAdapter({ app }) -> app.callTool('search_memory', ...)` path with internal runner request source, `noTokenReadOnly=true`, `noRawContentRead=true`, `precisionPolicyContext.enabled=true`, `proofNoResultMode=true`, and sanitized output only. Direct public `search_memory`, `dashboard`, `governance-report`, `http-observe`, ad hoc app/service calls, and new parallel runtime paths should not be treated as proof seams.
+- Validation: source/doc packet review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at seam-consumption guidance. It did not grant execution approval, did not choose a future exact query family, did not bind a future exact baseline, did not widen public `callTool()`, did not add public MCP tools, and did not start true live recall proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no future exact query-family/baseline rebind, no new exact-approved live recall execution, and no readiness/reliability claim path yet.
+- Next safe step: keep this seam internal-only until a separately exact-approved live recall proof explicitly chooses one exact query family and baseline, reuses this seam, and either executes once or stays blocked.
+
+## Checkpoint - CM-0897 CM-0737 candidate rebind packet - 2026-05-24
+
+- Status: `MEMORY_WRITE_PREFLIGHT_CM0737_CANDIDATE_REBIND_PACKET_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source/doc packet plus docs/board/status/truth-table only; no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: `CM-0737` may remain the strongest current candidate family, but only as a candidate-family anchor. Any future separately exact-approved live write proof that chooses it must explicitly rebind fresh baseline, exact accepted basis event/id, exact `process` target, exact opt-in app seam, repaired checkpoint-shaped payload family, exact current scope assumptions, exact duplicate interpretation, and exact one-write-only boundaries. Historical synced-main state, scope tuple, payload instance, duplicate interpretation, and approval line must not be inherited implicitly.
+- Validation: source/doc packet review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at rebind-packet guidance. It did not grant execution approval, did not enable write preflight by default, did not widen public `callTool()`, did not add public MCP tools, and did not start true live write proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no default-on preflight, no true live duplicate suppression proof against current real store data, no exact-approved live write execution, and no readiness/reliability claim path yet.
+- Next safe step: keep this seam internal-only until a separately exact-approved live write proof explicitly chooses one prebound basis, rebinds all required fields, and either executes once or stays blocked.
+
+## Checkpoint - CM-0896 write preflight duplicate-basis binding review - 2026-05-24
+
+- Status: `MEMORY_WRITE_PREFLIGHT_DUPLICATE_BASIS_BINDING_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source/doc review plus docs/board/status/truth-table only; no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future duplicate-basis rule is now fixed. Any future separately exact-approved live write proof must use one exact prebound duplicate basis. Broad scans, `search_memory`, ad hoc real-store exploration, and two-write manufacture are out. The strongest current candidate family is the prior accepted `CM-0737` bounded canary write, but it is not automatic authorization.
+- Validation: source/doc review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at basis-binding guidance. It did not grant execution approval, did not enable write preflight by default, did not widen public `callTool()`, did not add public MCP tools, and did not start true live write proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no default-on preflight, no true live duplicate suppression proof against current real store data, no exact-approved live write execution, and no readiness/reliability claim path yet.
+- Next safe step: keep this seam internal-only until a separately exact-approved live write proof explicitly chooses one prebound basis and rebinds the baseline.
+
+## Checkpoint - CM-0895 write preflight live write proof consumption packet - 2026-05-24
+
+- Status: `MEMORY_WRITE_PREFLIGHT_LIVE_WRITE_PROOF_CONSUMPTION_PACKET_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded packet/review plus docs/board/status/truth-table only; no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future live-proof consumption path is now fixed. If a separately exact-approved live write proof is ever chosen, it should consume the existing `createCodexMemoryApplication() -> callTool('record_memory', ...) + enableWritePreflight=true` seam rather than invent a parallel runtime path, and it should remain one-write-only with fail-closed behavior on missing exact duplicate basis.
+- Validation: source/doc review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at packet/review guidance. It did not grant execution approval, did not enable write preflight by default, did not widen public `callTool()`, did not add public MCP tools, and did not start true live write proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no default-on preflight, no true live duplicate suppression proof against current real store data, no exact-approved live write execution, and no readiness/reliability claim path yet.
+- Next safe step: keep this seam internal-only until a separately exact-approved live write proof is explicitly chosen and baseline-bound.
+
+## Checkpoint - CM-0894 write preflight internal-only boundary review - 2026-05-24
+
+- Status: `MEMORY_WRITE_PREFLIGHT_INTERNAL_ONLY_BOUNDARY_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source read-only review plus docs/board/status/truth-table only; no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the write-side opt-in app seam should no longer be described as helper-only or app-surface smoke, but it still should not be described as default runtime behavior. Current repository reality says it is an operationally internal-only seam because it rides the normal public `record_memory` path behind an opt-in config flag.
+- Validation: source read-only review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at interpretation boundary review. It did not enable write preflight by default, did not widen public `callTool()`, did not add public MCP tools, and did not start true live write proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no default-on preflight, no true live duplicate suppression proof against current real store data, no live write proof packet yet, and no readiness/reliability claim path yet.
+- Next safe step: prepare a bounded packet/review for how any future separately exact-approved live write proof would consume this existing opt-in app seam without turning it into default runtime behavior.
+
+## Checkpoint - CM-0893 write preflight app temp-local evidence - 2026-05-24
+
+- Status: `MEMORY_WRITE_PREFLIGHT_APP_TEMP_LOCAL_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded temp-local app-path test plus docs/board/status/truth-table only; opt-in `enableWritePreflight=true`, no runtime source change, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public/runtime durable governance apply, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the write-side opt-in app seam is no longer only app-surface smoke. `createCodexMemoryApplication()` now has isolated temp-local evidence showing same-scope duplicates are suppressed before the second durable projection, while same-content out-of-scope writes still persist as separate records.
+- Validation: changed test syntax check passed; targeted temp-local app evidence tests passed `2/2`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at isolated temp-local app evidence. It did not enable write preflight by default, did not widen public `callTool()`, did not add public MCP tools, and did not start true live write proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no default-on preflight, no true live duplicate suppression proof against current real store data, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded review for whether this stronger opt-in app path should remain internal-only until a separately exact-approved live write proof is chosen.
+
+## Checkpoint - CM-0892 write preflight app wiring - 2026-05-24
+
+- Status: `MEMORY_WRITE_PREFLIGHT_APP_WIRING_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test plus docs/board/status/truth-table only; default-disabled app wiring, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the write-side exact-scope seam is no longer only helper-backed. `createConfig()` now exposes `enableWritePreflight=false` by default, and `createCodexMemoryApplication()` now supplies an internal exact-scope candidate provider to `MemoryWriteService` without changing default runtime behavior.
+- Validation: changed source/test syntax checks passed; targeted phase-a app-surface tests passed `8/8`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at bounded internal app wiring. It did not enable write preflight by default, did not widen public `callTool()`, did not add new public MCP tools, and did not start live write proof or public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no default-on preflight, no true live duplicate suppression proof against current real store data, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded review for whether this opt-in app-level path should remain internal-only before any future live write proof.
+
+## Checkpoint - CM-0891 write preflight exact-scope candidate-source helper - 2026-05-24
+
+- Status: `MEMORY_WRITE_PREFLIGHT_EXACT_SCOPE_CANDIDATE_SOURCE_HELPER_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test plus docs/board/status/truth-table only; no app wiring, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the write-side candidate-source seam is no longer review-only. `SqliteShadowStore` now exposes `getWritePreflightCandidates({ target, allowedScope, limit })` as an exact-scope, target-bound, minimal-field internal helper that can directly back `MemoryWriteService.writePreflightCandidateProvider` in bounded harnesses.
+- Validation: changed source/test syntax checks passed; targeted candidate-source-helper tests passed `3/3`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at helper level. It did not wire the helper into `createCodexMemoryApplication()`, did not enable default runtime preflight, did not widen public `callTool()`, did not add new public MCP tools, and did not start public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no default app/runtime wiring yet, no live duplicate suppression proof against current real store data, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded review for whether `createCodexMemoryApplication()` should supply this helper to `MemoryWriteService` while preserving default-disabled preflight behavior.
+
+## Checkpoint - CM-0890 write preflight candidate-source review - 2026-05-24
+
+- Status: `MEMORY_WRITE_PREFLIGHT_CANDIDATE_SOURCE_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source read-only review plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the open write-side gap is no longer the preflight rule shape itself. Current repository reality already has default-disabled runtime preflight wiring, exact runtime-derived scope tuple, shared canonical-hash derivation, and fail-closed pre-projection rejection. The remaining seam is one reviewed internal exact-scope candidate source behind `writePreflightCandidateProvider`; it should live in `SqliteShadowStore` and should not reuse broad `listRecords(target)` scans.
+- Validation: source read-only review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stayed at candidate-source classification level. It did not add a runtime helper, did not enable write preflight in a production-like path, did not widen public `callTool()`, did not add new public MCP tools, and did not start public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no reviewed exact-scope candidate-source helper yet, no write-side runtime duplicate suppression proof against current real store data, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: add one bounded internal `SqliteShadowStore` exact-scope candidate-source helper for `MemoryWriteService.writePreflightCandidateProvider`, keeping canonical-hash computation in existing shared logic and keeping public/runtime boundaries frozen.
+
+## Checkpoint - CM-0889 internal runtime-entry family stabilization review - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_FAMILY_STABILIZATION_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source read-only review plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the shared internal runtime-entry gate should no longer be described as `validate + tombstone` only. Current repository reality now stabilizes that family on `validate + tombstone + supersede`, while `memory_exclude` and `memory_forget` remain deferred.
+- Validation: source read-only review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stayed at family-classification level. It did not add a new runtime surface, did not widen public `callTool()`, did not add new public MCP tools, and did not start public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded review for whether any family beyond `validate + tombstone + supersede` deserves runtime-entry effort now, or return effort to higher-value recall/write/governance closure gaps.
+
+## Checkpoint - CM-0888 internal supersede runtime entry - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_SUPERSEDE_RUNTIME_ENTRY_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede path is no longer only an internal service, temp-local proof, app-surface wiring, and direct CLI/runtime-adjacent entry. It now also has a bounded default-disabled internal runtime entry through `app.executeInternalSupersede(args, requestContext)` on the shared internal gate family, while public MCP tool names remain frozen.
+- Validation: changed source/test syntax checks passed; targeted supersede runtime-entry tests passed `4/4`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at default-disabled internal runtime-entry level. It did not widen public `callTool()`, did not add `memory_supersede` to public MCP, and did not start public/runtime durable governance apply. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded review for whether the shared internal runtime-entry gate should now explicitly stabilize on `validate + tombstone + supersede` while public MCP remains frozen.
+
+## Checkpoint - CM-0887 internal supersede CLI entry - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_SUPERSEDE_CLI_ENTRY_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test plus docs/board/status/truth-table only; no shared-gate adoption, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede path is no longer only an internal service shape, temp-local evidence, and app-level wiring. It now has a bounded internal CLI/runtime-adjacent entry that can reach `app.services.supersedeMemoryService` while public MCP tool names remain frozen.
+- Validation: changed source/test syntax checks passed; targeted supersede CLI tests passed `9/9`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at internal CLI level. It did not adopt the shared internal runtime-entry gate and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no shared-gate adoption yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded review for whether supersede should remain direct-path only before any shared-gate adoption or public/runtime governance entry discussion.
+
+## Checkpoint - CM-0886 internal supersede app service wiring - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_SUPERSEDE_APP_SERVICE_WIRING_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test plus docs/board/status/truth-table only; no shared-gate adoption, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede path is no longer only an internal service shape plus temp-local evidence. It now has bounded app-level internal wiring: `SupersedeMemoryService` is created by `createCodexMemoryApplication()` and exposed through `app.services.supersedeMemoryService`, while public MCP tool names remain frozen.
+- Validation: changed source/test syntax checks passed; targeted phase-a services tests passed `6/6`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at app service level. It did not adopt the shared internal runtime-entry gate and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no shared-gate adoption yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded review for whether supersede should remain `app.services`-only before any shared-gate adoption or public/runtime governance entry discussion.
+
+## Checkpoint - CM-0885 supersede temp-local evidence - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_SUPERSEDE_TEMP_LOCAL_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded temp-local source/test plus docs/board/status/truth-table only; no app wiring, no shared-gate adoption, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede path is no longer only an internal service shape. It now has bounded temp-local evidence on real local store classes: one accepted isolated pair mutation path with `pending -> superseded` audit evidence, and one rejected private cross-client path that fails before mutation and before audit append.
+- Validation: changed test syntax checks passed; targeted supersede temp-local evidence tests passed `2/2`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at temp-local evidence level. It did not wire supersede into `src/app.js`, did not adopt the shared internal runtime-entry gate, and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no app wiring yet, no shared-gate adoption yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded app-surface review for whether supersede should remain service-only before any shared-gate adoption or public/runtime governance entry discussion.
+
+## Checkpoint - CM-0884 internal supersede mutation service - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_SUPERSEDE_MUTATION_SERVICE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test plus docs/board/status/truth-table only; no app wiring, no shared-gate adoption, no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede path is no longer only a storage seam candidate. `SupersedeMemoryService` now exists as one actual internal core-layer mutation service that enforces exact old/new ids, exact bidirectional links, dual lifecycle eligibility, exact pair scope match, cross-client private guard, pending audit intent, guarded pair mutation through `applySupersedePair(...)`, and committed/cancelled audit follow-up.
+- Validation: changed source/test syntax checks passed; targeted supersede-memory runtime tests passed `10/10`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at service level. It did not wire supersede into `src/app.js`, did not adopt the shared internal runtime-entry gate, and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no temp-local supersede evidence yet, no app wiring yet, no shared-gate adoption yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded temp-local supersede evidence slice that consumes `SupersedeMemoryService` before any app wiring, shared-gate adoption, or public/runtime governance entry discussion.
+
+## Checkpoint - CM-0883 internal runtime-entry supersede shadow-store seam implementation candidate - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_SHADOW_STORE_SEAM_IMPLEMENTATION_CANDIDATE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future guarded supersede seam is no longer only a helper-level discussion shape. `SqliteShadowStore.applySupersedePair(...)` now exists as one actual internal storage-layer pair seam candidate that runs old/new row updates in one transaction, writes shared lifecycle metadata and bidirectional supersede links, and rolls back when the second guarded row update fails.
+- Validation: changed source/test syntax checks passed; targeted validate-memory runtime tests passed `19/19`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at storage seam level. It did not add an internal supersede service, did not append supersede runtime audit events, did not add a third adopter, and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no internal supersede service yet, no runtime supersede audit append yet, no shared-gate adoption yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded internal supersede mutation service slice that consumes `applySupersedePair(...)` before any shared-gate adoption or public/runtime governance entry discussion.
+
+## Checkpoint - CM-0882 internal runtime-entry supersede shadow seam candidate helper - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_SHADOW_SEAM_CANDIDATE_HELPER_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal helper/fixture/test plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future guarded supersede seam discussion shape is now emitted by a reusable explicit-input helper surface. `MemorySupersedeShadowSeamCandidateHelper` consumes the CM-0878 seam contract and CM-0881 runtime-prep shape, then emits one exact `applySupersedePair` candidate, one exact old/new pair update bundle, one exact shared guard bundle, one exact `pending / committed / cancelled` audit-correlation bundle, and one exact rollback carry-forward. This means future supersede seam work no longer has to reconstruct pair seam discussion shape from prose, runtime-prep wording, or separate helper outputs.
+- Validation: changed source/test syntax checks passed; targeted shadow-seam-candidate-helper tests passed `6/6`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at helper level. It did not implement the guarded two-record seam, did not implement a durable audit writer, did not add an internal supersede service, did not add a third adopter, and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no guarded two-record supersede seam implementation yet, no internal supersede service yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded guarded two-record `memory_supersede` shadow-store seam implementation candidate before any internal supersede service wiring or shared-gate adoption.
+
+## Checkpoint - CM-0881 internal runtime-entry supersede runtime prep - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_RUNTIME_PREP_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal helper/fixture/test plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede runtime-prep shape is now emitted by a reusable explicit-input helper surface. `MemorySupersedeRuntimePrepHelper` consumes the CM-0879 pair-outcome contract, the CM-0878 seam contract, the CM-0862 dry-run input shape, and the CM-0863 projection preview, then emits one coherent pair-shaped runtime-prep preview with one exact pair update API candidate, one exact `pending / committed / cancelled` audit plan, one exact rollback preview, and one exact runtime-surface blocker set. This means future supersede seam work no longer has to reconstruct pair runtime semantics from prose, contract-only wording, or pair-outcome helper output alone.
+- Validation: changed source/test syntax checks passed; targeted runtime-prep-helper tests passed `6/6`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at helper level. It did not implement the guarded two-record seam, did not implement a durable audit writer, did not add an internal supersede service, did not add a third adopter, and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no guarded two-record supersede seam implementation yet, no internal supersede service yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded guarded two-record `memory_supersede` seam discussion or implementation candidate before any internal supersede service wiring or shared-gate adoption.
+
+## Checkpoint - CM-0880 internal runtime-entry supersede pair-outcome helper - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_PAIR_OUTCOME_HELPER_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal helper/fixture/test plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede pair-outcome / audit-correlation shape is now emitted by a reusable explicit-input helper surface. `MemorySupersedePairOutcomeHelper` consumes the CM-0879 pair-outcome contract, CM-0862 dry-run input, and CM-0863 projection preview, then emits one coherent old/new pair-outcome preview plus one `pending / committed / cancelled` audit event preview family. This means future supersede runtime-prep no longer has to reconstruct pair audit semantics from prose or contract-only rules.
+- Validation: changed source/test syntax checks passed; targeted pair-outcome-helper tests passed `6/6`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at helper level. It did not implement a durable audit writer, did not implement a supersede runtime-prep helper, did not implement the two-record seam, did not add an internal supersede service, did not add a third adopter, and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no durable audit writer yet, no supersede runtime-prep helper yet, no guarded two-record shadow seam implementation yet, no internal supersede service yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded `memory_supersede` runtime-prep helper slice before any attempt to implement the seam or adopt supersede into the shared internal runtime-entry gate.
+
+## Checkpoint - CM-0879 internal runtime-entry supersede pair-outcome contract - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_PAIR_OUTCOME_CONTRACT_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal helper/fixture/test plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede pair-outcome / audit-correlation shape is now fixed as a reusable explicit-input contract helper. `MemorySupersedePairOutcomeContract` locks exact pair-outcome fields, exact event phases, and exact blocked properties, including one shared `pairCorrelationId`, dual previous-snapshot refs, dual lifecycle transitions, bidirectional link fields, pair atomicity, and the critical boundary `singleRecordAuditReuseAllowed=false`. This means future supersede work can no longer silently degrade into two unrelated single-record audit follow-ups.
+- Validation: changed source/test syntax checks passed; targeted pair-outcome-contract tests passed `9/9`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at contract/helper level. It did not implement a pair-outcome helper, did not implement an audit writer, did not implement the two-record seam, did not add a supersede runtime-prep helper, did not add an internal supersede service, did not add a third adopter, and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no supersede pair-outcome helper yet, no audit writer yet, no guarded two-record shadow seam implementation yet, no supersede runtime-prep helper yet, no internal supersede service yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded `memory_supersede` pair-outcome / audit-correlation helper slice before any attempt to implement the seam or adopt supersede into the shared internal runtime-entry gate.
+
+## Checkpoint - CM-0878 internal runtime-entry supersede shadow-seam contract - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_SHADOW_SEAM_CONTRACT_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal helper/fixture/test plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the future supersede two-record seam shape is now fixed as a reusable explicit-input contract helper. `MemorySupersedeShadowSeamContract` locks exact pair fields, exact link columns, and exact seam properties, including the critical boundary `singleRecordReuseAllowed=false`. This means future supersede work can no longer silently degrade back into two unrelated single-record lifecycle updates.
+- Validation: changed source/test syntax checks passed; targeted seam-contract tests passed `8/8`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at contract/helper level. It did not implement the seam, did not add a supersede runtime-prep helper, did not add an internal supersede service, did not add a third adopter, and did not widen into public MCP. Final changed-scope re-review found no actionable finding in the changed scope.
+- Remaining gaps: no guarded two-record shadow seam implementation yet, no supersede runtime-prep helper yet, no internal supersede service yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded `memory_supersede` pair-outcome / audit-correlation contract or helper slice before any attempt to implement the seam or adopt supersede into the shared internal runtime-entry gate.
+
+## Checkpoint - CM-0877 internal runtime-entry supersede storage-seam review - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_STORAGE_SEAM_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: source read-only review plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the next exact supersede blocker is now fixed at storage-seam level. Current source already proves packet-contract and projection-preview semantics, but `memory_supersede` should not be built from two independent calls to `updateLifecycleStatus(...)`. Before any runtime-prep helper or service exists, supersede needs one guarded two-record shadow seam that can verify both records, apply both lifecycle transitions, and apply both supersession links coherently.
+- Validation: source review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stayed read-only and decision-oriented. It did not add a third adopter, did not widen into public MCP, and did not start live governance proof. Final changed-scope re-review found no actionable finding in the reviewed scope.
+- Remaining gaps: no two-record shadow seam yet, no supersede runtime-prep helper yet, no internal supersede service yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded `memory_supersede` two-record shadow-seam contract/design slice before any attempt to add supersede runtime-prep, service wiring, CLI/runtime entry, or shared-gate adoption.
+
+## Checkpoint - CM-0876 internal runtime-entry supersede candidate review - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_CANDIDATE_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: source read-only review plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: `memory_supersede` is now more precisely classified. It already has packet-contract recognition and projection-preview semantics, but it is still a two-record, bidirectional-link mutation and current source still lacks an internal supersede service, a supersede runtime-prep helper, and a guarded two-record shadow seam for coherent lifecycle/link apply. It therefore still should not adopt the shared internal runtime-entry gate yet.
+- Validation: source review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stayed read-only and decision-oriented. It did not add a third adopter, did not widen into public MCP, and did not start live governance proof. Final changed-scope re-review found no actionable finding in the reviewed scope.
+- Remaining gaps: no third governance-family adopter yet, no supersede runtime-prep/helper yet, no guarded two-record shadow seam yet, no public/runtime durable governance apply yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded `memory_supersede` runtime-prep / two-record storage-seam review before any attempt to widen the shared internal gate beyond `validate + tombstone`.
+
+## Checkpoint - CM-0875 internal runtime-entry next-adopter review - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_NEXT_ADOPTER_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: source read-only review plus docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the next-adopter decision is now fixed. The shared internal runtime-entry gate should remain `validate + tombstone` only for now because those are the only current single-record mutation families with concrete service, audit, and lifecycle-update seams. `memory_supersede` is the next exact review/prep candidate, while `memory_exclude` and `memory_forget` remain less ready because they still lack bounded runtime-prep/projection seams.
+- Validation: source review completed; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stayed read-only and decision-oriented. It did not add a third adopter, did not widen into public MCP, and did not start live governance proof. Final changed-scope re-review found no actionable finding in the reviewed scope.
+- Remaining gaps: no third governance-family adopter yet, no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded `memory_supersede` runtime-prep / candidate review before any attempt to widen the shared internal gate beyond `validate + tombstone`.
+
+## Checkpoint - CM-0874 internal runtime-entry gate contract - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_GATE_CONTRACT_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test/docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the shared internal runtime-entry family is now a named core helper contract instead of inline app-only logic. `src/core/InternalRuntimeEntryGate.js` owns normalization, alias resolution, dry-run/confirm handling, actor-client derivation, default-disabled fail-closed behavior, and approved internal execution-context gating, while `src/app.js` continues to expose only `executeInternalValidate(...)` and `executeInternalTombstone(...)`.
+- Validation: changed source/test syntax checks passed; targeted helper tests passed `4/4`; targeted validate runtime-entry tests passed `4/4`; targeted tombstone runtime-entry tests passed `4/4`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at shared gate hardening. It did not add `validate_memory` or `memory_tombstone` public tools, did not widen `callTool()`, did not add a third governance family, and did not attempt live governance proof. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no third governance family has adopted the gate yet, no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: review or implement which future governance family, if any, should be the next exact adopter of this shared internal gate before any public MCP expansion or live governance proof discussion.
+
+## Checkpoint - CM-0873 internal validate runtime entry - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_VALIDATE_RUNTIME_ENTRY_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test/docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the shared internal runtime-entry gate is now proven reusable beyond tombstone. `src/app.js` now exposes `app.executeInternalValidate(args, requestContext)` alongside `app.executeInternalTombstone(args, requestContext)`, both powered by the same bounded `buildInternalRuntimeEntryPayload(...)` helper. The validate path stays fail-closed unless app construction explicitly enables `internalValidateRuntimeEntryEnabled` and the request also carries approved internal execution context with `internalValidateRuntimeEntry === true` and `requestSource === internal-validate-runtime-entry`.
+- Validation: changed source/test syntax checks passed; targeted validate runtime-entry tests passed `4/4`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at an internal default-disabled app entry. It did not add a public `validate_memory` tool, did not widen `callTool()`, did not expand `src/core/constants.js`, and did not attempt live governance proof. The targeted regression now locks default-disabled rejection, missing-approved-context rejection, enabled+approved proposal validation, execution-context-derived `actor_client_id`, and unchanged public tool names. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: review or implement whether this default-disabled internal runtime-entry family should remain validate+tombstone only or become the reusable internal gate shape for future governance families before any public MCP expansion or live governance proof discussion.
+
+## Checkpoint - CM-0872 internal tombstone runtime entry - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_TOMBSTONE_RUNTIME_ENTRY_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test/docs/board/status/truth-table only; no public MCP expansion, no public `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the tombstone-first path now has a default-disabled internal runtime entry beyond direct CLI use. `src/app.js` now exposes `app.executeInternalTombstone(args, requestContext)`, which stays fail-closed unless app construction explicitly enables `internalTombstoneRuntimeEntryEnabled` and the request also carries approved internal execution context with `internalTombstoneRuntimeEntry === true` and `requestSource === internal-tombstone-runtime-entry`.
+- Validation: changed source/test syntax checks passed; targeted tombstone runtime-entry tests passed `4/4`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at a default-disabled internal app entry. It did not widen into public MCP, did not add `callTool('memory_tombstone', ...)`, did not touch `src/core/constants.js`, and did not start live governance proof. The targeted regression locks both the new gate shape and the unchanged public tool list. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: review or implement whether this default-disabled internal gate should remain tombstone-only or become the reusable internal gate shape for future governance families before any public MCP expansion or live governance proof discussion.
+
+## Checkpoint - CM-0871 internal tombstone CLI entry - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_TOMBSTONE_CLI_ENTRY_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test/docs/board/status/truth-table only; no public MCP expansion, no `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the tombstone-first path now has a direct internal CLI/runtime-adjacent entry surface. `src/cli/tombstone-memory.js` reuses `createCodexMemoryApplication()` and `app.services.tombstoneMemoryService.tombstone(...)`, which means the path is no longer limited to direct service construction or app-service-only callers.
+- Validation: changed source/test syntax checks passed; targeted tombstone CLI tests passed `8/8`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately kept the entry surface internal-only. It did not widen into public MCP, did not add `callTool('memory_tombstone', ...)`, and did not start live governance proof. The targeted CLI regression locks both the new CLI behavior and the unchanged public tool list. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no default-disabled internal runtime-entry surface beyond direct CLI use yet, no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: review or implement the smallest bounded default-disabled internal runtime-entry surface beyond direct CLI use before any public MCP expansion or live governance proof discussion.
+
+## Checkpoint - CM-0870 internal tombstone app service wiring - 2026-05-24
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_TOMBSTONE_APP_SERVICE_WIRING_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test/docs/board/status/truth-table only; no public MCP expansion, no `callTool()` exposure, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the tombstone-first path now has one bounded app-surface integration step. `createCodexMemoryApplication()` instantiates `TombstoneMemoryService` and returns it through `app.services.tombstoneMemoryService`, which puts the service on the same internal surface family as `writeService` and `validateMemoryService` while preserving the current public MCP freeze.
+- Validation: changed source/test syntax checks passed; targeted phase-a app-surface tests passed `5/5`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stopped at internal app wiring. It did not widen into `callTool()`, `TOOL_DEFINITIONS`, a public `memory_tombstone` contract, or any live governance path. The targeted test locks both the new internal service surface and the unchanged public tool list. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no internal CLI/runtime-adjacent entry surface yet, no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: review or implement the smallest bounded internal-only CLI/runtime-adjacent tombstone entry surface before any public MCP expansion or live governance proof discussion.
+
+## Checkpoint - CM-0869 tombstone temp-local evidence - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_TOMBSTONE_TEMP_LOCAL_EVIDENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded temp-local test/docs/board/status/truth-table only; no `src/app.js` wiring, no public MCP expansion, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: tombstone-first governance now has one step stronger evidence than CM-0868 alone. The path is no longer only an internal service plus runtime-style fixture test; it now has isolated temp-root evidence on real local `SqliteShadowStore` and `AuditLogStore`, proving one accepted tombstone mutation path and one rejected private cross-client path.
+- Validation: changed test syntax checks passed; targeted temp-local tombstone tests passed `2/2`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stayed temp-local and synthetic. It did not add public/runtime wiring, and it used only isolated local stores plus synthetic records so the evidence is stronger than fixture-only but still below live governance proof. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no `src/app.js` wiring yet, no public/runtime durable governance apply yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: run a bounded runtime-integration review for `TombstoneMemoryService` before any default-disabled wiring or future live governance proof discussion.
+
+## Checkpoint - CM-0868 internal tombstone mutation service - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_INTERNAL_TOMBSTONE_MUTATION_SERVICE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded internal source/test/docs/board/status/truth-table only; no public MCP expansion, no `src/app.js` wiring, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: tombstone-first governance now has the smallest real internal mutation service above the CM-0867 writable seam. `TombstoneMemoryService` follows the `ValidateMemoryService` pattern with exact schema validation, secret-like content rejection, lifecycle/private-scope guards, default dry-run, confirm gating for mutation, pending audit intent, guarded single-record lifecycle update, and committed/cancelled audit follow-up.
+- Validation: changed source/test syntax checks passed; targeted tombstone runtime tests passed `14/14`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice deliberately stayed internal-only. It did not widen into `src/app.js` wiring or a public tool, and it kept the accepted transition surface narrow to `active/stale/superseded -> tombstoned`. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no runtime/public wiring yet, no bounded temp-local/runtime-adjacent tombstone proof yet, no live governance proof yet, and no readiness/reliability claim path yet.
+- Next safe step: review the smallest bounded runtime integration candidate for `TombstoneMemoryService`, or build a bounded temp-local/runtime-adjacent tombstone proof on top of the new internal service.
+
+## Checkpoint - CM-0867 tombstone-reason runtime seam - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_TOMBSTONE_REASON_RUNTIME_SEAM_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded source/test/docs/board/status/truth-table only; no durable governance mutation, no append-only governance audit apply, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the existing single-record lifecycle seam now supports writable `tombstone_reason`. `SqliteShadowStore.updateLifecycleStatus()` accepts optional `tombstoneReason` and persists it into `tombstone_reason` when that column exists, while preserving the existing status/status-reason/lifecycle timestamp/policy-guard behavior.
+- Validation: changed source/test syntax checks passed; targeted validate-memory runtime tests passed `16/16`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: this slice stayed intentionally small and storage-local. It did not add a new tombstone service or attach new audit behavior; it only removed the exact writable-seam blocker identified by CM-0866. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no internal tombstone mutation service yet, no runtime durable governance apply yet, no temp-local/runtime-adjacent tombstone proof yet, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, and no true live governance proof.
+- Next safe step: implement the next smallest internal tombstone mutation service slice, or build a bounded temp-local/runtime-adjacent tombstone proof on top of the now-complete single-record lifecycle seam.
+
+## Checkpoint - CM-0866 durable governance tombstone runtime prep - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_TOMBSTONE_RUNTIME_PREP_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded helper/test/docs/board/status/truth-table only; no durable governance mutation, no append-only audit apply, no SQLite schema/apply, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the CM-0864 tombstone-first runtime candidate is now concrete at the internal planning layer. `DurableGovernanceTombstoneRuntimePrepHelper` fuses one CM-0861 packet candidate, one CM-0863/CM-0865 projection snapshot, and one explicit runtime capability record into a fail-closed internal apply-plan preview with audit event previews, a single-record `updateLifecycleStatus` candidate, projected revision token, and `changedMemoryIds`.
+- Validation: changed source/test syntax checks passed; targeted tombstone runtime-prep helper tests passed `4/4`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: initial test input used a scope tuple that did not match the locked CM-0863 projection fixture, so the helper correctly failed closed on scope mismatch. The fixture-aligned scope tuple was then restored, leaving the intended blocker in place: current-source-like capabilities fail closed on `tombstone_reason_projection_surface_missing`. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no writable `tombstone_reason` runtime seam yet, no runtime durable governance apply yet, no temp-local/runtime-adjacent tombstone proof yet, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, and no true live governance proof.
+- Next safe step: review or patch the smallest writable `tombstone_reason` seam, or build a bounded temp-local/runtime-adjacent tombstone proof on top of the CM-0866 runtime-prep helper before any runtime durable governance apply.
+
+## Checkpoint - CM-0865 durable governance projection field convergence - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_PROJECTION_FIELD_CONVERGENCE_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: bounded helper/test/docs/board/status/truth-table only; no durable governance mutation, no SQLite schema/apply, no append-only audit writer implementation, no projection apply, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the CM-0864 naming-convergence blocker is now narrower. `DurableGovernanceShadowProjectionPreview` accepts SQLite-style lifecycle metadata on input and exposes SQLite-aligned alias surfaces on output while preserving the existing logical preview semantics from CM-0863.
+- Validation: changed source/test syntax checks passed; targeted shadow-projection preview tests passed `7/7`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: chose additive convergence rather than a breaking rename so future tombstone-first runtime-prep can consume SQLite vocabulary without forcing current bounded preview callers to migrate first. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no tombstone runtime service yet, no runtime durable governance apply yet, no temp-local/runtime-adjacent apply proof yet, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, and no true live governance proof.
+- Next safe step: implement the next smallest tombstone-first internal-only runtime-prep slice, or add a bounded temp-local/runtime-adjacent proof that consumes the converged projection vocabulary before any runtime apply.
+
+## Checkpoint - CM-0864 durable governance runtime candidate review - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_RUNTIME_CANDIDATE_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: source read-only review plus docs/board/status/truth-table only; no durable governance mutation, no SQLite schema apply, no append-only audit writer implementation, no projection apply, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Review verdict: the next smallest durable governance runtime candidate is no longer ambiguous. `ValidateMemoryService` already proves the right internal-only mutation/audit/update execution pattern, but `SqliteShadowStore.updateLifecycleStatus()` is still fundamentally a single-record lifecycle seam. Therefore the first runtime-facing governance candidate should be internal-only `memory_tombstone`, not `memory_supersede`.
+- Validation: `git diff --check` passed; docs validation passed.
+- Repair/re-review: the decisive source finding is the mismatch between current single-record update support and the much wider two-record bidirectional supersession shape. The review also surfaced a naming-convergence gap between `lifecycle-sqlite-dry-run` column names and CM-0863 logical projection-preview fields. Final changed-scope re-review on the review slice found no actionable finding.
+- Remaining gaps: no tombstone runtime service yet, no projection-field naming convergence yet, no temp-local/runtime apply proof yet, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, and no true live governance proof.
+- Next safe step: implement the next smallest tombstone-first internal-only runtime-prep slice, or align projection field naming with SQLite lifecycle column vocabulary before any bounded runtime apply proof.
+
+## Checkpoint - CM-0863 durable governance shadow projection proof - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_SHADOW_PROJECTION_PROOF_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal helper + fixture/test/docs/board/status/truth-table only; no durable governance mutation, no SQLite schema apply, no append-only audit writer implementation, no projection apply, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the CM-0861 packet contract and CM-0862 dry-run preview now have one bounded current-state projection proof layer above them. One explicit-input dry-run packet candidate plus one synthetic current projection record set can now be checked for supported family membership, current-record presence, lifecycle-state legality, exact scope match, link semantics, changed-memory-id preview, and projected before/after lifecycle metadata without performing any mutation.
+- Validation: changed source/test syntax checks passed; targeted shadow-projection preview tests passed `6/6`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: validation exposed two bounded issues that were repaired in-scope: one export mismatch in the normalization helper surface, and one redaction/coherence issue where normalized dry-run input needed the same sanitization path while still preserving exact raw-input scope comparison for correctness. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no temp-local projection proof yet, no runtime wiring yet, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, and no true live governance proof.
+- Next safe step: implement temp-local durable governance projection proof against the CM-0861/CM-0862/CM-0863 packet+preview stack, or perform a bounded runtime-candidate review for future projection/apply seams.
+
+## Checkpoint - CM-0862 durable governance mutation dry-run helper - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_MUTATION_DRY_RUN_HELPER_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal helper + fixture/test/docs/board/status/truth-table only; no durable governance mutation, no SQLite schema apply, no append-only audit writer implementation, no projection apply, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the CM-0861 packet contract now has a reusable fail-closed dry-run preview surface. One explicit-input candidate packet can now be checked for top-level field coverage, family-specific field coverage, target cardinality, lifecycle transition completeness, scope tuple presence, revision/change-set preview, rollback path presence, and mirrored-field consistency without performing any mutation.
+- Validation: changed source/test syntax checks passed; targeted dry-run helper tests passed `8/8`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: tightened the helper twice while validating: first by aligning family-specific field expectations to fixture reality, then by stripping suspicious key names and redacting scope-id values from preview output. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no temp-local or fixture-backed projection proof yet, no runtime wiring yet, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, and no true live governance proof.
+- Next safe step: implement temp-local or fixture-backed durable governance projection proof against the CM-0861/CM-0862 packet+preview shape.
+
+## Checkpoint - CM-0861 durable governance mutation packet contract - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_MUTATION_PACKET_CONTRACT_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal helper + fixture/test/docs/board/status/truth-table only; no durable governance mutation, no SQLite schema apply, no append-only audit writer implementation, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the CM-0860 durable governance mutation model now has a fixed fail-closed packet boundary. Packet families, required fields, blocked approval state, and side-effect-free posture are now locked in helper and fixture form instead of staying as prose only.
+- Validation: changed source/test syntax checks passed; targeted packet fixture/helper tests passed `22/22`; `git diff --check` passed; docs validation passed.
+- Repair/re-review: chose an explicit-input helper plus fixture lock because it matches the repository's existing contract style and gives CM-0862 a stable dry-run target. Final changed-scope re-review on the code slice found no actionable finding.
+- Remaining gaps: no dry-run durable governance mutation helper yet, no temp-local projection proof yet, no runtime wiring yet, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, and no true live governance proof.
+- Next safe step: implement a pure internal durable governance mutation dry-run helper against the CM-0861 packet contract.
+
+## Checkpoint - CM-0860 durable governance mutation flow design - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_MUTATION_FLOW_DESIGN_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: docs/board/status/truth-table design only; no durable governance write, no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, SQLite schema change, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: the durable governance mutation source-of-truth decision is now explicit. Future mutation should use append-only governance mutation audit as canonical event trail, SQLite shadow metadata as current projected governance state, and revision/change-set emission as the bridge into the already-built recall invalidation chain.
+- Validation: `git diff --check` passed; docs validation passed.
+- Repair/re-review: compared inline-only row mutation, journal-only without projection, and the hybrid model. Chose the hybrid because it best matches `ValidateMemoryService`, `AuditLogStore`, `SqliteShadowStore`, and `KnowledgeBaseSyncService` as they already exist. Final changed-scope re-review found no actionable finding.
+- Remaining gaps: no fixture-only durable mutation packet contract yet, no dry-run governance mutation helper yet, no projection proof for supersede/tombstone flows yet, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, and no true live governance proof.
+- Next safe step: implement a fixture-only durable governance mutation packet contract.
+
+## Checkpoint - CM-0859 memory lifecycle scope provider change-set invalidation - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_PROVIDER_CHANGESET_INVALIDATION_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal source/test/docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: candidate-cache invalidation is now sparse-delta capable on the custom-provider governance path. Providers may supply explicit `changedMemoryIds` without full snapshot replacement, while snapshot-based invalidation and legacy scalar fallback both remain intact.
+- Validation: changed source/test syntax checks passed; targeted runtime file `tests\recall-isolation-classification-runtime.test.js` passed `26/26`.
+- Repair/re-review: kept the provider contract backward-compatible, added explicit sparse-delta normalization, and preserved the existing fallback precedence so empty/absent deltas still fail closed. Final changed-scope re-review found no actionable finding.
+- Remaining gaps: no durable governance store, no provider-side lifecycle/tombstone/scope semantic guarantees beyond changed `memoryId` sets, no user/agent/folder projection, no candidate-generator pre-ranking governance rewiring, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: plan a future durable governance mutation flow or review provider-side semantic guarantees beyond changed `memoryId` sets.
+
+## Checkpoint - CM-0858 memory lifecycle scope provider snapshot per-record invalidation - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_PROVIDER_SNAPSHOT_PER_RECORD_INVALIDATION_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal source/test/docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: candidate-cache invalidation is now per-record on the custom-provider governance path too when the provider opts into bounded `{ revision, entries }` snapshots. Legacy scalar provider revisions still use the existing target-family fallback.
+- Validation: changed source/test syntax checks passed; targeted runtime file `tests\recall-isolation-classification-runtime.test.js` passed `25/25`.
+- Repair/re-review: kept the provider contract backward-compatible, reused the existing governance snapshot diff path, and preserved fail-closed fallback for providers that still expose revision-only semantics. Final changed-scope re-review found no actionable finding.
+- Remaining gaps: no durable governance store, no provider-side change-set semantics beyond full snapshots, no user/agent/folder projection, no candidate-generator pre-ranking governance rewiring, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: plan a future durable governance mutation flow or review provider-side change-set semantics beyond full snapshot replacement.
+
+## Checkpoint - CM-0857 memory lifecycle scope governance per-record invalidation - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_PER_RECORD_INVALIDATION_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal source/test/docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: candidate-cache invalidation is now per-record on the default governance-only path. Current-fingerprint metadata persists per-target governance entry snapshots, and governance-only drift now clears by changed governance `memoryId` when the snapshot model is available. Custom provider governance revisions still use target-family fallback.
+- Validation: changed source/test syntax checks passed; targeted runtime file `tests\recall-isolation-classification-runtime.test.js` passed `24/24`.
+- Repair/re-review: kept the change bounded to the default derived-governance path so provider mode remains fail-closed. Added snapshot persistence coverage and explicit provider-fallback coverage. Final changed-scope re-review found no actionable finding.
+- Remaining gaps: no durable governance store, no provider-side per-record snapshot contract, no user/agent/folder projection, no candidate-generator pre-ranking governance rewiring, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: plan a future durable governance mutation flow or review a provider-side per-record governance snapshot/diff design.
+
+## Checkpoint - CM-0856 memory lifecycle scope dependency-aware invalidation - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DEPENDENCY_AWARE_INVALIDATION_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal source/test/docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: candidate-cache invalidation is now dependency-aware for ordinary sync changes. Cache entries persist dependent candidate `memoryId` sets, and ordinary sync changes clear current-fingerprint entries by changed `memoryId` when governance revision did not drift. Governance-only drift still uses the existing target-family invalidation path.
+- Validation: changed source/test syntax checks passed; targeted runtime file `tests\recall-isolation-classification-runtime.test.js` passed `22/22`.
+- Repair/re-review: added dependent `memoryId` metadata to cache entries and verified ordinary sync changes now clear only matching dependent entries when metadata is present. Governance-only drift remains on the separate bounded path. Final changed-scope re-review found no actionable finding.
+- Remaining gaps: no durable governance store, no governance-only per-record diffing, no user/agent/folder projection, no candidate-generator pre-ranking governance rewiring, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: plan the future durable governance mutation flow or review a governance-only per-record diff/invalidation design.
+
+## Checkpoint - CM-0855 memory lifecycle scope target-local invalidation - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_TARGET_LOCAL_INVALIDATION_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal source/test/docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: candidate-cache invalidation is now target-aware. `process` drift clears `process` and `both`; `knowledge` drift clears `knowledge` and `both`; `both` still clears the full current fingerprint. `CandidateCacheStore` also clears governance revision metadata for the same selected target families.
+- Validation: changed source/test syntax checks passed; targeted runtime file `tests\recall-isolation-classification-runtime.test.js` passed `20/20`.
+- Repair/re-review: added selected-target cache clearing and verified that unrelated target cache entries remain intact. Added explicit fallback coverage proving `target='both'` still fails closed to broad current-fingerprint invalidation. Final changed-scope re-review found no actionable finding.
+- Remaining gaps: no durable governance store, no dependency-vector or record-level invalidation, no user/agent/folder projection, no candidate-generator pre-ranking governance rewiring, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: plan the future durable governance mutation flow or review whether dependency-aware invalidation beyond target family is worth the extra metadata and complexity.
+
+## Checkpoint - CM-0854 memory lifecycle scope governance cache invalidation - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_CACHE_INVALIDATION_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal source/test/docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: `CandidateCacheStore` now persists fingerprint-scoped governance revision metadata by target, and `KnowledgeBaseSyncService.syncTarget()` now clears current-fingerprint candidate cache when governance revision drift is detected even if ordinary diary-content refresh did not change, then stores the latest revision.
+- Validation: changed source/test syntax checks passed; targeted runtime file `tests\recall-isolation-classification-runtime.test.js` passed `18/18`.
+- Repair/re-review: initial governance-drift test shape refreshed ordinary sync state accidentally; the fixture was narrowed so `changed=false` while governance revision still drifted. `CandidateCacheStore.clearCurrentFingerprint()` was also repaired to flush when metadata is removed even if no entries were deleted. Final changed-scope re-review found no actionable finding.
+- Remaining gaps: no target-local selective invalidation, no new durable governance store, no user/agent/folder projection, no candidate-generator pre-ranking governance rewiring, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: review whether smarter target-local invalidation is worth the added complexity or plan the future durable governance-mutation flow that would feed this invalidation path.
+
+## Checkpoint - CM-0853 memory lifecycle scope default governance revision - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_DEFAULT_GOVERNANCE_REVISION_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal source/test/docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: when no custom provider is supplied, `KnowledgeBaseSyncService` now derives a default governance revision from current runtime governance metadata: shadow lifecycle `status` plus merged scope metadata (`projectId`, `workspaceId`, `clientId`, `taskId`, `conversationId`, `visibility`, `retentionPolicy`) from diary/shadow records.
+- Validation: changed source/test syntax checks passed; targeted runtime file `tests\recall-isolation-classification-runtime.test.js` passed `16/16`.
+- Repair/re-review: initial test shape exposed that lifecycle `status` should follow current repository reality and come from shadow-store metadata rather than diary fixtures, and that the "empty revision" test fixture must truly omit governance metadata. Both were repaired narrowly; final changed-scope re-review found no actionable finding.
+- Remaining gaps: no eager cache flush on governance-only revision change, no new durable governance store, no user/agent/folder projection, no candidate-generator pre-ranking governance rewiring, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: decide key-only invalidation versus eager candidate-cache flush for governance-only changes, then plan or implement the smallest bounded invalidation behavior.
+
+## Checkpoint - CM-0852 memory lifecycle scope governance sync-token hook - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_GOVERNANCE_SYNC_TOKEN_HOOK_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: internal source/test/docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Implementation verdict: `KnowledgeBaseSyncService` now supports an optional internal `governanceStateRevisionProvider`; `syncTarget()` returns `governanceStateRevision`; `buildSyncToken()` conditionally absorbs it; `KnowledgeBaseRecallPipeline.search()` forwards it; and `CandidateGenerator.buildCacheKey()` conditionally absorbs it too.
+- Validation: changed source/test syntax checks passed; targeted runtime file `tests\recall-isolation-classification-runtime.test.js` passed `14/14`.
+- Repair/re-review: changed-scope re-review found no actionable finding in the bounded sync/cache-key hook scope.
+- Remaining gaps: no durable governance state, no eager cache flush on governance-only revision change, no user/agent/folder projection, no candidate-generator pre-ranking governance rewiring, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: plan durable governance state and decide whether future governance-only revision changes need eager candidate-cache flush or key-only invalidation; keep controlled live governance proof exact-approval gated.
+
+## Checkpoint - CM-0851 memory lifecycle scope candidate-cache invalidation review - 2026-05-23
+
+- Status: `MEMORY_LIFECYCLE_SCOPE_CANDIDATE_CACHE_INVALIDATION_REVIEW_COMPLETED_NOT_READY`; project decision remains `RC_NOT_READY_BLOCKED`.
+- Scope: source read-only review plus docs/board/status/truth-table; no true live `record_memory`, true live `search_memory`, raw real memory read, direct real `.jsonl` read, provider/API call, durable memory/audit write, cleanup apply, rollback apply, public MCP expansion, package/config/watchdog/startup change, push, merge, release/cutover, tag, or readiness/reliability transition.
+- Review verdict: CM-0850 post-result governance filtering remains effective on candidate-cache hits because cached results still pass through app-level lifecycle/scope governance filtering before return.
+- Open gap: candidate-cache keying and `syncToken` do not yet encode durable governance-state revision. Future proposal / approval / supersession / tombstone / forget mutations still need either sync-token/cache-key enrichment or explicit bounded invalidation rules.
+- Remaining gaps: no durable governance state, no user/agent/folder projection, no candidate-generator governance rewiring, no candidate-cache invalidation proof for future governance mutations, no true live governance proof, and no reliability/readiness claim.
+- Next safe step: plan candidate-cache invalidation or durable governance state before any deeper candidate-generator rewiring or controlled live governance work.
 
 ## Checkpoint - CM-0850 memory lifecycle scope runtime integration - 2026-05-23
 
@@ -2469,3 +3923,839 @@ Changed files: STATUS.md; MAINTENANCE_BACKLOG.md; docs/CURRENT_RUNTIME_GAP_TRUTH
 Validation recorded from implementation: targeted HTTP tests `13/13`; `git diff --check` passed
 Boundary: no RC precheck, no live HTTP observe, no runtime expansion, no config/watchdog/startup, no provider, no real memory scan, no push/tag/release/deploy, no readiness claim
 Next: review state before selecting any RC precheck or additional HTTP hardening task
+
+## CM-0937 validation checkpoint
+
+Status: COMPLETED_VALIDATED
+Area: P0-mainline-health / P4-http-runtime
+Scope: read-only blocker-plan CLI for current memory reliability proof dirty-baseline state
+Changed files: src/cli/memory-reliability-proof-baseline-blocker-plan.js; tests/memory-reliability-proof-baseline-blocker-plan-cli.test.js; docs/MEMORY_RELIABILITY_PROOF_BASELINE_BLOCKER_PLAN_CLI.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; STATUS.md; MAINTENANCE_BACKLOG.md; .agent_board/*
+Validation: `node --check` changed CLI/test; targeted CLI test `node --test tests\memory-reliability-proof-baseline-blocker-plan-cli.test.js` (`4/4`); CM-0936 helper regression; CM-0935 CLI regression; CM-0934 policy regression; current CM-0937 CLI run; public MCP freeze scan; `git diff --check`; docs validation; changed-scope re-review
+Boundary: CLI runs the CM-0935 read-only baseline readiness path and consumes the report through CM-0936; no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/store read, no raw `.jsonl` read, no provider/API call, no durable memory/audit/projection write, no candidate-cache clear, no public MCP expansion, no package/config/watchdog/startup change, no commit, no push, no readiness or reliability claim
+Current expected result: accepted blocker plan while current baseline remains dirty, with `baselineReadyForLiveProof=false` and `unscopedCommitBlocked=true`
+Next: isolate or commit only verified intended changes, rerun CM-0937/CM-0935 from a clean synced baseline, and keep live proof blocked until separate clean-baseline review exists
+
+## CM-0941 local commit checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT
+Area: P0-mainline-health / P4-http-runtime
+Scope: scoped memory reliability phase commit review helper, CLI, tests, and docs
+Commit: 84e7388 feat: add scoped memory reliability commit review
+Committed files: docs/MEMORY_RELIABILITY_PHASE_COMMIT_REVIEW_CLI.md; src/cli/memory-reliability-phase-commit-review.js; src/core/MemoryReliabilityPhaseCommitReview.js; tests/memory-reliability-phase-commit-review-cli.test.js; tests/memory-reliability-phase-commit-review.test.js
+Validation: `git diff --cached --check` before commit; targeted helper test `7/7`; targeted CLI test `6/6`; public MCP tool freeze check returned `["memory_overview","record_memory","search_memory"]`
+Boundary: local commit only; no push, no PR, no public MCP expansion, no provider/API call, no true memory write/search, no real memory scan/export, no durable memory/audit/projection mutation, no config/watchdog/startup change, no readiness or reliability claim
+Remaining risk: repository still contains unrelated modified and untracked work outside the committed scoped candidate; push remains blocked until fresh push-readiness evidence exists.
+Next: continue with the next smallest safe local task from the dirty-tree reliability/governance queue, or reconcile board/status handoff changes in a separate verified scope.
+
+## CM-0942 post-commit reconciliation checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_RECONCILIATION_NOT_READY
+Area: P0-mainline-health / P6-docs-drift / P10-observability-admin
+Scope: docs/board/status reconciliation after CM-0941 local scoped candidate commit
+Commit recorded: 84e7388 feat: add scoped memory reliability commit review
+Changed files: STATUS.md; MAINTENANCE_BACKLOG.md; docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md; .agent_board/TASK_QUEUE.md; .agent_board/VALIDATION_LOG.md; .agent_board/AUTOPILOT_LEDGER.md; .agent_board/CHECKPOINT.md; .agent_board/HANDOFF.md; .agent_board/RUN_STATE.md
+Validation: `git status --short`; `git log --oneline --decorate -n 3`; `git diff --check`; docs validation
+Boundary: docs/board/status only; no source/test/runtime behavior change, no push, no PR, no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/export, no durable memory/audit/projection mutation, no provider/API call, no public MCP expansion, no package/config/watchdog/startup change, no readiness or reliability claim
+Remaining risk: worktree remains dirty outside the committed CM-0941 scope; push remains blocked until a fresh push-readiness review proves a coherent intended push scope.
+Next: select the next exact dirty-tree candidate with scoped phase commit review, or continue recall/write reliability closure below live-proof and durable-mutation boundaries.
+
+## CM-0943 CandidateGenerator review repair checkpoint
+
+Status: COMPLETED_VALIDATED_REVIEW_REPAIR_NOT_READY
+Area: P0-mainline-health / P4-http-runtime
+Scope: narrow formatting repair inside current recall governance cache dirty candidate
+Changed files: src/recall/CandidateGenerator.js; STATUS.md; .agent_board/TASK_QUEUE.md; .agent_board/VALIDATION_LOG.md; .agent_board/AUTOPILOT_LEDGER.md; .agent_board/CHECKPOINT.md; .agent_board/HANDOFF.md; .agent_board/RUN_STATE.md
+Validation: `node --check src\recall\CandidateGenerator.js`; `node --test tests\recall-isolation-classification-runtime.test.js` (`26/26`); `git diff --check`; docs validation
+Boundary: formatting/readability repair only; no live recall/write proof, no true `record_memory`, no true `search_memory`, no real memory scan/export, no durable memory/audit/projection mutation, no provider/API call, no public MCP expansion, no package/config/watchdog/startup change, no push, no readiness or reliability claim
+Remaining risk: broader recall governance cache invalidation source/test diff remains dirty and uncommitted pending separate scoped review and staged diff inspection.
+Next: either isolate and review the recall governance cache invalidation bundle, or continue with the next reliability/governance dirty-tree candidate below live-proof and durable-mutation boundaries.
+
+## CM-0944 recall governance cache invalidation checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P4-http-runtime / P8-memory-governance
+Scope: scoped recall governance-state candidate cache invalidation bundle plus one ValidationAggregator command-coverage time-drift test repair
+Changed files: src/recall/CandidateGenerator.js; src/recall/KnowledgeBaseRecallPipeline.js; src/recall/KnowledgeBaseSyncService.js; src/storage/CandidateCacheStore.js; tests/recall-isolation-classification-runtime.test.js; tests/v1-rc-validation-aggregator-implementation.test.js; .agent_board/TASK_QUEUE.md; .agent_board/VALIDATION_LOG.md; .agent_board/AUTOPILOT_LEDGER.md; .agent_board/CHECKPOINT.md; .agent_board/HANDOFF.md; .agent_board/RUN_STATE.md
+Validation: scoped phase commit review returned `candidate_ready`; changed source/test syntax checks passed; targeted recall isolation runtime test passed `26/26`; public MCP freeze returned exactly `memory_overview`, `record_memory`, and `search_memory`; scoped diff check passed; ordering compare matched `4/4`; ordering rollback ready `4/4`; ValidationAggregator implementation test passed `17/17`; full `npm test` passed `2417/2417`
+Boundary: no live recall/write proof, no true MCP memory tool call, no provider/API call, no raw memory or `.jsonl` read, no durable memory/audit/projection mutation outside test temp stores, no package/config/watchdog/startup change, no public MCP expansion, no push, no readiness or reliability claim
+Remaining risk: worktree remains dirty outside this scoped candidate, including separate write/governance runtime candidates and docs/board history; push remains deferred until a coherent pushed scope has fresh evidence.
+Next: stage only the six verified source/test files if still clean, inspect staged diff, commit locally if scope remains coherent, then continue with the next write reliability or governance closure bundle.
+
+## CM-0951 write preflight exact-scope candidate source helper checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance
+Scope: internal write preflight exact-scope candidate source helper
+Changed files: src/storage/SqliteShadowStore.js; tests/memory-write-preflight-candidate-source-helper.test.js; docs/MEMORY_WRITE_PREFLIGHT_EXACT_SCOPE_CANDIDATE_SOURCE_HELPER.md
+Commit: e55978f feat: add write preflight candidate source helper
+Validation: `node --check src\storage\SqliteShadowStore.js`; `node --check tests\memory-write-preflight-candidate-source-helper.test.js`; `node --test tests\memory-write-preflight-candidate-source-helper.test.js` (`3/3`); public MCP freeze returned `["memory_overview","record_memory","search_memory"]`; scoped phase commit review returned `candidate_ready`; `git diff --cached --check` passed; docs/ledger validation passed; post-commit git status/log inspected
+Boundary: local internal helper/test/docs only; no app/runtime wiring enablement, no live write proof, no true `record_memory`, no true `search_memory`, no provider/API call, no raw memory or `.jsonl` read, no durable real memory/audit/projection write, no public MCP expansion, no package/config/watchdog/startup change, no push, no readiness or reliability claim
+Remaining risk: broader worktree remains dirty with separate app-wiring, governance, board/status, and docs/test candidates. This helper is write reliability evidence only and does not prove `memory write reliable`.
+Next: continue with write app-wiring review or governance closure as separate scoped bundles; keep push deferred until dirty tree and push-readiness evidence are coherent.
+
+## CM-0952 write preflight app wiring and temp-local app-path evidence checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_CANDIDATE_NOT_READY
+Area: P0-mainline-health / P8-memory-governance
+Scope: default-disabled write preflight app wiring plus isolated temp-local app-path duplicate suppression evidence
+Changed files: src/app.js; src/config/createConfig.js; tests/phase-a-services.test.js; tests/memory-write-preflight-app-temp-local-evidence.test.js; docs/MEMORY_WRITE_PREFLIGHT_APP_WIRING.md; docs/MEMORY_WRITE_PREFLIGHT_APP_TEMP_LOCAL_EVIDENCE.md
+Commit: 7c746c3 feat: wire write preflight app path
+Validation: staged diff check passed; staged `src/app.js` syntax passed; staged `tests\phase-a-services.test.js` syntax passed; `node --check src\config\createConfig.js` passed; `node --check tests\memory-write-preflight-app-temp-local-evidence.test.js` passed; `node --test tests\phase-a-services.test.js` passed `8/8`; `node --test tests\memory-write-preflight-app-temp-local-evidence.test.js` passed `2/2`; public MCP freeze returned `["memory_overview","record_memory","search_memory"]`; scoped phase commit review returned `candidate_ready`; docs/ledger validation passed; post-commit git status/log inspected
+Boundary: default-disabled app wiring and isolated temp-local tests only; no live write proof, no true real-store `record_memory`, no true `search_memory`, no provider/API call, no raw memory or `.jsonl` read, no durable real memory/audit/projection write outside isolated temp tests, no public MCP expansion, no user config/watchdog/startup change, no push, no readiness or reliability claim
+Remaining risk: broader worktree remains dirty with separate governance runtime candidates and board/status/doc candidates. This app-path evidence still does not prove `memory write reliable`.
+Next: continue with live-proof precondition review or governance closure as separate scoped bundles; keep push deferred until dirty tree and push-readiness evidence are coherent.
+## CM-0962 durable governance shadow projection preview checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: explicit-input durable governance shadow projection preview helper, fixture, test, and proof doc
+Commit: 5cf2b09 feat: add durable governance projection preview
+Changed files: src/core/DurableGovernanceShadowProjectionPreview.js; tests/fixtures/durable-governance-shadow-projection-records-v1.json; tests/durable-governance-shadow-projection-preview.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_SHADOW_PROJECTION_PROOF.md
+Validation: `node --check src\core\DurableGovernanceShadowProjectionPreview.js`; `node --check tests\durable-governance-shadow-projection-preview.test.js`; `node --test tests\durable-governance-shadow-projection-preview.test.js` passed `7/7`; public MCP freeze returned exactly `memory_overview`, `record_memory`, and `search_memory`; targeted diff check passed; staged diff check passed; scoped phase commit review returned `candidate_ready`; docs validation passed; post-commit Git status/log/show inspected
+Boundary: local internal helper/test/docs/fixture only; no runtime apply, no live governance proof, no true real-store `record_memory`, no true `search_memory`, no provider/API call, no raw memory or `.jsonl` read, no durable real memory/audit/projection write, no public MCP expansion, no user config/watchdog/startup change, no push, no readiness or reliability claim
+Remaining risk: broader worktree remains dirty with separate app/runtime/deferred governance candidates and board/status/doc candidates. This projection preview is governance evidence only and does not prove lifecycle governance, write reliability, recall reliability, or readiness.
+Next: isolate the next committed-dependency leaf helper, likely one depending only on CM-0960/CM-0961/CM-0962 contracts, before any app/runtime wiring.
+## CM-0963 durable governance tombstone runtime-prep helper checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: explicit-input durable governance tombstone-first runtime-prep helper, test, and proof doc
+Commit: ccfbabc feat: add durable governance tombstone prep
+Changed files: src/core/DurableGovernanceTombstoneRuntimePrepHelper.js; tests/durable-governance-tombstone-runtime-prep-helper.test.js; docs/MEMORY_LIFECYCLE_SCOPE_DURABLE_GOVERNANCE_TOMBSTONE_RUNTIME_PREP.md
+Validation: `node --check src\core\DurableGovernanceTombstoneRuntimePrepHelper.js`; `node --check tests\durable-governance-tombstone-runtime-prep-helper.test.js`; `node --test tests\durable-governance-tombstone-runtime-prep-helper.test.js` passed `4/4`; public MCP freeze returned exactly `memory_overview`, `record_memory`, and `search_memory`; targeted diff check passed; staged diff check passed; scoped phase commit review returned `candidate_ready`; post-commit Git status/log/show inspected
+Boundary: local internal helper/test/docs only; no runtime apply, no live governance proof, no true real-store `record_memory`, no true `search_memory`, no provider/API call, no raw memory or `.jsonl` read, no durable real memory/audit/projection write, no public MCP expansion, no user config/watchdog/startup change, no push, no readiness or reliability claim
+Remaining risk: broader worktree remains dirty with separate app/runtime/deferred governance candidates and board/status/doc candidates. This runtime-prep helper is governance evidence only and does not prove lifecycle governance runtime apply, write reliability, recall reliability, or readiness.
+Next: isolate another committed-dependency leaf helper or a board/status reconciliation slice before any app/runtime wiring; keep live proof and push deferred until dirty baseline/push-readiness evidence is coherent.
+## CM-0964 supersede current-reality rebaseline checkpoint
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY
+Area: P0-mainline-health / P8-memory-governance / P9-codex-claude-client-scope
+Scope: explicit-input supersede current-reality rebaseline helper, test, and proof doc
+Commit: e613dce test: add supersede reality rebaseline
+Changed files: src/core/MemorySupersedeCurrentRealityRebaseline.js; tests/memory-supersede-current-reality-rebaseline.test.js; docs/MEMORY_LIFECYCLE_SCOPE_SUPERSEDE_CURRENT_REALITY_REBASELINE.md
+Validation: `node --check src\core\MemorySupersedeCurrentRealityRebaseline.js`; `node --check tests\memory-supersede-current-reality-rebaseline.test.js`; `node --test tests\memory-supersede-current-reality-rebaseline.test.js` passed `5/5`; public MCP freeze returned exactly `memory_overview`, `record_memory`, and `search_memory`; readiness/no-overclaim scan found only explicit NOT_READY/denial wording; targeted diff check passed; staged diff check passed; scoped phase commit review returned `candidate_ready`; post-commit Git status/log/show inspected
+Boundary: local internal helper/test/docs only; no runtime apply, no live governance proof, no true real-store `record_memory`, no true `search_memory`, no provider/API call, no raw memory or `.jsonl` read, no durable real memory/audit/projection write, no public MCP expansion, no user config/watchdog/startup change, no push, no readiness or reliability claim
+Remaining risk: broader worktree remains dirty with separate app/runtime/deferred governance candidates and board/status/doc candidates. This rebaseline only prevents stale supersede blockers from being recommitted; it does not prove supersede app wiring, runtime entry, live proof, write reliability, recall reliability, or readiness.
+Next: rebase supersede app/runtime candidates against current HEAD reality, or isolate another committed-dependency helper before any app/runtime wiring.
+## CM-0965 supersede runtime-prep rebase review checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `6ad566f test: add supersede runtime prep rebase review`
+
+Completed:
+- Added `src/core/MemorySupersedeRuntimePrepRebaseReview.js`.
+- Added `tests/memory-supersede-runtime-prep-rebase-review.test.js`.
+- Added `docs/MEMORY_LIFECYCLE_SCOPE_SUPERSEDE_RUNTIME_PREP_REBASE_REVIEW.md`.
+- The helper consumes CM-0964 current-reality evidence, rejects stale supersede blockers, preserves app/runtime/live-proof blockers, and keeps public MCP frozen.
+
+Validation:
+- `node --check src\core\MemorySupersedeRuntimePrepRebaseReview.js`
+- `node --check tests\memory-supersede-runtime-prep-rebase-review.test.js`
+- `node --test tests\memory-supersede-runtime-prep-rebase-review.test.js` passed `5/5`
+- `node --test tests\memory-supersede-current-reality-rebaseline.test.js tests\memory-supersede-runtime-prep-rebase-review.test.js` passed `10/10`
+- public MCP freeze returned exactly `memory_overview`, `record_memory`, `search_memory`
+- readiness/no-overclaim scan found only explicit NOT_READY/denial wording
+- targeted diff check passed
+- scoped phase commit review returned `candidate_ready`
+- staged diff check passed over exactly the three CM-0965 paths
+- post-commit Git status/log/show inspection completed
+
+Not validated:
+- supersede app wiring
+- CLI/runtime entry
+- shared gate adoption
+- live governance proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- Worktree remains broadly dirty outside the CM-0965 candidate. This slice is a guard for future candidate rebase; it is not runtime apply, reliability closure, or readiness.
+
+Next:
+- Use CM-0965 as a pre-commit guard before rebasing supersede runtime-prep/app candidates; keep push deferred until push-readiness evidence is coherent.
+## CM-0966 reliability baseline readiness policy checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `83fc35d test: add reliability baseline readiness policy`
+
+Completed:
+- Revalidated `src/core/MemoryReliabilityProofBaselineReadinessPolicy.js` against current HEAD.
+- Added sensitive explicit-input redaction to the policy normalization path.
+- Added targeted redaction coverage in `tests/memory-reliability-proof-baseline-readiness-policy.test.js`.
+- Updated `docs/MEMORY_RELIABILITY_PROOF_BASELINE_READINESS_POLICY.md` to reflect `6/6` targeted coverage.
+
+Validation:
+- `node --check src\core\MemoryReliabilityProofBaselineReadinessPolicy.js`
+- `node --check tests\memory-reliability-proof-baseline-readiness-policy.test.js`
+- `node --test tests\memory-reliability-proof-baseline-readiness-policy.test.js` passed `6/6`
+- `node --test tests\recall-proof-current-facts-preflight-cli.test.js tests\write-proof-current-facts-preflight-cli.test.js tests\memory-reliability-proof-baseline-readiness-policy.test.js` passed `18/18`
+- public MCP freeze returned exactly `memory_overview`, `record_memory`, `search_memory`
+- readiness/no-overclaim scan found only explicit NOT_READY/denial wording
+- targeted diff check passed
+- scoped phase commit review returned `candidate_ready`
+- staged diff check passed over exactly the three CM-0966 paths
+- post-commit Git status/log/show inspection completed
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- This policy only makes baseline readiness review machine-checkable. It does not clean the dirty baseline, execute live proof, or prove recall/write reliability.
+
+Next:
+- Continue with the reliability baseline CLI/blocker-plan isolation chain before any live proof; keep push deferred until push-readiness evidence is coherent.
+## CM-0979 deferred governance append-only audit plan policy checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `bd455e3 test: add deferred governance audit policy`
+
+Completed:
+- Selected the next smallest governance prerequisite after CM-0978.
+- Validated `src/core/DeferredGovernanceAppendOnlyAuditPlanPolicy.js`.
+- Validated `tests/deferred-governance-append-only-audit-plan-policy.test.js`.
+- Reviewed `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_APPEND_ONLY_AUDIT_PLAN_POLICY.md`.
+- Confirmed the packet is explicit-input/no-side-effect and keeps `memory_exclude` / `memory_forget` deferred.
+- Staged and committed exactly the three CM-0979 files.
+
+Validation:
+- `node --check src\core\DeferredGovernanceAppendOnlyAuditPlanPolicy.js`
+- `node --check tests\deferred-governance-append-only-audit-plan-policy.test.js`
+- `node --test tests\deferred-governance-append-only-audit-plan-policy.test.js` passed `5/5`
+- readiness/no-overclaim scan found only denial/boundary wording and explicit fail-closed fields
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces
+- `git diff --cached --check` passed over exactly the three CM-0979 paths
+- post-commit Git inspection confirmed `bd455e3` at `HEAD`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- Worktree remains broadly dirty outside CM-0979. This packet is an audit-plan prerequisite only; it does not implement an audit writer, append durable audit events, implement runtime apply, prove lifecycle governance readiness, write reliability, recall reliability, or readiness.
+
+Next:
+- Choose the next smallest scoped governance prerequisite, likely shadow projection policy, or resolve dirty baseline before live proof. Keep push deferred until a fresh push-readiness review has coherent scope and evidence.
+
+## CM-0978 deferred governance internal runtime-entry surface policy checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `8edd4df test: add deferred governance entry policy`
+
+Completed:
+- Selected the next smallest governance prerequisite after CM-0977.
+- Validated `src/core/DeferredGovernanceInternalRuntimeEntrySurfacePolicy.js`.
+- Validated `tests/deferred-governance-internal-runtime-entry-surface-policy.test.js`.
+- Reviewed `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_INTERNAL_RUNTIME_ENTRY_SURFACE_POLICY.md`.
+- Confirmed the packet is explicit-input/no-side-effect and keeps `memory_exclude` / `memory_forget` deferred.
+- Staged and committed exactly the three CM-0978 files.
+
+Validation:
+- `node --check src\core\DeferredGovernanceInternalRuntimeEntrySurfacePolicy.js`
+- `node --check tests\deferred-governance-internal-runtime-entry-surface-policy.test.js`
+- `node --test tests\deferred-governance-internal-runtime-entry-surface-policy.test.js` passed `5/5`
+- readiness/no-overclaim scan found only denial/boundary wording and explicit fail-closed fields
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces
+- `git diff --cached --check` passed over exactly the three CM-0978 paths
+- post-commit Git inspection confirmed `8edd4df` at `HEAD`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- Worktree remains broadly dirty outside CM-0978. This packet is a runtime-entry-surface prerequisite only; it does not implement entry functions, service classes, runtime apply, lifecycle governance readiness, write reliability, recall reliability, or readiness.
+
+Next:
+- Choose the next smallest scoped governance prerequisite, likely append-only audit plan policy or shadow projection policy, or resolve dirty baseline before live proof. Keep push deferred until a fresh push-readiness review has coherent scope and evidence.
+
+## CM-0977 deferred governance internal service surface policy checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `97fe095 test: add deferred governance service policy`
+
+Completed:
+- Selected the next smallest governance prerequisite after CM-0976.
+- Validated `src/core/DeferredGovernanceInternalServiceSurfacePolicy.js`.
+- Validated `tests/deferred-governance-internal-service-surface-policy.test.js`.
+- Reviewed `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_INTERNAL_SERVICE_SURFACE_POLICY.md`.
+- Confirmed the packet is explicit-input/no-side-effect and keeps `memory_exclude` / `memory_forget` deferred.
+- Staged and committed exactly the three CM-0977 files.
+
+Validation:
+- `node --check src\core\DeferredGovernanceInternalServiceSurfacePolicy.js`
+- `node --check tests\deferred-governance-internal-service-surface-policy.test.js`
+- `node --test tests\deferred-governance-internal-service-surface-policy.test.js` passed `5/5`
+- readiness/no-overclaim scan found only denial/boundary wording and explicit fail-closed fields
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces
+- `git diff --cached --check` passed over exactly the three CM-0977 paths
+- post-commit Git inspection confirmed `97fe095` at `HEAD`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- Worktree remains broadly dirty outside CM-0977. This packet is a service-surface prerequisite only; it does not implement service classes, runtime entries, runtime apply, lifecycle governance readiness, write reliability, recall reliability, or readiness.
+
+Next:
+- Choose the next smallest scoped governance prerequisite, likely the internal runtime-entry surface policy, or resolve dirty baseline before live proof. Keep push deferred until a fresh push-readiness review has coherent scope and evidence.
+
+## CM-0967 reliability baseline readiness CLI checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `f15a54b test: add reliability baseline readiness cli`
+
+Completed:
+- Revalidated `src/cli/memory-reliability-proof-baseline-readiness.js` against committed CM-0966 policy.
+- Revalidated `tests/memory-reliability-proof-baseline-readiness-cli.test.js`.
+- Updated `docs/MEMORY_RELIABILITY_PROOF_BASELINE_READINESS_CLI.md` to mark the current CM-0967 rebase and validation evidence.
+- Current dirty-baseline smoke returns blocked with `CMB-0013`/`CMB-0014` and no live proof.
+
+Validation:
+- `node --check src\cli\memory-reliability-proof-baseline-readiness.js`
+- `node --check tests\memory-reliability-proof-baseline-readiness-cli.test.js`
+- `node --test tests\memory-reliability-proof-baseline-readiness-cli.test.js` passed `5/5`
+- `node --test tests\memory-reliability-proof-baseline-readiness-policy.test.js tests\recall-proof-current-facts-preflight-cli.test.js tests\write-proof-current-facts-preflight-cli.test.js tests\memory-reliability-proof-baseline-readiness-cli.test.js` passed `23/23`
+- `node src\cli\memory-reliability-proof-baseline-readiness.js --json --pretty` returned blocked with `baselineReadyForLiveProof=false` and `dirtyBaselineBlocked=true`
+- public MCP freeze returned exactly `memory_overview`, `record_memory`, `search_memory`
+- readiness/no-overclaim scan found only explicit denial/boundary wording and `_READY_NOT_EXECUTED` decision constants
+- targeted diff check passed
+- scoped phase commit review returned `candidate_ready`
+- staged diff check passed over exactly the three CM-0967 paths
+- post-commit Git status/log/show inspection completed
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- This CLI proves repeatable blocked baseline review for the current dirty state. It does not clean the dirty baseline, execute live proof, or prove recall/write reliability.
+
+Next:
+- Continue with blocker-plan/isolation CLI chain before any live proof; keep push deferred until push-readiness evidence is coherent.
+## CM-0984 Deferred Governance Runtime-Entry Adapter Precommit Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `ca23542 test: add deferred governance adapter policy`
+
+Completed:
+- Selected the next smallest governance runtime-entry candidate after CM-0983.
+- Validated `src/core/DeferredGovernanceRuntimeEntryAdapter.js`.
+- Validated `tests/deferred-governance-runtime-entry-adapter.test.js`.
+- Updated `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_GOVERNANCE_RUNTIME_ENTRY_ADAPTER.md` to separate current CM-0984 commit task from historical CM-0925/CM-0930 candidate lineage.
+- Confirmed the adapter is unmounted, default-disabled by explicit flags, dry-run/planning only, and keeps `memory_exclude` / `memory_forget` off the public MCP contract.
+- Staged and committed exactly the three CM-0984 files.
+
+Validation:
+- `node --check src\core\DeferredGovernanceRuntimeEntryAdapter.js`
+- `node --check tests\deferred-governance-runtime-entry-adapter.test.js`
+- `node --test tests\deferred-governance-runtime-entry-adapter.test.js` passed `12/12`
+- `node --test tests\deferred-governance-mutation-planning-service.test.js` passed `7/7`
+- targeted diff check passed over exactly the three CM-0984 paths
+- staged diff check passed over exactly the three CM-0984 paths
+- post-commit Git inspection confirmed `ca23542` at `HEAD`
+- readiness/no-overclaim scan found only denial/boundary wording
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-0984 is an unmounted internal adapter candidate only. It does not wire `src/app.js`, mount runtime entries, start services, run live proof, apply durable governance mutation, prove recall/write reliability, or claim readiness.
+
+Next:
+- Choose the next separate unmounted helper/policy candidate, or resolve dirty baseline before live proof. Keep push deferred.
+## CM-0985 Deferred Governance Dependency Closure Precommit Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `b521af9 test: add deferred governance planning helpers`
+
+Completed:
+- Detected that committed CM-0984 depends on still-uncommitted planning and bounded preview modules.
+- Validated `src/core/DeferredGovernanceMutationPlanningService.js`.
+- Validated `src/core/DeferredGovernanceBoundedApplyPlanPreview.js`.
+- Validated both targeted test files.
+- Updated both docs to separate current CM-0985 commit task from historical CM-0924/CM-0929 candidate lineage.
+- Confirmed adapter dependency require smoke succeeds in the current workspace.
+- Staged and committed exactly the six CM-0985 files.
+
+Validation:
+- `node --check src\core\DeferredGovernanceMutationPlanningService.js`
+- `node --check src\core\DeferredGovernanceBoundedApplyPlanPreview.js`
+- `node --check tests\deferred-governance-mutation-planning-service.test.js`
+- `node --check tests\deferred-governance-bounded-apply-plan-preview.test.js`
+- `node --test tests\deferred-governance-mutation-planning-service.test.js` passed `7/7`
+- `node --test tests\deferred-governance-bounded-apply-plan-preview.test.js` passed `6/6`
+- adapter dependency require smoke passed
+- targeted diff check passed over exactly the six CM-0985 paths
+- staged diff check passed over exactly the six CM-0985 paths
+- readiness/no-overclaim scan found only denial/boundary wording and rejection-test input
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces
+- post-commit Git inspection confirmed `b521af9` at `HEAD`
+- post-fix re-review confirmed all three dependency modules/tests are Git-tracked and combined adapter/planning/preview tests passed `25/25`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-0985 closes a local dependency chain only. It does not wire app/runtime entries, mount services, run live proof, apply durable governance mutation, prove recall/write reliability, or claim readiness.
+
+Next:
+- Choose the next separate unmounted helper/policy candidate, or resolve dirty baseline before live proof. Keep push deferred.
+## CM-0986 Deferred Family Re-entry Contract Precommit Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `ca65516 test: add deferred governance family contract`
+
+Completed:
+- Selected the next smallest unmounted governance review helper after CM-0985.
+- Validated `src/core/DeferredGovernanceFamilyReentryContract.js`.
+- Validated `tests/deferred-governance-family-reentry-contract.test.js`.
+- Updated `docs/MEMORY_LIFECYCLE_SCOPE_DEFERRED_FAMILY_REENTRY_CONTRACT.md` to separate current CM-0986 commit task from historical candidate lineage.
+- Confirmed the helper requires exact explicit evidence before reporting `readyForInternalReentryReview=true`.
+- Staged and committed exactly the three CM-0986 files.
+
+Validation:
+- `node --check src\core\DeferredGovernanceFamilyReentryContract.js`
+- `node --check tests\deferred-governance-family-reentry-contract.test.js`
+- `node --test tests\deferred-governance-family-reentry-contract.test.js` passed `5/5`
+- targeted diff check passed over exactly the three CM-0986 paths
+- staged diff check passed over exactly the three CM-0986 paths
+- readiness/no-overclaim scan found only denial/boundary wording and negative public-MCP expansion test input
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces
+- post-commit Git inspection confirmed `ca65516` at `HEAD`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-0986 is an explicit-input review contract only. It does not wire app/runtime entries, mount services, run live proof, apply durable governance mutation, prove recall/write reliability, or claim readiness.
+
+Next:
+- Choose the next separate unmounted helper/policy candidate, or resolve dirty baseline before live proof. Keep push deferred.
+## CM-0987 Supersede Pair-Outcome Contract Precommit Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `832c247 test: add supersede pair outcome contract`
+
+Completed:
+- Selected the next independent lifecycle governance contract after skipping app-preview closure candidates.
+- Validated `src/core/MemorySupersedePairOutcomeContract.js`.
+- Validated `tests/memory-supersede-pair-outcome-contract.test.js`.
+- Reviewed `tests/fixtures/memory-supersede-pair-outcome-v1.json`.
+- Updated `docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_PAIR_OUTCOME_CONTRACT.md` to bind the current CM-0987 commit task.
+- Confirmed the contract remains fixture-only/review-only and blocks helper implementation, audit writer, durable mutation, public MCP expansion, and readiness claims.
+- Staged and committed exactly the four CM-0987 files.
+
+Validation:
+- `node --check src\core\MemorySupersedePairOutcomeContract.js`
+- `node --check tests\memory-supersede-pair-outcome-contract.test.js`
+- `node --test tests\memory-supersede-pair-outcome-contract.test.js` passed `9/9`
+- targeted diff check passed over exactly the four CM-0987 paths
+- staged diff check passed over exactly the four CM-0987 paths
+- readiness/no-overclaim scan found only denial/boundary wording
+- public MCP freeze scan showed only existing `record_memory`, `search_memory`, and `memory_overview` surfaces
+- post-commit Git inspection confirmed `832c247` at `HEAD`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-0987 is a fixture-only contract helper. It does not implement a supersede pair-outcome helper, audit writer, runtime service, live governance proof, recall/write reliability, or readiness.
+
+Next:
+- Choose the paired outcome helper candidate or another separate unmounted helper/policy candidate after fresh review. Keep push deferred.
+
+## CM-0996 Internal App Runtime Surface Precommit Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_CANDIDATE_NOT_READY`
+Date: 2026-05-24
+Commit: `e9ec5c7 feat: add internal app runtime surfaces`
+
+Completed:
+- Selected the next coherent dirty-baseline candidate after CM-0995: the default-disabled internal app runtime surface in `src/app.js`.
+- Verified candidate dependencies are already tracked: `InternalRuntimeEntryGate`, `TombstoneMemoryService`, `SupersedeMemoryService`, and `DeferredGovernanceRuntimeEntryAdapter`.
+- Validated internal app methods for validate, tombstone, supersede, deferred memory_exclude, deferred memory_forget, and deferred apply-plan preview.
+- Confirmed public MCP tool definitions remain exactly `record_memory`, `search_memory`, and `memory_overview`.
+- Confirmed readiness/reliability claim scan found only denial or boundary wording in candidate docs.
+
+Validation:
+- `node --check src\app.js`
+- `node --check tests\phase-a-services.test.js`
+- `node --check tests\deferred-governance-app-runtime-entry.test.js`
+- `node --check tests\validate-memory-runtime-entry.test.js`
+- `node --check tests\tombstone-memory-runtime-entry.test.js`
+- `node --check tests\supersede-memory-runtime-entry.test.js`
+- `node --test tests\phase-a-services.test.js` passed `8/8`
+- `node --test tests\deferred-governance-app-runtime-entry.test.js` passed `7/7`
+- `node --test tests\validate-memory-runtime-entry.test.js` passed `4/4`
+- `node --test tests\tombstone-memory-runtime-entry.test.js` passed `4/4`
+- `node --test tests\supersede-memory-runtime-entry.test.js` passed `4/4`
+- `node --test tests\deferred-governance-runtime-entry-adapter.test.js tests\deferred-governance-mutation-planning-service.test.js tests\deferred-governance-bounded-apply-plan-preview.test.js` passed `25/25`
+- public MCP freeze scan passed; `validate_memory` was observed only in HTTP mutation-sensitive guard metadata, not in public tool definitions
+- readiness/no-overclaim scan passed with denial/boundary wording only
+- `git diff --check -- src\app.js tests\phase-a-services.test.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-0996 is internal/default-disabled app wiring and test-fixture runtime evidence only. It does not expand public MCP, turn runtime apply default-on, close recall/write reliability, or claim readiness.
+
+Next:
+- CM-0996 committed locally as `e9ec5c7`. Keep push deferred.
+
+## CM-0997 Internal Lifecycle CLI Entry Precommit Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_CANDIDATE_NOT_READY`
+Date: 2026-05-24
+Commit: `f02dd9e feat: add internal lifecycle cli entries`
+
+Completed:
+- Selected the next coherent dirty-baseline candidate after CM-0996: internal tombstone/supersede CLI entries.
+- Verified the CLI entries are not package scripts or public MCP tools.
+- Confirmed default behavior is dry-run and apply requires `--apply --confirm --json`.
+- Confirmed apply tests mutate only isolated temp fixture SQLite/audit paths via `CODEX_MEMORY_*`.
+- Confirmed low-risk CLI summaries reject raw `workspace_id` output and preserve public MCP freeze.
+
+Validation:
+- `node --check src\cli\tombstone-memory.js`
+- `node --check src\cli\supersede-memory.js`
+- `node --check tests\tombstone-memory-cli.test.js`
+- `node --check tests\supersede-memory-cli.test.js`
+- `node --test tests\tombstone-memory-cli.test.js` passed `8/8`
+- `node --test tests\supersede-memory-cli.test.js` passed `9/9`
+- `node --test tests\tombstone-memory-runtime.test.js` passed `14/14`
+- `node --test tests\supersede-memory-runtime.test.js` passed `10/10`
+- `node --test tests\tombstone-memory-runtime-entry.test.js tests\supersede-memory-runtime-entry.test.js` passed `8/8`
+- public MCP freeze scan passed with only `record_memory`, `search_memory`, and `memory_overview` in public definitions
+- readiness/no-overclaim scan passed with denial/boundary wording only
+- targeted `git diff --check` passed
+- docs validation passed
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-0997 adds internal write-capable CLI entry files. They are dry-run-first and guarded, but they still are not live governance proof, public MCP, default mainline write reliability, or readiness closure.
+
+Next:
+- CM-0997 committed locally as `f02dd9e`. Keep push deferred.
+
+## CM-0998 Internal Runtime-Entry Family Stabilization Review Sync Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_CANDIDATE_NOT_READY`
+Date: 2026-05-24
+Commit: `d61a5bf docs: sync internal runtime entry family review`
+
+Completed:
+- Selected a docs-only current-state sync after CM-0996/CM-0997.
+- Corrected stale deferred-family wording in `docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_FAMILY_STABILIZATION_REVIEW.md`.
+- Preserved the conclusion that durable lifecycle internal runtime-entry family stabilization is `validate + tombstone + supersede`.
+- Clarified that `memory_exclude` and `memory_forget` have default-disabled app/adapter dry-run candidate surfaces, but no durable runtime service/apply seam.
+
+Validation:
+- `node --test tests\deferred-governance-app-runtime-entry.test.js tests\validate-memory-runtime-entry.test.js tests\tombstone-memory-runtime-entry.test.js tests\supersede-memory-runtime-entry.test.js` passed `19/19`
+- no-overclaim/stale-wording scan found only denial/boundary wording
+- `git diff --check -- docs\MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_FAMILY_STABILIZATION_REVIEW.md`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-0998 is docs-only current-state sync. It does not close deferred governance runtime apply, live proof, recall/write reliability, or readiness.
+
+Next:
+- CM-0998 committed locally as `d61a5bf`. Keep push deferred.
+
+## CM-0999 Historical Internal Runtime-Entry Review Supersession Cleanup Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `97e79af docs: mark stale runtime entry reviews historical`
+
+Completed:
+- Selected a docs-only dirty-baseline cleanup slice after CM-0998.
+- Added current-state supersession notes to the historical CM-0875/CM-0876/CM-0877-era review docs for next-adopter, supersede candidate, and supersede storage seam decisions.
+- Preserved those docs as historical trace while preventing stale "supersede lacks service/CLI/runtime entry" wording from being used as current source reality.
+
+Validation:
+- `rg` current-state supersession scan confirmed the three docs have `Current-State Supersession Note` and historical section headings
+- `node --test tests\deferred-governance-app-runtime-entry.test.js tests\validate-memory-runtime-entry.test.js tests\tombstone-memory-runtime-entry.test.js tests\supersede-memory-runtime-entry.test.js` passed `19/19`
+- `git diff --check` over CM-0999 docs and board passed
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed
+- staged diff contained exactly the three CM-0999 docs
+- local commit `97e79af docs: mark stale runtime entry reviews historical`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-0999 is docs-only cleanup. It does not close deferred governance runtime apply, live proof, recall/write reliability, or readiness.
+
+Next:
+- CM-0999 committed locally as `97e79af`. Keep push deferred until dirty worktree and push-readiness are coherent.
+
+## CM-1000 Recall Candidate-Cache Invalidation Evidence Docs Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `b090c87 docs: add recall cache invalidation evidence`
+
+Completed:
+- Selected a recall-reliability evidence packet from the remaining untracked docs.
+- Added seven docs covering candidate-cache invalidation review, governance sync-token/cache-key hook, target-local invalidation, dependency-aware invalidation, default governance per-record invalidation, provider snapshot invalidation, and provider change-set invalidation.
+- Kept all docs bounded as internal evidence, not live recall/write reliability or readiness claims.
+
+Validation:
+- `node --check src\storage\CandidateCacheStore.js`
+- `node --check src\recall\CandidateGenerator.js`
+- `node --check src\recall\KnowledgeBaseSyncService.js`
+- `node --check tests\recall-isolation-classification-runtime.test.js`
+- `node --test tests\recall-isolation-classification-runtime.test.js` passed `26/26`
+- no-overclaim scan found only denial/boundary wording
+- staged diff contained exactly the seven CM-1000 docs
+- `git diff --cached --check`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+- local commit `b090c87 docs: add recall cache invalidation evidence`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-1000 is docs/evidence sync over already-tested local behavior. It does not close live recall reliability, write reliability, durable governance mutation flow, or readiness.
+
+Next:
+- Choose another exact scoped candidate or dirty-baseline cleanup slice after fresh inspection. Keep push deferred until dirty worktree and push-readiness are coherent.
+
+## CM-1001 Governance Mutation Boundary Evidence Docs Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: `437e697 docs: add governance mutation boundary evidence`
+
+Completed:
+- Selected the remaining governance/cache/apply-plan/durable-mutation boundary docs as a coherent docs evidence packet.
+- Added current-state supersession notes where older adapter/cache/runtime-candidate wording was historical.
+- Preserved public MCP freeze, no durable mutation, no config/watchdog/startup change, and no readiness/reliability claims.
+
+Validation:
+- `node --test tests\recall-isolation-classification-runtime.test.js` passed `26/26`
+- `node --test tests\deferred-governance-runtime-entry-adapter.test.js tests\deferred-governance-bounded-apply-plan-preview.test.js tests\deferred-governance-app-runtime-entry.test.js` passed `25/25`
+- `node --test tests\durable-governance-shadow-projection-preview.test.js tests\durable-governance-tombstone-runtime-prep-helper.test.js tests\durable-governance-mutation-dry-run-helper.test.js` passed `19/19`
+- no-overclaim scan found only denial/boundary wording
+- staged diff contained exactly the seven CM-1001 docs
+- `git diff --cached --check`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+- local commit `437e697 docs: add governance mutation boundary evidence`
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-1001 is docs/evidence sync. It does not close live reliability, durable governance mutation readiness, RC readiness, or production readiness.
+
+Next:
+- Only tracked board/status/truth-table docs remain dirty. Reconcile them as a separate docs/status checkpoint before any push-readiness decision.
+
+## CM-1002 Board/Status/Truth-Table Reconciliation Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
+Date: 2026-05-24
+Commit: included in the CM-1002 local commit
+
+Completed:
+- Selected the remaining tracked board/status/truth-table reconciliation as a single docs/status closeout slice.
+- Repaired misleading truth-table wording so public MCP expansion and public `callTool()` widening remain explicitly blocked.
+- Preserved `RC_NOT_READY_BLOCKED`, public MCP freeze, no source/runtime change, and no reliability/readiness claims.
+
+Validation:
+- no-overclaim scan found no positive public MCP / `callTool()` permissive wording
+- `node scripts\validate_autopilot_ledger_consistency.js` passed
+- `git diff --check -- .agent_board STATUS.md MAINTENANCE_BACKLOG.md docs\CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` passed
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed
+- staged diff check required before commit
+
+Not validated:
+- live recall proof
+- live write proof
+- true `record_memory`
+- true `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- HTTP observe
+- full `npm test`
+- push-readiness
+- push
+
+Remaining risk:
+- CM-1002 is status-surface reconciliation only. It does not close live reliability, durable governance mutation readiness, RC readiness, or production readiness.
+
+Next:
+- Inspect post-commit status before any push-readiness decision.
