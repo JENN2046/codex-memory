@@ -1,5 +1,35 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1039 Memory Write Reconcile Worker Temp-Local Queue Drain Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_TEMP_LOCAL_QUEUE_DRAIN_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1039_MEMORY_WRITE_RECONCILE_WORKER_TEMP_LOCAL_QUEUE_DRAIN.md`
+
+Completed:
+- Added isolated temp-local worker queue-drain evidence.
+- Verified two synthetic degraded accepted writes leave four vector/chunk reconcile tasks.
+- Verified explicit worker `limit=1`, `dryRun=false`, `maxRuns=4` replays one queued task per manual tick.
+- Verified the worker stops after four ticks with timer cleared.
+- Verified reconcile queue count reaches `0`.
+- Verified vector count reaches `2` and chunk count is at least `2`.
+- Verified worker status omits raw memory ids.
+
+Validation:
+- Test syntax check passed.
+- CM-1039 targeted worker test passed `8/8`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `27/27`.
+- Full `npm test` passed `2491/2491`.
+
+Boundary:
+- Internal temp-local queue-drain evidence only.
+- No runtime source change, public MCP expansion, public `memory_write_reconcile_worker` tool, true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, dependency change, config/watchdog/startup edit, runtime observe execution, default worker start, startup reconcile execution, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward exact runtime observe, longer-horizon runtime durability, rollback cleanup posture, or governance lifecycle/scope closure. Broad write reliability, automatic degraded recovery, startup reconcile safety, runtime observe safety, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1038 Memory Write Reconcile Worker Bounded Loop Durability Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_BOUNDED_LOOP_NOT_RELIABLE_NOT_READY`

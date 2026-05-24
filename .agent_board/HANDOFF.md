@@ -1,5 +1,38 @@
 # HANDOFF.md — codex-memory
 
+## CM-1039 Memory Write Reconcile Worker Temp-Local Queue Drain Handoff
+
+Goal: add isolated temp-local evidence that the default-disabled write reconcile worker can explicitly drain multiple queued vector/chunk projection tasks across bounded manual ticks, without adding a public MCP tool, executing runtime observe, starting the worker by default, changing startup/config/watchdog, or claiming readiness/reliability.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_TEMP_LOCAL_QUEUE_DRAIN_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1039_MEMORY_WRITE_RECONCILE_WORKER_TEMP_LOCAL_QUEUE_DRAIN.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- The CM-1039 temp-local test writes two synthetic degraded process records under one temp root.
+- Deterministic vector/chunk projection failures leave four reconcile tasks visible.
+- The internal worker is started explicitly with `limit=1`, `dryRun=false`, `maxRuns=4`, and an injected manual scheduler.
+- Four manual ticks replay one queued task per tick.
+- After the fourth tick, worker status reports stopped/no timer and `runCount=4`.
+- Reconcile queue count is `0`, vector count is `2`, chunk count is at least `2`, and both diary files remain visible.
+- Worker status omits raw memory ids.
+- CM-1039 targeted worker test passed `8/8`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `27/27`.
+- Full `npm test` passed `2491/2491`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, automatic reconcile recovery, startup reconcile safety, runtime observe safety, real degraded projection recovery, reconcile cleanup safety, longer-horizon runtime durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is isolated temp-local explicit worker evidence, not runtime observe evidence.
+- It does not prove queue processing in a true long-running service.
+- It does not authorize startup/watchdog/config integration.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward exact runtime observe, longer-horizon runtime durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1038 Memory Write Reconcile Worker Bounded Loop Durability Handoff
 
 Goal: add bounded internal evidence that the default-disabled write reconcile worker's explicit scheduled loop stays non-overlapping and stops after `maxRuns`, without adding a public MCP tool, executing runtime observe, starting the worker by default, changing startup/config/watchdog, or claiming readiness/reliability.

@@ -381,6 +381,117 @@ test('CM-1038 worker keeps bounded scheduled loop non-overlapping across multipl
   assert.equal(JSON.stringify(finalStatus).includes('codex-process-cm1038'), false);
 });
 
+test('CM-1039 explicit worker drains multiple temp-local reconcile tasks across bounded ticks', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1039-worker-drain-'));
+  const config = createConfig(rootPath);
+  const shadowStore = new SqliteShadowStore(config);
+  const healthyVectorStore = new VectorIndexStore(config);
+  const auditLogStore = new AuditLogStore(config);
+  const failingVectorStore = {
+    ...healthyVectorStore,
+    async upsertRecord() {
+      throw new Error('cm1039 synthetic vector projection failure');
+    }
+  };
+  const failingChunkIndexingService = {
+    async indexRecord() {
+      throw new Error('cm1039 synthetic chunk projection failure');
+    }
+  };
+  const writeService = new MemoryWriteService({
+    config,
+    diaryStore: new DiaryStore(config),
+    shadowStore,
+    vectorStore: failingVectorStore,
+    auditLogStore,
+    chunkIndexingService: failingChunkIndexingService,
+    executionContextResolver: {
+      resolve: () => ({
+        agentAlias: 'Codex',
+        agentId: 'cm1039-temp-local-fixture-agent',
+        requestSource: 'cm1039-write-reconcile-worker-drain-test'
+      }),
+      isWritableByCodex: () => true
+    }
+  });
+  const reconcileService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore: healthyVectorStore,
+    chunkIndexingService: new ChunkIndexingService({
+      config,
+      shadowStore,
+      vectorStore: healthyVectorStore
+    })
+  });
+  const scheduler = new ManualScheduler();
+  const worker = new MemoryWriteReconcileWorker({
+    reconcileService,
+    scheduler,
+    intervalMs: 250,
+    limit: 1
+  });
+
+  try {
+    for (const targetPath of [
+      config.dailyNoteRootPath,
+      config.dbPath,
+      config.auditLogPath,
+      config.vectorIndexPath
+    ]) {
+      assertInsideRoot(rootPath, targetPath);
+    }
+
+    const firstWrite = await writeService.record(processPayload({
+      title: 'Checkpoint: CM-1039 internal write reconcile worker drain one',
+      task_id: 'CM-1039-A',
+      conversation_id: 'cm1039-write-reconcile-worker-temp-local-a'
+    }));
+    const secondWrite = await writeService.record(processPayload({
+      title: 'Checkpoint: CM-1039 internal write reconcile worker drain two',
+      task_id: 'CM-1039-B',
+      conversation_id: 'cm1039-write-reconcile-worker-temp-local-b'
+    }));
+
+    assert.equal(firstWrite.decision, 'accepted');
+    assert.equal(secondWrite.decision, 'accepted');
+    assert.equal(firstWrite.shadowWrite.status, 'degraded');
+    assert.equal(secondWrite.shadowWrite.status, 'degraded');
+    assert.equal((await shadowStore.getHealth()).reconcileCount, 4);
+
+    worker.start({ limit: 1, dryRun: false, maxRuns: 4 });
+
+    for (let i = 0; i < 4; i += 1) {
+      assert.equal(await scheduler.flushNext(), true);
+    }
+
+    const status = worker.getStatus();
+    const shadowAfterReplay = await shadowStore.getHealth();
+    const vectorAfterReplay = await healthyVectorStore.getHealth();
+
+    assert.equal(status.running, false);
+    assert.equal(status.timerScheduled, false);
+    assert.equal(status.runCount, 4);
+    assert.equal(status.lastResultSummary.success, true);
+    assert.equal(status.lastResultSummary.limit, 1);
+    assert.equal(status.lastResultSummary.replayedCount, 1);
+    assert.equal(status.lastResultSummary.clearedCount, 1);
+    assert.equal(shadowAfterReplay.recordCount, 2);
+    assert.equal(shadowAfterReplay.reconcileCount, 0);
+    assert.equal(shadowAfterReplay.chunkCount >= 2, true);
+    assert.equal(vectorAfterReplay.vectorCount, 2);
+    assert.equal(await pathExists(firstWrite.filePath), true);
+    assert.equal(await pathExists(secondWrite.filePath), true);
+    assert.equal(JSON.stringify(status).includes(firstWrite.memoryId), false);
+    assert.equal(JSON.stringify(status).includes(secondWrite.memoryId), false);
+  } finally {
+    worker.stop();
+    await shadowStore.close();
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
 test('CM-1037 worker status snapshot is read-only and does not expose raw task results or errors', async () => {
   const scheduler = new ManualScheduler();
   const reconcileService = {
