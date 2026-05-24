@@ -28,6 +28,54 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1027 Public Default Search Lifecycle Matrix Cold-Derived Temp-Local Evidence - 2026-05-25
+
+Result: `CM1027_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_MATRIX_COLD_DERIVED_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1027 records isolated temp-local lifecycle matrix evidence for private Codex-scoped default public `search_memory`:
+
+- six private Codex-scoped temp records with the same marker were written under an isolated temp root
+- records were marked active, stale, proposal, rejected, superseded, and tombstoned in temp-local lifecycle columns
+- default public scoped search returned exactly active and stale records before restart
+- proposal, rejected, superseded, and tombstoned records were not returned before restart
+- read-policy audit recorded included statuses, excluded statuses, stale retention, lifecycle policy application, and no raw workspace value
+- the first app was closed
+- only temp-local `candidateCachePath` and `vectorIndexPath` files were removed after verifying they resolved under the temp root
+- a second app reopened the same temp paths
+- default public `search_memory` with `include_content=false`, `enableLifecycleReadPolicy=true`, and explicit private Codex scope returned exactly active and stale records after cold-derived restart
+- proposal, rejected, superseded, and tombstoned records were not returned after cold-derived restart
+- read-policy audit was applied and raw workspace value was not printed
+
+Validation:
+
+- CM-1027 test `1/1` passed
+- lifecycle matrix/stale/rejected/validate/tombstone/supersede/MCP regression bundle `21/21` passed
+- validate/write-temp-local adjacent bundle `28/28` passed
+
+Boundary:
+
+```text
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+package/config/watchdog/startup change = false
+real cleanup = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens lifecycle read-policy matrix evidence around public/default scoped recall after cold-derived restart.
+- This consolidates CM-1022 tombstone, CM-1023 supersede, CM-1024 validate, CM-1025 rejected, and CM-1026 stale evidence into one bounded matrix-style check, but it is still temp-local and bounded.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, public search reliability, governance closure, and rollback readiness remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1026 Public Default Search Lifecycle Stale Cold-Derived Temp-Local Evidence - 2026-05-25
 
 Result: `CM1026_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_STALE_COLD_DERIVED_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
