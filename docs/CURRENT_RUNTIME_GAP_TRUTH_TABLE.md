@@ -28,6 +28,43 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1019 Public Default Search Scope Temp-Local Evidence - 2026-05-25
+
+Result: `CM1019_PUBLIC_DEFAULT_SEARCH_SCOPE_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1019 records isolated temp-local private client-scope evidence for default public `search_memory`:
+
+- [CM1019_PUBLIC_DEFAULT_SEARCH_SCOPE_TEMP_LOCAL_EVIDENCE.md](/A:/codex-memory/docs/CM1019_PUBLIC_DEFAULT_SEARCH_SCOPE_TEMP_LOCAL_EVIDENCE.md)
+
+Evidence facts:
+
+```text
+test = tests/public-default-search-scope-temp-local-evidence.test.js
+proofMarker = CM1019 public default scoped search temp local marker
+records = 2 temp private process records
+clients = codex, claude
+scoped searches = codex, claude, manual
+```
+
+Result facts:
+
+```text
+codex-scoped search -> exactly codex private record
+claude-scoped search -> exactly claude private record
+manual-scoped search -> no records
+include_content = false
+public MCP expansion = false
+real memory reads/writes = false
+readiness/reliability claims = false
+```
+
+Operator interpretation:
+
+- This proves default public `search_memory` can respect private `client_id` scope in an isolated temp-local Codex/Claude scenario.
+- This is stronger than CM-1018 for multi-client/scope behavior, but it is still temp-local and bounded.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `complete?` remains `no`.
+
 ## CM-1018 Public Default Search Coverage Proof - 2026-05-25
 
 Result: `CM1018_PUBLIC_DEFAULT_SEARCH_COVERAGE_PASSED_NOT_RELIABLE_NOT_READY`.

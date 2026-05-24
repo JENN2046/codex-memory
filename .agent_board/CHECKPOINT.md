@@ -1,5 +1,35 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1019 Public Default Search Scope Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1019_PUBLIC_DEFAULT_SEARCH_SCOPE_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local runtime evidence for private client-scoped default public search.
+- Wrote two temp records with the same marker, same project/workspace, `visibility=private`, and different client ids: `codex` and `claude`.
+- Verified Codex-scoped search returned only the Codex record.
+- Verified Claude-scoped search returned only the Claude record.
+- Verified Manual-scoped search returned no results.
+- Verified scoped result-bearing searches used the scope-map post-filter path.
+
+Validation:
+- CM-1019 test syntax check passed.
+- CM-1019 temp-local test passed `1/1`.
+- Adjacent scope/MCP regression bundle passed `13/13`.
+- Adjacent CM-1018 bundle passed `7/7`.
+
+Boundary:
+- Temp-local app paths only.
+- No real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, or public MCP boundary.
+
+Next:
+- Continue bounded reliability coverage toward long-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, and public/default search reliability remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1018 Public Default Search Coverage Proof Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`

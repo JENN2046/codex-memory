@@ -1,5 +1,33 @@
 # HANDOFF.md — codex-memory
 
+## CM-1019 Public Default Search Scope Temp-Local Evidence Handoff
+
+Goal: verify default public `search_memory` respects private client scope in an isolated Codex/Claude temp-local scenario without claiming broad reliability/readiness.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1019_PUBLIC_DEFAULT_SEARCH_SCOPE_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/public-default-search-scope-temp-local-evidence.test.js`.
+- Two temp-local private records shared the same marker phrase and differed only by `client_id=codex` versus `client_id=claude`.
+- Codex-scoped default search returned exactly the Codex record.
+- Claude-scoped default search returned exactly the Claude record.
+- Manual-scoped default search returned no results.
+- Adjacent scope/MCP regression bundle passed `13/13`.
+- Adjacent CM-1018 bundle passed `7/7`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local scoped runtime evidence, not broad real-store or long-run proof.
+- The write execution context remains Codex-authorized; the client split is in the memory payload scope.
+- The proof does not make public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability coverage toward long-run durability, rollback cleanup posture, or governance lifecycle closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1018 Public Default Search Coverage Proof Handoff
 
 Goal: verify whether known accepted process writes can be recalled through bounded default public `search_memory` marker queries, and add a fail-closed coverage boundary so public default coverage evidence cannot be consumed as reliability/readiness.
