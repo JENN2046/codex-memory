@@ -1,5 +1,38 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1031 Memory Write Rollback Cleanup Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_ROLLBACK_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1031_MEMORY_WRITE_ROLLBACK_CLEANUP_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local write rollback cleanup posture evidence.
+- Used real local `DiaryStore`, `SqliteShadowStore`, `VectorIndexStore`, `AuditLogStore`, `CandidateCacheStore`, and `ChunkIndexingService` under a run-specific temp root.
+- Verified all configured write/audit/vector/SQLite/cache paths stayed under the temp root.
+- Wrote one synthetic accepted process record through `MemoryWriteService`.
+- Verified diary, SQLite shadow/chunk, vector, embedding-cache, accepted audit, and candidate-cache projection surfaces existed under temp-local state.
+- Simulated partial cleanup by deleting the SQLite row, deleting the vector entry, and clearing candidate-cache entries by memory id.
+- Verified SQLite records/chunks, vector entries, and candidate-cache entries were cleared.
+- Verified diary and write-audit files remained visible as residuals rather than being hidden or destructively rewritten.
+
+Validation:
+- CM-1031 test syntax check passed.
+- CM-1031 temp-local write rollback cleanup posture test passed `1/1`.
+- Write cleanup/write reliability/MCP adjacent regression bundle passed `18/18`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Boundary:
+- Temp-local store paths only.
+- One synthetic accepted write and simulated partial cleanup occurred only under the isolated temp root.
+- No true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, partial cleanup posture, or public MCP boundary.
+
+Next:
+- Continue bounded write reliability closure toward degraded temp-local projection cleanup, longer-run durability, or governance remediation. Broad write reliability, real cleanup safety, real rollback safety, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1030 Public Default Search Lifecycle Supersede Cache-Mutation Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_SUPERSEDE_CACHE_MUTATION_NOT_RELIABLE_NOT_READY`

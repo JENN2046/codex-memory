@@ -1,5 +1,36 @@
 # HANDOFF.md — codex-memory
 
+## CM-1031 Memory Write Rollback Cleanup Temp-Local Evidence Handoff
+
+Goal: verify accepted synthetic write projection accounting and partial cleanup posture in isolated temp-local stores, without claiming broad reliability/readiness or real rollback safety.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_ROLLBACK_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1031_MEMORY_WRITE_ROLLBACK_CLEANUP_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-rollback-cleanup-temp-local-evidence.test.js`.
+- Real local `DiaryStore`, `SqliteShadowStore`, `VectorIndexStore`, `AuditLogStore`, `CandidateCacheStore`, and `ChunkIndexingService` were configured under one temp root.
+- All configured write, audit, vector, SQLite, and candidate-cache paths resolved under the temp root.
+- One synthetic process record was accepted through `MemoryWriteService`.
+- Diary, SQLite shadow/chunk, vector, embedding-cache, accepted audit, and candidate-cache surfaces were visible before cleanup.
+- Simulated partial cleanup cleared SQLite records/chunks, vector entry, and candidate-cache entry.
+- Diary file and write-audit file remained visible as residuals.
+- CM-1031 test passed `1/1`.
+- Write cleanup/write reliability/MCP adjacent regression bundle passed `18/18`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, diary cleanup, audit deletion/rewrite, long-run durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local partial cleanup posture evidence, not a real rollback helper or real cleanup safety proof.
+- Diary and audit residuals remain visible by design and still need governance remediation or a future non-destructive cleanup story.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward degraded temp-local projection cleanup, longer-run durability, or governance remediation. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1030 Public Default Search Lifecycle Supersede Cache-Mutation Temp-Local Evidence Handoff
 
 Goal: verify default public `search_memory` with lifecycle read policy returns only the replacement private Codex-scoped record after candidate-cache population and approved temp internal supersede mutation, without claiming broad reliability/readiness.
