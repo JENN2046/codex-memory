@@ -4,13 +4,22 @@ const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallI
 const { throwIfSearchMemoryAborted } = require('../core/SearchMemoryTimeoutPolicy');
 
 class KnowledgeBaseSyncService {
-  constructor({ config, diaryStore, shadowStore, vectorStore, chunkIndexingService, candidateCacheStore = null }) {
+  constructor({
+    config,
+    diaryStore,
+    shadowStore,
+    vectorStore,
+    chunkIndexingService,
+    candidateCacheStore = null,
+    governanceStateRevisionProvider = null
+  }) {
     this.config = config;
     this.diaryStore = diaryStore;
     this.shadowStore = shadowStore;
     this.vectorStore = vectorStore;
     this.chunkIndexingService = chunkIndexingService;
     this.candidateCacheStore = candidateCacheStore;
+    this.governanceStateRevisionProvider = governanceStateRevisionProvider;
   }
 
   async syncTarget(target = 'both', options = {}) {
@@ -24,6 +33,19 @@ class KnowledgeBaseSyncService {
       ? await this.shadowStore.listRecords(target)
       : [];
     throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
+    const previousGovernanceStateRevision = await this.getStoredGovernanceStateRevision(target, signal);
+    const previousGovernanceStateEntries = await this.getStoredGovernanceStateEntries(target, signal);
+    throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
+    const governanceStateSnapshot = await this.resolveGovernanceStateSnapshot({
+      target,
+      diaryRecords,
+      existingRecords,
+      signal
+    });
+    const governanceStateRevision = governanceStateSnapshot.revision;
+    const governanceStateEntries = governanceStateSnapshot.entries;
+    const providerGovernanceChangedMemoryIds = governanceStateSnapshot.changedMemoryIds;
+    throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
     const existingMap = new Map(existingRecords.map(record => [this.getRecordKey(record), record]));
 
     let sqliteWrites = 0;
@@ -33,6 +55,7 @@ class KnowledgeBaseSyncService {
     let isolationProjectionClears = 0;
     let diaryVectorWrites = 0;
     let isolatedRecords = 0;
+    const changedMemoryIds = new Set();
 
     for (const record of diaryRecords) {
       throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
@@ -48,6 +71,9 @@ class KnowledgeBaseSyncService {
       throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
       const needsRefresh = force || this.shouldRefreshRecord(existing, record) || (!isolated && !hasCurrentFingerprintChunks);
       const needsIsolationChunkClear = isolated && hasCurrentFingerprintChunks;
+      if ((needsRefresh || needsIsolationChunkClear) && record.memoryId) {
+        changedMemoryIds.add(record.memoryId);
+      }
 
       if (this.config.enableShadowWrites && (needsRefresh || needsIsolationChunkClear)) {
         if (existing) {
@@ -104,6 +130,7 @@ class KnowledgeBaseSyncService {
         throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
         await this.shadowStore.clearReconcileTasks(existing.memoryId);
         prunedRecords += 1;
+        changedMemoryIds.add(existing.memoryId);
 
         if (this.config.enableVectorIndex) {
           await this.vectorStore.deleteRecord(existing.memoryId);
@@ -112,18 +139,50 @@ class KnowledgeBaseSyncService {
     }
 
     const changed = sqliteWrites > 0 || vectorWrites > 0 || chunkWrites > 0 || prunedRecords > 0 || isolationProjectionClears > 0;
+    const governanceStateRevisionChanged = previousGovernanceStateRevision !== governanceStateRevision;
     if (this.config.enableVectorIndex) {
       throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
       diaryVectorWrites = await this.vectorStore.rebuildDiaryVectors(filterRecallIsolatedItems(diaryRecords));
       throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
     }
-    if (changed && this.candidateCacheStore) {
+    const invalidationTargets = this.getCandidateCacheInvalidationTargets(target);
+    const governanceChangedMemoryIds = governanceStateRevisionChanged
+      ? (
+          providerGovernanceChangedMemoryIds
+          || this.diffGovernanceStateEntries(previousGovernanceStateEntries, governanceStateEntries)
+        )
+      : [];
+    if (this.candidateCacheStore && changed && !governanceStateRevisionChanged) {
       throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
-      if (this.candidateCacheStore.clearCurrentFingerprint) {
+      if (changedMemoryIds.size > 0 && this.candidateCacheStore.clearCurrentFingerprintByMemoryIds) {
+        await this.candidateCacheStore.clearCurrentFingerprintByMemoryIds([...changedMemoryIds], invalidationTargets || [target]);
+      } else if (invalidationTargets && this.candidateCacheStore.clearCurrentFingerprintTargets) {
+        await this.candidateCacheStore.clearCurrentFingerprintTargets(invalidationTargets);
+      } else if (this.candidateCacheStore.clearCurrentFingerprint) {
         await this.candidateCacheStore.clearCurrentFingerprint();
       } else {
         await this.candidateCacheStore.clearAll();
       }
+    }
+    if (governanceStateRevisionChanged && this.candidateCacheStore) {
+      throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
+      if (governanceChangedMemoryIds.length > 0 && this.candidateCacheStore.clearCurrentFingerprintByMemoryIds) {
+        await this.candidateCacheStore.clearCurrentFingerprintByMemoryIds(governanceChangedMemoryIds, invalidationTargets || [target]);
+      } else if (invalidationTargets && this.candidateCacheStore.clearCurrentFingerprintTargets) {
+        await this.candidateCacheStore.clearCurrentFingerprintTargets(invalidationTargets);
+      } else if (this.candidateCacheStore.clearCurrentFingerprint) {
+        await this.candidateCacheStore.clearCurrentFingerprint();
+      } else {
+        await this.candidateCacheStore.clearAll();
+      }
+    }
+    if (this.candidateCacheStore?.setStoredGovernanceStateRevision) {
+      throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
+      await this.candidateCacheStore.setStoredGovernanceStateRevision(target, governanceStateRevision);
+    }
+    if (this.candidateCacheStore?.setStoredGovernanceStateEntries) {
+      throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
+      await this.candidateCacheStore.setStoredGovernanceStateEntries(target, governanceStateEntries);
     }
     throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
 
@@ -137,11 +196,14 @@ class KnowledgeBaseSyncService {
       isolatedRecords,
       diaryVectorWrites,
       changed,
-      syncToken: this.buildSyncToken(target, diaryRecords)
+      governanceStateRevisionChanged,
+      governanceStateRevision,
+      syncToken: this.buildSyncToken(target, diaryRecords, { governanceStateRevision })
     };
   }
 
-  buildSyncToken(target, diaryRecords = []) {
+  buildSyncToken(target, diaryRecords = [], options = {}) {
+    const governanceStateRevision = this.normalizeGovernanceStateRevision(options.governanceStateRevision);
     const normalized = [...diaryRecords]
       .filter(record => record.memoryId)
       .sort((left, right) => String(left.memoryId).localeCompare(String(right.memoryId)))
@@ -152,12 +214,17 @@ class KnowledgeBaseSyncService {
         target: record.target
       }));
 
+    const payload = {
+      target,
+      records: normalized
+    };
+    if (governanceStateRevision) {
+      payload.governanceStateRevision = governanceStateRevision;
+    }
+
     return crypto
       .createHash('sha1')
-      .update(JSON.stringify({
-        target,
-        records: normalized
-      }))
+      .update(JSON.stringify(payload))
       .digest('hex');
   }
 
@@ -186,6 +253,178 @@ class KnowledgeBaseSyncService {
       return true;
     }
     return (await this.shadowStore.countChunksForRecord(record.memoryId)) > 0;
+  }
+
+  async resolveGovernanceStateSnapshot({ target, diaryRecords, existingRecords, signal } = {}) {
+    if (typeof this.governanceStateRevisionProvider === 'function') {
+      const providerResult = await this.governanceStateRevisionProvider({ target, diaryRecords, existingRecords, signal });
+      if (providerResult && typeof providerResult === 'object' && !Array.isArray(providerResult)) {
+        const entries = this.normalizeGovernanceStateEntries(providerResult.entries);
+        const revision = this.normalizeGovernanceStateRevision(providerResult.revision);
+        const changedMemoryIds = this.normalizeGovernanceChangedMemoryIds(providerResult.changedMemoryIds);
+        return {
+          revision: revision || this.computeGovernanceStateRevision(entries || []),
+          entries,
+          changedMemoryIds
+        };
+      }
+      return {
+        revision: this.normalizeGovernanceStateRevision(providerResult),
+        entries: null,
+        changedMemoryIds: null
+      };
+    }
+    const entries = this.deriveDefaultGovernanceStateEntries({ diaryRecords, existingRecords });
+    return {
+      revision: this.computeGovernanceStateRevision(entries),
+      entries,
+      changedMemoryIds: null
+    };
+  }
+
+  normalizeGovernanceStateRevision(value) {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    return String(value);
+  }
+
+  deriveDefaultGovernanceStateEntries({ diaryRecords = [], existingRecords = [] } = {}) {
+    const existingMap = new Map(
+      (Array.isArray(existingRecords) ? existingRecords : [])
+        .map(record => [this.getRecordKey(record), record])
+    );
+    return this.normalizeGovernanceStateEntries(
+      (Array.isArray(diaryRecords) ? diaryRecords : [])
+      .filter(record => record?.memoryId)
+      .map(record => this.buildGovernanceStateEntry(record, existingMap.get(this.getRecordKey(record))))
+      .filter(Boolean)
+    );
+  }
+
+  computeGovernanceStateRevision(governanceEntries = []) {
+    if (governanceEntries.length === 0) {
+      return '';
+    }
+
+    return crypto
+      .createHash('sha1')
+      .update(JSON.stringify(governanceEntries))
+      .digest('hex');
+  }
+
+  buildGovernanceStateEntry(record, existing = null) {
+    const merged = {
+      memoryId: record?.memoryId || existing?.memoryId || '',
+      target: record?.target || existing?.target || '',
+      // Lifecycle status currently lives in shadow-store metadata, not diary records.
+      status: this.normalizeGovernanceField(existing?.status),
+      projectId: this.normalizeGovernanceField(record?.projectId || existing?.projectId),
+      workspaceId: this.normalizeGovernanceField(record?.workspaceId || existing?.workspaceId),
+      clientId: this.normalizeGovernanceField(record?.clientId || existing?.clientId),
+      taskId: this.normalizeGovernanceField(record?.taskId || existing?.taskId),
+      conversationId: this.normalizeGovernanceField(record?.conversationId || existing?.conversationId),
+      visibility: this.normalizeGovernanceField(record?.visibility || existing?.visibility),
+      retentionPolicy: this.normalizeGovernanceField(record?.retentionPolicy || existing?.retentionPolicy)
+    };
+
+    const hasGovernanceSignal = [
+      merged.status,
+      merged.projectId,
+      merged.workspaceId,
+      merged.clientId,
+      merged.taskId,
+      merged.conversationId,
+      merged.visibility,
+      merged.retentionPolicy
+    ].some(Boolean);
+
+    if (!merged.memoryId || !hasGovernanceSignal) {
+      return null;
+    }
+
+    return merged;
+  }
+
+  normalizeGovernanceField(value) {
+    return typeof value === 'string' ? value.trim() : '';
+  }
+
+  normalizeGovernanceStateEntries(entries = null) {
+    if (!Array.isArray(entries)) {
+      return null;
+    }
+    return entries
+      .filter(entry => entry && typeof entry === 'object' && entry.memoryId)
+      .map(entry => ({
+        ...entry,
+        memoryId: String(entry.memoryId),
+        target: this.normalizeGovernanceField(entry.target)
+      }))
+      .sort((left, right) => String(left.memoryId).localeCompare(String(right.memoryId)));
+  }
+
+  normalizeGovernanceChangedMemoryIds(memoryIds = null) {
+    if (!Array.isArray(memoryIds)) {
+      return null;
+    }
+    return [...new Set(
+      memoryIds
+        .filter(value => value !== null && value !== undefined && String(value).trim())
+        .map(value => String(value).trim())
+    )].sort();
+  }
+
+  async getStoredGovernanceStateRevision(target, signal = null) {
+    if (!this.candidateCacheStore?.getStoredGovernanceStateRevision) {
+      return '';
+    }
+    const revision = await this.candidateCacheStore.getStoredGovernanceStateRevision(target);
+    throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
+    return this.normalizeGovernanceStateRevision(revision);
+  }
+
+  async getStoredGovernanceStateEntries(target, signal = null) {
+    if (!this.candidateCacheStore?.getStoredGovernanceStateEntries) {
+      return null;
+    }
+    const entries = await this.candidateCacheStore.getStoredGovernanceStateEntries(target);
+    throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
+    return this.normalizeGovernanceStateEntries(entries);
+  }
+
+  diffGovernanceStateEntries(previousEntries = null, nextEntries = null) {
+    if (!Array.isArray(previousEntries) || !Array.isArray(nextEntries)) {
+      return [];
+    }
+
+    const previousMap = new Map(previousEntries.map(entry => [String(entry.memoryId), JSON.stringify(entry)]));
+    const nextMap = new Map(nextEntries.map(entry => [String(entry.memoryId), JSON.stringify(entry)]));
+    const changed = new Set();
+
+    for (const memoryId of previousMap.keys()) {
+      if (!nextMap.has(memoryId) || nextMap.get(memoryId) !== previousMap.get(memoryId)) {
+        changed.add(memoryId);
+      }
+    }
+    for (const memoryId of nextMap.keys()) {
+      if (!previousMap.has(memoryId) || previousMap.get(memoryId) !== nextMap.get(memoryId)) {
+        changed.add(memoryId);
+      }
+    }
+
+    return [...changed].sort();
+  }
+
+  getCandidateCacheInvalidationTargets(target = 'both') {
+    const normalizedTarget = String(target || 'both');
+    if (normalizedTarget === 'process') {
+      return ['process', 'both'];
+    }
+    if (normalizedTarget === 'knowledge') {
+      return ['knowledge', 'both'];
+    }
+    return null;
   }
 }
 

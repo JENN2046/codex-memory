@@ -117,6 +117,7 @@ class KnowledgeBaseRecallPipeline {
       directives,
       limit,
       syncToken: syncState.syncToken || '',
+      governanceStateRevision: syncState.governanceStateRevision || '',
       contextState,
       candidateFilters,
       signal,

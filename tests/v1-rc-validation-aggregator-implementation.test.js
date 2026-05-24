@@ -2614,6 +2614,7 @@ test('validation evidence rejection summary counts rejected explicit input reaso
 });
 
 test('validation evidence command coverage reports partial explicit command evidence without execution', () => {
+  const freshObservedAt = new Date().toISOString();
   const report = buildV1RcValidationAggregatorReport({
     validationEvidenceSources: [
       {
@@ -2621,7 +2622,7 @@ test('validation evidence command coverage reports partial explicit command evid
         source_type: 'local_validation',
         status: 'passed',
         source_ref: 'tests/v1-rc-validation-aggregator-implementation.test.js',
-        observed_at: '2026-05-17T00:00:00.000Z',
+        observed_at: freshObservedAt,
         commands: ['npm test'],
         safety: { mutated: false }
       },
@@ -2630,7 +2631,7 @@ test('validation evidence command coverage reports partial explicit command evid
         source_type: 'local_validation',
         status: 'passed',
         source_ref: 'tests/v1-rc-validation-aggregator.test.js',
-        observed_at: '2026-05-17T00:00:00.000Z',
+        observed_at: freshObservedAt,
         safety: { mutated: false }
       }
     ]

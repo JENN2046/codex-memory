@@ -55,7 +55,19 @@ class CandidateGenerator {
     };
   }
 
-  async generate({ target = 'both', queryText, queryAnalysis, directives = {}, limit, syncToken = '', contextState = null, candidateFilters = {}, signal = null, readOnly = false }) {
+  async generate({
+    target = 'both',
+    queryText,
+    queryAnalysis,
+    directives = {},
+    limit,
+    syncToken = '',
+    governanceStateRevision = '',
+    contextState = null,
+    candidateFilters = {},
+    signal = null,
+    readOnly = false
+  }) {
     throwIfSearchMemoryAborted(signal);
     const searchPlan = this.buildSearchPlan({
       limit,
@@ -66,12 +78,13 @@ class CandidateGenerator {
       target,
       queryText,
       queryAnalysis,
-        directives,
-        searchPlan,
-        syncToken,
-        contextState,
-        candidateFilters
-      });
+      directives,
+      searchPlan,
+      syncToken,
+      governanceStateRevision,
+      contextState,
+      candidateFilters
+    });
 
     if (this.candidateCacheStore) {
       const cached = await this.candidateCacheStore.get(cacheKey);
@@ -134,13 +147,28 @@ class CandidateGenerator {
         semanticCandidates,
         timeCandidates,
         allCandidates: [...semanticCandidates, ...timeCandidates]
-      }, { target });
+      }, {
+        target,
+        memoryIds: [...new Set([...semanticCandidates, ...timeCandidates]
+          .map(candidate => candidate?.memoryId)
+          .filter(Boolean))]
+      });
     }
 
     return result;
   }
 
-  buildCacheKey({ target, queryText, queryAnalysis, directives, searchPlan, syncToken, contextState, candidateFilters = {} }) {
+  buildCacheKey({
+    target,
+    queryText,
+    queryAnalysis,
+    directives,
+    searchPlan,
+    syncToken,
+    governanceStateRevision,
+    contextState,
+    candidateFilters = {}
+  }) {
     const payload = {
       target,
       embeddingFingerprint: this.config.embeddingFingerprint,
@@ -165,6 +193,9 @@ class CandidateGenerator {
       contextSignature: contextState?.signature || '',
       syncToken
     };
+    if (governanceStateRevision) {
+      payload.governanceStateRevision = governanceStateRevision;
+    }
 
     return crypto.createHash('sha1').update(JSON.stringify(payload)).digest('hex');
   }
