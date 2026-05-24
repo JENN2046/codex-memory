@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "memory-supersede-pair-outcome-v1",
+  "version": "v1",
+  "phase": "CM-0879-memory-supersede-pair-outcome-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "reviewOnly": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "approvalStatus": "BLOCKED_PENDING_APPROVAL",
+  "executionApproved": false,
+  "mutated": false,
+  "runtimeIntegrated": false,
+  "durableAuditWritten": false,
+  "publicMcpExpanded": false,
+  "realMemoryScanned": false,
+  "providerCalls": 0,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "safeSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "explicit_input",
+    "static_report_shape",
+    "local_validation_summary"
+  ],
+  "acceptedSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "explicit_input",
+    "static_report_shape",
+    "local_validation_summary"
+  ],
+  "unsupportedSourceTypes": [],
+  "acceptedForPlanning": true,
+  "requiredPairOutcomeFields": [
+    "oldMemoryId",
+    "newMemoryId",
+    "intentEventId",
+    "committedEventId",
+    "cancelledEventId",
+    "pairCorrelationId",
+    "oldPreviousSnapshotRef",
+    "newPreviousSnapshotRef",
+    "oldFromStatus",
+    "oldToStatus",
+    "newFromStatus",
+    "newToStatus",
+    "supersededByLink",
+    "supersedesLink",
+    "actorClientId",
+    "requestSource",
+    "reason",
+    "evidence",
+    "createdAt"
+  ],
+  "requiredEventPhases": [
+    "pending",
+    "committed",
+    "cancelled"
+  ],
+  "outcomeProperties": {
+    "pairIntentRequired": true,
+    "pairCommittedFollowUpRequired": true,
+    "pairCancelledFollowUpRequired": true,
+    "sharedCorrelationIdRequired": true,
+    "dualPreviousSnapshotRefsRequired": true,
+    "dualLifecycleTransitionsRequired": true,
+    "bidirectionalLinkFieldsRequired": true,
+    "pairAtomicityRequired": true,
+    "singleRecordAuditReuseAllowed": false,
+    "runtimeImplemented": false,
+    "executionApproved": false,
+    "durableAuditWritten": false,
+    "mutated": false
+  },
+  "requiredApprovals": [
+    "supersede_pair_outcome_helper_implementation",
+    "supersede_audit_correlation_helper_implementation",
+    "supersession_runtime_prep",
+    "internal_supersede_service_apply",
+    "durable_audit_write",
+    "public_mcp_governance_expansion",
+    "push_tag_release_deploy"
+  ],
+  "blockers": [
+    "supersede_pair_outcome_helper_not_implemented",
+    "supersede_audit_correlation_helper_not_implemented",
+    "supersede_runtime_prep_not_implemented",
+    "internal_supersede_service_not_implemented",
+    "durable_audit_write_not_approved",
+    "public_mcp_governance_expansion_not_approved",
+    "v1_rc_not_ready_blocked"
+  ],
+  "safety": {
+    "noRuntimeImplementation": true,
+    "noDurableAuditWrite": true,
+    "noDurableMemoryWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryScan": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noPackageScriptChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false
+  },
+  "requiredWording": [
+    "The supersede pair-outcome contract does not implement pair-outcome audit follow-up.",
+    "Future supersede pair audit events must share one shared correlation id.",
+    "The future pair-outcome helper remains BLOCKED_PENDING_APPROVAL until separately and explicitly approved.",
+    "Public MCP tools remain frozen at record_memory, search_memory, and memory_overview.",
+    "v1.0 RC remains NOT_READY_BLOCKED."
+  ],
+  "forbiddenClaims": [
+    "supersede pair-outcome audit helper is implemented",
+    "single-record audit reuse is sufficient for supersede",
+    "public MCP supersede expansion is approved",
+    "v1.0 RC readiness is unblocked"
+  ],
+  "evidenceSources": [
+    "docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_STORAGE_SEAM_REVIEW.md",
+    "docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_SHADOW_SEAM_CONTRACT.md",
+    "src/core/DurableGovernanceTombstoneRuntimePrepHelper.js",
+    "tests/fixtures/mutation-audit-shape-v1.json",
+    "src/core/MemorySupersedeShadowSeamContract.js"
+  ],
+  "next": "CM-0879-memory-supersede-pair-outcome-helper"
+}
