@@ -1,0 +1,49 @@
+{
+  "basisId": "CM-0737",
+  "approvalLine": "Approve exactly one CM-0737-bound sanitized record_memory write proof through createCodexMemoryApplication with enableWritePreflight=true; no search_memory, provider/API call, raw memory read, config/startup change, public MCP expansion, second write, remote action, or readiness claim is authorized.",
+  "gitFacts": {
+    "branch": "main",
+    "localHead": "a6782e338dfa320679f2802b0d8e2491d8f8b55d",
+    "originHead": "a6782e338dfa320679f2802b0d8e2491d8f8b55d",
+    "remoteMainHead": "a6782e338dfa320679f2802b0d8e2491d8f8b55d",
+    "statusShort": [
+      " M src/app.js",
+      "?? docs/MEMORY_WRITE_PREFLIGHT_CM0737_CANDIDATE_REBIND_PACKET.md"
+    ]
+  },
+  "basis": {
+    "basisFamily": "CM-0737",
+    "acceptedBasisEvent": "repaired_second_attempt",
+    "acceptedBasisMemoryId": "codex-process-1ef539a197d747e199e12fe1c0d69731",
+    "target": "process",
+    "payloadFamily": "repaired_checkpoint_shaped_process_payload"
+  },
+  "writeSeam": {
+    "appFactory": "createCodexMemoryApplication",
+    "configFlag": "enableWritePreflight",
+    "configFlagValue": true,
+    "appCallTool": "record_memory"
+  },
+  "scopeAssumptions": {
+    "targetScopeLane": "process",
+    "scopeDerivationSource": "payload_and_execution_context",
+    "duplicateBasisPrebound": true,
+    "broadDiscoveryUsed": false
+  },
+  "boundaryFlags": {
+    "oneWriteOnly": true,
+    "recordMemoryCallCount": 1,
+    "searchMemoryCallCount": 0,
+    "providerCallCount": 0,
+    "apiCallCount": 0,
+    "directJsonlRead": false,
+    "rawDurableMemoryRead": false,
+    "rawDurableAuditRead": false,
+    "secondWriteAllowed": false,
+    "publicMcpExpansion": false,
+    "configWatchdogStartupChange": false,
+    "sanitizedOutput": true,
+    "readinessClaimed": false,
+    "writeReliableClaimed": false
+  }
+}
