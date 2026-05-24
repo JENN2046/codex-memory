@@ -1,5 +1,40 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1034 Memory Write Degraded Reconcile Replay Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_DEGRADED_RECONCILE_REPLAY_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1034_MEMORY_WRITE_DEGRADED_RECONCILE_REPLAY_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local degraded reconcile replay evidence.
+- Used real local `DiaryStore`, `SqliteShadowStore`, `VectorIndexStore`, `AuditLogStore`, and `ChunkIndexingService` under a run-specific temp root.
+- Verified all configured write/audit/vector/SQLite paths stayed under the temp root.
+- Wrote one synthetic process record through `MemoryWriteService` with deterministic vector and chunk projection failures.
+- Verified the accepted write was classified as `degraded` and reported vector/chunk failure reasons.
+- Verified SQLite row and two reconcile tasks were visible while vector/chunk projections were absent before replay.
+- Replayed the vector reconcile payload into a healthy temp-local `VectorIndexStore`.
+- Replayed the chunks reconcile payload through a healthy temp-local `ChunkIndexingService`.
+- Cleared the vector/chunks reconcile tasks explicitly and verified reconcile count dropped to zero.
+- Verified diary, write audit, SQLite row/chunks, vector entry, and embedding-cache surfaces remained visible after replay.
+
+Validation:
+- CM-1034 test syntax check passed.
+- CM-1034 temp-local degraded reconcile replay test passed `1/1`.
+- Degraded replay/cleanup/restart/write reliability/MCP adjacent regression bundle passed `17/17`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Boundary:
+- Temp-local store paths only.
+- One synthetic degraded accepted write and explicit replay occurred only under the isolated temp root.
+- No true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, automatic reconcile worker, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, reconcile replay posture, or public MCP boundary.
+
+Next:
+- Continue bounded write reliability closure toward automatic reconcile worker design, longer-horizon durability, or governance remediation. Broad write reliability, automatic degraded recovery, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1033 Memory Write Restart Durability Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_RESTART_DURABILITY_NOT_RELIABLE_NOT_READY`

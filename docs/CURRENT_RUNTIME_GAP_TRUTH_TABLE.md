@@ -28,6 +28,56 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1034 Memory Write Degraded Reconcile Replay Temp-Local Evidence - 2026-05-25
+
+Result: `CM1034_MEMORY_WRITE_DEGRADED_RECONCILE_REPLAY_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1034 records isolated temp-local degraded reconcile replay evidence:
+
+- one synthetic process record was accepted through `MemoryWriteService`
+- vector and chunk projection adapters failed with deterministic synthetic errors
+- the write returned `shadowWrite.status=degraded` with vector/chunk failure reasons
+- SQLite row, write audit, and two reconcile tasks were visible before replay
+- vector and chunk projections were absent before replay
+- temp-local reconcile queue payloads carried expected memory id, store kind, reason, scope fields, and payload
+- explicit replay through healthy temp-local vector/chunk projection services restored vector/chunk projections
+- explicit reconcile task clearing dropped reconcile count to zero
+- diary and write-audit residuals remained visible instead of being hidden or destructively rewritten
+- the temp root was removed by the test harness
+
+Validation:
+
+- CM-1034 test `1/1` passed
+- degraded replay/cleanup/restart/write reliability/MCP adjacent regression bundle `17/17` passed
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+package/config/watchdog/startup change = false
+automatic reconcile worker implemented = false
+real cleanup apply = false
+real rollback apply = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens CM-1032 by covering explicit replay of the degraded projection branch with actual isolated temp-local stores.
+- This proves queued vector/chunk reconcile payloads can be replayed into healthy temp-local projection services and then cleared explicitly.
+- This does not implement an automatic reconcile worker and does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, real cleanup safety, real rollback safety, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, automatic degraded recovery, long-run durability, rollback readiness, governance closure, and real rollback safety remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1033 Memory Write Restart Durability Temp-Local Evidence - 2026-05-25
 
 Result: `CM1033_MEMORY_WRITE_RESTART_DURABILITY_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.

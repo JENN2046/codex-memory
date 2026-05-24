@@ -1,5 +1,39 @@
 # HANDOFF.md — codex-memory
 
+## CM-1034 Memory Write Degraded Reconcile Replay Temp-Local Evidence Handoff
+
+Goal: verify degraded accepted synthetic write reconcile payload replay in isolated temp-local stores, without claiming automatic reconcile processing, broad reliability/readiness, or real degraded recovery safety.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_DEGRADED_RECONCILE_REPLAY_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1034_MEMORY_WRITE_DEGRADED_RECONCILE_REPLAY_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-degraded-reconcile-replay-temp-local-evidence.test.js`.
+- Real local `DiaryStore`, `SqliteShadowStore`, `VectorIndexStore`, `AuditLogStore`, and `ChunkIndexingService` were configured under one temp root.
+- All configured write, audit, vector, and SQLite paths resolved under the temp root.
+- One synthetic process record was accepted through `MemoryWriteService` while vector/chunk projection adapters failed.
+- The write returned `shadowWrite.status=degraded` with deterministic vector/chunk failure reasons.
+- SQLite row, write audit, and two reconcile tasks were visible before replay; vector/chunk projections were absent.
+- The temp-local reconcile queue payloads carried expected memory id, store kind, reason, scope fields, and payload.
+- Explicit replay through healthy temp-local vector/chunk projection services restored vector/chunk projections.
+- Explicit reconcile task clearing dropped reconcile count to zero.
+- Diary file and write-audit file remained visible as residuals.
+- CM-1034 test passed `1/1`.
+- Degraded replay/cleanup/restart/write reliability/MCP adjacent regression bundle passed `17/17`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, automatic reconcile processing, real degraded projection recovery, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local explicit replay posture evidence, not an automatic reconcile worker.
+- It does not prove real degraded recovery safety, real cleanup safety, or real rollback safety.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward automatic reconcile worker design, longer-horizon durability, or governance remediation. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1033 Memory Write Restart Durability Temp-Local Evidence Handoff
 
 Goal: verify accepted synthetic write projection durability across fresh store reopen in isolated temp-local stores, without claiming broad reliability/readiness or long-run durability.
