@@ -1,5 +1,40 @@
 # HANDOFF.md — codex-memory
 
+## CM-1050 Memory Write Reconcile Worker Stop-In-Flight Handoff
+
+Goal: add unit-level evidence that an explicit `stop()` during an in-flight scheduled internal write reconcile worker tick prevents post-replay rescheduling, without touching startup, watchdog, config, public MCP tools, existing 7605, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_INFLIGHT_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1050_MEMORY_WRITE_RECONCILE_WORKER_STOP_INFLIGHT_RESCHEDULE_GUARD.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- The test uses a manual scheduler and delayed replay Promise.
+- The scheduled worker starts only inside the test.
+- The first scheduled tick enters `tickInFlight=true`.
+- `stop()` is called while replay is still pending.
+- Stop clears running state and leaves no scheduled timer.
+- After replay settles, worker remains stopped/no timer/no in-flight.
+- Manual scheduler active timers remain `0`.
+- `runCount` is exactly `1` and no extra replay call occurs after stop.
+- Status omits raw synthetic memory ids.
+- Targeted worker test passed `14/14`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `33/33`.
+- Full `npm test` passed `2500/2500`.
+
+Not validated:
+- Existing 7605 deployed worker behavior.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is unit-level stop/reschedule evidence, not automatic recovery or startup/runtime integration.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1049 Memory Write Reconcile Worker MaxRuns Residual Queue Handoff
 
 Goal: add isolated temp-local evidence that a scheduled internal write reconcile worker stops at `maxRuns` even when failed replay tasks keep the queue non-empty, without touching startup, watchdog, config, public MCP tools, existing 7605, or readiness/reliability claims.

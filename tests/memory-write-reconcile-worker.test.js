@@ -381,6 +381,76 @@ test('CM-1038 worker keeps bounded scheduled loop non-overlapping across multipl
   assert.equal(JSON.stringify(finalStatus).includes('codex-process-cm1038'), false);
 });
 
+test('CM-1050 worker stop during in-flight tick prevents reschedule after replay completes', async () => {
+  const calls = [];
+  const scheduler = new ManualScheduler();
+  let releaseReplay = null;
+  const reconcileService = {
+    async replayPending(options) {
+      calls.push(options);
+      return new Promise(resolve => {
+        releaseReplay = () => resolve({
+          success: true,
+          decision: 'completed',
+          dryRun: options.dryRun === true,
+          limit: options.limit,
+          scannedTaskCount: 1,
+          replayedCount: 1,
+          wouldReplayCount: 0,
+          clearedCount: 1,
+          failedCount: 0,
+          skippedCount: 0,
+          results: [{ memoryId: 'codex-process-cm1050-raw-result' }]
+        });
+      });
+    }
+  };
+  const worker = new MemoryWriteReconcileWorker({
+    reconcileService,
+    scheduler,
+    intervalMs: 250,
+    limit: 5
+  });
+
+  worker.start({ dryRun: false, limit: 5 });
+  assert.equal(worker.isRunning(), true);
+  assert.equal(scheduler.activeCount, 1);
+
+  const firstFlush = scheduler.flushNext();
+
+  assert.equal(calls.length, 1);
+  assert.equal(worker.getStatus().tickInFlight, true);
+  assert.equal(worker.getStatus().timerScheduled, false);
+
+  const stopped = worker.stop();
+  const stoppedDuringReplay = worker.getStatus();
+
+  assert.equal(stopped.decision, 'stopped');
+  assert.equal(stopped.running, false);
+  assert.equal(stoppedDuringReplay.running, false);
+  assert.equal(stoppedDuringReplay.timerScheduled, false);
+  assert.equal(stoppedDuringReplay.tickInFlight, true);
+  assert.equal(scheduler.activeCount, 0);
+
+  releaseReplay();
+  await firstFlush;
+
+  const finalStatus = worker.getStatus();
+
+  assert.equal(finalStatus.running, false);
+  assert.equal(finalStatus.timerScheduled, false);
+  assert.equal(finalStatus.tickInFlight, false);
+  assert.equal(finalStatus.runCount, 1);
+  assert.equal(scheduler.activeCount, 0);
+  assert.equal(await scheduler.flushNext(), false);
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0], { limit: 5, dryRun: false });
+  assert.equal(finalStatus.lastResultSummary.success, true);
+  assert.equal(finalStatus.lastResultSummary.replayedCount, 1);
+  assert.equal(finalStatus.lastResultSummary.clearedCount, 1);
+  assert.equal(JSON.stringify(finalStatus).includes('codex-process-cm1050'), false);
+});
+
 test('CM-1039 explicit worker drains multiple temp-local reconcile tasks across bounded ticks', async () => {
   const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1039-worker-drain-'));
   const config = createConfig(rootPath);

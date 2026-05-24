@@ -28,6 +28,67 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1050 Memory Write Reconcile Worker Stop-In-Flight Reschedule Guard - 2026-05-25
+
+Result: `CM1050_MEMORY_WRITE_RECONCILE_WORKER_STOP_INFLIGHT_RESCHEDULE_GUARD_NOT_RELIABLE_NOT_READY`.
+
+CM-1050 adds unit-level stop/reschedule evidence for the internal write reconcile worker:
+
+- a test uses a manual scheduler and delayed replay Promise
+- the test starts the default-disabled internal worker with `start({ dryRun: false, limit: 5 })`
+- one scheduled tick is flushed and held in flight
+- worker status shows `tickInFlight=true` and no timer currently scheduled during the replay
+- `stop()` is called while replay remains pending
+- stopped state has `running=false`, `timerScheduled=false`, and manual scheduler active timers `0`
+- after replay settles, worker remains stopped/no timer/no in-flight
+- `runCount` is exactly `1`
+- no second replay call occurs after stop
+- no new timer can be flushed
+- worker status summary contains no raw synthetic memory id
+
+Validation:
+
+- test syntax check passed
+- targeted memory write reconcile worker test `14/14` passed
+- adjacent worker/service/write reliability/MCP regression bundle `33/33` passed
+- full `npm test` `2500/2500` passed
+
+Boundary:
+
+```text
+worker source changed = false
+unit-level scheduler/replay stub only = true
+synthetic temp-local accepted writes = 0
+scheduled worker start calls = 1
+manual scheduler started ticks = 1
+stop calls during in-flight replay = 1
+replay calls after stop = 0
+runCount after replay settles = 1
+worker running after replay settles = false
+worker timerScheduled after replay settles = false
+manual scheduler active timers after replay settles = 0
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow stop/reschedule boundary gap: explicit stop during an in-flight scheduled tick remains a hard local bound after replay settles.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1049 Memory Write Reconcile Worker MaxRuns Residual Queue Temp-Local Evidence - 2026-05-25
 
 Result: `CM1049_MEMORY_WRITE_RECONCILE_WORKER_MAXRUNS_RESIDUAL_QUEUE_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.

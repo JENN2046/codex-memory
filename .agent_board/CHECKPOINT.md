@@ -1,5 +1,37 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1050 Memory Write Reconcile Worker Stop-In-Flight Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_INFLIGHT_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1050_MEMORY_WRITE_RECONCILE_WORKER_STOP_INFLIGHT_RESCHEDULE_GUARD.md`
+
+Completed:
+- Added a unit-level stop-in-flight worker test to `tests/memory-write-reconcile-worker.test.js`.
+- Started the internal worker with a manual scheduler and delayed replay Promise.
+- Verified the scheduled tick entered `tickInFlight=true` with no timer currently scheduled.
+- Called `stop()` while the replay was still in flight.
+- Verified stopped state had no scheduled timer and manual scheduler active timers `0`.
+- Released the replay and verified the worker did not schedule a new timer.
+- Verified final state remained stopped/no timer/no in-flight with `runCount=1`.
+- Verified no extra replay call occurred after stop.
+- Verified status omitted raw synthetic memory ids from the replay result payload.
+
+Validation:
+- Test syntax check passed.
+- Targeted memory write reconcile worker test passed `14/14`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `33/33`.
+- Full `npm test` passed `2500/2500`.
+
+Boundary:
+- Controlled unit-level stop/reschedule guard only.
+- No runtime source change, existing 7605 change, public MCP expansion, temp/real memory write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1049 Memory Write Reconcile Worker MaxRuns Residual Queue Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_MAXRUNS_RESIDUAL_QUEUE_NOT_RELIABLE_NOT_READY`
