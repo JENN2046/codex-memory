@@ -261,6 +261,32 @@ function assertKeySet(value, expected, label) {
   assert.deepEqual(Object.keys(value).sort(), expected, `${label} keys`);
 }
 
+function currentSourceReplayPayload(overrides = {}) {
+  return {
+    target: 'process',
+    title: 'Checkpoint: CM-1046 current-source observe replay summary',
+    content: [
+      'Type: checkpoint',
+      'CM1046 current-source observe replay summary marker',
+      'Purpose: prove observe reads bounded explicit replay summary.',
+      'Boundary: synthetic temp-local files only, no real memory, no provider, no public MCP expansion, no readiness claim.'
+    ].join('\n'),
+    evidence: 'cm1046 synthetic current-source replay summary evidence',
+    validated: true,
+    reusable: false,
+    tags: ['cm1046', 'http-observe', 'write-reconcile', 'temp-local'],
+    sensitivity: 'none',
+    project_id: 'codex-memory',
+    workspace_id: 'cm1046-http-observe-worker-replay-workspace',
+    client_id: 'codex',
+    task_id: 'CM-1046',
+    conversation_id: 'cm1046-http-observe-current-source-worker-replay',
+    visibility: 'project',
+    retention_policy: 'keep',
+    ...overrides
+  };
+}
+
 test('http-observe CLI should summarize runtime health, logs, and audits in json mode', async () => {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-'));
   const server = await startHealthServer({
@@ -840,6 +866,115 @@ test('http-observe CLI should read bounded worker last-result summary after expl
       assert.equal(summary.replayedCount, 0);
       assert.equal(summary.wouldReplayCount, 0);
       assert.equal(summary.clearedCount, 0);
+      assert.equal(summary.failedCount, 0);
+      assert.equal(summary.skippedCount, 0);
+      assert.equal(summary.hasError, false);
+      assert.equal(JSON.stringify(payload.runtime.writeReconcileWorker).includes('memoryId'), false);
+      assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+    } finally {
+      await fs.rm(tempBasePath, { recursive: true, force: true });
+    }
+  });
+});
+
+test('http-observe CLI should read bounded worker replay summary after explicit current-source replay', async () => {
+  await withCurrentSourceHttpServer(async ({ app, address }) => {
+    const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-current-replay-'));
+    await seedRuntimeArtifacts(tempBasePath);
+
+    try {
+      assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+      const writeResult = await app.services.writeService.record(
+        currentSourceReplayPayload(),
+        {
+          executionContext: {
+            agentAlias: 'Codex',
+            requestSource: 'cm1046-http-observe-current-source-replay-test'
+          }
+        }
+      );
+      assert.equal(writeResult.decision, 'accepted');
+      assert.equal(writeResult.shadowWrite.status, 'ok');
+
+      const replayRecord = await app.stores.shadowStore.getRecord(writeResult.memoryId);
+      assert.ok(replayRecord);
+      await app.stores.shadowStore.enqueueReconcileTask({
+        memoryId: writeResult.memoryId,
+        storeKind: 'vector',
+        reason: 'cm1046_synthetic_current_source_replay_summary',
+        payload: replayRecord
+      });
+      await app.stores.shadowStore.enqueueReconcileTask({
+        memoryId: writeResult.memoryId,
+        storeKind: 'chunks',
+        reason: 'cm1046_synthetic_current_source_replay_summary',
+        payload: replayRecord
+      });
+      assert.equal((await app.stores.shadowStore.getHealth()).reconcileCount, 2);
+
+      const replayResult = await app.services.memoryWriteReconcileWorker.runOnce({
+        dryRun: false,
+        limit: 2
+      });
+      assert.equal(replayResult.decision, 'completed');
+      assert.equal(replayResult.workerDecision, 'run_once_completed');
+      assert.equal(replayResult.dryRun, false);
+      assert.equal(replayResult.limit, 2);
+      assert.equal(replayResult.scannedTaskCount, 2);
+      assert.equal(replayResult.replayedCount, 2);
+      assert.equal(replayResult.clearedCount, 2);
+      assert.equal(replayResult.failedCount, 0);
+      assert.equal((await app.stores.shadowStore.getHealth()).reconcileCount, 0);
+      assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+
+      const result = await runCli({
+        args: ['--json'],
+        env: {
+          CODEX_MEMORY_BASE_PATH: tempBasePath,
+          CODEX_MEMORY_LOGS_DIR: 'logs',
+          CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+          CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+          CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+          CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+          CODEX_MEMORY_HTTP_PORT: String(address.port)
+        }
+      });
+
+      assert.equal(result.code, 0, result.stderr);
+      const payload = JSON.parse(result.stdout);
+      assert.equal(payload.health.status, 'ok');
+      assert.equal(payload.summary.writeReconcileWorkerHealthFieldAvailable, true);
+      assert.equal(payload.summary.writeReconcileWorkerAvailable, true);
+      assert.equal(payload.summary.writeReconcileWorkerRunning, false);
+      assert.equal(payload.summary.writeReconcileWorkerTimerScheduled, false);
+      assert.equal(payload.summary.writeReconcileWorkerTickInFlight, false);
+      assert.equal(payload.summary.writeReconcileWorkerRunCount, 0);
+      assert.equal(payload.summary.writeReconcileWorkerRawMemoryIdExposed, false);
+
+      const summary = payload.runtime.writeReconcileWorker.lastResultSummary;
+      assertKeySet(summary, [
+        'clearedCount',
+        'decision',
+        'dryRun',
+        'failedCount',
+        'hasError',
+        'limit',
+        'replayedCount',
+        'scannedTaskCount',
+        'skippedCount',
+        'success',
+        'workerDecision',
+        'wouldReplayCount'
+      ], 'http-observe worker replay last result summary');
+      assert.equal(summary.success, true);
+      assert.equal(summary.decision, 'completed');
+      assert.equal(summary.workerDecision, 'run_once_completed');
+      assert.equal(summary.dryRun, false);
+      assert.equal(summary.limit, 2);
+      assert.equal(summary.scannedTaskCount, 2);
+      assert.equal(summary.replayedCount, 2);
+      assert.equal(summary.wouldReplayCount, 0);
+      assert.equal(summary.clearedCount, 2);
       assert.equal(summary.failedCount, 0);
       assert.equal(summary.skippedCount, 0);
       assert.equal(summary.hasError, false);

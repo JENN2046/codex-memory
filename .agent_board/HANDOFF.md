@@ -1,5 +1,42 @@
 # HANDOFF.md — codex-memory
 
+## CM-1046 HTTP Observe Current-Source Worker Replay Summary Handoff
+
+Goal: add controlled current-source HTTP evidence that `observe:http` reads a bounded worker replay `lastResultSummary` after explicit internal `runOnce({ dryRun: false, limit: 2 })`, without touching existing 7605, startup, watchdog, config, public MCP tools, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_REPLAY_SUMMARY_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1046_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_REPLAY_SUMMARY.md`.
+
+Current evidence:
+- Test artifact: `tests/http-observe-cli.test.js`.
+- The test starts a current-source `createStreamableHttpServer(...)` on ephemeral port `0`.
+- The test creates one synthetic temp-local accepted write with explicit Codex execution context.
+- The test manually queues `vector` and `chunks` replay tasks for that temp-local record.
+- The internal worker is called explicitly with `runOnce({ dryRun: false, limit: 2 })`.
+- The direct replay returns `completed` / `run_once_completed`.
+- The direct replay scans `2`, replays `2`, clears `2`, fails `0`, and drains the temp-local reconcile queue to `0`.
+- `observe:http` reports health `ok` and service name `vcp_codex_memory`.
+- `observe:http` reports `writeReconcileWorkerHealthFieldAvailable=true`.
+- Worker status remains available/stopped/no timer/no in-flight/runCount `0`.
+- `lastResultSummary` contains only bounded counters/status flags and no raw `memoryId`.
+- `app.services.memoryWriteReconcileWorker.isRunning()` remains false before and after observe.
+- Targeted `http-observe` CLI test passed `20/20`.
+- Adjacent HTTP observe/MCP/worker bundle passed `55/55`.
+- Full `npm test` passed `2496/2496`.
+
+Not validated:
+- Existing 7605 deployed replay summary evidence.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is controlled temporary test-runtime evidence, not a mutation of the user's current 7605 process.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1045 HTTP Observe Current-Source Worker Dry-Run Summary Handoff
 
 Goal: add controlled current-source HTTP evidence that `observe:http` reads a bounded worker dry-run `lastResultSummary` after explicit internal `runOnce({ dryRun: true, limit: 4 })`, without touching existing 7605, startup, watchdog, config, public MCP tools, or readiness/reliability claims.
