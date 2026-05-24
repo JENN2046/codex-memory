@@ -7,6 +7,9 @@ const http = require('node:http');
 const { spawn } = require('node:child_process');
 const { DatabaseSync } = require('node:sqlite');
 
+const { createCodexMemoryApplication } = require('../src/app');
+const { createStreamableHttpServer } = require('../src/adapters/codex-mcp/http');
+
 const REPO_ASSERTION_RECORD_PATH = path.join(
   process.cwd(),
   'tests',
@@ -87,6 +90,34 @@ async function startHealthServer(healthPayload = {}) {
       await new Promise(resolve => server.close(resolve));
     }
   };
+}
+
+async function withCurrentSourceHttpServer(handler) {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-current-'));
+  const app = createCodexMemoryApplication({
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data'),
+    httpPort: 0
+  });
+
+  await app.initialize();
+  const httpServer = createStreamableHttpServer({
+    app,
+    host: '127.0.0.1',
+    port: 0,
+    mcpPath: '/mcp/codex-memory'
+  });
+  const address = await httpServer.listen();
+
+  try {
+    await handler({ app, address });
+  } finally {
+    await httpServer.close();
+    await app.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
 }
 
 async function seedRuntimeArtifacts(basePath) {
@@ -694,6 +725,53 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
     await server.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
+});
+
+test('http-observe CLI should read worker status from a current-source HTTP server refresh', async () => {
+  await withCurrentSourceHttpServer(async ({ app, address }) => {
+    const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-current-artifacts-'));
+    await seedRuntimeArtifacts(tempBasePath);
+
+    try {
+      assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+
+      const result = await runCli({
+        args: ['--json'],
+        env: {
+          CODEX_MEMORY_BASE_PATH: tempBasePath,
+          CODEX_MEMORY_LOGS_DIR: 'logs',
+          CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+          CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+          CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+          CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+          CODEX_MEMORY_HTTP_PORT: String(address.port)
+        }
+      });
+
+      assert.equal(result.code, 0, result.stderr);
+      const payload = JSON.parse(result.stdout);
+      assert.equal(payload.health.status, 'ok');
+      assert.equal(payload.health.payload.name, 'vcp_codex_memory');
+      assert.equal(payload.summary.writeReconcileWorkerHealthFieldAvailable, true);
+      assert.equal(payload.summary.writeReconcileWorkerAvailable, true);
+      assert.equal(payload.summary.writeReconcileWorkerRunning, false);
+      assert.equal(payload.summary.writeReconcileWorkerTimerScheduled, false);
+      assert.equal(payload.summary.writeReconcileWorkerTickInFlight, false);
+      assert.equal(payload.summary.writeReconcileWorkerRunCount, 0);
+      assert.equal(payload.summary.writeReconcileWorkerRawMemoryIdExposed, false);
+      assert.equal(payload.runtime.writeReconcileWorker.healthFieldAvailable, true);
+      assert.equal(payload.runtime.writeReconcileWorker.available, true);
+      assert.equal(payload.runtime.writeReconcileWorker.running, false);
+      assert.equal(payload.runtime.writeReconcileWorker.timerScheduled, false);
+      assert.equal(payload.runtime.writeReconcileWorker.tickInFlight, false);
+      assert.equal(payload.runtime.writeReconcileWorker.runCount, 0);
+      assert.equal(payload.runtime.writeReconcileWorker.lastResultSummary, null);
+      assert.equal(JSON.stringify(payload.runtime.writeReconcileWorker).includes('memoryId'), false);
+      assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+    } finally {
+      await fs.rm(tempBasePath, { recursive: true, force: true });
+    }
+  });
 });
 
 test('http-observe CLI should emit text output with auto-authorization bundle summary by default', async () => {

@@ -1,5 +1,39 @@
 # HANDOFF.md — codex-memory
 
+## CM-1044 HTTP Observe Current-Source Refresh Worker Status Handoff
+
+Goal: add controlled current-source HTTP refresh evidence for the CM-1042/CM-1043 worker-status path without touching existing 7605, startup, watchdog, config, public MCP tools, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_HTTP_OBSERVE_CURRENT_SOURCE_REFRESH_WORKER_STATUS_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1044_HTTP_OBSERVE_CURRENT_SOURCE_REFRESH_WORKER_STATUS.md`.
+
+Current evidence:
+- Test artifact: `tests/http-observe-cli.test.js`.
+- The test starts a current-source `createStreamableHttpServer(...)` on ephemeral port `0`.
+- The test points `observe:http` at that temporary server with isolated runtime artifact paths.
+- `observe:http` reports health `ok` and service name `vcp_codex_memory`.
+- `observe:http` reports `writeReconcileWorkerHealthFieldAvailable=true`.
+- Worker status is available/stopped/no timer/no in-flight/runCount `0`.
+- `lastResultSummary` is `null`.
+- Runtime surface JSON does not contain `memoryId`.
+- `app.services.memoryWriteReconcileWorker.isRunning()` remains false before and after observe.
+- Targeted `http-observe` CLI test passed `18/18`.
+- Adjacent HTTP observe/MCP/worker bundle passed `53/53`.
+- Full `npm test` passed `2494/2494`.
+
+Not validated:
+- Existing 7605 deployed new-field evidence.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is controlled temporary test-runtime evidence, not a mutation of the user's current 7605 process.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1043 HTTP Observe Write Reconcile Worker Status Handoff
 
 Goal: connect bounded write reconcile worker health status to `observe:http` without adding a public MCP tool, starting the worker, changing startup/config/watchdog, or claiming readiness/reliability.

@@ -1,5 +1,37 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1044 HTTP Observe Current-Source Refresh Worker Status Checkpoint
+
+Status: `COMPLETED_VALIDATED_HTTP_OBSERVE_CURRENT_SOURCE_REFRESH_WORKER_STATUS_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1044_HTTP_OBSERVE_CURRENT_SOURCE_REFRESH_WORKER_STATUS.md`
+
+Completed:
+- Added a controlled current-source HTTP refresh test to `tests/http-observe-cli.test.js`.
+- Started a temporary `createStreamableHttpServer(...)` on ephemeral port `0`.
+- Pointed `observe:http` at the temporary current-source port with isolated artifact paths.
+- Verified `observe:http` sees `writeReconcileWorkerHealthFieldAvailable=true`.
+- Verified worker status is available/stopped/no timer/no in-flight/runCount `0`.
+- Verified `lastResultSummary=null`.
+- Verified no `memoryId` appears in the summarized runtime surface.
+- Verified health/observe does not start the worker.
+
+Validation:
+- Test syntax check passed.
+- Targeted `http-observe` CLI test passed `18/18`.
+- Adjacent HTTP observe/MCP/worker bundle passed `53/53`.
+- Full `npm test` passed `2494/2494`.
+
+Boundary:
+- Controlled test-runtime refresh evidence only.
+- Existing 7605 process was not restarted, replaced, or changed.
+- No public MCP expansion, public `memory_write_reconcile_worker` tool, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1043 HTTP Observe Write Reconcile Worker Status Checkpoint
 
 Status: `COMPLETED_VALIDATED_HTTP_OBSERVE_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`
