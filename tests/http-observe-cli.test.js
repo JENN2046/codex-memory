@@ -774,6 +774,83 @@ test('http-observe CLI should read worker status from a current-source HTTP serv
   });
 });
 
+test('http-observe CLI should read bounded worker last-result summary after explicit current-source dry-run', async () => {
+  await withCurrentSourceHttpServer(async ({ app, address }) => {
+    const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-current-dry-run-'));
+    await seedRuntimeArtifacts(tempBasePath);
+
+    try {
+      assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+      const dryRunResult = await app.services.memoryWriteReconcileWorker.runOnce({
+        dryRun: true,
+        limit: 4
+      });
+      assert.equal(dryRunResult.decision, 'dry_run_completed');
+      assert.equal(dryRunResult.workerDecision, 'run_once_completed');
+      assert.equal(dryRunResult.dryRun, true);
+      assert.equal(dryRunResult.limit, 4);
+      assert.equal(dryRunResult.scannedTaskCount, 0);
+      assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+
+      const result = await runCli({
+        args: ['--json'],
+        env: {
+          CODEX_MEMORY_BASE_PATH: tempBasePath,
+          CODEX_MEMORY_LOGS_DIR: 'logs',
+          CODEX_MEMORY_HTTP_LOG: path.join(tempBasePath, 'logs', 'codex-memory-http.log'),
+          CODEX_MEMORY_AUDIT_LOG: path.join(tempBasePath, 'logs', 'codex-memory-bridge.jsonl'),
+          CODEX_MEMORY_RECALL_LOG: path.join(tempBasePath, 'logs', 'codex-memory-recall.jsonl'),
+          CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+          CODEX_MEMORY_HTTP_PORT: String(address.port)
+        }
+      });
+
+      assert.equal(result.code, 0, result.stderr);
+      const payload = JSON.parse(result.stdout);
+      assert.equal(payload.health.status, 'ok');
+      assert.equal(payload.summary.writeReconcileWorkerHealthFieldAvailable, true);
+      assert.equal(payload.summary.writeReconcileWorkerAvailable, true);
+      assert.equal(payload.summary.writeReconcileWorkerRunning, false);
+      assert.equal(payload.summary.writeReconcileWorkerTimerScheduled, false);
+      assert.equal(payload.summary.writeReconcileWorkerTickInFlight, false);
+      assert.equal(payload.summary.writeReconcileWorkerRunCount, 0);
+      assert.equal(payload.summary.writeReconcileWorkerRawMemoryIdExposed, false);
+
+      const summary = payload.runtime.writeReconcileWorker.lastResultSummary;
+      assertKeySet(summary, [
+        'clearedCount',
+        'decision',
+        'dryRun',
+        'failedCount',
+        'hasError',
+        'limit',
+        'replayedCount',
+        'scannedTaskCount',
+        'skippedCount',
+        'success',
+        'workerDecision',
+        'wouldReplayCount'
+      ], 'http-observe worker dry-run last result summary');
+      assert.equal(summary.success, true);
+      assert.equal(summary.decision, 'dry_run_completed');
+      assert.equal(summary.workerDecision, 'run_once_completed');
+      assert.equal(summary.dryRun, true);
+      assert.equal(summary.limit, 4);
+      assert.equal(summary.scannedTaskCount, 0);
+      assert.equal(summary.replayedCount, 0);
+      assert.equal(summary.wouldReplayCount, 0);
+      assert.equal(summary.clearedCount, 0);
+      assert.equal(summary.failedCount, 0);
+      assert.equal(summary.skippedCount, 0);
+      assert.equal(summary.hasError, false);
+      assert.equal(JSON.stringify(payload.runtime.writeReconcileWorker).includes('memoryId'), false);
+      assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+    } finally {
+      await fs.rm(tempBasePath, { recursive: true, force: true });
+    }
+  });
+});
+
 test('http-observe CLI should emit text output with auto-authorization bundle summary by default', async () => {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-text-'));
   const server = await startHealthServer();

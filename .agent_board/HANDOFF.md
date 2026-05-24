@@ -1,5 +1,40 @@
 # HANDOFF.md — codex-memory
 
+## CM-1045 HTTP Observe Current-Source Worker Dry-Run Summary Handoff
+
+Goal: add controlled current-source HTTP evidence that `observe:http` reads a bounded worker dry-run `lastResultSummary` after explicit internal `runOnce({ dryRun: true, limit: 4 })`, without touching existing 7605, startup, watchdog, config, public MCP tools, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_DRY_RUN_SUMMARY_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1045_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_DRY_RUN_SUMMARY.md`.
+
+Current evidence:
+- Test artifact: `tests/http-observe-cli.test.js`.
+- The test starts a current-source `createStreamableHttpServer(...)` on ephemeral port `0`.
+- The test points `observe:http` at that temporary server with isolated runtime artifact paths.
+- The internal worker is called explicitly with `runOnce({ dryRun: true, limit: 4 })`.
+- The direct dry-run returns `dry_run_completed` / `run_once_completed`.
+- `observe:http` reports health `ok` and service name `vcp_codex_memory`.
+- `observe:http` reports `writeReconcileWorkerHealthFieldAvailable=true`.
+- Worker status remains available/stopped/no timer/no in-flight/runCount `0`.
+- `lastResultSummary` contains only bounded counters/status flags and no raw `memoryId`.
+- `app.services.memoryWriteReconcileWorker.isRunning()` remains false before and after observe.
+- Targeted `http-observe` CLI test passed `19/19`.
+- Adjacent HTTP observe/MCP/worker bundle passed `54/54`.
+- Full `npm test` passed `2495/2495`.
+
+Not validated:
+- Existing 7605 deployed dry-run summary evidence.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is controlled temporary test-runtime evidence, not a mutation of the user's current 7605 process.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1044 HTTP Observe Current-Source Refresh Worker Status Handoff
 
 Goal: add controlled current-source HTTP refresh evidence for the CM-1042/CM-1043 worker-status path without touching existing 7605, startup, watchdog, config, public MCP tools, or readiness/reliability claims.

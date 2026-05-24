@@ -1,5 +1,38 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1045 HTTP Observe Current-Source Worker Dry-Run Summary Checkpoint
+
+Status: `COMPLETED_VALIDATED_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_DRY_RUN_SUMMARY_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1045_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_DRY_RUN_SUMMARY.md`
+
+Completed:
+- Added a controlled current-source HTTP dry-run summary test to `tests/http-observe-cli.test.js`.
+- Started a temporary `createStreamableHttpServer(...)` on ephemeral port `0`.
+- Called internal worker `runOnce({ dryRun: true, limit: 4 })` explicitly inside the test.
+- Pointed `observe:http` at the temporary current-source port with isolated artifact paths.
+- Verified `observe:http` sees `writeReconcileWorkerHealthFieldAvailable=true`.
+- Verified worker status remains available/stopped/no timer/no in-flight/runCount `0`.
+- Verified bounded `lastResultSummary` reports dry-run completion, `limit=4`, zero scanned/replayed/would-replay/cleared/failed/skipped counters, and `hasError=false`.
+- Verified no `memoryId` appears in the summarized runtime surface.
+- Verified health/observe does not start the worker.
+
+Validation:
+- Test syntax check passed.
+- Targeted `http-observe` CLI test passed `19/19`.
+- Adjacent HTTP observe/MCP/worker bundle passed `54/54`.
+- Full `npm test` passed `2495/2495`.
+
+Boundary:
+- Controlled test-runtime dry-run summary evidence only.
+- Existing 7605 process was not restarted, replaced, or changed.
+- No public MCP expansion, public `memory_write_reconcile_worker` tool, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, scheduled loop start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1044 HTTP Observe Current-Source Refresh Worker Status Checkpoint
 
 Status: `COMPLETED_VALIDATED_HTTP_OBSERVE_CURRENT_SOURCE_REFRESH_WORKER_STATUS_NOT_RELIABLE_NOT_READY`

@@ -28,6 +28,57 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1045 HTTP Observe Current-Source Worker Dry-Run Summary - 2026-05-25
+
+Result: `CM1045_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_DRY_RUN_SUMMARY_NOT_RELIABLE_NOT_READY`.
+
+CM-1045 adds controlled current-source dry-run summary evidence for the CM-1042/CM-1043/CM-1044 worker-status path:
+
+- a test starts a temporary current-source `createStreamableHttpServer(...)` on ephemeral port `0`
+- the test explicitly calls internal worker `runOnce({ dryRun: true, limit: 4 })`
+- `observe:http` is pointed at that temporary port with isolated runtime artifact paths
+- `/health.runtime.writeReconcileWorker.lastResultSummary` is present after the explicit internal dry-run
+- `observe:http` reports `writeReconcileWorkerHealthFieldAvailable=true`
+- worker status remains available/stopped/no timer/no in-flight/runCount `0`
+- `lastResultSummary` contains only bounded counters and status flags
+- summarized runtime surface does not contain `memoryId`
+- health/observe does not start the worker or scheduled loop
+- existing 7605 is not restarted, replaced, or changed
+
+Validation:
+
+- test syntax check passed
+- targeted `http-observe` CLI test `19/19` passed
+- adjacent HTTP observe/MCP/worker bundle `54/54` passed
+- full `npm test` `2495/2495` passed
+
+Boundary:
+
+```text
+existing 7605 service changed = false
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by health = false
+worker starts by observe = false
+worker starts by default = false
+scheduled worker loop started = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow current-source observe dry-run summary evidence gap after CM-1044.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1044 HTTP Observe Current-Source Refresh Worker Status - 2026-05-25
 
 Result: `CM1044_HTTP_OBSERVE_CURRENT_SOURCE_REFRESH_WORKER_STATUS_NOT_RELIABLE_NOT_READY`.
