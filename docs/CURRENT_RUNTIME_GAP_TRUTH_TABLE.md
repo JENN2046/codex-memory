@@ -28,6 +28,63 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1052 Memory Write Reconcile Worker Scheduler-Unavailable Start Guard - 2026-05-25
+
+Result: `CM1052_MEMORY_WRITE_RECONCILE_WORKER_SCHEDULER_UNAVAILABLE_START_GUARD_NOT_RELIABLE_NOT_READY`.
+
+CM-1052 adds a narrow worker start-return status guard:
+
+- `MemoryWriteReconcileWorker.scheduleNext()` already fail-closes when `scheduler.setTimeout` is unavailable
+- `MemoryWriteReconcileWorker.start()` now mirrors that fail-closed state in its return value
+- the scheduler-unavailable path returns `decision=start_failed` and `running=false`
+- the returned object includes a bounded sanitized `lastResultSummary`
+- the returned summary reports `worker_scheduler_unavailable` / `schedule_failed`
+- the returned summary does not expose the raw scheduler error string
+- `getStatus()` remains stopped/no timer/no in-flight/runCount `0`
+- no replay call is made on this scheduler-unavailable path
+
+Validation:
+
+- source/test syntax checks passed
+- targeted memory write reconcile worker test `16/16` passed
+- adjacent worker/service/write reliability/MCP regression bundle `35/35` passed
+- full `npm test` `2502/2502` passed
+
+Boundary:
+
+```text
+worker source changed = true
+unit-level scheduler/replay stub only = true
+synthetic temp-local accepted writes = 0
+scheduled worker start calls = 1
+scheduler.setTimeout unavailable = true
+start return decision = start_failed
+start return running = false
+status running = false
+timer scheduled = false
+replay calls = 0
+raw scheduler error exposed = false
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow scheduler-unavailable start-return boundary gap: an explicit worker start cannot report `started/running=true` when scheduling fail-closes before a timer exists.
+- This does not prove broad write reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, RC readiness, production readiness, or VCP full parity.
+- Current operator state remains `RC_NOT_READY_BLOCKED`.
+
 ## CM-1051 Memory Write Reconcile Worker Restart State Reset Guard - 2026-05-25
 
 Result: `CM1051_MEMORY_WRITE_RECONCILE_WORKER_RESTART_STATE_RESET_GUARD_NOT_RELIABLE_NOT_READY`.

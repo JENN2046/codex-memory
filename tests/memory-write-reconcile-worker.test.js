@@ -528,6 +528,47 @@ test('CM-1051 worker restart after stop clears stale last-result summary before 
   assert.equal(JSON.stringify(finalStatus).includes('codex-process-cm1051'), false);
 });
 
+test('CM-1052 worker start reports scheduler unavailable fail-closed state', async () => {
+  const reconcileService = {
+    async replayPending() {
+      throw new Error('cm1052 replay should not run without scheduler');
+    }
+  };
+  const worker = new MemoryWriteReconcileWorker({
+    reconcileService,
+    scheduler: {},
+    intervalMs: 250,
+    limit: 4
+  });
+
+  const started = worker.start({ dryRun: true, limit: 9, maxRuns: 2 });
+  const status = worker.getStatus();
+
+  assert.equal(started.decision, 'start_failed');
+  assert.equal(started.running, false);
+  assert.equal(started.intervalMs, 250);
+  assert.equal(started.limit, 9);
+  assert.equal(started.dryRun, true);
+  assert.equal(started.maxRuns, 2);
+  assert.equal(started.lastResultSummary.success, false);
+  assert.equal(started.lastResultSummary.decision, 'worker_scheduler_unavailable');
+  assert.equal(started.lastResultSummary.workerDecision, 'schedule_failed');
+  assert.equal(started.lastResultSummary.hasError, true);
+  assert.equal(Object.prototype.hasOwnProperty.call(started.lastResultSummary, 'error'), false);
+  assert.equal(JSON.stringify(started).includes('scheduler.setTimeout is unavailable'), false);
+
+  assert.equal(worker.isRunning(), false);
+  assert.equal(status.running, false);
+  assert.equal(status.timerScheduled, false);
+  assert.equal(status.tickInFlight, false);
+  assert.equal(status.runCount, 0);
+  assert.equal(status.limit, 9);
+  assert.equal(status.dryRun, true);
+  assert.equal(status.maxRuns, 2);
+  assert.deepEqual(status.lastResultSummary, started.lastResultSummary);
+  assert.equal(JSON.stringify(status).includes('cm1052 replay should not run'), false);
+});
+
 test('CM-1039 explicit worker drains multiple temp-local reconcile tasks across bounded ticks', async () => {
   const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1039-worker-drain-'));
   const config = createConfig(rootPath);

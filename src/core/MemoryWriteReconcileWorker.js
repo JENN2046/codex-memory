@@ -107,6 +107,18 @@ class MemoryWriteReconcileWorker {
     this.running = true;
     this.scheduleNext();
 
+    if (!this.running) {
+      return {
+        decision: 'start_failed',
+        running: false,
+        intervalMs: this.intervalMs,
+        limit: this.limit ?? null,
+        dryRun: this.dryRun,
+        maxRuns: this.maxRuns,
+        lastResultSummary: summarizeResult(this.lastResult)
+      };
+    }
+
     return {
       decision: 'started',
       running: true,

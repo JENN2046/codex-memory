@@ -1,5 +1,35 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1052 Memory Write Reconcile Worker Scheduler-Unavailable Start Guard Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_SCHEDULER_UNAVAILABLE_START_GUARD_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1052_MEMORY_WRITE_RECONCILE_WORKER_SCHEDULER_UNAVAILABLE_START_GUARD.md`
+
+Completed:
+- Updated `src/core/MemoryWriteReconcileWorker.js` so `start()` returns `start_failed/running=false` when scheduling fail-closes because `scheduler.setTimeout` is unavailable.
+- Added a unit-level scheduler-unavailable start guard test to `tests/memory-write-reconcile-worker.test.js`.
+- Verified no replay call occurs when the scheduler cannot schedule a timer.
+- Verified returned start summary reports bounded `worker_scheduler_unavailable` / `schedule_failed` status.
+- Verified `getStatus()` is stopped/no timer/no in-flight/runCount `0`.
+- Verified returned summary and status summary match.
+- Verified raw scheduler error text is not exposed.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted memory write reconcile worker test passed `16/16`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `35/35`.
+- Full `npm test` passed `2502/2502`.
+
+Boundary:
+- Narrow source/test worker start-return status hygiene guard only.
+- No public API change, public MCP expansion, temp/real memory write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1051 Memory Write Reconcile Worker Restart State Reset Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_RESTART_STATE_RESET_NOT_RELIABLE_NOT_READY`
