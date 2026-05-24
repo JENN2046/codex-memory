@@ -66,6 +66,9 @@ test('CM-0907 CLI reports default dirty-worktree fixture as blocked without exec
   assert.equal(report.acceptedForExecutionPreflight, false);
   assert.equal(report.executionStarted, false);
   assert.equal(report.recordMemoryStarted, false);
+  assert.equal(report.preflightOnly, true);
+  assert.equal(report.separateLiveWriteApprovalRequired, true);
+  assert.equal(report.implicitWriteAuthorizationGranted, false);
   assert.ok(report.blockerReasons.includes('dirty_worktree'));
   assert.equal(report.safety.callsRecordMemory, false);
   assert.equal(report.safety.callsSearchMemory, false);
@@ -85,13 +88,16 @@ test('CM-0907 CLI accepts an explicit clean fixture as preflight-ready but still
     assert.equal(report.acceptedForExecutionPreflight, true);
     assert.equal(report.executionStarted, false);
     assert.equal(report.recordMemoryStarted, false);
+    assert.equal(report.preflightOnly, true);
+    assert.equal(report.separateLiveWriteApprovalRequired, true);
+    assert.equal(report.implicitWriteAuthorizationGranted, false);
     assert.deepEqual(report.blockerReasons, []);
     assert.equal(report.cleanSyncedMainHead, true);
     assert.equal(report.exactBasisBound, true);
     assert.equal(report.optInAppSeamBound, true);
     assert.equal(report.scopeAssumptionsBound, true);
     assert.equal(report.boundaryFlagsBound, true);
-    assert.match(report.nextStep, /record_memory execution remains a separate step/);
+    assert.match(report.nextStep, /requires a separate exact approval/);
   });
 });
 
@@ -103,6 +109,9 @@ test('CM-0907 CLI text mode renders non-executing safety fields', () => {
   assert.match(result.stdout, /decision: WRITE_PROOF_EXECUTION_PREFLIGHT_BLOCKED_NOT_EXECUTED/);
   assert.match(result.stdout, /executionStarted: false/);
   assert.match(result.stdout, /recordMemoryStarted: false/);
+  assert.match(result.stdout, /preflightOnly: true/);
+  assert.match(result.stdout, /separateLiveWriteApprovalRequired: true/);
+  assert.match(result.stdout, /implicitWriteAuthorizationGranted: false/);
   assert.match(result.stdout, /callsRecordMemory: false/);
   assert.match(result.stdout, /readinessClaimAllowed: false/);
 });

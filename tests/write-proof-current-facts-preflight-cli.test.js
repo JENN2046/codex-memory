@@ -64,6 +64,9 @@ test('CM-0908 current-facts collector builds clean write preflight facts without
   assert.equal(report.acceptedForExecutionPreflight, true);
   assert.equal(report.executionStarted, false);
   assert.equal(report.recordMemoryStarted, false);
+  assert.equal(report.preflightOnly, true);
+  assert.equal(report.separateLiveWriteApprovalRequired, true);
+  assert.equal(report.implicitWriteAuthorizationGranted, false);
   assert.equal(report.cleanSyncedMainHead, true);
   assert.equal(report.exactBasisBound, true);
   assert.equal(report.optInAppSeamBound, true);

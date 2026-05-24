@@ -43,6 +43,9 @@ test('CM-0907 preflight accepts clean synced exact CM-0737 basis without executi
   assert.equal(result.acceptedForExecutionPreflight, true);
   assert.equal(result.executionStarted, false);
   assert.equal(result.recordMemoryStarted, false);
+  assert.equal(result.preflightOnly, true);
+  assert.equal(result.separateLiveWriteApprovalRequired, true);
+  assert.equal(result.implicitWriteAuthorizationGranted, false);
   assert.equal(result.exactApprovalLineMatched, true);
   assert.equal(result.cleanSyncedMainHead, true);
   assert.equal(result.exactBasisBound, true);

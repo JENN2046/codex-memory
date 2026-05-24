@@ -104,6 +104,9 @@ function buildReport(options = {}) {
     acceptedForExecutionPreflight: preflight.acceptedForExecutionPreflight,
     executionStarted: preflight.executionStarted,
     recordMemoryStarted: preflight.recordMemoryStarted,
+    preflightOnly: preflight.preflightOnly,
+    separateLiveWriteApprovalRequired: preflight.separateLiveWriteApprovalRequired,
+    implicitWriteAuthorizationGranted: preflight.implicitWriteAuthorizationGranted,
     blockerReasons: preflight.blockerReasons,
     exactApprovalLineMatched: preflight.exactApprovalLineMatched,
     cleanSyncedMainHead: preflight.cleanSyncedMainHead,
@@ -120,7 +123,7 @@ function buildReport(options = {}) {
     readinessClaimAllowed: false,
     memoryWriteReliableClaimed: false,
     nextStep: preflight.acceptedForExecutionPreflight
-      ? 'Review preflight output; live record_memory execution remains a separate step and is not performed by this command.'
+      ? 'Review preflight output; live record_memory execution still requires a separate exact approval and is not performed or authorized by this command.'
       : 'Resolve blockers, then rerun this non-executing preflight before any separate live write proof step.'
   };
 }
@@ -133,6 +136,9 @@ function renderText(report) {
     `acceptedForExecutionPreflight: ${report.acceptedForExecutionPreflight === true}`,
     `executionStarted: ${report.executionStarted === true}`,
     `recordMemoryStarted: ${report.recordMemoryStarted === true}`,
+    `preflightOnly: ${report.preflightOnly === true}`,
+    `separateLiveWriteApprovalRequired: ${report.separateLiveWriteApprovalRequired === true}`,
+    `implicitWriteAuthorizationGranted: ${report.implicitWriteAuthorizationGranted === true}`,
     `blockerReasons: ${(report.blockerReasons || []).join(', ') || 'none'}`,
     `cleanSyncedMainHead: ${report.cleanSyncedMainHead === true}`,
     `exactBasisBound: ${report.exactBasisBound === true}`,

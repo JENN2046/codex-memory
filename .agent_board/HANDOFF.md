@@ -1,5 +1,31 @@
 # HANDOFF.md — codex-memory
 
+## CM-1009 Write Proof Preflight Authorization Boundary Handoff
+
+Goal: continue write reliability closure by preventing write-proof preflight readiness from being mistaken for live write authorization or consumed CM-0737 approval reuse.
+
+Status: COMPLETED_VALIDATED_NOT_READY.
+
+Artifact: `docs/CM1009_WRITE_PROOF_PREFLIGHT_AUTHORIZATION_BOUNDARY.md`.
+
+Current evidence:
+- `WriteProofExecutionPreflight` now emits `preflightOnly=true`.
+- `WriteProofExecutionPreflight` now emits `separateLiveWriteApprovalRequired=true`.
+- `WriteProofExecutionPreflight` now emits `implicitWriteAuthorizationGranted=false`.
+- Both write-proof preflight CLIs forward those fields and ready `nextStep` says live `record_memory` is not performed or authorized by preflight.
+- Targeted write-proof preflight tests passed `16/16`.
+- Adjacent memory reliability baseline-readiness tests passed `11/11`.
+- Full `npm test` passed `2438/2438`.
+
+Not validated:
+- Live write proof, broad write reliability, rollback cleanup sufficiency, long-run durability, multi-client write behavior, production readiness, release/tag/deploy, real rollback apply.
+
+Remaining risks:
+- `memory write reliable` remains unclaimed and `complete? = no`. CM-1009 is a non-mutating interpretation guard, not positive write reliability evidence.
+
+Next safe step:
+- Either prepare/execute a separately exact-approved bounded live write proof with fresh payload and receipt, or add another non-mutating guard around write pollution/rollback overclaim. Do not execute another durable write merely because preflight is ready.
+
 ## CM-1008 Recall Reliability Blocker Review Handoff
 
 Goal: review CM-1007 patched true-live recall proof evidence under CM-0826 criteria without turning a narrow proof pass into a broad reliability claim.

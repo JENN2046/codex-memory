@@ -28,6 +28,43 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1009 Write Proof Preflight Authorization Boundary - 2026-05-24
+
+Result: `CM1009_WRITE_PROOF_PREFLIGHT_AUTHORIZATION_BOUNDARY_COMPLETED_NOT_READY`.
+
+CM-1009 updates the write-proof preflight surfaces so `READY_NOT_EXECUTED` cannot be confused with live write authorization:
+
+- [WriteProofExecutionPreflight.js](/A:/codex-memory/src/core/WriteProofExecutionPreflight.js)
+- [write-proof-execution-preflight.js](/A:/codex-memory/src/cli/write-proof-execution-preflight.js)
+- [write-proof-current-facts-preflight.js](/A:/codex-memory/src/cli/write-proof-current-facts-preflight.js)
+- [CM1009_WRITE_PROOF_PREFLIGHT_AUTHORIZATION_BOUNDARY.md](/A:/codex-memory/docs/CM1009_WRITE_PROOF_PREFLIGHT_AUTHORIZATION_BOUNDARY.md)
+
+The preflight result now explicitly reports:
+
+```text
+preflightOnly=true
+separateLiveWriteApprovalRequired=true
+implicitWriteAuthorizationGranted=false
+```
+
+Validation evidence:
+
+- source/test syntax checks for changed write-proof preflight files
+- targeted write-proof preflight tests passed `16/16`
+- adjacent baseline-readiness tests passed `11/11`
+- full `npm test` passed `2438/2438`
+
+Operator interpretation:
+
+- `WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED` means the preflight packet shape may be reviewable
+- it does not authorize live `record_memory`
+- it does not reactivate the consumed CM-0737 write approval
+- it does not execute a write proof
+- it does not call `search_memory`
+- it does not expand public MCP
+- it does not claim `memory write reliable`, `memory recall reliable`, runtime readiness, or RC readiness
+- `complete?` remains `no`
+
 ## CM-1002 Board/Status/Truth-Table Reconciliation - 2026-05-24
 
 Result: `BOARD_STATUS_TRUTH_TABLE_RECONCILIATION_COMPLETED_NOT_READY`.

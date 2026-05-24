@@ -156,6 +156,9 @@ function buildReport(options = {}, dependencies = {}) {
     acceptedForExecutionPreflight: preflight.acceptedForExecutionPreflight,
     executionStarted: false,
     recordMemoryStarted: false,
+    preflightOnly: preflight.preflightOnly,
+    separateLiveWriteApprovalRequired: preflight.separateLiveWriteApprovalRequired,
+    implicitWriteAuthorizationGranted: preflight.implicitWriteAuthorizationGranted,
     blockerReasons: preflight.blockerReasons,
     gitFactErrors: errors,
     exactApprovalLineMatched: preflight.exactApprovalLineMatched,
@@ -191,7 +194,7 @@ function buildReport(options = {}, dependencies = {}) {
     readinessClaimAllowed: false,
     memoryWriteReliableClaimed: false,
     nextStep: preflight.acceptedForExecutionPreflight
-      ? 'Review this current-facts preflight output; live record_memory execution remains separate and is not performed by this command.'
+      ? 'Review this current-facts preflight output; live record_memory execution still requires a separate exact approval and is not performed or authorized by this command.'
       : 'Resolve blockers, then rerun this read-only current-facts preflight before any separate live write proof step.'
   };
 }
@@ -204,6 +207,9 @@ function renderText(report) {
     `acceptedForExecutionPreflight: ${report.acceptedForExecutionPreflight === true}`,
     `executionStarted: ${report.executionStarted === true}`,
     `recordMemoryStarted: ${report.recordMemoryStarted === true}`,
+    `preflightOnly: ${report.preflightOnly === true}`,
+    `separateLiveWriteApprovalRequired: ${report.separateLiveWriteApprovalRequired === true}`,
+    `implicitWriteAuthorizationGranted: ${report.implicitWriteAuthorizationGranted === true}`,
     `blockerReasons: ${(report.blockerReasons || []).join(', ') || 'none'}`,
     `gitFactErrors: ${(report.gitFactErrors || []).length}`,
     `cleanSyncedMainHead: ${report.cleanSyncedMainHead === true}`,

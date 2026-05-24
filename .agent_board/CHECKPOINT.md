@@ -1,5 +1,31 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1009 Write Proof Preflight Authorization Boundary Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-24
+
+Artifact: `docs/CM1009_WRITE_PROOF_PREFLIGHT_AUTHORIZATION_BOUNDARY.md`
+
+Completed:
+- Added explicit non-authorization fields to the write-proof preflight result.
+- Forwarded the fields through both write-proof preflight CLIs.
+- Updated ready `nextStep` wording so live `record_memory` still requires separate exact approval and is not authorized by preflight.
+
+Validation:
+- Source/test syntax checks passed for changed write-proof preflight files.
+- Targeted write-proof preflight tests passed `16/16`.
+- Adjacent memory reliability baseline-readiness tests passed `11/11`.
+- Full `npm test` passed `2438/2438`.
+- Post-patch current-facts CLI smoke returned blocked under the current dirty worktree and exposed the new boundary fields.
+
+Boundary:
+- No live proof execution, `record_memory`, `search_memory`, provider/API call, raw memory read, direct `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+
+Next:
+- Continue write reliability closure through a separately exact-approved bounded live write proof or another non-mutating write reliability guard. Do not treat preflight readiness as write authorization.
+
 ## CM-1008 Recall Reliability Blocker Review Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
