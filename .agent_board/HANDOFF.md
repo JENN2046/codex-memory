@@ -1,5 +1,42 @@
 # HANDOFF.md — codex-memory
 
+## CM-1041 Memory Write Reconcile Worker Temp-Local Reopen Recovery Handoff
+
+Goal: add isolated temp-local evidence that the default-disabled write reconcile worker can drain queued replay tasks persisted across a SQLite shadow store close/reopen boundary, without adding a public MCP tool, executing runtime observe, starting the worker by default, changing startup/config/watchdog, or claiming readiness/reliability.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_TEMP_LOCAL_REOPEN_RECOVERY_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1041_MEMORY_WRITE_RECONCILE_WORKER_TEMP_LOCAL_REOPEN_RECOVERY.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- The CM-1041 temp-local test writes one synthetic degraded process record under one temp root.
+- Deterministic vector/chunk projection failures leave two reconcile tasks visible.
+- A first internal worker is started explicitly with failing replay projections, `limit=1`, `dryRun=false`, `maxRuns=1`, and an injected manual scheduler.
+- After one manual tick, failed worker status reports stopped/no timer and `runCount=1`.
+- Failed replay summary reports scanned `1`, replayed `0`, cleared `0`, failed `1`.
+- Reconcile queue count remains `2`, vector count remains `0`, and chunk count remains `0`.
+- The original SQLite shadow store is closed.
+- A fresh shadow store reopened on the same temp-local path still sees one record and two reconcile tasks.
+- A second internal worker is started with the reopened shadow store, healthy projection services, `limit=1`, `dryRun=false`, `maxRuns=2`, and an injected manual scheduler.
+- After two recovery ticks, reconcile queue count is `0`, vector count is `1`, chunk count is at least `1`, and the diary file remains visible.
+- Worker status omits raw memory ids.
+- CM-1041 targeted worker test passed `10/10`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `29/29`.
+- Full `npm test` passed `2493/2493`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, automatic reconcile recovery, startup reconcile safety, runtime observe safety, real degraded projection recovery, reconcile cleanup safety, longer-horizon runtime durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is isolated temp-local explicit worker evidence, not runtime observe evidence.
+- It does not prove queue processing in a true long-running service.
+- It does not authorize startup/watchdog/config integration.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward exact runtime observe, longer-horizon runtime durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1040 Memory Write Reconcile Worker Temp-Local Failure Recovery Handoff
 
 Goal: add isolated temp-local evidence that the default-disabled write reconcile worker keeps failed replay tasks queued and can later drain the same queue after projection recovery, without adding a public MCP tool, executing runtime observe, starting the worker by default, changing startup/config/watchdog, or claiming readiness/reliability.

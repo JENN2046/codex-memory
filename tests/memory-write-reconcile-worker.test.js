@@ -638,6 +638,160 @@ test('CM-1040 worker retains failed temp-local reconcile tasks and later drains 
   assert.equal(await pathExists(rootPath), false);
 });
 
+test('CM-1041 worker drains persisted temp-local reconcile queue after shadow store reopen', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1041-worker-reopen-'));
+  const config = createConfig(rootPath);
+  const shadowStore = new SqliteShadowStore(config);
+  const initialHealthyVectorStore = new VectorIndexStore(config);
+  const auditLogStore = new AuditLogStore(config);
+  const initialFailingVectorStore = {
+    ...initialHealthyVectorStore,
+    async upsertRecord() {
+      throw new Error('cm1041 synthetic initial vector projection failure');
+    }
+  };
+  const initialFailingChunkIndexingService = {
+    async indexRecord() {
+      throw new Error('cm1041 synthetic initial chunk projection failure');
+    }
+  };
+  const writeService = new MemoryWriteService({
+    config,
+    diaryStore: new DiaryStore(config),
+    shadowStore,
+    vectorStore: initialFailingVectorStore,
+    auditLogStore,
+    chunkIndexingService: initialFailingChunkIndexingService,
+    executionContextResolver: {
+      resolve: () => ({
+        agentAlias: 'Codex',
+        agentId: 'cm1041-temp-local-fixture-agent',
+        requestSource: 'cm1041-write-reconcile-worker-reopen-test'
+      }),
+      isWritableByCodex: () => true
+    }
+  });
+  const failingReplayService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore: {
+      ...initialHealthyVectorStore,
+      async upsertRecord() {
+        throw new Error('cm1041 synthetic replay vector projection failure');
+      }
+    },
+    chunkIndexingService: {
+      async indexRecord() {
+        throw new Error('cm1041 synthetic replay chunk projection failure');
+      }
+    }
+  });
+  const failingScheduler = new ManualScheduler();
+  const failingWorker = new MemoryWriteReconcileWorker({
+    reconcileService: failingReplayService,
+    scheduler: failingScheduler,
+    intervalMs: 250,
+    limit: 1
+  });
+  let reopenedShadowStore = null;
+  let recoveryWorker = null;
+
+  try {
+    for (const targetPath of [
+      config.dailyNoteRootPath,
+      config.dbPath,
+      config.auditLogPath,
+      config.vectorIndexPath
+    ]) {
+      assertInsideRoot(rootPath, targetPath);
+    }
+
+    const writeResult = await writeService.record(processPayload({
+      title: 'Checkpoint: CM-1041 internal write reconcile worker reopen recovery',
+      task_id: 'CM-1041',
+      conversation_id: 'cm1041-write-reconcile-worker-temp-local-reopen'
+    }));
+
+    assert.equal(writeResult.decision, 'accepted');
+    assert.equal(writeResult.shadowWrite.status, 'degraded');
+    assert.equal((await shadowStore.getHealth()).recordCount, 1);
+    assert.equal((await shadowStore.getHealth()).reconcileCount, 2);
+
+    failingWorker.start({ limit: 1, dryRun: false, maxRuns: 1 });
+    assert.equal(await failingScheduler.flushNext(), true);
+
+    const failedStatus = failingWorker.getStatus();
+    const shadowAfterFailedTick = await shadowStore.getHealth();
+
+    assert.equal(failedStatus.running, false);
+    assert.equal(failedStatus.runCount, 1);
+    assert.equal(failedStatus.lastResultSummary.success, false);
+    assert.equal(failedStatus.lastResultSummary.clearedCount, 0);
+    assert.equal(failedStatus.lastResultSummary.failedCount, 1);
+    assert.equal(shadowAfterFailedTick.recordCount, 1);
+    assert.equal(shadowAfterFailedTick.reconcileCount, 2);
+    assert.equal(shadowAfterFailedTick.chunkCount, 0);
+    assert.equal((await initialHealthyVectorStore.getHealth()).vectorCount, 0);
+
+    await shadowStore.close();
+
+    reopenedShadowStore = new SqliteShadowStore(config);
+    const recoveryVectorStore = new VectorIndexStore(config);
+    const reopenedHealth = await reopenedShadowStore.getHealth();
+
+    assert.equal(reopenedHealth.recordCount, 1);
+    assert.equal(reopenedHealth.reconcileCount, 2);
+    assert.equal(reopenedHealth.chunkCount, 0);
+    assert.equal((await recoveryVectorStore.getHealth()).vectorCount, 0);
+
+    recoveryWorker = new MemoryWriteReconcileWorker({
+      reconcileService: new MemoryWriteReconcileService({
+        shadowStore: reopenedShadowStore,
+        vectorStore: recoveryVectorStore,
+        chunkIndexingService: new ChunkIndexingService({
+          config,
+          shadowStore: reopenedShadowStore,
+          vectorStore: recoveryVectorStore
+        })
+      }),
+      scheduler: new ManualScheduler(),
+      intervalMs: 250,
+      limit: 1
+    });
+
+    recoveryWorker.start({ limit: 1, dryRun: false, maxRuns: 2 });
+    assert.equal(await recoveryWorker.scheduler.flushNext(), true);
+    assert.equal(await recoveryWorker.scheduler.flushNext(), true);
+
+    const recoveredStatus = recoveryWorker.getStatus();
+    const recoveredShadowHealth = await reopenedShadowStore.getHealth();
+    const recoveredVectorHealth = await recoveryVectorStore.getHealth();
+
+    assert.equal(recoveredStatus.running, false);
+    assert.equal(recoveredStatus.timerScheduled, false);
+    assert.equal(recoveredStatus.runCount, 2);
+    assert.equal(recoveredStatus.lastResultSummary.success, true);
+    assert.equal(recoveredStatus.lastResultSummary.clearedCount, 1);
+    assert.equal(recoveredShadowHealth.recordCount, 1);
+    assert.equal(recoveredShadowHealth.reconcileCount, 0);
+    assert.equal(recoveredShadowHealth.chunkCount >= 1, true);
+    assert.equal(recoveredVectorHealth.vectorCount, 1);
+    assert.equal(await pathExists(writeResult.filePath), true);
+    assert.equal(JSON.stringify(recoveredStatus).includes(writeResult.memoryId), false);
+  } finally {
+    failingWorker.stop();
+    if (recoveryWorker) {
+      recoveryWorker.stop();
+    }
+    await shadowStore.close();
+    if (reopenedShadowStore) {
+      await reopenedShadowStore.close();
+    }
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
 test('CM-1037 worker status snapshot is read-only and does not expose raw task results or errors', async () => {
   const scheduler = new ManualScheduler();
   const reconcileService = {

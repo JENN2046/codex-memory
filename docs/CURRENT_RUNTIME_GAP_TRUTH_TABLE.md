@@ -28,6 +28,72 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1041 Memory Write Reconcile Worker Temp-Local Reopen Recovery - 2026-05-25
+
+Result: `CM1041_MEMORY_WRITE_RECONCILE_WORKER_TEMP_LOCAL_REOPEN_RECOVERY_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1041 adds isolated temp-local close/reopen recovery evidence for the default-disabled reconcile worker:
+
+- one synthetic degraded accepted write is created under one temp root
+- deterministic vector/chunk projection failures leave two reconcile tasks visible
+- explicit worker `limit=1`, `dryRun=false`, `maxRuns=1` uses failing replay projections
+- after the failed tick, worker is stopped and timer is cleared
+- failed result summary reports scanned `1`, replayed `0`, cleared `0`, failed `1`
+- reconcile queue count remains `2`
+- vector count remains `0`
+- chunk count remains `0`
+- the original SQLite shadow store is closed
+- a fresh SQLite shadow store reopened on the same temp-local path still sees record count `1`
+- the reopened store still sees reconcile queue count `2`
+- reopened vector and chunk projections remain absent before recovery
+- a new explicit worker `limit=1`, `dryRun=false`, `maxRuns=2` uses healthy replay projections
+- after two recovery ticks, reconcile queue count is `0`
+- SQLite record count is `1`
+- vector count is `1`
+- chunk count is at least `1`
+- worker status does not expose raw memory ids
+- no runtime source file changed
+- no public MCP tool is added
+- no runtime observe command is executed
+- no worker is started by default
+- no startup worker, watchdog integration, or config integration is installed
+
+Validation:
+
+- test syntax check passed
+- CM-1041 targeted worker test `10/10` passed
+- adjacent worker/service/write reliability/MCP regression bundle `29/29` passed
+- full `npm test` `2493/2493` passed
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+worker starts by default = false
+startup reconcile execution = false
+runtime observe execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+real cleanup apply = false
+real rollback apply = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens CM-1040's failed replay retention and recovery proof with persisted queue visibility across shadow store close/reopen.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, runtime observe safety, long-horizon runtime durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1040 Memory Write Reconcile Worker Temp-Local Failure Recovery - 2026-05-25
 
 Result: `CM1040_MEMORY_WRITE_RECONCILE_WORKER_TEMP_LOCAL_FAILURE_RECOVERY_PASSED_NOT_RELIABLE_NOT_READY`.
