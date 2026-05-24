@@ -1,5 +1,35 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1007 Patched True-Live Recall Proof Execution Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-24
+
+Artifact: `docs/CM1007_PATCHED_TRUE_LIVE_RECALL_PROOF_EXECUTION.md`
+
+Completed:
+- Confirmed post-CM-1006 `main` was clean and synced with `origin/main` / remote.
+- Confirmed baseline readiness returned `MEMORY_RELIABILITY_PROOF_BASELINE_READY_NOT_EXECUTED`.
+- Executed exactly one CM0825 patched true-live recall proof through `TrueLiveRecallReadonlyProofRunner` and `TrueLiveRecallExecutorAdapter`.
+- Recorded sanitized execution evidence only.
+
+Validation:
+- Baseline commit: `c171176e48c1bcdb5ed2e6c677f2de994ddb2660`.
+- CM0825 decision: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PASSED_NOT_READY`.
+- Runner decision: `TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY`.
+- Query counts: Q1=`2`, Q2=`4`, Q3=`2`, Q4=`0`.
+- All side-effect counters were zero.
+- `rawContentReturned=false`.
+- Dashboard remained `LOCAL_MEMORY_MAINLINE_NOT_READY` / `NOT_READY_BLOCKED`, governance blocker count `5`.
+- Post-run `git status --short --branch` stayed `main...origin/main`.
+
+Boundary:
+- No `record_memory`, provider/API call, raw memory read, direct `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+
+Next:
+- Run CM0826-style review over this evidence before any blocker downgrade. Do not claim broad recall reliability from this proof alone.
+
 ## CM-1006 CM0825 Patched Recall Proof Runner Boundary Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -1,5 +1,31 @@
 # HANDOFF.md — codex-memory
 
+## CM-1007 Patched True-Live Recall Proof Execution Handoff
+
+Goal: execute one bounded CM0825 patched true-live recall proof after CM-1006 bound the internal runner to the exact approval/query profile.
+
+Status: COMPLETED_VALIDATED_NOT_READY.
+
+Artifact: `docs/CM1007_PATCHED_TRUE_LIVE_RECALL_PROOF_EXECUTION.md`.
+
+Current evidence:
+- Execution baseline: clean synced `main` at `c171176e48c1bcdb5ed2e6c677f2de994ddb2660`.
+- Result: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PASSED_NOT_READY`.
+- Positive result counts: Q1=`2`, Q2=`4`, Q3=`2`.
+- Negative-control result count: Q4=`0`.
+- All side-effect counters were present and zero.
+- `rawContentReturned=false`.
+- Dashboard remained `LOCAL_MEMORY_MAINLINE_NOT_READY` / `NOT_READY_BLOCKED` with governance blocker count `5`.
+
+Not validated:
+- CM0826 blocker downgrade review, broad recall reliability, write reliability, provider-backed quality, long-run behavior, production readiness, release/tag/deploy, real rollback apply.
+
+Remaining risks:
+- This is one exact patched proof shape. It can feed a CM0826 review, but it does not by itself prove `memory recall reliable`, `memory write reliable`, RC readiness, production readiness, V8 implementation, or VCP full parity.
+
+Next safe step:
+- Run a CM0826-style evidence review against CM-1007, preserving no-readiness and no-reliability wording.
+
 ## CM-1006 CM0825 Patched Recall Proof Runner Boundary Handoff
 
 Goal: remove approval-packet/runtime drift before any future patched true-live recall proof by making the internal runner recognize and enforce the CM0825 exact approval profile.
