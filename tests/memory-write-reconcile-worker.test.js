@@ -628,6 +628,202 @@ test('CM-1047 explicit worker runOnce preserves remaining temp-local tasks after
   assert.equal(await pathExists(rootPath), false);
 });
 
+test('CM-1048 explicit worker mixed batch clears successes and retains failed plus unscanned tasks', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1048-worker-mixed-'));
+  const config = createConfig(rootPath);
+  const shadowStore = new SqliteShadowStore(config);
+  const healthyVectorStore = new VectorIndexStore(config);
+  const auditLogStore = new AuditLogStore(config);
+  const initialFailingVectorStore = {
+    ...healthyVectorStore,
+    async upsertRecord() {
+      throw new Error('cm1048 synthetic initial vector projection failure');
+    }
+  };
+  const initialFailingChunkIndexingService = {
+    async indexRecord() {
+      throw new Error('cm1048 synthetic initial chunk projection failure');
+    }
+  };
+  const writeService = new MemoryWriteService({
+    config,
+    diaryStore: new DiaryStore(config),
+    shadowStore,
+    vectorStore: initialFailingVectorStore,
+    auditLogStore,
+    chunkIndexingService: initialFailingChunkIndexingService,
+    executionContextResolver: {
+      resolve: () => ({
+        agentAlias: 'Codex',
+        agentId: 'cm1048-temp-local-fixture-agent',
+        requestSource: 'cm1048-write-reconcile-worker-mixed-batch-test'
+      }),
+      isWritableByCodex: () => true
+    }
+  });
+  const mixedReplayService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore: healthyVectorStore,
+    chunkIndexingService: {
+      async indexRecord() {
+        throw new Error('cm1048 synthetic replay chunk projection failure');
+      }
+    }
+  });
+  const mixedWorker = new MemoryWriteReconcileWorker({
+    reconcileService: mixedReplayService,
+    limit: 2
+  });
+  const recoveryWorker = new MemoryWriteReconcileWorker({
+    reconcileService: new MemoryWriteReconcileService({
+      shadowStore,
+      vectorStore: healthyVectorStore,
+      chunkIndexingService: new ChunkIndexingService({
+        config,
+        shadowStore,
+        vectorStore: healthyVectorStore
+      })
+    }),
+    limit: 3
+  });
+
+  try {
+    for (const targetPath of [
+      config.dailyNoteRootPath,
+      config.dbPath,
+      config.auditLogPath,
+      config.vectorIndexPath
+    ]) {
+      assertInsideRoot(rootPath, targetPath);
+    }
+
+    const firstWrite = await writeService.record(processPayload({
+      title: 'Checkpoint: CM-1048 internal write reconcile worker mixed batch one',
+      task_id: 'CM-1048-A',
+      conversation_id: 'cm1048-write-reconcile-worker-temp-local-a'
+    }));
+    const secondWrite = await writeService.record(processPayload({
+      title: 'Checkpoint: CM-1048 internal write reconcile worker mixed batch two',
+      task_id: 'CM-1048-B',
+      conversation_id: 'cm1048-write-reconcile-worker-temp-local-b'
+    }));
+
+    assert.equal(firstWrite.decision, 'accepted');
+    assert.equal(secondWrite.decision, 'accepted');
+    assert.equal(firstWrite.shadowWrite.status, 'degraded');
+    assert.equal(secondWrite.shadowWrite.status, 'degraded');
+
+    const firstRecord = await shadowStore.getRecord(firstWrite.memoryId);
+    const secondRecord = await shadowStore.getRecord(secondWrite.memoryId);
+    assert.ok(firstRecord);
+    assert.ok(secondRecord);
+
+    await shadowStore.clearReconcileTasks(firstWrite.memoryId);
+    await shadowStore.clearReconcileTasks(secondWrite.memoryId);
+    await shadowStore.enqueueReconcileTask({
+      memoryId: firstWrite.memoryId,
+      storeKind: 'vector',
+      reason: 'cm1048 deterministic first vector replay',
+      payload: firstRecord,
+      createdAt: '2026-05-25T10:48:00.001Z'
+    });
+    await shadowStore.enqueueReconcileTask({
+      memoryId: firstWrite.memoryId,
+      storeKind: 'chunks',
+      reason: 'cm1048 deterministic first chunk replay',
+      payload: firstRecord,
+      createdAt: '2026-05-25T10:48:00.002Z'
+    });
+    await shadowStore.enqueueReconcileTask({
+      memoryId: secondWrite.memoryId,
+      storeKind: 'vector',
+      reason: 'cm1048 deterministic second vector replay',
+      payload: secondRecord,
+      createdAt: '2026-05-25T10:48:00.003Z'
+    });
+    await shadowStore.enqueueReconcileTask({
+      memoryId: secondWrite.memoryId,
+      storeKind: 'chunks',
+      reason: 'cm1048 deterministic second chunk replay',
+      payload: secondRecord,
+      createdAt: '2026-05-25T10:48:00.004Z'
+    });
+
+    const queuedBeforeReplay = await shadowStore.listReconcileTasks(10);
+    assert.deepEqual(queuedBeforeReplay.map(task => `${task.memoryId}:${task.storeKind}`), [
+      `${firstWrite.memoryId}:vector`,
+      `${firstWrite.memoryId}:chunks`,
+      `${secondWrite.memoryId}:vector`,
+      `${secondWrite.memoryId}:chunks`
+    ]);
+
+    const mixedReplay = await mixedWorker.runOnce({ limit: 2, dryRun: false });
+    const mixedStatus = mixedWorker.getStatus();
+    const queuedAfterMixedReplay = await shadowStore.listReconcileTasks(10);
+    const shadowAfterMixedReplay = await shadowStore.getHealth();
+
+    assert.equal(mixedReplay.success, false);
+    assert.equal(mixedReplay.workerDecision, 'run_once_completed');
+    assert.equal(mixedReplay.decision, 'completed_with_failures');
+    assert.equal(mixedReplay.limit, 2);
+    assert.equal(mixedReplay.scannedTaskCount, 2);
+    assert.equal(mixedReplay.replayedCount, 1);
+    assert.equal(mixedReplay.clearedCount, 1);
+    assert.equal(mixedReplay.failedCount, 1);
+    assert.equal(mixedReplay.skippedCount, 0);
+    assert.equal(mixedStatus.running, false);
+    assert.equal(mixedStatus.timerScheduled, false);
+    assert.equal(mixedStatus.runCount, 0);
+    assert.equal(mixedStatus.lastResultSummary.success, false);
+    assert.equal(mixedStatus.lastResultSummary.decision, 'completed_with_failures');
+    assert.equal(mixedStatus.lastResultSummary.scannedTaskCount, 2);
+    assert.equal(mixedStatus.lastResultSummary.replayedCount, 1);
+    assert.equal(mixedStatus.lastResultSummary.clearedCount, 1);
+    assert.equal(mixedStatus.lastResultSummary.failedCount, 1);
+    assert.equal(shadowAfterMixedReplay.recordCount, 2);
+    assert.equal(shadowAfterMixedReplay.reconcileCount, 3);
+    assert.equal(shadowAfterMixedReplay.chunkCount, 0);
+    assert.equal((await healthyVectorStore.getHealth()).vectorCount, 1);
+    assert.deepEqual(queuedAfterMixedReplay.map(task => `${task.memoryId}:${task.storeKind}`), [
+      `${firstWrite.memoryId}:chunks`,
+      `${secondWrite.memoryId}:vector`,
+      `${secondWrite.memoryId}:chunks`
+    ]);
+    assert.equal(JSON.stringify(mixedStatus).includes(firstWrite.memoryId), false);
+    assert.equal(JSON.stringify(mixedStatus).includes(secondWrite.memoryId), false);
+    assert.equal(JSON.stringify(mixedStatus).includes('cm1048 synthetic replay chunk projection failure'), false);
+
+    const recoveryReplay = await recoveryWorker.runOnce({ limit: 3, dryRun: false });
+    const recoveryStatus = recoveryWorker.getStatus();
+    const shadowAfterRecovery = await shadowStore.getHealth();
+    const vectorAfterRecovery = await healthyVectorStore.getHealth();
+
+    assert.equal(recoveryReplay.success, true);
+    assert.equal(recoveryReplay.scannedTaskCount, 3);
+    assert.equal(recoveryReplay.replayedCount, 3);
+    assert.equal(recoveryReplay.clearedCount, 3);
+    assert.equal(recoveryReplay.failedCount, 0);
+    assert.equal(recoveryStatus.running, false);
+    assert.equal(recoveryStatus.timerScheduled, false);
+    assert.equal(recoveryStatus.runCount, 0);
+    assert.equal(shadowAfterRecovery.recordCount, 2);
+    assert.equal(shadowAfterRecovery.reconcileCount, 0);
+    assert.equal(shadowAfterRecovery.chunkCount >= 2, true);
+    assert.equal(vectorAfterRecovery.vectorCount, 2);
+    assert.equal(await pathExists(firstWrite.filePath), true);
+    assert.equal(await pathExists(secondWrite.filePath), true);
+    assert.equal(JSON.stringify(recoveryStatus).includes(firstWrite.memoryId), false);
+    assert.equal(JSON.stringify(recoveryStatus).includes(secondWrite.memoryId), false);
+  } finally {
+    mixedWorker.stop();
+    recoveryWorker.stop();
+    await shadowStore.close();
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
 test('CM-1040 worker retains failed temp-local reconcile tasks and later drains them after recovery', async () => {
   const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1040-worker-recovery-'));
   const config = createConfig(rootPath);

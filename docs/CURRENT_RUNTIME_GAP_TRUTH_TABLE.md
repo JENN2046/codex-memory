@@ -28,6 +28,67 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1048 Memory Write Reconcile Worker Mixed Batch Temp-Local Evidence - 2026-05-25
+
+Result: `CM1048_MEMORY_WRITE_RECONCILE_WORKER_MIXED_BATCH_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.
+
+CM-1048 adds isolated temp-local mixed-batch evidence for the internal write reconcile worker:
+
+- a test creates two synthetic degraded accepted writes under an isolated temp root
+- four deterministic temp-local vector/chunk replay tasks are queued with explicit `createdAt` order
+- the test explicitly calls internal worker `runOnce({ dryRun: false, limit: 2 })`
+- the first bounded run uses healthy vector replay and failing chunk replay
+- the first bounded run scans `2`, replays `1`, clears `1`, and fails `1`
+- reconcile count remains `3` after the first bounded run
+- the failed chunk task and two unscanned tasks remain queued
+- worker status remains stopped/no timer/runCount `0`
+- worker status summary contains no raw memory ids or raw projection error text
+- a second explicit healthy `runOnce({ dryRun: false, limit: 3 })` drains the remaining three tasks
+- final reconcile count is `0`, vector count is `2`, and chunk count is at least `2`
+- no scheduled worker loop is started
+
+Validation:
+
+- test syntax check passed
+- targeted memory write reconcile worker test `12/12` passed
+- adjacent worker/service/write reliability/MCP regression bundle `31/31` passed
+- full `npm test` `2498/2498` passed
+
+Boundary:
+
+```text
+worker source changed = false
+synthetic temp-local accepted writes = 2
+synthetic temp-local queued replay tasks = 4
+explicit internal worker runOnce calls = 2
+first run limit = 2
+first run replayed tasks = 1
+first run failed tasks = 1
+first run remaining reconcile tasks = 3
+second run remaining reconcile tasks = 0
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+scheduled worker loop started = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow mixed-batch boundary gap: a bounded run with one success and one failure may clear successful work, but failed and unscanned tasks remain visible for later recovery.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1047 Memory Write Reconcile Worker Partial Batch Temp-Local Evidence - 2026-05-25
 
 Result: `CM1047_MEMORY_WRITE_RECONCILE_WORKER_PARTIAL_BATCH_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.

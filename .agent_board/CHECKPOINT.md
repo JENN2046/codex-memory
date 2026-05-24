@@ -1,5 +1,38 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1048 Memory Write Reconcile Worker Mixed Batch Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_MIXED_BATCH_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1048_MEMORY_WRITE_RECONCILE_WORKER_MIXED_BATCH_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added a temp-local mixed-batch worker test to `tests/memory-write-reconcile-worker.test.js`.
+- Created two synthetic degraded accepted writes under an isolated temp root.
+- Re-enqueued four deterministic replay tasks ordered as first vector, first chunks, second vector, second chunks.
+- Called internal worker `runOnce({ dryRun: false, limit: 2 })` with healthy vector replay and failing chunk replay.
+- Verified the first bounded run scanned `2`, replayed `1`, cleared `1`, failed `1`, and left reconcile count `3`.
+- Verified the failed chunk task and the two unscanned second-record tasks stayed queued.
+- Verified worker status remained stopped/no timer/runCount `0`.
+- Verified status omitted raw memory ids and raw projection error text.
+- Called a second explicit healthy `runOnce({ dryRun: false, limit: 3 })`.
+- Verified the remaining queue drained, vector count reached `2`, and chunk count was at least `2`.
+
+Validation:
+- Test syntax check passed.
+- Targeted memory write reconcile worker test passed `12/12`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `31/31`.
+- Full `npm test` passed `2498/2498`.
+
+Boundary:
+- Controlled temp-local mixed-batch evidence only.
+- No runtime source change, existing 7605 change, public MCP expansion, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, scheduled loop start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1047 Memory Write Reconcile Worker Partial Batch Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_PARTIAL_BATCH_NOT_RELIABLE_NOT_READY`
