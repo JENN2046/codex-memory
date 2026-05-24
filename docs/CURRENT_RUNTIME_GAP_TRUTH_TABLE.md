@@ -28,6 +28,59 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1018 Public Default Search Coverage Proof - 2026-05-25
+
+Result: `CM1018_PUBLIC_DEFAULT_SEARCH_COVERAGE_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1018 records bounded public/default `search_memory` coverage over three known accepted process-write id hashes:
+
+- [CM1018_PUBLIC_DEFAULT_SEARCH_COVERAGE_PROOF.md](/A:/codex-memory/docs/CM1018_PUBLIC_DEFAULT_SEARCH_COVERAGE_PROOF.md)
+
+Coverage facts:
+
+```text
+proofBaselineCommit = bdd10bdb904b124eb1a4d412df7e46462e5358a7
+proofRunId = CM1018-bdd10bd-public-default-search-coverage
+decision = PUBLIC_DEFAULT_SEARCH_COVERAGE_PASSED_NOT_READY
+boundaryStatus = PUBLIC_DEFAULT_SEARCH_COVERAGE_ACCEPTED_NOT_READY
+markerCount = 2
+```
+
+Marker facts:
+
+```text
+CM-1015-proof-marker:
+  matchMode = top_result_matches_expected
+  topResultIdHashOrStableOpaqueId = 6b158de28cb1166e
+
+store-freshness-family:
+  matchMode = all_expected_ids_present_in_results
+  matchedExpectedIds = 449633a01f7c2db6, 3b9263b32c973db5
+```
+
+Side-effect boundary:
+
+```text
+searchMemoryCalls = 2
+syncCalls = 2
+rawDurableMemoryReads = 2
+durableRecallAuditWrites = 2
+candidateCacheWrites = 2
+candidateCacheFlushes = 4
+vectorFlushes = 10
+embeddingCacheWrites = 8
+recordMemoryCalls/provider/api/public MCP/config/package/release counters = all zero
+raw output printed = false
+readiness/reliability claims = all false
+```
+
+Operator interpretation:
+
+- This proves three known accepted process-write ids are visible through two prebound default public `search_memory` queries with `include_content=false`.
+- This is stronger than CM-1017 for default public-path coverage, but it intentionally records normal local recall audit/cache/vector/embedding side effects.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, broad write-to-recall reliability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `complete?` remains `no`.
+
 ## CM-1017 Multi-Marker Write-To-Recall Coverage Proof - 2026-05-25
 
 Result: `CM1017_MULTI_MARKER_WRITE_TO_RECALL_COVERAGE_PASSED_NOT_RELIABLE_NOT_READY`.

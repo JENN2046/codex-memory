@@ -1,5 +1,33 @@
 # HANDOFF.md — codex-memory
 
+## CM-1018 Public Default Search Coverage Proof Handoff
+
+Goal: verify whether known accepted process writes can be recalled through bounded default public `search_memory` marker queries, and add a fail-closed coverage boundary so public default coverage evidence cannot be consumed as reliability/readiness.
+
+Status: COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1018_PUBLIC_DEFAULT_SEARCH_COVERAGE_PROOF.md`.
+
+Current evidence:
+- Current proof baseline: `bdd10bdb904b124eb1a4d412df7e46462e5358a7`.
+- Two exact marker queries ran through default `app.callTool('search_memory', { include_content: false })`.
+- CM-1015 proof marker top result id hash was `6b158de28cb1166e`.
+- Store-freshness family sanitized results contained expected ids `449633a01f7c2db6` and `3b9263b32c973db5`.
+- Side-effect counters recorded `searchMemoryCalls=2`, `syncCalls=2`, `rawDurableMemoryReads=2`, `durableRecallAuditWrites=2`, `candidateCacheWrites=2`, `candidateCacheFlushes=4`, `vectorFlushes=10`, and `embeddingCacheWrites=8`.
+- Forbidden counters were zero, raw output was not printed, and `PublicDefaultSearchCoverageBoundary` accepted the result as `PUBLIC_DEFAULT_SEARCH_COVERAGE_ACCEPTED_NOT_READY`.
+- Targeted tests passed `20/20`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, multi-client behavior, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is bounded marker coverage over known process-write ids, not broad public-search reliability.
+- The proof intentionally uses default public `search_memory`; unlike CM-1017, it has local recall audit/cache/vector/embedding side effects.
+- Default search responses may contain raw fields internally, but this proof output recorded only hashes/counts and did not print raw result content.
+
+Next safe step:
+- Continue bounded reliability coverage or shift to governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1017 Multi-Marker Write-To-Recall Coverage Proof Handoff
 
 Goal: verify whether multiple known accepted process writes can be recalled through prebound internal no-raw marker queries, and add a fail-closed coverage boundary so bounded coverage evidence cannot be consumed as reliability/readiness.

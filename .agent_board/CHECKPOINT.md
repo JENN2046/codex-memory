@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1018 Public Default Search Coverage Proof Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1018_PUBLIC_DEFAULT_SEARCH_COVERAGE_PROOF.md`
+
+Completed:
+- Added `PublicDefaultSearchCoverageBoundary` as a pure explicit-input/no-side-effect review helper.
+- Added targeted tests proving public/default search evidence is accepted only when counters, raw-output flags, marker match modes, and no-readiness/no-reliability claims are complete.
+- Executed exactly two default public `search_memory` marker queries with `include_content=false`.
+- Recorded CM-1015 proof marker top-result match for `6b158de28cb1166e`.
+- Recorded store-freshness family coverage containing expected ids `449633a01f7c2db6` and `3b9263b32c973db5`.
+- Consumed the sanitized result through the new boundary; boundary accepted it as not-ready coverage evidence with no blockers.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted public-default/continuity/MCP tests passed `20/20`.
+- Coverage proof returned `PUBLIC_DEFAULT_SEARCH_COVERAGE_PASSED_NOT_READY`.
+- Coverage boundary returned `PUBLIC_DEFAULT_SEARCH_COVERAGE_ACCEPTED_NOT_READY`.
+
+Boundary:
+- Exactly two public/default `search_memory` calls occurred.
+- Allowed local default-search side effects were recorded: `syncCalls=2`, `rawDurableMemoryReads=2`, `durableRecallAuditWrites=2`, `candidateCacheWrites=2`, `candidateCacheFlushes=4`, `vectorFlushes=10`, and `embeddingCacheWrites=8`.
+- No `record_memory`, provider/API call, raw output print, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+- Node emitted the SQLite experimental warning; it did not affect proof counters, mutation state, or no-raw-output boundary.
+
+Next:
+- Continue bounded reliability coverage toward multi-client behavior, long-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, and public/default search reliability remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1017 Multi-Marker Write-To-Recall Coverage Proof Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
