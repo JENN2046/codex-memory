@@ -288,6 +288,77 @@ class SqliteShadowStore {
     return rows.map(row => this.mapRow(row));
   }
 
+  async getWritePreflightCandidates({ target, allowedScope = {}, limit = 100 } = {}) {
+    await this.ensureReady();
+    this.refreshMemoryRecordColumnInfo();
+
+    const normalizedTarget = String(target || '').trim().toLowerCase();
+    if (normalizedTarget !== 'process' && normalizedTarget !== 'knowledge') {
+      return [];
+    }
+
+    const normalizedLimit = Number.isInteger(limit) && limit > 0 ? limit : 100;
+    const hasStatus = this.hasMemoryRecordColumn('status');
+    const whereClauses = ['target = ?'];
+    const params = [normalizedTarget];
+    const normalizeScopeValue = value => typeof value === 'string' ? value.trim() : '';
+    const addScopeGuard = (columnName, scopeKey) => {
+      const expectedValue = normalizeScopeValue(
+        allowedScope[scopeKey] || allowedScope[scopeKey.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`)]
+      );
+      if (!expectedValue) {
+        whereClauses.push(`(${columnName} IS NULL OR ${columnName} = '')`);
+        return;
+      }
+      whereClauses.push(`${columnName} = ?`);
+      params.push(expectedValue);
+    };
+
+    addScopeGuard('project_id', 'projectId');
+    addScopeGuard('workspace_id', 'workspaceId');
+    addScopeGuard('client_id', 'clientId');
+    addScopeGuard('task_id', 'taskId');
+    addScopeGuard('conversation_id', 'conversationId');
+    addScopeGuard('visibility', 'visibility');
+    addScopeGuard('retention_policy', 'retentionPolicy');
+
+    const rows = this.db.prepare(`
+      SELECT memory_id, target, title, content, evidence, tags_json,
+        project_id, workspace_id, client_id, task_id, conversation_id, visibility, retention_policy
+        ${hasStatus ? ', status' : ''}
+      FROM memory_records
+      WHERE ${whereClauses.join(' AND ')}
+      ORDER BY updated_at DESC
+      LIMIT ?
+    `).all(...params, normalizedLimit);
+
+    return rows.map(row => {
+      let tags = [];
+      try {
+        tags = JSON.parse(row.tags_json || '[]');
+      } catch {
+        tags = [];
+      }
+
+      return {
+        memoryId: row.memory_id,
+        target: row.target,
+        title: row.title,
+        content: row.content,
+        evidence: row.evidence,
+        tags,
+        projectId: row.project_id || null,
+        workspaceId: row.workspace_id || null,
+        clientId: row.client_id || null,
+        taskId: row.task_id || null,
+        conversationId: row.conversation_id || null,
+        visibility: row.visibility || null,
+        retentionPolicy: row.retention_policy || null,
+        lifecycleStatus: hasStatus ? (row.status || null) : null
+      };
+    });
+  }
+
   async getRecordsByIds(memoryIds = []) {
     await this.ensureReady();
     const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
