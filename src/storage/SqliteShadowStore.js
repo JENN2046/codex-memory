@@ -626,6 +626,153 @@ class SqliteShadowStore {
     };
   }
 
+  async applySupersedePair({
+    oldMemoryId,
+    newMemoryId,
+    oldFromStatus,
+    oldToStatus,
+    newFromStatus,
+    newToStatus,
+    updatedAt,
+    actorClientId = null,
+    reason = null,
+    expectedOldClientId = null,
+    expectedOldVisibility = null,
+    expectedNewClientId = null,
+    expectedNewVisibility = null,
+    supersedesLink = null,
+    supersededByLink = null
+  }) {
+    await this.ensureReady();
+    this.refreshMemoryRecordColumnInfo();
+    if (!this.hasMemoryRecordColumn('status')) {
+      return { updated: false, reason: 'missing_status_column' };
+    }
+    if (!this.hasMemoryRecordColumn('client_id') || !this.hasMemoryRecordColumn('visibility')) {
+      return { updated: false, reason: 'missing_policy_guard_column' };
+    }
+    if (!this.hasMemoryRecordColumn('supersedes_memory_id') || !this.hasMemoryRecordColumn('superseded_by_memory_id')) {
+      return { updated: false, reason: 'missing_supersede_link_column' };
+    }
+
+    const normalizedOldMemoryId = typeof oldMemoryId === 'string' ? oldMemoryId.trim() : '';
+    const normalizedNewMemoryId = typeof newMemoryId === 'string' ? newMemoryId.trim() : '';
+    if (!normalizedOldMemoryId || !normalizedNewMemoryId) {
+      return { updated: false, reason: 'missing_pair_memory_id' };
+    }
+    if (normalizedOldMemoryId === normalizedNewMemoryId) {
+      return { updated: false, reason: 'same_memory_id_not_allowed' };
+    }
+
+    const buildAssignments = ({ toStatusValue, linkAssignments = [] }) => {
+      const assignments = ['status = ?', 'updated_at = ?'];
+      const params = [toStatusValue, updatedAt];
+
+      if (this.hasMemoryRecordColumn('lifecycle_updated_at')) {
+        assignments.push('lifecycle_updated_at = ?');
+        params.push(updatedAt);
+      }
+      if (this.hasMemoryRecordColumn('lifecycle_actor_client_id')) {
+        assignments.push('lifecycle_actor_client_id = ?');
+        params.push(actorClientId);
+      }
+      if (this.hasMemoryRecordColumn('status_reason')) {
+        assignments.push('status_reason = ?');
+        params.push(reason);
+      }
+
+      for (const [columnName, value] of linkAssignments) {
+        assignments.push(`${columnName} = ?`);
+        params.push(value);
+      }
+
+      return { assignments, params };
+    };
+
+    const addExpectedGuard = (whereClauses, whereParams, columnName, expectedValue) => {
+      const normalized = typeof expectedValue === 'string' ? expectedValue.trim() : '';
+      if (!normalized) {
+        whereClauses.push(`(${columnName} IS NULL OR ${columnName} = '')`);
+        return;
+      }
+      whereClauses.push(`${columnName} = ?`);
+      whereParams.push(normalized);
+    };
+
+    const buildWhere = ({ memoryId, fromStatusValue, expectedClientId, expectedVisibility }) => {
+      const whereClauses = ['memory_id = ?', 'status = ?'];
+      const whereParams = [memoryId, fromStatusValue];
+      addExpectedGuard(whereClauses, whereParams, 'client_id', expectedClientId);
+      addExpectedGuard(whereClauses, whereParams, 'visibility', expectedVisibility);
+      return { whereClauses, whereParams };
+    };
+
+    const oldUpdate = buildAssignments({
+      toStatusValue: oldToStatus,
+      linkAssignments: [['superseded_by_memory_id', supersededByLink || normalizedNewMemoryId]]
+    });
+    const newUpdate = buildAssignments({
+      toStatusValue: newToStatus,
+      linkAssignments: [['supersedes_memory_id', supersedesLink || normalizedOldMemoryId]]
+    });
+    const oldWhere = buildWhere({
+      memoryId: normalizedOldMemoryId,
+      fromStatusValue: oldFromStatus,
+      expectedClientId: expectedOldClientId,
+      expectedVisibility: expectedOldVisibility
+    });
+    const newWhere = buildWhere({
+      memoryId: normalizedNewMemoryId,
+      fromStatusValue: newFromStatus,
+      expectedClientId: expectedNewClientId,
+      expectedVisibility: expectedNewVisibility
+    });
+
+    const oldStatement = this.db.prepare(`
+      UPDATE memory_records
+      SET ${oldUpdate.assignments.join(', ')}
+      WHERE ${oldWhere.whereClauses.join(' AND ')}
+    `);
+    const newStatement = this.db.prepare(`
+      UPDATE memory_records
+      SET ${newUpdate.assignments.join(', ')}
+      WHERE ${newWhere.whereClauses.join(' AND ')}
+    `);
+
+    try {
+      this.db.exec('BEGIN IMMEDIATE');
+      const oldResult = oldStatement.run(...oldUpdate.params, ...oldWhere.whereParams);
+      if (oldResult.changes !== 1) {
+        this.db.exec('ROLLBACK');
+        return { updated: false, reason: 'old_record_guard_failed', oldChanges: oldResult.changes, newChanges: 0 };
+      }
+
+      const newResult = newStatement.run(...newUpdate.params, ...newWhere.whereParams);
+      if (newResult.changes !== 1) {
+        this.db.exec('ROLLBACK');
+        return { updated: false, reason: 'new_record_guard_failed', oldChanges: oldResult.changes, newChanges: newResult.changes };
+      }
+
+      this.db.exec('COMMIT');
+      return {
+        updated: true,
+        oldChanges: oldResult.changes,
+        newChanges: newResult.changes,
+        changes: oldResult.changes + newResult.changes
+      };
+    } catch (error) {
+      try {
+        this.db.exec('ROLLBACK');
+      } catch {
+      }
+      return {
+        updated: false,
+        reason: 'pair_update_failed',
+        error: error.message
+      };
+    }
+  }
+
   normalizePathFilters(raw) {
     const values = Array.isArray(raw) ? raw : [];
     return [...new Set(values

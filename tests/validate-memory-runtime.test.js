@@ -11,7 +11,7 @@ const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 const { AuditLogStore } = require('../src/storage/AuditLogStore');
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
 
-function createMemoryRecordsTable(dbPath, { withStatus = true } = {}) {
+function createMemoryRecordsTable(dbPath, { withStatus = true, withSupersedeLinks = true } = {}) {
   const db = new DatabaseSync(dbPath);
   try {
     db.exec(`
@@ -40,8 +40,8 @@ function createMemoryRecordsTable(dbPath, { withStatus = true } = {}) {
         ${withStatus ? `,
         status TEXT,
         status_reason TEXT,
-        supersedes_memory_id TEXT,
-        superseded_by_memory_id TEXT,
+        ${withSupersedeLinks ? 'supersedes_memory_id TEXT,' : ''}
+        ${withSupersedeLinks ? 'superseded_by_memory_id TEXT,' : ''}
         tombstone_reason TEXT,
         lifecycle_updated_at TEXT,
         lifecycle_actor_client_id TEXT` : ''}
@@ -221,6 +221,115 @@ test('updateLifecycleStatus writes tombstone_reason through the single-record li
     assert.equal(row.tombstone_reason, 'retention-expired');
     assert.equal(row.lifecycle_updated_at, '2026-05-23T09:30:00.000Z');
     assert.equal(row.lifecycle_actor_client_id, 'codex');
+  });
+});
+
+test('applySupersedePair atomically updates old/new records with lifecycle metadata and bidirectional links', async () => {
+  await withService({
+    records: [
+      { memoryId: 'mem-old', status: 'active', clientId: 'codex', visibility: 'project', title: 'Old record' },
+      { memoryId: 'mem-new', status: 'proposal', clientId: 'codex', visibility: 'project', title: 'New record' }
+    ]
+  }, async ({ config, shadowStore }) => {
+    const result = await shadowStore.applySupersedePair({
+      oldMemoryId: 'mem-old',
+      newMemoryId: 'mem-new',
+      oldFromStatus: 'active',
+      oldToStatus: 'superseded',
+      newFromStatus: 'proposal',
+      newToStatus: 'active',
+      updatedAt: '2026-05-24T12:00:00.000Z',
+      actorClientId: 'codex',
+      reason: 'replacement memory approved after pair review',
+      expectedOldClientId: 'codex',
+      expectedOldVisibility: 'project',
+      expectedNewClientId: 'codex',
+      expectedNewVisibility: 'project',
+      supersedesLink: 'mem-old',
+      supersededByLink: 'mem-new'
+    });
+    const oldRow = getRecordRow(config.dbPath, 'mem-old');
+    const newRow = getRecordRow(config.dbPath, 'mem-new');
+
+    assert.equal(result.updated, true);
+    assert.equal(result.changes, 2);
+    assert.equal(oldRow.status, 'superseded');
+    assert.equal(oldRow.status_reason, 'replacement memory approved after pair review');
+    assert.equal(oldRow.superseded_by_memory_id, 'mem-new');
+    assert.equal(oldRow.lifecycle_updated_at, '2026-05-24T12:00:00.000Z');
+    assert.equal(oldRow.lifecycle_actor_client_id, 'codex');
+    assert.equal(newRow.status, 'active');
+    assert.equal(newRow.status_reason, 'replacement memory approved after pair review');
+    assert.equal(newRow.supersedes_memory_id, 'mem-old');
+    assert.equal(newRow.lifecycle_updated_at, '2026-05-24T12:00:00.000Z');
+    assert.equal(newRow.lifecycle_actor_client_id, 'codex');
+  });
+});
+
+test('applySupersedePair fails closed and leaves no half-applied pair when the second guard fails', async () => {
+  await withService({
+    records: [
+      { memoryId: 'mem-old', status: 'active', clientId: 'codex', visibility: 'project', title: 'Old record' },
+      { memoryId: 'mem-new', status: 'proposal', clientId: 'codex', visibility: 'project', title: 'New record' }
+    ]
+  }, async ({ config, shadowStore }) => {
+    const result = await shadowStore.applySupersedePair({
+      oldMemoryId: 'mem-old',
+      newMemoryId: 'mem-new',
+      oldFromStatus: 'active',
+      oldToStatus: 'superseded',
+      newFromStatus: 'proposal',
+      newToStatus: 'active',
+      updatedAt: '2026-05-24T12:05:00.000Z',
+      actorClientId: 'codex',
+      reason: 'replacement memory approved after pair review',
+      expectedOldClientId: 'codex',
+      expectedOldVisibility: 'project',
+      expectedNewClientId: 'claude',
+      expectedNewVisibility: 'project',
+      supersedesLink: 'mem-old',
+      supersededByLink: 'mem-new'
+    });
+    const oldRow = getRecordRow(config.dbPath, 'mem-old');
+    const newRow = getRecordRow(config.dbPath, 'mem-new');
+
+    assert.equal(result.updated, false);
+    assert.equal(result.reason, 'new_record_guard_failed');
+    assert.equal(oldRow.status, 'active');
+    assert.equal(oldRow.superseded_by_memory_id, null);
+    assert.equal(newRow.status, 'proposal');
+    assert.equal(newRow.supersedes_memory_id, null);
+  });
+});
+
+test('applySupersedePair rejects same-memory pair inputs', async () => {
+  await withService({
+    records: [
+      { memoryId: 'mem-old', status: 'active', clientId: 'codex', visibility: 'project', title: 'Old record' }
+    ]
+  }, async ({ config, shadowStore }) => {
+    const result = await shadowStore.applySupersedePair({
+      oldMemoryId: 'mem-old',
+      newMemoryId: 'mem-old',
+      oldFromStatus: 'active',
+      oldToStatus: 'superseded',
+      newFromStatus: 'active',
+      newToStatus: 'active',
+      updatedAt: '2026-05-24T12:10:00.000Z',
+      actorClientId: 'codex',
+      reason: 'replacement memory approved after pair review',
+      expectedOldClientId: 'codex',
+      expectedOldVisibility: 'project',
+      expectedNewClientId: 'codex',
+      expectedNewVisibility: 'project',
+      supersedesLink: 'mem-old',
+      supersededByLink: 'mem-old'
+    });
+    const oldRow = getRecordRow(config.dbPath, 'mem-old');
+
+    assert.equal(result.updated, false);
+    assert.equal(result.reason, 'same_memory_id_not_allowed');
+    assert.equal(oldRow.status, 'active');
   });
 });
 
