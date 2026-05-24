@@ -28,6 +28,58 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1035 Memory Write Reconcile Service Internal Idle - 2026-05-25
+
+Result: `CM1035_MEMORY_WRITE_RECONCILE_SERVICE_INTERNAL_IDLE_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1035 adds an internal default-idle reconcile replay service:
+
+- `MemoryWriteReconcileService` supports bounded `replayPending({ limit, dryRun })`
+- the app exposes it only as `app.services.memoryWriteReconcileService`
+- no public MCP tool is added
+- `memory_write_reconcile` remains rejected by public `callTool()`
+- dry-run reports queued tasks without mutating projections or clearing queue state
+- explicit replay supports queued `sqlite`, `vector`, and `chunks` projections
+- malformed tasks fail closed and remain queued
+- scan limit is bounded
+- no startup worker or automatic reconcile loop is installed
+
+Validation:
+
+- source/app/test syntax checks passed
+- CM-1035 targeted test `5/5` passed
+- degraded replay/cleanup/restart/write reliability/MCP adjacent regression bundle `22/22` passed
+- full `npm test` `2483/2483` passed
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+automatic reconcile worker = false
+startup reconcile execution = false
+package/config/watchdog/startup change = false
+real cleanup apply = false
+real rollback apply = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This moves CM-1034 explicit replay evidence into a reusable internal service surface.
+- This proves bounded temp-local dry-run and explicit replay behavior for queued sqlite/vector/chunk projection tasks.
+- This does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, real cleanup safety, real rollback safety, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, automatic degraded recovery, long-run durability, rollback readiness, governance closure, and real rollback safety remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1034 Memory Write Degraded Reconcile Replay Temp-Local Evidence - 2026-05-25
 
 Result: `CM1034_MEMORY_WRITE_DEGRADED_RECONCILE_REPLAY_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.

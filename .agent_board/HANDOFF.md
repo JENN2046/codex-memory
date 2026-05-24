@@ -1,5 +1,37 @@
 # HANDOFF.md — codex-memory
 
+## CM-1035 Memory Write Reconcile Service Internal Idle Handoff
+
+Goal: add a bounded internal default-idle service for explicit write reconcile queue replay, without adding a public MCP tool, startup worker, automatic recovery claim, or readiness/reliability claim.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_SERVICE_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1035_MEMORY_WRITE_RECONCILE_SERVICE_INTERNAL_IDLE.md`.
+
+Current evidence:
+- Source artifact: `src/core/MemoryWriteReconcileService.js`.
+- App wiring: `app.services.memoryWriteReconcileService` only.
+- Test artifact: `tests/memory-write-reconcile-service.test.js`.
+- Public MCP remains frozen to `record_memory`, `search_memory`, and `memory_overview`.
+- `app.callTool('memory_write_reconcile')` rejects with `Unknown tool`.
+- Dry-run over queued temp-local vector/chunk tasks reports `would_replay` without mutating projections or clearing queue entries.
+- Non-dry-run replay restores sqlite/vector/chunk projections through healthy temp-local services and clears the corresponding queue entries.
+- Malformed queued tasks report failure and remain queued.
+- CM-1035 test passed `5/5`.
+- Degraded replay/cleanup/restart/write reliability/MCP adjacent regression bundle passed `22/22`.
+- Full `npm test` passed `2483/2483`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, automatic reconcile worker behavior, real degraded projection recovery, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is an internal default-idle service, not automatic degraded recovery.
+- It does not prove real degraded recovery safety, real cleanup safety, real rollback safety, or queue processing in long-running runtime conditions.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward worker design review, longer-horizon durability, or governance remediation. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1034 Memory Write Degraded Reconcile Replay Temp-Local Evidence Handoff
 
 Goal: verify degraded accepted synthetic write reconcile payload replay in isolated temp-local stores, without claiming automatic reconcile processing, broad reliability/readiness, or real degraded recovery safety.

@@ -1,5 +1,38 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1035 Memory Write Reconcile Service Internal Idle Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_SERVICE_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1035_MEMORY_WRITE_RECONCILE_SERVICE_INTERNAL_IDLE.md`
+
+Completed:
+- Added `src/core/MemoryWriteReconcileService.js`.
+- Mounted the service only as `app.services.memoryWriteReconcileService`.
+- Kept public `callTool()` and `TOOL_DEFINITIONS` frozen to `record_memory`, `search_memory`, and `memory_overview`.
+- Added bounded `replayPending({ limit, dryRun })` support for queued `sqlite`, `vector`, and `chunks` reconcile tasks.
+- Verified dry-run reports queued vector/chunk tasks without mutating projections or clearing the queue.
+- Verified explicit replay restores sqlite/vector/chunk projections and clears corresponding queued tasks in isolated temp-local stores.
+- Verified malformed queued tasks fail closed and remain queued.
+- Verified `memory_write_reconcile` is not a public MCP tool.
+
+Validation:
+- Source/app/test syntax checks passed.
+- CM-1035 targeted service test passed `5/5`.
+- Degraded replay/cleanup/restart/write reliability/MCP adjacent regression bundle passed `22/22`.
+- Full `npm test` passed `2483/2483`.
+
+Boundary:
+- Internal default-idle service only.
+- Temp-local store paths only in tests.
+- No true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, automatic reconcile worker, startup reconcile execution, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, reconcile replay posture, or public MCP boundary.
+
+Next:
+- Continue bounded write reliability closure toward worker design review, longer-horizon durability, or governance remediation. Broad write reliability, automatic degraded recovery, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1034 Memory Write Degraded Reconcile Replay Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_DEGRADED_RECONCILE_REPLAY_NOT_RELIABLE_NOT_READY`

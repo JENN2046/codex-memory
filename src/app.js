@@ -3,6 +3,7 @@ const { ExecutionContextResolver } = require('./core/ExecutionContextResolver');
 const { buildInternalRuntimeEntryPayload } = require('./core/InternalRuntimeEntryGate');
 const { RecallEnhancer } = require('./core/RecallEnhancer');
 const { MemoryWriteService } = require('./core/MemoryWriteService');
+const { MemoryWriteReconcileService } = require('./core/MemoryWriteReconcileService');
 const { ValidateMemoryService } = require('./core/ValidateMemoryService');
 const { TombstoneMemoryService } = require('./core/TombstoneMemoryService');
 const { SupersedeMemoryService } = require('./core/SupersedeMemoryService');
@@ -603,6 +604,11 @@ function createCodexMemoryApplication(overrides = {}) {
     writePreflightEnabled: config.enableWritePreflight === true,
     writePreflightCandidateProvider: request => getDefaultWritePreflightCandidates(shadowStore, request)
   });
+  const memoryWriteReconcileService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore,
+    chunkIndexingService
+  });
   const validateMemoryService = new ValidateMemoryService({
     config,
     shadowStore,
@@ -740,6 +746,7 @@ function createCodexMemoryApplication(overrides = {}) {
     },
     services: {
       writeService,
+      memoryWriteReconcileService,
       validateMemoryService,
       tombstoneMemoryService,
       supersedeMemoryService,
