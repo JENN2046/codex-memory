@@ -276,6 +276,111 @@ test('CM-1036 explicit worker start schedules bounded non-overlapping replay and
   assert.equal(calls.length, 1);
 });
 
+test('CM-1038 worker keeps bounded scheduled loop non-overlapping across multiple ticks', async () => {
+  const calls = [];
+  const scheduler = new ManualScheduler();
+  let releaseFirstReplay = null;
+  const reconcileService = {
+    async replayPending(options) {
+      const callIndex = calls.length + 1;
+      calls.push({ callIndex, ...options });
+
+      if (callIndex === 1) {
+        return new Promise(resolve => {
+          releaseFirstReplay = () => resolve({
+            success: false,
+            decision: 'completed_with_failures',
+            dryRun: options.dryRun === true,
+            limit: options.limit,
+            scannedTaskCount: 1,
+            replayedCount: 0,
+            wouldReplayCount: 0,
+            clearedCount: 0,
+            failedCount: 1,
+            skippedCount: 0,
+            error: 'cm1038 raw first replay failure for codex-process-cm1038',
+            results: [{ memoryId: 'codex-process-cm1038-raw-result' }]
+          });
+        });
+      }
+
+      return {
+        success: true,
+        decision: 'completed',
+        dryRun: options.dryRun === true,
+        limit: options.limit,
+        scannedTaskCount: 1,
+        replayedCount: 1,
+        wouldReplayCount: 0,
+        clearedCount: 1,
+        failedCount: 0,
+        skippedCount: 0,
+        results: [{ memoryId: 'codex-process-cm1038-second-raw-result' }]
+      };
+    }
+  };
+  const worker = new MemoryWriteReconcileWorker({
+    reconcileService,
+    scheduler,
+    intervalMs: 250,
+    limit: 11
+  });
+
+  worker.start({ dryRun: true, maxRuns: 2 });
+  assert.equal(worker.isRunning(), true);
+  assert.equal(scheduler.activeCount, 1);
+
+  const firstFlush = scheduler.flushNext();
+
+  assert.equal(calls.length, 1);
+  assert.equal(worker.getStatus().tickInFlight, true);
+  assert.equal(worker.getStatus().timerScheduled, false);
+
+  const overlappingTickResult = await worker.tick();
+
+  assert.equal(overlappingTickResult, null);
+  assert.equal(calls.length, 1);
+
+  releaseFirstReplay();
+  await firstFlush;
+
+  const afterFirstStatus = worker.getStatus();
+
+  assert.equal(afterFirstStatus.running, true);
+  assert.equal(afterFirstStatus.timerScheduled, true);
+  assert.equal(afterFirstStatus.runCount, 1);
+  assert.equal(afterFirstStatus.lastResultSummary.success, false);
+  assert.equal(afterFirstStatus.lastResultSummary.hasError, true);
+  assert.equal(JSON.stringify(afterFirstStatus).includes('codex-process-cm1038'), false);
+  assert.deepEqual(calls[0], { callIndex: 1, limit: 11, dryRun: true });
+
+  await scheduler.flushNext();
+
+  const finalStatus = worker.getStatus();
+
+  assert.equal(finalStatus.running, false);
+  assert.equal(finalStatus.timerScheduled, false);
+  assert.equal(finalStatus.tickInFlight, false);
+  assert.equal(finalStatus.runCount, 2);
+  assert.deepEqual(calls[1], { callIndex: 2, limit: 11, dryRun: true });
+  assert.equal(calls.length, 2);
+  assert.deepEqual(finalStatus.lastResultSummary, {
+    success: true,
+    decision: 'completed',
+    workerDecision: 'run_once_completed',
+    dryRun: true,
+    limit: 11,
+    scannedTaskCount: 1,
+    replayedCount: 1,
+    wouldReplayCount: 0,
+    clearedCount: 1,
+    failedCount: 0,
+    skippedCount: 0,
+    hasError: false
+  });
+  assert.equal(JSON.stringify(finalStatus).includes('codex-process-cm1038'), false);
+});
+
 test('CM-1037 worker status snapshot is read-only and does not expose raw task results or errors', async () => {
   const scheduler = new ManualScheduler();
   const reconcileService = {

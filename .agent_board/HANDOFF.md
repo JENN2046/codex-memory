@@ -1,5 +1,36 @@
 # HANDOFF.md — codex-memory
 
+## CM-1038 Memory Write Reconcile Worker Bounded Loop Durability Handoff
+
+Goal: add bounded internal evidence that the default-disabled write reconcile worker's explicit scheduled loop stays non-overlapping and stops after `maxRuns`, without adding a public MCP tool, executing runtime observe, starting the worker by default, changing startup/config/watchdog, or claiming readiness/reliability.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_BOUNDED_LOOP_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1038_MEMORY_WRITE_RECONCILE_WORKER_BOUNDED_LOOP_DURABILITY.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- The CM-1038 manual-scheduler test starts the worker explicitly with `dryRun=true` and `maxRuns=2`.
+- A pending first replay keeps `tickInFlight=true`; a concurrent `tick()` attempt does not call replay again.
+- After the first replay resolves, the worker records a bounded failure summary and schedules the next tick.
+- The second scheduled tick runs with the same bounded options and then stops the worker because `maxRuns=2`.
+- Worker status omits raw synthetic memory ids from replay results.
+- CM-1038 targeted worker test passed `7/7`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `26/26`.
+- Full `npm test` passed `2490/2490`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, automatic reconcile recovery, startup reconcile safety, runtime observe safety, real degraded projection recovery, reconcile cleanup safety, longer-horizon runtime durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is test-only internal scheduled-loop evidence, not runtime observe evidence.
+- It does not prove queue processing in a true long-running service.
+- It does not authorize startup/watchdog/config integration.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward exact runtime observe, longer-horizon temp-local worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1037 Memory Write Reconcile Worker Status Snapshot Handoff
 
 Goal: add a bounded internal read-only status snapshot for the default-disabled write reconcile worker, without exposing raw queued task data, adding a public MCP tool, executing runtime observe, starting the worker, or claiming readiness/reliability.

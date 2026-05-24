@@ -1,5 +1,34 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1038 Memory Write Reconcile Worker Bounded Loop Durability Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_BOUNDED_LOOP_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1038_MEMORY_WRITE_RECONCILE_WORKER_BOUNDED_LOOP_DURABILITY.md`
+
+Completed:
+- Added a test-only manual-scheduler proof for the internal default-disabled worker.
+- Verified `start({ dryRun: true, maxRuns: 2 })` schedules explicit bounded worker ticks.
+- Verified an in-flight tick blocks overlapping `tick()` execution.
+- Verified the first delayed replay failure is summarized without raw memory id exposure.
+- Verified the second scheduled tick runs with bounded options.
+- Verified `maxRuns=2` stops the worker after the second tick.
+
+Validation:
+- Test syntax check passed.
+- CM-1038 targeted worker test passed `7/7`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `26/26`.
+- Full `npm test` passed `2490/2490`.
+
+Boundary:
+- Internal test-only scheduled-loop evidence.
+- No runtime source change, public MCP expansion, public `memory_write_reconcile_worker` tool, true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, dependency change, config/watchdog/startup edit, runtime observe execution, default worker start, startup reconcile execution, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward exact runtime observe, longer-horizon temp-local worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Broad write reliability, automatic degraded recovery, startup reconcile safety, runtime observe safety, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1037 Memory Write Reconcile Worker Status Snapshot Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`
