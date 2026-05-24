@@ -1,5 +1,39 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1036 Memory Write Reconcile Worker Internal Disabled Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_DISABLED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1036_MEMORY_WRITE_RECONCILE_WORKER_INTERNAL_DISABLED.md`
+
+Completed:
+- Added `src/core/MemoryWriteReconcileWorker.js`.
+- Mounted the worker only as `app.services.memoryWriteReconcileWorker`.
+- Kept public `callTool()` and `TOOL_DEFINITIONS` frozen to `record_memory`, `search_memory`, and `memory_overview`.
+- Verified app construction does not start the worker.
+- Verified `app.callTool('memory_write_reconcile_worker')` remains unknown.
+- Verified explicit `runOnce()` replays queued vector/chunk projection tasks in isolated temp-local stores and clears the reconcile queue.
+- Verified explicit `start({ maxRuns })` schedules bounded worker ticks without immediate execution.
+- Verified `stop()` clears the pending worker timer.
+
+Validation:
+- Source/app/test syntax checks passed.
+- CM-1036 targeted worker test passed `4/4`.
+- Degraded replay/service/write reliability/MCP adjacent regression bundle passed `25/25`.
+- App-surface regressions passed `27/27`.
+- Full `npm test` passed `2487/2487`.
+
+Boundary:
+- Internal default-disabled worker only.
+- Temp-local store paths only in tests.
+- No true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, default worker start, startup reconcile execution, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, worker idle posture, or public MCP boundary.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon durability, exact runtime observe, or governance remediation. Broad write reliability, automatic degraded recovery, startup reconcile safety, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1035 Memory Write Reconcile Service Internal Idle Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_SERVICE_NOT_RELIABLE_NOT_READY`

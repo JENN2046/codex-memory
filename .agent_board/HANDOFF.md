@@ -1,5 +1,37 @@
 # HANDOFF.md — codex-memory
 
+## CM-1036 Memory Write Reconcile Worker Internal Disabled Handoff
+
+Goal: add a bounded internal default-disabled worker candidate for explicit write reconcile queue replay, without adding a public MCP tool, default startup execution, watchdog/config integration, automatic recovery claim, or readiness/reliability claim.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_DISABLED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1036_MEMORY_WRITE_RECONCILE_WORKER_INTERNAL_DISABLED.md`.
+
+Current evidence:
+- Source artifact: `src/core/MemoryWriteReconcileWorker.js`.
+- App wiring: `app.services.memoryWriteReconcileWorker` only.
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- Public MCP remains frozen to `record_memory`, `search_memory`, and `memory_overview`.
+- `app.callTool('memory_write_reconcile_worker')` rejects with `Unknown tool`.
+- App construction leaves the worker stopped.
+- Explicit `runOnce()` replays queued temp-local vector/chunk tasks and clears the reconcile queue.
+- Explicit `start({ maxRuns })` schedules bounded worker ticks without immediate execution.
+- Explicit `stop()` clears the pending timer.
+- CM-1036 test passed `4/4`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, automatic reconcile recovery, startup reconcile safety, real degraded projection recovery, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is an internal default-disabled worker candidate, not automatic degraded recovery.
+- It does not prove queue processing in live long-running runtime conditions.
+- It does not authorize startup/watchdog/config integration.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon durability, exact runtime observe, or governance remediation. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1035 Memory Write Reconcile Service Internal Idle Handoff
 
 Goal: add a bounded internal default-idle service for explicit write reconcile queue replay, without adding a public MCP tool, startup worker, automatic recovery claim, or readiness/reliability claim.

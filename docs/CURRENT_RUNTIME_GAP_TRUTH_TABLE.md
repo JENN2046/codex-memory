@@ -28,6 +28,61 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1036 Memory Write Reconcile Worker Internal Disabled - 2026-05-25
+
+Result: `CM1036_MEMORY_WRITE_RECONCILE_WORKER_INTERNAL_DISABLED_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1036 adds an internal default-disabled reconcile worker candidate:
+
+- `MemoryWriteReconcileWorker` wraps `MemoryWriteReconcileService.replayPending(...)`
+- the app exposes it only as `app.services.memoryWriteReconcileWorker`
+- no public MCP tool is added
+- `memory_write_reconcile_worker` remains rejected by public `callTool()`
+- constructing the app does not start polling
+- `runOnce()` explicitly replays queued work through the existing internal service
+- `start()` schedules bounded timer ticks only after explicit internal caller action
+- `stop()` clears the pending worker timer
+- no startup worker, watchdog integration, or config integration is installed
+
+Validation:
+
+- source/app/test syntax checks passed
+- CM-1036 targeted test `4/4` passed
+- degraded replay/service/write reliability/MCP adjacent regression bundle `25/25` passed
+- app-surface regressions `27/27` passed
+- full `npm test` `2487/2487` passed
+- ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+real cleanup apply = false
+real rollback apply = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This moves CM-1035 from internal service-only replay to a bounded internal default-disabled worker candidate.
+- This proves explicit temp-local `runOnce` and manual-scheduler `start/stop` mechanics.
+- This does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, real cleanup safety, real rollback safety, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, automatic degraded recovery, startup reconcile safety, long-run durability, rollback readiness, governance closure, and real rollback safety remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1035 Memory Write Reconcile Service Internal Idle - 2026-05-25
 
 Result: `CM1035_MEMORY_WRITE_RECONCILE_SERVICE_INTERNAL_IDLE_PASSED_NOT_RELIABLE_NOT_READY`.

@@ -4,6 +4,7 @@ const { buildInternalRuntimeEntryPayload } = require('./core/InternalRuntimeEntr
 const { RecallEnhancer } = require('./core/RecallEnhancer');
 const { MemoryWriteService } = require('./core/MemoryWriteService');
 const { MemoryWriteReconcileService } = require('./core/MemoryWriteReconcileService');
+const { MemoryWriteReconcileWorker } = require('./core/MemoryWriteReconcileWorker');
 const { ValidateMemoryService } = require('./core/ValidateMemoryService');
 const { TombstoneMemoryService } = require('./core/TombstoneMemoryService');
 const { SupersedeMemoryService } = require('./core/SupersedeMemoryService');
@@ -609,6 +610,9 @@ function createCodexMemoryApplication(overrides = {}) {
     vectorStore,
     chunkIndexingService
   });
+  const memoryWriteReconcileWorker = new MemoryWriteReconcileWorker({
+    reconcileService: memoryWriteReconcileService
+  });
   const validateMemoryService = new ValidateMemoryService({
     config,
     shadowStore,
@@ -747,6 +751,7 @@ function createCodexMemoryApplication(overrides = {}) {
     services: {
       writeService,
       memoryWriteReconcileService,
+      memoryWriteReconcileWorker,
       validateMemoryService,
       tombstoneMemoryService,
       supersedeMemoryService,
@@ -881,6 +886,7 @@ function createCodexMemoryApplication(overrides = {}) {
       return deferredGovernanceRuntimeEntryAdapter.previewInternalMemoryForgetApplyPlan(args, requestContext);
     },
     async close() {
+      memoryWriteReconcileWorker.stop();
       await shadowStore.close();
     }
   };
