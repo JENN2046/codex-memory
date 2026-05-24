@@ -1,5 +1,36 @@
 # HANDOFF.md — codex-memory
 
+## CM-1033 Memory Write Restart Durability Temp-Local Evidence Handoff
+
+Goal: verify accepted synthetic write projection durability across fresh store reopen in isolated temp-local stores, without claiming broad reliability/readiness or long-run durability.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_RESTART_DURABILITY_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1033_MEMORY_WRITE_RESTART_DURABILITY_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-restart-durability-temp-local-evidence.test.js`.
+- Real local `DiaryStore`, `SqliteShadowStore`, `VectorIndexStore`, `AuditLogStore`, and `CandidateCacheStore` were configured under one temp root.
+- All configured write, audit, vector, SQLite, and candidate-cache paths resolved under the temp root.
+- One synthetic process record was accepted through `MemoryWriteService` with `shadowWrite.status=ok`.
+- Diary, SQLite shadow/chunk, vector, embedding-cache, write-audit, and candidate-cache surfaces were visible before restart.
+- Fresh store instances reopened on the same temp-local paths.
+- The same memory id, scope fields, SQLite record/chunk, vector, embedding-cache, write-audit entry, candidate-cache entry, and diary file remained visible after reopen.
+- CM-1033 test passed `1/1`.
+- Write restart/degraded/cleanup/write reliability/MCP adjacent regression bundle passed `16/16`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, degraded projection recovery, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local restart durability posture evidence, not broad or long-horizon durability proof.
+- It does not prove degraded projection recovery or real rollback safety.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward degraded recovery, longer-horizon durability, or governance remediation. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1032 Memory Write Degraded Cleanup Temp-Local Evidence Handoff
 
 Goal: verify degraded accepted synthetic write projection accounting and partial cleanup posture in isolated temp-local stores, without claiming broad reliability/readiness, reconcile cleanup safety, or real rollback safety.

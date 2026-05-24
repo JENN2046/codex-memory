@@ -1,5 +1,37 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1033 Memory Write Restart Durability Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_RESTART_DURABILITY_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1033_MEMORY_WRITE_RESTART_DURABILITY_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local write restart durability evidence.
+- Used real local `DiaryStore`, `SqliteShadowStore`, `VectorIndexStore`, `AuditLogStore`, and `CandidateCacheStore` under a run-specific temp root.
+- Verified all configured write/audit/vector/SQLite/cache paths stayed under the temp root.
+- Wrote one synthetic accepted process record through `MemoryWriteService`.
+- Verified diary, SQLite shadow/chunk, vector, embedding-cache, write-audit, and candidate-cache surfaces existed before restart.
+- Closed the SQLite shadow store and reopened fresh store instances on the same temp-local paths.
+- Verified the same memory id, scope fields, SQLite record/chunk, vector, embedding-cache, write-audit entry, candidate-cache entry, and diary file remained visible after reopen.
+
+Validation:
+- CM-1033 test syntax check passed.
+- CM-1033 temp-local write restart durability test passed `1/1`.
+- Write restart/degraded/cleanup/write reliability/MCP adjacent regression bundle passed `16/16`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Boundary:
+- Temp-local store paths only.
+- One synthetic accepted write and one fresh store reopen occurred only under the isolated temp root.
+- No true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, long-run durability claim, governance closure claim, or rollback readiness claim.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, restart durability posture, or public MCP boundary.
+
+Next:
+- Continue bounded write reliability closure toward degraded recovery, longer-horizon durability, or governance remediation. Broad write reliability, write-to-recall reliability, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1032 Memory Write Degraded Cleanup Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_DEGRADED_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY`

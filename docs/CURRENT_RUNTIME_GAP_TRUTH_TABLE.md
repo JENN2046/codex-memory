@@ -28,6 +28,52 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1033 Memory Write Restart Durability Temp-Local Evidence - 2026-05-25
+
+Result: `CM1033_MEMORY_WRITE_RESTART_DURABILITY_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1033 records isolated temp-local write restart durability evidence:
+
+- one synthetic process record was accepted through `MemoryWriteService`
+- the write returned `shadowWrite.status=ok`
+- diary file, SQLite row/chunks, vector entry, embedding-cache, write-audit entry, and candidate-cache entry were visible before restart
+- the SQLite shadow store was closed and fresh store instances reopened on the same temp-local paths
+- the same memory id and scope fields remained visible after reopen
+- SQLite row/chunks, vector entry, embedding-cache, write-audit entry, candidate-cache entry, and diary file remained visible after reopen
+- the temp root was removed by the test harness
+
+Validation:
+
+- CM-1033 test `1/1` passed
+- write restart/degraded/cleanup/write reliability/MCP adjacent regression bundle `16/16` passed
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+package/config/watchdog/startup change = false
+real cleanup apply = false
+real rollback apply = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens CM-1031 and CM-1032 by covering normal accepted write projection durability across fresh store reopen.
+- This proves one accepted synthetic temp-local write's diary, SQLite/chunk, vector, embedding-cache, write-audit, and candidate-cache surfaces remain visible after reopening stores on the same isolated paths.
+- This does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, degraded projection recovery, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, write-to-recall reliable, long-run durability, rollback readiness, governance closure, and real rollback safety remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1032 Memory Write Degraded Cleanup Temp-Local Evidence - 2026-05-25
 
 Result: `CM1032_MEMORY_WRITE_DEGRADED_CLEANUP_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
