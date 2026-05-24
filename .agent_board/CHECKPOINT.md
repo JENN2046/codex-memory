@@ -1,5 +1,31 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1010 Write Proof Result Boundary Contract Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1010_WRITE_PROOF_RESULT_BOUNDARY_CONTRACT.md`
+
+Completed:
+- Added `WriteProofExecutionResultBoundary` as a pure explicit-input result/counter boundary for future bounded write proof evidence.
+- Added targeted tests for accepted and rejected sanitized one-write result shapes.
+- Added fail-closed coverage for missing/malformed/unknown-positive counters, second write, search/provider/raw side effects, raw output flags, and readiness/reliability claims.
+
+Validation:
+- Source/test syntax checks passed for the new helper and test.
+- Targeted write-proof result boundary test passed `7/7`.
+- Adjacent write-proof tests passed `23/23`.
+- Adjacent baseline-readiness tests passed `11/11`.
+- Full `npm test` passed `2445/2445`.
+
+Boundary:
+- No live proof execution, `record_memory`, `search_memory`, provider/API call, raw memory read, direct `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+
+Next:
+- Continue write reliability closure through a separately exact-approved bounded live write proof or another non-mutating write reliability guard. CM-1010 makes future result consumption stricter but is not write reliability proof.
+
 ## CM-1009 Write Proof Preflight Authorization Boundary Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

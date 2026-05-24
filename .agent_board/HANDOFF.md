@@ -1,5 +1,29 @@
 # HANDOFF.md — codex-memory
 
+## CM-1010 Write Proof Result Boundary Contract Handoff
+
+Goal: continue write reliability closure by making future bounded write proof output fail closed unless the result is complete, sanitized, one-write-only, and explicitly not a readiness/reliability claim.
+
+Status: COMPLETED_VALIDATED_NOT_READY.
+
+Artifact: `docs/CM1010_WRITE_PROOF_RESULT_BOUNDARY_CONTRACT.md`.
+
+Current evidence:
+- `WriteProofExecutionResultBoundary` is pure explicit-input logic.
+- It accepts only `MEMORY_WRITE_BOUNDED_PROOF_PASSED_NOT_READY` and `MEMORY_WRITE_BOUNDED_PROOF_FAILED_NOT_READY`.
+- It requires exactly one `recordMemoryCalls`, exactly one accepted-or-rejected write outcome, complete required counters, zero forbidden side-effect counters, sanitized write-audit summary, all raw-output flags false, `readinessClaimAllowed=false`, `memoryWriteReliableClaimed=false`, and `rcNotReadyBlocked=true`.
+- Targeted boundary test passed `7/7`.
+- Adjacent write-proof tests passed `23/23`; baseline-readiness tests passed `11/11`; full `npm test` passed `2445/2445`.
+
+Not validated:
+- Live write proof, broad write reliability, rollback cleanup sufficiency, long-run durability, multi-client write behavior, production readiness, release/tag/deploy, real rollback apply.
+
+Remaining risks:
+- CM-1010 is a non-mutating result-consumption guard. It does not execute `record_memory`, prove `memory write reliable`, or close RC readiness.
+
+Next safe step:
+- Either prepare/execute a separately exact-approved bounded live write proof with fresh payload and receipt, or add another non-mutating guard around write pollution/rollback overclaim.
+
 ## CM-1009 Write Proof Preflight Authorization Boundary Handoff
 
 Goal: continue write reliability closure by preventing write-proof preflight readiness from being mistaken for live write authorization or consumed CM-0737 approval reuse.

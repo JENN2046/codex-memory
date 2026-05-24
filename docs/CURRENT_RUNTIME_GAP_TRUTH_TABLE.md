@@ -28,6 +28,43 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1010 Write Proof Result Boundary Contract - 2026-05-25
+
+Result: `CM1010_WRITE_PROOF_RESULT_BOUNDARY_CONTRACT_COMPLETED_NOT_READY`.
+
+CM-1010 adds a non-mutating result boundary for future bounded write proof evidence:
+
+- [WriteProofExecutionResultBoundary.js](/A:/codex-memory/src/core/WriteProofExecutionResultBoundary.js)
+- [write-proof-execution-result-boundary.test.js](/A:/codex-memory/tests/write-proof-execution-result-boundary.test.js)
+- [CM1010_WRITE_PROOF_RESULT_BOUNDARY_CONTRACT.md](/A:/codex-memory/docs/CM1010_WRITE_PROOF_RESULT_BOUNDARY_CONTRACT.md)
+
+The boundary accepts only sanitized not-ready result shapes:
+
+```text
+MEMORY_WRITE_BOUNDED_PROOF_PASSED_NOT_READY
+MEMORY_WRITE_BOUNDED_PROOF_FAILED_NOT_READY
+```
+
+Validation evidence:
+
+- source/test syntax checks for the new helper and test
+- targeted result-boundary test passed `7/7`
+- adjacent write-proof tests passed `23/23`
+- adjacent baseline-readiness tests passed `11/11`
+- full `npm test` passed `2445/2445`
+
+Operator interpretation:
+
+- this is future result-consumption guard evidence only
+- it does not execute live `record_memory`
+- it does not call `search_memory`
+- it does not call providers/APIs
+- it does not read raw memory or direct `.jsonl`
+- it does not write durable memory/audit state
+- it does not expand public MCP
+- it does not claim `memory write reliable`, `memory recall reliable`, runtime readiness, or RC readiness
+- `complete?` remains `no`
+
 ## CM-1009 Write Proof Preflight Authorization Boundary - 2026-05-24
 
 Result: `CM1009_WRITE_PROOF_PREFLIGHT_AUTHORIZATION_BOUNDARY_COMPLETED_NOT_READY`.
