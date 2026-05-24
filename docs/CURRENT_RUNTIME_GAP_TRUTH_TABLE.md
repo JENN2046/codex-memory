@@ -28,6 +28,60 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1051 Memory Write Reconcile Worker Restart State Reset Guard - 2026-05-25
+
+Result: `CM1051_MEMORY_WRITE_RECONCILE_WORKER_RESTART_STATE_RESET_GUARD_NOT_RELIABLE_NOT_READY`.
+
+CM-1051 adds a narrow worker restart status hygiene guard:
+
+- `MemoryWriteReconcileWorker.start()` now clears `lastResult` when it starts a new run
+- a test completes one explicit scheduled worker cycle with `start({ dryRun: false, limit: 3, maxRuns: 1 })`
+- the test verifies the first cycle has a bounded sanitized `lastResultSummary`
+- the stopped worker is explicitly started again with `start({ dryRun: true, limit: 8, maxRuns: 1 })`
+- restarted pre-tick status has `runCount=0`, new options, `timerScheduled=true`, and `lastResultSummary=null`
+- the second tick uses the new options and writes a fresh bounded summary
+- worker status does not expose raw synthetic memory ids
+
+Validation:
+
+- source/test syntax checks passed
+- targeted memory write reconcile worker test `15/15` passed
+- adjacent worker/service/write reliability/MCP regression bundle `34/34` passed
+- full `npm test` `2501/2501` passed
+
+Boundary:
+
+```text
+worker source changed = true
+unit-level scheduler/replay stub only = true
+synthetic temp-local accepted writes = 0
+scheduled worker start calls = 2
+restart pre-tick lastResultSummary = null
+restart pre-tick runCount = 0
+second run uses new options = true
+raw memory ids exposed = false
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow restart stale-summary boundary gap: a new explicit scheduled worker run cannot inherit the previous run's `lastResultSummary` before its own first tick.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1050 Memory Write Reconcile Worker Stop-In-Flight Reschedule Guard - 2026-05-25
 
 Result: `CM1050_MEMORY_WRITE_RECONCILE_WORKER_STOP_INFLIGHT_RESCHEDULE_GUARD_NOT_RELIABLE_NOT_READY`.

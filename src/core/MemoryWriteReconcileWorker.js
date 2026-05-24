@@ -103,6 +103,7 @@ class MemoryWriteReconcileWorker {
     this.dryRun = (options.dryRun ?? this.dryRun) === true;
     this.maxRuns = normalizeMaxRuns(options.maxRuns);
     this.runCount = 0;
+    this.lastResult = null;
     this.running = true;
     this.scheduleNext();
 

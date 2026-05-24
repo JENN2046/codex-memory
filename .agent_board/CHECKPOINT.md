@@ -1,5 +1,34 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1051 Memory Write Reconcile Worker Restart State Reset Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_RESTART_STATE_RESET_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1051_MEMORY_WRITE_RECONCILE_WORKER_RESTART_STATE_RESET_GUARD.md`
+
+Completed:
+- Updated `src/core/MemoryWriteReconcileWorker.js` so `start()` clears `lastResult` before scheduling a new explicit worker run.
+- Added a unit-level restart state-reset test to `tests/memory-write-reconcile-worker.test.js`.
+- Verified a first scheduled worker cycle completes with bounded sanitized summary.
+- Verified an explicit restart with different options reports `runCount=0`, `timerScheduled=true`, new options, and `lastResultSummary=null` before the first new tick.
+- Verified the second scheduled tick uses the new options and writes a fresh bounded summary.
+- Verified status omits raw synthetic memory ids.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted memory write reconcile worker test passed `15/15`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `34/34`.
+- Full `npm test` passed `2501/2501`.
+
+Boundary:
+- Narrow source/test worker status hygiene guard only.
+- No public API change, public MCP expansion, temp/real memory write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1050 Memory Write Reconcile Worker Stop-In-Flight Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_INFLIGHT_NOT_RELIABLE_NOT_READY`
