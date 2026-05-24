@@ -4,6 +4,8 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 
 const {
+  CM0825_PATCHED_EXACT_APPROVAL_LINE,
+  CM0825_PATCHED_REQUIRED_QUERIES,
   EXACT_APPROVAL_LINE,
   EXACT_QUERY_COUNT,
   PROOF_MODE,
@@ -35,6 +37,10 @@ function createQueries() {
       text: 'unlikely negative control phrase cm0777 synthetic'
     }
   ];
+}
+
+function createCm0825Queries() {
+  return CM0825_PATCHED_REQUIRED_QUERIES.map(query => ({ ...query }));
 }
 
 function assertBoundaryError(error, reason) {
@@ -161,6 +167,64 @@ test('internal proof runner allows a narrowed approval reference override withou
 
   assert.equal(report.proofContext.approvalReference, 'CM-0814-exact-approved-live-proof');
   assert.equal(Object.prototype.hasOwnProperty.call(report.proofContext, 'approvalPacket'), false);
+});
+
+test('internal proof runner accepts CM-0825 patched approval only with exact patched query set', async () => {
+  const calls = [];
+  const runner = new TrueLiveRecallReadonlyProofRunner({
+    async searchExecutor(request) {
+      calls.push(request);
+      return {
+        results: [],
+        sideEffectCounters: createZeroSideEffectCounters()
+      };
+    }
+  });
+
+  const report = await runner.run({
+    approvalLine: CM0825_PATCHED_EXACT_APPROVAL_LINE,
+    approvalReference: 'CM0825_EXACT_APPROVED_PATCHED_TRUE_LIVE_RECALL_PROOF_ONCE',
+    queries: createCm0825Queries(),
+    proofRunId: 'CM-1006-cm0825-profile-regression'
+  });
+
+  assert.equal(report.queryCount, EXACT_QUERY_COUNT);
+  assert.equal(calls.length, EXACT_QUERY_COUNT);
+  assert.deepEqual(
+    report.queryFamiliesUsed,
+    CM0825_PATCHED_REQUIRED_QUERIES.map(({ slot, family }) => ({ slot, family }))
+  );
+  assert.equal(report.proofContext.approvalReference, 'CM0825_EXACT_APPROVED_PATCHED_TRUE_LIVE_RECALL_PROOF_ONCE');
+  assert.equal(report.proofContext.readOnly, true);
+  assert.equal(report.proofContext.noProvider, true);
+  assert.equal(report.proofContext.noAudit, true);
+  assert.equal(report.proofContext.sanitizedOutput, true);
+  assert.equal(report.proofContext.includeContent, false);
+  assert.equal(report.memoryRecallReliableClaimed, false);
+  assert.equal(report.rcNotReadyBlocked, true);
+});
+
+test('internal proof runner rejects CM-0825 approval when any patched query drifts', async () => {
+  const runner = new TrueLiveRecallReadonlyProofRunner({
+    async searchExecutor() {
+      throw new Error('executor must not run when CM-0825 query set drifts');
+    }
+  });
+
+  const driftedQueries = createCm0825Queries();
+  driftedQueries[3] = {
+    ...driftedQueries[3],
+    text: 'xqzv-9137-lomdra-kepv-azmuth changed'
+  };
+
+  await assert.rejects(
+    () => runner.run({
+      approvalLine: CM0825_PATCHED_EXACT_APPROVAL_LINE,
+      queries: driftedQueries,
+      proofRunId: 'CM-1006-cm0825-drift'
+    }),
+    error => assertBoundaryError(error, 'approval_profile_query_mismatch')
+  );
 });
 
 test('internal proof runner requires complete finite zero side-effect counters', async () => {

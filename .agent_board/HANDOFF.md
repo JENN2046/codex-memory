@@ -1,5 +1,26 @@
 # HANDOFF.md — codex-memory
 
+## CM-1006 CM0825 Patched Recall Proof Runner Boundary Handoff
+
+Goal: remove approval-packet/runtime drift before any future patched true-live recall proof by making the internal runner recognize and enforce the CM0825 exact approval profile.
+
+Status: COMPLETED_VALIDATED_NOT_READY.
+
+Current evidence:
+- `TrueLiveRecallReadonlyProofRunner` accepts the CM0825 patched exact approval line from `docs/CM0824_TRUE_LIVE_RECALL_PATCHED_PROOF_APPROVAL_PACKET.md`.
+- For CM0825 only, the runner rejects any drift in the exact four query slots, families, or texts.
+- Legacy CM0774 approval behavior remains compatible.
+- Targeted validation passed: runner `10/10`, adjacent adapter/precision/recall hardening `25/25`, MCP contract `9/9`, syntax checks, docs validation, diff check, and full `npm test` `2438/2438`.
+
+Not validated:
+- No true live CM0825 proof execution, broad recall reliability closure, write reliability closure, provider smoke/benchmark, raw memory review, production readiness, release/tag/deploy, or real rollback apply.
+
+Remaining risks:
+- This is source/test boundary evidence only. It makes a future bounded CM0825 proof executable under the existing internal runner constraints, but it does not prove `memory recall reliable`, `memory write reliable`, RC readiness, production readiness, or long-run behavior. `RC_NOT_READY_BLOCKED` remains.
+
+Next safe step:
+- Commit/push CM-1006, then from clean synced `main` run fresh baseline readiness before deciding whether to execute exactly one sanitized CM0825 true-live recall proof.
+
 ## CM-1005 Store Freshness Exact Write Evidence Handoff
 
 Goal: close the store-freshness evidence blocker with exactly one sanitized local write while preserving no-readiness and no-public-MCP-expansion boundaries.

@@ -8,10 +8,45 @@ const {
 } = require('./SearchMemoryTimeoutPolicy');
 
 const EXACT_APPROVAL_LINE = 'I approve MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_EXECUTION_ONCE for codex-memory at the current synced main head, limited to exactly four read-only true live search_memory calls against the current local codex-memory real store, using the query-family and output boundaries in docs/MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_APPROVAL_PACKET.md, with no provider call, no direct .jsonl read, no durable memory/audit write, no migration/import/export/backup/restore apply, no config/watchdog/startup change, no public MCP expansion, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.';
+const CM0825_PATCHED_EXACT_APPROVAL_LINE = 'I approve CM0825_EXACT_APPROVED_PATCHED_TRUE_LIVE_RECALL_PROOF_ONCE for codex-memory at the current clean head containing the CM-0820 patched metadata-only recall path, limited to exactly four read-only true live recall queries through TrueLiveRecallReadonlyProofRunner and TrueLiveRecallExecutorAdapter, with noRawContentRead=true, sanitized output only, no raw memory output, no direct .jsonl read, no provider/model/API call, no durable memory/audit write, no migration/import/export/backup/restore apply, no config/watchdog/startup change, no public MCP expansion, no package/lockfile change, no tag/release/deploy/cutover, and no readiness or reliability claim.';
 
 const PROOF_MODE = 'true_live_recall_readonly_proof';
 const EXACT_QUERY_COUNT = 4;
 const REQUIRED_QUERY_SLOTS = ['Q1', 'Q2', 'Q3', 'Q4'];
+const CM0825_PATCHED_REQUIRED_QUERIES = [
+  {
+    slot: 'Q1',
+    family: 'positive_project_state',
+    text: 'current project status mainline memory spine state'
+  },
+  {
+    slot: 'Q2',
+    family: 'positive_recall_evidence_ladder',
+    text: 'memory recall evidence ladder bounded evidence progression'
+  },
+  {
+    slot: 'Q3',
+    family: 'positive_blocker_posture',
+    text: 'blocker not-ready no-overclaim status'
+  },
+  {
+    slot: 'Q4',
+    family: 'stricter_negative_control',
+    text: 'xqzv-9137-lomdra-kepv-azmuth'
+  }
+];
+const APPROVAL_PROFILES = [
+  {
+    id: 'CM-0774',
+    approvalLine: EXACT_APPROVAL_LINE,
+    requiredQueries: null
+  },
+  {
+    id: 'CM-0825',
+    approvalLine: CM0825_PATCHED_EXACT_APPROVAL_LINE,
+    requiredQueries: CM0825_PATCHED_REQUIRED_QUERIES
+  }
+];
 const RESULT_LABELS = {
   passed: 'TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY',
   failed: 'TRUE_LIVE_REAL_STORE_RECALL_PROOF_FAILED_NOT_READY',
@@ -64,14 +99,20 @@ function normalizeApprovalReference(value) {
 }
 
 function assertExactApproval(approvalLine) {
-  if (normalizeApprovalLine(approvalLine) !== EXACT_APPROVAL_LINE) {
+  const normalizedApprovalLine = normalizeApprovalLine(approvalLine);
+  const approvalProfile = APPROVAL_PROFILES.find(
+    profile => normalizeApprovalLine(profile.approvalLine) === normalizedApprovalLine
+  );
+  if (!approvalProfile) {
     throw createProofBoundaryError('exact approval required for true live recall proof runner', {
       reason: 'exact_approval_required'
     });
   }
+
+  return approvalProfile;
 }
 
-function normalizeQueries(queries) {
+function normalizeQueries(queries, { approvalProfile = null } = {}) {
   if (!Array.isArray(queries) || queries.length !== EXACT_QUERY_COUNT) {
     throw createProofBoundaryError('true live recall proof runner requires exactly four queries', {
       reason: 'exact_query_count_required',
@@ -102,6 +143,25 @@ function normalizeQueries(queries) {
       throw createProofBoundaryError('broad scan query rejected', {
         reason: 'broad_scan_query_rejected',
         slot
+      });
+    }
+
+    const requiredQuery = approvalProfile?.requiredQueries?.[index];
+    if (requiredQuery && (
+      slot !== requiredQuery.slot
+      || family !== requiredQuery.family
+      || text !== requiredQuery.text
+    )) {
+      throw createProofBoundaryError('query set must match exact approval profile', {
+        reason: 'approval_profile_query_mismatch',
+        approvalProfileId: approvalProfile.id,
+        slot,
+        expected: {
+          slot: requiredQuery.slot,
+          family: requiredQuery.family,
+          text: requiredQuery.text
+        },
+        actual: { slot, family, text }
       });
     }
 
@@ -306,8 +366,8 @@ class TrueLiveRecallReadonlyProofRunner {
     target = 'both',
     limit = 5
   } = {}) {
-    assertExactApproval(approvalLine);
-    const normalizedQueries = normalizeQueries(queries);
+    const approvalProfile = assertExactApproval(approvalLine);
+    const normalizedQueries = normalizeQueries(queries, { approvalProfile });
     const proofContext = createSealedProofContext({
       baselineCommit,
       proofRunId,
@@ -437,6 +497,8 @@ function mergeSideEffectCounters(perQuery = []) {
 
 module.exports = {
   EXACT_APPROVAL_LINE,
+  CM0825_PATCHED_EXACT_APPROVAL_LINE,
+  CM0825_PATCHED_REQUIRED_QUERIES,
   EXACT_QUERY_COUNT,
   PROOF_MODE,
   REQUIRED_QUERY_SLOTS,

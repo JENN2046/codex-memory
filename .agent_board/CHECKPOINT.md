@@ -1,5 +1,34 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1006 CM0825 Patched Recall Proof Runner Boundary Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-24
+
+Completed:
+- Added a CM0825 patched approval profile to `TrueLiveRecallReadonlyProofRunner`.
+- Exported the CM0825 patched exact approval line and required four-query set for tests and future bounded execution wiring.
+- Enforced exact slot/family/text matching only for the CM0825 profile.
+- Preserved legacy CM0774 `EXACT_APPROVAL_LINE` compatibility.
+
+Validation:
+- `node --check src\core\TrueLiveRecallReadonlyProofRunner.js`
+- `node --check tests\true-live-recall-internal-proof-runner.test.js`
+- `node --test tests\true-live-recall-internal-proof-runner.test.js` passed `10/10`.
+- `node --test tests\true-live-recall-executor-adapter.test.js tests\true-live-recall-precision-policy-path.test.js tests\recall-precision-hardening-bounded.test.js` passed `25/25`.
+- `node --test tests\mcp-contract.test.js` passed `9/9`.
+- `npm test` passed `2438/2438`.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `git diff --check -- src\core\TrueLiveRecallReadonlyProofRunner.js tests\true-live-recall-internal-proof-runner.test.js` passed.
+- Targeted no-overclaim/public-MCP scan found only explicit not-ready/forbidden boundary wording.
+
+Boundary:
+- No true live proof execution, `search_memory`, `record_memory`, provider/API call, raw memory read, `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, readiness claim, or reliability claim.
+
+Next:
+- Commit and push this source/test boundary at a coherent stage boundary, then resume from clean synced `main` before considering any separately bounded CM0825 live proof execution.
+
 ## CM-1005 Store Freshness Exact Write Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
