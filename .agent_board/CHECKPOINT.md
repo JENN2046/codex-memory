@@ -4759,3 +4759,51 @@ Remaining risk:
 
 Next:
 - Inspect post-commit status before any push-readiness decision.
+
+## CM-1003 Push-Readiness And Post-Push Reconciliation Checkpoint
+
+Status: `COMPLETED_VALIDATED_SYNCED_NOT_READY`
+Date: 2026-05-24
+Pushed range: `a6782e3..cd05d02`
+Post-push hash: `cd05d023098da3c7065fe5e0f36d1ac8df4b2ce8`
+
+Completed:
+- Fetched `origin` and confirmed the local branch was clean and ahead-only by 59 commits.
+- Inspected the push range log, stat, names, and whitespace diff.
+- Ran sensitive-pattern scanning with content suppressed; reviewed hits as policy/test/redaction/synthetic or token-variable context, with no raw credential material identified.
+- Started local HTTP MCP via `start:http:ensure` only for health validation; no watchdog/startup/config install occurred.
+- Observed HTTP MCP runtime as healthy with service `vcp_codex_memory`, `noProvider=true`, `mutated=false`, and `migrationApplied=false`.
+- Ran strict mainline gate successfully.
+- Pushed `main` to `origin/main`.
+- Verified local `HEAD`, `origin/main`, and remote `refs/heads/main` all equal `cd05d023098da3c7065fe5e0f36d1ac8df4b2ce8`.
+
+Validation:
+- `git fetch origin`
+- `git status -sb`
+- `git log --oneline origin/main..HEAD`
+- `git diff --stat origin/main..HEAD`
+- `git diff --name-only origin/main..HEAD`
+- `git diff --check origin/main..HEAD`
+- `git ls-remote origin refs/heads/main`
+- sensitive-pattern scan with content suppressed
+- `npm run start:http:ensure`
+- `npm run observe:http -- --json`
+- `npm run gate:mainline:strict` passed health, contract `25/25`, tests `2436/2436`, compare `43/43`, rollback `43/43`
+- `git push origin main`
+- post-push hash verification
+
+Not validated:
+- live recall reliability closure
+- live write reliability closure
+- true `record_memory`
+- true `search_memory`
+- provider smoke/benchmark
+- broad real memory scan
+- production readiness
+- release/tag/deploy
+
+Remaining risk:
+- The pushed stage is validated and synced, but it is not a readiness/reliability closure. `RC_NOT_READY_BLOCKED` remains.
+
+Next:
+- Commit and push this CM-1003 board/status reconciliation note, then continue with the next scoped reliability/governance task from a clean synced `main`.
