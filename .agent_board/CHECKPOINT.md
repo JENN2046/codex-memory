@@ -1,5 +1,40 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1028 Public Default Search Lifecycle Cache-Mutation Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_CACHE_MUTATION_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1028_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_CACHE_MUTATION_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local lifecycle cache-mutation evidence for private Codex-scoped default public search.
+- Wrote two temp records with the same marker, same project/workspace, `visibility=private`, and `client_id=codex`.
+- Marked one record active and one record stale in temp-local lifecycle columns.
+- Verified default public scoped search returned both active and stale records before mutation.
+- Verified candidate cache was enabled, populated, and located under the temp root.
+- Marked the formerly active record tombstoned in temp-local lifecycle columns.
+- Verified the same default public scoped search returned only the stale record after mutation.
+- Verified the tombstoned record was not returned after mutation.
+- Verified read-policy audit was applied and did not print the raw workspace value.
+
+Validation:
+- CM-1028 test syntax check passed.
+- CM-1028 temp-local lifecycle cache-mutation test passed `1/1`.
+- Lifecycle cache/matrix/stale/rejected/validate/tombstone/supersede/MCP regression bundle passed `22/22`.
+- Validate/write-temp-local adjacent bundle passed `28/28`.
+
+Boundary:
+- Temp-local app paths only.
+- Lifecycle status marking occurred only in isolated temp-local state.
+- Candidate-cache population occurred only under the temp root.
+- No real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, rollback readiness claim, or real cleanup.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, lifecycle cache-mutation boundary, or public MCP boundary.
+
+Next:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, public/default search reliability, real-store durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1027 Public Default Search Lifecycle Matrix Cold-Derived Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_MATRIX_COLD_DERIVED_NOT_RELIABLE_NOT_READY`
