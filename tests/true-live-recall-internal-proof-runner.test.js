@@ -200,6 +200,14 @@ test('internal proof runner accepts CM-0825 patched approval only with exact pat
   assert.equal(report.proofContext.noAudit, true);
   assert.equal(report.proofContext.sanitizedOutput, true);
   assert.equal(report.proofContext.includeContent, false);
+  assert.equal(calls[0].precisionPolicyContext, null);
+  assert.deepEqual(calls[3].precisionPolicyContext, {
+    enabled: true,
+    queryFamily: 'stricter_negative_control',
+    proofNoResultMode: true,
+    minimumScore: 0.12,
+    highConfidenceScore: 0.62
+  });
   assert.equal(report.memoryRecallReliableClaimed, false);
   assert.equal(report.rcNotReadyBlocked, true);
 });

@@ -183,6 +183,20 @@ function normalizePrecisionPolicyContext(value) {
   return { ...value };
 }
 
+function createDefaultPrecisionPolicyContext(query) {
+  if (query?.family !== 'stricter_negative_control') {
+    return null;
+  }
+
+  return {
+    enabled: true,
+    queryFamily: query.family,
+    proofNoResultMode: true,
+    minimumScore: 0.12,
+    highConfidenceScore: 0.62
+  };
+}
+
 function isBroadScanQuery(text) {
   const normalized = String(text || '').trim().toLowerCase();
   if (!normalized || normalized === '*' || normalized === 'all') return true;
@@ -399,7 +413,7 @@ class TrueLiveRecallReadonlyProofRunner {
               text: query.text,
               proofContext
             })
-            : null
+            : createDefaultPrecisionPolicyContext(query)
         );
         const response = await runSearchMemoryWithTimeout(
           ({ signal }) => this.searchExecutor({

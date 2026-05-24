@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1012 CM0825 Negative-Control Wiring Guard Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1012_CM0825_NEGATIVE_CONTROL_WIRING_GUARD.md`
+
+Completed:
+- Re-ran clean-head current-facts preflights on synced `main` at `c6926505603240d10bb8a1caa4903fa061c49ce7`.
+- Executed one bounded sanitized CM0825 recall proof attempt through the internal runner/adapter seam.
+- Recorded that Q4 `stricter_negative_control` returned `3` sanitized results while all side-effect counters stayed zero.
+- Added a narrow runner guard so `stricter_negative_control` proof slots receive default `proofNoResultMode=true` precision context when no factory is supplied.
+- Added regression assertion that CM0825 positive slots remain without default precision context and Q4 receives no-result context.
+
+Validation:
+- Clean-head recall/write/baseline preflights returned ready-not-executed.
+- Targeted runner test passed `10/10`.
+- Targeted precision policy path test passed `5/5`.
+- Targeted executor adapter test passed `7/7`.
+- MCP contract regression passed `9/9`.
+- Bounded precision regression passed `13/13`.
+- Full `npm test` passed `2445/2445`.
+
+Boundary:
+- The clean-head proof attempt called internal read-only `search_memory` exactly four times and returned sanitized metadata only.
+- No `record_memory`, provider/API call, raw memory output, direct `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim occurred.
+
+Next:
+- Commit the guard after final diff/no-overclaim validation. Any future live proof must first return to a clean synced baseline and rerun current-facts preflight.
+
 ## CM-1011 Memory Reliability Clean Baseline Preflight Review Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

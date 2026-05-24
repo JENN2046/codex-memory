@@ -28,6 +28,37 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1012 CM0825 Negative-Control Wiring Guard - 2026-05-25
+
+Result: `CM1012_CM0825_NEGATIVE_CONTROL_WIRING_GUARD_COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`.
+
+CM-1012 records both a failed clean-head proof attempt and a narrow internal wiring guard:
+
+- [CM1012_CM0825_NEGATIVE_CONTROL_WIRING_GUARD.md](/A:/codex-memory/docs/CM1012_CM0825_NEGATIVE_CONTROL_WIRING_GUARD.md)
+- [TrueLiveRecallReadonlyProofRunner.js](/A:/codex-memory/src/core/TrueLiveRecallReadonlyProofRunner.js)
+- [true-live-recall-internal-proof-runner.test.js](/A:/codex-memory/tests/true-live-recall-internal-proof-runner.test.js)
+
+Clean-head proof facts:
+
+```text
+HEAD / origin/main / remote refs/heads/main = c6926505603240d10bb8a1caa4903fa061c49ce7
+preflights = ready-not-executed
+Q1/Q2/Q3 counts = 4/4/2
+Q4 stricter_negative_control count = 3
+rawContentReturned = false
+sideEffectCounters = all zero
+```
+
+Runtime interpretation:
+
+- Q4 returning `3` sanitized results blocks any recall reliability closure from this proof attempt.
+- The failure is not a provider leak, raw-output leak, durable-write leak, or public MCP expansion.
+- The narrow source fix makes the internal runner supply `proofNoResultMode=true` for `stricter_negative_control` slots when no caller factory is supplied.
+- CM0825 positive slots and public `search_memory` behavior remain unchanged.
+- Targeted runner/precision/adapter/MCP validation passed `44/44`; full `npm test` passed `2445/2445`.
+- This does not prove broad recall reliability, write reliability, RC readiness, runtime readiness, production readiness, or VCP parity.
+- `complete?` remains `no`.
+
 ## CM-1011 Memory Reliability Clean Baseline Preflight Review - 2026-05-25
 
 Result: `CM1011_MEMORY_RELIABILITY_CLEAN_BASELINE_PREFLIGHT_READY_NOT_EXECUTED`.

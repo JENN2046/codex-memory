@@ -1,5 +1,30 @@
 # HANDOFF.md — codex-memory
 
+## CM-1012 CM0825 Negative-Control Wiring Guard Handoff
+
+Goal: record the current CM0825 negative-control failure honestly and close the narrow internal runner wiring gap that let `stricter_negative_control` run without no-result precision context when no factory was supplied.
+
+Status: COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1012_CM0825_NEGATIVE_CONTROL_WIRING_GUARD.md`.
+
+Current evidence:
+- Clean synced baseline was `c6926505603240d10bb8a1caa4903fa061c49ce7`.
+- Recall/write/baseline preflights returned ready-not-executed before the proof attempt.
+- One bounded sanitized CM0825 proof attempt kept all side-effect counters zero and no raw output leaked.
+- Q4 `stricter_negative_control` returned `3` sanitized results, so recall reliability remains unproven.
+- `TrueLiveRecallReadonlyProofRunner` now supplies default `proofNoResultMode=true` precision context for internal `stricter_negative_control` slots when no caller factory is supplied.
+- Targeted runner/precision/adapter/MCP regressions passed `44/44`; full `npm test` passed `2445/2445`.
+
+Not validated:
+- A new clean-head post-fix live proof, full `npm test`, HTTP observe, mainline gate, provider smoke/benchmark, write proof, production readiness, release/tag/deploy.
+
+Remaining risks:
+- CM-1012 is a wiring guard and failed-proof receipt, not recall reliability closure. A future live proof must run from a fresh clean synced baseline.
+
+Next safe step:
+- Commit and push this narrow guard if final validation/push-readiness passes, then re-run current-facts preflight before any future bounded live recall proof.
+
 ## CM-1011 Memory Reliability Clean Baseline Preflight Review Handoff
 
 Goal: remove the stale dirty-baseline blocker shape by binding current clean-synced Git facts to the existing recall/write proof preflight surfaces, without executing live proof or claiming reliability.
