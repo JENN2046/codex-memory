@@ -28,6 +28,32 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1014 CM0825 Post-Guard Recall Blocker Review - 2026-05-25
+
+Result: `CM1014_RECALL_RELIABILITY_BLOCKER_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`.
+
+CM-1014 reviews CM-1013 against the existing CM-0826-style blocker criteria:
+
+- [CM1014_CM0825_POST_GUARD_RECALL_BLOCKER_REVIEW.md](/A:/codex-memory/docs/CM1014_CM0825_POST_GUARD_RECALL_BLOCKER_REVIEW.md)
+
+Accepted bounded evidence:
+
+```text
+baseline = clean synced main at 5f29c3dc844a1c9b12483aba93ab48087a92b1fe
+query count = 4
+Q1/Q2/Q3 counts = 4/4/2
+Q4 stricter_negative_control count = 0
+rawContentReturned = false
+sideEffectCounters = all zero
+```
+
+Operator interpretation:
+
+- The immediate CM-1012/CM-1013 post-guard proof gap is downgraded for this exact proof shape.
+- This is still one bounded exact proof shape.
+- This does not prove broad recall reliability, write reliability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `complete?` remains `no`.
+
 ## CM-1013 CM0825 Post-Guard Recall Proof Execution - 2026-05-25
 
 Result: `CM1013_CM0825_POST_GUARD_RECALL_PROOF_PASSED_NOT_RELIABLE_NOT_READY`.

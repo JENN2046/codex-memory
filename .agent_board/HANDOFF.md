@@ -1,5 +1,29 @@
 # HANDOFF.md — codex-memory
 
+## CM-1014 CM0825 Post-Guard Recall Blocker Review Handoff
+
+Goal: consume CM-1013 post-guard CM0825 proof evidence through the existing CM-0826-style recall blocker criteria without executing another live proof or claiming reliability.
+
+Status: COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1014_CM0825_POST_GUARD_RECALL_BLOCKER_REVIEW.md`.
+
+Current evidence:
+- CM-1013 recorded clean synced `main` at `5f29c3dc844a1c9b12483aba93ab48087a92b1fe`.
+- CM-1013 executed exactly four fixed CM0825 queries through the internal runner/adapter seam.
+- Q1/Q2/Q3 counts were `4/4/2`; Q4 `stricter_negative_control` returned `0`.
+- Output was sanitized and all side-effect counters were zero.
+- CM-1014 decision is `CM1014_RECALL_RELIABILITY_BLOCKER_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`.
+
+Not validated:
+- Broad recall reliability, write reliability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- The evidence remains one exact proof shape and does not cover broad query families, long-run freshness/cache behavior, governance interaction, or write-to-recall continuity.
+
+Next safe step:
+- Continue with write reliability closure or create a new bounded recall-coverage plan. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1013 CM0825 Post-Guard Recall Proof Execution Handoff
 
 Goal: verify the CM-1012 default negative-control context guard from a clean synced baseline with one bounded CM0825 post-guard proof.

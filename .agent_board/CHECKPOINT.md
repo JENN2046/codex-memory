@@ -1,5 +1,31 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1014 CM0825 Post-Guard Recall Blocker Review Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1014_CM0825_POST_GUARD_RECALL_BLOCKER_REVIEW.md`
+
+Completed:
+- Reviewed CM-1013 evidence against `docs/CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA.md`.
+- Confirmed the exact post-guard CM0825 proof shape has clean synced baseline evidence, exact four-query execution, sanitized output, Q1/Q2/Q3 counts `4/4/2`, Q4 count `0`, and all side-effect counters zero.
+- Recorded decision `CM1014_RECALL_RELIABILITY_BLOCKER_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`.
+
+Validation:
+- Evidence review completed without another live proof.
+- Ledger consistency passed.
+- Docs validation passed.
+- Diff check passed.
+- No-overclaim/public-MCP scan found only denial/not-ready/boundary wording in the changed scope.
+
+Boundary:
+- No live proof execution, `search_memory`, `record_memory`, provider/API call, raw memory read, direct `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+
+Next:
+- Move to write reliability closure or plan broader bounded recall coverage. Broad recall reliability remains unproven and `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1013 CM0825 Post-Guard Recall Proof Execution Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
