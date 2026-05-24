@@ -1,5 +1,41 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1022 Public Default Search Lifecycle Tombstone Cold-Derived Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_TOMBSTONE_COLD_DERIVED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1022_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_TOMBSTONE_COLD_DERIVED_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local lifecycle tombstone cold-derived restart evidence for private Codex-scoped default public search.
+- Wrote two temp records with the same marker, same project/workspace, `visibility=private`, and `client_id=codex`.
+- Marked both records active in temp-local lifecycle columns.
+- Verified default public scoped search saw both active records before tombstone.
+- Tombstoned one record through the approved internal tombstone runtime entry in the temp app only.
+- Verified `candidateCachePath` and `vectorIndexPath` both resolved under the temp root, then removed those two temp-local derived files after app close.
+- Opened a second app instance on the same temp-local paths.
+- Verified Codex-scoped cold-restart search returned only the retained active record.
+- Verified the tombstoned record was not returned.
+- Verified read-policy audit was applied and did not print the raw workspace value.
+
+Validation:
+- CM-1022 test syntax check passed.
+- CM-1022 temp-local lifecycle tombstone cold-derived restart test passed `1/1`.
+- Lifecycle/tombstone/cold-derived/MCP regression bundle passed `21/21`.
+- Tombstone/write-temp-local adjacent bundle passed `7/7`.
+
+Boundary:
+- Temp-local app paths only.
+- One internal tombstone mutation occurred only in isolated temp-local state.
+- Only temp-local derived files were removed: candidate cache and vector index.
+- No real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, rollback readiness claim, or real cleanup.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, lifecycle tombstone boundary, cold-derived restart boundary, or public MCP boundary.
+
+Next:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, public/default search reliability, real-store durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1021 Public Default Search Cold-Derived Restart Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_COLD_DERIVED_RESTART_NOT_RELIABLE_NOT_READY`

@@ -1,5 +1,38 @@
 # HANDOFF.md — codex-memory
 
+## CM-1022 Public Default Search Lifecycle Tombstone Cold-Derived Temp-Local Evidence Handoff
+
+Goal: verify default public `search_memory` with lifecycle read policy excludes a tombstoned private Codex-scoped record after isolated temp-local app close, derived candidate-cache/vector-index file removal, and app reopen without claiming broad reliability/readiness.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_TOMBSTONE_COLD_DERIVED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1022_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_TOMBSTONE_COLD_DERIVED_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/public-default-search-lifecycle-tombstone-cold-derived-temp-local-evidence.test.js`.
+- Two temp-local private Codex records shared the same marker phrase and were both active before tombstone.
+- Default public scoped search saw both active records before tombstone.
+- One record was tombstoned through the approved internal tombstone runtime entry in the temp app only.
+- The first app instance closed after the tombstone.
+- The test verified `candidateCachePath` and `vectorIndexPath` resolved under the temp root, then removed only those temp-local derived files.
+- A second app instance reopened the same temp paths.
+- Codex-scoped cold-restart default search returned exactly the retained active record.
+- The tombstoned record was not returned.
+- CM-1022 test passed `1/1`.
+- Lifecycle/tombstone/cold-derived/MCP regression bundle passed `21/21`.
+- Tombstone/write-temp-local adjacent bundle passed `7/7`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local lifecycle tombstone evidence, not broad real-store, long-run, rollback, governance-ready, or production durability proof.
+- The tombstone execution is internal and isolated to temp-local state; it does not make governance mutation ready.
+- The proof does not make public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1021 Public Default Search Cold-Derived Restart Temp-Local Evidence Handoff
 
 Goal: verify default public `search_memory` respects private client scope after isolated temp-local app close, derived candidate-cache/vector-index file removal, and app reopen without claiming broad reliability/readiness.

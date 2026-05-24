@@ -28,6 +28,53 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1022 Public Default Search Lifecycle Tombstone Cold-Derived Temp-Local Evidence - 2026-05-25
+
+Result: `CM1022_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_TOMBSTONE_COLD_DERIVED_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1022 records isolated temp-local lifecycle tombstone evidence for private Codex-scoped default public `search_memory`:
+
+- two private Codex-scoped temp records with the same marker were written under an isolated temp root
+- both records were marked active in temp-local lifecycle columns
+- default public scoped search saw both active records before tombstone
+- one record was tombstoned through the approved internal tombstone runtime entry in temp-local state only
+- the first app was closed
+- only temp-local `candidateCachePath` and `vectorIndexPath` files were removed after verifying they resolved under the temp root
+- a second app reopened the same temp paths
+- default public `search_memory` with `include_content=false`, `enableLifecycleReadPolicy=true`, and explicit private Codex scope returned only the retained active record
+- the tombstoned record was not returned
+- read-policy audit was applied and raw workspace value was not printed
+
+Validation:
+
+- CM-1022 test `1/1` passed
+- lifecycle/tombstone/cold-derived/MCP regression bundle `21/21` passed
+- tombstone/write-temp-local adjacent bundle `7/7` passed
+
+Boundary:
+
+```text
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+package/config/watchdog/startup change = false
+real cleanup = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens lifecycle pollution-prevention evidence around public/default scoped recall after cold-derived restart.
+- This is stronger than CM-1021 for governance filtering behavior, but it is still temp-local and bounded.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, public search reliability, governance closure, and rollback readiness remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1021 Public Default Search Cold-Derived Restart Temp-Local Evidence - 2026-05-25
 
 Result: `CM1021_PUBLIC_DEFAULT_SEARCH_COLD_DERIVED_RESTART_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
