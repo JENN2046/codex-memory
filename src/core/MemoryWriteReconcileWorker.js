@@ -135,6 +135,10 @@ class MemoryWriteReconcileWorker {
       return {
         decision: 'not_running',
         running: false,
+        intervalMs: this.intervalMs,
+        limit: this.limit ?? null,
+        dryRun: this.dryRun,
+        maxRuns: this.maxRuns,
         runCount: this.runCount
       };
     }
@@ -148,6 +152,10 @@ class MemoryWriteReconcileWorker {
     return {
       decision: 'stopped',
       running: false,
+      intervalMs: this.intervalMs,
+      limit: this.limit ?? null,
+      dryRun: this.dryRun,
+      maxRuns: this.maxRuns,
       runCount: this.runCount
     };
   }

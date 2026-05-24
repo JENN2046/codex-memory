@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1055 Memory Write Reconcile Worker Stop Return Options Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_RETURN_OPTIONS_GUARD_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1055_MEMORY_WRITE_RECONCILE_WORKER_STOP_RETURN_OPTIONS_GUARD.md`
+
+Completed:
+- Updated `src/core/MemoryWriteReconcileWorker.js` so `stop()` returns active `intervalMs`, `limit`, `dryRun`, and `maxRuns`.
+- Added a unit-level stop-return audit test to `tests/memory-write-reconcile-worker.test.js`.
+- Verified `stop()` after one scheduled tick clears the next timer.
+- Verified `stop()` reports active bounded options and `runCount=1`.
+- Verified a later `not_running` stop reports the same bounded options and run count.
+- Verified stop returns omit `lastResultSummary`.
+- Verified stop returns omit raw synthetic memory ids.
+- Verified no additional replay occurs after stop.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted memory write reconcile worker test passed `19/19`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `41/41`.
+- Full `npm test` passed `2505/2505`.
+
+Boundary:
+- Narrow source/test worker stop-return bounded-option audit guard only.
+- No public API change, public MCP expansion, temp/real memory write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1054 Memory Write Reconcile Worker Already-Running Start Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_ALREADY_RUNNING_START_GUARD_NOT_RELIABLE_NOT_READY`

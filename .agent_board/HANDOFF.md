@@ -1,5 +1,38 @@
 # HANDOFF.md — codex-memory
 
+## CM-1055 Memory Write Reconcile Worker Stop Return Options Handoff
+
+Goal: make explicit `stop()` returns from the default-disabled internal write reconcile worker report active bounded options without exposing raw previous replay summaries, touching startup/watchdog/config, public MCP tools, existing 7605, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_RETURN_OPTIONS_GUARD_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1055_MEMORY_WRITE_RECONCILE_WORKER_STOP_RETURN_OPTIONS_GUARD.md`.
+
+Current evidence:
+- Source artifact: `src/core/MemoryWriteReconcileWorker.js`.
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- `stop()` now includes active `intervalMs`, `limit`, `dryRun`, and `maxRuns`.
+- Both `stopped` and `not_running` returns expose bounded options plus `runCount`.
+- `stop()` returns do not include `lastResultSummary`.
+- `stop()` returns do not expose raw synthetic memory ids.
+- `stop()` after one scheduled tick clears the next timer.
+- No additional replay occurs after stop.
+- Targeted worker test passed `19/19`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `41/41`.
+- Full `npm test` passed `2505/2505`.
+
+Not validated:
+- Existing 7605 deployed worker behavior.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is a narrow source/test stop-return audit guard, not automatic recovery or startup/runtime integration.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1054 Memory Write Reconcile Worker Already-Running Start Handoff
 
 Goal: make repeated explicit `start()` calls on an already-running internal write reconcile worker report active bounded options, including `maxRuns`, without reconfiguring the active run, scheduling another timer, touching startup/watchdog/config, public MCP tools, existing 7605, or readiness/reliability claims.

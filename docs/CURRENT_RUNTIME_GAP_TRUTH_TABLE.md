@@ -28,6 +28,56 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1055 Memory Write Reconcile Worker Stop Return Options Guard - 2026-05-25
+
+Result: `CM1055_MEMORY_WRITE_RECONCILE_WORKER_STOP_RETURN_OPTIONS_GUARD_NOT_RELIABLE_NOT_READY`.
+
+CM-1055 adds a narrow worker stop-return audit guard:
+
+- `stop()` now reports active `intervalMs`, `limit`, `dryRun`, and `maxRuns`
+- both `stopped` and `not_running` returns include the same bounded option fields plus `runCount`
+- `stop()` does not return `lastResultSummary`
+- stopped return payloads do not expose raw synthetic memory ids
+- stopping after one tick clears the next scheduled timer
+- no additional replay occurs after stop
+
+Validation:
+
+- source/test syntax checks passed
+- targeted memory write reconcile worker test `19/19` passed
+- adjacent worker/service/write reliability/MCP regression bundle `41/41` passed
+- full `npm test` `2505/2505` passed
+
+Boundary:
+
+```text
+worker source changed = true
+unit-level scheduler/replay stub only = true
+synthetic temp-local accepted writes = 0
+scheduled worker start calls = 1
+scheduled worker stop calls = 2
+stop return reports active intervalMs = true
+stop return reports active limit = true
+stop return reports active dryRun = true
+stop return reports active maxRuns = true
+stop return includes lastResultSummary = false
+stop return exposes raw memory id = false
+replay calls after stop = 0
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
 ## CM-1054 Memory Write Reconcile Worker Already-Running Start Guard - 2026-05-25
 
 Result: `CM1054_MEMORY_WRITE_RECONCILE_WORKER_ALREADY_RUNNING_START_GUARD_NOT_RELIABLE_NOT_READY`.

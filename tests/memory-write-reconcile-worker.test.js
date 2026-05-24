@@ -719,6 +719,72 @@ test('CM-1054 worker already-running start reports active options without resche
   worker.stop();
 });
 
+test('CM-1055 worker stop reports active options without raw replay summary', async () => {
+  const calls = [];
+  const scheduler = new ManualScheduler();
+  const reconcileService = {
+    async replayPending(options) {
+      calls.push(options);
+      return {
+        success: true,
+        decision: 'completed',
+        dryRun: options.dryRun === true,
+        limit: options.limit,
+        scannedTaskCount: 1,
+        replayedCount: 1,
+        wouldReplayCount: 0,
+        clearedCount: 1,
+        failedCount: 0,
+        skippedCount: 0,
+        results: [{ memoryId: 'codex-process-cm1055-raw-result' }]
+      };
+    }
+  };
+  const worker = new MemoryWriteReconcileWorker({
+    reconcileService,
+    scheduler,
+    intervalMs: 250,
+    limit: 4
+  });
+
+  const started = worker.start({ dryRun: true, limit: 7, maxRuns: 3 });
+
+  assert.equal(started.decision, 'started');
+  assert.equal(await scheduler.flushNext(), true);
+  assert.deepEqual(calls, [{ limit: 7, dryRun: true }]);
+  assert.equal(worker.getStatus().runCount, 1);
+  assert.equal(worker.getStatus().timerScheduled, true);
+  assert.equal(scheduler.activeCount, 1);
+
+  const stopped = worker.stop();
+
+  assert.equal(stopped.decision, 'stopped');
+  assert.equal(stopped.running, false);
+  assert.equal(stopped.intervalMs, 250);
+  assert.equal(stopped.limit, 7);
+  assert.equal(stopped.dryRun, true);
+  assert.equal(stopped.maxRuns, 3);
+  assert.equal(stopped.runCount, 1);
+  assert.equal(Object.prototype.hasOwnProperty.call(stopped, 'lastResultSummary'), false);
+  assert.equal(JSON.stringify(stopped).includes('codex-process-cm1055'), false);
+  assert.equal(worker.isRunning(), false);
+  assert.equal(scheduler.activeCount, 0);
+
+  const notRunning = worker.stop();
+
+  assert.equal(notRunning.decision, 'not_running');
+  assert.equal(notRunning.running, false);
+  assert.equal(notRunning.intervalMs, 250);
+  assert.equal(notRunning.limit, 7);
+  assert.equal(notRunning.dryRun, true);
+  assert.equal(notRunning.maxRuns, 3);
+  assert.equal(notRunning.runCount, 1);
+  assert.equal(Object.prototype.hasOwnProperty.call(notRunning, 'lastResultSummary'), false);
+  assert.equal(JSON.stringify(notRunning).includes('codex-process-cm1055'), false);
+  assert.equal(await scheduler.flushNext(), false);
+  assert.equal(calls.length, 1);
+});
+
 test('CM-1039 explicit worker drains multiple temp-local reconcile tasks across bounded ticks', async () => {
   const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1039-worker-drain-'));
   const config = createConfig(rootPath);
