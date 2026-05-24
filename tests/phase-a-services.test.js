@@ -163,6 +163,51 @@ test('CompatibilitySyntaxAdapter should parse passive blocks and directives', ()
   assert.deepEqual(parsed.activeBlocks, ['topic memory']);
 });
 
+test('app should expose internal tombstone service without expanding public MCP tools', async () => {
+  await withApp(async ({ app }) => {
+    const result = await app.services.tombstoneMemoryService.tombstone({
+      memory_id: 'missing-memory',
+      reason: 'retire nonexistent fixture candidate',
+      evidence: 'phase-a internal service smoke',
+      tombstone_reason: 'retention-expired',
+      actor_client_id: 'codex',
+      request_source: 'phase-a-service-test'
+    });
+
+    assert.ok(app.services.tombstoneMemoryService);
+    assert.equal(typeof app.services.tombstoneMemoryService.tombstone, 'function');
+    assert.equal(result.decision, 'rejected');
+    assert.match(result.reason, /memory not found/i);
+    assert.deepEqual(
+      TOOL_DEFINITIONS.map(tool => tool.name).sort(),
+      ['memory_overview', 'record_memory', 'search_memory']
+    );
+  });
+});
+
+test('app should expose internal supersede service without expanding public MCP tools', async () => {
+  await withApp(async ({ app }) => {
+    const result = await app.services.supersedeMemoryService.supersede({
+      old_memory_id: 'missing-old-memory',
+      new_memory_id: 'missing-new-memory',
+      reason: 'retire obsolete candidate in favor of a replacement',
+      evidence: 'phase-a internal supersede service smoke',
+      supersedes_link: 'missing-old-memory',
+      superseded_by_link: 'missing-new-memory',
+      actor_client_id: 'codex',
+      request_source: 'phase-a-service-test'
+    });
+
+    assert.ok(app.services.supersedeMemoryService);
+    assert.equal(typeof app.services.supersedeMemoryService.supersede, 'function');
+    assert.equal(result.decision, 'rejected');
+    assert.match(result.reason, /both old and new memory records must exist/i);
+    assert.deepEqual(
+      TOOL_DEFINITIONS.map(tool => tool.name).sort(),
+      ['memory_overview', 'record_memory', 'search_memory']
+    );
+  });
+});
 
 test('app should wire write preflight candidate provider while keeping default preflight disabled and public MCP frozen', async () => {
   await withApp(async ({ app }) => {

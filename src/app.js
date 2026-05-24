@@ -1,8 +1,12 @@
 const { createConfig } = require('./config/createConfig');
 const { ExecutionContextResolver } = require('./core/ExecutionContextResolver');
+const { buildInternalRuntimeEntryPayload } = require('./core/InternalRuntimeEntryGate');
 const { RecallEnhancer } = require('./core/RecallEnhancer');
 const { MemoryWriteService } = require('./core/MemoryWriteService');
 const { ValidateMemoryService } = require('./core/ValidateMemoryService');
+const { TombstoneMemoryService } = require('./core/TombstoneMemoryService');
+const { SupersedeMemoryService } = require('./core/SupersedeMemoryService');
+const { DeferredGovernanceRuntimeEntryAdapter } = require('./core/DeferredGovernanceRuntimeEntryAdapter');
 const { PassiveRecallService } = require('./core/PassiveRecallService');
 const { ActiveRecallService } = require('./core/ActiveRecallService');
 const { MemoryOverviewService } = require('./core/MemoryOverviewService');
@@ -156,6 +160,9 @@ const LIFECYCLE_SCOPE_GOVERNANCE_SUPPORTED_FIELDS = Object.freeze([
 ]);
 
 const INTERNAL_TRUE_LIVE_RECALL_SOURCE = 'internal-true-live-recall-readonly-proof-runner';
+const INTERNAL_VALIDATE_RUNTIME_ENTRY_SOURCE = 'internal-validate-runtime-entry';
+const INTERNAL_TOMBSTONE_RUNTIME_ENTRY_SOURCE = 'internal-tombstone-runtime-entry';
+const INTERNAL_SUPERSEDE_RUNTIME_ENTRY_SOURCE = 'internal-supersede-runtime-entry';
 const INTERNAL_PRECISION_POLICY_ALLOWED_KEYS = new Set([
   'enabled',
   'queryFamily',
@@ -245,6 +252,55 @@ function normalizeInternalNoRawContentRead(requestContext = {}) {
 
 function normalizeScopeValue(value) {
   return typeof value === 'string' ? value.trim() : '';
+}
+
+function buildInternalValidateRuntimePayload(args = {}, requestContext = {}, { enabled = false } = {}) {
+  return buildInternalRuntimeEntryPayload(args, requestContext, {
+    enabled,
+    requestSource: INTERNAL_VALIDATE_RUNTIME_ENTRY_SOURCE,
+    contextFlag: 'internalValidateRuntimeEntry',
+    entryLabel: 'validate',
+    fallbackActorClientId: inferRequestClientId(requestContext),
+    requiredStringFields: [
+      { name: 'memory_id', keys: ['memory_id', 'memoryId'] },
+      { name: 'reason', keys: ['reason'] },
+      { name: 'evidence', keys: ['evidence'] }
+    ]
+  });
+}
+
+function buildInternalTombstoneRuntimePayload(args = {}, requestContext = {}, { enabled = false } = {}) {
+  return buildInternalRuntimeEntryPayload(args, requestContext, {
+    enabled,
+    requestSource: INTERNAL_TOMBSTONE_RUNTIME_ENTRY_SOURCE,
+    contextFlag: 'internalTombstoneRuntimeEntry',
+    entryLabel: 'tombstone',
+    fallbackActorClientId: inferRequestClientId(requestContext),
+    requiredStringFields: [
+      { name: 'memory_id', keys: ['memory_id', 'memoryId'] },
+      { name: 'reason', keys: ['reason'] },
+      { name: 'evidence', keys: ['evidence'] },
+      { name: 'tombstone_reason', keys: ['tombstone_reason', 'tombstoneReason'] }
+    ]
+  });
+}
+
+function buildInternalSupersedeRuntimePayload(args = {}, requestContext = {}, { enabled = false } = {}) {
+  return buildInternalRuntimeEntryPayload(args, requestContext, {
+    enabled,
+    requestSource: INTERNAL_SUPERSEDE_RUNTIME_ENTRY_SOURCE,
+    contextFlag: 'internalSupersedeRuntimeEntry',
+    entryLabel: 'supersede',
+    fallbackActorClientId: inferRequestClientId(requestContext),
+    requiredStringFields: [
+      { name: 'old_memory_id', keys: ['old_memory_id', 'oldMemoryId'] },
+      { name: 'new_memory_id', keys: ['new_memory_id', 'newMemoryId'] },
+      { name: 'reason', keys: ['reason'] },
+      { name: 'evidence', keys: ['evidence'] },
+      { name: 'supersedes_link', keys: ['supersedes_link', 'supersedesLink'] },
+      { name: 'superseded_by_link', keys: ['superseded_by_link', 'supersededByLink'] }
+    ]
+  });
 }
 
 async function getDefaultWritePreflightCandidates(shadowStore, request = {}) {
@@ -464,6 +520,13 @@ async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
 
 function createCodexMemoryApplication(overrides = {}) {
   const config = createConfig(overrides);
+  const internalValidateRuntimeEntryEnabled = overrides.internalValidateRuntimeEntryEnabled === true;
+  const internalTombstoneRuntimeEntryEnabled = overrides.internalTombstoneRuntimeEntryEnabled === true;
+  const internalSupersedeRuntimeEntryEnabled = overrides.internalSupersedeRuntimeEntryEnabled === true;
+  const internalMemoryExcludeRuntimeEntryEnabled = overrides.internalMemoryExcludeRuntimeEntryEnabled === true;
+  const internalMemoryForgetRuntimeEntryEnabled = overrides.internalMemoryForgetRuntimeEntryEnabled === true;
+  const internalMemoryExcludeApplyPlanPreviewEnabled = overrides.internalMemoryExcludeApplyPlanPreviewEnabled === true;
+  const internalMemoryForgetApplyPlanPreviewEnabled = overrides.internalMemoryForgetApplyPlanPreviewEnabled === true;
   const diaryStore = new DiaryStore(config);
   const shadowStore = new SqliteShadowStore(config);
   const externalEmbeddingAdapter = new ExternalEmbeddingAdapter(config);
@@ -544,6 +607,22 @@ function createCodexMemoryApplication(overrides = {}) {
     config,
     shadowStore,
     auditLogStore
+  });
+  const tombstoneMemoryService = new TombstoneMemoryService({
+    config,
+    shadowStore,
+    auditLogStore
+  });
+  const supersedeMemoryService = new SupersedeMemoryService({
+    config,
+    shadowStore,
+    auditLogStore
+  });
+  const deferredGovernanceRuntimeEntryAdapter = new DeferredGovernanceRuntimeEntryAdapter({
+    memoryExcludeEnabled: internalMemoryExcludeRuntimeEntryEnabled,
+    memoryForgetEnabled: internalMemoryForgetRuntimeEntryEnabled,
+    memoryExcludeApplyPlanPreviewEnabled: internalMemoryExcludeApplyPlanPreviewEnabled,
+    memoryForgetApplyPlanPreviewEnabled: internalMemoryForgetApplyPlanPreviewEnabled
   });
 
   const passiveRecallService = new PassiveRecallService({
@@ -662,6 +741,9 @@ function createCodexMemoryApplication(overrides = {}) {
     services: {
       writeService,
       validateMemoryService,
+      tombstoneMemoryService,
+      supersedeMemoryService,
+      deferredGovernanceRuntimeEntryAdapter,
       passiveRecallService,
       activeRecallService,
       overviewService
@@ -739,6 +821,57 @@ function createCodexMemoryApplication(overrides = {}) {
         rootPath: options.rootPath || config.activeMemoryRootPath,
         force: !!options.force
       });
+    },
+    async executeInternalValidate(args = {}, requestContext = {}) {
+      const normalized = buildInternalValidateRuntimePayload(args, requestContext, {
+        enabled: internalValidateRuntimeEntryEnabled
+      });
+      if (!normalized.ok) {
+        return validateMemoryService.buildRejectedResult({
+          reason: normalized.reason,
+          payload: normalized.payload,
+          dryRun: normalized.payload?.dry_run !== false
+        });
+      }
+      return validateMemoryService.validate(normalized.payload);
+    },
+    async executeInternalTombstone(args = {}, requestContext = {}) {
+      const normalized = buildInternalTombstoneRuntimePayload(args, requestContext, {
+        enabled: internalTombstoneRuntimeEntryEnabled
+      });
+      if (!normalized.ok) {
+        return tombstoneMemoryService.buildRejectedResult({
+          reason: normalized.reason,
+          payload: normalized.payload,
+          dryRun: normalized.payload?.dry_run !== false
+        });
+      }
+      return tombstoneMemoryService.tombstone(normalized.payload);
+    },
+    async executeInternalSupersede(args = {}, requestContext = {}) {
+      const normalized = buildInternalSupersedeRuntimePayload(args, requestContext, {
+        enabled: internalSupersedeRuntimeEntryEnabled
+      });
+      if (!normalized.ok) {
+        return supersedeMemoryService.buildRejectedResult({
+          reason: normalized.reason,
+          payload: normalized.payload,
+          dryRun: normalized.payload?.dry_run !== false
+        });
+      }
+      return supersedeMemoryService.supersede(normalized.payload);
+    },
+    async executeInternalMemoryExclude(args = {}, requestContext = {}) {
+      return deferredGovernanceRuntimeEntryAdapter.executeInternalMemoryExclude(args, requestContext);
+    },
+    async executeInternalMemoryForget(args = {}, requestContext = {}) {
+      return deferredGovernanceRuntimeEntryAdapter.executeInternalMemoryForget(args, requestContext);
+    },
+    async previewInternalMemoryExcludeApplyPlan(args = {}, requestContext = {}) {
+      return deferredGovernanceRuntimeEntryAdapter.previewInternalMemoryExcludeApplyPlan(args, requestContext);
+    },
+    async previewInternalMemoryForgetApplyPlan(args = {}, requestContext = {}) {
+      return deferredGovernanceRuntimeEntryAdapter.previewInternalMemoryForgetApplyPlan(args, requestContext);
     },
     async close() {
       await shadowStore.close();
