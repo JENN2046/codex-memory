@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1015 CM0737 Bounded Write Proof Execution Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1015_CM0737_BOUNDED_WRITE_PROOF_EXECUTION.md`
+
+Completed:
+- Ran current-facts write proof preflight on clean synced `main` at `60f2544378e163fa83de6a42f7914af0b5b309a4`.
+- Executed exactly one sanitized CM0737-bound `record_memory` write through `createCodexMemoryApplication({ enableWritePreflight: true })`.
+- Recorded accepted result with opaque memory id hash `6b158de28cb1166e`, `shadowWriteStatus=ok`, and payload hash `a6785ca0f6d3ce566f6ca6421083997a616326f009a6212461c69b77dc1c6c0a`.
+- Consumed the sanitized result through `WriteProofExecutionResultBoundary`; boundary accepted it as not-ready evidence with no blockers.
+- Ran post-write store freshness dry-run; result `records=6`, `chunks=11`, `last24h=2`.
+
+Validation:
+- Write current-facts preflight returned `WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Result boundary returned `WRITE_PROOF_RESULT_BOUNDARY_ACCEPTED_NOT_READY`.
+- Targeted write proof preflight/result tests passed `18/18`.
+- Ledger consistency passed.
+- Docs validation passed.
+- Diff check passed.
+- No-overclaim/public-MCP scan found only denial/not-ready/boundary wording in the changed scope.
+
+Boundary:
+- One local durable `record_memory` write and one write-audit append occurred.
+- No `search_memory`, provider/API call, raw memory read, direct `.jsonl` read, raw durable audit read, `memory_overview`, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+
+Next:
+- Review CM-1015 as bounded write evidence or plan write-to-recall continuity. Broad write reliability remains unproven and `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1014 CM0825 Post-Guard Recall Blocker Review Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`

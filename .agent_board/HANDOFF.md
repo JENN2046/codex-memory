@@ -1,5 +1,32 @@
 # HANDOFF.md — codex-memory
 
+## CM-1015 CM0737 Bounded Write Proof Execution Handoff
+
+Goal: execute exactly one sanitized CM0737-bound bounded write proof through the existing opt-in app seam, then consume the result through the CM-1010 boundary without claiming write reliability.
+
+Status: COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1015_CM0737_BOUNDED_WRITE_PROOF_EXECUTION.md`.
+
+Current evidence:
+- Clean synced baseline was `60f2544378e163fa83de6a42f7914af0b5b309a4`.
+- Write current-facts preflight returned `WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Exactly one sanitized `record_memory` call executed through `createCodexMemoryApplication({ enableWritePreflight: true })`.
+- The write was accepted; opaque memory id hash is `6b158de28cb1166e`; `shadowWriteStatus=ok`.
+- Side-effect counters recorded `recordMemoryCalls=1`, `acceptedMemoryWrites=1`, `durableMemoryWrites=1`, `durableAuditWrites=1`; forbidden counters were zero.
+- `WriteProofExecutionResultBoundary` accepted the result as `WRITE_PROOF_RESULT_BOUNDARY_ACCEPTED_NOT_READY`.
+- Store freshness dry-run after the proof reported `records=6`, `chunks=11`, `last24h=2`.
+
+Not validated:
+- Broad write reliability, rollback cleanup sufficiency, write-to-recall continuity, multi-client behavior, long-run durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is exactly one accepted local write proof, not broad `memory write reliable`.
+- The proof intentionally leaves durable evidence in the local store; any future correction must use explicit lifecycle governance, not silent deletion.
+
+Next safe step:
+- Review CM-1015 evidence or plan a bounded write-to-recall continuity proof. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1014 CM0825 Post-Guard Recall Blocker Review Handoff
 
 Goal: consume CM-1013 post-guard CM0825 proof evidence through the existing CM-0826-style recall blocker criteria without executing another live proof or claiming reliability.

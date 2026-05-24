@@ -28,6 +28,50 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1015 CM0737 Bounded Write Proof Execution - 2026-05-25
+
+Result: `CM1015_CM0737_BOUNDED_WRITE_PROOF_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1015 records one accepted bounded write proof:
+
+- [CM1015_CM0737_BOUNDED_WRITE_PROOF_EXECUTION.md](/A:/codex-memory/docs/CM1015_CM0737_BOUNDED_WRITE_PROOF_EXECUTION.md)
+
+Baseline and preflight:
+
+```text
+HEAD / origin/main / remote refs/heads/main = 60f2544378e163fa83de6a42f7914af0b5b309a4
+worktree = clean
+write preflight = WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED
+```
+
+Proof facts:
+
+```text
+decision = MEMORY_WRITE_BOUNDED_PROOF_PASSED_NOT_READY
+recordMemoryCalls = 1
+acceptedMemoryWrites = 1
+durableMemoryWrites = 1
+durableAuditWrites = 1
+shadowWriteStatus = ok
+resultBoundary = WRITE_PROOF_RESULT_BOUNDARY_ACCEPTED_NOT_READY
+forbidden counters = all zero
+```
+
+Post-write dry-run freshness:
+
+```text
+records = 6
+chunks = 11
+last24h = 2
+```
+
+Operator interpretation:
+
+- This is one real local durable write and one write-audit append through the opt-in app seam.
+- It is stronger bounded write-path evidence than non-mutating preflight/result-boundary packets.
+- This does not prove broad write reliability, write-to-recall continuity, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `complete?` remains `no`.
+
 ## CM-1014 CM0825 Post-Guard Recall Blocker Review - 2026-05-25
 
 Result: `CM1014_RECALL_RELIABILITY_BLOCKER_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`.
