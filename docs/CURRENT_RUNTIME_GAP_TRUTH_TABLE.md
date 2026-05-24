@@ -28,6 +28,62 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1043 HTTP Observe Write Reconcile Worker Status - 2026-05-25
+
+Result: `CM1043_HTTP_OBSERVE_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`.
+
+CM-1043 connects CM-1042's bounded health status field to the existing HTTP observe operator surface:
+
+- `observe:http` now emits top-level `runtime.writeReconcileWorker`
+- `summary` now includes worker health field availability, worker available/running/timer/in-flight state, run count, and raw-memory-id exposure flag
+- text output includes a `[runtime]` block
+- missing live health-field support is represented as `healthFieldAvailable=false`
+- missing live health-field support does not make the HTTP runtime unhealthy
+- last-result summary is normalized to bounded counters/status flags only
+- raw health worker status objects are not passed through
+- no public MCP tool is added
+- no worker is started by observe
+- no startup worker, watchdog integration, or config integration is installed
+
+Validation:
+
+- source/test syntax checks passed
+- targeted `http-observe` CLI test `17/17` passed
+- adjacent HTTP observe/MCP/worker bundle `52/52` passed
+- full `npm test` `2493/2493` passed
+- `npm run observe:http -- --json` against the existing local 7605 process reported summary status `ok`, health status `ok`, `writeReconcileWorkerHealthFieldAvailable=false`, and `writeReconcileWorkerRawMemoryIdExposed=false`
+
+Live observe boundary:
+
+- The existing 7605 process was already running before CM-1042/CM-1043.
+- Its observed `/health` payload still did not include `runtime.writeReconcileWorker`.
+- Therefore CM-1043 does not claim live deployed new-field evidence.
+- CM-1043 proves current-source observe can consume the bounded field when present and handles field absence safely when not present.
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by observe = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens bounded operator observability for the write reconcile worker.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1042 HTTP Health Write Reconcile Worker Status - 2026-05-25
 
 Result: `CM1042_HTTP_HEALTH_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`.

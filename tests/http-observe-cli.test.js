@@ -56,7 +56,7 @@ const REPO_CM0595_EXECUTION_EVIDENCE_RECORD_PATH = path.join(
   'cm0650-cm0595-execution-evidence-record-v1.md'
 );
 
-async function startHealthServer() {
+async function startHealthServer(healthPayload = {}) {
   const server = http.createServer((req, res) => {
     if (req.url === '/health') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -65,7 +65,8 @@ async function startHealthServer() {
         name: 'vcp_codex_memory',
         version: '0.1.0',
         protocol: 'streamable-http',
-        path: '/mcp/codex-memory'
+        path: '/mcp/codex-memory',
+        ...healthPayload
       }));
       return;
     }
@@ -231,7 +232,35 @@ function assertKeySet(value, expected, label) {
 
 test('http-observe CLI should summarize runtime health, logs, and audits in json mode', async () => {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-observe-'));
-  const server = await startHealthServer();
+  const server = await startHealthServer({
+    runtime: {
+      writeReconcileWorker: {
+        available: true,
+        running: false,
+        timerScheduled: false,
+        tickInFlight: false,
+        runCount: 3,
+        intervalMs: 60000,
+        limit: 2,
+        dryRun: false,
+        maxRuns: 5,
+        lastResultSummary: {
+          success: true,
+          decision: 'completed',
+          workerDecision: 'run_once_completed',
+          dryRun: false,
+          limit: 2,
+          scannedTaskCount: 2,
+          replayedCount: 2,
+          wouldReplayCount: 0,
+          clearedCount: 2,
+          failedCount: 0,
+          skippedCount: 0,
+          hasError: false
+        }
+      }
+    }
+  });
   await seedRuntimeArtifacts(tempBasePath);
 
   try {
@@ -258,6 +287,7 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       'health',
       'logs',
       'readPolicy',
+      'runtime',
       'summary'
     ], 'http-observe top-level');
     assertKeySet(payload.summary, [
@@ -299,7 +329,14 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       'status',
       'strictScopedRecallCount',
       'watchdogEnsureFailureCount',
-      'watchdogRecoveryCount'
+      'watchdogRecoveryCount',
+      'writeReconcileWorkerAvailable',
+      'writeReconcileWorkerHealthFieldAvailable',
+      'writeReconcileWorkerRawMemoryIdExposed',
+      'writeReconcileWorkerRunCount',
+      'writeReconcileWorkerRunning',
+      'writeReconcileWorkerTickInFlight',
+      'writeReconcileWorkerTimerScheduled'
     ], 'http-observe summary');
     assertKeySet(payload.health, [
       'durationMs',
@@ -316,6 +353,44 @@ test('http-observe CLI should summarize runtime health, logs, and audits in json
       'logsDir'
     ], 'http-observe config');
     assertKeySet(payload.logs, ['http', 'watchdog'], 'http-observe logs');
+    assertKeySet(payload.runtime, ['writeReconcileWorker'], 'http-observe runtime');
+    assertKeySet(payload.runtime.writeReconcileWorker, [
+      'available',
+      'dryRun',
+      'healthFieldAvailable',
+      'intervalMs',
+      'lastResultSummary',
+      'limit',
+      'maxRuns',
+      'rawMemoryIdExposed',
+      'runCount',
+      'running',
+      'tickInFlight',
+      'timerScheduled'
+    ], 'http-observe write reconcile worker runtime');
+    assertKeySet(payload.runtime.writeReconcileWorker.lastResultSummary, [
+      'clearedCount',
+      'decision',
+      'dryRun',
+      'failedCount',
+      'hasError',
+      'limit',
+      'replayedCount',
+      'scannedTaskCount',
+      'skippedCount',
+      'success',
+      'workerDecision',
+      'wouldReplayCount'
+    ], 'http-observe write reconcile worker last result summary');
+    assert.equal(payload.summary.writeReconcileWorkerHealthFieldAvailable, true);
+    assert.equal(payload.summary.writeReconcileWorkerAvailable, true);
+    assert.equal(payload.summary.writeReconcileWorkerRunning, false);
+    assert.equal(payload.summary.writeReconcileWorkerTimerScheduled, false);
+    assert.equal(payload.summary.writeReconcileWorkerTickInFlight, false);
+    assert.equal(payload.summary.writeReconcileWorkerRunCount, 3);
+    assert.equal(payload.summary.writeReconcileWorkerRawMemoryIdExposed, false);
+    assert.equal(payload.runtime.writeReconcileWorker.lastResultSummary.replayedCount, 2);
+    assert.equal(JSON.stringify(payload.runtime.writeReconcileWorker).includes('memoryId'), false);
     assertKeySet(payload.logs.http, [
       'errorCount',
       'exists',

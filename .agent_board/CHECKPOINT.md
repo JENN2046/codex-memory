@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1043 HTTP Observe Write Reconcile Worker Status Checkpoint
+
+Status: `COMPLETED_VALIDATED_HTTP_OBSERVE_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1043_HTTP_OBSERVE_WRITE_RECONCILE_WORKER_STATUS.md`
+
+Completed:
+- Added bounded `runtime.writeReconcileWorker` to `observe:http`.
+- Added summary fields for worker health-field availability, available/running/timer/in-flight state, run count, and raw memory-id exposure.
+- Added `[runtime]` text output block.
+- Normalized worker last-result summary to bounded counters/status flags only.
+- Verified fixture health status is summarized without `memoryId` exposure.
+- Verified missing live health-field support is reported as unavailable rather than unhealthy.
+- Classified existing 7605 observe as existing-runtime health plus missing worker-health-field evidence only.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted `http-observe` CLI test passed `17/17`.
+- Adjacent HTTP observe/MCP/worker bundle passed `52/52`.
+- Full `npm test` passed `2493/2493`.
+- `observe:http -- --json` against existing 7605 reported summary `ok`, health `ok`, `writeReconcileWorkerHealthFieldAvailable=false`, and `writeReconcileWorkerRawMemoryIdExposed=false`.
+
+Boundary:
+- Internal bounded observe status only.
+- No public MCP expansion, public `memory_write_reconcile_worker` tool, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, live deployed new-field claim, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded reliability closure toward controlled runtime-refresh evidence, longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1042 HTTP Health Write Reconcile Worker Status Checkpoint
 
 Status: `COMPLETED_VALIDATED_HTTP_HEALTH_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`

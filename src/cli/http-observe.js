@@ -400,7 +400,74 @@ function collectGovernance(options = {}) {
   };
 }
 
-function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, governance, readPolicy }) {
+function normalizeNullableNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeWorkerLastResultSummary(summary) {
+  if (!summary || typeof summary !== 'object') {
+    return null;
+  }
+
+  return {
+    success: summary.success === true,
+    decision: summary.decision || null,
+    workerDecision: summary.workerDecision || null,
+    dryRun: summary.dryRun === true,
+    limit: summary.limit ?? null,
+    scannedTaskCount: normalizeNullableNumber(summary.scannedTaskCount) ?? 0,
+    replayedCount: normalizeNullableNumber(summary.replayedCount) ?? 0,
+    wouldReplayCount: normalizeNullableNumber(summary.wouldReplayCount) ?? 0,
+    clearedCount: normalizeNullableNumber(summary.clearedCount) ?? 0,
+    failedCount: normalizeNullableNumber(summary.failedCount) ?? 0,
+    skippedCount: normalizeNullableNumber(summary.skippedCount) ?? 0,
+    hasError: summary.hasError === true
+  };
+}
+
+function buildWriteReconcileWorkerRuntimeSurface(health) {
+  const status = health?.payload?.runtime?.writeReconcileWorker;
+  if (!status || typeof status !== 'object') {
+    return {
+      healthFieldAvailable: false,
+      available: false,
+      running: false,
+      timerScheduled: false,
+      tickInFlight: false,
+      runCount: null,
+      intervalMs: null,
+      limit: null,
+      dryRun: null,
+      maxRuns: null,
+      lastResultSummary: null,
+      rawMemoryIdExposed: false
+    };
+  }
+
+  return {
+    healthFieldAvailable: true,
+    available: status.available === true,
+    running: status.running === true,
+    timerScheduled: status.timerScheduled === true,
+    tickInFlight: status.tickInFlight === true,
+    runCount: normalizeNullableNumber(status.runCount),
+    intervalMs: normalizeNullableNumber(status.intervalMs),
+    limit: status.limit ?? null,
+    dryRun: typeof status.dryRun === 'boolean' ? status.dryRun : null,
+    maxRuns: status.maxRuns ?? null,
+    lastResultSummary: normalizeWorkerLastResultSummary(status.lastResultSummary),
+    rawMemoryIdExposed: JSON.stringify(status).includes('memoryId')
+  };
+}
+
+function buildRuntimeSurface(health) {
+  return {
+    writeReconcileWorker: buildWriteReconcileWorkerRuntimeSurface(health)
+  };
+}
+
+function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, governance, readPolicy, runtime }) {
   const hints = [];
   let status = 'ok';
   const autoAuthorizationBundleSummary = formatAutoAuthorizationBundleSummary(governance.autoAuthorization);
@@ -411,6 +478,13 @@ function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, g
   if (health.status !== 'ok') {
     status = 'error';
     hints.push('HTTP /health 未通过，先运行 `npm run start:http:ensure`。');
+  }
+
+  if (runtime.writeReconcileWorker.rawMemoryIdExposed === true) {
+    if (status === 'ok') {
+      status = 'warn';
+    }
+    hints.push('HTTP /health 的 writeReconcileWorker 状态疑似暴露 memoryId，请先检查 bounded status surface。');
   }
 
   if (watchdogLog.ensureFailureCount > 0 || httpLog.errorCount > 0) {
@@ -508,6 +582,13 @@ function buildSummary({ health, httpLog, watchdogLog, writeAudit, recallAudit, g
     status,
     message,
     healthStatus: health.status,
+    writeReconcileWorkerHealthFieldAvailable: runtime.writeReconcileWorker.healthFieldAvailable,
+    writeReconcileWorkerAvailable: runtime.writeReconcileWorker.available,
+    writeReconcileWorkerRunning: runtime.writeReconcileWorker.running,
+    writeReconcileWorkerTimerScheduled: runtime.writeReconcileWorker.timerScheduled,
+    writeReconcileWorkerTickInFlight: runtime.writeReconcileWorker.tickInFlight,
+    writeReconcileWorkerRunCount: runtime.writeReconcileWorker.runCount,
+    writeReconcileWorkerRawMemoryIdExposed: runtime.writeReconcileWorker.rawMemoryIdExposed,
     httpLogErrorCount: httpLog.errorCount,
     watchdogRecoveryCount: watchdogLog.recoveryCount,
     watchdogEnsureFailureCount: watchdogLog.ensureFailureCount,
@@ -561,6 +642,16 @@ function formatTextReport(report, options = {}) {
     `healthUrl: ${report.health.url}`,
     ''
   ];
+
+  lines.push('[runtime]');
+  lines.push(`  writeReconcileWorkerHealthFieldAvailable: ${report.runtime.writeReconcileWorker.healthFieldAvailable}`);
+  lines.push(`  writeReconcileWorkerAvailable: ${report.runtime.writeReconcileWorker.available}`);
+  lines.push(`  writeReconcileWorkerRunning: ${report.runtime.writeReconcileWorker.running}`);
+  lines.push(`  writeReconcileWorkerTimerScheduled: ${report.runtime.writeReconcileWorker.timerScheduled}`);
+  lines.push(`  writeReconcileWorkerTickInFlight: ${report.runtime.writeReconcileWorker.tickInFlight}`);
+  lines.push(`  writeReconcileWorkerRunCount: ${report.runtime.writeReconcileWorker.runCount ?? 'n/a'}`);
+  lines.push(`  writeReconcileWorkerRawMemoryIdExposed: ${report.runtime.writeReconcileWorker.rawMemoryIdExposed}`);
+  lines.push('');
 
   lines.push('[http-log]');
   lines.push(`  path: ${report.logs.http.path}`);
@@ -778,6 +869,7 @@ async function main() {
     recallEntries,
     auditTailLimit: options.auditTail
   });
+  const runtime = buildRuntimeSurface(health);
 
   const summary = buildSummary({
     health,
@@ -786,7 +878,8 @@ async function main() {
     writeAudit,
     recallAudit,
     governance,
-    readPolicy
+    readPolicy,
+    runtime
   });
 
   const report = {
@@ -803,6 +896,7 @@ async function main() {
       http: httpLog,
       watchdog: watchdogLog
     },
+    runtime,
     governance,
     readPolicy,
     audits: {
