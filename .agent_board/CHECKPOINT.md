@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1004 Post-Reconciliation Push-State Sync Checkpoint
+
+Status: `COMPLETED_VALIDATED_LOCAL_STATUS_SYNC_NOT_READY`
+
+Date: 2026-05-24
+
+Observed already-pushed commit: `fe99c92 docs: record push readiness reconciliation`
+
+Post-push hash: `fe99c92648595db68154ccd4d49371b8624a4a23`
+
+Completed:
+- Recorded that the CM-1003 board/status reconciliation note had already been committed and pushed to `origin/main`.
+- Verified local `HEAD`, local tracking `origin/main`, and remote `refs/heads/main` all converge at `fe99c92648595db68154ccd4d49371b8624a4a23`.
+- Updated `.agent_board`, `STATUS.md`, and `MAINTENANCE_BACKLOG.md` so the current handoff no longer points to the older `cd05d02` post-push baseline.
+
+Validation:
+- prior post-push `git status -sb`
+- prior post-push `git rev-parse HEAD`
+- prior post-push `git rev-parse origin/main`
+- prior post-push `git ls-remote origin refs/heads/main`
+- stale-follow-up scan
+- `node scripts\validate_autopilot_ledger_consistency.js`
+- `git diff --check -- .agent_board STATUS.md MAINTENANCE_BACKLOG.md`
+- docs validation
+
+Boundary:
+- No source/runtime change, service/config/watchdog/startup edit, dependency change, provider call, true `record_memory` / `search_memory`, raw memory / `.jsonl` read, durable memory/audit/projection mutation, public MCP expansion, tag/release/deploy/PR, readiness claim, or reliability claim.
+
+Next:
+- Continue from clean synced `main` with the next scoped recall reliability, write reliability, or governance closure task.
+
 ## CM-0995 Deferred Governance App Runtime Readiness Boundary Binding Checkpoint
 
 Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
@@ -4806,4 +4837,4 @@ Remaining risk:
 - The pushed stage is validated and synced, but it is not a readiness/reliability closure. `RC_NOT_READY_BLOCKED` remains.
 
 Next:
-- Commit and push this CM-1003 board/status reconciliation note, then continue with the next scoped reliability/governance task from a clean synced `main`.
+- Superseded by CM-1004, which committed and pushed this CM-1003 board/status reconciliation note; continue with the next scoped reliability/governance task from a clean synced `main`.

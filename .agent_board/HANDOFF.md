@@ -1,5 +1,29 @@
 # HANDOFF.md — codex-memory
 
+## CM-1004 Post-Reconciliation Push-State Sync Handoff
+
+Goal: record the final post-reconciliation push state after the CM-1003 board/status reconciliation note was committed and pushed.
+
+Status: COMPLETED_VALIDATED_LOCAL_STATUS_SYNC_NOT_READY.
+
+Observed already-pushed commit: `fe99c92 docs: record push readiness reconciliation`.
+
+Post-push hash: `fe99c92648595db68154ccd4d49371b8624a4a23`.
+
+Current evidence:
+- Local `HEAD`, local tracking `origin/main`, and remote `refs/heads/main` all equal `fe99c92648595db68154ccd4d49371b8624a4a23`.
+- Worktree was clean immediately after the push verification.
+- This handoff updates board/status/backlog truth only; it does not add runtime proof.
+
+Not validated:
+- Live recall reliability closure, live write reliability closure, true `record_memory`, true `search_memory`, provider smoke/benchmark, broad real memory scan, production readiness, release/tag/deploy.
+
+Remaining risks:
+- Pushed and synced does not mean RC-ready, production-ready, recall reliable, or write reliable. `RC_NOT_READY_BLOCKED` remains.
+
+Next safe step:
+- Continue from clean synced `main` with the next scoped recall reliability, write reliability, or governance closure task after fresh inspection.
+
 ## CM-0995 Deferred Governance App Runtime Readiness Boundary Binding Handoff
 
 Status: `COMPLETED_VALIDATED_LOCAL_COMMIT_NOT_READY`
@@ -6091,7 +6115,7 @@ Post-push hash: `cd05d023098da3c7065fe5e0f36d1ac8df4b2ce8`.
 Validation: preflight fetch/status/log/diff/remote checks passed; sensitive-pattern scan reviewed with content suppressed; `npm run start:http:ensure` started local HTTP only for health validation; `npm run observe:http -- --json` returned `status=ok`, service `vcp_codex_memory`, health 200, `noProvider=true`, `mutated=false`, `migrationApplied=false`; `npm run gate:mainline:strict` passed health, contract `25/25`, tests `2436/2436`, compare `43/43`, rollback `43/43`; post-push verification confirmed local, `origin/main`, and remote hashes all equal `cd05d023098da3c7065fe5e0f36d1ac8df4b2ce8`.
 Not validated: live recall reliability closure, live write reliability closure, true record_memory, true search_memory, provider smoke/benchmark, broad real memory scan, production readiness, release/tag/deploy.
 Remaining risks: Pushed and validated does not mean RC-ready, production-ready, recall reliable, or write reliable. `RC_NOT_READY_BLOCKED` remains.
-Next safe step: commit and push this CM-1003 board/status reconciliation note, then continue from clean synced `main` with the next scoped reliability/governance task.
+Next safe step: superseded by CM-1004, which committed and pushed this CM-1003 board/status reconciliation note; continue from clean synced `main` with the next scoped reliability/governance task.
 
 ## CM-0998 Internal Runtime-Entry Family Stabilization Review Sync Handoff
 
