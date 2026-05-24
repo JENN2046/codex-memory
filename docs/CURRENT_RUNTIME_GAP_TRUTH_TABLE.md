@@ -3828,6 +3828,44 @@ Boundary: this precondition review did not execute true live `search_memory`, ex
 
 Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
 
+## CM-1008 Recall Reliability Blocker Review - 2026-05-24
+
+Result: `CM1008_RECALL_RELIABILITY_BLOCKER_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`.
+
+Artifact: `docs/CM1008_RECALL_RELIABILITY_BLOCKER_REVIEW.md`.
+
+Review verdict:
+
+- CM-1007 evidence satisfies the CM-0826 review criteria for the exact CM0825 patched proof shape.
+- Q1/Q2/Q3 positive counts are `2/4/2`.
+- Q4 stricter negative-control count is `0`.
+- Output is sanitized metadata-only, `rawContentReturned=false`, and all side-effect counters are zero.
+- The patched proof-shape ambiguity around metadata-only `noRawContentRead=true` is downgraded for this exact proof shape.
+- The downgrade does not prove broad `memory recall reliable`, does not change `complete?` to `yes`, and does not create runtime, RC, production, release, or cutover readiness.
+
+Boundary: this review did not execute another true live `search_memory`, execute `record_memory`, read raw memory or `.jsonl` / durable memory content, call providers, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness/reliability claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
+## CM-1007 Patched True Live Recall Proof Execution - 2026-05-24
+
+Result: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PASSED_NOT_READY`.
+
+Artifact: `docs/CM1007_PATCHED_TRUE_LIVE_RECALL_PROOF_EXECUTION.md`.
+
+Execution verdict:
+
+- Executed exactly four in-process read-only `search_memory` calls through `TrueLiveRecallReadonlyProofRunner` and `TrueLiveRecallExecutorAdapter`.
+- Baseline was clean synced `main` at `c171176e48c1bcdb5ed2e6c677f2de994ddb2660`.
+- Q1/Q2/Q3 positive counts are `2/4/2`.
+- Q4 stricter negative-control count is `0`.
+- Output contains only sanitized counts, opaque hashes, scores, metadata key names, proof context flags, and counters.
+- `rawContentReturned=false`; all side-effect counters are zero.
+
+Boundary: this execution did not call `record_memory`, call providers/API, read raw memory or direct `.jsonl`, write durable memory/audit state, expand public MCP, modify package/config/watchdog/startup, tag/release/deploy/cutover, or make a readiness/reliability claim.
+
+Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remains bounded evidence only, and no row changes to `complete? = yes`.
+
 ## CM-0826 Recall Reliability Blocker Review Criteria - 2026-05-23
 
 Result: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`.

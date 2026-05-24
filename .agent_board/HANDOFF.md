@@ -1,5 +1,28 @@
 # HANDOFF.md — codex-memory
 
+## CM-1008 Recall Reliability Blocker Review Handoff
+
+Goal: review CM-1007 patched true-live recall proof evidence under CM-0826 criteria without turning a narrow proof pass into a broad reliability claim.
+
+Status: COMPLETED_VALIDATED_NOT_READY.
+
+Artifact: `docs/CM1008_RECALL_RELIABILITY_BLOCKER_REVIEW.md`.
+
+Current evidence:
+- CM-1007 exact patched proof shape passed: Q1/Q2/Q3=`2/4/2`, Q4=`0`.
+- Output was sanitized metadata-only and `rawContentReturned=false`.
+- All side-effect counters were present and zero.
+- CM-1008 downgrades only the patched proof-shape ambiguity around `noRawContentRead=true`.
+
+Not validated:
+- Broad recall reliability, write reliability, provider-backed quality, broad query-family coverage, long-run behavior, production readiness, release/tag/deploy, real rollback apply.
+
+Remaining risks:
+- `memory recall reliable` remains bounded evidence only and `complete? = no`. The next priority should shift to write reliability closure or governance fail-closed closure unless a new bounded recall expansion plan is selected.
+
+Next safe step:
+- Start a scoped write reliability closure task or a governance blocker closure task from clean synced `main`.
+
 ## CM-1007 Patched True-Live Recall Proof Execution Handoff
 
 Goal: execute one bounded CM0825 patched true-live recall proof after CM-1006 bound the internal runner to the exact approval/query profile.

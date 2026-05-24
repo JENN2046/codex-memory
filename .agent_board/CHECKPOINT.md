@@ -1,5 +1,29 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1008 Recall Reliability Blocker Review Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-24
+
+Artifact: `docs/CM1008_RECALL_RELIABILITY_BLOCKER_REVIEW.md`
+
+Completed:
+- Reviewed CM-1007 sanitized patched proof evidence against CM-0826 criteria.
+- Recorded narrow downgrade of the patched proof-shape ambiguity around metadata-only `noRawContentRead=true`.
+- Updated current runtime gap truth-table sections without changing `complete? = no`.
+
+Validation:
+- CM-1007 exact query counts accepted: Q1=`2`, Q2=`4`, Q3=`2`, Q4=`0`.
+- CM-1007 output shape accepted as sanitized metadata-only with complete zero side-effect counters.
+- No readiness or reliability claim was made.
+
+Boundary:
+- No live proof execution, `search_memory`, `record_memory`, provider/API call, raw memory read, direct `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim in this review.
+
+Next:
+- Move to the next explicit blocker class: write reliability closure or governance fail-closed closure. Any additional recall work needs a new bounded plan.
+
 ## CM-1007 Patched True-Live Recall Proof Execution Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
