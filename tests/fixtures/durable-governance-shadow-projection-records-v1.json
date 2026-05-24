@@ -1,0 +1,49 @@
+{
+  "records": [
+    {
+      "memoryId": "memory-old-001",
+      "status": "active",
+      "statusReason": "validated",
+      "projectId": "project-cm-0863",
+      "workspaceId": "workspace-cm-0863",
+      "clientId": "codex-desktop",
+      "taskId": "CM-0863",
+      "conversationId": "thread-cm-0863",
+      "visibility": "private",
+      "retentionPolicy": "retain",
+      "supersededBy": null,
+      "supersedes": null,
+      "tombstoneReason": null
+    },
+    {
+      "memoryId": "memory-new-001",
+      "status": "proposal",
+      "statusReason": "awaiting-review",
+      "projectId": "project-cm-0863",
+      "workspaceId": "workspace-cm-0863",
+      "clientId": "codex-desktop",
+      "taskId": "CM-0863",
+      "conversationId": "thread-cm-0863",
+      "visibility": "private",
+      "retentionPolicy": "retain",
+      "supersededBy": null,
+      "supersedes": null,
+      "tombstoneReason": null
+    },
+    {
+      "memoryId": "memory-tombstone-001",
+      "status": "stale",
+      "statusReason": "aged-out",
+      "projectId": "project-cm-0863",
+      "workspaceId": "workspace-cm-0863",
+      "clientId": "codex-desktop",
+      "taskId": "CM-0863",
+      "conversationId": "thread-cm-0863",
+      "visibility": "private",
+      "retentionPolicy": "retain",
+      "supersededBy": null,
+      "supersedes": null,
+      "tombstoneReason": null
+    }
+  ]
+}
