@@ -28,6 +28,62 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1037 Memory Write Reconcile Worker Status Snapshot - 2026-05-25
+
+Result: `CM1037_MEMORY_WRITE_RECONCILE_WORKER_STATUS_SNAPSHOT_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1037 adds a bounded internal status snapshot for the default-disabled reconcile worker:
+
+- `MemoryWriteReconcileWorker.getStatus()` reports internal run state and counters
+- `summarizeResult(result)` returns bounded replay counters and status flags only
+- raw queued task `results` are omitted
+- memory ids, replay payloads, and raw error text are omitted
+- no public MCP tool is added
+- no runtime observe command is executed
+- no worker is started by default
+- no startup worker, watchdog integration, or config integration is installed
+
+Validation:
+
+- source/test syntax checks passed
+- CM-1037 targeted worker test `6/6` passed
+- adjacent worker/service/write reliability/MCP regression bundle `25/25` passed
+- full `npm test` `2489/2489` passed
+- ledger consistency, docs validation, diff check, and no-overclaim/public-MCP/raw-status scans passed
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+raw worker status results exposed = false
+raw worker status error exposed = false
+worker starts by default = false
+startup reconcile execution = false
+runtime observe execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+real cleanup apply = false
+real rollback apply = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This makes CM-1036's internal worker inspectable through a bounded status seam.
+- This is an observability precursor, not runtime observe evidence.
+- This does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, runtime observe safety, real cleanup safety, real rollback safety, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, automatic degraded recovery, startup reconcile safety, runtime observe safety, long-run durability, rollback readiness, governance closure, and real rollback safety remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1036 Memory Write Reconcile Worker Internal Disabled - 2026-05-25
 
 Result: `CM1036_MEMORY_WRITE_RECONCILE_WORKER_INTERNAL_DISABLED_PASSED_NOT_RELIABLE_NOT_READY`.

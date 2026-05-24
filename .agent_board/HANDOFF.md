@@ -1,5 +1,32 @@
 # HANDOFF.md — codex-memory
 
+## CM-1037 Memory Write Reconcile Worker Status Snapshot Handoff
+
+Goal: add a bounded internal read-only status snapshot for the default-disabled write reconcile worker, without exposing raw queued task data, adding a public MCP tool, executing runtime observe, starting the worker, or claiming readiness/reliability.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1037_MEMORY_WRITE_RECONCILE_WORKER_STATUS_SNAPSHOT.md`.
+
+Current evidence:
+- Source artifact: `src/core/MemoryWriteReconcileWorker.js`.
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- `getStatus()` reports running/timer/tick/run-count/config state plus bounded last-result counters.
+- `summarizeResult(...)` omits raw `results`, memory ids, replay payloads, and raw error text.
+- CM-1037 targeted worker test passed `6/6`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, automatic reconcile recovery, startup reconcile safety, runtime observe safety, real degraded projection recovery, reconcile cleanup safety, multi-run or long-horizon durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is an internal status snapshot, not runtime observe evidence.
+- It does not prove queue processing in live long-running runtime conditions.
+- It does not authorize startup/watchdog/config integration.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward exact runtime observe or longer-horizon worker durability. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1036 Memory Write Reconcile Worker Internal Disabled Handoff
 
 Goal: add a bounded internal default-disabled worker candidate for explicit write reconcile queue replay, without adding a public MCP tool, default startup execution, watchdog/config integration, automatic recovery claim, or readiness/reliability claim.

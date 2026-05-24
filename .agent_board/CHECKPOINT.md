@@ -1,5 +1,34 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1037 Memory Write Reconcile Worker Status Snapshot Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1037_MEMORY_WRITE_RECONCILE_WORKER_STATUS_SNAPSHOT.md`
+
+Completed:
+- Added `MemoryWriteReconcileWorker.getStatus()`.
+- Added bounded `summarizeResult(result)`.
+- Verified initial status is stopped with no timer and no last result.
+- Verified explicit `start({ maxRuns: 1 })` reports a scheduled timer.
+- Verified a manual scheduler tick reports one completed run.
+- Verified worker status omits raw task `results`, memory ids, replay payloads, and raw error text.
+
+Validation:
+- Source/test syntax checks passed.
+- CM-1037 targeted worker test passed `6/6`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `25/25`.
+- Full `npm test` passed `2489/2489`.
+
+Boundary:
+- Internal read-only status snapshot only.
+- No public MCP expansion, public `memory_write_reconcile_worker` tool, true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, dependency change, config/watchdog/startup edit, runtime observe execution, default worker start, startup reconcile execution, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward exact runtime observe or longer-horizon worker durability. Broad write reliability, automatic degraded recovery, startup reconcile safety, runtime observe safety, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1036 Memory Write Reconcile Worker Internal Disabled Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_DISABLED_NOT_RELIABLE_NOT_READY`

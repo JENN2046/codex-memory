@@ -9,7 +9,11 @@ const path = require('node:path');
 const { createCodexMemoryApplication } = require('../src/app');
 const { MemoryWriteService } = require('../src/core/MemoryWriteService');
 const { MemoryWriteReconcileService } = require('../src/core/MemoryWriteReconcileService');
-const { MemoryWriteReconcileWorker, normalizeIntervalMs } = require('../src/core/MemoryWriteReconcileWorker');
+const {
+  MemoryWriteReconcileWorker,
+  normalizeIntervalMs,
+  summarizeResult
+} = require('../src/core/MemoryWriteReconcileWorker');
 const { TOOL_DEFINITIONS } = require('../src/core/constants');
 const { DiaryStore } = require('../src/storage/DiaryStore');
 const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
@@ -272,9 +276,119 @@ test('CM-1036 explicit worker start schedules bounded non-overlapping replay and
   assert.equal(calls.length, 1);
 });
 
+test('CM-1037 worker status snapshot is read-only and does not expose raw task results or errors', async () => {
+  const scheduler = new ManualScheduler();
+  const reconcileService = {
+    async replayPending(options) {
+      return {
+        success: false,
+        decision: 'completed_with_failures',
+        workerDecision: 'run_once_completed',
+        dryRun: options.dryRun === true,
+        limit: options.limit,
+        scannedTaskCount: 1,
+        replayedCount: 0,
+        wouldReplayCount: 0,
+        clearedCount: 0,
+        failedCount: 1,
+        skippedCount: 0,
+        error: 'raw synthetic worker error with memory id codex-process-cm1037',
+        results: [{
+          memoryId: 'codex-process-cm1037-raw-result',
+          error: 'raw projection failure'
+        }]
+      };
+    }
+  };
+  const worker = new MemoryWriteReconcileWorker({
+    reconcileService,
+    scheduler,
+    intervalMs: 250,
+    limit: 5
+  });
+
+  const initialStatus = worker.getStatus();
+
+  assert.deepEqual(initialStatus, {
+    running: false,
+    timerScheduled: false,
+    tickInFlight: false,
+    runCount: 0,
+    intervalMs: 250,
+    limit: 5,
+    dryRun: false,
+    maxRuns: null,
+    lastResultSummary: null
+  });
+
+  worker.start({ dryRun: true, maxRuns: 1 });
+  assert.equal(worker.getStatus().timerScheduled, true);
+
+  await scheduler.flushNext();
+
+  const status = worker.getStatus();
+
+  assert.equal(status.running, false);
+  assert.equal(status.timerScheduled, false);
+  assert.equal(status.runCount, 1);
+  assert.deepEqual(status.lastResultSummary, {
+    success: false,
+    decision: 'completed_with_failures',
+    workerDecision: 'run_once_completed',
+    dryRun: true,
+    limit: 5,
+    scannedTaskCount: 1,
+    replayedCount: 0,
+    wouldReplayCount: 0,
+    clearedCount: 0,
+    failedCount: 1,
+    skippedCount: 0,
+    hasError: true
+  });
+  assert.equal(Object.prototype.hasOwnProperty.call(status.lastResultSummary, 'results'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(status.lastResultSummary, 'error'), false);
+  assert.equal(JSON.stringify(status).includes('codex-process-cm1037'), false);
+  assert.equal(JSON.stringify(status).includes('raw projection failure'), false);
+});
+
 test('CM-1036 normalizeIntervalMs bounds worker polling intervals', () => {
   assert.equal(normalizeIntervalMs(undefined), 60_000);
   assert.equal(normalizeIntervalMs(1), 100);
   assert.equal(normalizeIntervalMs('250'), 250);
   assert.equal(normalizeIntervalMs(999_999), 600_000);
+});
+
+test('CM-1037 summarizeResult returns bounded counters without raw result payloads', () => {
+  const summary = summarizeResult({
+    success: true,
+    decision: 'completed',
+    workerDecision: 'run_once_completed',
+    dryRun: false,
+    limit: 10,
+    scannedTaskCount: 2,
+    replayedCount: 1,
+    wouldReplayCount: 0,
+    clearedCount: 1,
+    failedCount: 1,
+    skippedCount: 0,
+    results: [{ memoryId: 'codex-process-cm1037-hidden' }],
+    error: 'hidden raw error'
+  });
+
+  assert.deepEqual(summary, {
+    success: true,
+    decision: 'completed',
+    workerDecision: 'run_once_completed',
+    dryRun: false,
+    limit: 10,
+    scannedTaskCount: 2,
+    replayedCount: 1,
+    wouldReplayCount: 0,
+    clearedCount: 1,
+    failedCount: 1,
+    skippedCount: 0,
+    hasError: true
+  });
+  assert.equal(JSON.stringify(summary).includes('codex-process-cm1037-hidden'), false);
+  assert.equal(JSON.stringify(summary).includes('hidden raw error'), false);
 });

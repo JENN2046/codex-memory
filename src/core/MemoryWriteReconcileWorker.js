@@ -22,6 +22,27 @@ function errorMessage(error) {
   return error && error.message ? error.message : String(error || 'unknown error');
 }
 
+function summarizeResult(result) {
+  if (!result || typeof result !== 'object') {
+    return null;
+  }
+
+  return {
+    success: result.success === true,
+    decision: result.decision || null,
+    workerDecision: result.workerDecision || null,
+    dryRun: result.dryRun === true,
+    limit: result.limit ?? null,
+    scannedTaskCount: Number(result.scannedTaskCount || 0),
+    replayedCount: Number(result.replayedCount || 0),
+    wouldReplayCount: Number(result.wouldReplayCount || 0),
+    clearedCount: Number(result.clearedCount || 0),
+    failedCount: Number(result.failedCount || 0),
+    skippedCount: Number(result.skippedCount || 0),
+    hasError: !!result.error
+  };
+}
+
 class MemoryWriteReconcileWorker {
   constructor({
     reconcileService,
@@ -49,6 +70,20 @@ class MemoryWriteReconcileWorker {
 
   isRunning() {
     return this.running;
+  }
+
+  getStatus() {
+    return {
+      running: this.running,
+      timerScheduled: this.timer !== null,
+      tickInFlight: this.tickInFlight,
+      runCount: this.runCount,
+      intervalMs: this.intervalMs,
+      limit: this.limit ?? null,
+      dryRun: this.dryRun,
+      maxRuns: this.maxRuns,
+      lastResultSummary: summarizeResult(this.lastResult)
+    };
   }
 
   start(options = {}) {
@@ -177,5 +212,6 @@ class MemoryWriteReconcileWorker {
 
 module.exports = {
   MemoryWriteReconcileWorker,
-  normalizeIntervalMs
+  normalizeIntervalMs,
+  summarizeResult
 };
