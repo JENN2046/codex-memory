@@ -1,5 +1,39 @@
 # HANDOFF.md — codex-memory
 
+## CM-1029 Public Default Search Lifecycle Validate Cache-Mutation Temp-Local Evidence Handoff
+
+Goal: verify default public `search_memory` with lifecycle read policy returns a formerly hidden private Codex-scoped proposal record after candidate-cache population and approved temp internal validate mutation to active, without claiming broad reliability/readiness.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_VALIDATE_CACHE_MUTATION_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1029_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_VALIDATE_CACHE_MUTATION_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/public-default-search-lifecycle-validate-cache-mutation-temp-local-evidence.test.js`.
+- Two temp-local private Codex records shared the same marker phrase.
+- Records were marked active and proposal in temp-local lifecycle columns.
+- Default public scoped search returned only the active record before validation.
+- The proposal record was hidden by lifecycle read policy before validation.
+- Candidate cache was enabled, populated, and located under the temp root.
+- The proposal record was validated through the approved internal validate runtime entry.
+- The same Codex-scoped default search returned both the original active record and the newly validated record after validation.
+- Read-policy audit applied and did not print the raw workspace value.
+- CM-1029 test passed `1/1`.
+- Lifecycle validate-cache/cache/matrix/stale/rejected/validate/tombstone/supersede/MCP regression bundle passed `23/23`.
+- Validate/write-temp-local adjacent bundle passed `28/28`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local lifecycle validate cache-mutation evidence, not broad real-store, long-run, rollback, governance-ready, or production durability proof.
+- The proof uses the approved internal validate runtime entry inside an isolated temp app; it does not expand public MCP or prove public mutation tooling.
+- The proof does not distinguish whether the second search used a candidate-cache hit or was protected by governance-state cache invalidation; it proves the user-facing result was refreshed after proposal-to-active validation.
+- The proof does not make public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1028 Public Default Search Lifecycle Cache-Mutation Temp-Local Evidence Handoff
 
 Goal: verify default public `search_memory` with lifecycle read policy does not return a formerly visible private Codex-scoped record after candidate-cache population and temp-local lifecycle mutation to tombstoned, without claiming broad reliability/readiness.

@@ -1,5 +1,40 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1029 Public Default Search Lifecycle Validate Cache-Mutation Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_VALIDATE_CACHE_MUTATION_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1029_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_VALIDATE_CACHE_MUTATION_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local lifecycle validate cache-mutation evidence for private Codex-scoped default public search.
+- Wrote two temp records with the same marker, same project/workspace, `visibility=private`, and `client_id=codex`.
+- Marked one record active and one record proposal in temp-local lifecycle columns.
+- Verified default public scoped search returned only the active record before validation.
+- Verified the proposal record was hidden by lifecycle read policy before validation.
+- Verified candidate cache was enabled, populated, and located under the temp root.
+- Validated the proposal record through the approved internal validate runtime entry.
+- Verified the same default public scoped search returned both the original active record and the newly validated record after validation.
+- Verified read-policy audit was applied and did not print the raw workspace value.
+
+Validation:
+- CM-1029 test syntax check passed.
+- CM-1029 temp-local lifecycle validate cache-mutation test passed `1/1`.
+- Lifecycle validate-cache/cache/matrix/stale/rejected/validate/tombstone/supersede/MCP regression bundle passed `23/23`.
+- Validate/write-temp-local adjacent bundle passed `28/28`.
+
+Boundary:
+- Temp-local app paths only.
+- Lifecycle status marking and approved validate mutation occurred only in isolated temp-local state.
+- Candidate-cache population occurred only under the temp root.
+- No real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, rollback readiness claim, or real cleanup.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, lifecycle validate cache-mutation boundary, or public MCP boundary.
+
+Next:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, public/default search reliability, real-store durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1028 Public Default Search Lifecycle Cache-Mutation Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_CACHE_MUTATION_NOT_RELIABLE_NOT_READY`
