@@ -1,0 +1,46 @@
+{
+  "phaseId": "CM-0991-memory-supersede-shadow-seam-candidate-helper",
+  "mutationFamily": "memory_supersede",
+  "targetMemoryIds": [
+    "memory-old-001",
+    "memory-new-001"
+  ],
+  "scopeTuple": {
+    "projectId": "project-cm-0863",
+    "workspaceId": "workspace-cm-0863",
+    "clientId": "codex-desktop",
+    "taskId": "CM-0863",
+    "conversationId": "thread-cm-0863",
+    "visibility": "private",
+    "retentionPolicy": "retain"
+  },
+  "actorClientId": "codex-desktop",
+  "requestSource": "cm-0991-fixture",
+  "reason": "replacement memory approved after seam candidate review",
+  "evidenceSummary": "fixture-backed supersede shadow seam candidate preview",
+  "lifecycleTransition": {
+    "from": "active",
+    "to": "superseded"
+  },
+  "auditIntentPolicy": "append_only_intent_before_apply",
+  "auditCommitPolicy": "append_only_commit_after_apply",
+  "projectionPolicy": "shadow_metadata_projection_only",
+  "revisionEmitter": "governance_state_revision",
+  "changedMemoryIdsPolicy": "target_memory_ids",
+  "rollbackPath": "append compensating governance mutation before any future pair apply",
+  "validationMode": "internal_dry_run_only",
+  "executionApprovalStatement": "runtime durable governance apply remains blocked pending explicit approval",
+  "mutationFieldValues": {
+    "oldMemoryId": "memory-old-001",
+    "newMemoryId": "memory-new-001",
+    "supersedesLink": "memory-old-001",
+    "supersededByLink": "memory-new-001",
+    "scopeTuple": "workspace-cm-0863",
+    "reason": "replacement memory approved after seam candidate review",
+    "evidenceSummary": "fixture-backed supersede shadow seam candidate preview",
+    "auditIntentPolicy": "append_only_intent_before_apply",
+    "auditCommitPolicy": "append_only_commit_after_apply",
+    "projectionPolicy": "shadow_metadata_projection_only",
+    "revisionEmitter": "governance_state_revision"
+  }
+}
