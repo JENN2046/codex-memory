@@ -1,5 +1,34 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1016 CM1015 Write-To-Recall Continuity Proof Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1016_CM1015_WRITE_TO_RECALL_CONTINUITY_PROOF.md`
+
+Completed:
+- Added `WriteToRecallContinuityProofResultBoundary` as a pure explicit-input/no-side-effect review helper.
+- Added targeted tests proving passed/failed not-ready continuity evidence is accepted only when counters, raw-output flags, source write facts, and no-readiness/no-reliability claims are complete.
+- Executed exactly one read-only internal no-raw recall query for the CM-1015 proof marker through `createTrueLiveRecallExecutorAdapter({ app })`.
+- Recorded `resultCount=3`, `topResultIdHashOrStableOpaqueId=6b158de28cb1166e`, and `matchedSourceWriteMemoryIdHash=true`.
+- Consumed the sanitized result through the new boundary; boundary accepted it as not-ready continuity evidence with no blockers.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted continuity/write/adapter tests passed `20/20`.
+- Continuity proof returned `WRITE_TO_RECALL_CONTINUITY_PROOF_PASSED_NOT_READY`.
+- Result boundary returned `WRITE_TO_RECALL_CONTINUITY_RESULT_BOUNDARY_ACCEPTED_NOT_READY`.
+
+Boundary:
+- Exactly one internal read-only `search_memory` call occurred.
+- No `record_memory`, provider/API call, raw memory read, direct `.jsonl` read, raw durable audit read, `memory_overview`, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+- An earlier local probe used the wrong sanitized result field and is not used as the continuity conclusion.
+
+Next:
+- Continue with a bounded write/recall coverage plan or governance closure. Broad write reliability, broad recall reliability, and write-to-recall reliability remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1015 CM0737 Bounded Write Proof Execution Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`

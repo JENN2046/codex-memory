@@ -153,7 +153,7 @@ It still does not prove:
 - long-run durability
 - rollback cleanup sufficiency
 - multi-client behavior
-- write-to-recall continuity
+- broad write-to-recall reliability
 - governance lifecycle closure
 - production readiness
 

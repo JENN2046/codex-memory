@@ -28,6 +28,54 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1016 CM1015 Write-To-Recall Continuity Proof - 2026-05-25
+
+Result: `CM1016_CM1015_WRITE_TO_RECALL_CONTINUITY_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1016 records one narrow continuity proof from the accepted CM-1015 write to the internal no-raw recall adapter seam:
+
+- [CM1016_CM1015_WRITE_TO_RECALL_CONTINUITY_PROOF.md](/A:/codex-memory/docs/CM1016_CM1015_WRITE_TO_RECALL_CONTINUITY_PROOF.md)
+
+Source write facts:
+
+```text
+writeProofBaselineCommit = 60f2544378e163fa83de6a42f7914af0b5b309a4
+sourceWriteProofRunId = CM1015-60f2544-cm0737-bounded-write-proof
+sourceWriteMemoryIdHashOrOpaqueId = 6b158de28cb1166e
+sourceWriteDecision = MEMORY_WRITE_BOUNDED_PROOF_PASSED_NOT_READY
+sourceWriteShadowWriteStatus = ok
+```
+
+Continuity proof facts:
+
+```text
+continuityProofBaselineCommit = aefe8c2c81df857baae8569adb1742c820909cd2
+continuityProofRunId = CM1016-aefe8c2-cm1015-write-to-recall-continuity
+queryHash = 0cc54d5233908bd06538410258c5cc61c123a632dda48acce84881913ffb59ce
+decision = WRITE_TO_RECALL_CONTINUITY_PROOF_PASSED_NOT_READY
+resultCount = 3
+topResultIdHashOrStableOpaqueId = 6b158de28cb1166e
+matchedSourceWriteMemoryIdHash = true
+resultBoundary = WRITE_TO_RECALL_CONTINUITY_RESULT_BOUNDARY_ACCEPTED_NOT_READY
+```
+
+Side-effect boundary:
+
+```text
+searchMemoryCalls = 1
+recordMemoryCalls = 0
+provider/api/raw reads/durable writes/audit writes/public MCP/config/package/release counters = all zero
+raw output flags = all false
+readiness/reliability claims = all false
+```
+
+Operator interpretation:
+
+- This proves one exact CM-1015 marker can be recalled as the top sanitized result through the existing internal no-raw read-only recall adapter seam.
+- This is stronger than write-only evidence, but still one marker proof over one process write.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, broad write-to-recall reliability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `complete?` remains `no`.
+
 ## CM-1015 CM0737 Bounded Write Proof Execution - 2026-05-25
 
 Result: `CM1015_CM0737_BOUNDED_WRITE_PROOF_PASSED_NOT_RELIABLE_NOT_READY`.
@@ -69,7 +117,7 @@ Operator interpretation:
 
 - This is one real local durable write and one write-audit append through the opt-in app seam.
 - It is stronger bounded write-path evidence than non-mutating preflight/result-boundary packets.
-- This does not prove broad write reliability, write-to-recall continuity, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- CM-1016 now adds one narrow marker continuity proof on top of this write; CM-1015 itself still does not prove broad write reliability, broad write-to-recall reliability, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
 - `complete?` remains `no`.
 
 ## CM-1014 CM0825 Post-Guard Recall Blocker Review - 2026-05-25

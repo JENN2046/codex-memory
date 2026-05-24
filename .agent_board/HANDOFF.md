@@ -1,5 +1,34 @@
 # HANDOFF.md — codex-memory
 
+## CM-1016 CM1015 Write-To-Recall Continuity Proof Handoff
+
+Goal: verify whether the accepted CM-1015 write proof record can be recalled by one exact internal no-raw marker query, and add a fail-closed result boundary so this narrow continuity evidence cannot be consumed as reliability/readiness.
+
+Status: COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1016_CM1015_WRITE_TO_RECALL_CONTINUITY_PROOF.md`.
+
+Current evidence:
+- Source write proof: CM-1015 at `60f2544378e163fa83de6a42f7914af0b5b309a4`.
+- Current continuity proof baseline: `aefe8c2c81df857baae8569adb1742c820909cd2`.
+- One exact marker query ran through `createTrueLiveRecallExecutorAdapter({ app })`.
+- Sanitized result returned `resultCount=3`.
+- Top result id hash was `6b158de28cb1166e`, matching the CM-1015 source write id hash.
+- Side-effect counters recorded `searchMemoryCalls=1`; all forbidden counters were zero.
+- `WriteToRecallContinuityProofResultBoundary` accepted the result as `WRITE_TO_RECALL_CONTINUITY_RESULT_BOUNDARY_ACCEPTED_NOT_READY`.
+- Targeted tests passed `20/20`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, multi-client behavior, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is exactly one marker continuity proof over one CM-1015 process write, not broad write-to-recall reliability.
+- The proof intentionally uses the internal no-raw read-only adapter seam, not the default public `search_memory` behavior.
+- The earlier local probe used the wrong sanitized result field and is not used as evidence.
+
+Next safe step:
+- Build a bounded coverage plan for additional write/recall reliability dimensions, or shift to governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1015 CM0737 Bounded Write Proof Execution Handoff
 
 Goal: execute exactly one sanitized CM0737-bound bounded write proof through the existing opt-in app seam, then consume the result through the CM-1010 boundary without claiming write reliability.
