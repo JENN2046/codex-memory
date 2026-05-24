@@ -1,5 +1,33 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1005 Store Freshness Exact Write Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-24
+
+Memory id: `codex-process-734cb148a03749a494cfc0683d5e384c`
+
+Completed:
+- Ran `store-freshness-write-preflight` and confirmed exactly one sanitized `record_memory` payload was prepared for local store freshness evidence.
+- Executed exactly one local in-process `record_memory` call using the approval packet's proposed arguments and Codex execution context.
+- Received `decision=accepted` and `shadowWrite.status=ok`.
+- Re-ran store freshness preflight and dashboard summary; freshness evidence is no longer required.
+
+Validation:
+- `node .\src\cli\store-freshness-write-preflight.js --json` before write: `STORE_FRESHNESS_EVIDENCE_PREPARED_EXACT_ONLY`, `records=4`, `chunks=9`, `last24h=0`.
+- exactly one in-process `app.callTool('record_memory', approvalPacket.proposedArguments, Codex context)`.
+- post-write `node .\src\cli\store-freshness-write-preflight.js --json`: `STORE_FRESHNESS_EVIDENCE_NOT_REQUIRED`, `records=5`, `chunks=10`, `last24h=1`, `last7d=3`.
+- dashboard summary: `store_freshness_evidence_not_written` removed; remaining blockers are governance fail-closed, readiness claim disallowed, and local git ahead.
+- `git status --short --branch` showed tracked worktree clean and `main...origin/main [ahead 1]` before this board/status update.
+
+Boundary:
+- No `search_memory`, provider/API call, raw memory read, `.jsonl` read, config/watchdog/startup edit, public MCP expansion, remote action, additional memory write, readiness claim, or reliability claim.
+- If the evidence write ever needs correction, do not delete it automatically; use an explicit lifecycle governance action such as validate/supersede/tombstone.
+
+Next:
+- Record this checkpoint/handoff in Git, then decide whether to stage-wise push the local evidence docs with the existing ahead commit.
+
 ## CM-1004 Post-Reconciliation Push-State Sync Checkpoint
 
 Status: `COMPLETED_VALIDATED_LOCAL_STATUS_SYNC_NOT_READY`

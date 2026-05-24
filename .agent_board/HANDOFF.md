@@ -1,5 +1,30 @@
 # HANDOFF.md — codex-memory
 
+## CM-1005 Store Freshness Exact Write Evidence Handoff
+
+Goal: close the store-freshness evidence blocker with exactly one sanitized local write while preserving no-readiness and no-public-MCP-expansion boundaries.
+
+Status: COMPLETED_VALIDATED_NOT_READY.
+
+Memory id: `codex-process-734cb148a03749a494cfc0683d5e384c`.
+
+Current evidence:
+- Preflight prepared one exact sanitized `record_memory` process payload.
+- Exactly one local in-process `record_memory` call was executed with the preflight proposed arguments.
+- Result: `decision=accepted`, `shadowWrite.status=ok`.
+- Post-write preflight now returns `STORE_FRESHNESS_EVIDENCE_NOT_REQUIRED`.
+- Store counts are `records=5`, `chunks=10`, `last24h=1`, `last7d=3`.
+- Dashboard no longer lists `store_freshness_evidence_not_written`; remaining blockers are governance fail-closed items, readiness claim disallowed, and local git ahead.
+
+Not validated:
+- Live recall reliability closure, broad write reliability closure, provider smoke/benchmark, broad real memory scan, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is exactly-one freshness evidence only. It does not prove `memory write reliable`, `memory recall reliable`, RC readiness, production readiness, rollback cleanup, multi-client behavior, or long-run durability. `RC_NOT_READY_BLOCKED` remains.
+
+Next safe step:
+- Commit this local evidence record and decide whether to stage-wise push it together with the existing local status-sync commit, or continue with a separate scoped governance closure task.
+
 ## CM-1004 Post-Reconciliation Push-State Sync Handoff
 
 Goal: record the final post-reconciliation push state after the CM-1003 board/status reconciliation note was committed and pushed.
