@@ -533,6 +533,7 @@ class SqliteShadowStore {
     await this.ensureReady();
     this.refreshMemoryRecordColumnInfo();
     const hasStatus = this.hasMemoryRecordColumn('status');
+    const hasTombstoneReason = this.hasMemoryRecordColumn('tombstone_reason');
     const row = this.db.prepare(`
       SELECT memory_id, client_id, visibility${hasStatus ? ', status' : ''}
       FROM memory_records WHERE memory_id = ?
@@ -542,6 +543,7 @@ class SqliteShadowStore {
       return {
         exists: false,
         lifecycleColumnAvailable: hasStatus,
+        tombstoneReasonColumnAvailable: hasTombstoneReason,
         status: null,
         clientId: null,
         visibility: null
@@ -551,6 +553,7 @@ class SqliteShadowStore {
     return {
       exists: true,
       lifecycleColumnAvailable: hasStatus,
+      tombstoneReasonColumnAvailable: hasTombstoneReason,
       status: hasStatus ? (row.status || null) : null,
       clientId: row.client_id || null,
       visibility: row.visibility || null
@@ -564,6 +567,7 @@ class SqliteShadowStore {
     updatedAt,
     actorClientId = null,
     reason = null,
+    tombstoneReason = null,
     expectedClientId = null,
     expectedVisibility = null
   }) {
@@ -589,6 +593,10 @@ class SqliteShadowStore {
     if (this.hasMemoryRecordColumn('status_reason')) {
       assignments.splice(assignments.length, 0, 'status_reason = ?');
       setParams.push(reason);
+    }
+    if (this.hasMemoryRecordColumn('tombstone_reason')) {
+      assignments.splice(assignments.length, 0, 'tombstone_reason = ?');
+      setParams.push(tombstoneReason);
     }
 
     const whereClauses = ['memory_id = ?', 'status = ?'];

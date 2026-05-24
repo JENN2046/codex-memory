@@ -198,6 +198,32 @@ test('validate_memory writes pending audit before lifecycle mutation', async () 
   });
 });
 
+test('updateLifecycleStatus writes tombstone_reason through the single-record lifecycle seam', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'stale', clientId: 'codex', visibility: 'project' }]
+  }, async ({ config, shadowStore }) => {
+    const result = await shadowStore.updateLifecycleStatus({
+      memoryId: 'mem-1',
+      fromStatus: 'stale',
+      toStatus: 'tombstoned',
+      updatedAt: '2026-05-23T09:30:00.000Z',
+      actorClientId: 'codex',
+      reason: 'memory retired after governance review',
+      tombstoneReason: 'retention-expired',
+      expectedClientId: 'codex',
+      expectedVisibility: 'project'
+    });
+    const row = getRecordRow(config.dbPath, 'mem-1');
+
+    assert.equal(result.updated, true);
+    assert.equal(row.status, 'tombstoned');
+    assert.equal(row.status_reason, 'memory retired after governance review');
+    assert.equal(row.tombstone_reason, 'retention-expired');
+    assert.equal(row.lifecycle_updated_at, '2026-05-23T09:30:00.000Z');
+    assert.equal(row.lifecycle_actor_client_id, 'codex');
+  });
+});
+
 test('validate_memory applies proposal to active with pending and committed audit when confirmed', async () => {
   await withService({
     records: [{ memoryId: 'mem-1', status: 'proposal' }]
