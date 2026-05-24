@@ -28,6 +28,53 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1032 Memory Write Degraded Cleanup Temp-Local Evidence - 2026-05-25
+
+Result: `CM1032_MEMORY_WRITE_DEGRADED_CLEANUP_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1032 records isolated temp-local degraded write cleanup posture evidence:
+
+- one synthetic process record was accepted through `MemoryWriteService`
+- vector and chunk projection adapters failed with deterministic synthetic errors
+- the write returned `shadowWrite.status=degraded` with vector/chunk failure reasons
+- SQLite row, write audit, and two reconcile tasks were visible before cleanup
+- vector and chunk projections were absent before cleanup
+- simulated partial cleanup deleted the SQLite row, attempted vector cleanup, and cleared the candidate-cache entry by memory id
+- diary, write-audit, and reconcile residuals remained visible instead of being hidden or destructively rewritten
+- the temp root was removed by the test harness
+
+Validation:
+
+- CM-1032 test `1/1` passed
+- degraded/normal write cleanup/write reliability/MCP adjacent regression bundle `19/19` passed
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+package/config/watchdog/startup change = false
+real cleanup apply = false
+real rollback apply = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens CM-1031 by covering the degraded projection branch with actual isolated temp-local stores.
+- This proves vector/chunk failure reasons and reconcile residuals remain visible after partial SQLite/vector/cache cleanup.
+- This does not implement a real rollback helper and does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, reconcile cleanup safety, diary cleanup, audit deletion/rewrite, long-run durability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, rollback readiness, governance closure, reconcile cleanup safety, and real rollback safety remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1031 Memory Write Rollback Cleanup Temp-Local Evidence - 2026-05-25
 
 Result: `CM1031_MEMORY_WRITE_ROLLBACK_CLEANUP_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.

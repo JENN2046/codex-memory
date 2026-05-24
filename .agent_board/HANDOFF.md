@@ -1,5 +1,37 @@
 # HANDOFF.md — codex-memory
 
+## CM-1032 Memory Write Degraded Cleanup Temp-Local Evidence Handoff
+
+Goal: verify degraded accepted synthetic write projection accounting and partial cleanup posture in isolated temp-local stores, without claiming broad reliability/readiness, reconcile cleanup safety, or real rollback safety.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_DEGRADED_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1032_MEMORY_WRITE_DEGRADED_CLEANUP_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-degraded-cleanup-temp-local-evidence.test.js`.
+- Real local `DiaryStore`, `SqliteShadowStore`, `VectorIndexStore`, `AuditLogStore`, and `CandidateCacheStore` were configured under one temp root.
+- All configured write, audit, vector, SQLite, and candidate-cache paths resolved under the temp root.
+- One synthetic process record was accepted through `MemoryWriteService` while vector/chunk projection adapters failed.
+- The write returned `shadowWrite.status=degraded` with deterministic vector/chunk failure reasons.
+- SQLite row, write audit, and two reconcile tasks were visible before cleanup; vector/chunk projections were absent.
+- Simulated partial cleanup cleared SQLite/vector/cache surfaces.
+- Diary file, write-audit file, and reconcile tasks remained visible as residuals.
+- CM-1032 test passed `1/1`.
+- Degraded/normal write cleanup/write reliability/MCP adjacent regression bundle passed `19/19`.
+- Ledger consistency, docs validation, diff check, and no-overclaim/public-MCP scans passed.
+
+Not validated:
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, real cleanup safety, real rollback safety, diary cleanup, audit deletion/rewrite, reconcile cleanup safety, long-run durability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local degraded cleanup posture evidence, not a real rollback helper or real cleanup safety proof.
+- Diary, audit, and reconcile residuals remain visible by design and still need governance remediation or a future non-destructive cleanup story.
+- The proof does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-run durability or governance remediation. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1031 Memory Write Rollback Cleanup Temp-Local Evidence Handoff
 
 Goal: verify accepted synthetic write projection accounting and partial cleanup posture in isolated temp-local stores, without claiming broad reliability/readiness or real rollback safety.
