@@ -6,14 +6,16 @@ const path = require('node:path');
 
 const { createCodexMemoryApplication } = require('../src/app');
 const { CompatibilitySyntaxAdapter } = require('../src/adapters/vcp-passive-memory/CompatibilitySyntaxAdapter');
+const { TOOL_DEFINITIONS } = require('../src/core/constants');
 
-async function withApp(handler) {
+async function withApp(handler, overrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-phase-a-'));
   const app = createCodexMemoryApplication({
     projectBasePath: tempBasePath,
     dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
     logsDir: path.join(tempBasePath, 'logs'),
-    dataDir: path.join(tempBasePath, 'data')
+    dataDir: path.join(tempBasePath, 'data'),
+    ...overrides
   });
 
   await app.initialize();
@@ -24,6 +26,40 @@ async function withApp(handler) {
     await app.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
+}
+
+function codexExecutionContext(overrides = {}) {
+  return {
+    agentAlias: 'Codex',
+    agentId: 'codex-desktop',
+    requestSource: 'phase-a-test',
+    ...overrides
+  };
+}
+
+function writePreflightPayload(overrides = {}) {
+  return {
+    target: 'process',
+    title: 'Checkpoint: phase-a write preflight app wiring',
+    content: [
+      'Checkpoint: phase-a app wiring proof for write preflight.',
+      'Purpose: keep default preflight disabled while allowing exact-scope internal wiring.',
+      'Boundary: local temp app only; no provider, no readiness claim.'
+    ].join('\n'),
+    evidence: 'phase-a write preflight app wiring evidence',
+    validated: true,
+    reusable: false,
+    sensitivity: 'none',
+    tags: ['phase-a', 'write-preflight'],
+    project_id: 'codex-memory',
+    workspace_id: 'phase-a-write-preflight-workspace',
+    client_id: 'codex',
+    task_id: 'CM-0892',
+    conversation_id: 'phase-a-write-preflight-app-wiring',
+    visibility: 'project',
+    retention_policy: 'keep',
+    ...overrides
+  };
 }
 
 test('record_memory should reject non-Codex writes', async () => {
@@ -125,4 +161,65 @@ test('CompatibilitySyntaxAdapter should parse passive blocks and directives', ()
   assert.equal(parsed.directives.tagmemo, 1.2);
   assert.equal(parsed.directives.geodesicrerank, true);
   assert.deepEqual(parsed.activeBlocks, ['topic memory']);
+});
+
+
+test('app should wire write preflight candidate provider while keeping default preflight disabled and public MCP frozen', async () => {
+  await withApp(async ({ app }) => {
+    const seed = await app.callTool('record_memory', writePreflightPayload(), {
+      executionContext: codexExecutionContext()
+    });
+
+    assert.equal(seed.decision, 'accepted');
+    assert.equal(app.config.enableWritePreflight, false);
+    assert.equal(app.services.writeService.writePreflightEnabled, false);
+    assert.equal(typeof app.services.writeService.writePreflightCandidateProvider, 'function');
+
+    const candidates = await app.services.writeService.writePreflightCandidateProvider({
+      proposedWrite: { target: 'process' },
+      allowedScope: {
+        projectId: 'codex-memory',
+        workspaceId: 'phase-a-write-preflight-workspace',
+        clientId: 'codex',
+        taskId: 'CM-0892',
+        conversationId: 'phase-a-write-preflight-app-wiring',
+        visibility: 'project',
+        retentionPolicy: 'keep'
+      }
+    });
+
+    assert.equal(candidates.length, 1);
+    assert.equal(candidates[0].target, 'process');
+    assert.equal(candidates[0].taskId, 'CM-0892');
+    assert.deepEqual(
+      TOOL_DEFINITIONS.map(tool => tool.name).sort(),
+      ['memory_overview', 'record_memory', 'search_memory']
+    );
+  });
+});
+
+test('app should allow opt-in write preflight and suppress same-scope duplicate before durable projection', async () => {
+  await withApp(async ({ app }) => {
+    const requestContext = {
+      executionContext: codexExecutionContext()
+    };
+    const payload = writePreflightPayload();
+
+    const first = await app.callTool('record_memory', payload, requestContext);
+    const second = await app.callTool('record_memory', payload, requestContext);
+
+    assert.equal(app.config.enableWritePreflight, true);
+    assert.equal(app.services.writeService.writePreflightEnabled, true);
+    assert.equal(first.decision, 'accepted');
+    assert.equal(second.decision, 'rejected');
+    assert.match(second.reason, /write preflight rejected: duplicate_suppressed/i);
+    assert.equal(second.writePreflight.decision, 'duplicate_suppressed');
+    assert.equal(second.writePreflight.matchedCandidateCount, 1);
+    assert.deepEqual(
+      TOOL_DEFINITIONS.map(tool => tool.name).sort(),
+      ['memory_overview', 'record_memory', 'search_memory']
+    );
+  }, {
+    enableWritePreflight: true
+  });
 });

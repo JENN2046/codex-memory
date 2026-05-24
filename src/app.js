@@ -247,6 +247,13 @@ function normalizeScopeValue(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+async function getDefaultWritePreflightCandidates(shadowStore, request = {}) {
+  return shadowStore.getWritePreflightCandidates({
+    target: request?.proposedWrite?.target,
+    allowedScope: request?.allowedScope
+  });
+}
+
 function firstScopeValue(...values) {
   for (const value of values) {
     const normalized = normalizeScopeValue(value);
@@ -529,7 +536,9 @@ function createCodexMemoryApplication(overrides = {}) {
     vectorStore,
     auditLogStore,
     executionContextResolver,
-    chunkIndexingService
+    chunkIndexingService,
+    writePreflightEnabled: config.enableWritePreflight === true,
+    writePreflightCandidateProvider: request => getDefaultWritePreflightCandidates(shadowStore, request)
   });
   const validateMemoryService = new ValidateMemoryService({
     config,
