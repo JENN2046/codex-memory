@@ -1,0 +1,42 @@
+{
+  "phaseId": "CM-0862-durable-governance-mutation-dry-run-helper",
+  "mutationFamily": "memory_validate",
+  "targetMemoryIds": [
+    "memory-validate-001"
+  ],
+  "scopeTuple": {
+    "workspaceId": "workspace-cm-0862",
+    "clientId": "codex-desktop",
+    "taskId": "CM-0862",
+    "visibility": "private"
+  },
+  "actorClientId": "codex-desktop",
+  "requestSource": "cm-0862-fixture",
+  "reason": "proposal accepted after bounded governance review",
+  "evidenceSummary": "fixture-only packet preview against the CM-0861 contract",
+  "lifecycleTransition": {
+    "from": "proposal",
+    "to": "active"
+  },
+  "auditIntentPolicy": "append_only_intent_before_apply",
+  "auditCommitPolicy": "append_only_commit_after_apply",
+  "projectionPolicy": "shadow_metadata_projection_only",
+  "revisionEmitter": "governance_state_revision",
+  "changedMemoryIdsPolicy": "target_memory_ids",
+  "rollbackPath": "append compensating governance mutation packet before any future runtime apply",
+  "validationMode": "internal_dry_run_only",
+  "executionApprovalStatement": "runtime durable governance apply remains blocked pending explicit approval",
+  "mutationFieldValues": {
+    "targetMemoryId": "memory-validate-001",
+    "fromStatus": "proposal",
+    "toStatus": "active",
+    "actorClientId": "codex-desktop",
+    "requestSource": "cm-0862-fixture",
+    "reason": "proposal accepted after bounded governance review",
+    "evidenceSummary": "fixture-only packet preview against the CM-0861 contract",
+    "auditIntentPolicy": "append_only_intent_before_apply",
+    "auditCommitPolicy": "append_only_commit_after_apply",
+    "projectionPolicy": "shadow_metadata_projection_only",
+    "revisionEmitter": "governance_state_revision"
+  }
+}
