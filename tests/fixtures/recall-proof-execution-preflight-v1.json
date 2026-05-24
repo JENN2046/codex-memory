@@ -1,0 +1,51 @@
+{
+  "basisId": "CM-0814",
+  "approvalLine": "I approve MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_EXECUTION_ONCE for codex-memory at the current synced main head, limited to exactly four read-only true live search_memory calls against the current local codex-memory real store, using the query-family and output boundaries in docs/MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_APPROVAL_PACKET.md, with no provider call, no direct .jsonl read, no durable memory/audit write, no migration/import/export/backup/restore apply, no config/watchdog/startup change, no public MCP expansion, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.",
+  "gitFacts": {
+    "branch": "main",
+    "localHead": "a6782e338dfa320679f2802b0d8e2491d8f8b55d",
+    "originHead": "a6782e338dfa320679f2802b0d8e2491d8f8b55d",
+    "statusShort": [
+      " M src/app.js"
+    ]
+  },
+  "queries": [
+    {
+      "slot": "Q1",
+      "family": "stricter_negative_control",
+      "text": "xqzv-9137-lomdra-kepv-azmuth"
+    },
+    {
+      "slot": "Q2",
+      "family": "stricter_negative_control",
+      "text": "nareth-48291-pluvox-darnel-kiv"
+    },
+    {
+      "slot": "Q3",
+      "family": "stricter_negative_control",
+      "text": "vornik-73019-quaspel-threnn-ulo"
+    },
+    {
+      "slot": "Q4",
+      "family": "stricter_negative_control",
+      "text": "mavrix-60428-selkun-dopra-nyxal"
+    }
+  ],
+  "proofSeam": {
+    "runner": "TrueLiveRecallReadonlyProofRunner",
+    "adapter": "createTrueLiveRecallExecutorAdapter",
+    "appCallTool": "search_memory",
+    "requestSource": "internal-true-live-recall-readonly-proof-runner"
+  },
+  "boundaryFlags": {
+    "readOnly": true,
+    "noProvider": true,
+    "noAudit": true,
+    "noTokenReadOnly": true,
+    "noRawContentRead": true,
+    "includeContent": false,
+    "precisionPolicyEnabled": true,
+    "proofNoResultMode": true,
+    "sanitizedOutput": true
+  }
+}
