@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1040 Memory Write Reconcile Worker Temp-Local Failure Recovery Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_TEMP_LOCAL_FAILURE_RECOVERY_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1040_MEMORY_WRITE_RECONCILE_WORKER_TEMP_LOCAL_FAILURE_RECOVERY.md`
+
+Completed:
+- Added isolated temp-local worker failure-retention and recovery evidence.
+- Verified one synthetic degraded accepted write leaves two vector/chunk reconcile tasks.
+- Verified explicit worker `limit=1`, `dryRun=false`, `maxRuns=1` with failing replay projections scans one queued task.
+- Verified the failed worker tick replays `0`, clears `0`, fails `1`, and leaves reconcile queue count at `2`.
+- Verified vector and chunk projections remain absent after the failed tick.
+- Verified a second explicit healthy worker drains the same queue across two manual ticks.
+- Verified reconcile queue count reaches `0`, vector count reaches `1`, and chunk count is at least `1`.
+- Verified worker status omits raw memory id.
+
+Validation:
+- Test syntax check passed.
+- CM-1040 targeted worker test passed `9/9`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `28/28`.
+- Full `npm test` passed `2492/2492`.
+
+Boundary:
+- Internal temp-local failure-recovery evidence only.
+- No runtime source change, public MCP expansion, public `memory_write_reconcile_worker` tool, true live `record_memory`, true live `search_memory`, real memory read/write, real `.jsonl` read, provider/API call, dependency change, config/watchdog/startup edit, runtime observe execution, default worker start, startup reconcile execution, real cleanup apply, real rollback apply, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward exact runtime observe, longer-horizon runtime durability, rollback cleanup posture, or governance lifecycle/scope closure. Broad write reliability, automatic degraded recovery, startup reconcile safety, runtime observe safety, long-run durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1039 Memory Write Reconcile Worker Temp-Local Queue Drain Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_TEMP_LOCAL_QUEUE_DRAIN_NOT_RELIABLE_NOT_READY`

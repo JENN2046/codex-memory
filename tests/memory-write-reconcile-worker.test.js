@@ -492,6 +492,152 @@ test('CM-1039 explicit worker drains multiple temp-local reconcile tasks across 
   assert.equal(await pathExists(rootPath), false);
 });
 
+test('CM-1040 worker retains failed temp-local reconcile tasks and later drains them after recovery', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1040-worker-recovery-'));
+  const config = createConfig(rootPath);
+  const shadowStore = new SqliteShadowStore(config);
+  const healthyVectorStore = new VectorIndexStore(config);
+  const auditLogStore = new AuditLogStore(config);
+  const initialFailingVectorStore = {
+    ...healthyVectorStore,
+    async upsertRecord() {
+      throw new Error('cm1040 synthetic initial vector projection failure');
+    }
+  };
+  const initialFailingChunkIndexingService = {
+    async indexRecord() {
+      throw new Error('cm1040 synthetic initial chunk projection failure');
+    }
+  };
+  const writeService = new MemoryWriteService({
+    config,
+    diaryStore: new DiaryStore(config),
+    shadowStore,
+    vectorStore: initialFailingVectorStore,
+    auditLogStore,
+    chunkIndexingService: initialFailingChunkIndexingService,
+    executionContextResolver: {
+      resolve: () => ({
+        agentAlias: 'Codex',
+        agentId: 'cm1040-temp-local-fixture-agent',
+        requestSource: 'cm1040-write-reconcile-worker-recovery-test'
+      }),
+      isWritableByCodex: () => true
+    }
+  });
+  const failingReplayVectorStore = {
+    ...healthyVectorStore,
+    async upsertRecord() {
+      throw new Error('cm1040 synthetic replay vector projection failure');
+    }
+  };
+  const failingReplayChunkIndexingService = {
+    async indexRecord() {
+      throw new Error('cm1040 synthetic replay chunk projection failure');
+    }
+  };
+  const failingReplayService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore: failingReplayVectorStore,
+    chunkIndexingService: failingReplayChunkIndexingService
+  });
+  const failingScheduler = new ManualScheduler();
+  const failingWorker = new MemoryWriteReconcileWorker({
+    reconcileService: failingReplayService,
+    scheduler: failingScheduler,
+    intervalMs: 250,
+    limit: 1
+  });
+  const healthyReplayService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore: healthyVectorStore,
+    chunkIndexingService: new ChunkIndexingService({
+      config,
+      shadowStore,
+      vectorStore: healthyVectorStore
+    })
+  });
+  const recoveryScheduler = new ManualScheduler();
+  const recoveryWorker = new MemoryWriteReconcileWorker({
+    reconcileService: healthyReplayService,
+    scheduler: recoveryScheduler,
+    intervalMs: 250,
+    limit: 1
+  });
+
+  try {
+    for (const targetPath of [
+      config.dailyNoteRootPath,
+      config.dbPath,
+      config.auditLogPath,
+      config.vectorIndexPath
+    ]) {
+      assertInsideRoot(rootPath, targetPath);
+    }
+
+    const writeResult = await writeService.record(processPayload({
+      title: 'Checkpoint: CM-1040 internal write reconcile worker failure recovery',
+      task_id: 'CM-1040',
+      conversation_id: 'cm1040-write-reconcile-worker-temp-local-recovery'
+    }));
+
+    assert.equal(writeResult.decision, 'accepted');
+    assert.equal(writeResult.shadowWrite.status, 'degraded');
+    assert.equal((await shadowStore.getHealth()).reconcileCount, 2);
+    assert.equal((await healthyVectorStore.getHealth()).vectorCount, 0);
+
+    failingWorker.start({ limit: 1, dryRun: false, maxRuns: 1 });
+    assert.equal(await failingScheduler.flushNext(), true);
+
+    const failedStatus = failingWorker.getStatus();
+    const shadowAfterFailure = await shadowStore.getHealth();
+
+    assert.equal(failedStatus.running, false);
+    assert.equal(failedStatus.timerScheduled, false);
+    assert.equal(failedStatus.runCount, 1);
+    assert.equal(failedStatus.lastResultSummary.success, false);
+    assert.equal(failedStatus.lastResultSummary.decision, 'completed_with_failures');
+    assert.equal(failedStatus.lastResultSummary.scannedTaskCount, 1);
+    assert.equal(failedStatus.lastResultSummary.replayedCount, 0);
+    assert.equal(failedStatus.lastResultSummary.clearedCount, 0);
+    assert.equal(failedStatus.lastResultSummary.failedCount, 1);
+    assert.equal(shadowAfterFailure.recordCount, 1);
+    assert.equal(shadowAfterFailure.reconcileCount, 2);
+    assert.equal(shadowAfterFailure.chunkCount, 0);
+    assert.equal((await healthyVectorStore.getHealth()).vectorCount, 0);
+    assert.equal(JSON.stringify(failedStatus).includes(writeResult.memoryId), false);
+
+    recoveryWorker.start({ limit: 1, dryRun: false, maxRuns: 2 });
+    assert.equal(await recoveryScheduler.flushNext(), true);
+    assert.equal(await recoveryScheduler.flushNext(), true);
+
+    const recoveredStatus = recoveryWorker.getStatus();
+    const shadowAfterRecovery = await shadowStore.getHealth();
+    const vectorAfterRecovery = await healthyVectorStore.getHealth();
+
+    assert.equal(recoveredStatus.running, false);
+    assert.equal(recoveredStatus.timerScheduled, false);
+    assert.equal(recoveredStatus.runCount, 2);
+    assert.equal(recoveredStatus.lastResultSummary.success, true);
+    assert.equal(recoveredStatus.lastResultSummary.limit, 1);
+    assert.equal(recoveredStatus.lastResultSummary.replayedCount, 1);
+    assert.equal(recoveredStatus.lastResultSummary.clearedCount, 1);
+    assert.equal(shadowAfterRecovery.recordCount, 1);
+    assert.equal(shadowAfterRecovery.reconcileCount, 0);
+    assert.equal(shadowAfterRecovery.chunkCount >= 1, true);
+    assert.equal(vectorAfterRecovery.vectorCount, 1);
+    assert.equal(await pathExists(writeResult.filePath), true);
+    assert.equal(JSON.stringify(recoveredStatus).includes(writeResult.memoryId), false);
+  } finally {
+    failingWorker.stop();
+    recoveryWorker.stop();
+    await shadowStore.close();
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
 test('CM-1037 worker status snapshot is read-only and does not expose raw task results or errors', async () => {
   const scheduler = new ManualScheduler();
   const reconcileService = {
