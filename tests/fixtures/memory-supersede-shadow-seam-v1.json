@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "memory-supersede-shadow-seam-v1",
+  "version": "v1",
+  "phase": "CM-0989-memory-supersede-shadow-seam-contract",
+  "fixtureOnly": true,
+  "synthetic": true,
+  "reviewOnly": true,
+  "status": "blocked",
+  "decision": "NOT_READY_BLOCKED",
+  "approvalStatus": "BLOCKED_PENDING_APPROVAL",
+  "executionApproved": false,
+  "mutated": false,
+  "runtimeIntegrated": false,
+  "publicMcpExpanded": false,
+  "realMemoryScanned": false,
+  "providerCalls": 0,
+  "publicToolsFrozen": true,
+  "publicTools": [
+    "record_memory",
+    "search_memory",
+    "memory_overview"
+  ],
+  "safeSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "explicit_input",
+    "static_report_shape",
+    "local_validation_summary"
+  ],
+  "acceptedSourceTypes": [
+    "committed_doc",
+    "committed_fixture",
+    "committed_test",
+    "explicit_input",
+    "static_report_shape",
+    "local_validation_summary"
+  ],
+  "unsupportedSourceTypes": [],
+  "acceptedForPlanning": true,
+  "requiredPairFields": [
+    "oldMemoryId",
+    "newMemoryId",
+    "oldExpectedStatus",
+    "newExpectedStatus",
+    "oldExpectedClientId",
+    "newExpectedClientId",
+    "oldExpectedVisibility",
+    "newExpectedVisibility",
+    "oldToStatus",
+    "newToStatus",
+    "supersededByLink",
+    "supersedesLink",
+    "statusReason",
+    "actorClientId",
+    "updatedAt",
+    "pairCorrelationId"
+  ],
+  "supportedLinkColumns": [
+    "supersedes_memory_id",
+    "superseded_by_memory_id"
+  ],
+  "seamProperties": {
+    "requiresTwoRecordGuard": true,
+    "singleRecordReuseAllowed": false,
+    "oldRecordLifecycleWriteRequired": true,
+    "newRecordLifecycleWriteRequired": true,
+    "bidirectionalLinkWriteRequired": true,
+    "sharedPolicyGuardRequired": true,
+    "sharedCorrelationIdRequired": true,
+    "atomicPairOutcomeRequired": true,
+    "rollbackPreviewRequired": true,
+    "runtimeImplemented": false,
+    "executionApproved": false,
+    "mutated": false
+  },
+  "requiredApprovals": [
+    "two_record_shadow_seam_implementation",
+    "supersession_runtime_prep",
+    "internal_supersede_service_apply",
+    "durable_memory_mutation",
+    "public_mcp_governance_expansion",
+    "push_tag_release_deploy"
+  ],
+  "blockers": [
+    "two_record_shadow_seam_not_implemented",
+    "single_record_lifecycle_reuse_insufficient",
+    "supersede_runtime_prep_not_implemented",
+    "internal_supersede_service_not_implemented",
+    "public_mcp_governance_expansion_not_approved",
+    "v1_rc_not_ready_blocked"
+  ],
+  "safety": {
+    "noRuntimeImplementation": true,
+    "noDurableMemoryWrite": true,
+    "noPublicMcpExpansion": true,
+    "noRealMemoryScan": true,
+    "noProviderCall": true,
+    "noServiceStart": true,
+    "noConfigMutation": true,
+    "noPackageScriptChange": true,
+    "noRemoteWrite": true,
+    "rawSecretExposed": false,
+    "rawWorkspaceIdExposed": false
+  },
+  "requiredWording": [
+    "The supersede shadow seam contract does not implement runtime pair mutation.",
+    "Two independent single-record lifecycle updates are insufficient for supersede.",
+    "The future seam remains BLOCKED_PENDING_APPROVAL until separately and explicitly approved.",
+    "Public MCP tools remain frozen at record_memory, search_memory, and memory_overview.",
+    "v1.0 RC remains NOT_READY_BLOCKED."
+  ],
+  "forbiddenClaims": [
+    "supersede runtime seam is implemented",
+    "single-record lifecycle reuse is sufficient for supersede",
+    "public MCP supersede expansion is approved",
+    "v1.0 RC readiness is unblocked"
+  ],
+  "evidenceSources": [
+    "docs/MEMORY_LIFECYCLE_SCOPE_INTERNAL_RUNTIME_ENTRY_SUPERSEDE_STORAGE_SEAM_REVIEW.md",
+    "src/storage/SqliteShadowStore.js",
+    "src/core/DurableGovernanceShadowProjectionPreview.js",
+    "src/core/ValidateMemoryService.js",
+    "src/core/TombstoneMemoryService.js"
+  ],
+  "next": "CM-0990-memory-supersede-runtime-prep-helper"
+}
