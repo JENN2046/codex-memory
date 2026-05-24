@@ -1,5 +1,40 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1026 Public Default Search Lifecycle Stale Cold-Derived Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_STALE_COLD_DERIVED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1026_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_STALE_COLD_DERIVED_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local lifecycle stale cold-derived restart evidence for private Codex-scoped default public search.
+- Wrote two temp records with the same marker, same project/workspace, `visibility=private`, and `client_id=codex`.
+- Marked one record active and one record stale in temp-local lifecycle columns.
+- Verified default public scoped search returned both active and stale records before restart.
+- Verified read-policy audit recorded stale retention without printing the raw workspace value.
+- Verified `candidateCachePath` and `vectorIndexPath` both resolved under the temp root, then removed those two temp-local derived files after app close.
+- Opened a second app instance on the same temp-local paths.
+- Verified Codex-scoped cold-restart search still returned both active and stale records.
+- Verified read-policy audit was applied and did not print the raw workspace value.
+
+Validation:
+- CM-1026 test syntax check passed.
+- CM-1026 temp-local lifecycle stale cold-derived restart test passed `1/1`.
+- Lifecycle/stale/rejected/validate/tombstone/supersede/MCP regression bundle passed `20/20`.
+- Validate/write-temp-local adjacent bundle passed `28/28`.
+
+Boundary:
+- Temp-local app paths only.
+- Lifecycle status marking occurred only in isolated temp-local state.
+- Only temp-local derived files were removed: candidate cache and vector index.
+- No real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, reliability claim, governance closure claim, rollback readiness claim, or real cleanup.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, lifecycle stale boundary, cold-derived restart boundary, or public MCP boundary.
+
+Next:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, public/default search reliability, real-store durability, governance closure, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1025 Public Default Search Lifecycle Rejected Cold-Derived Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_REJECTED_COLD_DERIVED_NOT_RELIABLE_NOT_READY`
