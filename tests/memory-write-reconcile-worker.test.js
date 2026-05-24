@@ -492,6 +492,142 @@ test('CM-1039 explicit worker drains multiple temp-local reconcile tasks across 
   assert.equal(await pathExists(rootPath), false);
 });
 
+test('CM-1047 explicit worker runOnce preserves remaining temp-local tasks after partial batch', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1047-worker-partial-'));
+  const config = createConfig(rootPath);
+  const shadowStore = new SqliteShadowStore(config);
+  const healthyVectorStore = new VectorIndexStore(config);
+  const auditLogStore = new AuditLogStore(config);
+  const failingVectorStore = {
+    ...healthyVectorStore,
+    async upsertRecord() {
+      throw new Error('cm1047 synthetic vector projection failure');
+    }
+  };
+  const failingChunkIndexingService = {
+    async indexRecord() {
+      throw new Error('cm1047 synthetic chunk projection failure');
+    }
+  };
+  const writeService = new MemoryWriteService({
+    config,
+    diaryStore: new DiaryStore(config),
+    shadowStore,
+    vectorStore: failingVectorStore,
+    auditLogStore,
+    chunkIndexingService: failingChunkIndexingService,
+    executionContextResolver: {
+      resolve: () => ({
+        agentAlias: 'Codex',
+        agentId: 'cm1047-temp-local-fixture-agent',
+        requestSource: 'cm1047-write-reconcile-worker-partial-batch-test'
+      }),
+      isWritableByCodex: () => true
+    }
+  });
+  const reconcileService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore: healthyVectorStore,
+    chunkIndexingService: new ChunkIndexingService({
+      config,
+      shadowStore,
+      vectorStore: healthyVectorStore
+    })
+  });
+  const worker = new MemoryWriteReconcileWorker({
+    reconcileService,
+    limit: 2
+  });
+
+  try {
+    for (const targetPath of [
+      config.dailyNoteRootPath,
+      config.dbPath,
+      config.auditLogPath,
+      config.vectorIndexPath
+    ]) {
+      assertInsideRoot(rootPath, targetPath);
+    }
+
+    const firstWrite = await writeService.record(processPayload({
+      title: 'Checkpoint: CM-1047 internal write reconcile worker partial batch one',
+      task_id: 'CM-1047-A',
+      conversation_id: 'cm1047-write-reconcile-worker-temp-local-a'
+    }));
+    const secondWrite = await writeService.record(processPayload({
+      title: 'Checkpoint: CM-1047 internal write reconcile worker partial batch two',
+      task_id: 'CM-1047-B',
+      conversation_id: 'cm1047-write-reconcile-worker-temp-local-b'
+    }));
+
+    assert.equal(firstWrite.decision, 'accepted');
+    assert.equal(secondWrite.decision, 'accepted');
+    assert.equal(firstWrite.shadowWrite.status, 'degraded');
+    assert.equal(secondWrite.shadowWrite.status, 'degraded');
+    assert.equal((await shadowStore.getHealth()).recordCount, 2);
+    assert.equal((await shadowStore.getHealth()).reconcileCount, 4);
+
+    const partialReplay = await worker.runOnce({ limit: 2, dryRun: false });
+    const statusAfterPartialReplay = worker.getStatus();
+    const shadowAfterPartialReplay = await shadowStore.getHealth();
+    const vectorAfterPartialReplay = await healthyVectorStore.getHealth();
+
+    assert.equal(partialReplay.success, true);
+    assert.equal(partialReplay.workerDecision, 'run_once_completed');
+    assert.equal(partialReplay.decision, 'completed');
+    assert.equal(partialReplay.limit, 2);
+    assert.equal(partialReplay.scannedTaskCount, 2);
+    assert.equal(partialReplay.replayedCount, 2);
+    assert.equal(partialReplay.clearedCount, 2);
+    assert.equal(partialReplay.failedCount, 0);
+    assert.equal(statusAfterPartialReplay.running, false);
+    assert.equal(statusAfterPartialReplay.timerScheduled, false);
+    assert.equal(statusAfterPartialReplay.runCount, 0);
+    assert.equal(statusAfterPartialReplay.lastResultSummary.success, true);
+    assert.equal(statusAfterPartialReplay.lastResultSummary.limit, 2);
+    assert.equal(statusAfterPartialReplay.lastResultSummary.scannedTaskCount, 2);
+    assert.equal(statusAfterPartialReplay.lastResultSummary.replayedCount, 2);
+    assert.equal(statusAfterPartialReplay.lastResultSummary.clearedCount, 2);
+    assert.equal(statusAfterPartialReplay.lastResultSummary.failedCount, 0);
+    assert.equal(shadowAfterPartialReplay.recordCount, 2);
+    assert.equal(shadowAfterPartialReplay.reconcileCount, 2);
+    assert.equal(shadowAfterPartialReplay.chunkCount >= 1, true);
+    assert.equal(vectorAfterPartialReplay.vectorCount, 1);
+    assert.equal(JSON.stringify(statusAfterPartialReplay).includes(firstWrite.memoryId), false);
+    assert.equal(JSON.stringify(statusAfterPartialReplay).includes(secondWrite.memoryId), false);
+
+    const finalReplay = await worker.runOnce({ limit: 2, dryRun: false });
+    const finalStatus = worker.getStatus();
+    const shadowAfterFinalReplay = await shadowStore.getHealth();
+    const vectorAfterFinalReplay = await healthyVectorStore.getHealth();
+
+    assert.equal(finalReplay.success, true);
+    assert.equal(finalReplay.scannedTaskCount, 2);
+    assert.equal(finalReplay.replayedCount, 2);
+    assert.equal(finalReplay.clearedCount, 2);
+    assert.equal(finalReplay.failedCount, 0);
+    assert.equal(finalStatus.running, false);
+    assert.equal(finalStatus.timerScheduled, false);
+    assert.equal(finalStatus.runCount, 0);
+    assert.equal(finalStatus.lastResultSummary.replayedCount, 2);
+    assert.equal(finalStatus.lastResultSummary.clearedCount, 2);
+    assert.equal(shadowAfterFinalReplay.recordCount, 2);
+    assert.equal(shadowAfterFinalReplay.reconcileCount, 0);
+    assert.equal(shadowAfterFinalReplay.chunkCount >= 2, true);
+    assert.equal(vectorAfterFinalReplay.vectorCount, 2);
+    assert.equal(await pathExists(firstWrite.filePath), true);
+    assert.equal(await pathExists(secondWrite.filePath), true);
+    assert.equal(JSON.stringify(finalStatus).includes(firstWrite.memoryId), false);
+    assert.equal(JSON.stringify(finalStatus).includes(secondWrite.memoryId), false);
+  } finally {
+    worker.stop();
+    await shadowStore.close();
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
 test('CM-1040 worker retains failed temp-local reconcile tasks and later drains them after recovery', async () => {
   const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1040-worker-recovery-'));
   const config = createConfig(rootPath);

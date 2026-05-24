@@ -28,6 +28,63 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1047 Memory Write Reconcile Worker Partial Batch Temp-Local Evidence - 2026-05-25
+
+Result: `CM1047_MEMORY_WRITE_RECONCILE_WORKER_PARTIAL_BATCH_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.
+
+CM-1047 adds isolated temp-local partial-batch evidence for the internal write reconcile worker:
+
+- a test creates two synthetic degraded accepted writes under an isolated temp root
+- four temp-local vector/chunk replay tasks are queued
+- the test explicitly calls internal worker `runOnce({ dryRun: false, limit: 2 })`
+- the first run scans, replays, and clears exactly two tasks
+- reconcile count remains `2` after the first bounded run
+- worker status remains stopped/no timer/runCount `0`
+- worker status summary contains no raw memory ids
+- a second explicit `runOnce({ dryRun: false, limit: 2 })` drains the remaining two tasks
+- final reconcile count is `0`, vector count is `2`, and chunk count is at least `2`
+- no scheduled worker loop is started
+
+Validation:
+
+- test syntax check passed
+- targeted memory write reconcile worker test `11/11` passed
+- adjacent worker/service/write reliability/MCP regression bundle `30/30` passed
+- full `npm test` `2497/2497` passed
+
+Boundary:
+
+```text
+worker source changed = false
+synthetic temp-local accepted writes = 2
+synthetic temp-local queued replay tasks = 4
+explicit internal worker runOnce calls = 2
+first run limit = 2
+first run remaining reconcile tasks = 2
+second run remaining reconcile tasks = 0
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+scheduled worker loop started = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow partial-batch boundary gap: a successful bounded replay does not prove the whole queue is drained unless queue health proves no remaining tasks.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1046 HTTP Observe Current-Source Worker Replay Summary - 2026-05-25
 
 Result: `CM1046_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_REPLAY_SUMMARY_NOT_RELIABLE_NOT_READY`.

@@ -1,5 +1,39 @@
 # HANDOFF.md — codex-memory
 
+## CM-1047 Memory Write Reconcile Worker Partial Batch Handoff
+
+Goal: add isolated temp-local evidence that explicit bounded write reconcile worker replay does not over-clear queued work when `limit` is smaller than the queue size, without touching startup, watchdog, config, public MCP tools, existing 7605, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_PARTIAL_BATCH_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1047_MEMORY_WRITE_RECONCILE_WORKER_PARTIAL_BATCH_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- The test uses an isolated temp root with local diary, SQLite shadow store, vector index, audit log, and chunk indexing services.
+- Two synthetic accepted writes intentionally fail vector/chunk projection writes.
+- The temp-local shadow store contains two records and four queued reconcile tasks.
+- The first explicit internal `runOnce({ dryRun: false, limit: 2 })` scans/replays/clears exactly `2` tasks.
+- The first bounded run leaves reconcile count `2`, proving the successful batch is not treated as full queue drain.
+- Worker status remains stopped/no timer/runCount `0` and omits raw memory ids.
+- The second explicit `runOnce({ dryRun: false, limit: 2 })` drains the remaining tasks.
+- Final temp-local health shows reconcile count `0`, vector count `2`, and chunk count at least `2`.
+- Targeted worker test passed `11/11`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `30/30`.
+- Full `npm test` passed `2497/2497`.
+
+Not validated:
+- Existing 7605 deployed worker behavior.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is isolated temp-local explicit worker evidence, not automatic recovery or startup/runtime integration.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1046 HTTP Observe Current-Source Worker Replay Summary Handoff
 
 Goal: add controlled current-source HTTP evidence that `observe:http` reads a bounded worker replay `lastResultSummary` after explicit internal `runOnce({ dryRun: false, limit: 2 })`, without touching existing 7605, startup, watchdog, config, public MCP tools, or readiness/reliability claims.

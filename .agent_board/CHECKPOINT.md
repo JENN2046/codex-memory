@@ -1,5 +1,37 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1047 Memory Write Reconcile Worker Partial Batch Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_PARTIAL_BATCH_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1047_MEMORY_WRITE_RECONCILE_WORKER_PARTIAL_BATCH_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added a temp-local partial-batch worker test to `tests/memory-write-reconcile-worker.test.js`.
+- Created two synthetic degraded accepted writes under an isolated temp root.
+- Verified four queued projection replay tasks existed before worker replay.
+- Called internal worker `runOnce({ dryRun: false, limit: 2 })` explicitly.
+- Verified the first bounded run scanned `2`, replayed `2`, cleared `2`, failed `0`, and left reconcile count `2`.
+- Verified worker status remained stopped/no timer/runCount `0`.
+- Verified bounded status summary omitted raw memory ids.
+- Called a second explicit `runOnce({ dryRun: false, limit: 2 })`.
+- Verified the remaining two tasks drained, reconcile count returned to `0`, and vector/chunk projections existed for both records.
+
+Validation:
+- Test syntax check passed.
+- Targeted memory write reconcile worker test passed `11/11`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `30/30`.
+- Full `npm test` passed `2497/2497`.
+
+Boundary:
+- Controlled temp-local partial-batch evidence only.
+- No runtime source change, existing 7605 change, public MCP expansion, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, scheduled loop start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1046 HTTP Observe Current-Source Worker Replay Summary Checkpoint
 
 Status: `COMPLETED_VALIDATED_HTTP_OBSERVE_CURRENT_SOURCE_WORKER_REPLAY_SUMMARY_NOT_RELIABLE_NOT_READY`
