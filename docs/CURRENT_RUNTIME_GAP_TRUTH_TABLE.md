@@ -28,6 +28,38 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1013 CM0825 Post-Guard Recall Proof Execution - 2026-05-25
+
+Result: `CM1013_CM0825_POST_GUARD_RECALL_PROOF_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1013 records one bounded post-guard CM0825 recall proof:
+
+- [CM1013_CM0825_POST_GUARD_RECALL_PROOF_EXECUTION.md](/A:/codex-memory/docs/CM1013_CM0825_POST_GUARD_RECALL_PROOF_EXECUTION.md)
+
+Baseline facts:
+
+```text
+HEAD / origin/main / remote refs/heads/main = 5f29c3dc844a1c9b12483aba93ab48087a92b1fe
+worktree = clean
+preflights = ready-not-executed
+```
+
+Proof facts:
+
+```text
+Q1/Q2/Q3 counts = 4/4/2
+Q4 stricter_negative_control count = 0
+rawContentReturned = false
+sideEffectCounters = all zero
+```
+
+Operator interpretation:
+
+- CMB-0015 is closed for the exact post-guard CM0825 proof path.
+- This is still one bounded exact proof shape.
+- This does not prove broad recall reliability, write reliability, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `complete?` remains `no`.
+
 ## CM-1012 CM0825 Negative-Control Wiring Guard - 2026-05-25
 
 Result: `CM1012_CM0825_NEGATIVE_CONTROL_WIRING_GUARD_COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`.

@@ -1,5 +1,29 @@
 # HANDOFF.md — codex-memory
 
+## CM-1013 CM0825 Post-Guard Recall Proof Execution Handoff
+
+Goal: verify the CM-1012 default negative-control context guard from a clean synced baseline with one bounded CM0825 post-guard proof.
+
+Status: COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1013_CM0825_POST_GUARD_RECALL_PROOF_EXECUTION.md`.
+
+Current evidence:
+- `main`, `origin/main`, and remote `refs/heads/main` were synced at `5f29c3dc844a1c9b12483aba93ab48087a92b1fe`.
+- Recall/write/baseline preflights returned ready-not-executed.
+- One bounded sanitized CM0825 proof executed with no caller-supplied precision factory.
+- Q1/Q2/Q3 counts were `4/4/2`; Q4 `stricter_negative_control` returned `0`.
+- All side-effect counters were zero; no raw output leaked.
+
+Not validated:
+- Broad recall reliability, write reliability, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- CM-1013 proves only the exact post-guard CM0825 proof path. It does not prove broad `memory recall reliable` or readiness.
+
+Next safe step:
+- Review CM-1013 under existing recall blocker criteria, or switch to write reliability closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1012 CM0825 Negative-Control Wiring Guard Handoff
 
 Goal: record the current CM0825 negative-control failure honestly and close the narrow internal runner wiring gap that let `stricter_negative_control` run without no-result precision context when no factory was supplied.

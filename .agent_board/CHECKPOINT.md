@@ -1,5 +1,32 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1013 CM0825 Post-Guard Recall Proof Execution Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1013_CM0825_POST_GUARD_RECALL_PROOF_EXECUTION.md`
+
+Completed:
+- Confirmed current `main`, `origin/main`, and remote `refs/heads/main` are synced at `5f29c3dc844a1c9b12483aba93ab48087a92b1fe`.
+- Ran read-only recall, write, and combined baseline preflights; all returned ready-not-executed.
+- Executed one bounded CM0825 post-guard recall proof through the internal runner/adapter seam with no caller-supplied precision factory.
+- Recorded Q1/Q2/Q3 counts `4/4/2` and Q4 `stricter_negative_control` count `0`.
+- Verified all side-effect counters stayed zero and no raw output was returned.
+
+Validation:
+- Fresh Git status/hash/remote checks passed.
+- Recall/write/baseline preflights passed as ready-not-executed.
+- Bounded post-guard proof returned `TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY`.
+
+Boundary:
+- Exactly four internal read-only `search_memory` calls occurred through the approved runner/adapter seam.
+- No `record_memory`, provider/API call, raw memory output, direct `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim occurred.
+
+Next:
+- Use CM-1013 as bounded post-guard recall proof evidence only. Broad recall reliability remains unproven; next safe step is either evidence review or write reliability closure.
+
 ## CM-1012 CM0825 Negative-Control Wiring Guard Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
