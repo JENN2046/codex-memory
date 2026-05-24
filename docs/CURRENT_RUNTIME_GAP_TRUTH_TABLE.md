@@ -28,6 +28,54 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1023 Public Default Search Lifecycle Supersede Cold-Derived Temp-Local Evidence - 2026-05-25
+
+Result: `CM1023_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_SUPERSEDE_COLD_DERIVED_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1023 records isolated temp-local lifecycle supersede evidence for private Codex-scoped default public `search_memory`:
+
+- two private Codex-scoped temp records with the same marker were written under an isolated temp root
+- the old record was marked active in temp-local lifecycle columns
+- the replacement record was marked proposal in temp-local lifecycle columns
+- default public scoped search saw only the old active record before supersede
+- the old record was superseded by the replacement through the approved internal supersede runtime entry in temp-local state only
+- the first app was closed
+- only temp-local `candidateCachePath` and `vectorIndexPath` files were removed after verifying they resolved under the temp root
+- a second app reopened the same temp paths
+- default public `search_memory` with `include_content=false`, `enableLifecycleReadPolicy=true`, and explicit private Codex scope returned only the replacement active record
+- the superseded old record was not returned
+- read-policy audit was applied and raw workspace value was not printed
+
+Validation:
+
+- CM-1023 test `1/1` passed
+- lifecycle/supersede/tombstone/cold-derived/MCP regression bundle `31/31` passed
+- supersede/tombstone/write-temp-local adjacent bundle `13/13` passed
+
+Boundary:
+
+```text
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+package/config/watchdog/startup change = false
+real cleanup = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens lifecycle pollution-prevention evidence around public/default scoped recall after cold-derived restart.
+- This is a supersede counterpart to CM-1022 tombstone evidence, but it is still temp-local and bounded.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, public search reliability, governance closure, and rollback readiness remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1022 Public Default Search Lifecycle Tombstone Cold-Derived Temp-Local Evidence - 2026-05-25
 
 Result: `CM1022_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_TOMBSTONE_COLD_DERIVED_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.

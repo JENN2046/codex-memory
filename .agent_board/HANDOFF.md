@@ -1,5 +1,38 @@
 # HANDOFF.md — codex-memory
 
+## CM-1023 Public Default Search Lifecycle Supersede Cold-Derived Temp-Local Evidence Handoff
+
+Goal: verify default public `search_memory` with lifecycle read policy returns a replacement private Codex-scoped record and excludes the superseded old record after isolated temp-local app close, derived candidate-cache/vector-index file removal, and app reopen without claiming broad reliability/readiness.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_SUPERSEDE_COLD_DERIVED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1023_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_SUPERSEDE_COLD_DERIVED_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/public-default-search-lifecycle-supersede-cold-derived-temp-local-evidence.test.js`.
+- Two temp-local private Codex records shared the same marker phrase; old was active and replacement was proposal before supersede.
+- Default public scoped search saw only the old active record before supersede.
+- The old record was superseded by the replacement through the approved internal supersede runtime entry in the temp app only.
+- The first app instance closed after the supersede.
+- The test verified `candidateCachePath` and `vectorIndexPath` resolved under the temp root, then removed only those temp-local derived files.
+- A second app instance reopened the same temp paths.
+- Codex-scoped cold-restart default search returned exactly the replacement active record.
+- The superseded old record was not returned.
+- CM-1023 test passed `1/1`.
+- Lifecycle/supersede/tombstone/cold-derived/MCP regression bundle passed `31/31`.
+- Supersede/tombstone/write-temp-local adjacent bundle passed `13/13`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local lifecycle supersede evidence, not broad real-store, long-run, rollback, governance-ready, or production durability proof.
+- The supersede execution is internal and isolated to temp-local state; it does not make governance mutation ready.
+- The proof does not make public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1022 Public Default Search Lifecycle Tombstone Cold-Derived Temp-Local Evidence Handoff
 
 Goal: verify default public `search_memory` with lifecycle read policy excludes a tombstoned private Codex-scoped record after isolated temp-local app close, derived candidate-cache/vector-index file removal, and app reopen without claiming broad reliability/readiness.
