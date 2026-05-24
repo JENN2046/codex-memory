@@ -1,5 +1,39 @@
 # HANDOFF.md — codex-memory
 
+## CM-1025 Public Default Search Lifecycle Rejected Cold-Derived Temp-Local Evidence Handoff
+
+Goal: verify default public `search_memory` with lifecycle read policy returns a matching active private Codex-scoped record and excludes a matching rejected private Codex-scoped record after isolated temp-local app close, derived candidate-cache/vector-index file removal, and app reopen without claiming broad reliability/readiness.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_REJECTED_COLD_DERIVED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1025_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_REJECTED_COLD_DERIVED_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/public-default-search-lifecycle-rejected-cold-derived-temp-local-evidence.test.js`.
+- Two temp-local private Codex records shared the same marker phrase.
+- One record was marked active and one record was marked rejected in temp-local lifecycle columns.
+- Default public scoped search returned only the active record before restart.
+- The rejected record was not returned before restart.
+- The first app instance closed after the scoped search.
+- The test verified `candidateCachePath` and `vectorIndexPath` resolved under the temp root, then removed only those temp-local derived files.
+- A second app instance reopened the same temp paths.
+- Codex-scoped cold-restart default search returned exactly the active record.
+- The rejected record was not returned after cold-derived restart.
+- CM-1025 test passed `1/1`.
+- Lifecycle/rejected/validate/tombstone/supersede/MCP regression bundle passed `19/19`.
+- Validate/write-temp-local adjacent bundle passed `28/28`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local lifecycle rejected evidence, not broad real-store, long-run, rollback, governance-ready, or production durability proof.
+- The rejected status was marked directly in isolated temp-local lifecycle columns because there is no internal reject runtime entry in the current app surface.
+- The proof does not make public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1024 Public Default Search Lifecycle Validate Cold-Derived Temp-Local Evidence Handoff
 
 Goal: verify default public `search_memory` with lifecycle read policy hides a proposal private Codex-scoped record before validation, then returns it after approved internal validate mutation, isolated temp-local app close, derived candidate-cache/vector-index file removal, and app reopen without claiming broad reliability/readiness.
