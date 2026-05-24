@@ -1,5 +1,40 @@
 # HANDOFF.md — codex-memory
 
+## CM-1024 Public Default Search Lifecycle Validate Cold-Derived Temp-Local Evidence Handoff
+
+Goal: verify default public `search_memory` with lifecycle read policy hides a proposal private Codex-scoped record before validation, then returns it after approved internal validate mutation, isolated temp-local app close, derived candidate-cache/vector-index file removal, and app reopen without claiming broad reliability/readiness.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_LIFECYCLE_VALIDATE_COLD_DERIVED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1024_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_VALIDATE_COLD_DERIVED_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/public-default-search-lifecycle-validate-cold-derived-temp-local-evidence.test.js`.
+- One temp-local private Codex record used the CM-1024 marker phrase.
+- The record was marked proposal before validation.
+- Default public scoped search returned no results before validation.
+- The pre-validation read-policy audit recorded lifecycle filtering.
+- The record was validated through the approved internal validate runtime entry in the temp app only.
+- The validate transition was `proposal -> active`.
+- The first app instance closed after validation.
+- The test verified `candidateCachePath` and `vectorIndexPath` resolved under the temp root, then removed only those temp-local derived files.
+- A second app instance reopened the same temp paths.
+- Codex-scoped cold-restart default search returned exactly the validated active record.
+- CM-1024 test passed `1/1`.
+- Lifecycle/validate/tombstone/supersede/MCP regression bundle passed `41/41`.
+- Validate/tombstone/supersede/write-temp-local adjacent bundle passed `17/17`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local lifecycle validate evidence, not broad real-store, long-run, rollback, governance-ready, or production durability proof.
+- The validate execution is internal and isolated to temp-local state; it does not make governance mutation ready.
+- The proof does not make public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1023 Public Default Search Lifecycle Supersede Cold-Derived Temp-Local Evidence Handoff
 
 Goal: verify default public `search_memory` with lifecycle read policy returns a replacement private Codex-scoped record and excludes the superseded old record after isolated temp-local app close, derived candidate-cache/vector-index file removal, and app reopen without claiming broad reliability/readiness.

@@ -28,6 +28,54 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1024 Public Default Search Lifecycle Validate Cold-Derived Temp-Local Evidence - 2026-05-25
+
+Result: `CM1024_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_VALIDATE_COLD_DERIVED_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1024 records isolated temp-local lifecycle validate evidence for private Codex-scoped default public `search_memory`:
+
+- one private Codex-scoped temp record with the marker was written under an isolated temp root
+- the record was marked proposal in temp-local lifecycle columns
+- default public scoped search returned no results before validation
+- read-policy audit recorded lifecycle filtering for the proposal record
+- the record was validated through the approved internal validate runtime entry in temp-local state only
+- the validate transition was `proposal -> active`
+- the first app was closed
+- only temp-local `candidateCachePath` and `vectorIndexPath` files were removed after verifying they resolved under the temp root
+- a second app reopened the same temp paths
+- default public `search_memory` with `include_content=false`, `enableLifecycleReadPolicy=true`, and explicit private Codex scope returned exactly the validated active record
+- read-policy audit was applied and raw workspace value was not printed
+
+Validation:
+
+- CM-1024 test `1/1` passed
+- lifecycle/validate/tombstone/supersede/MCP regression bundle `41/41` passed
+- validate/tombstone/supersede/write-temp-local adjacent bundle `17/17` passed
+
+Boundary:
+
+```text
+provider/API calls = 0
+real memory reads = 0
+real memory writes = 0
+real .jsonl reads = 0
+raw real memory output = 0
+public MCP expansion = false
+package/config/watchdog/startup change = false
+real cleanup = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens lifecycle approval-flow evidence around public/default scoped recall after cold-derived restart.
+- This is a validate counterpart to CM-1022 tombstone and CM-1023 supersede evidence, but it is still temp-local and bounded.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `memory write reliable`, `memory recall reliable`, public search reliability, governance closure, and rollback readiness remain not claimed.
+- `complete? = no`
+- `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1023 Public Default Search Lifecycle Supersede Cold-Derived Temp-Local Evidence - 2026-05-25
 
 Result: `CM1023_PUBLIC_DEFAULT_SEARCH_LIFECYCLE_SUPERSEDE_COLD_DERIVED_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
