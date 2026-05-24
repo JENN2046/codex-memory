@@ -1,5 +1,29 @@
 # HANDOFF.md — codex-memory
 
+## CM-1011 Memory Reliability Clean Baseline Preflight Review Handoff
+
+Goal: remove the stale dirty-baseline blocker shape by binding current clean-synced Git facts to the existing recall/write proof preflight surfaces, without executing live proof or claiming reliability.
+
+Status: COMPLETED_VALIDATED_NOT_READY.
+
+Artifact: `docs/CM1011_MEMORY_RELIABILITY_CLEAN_BASELINE_PREFLIGHT_REVIEW.md`.
+
+Current evidence:
+- `main`, `origin/main`, and remote `refs/heads/main` are synced at `fcc87f3842095c9a2d48a4d49a041baec27026a4`.
+- Dirty status line count is `0`.
+- Recall preflight returned `RECALL_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Write preflight returned `WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Combined baseline readiness returned `MEMORY_RELIABILITY_PROOF_BASELINE_READY_NOT_EXECUTED` and `baselineReadyForLiveProof=true`.
+
+Not validated:
+- Live recall proof, live write proof, true `search_memory`, true `record_memory`, provider smoke/benchmark, raw memory/`.jsonl` reads, durable memory/audit/projection mutation, HTTP observe, full `npm test`, production readiness, release/tag/deploy.
+
+Remaining risks:
+- CM-1011 closes only the dirty-baseline blocker shape. It does not prove `memory recall reliable`, `memory write reliable`, runtime readiness, RC readiness, or production readiness.
+
+Next safe step:
+- Choose one exact bounded live proof or one further non-mutating result-consumption guard. Re-run the current-facts preflight first if the branch, HEAD, remote, or worktree changes.
+
 ## CM-1010 Write Proof Result Boundary Contract Handoff
 
 Goal: continue write reliability closure by making future bounded write proof output fail closed unless the result is complete, sanitized, one-write-only, and explicitly not a readiness/reliability claim.

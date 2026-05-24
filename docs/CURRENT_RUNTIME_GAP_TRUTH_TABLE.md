@@ -28,6 +28,44 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1011 Memory Reliability Clean Baseline Preflight Review - 2026-05-25
+
+Result: `CM1011_MEMORY_RELIABILITY_CLEAN_BASELINE_PREFLIGHT_READY_NOT_EXECUTED`.
+
+CM-1011 records fresh clean-synced current-baseline evidence:
+
+- [CM1011_MEMORY_RELIABILITY_CLEAN_BASELINE_PREFLIGHT_REVIEW.md](/A:/codex-memory/docs/CM1011_MEMORY_RELIABILITY_CLEAN_BASELINE_PREFLIGHT_REVIEW.md)
+
+Baseline facts:
+
+```text
+HEAD = fcc87f3842095c9a2d48a4d49a041baec27026a4
+origin/main = fcc87f3842095c9a2d48a4d49a041baec27026a4
+remote refs/heads/main = fcc87f3842095c9a2d48a4d49a041baec27026a4
+dirtyStatusLineCount = 0
+```
+
+Read-only decisions:
+
+```text
+RECALL_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED
+WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED
+MEMORY_RELIABILITY_PROOF_BASELINE_READY_NOT_EXECUTED
+```
+
+Operator interpretation:
+
+- stale dirty-baseline blockers `CMB-0013` and `CMB-0014` no longer describe current `main`
+- the current baseline is ready for a separately scoped live-proof decision
+- this did not execute live proof
+- this did not call `search_memory` or `record_memory`
+- this did not call providers/APIs
+- this did not read raw memory or direct `.jsonl`
+- this did not write durable memory/audit state
+- this did not expand public MCP
+- this did not claim `memory recall reliable`, `memory write reliable`, runtime readiness, or RC readiness
+- `complete?` remains `no`
+
 ## CM-1010 Write Proof Result Boundary Contract - 2026-05-25
 
 Result: `CM1010_WRITE_PROOF_RESULT_BOUNDARY_CONTRACT_COMPLETED_NOT_READY`.

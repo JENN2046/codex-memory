@@ -1,5 +1,33 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1011 Memory Reliability Clean Baseline Preflight Review Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1011_MEMORY_RELIABILITY_CLEAN_BASELINE_PREFLIGHT_REVIEW.md`
+
+Completed:
+- Confirmed current `main`, `origin/main`, and remote `refs/heads/main` are synced at `fcc87f3842095c9a2d48a4d49a041baec27026a4`.
+- Ran read-only recall current-facts preflight; result `RECALL_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Ran read-only write current-facts preflight; result `WRITE_PROOF_EXECUTION_PREFLIGHT_READY_NOT_EXECUTED`.
+- Ran combined baseline readiness CLI; result `MEMORY_RELIABILITY_PROOF_BASELINE_READY_NOT_EXECUTED`.
+- Updated `CMB-0013` and `CMB-0014` so the stale dirty-baseline blocker shape is closed for current facts.
+
+Validation:
+- Fresh Git status/hash/remote checks passed.
+- Recall/write current-facts preflights and combined baseline readiness passed as ready-not-executed.
+- Ledger consistency passed.
+- Docs validation passed.
+- Diff review and no-overclaim/public-MCP scan passed.
+
+Boundary:
+- No live proof execution, `record_memory`, `search_memory`, provider/API call, raw memory read, direct `.jsonl` read, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+
+Next:
+- Use this clean baseline as the preflight basis for a separate bounded live proof step only if the next scope remains exact and still preserves no-readiness/no-reliability wording.
+
 ## CM-1010 Write Proof Result Boundary Contract Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
