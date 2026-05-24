@@ -1,5 +1,41 @@
 # HANDOFF.md — codex-memory
 
+## CM-1049 Memory Write Reconcile Worker MaxRuns Residual Queue Handoff
+
+Goal: add isolated temp-local evidence that a scheduled internal write reconcile worker stops at `maxRuns` even when failed replay tasks keep the queue non-empty, without touching startup, watchdog, config, public MCP tools, existing 7605, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_MAXRUNS_RESIDUAL_QUEUE_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1049_MEMORY_WRITE_RECONCILE_WORKER_MAXRUNS_RESIDUAL_QUEUE_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- The test uses an isolated temp root with local diary, SQLite shadow store, vector index, audit log, and chunk indexing services.
+- Two synthetic accepted writes intentionally fail initial vector/chunk projection writes.
+- The test re-enqueues four deterministic replay tasks with explicit `createdAt` order.
+- The scheduled worker starts only inside the test with manual scheduler and `maxRuns=2`.
+- The first scheduled tick scans `2`, replays/clears `1`, fails/retains `1`, remains running, and schedules the next tick.
+- The second scheduled tick scans `2`, replays/clears `1`, fails/retains `1`, reaches `runCount=2`, and stops.
+- After maxRuns, worker is stopped/no timer and manual scheduler active timers are `0`.
+- Reconcile count remains `2`, preserving the two failed chunk tasks.
+- Status omits raw memory ids and raw projection error text.
+- A separate explicit healthy worker drains the residual queue.
+- Targeted worker test passed `13/13`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `32/32`.
+- Full `npm test` passed `2499/2499`.
+
+Not validated:
+- Existing 7605 deployed worker behavior.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is isolated temp-local explicit worker evidence, not automatic recovery or startup/runtime integration.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1048 Memory Write Reconcile Worker Mixed Batch Handoff
 
 Goal: add isolated temp-local evidence that explicit bounded write reconcile worker replay clears successful tasks while retaining failed and unscanned queued tasks in a mixed-result batch, without touching startup, watchdog, config, public MCP tools, existing 7605, or readiness/reliability claims.

@@ -1,5 +1,38 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1049 Memory Write Reconcile Worker MaxRuns Residual Queue Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_MAXRUNS_RESIDUAL_QUEUE_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1049_MEMORY_WRITE_RECONCILE_WORKER_MAXRUNS_RESIDUAL_QUEUE_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added a temp-local scheduled maxRuns worker test to `tests/memory-write-reconcile-worker.test.js`.
+- Created two synthetic degraded accepted writes under an isolated temp root.
+- Re-enqueued four deterministic replay tasks ordered as first vector, first chunks, second vector, second chunks.
+- Started the internal worker with manual scheduler: `start({ dryRun: false, limit: 2, maxRuns: 2 })`.
+- Verified the first scheduled tick replayed/cleared one vector task, failed/retained one chunk task, kept worker running, and scheduled the next tick.
+- Verified the second scheduled tick replayed/cleared the second vector task, failed/retained a chunk task, and stopped at `maxRuns=2`.
+- Verified final worker state was stopped/no timer/runCount `2` with manual scheduler active timers `0`.
+- Verified two failed chunk tasks remained queued after maxRuns stopped the worker.
+- Verified status omitted raw memory ids and raw projection error text.
+- Verified a separate explicit healthy worker drained the residual queue.
+
+Validation:
+- Test syntax check passed.
+- Targeted memory write reconcile worker test passed `13/13`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `32/32`.
+- Full `npm test` passed `2499/2499`.
+
+Boundary:
+- Controlled temp-local scheduled maxRuns evidence only.
+- No runtime source change, existing 7605 change, public MCP expansion, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1048 Memory Write Reconcile Worker Mixed Batch Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_MIXED_BATCH_NOT_RELIABLE_NOT_READY`

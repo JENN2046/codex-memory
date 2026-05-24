@@ -28,6 +28,68 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1049 Memory Write Reconcile Worker MaxRuns Residual Queue Temp-Local Evidence - 2026-05-25
+
+Result: `CM1049_MEMORY_WRITE_RECONCILE_WORKER_MAXRUNS_RESIDUAL_QUEUE_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.
+
+CM-1049 adds isolated temp-local scheduled maxRuns evidence for the internal write reconcile worker:
+
+- a test creates two synthetic degraded accepted writes under an isolated temp root
+- four deterministic temp-local vector/chunk replay tasks are queued with explicit `createdAt` order
+- the test starts the default-disabled internal worker with manual scheduler: `start({ dryRun: false, limit: 2, maxRuns: 2 })`
+- vector replay succeeds and chunk replay fails during the scheduled ticks
+- the first scheduled tick scans `2`, replays `1`, clears `1`, fails `1`, keeps the worker running, and schedules the next tick
+- the second scheduled tick scans `2`, replays `1`, clears `1`, fails `1`, reaches `runCount=2`, and stops because `maxRuns=2`
+- final scheduled-worker state is stopped/no timer, with manual scheduler active timers `0`
+- reconcile count remains `2`, preserving the two failed chunk tasks
+- worker status summary contains no raw memory ids or raw projection error text
+- a separate explicit healthy `runOnce({ dryRun: false, limit: 2 })` drains the residual queue
+- final reconcile count is `0` and chunk count is at least `2`
+
+Validation:
+
+- test syntax check passed
+- targeted memory write reconcile worker test `13/13` passed
+- adjacent worker/service/write reliability/MCP regression bundle `32/32` passed
+- full `npm test` `2499/2499` passed
+
+Boundary:
+
+```text
+worker source changed = false
+synthetic temp-local accepted writes = 2
+synthetic temp-local queued replay tasks = 4
+scheduled worker start calls = 1
+manual scheduler ticks = 2
+scheduled worker maxRuns = 2
+scheduled worker runCount after maxRuns = 2
+scheduled worker timer after maxRuns = false
+manual scheduler active timers after maxRuns = 0
+residual reconcile tasks after maxRuns = 2
+explicit recovery worker runOnce calls = 1
+residual reconcile tasks after recovery = 0
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow maxRuns residual-queue boundary gap: the scheduled worker remains bounded and stops even when failed queued tasks remain visible.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1048 Memory Write Reconcile Worker Mixed Batch Temp-Local Evidence - 2026-05-25
 
 Result: `CM1048_MEMORY_WRITE_RECONCILE_WORKER_MIXED_BATCH_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.
