@@ -155,6 +155,45 @@ function createSessionLimitPayload({ limitType, limit }) {
     }
   };
 }
+
+function summarizeWriteReconcileWorkerStatus(app) {
+  const worker = app?.services?.memoryWriteReconcileWorker;
+  if (!worker || typeof worker.getStatus !== 'function') {
+    return {
+      available: false,
+      running: false,
+      timerScheduled: false,
+      tickInFlight: false,
+      runCount: 0,
+      intervalMs: null,
+      limit: null,
+      dryRun: null,
+      maxRuns: null,
+      lastResultSummary: null
+    };
+  }
+
+  const status = worker.getStatus();
+  return {
+    available: true,
+    running: status.running === true,
+    timerScheduled: status.timerScheduled === true,
+    tickInFlight: status.tickInFlight === true,
+    runCount: Number(status.runCount || 0),
+    intervalMs: Number.isFinite(Number(status.intervalMs)) ? Number(status.intervalMs) : null,
+    limit: status.limit ?? null,
+    dryRun: status.dryRun === true,
+    maxRuns: status.maxRuns ?? null,
+    lastResultSummary: status.lastResultSummary || null
+  };
+}
+
+function buildRuntimeHealth(app) {
+  return {
+    writeReconcileWorker: summarizeWriteReconcileWorkerStatus(app)
+  };
+}
+
 function isLoopbackHost(host) {
   const normalized = String(host || '').trim().toLowerCase();
   return normalized === 'localhost'
@@ -386,7 +425,8 @@ function createStreamableHttpServer({
             maxStreamsPerSession: sessionHardening.maxStreamsPerSession,
             cleanupIntervalMs: sessionHardening.cleanupIntervalMs,
             warnings: sessionHardening.warnings
-          }
+          },
+          runtime: buildRuntimeHealth(app)
         });
       }
 
@@ -564,6 +604,7 @@ function createStreamableHttpServer({
 module.exports = {
   SESSION_HEADER,
   createStreamableHttpServer,
+  buildRuntimeHealth,
   getHttpAuthWarning,
   isLoopbackHost,
   normalizePathname,

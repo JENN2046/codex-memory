@@ -28,6 +28,63 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1042 HTTP Health Write Reconcile Worker Status - 2026-05-25
+
+Result: `CM1042_HTTP_HEALTH_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`.
+
+CM-1042 adds bounded current-source HTTP health visibility for the internal default-disabled write reconcile worker:
+
+- `/health` now includes `runtime.writeReconcileWorker`
+- the summary exposes only `available`, `running`, `timerScheduled`, `tickInFlight`, `runCount`, `intervalMs`, `limit`, `dryRun`, `maxRuns`, and `lastResultSummary`
+- missing worker/status support returns a safe unavailable snapshot
+- current-source HTTP MCP test proves the health probe does not start the worker
+- current-source HTTP MCP test proves initial worker health is stopped/no timer/no in-flight/runCount `0`
+- current-source HTTP MCP test proves the health status JSON does not include `memoryId`
+- no public MCP tool is added
+- no worker is started by default
+- no startup worker, watchdog integration, or config integration is installed
+
+Validation:
+
+- source/test syntax checks passed
+- targeted HTTP MCP test `16/16` passed
+- adjacent HTTP observe/MCP/worker bundle `52/52` passed
+- full `npm test` `2493/2493` passed
+- `npm run start:http:ensure` reported the existing local 7605 HTTP MCP process healthy
+- `npm run observe:http -- --json` reported summary status `ok`, health status `ok`, HTTP status `200`, and service name `vcp_codex_memory`
+
+HTTP observe boundary:
+
+- The observed 7605 process was already running before CM-1042.
+- Its observed `/health` payload did not include `runtime.writeReconcileWorker`.
+- Therefore CM-1042 does not claim live deployed new-field evidence from that existing process.
+- New-field behavior is validated by the current-source HTTP test server.
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+true live search_memory calls = 0
+provider/API calls = 0
+real memory writes = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by health probe = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This strengthens bounded internal observability for the write reconcile worker.
+- It does not prove broad write reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, real cleanup safety, real rollback safety, governance closure, rollback readiness, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `RC_NOT_READY_BLOCKED` remains unchanged.
+- `complete? = no`.
+
 ## CM-1041 Memory Write Reconcile Worker Temp-Local Reopen Recovery - 2026-05-25
 
 Result: `CM1041_MEMORY_WRITE_RECONCILE_WORKER_TEMP_LOCAL_REOPEN_RECOVERY_PASSED_NOT_RELIABLE_NOT_READY`.

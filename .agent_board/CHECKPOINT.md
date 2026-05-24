@@ -1,5 +1,37 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1042 HTTP Health Write Reconcile Worker Status Checkpoint
+
+Status: `COMPLETED_VALIDATED_HTTP_HEALTH_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1042_HTTP_HEALTH_WRITE_RECONCILE_WORKER_STATUS.md`
+
+Completed:
+- Added bounded `runtime.writeReconcileWorker` to HTTP `/health`.
+- Limited health output to availability, run-state, timer/in-flight state, run count, bounded options, and bounded last-result summary.
+- Verified current-source HTTP health exposes exactly the bounded worker status keys.
+- Verified the health probe does not start the worker.
+- Verified initial worker health is stopped/no timer/no in-flight/runCount `0`.
+- Verified status JSON does not include `memoryId`.
+- Classified live 7605 observe as existing-runtime health only, not deployed new-field proof.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted HTTP MCP test passed `16/16`.
+- Adjacent HTTP observe/MCP/worker bundle passed `52/52`.
+- Full `npm test` passed `2493/2493`.
+- `start:http:ensure` reported the existing 7605 HTTP MCP service healthy.
+- `observe:http -- --json` reported summary status `ok`, health status `ok`, HTTP status `200`, and service name `vcp_codex_memory`; the already-running process did not include the new field.
+
+Boundary:
+- Internal bounded health status only.
+- No public MCP expansion, public `memory_write_reconcile_worker` tool, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, live deployed new-field claim, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded reliability closure toward controlled runtime-refresh evidence, longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1041 Memory Write Reconcile Worker Temp-Local Reopen Recovery Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_TEMP_LOCAL_REOPEN_RECOVERY_NOT_RELIABLE_NOT_READY`

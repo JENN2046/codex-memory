@@ -69,13 +69,36 @@ test('HTTP MCP should initialize and return a session header', async () => {
 });
 
 test('HTTP MCP should expose health and tools/list', async () => {
-  await withHttpServer(async ({ address }) => {
+  await withHttpServer(async ({ app, address }) => {
+    assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
+
     const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'));
     const healthPayload = await health.json();
     assert.equal(health.status, 200);
     assert.equal(healthPayload.ok, true);
     assert.equal(healthPayload.auth.required, false);
     assert.match(healthPayload.auth.warning, /loopback host without a bearer token/);
+    assert.deepEqual(Object.keys(healthPayload.runtime).sort(), ['writeReconcileWorker']);
+    assert.deepEqual(Object.keys(healthPayload.runtime.writeReconcileWorker).sort(), [
+      'available',
+      'dryRun',
+      'intervalMs',
+      'lastResultSummary',
+      'limit',
+      'maxRuns',
+      'runCount',
+      'running',
+      'tickInFlight',
+      'timerScheduled'
+    ]);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.available, true);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.running, false);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.timerScheduled, false);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.tickInFlight, false);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.runCount, 0);
+    assert.equal(healthPayload.runtime.writeReconcileWorker.lastResultSummary, null);
+    assert.equal(JSON.stringify(healthPayload.runtime.writeReconcileWorker).includes('memoryId'), false);
+    assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);
 
     const tools = await fetch(address.url, {
       method: 'POST',

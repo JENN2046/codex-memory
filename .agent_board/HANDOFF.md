@@ -1,5 +1,39 @@
 # HANDOFF.md — codex-memory
 
+## CM-1042 HTTP Health Write Reconcile Worker Status Handoff
+
+Goal: add bounded write reconcile worker status to current-source HTTP `/health` without adding a public MCP tool, starting the worker, changing startup/config/watchdog, or claiming readiness/reliability.
+
+Status: COMPLETED_VALIDATED_HTTP_HEALTH_WRITE_RECONCILE_WORKER_STATUS_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1042_HTTP_HEALTH_WRITE_RECONCILE_WORKER_STATUS.md`.
+
+Current evidence:
+- Source artifact: `src/adapters/codex-mcp/http.js`.
+- Test artifact: `tests/mcp-http.test.js`.
+- `/health` now includes `runtime.writeReconcileWorker`.
+- The exposed worker status is bounded to availability, run-state, timer/in-flight state, run count, bounded options, and bounded last-result summary.
+- Missing worker/status support returns a safe unavailable snapshot.
+- Current-source HTTP test proves health does not start the worker.
+- Current-source HTTP test proves initial worker health is stopped/no timer/no in-flight/runCount `0`.
+- Current-source HTTP test proves status JSON does not contain `memoryId`.
+- Targeted HTTP MCP test passed `16/16`.
+- Adjacent HTTP observe/MCP/worker bundle passed `52/52`.
+- Full `npm test` passed `2493/2493`.
+- Existing local 7605 HTTP MCP process remained healthy under `start:http:ensure` and `observe:http -- --json`.
+
+Not validated:
+- The existing 7605 process did not include the new health field, so no live deployed new-field evidence is claimed.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is current-source HTTP test evidence plus existing-runtime health observation, not a controlled restart or deployed new-field runtime proof.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward controlled runtime-refresh evidence, longer-horizon runtime durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1041 Memory Write Reconcile Worker Temp-Local Reopen Recovery Handoff
 
 Goal: add isolated temp-local evidence that the default-disabled write reconcile worker can drain queued replay tasks persisted across a SQLite shadow store close/reopen boundary, without adding a public MCP tool, executing runtime observe, starting the worker by default, changing startup/config/watchdog, or claiming readiness/reliability.
