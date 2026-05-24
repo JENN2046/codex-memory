@@ -1,5 +1,39 @@
 # HANDOFF.md — codex-memory
 
+## CM-1053 Memory Write Reconcile Worker Stop Without ClearTimeout Handoff
+
+Goal: prove an explicitly stopped internal write reconcile worker does not replay or reschedule if an injected scheduler lacks `clearTimeout` and a stale timer callback later fires, without touching startup, watchdog, config, public MCP tools, existing 7605, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_WITHOUT_CLEARTIMEOUT_GUARD_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1053_MEMORY_WRITE_RECONCILE_WORKER_STOP_WITHOUT_CLEARTIMEOUT_GUARD.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-reconcile-worker.test.js`.
+- No runtime source change was needed.
+- The test scheduler has `setTimeout` but no `clearTimeout`.
+- `stop()` leaves worker status stopped/no timer/no in-flight/runCount `0`.
+- A stale external timer callback remains flushable because the scheduler cannot clear it.
+- Flushing the stale callback does not call replay.
+- Flushing the stale callback does not schedule another timer.
+- Final status remains stopped/no timer/no in-flight/runCount `0`.
+- Status omits raw synthetic memory ids.
+- Targeted worker test passed `17/17`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `36/36`.
+- Full `npm test` passed `2503/2503`.
+
+Not validated:
+- Existing 7605 deployed worker behavior.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, write-to-recall reliability, automatic reconcile recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is unit-level scheduler degradation evidence, not automatic recovery or startup/runtime integration.
+- It does not authorize startup/watchdog/config integration.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1052 Memory Write Reconcile Worker Scheduler-Unavailable Start Guard Handoff
 
 Goal: prevent an explicit internal write reconcile worker start from reporting `started/running=true` when the injected scheduler cannot schedule a timer, without touching startup, watchdog, config, public MCP tools, existing 7605, or readiness/reliability claims.

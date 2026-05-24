@@ -28,6 +28,67 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1053 Memory Write Reconcile Worker Stop Without ClearTimeout Guard - 2026-05-25
+
+Result: `CM1053_MEMORY_WRITE_RECONCILE_WORKER_STOP_WITHOUT_CLEARTIMEOUT_GUARD_NOT_RELIABLE_NOT_READY`.
+
+CM-1053 adds a narrow worker stale-timer no-op guard:
+
+- the injected scheduler provides `setTimeout` but no `clearTimeout`
+- `start({ dryRun: false, limit: 6, maxRuns: 3 })` schedules one timer
+- `stop()` sets the worker to stopped state before the callback fires
+- status after stop is stopped/no timer/no in-flight/runCount `0`
+- the external stale timer still exists because the scheduler cannot clear it
+- flushing the stale callback does not call replay
+- flushing the stale callback does not schedule another timer
+- final status remains stopped/no timer/no in-flight/runCount `0`
+- `lastResultSummary` remains null
+- worker status does not expose raw synthetic memory ids
+
+Validation:
+
+- test syntax check passed
+- targeted memory write reconcile worker test `17/17` passed
+- adjacent worker/service/write reliability/MCP regression bundle `36/36` passed
+- full `npm test` `2503/2503` passed
+
+Boundary:
+
+```text
+worker source changed = false
+unit-level scheduler/replay stub only = true
+synthetic temp-local accepted writes = 0
+scheduled worker start calls = 1
+scheduler.clearTimeout unavailable = true
+stop calls = 1
+stale timer callback flushed = true
+replay calls after stop = 0
+rescheduled timers after stale callback = 0
+final status running = false
+final timer scheduled = false
+final runCount = 0
+raw memory ids exposed = false
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow stop-without-clearTimeout stale-callback boundary gap: a stopped worker does not replay work if an injected scheduler cannot clear a previously scheduled timer.
+- This does not prove broad write reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, RC readiness, production readiness, or VCP full parity.
+- Current operator state remains `RC_NOT_READY_BLOCKED`.
+
 ## CM-1052 Memory Write Reconcile Worker Scheduler-Unavailable Start Guard - 2026-05-25
 
 Result: `CM1052_MEMORY_WRITE_RECONCILE_WORKER_SCHEDULER_UNAVAILABLE_START_GUARD_NOT_RELIABLE_NOT_READY`.

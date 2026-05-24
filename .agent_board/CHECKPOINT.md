@@ -1,5 +1,37 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1053 Memory Write Reconcile Worker Stop Without ClearTimeout Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_WITHOUT_CLEARTIMEOUT_GUARD_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1053_MEMORY_WRITE_RECONCILE_WORKER_STOP_WITHOUT_CLEARTIMEOUT_GUARD.md`
+
+Completed:
+- Added a unit-level stop-without-clearTimeout worker test to `tests/memory-write-reconcile-worker.test.js`.
+- Built a scheduler stub with `setTimeout` but no `clearTimeout`.
+- Verified explicit worker start schedules one timer.
+- Verified `stop()` leaves worker stopped/no timer/no in-flight/runCount `0`.
+- Verified the external stale timer remains flushable because the scheduler cannot clear it.
+- Verified flushing that stale callback does not call replay.
+- Verified flushing that stale callback does not schedule another timer.
+- Verified final status remains stopped/no timer/no in-flight/runCount `0`.
+- Verified status omits raw synthetic memory ids.
+
+Validation:
+- Test syntax check passed.
+- Targeted memory write reconcile worker test passed `17/17`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `36/36`.
+- Full `npm test` passed `2503/2503`.
+
+Boundary:
+- Narrow unit-level scheduler degradation guard only.
+- No runtime source change, public API change, public MCP expansion, temp/real memory write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1052 Memory Write Reconcile Worker Scheduler-Unavailable Start Guard Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_SCHEDULER_UNAVAILABLE_START_GUARD_NOT_RELIABLE_NOT_READY`
