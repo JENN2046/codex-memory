@@ -28,6 +28,45 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1021 Public Default Search Cold-Derived Restart Temp-Local Evidence - 2026-05-25
+
+Result: `CM1021_PUBLIC_DEFAULT_SEARCH_COLD_DERIVED_RESTART_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1021 records isolated temp-local cold-derived restart evidence for private client-scoped default public `search_memory`:
+
+- [CM1021_PUBLIC_DEFAULT_SEARCH_COLD_DERIVED_RESTART_TEMP_LOCAL_EVIDENCE.md](/A:/codex-memory/docs/CM1021_PUBLIC_DEFAULT_SEARCH_COLD_DERIVED_RESTART_TEMP_LOCAL_EVIDENCE.md)
+
+Evidence facts:
+
+```text
+test = tests/public-default-search-cold-derived-restart-temp-local-evidence.test.js
+proofMarker = CM1021 public default scoped cold derived restart temp local marker
+records = 2 temp private process records
+clients = codex, claude
+derived files removed = candidateCachePath, vectorIndexPath
+restart = close first app, open second app on same temp paths
+scoped cold-restart searches = codex, claude, manual
+```
+
+Result facts:
+
+```text
+codex-scoped cold-restart search -> exactly codex private record
+claude-scoped cold-restart search -> exactly claude private record
+manual-scoped cold-restart search -> no records
+include_content = false
+public MCP expansion = false
+real memory reads/writes = false
+readiness/reliability claims = false
+```
+
+Operator interpretation:
+
+- This proves default public `search_memory` can respect private `client_id` scope across one isolated temp-local app close/reopen cycle after temp-local candidate-cache and vector-index derived files are removed.
+- This is stronger than CM-1020 for derived-state rebuild behavior, but it is still temp-local and bounded.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `complete?` remains `no`.
+
 ## CM-1020 Public Default Search Restart Durability Temp-Local Evidence - 2026-05-25
 
 Result: `CM1020_PUBLIC_DEFAULT_SEARCH_RESTART_DURABILITY_TEMP_LOCAL_PASSED_NOT_RELIABLE_NOT_READY`.

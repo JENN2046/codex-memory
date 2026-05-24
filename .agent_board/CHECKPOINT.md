@@ -1,5 +1,39 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1021 Public Default Search Cold-Derived Restart Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_COLD_DERIVED_RESTART_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1021_PUBLIC_DEFAULT_SEARCH_COLD_DERIVED_RESTART_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local cold-derived restart evidence for private client-scoped default public search.
+- Wrote two temp records with the same marker, same project/workspace, `visibility=private`, and different client ids: `codex` and `claude`.
+- Closed the first app instance.
+- Verified `candidateCachePath` and `vectorIndexPath` both resolved under the temp root, then removed those two temp-local derived files.
+- Opened a second app instance on the same temp-local paths.
+- Verified Codex-scoped cold-restart search returned only the Codex record written before close.
+- Verified Claude-scoped cold-restart search returned only the Claude record written before close.
+- Verified Manual-scoped cold-restart search returned no results.
+- Verified scoped result-bearing cold-restart searches used the scope-map post-filter path.
+
+Validation:
+- CM-1021 test syntax check passed.
+- CM-1021 temp-local cold-derived restart test passed `1/1`.
+- Adjacent cold-derived/restart/scope/MCP regression bundle passed `15/15`.
+- Adjacent cold-derived/write-temp-local bundle passed `5/5`.
+
+Boundary:
+- Temp-local app paths only.
+- Only temp-local derived files were removed: candidate cache and vector index.
+- No real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, reliability claim, rollback readiness claim, or real cleanup.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, cold-derived restart boundary, or public MCP boundary.
+
+Next:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, public/default search reliability, real-store durability, and rollback readiness remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1020 Public Default Search Restart Durability Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_RESTART_NOT_RELIABLE_NOT_READY`
