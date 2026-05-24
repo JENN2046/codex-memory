@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1054 Memory Write Reconcile Worker Already-Running Start Checkpoint
+
+Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_ALREADY_RUNNING_START_GUARD_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1054_MEMORY_WRITE_RECONCILE_WORKER_ALREADY_RUNNING_START_GUARD.md`
+
+Completed:
+- Updated `src/core/MemoryWriteReconcileWorker.js` so the `already_running` start return includes active `maxRuns`.
+- Added a unit-level already-running start idempotency test to `tests/memory-write-reconcile-worker.test.js`.
+- Verified a repeated `start()` call reports active bounded options.
+- Verified attempted new options on the repeated `start()` call are ignored.
+- Verified the repeated `start()` call does not reset `runCount`.
+- Verified the repeated `start()` call does not schedule an extra timer.
+- Verified the next tick uses the original active options.
+- Verified status omits raw synthetic memory ids.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted memory write reconcile worker test passed `18/18`.
+- Adjacent worker/service/write reliability/MCP regression bundle passed `37/37`.
+- Full `npm test` passed `2504/2504`.
+
+Boundary:
+- Narrow source/test worker already-running status/idempotency guard only.
+- No public API change, public MCP expansion, temp/real memory write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, worker default start, startup reconcile execution, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded write reliability closure toward longer-horizon worker durability, rollback cleanup posture, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1053 Memory Write Reconcile Worker Stop Without ClearTimeout Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_WITHOUT_CLEARTIMEOUT_GUARD_NOT_RELIABLE_NOT_READY`

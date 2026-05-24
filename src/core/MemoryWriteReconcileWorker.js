@@ -94,6 +94,7 @@ class MemoryWriteReconcileWorker {
         intervalMs: this.intervalMs,
         limit: this.limit ?? null,
         dryRun: this.dryRun,
+        maxRuns: this.maxRuns,
         runCount: this.runCount
       };
     }

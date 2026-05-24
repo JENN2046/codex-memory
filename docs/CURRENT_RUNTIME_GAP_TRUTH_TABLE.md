@@ -28,6 +28,63 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1054 Memory Write Reconcile Worker Already-Running Start Guard - 2026-05-25
+
+Result: `CM1054_MEMORY_WRITE_RECONCILE_WORKER_ALREADY_RUNNING_START_GUARD_NOT_RELIABLE_NOT_READY`.
+
+CM-1054 adds a narrow worker already-running start guard:
+
+- `start()` already rejects a second start while the worker is running
+- the `already_running` return now includes active `maxRuns`
+- a second start reports the active options rather than the attempted new options
+- a second start does not reset `runCount`
+- a second start does not schedule an extra timer
+- the next tick uses the original active options
+- after one tick, the worker remains running with one next timer because `maxRuns=2`
+- worker status does not expose raw synthetic memory ids
+
+Validation:
+
+- source/test syntax checks passed
+- targeted memory write reconcile worker test `18/18` passed
+- adjacent worker/service/write reliability/MCP regression bundle `37/37` passed
+- full `npm test` `2504/2504` passed
+
+Boundary:
+
+```text
+worker source changed = true
+unit-level scheduler/replay stub only = true
+synthetic temp-local accepted writes = 0
+scheduled worker start calls = 2
+already_running return = true
+already_running returns active maxRuns = true
+second start changes active options = false
+second start schedules extra timer = false
+replay calls after one tick = 1
+replay uses original active options = true
+raw memory ids exposed = false
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+provider/API calls = 0
+public MCP expansion = false
+public memory_write_reconcile_worker tool = false
+worker starts by default = false
+startup reconcile execution = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- This closes the narrow already-running start status/idempotency gap: repeated `start()` calls report active bounded options and do not reconfigure or reschedule the running worker.
+- This does not prove broad write reliability, automatic degraded recovery, startup reconcile safety, long-running worker durability, runtime readiness, rollback readiness, governance closure, RC readiness, production readiness, or VCP full parity.
+- Current operator state remains `RC_NOT_READY_BLOCKED`.
+
 ## CM-1053 Memory Write Reconcile Worker Stop Without ClearTimeout Guard - 2026-05-25
 
 Result: `CM1053_MEMORY_WRITE_RECONCILE_WORKER_STOP_WITHOUT_CLEARTIMEOUT_GUARD_NOT_RELIABLE_NOT_READY`.
