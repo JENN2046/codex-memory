@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1020 Public Default Search Restart Durability Temp-Local Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_RESTART_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1020_PUBLIC_DEFAULT_SEARCH_RESTART_DURABILITY_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added isolated temp-local restart evidence for private client-scoped default public search.
+- Wrote two temp records with the same marker, same project/workspace, `visibility=private`, and different client ids: `codex` and `claude`.
+- Closed the first app instance and opened a second app instance on the same temp-local paths.
+- Verified Codex-scoped post-restart search returned only the Codex record written before close.
+- Verified Claude-scoped post-restart search returned only the Claude record written before close.
+- Verified Manual-scoped post-restart search returned no results.
+- Verified scoped result-bearing post-restart searches used the scope-map post-filter path.
+
+Validation:
+- CM-1020 test syntax check passed.
+- CM-1020 temp-local restart test passed `1/1`.
+- Adjacent restart/scope/MCP regression bundle passed `14/14`.
+- Adjacent restart/write-temp-local bundle passed `5/5`.
+
+Boundary:
+- Temp-local app paths only.
+- No real memory read/write, real `.jsonl` read, provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+- Node emitted the SQLite experimental warning; it did not affect proof result, temp cleanup, restart boundary, or public MCP boundary.
+
+Next:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, public/default search reliability, and real-store durability remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1019 Public Default Search Scope Temp-Local Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_NOT_RELIABLE_NOT_READY`

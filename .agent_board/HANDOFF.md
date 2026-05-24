@@ -1,5 +1,34 @@
 # HANDOFF.md — codex-memory
 
+## CM-1020 Public Default Search Restart Durability Temp-Local Evidence Handoff
+
+Goal: verify default public `search_memory` respects private client scope after isolated temp-local app close/reopen without claiming broad reliability/readiness.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_RESTART_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1020_PUBLIC_DEFAULT_SEARCH_RESTART_DURABILITY_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/public-default-search-restart-durability-temp-local-evidence.test.js`.
+- Two temp-local private records shared the same marker phrase and differed only by `client_id=codex` versus `client_id=claude`.
+- The first app instance closed after the writes, and a second app instance reopened the same temp paths.
+- Codex-scoped post-restart default search returned exactly the pre-restart Codex record.
+- Claude-scoped post-restart default search returned exactly the pre-restart Claude record.
+- Manual-scoped post-restart default search returned no results.
+- Adjacent restart/scope/MCP regression bundle passed `14/14`.
+- Adjacent restart/write-temp-local bundle passed `5/5`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, real-store multi-client coverage, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is temp-local restart evidence, not broad real-store, long-run, or production durability proof.
+- The write execution context remains Codex-authorized; the client split is in the memory payload scope.
+- The proof does not make public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability coverage toward longer-run durability, rollback cleanup posture, or governance lifecycle closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1019 Public Default Search Scope Temp-Local Evidence Handoff
 
 Goal: verify default public `search_memory` respects private client scope in an isolated Codex/Claude temp-local scenario without claiming broad reliability/readiness.
