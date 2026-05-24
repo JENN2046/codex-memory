@@ -1,5 +1,35 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1017 Multi-Marker Write-To-Recall Coverage Proof Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1017_MULTI_MARKER_WRITE_TO_RECALL_COVERAGE_PROOF.md`
+
+Completed:
+- Added `WriteToRecallContinuityCoverageBoundary` as a pure explicit-input/no-side-effect review helper.
+- Added targeted tests proving multi-marker coverage is accepted only when counters, raw-output flags, marker match modes, and no-readiness/no-reliability claims are complete.
+- Executed exactly two read-only internal no-raw recall queries through `createTrueLiveRecallExecutorAdapter({ app })`.
+- Recorded CM-1015 proof marker top-result match for `6b158de28cb1166e`.
+- Recorded store-freshness family coverage containing expected ids `449633a01f7c2db6` and `3b9263b32c973db5`.
+- Consumed the sanitized result through the new boundary; boundary accepted it as not-ready coverage evidence with no blockers.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted coverage/continuity/adapter tests passed `18/18`.
+- Coverage proof returned `WRITE_TO_RECALL_CONTINUITY_COVERAGE_PASSED_NOT_READY`.
+- Coverage boundary returned `WRITE_TO_RECALL_CONTINUITY_COVERAGE_ACCEPTED_NOT_READY`.
+
+Boundary:
+- Exactly two internal read-only `search_memory` calls occurred.
+- No `record_memory`, provider/API call, raw memory read, direct `.jsonl` read, raw durable audit read, `memory_overview`, durable memory/audit write, public MCP expansion, dependency change, config/watchdog/startup edit, tag/release/deploy/cutover, readiness claim, or reliability claim.
+- Node emitted the SQLite experimental warning; it did not affect proof counters, mutation state, or no-raw output.
+
+Next:
+- Continue bounded reliability coverage toward public/default search behavior, scope/multi-client behavior, long-run durability, rollback cleanup posture, or governance lifecycle closure. Broad write reliability, broad recall reliability, and write-to-recall reliability remain unproven; `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1016 CM1015 Write-To-Recall Continuity Proof Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY`

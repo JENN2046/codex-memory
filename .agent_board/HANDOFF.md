@@ -1,5 +1,33 @@
 # HANDOFF.md — codex-memory
 
+## CM-1017 Multi-Marker Write-To-Recall Coverage Proof Handoff
+
+Goal: verify whether multiple known accepted process writes can be recalled through prebound internal no-raw marker queries, and add a fail-closed coverage boundary so bounded coverage evidence cannot be consumed as reliability/readiness.
+
+Status: COMPLETED_VALIDATED_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1017_MULTI_MARKER_WRITE_TO_RECALL_COVERAGE_PROOF.md`.
+
+Current evidence:
+- Current proof baseline: `ea12485b77279767410e10f9671af046c79293d0`.
+- Two exact marker queries ran through `createTrueLiveRecallExecutorAdapter({ app })`.
+- CM-1015 proof marker top result id hash was `6b158de28cb1166e`.
+- Store-freshness family sanitized results contained expected ids `449633a01f7c2db6` and `3b9263b32c973db5`.
+- Side-effect counters recorded `searchMemoryCalls=2`; all forbidden counters were zero.
+- `WriteToRecallContinuityCoverageBoundary` accepted the result as `WRITE_TO_RECALL_CONTINUITY_COVERAGE_ACCEPTED_NOT_READY`.
+- Targeted tests passed `18/18`.
+
+Not validated:
+- Broad write reliability, broad recall reliability, public/default `search_memory` reliability, multi-client behavior, long-run durability, rollback cleanup sufficiency, governance closure, HTTP observe, mainline gate, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is bounded marker coverage over known process-write ids, not broad write-to-recall reliability.
+- The proof intentionally uses the internal no-raw read-only adapter seam, not the default public `search_memory` behavior.
+- Duplicate/family-style freshness records are treated as expected ids present in sanitized results, not as distinct top-result precision proof.
+
+Next safe step:
+- Continue bounded reliability coverage or shift to governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1016 CM1015 Write-To-Recall Continuity Proof Handoff
 
 Goal: verify whether the accepted CM-1015 write proof record can be recalled by one exact internal no-raw marker query, and add a fail-closed result boundary so this narrow continuity evidence cannot be consumed as reliability/readiness.

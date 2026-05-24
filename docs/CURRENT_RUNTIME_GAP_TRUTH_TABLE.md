@@ -28,6 +28,53 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1017 Multi-Marker Write-To-Recall Coverage Proof - 2026-05-25
+
+Result: `CM1017_MULTI_MARKER_WRITE_TO_RECALL_COVERAGE_PASSED_NOT_RELIABLE_NOT_READY`.
+
+CM-1017 records bounded multi-marker continuity proof over three known accepted process-write id hashes:
+
+- [CM1017_MULTI_MARKER_WRITE_TO_RECALL_COVERAGE_PROOF.md](/A:/codex-memory/docs/CM1017_MULTI_MARKER_WRITE_TO_RECALL_COVERAGE_PROOF.md)
+
+Coverage facts:
+
+```text
+proofBaselineCommit = ea12485b77279767410e10f9671af046c79293d0
+coverageProofRunId = CM1017-ea12485-multi-marker-continuity
+decision = WRITE_TO_RECALL_CONTINUITY_COVERAGE_PASSED_NOT_READY
+boundaryStatus = WRITE_TO_RECALL_CONTINUITY_COVERAGE_ACCEPTED_NOT_READY
+markerCount = 2
+```
+
+Marker facts:
+
+```text
+CM-1015-proof-marker:
+  matchMode = top_result_matches_expected
+  topResultIdHashOrStableOpaqueId = 6b158de28cb1166e
+
+store-freshness-family:
+  matchMode = all_expected_ids_present_in_results
+  matchedExpectedIds = 449633a01f7c2db6, 3b9263b32c973db5
+```
+
+Side-effect boundary:
+
+```text
+searchMemoryCalls = 2
+recordMemoryCalls = 0
+provider/api/raw reads/durable writes/audit writes/public MCP/config/package/release counters = all zero
+raw output flags = all false
+readiness/reliability claims = all false
+```
+
+Operator interpretation:
+
+- This proves three known accepted process-write ids are recall-visible through two prebound internal no-raw read-only recall queries.
+- This is stronger than CM-1016's one-marker proof, but it is still bounded coverage evidence.
+- This does not prove broad write reliability, broad recall reliability, public/default `search_memory` reliability, broad write-to-recall reliability, governance closure, runtime readiness, RC readiness, production readiness, release readiness, or VCP full parity.
+- `complete?` remains `no`.
+
 ## CM-1016 CM1015 Write-To-Recall Continuity Proof - 2026-05-25
 
 Result: `CM1016_CM1015_WRITE_TO_RECALL_CONTINUITY_PASSED_NOT_RELIABLE_NOT_READY`.
