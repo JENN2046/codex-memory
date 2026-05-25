@@ -212,6 +212,104 @@ test('internal proof runner accepts CM-0825 patched approval only with exact pat
   assert.equal(report.rcNotReadyBlocked, true);
 });
 
+test('internal proof runner prevents factory from weakening CM-0825 negative-control guard', async () => {
+  const cases = [
+    {
+      name: 'missing context',
+      factory: () => null,
+      reason: 'negative_control_precision_policy_context_missing'
+    },
+    {
+      name: 'missing proof no-result mode',
+      factory: () => ({
+        enabled: true,
+        queryFamily: 'stricter_negative_control'
+      }),
+      reason: 'negative_control_proof_no_result_mode_required'
+    },
+    {
+      name: 'disabled context',
+      factory: () => ({
+        enabled: false,
+        queryFamily: 'stricter_negative_control',
+        proofNoResultMode: true
+      }),
+      reason: 'negative_control_precision_policy_enabled_required'
+    },
+    {
+      name: 'explicit false proof no-result mode',
+      factory: () => ({
+        enabled: true,
+        queryFamily: 'stricter_negative_control',
+        proofNoResultMode: false
+      }),
+      reason: 'negative_control_proof_no_result_mode_required'
+    }
+  ];
+
+  for (const guardCase of cases) {
+    const calls = [];
+    const runner = new TrueLiveRecallReadonlyProofRunner({
+      async searchExecutor(request) {
+        calls.push(request);
+        return {
+          results: [],
+          sideEffectCounters: createZeroSideEffectCounters()
+        };
+      }
+    });
+
+    await assert.rejects(
+      () => runner.run({
+        approvalLine: CM0825_PATCHED_EXACT_APPROVAL_LINE,
+        queries: createCm0825Queries(),
+        proofRunId: `CM-1064-negative-control-factory-${guardCase.name}`,
+        precisionPolicyContextFactory: guardCase.factory
+      }),
+      error => assertBoundaryError(error, guardCase.reason),
+      guardCase.name
+    );
+    assert.equal(calls.length, 3);
+  }
+});
+
+test('internal proof runner lets factory supplement but not override CM-0825 negative-control defaults', async () => {
+  const calls = [];
+  const runner = new TrueLiveRecallReadonlyProofRunner({
+    async searchExecutor(request) {
+      calls.push(request);
+      return {
+        results: [],
+        sideEffectCounters: createZeroSideEffectCounters()
+      };
+    }
+  });
+
+  await runner.run({
+    approvalLine: CM0825_PATCHED_EXACT_APPROVAL_LINE,
+    queries: createCm0825Queries(),
+    proofRunId: 'CM-1064-negative-control-factory-supplement',
+    precisionPolicyContextFactory: ({ family }) => ({
+      enabled: true,
+      queryFamily: `custom:${family}`,
+      proofNoResultMode: true,
+      minimumScore: 0,
+      highConfidenceScore: 0,
+      customPolicyNote: 'supplement-only'
+    })
+  });
+
+  assert.equal(calls.length, EXACT_QUERY_COUNT);
+  assert.deepEqual(calls[3].precisionPolicyContext, {
+    enabled: true,
+    queryFamily: 'stricter_negative_control',
+    proofNoResultMode: true,
+    minimumScore: 0.12,
+    highConfidenceScore: 0.62,
+    customPolicyNote: 'supplement-only'
+  });
+});
+
 test('internal proof runner rejects CM-0825 approval when any patched query drifts', async () => {
   const runner = new TrueLiveRecallReadonlyProofRunner({
     async searchExecutor() {

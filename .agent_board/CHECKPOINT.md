@@ -6679,3 +6679,117 @@ Remaining risk:
 
 Next:
 - Superseded by CM-1004, which committed and pushed this CM-1003 board/status reconciliation note; continue with the next scoped reliability/governance task from a clean synced `main`.
+
+## CM-1065 Continuity Boundary Payload Hash And Claim Acceptance Hardening
+
+Status: `COMPLETED_VALIDATED_CONTINUITY_BOUNDARY_PAYLOAD_HASH_AND_CLAIM_ACCEPTANCE_HARDENING_NOT_RELIABLE_NOT_READY`
+Date: 2026-05-25
+
+Completed:
+- Hardened `WriteToRecallContinuityProofResultBoundary` so `sourceWritePayloadHash` must be sha256-64, matching the existing `queryHash` audit-anchor posture.
+- Added explicit claim receipt/acceptance semantics: `proofExecutionClaimReceived=true`, `proofExecutionClaimAccepted=acceptedForContinuityProofReview`, and `proofExecutionClaimConsumed=acceptedForContinuityProofReview`.
+- Updated continuity boundary tests so blocked output proves a claim was received but not accepted or consumed.
+
+Validation:
+- `node --check src\core\WriteToRecallContinuityProofResultBoundary.js`
+- `node --check tests\write-to-recall-continuity-proof-result-boundary.test.js`
+- `node --test tests\write-to-recall-continuity-proof-result-boundary.test.js` passed `8/8`
+- `node --test tests\write-to-recall-continuity-coverage-boundary.test.js tests\public-default-search-coverage-boundary.test.js` passed `11/11`
+- `npm test` passed `2534/2534`
+
+Not validated:
+- true live `record_memory`
+- true live `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- cleanup/rollback apply
+- HTTP observe
+- push-readiness
+- push
+
+Remaining risk:
+- This closes the CM-1064 re-review follow-ups only. It does not prove broad recall reliability, write reliability, write-to-recall reliability, proof namespace/retention safety, runtime readiness, rollback readiness, RC readiness, or production readiness.
+
+Next:
+- Inspect final diff and decide separately whether a guarded local commit is desired. Keep `RC_NOT_READY_BLOCKED`; do not push or claim readiness.
+
+## CM-1064 Review Follow-up Negative-Control And Continuity Boundary Hardening
+
+Status: `COMPLETED_VALIDATED_REVIEW_FOLLOWUP_HARDENING_NOT_RELIABLE_NOT_READY`
+Date: 2026-05-25
+
+Completed:
+- Hardened `TrueLiveRecallReadonlyProofRunner` so caller-supplied `precisionPolicyContextFactory` cannot weaken `stricter_negative_control` guard.
+- Added fail-closed checks for missing factory context, `proofNoResultMode !== true`, and `enabled === false` on negative-control slots.
+- Preserved factory supplement behavior while restoring default negative-control guard fields.
+- Hardened `WriteToRecallContinuityProofResultBoundary` to require sha256-64 `queryHash`.
+- Added explicit boundary/result semantics: `consumedProofCounters.searchMemoryCalls`, `executionObservedByBoundary=false`, `proofExecutionClaimConsumed=true`, `continuityMatchSemantics=top1_continuity_proof`, and `topKPresenceProof=false`.
+- Left proof namespace / retention as future governance design work, not part of this slice.
+
+Validation:
+- `node --check src\core\TrueLiveRecallReadonlyProofRunner.js`
+- `node --check src\core\WriteToRecallContinuityProofResultBoundary.js`
+- `node --check tests\true-live-recall-internal-proof-runner.test.js`
+- `node --check tests\write-to-recall-continuity-proof-result-boundary.test.js`
+- `node --test tests\true-live-recall-internal-proof-runner.test.js` passed `12/12`
+- `node --test tests\write-to-recall-continuity-proof-result-boundary.test.js` passed `7/7`
+- `node --test tests\true-live-recall-executor-adapter.test.js tests\true-live-recall-precision-policy-path.test.js tests\recall-precision-hardening-bounded.test.js` passed `25/25`
+- `node --test tests\write-to-recall-continuity-coverage-boundary.test.js tests\public-default-search-coverage-boundary.test.js` passed `11/11`
+- `npm test` passed `2533/2533`
+
+Not validated:
+- true live `record_memory`
+- true live `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- cleanup/rollback apply
+- HTTP observe
+- push-readiness
+- push
+
+Remaining risk:
+- This hardening closes three review follow-ups but does not prove broad recall reliability, write reliability, write-to-recall reliability, proof retention safety, runtime readiness, rollback readiness, RC readiness, or production readiness.
+
+Next:
+- Inspect final diff and decide separately whether a guarded local commit is desired. Keep `RC_NOT_READY_BLOCKED`; do not push or claim readiness.
+
+## CM-1063 Local Status-Surface Sync After Remote Fast-Forward
+
+Status: `COMPLETED_VALIDATED_LOCAL_STATUS_SURFACE_SYNC_NOT_READY`
+Date: 2026-05-25
+
+Completed:
+- Fetched remote refs with prune and observed `origin/main` advance from `a6782e3` to `a2171d8`.
+- Confirmed local `main` was clean, behind `origin/main` by 119 commits, and had no local ahead commits before sync.
+- Fast-forwarded local `main` to `origin/main` with `git merge --ff-only origin/main`.
+- Confirmed final `HEAD == origin/main == a2171d8`.
+- Updated local status surfaces to record the sync fact without changing runtime code.
+
+Validation:
+- diff inspected
+- `git diff --check -- STATUS.md .agent_board/RUN_STATE.md .agent_board/TASK_QUEUE.md .agent_board/CHECKPOINT.md .agent_board/HANDOFF.md .agent_board/VALIDATION_LOG.md .agent_board/AUTOPILOT_LEDGER.md`
+- docs validation and ledger consistency via `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Not validated:
+- full `npm test`
+- HTTP observe
+- true live `record_memory`
+- true live `search_memory`
+- provider/API calls
+- raw memory or `.jsonl` reads
+- durable real memory/audit/projection writes
+- cleanup/rollback apply
+- public MCP expansion
+- config/watchdog/startup changes
+- dependency changes
+- commit
+- push
+
+Remaining risk:
+- This is status-surface reconciliation only. It does not close live recall/write reliability, real cleanup safety, rollback readiness, runtime readiness, RC readiness, or production readiness.
+- The status-surface update itself leaves local docs/board files modified until explicitly committed or reverted.
+
+Next:
+- Keep `RC_NOT_READY_BLOCKED`; do not push or claim readiness. Commit this status-surface sync only if a separate guarded commit decision is desired.

@@ -197,6 +197,58 @@ function createDefaultPrecisionPolicyContext(query) {
   };
 }
 
+function createPrecisionPolicyContext({
+  query,
+  precisionPolicyContextFactory,
+  proofContext
+}) {
+  const defaultContext = createDefaultPrecisionPolicyContext(query);
+
+  if (typeof precisionPolicyContextFactory !== 'function') {
+    return defaultContext;
+  }
+
+  const factoryContext = normalizePrecisionPolicyContext(
+    precisionPolicyContextFactory({
+      slot: query.slot,
+      family: query.family,
+      text: query.text,
+      proofContext
+    })
+  );
+
+  if (query?.family !== 'stricter_negative_control') {
+    return factoryContext;
+  }
+
+  if (!factoryContext) {
+    throw createProofBoundaryError('stricter negative-control precision policy context is required', {
+      reason: 'negative_control_precision_policy_context_missing',
+      slot: query.slot,
+      family: query.family
+    });
+  }
+  if (factoryContext.enabled === false) {
+    throw createProofBoundaryError('stricter negative-control precision policy cannot be disabled', {
+      reason: 'negative_control_precision_policy_enabled_required',
+      slot: query.slot,
+      family: query.family
+    });
+  }
+  if (factoryContext.proofNoResultMode !== true) {
+    throw createProofBoundaryError('stricter negative-control proof no-result mode is required', {
+      reason: 'negative_control_proof_no_result_mode_required',
+      slot: query.slot,
+      family: query.family
+    });
+  }
+
+  return {
+    ...factoryContext,
+    ...defaultContext
+  };
+}
+
 function isBroadScanQuery(text) {
   const normalized = String(text || '').trim().toLowerCase();
   if (!normalized || normalized === '*' || normalized === 'all') return true;
@@ -405,16 +457,11 @@ class TrueLiveRecallReadonlyProofRunner {
       };
 
       try {
-        const precisionPolicyContext = normalizePrecisionPolicyContext(
-          typeof precisionPolicyContextFactory === 'function'
-            ? precisionPolicyContextFactory({
-              slot: query.slot,
-              family: query.family,
-              text: query.text,
-              proofContext
-            })
-            : createDefaultPrecisionPolicyContext(query)
-        );
+        const precisionPolicyContext = createPrecisionPolicyContext({
+          query,
+          precisionPolicyContextFactory,
+          proofContext
+        });
         const response = await runSearchMemoryWithTimeout(
           ({ signal }) => this.searchExecutor({
             query: query.text,

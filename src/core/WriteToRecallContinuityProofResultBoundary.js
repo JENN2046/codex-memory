@@ -60,6 +60,10 @@ function isFortyCharHex(value) {
   return /^[a-f0-9]{40}$/i.test(value);
 }
 
+function isSha256Hex(value) {
+  return /^[a-f0-9]{64}$/i.test(value);
+}
+
 function isNonNegativeInteger(value) {
   return typeof value === 'number'
     && Number.isFinite(value)
@@ -213,12 +217,20 @@ function evaluateWriteToRecallContinuityProofResultBoundary(input = {}) {
   }
   if (!sourceWriteProofRunId) blockers.push('sourceWriteProofRunId_missing');
   if (!continuityProofRunId) blockers.push('continuityProofRunId_missing');
-  if (!sourceWritePayloadHash) blockers.push('sourceWritePayloadHash_missing');
+  if (!sourceWritePayloadHash) {
+    blockers.push('sourceWritePayloadHash_missing');
+  } else if (!isSha256Hex(sourceWritePayloadHash)) {
+    blockers.push('sourceWritePayloadHash_must_be_sha256_hex_64');
+  }
   if (!sourceWriteMemoryIdHashOrOpaqueId) {
     blockers.push('sourceWriteMemoryIdHashOrOpaqueId_missing');
   }
   if (target !== 'process') blockers.push('target_must_be_process');
-  if (!queryHash) blockers.push('queryHash_missing');
+  if (!queryHash) {
+    blockers.push('queryHash_missing');
+  } else if (!isSha256Hex(queryHash)) {
+    blockers.push('queryHash_must_be_sha256_hex_64');
+  }
   if (sourceWriteDecision !== 'MEMORY_WRITE_BOUNDED_PROOF_PASSED_NOT_READY') {
     blockers.push('sourceWriteDecision_must_be_passed_not_ready');
   }
@@ -267,6 +279,15 @@ function evaluateWriteToRecallContinuityProofResultBoundary(input = {}) {
     topResultIdHashOrStableOpaqueId,
     matchedSourceWriteMemoryIdHash,
     sideEffectCounters,
+    consumedProofCounters: {
+      searchMemoryCalls: sideEffectCounters.searchMemoryCalls
+    },
+    executionObservedByBoundary: false,
+    proofExecutionClaimReceived: true,
+    proofExecutionClaimAccepted: acceptedForContinuityProofReview,
+    proofExecutionClaimConsumed: acceptedForContinuityProofReview,
+    continuityMatchSemantics: 'top1_continuity_proof',
+    topKPresenceProof: false,
     blockerReasons,
     safety: {
       sourceMode: 'explicit_input_only',

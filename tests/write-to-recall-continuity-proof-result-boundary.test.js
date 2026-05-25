@@ -76,6 +76,13 @@ test('accepts complete sanitized passed write-to-recall continuity evidence as n
   assert.equal(result.decision, 'WRITE_TO_RECALL_CONTINUITY_PROOF_PASSED_NOT_READY');
   assert.deepEqual(result.blockerReasons, []);
   assert.equal(result.safety.callsSearchMemory, false);
+  assert.deepEqual(result.consumedProofCounters, { searchMemoryCalls: 1 });
+  assert.equal(result.executionObservedByBoundary, false);
+  assert.equal(result.proofExecutionClaimReceived, true);
+  assert.equal(result.proofExecutionClaimAccepted, true);
+  assert.equal(result.proofExecutionClaimConsumed, true);
+  assert.equal(result.continuityMatchSemantics, 'top1_continuity_proof');
+  assert.equal(result.topKPresenceProof, false);
   assert.equal(result.safety.claimsContinuityReliable, false);
 });
 
@@ -104,6 +111,9 @@ test('blocks passed evidence when the recalled top id does not match the source 
 
   assert.equal(result.status, RESULT_STATUS_BLOCKED);
   assert.equal(result.acceptedForContinuityProofReview, false);
+  assert.equal(result.proofExecutionClaimReceived, true);
+  assert.equal(result.proofExecutionClaimAccepted, false);
+  assert.equal(result.proofExecutionClaimConsumed, false);
   assert.ok(
     result.blockerReasons.includes('passed_result_requires_source_write_memory_id_match')
   );
@@ -154,6 +164,33 @@ test('blocks missing counters, raw output, extra writes, and readiness or reliab
   assert.ok(result.blockerReasons.includes('claim_memoryRecallReliableClaimed_must_be_false'));
   assert.ok(result.blockerReasons.includes('claim_writeToRecallReliableClaimed_must_be_false'));
   assert.ok(result.blockerReasons.includes('claim_readinessClaimAllowed_must_be_false'));
+});
+
+test('blocks malformed source write payload hash values because write proof uses sha256 anchors', () => {
+  for (const sourceWritePayloadHash of ['not-a-hash', 'abc123', 'g'.repeat(64), 'a'.repeat(63)]) {
+    const result = evaluateWriteToRecallContinuityProofResultBoundary({
+      ...BASE_INPUT,
+      sourceWritePayloadHash
+    });
+
+    assert.equal(result.status, RESULT_STATUS_BLOCKED);
+    assert.equal(result.proofExecutionClaimReceived, true);
+    assert.equal(result.proofExecutionClaimAccepted, false);
+    assert.equal(result.proofExecutionClaimConsumed, false);
+    assert.ok(result.blockerReasons.includes('sourceWritePayloadHash_must_be_sha256_hex_64'));
+  }
+});
+
+test('blocks malformed query hash values because continuity proof uses sha256 anchors', () => {
+  for (const queryHash of ['not-a-hash', 'abc123', 'g'.repeat(64), 'a'.repeat(63)]) {
+    const result = evaluateWriteToRecallContinuityProofResultBoundary({
+      ...BASE_INPUT,
+      queryHash
+    });
+
+    assert.equal(result.status, RESULT_STATUS_BLOCKED);
+    assert.ok(result.blockerReasons.includes('queryHash_must_be_sha256_hex_64'));
+  }
 });
 
 test('blocks malformed baselines and source write drift', () => {

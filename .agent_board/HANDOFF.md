@@ -7801,6 +7801,37 @@ Not validated: live recall proof, live write proof, true `record_memory`, true `
 Remaining risks: CM-0979 is a prerequisite policy only. It does not implement audit writing, append durable audit events, app/runtime wiring, runtime apply, durable governance mutation, reliability closure, or readiness.
 Next safe step: choose the next smallest scoped governance prerequisite, likely shadow projection policy, or resolve dirty baseline before live proof. Keep push deferred until the broad dirty worktree and push-readiness evidence are coherent.
 
+## CM-1065 Continuity Boundary Payload Hash And Claim Acceptance Handoff
+
+Goal: address the remaining re-review follow-ups by requiring `sourceWritePayloadHash` sha256 format and preventing blocked continuity boundary output from implying an accepted/consumed valid proof claim.
+Status: COMPLETED_VALIDATED_CONTINUITY_BOUNDARY_PAYLOAD_HASH_AND_CLAIM_ACCEPTANCE_HARDENING_NOT_RELIABLE_NOT_READY.
+Changed files: `src/core/WriteToRecallContinuityProofResultBoundary.js`; `tests/write-to-recall-continuity-proof-result-boundary.test.js`; status/board surfaces.
+Validation: source/test syntax checks passed; continuity boundary test `8/8`; continuity/public coverage bundle `11/11`; full `npm test` `2534/2534`.
+Not validated: true `record_memory`, true `search_memory`, provider smoke/benchmark, raw memory/.jsonl reads, real durable memory/audit/projection mutation, cleanup/rollback apply, HTTP observe, push-readiness, push.
+Remaining risks: proof namespace/retention is not implemented; this is not recall reliability, write reliability, write-to-recall reliability, rollback readiness, runtime readiness, RC readiness, or production readiness.
+Next safe step: inspect final diff and decide separately whether a guarded local commit is desired. Keep `RC_NOT_READY_BLOCKED`; commit/push require separate decision and guards.
+
+## CM-1064 Review Follow-up Hardening Handoff
+
+Goal: address the actionable review follow-ups for negative-control precision guard and write-to-recall continuity boundary semantics without expanding public MCP, executing live memory calls, or claiming reliability/readiness.
+Status: COMPLETED_VALIDATED_REVIEW_FOLLOWUP_HARDENING_NOT_RELIABLE_NOT_READY.
+Changed files: `src/core/TrueLiveRecallReadonlyProofRunner.js`; `src/core/WriteToRecallContinuityProofResultBoundary.js`; `tests/true-live-recall-internal-proof-runner.test.js`; `tests/write-to-recall-continuity-proof-result-boundary.test.js`; status/board surfaces.
+Validation: changed source/test syntax checks passed; runner test `12/12`; continuity boundary test `7/7`; adjacent adapter/precision/bounded recall bundle `25/25`; continuity/public coverage bundle `11/11`; full `npm test` `2533/2533`.
+Not validated: true `record_memory`, true `search_memory`, provider smoke/benchmark, raw memory/.jsonl reads, real durable memory/audit/projection mutation, cleanup/rollback apply, HTTP observe, push-readiness, push.
+Remaining risks: proof namespace/retention is not implemented; this is not recall reliability, write reliability, write-to-recall reliability, rollback readiness, runtime readiness, RC readiness, or production readiness.
+Next safe step: inspect final diff and decide separately whether a guarded local commit is desired. Keep `RC_NOT_READY_BLOCKED`; commit/push require separate decision and guards.
+
+## CM-1063 Local Status-Surface Sync After Remote Fast-Forward Handoff
+
+Goal: update local status surfaces after the remote update was fetched and local `main` was fast-forwarded.
+Status: COMPLETED_VALIDATED_LOCAL_STATUS_SURFACE_SYNC_NOT_READY.
+Current repository state before this status edit: local `main` had been clean, behind `origin/main` by 119 commits, and had no local ahead commits; after `git merge --ff-only origin/main`, `HEAD == origin/main == a2171d8 test: add rollback cleanup store-backed preview`.
+Changed candidate files: `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`.
+Validation: diff inspection, targeted `git diff --check`, docs validation, and ledger consistency passed.
+Not validated: full `npm test`, HTTP observe, true `record_memory`, true `search_memory`, provider smoke/benchmark, raw memory/.jsonl reads, real durable memory/audit/projection mutation, cleanup/rollback apply, public MCP expansion, config/watchdog/startup changes, dependency changes, commit, push, tag, release, deploy, readiness, or reliability.
+Remaining risks: status-surface-only update; no runtime readiness, rollback readiness, cleanup safety, recall reliability, write reliability, RC readiness, or production readiness is claimed. The worktree is expected to be dirty with local docs/status files until a separate commit/revert decision.
+Next safe step: keep `RC_NOT_READY_BLOCKED`; decide separately whether to guarded-commit this local status-surface sync. Do not push without explicit push authorization or fully passing safe-push policy.
+
 ## CM-0978 Deferred Governance Internal Runtime-Entry Surface Policy Handoff
 
 Goal: commit a scoped explicit-input policy that fixes the internal runtime-entry surface contract for future deferred `memory_exclude` / `memory_forget` governance work without implementing entry functions, services, public tools, `callTool()` exposure, or apply behavior.
