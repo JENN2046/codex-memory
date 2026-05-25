@@ -28,6 +28,72 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1058 Memory Write Memory-Id Reconcile Cleanup Temp-Local Evidence - 2026-05-25
+
+Result: `CM1058_MEMORY_WRITE_MEMORY_ID_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.
+
+CM-1058 adds a narrow temp-local cleanup isolation proof:
+
+- two synthetic degraded accepted writes queue exactly four reconcile residual tasks
+- each memory id has one `chunks` residual and one `vector` residual
+- first-memory projection cleanup leaves the second SQLite record visible
+- first-memory projection cleanup still leaves `reconcileCount=4`
+- explicit `clearReconcileTasks(firstMemoryId)` clears only the first memory id's residual tasks
+- the remaining queued tasks belong only to the second memory id
+- repeating first-memory cleanup does not over-clear the second memory id's residual tasks
+- explicit `clearReconcileTasks(secondMemoryId)` clears the final residual tasks
+- both diary files and write-audit evidence remain visible after scoped cleanup
+- vector and candidate-cache projections are not resurrected
+
+Validation:
+
+- test syntax check passed
+- targeted degraded cleanup test file `4/4` passed
+- adjacent write cleanup/reconcile/MCP regression bundle `44/44` passed
+- full `npm test` `2508/2508` passed
+
+Boundary:
+
+```text
+test-only change = true
+temp-local degraded accepted writes = 2
+temp-local reconcile tasks before cleanup = 4
+first memory-id projection cleanup record count after = 1
+temp-local reconcile tasks after first projection cleanup = 4
+temp-local reconcile tasks after first memory-id cleanup = 2
+remaining reconcile memory id after first cleanup = second memory id
+temp-local reconcile tasks after repeated first memory-id cleanup = 2
+temp-local reconcile tasks after second memory-id cleanup = 0
+diary evidence retained after scoped cleanup = true
+audit evidence retained after scoped cleanup = true
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+real jsonl reads = 0
+provider/API calls = 0
+public MCP expansion = false
+public cleanup tool = false
+real cleanup apply = false
+real rollback apply = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- `memory write reliable`: no
+- `automatic degraded recovery`: no
+- `real cleanup safe`: no
+- `real rollback safe`: no
+- `rollback readiness`: no
+- `runtime readiness`: no
+- `complete?`: no
+
+`RC_NOT_READY_BLOCKED` remains unchanged.
+
 ## CM-1057 Memory Write Store-Kind Reconcile Cleanup Temp-Local Evidence - 2026-05-25
 
 Result: `CM1057_MEMORY_WRITE_STORE_KIND_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.

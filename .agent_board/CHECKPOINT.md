@@ -1,5 +1,38 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1058 Memory Write Memory-Id Reconcile Cleanup Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_MEMORY_ID_RECONCILE_CLEANUP_ISOLATION_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1058_MEMORY_WRITE_MEMORY_ID_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added a CM-1058 temp-local memory-id cleanup isolation test to `tests/memory-write-degraded-cleanup-temp-local-evidence.test.js`.
+- Verified two synthetic degraded accepted writes leave exactly four reconcile residual tasks.
+- Verified each memory id has `chunks` and `vector` residual task kinds.
+- Verified first-memory projection cleanup leaves the second SQLite record visible.
+- Verified first-memory projection cleanup leaves `reconcileCount=4`.
+- Verified `clearReconcileTasks(firstMemoryId)` clears only first-memory residual tasks.
+- Verified the remaining queued tasks belong only to the second memory id.
+- Verified repeating first-memory cleanup does not over-clear second-memory residuals.
+- Verified `clearReconcileTasks(secondMemoryId)` clears the final residuals.
+- Verified both diary files and write-audit file remain visible after scoped cleanup.
+
+Validation:
+- Test syntax check passed.
+- Targeted degraded cleanup test file passed `4/4`.
+- Adjacent write cleanup/reconcile/MCP regression bundle passed `44/44`.
+- Full `npm test` passed `2508/2508`.
+
+Boundary:
+- Isolated temp-local test/doc/board evidence only.
+- No runtime source change, public API change, public MCP expansion, real memory read/write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, real cleanup apply, real rollback apply, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded reliability closure toward long-horizon worker durability, real cleanup design, real rollback safety, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1057 Memory Write Store-Kind Reconcile Cleanup Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_STORE_KIND_RECONCILE_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY`

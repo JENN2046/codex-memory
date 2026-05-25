@@ -1,5 +1,40 @@
 # HANDOFF.md — codex-memory
 
+## CM-1058 Memory Write Memory-Id Reconcile Cleanup Handoff
+
+Goal: prove the existing temp-local shadow-store reconcile cleanup primitive can clear degraded residual queue entries for one synthetic memory id without over-clearing another synthetic memory id, while preserving diary/audit evidence and without touching public MCP tools, real memory stores, config/watchdog/startup, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_MEMORY_ID_RECONCILE_CLEANUP_ISOLATION_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1058_MEMORY_WRITE_MEMORY_ID_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-degraded-cleanup-temp-local-evidence.test.js`.
+- Two synthetic degraded accepted writes queue exactly four reconcile tasks.
+- Each memory id has residual task kinds `chunks` and `vector`.
+- First-memory projection/cache cleanup leaves the second SQLite record visible.
+- Projection/cache cleanup leaves reconcile residual count at `4`.
+- Explicit `clearReconcileTasks(firstMemoryId)` clears only first-memory residuals.
+- Remaining queued tasks belong only to the second memory id.
+- Repeating first-memory cleanup does not delete second-memory residuals.
+- Explicit `clearReconcileTasks(secondMemoryId)` clears the final residuals.
+- Both diary files and write-audit evidence remain visible after scoped cleanup.
+- Targeted degraded cleanup test file passed `4/4`.
+- Adjacent write cleanup/reconcile/MCP regression bundle passed `44/44`.
+- Full `npm test` passed `2508/2508`.
+
+Not validated:
+- Existing 7605 deployed runtime cleanup behavior.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, automatic reconcile recovery, real cleanup safety, real rollback safety, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is isolated temp-local cleanup isolation evidence, not a public cleanup command and not a real rollback plan.
+- It does not authorize real memory cleanup, rollback apply, startup/watchdog/config integration, or public MCP expansion.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability closure toward long-horizon worker durability, real cleanup design, real rollback safety, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1057 Memory Write Store-Kind Reconcile Cleanup Handoff
 
 Goal: prove the existing temp-local shadow-store reconcile cleanup primitive can clear degraded residual queue entries by store kind without over-clearing a different residual kind, while preserving diary/audit evidence and without touching public MCP tools, real memory stores, config/watchdog/startup, or readiness/reliability claims.

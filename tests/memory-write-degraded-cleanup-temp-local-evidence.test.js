@@ -438,3 +438,144 @@ test('CM-1057 degraded temp-local cleanup can clear reconcile residuals by store
 
   assert.equal(await pathExists(harness.rootPath), false);
 });
+
+test('CM-1058 degraded temp-local cleanup clears one memory id without over-clearing another memory id', async () => {
+  const harness = await createTempLocalHarness();
+
+  try {
+    for (const targetPath of [
+      harness.config.dailyNoteRootPath,
+      harness.config.dbPath,
+      harness.config.auditLogPath,
+      harness.config.vectorIndexPath,
+      harness.config.candidateCachePath
+    ]) {
+      assertInsideRoot(harness.rootPath, targetPath);
+    }
+
+    const firstWrite = await harness.service.record(processPayload({
+      title: 'Checkpoint: CM-1058 first memory-id cleanup isolation temp-local evidence',
+      content: [
+        'Type: checkpoint',
+        'CM1058 first memory-id cleanup isolation temp local marker',
+        'Purpose: prove cleanup for one memory id does not clear another memory id.',
+        'Boundary: synthetic temp-local files only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1058 first synthetic temp-local memory-id cleanup isolation evidence',
+      tags: ['cm1058', 'write', 'degraded', 'reconcile', 'memory-id', 'cleanup', 'temp-local', 'first'],
+      workspace_id: 'cm1058-memory-id-cleanup-workspace',
+      task_id: 'CM-1058',
+      conversation_id: 'cm1058-memory-id-cleanup-temp-local-first'
+    }));
+    const secondWrite = await harness.service.record(processPayload({
+      title: 'Checkpoint: CM-1058 second memory-id cleanup isolation temp-local evidence',
+      content: [
+        'Type: checkpoint',
+        'CM1058 second memory-id cleanup isolation temp local marker',
+        'Purpose: prove cleanup for one memory id preserves another memory id residual queue.',
+        'Boundary: synthetic temp-local files only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1058 second synthetic temp-local memory-id cleanup isolation evidence',
+      tags: ['cm1058', 'write', 'degraded', 'reconcile', 'memory-id', 'cleanup', 'temp-local', 'second'],
+      workspace_id: 'cm1058-memory-id-cleanup-workspace',
+      task_id: 'CM-1058',
+      conversation_id: 'cm1058-memory-id-cleanup-temp-local-second'
+    }));
+
+    assert.notEqual(firstWrite.memoryId, secondWrite.memoryId);
+    for (const result of [firstWrite, secondWrite]) {
+      assert.equal(result.decision, 'accepted');
+      assert.equal(result.success, true);
+      assert.equal(result.shadowWrite.status, 'degraded');
+      assert.deepEqual(result.shadowWrite.failures.sort(), [
+        'chunks:cm1032 synthetic chunk projection failure',
+        'vector:cm1032 synthetic vector projection failure'
+      ]);
+      assertInsideRoot(harness.rootPath, result.filePath);
+      assert.equal(await pathExists(result.filePath), true);
+    }
+
+    const queuedBeforeCleanup = await harness.shadowStore.listReconcileTasks(10);
+    assert.equal(queuedBeforeCleanup.length, 4);
+    assert.equal(queuedBeforeCleanup.filter(task => task.memoryId === firstWrite.memoryId).length, 2);
+    assert.equal(queuedBeforeCleanup.filter(task => task.memoryId === secondWrite.memoryId).length, 2);
+    assert.deepEqual(
+      queuedBeforeCleanup
+        .filter(task => task.memoryId === firstWrite.memoryId)
+        .map(task => task.storeKind)
+        .sort(),
+      ['chunks', 'vector']
+    );
+    assert.deepEqual(
+      queuedBeforeCleanup
+        .filter(task => task.memoryId === secondWrite.memoryId)
+        .map(task => task.storeKind)
+        .sort(),
+      ['chunks', 'vector']
+    );
+
+    await harness.candidateCacheStore.set('cm1058-first-cache-entry', {
+      resultMemoryIds: [firstWrite.memoryId]
+    }, {
+      target: 'process',
+      memoryIds: [firstWrite.memoryId]
+    });
+
+    await harness.shadowStore.deleteRecord(firstWrite.memoryId);
+    const firstVectorDeleted = await harness.vectorStore.deleteRecord(firstWrite.memoryId);
+    const firstCacheEntriesRemoved = await harness.candidateCacheStore.clearCurrentFingerprintByMemoryIds(
+      [firstWrite.memoryId],
+      ['process']
+    );
+
+    const shadowAfterFirstProjectionCleanup = await harness.shadowStore.getHealth();
+    assert.equal(shadowAfterFirstProjectionCleanup.recordCount, 1);
+    assert.equal(shadowAfterFirstProjectionCleanup.chunkCount, 0);
+    assert.equal(shadowAfterFirstProjectionCleanup.reconcileCount, 4);
+    assert.equal(firstVectorDeleted, false);
+    assert.equal(firstCacheEntriesRemoved, 1);
+
+    await harness.shadowStore.clearReconcileTasks(firstWrite.memoryId);
+
+    const shadowAfterFirstReconcileCleanup = await harness.shadowStore.getHealth();
+    assert.equal(shadowAfterFirstReconcileCleanup.recordCount, 1);
+    assert.equal(shadowAfterFirstReconcileCleanup.chunkCount, 0);
+    assert.equal(shadowAfterFirstReconcileCleanup.reconcileCount, 2);
+
+    const queuedAfterFirstCleanup = await harness.shadowStore.listReconcileTasks(10);
+    assert.equal(queuedAfterFirstCleanup.length, 2);
+    assert.equal(queuedAfterFirstCleanup.every(task => task.memoryId === secondWrite.memoryId), true);
+    assert.deepEqual(queuedAfterFirstCleanup.map(task => task.storeKind).sort(), ['chunks', 'vector']);
+    assert.deepEqual(queuedAfterFirstCleanup.map(task => task.payload.memoryId), [
+      secondWrite.memoryId,
+      secondWrite.memoryId
+    ]);
+
+    await harness.shadowStore.clearReconcileTasks(firstWrite.memoryId);
+    const queuedAfterRepeatedFirstCleanup = await harness.shadowStore.listReconcileTasks(10);
+    assert.deepEqual(queuedAfterRepeatedFirstCleanup.map(task => task.memoryId), [
+      secondWrite.memoryId,
+      secondWrite.memoryId
+    ]);
+
+    await harness.shadowStore.clearReconcileTasks(secondWrite.memoryId);
+
+    const shadowAfterSecondReconcileCleanup = await harness.shadowStore.getHealth();
+    assert.equal(shadowAfterSecondReconcileCleanup.recordCount, 1);
+    assert.equal(shadowAfterSecondReconcileCleanup.chunkCount, 0);
+    assert.equal(shadowAfterSecondReconcileCleanup.reconcileCount, 0);
+
+    const queuedAfterSecondCleanup = await harness.shadowStore.listReconcileTasks(10);
+    assert.deepEqual(queuedAfterSecondCleanup, []);
+
+    assert.equal(await pathExists(firstWrite.filePath), true);
+    assert.equal(await pathExists(secondWrite.filePath), true);
+    assert.equal(await pathExists(harness.config.auditLogPath), true);
+    assert.equal(harness.auditEvents.length, 2);
+    assert.deepEqual(harness.auditEvents.map(event => event.shadowWrite.status), ['degraded', 'degraded']);
+  } finally {
+    await harness.cleanup();
+  }
+
+  assert.equal(await pathExists(harness.rootPath), false);
+});
