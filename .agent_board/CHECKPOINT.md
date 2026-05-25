@@ -1,5 +1,35 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1097 Authorized Mutation Token Path Diagnostic Checkpoint
+
+Status: `COMPLETED_AUTHORIZED_MUTATION_TOKEN_PATH_DIAGNOSTIC_NO_TOKEN_RUNTIME_NOT_WRITTEN_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/V11AuthorizedMutationTokenPathDiagnostic.js`.
+- Added `tests/v1-1-authorized-mutation-token-path-diagnostic.test.js`.
+- Added `docs/CM1097_AUTHORIZED_MUTATION_TOKEN_PATH_DIAGNOSTIC.md`.
+- Diagnosed CM-1096 `NO_TOKEN_MUTATION_REJECTED` as active HTTP MCP no-token mutation gate evidence.
+
+Validation:
+- `node --check .\src\core\V11AuthorizedMutationTokenPathDiagnostic.js`
+- `node --check .\tests\v1-1-authorized-mutation-token-path-diagnostic.test.js`
+- `node --test .\tests\v1-1-authorized-mutation-token-path-diagnostic.test.js` passed `6/6`
+
+Boundary:
+- No `record_memory` retry.
+- No `search_memory`.
+- No token value read, print, injection, or persistence.
+- No config/watchdog/startup/dependency change.
+- No raw store, direct `.jsonl`, or raw audit read.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Establish or verify a bearer-authorized MCP mutation path under a separate exact approval boundary, then generate a fresh exact write packet.
+
 ## CM-1096 Exact Record Memory Write Attempt Checkpoint
 
 Status: `BLOCKED_RECORD_MEMORY_WRITE_REJECTED_NO_TOKEN_NOT_WRITTEN_NOT_READY`

@@ -1,5 +1,35 @@
 # HANDOFF.md — codex-memory
 
+## CM-1097 Authorized Mutation Token Path Diagnostic Handoff
+
+Goal: diagnose the actual mutation token path after CM-1096 without retrying write or changing config.
+
+Status: COMPLETED_AUTHORIZED_MUTATION_TOKEN_PATH_DIAGNOSTIC_NO_TOKEN_RUNTIME_NOT_WRITTEN_NOT_READY.
+
+Current evidence:
+- Source: `src/core/V11AuthorizedMutationTokenPathDiagnostic.js`.
+- Test: `tests/v1-1-authorized-mutation-token-path-diagnostic.test.js`.
+- Design doc: `docs/CM1097_AUTHORIZED_MUTATION_TOKEN_PATH_DIAGNOSTIC.md`.
+- Targeted CM-1097 test passed `6/6`.
+
+Conclusion:
+- CM-1096 returned `NO_TOKEN_MUTATION_REJECTED`, which maps to active HTTP MCP no-token mutation gate.
+- The actual tool path is not confirmed bearer-authorized.
+- CM-1096 approval packet is consumed and must not be reused.
+
+Not performed:
+- no `record_memory` retry
+- no `search_memory`
+- no token value read/print/injection
+- no raw store/audit read
+- no config/watchdog/startup/dependency change
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- Generate a separate exact token-path/config approval packet if Codex is expected to change or verify the bearer path, or have the operator establish it externally before a fresh exact write approval packet.
+
 ## CM-1096 Exact Record Memory Write Attempt Handoff
 
 Goal: execute one safe exact `record_memory` write after CM-1095 token path boundary and regenerated CM-1096 packet.
