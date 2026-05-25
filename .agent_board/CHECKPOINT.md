@@ -1,5 +1,38 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1060 Memory Write Rollback Cleanup Design Review Policy Checkpoint
+
+Status: `COMPLETED_VALIDATED_ROLLBACK_CLEANUP_DESIGN_REVIEW_POLICY_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1060_MEMORY_WRITE_ROLLBACK_CLEANUP_DESIGN_REVIEW_POLICY.md`
+
+Completed:
+- Added `src/core/MemoryWriteRollbackCleanupDesignReviewPolicy.js`.
+- Added `tests/memory-write-rollback-cleanup-design-review-policy.test.js`.
+- Added CM-1060 evidence doc.
+- Verified the helper consumes an accepted CM-1059 plan boundary report.
+- Verified it accepts only `design_review_only` / `memory_id_and_store_kind_scoped` input.
+- Verified the cleanup review sequence must be exact and preview-first.
+- Verified target stores are limited to SQLite shadow record, vector index record, candidate cache entries, and reconcile queue tasks.
+- Verified diary record and write-audit log must remain retained stores.
+- Verified it fails closed on cleanup apply, rollback apply, diary deletion, audit rewrite, public MCP expansion, config/watchdog/startup change, dependency change, readiness claim, reliability claim, malformed counters, and unknown positive counters.
+
+Validation:
+- Source syntax check passed.
+- Test syntax check passed.
+- Targeted CM-1060 helper test passed `6/6`.
+- Adjacent rollback cleanup/reconcile/MCP regression bundle passed `54/54`.
+- Full `npm test` passed `2520/2520`.
+
+Boundary:
+- Pure explicit-input helper/test/doc/board evidence only.
+- No runtime execution, public API change, public MCP expansion, real memory read/write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, real cleanup apply, real rollback apply, diary deletion, audit rewrite, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue toward a separate real cleanup dry-run preview design or governance lifecycle/scope closure while keeping real cleanup/rollback apply blocked. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1059 Memory Write Rollback Cleanup Plan Boundary Checkpoint
 
 Status: `COMPLETED_VALIDATED_ROLLBACK_CLEANUP_PLAN_BOUNDARY_NOT_EXECUTED_NOT_READY`

@@ -28,6 +28,67 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1060 Memory Write Rollback Cleanup Design Review Policy - 2026-05-25
+
+Result: `CM1060_MEMORY_WRITE_ROLLBACK_CLEANUP_DESIGN_REVIEW_POLICY_NOT_EXECUTED_NOT_READY`.
+
+CM-1060 adds a narrow rollback cleanup design-review policy:
+
+- it requires an accepted CM-1059 plan boundary report
+- accepted cleanup design review mode must be `design_review_only`
+- accepted cleanup design review scope must be `memory_id_and_store_kind_scoped`
+- required sequence is exact: identify exact memory id, preview projection targets, preview candidate-cache entries, preview reconcile tasks by memory id and store kind, verify diary/audit retention, require runtime-validation plan, and stop before apply
+- reviewable target stores are limited to `sqlite_shadow_record`, `vector_index_record`, `candidate_cache_entries`, and `reconcile_queue_tasks`
+- retained stores must be `diary_record` and `write_audit_log`
+- cleanup apply, rollback apply, diary deletion, audit rewrite, public MCP expansion, config/watchdog/startup change, dependency change, real cleanup safety claim, real rollback safety claim, write reliability claim, readiness claim, and all side-effect counters must remain zero/false
+
+Validation:
+
+- source syntax check passed
+- test syntax check passed
+- targeted CM-1060 helper test `6/6` passed
+- adjacent rollback cleanup/reconcile/MCP regression bundle `54/54` passed
+- full `npm test` `2520/2520` passed
+
+Boundary:
+
+```text
+source change = pure explicit-input helper
+runtime execution = false
+consumed boundary = CM-1059 accepted plan boundary
+accepted mode = design_review_only
+accepted scope = memory_id_and_store_kind_scoped
+accepted final step = stop_before_apply
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+real jsonl reads = 0
+provider/API calls = 0
+public MCP expansion = false
+public cleanup tool = false
+real cleanup apply = false
+real rollback apply = false
+diary deletion = false
+audit rewrite = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- `memory write reliable`: no
+- `automatic degraded recovery`: no
+- `real cleanup safe`: no
+- `real rollback safe`: no
+- `rollback readiness`: no
+- `runtime readiness`: no
+- `complete?`: no
+
+`RC_NOT_READY_BLOCKED` remains unchanged.
+
 ## CM-1059 Memory Write Rollback Cleanup Plan Boundary - 2026-05-25
 
 Result: `CM1059_MEMORY_WRITE_ROLLBACK_CLEANUP_PLAN_BOUNDARY_NOT_EXECUTED_NOT_READY`.
