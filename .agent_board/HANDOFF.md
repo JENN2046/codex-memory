@@ -6,6 +6,8 @@ Goal: prevent proof memories from polluting normal long-term recall while preser
 
 Status: COMPLETED_VALIDATED_PROOF_MEMORY_NAMESPACE_RETENTION_POLICY_NOT_READY.
 
+Local commit: `fe4a003 test: add proof memory namespace policy`.
+
 Current evidence:
 - Source: `src/core/ProofMemoryPolicy.js`.
 - Runtime write integration: `src/core/MemoryWriteService.js`.
@@ -31,7 +33,7 @@ Remaining risks:
 - New remote CI evidence requires a future push, which remains explicit-approval only.
 
 Next safe step:
-- Final diff/re-review, then guarded local commit if all commit guards pass.
+- Complete post-commit status-surface sync and push-readiness review.
 - Do not push without explicit user authorization.
 
 ## CM-1066..CM-1069 Reconcile/HTTP/Cleanup Hardening Handoff

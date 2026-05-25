@@ -6,6 +6,8 @@ Status: `COMPLETED_VALIDATED_PROOF_MEMORY_NAMESPACE_RETENTION_POLICY_NOT_READY`
 
 Date: 2026-05-25
 
+Local commit: `fe4a003 test: add proof memory namespace policy`
+
 Completed:
 - Added `src/core/ProofMemoryPolicy.js`.
 - `record_memory` runtime now normalizes explicit proof-retention writes to `visibility=internal_proof`, `retentionPolicy=short_lived_or_tombstone_after_validation`, and a `proof` tag.
@@ -33,8 +35,7 @@ Boundary:
 - `RC_NOT_READY_BLOCKED` remains.
 
 Next:
-- Inspect final diff and perform post-fix re-review.
-- Guarded local commit may be created if commit guards pass.
+- Complete post-commit status-surface sync and push-readiness review.
 - Push remains blocked until explicitly authorized.
 
 ## CM-1066..CM-1069 Reconcile/HTTP/Cleanup Hardening Checkpoint
