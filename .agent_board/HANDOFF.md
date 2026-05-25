@@ -1,5 +1,112 @@
 # HANDOFF.md — codex-memory
 
+## CM-1088 v1.1 Hardening Staged Local Closeout Handoff
+
+Goal: commit the local CM-1081 through CM-1088 v1.1 hardening stage without moving the sealed v1.0 RC tag or claiming readiness/reliability.
+
+Status: COMPLETED_VALIDATED_LOCAL_COMMIT_CANDIDATE_NOT_READY.
+
+Completed:
+- CM-1081 proof memory retention tombstone pure design helper.
+- CM-1082 store-backed proof tombstone dry-run preview.
+- CM-1083 reconcile retry/backoff durable persistence preview.
+- CM-1084 startup reconcile worker safety review.
+- CM-1085 cleanup/rollback apply design policy.
+- CM-1086 v1.1 ValidationAggregator current-head evidence aggregator.
+- CM-1087 governance runtime approval/audit loop review.
+- CM-1088 staged local closeout.
+- Post-review fixes: CM-1082 store read malformed/throw fail-closed, CM-1086 nested side-effect rejection, CM-1088 per-record closeout validation.
+
+Validation:
+- changed source/test syntax checks
+- targeted CM-1082/CM-1086/CM-1088 tests passed `18/18`
+- original review repros now fail closed
+- `git diff --check` passed
+- full `npm test` passed `2590/2590`
+
+Not validated:
+- live recall/write reliability closure
+- true live `record_memory`
+- true live `search_memory`
+- provider/API calls
+- raw memory, direct `.jsonl`, or raw audit reads
+- real cleanup/rollback apply
+- startup/config/watchdog behavior
+- push/CI after this local commit
+
+Remaining risks:
+- This is local staged hardening only. It does not prove runtime readiness, reliability, real cleanup safety, rollback readiness, release readiness, or production readiness.
+
+Next safe step:
+- Create the explicitly requested guarded local commit. Do not push without separate explicit push authorization.
+
+## CM-1083 Reconcile Retry/Backoff Durable Persistence Preview Handoff
+
+Goal: extend CM-1067 retry/backoff metadata into a temp-local store-backed durable persistence preview without migrating schema, applying retry metadata, enabling startup worker behavior, or changing public MCP.
+
+Status: COMPLETED_RECONCILE_RETRY_BACKOFF_DURABLE_PERSISTENCE_PREVIEW_NOT_APPLIED_NOT_READY.
+
+Current evidence:
+- Source: `src/core/MemoryWriteReconcileRetryBackoffPersistencePreview.js`.
+- Read-only queue task reader: `SqliteShadowStore.getReconcileTaskById(...)`.
+- Read-only queue schema reader: `SqliteShadowStore.getReconcileQueueColumnNames()`.
+- Test: `tests/memory-write-reconcile-retry-backoff-persistence-preview.test.js`.
+- Design doc: `docs/CM1083_MEMORY_WRITE_RECONCILE_RETRY_BACKOFF_DURABLE_PERSISTENCE_PREVIEW.md`.
+- Targeted CM-1083 test passed `5/5`.
+- CM-1067 metadata regression passed `5/5`.
+- Reconcile service regression passed `7/7`.
+
+Not validated:
+- Full `npm test`.
+- Real SQLite retry schema migration.
+- Runtime retry metadata apply.
+- Automatic or startup reconcile worker behavior.
+- True live `record_memory` or `search_memory`.
+- Provider/API calls.
+- Raw memory, direct `.jsonl`, or raw audit reads.
+- Cleanup/rollback apply.
+- Push.
+
+Remaining risks:
+- CM-1083 is still preview-only and temp-local store-backed. It does not prove production retry persistence, schema migration safety, automatic degraded recovery, startup reconcile safety, broad write reliability, runtime readiness, or rollback readiness.
+- The apply gate is explicitly closed: `applyApproved=false`, `applyExecuted=false`, `schemaMigrationApplied=false`.
+
+Next safe step:
+- Continue CM-1084 startup reconcile worker safety as a local design/helper/temp-local safety slice.
+- Keep all hard stops active: no schema migration/apply, cleanup/rollback apply, startup/config/watchdog enablement, public MCP expansion, provider/API, true memory calls, raw memory/audit reads, commit, push, or readiness/reliability claim without exact approval.
+
+## CM-1082 Proof Memory Retention Tombstone Store-Backed Dry-Run Preview Handoff
+
+Goal: extend CM-1081 proof memory retention/tombstone planning into a temp-local store-backed dry-run preview without applying tombstones, mutating real memory, starting a worker, or changing public MCP.
+
+Status: COMPLETED_PROOF_MEMORY_RETENTION_TOMBSTONE_STORE_BACKED_DRY_RUN_PREVIEW_ACCEPTED_NOT_APPLIED_NOT_READY.
+
+Current evidence:
+- Source: `src/core/ProofMemoryRetentionTombstoneStoreBackedDryRunPreview.js`.
+- Metadata-only store reader: `SqliteShadowStore.listProofMemoryRetentionCandidates(...)`.
+- Test: `tests/proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js`.
+- Design doc: `docs/CM1082_PROOF_MEMORY_RETENTION_TOMBSTONE_STORE_BACKED_DRY_RUN_PREVIEW.md`.
+- Targeted CM-1082 test passed `4/4`.
+- CM-1081 plan regression passed `4/4`.
+
+Not validated:
+- Full `npm test`.
+- Real proof-memory tombstone apply.
+- Automatic retention worker.
+- True live `record_memory` or `search_memory`.
+- Provider/API calls.
+- Raw memory, direct `.jsonl`, or raw audit reads.
+- Cleanup/rollback apply.
+- Push.
+
+Remaining risks:
+- CM-1082 is still preview-only and temp-local store-backed. It does not prove real-store cleanup, automatic retention, broad lifecycle governance closure, runtime readiness, or reliability.
+- The apply gate is explicitly closed: `applyAuthorized=false`, `applyExecuted=false`, `tombstoneApplyRunsAllowed=0`.
+
+Next safe step:
+- Continue CM-1083 in staged v1.1 order unless repository reality shows a safer dependency order.
+- Keep all hard stops active: no tombstone apply, cleanup/rollback apply, worker enablement, public MCP expansion, provider/API, true memory calls, raw memory/audit reads, commit, push, or readiness/reliability claim without exact approval.
+
 ## CM-1070 Proof Memory Namespace / Retention Policy Handoff
 
 Goal: prevent proof memories from polluting normal long-term recall while preserving explicit internal proof recall and keeping public MCP schema frozen.

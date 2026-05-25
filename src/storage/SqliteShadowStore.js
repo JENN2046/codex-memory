@@ -288,6 +288,60 @@ class SqliteShadowStore {
     return rows.map(row => this.mapRow(row));
   }
 
+  async listProofMemoryRetentionCandidates({
+    target = 'process',
+    limit = 50
+  } = {}) {
+    await this.ensureReady();
+    this.refreshMemoryRecordColumnInfo();
+
+    const normalizedTarget = String(target || '').trim().toLowerCase() || 'process';
+    const normalizedLimit = Number.isInteger(limit) && limit > 0 ? Math.min(limit, 100) : 50;
+    const hasStatus = this.hasMemoryRecordColumn('status');
+    const hasLifecycleUpdatedAt = this.hasMemoryRecordColumn('lifecycle_updated_at');
+    const rows = this.db.prepare(`
+      SELECT memory_id, target, tags_json, validated, updated_at,
+        visibility, retention_policy
+        ${hasStatus ? ', status' : ''}
+        ${hasLifecycleUpdatedAt ? ', lifecycle_updated_at' : ''}
+      FROM memory_records
+      WHERE target = ?
+        AND (
+          visibility = 'internal_proof'
+          OR retention_policy = 'short_lived_or_tombstone_after_validation'
+          OR tags_json LIKE '%"proof"%'
+        )
+      ORDER BY updated_at ASC
+      LIMIT ?
+    `).all(normalizedTarget, normalizedLimit);
+
+    return rows.map(row => {
+      let tags = [];
+      try {
+        tags = JSON.parse(row.tags_json || '[]');
+      } catch {
+        tags = [];
+      }
+
+      const validated = row.validated === 1 || row.validated === true;
+      const lifecycleUpdatedAt = hasLifecycleUpdatedAt ? (row.lifecycle_updated_at || null) : null;
+      return {
+        memoryId: row.memory_id,
+        target: row.target,
+        tags,
+        validated,
+        validationStatus: validated ? 'accepted' : 'pending',
+        validatedAt: validated ? (lifecycleUpdatedAt || row.updated_at || null) : null,
+        validatedAtSource: lifecycleUpdatedAt
+          ? 'sqlite_lifecycle_updated_at_metadata'
+          : 'sqlite_updated_at_metadata',
+        visibility: row.visibility || null,
+        status: hasStatus ? (row.status || null) : null,
+        retentionPolicy: row.retention_policy || null
+      };
+    });
+  }
+
   async getWritePreflightCandidates({ target, allowedScope = {}, limit = 100 } = {}) {
     await this.ensureReady();
     this.refreshMemoryRecordColumnInfo();
@@ -1029,8 +1083,23 @@ class SqliteShadowStore {
     `).all(normalizedMemoryId, normalizedLimit).map(row => this.mapReconcileTaskRow(row));
   }
 
+  async getReconcileTaskById(taskId) {
+    await this.ensureReady();
+    const normalizedTaskId = Number.parseInt(taskId, 10);
+    if (!Number.isInteger(normalizedTaskId) || normalizedTaskId <= 0) return null;
+    const row = this.db.prepare('SELECT * FROM reconcile_queue WHERE id = ?').get(normalizedTaskId);
+    return row ? this.mapReconcileTaskRow(row) : null;
+  }
+
+  async getReconcileQueueColumnNames() {
+    await this.ensureReady();
+    return this.db.prepare('PRAGMA table_info(reconcile_queue)').all()
+      .map(column => column.name);
+  }
+
   mapReconcileTaskRow(row) {
     const parsedPayload = this.parseReconcileTaskPayload(row && row.payload_json);
+    const parsedRetryMetadata = this.parseOptionalJsonField(row && row.retry_metadata_json);
     return {
       id: row.id,
       memoryId: row.memory_id,
@@ -1039,7 +1108,15 @@ class SqliteShadowStore {
       payload: parsedPayload.payload,
       payloadMalformed: parsedPayload.payloadMalformed,
       payloadParseError: parsedPayload.payloadParseError,
-      createdAt: row.created_at
+      createdAt: row.created_at,
+      retryBackoffMetadata: parsedRetryMetadata.value,
+      retryBackoffMetadataMalformed: parsedRetryMetadata.malformed,
+      retryBackoffMetadataParseError: parsedRetryMetadata.parseError,
+      retryState: row.retry_state ?? null,
+      retryAttemptCount: row.retry_attempt_count ?? null,
+      nextAttemptAfter: row.next_attempt_after ?? null,
+      lastAttemptAt: row.last_attempt_at ?? null,
+      lastErrorCode: row.last_error_code ?? null
     };
   }
 
@@ -1055,6 +1132,30 @@ class SqliteShadowStore {
         payload: {},
         payloadMalformed: true,
         payloadParseError: 'malformed_payload_json'
+      };
+    }
+  }
+
+  parseOptionalJsonField(value) {
+    if (value === undefined || value === null || value === '') {
+      return {
+        value: null,
+        malformed: false,
+        parseError: null
+      };
+    }
+
+    try {
+      return {
+        value: JSON.parse(value),
+        malformed: false,
+        parseError: null
+      };
+    } catch {
+      return {
+        value: null,
+        malformed: true,
+        parseError: 'malformed_json'
       };
     }
   }

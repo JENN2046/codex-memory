@@ -1,5 +1,189 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1088 v1.1 Hardening Staged Local Closeout Checkpoint
+
+Status: `COMPLETED_VALIDATED_V1_1_HARDENING_STAGED_LOCAL_CLOSEOUT_NOT_RELEASED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Completed CM-1084 startup reconcile worker safety review helper/test/doc.
+- Completed CM-1085 cleanup/rollback apply design policy helper/test/doc.
+- Completed CM-1086 v1.1 ValidationAggregator evidence aggregator helper/test/doc and optional `ValidationAggregatorService` surface.
+- Completed CM-1087 governance runtime approval/audit loop review helper/test/doc.
+- Completed CM-1088 staged local closeout helper/test/doc.
+- Fixed post-review gaps: CM-1082 store read fail-closed handling, CM-1086 nested side-effect scan, and CM-1088 record-level closeout validation.
+
+Validation:
+- changed source/test syntax checks
+- `node --test .\tests\proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js .\tests\v1-1-hardening-validation-aggregator.test.js .\tests\v1-1-hardening-staged-closeout.test.js` passed `18/18`
+- review repro confirmed the three original findings now fail closed
+- `git diff --check` passed
+- `npm test` passed `2590/2590`
+
+Boundary:
+- `v1.0.0-rc.1` remains sealed at `f4549b4a1a9265bdc867c35b72f66d8d1a1a66a9`.
+- No provider/API call.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No cleanup/rollback apply.
+- No startup/config/watchdog/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Remaining risk:
+- This is staged local hardening evidence only. It does not prove live runtime readiness, broad recall/write reliability, real cleanup safety, real rollback safety, release readiness, or production readiness.
+
+Next:
+- Guarded local commit is allowed only because the user explicitly requested `commit`. Push remains blocked without explicit push authorization.
+
+## CM-1083 Reconcile Retry/Backoff Durable Persistence Preview Checkpoint
+
+Status: `RECONCILE_RETRY_BACKOFF_DURABLE_PERSISTENCE_PREVIEW_NOT_APPLIED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/MemoryWriteReconcileRetryBackoffPersistencePreview.js`.
+- Added read-only `SqliteShadowStore.getReconcileTaskById(...)`.
+- Added read-only `SqliteShadowStore.getReconcileQueueColumnNames()`.
+- Added `tests/memory-write-reconcile-retry-backoff-persistence-preview.test.js`.
+- Added `docs/CM1083_MEMORY_WRITE_RECONCILE_RETRY_BACKOFF_DURABLE_PERSISTENCE_PREVIEW.md`.
+- Helper builds a no-apply durable update shape only when required retry columns are present.
+- Missing retry columns fail closed with `reconcile_queue_retry_columns_missing`.
+- Apply requests fail closed with `apply_requested_but_not_allowed_in_cm1083`.
+
+Validation:
+- `node --check .\src\core\MemoryWriteReconcileRetryBackoffPersistencePreview.js`
+- `node --check .\src\storage\SqliteShadowStore.js`
+- `node --check .\tests\memory-write-reconcile-retry-backoff-persistence-preview.test.js`
+- `node --test .\tests\memory-write-reconcile-retry-backoff-persistence-preview.test.js` passed `5/5`
+- `node --test .\tests\memory-write-reconcile-retry-backoff-metadata.test.js` passed `5/5`
+- `node --test .\tests\memory-write-reconcile-service.test.js` passed `7/7`
+
+Boundary:
+- No SQLite schema migration.
+- No retry metadata apply.
+- No startup worker enablement.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No provider/API.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No cleanup apply or rollback apply.
+- No package/dependency change.
+- No tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- CM-1084 should continue startup reconcile worker safety in a bounded local slice without enabling real startup/config/watchdog behavior.
+- Retry metadata apply, schema migration, worker enablement, public MCP expansion, cleanup/rollback apply, and readiness/reliability claims remain blocked.
+
+## CM-1082 Proof Memory Retention Tombstone Store-Backed Dry-Run Preview Checkpoint
+
+Status: `PROOF_MEMORY_RETENTION_TOMBSTONE_STORE_BACKED_DRY_RUN_PREVIEW_ACCEPTED_NOT_APPLIED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/ProofMemoryRetentionTombstoneStoreBackedDryRunPreview.js`.
+- Added metadata-only `SqliteShadowStore.listProofMemoryRetentionCandidates(...)`.
+- Added `tests/proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js`.
+- Added `docs/CM1082_PROOF_MEMORY_RETENTION_TOMBSTONE_STORE_BACKED_DRY_RUN_PREVIEW.md`.
+- Helper consumes only `store_backed_dry_run_preview_only` / `temp_local_store_backed_read_only` / `temp_local_fixture` input.
+- Helper delegates to CM-1081 no-apply planner after a bounded temp-local metadata store read.
+- Helper returns an apply gate with `applyAuthorized=false`, `applyExecuted=false`, and `tombstoneApplyRunsAllowed=0`.
+
+Validation:
+- `node --check .\src\core\ProofMemoryRetentionTombstoneStoreBackedDryRunPreview.js`
+- `node --check .\src\storage\SqliteShadowStore.js`
+- `node --check .\tests\proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js`
+- `node --test .\tests\proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js` passed `4/4`
+- `node --test .\tests\proof-memory-retention-tombstone-plan.test.js` passed `4/4`
+
+Boundary:
+- No real memory mutation.
+- No real proof record tombstone.
+- No automatic worker start.
+- No public MCP expansion.
+- No provider/API.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No cleanup apply or rollback apply.
+- No package/config/watchdog/startup/dependency change.
+- No tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- CM-1083 should continue v1.1 hardening in order unless repository reality shows a safer dependency order.
+- Tombstone apply, worker enablement, cleanup/rollback apply, public MCP expansion, and readiness/reliability claims remain blocked.
+
+## CM-1081 Proof Memory Retention Tombstone Design Checkpoint
+
+Status: `PROOF_MEMORY_RETENTION_TOMBSTONE_DESIGN_PREVIEW_PASSED_NOT_IMPLEMENTED`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/ProofMemoryRetentionTombstonePlan.js`.
+- Added `tests/proof-memory-retention-tombstone-plan.test.js`.
+- Added `docs/CM1081_PROOF_MEMORY_RETENTION_TOMBSTONE_DESIGN.md`.
+- Helper consumes only `design_preview_only` / `temp_local_explicit_input_only` records.
+- Helper emits only planned tombstone actions with `applies=false`.
+- Tests cover eligible proof record planning, ineligible records, fail-closed apply/worker/public-MCP/real-store attempts, and public MCP freeze.
+
+Boundary:
+- No real memory mutation.
+- No real proof record tombstone.
+- No automatic worker start.
+- No public MCP expansion.
+- No provider/API.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No cleanup apply or rollback apply.
+- No package/config/watchdog/startup/dependency change.
+- No tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Recommended CM-1082: store-backed dry-run preview design, still no apply.
+
+## CM-1080 Open v1.1 Hardening Track Checkpoint
+
+Status: `V1_1_HARDENING_TRACK_OPENED_NOT_IMPLEMENTED`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/V1_1_HARDENING_ROADMAP.md`.
+- Verified clean synced `main` at `f4549b4a1a9265bdc867c35b72f66d8d1a1a66a9`.
+- Verified local and remote `v1.0.0-rc.1` tag exists.
+- Verified remote `v1.0.0-rc.1^{}` peels to `f4549b4a1a9265bdc867c35b72f66d8d1a1a66a9`.
+- Opened six v1.1 workstreams and marked all as `NOT_IMPLEMENTED`.
+
+Workstreams:
+- proof retention/tombstone automation: `NOT_IMPLEMENTED`
+- reconcile retry/backoff durable persistence: `NOT_IMPLEMENTED`
+- startup reconcile worker safety: `NOT_IMPLEMENTED`
+- cleanup/rollback apply design: `NOT_IMPLEMENTED`
+- ValidationAggregator full implementation: `NOT_IMPLEMENTED`
+- governance runtime approval/audit loop: `NOT_IMPLEMENTED`
+
+Boundary:
+- No source runtime change.
+- No provider/API.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No public MCP expansion.
+- No cleanup apply or rollback apply.
+- No package/config/watchdog/startup/dependency change.
+- No tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Recommended CM-1081: proof retention/tombstone automation plan.
+
 ## CM-1075 Final Blocker Disposition And v1.0 RC Candidate Decision Checkpoint
 
 Status: `V1_0_RC_CANDIDATE_READY_NOT_RELEASED`

@@ -2,6 +2,9 @@ const { TOOL_DEFINITIONS } = require('./constants');
 const {
   collectValidationAggregatorRuntimeProofUnits
 } = require('./ValidationAggregatorRuntimeProofCollector');
+const {
+  evaluateV11HardeningValidationAggregator
+} = require('./V11HardeningValidationAggregator');
 
 const DECISION_LABELS = [
   'READY_FOR_V1_0_RC',
@@ -1826,13 +1829,16 @@ function buildV1RcValidationAggregatorReport({
   generatedAt = new Date().toISOString(),
   validationEvidenceSources = [],
   runtimeEvidenceSummary = null,
-  runtimeProofInputs = null
+  runtimeProofInputs = null,
+  v11HardeningEvidence = null
 } = {}) {
   const validationEvidenceReader = normalizeValidationEvidenceSources(validationEvidenceSources);
   const runtimeEvidenceSummaryBridge = normalizeRuntimeEvidenceSummary(runtimeEvidenceSummary);
   const runtimeProofCollector = collectValidationAggregatorRuntimeProofUnits(
     runtimeProofInputs || {}
   );
+  const v11HardeningValidationAggregator =
+    evaluateV11HardeningValidationAggregator(v11HardeningEvidence || {});
   const validationEvidenceFreshness = summarizeValidationEvidenceFreshness({
     acceptedSources: validationEvidenceReader.acceptedSources,
     generatedAt
@@ -1953,6 +1959,16 @@ function buildV1RcValidationAggregatorReport({
       validationAggregatorRuntimeProofCollectorExecutedUnitCount:
         runtimeProofCollector.summary.executedUnitCount,
       validationAggregatorRuntimeProofCollectorCanClaimV1RcReady: false,
+      v11HardeningValidationAggregatorImplemented: true,
+      v11HardeningValidationAggregatorStatus:
+        v11HardeningValidationAggregator.status,
+      v11HardeningValidationAggregatorAccepted:
+        v11HardeningValidationAggregator.accepted,
+      v11HardeningValidationAggregatorCurrentSliceAcceptedCount:
+        v11HardeningValidationAggregator.evidenceMatrix.acceptedCurrentSliceCount,
+      v11HardeningValidationAggregatorFutureGapCount:
+        v11HardeningValidationAggregator.evidenceMatrix.requiredFutureGapIds.length,
+      v11HardeningValidationAggregatorCanClaimV1RcReady: false,
       schemaVersionRuntimeEnforcementImplemented: true,
       schemaVersionRuntimeWriteBoundaryGuardImplemented: true,
       schemaVersionRuntimeWriteBoundaryRejectsMetadata: true,
@@ -3076,6 +3092,7 @@ function buildV1RcValidationAggregatorReport({
         canClaimV1RcReady: false
       },
       p66ValidationAggregatorRuntimeProofCollector: runtimeProofCollector,
+      cm1086V11HardeningValidationAggregator: v11HardeningValidationAggregator,
       p66ValidationAggregatorSourceRegistryProof: {
         status: 'static_helper_capability_added_not_executed',
         sourceMode: 'static_report_shape_only',
