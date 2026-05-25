@@ -1,5 +1,34 @@
 # HANDOFF.md — codex-memory
 
+## CM-1066..CM-1069 Reconcile/HTTP/Cleanup Hardening Handoff
+
+Goal: execute the approved next patch set for reconcile task identity and malformed payload handling, retry/backoff metadata design, HTTP runtime health allowlisting, and cleanup preview apply gate fields.
+
+Status: COMPLETED_VALIDATED_PATCH_SET_NOT_READY.
+
+Current evidence:
+- CM-1066 source: `src/core/MemoryWriteReconcileService.js`, `src/storage/SqliteShadowStore.js`, `tests/memory-write-reconcile-service.test.js`.
+- CM-1067 source/doc/test: `src/core/MemoryWriteReconcileRetryBackoffMetadata.js`, `docs/CM1067_MEMORY_WRITE_RECONCILE_RETRY_BACKOFF_METADATA_DESIGN.md`, `tests/memory-write-reconcile-retry-backoff-metadata.test.js`.
+- CM-1068 source/test: `src/adapters/codex-mcp/http.js`, `tests/mcp-http.test.js`, `tests/http-observe-cli.test.js`.
+- CM-1069 source/test: `src/core/MemoryWriteRollbackCleanupDryRunPreview.js`, `src/core/MemoryWriteRollbackCleanupStoreBackedDryRunPreview.js`, rollback cleanup preview tests.
+- Combined reconcile/HTTP/cleanup regression bundle passed `79/79`.
+- Full `npm test` passed `2543/2543`.
+
+Not validated:
+- Existing deployed 7605 runtime after restart.
+- Durable schema migration for retry/backoff metadata.
+- Automatic startup worker safety.
+- Real cleanup apply or rollback apply.
+- Broad write reliability, automatic degraded recovery, runtime readiness, rollback readiness, RC readiness, production readiness, release/tag/deploy.
+
+Remaining risks:
+- CM-1067 is design/helper-only; durable persistence and scheduling integration still need a separate patch and review.
+- CM-1069 only exposes an apply gate; it does not authorize or implement apply.
+- This patch set hardens local source/test behavior but does not close reliability/readiness.
+
+Next safe step:
+- Inspect final diff and post-fix re-review. Commit only with explicit user intent and guarded commit checks. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1062 Memory Write Rollback Cleanup Store-Backed Dry-Run Preview Handoff
 
 Goal: convert the CM-1061 explicit cleanup preview shape into an internal exact-memory-id store-backed dry-run preview adapter, without applying cleanup, touching public MCP tools, broad memory stores, config/watchdog/startup, dependencies, or readiness/reliability claims.

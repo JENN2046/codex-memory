@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1066..CM-1069 Reconcile/HTTP/Cleanup Hardening Checkpoint
+
+Status: `COMPLETED_VALIDATED_PATCH_SET_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- CM-1066: malformed reconcile `payload_json` rows no longer throw through queue listing; task/payload `memoryId` mismatch fails closed without replay or clearing.
+- CM-1067: retry/backoff metadata design helper and doc added; helper is not integrated into persistence or scheduler and keeps automatic startup worker disabled.
+- CM-1068: HTTP runtime worker `lastResultSummary` is allowlisted before `/health` output; observe consumes the bounded surface.
+- CM-1069: cleanup dry-run preview and store-backed preview now expose explicit apply gate fields with apply unauthorized/unexecuted and allowed apply runs `0`.
+
+Validation:
+- Targeted syntax checks passed for all touched source/test files.
+- `memory-write-reconcile-service.test.js` passed `7/7`.
+- `memory-write-reconcile-retry-backoff-metadata.test.js` passed `5/5`.
+- `mcp-http.test.js` passed `17/17`.
+- `http-observe-cli.test.js` passed `21/21`.
+- `memory-write-rollback-cleanup-dry-run-preview.test.js` passed `6/6`.
+- `memory-write-rollback-cleanup-store-backed-dry-run-preview.test.js` passed `4/4`.
+- Combined reconcile/HTTP/cleanup regression bundle passed `79/79`.
+- Full `npm test` passed `2543/2543`.
+
+Boundary:
+- No true live `record_memory` or `search_memory`.
+- No provider/API call, public MCP expansion, dependency change, config/watchdog/startup edit, cleanup apply, rollback apply, diary deletion, audit rewrite, commit, push, readiness claim, or reliability claim.
+- `RC_NOT_READY_BLOCKED` remains.
+
+Next:
+- Final diff re-review, then guarded commit only if explicitly requested and commit guards pass.
+
 ## CM-1062 Memory Write Rollback Cleanup Store-Backed Dry-Run Preview Checkpoint
 
 Status: `COMPLETED_VALIDATED_ROLLBACK_CLEANUP_STORE_BACKED_DRY_RUN_PREVIEW_NOT_APPLIED_NOT_READY`

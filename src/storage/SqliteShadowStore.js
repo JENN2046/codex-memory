@@ -1000,14 +1000,7 @@ class SqliteShadowStore {
     await this.ensureReady();
     return this.db.prepare(`
       SELECT * FROM reconcile_queue ORDER BY created_at ASC LIMIT ?
-    `).all(limit).map(row => ({
-      id: row.id,
-      memoryId: row.memory_id,
-      storeKind: row.store_kind,
-      reason: row.reason,
-      payload: JSON.parse(row.payload_json || '{}'),
-      createdAt: row.created_at
-    }));
+    `).all(limit).map(row => this.mapReconcileTaskRow(row));
   }
 
   async listReconcileTasksForMemoryId(memoryId, limit = 50) {
@@ -1020,14 +1013,37 @@ class SqliteShadowStore {
       WHERE memory_id = ?
       ORDER BY created_at ASC
       LIMIT ?
-    `).all(normalizedMemoryId, normalizedLimit).map(row => ({
+    `).all(normalizedMemoryId, normalizedLimit).map(row => this.mapReconcileTaskRow(row));
+  }
+
+  mapReconcileTaskRow(row) {
+    const parsedPayload = this.parseReconcileTaskPayload(row && row.payload_json);
+    return {
       id: row.id,
       memoryId: row.memory_id,
       storeKind: row.store_kind,
       reason: row.reason,
-      payload: JSON.parse(row.payload_json || '{}'),
+      payload: parsedPayload.payload,
+      payloadMalformed: parsedPayload.payloadMalformed,
+      payloadParseError: parsedPayload.payloadParseError,
       createdAt: row.created_at
-    }));
+    };
+  }
+
+  parseReconcileTaskPayload(payloadJson) {
+    try {
+      return {
+        payload: JSON.parse(payloadJson || '{}'),
+        payloadMalformed: false,
+        payloadParseError: null
+      };
+    } catch {
+      return {
+        payload: {},
+        payloadMalformed: true,
+        payloadParseError: 'malformed_payload_json'
+      };
+    }
   }
 
   async getHealth() {

@@ -117,6 +117,72 @@ test('HTTP MCP should expose health and tools/list', async () => {
   });
 });
 
+test('HTTP MCP health should sanitize write reconcile worker last result summary with allowlist', async () => {
+  await withHttpServer(async ({ app, address }) => {
+    const originalGetStatus = app.services.memoryWriteReconcileWorker.getStatus;
+    app.services.memoryWriteReconcileWorker.getStatus = () => ({
+      available: true,
+      running: false,
+      timerScheduled: false,
+      tickInFlight: false,
+      runCount: '7',
+      intervalMs: '1000',
+      limit: '3',
+      dryRun: false,
+      maxRuns: '9',
+      lastResultSummary: {
+        success: false,
+        decision: 'completed_with_failures',
+        workerDecision: 'run_once_completed',
+        dryRun: false,
+        limit: 3,
+        scannedTaskCount: 2,
+        replayedCount: 1,
+        wouldReplayCount: 0,
+        clearedCount: 1,
+        failedCount: 1,
+        skippedCount: 0,
+        hasError: true,
+        memoryId: 'codex-process-cm1068-raw-memory-id',
+        results: [{ memoryId: 'codex-process-cm1068-nested-memory-id' }],
+        error: 'cm1068 raw internal error'
+      }
+    });
+
+    try {
+      const health = await fetch(address.url.replace('/mcp/codex-memory', '/health'));
+      const payload = await health.json();
+      const worker = payload.runtime.writeReconcileWorker;
+
+      assert.equal(health.status, 200);
+      assert.equal(worker.runCount, 7);
+      assert.equal(worker.intervalMs, 1000);
+      assert.equal(worker.limit, 3);
+      assert.equal(worker.maxRuns, 9);
+      assert.deepEqual(Object.keys(worker.lastResultSummary).sort(), [
+        'clearedCount',
+        'decision',
+        'dryRun',
+        'failedCount',
+        'hasError',
+        'limit',
+        'replayedCount',
+        'scannedTaskCount',
+        'skippedCount',
+        'success',
+        'workerDecision',
+        'wouldReplayCount'
+      ]);
+      assert.equal(worker.lastResultSummary.failedCount, 1);
+      assert.equal(worker.lastResultSummary.hasError, true);
+      assert.equal(JSON.stringify(worker).includes('memoryId'), false);
+      assert.equal(JSON.stringify(worker).includes('raw internal error'), false);
+    } finally {
+      app.services.memoryWriteReconcileWorker.getStatus = originalGetStatus;
+    }
+  });
+});
+
 test('HTTP MCP should reject browser-origin no-token POST writes', async () => {
   await withHttpServer(async ({ address }) => {
     const response = await fetch(address.url, {

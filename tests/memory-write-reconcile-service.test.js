@@ -247,6 +247,119 @@ test('CM-1035 internal write reconcile service keeps malformed tasks queued and 
   assert.equal(await pathExists(rootPath), false);
 });
 
+test('CM-1066 internal write reconcile service rejects task and payload memoryId mismatch', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1066-mismatch-'));
+  const config = createConfig(rootPath);
+  const shadowStore = new SqliteShadowStore(config);
+  const replayCalls = [];
+  const reconcileService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore: {
+      async upsertRecord(record) {
+        replayCalls.push(record);
+      }
+    }
+  });
+
+  try {
+    await shadowStore.enqueueReconcileTask({
+      memoryId: 'codex-process-cm1066-task-memory-id',
+      storeKind: 'vector',
+      reason: 'cm1066 mismatched queued projection',
+      payload: {
+        memoryId: 'codex-process-cm1066-payload-memory-id',
+        target: 'process',
+        title: 'Checkpoint: CM-1066 mismatched replay payload',
+        content: 'Type: checkpoint\nCM1066 mismatched replay payload marker',
+        evidence: 'cm1066 mismatched replay payload evidence',
+        tags: ['cm1066', 'reconcile', 'mismatch'],
+        validated: true,
+        reusable: false,
+        sensitivity: 'none'
+      }
+    });
+
+    const replay = await reconcileService.replayPending({ limit: 10 });
+
+    assert.equal(replay.success, false);
+    assert.equal(replay.decision, 'completed_with_failures');
+    assert.equal(replay.failedCount, 1);
+    assert.equal(replay.clearedCount, 0);
+    assert.equal(replay.results[0].status, 'failed');
+    assert.equal(replay.results[0].memoryId, 'codex-process-cm1066-task-memory-id');
+    assert.match(replay.results[0].error, /memoryId mismatch/);
+    assert.equal(replayCalls.length, 0);
+
+    const queuedTasks = await shadowStore.listReconcileTasks(10);
+    assert.equal(queuedTasks.length, 1);
+    assert.equal(queuedTasks[0].memoryId, 'codex-process-cm1066-task-memory-id');
+    assert.equal(queuedTasks[0].payload.memoryId, 'codex-process-cm1066-payload-memory-id');
+  } finally {
+    await shadowStore.close();
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
+test('CM-1066 sqlite reconcile task listing preserves malformed payload_json rows', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1066-malformed-json-'));
+  const config = createConfig(rootPath);
+  const shadowStore = new SqliteShadowStore(config);
+  const reconcileService = new MemoryWriteReconcileService({
+    shadowStore,
+    vectorStore: {
+      async upsertRecord() {
+        throw new Error('cm1066 malformed payload_json should not replay');
+      }
+    }
+  });
+  const memoryId = 'codex-process-cm1066-malformed-json';
+
+  try {
+    await shadowStore.ensureReady();
+    shadowStore.db.prepare(`
+      INSERT INTO reconcile_queue (memory_id, store_kind, reason, payload_json, created_at)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(
+      memoryId,
+      'vector',
+      'cm1066 malformed payload_json',
+      '{"memoryId":',
+      new Date().toISOString()
+    );
+
+    const listedTasks = await shadowStore.listReconcileTasks(10);
+    assert.equal(listedTasks.length, 1);
+    assert.equal(listedTasks[0].memoryId, memoryId);
+    assert.deepEqual(listedTasks[0].payload, {});
+    assert.equal(listedTasks[0].payloadMalformed, true);
+    assert.equal(listedTasks[0].payloadParseError, 'malformed_payload_json');
+
+    const listedForMemoryId = await shadowStore.listReconcileTasksForMemoryId(memoryId, 10);
+    assert.equal(listedForMemoryId.length, 1);
+    assert.equal(listedForMemoryId[0].payloadMalformed, true);
+
+    const replay = await reconcileService.replayPending({ limit: 10 });
+
+    assert.equal(replay.success, false);
+    assert.equal(replay.decision, 'completed_with_failures');
+    assert.equal(replay.failedCount, 1);
+    assert.equal(replay.clearedCount, 0);
+    assert.match(replay.results[0].error, /malformed replay payload_json/);
+
+    const queuedTasks = await shadowStore.listReconcileTasks(10);
+    assert.equal(queuedTasks.length, 1);
+    assert.equal(queuedTasks[0].memoryId, memoryId);
+    assert.equal(queuedTasks[0].payloadMalformed, true);
+  } finally {
+    await shadowStore.close();
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
 test('CM-1035 internal write reconcile service replays queued sqlite projection payloads', async () => {
   const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1035-sqlite-'));
   const config = createConfig(rootPath);

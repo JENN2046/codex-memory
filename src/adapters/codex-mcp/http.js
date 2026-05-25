@@ -156,6 +156,32 @@ function createSessionLimitPayload({ limitType, limit }) {
   };
 }
 
+function normalizeRuntimeNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function sanitizeWriteReconcileWorkerLastResultSummary(summary) {
+  if (!summary || typeof summary !== 'object' || Array.isArray(summary)) {
+    return null;
+  }
+
+  return {
+    success: summary.success === true,
+    decision: typeof summary.decision === 'string' ? summary.decision : null,
+    workerDecision: typeof summary.workerDecision === 'string' ? summary.workerDecision : null,
+    dryRun: summary.dryRun === true,
+    limit: summary.limit ?? null,
+    scannedTaskCount: normalizeRuntimeNumber(summary.scannedTaskCount) ?? 0,
+    replayedCount: normalizeRuntimeNumber(summary.replayedCount) ?? 0,
+    wouldReplayCount: normalizeRuntimeNumber(summary.wouldReplayCount) ?? 0,
+    clearedCount: normalizeRuntimeNumber(summary.clearedCount) ?? 0,
+    failedCount: normalizeRuntimeNumber(summary.failedCount) ?? 0,
+    skippedCount: normalizeRuntimeNumber(summary.skippedCount) ?? 0,
+    hasError: summary.hasError === true
+  };
+}
+
 function summarizeWriteReconcileWorkerStatus(app) {
   const worker = app?.services?.memoryWriteReconcileWorker;
   if (!worker || typeof worker.getStatus !== 'function') {
@@ -179,12 +205,12 @@ function summarizeWriteReconcileWorkerStatus(app) {
     running: status.running === true,
     timerScheduled: status.timerScheduled === true,
     tickInFlight: status.tickInFlight === true,
-    runCount: Number(status.runCount || 0),
-    intervalMs: Number.isFinite(Number(status.intervalMs)) ? Number(status.intervalMs) : null,
-    limit: status.limit ?? null,
+    runCount: normalizeRuntimeNumber(status.runCount) ?? 0,
+    intervalMs: normalizeRuntimeNumber(status.intervalMs),
+    limit: normalizeRuntimeNumber(status.limit),
     dryRun: status.dryRun === true,
-    maxRuns: status.maxRuns ?? null,
-    lastResultSummary: status.lastResultSummary || null
+    maxRuns: normalizeRuntimeNumber(status.maxRuns),
+    lastResultSummary: sanitizeWriteReconcileWorkerLastResultSummary(status.lastResultSummary)
   };
 }
 

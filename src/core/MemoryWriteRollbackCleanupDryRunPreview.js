@@ -337,6 +337,25 @@ function buildPlannedActions(preview) {
   return actions;
 }
 
+function buildCleanupPreviewApplyGate({ dryRunPreviewAccepted = false } = {}) {
+  return {
+    gateId: 'CM-1069_MEMORY_WRITE_ROLLBACK_CLEANUP_PREVIEW_APPLY_GATE',
+    gateMode: 'separate_apply_approval_required',
+    dryRunPreviewAccepted: dryRunPreviewAccepted === true,
+    applyAuthorized: false,
+    applyExecuted: false,
+    approvalRequiredBeforeApply: true,
+    runtimeValidationRequiredBeforeApply: true,
+    operatorReceiptRequiredBeforeApply: true,
+    destructiveActionAllowed: false,
+    cleanupApplyRunsAllowed: 0,
+    rollbackApplyRunsAllowed: 0,
+    nextAllowedAction: dryRunPreviewAccepted === true
+      ? 'request_separate_cleanup_apply_approval'
+      : 'fix_preview_blockers_before_apply_consideration'
+  };
+}
+
 function evaluateMemoryWriteRollbackCleanupDryRunPreview(input = {}) {
   const safeInput = isPlainObject(input) ? input : {};
   const cleanupPreview = normalizeCleanupPreview(safeInput.cleanupPreview);
@@ -359,6 +378,7 @@ function evaluateMemoryWriteRollbackCleanupDryRunPreview(input = {}) {
     sourceDesignReviewTaskId: DESIGN_REVIEW_TASK_ID,
     cleanupPreview,
     plannedActions,
+    applyGate: buildCleanupPreviewApplyGate({ dryRunPreviewAccepted }),
     retainedEvidence: REQUIRED_RETAINED_STORES.map(store => ({
       store,
       retained: dryRunPreviewAccepted,
@@ -402,5 +422,6 @@ module.exports = {
   RESULT_STATUS_ACCEPTED,
   RESULT_STATUS_BLOCKED,
   TASK_ID,
+  buildCleanupPreviewApplyGate,
   evaluateMemoryWriteRollbackCleanupDryRunPreview
 };

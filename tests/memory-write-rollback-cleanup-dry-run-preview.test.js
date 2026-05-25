@@ -219,6 +219,20 @@ test('CM-1061 accepts explicit dry-run preview and builds stop-before-apply acti
     { store: 'diary_record', retained: true, applies: false },
     { store: 'write_audit_log', retained: true, applies: false }
   ]);
+  assert.deepEqual(report.applyGate, {
+    gateId: 'CM-1069_MEMORY_WRITE_ROLLBACK_CLEANUP_PREVIEW_APPLY_GATE',
+    gateMode: 'separate_apply_approval_required',
+    dryRunPreviewAccepted: true,
+    applyAuthorized: false,
+    applyExecuted: false,
+    approvalRequiredBeforeApply: true,
+    runtimeValidationRequiredBeforeApply: true,
+    operatorReceiptRequiredBeforeApply: true,
+    destructiveActionAllowed: false,
+    cleanupApplyRunsAllowed: 0,
+    rollbackApplyRunsAllowed: 0,
+    nextAllowedAction: 'request_separate_cleanup_apply_approval'
+  });
   assert.equal(report.safety.buildsDryRunPreview, true);
   assert.equal(report.safety.readsStores, false);
   assert.equal(report.safety.writesStores, false);
@@ -239,6 +253,9 @@ test('CM-1061 fails closed when the design review report is not accepted', () =>
   assert.equal(report.status, RESULT_STATUS_BLOCKED);
   assert.equal(report.dryRunPreviewAccepted, false);
   assert.deepEqual(report.plannedActions, []);
+  assert.equal(report.applyGate.applyAuthorized, false);
+  assert.equal(report.applyGate.applyExecuted, false);
+  assert.equal(report.applyGate.nextAllowedAction, 'fix_preview_blockers_before_apply_consideration');
   assert.ok(report.blockerReasons.includes('design_review_status_must_be_accepted'));
   assert.ok(report.blockerReasons.includes('design_review_acceptance_missing'));
   assert.ok(report.blockerReasons.includes('design_review_decision_mismatch'));

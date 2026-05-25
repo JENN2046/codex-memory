@@ -71,7 +71,9 @@ class MemoryWriteReconcileService {
   async replayTask(task = {}, { dryRun = false } = {}) {
     const storeKind = normalizeString(task.storeKind).toLowerCase();
     const payload = task.payload;
-    const memoryId = normalizeString(task.memoryId) || normalizeString(payload && payload.memoryId);
+    const taskMemoryId = normalizeString(task.memoryId);
+    const payloadMemoryId = normalizeString(payload && payload.memoryId);
+    const memoryId = taskMemoryId || payloadMemoryId;
     const baseResult = {
       taskId: task.id || null,
       memoryId: memoryId || null,
@@ -88,11 +90,27 @@ class MemoryWriteReconcileService {
       };
     }
 
+    if (task.payloadMalformed === true) {
+      return {
+        ...baseResult,
+        status: 'failed',
+        error: 'malformed replay payload_json'
+      };
+    }
+
     if (!memoryId) {
       return {
         ...baseResult,
         status: 'failed',
         error: 'missing memoryId'
+      };
+    }
+
+    if (taskMemoryId && payloadMemoryId && taskMemoryId !== payloadMemoryId) {
+      return {
+        ...baseResult,
+        status: 'failed',
+        error: 'reconcile task memoryId mismatch'
       };
     }
 

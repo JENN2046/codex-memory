@@ -10,6 +10,7 @@ const {
   REQUIRED_TRUE_FLAGS,
   REQUIRED_ZERO_COUNTER_KEYS,
   RESULT_STATUS_ACCEPTED: DRY_RUN_PREVIEW_STATUS_ACCEPTED,
+  buildCleanupPreviewApplyGate,
   evaluateMemoryWriteRollbackCleanupDryRunPreview
 } = require('./MemoryWriteRollbackCleanupDryRunPreview');
 
@@ -149,6 +150,7 @@ async function buildMemoryWriteRollbackCleanupStoreBackedDryRunPreview(input = {
       target,
       plannedActions: [],
       retainedEvidence: [],
+      applyGate: buildCleanupPreviewApplyGate({ dryRunPreviewAccepted: false }),
       storeReadSummary: {
         readsAttempted: false,
         storeReadCount: 0,
@@ -214,6 +216,7 @@ async function buildMemoryWriteRollbackCleanupStoreBackedDryRunPreview(input = {
     target,
     plannedActions: cleanupPreviewReport.plannedActions,
     retainedEvidence: cleanupPreviewReport.retainedEvidence,
+    applyGate: cleanupPreviewReport.applyGate,
     storeReadSummary: {
       readsAttempted: true,
       storeReadCount: 4,

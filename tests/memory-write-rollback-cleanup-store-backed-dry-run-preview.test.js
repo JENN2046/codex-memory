@@ -275,6 +275,12 @@ test('CM-1062 builds a store-backed dry-run preview without applying cleanup', a
       }
     ]);
     assert.equal(report.cleanupPreviewReport.dryRunPreviewAccepted, true);
+    assert.equal(report.applyGate.gateId, 'CM-1069_MEMORY_WRITE_ROLLBACK_CLEANUP_PREVIEW_APPLY_GATE');
+    assert.equal(report.applyGate.dryRunPreviewAccepted, true);
+    assert.equal(report.applyGate.applyAuthorized, false);
+    assert.equal(report.applyGate.applyExecuted, false);
+    assert.equal(report.applyGate.cleanupApplyRunsAllowed, 0);
+    assert.equal(report.applyGate.nextAllowedAction, 'request_separate_cleanup_apply_approval');
     assert.equal(report.safety.readsStores, true);
     assert.equal(report.safety.writesStores, false);
     assert.equal(report.safety.appliesCleanup, false);
@@ -332,6 +338,9 @@ test('CM-1062 blocks before store reads when design review is not accepted', asy
   assert.equal(report.status, RESULT_STATUS_BLOCKED);
   assert.equal(report.storeReadSummary.readsAttempted, false);
   assert.equal(readAttempted, false);
+  assert.equal(report.applyGate.applyAuthorized, false);
+  assert.equal(report.applyGate.applyExecuted, false);
+  assert.equal(report.applyGate.nextAllowedAction, 'fix_preview_blockers_before_apply_consideration');
   assert.ok(report.blockerReasons.includes('design_review_status_must_be_accepted'));
   assert.ok(report.blockerReasons.includes('design_review_acceptance_missing'));
 });
