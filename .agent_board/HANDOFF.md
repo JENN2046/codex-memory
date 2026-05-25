@@ -1,5 +1,72 @@
 # HANDOFF.md — codex-memory
 
+## CM-1090 v1.1 Write Governance Preflight Handoff
+
+Goal: add a local fail-closed no-write governance preflight surface for future exact-approved `record_memory` writes after CM-1089 evidence packet validation.
+
+Status: COMPLETED_V1_1_WRITE_GOVERNANCE_PREFLIGHT_ACCEPTED_NOT_EXECUTED_NOT_READY.
+
+Current evidence:
+- Source: `src/core/V11WriteGovernancePreflight.js`.
+- Test: `tests/v1-1-write-governance-preflight.test.js`.
+- Design doc: `docs/CM1090_V1_1_WRITE_GOVERNANCE_PREFLIGHT.md`.
+- Targeted CM-1090 test passed `5/5`.
+- CM-1089 adjacent regression bundle passed `10/10`.
+
+Not validated:
+- true live `record_memory`
+- true live `search_memory`
+- provider/API/MCP calls
+- raw memory, direct `.jsonl`, or raw audit reads
+- durable memory/audit writes
+- real tombstone/cleanup/rollback apply
+- schema migration
+- startup/config/watchdog behavior
+- public MCP expansion
+- push/CI for this local slice
+
+Remaining risks:
+- CM-1090 can shape a future write approval packet, but it is not an approval and not an execution.
+- Write reliability, runtime readiness, release readiness, and production readiness remain unproven and unclaimed.
+
+Next safe step:
+- Continue local fail-closed governance design, or prepare a guarded local commit if requested.
+- Keep hard stops active: no true memory write/read, provider/API call, raw memory/audit read, apply action, startup/config/watchdog/dependency change, public MCP expansion, push, tag, release, deploy, readiness claim, or reliability claim.
+
+## CM-1089 v1.1 Evidence Packet Runner Handoff
+
+Goal: create a local fail-closed evidence packet surface for CM-1081 through CM-1088 before moving into write-governance preflight work, while preserving the sealed v1.0 RC posture.
+
+Status: COMPLETED_V1_1_EVIDENCE_PACKET_ACCEPTED_NOT_EXECUTED_NOT_READY.
+
+Current evidence:
+- Source: `src/core/V11HardeningEvidencePacketRunner.js`.
+- Test: `tests/v1-1-hardening-evidence-packet-runner.test.js`.
+- Design doc: `docs/CM1089_V1_1_EVIDENCE_PACKET_RUNNER.md`.
+- Targeted CM-1089 test passed `5/5`.
+- Adjacent CM-1086/CM-1088 regression bundle is part of CMV-1198 validation.
+
+Not validated:
+- live recall/write reliability closure
+- true live `record_memory`
+- true live `search_memory`
+- provider/API calls
+- raw memory, direct `.jsonl`, or raw audit reads
+- durable memory/audit writes
+- real tombstone/cleanup/rollback apply
+- schema migration
+- startup/config/watchdog behavior
+- public MCP expansion
+- push/CI for this local slice
+
+Remaining risks:
+- This packet runner can reject unsafe or stale sanitized reports, but it cannot turn local reports into runtime readiness or reliability proof.
+- Write-governance execution remains unimplemented and blocked from true writes unless separately and exactly approved.
+
+Next safe step:
+- Start CM-1090 write-governance preflight surfaces as local explicit-input/no-write helper and tests.
+- Keep hard stops active: no true memory write/read, provider/API call, raw memory/audit read, apply action, startup/config/watchdog/dependency change, public MCP expansion, push, tag, release, deploy, readiness claim, or reliability claim.
+
 ## CM-1088 v1.1 Hardening Staged Local Closeout Handoff
 
 Goal: commit the local CM-1081 through CM-1088 v1.1 hardening stage without moving the sealed v1.0 RC tag or claiming readiness/reliability.

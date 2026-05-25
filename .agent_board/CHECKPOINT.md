@@ -1,5 +1,90 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1090 v1.1 Write Governance Preflight Checkpoint
+
+Status: `COMPLETED_V1_1_WRITE_GOVERNANCE_PREFLIGHT_ACCEPTED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/V11WriteGovernancePreflight.js`.
+- Added `tests/v1-1-write-governance-preflight.test.js`.
+- Added `docs/CM1090_V1_1_WRITE_GOVERNANCE_PREFLIGHT.md`.
+- Helper consumes an accepted CM-1089 evidence packet and an explicit sanitized proposed `record_memory` write request.
+- Helper requires exact scope, payload hash, review gate, exact approval gate, runtime validation gate, operator receipt gate, one future write cap, and zero side-effect counters.
+- Helper emits an approval packet template with execution and durable-write fields false.
+
+Validation:
+- `node --check .\src\core\V11WriteGovernancePreflight.js`
+- `node --check .\tests\v1-1-write-governance-preflight.test.js`
+- `node --test .\tests\v1-1-write-governance-preflight.test.js` passed `5/5`
+- `node --test .\tests\v1-1-hardening-evidence-packet-runner.test.js .\tests\v1-1-write-governance-preflight.test.js` passed `10/10`
+- `git diff --check`
+- docs validation
+- ledger consistency
+- no-overclaim scan
+- changed-scope re-review
+
+Boundary:
+- No provider/API/MCP call.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No durable memory/audit write.
+- No tombstone, cleanup, or rollback apply.
+- No schema migration.
+- No startup/config/watchdog/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Remaining risk:
+- CM-1090 is a no-write preflight surface only. It does not approve or execute any memory write and does not prove write reliability, runtime readiness, release readiness, or production readiness.
+
+Next:
+- Continue Phase 2 by designing the next local fail-closed governance surface, or stop for guarded local commit if the user wants a checkpoint commit. Any actual `record_memory` write still requires separate exact approval.
+
+## CM-1089 v1.1 Evidence Packet Runner Checkpoint
+
+Status: `COMPLETED_V1_1_EVIDENCE_PACKET_ACCEPTED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/V11HardeningEvidencePacketRunner.js`.
+- Added `tests/v1-1-hardening-evidence-packet-runner.test.js`.
+- Added `docs/CM1089_V1_1_EVIDENCE_PACKET_RUNNER.md`.
+- The helper consumes explicit sanitized CM-1081..CM-1088 slice reports and builds CM-1086 aggregator input for CM-1082/CM-1083/CM-1084/CM-1085/CM-1087 only.
+- The helper fail-closes on missing/stale/head-mismatched slice evidence, nonzero side-effect counters, nested apply/write/read/provider/public-MCP/startup/config/dependency/remote/release/readiness/reliability claims, and sensitive-looking fragments.
+
+Validation:
+- `node --check .\src\core\V11HardeningEvidencePacketRunner.js`
+- `node --check .\tests\v1-1-hardening-evidence-packet-runner.test.js`
+- `node --test .\tests\v1-1-hardening-evidence-packet-runner.test.js` passed `5/5`
+- adjacent CM-1086/CM-1088 regression bundle
+- `git diff --check`
+- docs validation
+- ledger consistency
+- no-overclaim scan
+- changed-scope re-review
+
+Boundary:
+- No provider/API call.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No durable memory/audit write.
+- No tombstone, cleanup, or rollback apply.
+- No schema migration.
+- No startup/config/watchdog/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Remaining risk:
+- CM-1089 only packages sanitized local evidence for review. It does not prove live runtime readiness, write governance execution, broad recall/write reliability, real cleanup safety, real rollback safety, release readiness, or production readiness.
+
+Next:
+- Continue with CM-1090 write-governance preflight surfaces as local no-write work. Any true memory write/read, apply, provider/API, startup/config/dependency change, public MCP expansion, push, tag, release, or deploy remains blocked without exact approval.
+
 ## CM-1088 v1.1 Hardening Staged Local Closeout Checkpoint
 
 Status: `COMPLETED_VALIDATED_V1_1_HARDENING_STAGED_LOCAL_CLOSEOUT_NOT_RELEASED_NOT_READY`
