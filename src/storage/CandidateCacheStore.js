@@ -207,6 +207,37 @@ class CandidateCacheStore {
     return removedEntries;
   }
 
+  async countCurrentFingerprintByMemoryIds(memoryIds = []) {
+    await this.ensureReady();
+    this.pruneExpiredEntries();
+    const normalizedMemoryIds = new Set(
+      (Array.isArray(memoryIds) ? memoryIds : [memoryIds])
+        .map(memoryId => String(memoryId || '').trim())
+        .filter(Boolean)
+    );
+    if (normalizedMemoryIds.size === 0) {
+      return 0;
+    }
+
+    let matchingEntries = 0;
+    for (const entry of Object.values(this.cache.entries || {})) {
+      if (entry?.embeddingFingerprint !== this.config.embeddingFingerprint) {
+        continue;
+      }
+
+      const entryMemoryIds = Array.isArray(entry?.memoryIds)
+        ? entry.memoryIds.map(memoryId => String(memoryId || '').trim()).filter(Boolean)
+        : [];
+      const hasDependencyMatch = entryMemoryIds.some(memoryId => normalizedMemoryIds.has(memoryId));
+
+      if (hasDependencyMatch) {
+        matchingEntries += 1;
+      }
+    }
+
+    return matchingEntries;
+  }
+
   async getStoredGovernanceStateRevision(target = 'both') {
     if (!this.config.enableCandidateCache) return '';
     await this.ensureReady();

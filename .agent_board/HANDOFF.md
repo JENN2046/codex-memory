@@ -1,5 +1,40 @@
 # HANDOFF.md — codex-memory
 
+## CM-1062 Memory Write Rollback Cleanup Store-Backed Dry-Run Preview Handoff
+
+Goal: convert the CM-1061 explicit cleanup preview shape into an internal exact-memory-id store-backed dry-run preview adapter, without applying cleanup, touching public MCP tools, broad memory stores, config/watchdog/startup, dependencies, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_ROLLBACK_CLEANUP_STORE_BACKED_DRY_RUN_PREVIEW_NOT_APPLIED_NOT_READY.
+
+Artifact: `docs/CM1062_MEMORY_WRITE_ROLLBACK_CLEANUP_STORE_BACKED_DRY_RUN_PREVIEW.md`.
+
+Current evidence:
+- Source artifact: `src/core/MemoryWriteRollbackCleanupStoreBackedDryRunPreview.js`.
+- Test artifact: `tests/memory-write-rollback-cleanup-store-backed-dry-run-preview.test.js`.
+- Read-only helper additions: `SqliteShadowStore.listReconcileTasksForMemoryId`, `VectorIndexStore.hasRecord`, and `CandidateCacheStore.countCurrentFingerprintByMemoryIds`.
+- The adapter requires an accepted CM-1060 design-review report before any store read.
+- Accepted input reads only one exact `process` memory id through injected stores.
+- Store-backed facts are converted into CM-1061 preview input.
+- Accepted output builds planned actions for SQLite, vector, cache, and reconcile cleanup with every action `applies=false`.
+- The targeted temp-local test verifies record/reconcile/cache/vector state is unchanged after preview.
+- Targeted CM-1062 helper test passed `4/4`.
+- Adjacent rollback cleanup/reconcile/MCP regression bundle passed `64/64`.
+- Full `npm test` passed `2530/2530`.
+
+Not validated:
+- Existing 7605 deployed runtime cleanup behavior.
+- Any public or operator-facing cleanup command.
+- Any real cleanup apply or rollback apply.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, automatic reconcile recovery, real cleanup safety, real rollback safety, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is an internal dry-run preview adapter, not a public cleanup command or cleanup apply path.
+- It does not authorize real memory cleanup, rollback apply, startup/watchdog/config integration, diary deletion, audit rewrite, or public MCP expansion.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue toward a separate reviewed apply design or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1061 Memory Write Rollback Cleanup Dry-Run Preview Handoff
 
 Goal: convert the CM-1060 cleanup design-review policy into a fail-closed explicit-input dry-run preview builder, without reading or writing stores, executing cleanup, touching public MCP tools, real memory stores, config/watchdog/startup, dependencies, or readiness/reliability claims.

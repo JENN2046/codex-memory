@@ -1010,6 +1010,26 @@ class SqliteShadowStore {
     }));
   }
 
+  async listReconcileTasksForMemoryId(memoryId, limit = 50) {
+    await this.ensureReady();
+    const normalizedMemoryId = String(memoryId || '').trim();
+    if (!normalizedMemoryId) return [];
+    const normalizedLimit = Number.isInteger(limit) && limit > 0 ? limit : 50;
+    return this.db.prepare(`
+      SELECT * FROM reconcile_queue
+      WHERE memory_id = ?
+      ORDER BY created_at ASC
+      LIMIT ?
+    `).all(normalizedMemoryId, normalizedLimit).map(row => ({
+      id: row.id,
+      memoryId: row.memory_id,
+      storeKind: row.store_kind,
+      reason: row.reason,
+      payload: JSON.parse(row.payload_json || '{}'),
+      createdAt: row.created_at
+    }));
+  }
+
   async getHealth() {
     await this.ensureReady();
     const recordCount = this.db.prepare('SELECT COUNT(*) AS count FROM memory_records').get().count;

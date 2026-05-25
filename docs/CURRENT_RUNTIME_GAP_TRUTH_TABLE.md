@@ -28,6 +28,68 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1062 Memory Write Rollback Cleanup Store-Backed Dry-Run Preview - 2026-05-25
+
+Result: `CM1062_MEMORY_WRITE_ROLLBACK_CLEANUP_STORE_BACKED_DRY_RUN_PREVIEW_NOT_APPLIED_NOT_READY`.
+
+CM-1062 adds a narrow internal store-backed rollback cleanup dry-run preview adapter:
+
+- it requires an accepted CM-1060 design-review report before store reads
+- it reads only injected store surfaces for one exact `process` memory id
+- it adds read-only helpers for exact reconcile tasks, vector presence, and candidate-cache memory-id dependency counts
+- it builds CM-1061 cleanup preview input from store-backed facts
+- accepted output builds planned actions with `applies=false`
+- it blocks before store reads when design review, memory id, target, or helper preflight fails
+- it blocks after exact store reads when no cleanup target exists
+- unrelated memory ids and target-only cache entries are not counted as exact memory-id cleanup targets
+
+Validation:
+
+- source syntax check passed
+- test syntax check passed
+- targeted CM-1062 helper test `4/4` passed
+- adjacent rollback cleanup/reconcile/MCP regression bundle `64/64` passed
+- full `npm test` `2530/2530` passed
+
+Boundary:
+
+```text
+source change = internal store-backed dry-run preview adapter
+runtime execution = temp-local test only
+consumed boundary = CM-1061 accepted dry-run preview builder
+accepted design review = CM-1060
+store reads = exact injected temp-local SQLite/vector/cache/reconcile reads
+store writes by adapter = 0
+planned actions apply = false
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory writes = 0
+real jsonl reads = 0
+provider/API calls = 0
+public MCP expansion = false
+public cleanup tool = false
+real cleanup apply = false
+real rollback apply = false
+diary deletion = false
+audit rewrite = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- `memory write reliable`: no
+- `automatic degraded recovery`: no
+- `real cleanup safe`: no
+- `real rollback safe`: no
+- `rollback readiness`: no
+- `runtime readiness`: no
+- `complete?`: no
+
+`RC_NOT_READY_BLOCKED` remains unchanged.
+
 ## CM-1061 Memory Write Rollback Cleanup Dry-Run Preview - 2026-05-25
 
 Result: `CM1061_MEMORY_WRITE_ROLLBACK_CLEANUP_DRY_RUN_PREVIEW_NOT_EXECUTED_NOT_READY`.

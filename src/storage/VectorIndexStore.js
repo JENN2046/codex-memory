@@ -288,6 +288,15 @@ class VectorIndexStore {
     return true;
   }
 
+  async hasRecord(memoryId) {
+    if (!this.config.enableVectorIndex) return false;
+    await this.ensureReady();
+    const normalizedMemoryId = String(memoryId || '').trim();
+    if (!normalizedMemoryId) return false;
+    const entry = this.index.vectors[normalizedMemoryId];
+    return entry?.embeddingFingerprint === this.config.embeddingFingerprint;
+  }
+
   async getScoreMap(query, records = []) {
     await this.ensureReady();
     const queryVector = await this.getSingleEmbeddingCached(query, { inputKind: 'query' });
