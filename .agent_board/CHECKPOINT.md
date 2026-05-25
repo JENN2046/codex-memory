@@ -1,5 +1,234 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1096 Exact Record Memory Write Attempt Checkpoint
+
+Status: `BLOCKED_RECORD_MEMORY_WRITE_REJECTED_NO_TOKEN_NOT_WRITTEN_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1096_EXACT_RECORD_MEMORY_WRITE_APPROVAL_PACKET.md`.
+- Regenerated the exact write packet with MCP-schema-compatible `visibility=project`.
+- Bound payload hash `90b07352b8281dfff6fd668e58d13ded31572839ba30f57291dcecb6cdc256a0`.
+- User approved `CM-1096-EXACT-RECORD-MEMORY-WRITE-001`.
+- Preflight matched `HEAD=764c7e5e5fb435ca8396448544e6646da933a8b4`.
+- Called `record_memory` exactly once with the approved payload.
+
+Result:
+- MCP returned error `-32001`.
+- Code: `NO_TOKEN_MUTATION_REJECTED`.
+- The actual MCP mutation request path still did not carry bearer authorization.
+- No accepted memory id was returned.
+- No accepted write result was returned.
+
+Boundary:
+- No `record_memory` retry after the single approved call.
+- No `search_memory`.
+- No token value read, print, injection, or persistence.
+- No config/watchdog/startup/dependency change.
+- No raw store, direct `.jsonl`, or raw audit read.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Establish a bearer-authorized MCP mutation path that the actual tool request will use, then generate a fresh exact approval packet/line if another attempt is desired.
+
+## CM-1095 Authorized Mutation Token Path Boundary Checkpoint
+
+Status: `COMPLETED_MUTATION_TOKEN_PATH_BOUNDARY_READY_NOT_CONFIGURED_NOT_WRITTEN_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1095_AUTHORIZED_MUTATION_TOKEN_PATH_BOUNDARY.md`.
+- Confirmed from source that no-token HTTP MCP rejects mutation tools.
+- Separated token/config authorization from write retry authorization.
+
+Boundary:
+- No token value read, print, injection, or persistence.
+- No `.env`, Codex config, Claude config, startup, watchdog, or dependency change.
+- No service start/restart/replacement.
+- No `record_memory` retry.
+- No `search_memory`.
+- No raw store, direct `.jsonl`, or raw audit read.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Operator-side bearer-token setup or a new exact approval packet for bounded token-presence/config-boundary work.
+
+## CM-1094 Exact-Approved Record Memory Write Attempt Checkpoint
+
+Status: `BLOCKED_RECORD_MEMORY_WRITE_REJECTED_NO_TOKEN_NOT_WRITTEN_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- User approved `CM-1094-EXACT-RECORD-MEMORY-WRITE-001`.
+- Preflight matched `HEAD=764c7e5e5fb435ca8396448544e6646da933a8b4`.
+- Preflight matched payload hash `e75551901b3202d3025d4e0eba9222ff627a0adce5da654f141c534c01f352c1`.
+- Called `record_memory` exactly once with the approved payload.
+
+Result:
+- MCP returned error `-32001`.
+- Code: `NO_TOKEN_MUTATION_REJECTED`.
+- Reason: no-token HTTP MCP requests cannot call mutation tools.
+- No accepted memory id was returned.
+- No accepted `shadowWrite` status was returned.
+
+Boundary:
+- No retry.
+- No `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No provider/API call.
+- No cleanup, tombstone, or rollback apply.
+- No schema migration.
+- No startup/config/watchdog/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Remaining risk:
+- The exact payload has not been written. A future attempt requires fresh exact approval and a separate token/config boundary decision.
+
+Next:
+- Decide whether to establish an authorized mutation token path or use another approved write route. Do not retry implicitly.
+
+## CM-1093 v1.1 Post-Write Verification Plan Checkpoint
+
+Status: `COMPLETED_V1_1_POST_WRITE_VERIFICATION_PLAN_ACCEPTED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/V11WriteGovernancePostWriteVerificationPlan.js`.
+- Added `tests/v1-1-write-governance-post-write-verification-plan.test.js`.
+- Added `docs/CM1093_V1_1_POST_WRITE_VERIFICATION_PLAN.md`.
+- Helper consumes accepted CM-1092 receipt/audit preview and a sanitized verification plan.
+- Helper validates exact receipt preview packet id, target scope, payload hash, current head, sealed RC, one-write cap, required verification steps, validation commands, deferred store-backed verification, failure-stop posture, no `search_memory` verification, and no cleanup/rollback apply.
+
+Validation:
+- `node --check .\src\core\V11WriteGovernancePostWriteVerificationPlan.js`
+- `node --check .\tests\v1-1-write-governance-post-write-verification-plan.test.js`
+- `node --test .\tests\v1-1-write-governance-post-write-verification-plan.test.js` passed `5/5`
+- adjacent CM-1092/CM-1093 regression bundle
+- `git diff --check`
+- docs validation
+- ledger consistency
+- no-overclaim scan
+- changed-scope re-review
+
+Boundary:
+- No provider/API/MCP call.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No durable memory/audit write.
+- No operator receipt or approval-audit write.
+- No post-write verification run.
+- No tombstone, cleanup, or rollback apply.
+- No schema migration.
+- No startup/config/watchdog/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Remaining risk:
+- CM-1093 is only a verification plan. It does not authorize or execute the actual memory write.
+
+Next:
+- Discuss whether to allow exactly one exact-approved `record_memory` write.
+
+## CM-1092 v1.1 Operator Receipt Audit Preview Checkpoint
+
+Status: `COMPLETED_V1_1_OPERATOR_RECEIPT_AUDIT_PREVIEW_ACCEPTED_NOT_WRITTEN_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/V11WriteGovernanceOperatorReceiptAuditPreview.js`.
+- Added `tests/v1-1-write-governance-operator-receipt-audit-preview.test.js`.
+- Added `docs/CM1092_V1_1_OPERATOR_RECEIPT_AUDIT_PREVIEW.md`.
+- Helper consumes accepted CM-1091 approval packet boundary and a sanitized receipt/audit preview.
+- Helper validates exact approval boundary packet id, target scope, payload hash, current head, sealed RC, one-write cap, preview-only receipt/audit posture, validation commands, and rollback/cleanup posture.
+
+Validation:
+- `node --check .\src\core\V11WriteGovernanceOperatorReceiptAuditPreview.js`
+- `node --check .\tests\v1-1-write-governance-operator-receipt-audit-preview.test.js`
+- `node --test .\tests\v1-1-write-governance-operator-receipt-audit-preview.test.js` passed `5/5`
+- adjacent CM-1091/CM-1092 regression bundle
+- `git diff --check`
+- docs validation
+- ledger consistency
+- no-overclaim scan
+- changed-scope re-review
+
+Boundary:
+- No provider/API/MCP call.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No durable memory/audit write.
+- No operator receipt or approval-audit write.
+- No post-write verification run.
+- No tombstone, cleanup, or rollback apply.
+- No schema migration.
+- No startup/config/watchdog/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Remaining risk:
+- CM-1092 is only a receipt/audit preview. It does not create durable receipt/audit evidence and does not execute the write.
+
+Next:
+- Continue CM-1093 post-write verification plan as local no-write/no-verification-run work.
+
+## CM-1091 v1.1 Write Governance Approval Packet Boundary Checkpoint
+
+Status: `COMPLETED_V1_1_WRITE_GOVERNANCE_APPROVAL_PACKET_ACCEPTED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/V11WriteGovernanceApprovalPacketBoundary.js`.
+- Added `tests/v1-1-write-governance-approval-packet-boundary.test.js`.
+- Added `docs/CM1091_V1_1_WRITE_GOVERNANCE_APPROVAL_PACKET_BOUNDARY.md`.
+- Helper consumes accepted CM-1090 preflight and a sanitized exact approval packet.
+- Helper validates exact action, target tool, target scope, payload hash, current head, sealed RC, max write count, validation commands, operator receipt requirement, runtime validation requirement, post-write verification requirement, and rollback/cleanup posture.
+- Helper rejects blanket, implicit, wildcard, payload-substitution, and reuse-across-head approvals.
+
+Validation:
+- `node --check .\src\core\V11WriteGovernanceApprovalPacketBoundary.js`
+- `node --check .\tests\v1-1-write-governance-approval-packet-boundary.test.js`
+- `node --test .\tests\v1-1-write-governance-approval-packet-boundary.test.js` passed `6/6`
+- `node --test .\tests\v1-1-write-governance-preflight.test.js .\tests\v1-1-write-governance-approval-packet-boundary.test.js` passed `11/11`
+- `git diff --check`
+- docs validation
+- ledger consistency
+- no-overclaim scan
+- changed-scope re-review
+
+Boundary:
+- No provider/API/MCP call.
+- No true `record_memory` or `search_memory`.
+- No raw memory, direct `.jsonl`, or raw audit read.
+- No durable memory/audit write.
+- No operator receipt write.
+- No post-write verification run.
+- No tombstone, cleanup, or rollback apply.
+- No schema migration.
+- No startup/config/watchdog/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Remaining risk:
+- CM-1091 accepts only the approval packet shape. It does not execute any memory write and does not prove write reliability, runtime readiness, release readiness, or production readiness.
+
+Next:
+- Continue CM-1092 operator receipt/audit preview as local no-write/no-audit-write work.
+
 ## CM-1090 v1.1 Write Governance Preflight Checkpoint
 
 Status: `COMPLETED_V1_1_WRITE_GOVERNANCE_PREFLIGHT_ACCEPTED_NOT_EXECUTED_NOT_READY`
