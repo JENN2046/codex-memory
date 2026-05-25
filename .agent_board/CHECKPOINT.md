@@ -1,5 +1,34 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1103 Proof Memory Retention Metadata Dry-Run Preview Checkpoint
+
+Status: `CONSUMED_METADATA_DRY_RUN_PREVIEW_COMPLETED_NO_APPLY_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1103_PROOF_MEMORY_RETENTION_METADATA_DRY_RUN_APPROVAL_PACKET.md`.
+- Bound the exact dry-run request to current `HEAD=6d4ae71389d6a942d2b1b944de0ed7d8b1727714`.
+- Bound request hash `9ae1fa7a103845c22ded6fd9b6ad67391788531b9bbf40941b2b8658a7663068`.
+- Consumed the exact approval once for memory id `codex-process-50325be15fdb479d805728fe420b4838`.
+- Executed a bounded metadata-only store-backed dry-run preview with store read count `1`.
+- Found the exact record and previewed `1` future tombstone action with `applies=false`.
+
+Boundary:
+- No `search_memory`.
+- No `memory_overview`.
+- No raw/content/evidence/vector/candidate/audit read.
+- No provider/API call.
+- No cleanup/rollback/tombstone apply.
+- No automatic worker start.
+- No schema/config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Any tombstone apply, cleanup apply, rollback apply, broader verification, or additional store-backed read requires a separate exact approval packet.
+
 ## CM-1102 Proof Memory Retention Handling Packet Checkpoint
 
 Status: `COMPLETED_PROOF_MEMORY_RETENTION_HANDLING_PACKET_READY_NO_APPLY_NOT_READY`

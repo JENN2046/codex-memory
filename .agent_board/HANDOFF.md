@@ -1,5 +1,37 @@
 # HANDOFF.md — codex-memory
 
+## CM-1103 Proof Memory Retention Metadata Dry-Run Preview Handoff
+
+Goal: execute the exact-approved metadata-only store-backed proof-memory retention dry-run preview without apply.
+
+Status: CONSUMED_METADATA_DRY_RUN_PREVIEW_COMPLETED_NO_APPLY_NOT_READY.
+
+Current evidence:
+- Packet doc: `docs/CM1103_PROOF_MEMORY_RETENTION_METADATA_DRY_RUN_APPROVAL_PACKET.md`.
+- Current head binding: `6d4ae71389d6a942d2b1b944de0ed7d8b1727714`.
+- Request hash: `9ae1fa7a103845c22ded6fd9b6ad67391788531b9bbf40941b2b8658a7663068`.
+- Scoped memory id: `codex-process-50325be15fdb479d805728fe420b4838`.
+- Store-backed metadata-only dry-run executed once.
+- Store read count: `1`.
+- Selected metadata columns: `memory_id`, `target`, `tags_json`, `validated`, `reusable`, `visibility`, `retention_policy`, `status`, `updated_at`.
+- Record found: `true`.
+- Planned tombstone actions: `1`, all `applies=false`.
+
+Not performed:
+- no `search_memory`
+- no `memory_overview`
+- no raw/content/evidence/vector/candidate/audit read
+- no provider/API call
+- no cleanup/rollback/tombstone apply
+- no automatic worker start
+- no config/watchdog/startup/dependency change
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- Validate and optionally commit CM-1103 closeout if explicitly requested. Any apply, broader verification, true memory read/write, provider call, worker start, public MCP expansion, push/tag/release/deploy, or readiness/reliability claim requires separate exact approval.
+
 ## CM-1102 Proof Memory Retention Handling Packet Handoff
 
 Goal: classify the CM-1100 accepted proof memory for retention handling without reading stores or applying tombstone/cleanup.
