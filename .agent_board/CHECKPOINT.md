@@ -1,5 +1,42 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1075 Final Blocker Disposition And v1.0 RC Candidate Decision Checkpoint
+
+Status: `V1_0_RC_CANDIDATE_READY_NOT_RELEASED`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1075_FINAL_BLOCKER_DISPOSITION_AND_V1_0_RC_CANDIDATE_DECISION.md`.
+- Verified clean synced `main` at `21f51f0ba61001973df6d7b6a471a169eacaa175`.
+- Verified GitHub Actions run `26382885882` for the pushed CM-1074 head passed.
+- Read and consumed the CM-1074 final matrix.
+- Reclassified CM-1074 broad final-readiness blockers against the narrowed v1.0 RC candidate scope.
+- Confirmed public MCP remains exactly `record_memory`, `search_memory`, and `memory_overview`.
+
+Decision:
+- `must_close_for_v1_0`: none remaining for the narrowed v1.0 RC candidate scope after CM-1075.
+- `defer_to_v1_1`: full automated final matrix authority, ValidationAggregator full implementation, governance runtime loop closure, broad recall/write reliability, dashboard blocker clearance, proof-memory retention/tombstone worker, reconcile retry/backoff integration, and admin/governance review expansion.
+- `forbidden_before_v1_0`: public MCP expansion, provider/API validation, true broad memory proof expansion, raw memory/audit reads, package/config/watchdog/startup/dependency changes, migration/import/export apply, cleanup/rollback apply, tag/release/deploy/cutover, readiness/reliability overclaim, and V8/VCP full parity expansion.
+
+Validation:
+- Remote CI run `26382885882` passed.
+- Public MCP freeze check passed.
+- Docs validation, ledger consistency, no-overclaim scan, and diff check passed.
+
+Boundary:
+- No runtime mutation.
+- No provider/API call.
+- No true live `record_memory` or `search_memory`.
+- No raw memory, `.jsonl`, or raw audit read.
+- No package/config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No cleanup apply, rollback apply, tag, release, deploy, readiness claim, or reliability claim.
+
+Next:
+- Guarded local commit if requested.
+- Push-readiness review only after commit.
+
 ## CM-1074 RC Final Matrix And Blocker Table Checkpoint
 
 Status: `RC_FINAL_MATRIX_NOT_READY`
