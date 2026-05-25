@@ -1,5 +1,39 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1074 RC Final Matrix And Blocker Table Checkpoint
+
+Status: `RC_FINAL_MATRIX_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1074_RC_FINAL_MATRIX_AND_BLOCKER_TABLE.md`.
+- Verified clean synced `main` at `6f01873957b25f01f0e20631cedf30ea5bbfcebe`.
+- Verified GitHub Actions run `26382393914` for the pushed head passed.
+- Confirmed public MCP tools remain exactly `record_memory`, `search_memory`, and `memory_overview`.
+- Confirmed proof memory namespace remains internal-only and normal recall excludes `internal_proof` by default.
+- Built final evidence matrix for public MCP freeze, proof memory namespace, recall/write/continuity/public search proof, lifecycle temp-local evidence, reconcile hardening, cleanup apply gate, HTTP observe/health hardening, and no-overclaim posture.
+- Classified must-close and may-defer blockers.
+
+Validation:
+- Final RC runner remains `NOT_READY_BLOCKED`.
+- V1 RC validation aggregator remains `NOT_READY_BLOCKED`.
+- Dashboard summary remains readiness blocked.
+- Ledger consistency passed after the board update.
+
+Boundary:
+- No runtime mutation.
+- No provider/API call.
+- No true live `record_memory` or `search_memory`.
+- No raw memory, `.jsonl`, or raw audit read.
+- No package/config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No cleanup apply, rollback apply, tag, release, deploy, readiness claim, or reliability claim.
+
+Next:
+- Pick one must-close blocker for a separate exact-scope phase.
+- Keep `RC_NOT_READY_BLOCKED` until must-close blockers are closed.
+
 ## CM-1070 Proof Memory Namespace / Retention Policy Checkpoint
 
 Status: `COMPLETED_VALIDATED_PROOF_MEMORY_NAMESPACE_RETENTION_POLICY_NOT_READY`
