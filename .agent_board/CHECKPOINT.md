@@ -1,5 +1,33 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1104 CM-1103 Retention Dry-Run Evidence Receipt Checkpoint
+
+Status: `COMPLETED_SANITIZED_RECEIPT_RECONCILED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1104_CM1103_RETENTION_DRY_RUN_EVIDENCE_RECEIPT.md`.
+- Updated `docs/CM1103_PROOF_MEMORY_RETENTION_METADATA_DRY_RUN_APPROVAL_PACKET.md`.
+- Aligned CM-1103 field wording with `SqliteShadowStore.listProofMemoryRetentionCandidates(...)`.
+- Added sanitized receipt hash `e7bbd61ad2b3a058e2f5bbd8fc6767a43ba1b6c8758dfc0c1075877988ae20d3`.
+- Marked the consumed CM-1103 approval line as `NOT_AUTHORIZATION` / `DO_NOT_REUSE`.
+
+Boundary:
+- No store read.
+- No `search_memory`.
+- No `memory_overview`.
+- No provider/API call.
+- No cleanup/rollback/tombstone apply.
+- No automatic worker start.
+- No schema/config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Any apply, broader verification, additional store-backed read, or memory tool action requires separate exact approval.
+
 ## CM-1103 Proof Memory Retention Metadata Dry-Run Preview Checkpoint
 
 Status: `CONSUMED_METADATA_DRY_RUN_PREVIEW_COMPLETED_NO_APPLY_NOT_READY`

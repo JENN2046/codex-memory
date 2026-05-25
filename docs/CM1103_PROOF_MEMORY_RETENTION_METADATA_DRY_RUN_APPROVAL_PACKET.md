@@ -44,8 +44,17 @@ forbidden: search_memory, memory_overview, provider/API calls, raw store reads, 
 
 ## Required Approval Line
 
+Status: `CONSUMED_NOT_AUTHORIZATION_DO_NOT_REUSE`
+
+This line is preserved only as historical evidence of the consumed CM-1103 approval. It is not current authorization for any future action.
+
 ```text
 我批准执行 CM-1103-PROOF-MEMORY-RETENTION-METADATA-DRY-RUN-001：target_action=proof_memory_retention_metadata_dry_run_preview，max_runs=1，current_head=6d4ae71389d6a942d2b1b944de0ed7d8b1727714，request_sha256=9ae1fa7a103845c22ded6fd9b6ad67391788531b9bbf40941b2b8658a7663068，只允许按 docs/CM1103_PROOF_MEMORY_RETENTION_METADATA_DRY_RUN_APPROVAL_PACKET.md 中的 exact dry-run request 对 memory_id=codex-process-50325be15fdb479d805728fe420b4838 执行 metadata-only store-backed dry-run preview；禁止 search_memory、memory_overview、provider/API calls、raw store reads、content/evidence reads、raw diary/.jsonl/raw audit reads、vector/candidate payload reads、broad store scan、tombstone/cleanup/rollback apply、worker start、schema/config/watchdog/startup/dependency change、public MCP expansion、push/tag/release/deploy、readiness/reliability claim。
+```
+
+```text
+NOT_AUTHORIZATION
+DO_NOT_REUSE
 ```
 
 ## Stop Conditions
@@ -74,6 +83,19 @@ Store-backed metadata-only preview:
 - eligible for future apply review: `true`
 - planned tombstone actions: `1`
 - planned action apply flag: `false`
+
+Field alignment note:
+
+- `listProofMemoryRetentionCandidates(...)` declares selected columns `memory_id`, `target`, `tags_json`, `validated`, `updated_at`, `visibility`, `retention_policy`, optional `status`, and optional `lifecycle_updated_at`.
+- Its normalized return fields are `memoryId`, `target`, `tags`, `validated`, `validationStatus`, `validatedAt`, `validatedAtSource`, `visibility`, `status`, and `retentionPolicy`.
+- CM-1103 intentionally used a stricter exact-memory-id metadata query instead of the broader helper. It selected the extra metadata-only `reusable` column, did not select `lifecycle_updated_at`, and therefore does not claim `validatedAtSource`.
+- The reconciled receipt and field map are pinned in [CM1104_CM1103_RETENTION_DRY_RUN_EVIDENCE_RECEIPT.md](/A:/codex-memory/docs/CM1104_CM1103_RETENTION_DRY_RUN_EVIDENCE_RECEIPT.md).
+
+Sanitized receipt SHA256:
+
+```text
+e7bbd61ad2b3a058e2f5bbd8fc6767a43ba1b6c8758dfc0c1075877988ae20d3
+```
 
 Sanitized metadata result:
 

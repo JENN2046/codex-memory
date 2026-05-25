@@ -1,5 +1,32 @@
 # HANDOFF.md — codex-memory
 
+## CM-1104 CM-1103 Retention Dry-Run Evidence Receipt Handoff
+
+Goal: reconcile CM-1103 retention dry-run evidence before any tombstone apply discussion.
+
+Status: COMPLETED_SANITIZED_RECEIPT_RECONCILED_NOT_READY.
+
+Current evidence:
+- Receipt doc: `docs/CM1104_CM1103_RETENTION_DRY_RUN_EVIDENCE_RECEIPT.md`.
+- Updated CM-1103 doc: `docs/CM1103_PROOF_MEMORY_RETENTION_METADATA_DRY_RUN_APPROVAL_PACKET.md`.
+- Receipt SHA256: `e7bbd61ad2b3a058e2f5bbd8fc6767a43ba1b6c8758dfc0c1075877988ae20d3`.
+- CM-1103 approval line status: `CONSUMED_NOT_AUTHORIZATION_DO_NOT_REUSE`.
+
+Not performed:
+- no store read
+- no `search_memory`
+- no `memory_overview`
+- no provider/API call
+- no cleanup/rollback/tombstone apply
+- no automatic worker start
+- no config/watchdog/startup/dependency change
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- Validate CM-1104 docs/status/board. Future apply, broader verification, additional store-backed read, or memory tool action requires separate exact approval.
+
 ## CM-1103 Proof Memory Retention Metadata Dry-Run Preview Handoff
 
 Goal: execute the exact-approved metadata-only store-backed proof-memory retention dry-run preview without apply.
