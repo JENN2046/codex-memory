@@ -1,5 +1,37 @@
 # HANDOFF.md — codex-memory
 
+## CM-1059 Memory Write Rollback Cleanup Plan Boundary Handoff
+
+Goal: convert the accumulated rollback cleanup evidence ladder into a fail-closed explicit-input boundary for a future real cleanup design review, without executing cleanup, touching public MCP tools, real memory stores, config/watchdog/startup, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_ROLLBACK_CLEANUP_PLAN_BOUNDARY_NOT_EXECUTED_NOT_READY.
+
+Artifact: `docs/CM1059_MEMORY_WRITE_ROLLBACK_CLEANUP_PLAN_BOUNDARY.md`.
+
+Current evidence:
+- Source artifact: `src/core/MemoryWriteRollbackCleanupPlanBoundary.js`.
+- Test artifact: `tests/memory-write-rollback-cleanup-plan-boundary.test.js`.
+- The helper accepts exact evidence refs `CM-0840`, `CM-0841`, `CM-0842`, `CM-1031`, `CM-1032`, `CM-1056`, `CM-1057`, and `CM-1058`.
+- Accepted input must preserve rejected/no-projection, accepted projection accounting, degraded residual visibility, partial cleanup, reconcile cleanup, candidate-cache cleanup, diary-retention, and audit append-only evidence.
+- Accepted input must keep execution approval, real cleanup apply, real rollback apply, public MCP expansion, config/watchdog/startup change, dependency change, readiness claim, reliability claim, and all side-effect counters at zero/false.
+- The accepted next stage is only `real_cleanup_design_review_only`.
+- Targeted CM-1059 helper test passed `6/6`.
+- Adjacent rollback cleanup/reconcile/MCP regression bundle passed `48/48`.
+- Full `npm test` passed `2514/2514`.
+
+Not validated:
+- Existing 7605 deployed runtime cleanup behavior.
+- Any real cleanup design implementation.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, automatic reconcile recovery, real cleanup safety, real rollback safety, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is a planning boundary, not a public cleanup command and not a real rollback plan.
+- It does not authorize real memory cleanup, rollback apply, startup/watchdog/config integration, or public MCP expansion.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue toward real cleanup design review or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1058 Memory Write Memory-Id Reconcile Cleanup Handoff
 
 Goal: prove the existing temp-local shadow-store reconcile cleanup primitive can clear degraded residual queue entries for one synthetic memory id without over-clearing another synthetic memory id, while preserving diary/audit evidence and without touching public MCP tools, real memory stores, config/watchdog/startup, or readiness/reliability claims.

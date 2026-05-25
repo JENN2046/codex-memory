@@ -1,5 +1,37 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1059 Memory Write Rollback Cleanup Plan Boundary Checkpoint
+
+Status: `COMPLETED_VALIDATED_ROLLBACK_CLEANUP_PLAN_BOUNDARY_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1059_MEMORY_WRITE_ROLLBACK_CLEANUP_PLAN_BOUNDARY.md`
+
+Completed:
+- Added `src/core/MemoryWriteRollbackCleanupPlanBoundary.js`.
+- Added `tests/memory-write-rollback-cleanup-plan-boundary.test.js`.
+- Added CM-1059 evidence doc.
+- Verified the helper accepts only exact CM-0840/0841/0842/1031/1032/1056/1057/1058 evidence refs.
+- Verified it fails closed on missing, duplicated, or unexpected evidence refs.
+- Verified it fails closed when residual evidence is hidden or real cleanup/rollback safety is claimed.
+- Verified it fails closed on execution approval, real cleanup apply, public MCP expansion, readiness claim, reliability claim, malformed counters, and unknown positive counters.
+- Verified accepted output only permits `real_cleanup_design_review_only`.
+
+Validation:
+- Source syntax check passed.
+- Test syntax check passed.
+- Targeted CM-1059 helper test passed `6/6`.
+- Adjacent rollback cleanup/reconcile/MCP regression bundle passed `48/48`.
+- Full `npm test` passed `2514/2514`.
+
+Boundary:
+- Pure explicit-input helper/test/doc/board evidence only.
+- No runtime execution, public API change, public MCP expansion, real memory read/write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, real cleanup apply, real rollback apply, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue toward a real cleanup design review or governance lifecycle/scope closure while keeping real cleanup/rollback apply blocked. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1058 Memory Write Memory-Id Reconcile Cleanup Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_MEMORY_ID_RECONCILE_CLEANUP_ISOLATION_NOT_RELIABLE_NOT_READY`

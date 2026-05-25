@@ -28,6 +28,61 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1059 Memory Write Rollback Cleanup Plan Boundary - 2026-05-25
+
+Result: `CM1059_MEMORY_WRITE_ROLLBACK_CLEANUP_PLAN_BOUNDARY_NOT_EXECUTED_NOT_READY`.
+
+CM-1059 adds a narrow rollback cleanup design-review boundary:
+
+- exact evidence refs must include `CM-0840`, `CM-0841`, `CM-0842`, `CM-1031`, `CM-1032`, `CM-1056`, `CM-1057`, and `CM-1058`
+- rejected/no-projection, accepted projection accounting, degraded residual visibility, partial cleanup, reconcile cleanup, candidate-cache cleanup, diary-retention, and audit append-only evidence must all be explicit
+- real cleanup safety and real rollback safety must remain false
+- diary deletion, audit deletion/rewrite, and public cleanup tool implementation must remain false
+- the only accepted next stage is `real_cleanup_design_review_only`
+- all true memory, provider/API, real memory read/write, cleanup apply, rollback apply, public MCP expansion, config/watchdog/startup, dependency, readiness, and reliability counters must be zero
+
+Validation:
+
+- source syntax check passed
+- test syntax check passed
+- targeted CM-1059 helper test `6/6` passed
+- adjacent rollback cleanup/reconcile/MCP regression bundle `48/48` passed
+- full `npm test` `2514/2514` passed
+
+Boundary:
+
+```text
+source change = pure explicit-input helper
+runtime execution = false
+accepted next stage = real_cleanup_design_review_only
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+real jsonl reads = 0
+provider/API calls = 0
+public MCP expansion = false
+public cleanup tool = false
+real cleanup apply = false
+real rollback apply = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- `memory write reliable`: no
+- `automatic degraded recovery`: no
+- `real cleanup safe`: no
+- `real rollback safe`: no
+- `rollback readiness`: no
+- `runtime readiness`: no
+- `complete?`: no
+
+`RC_NOT_READY_BLOCKED` remains unchanged.
+
 ## CM-1058 Memory Write Memory-Id Reconcile Cleanup Temp-Local Evidence - 2026-05-25
 
 Result: `CM1058_MEMORY_WRITE_MEMORY_ID_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.
