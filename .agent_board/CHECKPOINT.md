@@ -1,5 +1,42 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1070 Proof Memory Namespace / Retention Policy Checkpoint
+
+Status: `COMPLETED_VALIDATED_PROOF_MEMORY_NAMESPACE_RETENTION_POLICY_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `src/core/ProofMemoryPolicy.js`.
+- `record_memory` runtime now normalizes explicit proof-retention writes to `visibility=internal_proof`, `retentionPolicy=short_lived_or_tombstone_after_validation`, and a `proof` tag.
+- `search_memory` recall pipeline now excludes `internal_proof` visibility by default.
+- Explicit internal proof recall remains possible through internal/direct `scope.visibility=internal_proof`.
+- `SqliteShadowStore` now supports `visibilityExclude` / `excludeVisibility` candidate filtering.
+- Public MCP schema remains frozen: no `proof_memory`, no `include_proof_memory`, and no public enum addition for `internal_proof`.
+- Remote CI second evidence for pushed `74b960b` failed on dashboard coverage for CM-1066/1067/1068; local board coverage has been repaired.
+
+Validation:
+- Source/test syntax checks passed.
+- `proof-memory-policy.test.js` passed `4/4`.
+- `scope-filter.test.js` passed `18/18`.
+- `dashboard-cli.test.js` passed `20/20`.
+- `scope-acceptance-cli.test.js` passed `5/5`.
+- Full `npm test` passed `2547/2547`.
+- `final-rc-matrix-runner.js --json --pretty` dry-run returned expected `NOT_READY_BLOCKED` with `commandsExecuted=false`.
+- `v1-rc-validation-aggregator.js --pretty` returned `NOT_READY_BLOCKED`.
+- Dashboard summary returned blocked/not-ready with local dirty state expected.
+
+Boundary:
+- No public MCP expansion.
+- No true live `record_memory` or `search_memory`.
+- No provider/API call, dependency change, config/watchdog/startup edit, cleanup apply, rollback apply, remote write, readiness claim, or reliability claim.
+- `RC_NOT_READY_BLOCKED` remains.
+
+Next:
+- Inspect final diff and perform post-fix re-review.
+- Guarded local commit may be created if commit guards pass.
+- Push remains blocked until explicitly authorized.
+
 ## CM-1066..CM-1069 Reconcile/HTTP/Cleanup Hardening Checkpoint
 
 Status: `COMPLETED_VALIDATED_PATCH_SET_NOT_READY`

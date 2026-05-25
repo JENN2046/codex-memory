@@ -1,4 +1,5 @@
 const { getDiaryNamesForTarget, getTargetForDiaryName } = require('../core/constants');
+const { buildProofMemoryRecallFilters } = require('../core/ProofMemoryPolicy');
 const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
 const { throwIfSearchMemoryAborted } = require('../core/SearchMemoryTimeoutPolicy');
 const { stripMemoryMarkers } = require('../storage/DiaryStore');
@@ -119,7 +120,7 @@ class KnowledgeBaseRecallPipeline {
       syncToken: syncState.syncToken || '',
       governanceStateRevision: syncState.governanceStateRevision || '',
       contextState,
-      candidateFilters,
+      candidateFilters: buildProofMemoryRecallFilters(candidateFilters),
       signal,
       readOnly
     });

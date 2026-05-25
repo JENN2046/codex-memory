@@ -5,6 +5,7 @@ const {
   computeCanonicalWriteHash,
   summarizeMemoryWriteLifecycleDedupSuppressionPreflight
 } = require('./MemoryWriteLifecycleDedupSuppressionPreflight');
+const { applyProofMemoryWritePolicy } = require('./ProofMemoryPolicy');
 const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
 
 const HIGH_RISK_SENSITIVITY_PATTERN = /\b(secret|unsafe|credential|credentials|password|passwd|token|api[-_ ]?key|access[-_ ]?key|private[-_ ]?key|secret[-_ ]?key)\b/i;
@@ -346,6 +347,11 @@ class MemoryWriteService {
       return result;
     }
 
+    const proofPolicy = applyProofMemoryWritePolicy(payload, {
+      tags,
+      visibility: normalizeString(payload.visibility) || null,
+      retentionPolicy: normalizeString(payload.retention_policy || payload.retentionPolicy) || null
+    });
     const createdAt = new Date().toISOString();
     const record = {
       memoryId: generateMemoryId(target),
@@ -353,7 +359,7 @@ class MemoryWriteService {
       title,
       content,
       evidence,
-      tags,
+      tags: proofPolicy.tags,
       sensitivity,
       validated,
       reusable,
@@ -366,8 +372,8 @@ class MemoryWriteService {
       clientId: normalizeString(payload.client_id || payload.clientId) || null,
       taskId: normalizeString(payload.task_id || payload.taskId) || null,
       conversationId: normalizeString(payload.conversation_id || payload.conversationId) || null,
-      visibility: normalizeString(payload.visibility) || null,
-      retentionPolicy: normalizeString(payload.retention_policy || payload.retentionPolicy) || null
+      visibility: proofPolicy.visibility,
+      retentionPolicy: proofPolicy.retentionPolicy
     };
 
     const diaryWrite = await this.diaryStore.writeRecord(record);
@@ -436,6 +442,7 @@ class MemoryWriteService {
       agentId: executionContext.agentId || null,
       requestSource: executionContext.requestSource || this.config.defaultRequestSource,
       target,
+      proofMemory: proofPolicy.proofMemory,
       shadowWrite: createShadowWriteStatus(shadowFailures.length > 0 ? 'degraded' : 'ok', shadowFailures)
     };
 

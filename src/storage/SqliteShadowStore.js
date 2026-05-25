@@ -910,6 +910,19 @@ class SqliteShadowStore {
       )`);
       params.push(...recordScopeParams);
     }
+    const excludedVisibilityValues = Array.isArray(filters.visibilityExclude)
+      ? filters.visibilityExclude.map(value => String(value || '').trim()).filter(Boolean)
+      : Array.isArray(filters.excludeVisibility)
+        ? filters.excludeVisibility.map(value => String(value || '').trim()).filter(Boolean)
+        : [];
+    if (excludedVisibilityValues.length > 0) {
+      where.push(`NOT EXISTS (
+        SELECT 1 FROM memory_records mr
+        WHERE mr.memory_id = memory_chunks.memory_id
+          AND mr.visibility IN (${excludedVisibilityValues.map(() => '?').join(',')})
+      )`);
+      params.push(...excludedVisibilityValues);
+    }
 
     const sql = [
       'SELECT * FROM memory_chunks',

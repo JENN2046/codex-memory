@@ -1,5 +1,39 @@
 # HANDOFF.md — codex-memory
 
+## CM-1070 Proof Memory Namespace / Retention Policy Handoff
+
+Goal: prevent proof memories from polluting normal long-term recall while preserving explicit internal proof recall and keeping public MCP schema frozen.
+
+Status: COMPLETED_VALIDATED_PROOF_MEMORY_NAMESPACE_RETENTION_POLICY_NOT_READY.
+
+Current evidence:
+- Source: `src/core/ProofMemoryPolicy.js`.
+- Runtime write integration: `src/core/MemoryWriteService.js`.
+- Recall integration: `src/recall/KnowledgeBaseRecallPipeline.js`.
+- SQL filter support: `src/storage/SqliteShadowStore.js`.
+- Test: `tests/proof-memory-policy.test.js`.
+- Board/status repair: `.agent_board/AUTOPILOT_LEDGER.md`, `.agent_board/VALIDATION_LOG.md`, `.agent_board/CHECKPOINT.md`, `.agent_board/HANDOFF.md`, `.agent_board/RUN_STATE.md`, `STATUS.md`.
+- Targeted proof policy test passed `4/4`.
+- Scope filter regression passed `18/18`.
+- Dashboard regression passed `20/20`.
+- Scope acceptance regression passed `5/5`.
+- Full `npm test` passed `2547/2547`.
+- Remote CI second evidence for `74b960b` failed at dashboard summary coverage for CM-1066/1067/1068; local board repair now makes that test pass.
+
+Not validated:
+- Remote CI on the new local CM-1070 fix; no push has occurred.
+- Real cleanup/retention/tombstone execution for proof memories.
+- Broad recall/write reliability or RC readiness.
+
+Remaining risks:
+- Proof retention is normalized and isolated, but no automatic tombstone/expiry worker is implemented.
+- Public MCP clients can request proof retention through existing `retention_policy`; the internal namespace prevents normal recall pollution but does not delete proof records.
+- New remote CI evidence requires a future push, which remains explicit-approval only.
+
+Next safe step:
+- Final diff/re-review, then guarded local commit if all commit guards pass.
+- Do not push without explicit user authorization.
+
 ## CM-1066..CM-1069 Reconcile/HTTP/Cleanup Hardening Handoff
 
 Goal: execute the approved next patch set for reconcile task identity and malformed payload handling, retry/backoff metadata design, HTTP runtime health allowlisting, and cleanup preview apply gate fields.
