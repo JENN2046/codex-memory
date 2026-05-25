@@ -1,5 +1,37 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1057 Memory Write Store-Kind Reconcile Cleanup Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_STORE_KIND_RECONCILE_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1057_MEMORY_WRITE_STORE_KIND_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added a CM-1057 temp-local store-kind cleanup precision test to `tests/memory-write-degraded-cleanup-temp-local-evidence.test.js`.
+- Verified one synthetic degraded accepted write leaves exactly two reconcile residual tasks.
+- Verified residual task kinds are `chunks` and `vector`.
+- Verified partial projection cleanup leaves `reconcileCount=2`.
+- Verified `clearReconcileTasks(memoryId, 'vector')` clears only the vector residual.
+- Verified the remaining residual task is still `chunks`.
+- Verified repeating vector cleanup does not over-clear the chunks residual.
+- Verified `clearReconcileTasks(memoryId, 'chunks')` clears the final residual.
+- Verified diary file and write-audit file remain visible after scoped cleanup.
+
+Validation:
+- Test syntax check passed.
+- Targeted degraded cleanup test file passed `3/3`.
+- Adjacent write cleanup/reconcile/MCP regression bundle passed `43/43`.
+- Full `npm test` passed `2507/2507`.
+
+Boundary:
+- Isolated temp-local test/doc/board evidence only.
+- No runtime source change, public API change, public MCP expansion, real memory read/write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, real cleanup apply, real rollback apply, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded reliability closure toward long-horizon worker durability, real cleanup design, real rollback safety, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1056 Memory Write Degraded Reconcile Cleanup Checkpoint
 
 Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_DEGRADED_RECONCILE_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY`

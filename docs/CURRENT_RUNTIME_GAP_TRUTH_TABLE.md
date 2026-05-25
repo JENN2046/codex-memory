@@ -28,6 +28,70 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1057 Memory Write Store-Kind Reconcile Cleanup Temp-Local Evidence - 2026-05-25
+
+Result: `CM1057_MEMORY_WRITE_STORE_KIND_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.
+
+CM-1057 adds a narrow temp-local cleanup precision proof:
+
+- a synthetic degraded accepted write queues exactly two reconcile residual tasks
+- queued residual task kinds are `chunks` and `vector`
+- partial projection cleanup still leaves `reconcileCount=2`
+- explicit `clearReconcileTasks(memoryId, 'vector')` clears only the `vector` residual task
+- the remaining queued task is still `chunks`
+- repeating vector cleanup does not over-clear the `chunks` residual task
+- explicit `clearReconcileTasks(memoryId, 'chunks')` clears the final residual task
+- diary and write-audit evidence remain visible after scoped cleanup
+- vector and candidate-cache projections are not resurrected
+
+Validation:
+
+- test syntax check passed
+- targeted degraded cleanup test file `3/3` passed
+- adjacent write cleanup/reconcile/MCP regression bundle `43/43` passed
+- full `npm test` `2507/2507` passed
+
+Boundary:
+
+```text
+test-only change = true
+temp-local degraded accepted writes = 1
+temp-local reconcile tasks before cleanup = 2
+temp-local reconcile tasks after projection cleanup = 2
+temp-local reconcile tasks after vector cleanup = 1
+remaining reconcile task after vector cleanup = chunks
+temp-local reconcile tasks after repeated vector cleanup = 1
+temp-local reconcile tasks after chunks cleanup = 0
+diary evidence retained after scoped cleanup = true
+audit evidence retained after scoped cleanup = true
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+real jsonl reads = 0
+provider/API calls = 0
+public MCP expansion = false
+public cleanup tool = false
+real cleanup apply = false
+real rollback apply = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- `memory write reliable`: no
+- `automatic degraded recovery`: no
+- `real cleanup safe`: no
+- `real rollback safe`: no
+- `rollback readiness`: no
+- `runtime readiness`: no
+- `complete?`: no
+
+`RC_NOT_READY_BLOCKED` remains unchanged.
+
 ## CM-1056 Memory Write Degraded Reconcile Cleanup Temp-Local Evidence - 2026-05-25
 
 Result: `CM1056_MEMORY_WRITE_DEGRADED_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE_NOT_RELIABLE_NOT_READY`.
