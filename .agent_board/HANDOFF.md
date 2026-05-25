@@ -1,5 +1,64 @@
 # HANDOFF.md — codex-memory
 
+## CM-1102 Proof Memory Retention Handling Packet Handoff
+
+Goal: classify the CM-1100 accepted proof memory for retention handling without reading stores or applying tombstone/cleanup.
+
+Status: COMPLETED_PROOF_MEMORY_RETENTION_HANDLING_PACKET_READY_NO_APPLY_NOT_READY.
+
+Current evidence:
+- Packet doc: `docs/CM1102_PROOF_MEMORY_RETENTION_HANDLING_PACKET.md`.
+- Source packet: `CM-1100-EXACT-RECORD-MEMORY-WRITE-001`.
+- Source verification packet: `CM-1101`.
+- Accepted memory id: `codex-process-50325be15fdb479d805728fe420b4838`.
+- Proof memory visibility: `internal_proof`.
+- Retention policy: `short_lived_or_tombstone_after_validation`.
+
+Not performed:
+- no store-backed dry-run
+- no `search_memory`
+- no `memory_overview`
+- no raw store/audit/diary read
+- no provider/API call
+- no cleanup/rollback/tombstone apply
+- no automatic worker start
+- no config/watchdog/startup/dependency change
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- Commit CM-1101/CM-1102 docs/status/board if requested. Future metadata-only store-backed dry-run or any apply requires separate exact approval.
+
+## CM-1101 Post-Write Verification Packet Handoff
+
+Goal: generate a local post-write verification packet for the CM-1100 accepted `record_memory` result without executing further memory reads.
+
+Status: POST_WRITE_VERIFICATION_PACKET_READY_NOT_EXECUTED_NOT_READY.
+
+Current evidence:
+- Packet doc: `docs/CM1101_POST_WRITE_VERIFICATION_PACKET.md`.
+- Source packet: `CM-1100-EXACT-RECORD-MEMORY-WRITE-001`.
+- CM-1100 closeout commit: `a9da0bc486f9170c14d24ce7ea7b4ce7cd6b2be6`.
+- Accepted memory id: `codex-process-50325be15fdb479d805728fe420b4838`.
+- Shadow write status: `ok`.
+- Proof memory applied: `true`.
+- Proof memory visibility: `internal_proof`.
+
+Not performed:
+- no `search_memory`
+- no `memory_overview`
+- no raw store/audit/diary read
+- no provider/API call
+- no cleanup/rollback/tombstone apply
+- no config/watchdog/startup/dependency change
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- Commit CM-1101 docs/status/board if requested. Future overview/search/raw verification/tombstone work requires separate exact approval.
+
 ## CM-1100 Exact Record Memory Write Attempt Handoff
 
 Goal: execute exactly one user-approved sanitized `record_memory` write after Codex Desktop restart and current-head CM-1100 approval packet generation.

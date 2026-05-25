@@ -1,5 +1,61 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1102 Proof Memory Retention Handling Packet Checkpoint
+
+Status: `COMPLETED_PROOF_MEMORY_RETENTION_HANDLING_PACKET_READY_NO_APPLY_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1102_PROOF_MEMORY_RETENTION_HANDLING_PACKET.md`.
+- Classified memory id `codex-process-50325be15fdb479d805728fe420b4838` as retention-managed proof memory from already-returned metadata.
+- Recorded proof memory visibility `internal_proof`.
+- Recorded retention policy `short_lived_or_tombstone_after_validation`.
+- Defined a future exact-approved metadata-only dry-run candidate boundary.
+
+Boundary:
+- No store-backed dry-run.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw store/audit/diary read.
+- No provider/API call.
+- No cleanup/rollback/tombstone apply.
+- No automatic worker start.
+- No schema/config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Future metadata-only store-backed dry-run or apply requires separate exact approval.
+
+## CM-1101 Post-Write Verification Packet Checkpoint
+
+Status: `POST_WRITE_VERIFICATION_PACKET_READY_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1101_POST_WRITE_VERIFICATION_PACKET.md`.
+- Verified only the sanitized CM-1100 returned result shape.
+- Recorded accepted memory id `codex-process-50325be15fdb479d805728fe420b4838`.
+- Recorded `shadowWrite.status=ok`.
+- Recorded proof memory `applied=true` / `visibility=internal_proof`.
+
+Boundary:
+- No `search_memory`.
+- No `memory_overview`.
+- No raw store/audit/diary read.
+- No provider/API call.
+- No cleanup/rollback/tombstone apply.
+- No schema/config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Future overview/search/raw verification/tombstone work requires separate exact approval.
+
 ## CM-1100 Exact Record Memory Write Attempt Checkpoint
 
 Status: `COMPLETED_ACCEPTED_WRITTEN_NOT_READY`
