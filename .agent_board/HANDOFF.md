@@ -1,5 +1,33 @@
 # HANDOFF.md — codex-memory
 
+## CM-1098 Authorized Mutation Token Path Enablement Handoff
+
+Goal: fix the local Codex Desktop MCP connector / HTTP MCP bearer authorization path without writing memory.
+
+Status: COMPLETED_AUTHORIZED_MUTATION_TOKEN_PATH_ENABLED_NO_MEMORY_WRITE_NOT_READY.
+
+Current evidence:
+- Config path: `C:\Users\617\.codex\config.toml`.
+- Backup path: `C:\Users\617\.codex\config.toml.bak-cm1098-20260525-175037`.
+- Config key added: `bearer_token_env_var = "CODEX_MEMORY_HTTP_TOKEN"`.
+- Windows user env token is present; token value was not printed.
+- `/health` reports `auth.required=true`.
+- Direct bearer-authenticated HTTP MCP `initialize` and `tools/list` passed.
+
+Not performed:
+- no `record_memory`
+- no `search_memory`
+- no raw store/audit read
+- no provider/API call
+- no dependency change
+- no watchdog/startup persistence install
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- Reload/restart Codex Desktop connector if the current tool session does not inherit the new user environment variable, then generate a fresh exact `record_memory` approval packet. Do not reuse CM-1096.
+
 ## CM-1097 Authorized Mutation Token Path Diagnostic Handoff
 
 Goal: diagnose the actual mutation token path after CM-1096 without retrying write or changing config.

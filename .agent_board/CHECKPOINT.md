@@ -1,5 +1,33 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1098 Authorized Mutation Token Path Enablement Checkpoint
+
+Status: `COMPLETED_AUTHORIZED_MUTATION_TOKEN_PATH_ENABLED_NO_MEMORY_WRITE_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Backed up `C:\Users\617\.codex\config.toml`.
+- Added `bearer_token_env_var = "CODEX_MEMORY_HTTP_TOKEN"` to `[mcp_servers.vcp_codex_memory]`.
+- Created Windows user env `CODEX_MEMORY_HTTP_TOKEN` without printing the token value.
+- Restarted local 7605 HTTP MCP through `npm run start:http:ensure`.
+- Verified `/health auth.required=true`.
+- Verified direct bearer-authenticated HTTP MCP `initialize` and `tools/list`.
+
+Boundary:
+- No `record_memory`.
+- No `search_memory`.
+- No raw store/audit read.
+- No provider/API call.
+- No dependency change.
+- No public MCP expansion.
+- No watchdog/startup persistence install.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Reload/restart Codex Desktop connector if needed, then generate a fresh exact write approval packet.
+
 ## CM-1097 Authorized Mutation Token Path Diagnostic Checkpoint
 
 Status: `COMPLETED_AUTHORIZED_MUTATION_TOKEN_PATH_DIAGNOSTIC_NO_TOKEN_RUNTIME_NOT_WRITTEN_NOT_READY`
