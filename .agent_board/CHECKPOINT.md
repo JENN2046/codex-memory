@@ -1,5 +1,67 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1100 Exact Record Memory Write Attempt Checkpoint
+
+Status: `COMPLETED_ACCEPTED_WRITTEN_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- User approved `CM-1100-EXACT-RECORD-MEMORY-WRITE-001`.
+- Preflight matched `HEAD=ff7e7c22a16a5df7ba94cca9d77b24523b4704f8`.
+- Preflight matched payload hash `afedd188244627674bcc8d47093410df3ff0c6e2c51adfe24c2c5c560159d752`.
+- Called `record_memory` exactly once with the approved payload.
+
+Result:
+- Success: `true`.
+- Decision: `accepted`.
+- Memory id: `codex-process-50325be15fdb479d805728fe420b4838`.
+- Shadow write status: `ok`.
+- Proof memory applied: `true`.
+- Proof memory visibility: `internal_proof`.
+
+Boundary:
+- No retry.
+- No `search_memory`.
+- No raw store/audit read.
+- No provider/API call.
+- No cleanup/rollback/tombstone apply.
+- No schema/config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Validate and close out local docs/status/board.
+- Future verification, search, cleanup/tombstone, or additional memory write requires separate exact approval.
+
+## CM-1100 Exact Record Memory Write Approval Packet Checkpoint
+
+Status: `DRAFT_NOT_APPROVED_NOT_WRITTEN_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1100_EXACT_RECORD_MEMORY_WRITE_APPROVAL_PACKET.md`.
+- Bound the draft approval packet to current `HEAD=ff7e7c22a16a5df7ba94cca9d77b24523b4704f8`.
+- Bound the exact JSON payload to SHA256 `afedd188244627674bcc8d47093410df3ff0c6e2c51adfe24c2c5c560159d752`.
+- Recorded that the user confirmed Codex Desktop restart.
+- Recorded that CM-1099 is stale due post-draft commit head drift and must not be reused.
+
+Boundary:
+- No `record_memory`.
+- No `search_memory`.
+- No raw store/audit read.
+- No provider/API call.
+- No token value printed or recorded.
+- No config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- If one write attempt is desired, provide the exact CM-1100 approval line from the packet doc.
+
 ## CM-1099 Exact Record Memory Write Approval Packet Checkpoint
 
 Status: `DRAFT_NOT_APPROVED_NOT_WRITTEN_NOT_READY`

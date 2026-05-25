@@ -1,5 +1,63 @@
 # HANDOFF.md — codex-memory
 
+## CM-1100 Exact Record Memory Write Attempt Handoff
+
+Goal: execute exactly one user-approved sanitized `record_memory` write after Codex Desktop restart and current-head CM-1100 approval packet generation.
+
+Status: COMPLETED_ACCEPTED_WRITTEN_NOT_READY.
+
+Current evidence:
+- Approval packet: `CM-1100-EXACT-RECORD-MEMORY-WRITE-001`.
+- Bound head: `ff7e7c22a16a5df7ba94cca9d77b24523b4704f8`.
+- Payload hash: `afedd188244627674bcc8d47093410df3ff0c6e2c51adfe24c2c5c560159d752`.
+- Calls used: one `record_memory` MCP call.
+- Result: `success=true`, `decision=accepted`.
+- Memory id: `codex-process-50325be15fdb479d805728fe420b4838`.
+- Shadow write status: `ok`.
+- Proof memory applied: `true`.
+- Proof memory visibility: `internal_proof`.
+
+Not performed:
+- no retry
+- no `search_memory`
+- no raw store/audit read
+- no provider/API call
+- no cleanup/rollback/tombstone apply
+- no config/watchdog/startup/dependency change
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- Validate and close out local docs/status/board. Future verification, recall/search, cleanup/tombstone, or additional memory write requires separate exact approval.
+
+## CM-1100 Exact Record Memory Write Approval Packet Handoff
+
+Goal: generate a current-head exact `record_memory` approval packet after the user confirmed Codex Desktop restart, without executing a write.
+
+Status: DRAFT_NOT_APPROVED_NOT_WRITTEN_NOT_READY.
+
+Current evidence:
+- Packet doc: `docs/CM1100_EXACT_RECORD_MEMORY_WRITE_APPROVAL_PACKET.md`.
+- Bound head: `ff7e7c22a16a5df7ba94cca9d77b24523b4704f8`.
+- Payload hash: `afedd188244627674bcc8d47093410df3ff0c6e2c51adfe24c2c5c560159d752`.
+- Sealed v1.0 RC: `f4549b4a1a9265bdc867c35b72f66d8d1a1a66a9`.
+- User confirmed Codex Desktop restart in-thread.
+
+Not performed:
+- no `record_memory`
+- no `search_memory`
+- no raw store/audit read
+- no provider/API call
+- no token value print or repo persistence
+- no config/watchdog/startup/dependency change
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- If the user wants the write, they must provide the exact CM-1100 approval line from the packet doc. Do not reuse CM-1096 or CM-1099, and do not retry automatically.
+
 ## CM-1099 Exact Record Memory Write Approval Packet Handoff
 
 Goal: generate a fresh exact `record_memory` approval packet after CM-1098 bearer authorization path enablement, without executing a write.
