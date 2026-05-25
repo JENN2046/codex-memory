@@ -1,5 +1,40 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1061 Memory Write Rollback Cleanup Dry-Run Preview Checkpoint
+
+Status: `COMPLETED_VALIDATED_ROLLBACK_CLEANUP_DRY_RUN_PREVIEW_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1061_MEMORY_WRITE_ROLLBACK_CLEANUP_DRY_RUN_PREVIEW.md`
+
+Completed:
+- Added `src/core/MemoryWriteRollbackCleanupDryRunPreview.js`.
+- Added `tests/memory-write-rollback-cleanup-dry-run-preview.test.js`.
+- Added CM-1061 evidence doc.
+- Verified the helper consumes an accepted CM-1060 design-review report.
+- Verified it accepts only `dry_run_preview_only` / `memory_id_and_store_kind_scoped` input.
+- Verified it requires an exact process `memoryId`.
+- Verified it limits target stores to SQLite shadow record, vector index record, candidate cache entries, and reconcile queue tasks.
+- Verified it retains diary record and write-audit log evidence.
+- Verified accepted output builds planned actions with `applies=false`.
+- Verified reconcile planned actions are grouped by store kind and reject memory-id mismatch or missing store kind.
+- Verified it fails closed on cleanup apply, rollback apply, diary deletion, audit rewrite, public MCP expansion, config/watchdog/startup change, dependency change, readiness claim, reliability claim, malformed counters, and unknown positive counters.
+
+Validation:
+- Source syntax check passed.
+- Test syntax check passed.
+- Targeted CM-1061 helper test passed `6/6`.
+- Adjacent rollback cleanup/reconcile/MCP regression bundle passed `60/60`.
+- Full `npm test` passed `2526/2526`.
+
+Boundary:
+- Pure explicit-input helper/test/doc/board evidence only.
+- No store read/write, runtime execution, public API change, public MCP expansion, real memory read/write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, real cleanup apply, real rollback apply, diary deletion, audit rewrite, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue toward a separate store-backed dry-run preview adapter or governance lifecycle/scope closure while keeping real cleanup/rollback apply blocked. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1060 Memory Write Rollback Cleanup Design Review Policy Checkpoint
 
 Status: `COMPLETED_VALIDATED_ROLLBACK_CLEANUP_DESIGN_REVIEW_POLICY_NOT_EXECUTED_NOT_READY`

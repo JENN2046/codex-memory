@@ -28,6 +28,73 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1061 Memory Write Rollback Cleanup Dry-Run Preview - 2026-05-25
+
+Result: `CM1061_MEMORY_WRITE_ROLLBACK_CLEANUP_DRY_RUN_PREVIEW_NOT_EXECUTED_NOT_READY`.
+
+CM-1061 adds a narrow rollback cleanup dry-run preview builder:
+
+- it requires an accepted CM-1060 design-review report
+- accepted cleanup preview mode must be `dry_run_preview_only`
+- accepted cleanup preview scope must be `memory_id_and_store_kind_scoped`
+- accepted target must be `process`
+- accepted memory id must be non-empty and exact
+- target stores are limited to `sqlite_shadow_record`, `vector_index_record`, `candidate_cache_entries`, and `reconcile_queue_tasks`
+- retained stores must be `diary_record` and `write_audit_log`
+- at least one cleanup preview target must be present
+- reconcile tasks must match the exact memory id and carry explicit store kinds
+- accepted output builds planned actions with `applies=false`
+- store reads, store writes, cleanup apply, rollback apply, diary deletion, audit rewrite, public MCP expansion, config/watchdog/startup change, dependency change, real cleanup safety claim, real rollback safety claim, write reliability claim, readiness claim, and all side-effect counters must remain zero/false
+
+Validation:
+
+- source syntax check passed
+- test syntax check passed
+- targeted CM-1061 helper test `6/6` passed
+- adjacent rollback cleanup/reconcile/MCP regression bundle `60/60` passed
+- full `npm test` `2526/2526` passed
+
+Boundary:
+
+```text
+source change = pure explicit-input helper
+runtime execution = false
+consumed boundary = CM-1060 accepted design-review policy
+accepted mode = dry_run_preview_only
+accepted scope = memory_id_and_store_kind_scoped
+planned actions apply = false
+store reads = 0
+store writes = 0
+true live record_memory calls = 0
+true live search_memory calls = 0
+real memory reads = 0
+real memory writes = 0
+real jsonl reads = 0
+provider/API calls = 0
+public MCP expansion = false
+public cleanup tool = false
+real cleanup apply = false
+real rollback apply = false
+diary deletion = false
+audit rewrite = false
+watchdog/startup/config change = false
+package/dependency change = false
+readiness claim = false
+reliability claim = false
+```
+
+Truth-table impact:
+
+- `memory write reliable`: no
+- `automatic degraded recovery`: no
+- `real cleanup safe`: no
+- `real rollback safe`: no
+- `rollback readiness`: no
+- `runtime readiness`: no
+- `complete?`: no
+
+`RC_NOT_READY_BLOCKED` remains unchanged.
+
 ## CM-1060 Memory Write Rollback Cleanup Design Review Policy - 2026-05-25
 
 Result: `CM1060_MEMORY_WRITE_ROLLBACK_CLEANUP_DESIGN_REVIEW_POLICY_NOT_EXECUTED_NOT_READY`.
