@@ -1,5 +1,37 @@
 # HANDOFF.md — codex-memory
 
+## CM-1056 Memory Write Degraded Reconcile Cleanup Handoff
+
+Goal: prove the existing temp-local shadow-store reconcile cleanup primitive can explicitly clear degraded write residual queue entries after partial projection cleanup, without hiding diary/audit evidence, touching public MCP tools, real memory stores, config/watchdog/startup, or readiness/reliability claims.
+
+Status: COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_DEGRADED_RECONCILE_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY.
+
+Artifact: `docs/CM1056_MEMORY_WRITE_DEGRADED_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE.md`.
+
+Current evidence:
+- Test artifact: `tests/memory-write-degraded-cleanup-temp-local-evidence.test.js`.
+- One synthetic degraded accepted write queues exactly two reconcile tasks.
+- Residual task kinds are `chunks` and `vector`.
+- Projection/cache cleanup removes SQLite record, vector projection, and candidate cache entry.
+- Projection/cache cleanup leaves reconcile residual count at `2`.
+- Explicit `clearReconcileTasks(memoryId)` clears the residual queue to `0`.
+- Diary and write-audit evidence remain visible after reconcile cleanup.
+- Targeted degraded cleanup test file passed `2/2`.
+- Adjacent write cleanup/reconcile/MCP regression bundle passed `42/42`.
+- Full `npm test` passed `2506/2506`.
+
+Not validated:
+- Existing 7605 deployed runtime cleanup behavior.
+- Broad write reliability, broad recall reliability, default unattended `record_memory` reliability, automatic reconcile recovery, real cleanup safety, real rollback safety, runtime readiness, rollback readiness, governance closure, provider smoke/benchmark, production readiness, release/tag/deploy.
+
+Remaining risks:
+- This is isolated temp-local cleanup-posture evidence, not a public cleanup command and not a real rollback plan.
+- It does not authorize real memory cleanup, rollback apply, startup/watchdog/config integration, or public MCP expansion.
+- It does not make `record_memory`, write-to-recall, rollback, or public `search_memory` reliable or ready.
+
+Next safe step:
+- Continue bounded reliability closure toward long-horizon worker durability, real cleanup design, real rollback safety, or governance lifecycle/scope closure. Keep `RC_NOT_READY_BLOCKED`.
+
 ## CM-1055 Memory Write Reconcile Worker Stop Return Options Handoff
 
 Goal: make explicit `stop()` returns from the default-disabled internal write reconcile worker report active bounded options without exposing raw previous replay summaries, touching startup/watchdog/config, public MCP tools, existing 7605, or readiness/reliability claims.

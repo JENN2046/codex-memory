@@ -212,3 +212,118 @@ test('CM-1032 degraded temp-local write keeps reconcile residuals visible after 
 
   assert.equal(await pathExists(harness.rootPath), false);
 });
+
+test('CM-1056 degraded temp-local cleanup clears reconcile residuals explicitly while preserving diary and audit evidence', async () => {
+  const harness = await createTempLocalHarness();
+
+  try {
+    for (const targetPath of [
+      harness.config.dailyNoteRootPath,
+      harness.config.dbPath,
+      harness.config.auditLogPath,
+      harness.config.vectorIndexPath,
+      harness.config.candidateCachePath
+    ]) {
+      assertInsideRoot(harness.rootPath, targetPath);
+    }
+
+    const result = await harness.service.record(processPayload({
+      title: 'Checkpoint: CM-1056 degraded reconcile cleanup temp-local evidence',
+      content: [
+        'Type: checkpoint',
+        'CM1056 write degraded reconcile cleanup temp local marker',
+        'Purpose: prove explicit reconcile queue cleanup can clear degraded residuals after projection cleanup.',
+        'Boundary: synthetic temp-local files only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1056 synthetic temp-local degraded reconcile cleanup evidence',
+      tags: ['cm1056', 'write', 'degraded', 'reconcile', 'rollback', 'cleanup', 'temp-local'],
+      workspace_id: 'cm1056-degraded-reconcile-cleanup-workspace',
+      task_id: 'CM-1056',
+      conversation_id: 'cm1056-degraded-reconcile-cleanup-temp-local'
+    }));
+
+    assert.equal(result.decision, 'accepted');
+    assert.equal(result.success, true);
+    assert.equal(result.shadowWrite.status, 'degraded');
+    assert.deepEqual(result.shadowWrite.failures.sort(), [
+      'chunks:cm1032 synthetic chunk projection failure',
+      'vector:cm1032 synthetic vector projection failure'
+    ]);
+    assertInsideRoot(harness.rootPath, result.filePath);
+    assert.equal(await pathExists(result.filePath), true);
+
+    const shadowBeforeCleanup = await harness.shadowStore.getHealth();
+    assert.equal(shadowBeforeCleanup.recordCount, 1);
+    assert.equal(shadowBeforeCleanup.chunkCount, 0);
+    assert.equal(shadowBeforeCleanup.reconcileCount, 2);
+
+    const tasksBeforeCleanup = await harness.shadowStore.listReconcileTasks(10);
+    assert.equal(tasksBeforeCleanup.length, 2);
+    assert.deepEqual(tasksBeforeCleanup.map(task => task.storeKind).sort(), ['chunks', 'vector']);
+    assert.deepEqual(tasksBeforeCleanup.map(task => task.memoryId), [result.memoryId, result.memoryId]);
+    assert.deepEqual(tasksBeforeCleanup.map(task => task.payload.memoryId), [result.memoryId, result.memoryId]);
+
+    const vectorBeforeCleanup = await harness.vectorStore.getHealth();
+    assert.equal(vectorBeforeCleanup.vectorCount, 0);
+
+    assert.equal(harness.auditEvents.length, 1);
+    assert.equal(harness.auditEvents[0].decision, 'accepted');
+    assert.equal(harness.auditEvents[0].shadowWrite.status, 'degraded');
+    assert.equal(await pathExists(harness.config.auditLogPath), true);
+
+    await harness.candidateCacheStore.set('cm1056-cache-entry', {
+      resultMemoryIds: [result.memoryId]
+    }, {
+      target: 'process',
+      memoryIds: [result.memoryId]
+    });
+    const cacheBeforeCleanup = await harness.candidateCacheStore.getHealth();
+    assert.equal(cacheBeforeCleanup.entryCount, 1);
+    assertInsideRoot(harness.rootPath, cacheBeforeCleanup.candidateCachePath);
+
+    await harness.shadowStore.deleteRecord(result.memoryId);
+    const vectorDeleted = await harness.vectorStore.deleteRecord(result.memoryId);
+    const cacheEntriesRemoved = await harness.candidateCacheStore.clearCurrentFingerprintByMemoryIds(
+      [result.memoryId],
+      ['process']
+    );
+
+    const shadowAfterProjectionCleanup = await harness.shadowStore.getHealth();
+    assert.equal(shadowAfterProjectionCleanup.recordCount, 0);
+    assert.equal(shadowAfterProjectionCleanup.chunkCount, 0);
+    assert.equal(shadowAfterProjectionCleanup.reconcileCount, 2);
+
+    const vectorAfterProjectionCleanup = await harness.vectorStore.getHealth();
+    assert.equal(vectorDeleted, false);
+    assert.equal(vectorAfterProjectionCleanup.vectorCount, 0);
+
+    const cacheAfterProjectionCleanup = await harness.candidateCacheStore.getHealth();
+    assert.equal(cacheEntriesRemoved, 1);
+    assert.equal(cacheAfterProjectionCleanup.entryCount, 0);
+
+    await harness.shadowStore.clearReconcileTasks(result.memoryId);
+
+    const shadowAfterReconcileCleanup = await harness.shadowStore.getHealth();
+    assert.equal(shadowAfterReconcileCleanup.recordCount, 0);
+    assert.equal(shadowAfterReconcileCleanup.chunkCount, 0);
+    assert.equal(shadowAfterReconcileCleanup.reconcileCount, 0);
+
+    const tasksAfterReconcileCleanup = await harness.shadowStore.listReconcileTasks(10);
+    assert.deepEqual(tasksAfterReconcileCleanup, []);
+
+    const vectorAfterReconcileCleanup = await harness.vectorStore.getHealth();
+    assert.equal(vectorAfterReconcileCleanup.vectorCount, 0);
+
+    const cacheAfterReconcileCleanup = await harness.candidateCacheStore.getHealth();
+    assert.equal(cacheAfterReconcileCleanup.entryCount, 0);
+
+    assert.equal(await pathExists(result.filePath), true);
+    assert.equal(await pathExists(harness.config.auditLogPath), true);
+    assert.equal(harness.auditEvents.length, 1);
+    assert.equal(harness.auditEvents[0].shadowWrite.status, 'degraded');
+  } finally {
+    await harness.cleanup();
+  }
+
+  assert.equal(await pathExists(harness.rootPath), false);
+});

@@ -1,5 +1,36 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1056 Memory Write Degraded Reconcile Cleanup Checkpoint
+
+Status: `COMPLETED_VALIDATED_TEMP_LOCAL_WRITE_DEGRADED_RECONCILE_CLEANUP_POSTURE_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Artifact: `docs/CM1056_MEMORY_WRITE_DEGRADED_RECONCILE_CLEANUP_TEMP_LOCAL_EVIDENCE.md`
+
+Completed:
+- Added a CM-1056 temp-local degraded cleanup posture test to `tests/memory-write-degraded-cleanup-temp-local-evidence.test.js`.
+- Verified one synthetic degraded accepted write leaves exactly two reconcile residual tasks.
+- Verified residual task kinds are `chunks` and `vector`.
+- Verified partial projection cleanup removes SQLite record, vector projection, and candidate cache entry.
+- Verified partial projection cleanup leaves `reconcileCount=2`.
+- Verified explicit `clearReconcileTasks(memoryId)` clears the residual queue to `0`.
+- Verified diary file and write-audit file remain visible after reconcile cleanup.
+- Verified vector/cache projections are not resurrected.
+
+Validation:
+- Test syntax check passed.
+- Targeted degraded cleanup test file passed `2/2`.
+- Adjacent write cleanup/reconcile/MCP regression bundle passed `42/42`.
+- Full `npm test` passed `2506/2506`.
+
+Boundary:
+- Isolated temp-local test/doc/board evidence only.
+- No runtime source change, public API change, public MCP expansion, real memory read/write, true live `record_memory`, true live `search_memory`, provider/API call, dependency change, config/watchdog/startup edit, real cleanup apply, real rollback apply, readiness claim, reliability claim, governance closure claim, or rollback readiness claim.
+
+Next:
+- Continue bounded reliability closure toward long-horizon worker durability, real cleanup design, real rollback safety, or governance lifecycle/scope closure. `RC_NOT_READY_BLOCKED` remains.
+
 ## CM-1055 Memory Write Reconcile Worker Stop Return Options Checkpoint
 
 Status: `COMPLETED_VALIDATED_INTERNAL_WRITE_RECONCILE_WORKER_STOP_RETURN_OPTIONS_GUARD_NOT_RELIABLE_NOT_READY`
