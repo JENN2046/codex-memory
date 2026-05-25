@@ -1,5 +1,32 @@
 # CHECKPOINT.md — codex-memory
 
+## CM-1099 Exact Record Memory Write Approval Packet Checkpoint
+
+Status: `DRAFT_NOT_APPROVED_NOT_WRITTEN_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1099_EXACT_RECORD_MEMORY_WRITE_APPROVAL_PACKET.md`.
+- Bound the draft approval packet to `HEAD=d12279339cbb9e6a30d96d4a87075648e00a6569`.
+- Bound the exact JSON payload to SHA256 `77b70409f17f5e675eb1221f3d56c9da3df130c32c8d431a44bc57b6d4d49e72`.
+- Recorded that CM-1096 approval was consumed and must not be reused.
+
+Boundary:
+- No `record_memory`.
+- No `search_memory`.
+- No raw store/audit read.
+- No provider/API call.
+- No token value printed or recorded.
+- No config/watchdog/startup/dependency change.
+- No public MCP expansion.
+- No push/tag/release/deploy.
+- No readiness or reliability claim.
+
+Next:
+- Reload/restart Codex Desktop connector if needed.
+- If one write attempt is desired, provide the exact CM-1099 approval line from the packet doc.
+
 ## CM-1098 Authorized Mutation Token Path Enablement Checkpoint
 
 Status: `COMPLETED_AUTHORIZED_MUTATION_TOKEN_PATH_ENABLED_NO_MEMORY_WRITE_NOT_READY`

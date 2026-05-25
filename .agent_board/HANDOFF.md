@@ -1,5 +1,32 @@
 # HANDOFF.md — codex-memory
 
+## CM-1099 Exact Record Memory Write Approval Packet Handoff
+
+Goal: generate a fresh exact `record_memory` approval packet after CM-1098 bearer authorization path enablement, without executing a write.
+
+Status: DRAFT_NOT_APPROVED_NOT_WRITTEN_NOT_READY.
+
+Current evidence:
+- Packet doc: `docs/CM1099_EXACT_RECORD_MEMORY_WRITE_APPROVAL_PACKET.md`.
+- Bound head: `d12279339cbb9e6a30d96d4a87075648e00a6569`.
+- Payload hash: `77b70409f17f5e675eb1221f3d56c9da3df130c32c8d431a44bc57b6d4d49e72`.
+- Sealed v1.0 RC: `f4549b4a1a9265bdc867c35b72f66d8d1a1a66a9`.
+
+Not performed:
+- no `record_memory`
+- no `search_memory`
+- no raw store/audit read
+- no provider/API call
+- no token value print or repo persistence
+- no config/watchdog/startup/dependency change
+- no public MCP expansion
+- no push/tag/release/deploy
+- no readiness/reliability claim
+
+Next safe step:
+- Reload/restart Codex Desktop connector if needed.
+- If the user wants the write, they must provide the exact CM-1099 approval line from the packet doc. Do not reuse CM-1096 and do not retry automatically.
+
 ## CM-1098 Authorized Mutation Token Path Enablement Handoff
 
 Goal: fix the local Codex Desktop MCP connector / HTTP MCP bearer authorization path without writing memory.
