@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-1167 Guarded Startup Recovery Policy Design Handoff
+
+Goal: continue CM-1166 by adding a guarded policy-design gate before any future startup recovery dry-run or execution work.
+
+Status: CM1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN_VALIDATED_NOT_READY.
+
+Local commit: pending guarded local commit.
+
+Changed files: `src/core/MemoryWriteReconcileStartupSafetyPolicy.js`; `tests/memory-write-reconcile-startup-safety-policy.test.js`; `docs/CM1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: none executed. The helper consumes an accepted CM-1166 preflight and produces a disabled policy design requiring dry-run-first/manual approval, bounded `1..10` limits, and next action `implement_temp_local_startup_recovery_dry_run_harness_only`. It blocks startup recovery execution, runtime recovery, dry-run execution, real-store scope, provider/API, public MCP expansion, config/watchdog/startup changes, migration/import/export/backup/restore, and readiness/reliability claims.
+
+Validation: source/test syntax passed. Targeted startup safety/policy tests passed `12/12`. Adjacent v1.1/governance bundle passed `36/36`. Full `npm test` passed `2777/2777`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed. The focused scan returned only expected boundary/negative wording, historical board entries, and sanitizer-test synthetic secret strings. Re-review found and repaired one policy scope issue; no remaining actionable issue in changed scope after rerun.
+
+Remaining risks: no startup recovery dry-run harness, no startup/runtime recovery execution, no background worker/scheduler recovery, no retry/backoff policy, no real memory recovery proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: make guarded local commit, then record post-commit clean state. Do not push or claim readiness/reliability.
+
 ## CM-1166 Startup Recovery Safety Preflight Handoff
 
 Goal: continue CM-1165 by adding a preflight-only safety surface before any future startup recovery design.

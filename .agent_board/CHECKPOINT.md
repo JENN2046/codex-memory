@@ -1,5 +1,46 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1167 Guarded Startup Recovery Policy Design Checkpoint
+
+Status: `CM1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending guarded local commit.
+
+Completed:
+- Added policy-design-only `buildGuardedStartupRecoveryPolicyDesign(...)`.
+- Required accepted CM-1166 startup recovery preflight before policy design is accepted.
+- Required dry-run-first and manual approval flags.
+- Added bounded `1..10` planning limits for future startup recovery, reconcile replay, and repair.
+- Kept startup recovery and startup reconcile replay disabled by default.
+- Set next allowed action to temp-local startup recovery dry-run harness only.
+- Blocked startup execution, runtime recovery, dry-run execution, real-store scope, config/watchdog/startup changes, public MCP expansion, provider/API, migration/import/export/backup/restore, and readiness/reliability claims.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted startup safety/policy tests passed `12/12`.
+- Adjacent v1.1/governance bundle passed `36/36`.
+- Full `npm test` passed `2777/2777`.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan returned only expected boundary/negative wording, historical board entries, and sanitizer-test synthetic secret strings.
+- Changed-scope re-review found one actionable scope-tightening issue; policy design now requires `realStoreScope` to be `temp_local` or `fixture_only`, the malformed-policy test covers broad scope rejection, and source/test syntax, targeted tests, adjacent bundle, and full `npm test` were rerun. No remaining actionable issue in changed scope.
+
+Boundary:
+- No startup recovery execution.
+- No runtime recovery execution.
+- No dry-run recovery execution.
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, config/watchdog/startup/dependency change, push, production-readiness claim, or reliability claim.
+- No automatic startup repair/cancellation, background worker enablement, scheduler/watchdog recovery, retry/backoff policy, real-store recovery, or cross-store transactionality.
+
+Next:
+- Make guarded local commit.
+- After commit, record post-commit clean state.
+
 ## CM-1166 Startup Recovery Safety Preflight Checkpoint
 
 Status: `CM1166_STARTUP_RECOVERY_SAFETY_PREFLIGHT_VALIDATED_NOT_READY`

@@ -28,6 +28,24 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1167 Guarded Startup Recovery Policy Design - 2026-05-26
+
+Result: `CM1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN_VALIDATED_NOT_READY`.
+
+CM-1167 continues the minimum durable write kernel hardening ladder:
+
+```text
+accepted CM-1166 startup recovery preflight
+policy design only
+dry-run-first and manual approval required
+startup recovery remains disabled
+future next action limited to temp-local dry-run harness
+```
+
+This adds a guarded policy-design surface for future startup recovery. It does not implement or enable startup recovery, runtime recovery, dry-run recovery execution, automatic repair/cancellation, background recovery workers, scheduler/watchdog recovery, retry/backoff policy, real memory recovery, cross-store transactionality, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
+Validation passed: source/test syntax, targeted startup safety/policy tests `12/12`, adjacent v1.1/governance bundle `36/36`, and full `npm test` `2777/2777`.
+
 ## CM-1166 Startup Recovery Safety Preflight - 2026-05-26
 
 Result: `CM1166_STARTUP_RECOVERY_SAFETY_PREFLIGHT_VALIDATED_NOT_READY`.
