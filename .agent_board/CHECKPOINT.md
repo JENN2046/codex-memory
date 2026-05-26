@@ -6,6 +6,8 @@ Status: `CM1164_UNRECOVERABLE_PENDING_MANIFEST_CANCEL_POLICY_VALIDATED_NOT_READY
 
 Date: 2026-05-26
 
+Local commit: `7aae385 feat: cancel unrecoverable write manifests`
+
 Completed:
 - Added guarded `SqliteShadowStore.cancelPendingMemoryWriteManifest(...)`.
 - Added explicit `MemoryWriteService.cancelUnrecoverablePendingWriteManifests(...)`.
@@ -34,7 +36,6 @@ Boundary:
 - No automatic startup cancellation/recovery, background worker enablement, scheduler/watchdog change, retry/backoff policy, real-store cancellation, manifest deletion, or cross-store transactionality.
 
 Next:
-- Commit CM-1164 if guarded commit eligibility remains clean.
 - Continue kernel hardening with manifest degraded-to-repaired status policy design, guarded automatic recovery policy design, or retry/backoff policy for reconcile and recovery tasks.
 
 ## CM-1163 Missing Diary Pending Manifest Restart Validation Checkpoint
