@@ -6,7 +6,7 @@ Status: `CM1169_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_VALIDATE
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `8fea8aa test: guard startup recovery dry-run preflight`.
 
 Completed:
 - Added preflight-only `buildTempLocalStartupRecoveryDryRunExecutionPreflight(...)`.
@@ -42,6 +42,9 @@ Boundary:
 Next:
 - Continue only by preparing/requesting exact approval for one temp-local dry-run execution or by designing a runtime-isolated fixture.
 - Do not execute dry-run/startup/runtime recovery, push, or claim readiness/reliability.
+
+Post-commit state:
+- After `8fea8aa`, `git status --short --branch` reported `## main...origin/main [ahead 36]` with a clean worktree.
 
 ## CM-1168 Temp-Local Startup Recovery Dry-Run Harness Checkpoint
 
