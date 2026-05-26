@@ -96,6 +96,26 @@ test('durable write kernel uses SQLite manifest idempotency across record -> sea
     assert.equal(first.idempotency.replayed, false);
     assert.equal(second.idempotency.replayed, true);
 
+    const manifestAudit = await app.stores.auditLogStore.readSelectedWriteManifestAuditCorrelation({
+      memoryId: first.memoryId,
+      idempotencyKey: first.idempotency.key,
+      canonicalHash: first.idempotency.canonicalHash,
+      requestSource: requestContext.executionContext.requestSource
+    });
+    const serializedManifestAudit = JSON.stringify(manifestAudit);
+
+    assert.equal(manifestAudit.found, true);
+    assert.equal(manifestAudit.selectedFieldsOnly, true);
+    assert.equal(manifestAudit.rawAuditReturned, false);
+    assert.equal(manifestAudit.matchedEventCount, 2);
+    assert.equal(manifestAudit.committed.memoryId, first.memoryId);
+    assert.equal(manifestAudit.committed.authoritativeStore, 'sqlite');
+    assert.equal(manifestAudit.replayed.memoryId, first.memoryId);
+    assert.equal(manifestAudit.latest.replayed, true);
+    assert.equal(serializedManifestAudit.includes(payload.title), false);
+    assert.equal(serializedManifestAudit.includes(payload.content), false);
+    assert.equal(serializedManifestAudit.includes(payload.evidence), false);
+
     const records = await app.stores.shadowStore.listRecords('process');
     assert.equal(records.length, 1);
     assert.equal(records[0].memoryId, first.memoryId);
@@ -166,6 +186,17 @@ test('durable write kernel fails closed when matching write manifest is pending 
     assert.equal(result.idempotency.recoveryRequired, true);
     assert.equal(result.idempotency.authoritativeStore, 'sqlite');
 
+    const manifestAudit = await app.stores.auditLogStore.readSelectedWriteManifestAuditCorrelation({
+      memoryId: 'codex-process-pendingmanifest000000000000000001',
+      idempotencyKey,
+      canonicalHash,
+      requestSource: requestContext.executionContext.requestSource
+    });
+    assert.equal(manifestAudit.found, true);
+    assert.equal(manifestAudit.recoveryRequired.memoryId, 'codex-process-pendingmanifest000000000000000001');
+    assert.equal(manifestAudit.recoveryRequired.recoveryRequired, true);
+    assert.equal(manifestAudit.recoveryRequired.status, 'pending');
+
     const health = await app.stores.shadowStore.getHealth();
     assert.equal(health.recordCount, 0);
     assert.equal(health.writeManifest.total, 1);
@@ -222,10 +253,27 @@ test('durable write kernel can replay a pending manifest from diary into project
     assert.equal(manifest.status, 'committed');
     assert.equal(manifest.result.idempotency.recovered, true);
 
+    const recoveredManifestAudit = await app.stores.auditLogStore.readSelectedWriteManifestAuditCorrelation({
+      memoryId,
+      idempotencyKey,
+      canonicalHash
+    });
+    assert.equal(recoveredManifestAudit.found, true);
+    assert.equal(recoveredManifestAudit.recovered.memoryId, memoryId);
+    assert.equal(recoveredManifestAudit.recovered.status, 'committed');
+
     const duplicate = await app.callTool('record_memory', payload, requestContext);
     assert.equal(duplicate.decision, 'accepted');
     assert.equal(duplicate.memoryId, memoryId);
     assert.equal(duplicate.idempotency.replayed, true);
+
+    const replayedManifestAudit = await app.stores.auditLogStore.readSelectedWriteManifestAuditCorrelation({
+      memoryId,
+      idempotencyKey,
+      canonicalHash
+    });
+    assert.equal(replayedManifestAudit.replayed.memoryId, memoryId);
+    assert.equal(replayedManifestAudit.latest.replayed, true);
 
     const search = await app.callTool('search_memory', {
       query: 'durable write kernel idempotency runtime integration marker',

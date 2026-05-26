@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1157 Durable Write Kernel Audit Manifest Correlation Handoff
+
+Goal: continue CM-1156 by making SQLite write-manifest outcomes observable through selected-only write audit correlation.
+
+Status: CM1157_DURABLE_WRITE_KERNEL_AUDIT_MANIFEST_CORRELATION_COMPLETED_VALIDATED_NOT_READY.
+
+Changed files: `src/core/MemoryWriteService.js`; `src/storage/AuditLogStore.js`; `tests/audit-log-store-selected-correlation.test.js`; `tests/durable-write-kernel-idempotency-runtime.test.js`; `docs/CM1157_DURABLE_WRITE_KERNEL_AUDIT_MANIFEST_CORRELATION.md`; status/truth-table/board surfaces.
+
+Runtime behavior: `MemoryWriteService.writeAudit()` appends a sanitized `writeManifest` block for idempotent write results. `AuditLogStore.readSelectedWriteManifestAuditCorrelation(...)` can return selected manifest metadata by `memoryId`, `idempotencyKey`, `canonicalHash`, and optional `requestSource`, while fail-closing without a selector.
+
+Validation: source/test syntax passed. Targeted audit/runtime/MCP tests passed `22/22`. Full `npm test` passed `2759/2759`. Docs validation, ledger consistency, and `git diff --check` passed. Focused scan had only expected negative/boundary hits.
+
+Remaining risks: no audit/manifest same-transaction guarantee, no automatic startup recovery, no corruption quarantine, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: commit if guarded commit eligibility remains clean. After that, consider corruption quarantine or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
+
 ## CM-1156 Durable Write Kernel Atomic Recovery Baseline Handoff
 
 Goal: continue CM-1155 by reducing partial-file and pending-manifest recovery risk in the local durable write kernel.

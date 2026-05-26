@@ -30,6 +30,28 @@ function selectMutationAuditEvent(event) {
   };
 }
 
+function selectWriteManifestAuditEvent(entry) {
+  if (!entry || typeof entry !== 'object') return null;
+  const manifest = entry.writeManifest;
+  if (!manifest || typeof manifest !== 'object') return null;
+
+  return {
+    timestamp: entry.timestamp || null,
+    decision: entry.decision || null,
+    target: entry.target || null,
+    memoryId: entry.memoryId || null,
+    requestSource: entry.requestSource || null,
+    shadowWriteStatus: entry.shadowWrite?.status || null,
+    authoritativeStore: manifest.authoritativeStore || null,
+    idempotencyKey: manifest.idempotencyKey || null,
+    canonicalHash: manifest.canonicalHash || null,
+    status: manifest.status || null,
+    replayed: manifest.replayed === true,
+    recovered: manifest.recovered === true,
+    recoveryRequired: manifest.recoveryRequired === true
+  };
+}
+
 function matchesSelectedCorrelationFilter(event, {
   memoryId,
   eventType,
@@ -40,6 +62,20 @@ function matchesSelectedCorrelationFilter(event, {
   if (memoryId && event.memoryId !== memoryId) return false;
   if (eventType && event.eventType !== eventType) return false;
   if (toolName && event.toolName !== toolName) return false;
+  if (requestSource && event.requestSource !== requestSource) return false;
+  return true;
+}
+
+function matchesWriteManifestAuditFilter(event, {
+  memoryId,
+  idempotencyKey,
+  canonicalHash,
+  requestSource
+}) {
+  if (!event) return false;
+  if (memoryId && event.memoryId !== memoryId) return false;
+  if (idempotencyKey && event.idempotencyKey !== idempotencyKey) return false;
+  if (canonicalHash && event.canonicalHash !== canonicalHash) return false;
   if (requestSource && event.requestSource !== requestSource) return false;
   return true;
 }
@@ -151,6 +187,74 @@ class AuditLogStore {
       requestSource: filter.requestSource,
       pending,
       committed
+    };
+  }
+
+  async readSelectedWriteManifestAuditCorrelation({
+    memoryId = '',
+    idempotencyKey = '',
+    canonicalHash = '',
+    requestSource = '',
+    maxLines = DEFAULT_AUDIT_WINDOW,
+    maxBytes = MAX_AUDIT_BYTES
+  } = {}) {
+    const selectedMemoryId = normalizeString(memoryId);
+    const selectedIdempotencyKey = normalizeString(idempotencyKey);
+    const selectedCanonicalHash = normalizeString(canonicalHash);
+    const selectedRequestSource = normalizeString(requestSource);
+
+    if (!selectedMemoryId && !selectedIdempotencyKey && !selectedCanonicalHash) {
+      return {
+        found: false,
+        reason: 'write_manifest_selector_required',
+        selectedFieldsOnly: true,
+        rawAuditReturned: false,
+        inspectedEntryCount: 0,
+        matchedEventCount: 0,
+        memoryId: selectedMemoryId || null,
+        idempotencyKey: selectedIdempotencyKey || null,
+        canonicalHash: selectedCanonicalHash || null,
+        requestSource: selectedRequestSource,
+        latest: null,
+        committed: null,
+        degraded: null,
+        replayed: null,
+        recovered: null,
+        recoveryRequired: null
+      };
+    }
+
+    const entries = await this.readRecentWriteAudit(maxLines, maxBytes);
+    const filter = {
+      memoryId: selectedMemoryId,
+      idempotencyKey: selectedIdempotencyKey,
+      canonicalHash: selectedCanonicalHash,
+      requestSource: selectedRequestSource
+    };
+    const selectedEvents = entries
+      .map(entry => selectWriteManifestAuditEvent(entry))
+      .filter(event => matchesWriteManifestAuditFilter(event, filter));
+    const latest = selectedEvents.length > 0
+      ? selectedEvents[selectedEvents.length - 1]
+      : null;
+
+    return {
+      found: selectedEvents.length > 0,
+      reason: selectedEvents.length > 0 ? null : 'write_manifest_audit_not_found',
+      selectedFieldsOnly: true,
+      rawAuditReturned: false,
+      inspectedEntryCount: entries.length,
+      matchedEventCount: selectedEvents.length,
+      memoryId: selectedMemoryId || null,
+      idempotencyKey: selectedIdempotencyKey || null,
+      canonicalHash: selectedCanonicalHash || null,
+      requestSource: selectedRequestSource,
+      latest,
+      committed: selectedEvents.find(event => normalizeAuditPhase(event.status) === 'committed') || null,
+      degraded: selectedEvents.find(event => normalizeAuditPhase(event.status) === 'degraded') || null,
+      replayed: selectedEvents.find(event => event.replayed === true) || null,
+      recovered: selectedEvents.find(event => event.recovered === true) || null,
+      recoveryRequired: selectedEvents.find(event => event.recoveryRequired === true) || null
     };
   }
 

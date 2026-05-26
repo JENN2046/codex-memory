@@ -28,6 +28,21 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1157 Durable Write Kernel Audit Manifest Correlation - 2026-05-26
+
+Result: `CM1157_DURABLE_WRITE_KERNEL_AUDIT_MANIFEST_CORRELATION_COMPLETED_VALIDATED_NOT_READY`.
+
+CM-1157 continues the minimum durable write kernel baseline:
+
+```text
+sanitized writeManifest metadata in write audit entries
+selected-only write manifest audit correlation reader
+committed/replayed/recoveryRequired/recovered correlation coverage
+raw title/reason/content/evidence excluded from selected projection
+```
+
+This improves local auditability between the SQLite write manifest and write audit. It does not make the audit append part of the same transaction as the manifest finalization, does not complete cross-store transactionality, does not add automatic startup recovery, does not add corruption quarantine, does not implement migration/import/export/backup/restore, and does not prove production readiness, write reliability, recall reliability, or RC readiness.
+
 ## CM-1156 Durable Write Kernel Atomic Recovery Baseline - 2026-05-26
 
 Result: `CM1156_DURABLE_WRITE_KERNEL_ATOMIC_RECOVERY_BASELINE_COMPLETED_VALIDATED_NOT_READY`.

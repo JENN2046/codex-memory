@@ -417,6 +417,7 @@ class MemoryWriteService {
           executionContext,
           target
         );
+        result.memoryId = manifest.memoryId || null;
         result.idempotency = {
           key: manifest.idempotencyKey,
           canonicalHash: manifest.canonicalHash,
@@ -694,6 +695,7 @@ class MemoryWriteService {
   }
 
   async writeAudit(result) {
+    const idempotency = result.idempotency || null;
     await this.auditLogStore.appendWriteAudit({
       timestamp: new Date().toISOString(),
       agentAlias: result.agentAlias || null,
@@ -705,7 +707,16 @@ class MemoryWriteService {
       reason: result.reason,
       filePath: result.filePath || null,
       requestSource: result.requestSource || this.config.defaultRequestSource,
-      shadowWrite: result.shadowWrite || createShadowWriteStatus('unknown')
+      shadowWrite: result.shadowWrite || createShadowWriteStatus('unknown'),
+      writeManifest: idempotency ? {
+        authoritativeStore: idempotency.authoritativeStore || null,
+        idempotencyKey: idempotency.key || null,
+        canonicalHash: idempotency.canonicalHash || null,
+        status: idempotency.status || null,
+        replayed: idempotency.replayed === true,
+        recovered: idempotency.recovered === true,
+        recoveryRequired: idempotency.recoveryRequired === true
+      } : null
     });
   }
 }

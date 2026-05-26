@@ -1,5 +1,37 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1157 Durable Write Kernel Audit Manifest Correlation Checkpoint
+
+Status: `CM1157_DURABLE_WRITE_KERNEL_AUDIT_MANIFEST_CORRELATION_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added sanitized `writeManifest` metadata to write audit entries for idempotent write results.
+- Added `AuditLogStore.readSelectedWriteManifestAuditCorrelation(...)` as a selected-only manifest audit correlation reader.
+- Added pending-manifest rejection `memoryId` propagation so recovery-required audit entries can correlate by memory id.
+- Added tests for committed, replayed, recovery-required, and recovered manifest audit states.
+- Verified selected manifest audit output does not project raw title, reason, content, or evidence.
+
+Validation:
+- Source/test syntax checks passed for changed runtime/test files.
+- Targeted audit/runtime/MCP tests passed `22/22`.
+- Full `npm test` passed `2759/2759`.
+- Docs validation passed.
+- Autopilot ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan had only expected negative/boundary hits.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation outside temp-local tests.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No audit/manifest same-transaction guarantee, automatic startup recovery, or corruption quarantine.
+
+Next:
+- Commit if guarded commit eligibility remains clean.
+- Continue kernel hardening with corruption quarantine or guarded automatic recovery design.
+
 ## CM-1156 Durable Write Kernel Atomic Recovery Baseline Checkpoint
 
 Status: `CM1156_DURABLE_WRITE_KERNEL_ATOMIC_RECOVERY_BASELINE_COMPLETED_VALIDATED_NOT_READY`

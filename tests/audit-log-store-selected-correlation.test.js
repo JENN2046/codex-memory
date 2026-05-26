@@ -155,3 +155,115 @@ test('readSelectedWriteAuditCorrelation does not return an uncorrelated committe
     assert.equal(result.matchedEventCount, 1);
   });
 });
+
+test('readSelectedWriteManifestAuditCorrelation returns selected manifest metadata only', async () => {
+  await withAuditStore(async ({ store }) => {
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:00:00.000Z',
+      decision: 'accepted',
+      target: 'process',
+      title: 'raw durable kernel title must not be projected',
+      memoryId: 'mem-manifest-1',
+      reason: 'raw durable kernel reason must not be projected',
+      content: 'raw durable kernel content must not be projected',
+      evidence: 'raw durable kernel evidence must not be projected',
+      requestSource: 'durable-write-kernel-audit-manifest-test',
+      shadowWrite: { status: 'ok', failures: [] },
+      writeManifest: {
+        authoritativeStore: 'sqlite',
+        idempotencyKey: 'memory-write-v1:abc123',
+        canonicalHash: 'abc123',
+        status: 'committed',
+        replayed: false,
+        recovered: false,
+        recoveryRequired: false
+      }
+    });
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:01:00.000Z',
+      decision: 'accepted',
+      target: 'process',
+      title: 'raw replay title must not be projected',
+      memoryId: 'mem-manifest-1',
+      reason: 'raw replay reason must not be projected',
+      content: 'raw replay content must not be projected',
+      evidence: 'raw replay evidence must not be projected',
+      requestSource: 'durable-write-kernel-audit-manifest-test',
+      shadowWrite: { status: 'ok', failures: [] },
+      writeManifest: {
+        authoritativeStore: 'sqlite',
+        idempotencyKey: 'memory-write-v1:abc123',
+        canonicalHash: 'abc123',
+        status: 'committed',
+        replayed: true,
+        recovered: false,
+        recoveryRequired: false
+      }
+    });
+
+    const result = await store.readSelectedWriteManifestAuditCorrelation({
+      memoryId: 'mem-manifest-1',
+      idempotencyKey: 'memory-write-v1:abc123',
+      canonicalHash: 'abc123',
+      requestSource: 'durable-write-kernel-audit-manifest-test'
+    });
+    const serialized = JSON.stringify(result);
+
+    assert.equal(result.found, true);
+    assert.equal(result.selectedFieldsOnly, true);
+    assert.equal(result.rawAuditReturned, false);
+    assert.equal(result.matchedEventCount, 2);
+    assert.equal(result.latest.replayed, true);
+    assert.equal(result.committed.memoryId, 'mem-manifest-1');
+    assert.equal(result.committed.authoritativeStore, 'sqlite');
+    assert.equal(result.committed.shadowWriteStatus, 'ok');
+    assert.equal(result.replayed.idempotencyKey, 'memory-write-v1:abc123');
+    assert.equal(serialized.includes('raw durable kernel title'), false);
+    assert.equal(serialized.includes('raw durable kernel reason'), false);
+    assert.equal(serialized.includes('raw durable kernel content'), false);
+    assert.equal(serialized.includes('raw durable kernel evidence'), false);
+    assert.equal(serialized.includes('raw replay title'), false);
+  });
+});
+
+test('readSelectedWriteManifestAuditCorrelation fails closed without selector or match', async () => {
+  await withAuditStore(async ({ store }) => {
+    const missingSelector = await store.readSelectedWriteManifestAuditCorrelation({
+      requestSource: 'durable-write-kernel-audit-manifest-test'
+    });
+    assert.equal(missingSelector.found, false);
+    assert.equal(missingSelector.reason, 'write_manifest_selector_required');
+    assert.equal(missingSelector.rawAuditReturned, false);
+    assert.equal(missingSelector.inspectedEntryCount, 0);
+
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:00:00.000Z',
+      decision: 'accepted',
+      target: 'process',
+      memoryId: 'mem-manifest-2',
+      requestSource: 'durable-write-kernel-audit-manifest-test',
+      shadowWrite: { status: 'degraded', failures: ['vector:synthetic'] },
+      writeManifest: {
+        authoritativeStore: 'sqlite',
+        idempotencyKey: 'memory-write-v1:def456',
+        canonicalHash: 'def456',
+        status: 'degraded',
+        replayed: false,
+        recovered: false,
+        recoveryRequired: false
+      }
+    });
+
+    const result = await store.readSelectedWriteManifestAuditCorrelation({
+      idempotencyKey: 'memory-write-v1:not-found',
+      requestSource: 'durable-write-kernel-audit-manifest-test'
+    });
+
+    assert.equal(result.found, false);
+    assert.equal(result.reason, 'write_manifest_audit_not_found');
+    assert.equal(result.selectedFieldsOnly, true);
+    assert.equal(result.rawAuditReturned, false);
+    assert.equal(result.inspectedEntryCount, 1);
+    assert.equal(result.matchedEventCount, 0);
+  });
+});
