@@ -28,6 +28,52 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1151 CM1120 Selected Audit Correlation Execution Record - 2026-05-26
+
+Result: `CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTED_RECORDED_NOT_READY`.
+
+CM-1151 consumed the exact CM-1120 approval for `HEAD=afcc3a942e31fb3509686eb61dc008171f6c6930` and request hash `7a5d29f6c09e6be2e0de4af1952ebfb33cce2ba828a8c6ee1f2d6f559fb856ef`.
+
+The one successful execution used only the allowed selected audit-correlation surface:
+
+```text
+AuditLogStore.readSelectedWriteAuditCorrelation({
+  memoryId=codex-process-50325be15fdb479d805728fe420b4838
+  eventType=memory_tombstone
+  toolName=memory_tombstone
+  requestSource=CM-1111-proof-memory-retention-apply
+})
+```
+
+Sanitized selected result:
+
+```text
+found=true
+selectedFieldsOnly=true
+rawAuditReturned=false
+inspectedEntryCount=500
+matchedEventCount=2
+pending.auditPhase=pending
+pending.mutationApplied=false
+committed.auditPhase=committed
+committed.mutationApplied=true
+committed.correlationId=pending.eventId
+memoryId=codex-process-50325be15fdb479d805728fe420b4838
+eventType=memory_tombstone
+toolName=memory_tombstone
+requestSource=CM-1111-proof-memory-retention-apply
+fromStatus=active
+toStatus=tombstoned
+```
+
+Result class:
+
+```text
+AUDIT_SELECTED_CORRELATION_OBSERVED
+```
+
+CM-1151 does not prove public/default recall suppression, cleanup safety, rollback safety, long-run durability, automatic retention worker safety, write reliability, recall reliability, runtime readiness, RC readiness, production readiness, or release/cutover readiness.
+
 ## CM-1150 Fresh CM1120 Selected Audit Correlation Approval Packet - 2026-05-26
 
 Result: `CM1150_FRESH_CM1120_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.

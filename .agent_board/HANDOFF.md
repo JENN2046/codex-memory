@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1151 CM1120 Selected Audit Correlation Execution Record Handoff
+
+Goal: execute exact-approved CM-1120 selected audit-correlation observation and record the result.
+
+Status: CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTED_RECORDED_NOT_READY.
+
+Changed files: `docs/CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTION_RECORD.md`; `STATUS.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Execution result: one approved `AuditLogStore.readSelectedWriteAuditCorrelation` selected read returned `AUDIT_SELECTED_CORRELATION_OBSERVED` for `codex-process-50325be15fdb479d805728fe420b4838` and `CM-1111-proof-memory-retention-apply`.
+
+Validation: docs validation, ledger consistency, `git diff --check`, and focused no-secret scan passed.
+
+Remaining risks: public/default recall suppression, cleanup safety, rollback safety, long-run durability, write reliability, recall reliability, runtime readiness, and RC readiness remain unproven.
+
+Next safe step: commit, then decide only the next bounded evidence gap. Do not claim readiness or reliability.
+
 ## CM-1150 Fresh CM1120 Selected Audit Correlation Approval Packet Handoff
 
 Goal: prepare/request the next allowed CM-1120 exact approval without executing CM-1120.

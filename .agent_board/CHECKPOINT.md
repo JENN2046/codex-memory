@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1151 CM1120 Selected Audit Correlation Execution Record Checkpoint
+
+Status: `CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTED_RECORDED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Consumed exact CM-1120 approval for `HEAD=afcc3a942e31fb3509686eb61dc008171f6c6930` and request hash `7a5d29f6c09e6be2e0de4af1952ebfb33cce2ba828a8c6ee1f2d6f559fb856ef`.
+- Ran one selected audit-correlation read through `AuditLogStore.readSelectedWriteAuditCorrelation`.
+- Observed `AUDIT_SELECTED_CORRELATION_OBSERVED` for the exact memory id and request source.
+
+Validation:
+- Docs validation, ledger consistency, `git diff --check`, and focused no-secret scan passed.
+
+Boundary:
+- No retry.
+- No raw audit, raw memory, diary, or `.jsonl` output.
+- No memory tools or provider/API calls.
+- No durable memory/audit write or apply.
+- No public MCP/config/watchdog/startup/package/dependency change.
+- No push.
+- No readiness or reliability claim.
+
+Next:
+- Commit CM-1151 record.
+- Decide only the next evidence gap; do not claim readiness/reliability.
+
 ## CM-1150 Fresh CM1120 Selected Audit Correlation Approval Packet Checkpoint
 
 Status: `CM1150_FRESH_CM1120_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
