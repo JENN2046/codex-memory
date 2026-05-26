@@ -1,5 +1,41 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1165 Degraded Manifest Repair Policy Checkpoint
+
+Status: `CM1165_DEGRADED_MANIFEST_REPAIR_POLICY_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added guarded `SqliteShadowStore.repairDegradedMemoryWriteManifest(...)`.
+- Added explicit `MemoryWriteService.repairDegradedMemoryWriteManifests(...)`.
+- Added idempotent replay support for `repaired` manifests.
+- Extended selected write-manifest audit metadata with `repaired` and `repairReason`.
+- Added temp-local validation for drained degraded manifest repair.
+- Verified repair is retained while reconcile tasks remain.
+- Verified duplicate canonical writes replay repaired results after repair.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted storage/runtime/reconcile/audit tests passed `40/40`.
+- Full `npm test` passed `2770/2770`.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan returned only expected boundary/negative wording plus the existing secret-scanner pattern in `MemoryWriteService`.
+- Changed-scope re-review found no actionable issue.
+- First targeted run exposed missing repaired replay metadata; narrow replay repair fixed it before passing.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No automatic startup repair, background worker enablement, scheduler/watchdog change, retry/backoff policy, real-store repair, or cross-store transactionality.
+
+Next:
+- Commit CM-1165 if guarded commit eligibility remains clean.
+- Continue kernel hardening with guarded automatic pending-manifest recovery policy design, retry/backoff policy for reconcile and recovery tasks, or startup recovery safety preflight.
+
 ## CM-1164 Unrecoverable Pending Manifest Cancel Policy Checkpoint
 
 Status: `CM1164_UNRECOVERABLE_PENDING_MANIFEST_CANCEL_POLICY_VALIDATED_NOT_READY`

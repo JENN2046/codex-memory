@@ -381,6 +381,29 @@ class SqliteShadowStore {
     };
   }
 
+  async repairDegradedMemoryWriteManifest({
+    idempotencyKey,
+    status = 'repaired',
+    result = null,
+    updatedAt = new Date().toISOString()
+  } = {}) {
+    await this.ensureReady();
+    const normalizedStatus = String(status || '').trim() || 'repaired';
+    const resultJson = result ? JSON.stringify(result) : null;
+    const update = this.db.prepare(`
+      UPDATE memory_write_manifests
+      SET status = ?,
+        result_json = ?,
+        updated_at = ?
+      WHERE idempotency_key = ? AND status = 'degraded'
+    `).run(normalizedStatus, resultJson, updatedAt, idempotencyKey);
+
+    return {
+      updated: update.changes === 1,
+      changes: update.changes
+    };
+  }
+
   async getMemoryWriteManifestByIdempotencyKey(idempotencyKey) {
     await this.ensureReady();
     const row = this.db.prepare(`
@@ -1382,6 +1405,8 @@ class SqliteShadowStore {
       pending: 0,
       committed: 0,
       degraded: 0,
+      repaired: 0,
+      cancelled: 0,
       failed: 0
     };
     for (const row of manifestRows) {

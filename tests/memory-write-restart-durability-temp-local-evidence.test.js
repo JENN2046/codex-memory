@@ -804,3 +804,158 @@ test('CM-1164 unrecoverable pending manifest can be explicitly cancelled after s
 
   assert.equal(await pathExists(rootPath), false);
 });
+
+test('CM-1165 degraded manifest can be explicitly repaired after reconcile queue drains', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1165-repair-manifest-'));
+  const config = createConfig(rootPath);
+  let firstStores;
+  let degradedStores;
+  let replayStores;
+
+  try {
+    const payload = processPayload({
+      title: 'Checkpoint: CM-1165 degraded manifest repair',
+      content: [
+        'Type: checkpoint',
+        'CM1165 degraded manifest repair temp local marker',
+        'Purpose: prove explicit repair marks drained degraded manifest repaired.',
+        'Boundary: synthetic temp-local files only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1165 synthetic degraded manifest repair evidence',
+      tags: ['cm1165', 'degraded-manifest', 'repaired', 'temp-local'],
+      task_id: 'CM-1165',
+      conversation_id: 'cm1165-degraded-manifest-repair'
+    });
+    const canonicalHash = computeCanonicalWriteHash(payload);
+    const idempotencyKey = buildDefaultIdempotencyKey(canonicalHash);
+    const memoryId = 'codex-process-cm1165repairmanifest00000001';
+    const now = new Date().toISOString();
+
+    firstStores = openStores(config);
+    await firstStores.shadowStore.beginMemoryWriteManifest({
+      idempotencyKey,
+      memoryId,
+      canonicalHash,
+      target: 'process',
+      createdAt: now
+    });
+    await firstStores.service.diaryStore.writeRecord({
+      memoryId,
+      target: 'process',
+      title: payload.title,
+      content: payload.content,
+      evidence: payload.evidence,
+      tags: payload.tags,
+      sensitivity: payload.sensitivity,
+      validated: payload.validated,
+      reusable: payload.reusable,
+      createdAt: now,
+      updatedAt: now,
+      projectId: payload.project_id,
+      workspaceId: payload.workspace_id,
+      clientId: payload.client_id,
+      taskId: payload.task_id,
+      conversationId: payload.conversation_id,
+      visibility: payload.visibility,
+      retentionPolicy: payload.retention_policy
+    });
+    await firstStores.shadowStore.close();
+    firstStores = null;
+
+    degradedStores = openStores(config);
+    degradedStores.vectorStore.upsertRecord = async () => {
+      throw new Error('cm1165 synthetic vector projection failure before repair');
+    };
+    const degradedRecovery = await degradedStores.service.recoverPendingWriteManifests({ limit: 10 });
+    assert.equal(degradedRecovery.attempted, 1);
+    assert.equal(degradedRecovery.recovered, 1);
+    assert.equal(degradedRecovery.degraded, 1);
+    assert.equal((await degradedStores.shadowStore.getHealth()).reconcileCount, 1);
+    await degradedStores.shadowStore.close();
+    degradedStores = null;
+
+    replayStores = openStores(config);
+    const repairBeforeReplay = await replayStores.service.repairDegradedMemoryWriteManifests({
+      limit: 10,
+      reason: 'reconcile_queue_drained'
+    });
+    assert.equal(repairBeforeReplay.attempted, 1);
+    assert.equal(repairBeforeReplay.repaired, 0);
+    assert.equal(repairBeforeReplay.retained, 1);
+    assert.equal(repairBeforeReplay.items[0].reason, 'reconcile_tasks_remaining');
+
+    const reconcileService = new MemoryWriteReconcileService({
+      shadowStore: replayStores.shadowStore,
+      vectorStore: replayStores.vectorStore,
+      chunkIndexingService: new ChunkIndexingService({
+        config,
+        shadowStore: replayStores.shadowStore,
+        vectorStore: replayStores.vectorStore
+      })
+    });
+    const replay = await reconcileService.replayPending({ limit: 10, dryRun: false });
+    assert.equal(replay.success, true);
+    assert.equal(replay.replayedCount, 1);
+    assert.equal(replay.clearedCount, 1);
+    assert.equal((await replayStores.shadowStore.getHealth()).reconcileCount, 0);
+    assert.equal((await replayStores.vectorStore.getHealth()).vectorCount, 1);
+
+    const repair = await replayStores.service.repairDegradedMemoryWriteManifests({
+      limit: 10,
+      reason: 'reconcile_queue_drained'
+    });
+    assert.equal(repair.attempted, 1);
+    assert.equal(repair.repaired, 1);
+    assert.equal(repair.retained, 0);
+    assert.equal(repair.items[0].memoryId, memoryId);
+    assert.equal(repair.items[0].status, 'repaired');
+    assert.equal(repair.items[0].reason, 'reconcile_queue_drained');
+
+    const repairedHealth = await replayStores.shadowStore.getHealth();
+    assert.equal(repairedHealth.writeManifest.degraded, 0);
+    assert.equal(repairedHealth.writeManifest.repaired, 1);
+    assert.equal(repairedHealth.reconcileCount, 0);
+
+    const manifest = await replayStores.shadowStore.getMemoryWriteManifestByIdempotencyKey(idempotencyKey);
+    assert.equal(manifest.status, 'repaired');
+    assert.equal(manifest.result.idempotency.status, 'repaired');
+    assert.equal(manifest.result.idempotency.repaired, true);
+    assert.equal(manifest.result.idempotency.repairReason, 'reconcile_queue_drained');
+    assert.equal(manifest.result.shadowWrite.status, 'repaired');
+    assert.equal(manifest.result.shadowWrite.repaired, true);
+
+    const duplicate = await replayStores.service.record(payload);
+    assert.equal(duplicate.decision, 'accepted');
+    assert.equal(duplicate.memoryId, memoryId);
+    assert.equal(duplicate.idempotency.replayed, true);
+    assert.equal(duplicate.idempotency.status, 'repaired');
+    assert.equal(duplicate.idempotency.repaired, true);
+    assert.equal(duplicate.shadowWrite.status, 'repaired');
+    assert.equal((await replayStores.shadowStore.getHealth()).recordCount, 1);
+    assert.equal((await replayStores.shadowStore.getHealth()).reconcileCount, 0);
+
+    const manifestAudit = await replayStores.auditLogStore.readSelectedWriteManifestAuditCorrelation({
+      memoryId,
+      idempotencyKey,
+      canonicalHash
+    });
+    assert.equal(manifestAudit.found, true);
+    assert.equal(manifestAudit.repaired.memoryId, memoryId);
+    assert.equal(manifestAudit.repaired.status, 'repaired');
+    assert.equal(manifestAudit.repaired.repaired, true);
+    assert.equal(manifestAudit.repaired.repairReason, 'reconcile_queue_drained');
+  } finally {
+    if (firstStores) {
+      await firstStores.shadowStore.close();
+    }
+    if (degradedStores) {
+      await degradedStores.shadowStore.close();
+    }
+    if (replayStores) {
+      await replayStores.shadowStore.close();
+    }
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});

@@ -121,6 +121,12 @@ function supportsWriteManifestCancellation(config = {}, shadowStore = null) {
     typeof shadowStore.cancelPendingMemoryWriteManifest === 'function';
 }
 
+function supportsWriteManifestRepair(config = {}, shadowStore = null) {
+  return supportsWriteManifestRecovery(config, shadowStore) &&
+    typeof shadowStore.repairDegradedMemoryWriteManifest === 'function' &&
+    typeof shadowStore.listReconcileTasksForMemoryId === 'function';
+}
+
 function findSchemaVersionMetadataKeys(payload = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return [];
@@ -394,7 +400,7 @@ class MemoryWriteService {
       const manifest = manifestStart.manifest;
 
       if (!manifestStart.started && manifest) {
-        if (['committed', 'degraded'].includes(manifest.status)) {
+        if (['committed', 'degraded', 'repaired'].includes(manifest.status)) {
           result = {
             ...(manifest.result || {}),
             success: true,
@@ -409,6 +415,9 @@ class MemoryWriteService {
               canonicalHash: manifest.canonicalHash,
               status: manifest.status,
               replayed: true,
+              recovered: manifest.result?.idempotency?.recovered === true,
+              repaired: manifest.result?.idempotency?.repaired === true,
+              repairReason: manifest.result?.idempotency?.repairReason || null,
               authoritativeStore: 'sqlite'
             },
             shadowWrite: manifest.result?.shadowWrite || createShadowWriteStatus('ok')
@@ -719,6 +728,100 @@ class MemoryWriteService {
     return summary;
   }
 
+  async repairDegradedMemoryWriteManifests(options = {}) {
+    if (!supportsWriteManifestRepair(this.config, this.shadowStore)) {
+      return {
+        attempted: 0,
+        repaired: 0,
+        retained: 0,
+        items: []
+      };
+    }
+
+    const limit = Number.isInteger(options.limit) && options.limit > 0 ? Math.min(options.limit, 500) : 50;
+    const repairReason = normalizeString(options.reason) || 'reconcile_queue_drained';
+    const manifests = await this.shadowStore.listMemoryWriteManifestsByStatus('degraded', limit);
+    const summary = {
+      attempted: manifests.length,
+      repaired: 0,
+      retained: 0,
+      items: []
+    };
+
+    for (const manifest of manifests) {
+      const remainingTasks = await this.shadowStore.listReconcileTasksForMemoryId(manifest.memoryId, 1);
+      if (remainingTasks.length > 0) {
+        summary.retained += 1;
+        summary.items.push({
+          memoryId: manifest.memoryId,
+          idempotencyKey: manifest.idempotencyKey,
+          status: manifest.status,
+          repaired: false,
+          reason: 'reconcile_tasks_remaining'
+        });
+        continue;
+      }
+
+      const result = {
+        ...(manifest.result || {}),
+        success: true,
+        decision: 'accepted',
+        reason: 'write manifest repaired: reconcile queue drained.',
+        memoryId: manifest.memoryId,
+        target: manifest.target,
+        idempotency: {
+          ...((manifest.result && manifest.result.idempotency) || {}),
+          key: manifest.idempotencyKey,
+          canonicalHash: manifest.canonicalHash,
+          status: 'repaired',
+          replayed: false,
+          recovered: (manifest.result && manifest.result.idempotency && manifest.result.idempotency.recovered) === true,
+          recoveryRequired: false,
+          repaired: true,
+          repairReason,
+          authoritativeStore: 'sqlite'
+        },
+        shadowWrite: {
+          ...((manifest.result && manifest.result.shadowWrite) || {}),
+          status: 'repaired',
+          repaired: true,
+          repairReason
+        }
+      };
+
+      const repair = await this.shadowStore.repairDegradedMemoryWriteManifest({
+        idempotencyKey: manifest.idempotencyKey,
+        status: 'repaired',
+        result,
+        updatedAt: new Date().toISOString()
+      });
+
+      if (!repair.updated) {
+        summary.retained += 1;
+        summary.items.push({
+          memoryId: manifest.memoryId,
+          idempotencyKey: manifest.idempotencyKey,
+          status: manifest.status,
+          repaired: false,
+          reason: 'repair_guard_failed'
+        });
+        continue;
+      }
+
+      await this.writeAudit(result);
+      summary.repaired += 1;
+      summary.items.push({
+        memoryId: manifest.memoryId,
+        idempotencyKey: manifest.idempotencyKey,
+        status: 'repaired',
+        repaired: true,
+        reason: repairReason
+      });
+    }
+
+    return summary;
+  }
+
   async cancelUnrecoverablePendingWriteManifests(options = {}) {
     if (!supportsWriteManifestCancellation(this.config, this.shadowStore)) {
       return {
@@ -839,6 +942,8 @@ class MemoryWriteService {
         replayed: idempotency.replayed === true,
         recovered: idempotency.recovered === true,
         recoveryRequired: idempotency.recoveryRequired === true,
+        repaired: idempotency.repaired === true,
+        repairReason: idempotency.repairReason || null,
         cancelled: idempotency.cancelled === true,
         cancelReason: idempotency.cancelReason || null
       } : null

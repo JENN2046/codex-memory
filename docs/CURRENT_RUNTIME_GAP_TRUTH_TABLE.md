@@ -28,6 +28,25 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1165 Degraded Manifest Repair Policy - 2026-05-26
+
+Result: `CM1165_DEGRADED_MANIFEST_REPAIR_POLICY_VALIDATED_NOT_READY`.
+
+CM-1165 continues the minimum durable write kernel hardening ladder:
+
+```text
+degraded write manifest exists
+reconcile queue drains
+explicit repair policy
+degraded -> repaired guard
+duplicate canonical write replays repaired result
+selected repaired audit metadata
+```
+
+This adds a bounded explicit repair policy for degraded write manifests only after their reconcile queue is empty. It does not enable automatic startup repair, background repair workers, automatic reconcile replay, retry/backoff policy, real memory repair, cross-store transactionality, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
+Validation passed: source/test syntax, targeted storage/runtime/reconcile/audit tests `40/40`, full `npm test` `2770/2770`, docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review. The first targeted run exposed missing `idempotency.repaired` preservation on duplicate replay; the replay branch was repaired narrowly and the targeted bundle then passed.
+
 ## CM-1164 Unrecoverable Pending Manifest Cancel Policy - 2026-05-26
 
 Result: `CM1164_UNRECOVERABLE_PENDING_MANIFEST_CANCEL_POLICY_VALIDATED_NOT_READY`.
