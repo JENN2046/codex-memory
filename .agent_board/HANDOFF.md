@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-1177 Readonly/Syncing Search Semantic Split Handoff
+
+Goal: make readonly `search_memory` avoid candidate-cache metadata reads/writes while preserving authorized syncing search behavior.
+
+Status: CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT_VALIDATED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `src/recall/CandidateGenerator.js`; `tests/mcp-http.test.js`; `docs/CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: no-token HTTP `search_memory` now fails tests if it attempts local sync, candidate cache get/set, recall audit, read-policy audit, embedding-cache flush, external embedding provider, or external rerank provider calls. Authorized/default syncing search still passes the phase-B sync/cache/rerank regression, including candidate cache and cached recall audit behavior.
+
+Validation: source/test syntax, targeted HTTP plus phase-B tests `33/33`, and full `npm test` `2786/2786` passed.
+
+Remaining risks: this is not full no-token read closure, recall-quality proof, recall reliability, production readiness, or RC readiness. SQLite schema migration/version gate, startup explicit rebuild/recovery policy, and a full lifecycle transition log remain open.
+
+Next safe step: run docs/ledger/diff checks, then optionally commit CM-1177 if guarded conditions pass. After that, continue to CM-1178 broader no-token read closure.
+
 ## CM-1176 Diary Projection Rebuild From SQLite Authority Handoff
 
 Goal: add a bounded internal rebuild path for writes whose SQLite authority exists but diary projection is missing.

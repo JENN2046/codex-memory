@@ -86,7 +86,7 @@ class CandidateGenerator {
       candidateFilters
     });
 
-    if (this.candidateCacheStore) {
+    if (this.candidateCacheStore && !readOnly) {
       const cached = await this.candidateCacheStore.get(cacheKey);
       throwIfSearchMemoryAborted(signal);
       if (cached) {

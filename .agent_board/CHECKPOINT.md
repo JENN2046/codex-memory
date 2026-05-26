@@ -1,5 +1,40 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1177 Readonly/Syncing Search Semantic Split Checkpoint
+
+Status: `CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Changed readonly candidate generation to bypass candidate cache reads as well as writes.
+- Strengthened HTTP no-token search regression so it fails on sync, candidate cache get/set, recall audit, read-policy audit, embedding-cache flush, external embedding provider, or external rerank provider calls.
+- Preserved default authorized syncing search behavior through existing phase-B sync/cache/rerank regression.
+- Added CM-1177 evidence doc and status/truth-table/board records.
+
+Validation:
+- `node --check src\recall\CandidateGenerator.js` passed.
+- `node --check tests\mcp-http.test.js` passed.
+- `node --test tests\mcp-http.test.js tests\phase-b-sync-cache-rerank.test.js` passed `33/33`.
+- `npm test` passed `2786/2786`.
+
+Boundary:
+- No public MCP schema/tool expansion.
+- No real memory store mutation.
+- No provider/API call.
+- No `.env`, config, watchdog, startup, or dependency change.
+- No migration, import, export, backup, or restore.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- Broader no-token read closure.
+- SQLite schema migration/version startup gate.
+- Startup explicit rebuild/recovery policy.
+- Full lifecycle transition log.
+
 ## CM-1176 Diary Projection Rebuild From SQLite Authority Checkpoint
 
 Status: `CM1176_DIARY_PROJECTION_REBUILD_FROM_SQLITE_AUTHORITY_VALIDATED_NOT_READY`

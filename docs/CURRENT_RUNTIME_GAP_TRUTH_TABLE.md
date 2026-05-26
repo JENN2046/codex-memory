@@ -28,6 +28,28 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1177 Readonly/Syncing Search Semantic Split - 2026-05-26
+
+Result: `CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT_VALIDATED_NOT_READY`.
+
+CM-1177 is a narrow runtime-kernel source/test slice:
+
+- `CandidateGenerator.generate(...)` now bypasses candidate cache reads and writes when `readOnly=true`.
+- Existing readonly pipeline behavior continues to skip `KnowledgeBaseSyncService.syncTarget(...)`.
+- Existing readonly app behavior continues to skip recall audit and read-policy audit writes.
+- Existing readonly vector/rerank behavior continues to avoid external embedding/rerank providers and embedding-cache flushes.
+- Strengthened HTTP no-token tests fail if no-token `search_memory` attempts sync, candidate-cache get/set, recall/read-policy audit writes, embedding-cache flush, or external provider calls.
+- Phase-B sync/cache/rerank regression still proves default authorized syncing search can use sync/cache/audit.
+
+Still not proven:
+
+- This is not general recall-quality proof.
+- Broader no-token read closure remains open.
+- No production readiness, write reliability, or recall reliability.
+- No schema migration/version startup hard stop.
+- No startup explicit rebuild/recovery policy.
+- Lifecycle is still timestamp/counter based, not a full transition log.
+
 ## CM-1176 Diary Projection Rebuild From SQLite Authority - 2026-05-26
 
 Result: `CM1176_DIARY_PROJECTION_REBUILD_FROM_SQLITE_AUTHORITY_VALIDATED_NOT_READY`.
@@ -46,8 +68,7 @@ Still not proven:
 
 - Rebuild is not startup automatic recovery.
 - Lifecycle is still timestamp/counter based, not a full transition log.
-- Readonly and syncing search behavior are still not explicitly split.
-- No no-token read closure.
+- CM-1177 has added the first explicit readonly/syncing search cache boundary, but broader no-token read closure remains open.
 - No schema migration/version startup hard stop.
 - No production readiness, write reliability, or recall reliability.
 

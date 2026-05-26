@@ -368,6 +368,7 @@ test('HTTP MCP no-token search_memory should avoid local maintenance writes', as
     });
 
     const originalSyncTarget = app.recall.knowledgeBaseSyncService.syncTarget;
+    const originalCacheGet = app.stores.candidateCacheStore.get;
     const originalCacheSet = app.stores.candidateCacheStore.set;
     const originalAuditRecord = app.recall.recallAuditService.record;
     const originalReadPolicyAudit = app.recall.recallAuditService.recordReadPolicySummary;
@@ -376,6 +377,9 @@ test('HTTP MCP no-token search_memory should avoid local maintenance writes', as
 
     app.recall.knowledgeBaseSyncService.syncTarget = async () => {
       throw new Error('no-token search must not sync local stores');
+    };
+    app.stores.candidateCacheStore.get = async () => {
+      throw new Error('no-token search must not read or update candidate cache metadata');
     };
     app.stores.candidateCacheStore.set = async () => {
       throw new Error('no-token search must not write candidate cache');
@@ -422,6 +426,7 @@ test('HTTP MCP no-token search_memory should avoid local maintenance writes', as
       assert.ok(Array.isArray(payload.result.structuredContent.results));
     } finally {
       app.recall.knowledgeBaseSyncService.syncTarget = originalSyncTarget;
+      app.stores.candidateCacheStore.get = originalCacheGet;
       app.stores.candidateCacheStore.set = originalCacheSet;
       app.recall.recallAuditService.record = originalAuditRecord;
       app.recall.recallAuditService.recordReadPolicySummary = originalReadPolicyAudit;
