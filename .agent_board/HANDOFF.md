@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1144 Fresh CM1111 Approval Packet Handoff
+
+Goal: prepare the next allowed step after clean-worktree gates: a fresh CM-1111 exact approval request packet, without executing CM-1111.
+
+Status: COMPLETED_VALIDATED_CM1144_FRESH_CM1111_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY.
+
+Changed files: `docs/CM1144_FRESH_CM1111_PROOF_MEMORY_RETENTION_APPLY_APPROVAL_PACKET.md`; `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`.
+
+Validation: current Git facts inspected; prior CM-1111 packet reviewed; tombstone CLI/test boundaries reviewed; request hash calculated as `0c4e30af03dd946c1623639cb1d3bd3bcdaf942a5b6aa4fd52d9a39ba2a1c982`; ledger consistency passed; docs validation passed; `git diff --check` passed; focused no-overclaim/secret scan passed.
+
+Not validated: `npm test`, HTTP observe, mainline gate, true audit log read, raw store/diary/`.jsonl` read, memory tools, provider/API calls, durable memory/audit write, tombstone apply, cleanup/rollback/migration/import/export/backup/restore apply, push.
+
+Remaining risks: this packet is draft-only. CM-1111 execution remains blocked until the user provides the fresh exact approval line and pre-execution checks pass. CM-1115 and CM-1120 remain out of order.
+
+Next safe step: commit locally if guarded commit conditions pass. Do not execute `tombstone-memory.js` from this packet without fresh exact approval.
+
 ## CM-1143 Operator State Sync After Remote Fast-Forward Handoff
 
 Goal: update the operator status surfaces after local `main` fast-forwarded to the remote commit that contains the previous CM-1132..CM-1142 dirty-scope work.

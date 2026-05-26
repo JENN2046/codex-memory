@@ -1,5 +1,42 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1144 Fresh CM1111 Approval Packet Checkpoint
+
+Status: `CM1144_FRESH_CM1111_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Drafted `docs/CM1144_FRESH_CM1111_PROOF_MEMORY_RETENTION_APPLY_APPROVAL_PACKET.md`.
+- Bound the fresh CM-1111 exact approval request to local `HEAD=ffa9bbb52d9f69f087128a8daebbddbe1e802ac9`.
+- Marked the prior CM-1111 packet bound to `16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d` stale for the current local baseline.
+
+Validation:
+- Current Git facts inspected.
+- CM-1111 prior packet and tombstone CLI/test boundaries reviewed.
+- Request hash calculated as `0c4e30af03dd946c1623639cb1d3bd3bcdaf942a5b6aa4fd52d9a39ba2a1c982`.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `git diff --check` passed.
+- Focused no-overclaim/secret scan over the CM-1144 diff had no findings.
+
+Boundary:
+- No CM-1111 approval consumed.
+- No `tombstone-memory.js` execution.
+- No `record_memory`, `search_memory`, or `memory_overview`.
+- No true audit log, raw store, diary, or direct `.jsonl` read.
+- No durable memory/audit write.
+- No cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push.
+- No readiness or reliability claim.
+
+Next:
+- Commit the docs/board-only packet if guarded commit conditions pass.
+- Execution still requires the user to provide the fresh exact approval line and pre-execution checks to pass.
+
 ## CM-1143 Operator State Sync After Remote Fast-Forward Checkpoint
 
 Status: `CM1143_OPERATOR_STATE_SYNC_AFTER_REMOTE_FAST_FORWARD_DOCS_ONLY_NOT_READY`
