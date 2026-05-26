@@ -6,6 +6,8 @@ Status: `CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_VALIDATED_NOT_READY`
 
 Date: 2026-05-26
 
+Local commit: `a523341 fix: block no-token overview`.
+
 Completed:
 - Added HTTP no-token JSON-RPC rejection for `tools/call` + `memory_overview`.
 - Added `NO_TOKEN_OVERVIEW_REJECTED` selected data code.
