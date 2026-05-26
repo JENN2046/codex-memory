@@ -28,6 +28,39 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1147 Fresh CM1115 Metadata Lifecycle Approval Packet - 2026-05-26
+
+Result: `CM1147_FRESH_CM1115_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1147 prepares a fresh CM-1115 exact approval request boundary after CM-1146 gates recognized the CM-1145 recorded CM-1111 result. It does not approve or execute CM-1115.
+
+The future exact-approved action is limited to one metadata-only exact-id `SqliteShadowStore.getRecordValidationPolicy` read for memory id `codex-process-50325be15fdb479d805728fe420b4838`, selected fields only:
+
+```text
+exists
+lifecycleColumnAvailable
+tombstoneReasonColumnAvailable
+status
+clientId
+visibility
+```
+
+Expected favorable result:
+
+```text
+status=tombstoned
+clientId=codex
+visibility=internal_proof
+```
+
+Maximum possible future result class:
+
+```text
+METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE
+```
+
+CM-1147 does not execute CM-1115, approve or execute CM-1120, read metadata store, read true audit/raw memory/diary/`.jsonl`, call memory tools/provider/API, write durable memory/audit, run apply, change public MCP/config/watchdog/startup/package/dependency, push/tag/release/deploy, or claim readiness/reliability.
+
 ## CM-1146 Current-Facts Rebaseline And CM1145 Prior Result Ingestion - 2026-05-26
 
 Result: `CM1146_CURRENT_FACTS_REBASELINE_PRIOR_RESULT_INGESTION_COMPLETED_VALIDATED_NOT_READY`.

@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1147 Fresh CM1115 Metadata Lifecycle Approval Packet Checkpoint
+
+Status: `CM1147_FRESH_CM1115_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Prepared CM-1115 approval request boundary after CM-1146 gates selected CM-1115 as next target.
+- Limited future possible action to one metadata-only exact-id `SqliteShadowStore.getRecordValidationPolicy` selected-field read.
+- Kept CM-1115 execution, CM-1120 approval/execution, readiness, and reliability blocked.
+
+Validation:
+- Ledger consistency, docs validation, `git diff --check`, and focused no-secret scan passed.
+
+Boundary:
+- No CM-1115 execution.
+- No CM-1120 approval or execution.
+- No metadata store, true audit, raw memory, diary, or `.jsonl` read.
+- No memory tools or provider/API calls.
+- No durable memory/audit write or apply.
+- No public MCP/config/watchdog/startup/package/dependency change.
+- No push.
+- No readiness or reliability claim.
+
+Next:
+- Validate and commit this packet.
+- Generate final copy/paste CM-1115 approval line from the resulting clean HEAD.
+
 ## CM-1146 Current-Facts Rebaseline And CM1145 Prior Result Ingestion Checkpoint
 
 Status: `CM1146_CURRENT_FACTS_REBASELINE_PRIOR_RESULT_INGESTION_COMPLETED_VALIDATED_NOT_READY`

@@ -1,5 +1,19 @@
 # HANDOFF.md - codex-memory
 
+## CM-1147 Fresh CM1115 Metadata Lifecycle Approval Packet Handoff
+
+Goal: prepare/request the next allowed CM-1115 exact approval without executing CM-1115.
+
+Status: CM1147_FRESH_CM1115_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY.
+
+Changed files: `docs/CM1147_FRESH_CM1115_METADATA_LIFECYCLE_APPROVAL_PACKET.md`; `STATUS.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Validation: ledger consistency, docs validation, `git diff --check`, and focused no-secret scan passed; guarded local commit pending.
+
+Remaining risks: final approval line must be calculated after commit against clean HEAD. CM-1115 execution remains blocked until the user repeats the exact line. CM-1120 remains blocked until CM-1115 result and later CM-1120 rebaseline/approval gates.
+
+Next safe step: validate, commit, calculate final exact approval line, and provide it for copy/paste. Do not execute CM-1115.
+
 ## CM-1146 Current-Facts Rebaseline And CM1145 Prior Result Ingestion Handoff
 
 Goal: make current-facts gates recognize the recorded CM-1145 CM-1111 result and classify stale CM-1120 target head as later rebaseline work.
