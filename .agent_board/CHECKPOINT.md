@@ -1,5 +1,49 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1143 Operator State Sync After Remote Fast-Forward Checkpoint
+
+Status: `CM1143_OPERATOR_STATE_SYNC_AFTER_REMOTE_FAST_FORWARD_DOCS_ONLY_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Fast-forwarded local `main` to `origin/main` at `e11fe0bd1da3a08eae8c0e2c405ccfd38a55cd28` before this status update.
+- Recorded that the old CM-1132..CM-1142 dirty-scope worktree is now committed in history via `e11fe0b chore: record memory evidence isolation gates`.
+- Updated top-level operator status surfaces so they no longer treat the old dirty scope as an active local worktree isolation blocker.
+
+Validation:
+- Pre-update `git rev-parse HEAD` matched `git rev-parse origin/main`.
+- Pre-update `git status --short --branch` returned `## main...origin/main`.
+- Pre-update `git diff --stat` was empty.
+- Status/board diff inspection completed.
+- `git diff --check` passed.
+
+Boundary:
+- No `npm test`.
+- No HTTP observe.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No staging.
+- No commit.
+- No push.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Start future work from the clean synchronized `e11fe0b` baseline.
+- Rerun relevant current-facts gates before any CM-1111/CM-1115/CM-1120 approval request.
+
 ## CM-1142 Expanded Dirty Scope Local Commit Isolation Approval Packet Checkpoint
 
 Status: `CM1142_EXPANDED_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`

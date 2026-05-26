@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1143 Operator State Sync After Remote Fast-Forward Handoff
+
+Goal: update the operator status surfaces after local `main` fast-forwarded to the remote commit that contains the previous CM-1132..CM-1142 dirty-scope work.
+
+Status: COMPLETED_VALIDATED_CM1143_OPERATOR_STATE_SYNC_AFTER_REMOTE_FAST_FORWARD_DOCS_ONLY_NOT_READY.
+
+Changed files: `STATUS.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`.
+
+Validation: pre-update Git facts showed `HEAD == origin/main == e11fe0bd1da3a08eae8c0e2c405ccfd38a55cd28`, `git status --short --branch` returned `## main...origin/main`, and `git diff --stat` was empty. Status/board diff inspection completed and `git diff --check` passed.
+
+Not validated: `npm test`, HTTP observe, selected audit-correlation gates after the status edit, true audit log read, observation input-file read, raw audit/store/diary/`.jsonl` read, metadata store read, true `record_memory`, true `search_memory`, `memory_overview`, provider/API calls, durable project memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, push-readiness, push.
+
+Remaining risks: CM-1143 only corrects operator surfaces after remote synchronization. It does not prove CM-1111/CM-1115/CM-1120, actual audit correlation, metadata lifecycle state, public/default recall suppression, write reliability, recall reliability, runtime readiness, or release readiness.
+
+Next safe step: rerun the relevant current-facts gates from the clean synchronized `e11fe0b` baseline before any approval request for CM-1111/CM-1115/CM-1120. Do not reuse the stale CM-1142 local-commit-isolation packet for already-committed historical scope.
+
 ## CM-1142 Expanded Dirty Scope Local Commit Isolation Approval Packet Handoff
 
 Goal: draft a fresh exact local commit isolation approval packet for the expanded current dirty scope after CM-1141 made the old CM-1135 line stale.
