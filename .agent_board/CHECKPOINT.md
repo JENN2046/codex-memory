@@ -1,5 +1,28 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1154 Public Default Recall Suppression Current-Facts Ingestion Checkpoint
+
+Status: `CM1154_PUBLIC_DEFAULT_RECALL_SUPPRESSION_CURRENT_FACTS_INGESTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added CM-1153 sanitized proof ingestion to the current-facts classifier.
+- Added targeted tests proving CM-1151+CM-1153 routes to `NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY`.
+
+Validation:
+- Targeted current-facts tests passed `29/29`.
+- Docs validation, ledger consistency, and `git diff --check` passed after recording.
+- Focused no-secret/no-overclaim scan passed after recording.
+
+Boundary:
+- No proof execution.
+- No memory tools, provider/API, raw read, durable write/apply, push, readiness, or reliability claim.
+
+Next:
+- Commit CM-1154.
+- Rerun real clean-head current-facts gates after commit.
+
 ## CM-1153 Public Default Recall Suppression Proof Checkpoint
 
 Status: `CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY`

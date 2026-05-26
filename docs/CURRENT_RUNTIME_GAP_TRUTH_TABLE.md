@@ -28,6 +28,39 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1154 Public Default Recall Suppression Current-Facts Ingestion - 2026-05-26
+
+Result: `CM1154_PUBLIC_DEFAULT_RECALL_SUPPRESSION_CURRENT_FACTS_INGESTED_NOT_READY`.
+
+CM-1154 repairs current-facts ingestion for the already-recorded CM-1153 proof so the gates do not continue to ask for a repeat proof.
+
+Accepted CM-1153 proof markers:
+
+```text
+resultClass=PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY
+searchMemoryCallCount=1
+target=process
+limit=5
+includeContent=false
+scopeProvided=false
+noRawContentRead=true
+readOnly=true
+targetReturned=false
+forbiddenResultFieldCount=0
+providerFetchAttempts=0
+```
+
+Expected downstream route after clean-head rerun:
+
+```text
+classification.resultClass=AUDIT_SELECTED_CORRELATION_OBSERVED
+stageClass=NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY
+resolutionClass=NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY
+nextAllowedAction=record_narrow_selected_audit_correlation_blocker_downgrade_only
+```
+
+This does not claim broad recall reliability, write reliability, runtime readiness, RC readiness, production readiness, cleanup safety, rollback safety, or release/cutover readiness.
+
 ## CM-1153 Public Default Recall Suppression Proof - 2026-05-26
 
 Result: `CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY`.

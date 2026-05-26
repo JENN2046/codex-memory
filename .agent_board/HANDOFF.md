@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1154 Public Default Recall Suppression Current-Facts Ingestion Handoff
+
+Goal: make current-facts gates consume the recorded CM-1153 proof so the chain does not repeat the bounded proof.
+
+Status: CM1154_PUBLIC_DEFAULT_RECALL_SUPPRESSION_CURRENT_FACTS_INGESTED_NOT_READY.
+
+Changed files: `src/cli/selected-audit-correlation-current-facts-classifier.js`; current-facts tests; `docs/CM1154_PUBLIC_DEFAULT_RECALL_SUPPRESSION_CURRENT_FACTS_INGESTION.md`; status/truth-table/board surfaces.
+
+Gate behavior: CM-1151 selected audit observation plus CM-1153 recall suppression proof now classifies as `AUDIT_SELECTED_CORRELATION_OBSERVED`; downstream stage/resolution route to `NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY`.
+
+Validation: targeted current-facts tests passed `29/29`; docs validation, ledger consistency, `git diff --check`, and focused no-secret/no-overclaim scan passed.
+
+Remaining risks: this only enables narrow blocker-downgrade recording. It does not prove recall/write reliability, runtime readiness, RC readiness, cleanup safety, rollback safety, production readiness, or release/cutover readiness.
+
+Next safe step: commit CM-1154, then rerun real clean-head current-facts gates. Do not claim readiness or reliability.
+
 ## CM-1153 Public Default Recall Suppression Proof Handoff
 
 Goal: execute one bounded public/default recall suppression proof after CM-1120/CM-1152 gates allowed it.

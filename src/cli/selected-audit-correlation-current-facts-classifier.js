@@ -77,6 +77,11 @@ function collectRecordedSelectedObservationResult({
       return null;
     }
 
+    const recordedRecallSuppressionProof = collectRecordedRecallSuppressionProofResult({
+      cwd,
+      fileReader
+    });
+
     return {
       source: 'docs/CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTION_RECORD.md',
       resultClass: 'AUDIT_SELECTED_CORRELATION_OBSERVED',
@@ -122,8 +127,67 @@ function collectRecordedSelectedObservationResult({
       },
       followup: {
         metadataLifecycleObserved: true,
-        recallSuppressionObserved: false
-      }
+        recallSuppressionObserved: !!recordedRecallSuppressionProof
+      },
+      recallSuppressionProof: recordedRecallSuppressionProof
+    };
+  } catch {
+    return null;
+  }
+}
+
+function collectRecordedRecallSuppressionProofResult({
+  cwd = process.cwd(),
+  fileReader = fs.readFileSync
+} = {}) {
+  const recordPath = path.join(cwd, 'docs', 'CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF.md');
+  try {
+    const content = fileReader(recordPath, 'utf8');
+    const requiredMarkers = [
+      'CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY',
+      'resultClass=PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY',
+      'targetMemoryId=codex-process-50325be15fdb479d805728fe420b4838',
+      'searchMemoryCallCount=1',
+      'target=process',
+      'limit=5',
+      'includeContent=false',
+      'scopeProvided=false',
+      'noRawContentRead=true',
+      'readOnly=true',
+      'defaultFilterTargetChunkCount=0',
+      'targetReturned=false',
+      'forbiddenResultFieldCount=0',
+      'providerFetchAttempts=0',
+      'recordMemoryCallCount=0',
+      'memoryOverviewCallCount=0',
+      'durableMemoryWrites=0',
+      'publicMcpExpansion=false',
+      'configWatchdogStartupPackageChange=false',
+      'readinessClaimAllowed=false',
+      'reliabilityClaimAllowed=false'
+    ];
+    if (!requiredMarkers.every(marker => content.includes(marker))) {
+      return null;
+    }
+
+    const resultCount = parseNumberLine(content, 'resultCount');
+    const targetCurrentChunkCount = parseNumberLine(content, 'targetCurrentChunkCount');
+    if (!Number.isInteger(resultCount) || !Number.isInteger(targetCurrentChunkCount) || targetCurrentChunkCount < 1) {
+      return null;
+    }
+
+    return {
+      source: 'docs/CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF.md',
+      resultClass: 'PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY',
+      targetMemoryId: parseStringLine(content, 'targetMemoryId'),
+      querySha256: parseStringLine(content, 'querySha256'),
+      searchMemoryCallCount: parseNumberLine(content, 'searchMemoryCallCount'),
+      resultCount,
+      targetCurrentChunkCount,
+      defaultFilterTargetChunkCount: parseNumberLine(content, 'defaultFilterTargetChunkCount'),
+      targetReturned: parseBooleanLine(content, 'targetReturned'),
+      forbiddenResultFieldCount: parseNumberLine(content, 'forbiddenResultFieldCount'),
+      providerFetchAttempts: parseNumberLine(content, 'providerFetchAttempts')
     };
   } catch {
     return null;
@@ -230,10 +294,16 @@ function buildReport(options = {}, dependencies = {}) {
       followup: recordedSelectedObservation.followup
     });
 
+    const recallSuppressionProof = recordedSelectedObservation.recallSuppressionProof || null;
+    const followupObserved = !!recallSuppressionProof;
     return {
       status: 'blocked',
-      decision: 'SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_CLASSIFIED_RECORDED_OBSERVATION_FOLLOWUP_MISSING',
-      source: 'current_git_facts_readonly_plus_recorded_cm1151_selected_observation_classifier',
+      decision: followupObserved
+        ? 'SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_CLASSIFIED_RECORDED_OBSERVATION_AND_RECALL_SUPPRESSION'
+        : 'SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_CLASSIFIED_RECORDED_OBSERVATION_FOLLOWUP_MISSING',
+      source: followupObserved
+        ? 'current_git_facts_readonly_plus_recorded_cm1151_and_cm1153_status_surfaces'
+        : 'current_git_facts_readonly_plus_recorded_cm1151_selected_observation_classifier',
       currentFactsCollected: true,
       currentFactsStatus: recordedFacts.status,
       currentFactsDecision: recordedFacts.decision,
@@ -242,6 +312,9 @@ function buildReport(options = {}, dependencies = {}) {
       recordedSelectedObservationIngested: true,
       recordedSelectedObservationSource: recordedSelectedObservation.source,
       recordedSelectedObservationResultClass: recordedSelectedObservation.resultClass,
+      recordedRecallSuppressionProofIngested: followupObserved,
+      recordedRecallSuppressionProofSource: recallSuppressionProof?.source || '',
+      recordedRecallSuppressionProofResultClass: recallSuppressionProof?.resultClass || '',
       classifierExecuted: true,
       classification,
       blockerDowngradeAllowed: classification.blockerDowngradeAllowed === true,
@@ -271,7 +344,9 @@ function buildReport(options = {}, dependencies = {}) {
         claimsReadiness: false
       },
       currentFacts: recordedFacts,
-      nextStep: 'CM-1120 selected audit correlation is recorded; public/default recall suppression remains the next bounded follow-up proof before any downgrade or readiness/reliability claim.'
+      nextStep: followupObserved
+        ? 'CM-1120 selected audit correlation and CM-1153 public/default recall suppression follow-up are recorded; only narrow blocker downgrade recording may be considered, with readiness/reliability still blocked.'
+        : 'CM-1120 selected audit correlation is recorded; public/default recall suppression remains the next bounded follow-up proof before any downgrade or readiness/reliability claim.'
     };
   }
 
@@ -389,6 +464,7 @@ if (require.main === module) {
 module.exports = {
   buildPreflightSummary,
   buildReport,
+  collectRecordedRecallSuppressionProofResult,
   collectRecordedSelectedObservationResult,
   main,
   parseArgs,

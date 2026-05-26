@@ -115,6 +115,38 @@ function cm1151Reader(filePath) {
   throw new Error('missing');
 }
 
+function cm1151AndCm1153Reader(filePath) {
+  if (String(filePath).includes('CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF.md')) {
+    return [
+      'Status: `CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY`',
+      'resultClass=PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY',
+      'targetMemoryId=codex-process-50325be15fdb479d805728fe420b4838',
+      'querySha256=c1f1a54db6af1556f8e7027ef7c9ce87a9941814fdf83e200ffce0c8494ad2af',
+      'searchMemoryCallCount=1',
+      'target=process',
+      'limit=5',
+      'includeContent=false',
+      'scopeProvided=false',
+      'noRawContentRead=true',
+      'readOnly=true',
+      'resultCount=3',
+      'targetCurrentChunkCount=2',
+      'defaultFilterTargetChunkCount=0',
+      'targetReturned=false',
+      'forbiddenResultFieldCount=0',
+      'providerFetchAttempts=0',
+      'recordMemoryCallCount=0',
+      'memoryOverviewCallCount=0',
+      'durableMemoryWrites=0',
+      'publicMcpExpansion=false',
+      'configWatchdogStartupPackageChange=false',
+      'readinessClaimAllowed=false',
+      'reliabilityClaimAllowed=false'
+    ].join('\n');
+  }
+  return cm1151Reader(filePath);
+}
+
 test('CM-1140 current-facts CLI reports dirty worktree resolution sequence without approvals', () => {
   const report = buildReport({}, {
     gitRunner: gitRunnerForDirtyHead
@@ -177,6 +209,24 @@ test('CM-1152 current-facts CLI allows only bounded public default recall suppre
   assert.equal(report.blockerDowngradeRecordAllowed, false);
   assert.equal(report.readinessClaimAllowed, false);
   assert.equal(report.reliabilityClaimAllowed, false);
+});
+
+test('CM-1154 current-facts CLI routes recorded recall suppression proof to narrow downgrade record only', () => {
+  const report = buildReport({}, {
+    gitRunner: gitRunnerForCleanHead,
+    fileReader: cm1151AndCm1153Reader
+  });
+
+  assert.equal(report.stageClass, 'NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY');
+  assert.equal(report.resolutionClass, RESOLUTION_CLASSES.NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY);
+  assert.equal(report.nextAllowedAction, 'record_narrow_selected_audit_correlation_blocker_downgrade_only');
+  assert.equal(report.nextApprovalTarget, 'none');
+  assert.equal(report.blockerDowngradeRecordAllowed, true);
+  assert.equal(report.cm1120ExecutionAuthorizedNow, false);
+  assert.equal(report.readinessClaimAllowed, false);
+  assert.equal(report.reliabilityClaimAllowed, false);
+  assert.equal(report.safety.callsSearchMemory, false);
+  assert.equal(report.safety.callsProvider, false);
 });
 
 test('CM-1140 current-facts CLI rejects audit flags before Git collection', () => {
