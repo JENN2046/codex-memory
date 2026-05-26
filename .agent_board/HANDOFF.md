@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-1166 Startup Recovery Safety Preflight Handoff
+
+Goal: continue CM-1165 by adding a preflight-only safety surface before any future startup recovery design.
+
+Status: CM1166_STARTUP_RECOVERY_SAFETY_PREFLIGHT_VALIDATED_NOT_READY.
+
+Local commit: pending guarded local commit.
+
+Changed files: `src/core/MemoryWriteReconcileStartupSafetyPolicy.js`; `tests/memory-write-reconcile-startup-safety-policy.test.js`; `docs/CM1166_STARTUP_RECOVERY_SAFETY_PREFLIGHT.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: app initialization can observe write-manifest health but does not auto-recover a pending manifest; startup recovery preflight returns selected counters and bounded future plan fields while execution/config/provider/real-store/readiness requests fail closed; public tools remain frozen and no startup recovery public tool exists.
+
+Validation: source/test syntax passed. Targeted startup safety tests passed `9/9`. Adjacent v1.1/governance bundle passed `33/33`. Full `npm test` passed `2774/2774`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed. The focused scan returned only expected boundary/negative wording, historical board entries, and sanitizer-test synthetic secret strings. Re-review found and repaired one counter-normalization issue (`null` could be treated as `0`); no remaining actionable issue in changed scope after rerun.
+
+Remaining risks: no automatic startup recovery, no runtime recovery execution, no background worker/scheduler recovery, no retry/backoff policy, no real memory recovery proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: make guarded local commit, then record post-commit clean state. Do not push or claim readiness/reliability.
+
 ## CM-1165 Degraded Manifest Repair Policy Handoff
 
 Goal: continue CM-1164 by adding an explicit repair policy for degraded manifests after reconcile tasks drain.

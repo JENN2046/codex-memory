@@ -1,10 +1,16 @@
 'use strict';
 
 const TASK_ID = 'CM-1084_MEMORY_WRITE_RECONCILE_STARTUP_WORKER_SAFETY';
+const STARTUP_RECOVERY_TASK_ID = 'CM-1166_MEMORY_WRITE_STARTUP_RECOVERY_SAFETY_PREFLIGHT';
 const ACCEPTED_MODE = 'startup_reconcile_worker_safety_review_only';
+const ACCEPTED_RECOVERY_MODE = 'startup_recovery_safety_preflight_only';
 const ACCEPTED_SOURCES = Object.freeze([
   'temp_local_app_initialization_fixture',
   'temp_local_worker_status_fixture'
+]);
+const ACCEPTED_RECOVERY_SOURCES = Object.freeze([
+  'temp_local_app_initialization_fixture',
+  'temp_local_write_manifest_health_fixture'
 ]);
 const WORKER_STATUS_KEYS = Object.freeze([
   'running',
@@ -30,6 +36,15 @@ const LAST_RESULT_SUMMARY_KEYS = Object.freeze([
   'skippedCount',
   'hasError'
 ]);
+const WRITE_MANIFEST_COUNTER_KEYS = Object.freeze([
+  'total',
+  'pending',
+  'committed',
+  'degraded',
+  'repaired',
+  'cancelled',
+  'failed'
+]);
 
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
@@ -45,6 +60,10 @@ function pickBoolean(value) {
 
 function pickNumberOrNull(value) {
   return Number.isFinite(value) ? value : null;
+}
+
+function pickCounter(value) {
+  return Number.isInteger(value) && value >= 0 ? value : null;
 }
 
 function sanitizeLastResultSummary(summary) {
@@ -96,6 +115,162 @@ function buildApplyGate() {
     watchdogChangeExecuted: false,
     publicMcpExpansionApproved: false,
     publicMcpExpansionExecuted: false
+  };
+}
+
+function buildStartupRecoveryApplyGate() {
+  return {
+    startupRecoveryApproved: false,
+    startupRecoveryExecuted: false,
+    runtimeRecoveryApproved: false,
+    runtimeRecoveryExecuted: false,
+    manifestRecoveryExecuted: false,
+    manifestRepairExecuted: false,
+    manifestCancelExecuted: false,
+    configChangeApproved: false,
+    configChangeExecuted: false,
+    watchdogChangeApproved: false,
+    watchdogChangeExecuted: false,
+    publicMcpExpansionApproved: false,
+    publicMcpExpansionExecuted: false
+  };
+}
+
+function sanitizeStartupRecoveryHealth(health) {
+  if (!isPlainObject(health)) return null;
+  const writeManifest = isPlainObject(health.writeManifest) ? health.writeManifest : {};
+  const sanitizedWriteManifest = {};
+  for (const key of WRITE_MANIFEST_COUNTER_KEYS) {
+    sanitizedWriteManifest[key] = pickCounter(writeManifest[key]);
+  }
+  return {
+    available: health.available === true,
+    authoritativeStore: normalizeString(health.authoritativeStore) || null,
+    recordCount: pickCounter(health.recordCount),
+    chunkCount: pickCounter(health.chunkCount),
+    totalChunkCount: pickCounter(health.totalChunkCount),
+    reconcileCount: pickCounter(health.reconcileCount),
+    writeManifest: sanitizedWriteManifest
+  };
+}
+
+function hasMalformedStartupRecoveryHealth(health) {
+  if (!health) return true;
+  const counters = [
+    health.recordCount,
+    health.chunkCount,
+    health.totalChunkCount,
+    health.reconcileCount,
+    ...WRITE_MANIFEST_COUNTER_KEYS.map(key => health.writeManifest?.[key])
+  ];
+  return counters.some(value => value === null);
+}
+
+function normalizeBoundedLimit(value, fallback = 50) {
+  const number = Number(value ?? fallback);
+  return Number.isInteger(number) && number > 0 && number <= 50 ? number : null;
+}
+
+function buildStartupRecoverySafetyPreflight({
+  mode = '',
+  source = '',
+  shadowHealth = null,
+  proposedRecoveryLimit = 50,
+  proposedRepairLimit = 50,
+  proposedCancelLimit = 50,
+  requestedStartupRecovery = false,
+  requestedRuntimeRecovery = false,
+  requestedConfigChange = false,
+  requestedWatchdogChange = false,
+  requestedStartupTaskChange = false,
+  requestedPublicMcpExpansion = false,
+  requestedProviderCall = false,
+  requestedRealStoreWrite = false,
+  requestedSchemaMigration = false,
+  requestedBackupRestore = false,
+  requestedImportExport = false,
+  readinessClaimed = false,
+  reliabilityClaimed = false
+} = {}) {
+  const blockers = [];
+  const normalizedMode = normalizeString(mode);
+  const normalizedSource = normalizeString(source);
+  const sanitizedHealth = sanitizeStartupRecoveryHealth(shadowHealth);
+  const recoveryLimit = normalizeBoundedLimit(proposedRecoveryLimit);
+  const repairLimit = normalizeBoundedLimit(proposedRepairLimit);
+  const cancelLimit = normalizeBoundedLimit(proposedCancelLimit);
+
+  if (normalizedMode !== ACCEPTED_RECOVERY_MODE) {
+    blockers.push('startup_recovery_safety_preflight_mode_required');
+  }
+  if (!ACCEPTED_RECOVERY_SOURCES.includes(normalizedSource)) {
+    blockers.push('temp_local_startup_recovery_source_required');
+  }
+  if (!sanitizedHealth) {
+    blockers.push('shadow_health_required');
+  } else if (hasMalformedStartupRecoveryHealth(sanitizedHealth)) {
+    blockers.push('shadow_health_counters_malformed');
+  }
+  if (recoveryLimit === null) blockers.push('proposed_recovery_limit_must_be_1_to_50');
+  if (repairLimit === null) blockers.push('proposed_repair_limit_must_be_1_to_50');
+  if (cancelLimit === null) blockers.push('proposed_cancel_limit_must_be_1_to_50');
+  if (requestedStartupRecovery === true) blockers.push('startup_recovery_not_authorized');
+  if (requestedRuntimeRecovery === true) blockers.push('runtime_recovery_not_authorized');
+  if (requestedConfigChange === true) blockers.push('config_change_not_authorized');
+  if (requestedWatchdogChange === true) blockers.push('watchdog_change_not_authorized');
+  if (requestedStartupTaskChange === true) blockers.push('startup_task_change_not_authorized');
+  if (requestedPublicMcpExpansion === true) blockers.push('public_mcp_expansion_not_authorized');
+  if (requestedProviderCall === true) blockers.push('provider_call_not_authorized');
+  if (requestedRealStoreWrite === true) blockers.push('real_store_write_not_authorized');
+  if (requestedSchemaMigration === true) blockers.push('schema_migration_not_authorized');
+  if (requestedBackupRestore === true) blockers.push('backup_restore_not_authorized');
+  if (requestedImportExport === true) blockers.push('import_export_not_authorized');
+  if (readinessClaimed === true) blockers.push('readiness_claim_not_authorized');
+  if (reliabilityClaimed === true) blockers.push('reliability_claim_not_authorized');
+
+  const accepted = blockers.length === 0;
+  return {
+    taskId: STARTUP_RECOVERY_TASK_ID,
+    accepted,
+    status: accepted
+      ? 'startup_recovery_safety_preflight_passed_not_enabled'
+      : 'startup_recovery_safety_preflight_blocked',
+    mode: normalizedMode || null,
+    source: normalizedSource || null,
+    blockerReasons: blockers,
+    shadowHealth: sanitizedHealth,
+    candidateCounts: {
+      pendingManifestCount: sanitizedHealth?.writeManifest?.pending ?? null,
+      degradedManifestCount: sanitizedHealth?.writeManifest?.degraded ?? null,
+      reconcileTaskCount: sanitizedHealth?.reconcileCount ?? null
+    },
+    boundedPlan: {
+      recoveryLimit,
+      repairLimit,
+      cancelLimit,
+      dryRunFirstRequired: true,
+      manualApprovalRequired: true,
+      startupEnablementRequiresA5Approval: true,
+      realStoreRecoveryRequiresA5Approval: true
+    },
+    startupRecoveryPreflightAccepted: accepted,
+    startupRecoveryEnabled: false,
+    runtimeRecoveryExecuted: false,
+    manifestRecoveryExecuted: false,
+    manifestRepairExecuted: false,
+    manifestCancelExecuted: false,
+    configChanged: false,
+    watchdogChanged: false,
+    startupTaskChanged: false,
+    publicMcpExpansion: false,
+    providerCalled: false,
+    realStoreWritten: false,
+    schemaMigrationApplied: false,
+    backupRestoreApplied: false,
+    importExportApplied: false,
+    readinessClaimed: false,
+    reliabilityClaimed: false,
+    applyGate: buildStartupRecoveryApplyGate()
   };
 }
 
@@ -178,8 +353,13 @@ function buildStartupSafetyReport({
 
 module.exports = {
   ACCEPTED_MODE,
+  ACCEPTED_RECOVERY_MODE,
+  ACCEPTED_RECOVERY_SOURCES,
   ACCEPTED_SOURCES,
+  STARTUP_RECOVERY_TASK_ID,
   TASK_ID,
+  buildStartupRecoverySafetyPreflight,
   buildStartupSafetyReport,
+  sanitizeStartupRecoveryHealth,
   sanitizeWorkerStatus
 };

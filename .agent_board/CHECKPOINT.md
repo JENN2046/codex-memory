@@ -1,5 +1,45 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1166 Startup Recovery Safety Preflight Checkpoint
+
+Status: `CM1166_STARTUP_RECOVERY_SAFETY_PREFLIGHT_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending guarded local commit.
+
+Completed:
+- Added preflight-only `buildStartupRecoverySafetyPreflight(...)`.
+- Added selected-only `sanitizeStartupRecoveryHealth(...)`.
+- Added exact mode/source checks for startup recovery safety preflight input.
+- Added bounded future limit checks for recovery/repair/cancel planning.
+- Added fail-closed blockers for execution, config/watchdog/startup changes, public MCP expansion, provider calls, real-store writes, migration/import/export/backup/restore, and readiness/reliability claims.
+- Added temp-local validation proving `app.initialize()` does not auto-recover a pending manifest.
+- Verified public MCP tools remain frozen to `memory_overview`, `record_memory`, and `search_memory`.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted startup safety tests passed `9/9`.
+- Adjacent v1.1/governance bundle passed `33/33`.
+- Full `npm test` passed `2774/2774`.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan returned only expected boundary/negative wording, historical board entries, and sanitizer-test synthetic secret strings.
+- Changed-scope re-review found one actionable counter-normalization issue; `pickCounter()` was repaired to require an actual non-negative integer, the malformed-health test now covers a `null` manifest counter, and source/test syntax, targeted tests, adjacent bundle, and full `npm test` were rerun. No remaining actionable issue in changed scope.
+
+Boundary:
+- No startup recovery execution.
+- No runtime recovery execution.
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, config/watchdog/startup/dependency change, push, production-readiness claim, or reliability claim.
+- No automatic startup repair/cancellation, background worker enablement, scheduler/watchdog recovery, retry/backoff policy, real-store recovery, or cross-store transactionality.
+
+Next:
+- Make guarded local commit.
+- After commit, record post-commit clean state.
+
 ## CM-1165 Degraded Manifest Repair Policy Checkpoint
 
 Status: `CM1165_DEGRADED_MANIFEST_REPAIR_POLICY_VALIDATED_NOT_READY`
