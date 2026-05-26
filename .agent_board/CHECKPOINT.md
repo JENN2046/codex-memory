@@ -6,6 +6,8 @@ Status: `CM1165_DEGRADED_MANIFEST_REPAIR_POLICY_VALIDATED_NOT_READY`
 
 Date: 2026-05-26
 
+Local commit: `ddf7a9f feat: repair drained write manifests`
+
 Completed:
 - Added guarded `SqliteShadowStore.repairDegradedMemoryWriteManifest(...)`.
 - Added explicit `MemoryWriteService.repairDegradedMemoryWriteManifests(...)`.
@@ -33,7 +35,6 @@ Boundary:
 - No automatic startup repair, background worker enablement, scheduler/watchdog change, retry/backoff policy, real-store repair, or cross-store transactionality.
 
 Next:
-- Commit CM-1165 if guarded commit eligibility remains clean.
 - Continue kernel hardening with guarded automatic pending-manifest recovery policy design, retry/backoff policy for reconcile and recovery tasks, or startup recovery safety preflight.
 
 ## CM-1164 Unrecoverable Pending Manifest Cancel Policy Checkpoint

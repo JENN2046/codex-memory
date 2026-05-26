@@ -6,6 +6,8 @@ Goal: continue CM-1164 by adding an explicit repair policy for degraded manifest
 
 Status: CM1165_DEGRADED_MANIFEST_REPAIR_POLICY_VALIDATED_NOT_READY.
 
+Local commit: `ddf7a9f feat: repair drained write manifests`.
+
 Changed files: `src/storage/SqliteShadowStore.js`; `src/core/MemoryWriteService.js`; `src/storage/AuditLogStore.js`; `tests/memory-write-restart-durability-temp-local-evidence.test.js`; `docs/CM1165_DEGRADED_MANIFEST_REPAIR_POLICY.md`; status/truth-table/board surfaces.
 
 Runtime behavior under test: a degraded SQLite write manifest with remaining reconcile tasks is retained; after explicit reconcile replay drains the queue, explicit repair marks it `repaired`, duplicate canonical writes replay the repaired result, and selected audit metadata reports repaired status and reason.
@@ -14,7 +16,7 @@ Validation: source/test syntax passed. Targeted storage/runtime/reconcile/audit 
 
 Remaining risks: no automatic startup repair/recovery, no background worker/scheduler repair, no retry/backoff policy, no real memory repair proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
 
-Next safe step: commit CM-1165 if guarded commit eligibility remains clean. After that, consider guarded automatic pending-manifest recovery policy design, retry/backoff policy for reconcile and recovery tasks, or startup recovery safety preflight. Do not push or claim readiness/reliability.
+Next safe step: consider guarded automatic pending-manifest recovery policy design, retry/backoff policy for reconcile and recovery tasks, or startup recovery safety preflight. Do not push or claim readiness/reliability.
 
 ## CM-1164 Unrecoverable Pending Manifest Cancel Policy Handoff
 
