@@ -6,7 +6,7 @@ Status: `CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE_VALIDATED_NOT_READY`
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `d50b76e fix: reject no-token raw search content`.
 
 Completed:
 - Added HTTP JSON-RPC no-token rejection for `search_memory` calls with `include_content=true`.
@@ -45,7 +45,7 @@ Status: `CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT_VALIDATED_NOT_READY`
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `1c756b9 fix: split readonly search cache behavior`.
 
 Completed:
 - Changed readonly candidate generation to bypass candidate cache reads as well as writes.

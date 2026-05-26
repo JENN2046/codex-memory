@@ -6,7 +6,7 @@ Goal: prevent no-token HTTP `search_memory` from requesting raw memory content.
 
 Status: CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE_VALIDATED_NOT_READY.
 
-Local commit: pending.
+Local commit: `d50b76e fix: reject no-token raw search content`.
 
 Changed files: `src/adapters/codex-mcp/http.js`; `tests/mcp-http.test.js`; `docs/CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE.md`; status/truth-table/board surfaces.
 
@@ -16,7 +16,7 @@ Validation: source/test syntax, targeted HTTP tests `18/18`, adjacent HTTP/contr
 
 Remaining risks: no-token `memory_overview` selected-output posture still needs review; this is not recall reliability, production readiness, or RC readiness.
 
-Next safe step: run docs/ledger/diff checks, then optionally commit CM-1178 if guarded conditions pass.
+Next safe step: continue to CM-1179 actual evidence review or no-token `memory_overview` selected-output posture review.
 
 ## CM-1177 Readonly/Syncing Search Semantic Split Handoff
 
@@ -24,7 +24,7 @@ Goal: make readonly `search_memory` avoid candidate-cache metadata reads/writes 
 
 Status: CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT_VALIDATED_NOT_READY.
 
-Local commit: pending.
+Local commit: `1c756b9 fix: split readonly search cache behavior`.
 
 Changed files: `src/recall/CandidateGenerator.js`; `tests/mcp-http.test.js`; `docs/CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT.md`; status/truth-table/board surfaces.
 
@@ -34,7 +34,7 @@ Validation: source/test syntax, targeted HTTP plus phase-B tests `33/33`, and fu
 
 Remaining risks: this is not full no-token read closure, recall-quality proof, recall reliability, production readiness, or RC readiness. SQLite schema migration/version gate, startup explicit rebuild/recovery policy, and a full lifecycle transition log remain open.
 
-Next safe step: run docs/ledger/diff checks, then optionally commit CM-1177 if guarded conditions pass. After that, continue to CM-1178 broader no-token read closure.
+Next safe step: CM-1178 has since been completed and locally committed as `d50b76e`; continue to CM-1179 actual evidence review or no-token `memory_overview` selected-output posture review.
 
 ## CM-1176 Diary Projection Rebuild From SQLite Authority Handoff
 
