@@ -28,6 +28,26 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1172 Temp-Local Reconcile Positive Dry-Run Approval Packet - 2026-05-26
+
+Result: `CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1172 prepares the next exact approval request only:
+
+- Drafts one approval packet after CM-1171 consumed CM-1170.
+- Binds the request to clean `HEAD=8cbe58c13c1057114b8fc0f1cf986ded9ba72261` before packet commit.
+- Limits any future separately approved action to one isolated temp-local/fixture-only positive reconcile dry-run.
+- Allows only one synthetic `SqliteShadowStore.enqueueReconcileTask(...)` seed and one `MemoryWriteReconcileWorker.runOnce({ dryRun:true, limit:1 })`.
+- Requires `dryRun=true`, `apply=false`, `confirm=false`, `maxRuns=1`, `workerLimit=1`, `isolatedTempRoot=true`, `cleanupRequired=true`, `rawOutputAllowed=false`, and `durableAuditAllowed=false`.
+- Expected selected counters are `scannedTaskCount=1`, `wouldReplayCount=1`, `replayedCount=0`, `clearedCount=0`, `failedCount=0`, and `skippedCount=0`.
+- Forbids CM-1170 approval reuse, `record_memory`, diary writes, projection apply, real stores, startup/runtime/manifest recovery execution, repair/cancel/reconcile apply, durable audit write, raw output, provider/API, public MCP expansion, config/watchdog/startup/dependency changes, migration/import/export/backup/restore, push, readiness, and reliability claims.
+
+Still not proven:
+
+- No exact approval has been consumed.
+- No positive dry-run has been executed.
+- No startup recovery, runtime recovery, real-store recovery proof, durable audit write, production readiness, write reliability, or recall reliability.
+
 ## CM-1171 CM1170 Temp-Local Dry-Run Execution Record - 2026-05-26
 
 Result: `CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTED_RECORDED_NOT_READY`.

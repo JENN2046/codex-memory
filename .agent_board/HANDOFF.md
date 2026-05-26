@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-1172 Temp-Local Reconcile Positive Dry-Run Approval Packet Handoff
+
+Goal: prepare the exact approval request boundary for one future positive queued-task dry-run without executing it.
+
+Status: CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `docs/CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_APPROVAL_PACKET.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: none executed. The packet only describes a possible future exact-approved temp-local/fixture-only flow that seeds exactly one synthetic `vector` reconcile task through `SqliteShadowStore.enqueueReconcileTask(...)`, runs `MemoryWriteReconcileWorker.runOnce({ dryRun:true, limit:1 })`, and records selected counters only.
+
+Validation: source surface inspection, docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and final review passed.
+
+Remaining risks: exact approval not yet consumed, positive dry-run not executed, no startup/runtime recovery proof, no manifest recovery/repair/cancel execution, no real-store proof, no durable audit proof, no background worker/scheduler recovery, no retry/backoff policy, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Post-commit state: pending.
+
+Next safe step: validate and commit packet if guarded commit conditions pass, generate final copy/paste approval line from clean HEAD, then pause for user approval. Do not execute positive dry-run/startup/runtime recovery, push, or claim readiness/reliability.
+
 ## CM-1171 CM-1170 Temp-Local Dry-Run Execution Record Handoff
 
 Goal: consume the exact-approved CM-1170 temp-local dry-run once and record the result without expanding into recovery or real-store work.

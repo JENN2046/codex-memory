@@ -1,5 +1,50 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1172 Temp-Local Reconcile Positive Dry-Run Approval Packet Checkpoint
+
+Status: `CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Drafted `docs/CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_APPROVAL_PACKET.md`.
+- Bound the draft to clean pre-packet `HEAD=8cbe58c13c1057114b8fc0f1cf986ded9ba72261`.
+- Confirmed source surfaces: `SqliteShadowStore.enqueueReconcileTask(...)`, `MemoryWriteReconcileWorker.runOnce(...)`, and `MemoryWriteReconcileService.replayPending(...)`.
+- Limited the future separately approved action to one synthetic temp-local queued `vector` task and one worker dry-run with `limit=1`.
+- Expected selected counters are `scannedTaskCount=1`, `wouldReplayCount=1`, `replayedCount=0`, `clearedCount=0`, `failedCount=0`, and `skippedCount=0`.
+- Recorded that the final request hash must be generated after this packet is committed.
+
+Validation:
+- Source surface inspection completed.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan passed; the only CM-1172 packet hit was negative `non-secret` wording.
+- Final review found no execution authorization in this packet.
+
+Boundary:
+- No exact approval consumed.
+- No CM-1170 approval reuse.
+- No positive dry-run execution.
+- No `record_memory` call.
+- No diary write.
+- No projection apply.
+- No startup recovery execution.
+- No runtime recovery execution.
+- No manifest recovery, repair, or cancellation execution.
+- No reconcile apply.
+- No durable audit write.
+- No public MCP schema expansion.
+- No real memory store mutation.
+- No provider/API, migration/import/export/backup/restore, config/watchdog/startup/dependency change, push, production-readiness claim, or reliability claim.
+
+Next:
+- Validate and commit this approval packet if guarded commit conditions pass.
+- Generate the final copy/paste approval line from the resulting clean HEAD.
+- Pause before any positive dry-run execution until the user provides that exact approval line.
+
 ## CM-1171 CM-1170 Temp-Local Dry-Run Execution Record Checkpoint
 
 Status: `CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTED_RECORDED_NOT_READY`
