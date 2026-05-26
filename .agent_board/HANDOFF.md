@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-1171 CM-1170 Temp-Local Dry-Run Execution Record Handoff
+
+Goal: consume the exact-approved CM-1170 temp-local dry-run once and record the result without expanding into recovery or real-store work.
+
+Status: CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTED_RECORDED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `docs/CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTION_RECORD.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: one isolated temp-local `MemoryWriteReconcileWorker.runOnce({ dryRun:true, limit:1 })`; result was `dry_run_completed`, scanned `0`, replayed `0`, failed `0`; cleanup executed and verified.
+
+Validation: exact approval intake, pre-execution Git facts, request hash recompute, sanitized dry-run output review, cleanup verification, docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and final review passed.
+
+Remaining risks: no startup/runtime recovery execution, no manifest recovery/repair/cancel execution, no reconcile apply, no real-store recovery proof, no durable audit write proof, no background worker/scheduler recovery, no retry/backoff policy, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Post-commit state: pending.
+
+Next safe step: commit the execution record, then decide the next bounded checkpoint from clean HEAD. Do not rerun CM-1170 without a new exact approval.
+
 ## CM-1170 Temp-Local Startup Recovery Dry-Run Execution Approval Packet Handoff
 
 Goal: prepare the exact approval request boundary after CM-1169 without executing any dry-run.

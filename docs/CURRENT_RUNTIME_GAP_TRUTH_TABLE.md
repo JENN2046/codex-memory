@@ -28,6 +28,30 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1171 CM1170 Temp-Local Dry-Run Execution Record - 2026-05-26
+
+Result: `CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTED_RECORDED_NOT_READY`.
+
+CM-1171 records the exact-approved CM-1170 execution:
+
+- Exact approval consumed for `HEAD=d044b80771a0a5ee2c01c4aa5f0b0a9feb80c209`.
+- Request hash recomputed as `090f434e9e3200abe8f1c94f2adb5450aec8ca46b0f30a4de749aae61c79d002`.
+- One isolated temp-local `MemoryWriteReconcileWorker.runOnce({ dryRun:true, limit:1 })` executed.
+- Result was `decision=dry_run_completed`, `workerDecision=run_once_completed`, `success=true`.
+- Counters were `scannedTaskCount=0`, `wouldReplayCount=0`, `replayedCount=0`, `clearedCount=0`, `failedCount=0`, `skippedCount=0`.
+- Cleanup was executed and verified.
+
+Still not proven:
+
+- No startup recovery execution.
+- No runtime recovery execution.
+- No manifest recovery, repair, or cancellation execution.
+- No reconcile replay apply.
+- No durable audit write.
+- No real-store recovery proof.
+- No automatic startup recovery, scheduled recovery, retry/backoff policy, or cross-store transactionality.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1170 Temp-Local Startup Recovery Dry-Run Execution Approval Packet - 2026-05-26
 
 Result: `CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.

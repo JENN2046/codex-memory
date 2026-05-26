@@ -1,5 +1,48 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1171 CM-1170 Temp-Local Dry-Run Execution Record Checkpoint
+
+Status: `CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTED_RECORDED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Consumed exact CM-1170 approval for `HEAD=d044b80771a0a5ee2c01c4aa5f0b0a9feb80c209` and request hash `090f434e9e3200abe8f1c94f2adb5450aec8ca46b0f30a4de749aae61c79d002`.
+- Confirmed clean worktree and matching HEAD before execution.
+- Recomputed request hash before execution.
+- Executed exactly one isolated temp-local `MemoryWriteReconcileWorker.runOnce({ dryRun:true, limit:1 })`.
+- Recorded sanitized result `TEMP_LOCAL_DRY_RUN_EXECUTED_NOT_READY`.
+- Cleaned up the temp-local execution directory and verified cleanup.
+
+Validation:
+- Pre-execution Git facts passed.
+- Request hash recompute passed.
+- Sanitized dry-run output review passed.
+- Cleanup verification passed.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan passed.
+- Final review found no further CM-1170 execution authorization.
+
+Boundary:
+- CM-1170 approval consumed once and cannot be reused.
+- No startup recovery execution.
+- No runtime recovery execution.
+- No manifest recovery, repair, or cancellation execution.
+- No reconcile apply.
+- No durable audit write.
+- No public MCP schema expansion.
+- No real memory store mutation.
+- No provider/API, migration/import/export/backup/restore, config/watchdog/startup/dependency change, push, production-readiness claim, or reliability claim.
+
+Next:
+- Commit this execution record.
+- Decide the next safe bounded checkpoint from the clean head.
+- Do not rerun CM-1170 without a new exact approval.
+
 ## CM-1170 Temp-Local Startup Recovery Dry-Run Execution Approval Packet Checkpoint
 
 Status: `CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
