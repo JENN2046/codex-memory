@@ -28,6 +28,32 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1181 Startup Explicit Rebuild Recovery Policy Plan - 2026-05-26
+
+Result: `CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`.
+
+Current source facts:
+
+- Explicit diary projection rebuild and reconcile worker building blocks exist.
+- Worker status and dry-run behavior exist.
+- No unified startup recovery policy currently authorizes or blocks automatic rebuild/reconcile apply.
+
+CM-1181 only plans a future policy:
+
+- startup inspection/reporting is allowed as a future safe surface
+- silent diary rebuild is blocked
+- silent reconcile apply is blocked
+- schema gate blockers must stop recovery first
+- apply/rebuild/reconcile require exact bounded authorization and validation
+
+Still not proven:
+
+- No source implementation yet.
+- No startup behavior change.
+- No worker install/startup persistence.
+- No rebuild/reconcile apply.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1180 SQLite Schema Version Startup Gate Plan - 2026-05-26
 
 Result: `CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`.

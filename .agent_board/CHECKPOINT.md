@@ -1,12 +1,47 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1181 Startup Explicit Rebuild Recovery Policy Plan Checkpoint
+
+Status: `CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Inspected current recovery building blocks.
+- Documented startup recovery policy boundary.
+- Planned future decision classes and acceptance criteria.
+
+Validation:
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `git diff --check` passed.
+
+Boundary:
+- No source change.
+- No worker start/install.
+- No startup behavior change.
+- No rebuild/reconcile apply.
+- No durable memory/audit write.
+- No config/watchdog/startup/dependency change.
+- No migration, import, export, backup, or restore apply.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- Implement explicit startup recovery inspection/reporting in a later source/test slice.
+- Keep rebuild/reconcile apply separate and approval-gated for real stores.
+- No-token `memory_overview` selected-output posture.
+- Full lifecycle transition log.
+
 ## CM-1180 SQLite Schema Version Startup Gate Plan Checkpoint
 
 Status: `CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `054f62e docs: plan sqlite schema startup gate`.
 
 Completed:
 - Inspected current `SqliteShadowStore.ensureReady()` source behavior.

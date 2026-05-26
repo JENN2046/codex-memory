@@ -1,12 +1,28 @@
 # HANDOFF.md - codex-memory
 
+## CM-1181 Startup Explicit Rebuild Recovery Policy Plan Handoff
+
+Goal: plan a future startup recovery policy without enabling automatic recovery.
+
+Status: CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `docs/CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `.agent_board/*`.
+
+Decision: startup may become an inspection/reporting surface, but silent diary rebuild and reconcile apply remain blocked.
+
+Validation: ledger consistency, docs validation, and `git diff --check` passed.
+
+Next safe step: optionally commit CM-1181 if guarded conditions pass.
+
 ## CM-1180 SQLite Schema Version Startup Gate Plan Handoff
 
 Goal: plan a future SQLite schema version startup gate without changing runtime behavior.
 
 Status: CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY.
 
-Local commit: pending.
+Local commit: `054f62e docs: plan sqlite schema startup gate`.
 
 Changed files: `docs/CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `.agent_board/*`.
 
@@ -14,7 +30,7 @@ Current source fact: `SqliteShadowStore.ensureReady()` creates tables and opport
 
 Validation: ledger consistency, docs validation, and `git diff --check` passed.
 
-Next safe step: optionally commit CM-1180 if guarded conditions pass.
+Next safe step: CM-1181 startup explicit rebuild/recovery policy plan has since started.
 
 ## CM-1179 No-Token Search Evidence Review Handoff
 
