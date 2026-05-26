@@ -32,7 +32,6 @@ Boundary:
 - No automatic missing-diary repair, manifest abort/cancel/status policy, startup recovery, background worker enablement, scheduler/watchdog change, or cross-store transactionality.
 
 Next:
-- Commit CM-1163 if guarded commit eligibility remains clean.
 - Continue kernel hardening with manifest abort/cancel policy design for unrecoverable pending writes, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design.
 
 ## CM-1162 Degraded Reconcile Replay After Restart Validation Checkpoint

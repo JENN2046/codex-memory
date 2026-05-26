@@ -14,7 +14,7 @@ Validation: test syntax passed. Targeted storage/runtime/reconcile tests passed 
 
 Remaining risks: no automatic missing-diary repair, no manifest abort/cancel/status transition policy, no automatic startup recovery, no background worker/scheduler recovery, no real memory recovery proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
 
-Next safe step: commit CM-1163 if guarded commit eligibility remains clean. After that, consider manifest abort/cancel policy design for unrecoverable pending writes, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
+Next safe step: consider manifest abort/cancel policy design for unrecoverable pending writes, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
 
 ## CM-1162 Degraded Reconcile Replay After Restart Validation Handoff
 
