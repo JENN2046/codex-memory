@@ -6,7 +6,7 @@ Goal: review no-token `memory_overview` selected-output posture and decide wheth
 
 Status: CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW_BLOCKED_NOT_DOWNGRADED_NOT_READY.
 
-Local commit: pending.
+Local commit: `a54b680 docs: review no-token overview posture`.
 
 Changed files: `docs/CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `.agent_board/*`.
 

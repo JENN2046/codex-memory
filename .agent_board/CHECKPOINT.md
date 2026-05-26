@@ -6,7 +6,7 @@ Status: `CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW_BLOCKED_
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `a54b680 docs: review no-token overview posture`.
 
 Completed:
 - Reviewed HTTP no-token validation behavior for `memory_overview`.
