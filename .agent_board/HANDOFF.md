@@ -1,5 +1,19 @@
 # HANDOFF.md - codex-memory
 
+## CM-1150 Fresh CM1120 Selected Audit Correlation Approval Packet Handoff
+
+Goal: prepare/request the next allowed CM-1120 exact approval without executing CM-1120.
+
+Status: CM1150_FRESH_CM1120_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY.
+
+Changed files: `docs/CM1150_FRESH_CM1120_SELECTED_AUDIT_CORRELATION_APPROVAL_PACKET.md`; `STATUS.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Validation: docs validation, ledger consistency, `git diff --check`, and focused no-secret scan passed; commit and final approval-line hash calculation remain.
+
+Remaining risks: final approval line must be calculated after commit against clean HEAD. CM-1120 execution remains blocked until the user repeats the exact line. A favorable CM-1120 result would still not prove readiness/reliability.
+
+Next safe step: validate, commit, calculate final exact approval line, and provide it for copy/paste. Do not execute CM-1120.
+
 ## CM-1149 Post CM1115 Current-Facts Gate Rerun Handoff
 
 Goal: record the post-CM1115 current-facts gate rerun and next allowed action.

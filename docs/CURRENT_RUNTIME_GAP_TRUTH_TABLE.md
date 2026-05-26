@@ -28,6 +28,31 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1150 Fresh CM1120 Selected Audit Correlation Approval Packet - 2026-05-26
+
+Result: `CM1150_FRESH_CM1120_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1150 prepares a fresh CM-1120 exact approval request boundary after CM-1149 gates recognized both prior results and selected target-head rebaseline as the next allowed action.
+
+The future exact-approved action would be limited to one selected audit-correlation observation:
+
+```text
+surface=AuditLogStore.readSelectedWriteAuditCorrelation
+memoryId=codex-process-50325be15fdb479d805728fe420b4838
+eventType=memory_tombstone
+toolName=memory_tombstone
+requestSource=CM-1111-proof-memory-retention-apply
+maxSelectedAuditCorrelationReads=1
+```
+
+Maximum possible future result class:
+
+```text
+AUDIT_SELECTED_CORRELATION_OBSERVED
+```
+
+CM-1150 does not execute CM-1120, read observation input, read true audit/raw audit/raw memory/diary/`.jsonl`, call memory tools/provider/API, write durable memory/audit, run apply, change public MCP/config/watchdog/startup/package/dependency, push/tag/release/deploy, or claim readiness/reliability.
+
 ## CM-1149 Post CM1115 Current-Facts Gate Rerun - 2026-05-26
 
 Result: `CM1149_POST_CM1115_CURRENT_FACTS_GATE_RERUN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.

@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1150 Fresh CM1120 Selected Audit Correlation Approval Packet Checkpoint
+
+Status: `CM1150_FRESH_CM1120_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Prepared CM-1120 approval request boundary after CM-1149 gates selected target-head rebaseline.
+- Limited future possible action to one selected `AuditLogStore.readSelectedWriteAuditCorrelation` observation.
+- Kept CM-1120 execution, readiness, and reliability blocked.
+
+Validation:
+- Docs validation, ledger consistency, `git diff --check`, and focused no-secret scan passed.
+- Post-commit exact line hash calculation pending.
+
+Boundary:
+- No CM-1120 execution.
+- No observation input, true audit, raw audit, raw memory, diary, or `.jsonl` read.
+- No memory tools or provider/API calls.
+- No durable memory/audit write or apply.
+- No public MCP/config/watchdog/startup/package/dependency change.
+- No push.
+- No readiness or reliability claim.
+
+Next:
+- Commit this packet.
+- Generate final copy/paste CM-1120 approval line from the resulting clean HEAD.
+
 ## CM-1149 Post CM1115 Current-Facts Gate Rerun Checkpoint
 
 Status: `CM1149_POST_CM1115_CURRENT_FACTS_GATE_RERUN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
