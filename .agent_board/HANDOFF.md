@@ -1,5 +1,19 @@
 # HANDOFF.md - codex-memory
 
+## CM-1146 Current-Facts Rebaseline And CM1145 Prior Result Ingestion Handoff
+
+Goal: make current-facts gates recognize the recorded CM-1145 CM-1111 result and classify stale CM-1120 target head as later rebaseline work.
+
+Status: COMPLETED_VALIDATED_CM1146_CURRENT_FACTS_REBASELINE_PRIOR_RESULT_INGESTION_NOT_READY.
+
+Changed files: `src/cli/selected-audit-correlation-current-facts-preflight.js`; `src/core/SelectedAuditCorrelationPrerequisiteBlockerPlan.js`; `src/core/SelectedAuditCorrelationPrerequisiteStageGate.js`; `src/core/SelectedAuditCorrelationPrerequisiteResolutionSequence.js`; related tests; `docs/CM1146_CURRENT_FACTS_REBASELINE_PRIOR_RESULT_INGESTION.md`; status/board files.
+
+Validation: targeted tests passed `33/33`; adjacent regression bundle passed `49/49`; full `npm test` passed `2747/2747`.
+
+Remaining risks: real gates must be rerun from a clean committed head. CM-1115 still requires separate exact approval; CM-1120 remains blocked until CM-1115 result and target-head rebaseline/approval gates.
+
+Next safe step: commit after validation, then rerun current-facts stage gate and resolution sequence from clean head.
+
 ## CM-1145 CM1111 Proof Memory Retention Apply Execution Record Handoff
 
 Goal: execute and record the user exact-approved CM-1111 proof-memory retention tombstone apply once.

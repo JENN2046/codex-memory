@@ -81,6 +81,7 @@ test('CM-1131 allows only CM-1115 approval request after CM-1111 result exists',
   const gate = evaluateSelectedAuditCorrelationPrerequisiteStageGate(
     planReport({
       prerequisiteBlockers: [
+        'localHead_target_head_mismatch',
         'prior_result_CM-1115_missing'
       ]
     })
@@ -92,6 +93,26 @@ test('CM-1131 allows only CM-1115 approval request after CM-1111 result exists',
   assert.equal(gate.cm1115ApprovalRequestAllowed, true);
   assert.equal(gate.cm1120ApprovalRequestAllowed, false);
   assert.equal(gate.cm1115ExecutionAuthorizedNow, false);
+});
+
+test('CM-1131 treats CM-1120 target-head drift as rebaseline after prior results', () => {
+  const gate = evaluateSelectedAuditCorrelationPrerequisiteStageGate(
+    planReport({
+      prerequisiteBlockers: [
+        'localHead_target_head_mismatch',
+        'originHead_target_head_mismatch',
+        'remoteMainHead_target_head_mismatch'
+      ]
+    })
+  );
+
+  assert.equal(gate.stageClass, STAGE_CLASSES.WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115);
+  assert.equal(gate.nextApprovalTarget, 'CM-1120-rebaseline');
+  assert.equal(gate.cm1111ApprovalRequestAllowed, false);
+  assert.equal(gate.cm1115ApprovalRequestAllowed, false);
+  assert.equal(gate.cm1120ApprovalRequestAllowed, false);
+  assert.equal(gate.cm1120ExecutionAuthorizedNow, false);
+  assert.equal(gate.readinessClaimAllowed, false);
 });
 
 test('CM-1131 gates CM-1120 approval request without executing observation', () => {

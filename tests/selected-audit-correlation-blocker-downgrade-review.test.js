@@ -111,7 +111,7 @@ function favorableReadinessReport() {
 }
 
 test('CM-1128 review keeps current dirty CM-1127 readiness blocked', () => {
-  const readinessReport = buildReport({}, {
+  const readinessReport = buildReport({ noRecordedPriorResults: true }, {
     gitRunner: gitRunnerForDirtyHead
   });
   const review = reviewSelectedAuditCorrelationBlockerDowngrade(readinessReport);

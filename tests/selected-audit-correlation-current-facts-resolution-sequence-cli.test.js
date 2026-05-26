@@ -44,6 +44,33 @@ function gitRunnerForDirtyHead(args) {
   return gitRunnerForCleanHead(args);
 }
 
+function gitRunnerForCurrentPostCm1145Head(args) {
+  const key = args.join(' ');
+  const outputs = {
+    'branch --show-current': 'main\n',
+    'rev-parse HEAD': '1a46897cb5792bc84a07a5eeaadb5b1b3c95e075\n',
+    'rev-parse origin/main': 'e11fe0bd1da3a08eae8c0e2c405ccfd38a55cd28\n',
+    'rev-parse refs/remotes/origin/main': 'e11fe0bd1da3a08eae8c0e2c405ccfd38a55cd28\n',
+    'status --short': ''
+  };
+  return {
+    status: 0,
+    stdout: outputs[key] || '',
+    stderr: '',
+    error: ''
+  };
+}
+
+function cm1145Reader() {
+  return [
+    'Status: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`',
+    'APPLIED_TOMBSTONED_SANITIZED',
+    'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+    'decision=tombstoned',
+    'mutated=true'
+  ].join('\n');
+}
+
 test('CM-1140 current-facts CLI reports dirty worktree resolution sequence without approvals', () => {
   const report = buildReport({}, {
     gitRunner: gitRunnerForDirtyHead
@@ -74,6 +101,22 @@ test('CM-1140 current-facts CLI reaches CM-1120 approval-packet boundary only wi
   assert.equal(report.cm1120ExecutionAuthorizedNow, false);
   assert.equal(report.safety.readsTrueAuditLog, false);
   assert.equal(report.safety.callsSearchMemory, false);
+});
+
+test('CM-1140 current-facts CLI sequences CM-1115 after CM-1145 even when CM-1120 head is stale', () => {
+  const report = buildReport({}, {
+    gitRunner: gitRunnerForCurrentPostCm1145Head,
+    fileReader: cm1145Reader
+  });
+
+  assert.equal(report.stageClass, 'WAIT_CM1115_SEPARATE_EXACT_APPROVAL_AFTER_CM1111');
+  assert.equal(report.resolutionClass, RESOLUTION_CLASSES.WAIT_CM1115_APPROVAL_PACKET_ONLY_AFTER_CM1111);
+  assert.equal(report.nextAllowedAction, 'request_separate_exact_cm1115_approval_only');
+  assert.equal(report.nextApprovalTarget, 'CM-1115');
+  assert.equal(report.cm1115ExecutionAuthorizedNow, false);
+  assert.equal(report.cm1120ExecutionAuthorizedNow, false);
+  assert.ok(report.currentFactsBlockerReasons.includes('localHead_target_head_mismatch'));
+  assert.ok(!report.currentFactsBlockerReasons.includes('prior_result_CM-1111_missing'));
 });
 
 test('CM-1140 current-facts CLI rejects audit flags before Git collection', () => {

@@ -15,6 +15,15 @@ const PLAN_CLASSES = Object.freeze({
 });
 
 const BLOCKER_ACTIONS = Object.freeze({
+  localHead_target_head_mismatch: [
+    'prepare_fresh_cm1120_target_head_rebaseline_after_cm1115_result'
+  ],
+  originHead_target_head_mismatch: [
+    'prepare_fresh_cm1120_target_head_rebaseline_after_cm1115_result'
+  ],
+  remoteMainHead_target_head_mismatch: [
+    'prepare_fresh_cm1120_target_head_rebaseline_after_cm1115_result'
+  ],
   dirty_worktree: [
     'resolve_dirty_worktree_or_isolate_verified_scope_without_overwriting_user_work'
   ],

@@ -28,6 +28,40 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1146 Current-Facts Rebaseline And CM1145 Prior Result Ingestion - 2026-05-26
+
+Result: `CM1146_CURRENT_FACTS_REBASELINE_PRIOR_RESULT_INGESTION_COMPLETED_VALIDATED_NOT_READY`.
+
+Current-facts gates now recognize the local CM-1145 execution record as the narrow prior result:
+
+```text
+CM-1111:APPLIED_TOMBSTONED_SANITIZED
+```
+
+CM-1120 target-head mismatch is now classified as a later rebaseline blocker after prior results, rather than an unknown blocker or a reason to return to CM-1111.
+
+Targeted tests:
+
+```text
+selected-audit-correlation-current-facts-preflight-cli.test.js
+selected-audit-correlation-prerequisite-stage-gate.test.js
+selected-audit-correlation-prerequisite-resolution-sequence.test.js
+selected-audit-correlation-current-facts-stage-gate-cli.test.js
+selected-audit-correlation-current-facts-resolution-sequence-cli.test.js
+result=33/33 passed
+```
+
+Current effect:
+
+```text
+CM-1111 result ingestion = fixed for CM-1145
+CM-1115 approval request sequencing = expected next after clean gate rerun
+CM-1120 target-head rebaseline = still required later
+CM-1120 execution = false
+readiness = false
+reliability = false
+```
+
 ## CM-1145 CM1111 Proof Memory Retention Apply Execution Record - 2026-05-26
 
 Result: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`.

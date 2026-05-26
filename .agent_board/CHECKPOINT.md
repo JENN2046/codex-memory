@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1146 Current-Facts Rebaseline And CM1145 Prior Result Ingestion Checkpoint
+
+Status: `CM1146_CURRENT_FACTS_REBASELINE_PRIOR_RESULT_INGESTION_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added narrow local CM-1145 prior-result ingestion for `CM-1111:APPLIED_TOMBSTONED_SANITIZED`.
+- Added known CM-1120 target-head rebaseline blocker classification.
+- Kept CM-1120 execution blocked and CM-1115 execution approval separate.
+
+Validation:
+- Targeted CM-1122/CM-1131/CM-1140 tests passed `33/33`.
+- Adjacent current-facts fail-closed regression bundle passed `49/49`.
+- Full `npm test` passed `2747/2747`.
+
+Boundary:
+- No CM-1115 or CM-1120 execution.
+- No true audit/raw memory/diary/`.jsonl` read.
+- No memory tools or provider/API calls.
+- No cleanup/rollback/migration apply.
+- No public MCP/config/watchdog/startup/package change.
+- No push.
+- No readiness or reliability claim.
+
+Next:
+- Commit after final docs/ledger/diff validation.
+- Rerun real current-facts gates from clean head.
+
 ## CM-1145 CM1111 Proof Memory Retention Apply Execution Record Checkpoint
 
 Status: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`

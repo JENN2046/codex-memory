@@ -45,7 +45,7 @@ function gitRunnerForDirtyHead(args) {
 }
 
 test('CM-1129 downgrade review CLI reports current dirty facts as not downgrade', () => {
-  const report = buildReport({}, {
+  const report = buildReport({ noRecordedPriorResults: true }, {
     gitRunner: gitRunnerForDirtyHead
   });
 

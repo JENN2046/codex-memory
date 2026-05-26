@@ -8,6 +8,7 @@ const STAGE_CLASSES = Object.freeze({
   BLOCKED_RESOLVE_WORKTREE_BEFORE_APPROVAL: 'BLOCKED_RESOLVE_WORKTREE_BEFORE_APPROVAL',
   WAIT_CM1111_SEPARATE_EXACT_APPROVAL: 'WAIT_CM1111_SEPARATE_EXACT_APPROVAL',
   WAIT_CM1115_SEPARATE_EXACT_APPROVAL_AFTER_CM1111: 'WAIT_CM1115_SEPARATE_EXACT_APPROVAL_AFTER_CM1111',
+  WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115: 'WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115',
   WAIT_CM1120_SEPARATE_EXACT_OBSERVATION_APPROVAL: 'WAIT_CM1120_SEPARATE_EXACT_OBSERVATION_APPROVAL',
   NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY: 'NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY',
   FAIL_CLOSED_REPORT_MISSING: 'FAIL_CLOSED_REPORT_MISSING',
@@ -35,6 +36,12 @@ const FORBIDDEN_SAFETY_FLAGS = Object.freeze([
   'claimsWriteReliable',
   'claimsRecallReliable',
   'claimsReadiness'
+]);
+
+const TARGET_HEAD_REBASELINE_BLOCKERS = Object.freeze([
+  'localHead_target_head_mismatch',
+  'originHead_target_head_mismatch',
+  'remoteMainHead_target_head_mismatch'
 ]);
 
 function isPlainObject(value) {
@@ -243,6 +250,20 @@ function evaluateSelectedAuditCorrelationPrerequisiteStageGate(prerequisitePlanR
       );
     }
 
+    if (TARGET_HEAD_REBASELINE_BLOCKERS.some(blocker => blockers.includes(blocker))) {
+      return baseGate(
+        STAGE_CLASSES.WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115,
+        prerequisitePlanReport,
+        plan,
+        {
+          reason: 'cm1120_target_head_rebaseline_required_after_prior_results',
+          nextApprovalTarget: 'CM-1120-rebaseline',
+          nextOperatorAction: 'prepare_fresh_cm1120_target_head_rebaseline_packet_after_cm1115_result',
+          nextStep: 'Prepare a fresh CM-1120 target-head rebaseline packet after CM-1115 result is recorded; do not execute CM-1120.'
+        }
+      );
+    }
+
     return baseGate(
       STAGE_CLASSES.FAIL_CLOSED_INCONSISTENT_STAGE_SIGNAL,
       prerequisitePlanReport,
@@ -297,5 +318,6 @@ function evaluateSelectedAuditCorrelationPrerequisiteStageGate(prerequisitePlanR
 module.exports = {
   FORBIDDEN_SAFETY_FLAGS,
   STAGE_CLASSES,
+  TARGET_HEAD_REBASELINE_BLOCKERS,
   evaluateSelectedAuditCorrelationPrerequisiteStageGate
 };

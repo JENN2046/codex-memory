@@ -8,6 +8,7 @@ const test = require('node:test');
 
 const {
   buildReport,
+  collectRecordedPriorResults,
   collectGitFacts
 } = require('../src/cli/selected-audit-correlation-current-facts-preflight');
 const {
@@ -57,7 +58,7 @@ function runCli(args = []) {
 
 test('CM-1122 current-facts collector defaults to blocked when prior results are not assumed', () => {
   const report = buildReport(
-    {},
+    { noRecordedPriorResults: true },
     { gitRunner: fakeGitRunner(cleanOutputs()) }
   );
 
@@ -70,6 +71,7 @@ test('CM-1122 current-facts collector defaults to blocked when prior results are
   assert.equal(report.separateExactApprovalRequired, true);
   assert.equal(report.implicitAuditReadAuthorizationGranted, false);
   assert.equal(report.withSatisfiedPriorResults, false);
+  assert.equal(report.recordedPriorResultsEnabled, false);
   assert.ok(report.blockerReasons.includes('prior_result_CM-1111_missing'));
   assert.ok(report.blockerReasons.includes('prior_result_CM-1115_missing'));
   assert.equal(report.cleanTargetHead, true);
@@ -81,6 +83,41 @@ test('CM-1122 current-facts collector defaults to blocked when prior results are
   assert.equal(report.collectorSafety.readsTrueAuditLog, false);
   assert.equal(report.collectorSafety.callsRecordMemory, false);
   assert.equal(report.readinessClaimAllowed, false);
+});
+
+test('CM-1122 current-facts collector ingests CM-1145 recorded CM-1111 prior result only', () => {
+  const report = buildReport(
+    {},
+    {
+      gitRunner: fakeGitRunner(cleanOutputs()),
+      fileReader: () => [
+        'Status: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`',
+        'APPLIED_TOMBSTONED_SANITIZED',
+        'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+        'decision=tombstoned',
+        'mutated=true'
+      ].join('\n')
+    }
+  );
+
+  assert.equal(report.status, 'blocked');
+  assert.equal(report.recordedPriorResultsEnabled, true);
+  assert.equal(report.priorResultsSource, 'local_recorded_status_surfaces');
+  assert.deepEqual(report.recordedPriorResultTaskIds, ['CM-1111']);
+  assert.equal(report.requiredPriorResultsBound, false);
+  assert.ok(!report.blockerReasons.includes('prior_result_CM-1111_missing'));
+  assert.ok(report.blockerReasons.includes('prior_result_CM-1115_missing'));
+  assert.equal(report.cleanTargetHead, true);
+});
+
+test('CM-1122 recorded prior-result ingestion fails closed on missing CM-1145 status surface', () => {
+  const results = collectRecordedPriorResults({
+    fileReader: () => {
+      throw new Error('missing');
+    }
+  });
+
+  assert.deepEqual(results, []);
 });
 
 test('CM-1122 current-facts collector can prove the synthetic all-prior-results preflight shape without execution', () => {

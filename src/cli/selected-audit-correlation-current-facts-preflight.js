@@ -2,6 +2,8 @@
 'use strict';
 
 const { spawnSync } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const {
   EXACT_APPROVAL_LINE,
@@ -46,6 +48,7 @@ function parseArgs(argv = []) {
     pretty: false,
     help: false,
     withSatisfiedPriorResults: false,
+    noRecordedPriorResults: false,
     rejectedFlag: null
   };
 
@@ -60,6 +63,10 @@ function parseArgs(argv = []) {
     }
     if (token === '--with-satisfied-prior-results') {
       options.withSatisfiedPriorResults = true;
+      continue;
+    }
+    if (token === '--no-recorded-prior-results') {
+      options.noRecordedPriorResults = true;
       continue;
     }
     if (token === '--help' || token === '-h') {
@@ -123,16 +130,51 @@ function collectGitFacts({ cwd = process.cwd(), gitRunner = runGit } = {}) {
   };
 }
 
-function buildPreflightInput(gitFacts, options = {}) {
+function collectRecordedPriorResults({ cwd = process.cwd(), fileReader = fs.readFileSync } = {}) {
+  const results = [];
+  const cm1145Path = path.join(cwd, 'docs', 'CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTION_RECORD.md');
+
+  try {
+    const content = fileReader(cm1145Path, 'utf8');
+    if (
+      content.includes('CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY') &&
+      content.includes('APPLIED_TOMBSTONED_SANITIZED') &&
+      content.includes('memoryId=codex-process-50325be15fdb479d805728fe420b4838') &&
+      content.includes('decision=tombstoned') &&
+      content.includes('mutated=true')
+    ) {
+      results.push({
+        taskId: 'CM-1111',
+        resultClass: 'APPLIED_TOMBSTONED_SANITIZED',
+        source: 'docs/CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTION_RECORD.md'
+      });
+    }
+  } catch {
+    // Missing status record simply means no prior result is ingested.
+  }
+
+  return results;
+}
+
+function buildPreflightInput(gitFacts, options = {}, dependencies = {}) {
+  let priorResults = [];
+  let priorResultsSource = 'none';
+  if (options.withSatisfiedPriorResults) {
+    priorResults = REQUIRED_PRIOR_RESULTS.map(item => ({ ...item }));
+    priorResultsSource = 'synthetic_with_satisfied_prior_results';
+  } else if (options.noRecordedPriorResults !== true) {
+    priorResults = collectRecordedPriorResults(dependencies);
+    priorResultsSource = 'local_recorded_status_surfaces';
+  }
+
   return {
     basisId: 'CM-1120',
     approvalLine: EXACT_APPROVAL_LINE,
     packetId: 'CM-1120-SELECTED-AUDIT-CORRELATION-OBSERVATION-APPROVAL-001',
     requestSha256: REQUEST_SHA256,
     gitFacts,
-    priorResults: options.withSatisfiedPriorResults
-      ? REQUIRED_PRIOR_RESULTS.map(item => ({ ...item }))
-      : [],
+    priorResults,
+    priorResultsSource,
     currentArtifacts: REQUIRED_CURRENT_ARTIFACTS.map(item => ({ ...item })),
     observationSurface: { ...REQUIRED_OBSERVATION_SURFACE },
     boundaryFlags: { ...REQUIRED_BOUNDARY_FLAGS }
@@ -163,7 +205,7 @@ function buildReport(options = {}, dependencies = {}) {
   }
 
   const { gitFacts, errors } = collectGitFacts(dependencies);
-  const preflightInput = buildPreflightInput(gitFacts, options);
+  const preflightInput = buildPreflightInput(gitFacts, options, dependencies);
   const preflight = evaluateSelectedAuditCorrelationObservationPreflight(preflightInput);
 
   return {
@@ -178,6 +220,11 @@ function buildReport(options = {}, dependencies = {}) {
     separateExactApprovalRequired: preflight.separateExactApprovalRequired,
     implicitAuditReadAuthorizationGranted: preflight.implicitAuditReadAuthorizationGranted,
     withSatisfiedPriorResults: options.withSatisfiedPriorResults === true,
+    recordedPriorResultsEnabled: options.noRecordedPriorResults !== true,
+    priorResultsSource: preflightInput.priorResultsSource,
+    recordedPriorResultTaskIds: preflightInput.priorResults
+      .filter(item => item.source)
+      .map(item => item.taskId),
     blockerReasons: preflight.blockerReasons,
     gitFactErrors: errors,
     exactApprovalLineMatched: preflight.exactApprovalLineMatched,
@@ -268,6 +315,7 @@ function renderHelp() {
     'This command never reads audit logs, .jsonl, stores, raw memory, or runs memory tools, providers, services, or apply commands.',
     '',
     'By default, required CM-1111/CM-1115 prior results are not assumed and the preflight remains blocked.',
+    'By default, the CLI ingests recorded prior-result status surfaces such as CM-1145 when present; use --no-recorded-prior-results to disable that read.',
     '',
     'Rejected flags: --execute --run --observe --audit-read --read-audit --jsonl --raw --record-memory --search-memory --memory-overview --tombstone-memory --provider --write --apply --mutate --start-service'
   ].join('\n') + '\n';
@@ -297,6 +345,7 @@ if (require.main === module) {
 module.exports = {
   buildPreflightInput,
   buildReport,
+  collectRecordedPriorResults,
   collectGitFacts,
   main,
   parseArgs,

@@ -8,6 +8,7 @@ const RESOLUTION_CLASSES = Object.freeze({
   BLOCKED_DIRTY_WORKTREE_ISOLATION_REQUIRED: 'BLOCKED_DIRTY_WORKTREE_ISOLATION_REQUIRED',
   WAIT_CM1111_APPROVAL_PACKET_ONLY: 'WAIT_CM1111_APPROVAL_PACKET_ONLY',
   WAIT_CM1115_APPROVAL_PACKET_ONLY_AFTER_CM1111: 'WAIT_CM1115_APPROVAL_PACKET_ONLY_AFTER_CM1111',
+  WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115: 'WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115',
   WAIT_CM1120_APPROVAL_PACKET_ONLY_AFTER_PRIOR_RESULTS: 'WAIT_CM1120_APPROVAL_PACKET_ONLY_AFTER_PRIOR_RESULTS',
   NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY: 'NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY',
   FAIL_CLOSED_REPORT_MISSING: 'FAIL_CLOSED_REPORT_MISSING',
@@ -292,6 +293,26 @@ function buildSelectedAuditCorrelationPrerequisiteResolutionSequence(stageGateRe
           'record_only_narrow_blocker_downgrade_if_allowed'
         ],
         nextStep: 'Only CM-1120 approval may be requested next; observation execution still requires separate exact approval.'
+      }
+    );
+  }
+
+  if (stageClass === STAGE_CLASSES.WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115) {
+    return baseSequence(
+      RESOLUTION_CLASSES.WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115,
+      stageGateReport,
+      stageGate,
+      {
+        reason: 'cm1120_target_head_rebaseline_required_before_observation_approval',
+        nextAllowedAction: 'prepare_fresh_cm1120_target_head_rebaseline_packet_only',
+        approvalRequestCandidate: 'CM-1120-rebaseline',
+        nextApprovalTarget: 'CM-1120-rebaseline',
+        orderedResolutionSteps: [
+          'prepare_fresh_cm1120_selected_observation_packet_bound_to_current_clean_head',
+          'rerun_cm1129_cm1131_after_rebaseline_packet',
+          'request_cm1120_exact_approval_only_if_rebaseline_gate_allows'
+        ],
+        nextStep: 'Prepare only a fresh CM-1120 target-head rebaseline packet; do not execute selected audit observation.'
       }
     );
   }

@@ -87,6 +87,24 @@ test('CM-1140 sequences CM-1115 and CM-1120 approval packet boundaries in order'
   assert.equal(cm1120.cm1120ExecutionAuthorizedNow, false);
 });
 
+test('CM-1140 sequences CM-1120 target-head rebaseline before observation approval', () => {
+  const sequence = buildSelectedAuditCorrelationPrerequisiteResolutionSequence(stageReport({
+    stageClass: STAGE_CLASSES.WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115,
+    currentFactsBlockerReasons: [
+      'localHead_target_head_mismatch',
+      'originHead_target_head_mismatch',
+      'remoteMainHead_target_head_mismatch'
+    ]
+  }));
+
+  assert.equal(sequence.resolutionClass, RESOLUTION_CLASSES.WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115);
+  assert.equal(sequence.nextAllowedAction, 'prepare_fresh_cm1120_target_head_rebaseline_packet_only');
+  assert.equal(sequence.nextApprovalTarget, 'CM-1120-rebaseline');
+  assert.equal(sequence.cm1120ApprovalRequestAllowed, false);
+  assert.equal(sequence.cm1120ExecutionAuthorizedNow, false);
+  assert.match(sequence.orderedResolutionSteps.join(' '), /prepare_fresh_cm1120_selected_observation_packet/);
+});
+
 test('CM-1140 allows only narrow downgrade record when stage gate says record-only', () => {
   const sequence = buildSelectedAuditCorrelationPrerequisiteResolutionSequence(stageReport({
     stageClass: STAGE_CLASSES.NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY,

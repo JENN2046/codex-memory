@@ -45,7 +45,7 @@ function gitRunnerForDirtyHead(args) {
 }
 
 test('CM-1130 current-facts prerequisite CLI returns ordered blockers for dirty current state', () => {
-  const report = buildReport({}, {
+  const report = buildReport({ noRecordedPriorResults: true }, {
     gitRunner: gitRunnerForDirtyHead
   });
 

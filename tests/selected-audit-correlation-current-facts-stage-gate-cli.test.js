@@ -44,6 +44,33 @@ function gitRunnerForDirtyHead(args) {
   return gitRunnerForCleanHead(args);
 }
 
+function gitRunnerForCurrentPostCm1145Head(args) {
+  const key = args.join(' ');
+  const outputs = {
+    'branch --show-current': 'main\n',
+    'rev-parse HEAD': '1a46897cb5792bc84a07a5eeaadb5b1b3c95e075\n',
+    'rev-parse origin/main': 'e11fe0bd1da3a08eae8c0e2c405ccfd38a55cd28\n',
+    'rev-parse refs/remotes/origin/main': 'e11fe0bd1da3a08eae8c0e2c405ccfd38a55cd28\n',
+    'status --short': ''
+  };
+  return {
+    status: 0,
+    stdout: outputs[key] || '',
+    stderr: '',
+    error: ''
+  };
+}
+
+function cm1145Reader() {
+  return [
+    'Status: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`',
+    'APPLIED_TOMBSTONED_SANITIZED',
+    'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+    'decision=tombstoned',
+    'mutated=true'
+  ].join('\n');
+}
+
 test('CM-1131 current-facts stage gate blocks dirty worktree before approval requests', () => {
   const report = buildReport({}, {
     gitRunner: gitRunnerForDirtyHead
@@ -75,6 +102,24 @@ test('CM-1131 current-facts stage gate reaches CM-1120 request gate only with cl
   assert.equal(report.cm1120ExecutionAuthorizedNow, false);
   assert.equal(report.readinessClaimAllowed, false);
   assert.equal(report.reliabilityClaimAllowed, false);
+});
+
+test('CM-1131 current-facts stage gate ingests CM-1145 and advances to CM-1115 despite stale CM-1120 head', () => {
+  const report = buildReport({}, {
+    gitRunner: gitRunnerForCurrentPostCm1145Head,
+    fileReader: cm1145Reader
+  });
+
+  assert.equal(report.currentFactsCollected, true);
+  assert.equal(report.stageClass, STAGE_CLASSES.WAIT_CM1115_SEPARATE_EXACT_APPROVAL_AFTER_CM1111);
+  assert.equal(report.nextApprovalTarget, 'CM-1115');
+  assert.equal(report.cm1111ApprovalRequestAllowed, false);
+  assert.equal(report.cm1115ApprovalRequestAllowed, true);
+  assert.equal(report.cm1120ApprovalRequestAllowed, false);
+  assert.equal(report.cm1115ExecutionAuthorizedNow, false);
+  assert.ok(report.currentFactsBlockerReasons.includes('localHead_target_head_mismatch'));
+  assert.ok(report.currentFactsBlockerReasons.includes('prior_result_CM-1115_missing'));
+  assert.ok(!report.currentFactsBlockerReasons.includes('prior_result_CM-1111_missing'));
 });
 
 test('CM-1131 current-facts stage gate rejects observation and audit flags before Git collection', () => {
