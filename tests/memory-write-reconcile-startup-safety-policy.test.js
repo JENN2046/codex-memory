@@ -11,6 +11,7 @@ const { TOOL_DEFINITIONS } = require('../src/core/constants');
 const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 const {
   ACCEPTED_MODE,
+  ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_MODE,
   ACCEPTED_RECOVERY_DRY_RUN_MODE,
   ACCEPTED_RECOVERY_MODE,
   ACCEPTED_RECOVERY_POLICY_MODE,
@@ -18,6 +19,7 @@ const {
   buildGuardedStartupRecoveryPolicyDesign,
   buildStartupRecoverySafetyPreflight,
   buildStartupSafetyReport,
+  buildTempLocalStartupRecoveryDryRunExecutionPreflight,
   buildTempLocalStartupRecoveryDryRunHarness,
   sanitizeStartupRecoveryHealth,
   sanitizeWorkerStatus
@@ -108,6 +110,58 @@ function acceptedCm1167PolicyDesign(overrides = {}) {
     manifestRecoveryExecuted: false,
     manifestRepairExecuted: false,
     manifestCancelExecuted: false,
+    configChanged: false,
+    watchdogChanged: false,
+    startupTaskChanged: false,
+    publicMcpExpansion: false,
+    providerCalled: false,
+    realStoreWritten: false,
+    schemaMigrationApplied: false,
+    backupRestoreApplied: false,
+    importExportApplied: false,
+    readinessClaimed: false,
+    reliabilityClaimed: false,
+    ...overrides
+  };
+}
+
+function acceptedCm1168DryRunHarness(overrides = {}) {
+  return {
+    taskId: 'CM-1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS',
+    accepted: true,
+    status: 'temp_local_startup_recovery_dry_run_harness_ready_not_executed',
+    mode: 'temp_local_startup_recovery_dry_run_harness_only',
+    source: 'cm1167_guarded_startup_recovery_policy_design',
+    realStoreScope: 'temp_local',
+    blockerReasons: [],
+    priorPolicyDesignAccepted: true,
+    inventory: {
+      pendingManifestCount: 7,
+      degradedManifestCount: 2,
+      reconcileTaskCount: 9
+    },
+    dryRunPlan: {
+      startupRecoveryLimit: 5,
+      reconcileReplayLimit: 4,
+      repairLimit: 3,
+      pendingManifestCandidates: 5,
+      degradedManifestCandidates: 2,
+      reconcileReplayCandidates: 4,
+      dryRunOnly: true,
+      tempLocalOnly: true,
+      fixtureOnly: false,
+      executionDefault: 'disabled',
+      manualApprovalRequiredBeforeApply: true,
+      nextAllowedAction: 'record_temp_local_startup_recovery_dry_run_harness_only'
+    },
+    dryRunHarnessReady: true,
+    dryRunExecuted: false,
+    startupRecoveryExecuted: false,
+    runtimeRecoveryExecuted: false,
+    manifestRecoveryExecuted: false,
+    manifestRepairExecuted: false,
+    manifestCancelExecuted: false,
+    reconcileReplayExecuted: false,
     configChanged: false,
     watchdogChanged: false,
     startupTaskChanged: false,
@@ -792,6 +846,164 @@ test('CM-1168 temp-local startup recovery dry-run harness blocks execution, real
   assert.equal(report.applyGate.startupRecoveryExecuted, false);
   assert.equal(report.applyGate.runtimeRecoveryExecuted, false);
   assert.equal(report.applyGate.reconcileReplayExecuted, false);
+  assert.equal(report.realStoreWritten, false);
+  assert.equal(report.readinessClaimed, false);
+  assert.equal(report.reliabilityClaimed, false);
+});
+
+test('CM-1169 temp-local startup recovery dry-run execution preflight is ready without executing dry-run', () => {
+  const report = buildTempLocalStartupRecoveryDryRunExecutionPreflight({
+    mode: ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_MODE,
+    source: 'cm1168_temp_local_startup_recovery_dry_run_harness',
+    priorDryRunHarness: acceptedCm1168DryRunHarness(),
+    executionPlan: {
+      dryRun: true,
+      apply: false,
+      confirm: false,
+      maxRuns: 1,
+      isolatedTempRoot: true,
+      cleanupRequired: true,
+      rawOutputAllowed: false,
+      durableAuditAllowed: false,
+      storeScope: ' temp_local '
+    }
+  });
+
+  assert.equal(report.accepted, true);
+  assert.equal(report.status, 'temp_local_startup_recovery_dry_run_execution_preflight_ready_not_executed');
+  assert.equal(report.priorDryRunHarnessAccepted, true);
+  assert.equal(report.executionPlan.dryRun, true);
+  assert.equal(report.executionPlan.apply, false);
+  assert.equal(report.executionPlan.confirm, false);
+  assert.equal(report.executionPlan.maxRuns, 1);
+  assert.equal(report.executionPlan.isolatedTempRoot, true);
+  assert.equal(report.executionPlan.cleanupRequired, true);
+  assert.equal(report.executionPlan.rawOutputAllowed, false);
+  assert.equal(report.executionPlan.durableAuditAllowed, false);
+  assert.equal(report.executionPlan.storeScope, 'temp_local');
+  assert.deepEqual(report.executionPlan.candidateLimits, {
+    pendingManifestCandidates: 5,
+    degradedManifestCandidates: 2,
+    reconcileReplayCandidates: 4
+  });
+  assert.equal(report.executionPlan.nextAllowedAction, 'request_exact_temp_local_dry_run_execution_approval_only');
+  assert.equal(report.dryRunExecutionPreflightReady, true);
+  assert.equal(report.dryRunExecutionApproved, false);
+  assert.equal(report.dryRunExecuted, false);
+  assert.equal(report.startupRecoveryExecuted, false);
+  assert.equal(report.runtimeRecoveryExecuted, false);
+  assert.equal(report.manifestRecoveryExecuted, false);
+  assert.equal(report.manifestRepairExecuted, false);
+  assert.equal(report.manifestCancelExecuted, false);
+  assert.equal(report.reconcileReplayExecuted, false);
+  assert.equal(report.durableAuditWritten, false);
+  assert.equal(report.realStoreWritten, false);
+  assert.equal(report.readinessClaimed, false);
+  assert.equal(report.reliabilityClaimed, false);
+  assert.equal(report.applyGate.dryRunExecutionStarted, false);
+  assert.equal(report.applyGate.durableAuditWritten, false);
+});
+
+test('CM-1169 temp-local startup recovery dry-run execution preflight requires accepted harness and strict isolated plan', () => {
+  const report = buildTempLocalStartupRecoveryDryRunExecutionPreflight({
+    mode: 'run_startup_recovery_dry_run_now',
+    source: 'real_memory_store',
+    priorDryRunHarness: acceptedCm1168DryRunHarness({
+      accepted: false,
+      dryRunExecuted: true
+    }),
+    executionPlan: {
+      dryRun: false,
+      apply: true,
+      confirm: true,
+      maxRuns: 2,
+      isolatedTempRoot: false,
+      cleanupRequired: false,
+      rawOutputAllowed: true,
+      durableAuditAllowed: true,
+      storeScope: 'broad'
+    }
+  });
+
+  assert.equal(report.accepted, false);
+  assert.equal(report.priorDryRunHarnessAccepted, false);
+  assert.ok(report.blockerReasons.includes('startup_recovery_dry_run_execution_preflight_mode_required'));
+  assert.ok(report.blockerReasons.includes('startup_recovery_dry_run_execution_preflight_source_required'));
+  assert.ok(report.blockerReasons.includes('accepted_cm1168_dry_run_harness_required'));
+  assert.ok(report.blockerReasons.includes('dry_run_true_required'));
+  assert.ok(report.blockerReasons.includes('apply_confirm_not_allowed'));
+  assert.ok(report.blockerReasons.includes('max_runs_one_required'));
+  assert.ok(report.blockerReasons.includes('isolated_temp_root_required'));
+  assert.ok(report.blockerReasons.includes('cleanup_required'));
+  assert.ok(report.blockerReasons.includes('raw_output_not_allowed'));
+  assert.ok(report.blockerReasons.includes('durable_audit_not_allowed'));
+  assert.ok(report.blockerReasons.includes('temp_local_execution_scope_required'));
+  assert.equal(report.dryRunExecutionPreflightReady, false);
+  assert.equal(report.dryRunExecuted, false);
+});
+
+test('CM-1169 temp-local startup recovery dry-run execution preflight blocks execution, real-store scope, durable audit, and overclaims', () => {
+  const report = buildTempLocalStartupRecoveryDryRunExecutionPreflight({
+    mode: ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_MODE,
+    source: 'runtime_isolated_temp_local_dry_run_fixture',
+    priorDryRunHarness: acceptedCm1168DryRunHarness(),
+    executionPlan: {
+      dryRun: true,
+      apply: false,
+      confirm: false,
+      maxRuns: 1,
+      isolatedTempRoot: true,
+      cleanupRequired: true,
+      rawOutputAllowed: false,
+      durableAuditAllowed: false,
+      storeScope: 'real'
+    },
+    requestedDryRunExecution: true,
+    requestedStartupRecovery: true,
+    requestedRuntimeRecovery: true,
+    requestedManifestRecovery: true,
+    requestedManifestRepair: true,
+    requestedManifestCancel: true,
+    requestedReconcileReplay: true,
+    requestedDurableAuditWrite: true,
+    requestedConfigChange: true,
+    requestedWatchdogChange: true,
+    requestedStartupTaskChange: true,
+    requestedPublicMcpExpansion: true,
+    requestedProviderCall: true,
+    requestedRealStoreWrite: true,
+    requestedSchemaMigration: true,
+    requestedBackupRestore: true,
+    requestedImportExport: true,
+    readinessClaimed: true,
+    reliabilityClaimed: true
+  });
+
+  assert.equal(report.accepted, false);
+  assert.ok(report.blockerReasons.includes('real_store_scope_not_allowed'));
+  assert.ok(report.blockerReasons.includes('dry_run_execution_not_authorized'));
+  assert.ok(report.blockerReasons.includes('startup_recovery_not_authorized'));
+  assert.ok(report.blockerReasons.includes('runtime_recovery_not_authorized'));
+  assert.ok(report.blockerReasons.includes('manifest_recovery_not_authorized'));
+  assert.ok(report.blockerReasons.includes('manifest_repair_not_authorized'));
+  assert.ok(report.blockerReasons.includes('manifest_cancel_not_authorized'));
+  assert.ok(report.blockerReasons.includes('reconcile_replay_not_authorized'));
+  assert.ok(report.blockerReasons.includes('durable_audit_write_not_authorized'));
+  assert.ok(report.blockerReasons.includes('config_change_not_authorized'));
+  assert.ok(report.blockerReasons.includes('watchdog_change_not_authorized'));
+  assert.ok(report.blockerReasons.includes('startup_task_change_not_authorized'));
+  assert.ok(report.blockerReasons.includes('public_mcp_expansion_not_authorized'));
+  assert.ok(report.blockerReasons.includes('provider_call_not_authorized'));
+  assert.ok(report.blockerReasons.includes('real_store_write_not_authorized'));
+  assert.ok(report.blockerReasons.includes('schema_migration_not_authorized'));
+  assert.ok(report.blockerReasons.includes('backup_restore_not_authorized'));
+  assert.ok(report.blockerReasons.includes('import_export_not_authorized'));
+  assert.ok(report.blockerReasons.includes('readiness_claim_not_authorized'));
+  assert.ok(report.blockerReasons.includes('reliability_claim_not_authorized'));
+  assert.equal(report.applyGate.dryRunExecutionStarted, false);
+  assert.equal(report.applyGate.startupRecoveryExecuted, false);
+  assert.equal(report.applyGate.runtimeRecoveryExecuted, false);
+  assert.equal(report.applyGate.durableAuditWritten, false);
   assert.equal(report.realStoreWritten, false);
   assert.equal(report.readinessClaimed, false);
   assert.equal(report.reliabilityClaimed, false);

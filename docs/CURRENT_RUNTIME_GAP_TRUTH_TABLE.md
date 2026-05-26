@@ -28,6 +28,34 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1169 Temp-Local Startup Recovery Dry-Run Execution Preflight - 2026-05-26
+
+Result: `CM1169_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_VALIDATED_NOT_READY`.
+
+CM-1169 continues the minimum durable write kernel hardening ladder:
+
+- Added `buildTempLocalStartupRecoveryDryRunExecutionPreflight(...)`.
+- Requires accepted CM-1168 dry-run harness report.
+- Requires a strict isolated future execution plan: `dryRun=true`, `apply=false`, `confirm=false`, `maxRuns=1`, `isolatedTempRoot=true`, `cleanupRequired=true`, `rawOutputAllowed=false`, and `durableAuditAllowed=false`.
+- Accepts only `temp_local` or `fixture_only` execution scope after normalization.
+- Carries bounded candidate limits from CM-1168.
+- Blocks dry-run execution, startup/runtime recovery, manifest recovery/repair/cancel, reconcile replay, durable audit write, real-store writes, provider/API, public MCP expansion, config/watchdog/startup changes, migration/import/export/backup/restore, readiness, and reliability.
+
+Validation:
+
+- Source/test syntax passed.
+- Targeted startup safety/policy tests passed `18/18`.
+- Adjacent v1.1/governance bundle passed `42/42`.
+- First full `npm test` run reported `2781/2783` pass with `2` failures; failure names were not visible in the truncated captured output.
+- Full `npm test` summary extraction rerun passed `2783/2783`.
+
+Still not proven:
+
+- No actual startup recovery dry-run execution.
+- No real-store recovery proof.
+- No automatic startup recovery, scheduled recovery, retry/backoff policy, or cross-store transactionality.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1168 Temp-Local Startup Recovery Dry-Run Harness - 2026-05-26
 
 Result: `CM1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS_VALIDATED_NOT_READY`.

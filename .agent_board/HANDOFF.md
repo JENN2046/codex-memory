@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-1169 Temp-Local Startup Recovery Dry-Run Execution Preflight Handoff
+
+Goal: continue CM-1168 by adding a strict preflight before any future temp-local startup recovery dry-run execution.
+
+Status: CM1169_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_VALIDATED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `src/core/MemoryWriteReconcileStartupSafetyPolicy.js`; `tests/memory-write-reconcile-startup-safety-policy.test.js`; `docs/CM1169_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: none executed. The helper consumes an accepted CM-1168 dry-run harness and a strict isolated plan, normalizes store scope, then returns preflight-ready only for `dryRun=true`, `apply=false`, `confirm=false`, `maxRuns=1`, isolated temp root, cleanup required, no raw output, no durable audit, and temp-local/fixture-only scope.
+
+Validation: source/test syntax passed. Targeted startup safety/policy tests passed `18/18`. Adjacent v1.1/governance bundle passed `42/42`. First full `npm test` reported `2781/2783` with truncated failure names; summary extraction rerun passed `2783/2783` without code changes. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed. Re-review found and repaired one store-scope normalization issue; no remaining actionable issue in changed scope.
+
+Remaining risks: no actual startup recovery dry-run execution, no runtime recovery execution, no real-store recovery proof, no durable audit write proof, no background worker/scheduler recovery, no retry/backoff policy, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Post-commit state: pending.
+
+Next safe step: prepare/request exact approval for one temp-local dry-run execution only, or design a runtime-isolated fixture. Do not execute dry-run/startup/runtime recovery, push, or claim readiness/reliability.
+
 ## CM-1168 Temp-Local Startup Recovery Dry-Run Harness Handoff
 
 Goal: continue CM-1167 by adding a planning-only temp-local startup recovery dry-run harness before any future dry-run execution or runtime recovery work.

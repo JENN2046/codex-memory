@@ -1,5 +1,48 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1169 Temp-Local Startup Recovery Dry-Run Execution Preflight Checkpoint
+
+Status: `CM1169_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Added preflight-only `buildTempLocalStartupRecoveryDryRunExecutionPreflight(...)`.
+- Required accepted CM-1168 dry-run harness before the execution preflight can be accepted.
+- Required a strict future execution plan: `dryRun=true`, `apply=false`, `confirm=false`, `maxRuns=1`, `isolatedTempRoot=true`, `cleanupRequired=true`, `rawOutputAllowed=false`, `durableAuditAllowed=false`, and temp-local or fixture-only scope.
+- Normalized the execution plan store scope before checking temp-local/fixture-only boundaries.
+- Returned next allowed action `request_exact_temp_local_dry_run_execution_approval_only`.
+- Blocked startup recovery, runtime recovery, manifest recovery/repair/cancel, reconcile replay, dry-run execution, durable audit writes, real-store writes, config/watchdog/startup changes, public MCP expansion, provider/API, migration/import/export/backup/restore, and readiness/reliability claims.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted startup safety/policy tests passed `18/18`.
+- Adjacent v1.1/governance bundle passed `42/42`.
+- First full `npm test` reported `2781/2783` with two failures not visible in truncated output.
+- Summary extraction full `npm test` rerun passed `2783/2783` without code changes.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan passed with only existing sanitizer-test synthetic secret/path strings.
+- Changed-scope re-review found one actionable scope-normalization issue; CM-1169 now normalizes execution plan store scope before applying temp-local/fixture-only checks, and source/test syntax plus targeted tests were rerun. No remaining actionable issue in changed scope before docs updates.
+
+Boundary:
+- No startup recovery execution.
+- No runtime recovery execution.
+- No manifest recovery, repair, or cancellation execution.
+- No reconcile replay execution.
+- No dry-run execution.
+- No durable audit write.
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, config/watchdog/startup/dependency change, push, production-readiness claim, or reliability claim.
+
+Next:
+- Continue only by preparing/requesting exact approval for one temp-local dry-run execution or by designing a runtime-isolated fixture.
+- Do not execute dry-run/startup/runtime recovery, push, or claim readiness/reliability.
+
 ## CM-1168 Temp-Local Startup Recovery Dry-Run Harness Checkpoint
 
 Status: `CM1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS_VALIDATED_NOT_READY`

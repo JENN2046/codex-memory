@@ -4,10 +4,12 @@ const TASK_ID = 'CM-1084_MEMORY_WRITE_RECONCILE_STARTUP_WORKER_SAFETY';
 const STARTUP_RECOVERY_TASK_ID = 'CM-1166_MEMORY_WRITE_STARTUP_RECOVERY_SAFETY_PREFLIGHT';
 const STARTUP_RECOVERY_POLICY_TASK_ID = 'CM-1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN';
 const STARTUP_RECOVERY_DRY_RUN_TASK_ID = 'CM-1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS';
+const STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_TASK_ID = 'CM-1169_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT';
 const ACCEPTED_MODE = 'startup_reconcile_worker_safety_review_only';
 const ACCEPTED_RECOVERY_MODE = 'startup_recovery_safety_preflight_only';
 const ACCEPTED_RECOVERY_POLICY_MODE = 'guarded_startup_recovery_policy_design_only';
 const ACCEPTED_RECOVERY_DRY_RUN_MODE = 'temp_local_startup_recovery_dry_run_harness_only';
+const ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_MODE = 'temp_local_startup_recovery_dry_run_execution_preflight_only';
 const ACCEPTED_SOURCES = Object.freeze([
   'temp_local_app_initialization_fixture',
   'temp_local_worker_status_fixture'
@@ -23,6 +25,10 @@ const ACCEPTED_RECOVERY_POLICY_SOURCES = Object.freeze([
 const ACCEPTED_RECOVERY_DRY_RUN_SOURCES = Object.freeze([
   'cm1167_guarded_startup_recovery_policy_design',
   'temp_local_startup_recovery_dry_run_fixture'
+]);
+const ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_SOURCES = Object.freeze([
+  'cm1168_temp_local_startup_recovery_dry_run_harness',
+  'runtime_isolated_temp_local_dry_run_fixture'
 ]);
 const WORKER_STATUS_KEYS = Object.freeze([
   'running',
@@ -175,6 +181,27 @@ function buildStartupRecoveryDryRunApplyGate() {
     manifestRepairExecuted: false,
     manifestCancelExecuted: false,
     reconcileReplayExecuted: false,
+    configChangeApproved: false,
+    configChangeExecuted: false,
+    watchdogChangeApproved: false,
+    watchdogChangeExecuted: false,
+    publicMcpExpansionApproved: false,
+    publicMcpExpansionExecuted: false
+  };
+}
+
+function buildStartupRecoveryDryRunExecutionPreflightApplyGate() {
+  return {
+    dryRunExecutionApproved: false,
+    dryRunExecutionStarted: false,
+    dryRunExecutionCompleted: false,
+    startupRecoveryExecuted: false,
+    runtimeRecoveryExecuted: false,
+    manifestRecoveryExecuted: false,
+    manifestRepairExecuted: false,
+    manifestCancelExecuted: false,
+    reconcileReplayExecuted: false,
+    durableAuditWritten: false,
     configChangeApproved: false,
     configChangeExecuted: false,
     watchdogChangeApproved: false,
@@ -656,6 +683,172 @@ function buildTempLocalStartupRecoveryDryRunHarness({
   };
 }
 
+function hasAcceptedTempLocalStartupRecoveryDryRunHarness(report) {
+  return isPlainObject(report) &&
+    report.taskId === STARTUP_RECOVERY_DRY_RUN_TASK_ID &&
+    report.accepted === true &&
+    report.status === 'temp_local_startup_recovery_dry_run_harness_ready_not_executed' &&
+    report.priorPolicyDesignAccepted === true &&
+    ['temp_local', 'fixture_only'].includes(report.realStoreScope) &&
+    pickCounter(report.inventory?.pendingManifestCount) !== null &&
+    pickCounter(report.inventory?.degradedManifestCount) !== null &&
+    pickCounter(report.inventory?.reconcileTaskCount) !== null &&
+    report.dryRunPlan?.dryRunOnly === true &&
+    report.dryRunPlan?.executionDefault === 'disabled' &&
+    report.dryRunPlan?.manualApprovalRequiredBeforeApply === true &&
+    Number.isInteger(report.dryRunPlan?.startupRecoveryLimit) &&
+    Number.isInteger(report.dryRunPlan?.reconcileReplayLimit) &&
+    Number.isInteger(report.dryRunPlan?.repairLimit) &&
+    pickCounter(report.dryRunPlan?.pendingManifestCandidates) !== null &&
+    pickCounter(report.dryRunPlan?.degradedManifestCandidates) !== null &&
+    pickCounter(report.dryRunPlan?.reconcileReplayCandidates) !== null &&
+    report.dryRunPlan?.nextAllowedAction === 'record_temp_local_startup_recovery_dry_run_harness_only' &&
+    report.dryRunHarnessReady === true &&
+    report.dryRunExecuted === false &&
+    report.startupRecoveryExecuted === false &&
+    report.runtimeRecoveryExecuted === false &&
+    report.manifestRecoveryExecuted === false &&
+    report.manifestRepairExecuted === false &&
+    report.manifestCancelExecuted === false &&
+    report.reconcileReplayExecuted === false &&
+    report.configChanged === false &&
+    report.watchdogChanged === false &&
+    report.startupTaskChanged === false &&
+    report.publicMcpExpansion === false &&
+    report.providerCalled === false &&
+    report.realStoreWritten === false &&
+    report.schemaMigrationApplied === false &&
+    report.backupRestoreApplied === false &&
+    report.importExportApplied === false &&
+    report.readinessClaimed === false &&
+    report.reliabilityClaimed === false;
+}
+
+function buildTempLocalStartupRecoveryDryRunExecutionPreflight({
+  mode = '',
+  source = '',
+  priorDryRunHarness = null,
+  executionPlan = {},
+  requestedDryRunExecution = false,
+  requestedStartupRecovery = false,
+  requestedRuntimeRecovery = false,
+  requestedManifestRecovery = false,
+  requestedManifestRepair = false,
+  requestedManifestCancel = false,
+  requestedReconcileReplay = false,
+  requestedDurableAuditWrite = false,
+  requestedConfigChange = false,
+  requestedWatchdogChange = false,
+  requestedStartupTaskChange = false,
+  requestedPublicMcpExpansion = false,
+  requestedProviderCall = false,
+  requestedRealStoreWrite = false,
+  requestedSchemaMigration = false,
+  requestedBackupRestore = false,
+  requestedImportExport = false,
+  readinessClaimed = false,
+  reliabilityClaimed = false
+} = {}) {
+  const blockers = [];
+  const normalizedMode = normalizeString(mode);
+  const normalizedSource = normalizeString(source);
+  const plan = isPlainObject(executionPlan) ? executionPlan : {};
+  const normalizedStoreScope = normalizeString(plan.storeScope);
+  const harnessAccepted = hasAcceptedTempLocalStartupRecoveryDryRunHarness(priorDryRunHarness);
+
+  if (normalizedMode !== ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_MODE) {
+    blockers.push('startup_recovery_dry_run_execution_preflight_mode_required');
+  }
+  if (!ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_SOURCES.includes(normalizedSource)) {
+    blockers.push('startup_recovery_dry_run_execution_preflight_source_required');
+  }
+  if (!harnessAccepted) {
+    blockers.push('accepted_cm1168_dry_run_harness_required');
+  }
+  if (plan.dryRun !== true) blockers.push('dry_run_true_required');
+  if (plan.apply === true || plan.confirm === true) blockers.push('apply_confirm_not_allowed');
+  if (plan.maxRuns !== 1) blockers.push('max_runs_one_required');
+  if (plan.isolatedTempRoot !== true) blockers.push('isolated_temp_root_required');
+  if (plan.cleanupRequired !== true) blockers.push('cleanup_required');
+  if (plan.rawOutputAllowed === true) blockers.push('raw_output_not_allowed');
+  if (plan.durableAuditAllowed === true) blockers.push('durable_audit_not_allowed');
+  if (!['temp_local', 'fixture_only'].includes(normalizedStoreScope)) blockers.push('temp_local_execution_scope_required');
+  if (normalizedStoreScope === 'real' || normalizedStoreScope === 'production') blockers.push('real_store_scope_not_allowed');
+  if (requestedDryRunExecution === true) blockers.push('dry_run_execution_not_authorized');
+  if (requestedStartupRecovery === true) blockers.push('startup_recovery_not_authorized');
+  if (requestedRuntimeRecovery === true) blockers.push('runtime_recovery_not_authorized');
+  if (requestedManifestRecovery === true) blockers.push('manifest_recovery_not_authorized');
+  if (requestedManifestRepair === true) blockers.push('manifest_repair_not_authorized');
+  if (requestedManifestCancel === true) blockers.push('manifest_cancel_not_authorized');
+  if (requestedReconcileReplay === true) blockers.push('reconcile_replay_not_authorized');
+  if (requestedDurableAuditWrite === true) blockers.push('durable_audit_write_not_authorized');
+  if (requestedConfigChange === true) blockers.push('config_change_not_authorized');
+  if (requestedWatchdogChange === true) blockers.push('watchdog_change_not_authorized');
+  if (requestedStartupTaskChange === true) blockers.push('startup_task_change_not_authorized');
+  if (requestedPublicMcpExpansion === true) blockers.push('public_mcp_expansion_not_authorized');
+  if (requestedProviderCall === true) blockers.push('provider_call_not_authorized');
+  if (requestedRealStoreWrite === true) blockers.push('real_store_write_not_authorized');
+  if (requestedSchemaMigration === true) blockers.push('schema_migration_not_authorized');
+  if (requestedBackupRestore === true) blockers.push('backup_restore_not_authorized');
+  if (requestedImportExport === true) blockers.push('import_export_not_authorized');
+  if (readinessClaimed === true) blockers.push('readiness_claim_not_authorized');
+  if (reliabilityClaimed === true) blockers.push('reliability_claim_not_authorized');
+
+  const accepted = blockers.length === 0;
+  return {
+    taskId: STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_TASK_ID,
+    accepted,
+    status: accepted
+      ? 'temp_local_startup_recovery_dry_run_execution_preflight_ready_not_executed'
+      : 'temp_local_startup_recovery_dry_run_execution_preflight_blocked',
+    mode: normalizedMode || null,
+    source: normalizedSource || null,
+    blockerReasons: blockers,
+    priorDryRunHarnessAccepted: harnessAccepted,
+    executionPlan: {
+      dryRun: plan.dryRun === true,
+      apply: plan.apply === true,
+      confirm: plan.confirm === true,
+      maxRuns: Number.isInteger(plan.maxRuns) ? plan.maxRuns : null,
+      isolatedTempRoot: plan.isolatedTempRoot === true,
+      cleanupRequired: plan.cleanupRequired === true,
+      rawOutputAllowed: plan.rawOutputAllowed === true,
+      durableAuditAllowed: plan.durableAuditAllowed === true,
+      storeScope: normalizedStoreScope || null,
+      candidateLimits: {
+        pendingManifestCandidates: harnessAccepted ? priorDryRunHarness.dryRunPlan.pendingManifestCandidates : null,
+        degradedManifestCandidates: harnessAccepted ? priorDryRunHarness.dryRunPlan.degradedManifestCandidates : null,
+        reconcileReplayCandidates: harnessAccepted ? priorDryRunHarness.dryRunPlan.reconcileReplayCandidates : null
+      },
+      nextAllowedAction: accepted
+        ? 'request_exact_temp_local_dry_run_execution_approval_only'
+        : 'resolve_temp_local_dry_run_execution_preflight_blockers'
+    },
+    dryRunExecutionPreflightReady: accepted,
+    dryRunExecutionApproved: false,
+    dryRunExecuted: false,
+    startupRecoveryExecuted: false,
+    runtimeRecoveryExecuted: false,
+    manifestRecoveryExecuted: false,
+    manifestRepairExecuted: false,
+    manifestCancelExecuted: false,
+    reconcileReplayExecuted: false,
+    durableAuditWritten: false,
+    configChanged: false,
+    watchdogChanged: false,
+    startupTaskChanged: false,
+    publicMcpExpansion: false,
+    providerCalled: false,
+    realStoreWritten: false,
+    schemaMigrationApplied: false,
+    backupRestoreApplied: false,
+    importExportApplied: false,
+    readinessClaimed: false,
+    reliabilityClaimed: false,
+    applyGate: buildStartupRecoveryDryRunExecutionPreflightApplyGate()
+  };
+}
+
 function buildStartupSafetyReport({
   mode = '',
   source = '',
@@ -735,6 +928,8 @@ function buildStartupSafetyReport({
 
 module.exports = {
   ACCEPTED_MODE,
+  ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_MODE,
+  ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_SOURCES,
   ACCEPTED_RECOVERY_DRY_RUN_MODE,
   ACCEPTED_RECOVERY_DRY_RUN_SOURCES,
   ACCEPTED_RECOVERY_MODE,
@@ -743,12 +938,14 @@ module.exports = {
   ACCEPTED_RECOVERY_SOURCES,
   ACCEPTED_SOURCES,
   STARTUP_RECOVERY_POLICY_TASK_ID,
+  STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_TASK_ID,
   STARTUP_RECOVERY_DRY_RUN_TASK_ID,
   STARTUP_RECOVERY_TASK_ID,
   TASK_ID,
   buildGuardedStartupRecoveryPolicyDesign,
   buildStartupRecoverySafetyPreflight,
   buildStartupSafetyReport,
+  buildTempLocalStartupRecoveryDryRunExecutionPreflight,
   buildTempLocalStartupRecoveryDryRunHarness,
   sanitizeStartupRecoveryHealth,
   sanitizeWorkerStatus
