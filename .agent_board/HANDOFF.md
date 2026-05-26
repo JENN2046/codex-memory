@@ -14,7 +14,7 @@ Validation: test syntax passed. Targeted storage/runtime tests passed `12/12`. F
 
 Remaining risks: no automatic startup recovery, no background worker/scheduler recovery, no degraded auto-healing proof, no real memory recovery proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
 
-Next safe step: commit CM-1161 if guarded commit eligibility remains clean. After that, consider degraded reconcile replay after restart validation, missing-diary restart validation, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
+Next safe step: continue with degraded reconcile replay after restart validation, missing-diary restart validation, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
 
 ## CM-1160 Pending Manifest Restart Recovery Validation Handoff
 

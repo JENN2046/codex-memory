@@ -27,7 +27,6 @@ Boundary:
 - No automatic startup recovery, background worker enablement, degraded auto-healing, scheduler/watchdog change, or cross-store transactionality.
 
 Next:
-- Commit CM-1161 if guarded commit eligibility remains clean.
 - Continue kernel hardening with degraded reconcile replay after restart validation, missing-diary restart validation, or guarded automatic recovery policy design.
 
 ## CM-1160 Pending Manifest Restart Recovery Validation Checkpoint
