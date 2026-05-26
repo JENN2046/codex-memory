@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1148 CM1115 Metadata Lifecycle Verify Execution Record Handoff
+
+Goal: execute exact-approved CM-1115 selected metadata lifecycle verification, record the result, and rerun current-facts gates.
+
+Status: CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTED_RECORDED_NOT_READY.
+
+Changed files: `docs/CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTION_RECORD.md`; `src/cli/selected-audit-correlation-current-facts-preflight.js`; `tests/selected-audit-correlation-current-facts-preflight-cli.test.js`; `STATUS.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Execution result: one approved `SqliteShadowStore.getRecordValidationPolicy` selected metadata read returned `METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE` for `codex-process-50325be15fdb479d805728fe420b4838`.
+
+Validation: targeted current-facts tests passed `34/34`; docs validation, ledger consistency, `git diff --check`, and focused no-secret scan passed.
+
+Remaining risks: CM-1120 remains blocked until current-facts gates are rerun from the recorded CM-1115 result and any stale target-head rebaseline/approval boundary is handled. No readiness/reliability claim exists.
+
+Next safe step: commit, then rerun CM-1129/CM-1131/CM-1139/CM-1140 gates from clean HEAD. Do not execute CM-1120.
+
 ## CM-1147 Fresh CM1115 Metadata Lifecycle Approval Packet Handoff
 
 Goal: prepare/request the next allowed CM-1115 exact approval without executing CM-1115.

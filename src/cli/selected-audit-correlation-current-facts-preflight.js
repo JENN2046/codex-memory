@@ -133,6 +133,7 @@ function collectGitFacts({ cwd = process.cwd(), gitRunner = runGit } = {}) {
 function collectRecordedPriorResults({ cwd = process.cwd(), fileReader = fs.readFileSync } = {}) {
   const results = [];
   const cm1145Path = path.join(cwd, 'docs', 'CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTION_RECORD.md');
+  const cm1148Path = path.join(cwd, 'docs', 'CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTION_RECORD.md');
 
   try {
     const content = fileReader(cm1145Path, 'utf8');
@@ -147,6 +148,27 @@ function collectRecordedPriorResults({ cwd = process.cwd(), fileReader = fs.read
         taskId: 'CM-1111',
         resultClass: 'APPLIED_TOMBSTONED_SANITIZED',
         source: 'docs/CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTION_RECORD.md'
+      });
+    }
+  } catch {
+    // Missing status record simply means no prior result is ingested.
+  }
+
+  try {
+    const content = fileReader(cm1148Path, 'utf8');
+    if (
+      content.includes('CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTED_RECORDED_NOT_READY') &&
+      content.includes('METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE') &&
+      content.includes('memoryId=codex-process-50325be15fdb479d805728fe420b4838') &&
+      content.includes('status=tombstoned') &&
+      content.includes('clientId=codex') &&
+      content.includes('visibility=internal_proof') &&
+      content.includes('maxMetadataStoreReadsUsed=1')
+    ) {
+      results.push({
+        taskId: 'CM-1115',
+        resultClass: 'METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE',
+        source: 'docs/CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTION_RECORD.md'
       });
     }
   } catch {

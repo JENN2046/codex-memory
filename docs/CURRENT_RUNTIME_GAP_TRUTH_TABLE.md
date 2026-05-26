@@ -28,6 +28,38 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1148 CM1115 Metadata Lifecycle Verify Execution Record - 2026-05-26
+
+Result: `CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTED_RECORDED_NOT_READY`.
+
+CM-1148 consumed the exact CM-1115 approval for `HEAD=677f96036759eb14904e9f660b0758912d2394b6` and request hash `01fc9e085513f3d9dbb59f909d8a903f1d8428f0913cec222cea0fc9b9c85e8c`.
+
+The one successful execution used only the allowed selected metadata surface:
+
+```text
+SqliteShadowStore.getRecordValidationPolicy("codex-process-50325be15fdb479d805728fe420b4838")
+```
+
+Sanitized selected metadata result:
+
+```text
+exists=true
+lifecycleColumnAvailable=true
+tombstoneReasonColumnAvailable=true
+status=tombstoned
+clientId=codex
+visibility=internal_proof
+maxMetadataStoreReadsUsed=1
+```
+
+Result class:
+
+```text
+METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE
+```
+
+CM-1148 does not approve or execute CM-1120, observe selected audit correlation, read raw memory/evidence/raw text/diary/raw audit/`.jsonl`, call memory tools/provider/API, write durable memory/audit, run apply, change public MCP/config/watchdog/startup/package/dependency, push/tag/release/deploy, or claim readiness/reliability.
+
 ## CM-1147 Fresh CM1115 Metadata Lifecycle Approval Packet - 2026-05-26
 
 Result: `CM1147_FRESH_CM1115_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.

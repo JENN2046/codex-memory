@@ -90,13 +90,18 @@ test('CM-1122 current-facts collector ingests CM-1145 recorded CM-1111 prior res
     {},
     {
       gitRunner: fakeGitRunner(cleanOutputs()),
-      fileReader: () => [
-        'Status: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`',
-        'APPLIED_TOMBSTONED_SANITIZED',
-        'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
-        'decision=tombstoned',
-        'mutated=true'
-      ].join('\n')
+      fileReader: (filePath) => {
+        if (filePath.includes('CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTION_RECORD.md')) {
+          return [
+            'Status: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`',
+            'APPLIED_TOMBSTONED_SANITIZED',
+            'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+            'decision=tombstoned',
+            'mutated=true'
+          ].join('\n');
+        }
+        throw new Error('missing');
+      }
     }
   );
 
@@ -108,6 +113,50 @@ test('CM-1122 current-facts collector ingests CM-1145 recorded CM-1111 prior res
   assert.ok(!report.blockerReasons.includes('prior_result_CM-1111_missing'));
   assert.ok(report.blockerReasons.includes('prior_result_CM-1115_missing'));
   assert.equal(report.cleanTargetHead, true);
+});
+
+test('CM-1122 current-facts collector ingests CM-1148 recorded CM-1115 prior result with CM-1111', () => {
+  const report = buildReport(
+    {},
+    {
+      gitRunner: fakeGitRunner(cleanOutputs({
+        'rev-parse HEAD': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n',
+        'rev-parse origin/main': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n',
+        'rev-parse refs/remotes/origin/main': 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n'
+      })),
+      fileReader: (filePath) => {
+        if (filePath.includes('CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTION_RECORD.md')) {
+          return [
+            'Status: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`',
+            'APPLIED_TOMBSTONED_SANITIZED',
+            'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+            'decision=tombstoned',
+            'mutated=true'
+          ].join('\n');
+        }
+        if (filePath.includes('CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTION_RECORD.md')) {
+          return [
+            'Status: `CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTED_RECORDED_NOT_READY`',
+            'METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE',
+            'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+            'status=tombstoned',
+            'clientId=codex',
+            'visibility=internal_proof',
+            'maxMetadataStoreReadsUsed=1'
+          ].join('\n');
+        }
+        throw new Error('missing');
+      }
+    }
+  );
+
+  assert.equal(report.status, 'blocked');
+  assert.deepEqual(report.recordedPriorResultTaskIds, ['CM-1111', 'CM-1115']);
+  assert.equal(report.requiredPriorResultsBound, true);
+  assert.ok(!report.blockerReasons.includes('prior_result_CM-1111_missing'));
+  assert.ok(!report.blockerReasons.includes('prior_result_CM-1115_missing'));
+  assert.ok(report.blockerReasons.includes('localHead_target_head_mismatch'));
+  assert.equal(report.cleanTargetHead, false);
 });
 
 test('CM-1122 recorded prior-result ingestion fails closed on missing CM-1145 status surface', () => {
