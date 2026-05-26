@@ -28,6 +28,29 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1176 Diary Projection Rebuild From SQLite Authority - 2026-05-26
+
+Result: `CM1176_DIARY_PROJECTION_REBUILD_FROM_SQLITE_AUTHORITY_VALIDATED_NOT_READY`.
+
+CM-1176 is a runtime-kernel source/test slice:
+
+- Adds internal `MemoryWriteService.rebuildMissingDiaryProjections(...)`.
+- Adds `SqliteShadowStore.updateMemoryWriteManifestRecord(...)` to refresh manifest `record_json` and shadow record inside a SQLite `BEGIN IMMEDIATE` transaction.
+- Lists bounded manifest candidates with committed SQLite authority and manifest `record_json`.
+- Skips records that already have diary projection fields.
+- Rebuilds missing diary files from SQLite authoritative manifest records.
+- Refreshes shadow/vector/chunk projections and selected manifest audit lifecycle.
+- Temp-local tests prove `record_memory -> diary failure -> explicit rebuild -> search_memory -> overview` consistency for this synthetic case.
+
+Still not proven:
+
+- Rebuild is not startup automatic recovery.
+- Lifecycle is still timestamp/counter based, not a full transition log.
+- Readonly and syncing search behavior are still not explicitly split.
+- No no-token read closure.
+- No schema migration/version startup hard stop.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1175 Write Manifest Lifecycle State Split - 2026-05-26
 
 Result: `CM1175_WRITE_MANIFEST_LIFECYCLE_STATE_SPLIT_VALIDATED_NOT_READY`.

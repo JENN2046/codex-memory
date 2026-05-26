@@ -1,5 +1,43 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1176 Diary Projection Rebuild From SQLite Authority Checkpoint
+
+Status: `CM1176_DIARY_PROJECTION_REBUILD_FROM_SQLITE_AUTHORITY_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending before guarded commit.
+
+Completed:
+- Added internal `MemoryWriteService.rebuildMissingDiaryProjections(...)`.
+- Added `SqliteShadowStore.updateMemoryWriteManifestRecord(...)` to refresh manifest `record_json` and shadow record in a SQLite `BEGIN IMMEDIATE` transaction.
+- Added bounded candidate listing for manifests with SQLite committed authority and `record_json`.
+- Rebuild skips records that already have `filePath` or `relativePath`.
+- Missing diary projection is rebuilt from manifest `record_json`, then shadow/vector/chunk projections and selected manifest audit lifecycle are refreshed.
+- Added temp-local runtime test for diary projection failure followed by explicit rebuild.
+
+Validation:
+- Source/test syntax checks passed.
+- `node --test tests\durable-write-kernel-idempotency-runtime.test.js` passed `7/7`.
+- `node --test tests\memory-write-restart-durability-temp-local-evidence.test.js tests\memory-write-reconcile-service.test.js tests\memory-write-reliability-temp-local-evidence.test.js tests\memory-write-reconcile-worker.test.js` passed `37/37`.
+- `npm test` passed `2786/2786`.
+
+Boundary:
+- No public MCP schema/tool expansion.
+- No real memory store mutation.
+- No provider/API call.
+- No `.env`, config, watchdog, startup, or dependency change.
+- No real rebuild, migration, import, export, backup, or restore.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- Rebuild is explicit internal service method only, not startup automatic recovery.
+- Lifecycle remains timestamp/counter based, not a full transition log.
+- Split readonly and syncing search behavior explicitly.
+- Close no-token read.
+- Add SQLite schema migration/version startup gate.
+
 ## CM-1175 Write Manifest Lifecycle State Split Checkpoint
 
 Status: `CM1175_WRITE_MANIFEST_LIFECYCLE_STATE_SPLIT_VALIDATED_NOT_READY`

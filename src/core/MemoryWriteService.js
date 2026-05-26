@@ -127,6 +127,12 @@ function supportsWriteManifestRepair(config = {}, shadowStore = null) {
     typeof shadowStore.listReconcileTasksForMemoryId === 'function';
 }
 
+function supportsDiaryProjectionRebuild(config = {}, shadowStore = null) {
+  return supportsWriteManifestRecovery(config, shadowStore) &&
+    typeof shadowStore.listMemoryWriteManifestsForDiaryProjectionRebuild === 'function' &&
+    typeof shadowStore.updateMemoryWriteManifestRecord === 'function';
+}
+
 function findSchemaVersionMetadataKeys(payload = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return [];
@@ -799,6 +805,177 @@ class MemoryWriteService {
         idempotencyKey: manifest.idempotencyKey,
         status,
         recovered: true,
+        shadowFailureCount: shadowFailures.length
+      });
+    }
+
+    return summary;
+  }
+
+  async rebuildMissingDiaryProjections(options = {}) {
+    if (!supportsDiaryProjectionRebuild(this.config, this.shadowStore)) {
+      return {
+        attempted: 0,
+        rebuilt: 0,
+        degraded: 0,
+        skipped: 0,
+        malformedRecord: 0,
+        items: []
+      };
+    }
+
+    const limit = Number.isInteger(options.limit) && options.limit > 0 ? Math.min(options.limit, 500) : 50;
+    const manifests = await this.shadowStore.listMemoryWriteManifestsForDiaryProjectionRebuild(limit);
+    const summary = {
+      attempted: manifests.length,
+      rebuilt: 0,
+      degraded: 0,
+      skipped: 0,
+      malformedRecord: 0,
+      items: []
+    };
+
+    for (const manifest of manifests) {
+      const record = manifest.record;
+      if (!record || manifest.recordMalformed || !record.memoryId || !record.target) {
+        summary.malformedRecord += 1;
+        summary.items.push({
+          memoryId: manifest.memoryId,
+          idempotencyKey: manifest.idempotencyKey,
+          status: manifest.status,
+          rebuilt: false,
+          reason: 'manifest_record_malformed'
+        });
+        continue;
+      }
+
+      if (record.filePath || record.relativePath) {
+        summary.skipped += 1;
+        summary.items.push({
+          memoryId: manifest.memoryId,
+          idempotencyKey: manifest.idempotencyKey,
+          status: manifest.status,
+          rebuilt: false,
+          reason: 'diary_projection_present'
+        });
+        continue;
+      }
+
+      const shadowFailures = [];
+      try {
+        const diaryWrite = await this.diaryStore.writeRecord(record);
+        record.filePath = diaryWrite.filePath;
+        record.relativePath = diaryWrite.relativePath;
+        record.rawText = diaryWrite.fileContent;
+        record.updatedAt = new Date().toISOString();
+      } catch (error) {
+        shadowFailures.push(`diary:${error.message}`);
+      }
+
+      let sqliteShadowReady = !this.config.enableShadowWrites;
+      if (this.config.enableShadowWrites && shadowFailures.length === 0) {
+        try {
+          await this.shadowStore.updateMemoryWriteManifestRecord({
+            idempotencyKey: manifest.idempotencyKey,
+            record,
+            updatedAt: new Date().toISOString()
+          });
+          await this.shadowStore.clearReconcileTasks(record.memoryId, 'sqlite');
+          sqliteShadowReady = true;
+        } catch (error) {
+          shadowFailures.push(`sqlite:${error.message}`);
+          await this.shadowStore.enqueueReconcileTask({
+            memoryId: record.memoryId,
+            storeKind: 'sqlite',
+            reason: 'diary_projection_rebuild_shadow_write_failed',
+            payload: record
+          });
+        }
+      }
+
+      if (this.config.enableVectorIndex && shadowFailures.length === 0) {
+        try {
+          await this.vectorStore.upsertRecord(record);
+          await this.shadowStore.clearReconcileTasks(record.memoryId, 'vector');
+        } catch (error) {
+          shadowFailures.push(`vector:${error.message}`);
+          await this.shadowStore.enqueueReconcileTask({
+            memoryId: record.memoryId,
+            storeKind: 'vector',
+            reason: 'diary_projection_rebuild_shadow_write_failed',
+            payload: record
+          });
+        }
+      }
+
+      if (
+        this.config.enableShadowWrites &&
+        sqliteShadowReady &&
+        this.chunkIndexingService &&
+        shadowFailures.length === 0
+      ) {
+        try {
+          await this.chunkIndexingService.indexRecord(record);
+          await this.shadowStore.clearReconcileTasks(record.memoryId, 'chunks');
+        } catch (error) {
+          shadowFailures.push(`chunks:${error.message}`);
+          await this.shadowStore.enqueueReconcileTask({
+            memoryId: record.memoryId,
+            storeKind: 'chunks',
+            reason: 'diary_projection_rebuild_shadow_write_failed',
+            payload: record
+          });
+        }
+      }
+
+      const status = shadowFailures.length > 0 ? 'degraded' : 'committed';
+      const result = {
+        success: true,
+        decision: 'accepted',
+        targetDiary: record.target === 'knowledge' ? 'Codex knowledge' : 'Codex',
+        reason: 'rebuilt missing diary projection from sqlite authority.',
+        title: record.title,
+        memoryId: record.memoryId,
+        filePath: record.filePath || null,
+        agentAlias: null,
+        agentId: null,
+        requestSource: this.config.defaultRequestSource,
+        target: record.target,
+        idempotency: {
+          key: manifest.idempotencyKey,
+          canonicalHash: manifest.canonicalHash,
+          status,
+          replayed: false,
+          recovered: manifest.result?.idempotency?.recovered === true,
+          diaryProjectionRebuilt: Boolean(record.filePath || record.relativePath),
+          authoritativeStore: 'sqlite',
+          lifecycle: {
+            pending: false,
+            committed: true,
+            projected: true,
+            audited: false
+          }
+        },
+        shadowWrite: createShadowWriteStatus(status === 'committed' ? 'ok' : 'degraded', shadowFailures)
+      };
+
+      await this.shadowStore.finalizeMemoryWriteManifest({
+        idempotencyKey: manifest.idempotencyKey,
+        status,
+        result,
+        updatedAt: new Date().toISOString()
+      });
+      await this.writeAuditAndMarkMemoryWriteManifestAudited(result);
+      if (status === 'committed') {
+        summary.rebuilt += 1;
+      } else {
+        summary.degraded += 1;
+      }
+      summary.items.push({
+        memoryId: manifest.memoryId,
+        idempotencyKey: manifest.idempotencyKey,
+        status,
+        rebuilt: status === 'committed',
         shadowFailureCount: shadowFailures.length
       });
     }

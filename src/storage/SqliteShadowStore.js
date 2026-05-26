@@ -372,6 +372,46 @@ class SqliteShadowStore {
     }
   }
 
+  async updateMemoryWriteManifestRecord({
+    idempotencyKey,
+    record,
+    updatedAt = new Date().toISOString()
+  } = {}) {
+    await this.ensureReady();
+    const recordJson = record ? JSON.stringify(record) : null;
+
+    try {
+      this.db.exec('BEGIN IMMEDIATE');
+      this.runUpsertRecord(record);
+      const update = this.db.prepare(`
+        UPDATE memory_write_manifests
+        SET record_json = ?,
+          updated_at = ?
+        WHERE idempotency_key = ?
+          AND status IN ('pending', 'committed', 'degraded', 'repaired')
+      `).run(recordJson, updatedAt, idempotencyKey);
+      if (update.changes !== 1) {
+        this.db.exec('ROLLBACK');
+        return {
+          updated: false,
+          changes: update.changes,
+          reason: 'manifest_update_guard_failed'
+        };
+      }
+      this.db.exec('COMMIT');
+      return {
+        updated: true,
+        changes: update.changes
+      };
+    } catch (error) {
+      try {
+        this.db.exec('ROLLBACK');
+      } catch {
+      }
+      throw error;
+    }
+  }
+
   async beginMemoryWriteManifest({
     idempotencyKey,
     memoryId,
@@ -515,6 +555,20 @@ class SqliteShadowStore {
       ORDER BY updated_at ASC
       LIMIT ?
     `).all(status, normalizedLimit);
+    return rows.map(row => this.mapMemoryWriteManifestRow(row));
+  }
+
+  async listMemoryWriteManifestsForDiaryProjectionRebuild(limit = 50) {
+    await this.ensureReady();
+    const normalizedLimit = Number.isInteger(limit) && limit > 0 ? Math.min(limit, 500) : 50;
+    const rows = this.db.prepare(`
+      SELECT * FROM memory_write_manifests
+      WHERE record_json IS NOT NULL
+        AND committed_at IS NOT NULL
+        AND status IN ('pending', 'committed', 'degraded', 'repaired')
+      ORDER BY updated_at ASC
+      LIMIT ?
+    `).all(normalizedLimit);
     return rows.map(row => this.mapMemoryWriteManifestRow(row));
   }
 

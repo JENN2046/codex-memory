@@ -304,6 +304,97 @@ test('durable write kernel commits SQLite authority before diary projection fail
   });
 });
 
+test('durable write kernel rebuilds missing diary projection from SQLite authority', async () => {
+  await withTempApp(async ({ app }) => {
+    const payload = processPayload({
+      title: 'Checkpoint: CM-1176 diary projection rebuild from SQLite authority',
+      content: [
+        'Type: checkpoint',
+        'CM1176 diary projection rebuild from sqlite authority marker.',
+        'Purpose: prove missing diary projection can be rebuilt from manifest record_json.',
+        'Boundary: synthetic temp-local runtime only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1176 synthetic diary projection rebuild evidence',
+      tags: ['cm1176', 'sqlite-authoritative', 'diary-projection-rebuild'],
+      task_id: 'CM-1176',
+      conversation_id: 'cm1176-diary-projection-rebuild'
+    });
+    const originalWriteRecord = app.stores.diaryStore.writeRecord.bind(app.stores.diaryStore);
+    app.stores.diaryStore.writeRecord = async () => {
+      throw new Error('cm1176 synthetic diary projection failure');
+    };
+
+    let result;
+    try {
+      result = await app.callTool('record_memory', payload, requestContext);
+    } finally {
+      app.stores.diaryStore.writeRecord = originalWriteRecord;
+    }
+
+    assert.equal(result.decision, 'accepted');
+    assert.equal(result.filePath, null);
+    assert.equal(result.idempotency.status, 'degraded');
+
+    const beforeManifest = await app.stores.shadowStore.getMemoryWriteManifestByIdempotencyKey(result.idempotency.key);
+    assert.equal(beforeManifest.status, 'degraded');
+    assert.equal(beforeManifest.record.filePath, undefined);
+    const beforeRecord = await app.stores.shadowStore.getRecord(result.memoryId);
+    assert.equal(beforeRecord.filePath, null);
+    const beforeDiaryRecords = await app.stores.diaryStore.listRecords({ target: 'process' });
+    assert.equal(beforeDiaryRecords.some(record => record.memoryId === result.memoryId), false);
+
+    const rebuild = await app.services.writeService.rebuildMissingDiaryProjections({ limit: 10 });
+    assert.equal(rebuild.attempted, 1);
+    assert.equal(rebuild.rebuilt, 1);
+    assert.equal(rebuild.degraded, 0);
+    assert.equal(rebuild.skipped, 0);
+    assert.equal(rebuild.items[0].status, 'committed');
+    assert.equal(rebuild.items[0].rebuilt, true);
+
+    const manifest = await app.stores.shadowStore.getMemoryWriteManifestByIdempotencyKey(result.idempotency.key);
+    assert.equal(manifest.status, 'committed');
+    assert.notEqual(manifest.record.filePath, undefined);
+    assert.notEqual(manifest.record.relativePath, undefined);
+    assert.equal(manifest.result.idempotency.diaryProjectionRebuilt, true);
+    assert.equal(manifest.result.idempotency.lifecycle.committed, true);
+    assert.equal(manifest.result.idempotency.lifecycle.projected, true);
+    assert.equal(manifest.result.idempotency.lifecycle.audited, true);
+    assert.notEqual(manifest.auditedAt, null);
+
+    const rebuiltRecord = await app.stores.shadowStore.getRecord(result.memoryId);
+    assert.notEqual(rebuiltRecord.filePath, null);
+    const diaryRecords = await app.stores.diaryStore.listRecords({ target: 'process' });
+    assert.equal(diaryRecords.some(record => record.memoryId === result.memoryId), true);
+
+    const search = await app.callTool('search_memory', {
+      query: 'CM1176 diary projection rebuild from sqlite authority marker',
+      target: 'process',
+      limit: 5,
+      include_content: false,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'durable-write-kernel-temp-workspace',
+        client_id: 'codex',
+        visibility: 'project'
+      }
+    }, {
+      ...requestContext,
+      noTokenReadOnly: true
+    });
+    assert.equal(search.results.some(item => item.memoryId === result.memoryId), true);
+
+    const overview = await app.callTool('memory_overview', {
+      limit: 10,
+      auditWindow: 20
+    }, requestContext);
+    assert.equal(overview.shadowSync.writeManifest.committed, 1);
+    assert.equal(overview.shadowSync.writeManifest.degraded, 0);
+    assert.equal(overview.shadowSync.writeManifest.lifecycle.sqliteCommitted, 1);
+    assert.equal(overview.shadowSync.writeManifest.lifecycle.projected, 1);
+    assert.equal(overview.shadowSync.writeManifest.lifecycle.audited, 1);
+  });
+});
+
 test('durable write kernel fails closed when matching write manifest is pending recovery', async () => {
   await withTempApp(async ({ app }) => {
     const payload = processPayload();

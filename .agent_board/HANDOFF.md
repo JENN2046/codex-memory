@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-1176 Diary Projection Rebuild From SQLite Authority Handoff
+
+Goal: add a bounded internal rebuild path for writes whose SQLite authority exists but diary projection is missing.
+
+Status: CM1176_DIARY_PROJECTION_REBUILD_FROM_SQLITE_AUTHORITY_VALIDATED_NOT_READY.
+
+Local commit: pending before guarded commit.
+
+Changed files: `src/storage/SqliteShadowStore.js`; `src/core/MemoryWriteService.js`; `tests/durable-write-kernel-idempotency-runtime.test.js`; status/truth-table/board surfaces.
+
+Runtime behavior under test: temp-local `record_memory` can still accept/degrade when diary write fails after SQLite authority is committed. The new internal `rebuildMissingDiaryProjections(...)` then scans committed manifest `record_json`, skips already-projected records, writes the missing diary projection, refreshes manifest/shadow/vector/chunks, records selected audit lifecycle, and restores read-only search plus overview consistency.
+
+Validation: source/test syntax, targeted durable runtime test `7/7`, adjacent restart/reconcile/reliability/worker bundle `37/37`, and full `npm test` `2786/2786` passed.
+
+Remaining risks: rebuild is not automatic startup recovery; lifecycle is still not a full transition log; readonly/syncing search is not split; no-token read remains open; SQLite schema migration/version startup hard stop is still absent; no production/readiness/reliability proof.
+
+Next safe step: commit CM-1176 if guarded conditions pass, then choose the next kernel checkpoint. Do not push unless explicitly requested.
+
 ## CM-1175 Write Manifest Lifecycle State Split Handoff
 
 Goal: make the CM-1174 SQLite authoritative write path explain its committed/projected/audited lifecycle without weakening pending recovery.
