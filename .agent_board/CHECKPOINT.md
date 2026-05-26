@@ -6,7 +6,7 @@ Status: `CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTED_RECORDED_NOT_READY`
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `5e379a4 docs: record cm1170 dry-run execution`.
 
 Completed:
 - Consumed exact CM-1170 approval for `HEAD=d044b80771a0a5ee2c01c4aa5f0b0a9feb80c209` and request hash `090f434e9e3200abe8f1c94f2adb5450aec8ca46b0f30a4de749aae61c79d002`.
@@ -42,6 +42,9 @@ Next:
 - Commit this execution record.
 - Decide the next safe bounded checkpoint from the clean head.
 - Do not rerun CM-1170 without a new exact approval.
+
+Post-commit state:
+- After `5e379a4`, `git status --short --branch` reported `## main...origin/main [ahead 40]` with a clean worktree.
 
 ## CM-1170 Temp-Local Startup Recovery Dry-Run Execution Approval Packet Checkpoint
 

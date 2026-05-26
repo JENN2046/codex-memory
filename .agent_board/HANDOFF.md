@@ -6,7 +6,7 @@ Goal: consume the exact-approved CM-1170 temp-local dry-run once and record the 
 
 Status: CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTED_RECORDED_NOT_READY.
 
-Local commit: pending.
+Local commit: `5e379a4 docs: record cm1170 dry-run execution`.
 
 Changed files: `docs/CM1171_CM1170_TEMP_LOCAL_DRY_RUN_EXECUTION_RECORD.md`; status/truth-table/board surfaces.
 
@@ -16,7 +16,7 @@ Validation: exact approval intake, pre-execution Git facts, request hash recompu
 
 Remaining risks: no startup/runtime recovery execution, no manifest recovery/repair/cancel execution, no reconcile apply, no real-store recovery proof, no durable audit write proof, no background worker/scheduler recovery, no retry/backoff policy, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
 
-Post-commit state: pending.
+Post-commit state: after `5e379a4`, worktree was clean with `main...origin/main [ahead 40]`.
 
 Next safe step: commit the execution record, then decide the next bounded checkpoint from clean HEAD. Do not rerun CM-1170 without a new exact approval.
 
