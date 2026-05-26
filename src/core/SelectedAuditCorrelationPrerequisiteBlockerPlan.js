@@ -7,6 +7,7 @@ const {
 const PLAN_CLASSES = Object.freeze({
   BLOCKED_PREREQUISITES_PENDING: 'BLOCKED_PREREQUISITES_PENDING',
   AWAIT_SEPARATE_EXACT_OBSERVATION_APPROVAL_NOT_DOWNGRADE: 'AWAIT_SEPARATE_EXACT_OBSERVATION_APPROVAL_NOT_DOWNGRADE',
+  RECALL_SUPPRESSION_FOLLOWUP_PROOF_ALLOWED_NOT_READY: 'RECALL_SUPPRESSION_FOLLOWUP_PROOF_ALLOWED_NOT_READY',
   DOWNGRADE_RECORD_ONLY_NOT_READY: 'DOWNGRADE_RECORD_ONLY_NOT_READY',
   FAIL_CLOSED_REPORT_MISSING: 'FAIL_CLOSED_REPORT_MISSING',
   FAIL_CLOSED_UNSUPPORTED_REVIEW_CLASS: 'FAIL_CLOSED_UNSUPPORTED_REVIEW_CLASS',
@@ -251,6 +252,25 @@ function summarizeSelectedAuditCorrelationPrerequisiteBlockerPlan(currentFactsDo
           'keep_readiness_and_reliability_unclaimed'
         ],
         nextStep: 'Separate exact approval is still required before any selected audit observation.'
+      }
+    );
+  }
+
+  if (reviewClass === REVIEW_CLASSES.SELECTED_AUDIT_OBSERVED_BUT_FOLLOWUP_MISSING_NOT_DOWNGRADE) {
+    return basePlan(
+      PLAN_CLASSES.RECALL_SUPPRESSION_FOLLOWUP_PROOF_ALLOWED_NOT_READY,
+      currentFactsDowngradeReport,
+      review,
+      {
+        reason: 'selected_audit_observed_but_recall_suppression_followup_missing',
+        requiredNextActions: [
+          'execute_one_bounded_public_default_recall_suppression_proof_if_allowed_by_current_goal',
+          'record_result_as_followup_evidence_only',
+          'keep_memory_recall_reliable_unclaimed',
+          'keep_memory_write_reliable_unclaimed',
+          'keep_readiness_unclaimed'
+        ],
+        nextStep: 'Public/default recall suppression is the next bounded follow-up proof; do not record a blocker downgrade or claim reliability/readiness yet.'
       }
     );
   }

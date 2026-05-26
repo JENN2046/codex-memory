@@ -12,6 +12,7 @@ const {
 const {
   buildPreflightSummary,
   buildReport,
+  collectRecordedSelectedObservationResult,
   main,
   parseArgs
 } = require('../src/cli/selected-audit-correlation-current-facts-classifier');
@@ -61,6 +62,76 @@ test('CM-1124 current facts can be preflight-ready but still no-observation clas
   assert.equal(report.classification.resultClass, RESULT_CLASSES.DRAFT_ONLY_NO_EVIDENCE);
   assert.equal(report.classification.reason, 'audit_observation_not_started');
   assert.equal(report.blockerDowngradeAllowed, false);
+});
+
+function cm1151Reader(filePath) {
+  if (String(filePath).includes('CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTION_RECORD.md')) {
+    return [
+      'Status: `CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTED_RECORDED_NOT_READY`',
+      'resultClass=AUDIT_SELECTED_CORRELATION_OBSERVED',
+      'found=true',
+      'reason=null',
+      'selectedFieldsOnly=true',
+      'rawAuditReturned=false',
+      'inspectedEntryCount=500',
+      'matchedEventCount=2',
+      'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+      'eventType=memory_tombstone',
+      'toolName=memory_tombstone',
+      'requestSource=CM-1111-proof-memory-retention-apply',
+      'pending.eventId=b1e084b1-bef9-4af9-8708-8ba47f9c21d9',
+      'pending.correlationId=null',
+      'pending.auditPhase=pending',
+      'pending.mutationApplied=false',
+      'pending.memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+      'pending.eventType=memory_tombstone',
+      'pending.toolName=memory_tombstone',
+      'pending.actorClientId=codex',
+      'pending.requestSource=CM-1111-proof-memory-retention-apply',
+      'pending.fromStatus=active',
+      'pending.toStatus=tombstoned',
+      'pending.tombstoneReason=proof-memory-retention-expired-after-validation',
+      'committed.eventId=b1e084b1-bef9-4af9-8708-8ba47f9c21d9',
+      'committed.correlationId=b1e084b1-bef9-4af9-8708-8ba47f9c21d9',
+      'committed.auditPhase=committed',
+      'committed.mutationApplied=true',
+      'committed.memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+      'committed.eventType=memory_tombstone',
+      'committed.toolName=memory_tombstone',
+      'committed.actorClientId=codex',
+      'committed.requestSource=CM-1111-proof-memory-retention-apply',
+      'committed.fromStatus=active',
+      'committed.toStatus=tombstoned',
+      'committed.tombstoneReason=proof-memory-retention-expired-after-validation'
+    ].join('\n');
+  }
+  throw new Error('missing');
+}
+
+test('CM-1152 current-facts classifier ingests recorded CM-1151 selected observation follow-up gap', () => {
+  const recorded = collectRecordedSelectedObservationResult({ fileReader: cm1151Reader });
+  assert.equal(recorded.resultClass, RESULT_CLASSES.AUDIT_SELECTED_CORRELATION_OBSERVED);
+  assert.equal(recorded.observation.found, true);
+  assert.equal(recorded.observation.rawAuditReturned, false);
+  assert.equal(recorded.followup.metadataLifecycleObserved, true);
+  assert.equal(recorded.followup.recallSuppressionObserved, false);
+
+  const report = buildReport({}, {
+    gitRunner: gitRunnerForCleanHead,
+    fileReader: cm1151Reader
+  });
+
+  assert.equal(report.decision, 'SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_CLASSIFIED_RECORDED_OBSERVATION_FOLLOWUP_MISSING');
+  assert.equal(report.currentFactsStatus, 'recorded_observation');
+  assert.equal(report.currentFactsAcceptedForExecutionPreflight, true);
+  assert.deepEqual(report.currentFactsBlockerReasons, []);
+  assert.equal(report.recordedSelectedObservationIngested, true);
+  assert.equal(report.classification.resultClass, RESULT_CLASSES.AUDIT_OBSERVED_BUT_RECALL_SUPPRESSION_MISSING);
+  assert.equal(report.blockerDowngradeAllowed, false);
+  assert.equal(report.readinessClaimAllowed, false);
+  assert.equal(report.reliabilityClaimAllowed, false);
+  assert.equal(report.safety.readsTrueAuditLog, false);
+  assert.equal(report.safety.callsSearchMemory, false);
 });
 
 test('CM-1124 rejects observation and raw input flags before collecting current facts', () => {

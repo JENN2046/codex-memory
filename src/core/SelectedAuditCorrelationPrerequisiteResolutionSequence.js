@@ -10,6 +10,7 @@ const RESOLUTION_CLASSES = Object.freeze({
   WAIT_CM1115_APPROVAL_PACKET_ONLY_AFTER_CM1111: 'WAIT_CM1115_APPROVAL_PACKET_ONLY_AFTER_CM1111',
   WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115: 'WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115',
   WAIT_CM1120_APPROVAL_PACKET_ONLY_AFTER_PRIOR_RESULTS: 'WAIT_CM1120_APPROVAL_PACKET_ONLY_AFTER_PRIOR_RESULTS',
+  PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY: 'PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY',
   NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY: 'NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY',
   FAIL_CLOSED_REPORT_MISSING: 'FAIL_CLOSED_REPORT_MISSING',
   FAIL_CLOSED_UNSUPPORTED_STAGE_CLASS: 'FAIL_CLOSED_UNSUPPORTED_STAGE_CLASS',
@@ -313,6 +314,25 @@ function buildSelectedAuditCorrelationPrerequisiteResolutionSequence(stageGateRe
           'request_cm1120_exact_approval_only_if_rebaseline_gate_allows'
         ],
         nextStep: 'Prepare only a fresh CM-1120 target-head rebaseline packet; do not execute selected audit observation.'
+      }
+    );
+  }
+
+  if (stageClass === STAGE_CLASSES.WAIT_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF) {
+    return baseSequence(
+      RESOLUTION_CLASSES.PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY,
+      stageGateReport,
+      stageGate,
+      {
+        reason: 'bounded_public_default_recall_suppression_followup_is_next',
+        nextAllowedAction: 'execute_one_bounded_public_default_recall_suppression_proof_only',
+        orderedResolutionSteps: [
+          'execute_one_bounded_public_default_recall_suppression_proof_with_sanitized_output',
+          'record_followup_evidence_without_blocker_downgrade',
+          'rerun_cm1129_cm1131_cm1140_after_followup_record',
+          'keep_memory_write_reliable_memory_recall_reliable_and_readiness_unclaimed'
+        ],
+        nextStep: 'Execute only one bounded public/default recall suppression proof; do not claim reliability/readiness.'
       }
     );
   }

@@ -28,6 +28,27 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1152 Post-CM1120 Current-Facts Gate Rerun - 2026-05-26
+
+Result: `CM1152_POST_CM1120_CURRENT_FACTS_GATE_RERUN_REPAIRED_PROOF_ALLOWED_NOT_READY`.
+
+CM-1152 repairs the local current-facts gates so the recorded CM-1120 result from CM-1151 is ingested as a completed selected observation instead of being misclassified as a stale approval packet.
+
+Gate result after repair:
+
+```text
+currentFactsStatus=recorded_observation
+recordedSelectedObservationResultClass=AUDIT_SELECTED_CORRELATION_OBSERVED
+classification.resultClass=AUDIT_OBSERVED_BUT_RECALL_SUPPRESSION_MISSING
+readinessClass=SELECTED_AUDIT_OBSERVED_BUT_FOLLOWUP_MISSING
+reviewClass=SELECTED_AUDIT_OBSERVED_BUT_FOLLOWUP_MISSING_NOT_DOWNGRADE
+stageClass=WAIT_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF
+resolutionClass=PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY
+nextAllowedAction=execute_one_bounded_public_default_recall_suppression_proof_only
+```
+
+This is not a blocker downgrade and not a readiness/reliability claim. It only allows the next bounded follow-up proof after a clean rerun.
+
 ## CM-1151 CM1120 Selected Audit Correlation Execution Record - 2026-05-26
 
 Result: `CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTED_RECORDED_NOT_READY`.

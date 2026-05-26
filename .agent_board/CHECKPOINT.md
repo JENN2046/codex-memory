@@ -1,5 +1,29 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1152 Post-CM1120 Current-Facts Gate Rerun Checkpoint
+
+Status: `CM1152_POST_CM1120_CURRENT_FACTS_GATE_RERUN_REPAIRED_PROOF_ALLOWED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Repaired current-facts classifier ingestion for recorded CM-1151/CM-1120 selected observation.
+- Routed CM-1129/CM-1131/CM-1140 from stale CM-1120 rebaseline to `PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY`.
+- Added targeted regression tests for recorded observation ingestion and proof-followup routing.
+
+Validation:
+- Targeted current-facts tests passed.
+- Real gates returned `nextAllowedAction=execute_one_bounded_public_default_recall_suppression_proof_only`.
+
+Boundary:
+- Recall suppression proof not yet executed in CM-1152.
+- No memory tools, provider/API, raw read, durable write/apply, push, readiness, or reliability claim.
+
+Next:
+- Commit CM-1152.
+- Rerun gates from clean HEAD.
+- Execute exactly one bounded public/default recall suppression proof only if clean rerun still allows it.
+
 ## CM-1151 CM1120 Selected Audit Correlation Execution Record Checkpoint
 
 Status: `CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTED_RECORDED_NOT_READY`

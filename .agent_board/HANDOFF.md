@@ -1,5 +1,19 @@
 # HANDOFF.md - codex-memory
 
+## CM-1152 Post-CM1120 Current-Facts Gate Rerun Handoff
+
+Goal: rerun current-facts gates after CM-1120 and decide whether public/default recall suppression proof is allowed.
+
+Status: CM1152_POST_CM1120_CURRENT_FACTS_GATE_RERUN_REPAIRED_PROOF_ALLOWED_NOT_READY.
+
+Changed files: current-facts classifier, selected audit prerequisite gate core, related tests, `docs/CM1152_POST_CM1120_CURRENT_FACTS_GATE_RERUN.md`, status/truth-table/board surfaces.
+
+Gate result: recorded CM-1151/CM-1120 result is ingested as `AUDIT_SELECTED_CORRELATION_OBSERVED`; CM-1129 review remains no downgrade with `SELECTED_AUDIT_OBSERVED_BUT_FOLLOWUP_MISSING_NOT_DOWNGRADE`; resolution allows only `execute_one_bounded_public_default_recall_suppression_proof_only`.
+
+Validation: targeted current-facts tests passed; real gates returned proof-followup allowed. Docs validation and commit are pending.
+
+Next safe step: commit CM-1152, rerun gates from clean HEAD, then execute exactly one bounded public/default recall suppression proof only if still allowed. Do not claim readiness or reliability.
+
 ## CM-1151 CM1120 Selected Audit Correlation Execution Record Handoff
 
 Goal: execute exact-approved CM-1120 selected audit-correlation observation and record the result.

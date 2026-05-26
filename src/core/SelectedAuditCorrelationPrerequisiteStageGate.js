@@ -10,6 +10,7 @@ const STAGE_CLASSES = Object.freeze({
   WAIT_CM1115_SEPARATE_EXACT_APPROVAL_AFTER_CM1111: 'WAIT_CM1115_SEPARATE_EXACT_APPROVAL_AFTER_CM1111',
   WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115: 'WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115',
   WAIT_CM1120_SEPARATE_EXACT_OBSERVATION_APPROVAL: 'WAIT_CM1120_SEPARATE_EXACT_OBSERVATION_APPROVAL',
+  WAIT_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF: 'WAIT_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF',
   NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY: 'NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY',
   FAIL_CLOSED_REPORT_MISSING: 'FAIL_CLOSED_REPORT_MISSING',
   FAIL_CLOSED_OVERCLAIM_SIGNAL: 'FAIL_CLOSED_OVERCLAIM_SIGNAL',
@@ -286,6 +287,19 @@ function evaluateSelectedAuditCorrelationPrerequisiteStageGate(prerequisitePlanR
         nextOperatorAction: 'request_separate_exact_cm1120_selected_observation_approval_only',
         cm1120ApprovalRequestAllowed: true,
         nextStep: 'Request separate exact CM-1120 selected-observation approval only; do not execute unless separately approved.'
+      }
+    );
+  }
+
+  if (planClass === PLAN_CLASSES.RECALL_SUPPRESSION_FOLLOWUP_PROOF_ALLOWED_NOT_READY) {
+    return baseGate(
+      STAGE_CLASSES.WAIT_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF,
+      prerequisitePlanReport,
+      plan,
+      {
+        reason: 'public_default_recall_suppression_followup_required_after_selected_audit_observation',
+        nextOperatorAction: 'execute_one_bounded_public_default_recall_suppression_proof_only',
+        nextStep: 'Execute only one bounded public/default recall suppression proof if allowed by the current goal; do not record a blocker downgrade or claim reliability/readiness.'
       }
     );
   }

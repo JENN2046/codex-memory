@@ -71,6 +71,50 @@ function cm1145Reader() {
   ].join('\n');
 }
 
+function cm1151Reader(filePath) {
+  if (String(filePath).includes('CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTION_RECORD.md')) {
+    return [
+      'Status: `CM1151_CM1120_SELECTED_AUDIT_CORRELATION_EXECUTED_RECORDED_NOT_READY`',
+      'resultClass=AUDIT_SELECTED_CORRELATION_OBSERVED',
+      'found=true',
+      'reason=null',
+      'selectedFieldsOnly=true',
+      'rawAuditReturned=false',
+      'inspectedEntryCount=500',
+      'matchedEventCount=2',
+      'memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+      'eventType=memory_tombstone',
+      'toolName=memory_tombstone',
+      'requestSource=CM-1111-proof-memory-retention-apply',
+      'pending.eventId=b1e084b1-bef9-4af9-8708-8ba47f9c21d9',
+      'pending.correlationId=null',
+      'pending.auditPhase=pending',
+      'pending.mutationApplied=false',
+      'pending.memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+      'pending.eventType=memory_tombstone',
+      'pending.toolName=memory_tombstone',
+      'pending.actorClientId=codex',
+      'pending.requestSource=CM-1111-proof-memory-retention-apply',
+      'pending.fromStatus=active',
+      'pending.toStatus=tombstoned',
+      'pending.tombstoneReason=proof-memory-retention-expired-after-validation',
+      'committed.eventId=b1e084b1-bef9-4af9-8708-8ba47f9c21d9',
+      'committed.correlationId=b1e084b1-bef9-4af9-8708-8ba47f9c21d9',
+      'committed.auditPhase=committed',
+      'committed.mutationApplied=true',
+      'committed.memoryId=codex-process-50325be15fdb479d805728fe420b4838',
+      'committed.eventType=memory_tombstone',
+      'committed.toolName=memory_tombstone',
+      'committed.actorClientId=codex',
+      'committed.requestSource=CM-1111-proof-memory-retention-apply',
+      'committed.fromStatus=active',
+      'committed.toStatus=tombstoned',
+      'committed.tombstoneReason=proof-memory-retention-expired-after-validation'
+    ].join('\n');
+  }
+  throw new Error('missing');
+}
+
 test('CM-1140 current-facts CLI reports dirty worktree resolution sequence without approvals', () => {
   const report = buildReport({}, {
     gitRunner: gitRunnerForDirtyHead
@@ -117,6 +161,22 @@ test('CM-1140 current-facts CLI sequences CM-1115 after CM-1145 even when CM-112
   assert.equal(report.cm1120ExecutionAuthorizedNow, false);
   assert.ok(report.currentFactsBlockerReasons.includes('localHead_target_head_mismatch'));
   assert.ok(!report.currentFactsBlockerReasons.includes('prior_result_CM-1111_missing'));
+});
+
+test('CM-1152 current-facts CLI allows only bounded public default recall suppression follow-up after recorded CM-1120', () => {
+  const report = buildReport({}, {
+    gitRunner: gitRunnerForCleanHead,
+    fileReader: cm1151Reader
+  });
+
+  assert.equal(report.stageClass, 'WAIT_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF');
+  assert.equal(report.resolutionClass, RESOLUTION_CLASSES.PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY);
+  assert.equal(report.nextAllowedAction, 'execute_one_bounded_public_default_recall_suppression_proof_only');
+  assert.equal(report.nextApprovalTarget, 'none');
+  assert.equal(report.cm1120ExecutionAuthorizedNow, false);
+  assert.equal(report.blockerDowngradeRecordAllowed, false);
+  assert.equal(report.readinessClaimAllowed, false);
+  assert.equal(report.reliabilityClaimAllowed, false);
 });
 
 test('CM-1140 current-facts CLI rejects audit flags before Git collection', () => {
