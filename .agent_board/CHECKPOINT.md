@@ -1,5 +1,39 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1162 Degraded Reconcile Replay After Restart Validation Checkpoint
+
+Status: `CM1162_DEGRADED_RECONCILE_REPLAY_AFTER_RESTART_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added temp-local validation for explicit reconcile replay after degraded manifest recovery and a second store reopen.
+- Verified vector reconcile task survives reopen.
+- Verified explicit `MemoryWriteReconcileService.replayPending({ dryRun:false })` restores vector projection and clears reconcile queue.
+- Verified SQLite record/chunk projection remains present.
+- Verified historical manifest remains `degraded` after projection replay.
+- Verified duplicate canonical write replays the existing degraded manifest without creating another record.
+
+Validation:
+- Test syntax check passed.
+- Targeted storage/runtime/reconcile tests passed `32/32`.
+- Full `npm test` passed `2767/2767`.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan returned only expected boundary/negative wording.
+- Changed-scope re-review found no actionable issue.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No automatic startup recovery, background worker enablement, degraded auto-healing, manifest repair/promotion, scheduler/watchdog change, or cross-store transactionality.
+
+Next:
+- Commit CM-1162 if guarded commit eligibility remains clean.
+- Continue kernel hardening with missing-diary pending-manifest restart validation, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design.
+
 ## CM-1161 Degraded Manifest Restart Recovery Validation Checkpoint
 
 Status: `CM1161_DEGRADED_MANIFEST_RESTART_RECOVERY_VALIDATED_NOT_READY`

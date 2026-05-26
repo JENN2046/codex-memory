@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1162 Degraded Reconcile Replay After Restart Validation Handoff
+
+Goal: continue CM-1161 by validating explicit degraded reconcile replay after a second store reopen.
+
+Status: CM1162_DEGRADED_RECONCILE_REPLAY_AFTER_RESTART_VALIDATED_NOT_READY.
+
+Changed files: `tests/memory-write-restart-durability-temp-local-evidence.test.js`; `docs/CM1162_DEGRADED_RECONCILE_REPLAY_AFTER_RESTART_VALIDATION.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: a degraded vector reconcile task left by pending-manifest recovery survives a second store reopen, explicit `MemoryWriteReconcileService.replayPending({ dryRun:false })` restores vector projection and clears the reconcile queue, while the historical manifest remains degraded and duplicate canonical writes replay the existing manifest.
+
+Validation: test syntax passed. Targeted storage/runtime/reconcile tests passed `32/32`. Full `npm test` passed `2767/2767`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Remaining risks: no automatic startup recovery, no background worker/scheduler recovery, no degraded manifest repair/promotion policy, no real memory recovery proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1162 if guarded commit eligibility remains clean. After that, consider missing-diary pending-manifest restart validation, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
+
 ## CM-1161 Degraded Manifest Restart Recovery Validation Handoff
 
 Goal: continue CM-1160 by validating degraded pending-manifest recovery behavior across store reopen.

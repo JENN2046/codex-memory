@@ -8,6 +8,7 @@ const path = require('node:path');
 
 const { MemoryWriteService, buildDefaultIdempotencyKey } = require('../src/core/MemoryWriteService');
 const { computeCanonicalWriteHash } = require('../src/core/MemoryWriteLifecycleDedupSuppressionPreflight');
+const { MemoryWriteReconcileService } = require('../src/core/MemoryWriteReconcileService');
 const { DiaryStore } = require('../src/storage/DiaryStore');
 const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 const { VectorIndexStore } = require('../src/storage/VectorIndexStore');
@@ -464,6 +465,138 @@ test('CM-1161 pending manifest restart recovery degrades and replays when vector
     }
     if (reopenedStores) {
       await reopenedStores.shadowStore.close();
+    }
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
+test('CM-1162 degraded manifest reconcile task replays after second store reopen', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1162-reconcile-restart-'));
+  const config = createConfig(rootPath);
+  let firstStores;
+  let degradedStores;
+  let replayStores;
+
+  try {
+    const payload = processPayload({
+      title: 'Checkpoint: CM-1162 degraded reconcile replay after restart',
+      content: [
+        'Type: checkpoint',
+        'CM1162 degraded reconcile replay after restart temp local marker',
+        'Purpose: prove degraded vector reconcile task can replay after a second store reopen.',
+        'Boundary: synthetic temp-local files only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1162 synthetic degraded reconcile replay evidence',
+      tags: ['cm1162', 'degraded-manifest', 'reconcile-replay', 'temp-local'],
+      task_id: 'CM-1162',
+      conversation_id: 'cm1162-degraded-reconcile-replay'
+    });
+    const canonicalHash = computeCanonicalWriteHash(payload);
+    const idempotencyKey = buildDefaultIdempotencyKey(canonicalHash);
+    const memoryId = 'codex-process-cm1162reconcilereplay00000001';
+    const now = new Date().toISOString();
+
+    firstStores = openStores(config);
+    await firstStores.shadowStore.beginMemoryWriteManifest({
+      idempotencyKey,
+      memoryId,
+      canonicalHash,
+      target: 'process',
+      createdAt: now
+    });
+    await firstStores.service.diaryStore.writeRecord({
+      memoryId,
+      target: 'process',
+      title: payload.title,
+      content: payload.content,
+      evidence: payload.evidence,
+      tags: payload.tags,
+      sensitivity: payload.sensitivity,
+      validated: payload.validated,
+      reusable: payload.reusable,
+      createdAt: now,
+      updatedAt: now,
+      projectId: payload.project_id,
+      workspaceId: payload.workspace_id,
+      clientId: payload.client_id,
+      taskId: payload.task_id,
+      conversationId: payload.conversation_id,
+      visibility: payload.visibility,
+      retentionPolicy: payload.retention_policy
+    });
+    await firstStores.shadowStore.close();
+    firstStores = null;
+
+    degradedStores = openStores(config);
+    degradedStores.vectorStore.upsertRecord = async () => {
+      throw new Error('cm1162 synthetic vector projection failure before replay');
+    };
+    const degradedRecovery = await degradedStores.service.recoverPendingWriteManifests({ limit: 10 });
+    assert.equal(degradedRecovery.attempted, 1);
+    assert.equal(degradedRecovery.recovered, 1);
+    assert.equal(degradedRecovery.degraded, 1);
+    assert.equal((await degradedStores.shadowStore.getHealth()).reconcileCount, 1);
+    assert.equal((await degradedStores.vectorStore.getHealth()).vectorCount, 0);
+    await degradedStores.shadowStore.close();
+    degradedStores = null;
+
+    replayStores = openStores(config);
+    const replayBeforeHealth = await replayStores.shadowStore.getHealth();
+    assert.equal(replayBeforeHealth.recordCount, 1);
+    assert.equal(replayBeforeHealth.chunkCount >= 1, true);
+    assert.equal(replayBeforeHealth.reconcileCount, 1);
+    assert.equal(replayBeforeHealth.writeManifest.degraded, 1);
+    assert.equal((await replayStores.vectorStore.getHealth()).vectorCount, 0);
+
+    const reconcileService = new MemoryWriteReconcileService({
+      shadowStore: replayStores.shadowStore,
+      vectorStore: replayStores.vectorStore,
+      chunkIndexingService: new ChunkIndexingService({
+        config,
+        shadowStore: replayStores.shadowStore,
+        vectorStore: replayStores.vectorStore
+      })
+    });
+    const replay = await reconcileService.replayPending({ limit: 10, dryRun: false });
+    assert.equal(replay.success, true);
+    assert.equal(replay.decision, 'completed');
+    assert.equal(replay.scannedTaskCount, 1);
+    assert.equal(replay.replayedCount, 1);
+    assert.equal(replay.clearedCount, 1);
+    assert.equal(replay.failedCount, 0);
+    assert.equal(replay.results[0].memoryId, memoryId);
+    assert.equal(replay.results[0].storeKind, 'vector');
+    assert.equal(replay.results[0].status, 'replayed');
+
+    const replayAfterHealth = await replayStores.shadowStore.getHealth();
+    assert.equal(replayAfterHealth.recordCount, 1);
+    assert.equal(replayAfterHealth.chunkCount >= 1, true);
+    assert.equal(replayAfterHealth.reconcileCount, 0);
+    assert.equal((await replayStores.vectorStore.getHealth()).vectorCount, 1);
+
+    const manifest = await replayStores.shadowStore.getMemoryWriteManifestByIdempotencyKey(idempotencyKey);
+    assert.equal(manifest.status, 'degraded');
+    assert.equal(manifest.result.idempotency.recovered, true);
+    assert.equal(manifest.result.shadowWrite.status, 'degraded');
+
+    const duplicate = await replayStores.service.record(payload);
+    assert.equal(duplicate.decision, 'accepted');
+    assert.equal(duplicate.memoryId, memoryId);
+    assert.equal(duplicate.idempotency.replayed, true);
+    assert.equal(duplicate.idempotency.status, 'degraded');
+    assert.equal((await replayStores.shadowStore.getHealth()).recordCount, 1);
+    assert.equal((await replayStores.shadowStore.getHealth()).reconcileCount, 0);
+  } finally {
+    if (firstStores) {
+      await firstStores.shadowStore.close();
+    }
+    if (degradedStores) {
+      await degradedStores.shadowStore.close();
+    }
+    if (replayStores) {
+      await replayStores.shadowStore.close();
     }
     await fs.rm(rootPath, { recursive: true, force: true });
   }
