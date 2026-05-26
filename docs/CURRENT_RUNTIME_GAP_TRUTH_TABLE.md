@@ -28,6 +28,36 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1149 Post CM1115 Current-Facts Gate Rerun - 2026-05-26
+
+Result: `CM1149_POST_CM1115_CURRENT_FACTS_GATE_RERUN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+After CM-1148, current-facts gates now recognize both recorded prior results:
+
+```text
+recordedPriorResultTaskIds=CM-1111,CM-1115
+requiredPriorResultsBound=true
+```
+
+The remaining blockers are target-head rebaseline blockers:
+
+```text
+localHead_target_head_mismatch
+originHead_target_head_mismatch
+remoteMainHead_target_head_mismatch
+```
+
+Stage/resolution:
+
+```text
+stageClass=WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115
+resolutionClass=WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115
+nextAllowedAction=prepare_fresh_cm1120_target_head_rebaseline_packet_only
+nextApprovalTarget=CM-1120-rebaseline
+```
+
+No CM-1120 approval or execution is allowed by CM-1149. No readiness or reliability claim is allowed.
+
 ## CM-1148 CM1115 Metadata Lifecycle Verify Execution Record - 2026-05-26
 
 Result: `CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTED_RECORDED_NOT_READY`.

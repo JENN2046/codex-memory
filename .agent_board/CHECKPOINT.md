@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1149 Post CM1115 Current-Facts Gate Rerun Checkpoint
+
+Status: `CM1149_POST_CM1115_CURRENT_FACTS_GATE_RERUN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Reran current-facts preflight, stage gate, and resolution sequence after CM-1148 commit.
+- Confirmed recorded prior results include `CM-1111` and `CM-1115`.
+- Confirmed CM-1120 remains blocked on target-head rebaseline.
+
+Validation:
+- Current-facts preflight/stage/resolution gates ran and stayed blocked before CM-1149 record.
+- Docs validation, ledger consistency, `git diff --check`, and focused no-secret scan passed.
+
+Boundary:
+- No CM-1120 approval or execution.
+- No observation/audit/raw memory read.
+- No memory tools or provider/API calls.
+- No durable memory/audit write or apply.
+- No public MCP/config/watchdog/startup/package/dependency change.
+- No push.
+- No readiness or reliability claim.
+
+Next:
+- Commit CM-1149 record.
+- Rerun final clean-head gates.
+
 ## CM-1148 CM1115 Metadata Lifecycle Verify Execution Record Checkpoint
 
 Status: `CM1148_CM1115_METADATA_LIFECYCLE_VERIFY_EXECUTED_RECORDED_NOT_READY`

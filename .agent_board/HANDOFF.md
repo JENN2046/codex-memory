@@ -1,5 +1,19 @@
 # HANDOFF.md - codex-memory
 
+## CM-1149 Post CM1115 Current-Facts Gate Rerun Handoff
+
+Goal: record the post-CM1115 current-facts gate rerun and next allowed action.
+
+Status: CM1149_POST_CM1115_CURRENT_FACTS_GATE_RERUN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY.
+
+Changed files: `docs/CM1149_POST_CM1115_CURRENT_FACTS_GATE_RERUN.md`; `STATUS.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Gate result: recorded prior results are `CM-1111` and `CM-1115`; required prior results are bound; remaining blockers are CM-1120 target-head mismatches; stage/resolution are `WAIT_CM1120_TARGET_HEAD_REBASELINE_AFTER_CM1115`.
+
+Validation: current-facts preflight/stage/resolution gates ran and stayed blocked; docs validation, ledger consistency, diff check, and focused no-secret scan passed. Commit and final clean-head gate rerun remain.
+
+Next safe step: prepare only a fresh CM-1120 target-head rebaseline packet if continuing. Do not execute CM-1120.
+
 ## CM-1148 CM1115 Metadata Lifecycle Verify Execution Record Handoff
 
 Goal: execute exact-approved CM-1115 selected metadata lifecycle verification, record the result, and rerun current-facts gates.
