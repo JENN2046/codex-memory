@@ -1,5 +1,42 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1179 No-Token Search Evidence Review Checkpoint
+
+Status: `CM1179_NO_TOKEN_SEARCH_EVIDENCE_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Reviewed committed CM-1177 and CM-1178 evidence.
+- Accepted narrow blocker downgrade for covered public HTTP no-token `search_memory` side-effect/raw-content boundary.
+- Preserved no-readiness and no-reliability boundary.
+
+Validation:
+- First ledger/docs validation attempt failed because CMV-1297 was still marked pending.
+- Pending-row correction applied.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `git diff --check` passed.
+
+Boundary:
+- No live `search_memory` or `record_memory`.
+- No raw memory or `.jsonl` read.
+- No durable memory/audit write.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/dependency change.
+- No migration, import, export, backup, or restore.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- No-token `memory_overview` selected-output posture.
+- SQLite schema migration/version startup gate.
+- Startup explicit rebuild/recovery policy.
+- Full lifecycle transition log.
+
 ## CM-1178 No-Token Raw Content Read Closure Checkpoint
 
 Status: `CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE_VALIDATED_NOT_READY`

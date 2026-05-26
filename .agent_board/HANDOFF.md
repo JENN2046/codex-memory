@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1179 No-Token Search Evidence Review Handoff
+
+Goal: review CM-1177/CM-1178 evidence for a narrow no-token search blocker downgrade.
+
+Status: CM1179_NO_TOKEN_SEARCH_EVIDENCE_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `docs/CM1179_NO_TOKEN_SEARCH_EVIDENCE_REVIEW.md`; `docs/CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `.agent_board/*`.
+
+Decision: downgrade allowed only for covered public HTTP no-token `search_memory` side-effect/raw-content boundary. This does not close full no-token governance, recall reliability, write reliability, runtime readiness, production readiness, or `RC_READY`.
+
+Validation: first ledger/docs validation attempt failed because CMV-1297 was still marked pending. Pending-row correction applied; ledger consistency, docs validation, and `git diff --check` passed.
+
+Next safe step: optionally commit CM-1179 if guarded conditions pass.
+
 ## CM-1178 No-Token Raw Content Read Closure Handoff
 
 Goal: prevent no-token HTTP `search_memory` from requesting raw memory content.

@@ -53,7 +53,8 @@ This does not prove general recall quality, full no-token read closure, write re
 
 ## Remaining
 
-- Broader no-token read closure still needs a dedicated CM-1178 review/test slice.
+- CM-1178 has since closed the `include_content=true` raw-content request gap for no-token HTTP `search_memory`.
+- No-token `memory_overview` selected-output posture still needs review.
 - SQLite schema migration/version startup gate remains open.
 - Startup explicit rebuild/recovery policy remains open.
 - Lifecycle remains timestamp/counter based, not a full transition log.

@@ -28,6 +28,28 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1179 No-Token Search Evidence Review - 2026-05-26
+
+Result: `CM1179_NO_TOKEN_SEARCH_EVIDENCE_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`.
+
+CM-1179 reviews CM-1177 and CM-1178 as committed local evidence.
+
+Allowed narrow downgrade:
+
+- Covered public HTTP no-token `search_memory` now has source/test evidence for readonly side-effect control.
+- No-token `search_memory` avoids sync, candidate-cache get/set, recall/read-policy audit writes, embedding-cache flush, and external embedding/rerank providers.
+- No-token `search_memory` with `arguments.include_content === true` is rejected at the HTTP boundary with HTTP `403` before tool execution.
+
+Still not proven:
+
+- This is not general recall-quality proof.
+- This is not full no-token governance closure.
+- No-token `memory_overview` selected-output posture still needs review.
+- No production readiness, write reliability, or recall reliability.
+- No schema migration/version startup hard stop.
+- No startup explicit rebuild/recovery policy.
+- Lifecycle is still timestamp/counter based, not a full transition log.
+
 ## CM-1178 No-Token Raw Content Read Closure - 2026-05-26
 
 Result: `CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE_VALIDATED_NOT_READY`.
@@ -64,7 +86,7 @@ CM-1177 is a narrow runtime-kernel source/test slice:
 Still not proven:
 
 - This is not general recall-quality proof.
-- Broader no-token read closure remains open.
+- CM-1178 later closes the `include_content=true` raw-content request gap for no-token HTTP `search_memory`; no-token `memory_overview` selected-output posture still needs review.
 - No production readiness, write reliability, or recall reliability.
 - No schema migration/version startup hard stop.
 - No startup explicit rebuild/recovery policy.
