@@ -4,6 +4,46 @@ const path = require('node:path');
 const DEFAULT_AUDIT_WINDOW = 500;
 const MAX_AUDIT_BYTES = 1024 * 1024;
 
+function normalizeString(value) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function normalizeAuditPhase(value) {
+  return normalizeString(value).toLowerCase();
+}
+
+function selectMutationAuditEvent(event) {
+  if (!event || typeof event !== 'object') return null;
+  return {
+    eventId: event.event_id || null,
+    correlationId: event.correlation_id || null,
+    auditPhase: event.audit_phase || null,
+    mutationApplied: event.mutation_applied === true,
+    memoryId: event.memory_id || null,
+    eventType: event.event_type || null,
+    toolName: event.tool_name || null,
+    actorClientId: event.actor_client_id || null,
+    requestSource: event.request_source || null,
+    fromStatus: event.from_status || null,
+    toStatus: event.to_status || null,
+    tombstoneReason: event.tombstone_reason || null
+  };
+}
+
+function matchesSelectedCorrelationFilter(event, {
+  memoryId,
+  eventType,
+  toolName,
+  requestSource
+}) {
+  if (!event) return false;
+  if (memoryId && event.memoryId !== memoryId) return false;
+  if (eventType && event.eventType !== eventType) return false;
+  if (toolName && event.toolName !== toolName) return false;
+  if (requestSource && event.requestSource !== requestSource) return false;
+  return true;
+}
+
 async function pathExists(targetPath) {
   try {
     await fs.access(targetPath);
@@ -53,6 +93,65 @@ class AuditLogStore {
 
   async readRecentRecallAudit(maxLines = DEFAULT_AUDIT_WINDOW, maxBytes = MAX_AUDIT_BYTES) {
     return this.readRecentJsonlEntries(this.config.recallLogPath, maxLines, maxBytes);
+  }
+
+  async readSelectedWriteAuditCorrelation({
+    memoryId,
+    eventType = 'memory_tombstone',
+    toolName = 'memory_tombstone',
+    requestSource = '',
+    maxLines = DEFAULT_AUDIT_WINDOW,
+    maxBytes = MAX_AUDIT_BYTES
+  } = {}) {
+    const selectedMemoryId = normalizeString(memoryId);
+    if (!selectedMemoryId) {
+      return {
+        found: false,
+        reason: 'memory_id_required',
+        selectedFieldsOnly: true,
+        rawAuditReturned: false,
+        inspectedEntryCount: 0,
+        memoryId: null,
+        eventType,
+        toolName,
+        requestSource: normalizeString(requestSource),
+        pending: null,
+        committed: null
+      };
+    }
+
+    const entries = await this.readRecentWriteAudit(maxLines, maxBytes);
+    const filter = {
+      memoryId: selectedMemoryId,
+      eventType: normalizeString(eventType),
+      toolName: normalizeString(toolName),
+      requestSource: normalizeString(requestSource)
+    };
+    const selectedEvents = entries
+      .map(entry => selectMutationAuditEvent(entry.mutationAuditEvent))
+      .filter(event => matchesSelectedCorrelationFilter(event, filter));
+    const pending = selectedEvents.find(event => normalizeAuditPhase(event.auditPhase) === 'pending') || null;
+    const committed = pending
+      ? selectedEvents.find(event => {
+        if (normalizeAuditPhase(event.auditPhase) !== 'committed') return false;
+        return event.correlationId === pending.eventId || event.eventId === pending.eventId;
+      }) || null
+      : null;
+
+    return {
+      found: Boolean(pending && committed),
+      reason: pending && committed ? null : 'selected_audit_correlation_not_found',
+      selectedFieldsOnly: true,
+      rawAuditReturned: false,
+      inspectedEntryCount: entries.length,
+      matchedEventCount: selectedEvents.length,
+      memoryId: selectedMemoryId,
+      eventType: filter.eventType,
+      toolName: filter.toolName,
+      requestSource: filter.requestSource,
+      pending,
+      committed
+    };
   }
 
   async readRecentJsonlEntries(filePath, maxLines = DEFAULT_AUDIT_WINDOW, maxBytes = MAX_AUDIT_BYTES) {

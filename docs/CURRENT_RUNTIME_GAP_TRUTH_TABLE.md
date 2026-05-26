@@ -28,6 +28,1756 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1142 Expanded Dirty Scope Local Commit Isolation Approval Packet - 2026-05-26
+
+Result: `CM1142_EXPANDED_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1142 drafts a fresh exact approval packet for possible local dirty-scope isolation after CM-1141 proved the old CM-1135 line stale:
+
+```text
+request_hash=060da750a39415fd627d224d0eda1884a76679c0865d08b57a5d4ed246b91a06
+dirty_scope_max_doc_number=1142
+dirty_scope_max_status_lines=94
+targeted_CM1136_CM1137_CM1142_tests=22/22 passed
+```
+
+Current-facts preflight when the CM-1142 draft line is supplied as input:
+
+```text
+status=accepted_not_executed
+preflightClass=ACCEPTED_FOR_SEPARATE_LOCAL_COMMIT_EXECUTION_NOT_EXECUTED
+approvalPacketId=CM-1142
+dirtyLineCount=94
+unknownDirtyLineCount=0
+localCommitExecutionAllowedNow=true
+commitAuthorized=false
+cleanAuthorized=false
+pushAuthorized=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current-facts dry-run plan when the CM-1142 draft line is supplied as input:
+
+```text
+status=ready_not_executed
+planClass=LOCAL_COMMIT_ISOLATION_DRY_RUN_PLAN_READY_NOT_EXECUTED
+planPrepared=true
+commitExecutableNow=false
+pushExecutableNow=false
+cleanExecutableNow=false
+```
+
+Interpretation:
+
+CM-1142 is a draft packet and preflight boundary only. The approval line inside the document is not active unless the user repeats it as a fresh exact instruction. CM-1142 does not stage, commit, clean, push, request or execute CM-1111/CM-1115/CM-1120, read true audit/raw stores, call memory tools, run apply, write durable project memory/audit, expand public MCP, or claim readiness/reliability.
+
+## CM-1141 Stale Local Commit Approval Scope Guard - 2026-05-26
+
+Result: `CM1141_STALE_LOCAL_COMMIT_APPROVAL_SCOPE_GUARD_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1141 hardens the CM-1136 local commit isolation preflight so the old CM-1135 exact approval line cannot be reused after the dirty scope expands beyond the packet's original boundary:
+
+```text
+updated_helper=src/core/SelectedAuditCorrelationLocalCommitIsolationPreflight.js
+updated_tests=tests/selected-audit-correlation-local-commit-isolation-preflight.test.js,tests/selected-audit-correlation-local-commit-isolation-preflight-cli.test.js
+targeted_CM1136_CM1141_tests=10/10 passed
+new_preflight_class=BLOCKED_APPROVAL_PACKET_STALE_DIRTY_SCOPE_EXPANDED
+```
+
+Real current-facts preflight with the CM-1135 exact approval line:
+
+```text
+status=blocked
+preflightClass=BLOCKED_APPROVAL_PACKET_STALE_DIRTY_SCOPE_EXPANDED
+dirtyLineCount=93
+unknownDirtyLineCount=0
+approvalLineAccepted=true
+localCommitExecutionAllowedNow=false
+commitAuthorized=false
+pushAuthorized=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+approvalScopeExpansionCount=18
+```
+
+Current effect:
+
+```text
+old_cm1135_approval_line_reusable_for_current_worktree=false
+fresh_local_commit_isolation_packet_required=true
+stage_executed=false
+commit_executed=false
+clean_reset_restore_executed=false
+push_executed=false
+cm1111_approved_or_executed=false
+cm1115_approved_or_executed=false
+cm1120_approved_or_executed=false
+memory_tools_called=false
+true_audit_or_raw_store_read=false
+provider_api_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+Interpretation:
+
+CM-1141 is a guardrail, not isolation execution. It improves governance around approval freshness and dirty-scope ownership, but it does not make the worktree clean, does not authorize a local commit, does not unlock CM-1111/CM-1115/CM-1120, and does not prove write reliability, recall reliability, or readiness.
+
+## CM-1140 Prerequisite Resolution Sequence - 2026-05-26
+
+Result: `CM1140_PREREQUISITE_RESOLUTION_SEQUENCE_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1140 adds a no-execution helper/CLI over the CM-1131/CM-1139 stage-gate report:
+
+```text
+helper=src/core/SelectedAuditCorrelationPrerequisiteResolutionSequence.js
+cli=src/cli/selected-audit-correlation-current-facts-resolution-sequence.js
+targeted_CM1140_tests=9/9 passed
+```
+
+Real current-facts resolution sequence:
+
+```text
+resolutionClass=BLOCKED_DIRTY_WORKTREE_ISOLATION_REQUIRED
+stageClass=BLOCKED_RESOLVE_WORKTREE_BEFORE_APPROVAL
+dirtyStatusLineCount=92
+nextAllowedAction=local_dirty_scope_isolation_decision_only
+nextApprovalTarget=none
+approvalRequestCandidate=none
+cm1111ApprovalRequestAllowed=false
+cm1115ApprovalRequestAllowed=false
+cm1120ApprovalRequestAllowed=false
+cm1111ExecutionAuthorizedNow=false
+cm1115ExecutionAuthorizedNow=false
+cm1120ExecutionAuthorizedNow=false
+blockerDowngradeRecordAllowed=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+resolution_sequence_built=true
+approval_request_created=false
+stage_executed=false
+commit_executed=false
+clean_reset_restore_executed=false
+push_executed=false
+cm1111_approved_or_executed=false
+cm1115_approved_or_executed=false
+cm1120_approved_or_executed=false
+memory_tools_called=false
+true_audit_or_raw_store_read=false
+provider_api_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+CM-1140 locks the current order: dirty worktree isolation must come before any CM-1111, CM-1115, or CM-1120 approval request. It does not satisfy the prerequisite or execute the isolation.
+
+## CM-1139 Post Full-Test Stage-Gate Recheck - 2026-05-26
+
+Result: `CM1139_POST_FULL_TEST_STAGE_GATE_RECHECK_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1139 reruns the selected audit-correlation current-facts stage gate after CM-1138 full tests:
+
+```text
+command=node .\src\cli\selected-audit-correlation-current-facts-stage-gate.js --json --pretty
+status=blocked
+planClass=BLOCKED_PREREQUISITES_PENDING
+stageClass=BLOCKED_RESOLVE_WORKTREE_BEFORE_APPROVAL
+dirtyStatusLineCount=87
+blockers=dirty_worktree,prior_result_CM-1111_missing,prior_result_CM-1115_missing
+nextApprovalTarget=none
+cm1111ApprovalRequestAllowed=false
+cm1115ApprovalRequestAllowed=false
+cm1120ApprovalRequestAllowed=false
+cm1111ExecutionAuthorizedNow=false
+cm1115ExecutionAuthorizedNow=false
+cm1120ExecutionAuthorizedNow=false
+blockerDowngradeRecordAllowed=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+stage_gate_rechecked=true
+stage_executed=false
+commit_executed=false
+clean_reset_restore_executed=false
+push_executed=false
+cm1111_approved_or_executed=false
+cm1115_approved_or_executed=false
+cm1120_approved_or_executed=false
+memory_tools_called=false
+true_audit_or_raw_store_read=false
+provider_api_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+Full local tests passing does not unlock selected audit-correlation execution. The same prerequisite blockers remain: dirty worktree, missing CM-1111 applied tombstone result, and missing CM-1115 metadata lifecycle verification result.
+
+## CM-1138 Full Project Test After CM-1137 - 2026-05-26
+
+Result: `CM1138_FULL_PROJECT_TEST_AFTER_CM1137_COMPLETED_VALIDATED_NOT_READY`.
+
+CM-1138 records full local project test evidence after CM-1137:
+
+```text
+first_npm_test_result=timeout_after_124195_ms_not_counted_as_pass_or_failure
+second_npm_test_result=passed
+tests=2725
+pass=2725
+fail=0
+cancelled=0
+skipped=0
+todo=0
+duration_ms=203642.1498
+```
+
+Current effect:
+
+```text
+full_local_test_suite_passed=true
+stage_executed=false
+commit_executed=false
+clean_reset_restore_executed=false
+push_executed=false
+cm1111_approved_or_executed=false
+cm1115_approved_or_executed=false
+cm1120_approved_or_executed=false
+memory_tools_called=false
+true_audit_or_raw_store_read=false
+provider_api_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+This strengthens local compatibility evidence for the current CM08xx/CM11xx helper/test/docs chain. It does not clean the dirty worktree, consume approval, execute isolation, unlock CM-1111/CM-1115/CM-1120, prove selected audit correlation, prove metadata lifecycle, prove public/default recall suppression, prove write reliability, prove recall reliability, or change readiness.
+
+## CM-1137 Local Commit Isolation Dry-Run Plan - 2026-05-26
+
+Result: `CM1137_LOCAL_COMMIT_ISOLATION_DRY_RUN_PLAN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1137 adds a dry-run-only plan layer on top of CM-1136:
+
+```text
+helper=src/core/SelectedAuditCorrelationLocalCommitIsolationDryRunPlan.js
+cli=src/cli/selected-audit-correlation-local-commit-isolation-dry-run-plan.js
+targeted_CM1137_tests=7/7 passed
+```
+
+Real current dry-run plan smoke:
+
+```text
+preflightClass=BLOCKED_APPROVAL_MISSING
+planClass=BLOCKED_PREFLIGHT_NOT_ACCEPTED
+branch=main
+head=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+inventoryClass=KNOWN_CM_EVIDENCE_SCOPE_DIRTY_NOT_CLEAN
+dirtyLineCount=85
+unknownDirtyLineCount=0
+planPrepared=false
+stageCommandsPrepared=false
+commitCommandPrepared=false
+commitExecutableNow=false
+pushExecutableNow=false
+cleanExecutableNow=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+stage_executed=false
+commit_executed=false
+clean_reset_restore_executed=false
+push_executed=false
+cm1111_approved_or_executed=false
+cm1115_approved_or_executed=false
+cm1120_approved_or_executed=false
+memory_tools_called=false
+true_audit_or_raw_store_read=false
+provider_api_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+This adds a reviewable dry-run plan boundary for a possible future exact-approved local commit isolation. It does not consume approval, execute isolation, clean the worktree, unlock CM-1111/CM-1115/CM-1120, prove selected audit correlation, prove metadata lifecycle, prove public/default recall suppression, prove write reliability, prove recall reliability, or change readiness.
+
+## CM-1136 Local Commit Isolation Preflight - 2026-05-26
+
+Result: `CM1136_LOCAL_COMMIT_ISOLATION_PREFLIGHT_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1136 adds a no-execution preflight helper and CLI for the CM-1135 draft local commit isolation packet:
+
+```text
+helper=src/core/SelectedAuditCorrelationLocalCommitIsolationPreflight.js
+cli=src/cli/selected-audit-correlation-local-commit-isolation-preflight.js
+targeted_CM1136_tests=8/8 passed
+```
+
+Real current preflight smoke:
+
+```text
+preflightClass=BLOCKED_APPROVAL_MISSING
+branch=main
+head=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+inventoryClass=KNOWN_CM_EVIDENCE_SCOPE_DIRTY_NOT_CLEAN
+dirtyLineCount=80
+unknownDirtyLineCount=0
+approvalLineAccepted=false
+localCommitExecutionAllowedNow=false
+commitAuthorized=false
+cleanAuthorized=false
+pushAuthorized=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+stage_executed=false
+commit_executed=false
+clean_reset_restore_executed=false
+push_executed=false
+cm1111_approved_or_executed=false
+cm1115_approved_or_executed=false
+cm1120_approved_or_executed=false
+memory_tools_called=false
+true_audit_or_raw_store_read=false
+provider_api_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+This makes the future CM-1135 approval line machine-checkable. It does not resolve the dirty-worktree blocker because no exact approval line was provided or consumed.
+
+## CM-1135 Dirty Scope Local Commit Isolation Approval Packet - 2026-05-26
+
+Result: `CM1135_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1135 adds a draft-only exact approval packet for a possible future one-local-commit dirty-scope isolation action:
+
+```text
+approval_packet=docs/CM1135_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET.md
+bound_head=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+bound_origin_main=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+request_hash=381e4d8385b9cd2dcc7e9b13668b42b5f5330bed6812a7b84c01b48b7d765ec2
+```
+
+Current effect:
+
+```text
+approval_draft_only=true
+approved=false
+stage_executed=false
+commit_executed=false
+clean_reset_restore_executed=false
+push_executed=false
+cm1111_approved_or_executed=false
+cm1115_approved_or_executed=false
+cm1120_approved_or_executed=false
+memory_tools_called=false
+true_audit_or_raw_store_read=false
+provider_api_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+This reduces ambiguity for a future explicit local isolation commit. It does not resolve the dirty-worktree blocker by itself and cannot be used unless the user later provides the exact approval line and fresh preflight validation passes.
+
+## CM-1134 Dirty Scope Content Review Packet - 2026-05-26
+
+Result: `CM1134_DIRTY_SCOPE_CONTENT_REVIEW_PACKET_COMPLETED_REVIEW_ONLY_NOT_MUTATED_NOT_READY`.
+
+CM-1134 adds a local content-level review packet over the CM-1133 dirty-scope isolation packet:
+
+```text
+review_doc=docs/CM1134_DIRTY_SCOPE_CONTENT_REVIEW_PACKET.md
+reviewed_inputs=CM-1133,CM-0826,CM-1105,AuditLogStore selected-correlation helper surface
+focused_scan_scope=docs/CM0825..CM1133 plus selected-audit-correlation source/tests plus AuditLogStore helper/test
+```
+
+Focused scan result:
+
+```text
+secret_token_pattern_matches=0
+raw_content_provider_api_durable_write_positive_counter_matches=0
+unexpected_positive_readiness_or_reliability_matches=0
+expected_negative_overclaim_fixture_matches=3
+```
+
+The three positive overclaim tokens were negative fail-closed test fixtures:
+
+```text
+tests/selected-audit-correlation-execution-readiness.test.js readinessClaimAllowed=true -> FAIL_CLOSED_INVALID_OVERCLAIM_SIGNAL
+tests/selected-audit-correlation-prerequisite-blocker-plan.test.js readinessClaimAllowed=true -> FAIL_CLOSED_OVERCLAIM_SIGNAL
+tests/selected-audit-correlation-prerequisite-stage-gate.test.js reliabilityClaimAllowed=true -> FAIL_CLOSED_OVERCLAIM_SIGNAL
+```
+
+Current effect:
+
+```text
+review_receipt_only=true
+commit_executed=false
+clean_reset_restore_executed=false
+cm1111_approved_or_executed=false
+cm1115_approved_or_executed=false
+cm1120_approved_or_executed=false
+true_audit_log_read=false
+memory_tools_called=false
+provider_api_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+This reduces review ambiguity over the known dirty CM evidence scope. It does not resolve the dirty-worktree blocker, authorize staging/commit/clean, or allow CM-1111/CM-1115/CM-1120 approval requests.
+
+## CM-1133 Selected Audit Correlation Dirty Scope Isolation Decision - 2026-05-26
+
+Result: `CM1133_SELECTED_AUDIT_CORRELATION_DIRTY_SCOPE_ISOLATION_DECISION_COMPLETED_BLOCKED_NOT_MUTATED_NOT_READY`.
+
+CM-1133 adds a no-mutation isolation decision packet over CM-1132:
+
+```text
+helper=src/core/SelectedAuditCorrelationDirtyScopeIsolationDecision.js
+cli=src/cli/selected-audit-correlation-dirty-scope-isolation-decision.js
+targeted_CM1133_tests=8/8 passed
+CM1132_CM1133_regression=18/18 passed
+```
+
+Real current isolation-decision smoke:
+
+```text
+decisionClass=KNOWN_DIRTY_SCOPE_HUMAN_REVIEW_REQUIRED_NOT_MUTATED
+dirtyLineCount=73
+unknownDirtyLineCount=0
+humanReviewRequired=true
+commitDecisionPrepared=true
+commitAuthorized=false
+cleanAuthorized=false
+approvalRequestsAllowedNow=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Review bundles:
+
+```text
+operator_status_surfaces
+recall_proof_review_docs
+write_governance_review_docs
+selected_audit_correlation_chain
+selected_audit_correlation_source_tests
+audit_log_store_helper
+```
+
+Current effect:
+
+```text
+git_status_short_read=true
+file_content_read=false
+commit_executed=false
+clean_reset_restore_executed=false
+memory_tools_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+This prepares a human-review decision packet only. It does not stage, commit, clean, resolve the dirty-worktree blocker, or authorize CM-1111/CM-1115/CM-1120 approval requests.
+
+## CM-1132 Selected Audit Correlation Dirty Scope Inventory - 2026-05-26
+
+Result: `CM1132_SELECTED_AUDIT_CORRELATION_DIRTY_SCOPE_INVENTORY_COMPLETED_BLOCKED_NOT_MUTATED_NOT_READY`.
+
+CM-1132 adds a read-only dirty-scope inventory:
+
+```text
+helper=src/core/SelectedAuditCorrelationDirtyScopeInventory.js
+cli=src/cli/selected-audit-correlation-dirty-scope-inventory.js
+targeted_CM1132_tests=10/10 passed
+```
+
+Real current dirty-scope inventory smoke:
+
+```text
+inventoryClass=KNOWN_CM_EVIDENCE_SCOPE_DIRTY_NOT_CLEAN
+worktreeClean=false
+dirtyLineCount=68
+knownDirtyLineCount=68
+unknownDirtyLineCount=0
+commitAuthorized=false
+cleanAuthorized=false
+approvalRequestsAllowedNow=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+git_status_short_read=true
+file_content_read=false
+commit_executed=false
+clean_reset_restore_executed=false
+memory_tools_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+This inventory reduces ambiguity around the dirty-worktree blocker, but it does not resolve it. The worktree remains dirty; CM-1131 still blocks before any CM-1111, CM-1115, or CM-1120 approval request.
+
+## CM-1131 Selected Audit Correlation Prerequisite Stage Gate - 2026-05-26
+
+Result: `CM1131_SELECTED_AUDIT_CORRELATION_PREREQUISITE_STAGE_GATE_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1131 adds a strict no-execution stage gate over CM-1130:
+
+```text
+helper=src/core/SelectedAuditCorrelationPrerequisiteStageGate.js
+cli=src/cli/selected-audit-correlation-current-facts-stage-gate.js
+targeted_CM1131_tests=11/11 passed
+adjacent_CM1123_CM1126_CM1127_CM1128_CM1129_CM1130_CM1131_regression=49/49 passed
+```
+
+Real current-facts stage-gate smoke:
+
+```text
+status=blocked
+planClass=BLOCKED_PREREQUISITES_PENDING
+stageClass=BLOCKED_RESOLVE_WORKTREE_BEFORE_APPROVAL
+currentFactsBlockerReasons=dirty_worktree,prior_result_CM-1111_missing,prior_result_CM-1115_missing
+nextApprovalTarget=none
+cm1111ApprovalRequestAllowed=false
+cm1115ApprovalRequestAllowed=false
+cm1120ApprovalRequestAllowed=false
+cm1111ExecutionAuthorizedNow=false
+cm1115ExecutionAuthorizedNow=false
+cm1120ExecutionAuthorizedNow=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+true_audit_log_read=false
+observation_input_read=false
+memory_tools_called=false
+apply_executed=false
+readiness_claimed=false
+reliability_claimed=false
+```
+
+This is an ordering guard, not live audit evidence. It blocks before any approval request because the worktree is dirty, so CM-1111, CM-1115, and CM-1120 remain unapproved and unexecuted.
+
+## CM-1130 Selected Audit Correlation Prerequisite Blocker Plan - 2026-05-26
+
+Result: `CM1130_SELECTED_AUDIT_CORRELATION_PREREQUISITE_BLOCKER_PLAN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1130 adds a no-execution prerequisite blocker plan over CM-1129:
+
+```text
+helper=src/core/SelectedAuditCorrelationPrerequisiteBlockerPlan.js
+cli=src/cli/selected-audit-correlation-current-facts-prerequisite-plan.js
+targeted_CM1130_tests=9/9 passed
+adjacent_CM1123_CM1126_CM1127_CM1128_CM1129_CM1130_regression=38/38 passed
+```
+
+Real current-facts prerequisite-plan smoke:
+
+```text
+status=blocked
+readinessClass=BLOCKED_PREFLIGHT_NOT_READY
+reviewClass=BLOCKED_CURRENT_FACTS_NOT_READY
+planClass=BLOCKED_PREREQUISITES_PENDING
+currentFactsBlockerReasons=dirty_worktree,prior_result_CM-1111_missing,prior_result_CM-1115_missing
+blockerDowngradeAllowed=false
+cm1120ExecutionAllowedNow=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current required next actions:
+
+```text
+resolve_dirty_worktree_or_isolate_verified_scope_without_overwriting_user_work
+obtain_separate_exact_cm1111_retention_apply_approval
+execute_cm1111_only_if_approved_and_record_result_class
+obtain_separate_exact_cm1115_metadata_verify_approval_after_cm1111
+execute_cm1115_only_if_approved_and_record_result_class
+rerun_cm1129_current_facts_downgrade_review_after_prerequisites
+keep_cm1120_blocked_until_cm1129_allows_next_stage
+keep_readiness_and_reliability_unclaimed
+```
+
+These are prerequisite blockers only, not execution authorization. CM-1130 does not approve CM-1111, CM-1115, or CM-1120 and does not create live audit evidence, recall reliability, write reliability, or readiness.
+
+## CM-1129 Selected Audit Correlation Current-Facts Downgrade Review CLI - 2026-05-26
+
+Result: `CM1129_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_DOWNGRADE_REVIEW_CLI_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1129 adds a read-only current-facts downgrade-review CLI:
+
+```text
+cli=src/cli/selected-audit-correlation-current-facts-downgrade-review.js
+test=tests/selected-audit-correlation-current-facts-downgrade-review-cli.test.js
+targeted_tests=4/4 passed
+adjacent_CM1123_CM1126_CM1127_CM1128_regression=29/29 passed
+```
+
+Real current-facts downgrade-review smoke:
+
+```text
+status=blocked
+readinessClass=BLOCKED_PREFLIGHT_NOT_READY
+reviewClass=BLOCKED_CURRENT_FACTS_NOT_READY
+currentFactsBlockerReasons=dirty_worktree,prior_result_CM-1111_missing,prior_result_CM-1115_missing
+blockerDowngradeAllowed=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+true_audit_log_read = false
+observation_input_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This is an operator guard, not live audit evidence. It confirms CM-1120 remains blocked and no blocker downgrade is allowed under current facts.
+
+## CM-1128 Selected Audit Correlation Blocker Downgrade Review Guard - 2026-05-26
+
+Result: `CM1128_SELECTED_AUDIT_CORRELATION_BLOCKER_DOWNGRADE_REVIEW_GUARD_COMPLETED_NOT_EXECUTED_NOT_READY`.
+
+CM-1128 adds a pure explicit-input blocker-downgrade review guard:
+
+```text
+helper=src/core/SelectedAuditCorrelationBlockerDowngradeReview.js
+test=tests/selected-audit-correlation-blocker-downgrade-review.test.js
+targeted_tests=8/8 passed
+adjacent_CM1123_CM1126_CM1127_regression=25/25 passed
+```
+
+Current CM-1127 report review:
+
+```text
+reviewClass=BLOCKED_CURRENT_FACTS_NOT_READY
+currentFactsBlockerReasons=dirty_worktree,prior_result_CM-1111_missing,prior_result_CM-1115_missing
+blockerDowngradeAllowed=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Synthetic preflight-ready no-observation review:
+
+```text
+reviewClass=READY_FOR_SEPARATE_EXACT_OBSERVATION_NOT_DOWNGRADE
+blockerDowngradeAllowed=false
+```
+
+Only favorable selected evidence plus required follow-up can produce:
+
+```text
+reviewClass=DOWNGRADE_ALLOWED_NARROW_NOT_READY
+downgradeScope=one_exact_selected_audit_correlation_blocker_only
+readinessAcceptedAsEvidence=false
+reliabilityAcceptedAsEvidence=false
+```
+
+Current effect:
+
+```text
+true_audit_log_read = false
+observation_input_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This is a downgrade review guard, not live audit evidence. It confirms the current CM-1120 path remains blocked.
+
+## CM-1127 Selected Audit Correlation Current-Facts Readiness CLI - 2026-05-26
+
+Result: `CM1127_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_READINESS_CLI_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1127 adds a read-only current-facts readiness CLI:
+
+```text
+cli=src/cli/selected-audit-correlation-current-facts-readiness.js
+test=tests/selected-audit-correlation-current-facts-readiness-cli.test.js
+targeted_tests=4/4 passed
+adjacent_CM1123_CM1124_CM1126_CM1127_regression=23/23 passed
+```
+
+Real current-facts readiness smoke:
+
+```text
+status=blocked
+readinessClass=BLOCKED_PREFLIGHT_NOT_READY
+currentFactsBlockerReasons=dirty_worktree,prior_result_CM-1111_missing,prior_result_CM-1115_missing
+dirtyStatusLineCount=47
+blockerDowngradeAllowed=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+true_audit_log_read = false
+observation_input_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This is an operator guard, not live audit evidence. It confirms CM-1120 remains blocked.
+
+## CM-1126 Selected Audit Correlation Execution Readiness Gate - 2026-05-26
+
+Result: `CM1126_SELECTED_AUDIT_CORRELATION_EXECUTION_READINESS_GATE_COMPLETED_NOT_EXECUTED_NOT_READY`.
+
+CM-1126 adds an explicit-input source/test gate:
+
+```text
+helper=src/core/SelectedAuditCorrelationExecutionReadiness.js
+test=tests/selected-audit-correlation-execution-readiness.test.js
+targeted_tests=7/7 passed
+adjacent_CM1123_CM1124_regression=12/12 passed
+```
+
+The gate consumes only:
+
+```text
+preflightSummary
+classification
+```
+
+It separates the CM-1120 path into:
+
+```text
+BLOCKED_PREFLIGHT_NOT_READY
+READY_FOR_SEPARATE_EXACT_SELECTED_OBSERVATION_NOT_EXECUTED
+SELECTED_AUDIT_OBSERVED_BUT_FOLLOWUP_MISSING
+SELECTED_AUDIT_CORRELATION_DOWNGRADE_ALLOWED_NOT_READY
+FAIL_CLOSED_CLASSIFICATION_MISSING
+FAIL_CLOSED_PREFLIGHT_INCONSISTENT
+FAIL_CLOSED_INVALID_OVERCLAIM_SIGNAL
+FAIL_CLOSED_INVALID_DOWNGRADE_SIGNAL
+FAIL_CLOSED_UNFAVORABLE_CLASSIFICATION
+```
+
+Current effect:
+
+```text
+true_audit_log_read = false
+observation_input_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This does not make CM-1120 executable. The current real CM-1124 state remains blocked by dirty worktree plus missing CM-1111 and CM-1115 prior results.
+
+## CM-1125 Operator State Sync After CM-1124 - 2026-05-26
+
+Result: `CM1125_OPERATOR_STATE_SYNC_DOCS_ONLY_NOT_READY`.
+
+CM-1125 synchronized top-level operator state after CM-1124:
+
+```text
+current_task_pointer = CM-1124
+stale_top_level_CM1122_pointer = corrected
+runtime_source_changed = false
+runtime_evidence_added = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This is docs/board/status alignment only. It does not change any `complete?` row and does not authorize CM-1120 execution.
+
+## CM-1124 Selected Audit Correlation Current-Facts Classifier - 2026-05-26
+
+Result: `CM1124_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_CLASSIFIER_COMPLETED_NO_OBSERVATION_NOT_READY`.
+
+CM-1124 adds a read-only current-facts classifier CLI:
+
+```text
+cli=src/cli/selected-audit-correlation-current-facts-classifier.js
+test=tests/selected-audit-correlation-current-facts-classifier-cli.test.js
+targeted_tests=6/6 passed
+```
+
+It connects CM-1122 current Git facts to CM-1123 classification without accepting or reading any selected audit observation:
+
+```text
+current_facts_preflight=true
+classifier_executed=true
+observation_input_read=false
+resultClass=DRAFT_ONLY_NO_EVIDENCE
+blockerDowngradeAllowed=false
+```
+
+Real current-facts classifier smoke:
+
+```text
+status=blocked
+currentFactsBlockerReasons=dirty_worktree,prior_result_CM-1111_missing,prior_result_CM-1115_missing
+dirtyStatusLineCount=41
+resultClass=DRAFT_ONLY_NO_EVIDENCE
+blockerDowngradeAllowed=false
+readinessClaimAllowed=false
+reliabilityClaimAllowed=false
+```
+
+Current effect:
+
+```text
+true_audit_log_read = false
+raw_audit_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This prevents preflight-ready shape from being treated as selected audit evidence. It is not live audit evidence and does not change any `complete?` row.
+
+## CM-1123 Selected Audit Correlation Result Classifier - 2026-05-26
+
+Result: `CM1123_SELECTED_AUDIT_CORRELATION_RESULT_CLASSIFIER_COMPLETED_NOT_EXECUTED_NOT_READY`.
+
+CM-1123 adds a pure explicit-input classifier for CM-1119/CM-1120 selected audit-correlation outcomes:
+
+```text
+source=src/core/SelectedAuditCorrelationResultClassifier.js
+test=tests/selected-audit-correlation-result-classifier.test.js
+targeted_tests=6/6 passed
+```
+
+The classifier consumes only caller-provided `preflightSummary`, `observation`, and `followup` values. It preserves the CM-1119 fail-closed result classes and only allows a narrow blocker downgrade when all of these are true:
+
+```text
+resultClass=AUDIT_SELECTED_CORRELATION_OBSERVED
+selectedFieldsOnly=true
+rawAuditReturned=false
+metadataLifecycleObserved=true
+recallSuppressionObserved=true
+```
+
+Current effect:
+
+```text
+executionStarted = false
+auditObservationStarted = false
+true_audit_log_read = false
+raw_audit_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This is not live audit evidence and does not change any `complete?` row. Even a future favorable classifier result cannot by itself prove `memory write reliable`, `memory recall reliable`, runtime readiness, RC readiness, production readiness, release readiness, or cutover readiness.
+
+## CM-1122 Selected Audit Correlation Current-Facts Preflight CLI - 2026-05-26
+
+Result: `CM1122_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_PREFLIGHT_CLI_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`.
+
+CM-1122 adds a read-only current-facts CLI wrapper for CM-1121:
+
+```text
+cli=src/cli/selected-audit-correlation-current-facts-preflight.js
+test=tests/selected-audit-correlation-current-facts-preflight-cli.test.js
+targeted_tests=7/7 passed
+```
+
+Real current-facts smoke:
+
+```text
+status=blocked
+decision=SELECTED_AUDIT_CORRELATION_OBSERVATION_PREFLIGHT_BLOCKED_NOT_EXECUTED
+blockerReasons=dirty_worktree,prior_result_CM-1111_missing,prior_result_CM-1115_missing
+dirtyStatusLineCount=35
+target_head_facts_match=true
+currentArtifactsBound=true
+observationSurfaceBound=true
+boundaryFlagsBound=true
+```
+
+Current effect:
+
+```text
+executionStarted = false
+auditObservationStarted = false
+preflightOnly = true
+implicitAuditReadAuthorizationGranted = false
+true_audit_log_read = false
+raw_audit_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This is not live audit evidence and does not change any `complete?` row.
+
+## CM-1121 Selected Audit Correlation Observation Preflight - 2026-05-26
+
+Result: `CM1121_SELECTED_AUDIT_CORRELATION_OBSERVATION_PREFLIGHT_ACCEPTED_NOT_EXECUTED_NOT_READY`.
+
+CM-1121 adds a pure explicit-input fail-closed preflight helper for CM-1120:
+
+```text
+source=src/core/SelectedAuditCorrelationObservationPreflight.js
+test=tests/selected-audit-correlation-observation-preflight.test.js
+targeted_tests=5/5 passed
+```
+
+The helper checks only caller-provided facts:
+
+```text
+exact CM-1120 approval line
+request hash
+clean target head
+CM-1111 and CM-1115 required prior results
+CM-1118 selected helper evidence
+CM-1119 interpretation matrix evidence
+selected observation surface
+forbidden side-effect flags
+```
+
+Current effect:
+
+```text
+executionStarted = false
+auditObservationStarted = false
+preflightOnly = true
+implicitAuditReadAuthorizationGranted = false
+true_audit_log_read = false
+raw_audit_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+This is not live audit evidence and does not change any `complete?` row.
+
+## CM-1120 Selected Audit Correlation Observation Approval Packet - 2026-05-26
+
+Result: `CM1120_SELECTED_AUDIT_CORRELATION_OBSERVATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1120 adds a draft exact approval packet for a possible future selected audit-correlation observation. It binds:
+
+```text
+packet_id=CM-1120-SELECTED-AUDIT-CORRELATION-OBSERVATION-APPROVAL-001
+target_head=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+target_memory_id=codex-process-50325be15fdb479d805728fe420b4838
+required_prior_result_1=CM-1111:APPLIED_TOMBSTONED_SANITIZED
+required_prior_result_2=CM-1115:METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE
+required_helper=AuditLogStore.readSelectedWriteAuditCorrelation
+interpretation_matrix=CM-1119
+request_sha256=dfe4edcece5d561bbcdcdf38764679f6822cad77939dea06d68788a9840bad8e
+```
+
+Current effect:
+
+```text
+approval_consumed = false
+executed = false
+true_audit_log_read = false
+raw_audit_read = false
+memory_tools_called = false
+apply_executed = false
+readiness_claimed = false
+reliability_claimed = false
+```
+
+Maximum possible future downgrade remains unchanged from CM-1119 and only if a future separate exact approval is valid and execution returns `AUDIT_SELECTED_CORRELATION_OBSERVED`:
+
+```text
+from: no exact-approved selected audit-correlation observation exists
+to: one exact-approved selected-field audit-correlation observation reports pending and committed memory_tombstone audit metadata for the exact CM-1100 proof memory and expected CM-1111 request source
+```
+
+Still not claimed:
+
+```text
+memory write reliable = false
+memory recall reliable = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+```
+
+## CM-1119 Selected Audit Correlation Result Interpretation Matrix - 2026-05-26
+
+Result: `CM1119_SELECTED_AUDIT_CORRELATION_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`.
+
+CM-1119 adds a no-execution interpretation matrix for any possible future exact-approved selected audit-correlation observation. It defines these result classes:
+
+- `DRAFT_ONLY_NO_EVIDENCE`
+- `FAIL_CLOSED_PRIOR_RESULTS_MISSING`
+- `FAIL_CLOSED_APPROVAL_INVALID`
+- `INVALID_SCOPE_EXPANSION`
+- `INVALID_RAW_OR_SECRET_OUTPUT`
+- `FAIL_CLOSED_READER_UNAVAILABLE`
+- `FAIL_CLOSED_AUDIT_READ_FAILED`
+- `AUDIT_CORRELATION_NOT_FOUND`
+- `AUDIT_MEMORY_ID_MISMATCH`
+- `AUDIT_EVENT_FAMILY_MISMATCH`
+- `AUDIT_REQUEST_SOURCE_MISMATCH`
+- `AUDIT_PENDING_MISSING`
+- `AUDIT_COMMITTED_MISSING`
+- `AUDIT_CORRELATION_ID_MISMATCH`
+- `AUDIT_PHASE_OR_MUTATION_FLAG_MISMATCH`
+- `AUDIT_LIFECYCLE_TRANSITION_MISMATCH`
+- `AUDIT_SELECTED_CORRELATION_OBSERVED`
+- `AUDIT_OBSERVED_BUT_METADATA_LIFECYCLE_MISSING`
+- `AUDIT_OBSERVED_BUT_RECALL_SUPPRESSION_MISSING`
+
+Maximum possible future selected-audit downgrade:
+
+```text
+from: no exact-approved selected audit-correlation observation exists
+to: one exact-approved selected-field audit-correlation observation reports pending and committed memory_tombstone audit metadata for the exact CM-1100 proof memory and expected CM-1111 request source
+```
+
+Still not claimed:
+
+```text
+raw audit payload safety beyond selected output = false
+raw store absence = false
+chunk/vector/cache absence = false
+current metadata lifecycle projection unless CM-1115 separately exists = false
+public/default recall suppression = false
+cleanup/rollback safety = false
+long-run durability = false
+automatic retention worker safety = false
+startup/watchdog enforcement = false
+memory write reliable = false
+memory recall reliable = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1119 does not approve or execute CM-1111, CM-1115, or CM-1117 and does not execute `tombstone-memory`, `record_memory`, `search_memory`, `memory_overview`, true audit log read, raw/store/audit/diary/`.jsonl` read, metadata store read, durable project memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1118 Selected Audit Correlation Reader Temp Fixture Evidence - 2026-05-26
+
+Result: `CM1118_SELECTED_AUDIT_CORRELATION_READER_TEMP_FIXTURE_EVIDENCE_COMPLETED_NOT_LIVE_NOT_READY`.
+
+CM-1118 adds a selected-field write-audit correlation helper and temp-fixture tests:
+
+```text
+source=src/storage/AuditLogStore.js
+method=AuditLogStore.readSelectedWriteAuditCorrelation(...)
+test=tests/audit-log-store-selected-correlation.test.js
+selected_correlation_test=3/3 passed
+adjacent_tombstone_runtime_test=14/14 passed
+```
+
+Current source status after CM-1118:
+
+```text
+selected-field audit-correlation reader exists = true
+temp-fixture raw title/reason/evidence leakage check = passed
+true audit log read = false
+true project audit correlation observation = false
+CM-1117 executable without separate exact approval = false
+truth-table complete? = no
+```
+
+CM-1118 narrows the CM-1117 source gap from no selected-field reader to selected-field reader with temp-fixture coverage, including fail-closed behavior when pending intent is absent. It does not prove the CM-1100 proof memory has a durable tombstone audit pair, CM-1111 apply happened, CM-1115 metadata lifecycle observation happened, true audit-log correlation for current project data, public/default recall suppression, cleanup safety, rollback safety, long-run durability, automatic retention worker safety, startup/watchdog enforcement, `memory write reliable`, `memory recall reliable`, runtime readiness, RC readiness, production readiness, or release/cutover readiness.
+
+Any future use of `AuditLogStore.readSelectedWriteAuditCorrelation(...)` against current project audit logs still requires a separate exact approval packet, fresh preflight, selected output only, no raw audit payload, and no readiness/reliability claim.
+
+CM-1118 does not approve or execute CM-1111, CM-1115, or CM-1117 and does not execute `tombstone-memory`, `record_memory`, `search_memory`, `memory_overview`, true audit log read, raw/store/audit/diary/`.jsonl` read, metadata store read, durable project memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1117 Post Tombstone Audit Correlation Approval Packet - 2026-05-26
+
+Result: `CM1117_POST_TOMBSTONE_AUDIT_CORRELATION_APPROVAL_PACKET_DRAFT_BLOCKED_NO_SAFE_READER_NOT_EXECUTED_NOT_READY`.
+
+CM-1117 adds a draft fail-closed approval packet for a possible future selected-field audit-correlation observation after a future CM-1111 tombstone apply and future CM-1115 metadata lifecycle observation. It binds:
+
+```text
+HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+memory_id=codex-process-50325be15fdb479d805728fe420b4838
+required_prior_result_1=CM-1111:APPLIED_TOMBSTONED_SANITIZED
+required_prior_result_2=CM-1115:METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE
+request_sha256=e053d2dc0e4ede6b9d48b840fe60de461bf11cc47916a347a83fe573575430f0
+current_source_surface=NO_SAFE_SELECTED_AUDIT_CORRELATION_READER
+```
+
+Source review:
+
+```text
+TombstoneMemoryService pending/committed/cancelled audit write shape exists = true
+tombstone temp-fixture audit order/correlation tests exist = true
+AuditLogStore.readRecentWriteAudit returns full recent entries = true
+safe selected-field audit-correlation reader exists = false
+CM-1117 executable against current source = false
+```
+
+Current status:
+
+```text
+CM-1111 approved = false
+CM-1111 executed = false
+CM-1115 approved = false
+CM-1115 executed = false
+CM-1117 approved = false
+CM-1117 executed = false
+selected-field audit-correlation observation = false
+truth-table complete? = no
+```
+
+Even if a future safe reader is implemented and a future observation is favorable, CM-1117 would not prove raw audit payload safety beyond the selected reader output, raw store absence, chunk/vector/cache absence, public/default recall suppression, cleanup safety, rollback safety, long-run durability, automatic retention worker safety, startup/watchdog enforcement, `memory write reliable`, `memory recall reliable`, runtime readiness, RC readiness, production readiness, or release/cutover readiness.
+
+CM-1117 does not approve or execute CM-1111, CM-1115, or CM-1117 and does not execute `tombstone-memory`, `record_memory`, `search_memory`, `memory_overview`, raw/store/audit/diary/`.jsonl` read, metadata store read, audit log read, durable memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1116 Post Tombstone Metadata Lifecycle Result Interpretation Matrix - 2026-05-26
+
+Result: `CM1116_POST_TOMBSTONE_METADATA_LIFECYCLE_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`.
+
+CM-1116 adds a no-execution interpretation matrix for any possible future CM-1115 metadata-only lifecycle verification result. It defines these result classes:
+
+- `DRAFT_ONLY_NO_EVIDENCE`
+- `FAIL_CLOSED_PRIOR_RESULTS_MISSING`
+- `FAIL_CLOSED_APPROVAL_INVALID`
+- `INVALID_SCOPE_EXPANSION`
+- `INVALID_RAW_OR_SECRET_OUTPUT`
+- `FAIL_CLOSED_METADATA_READ_FAILED`
+- `METADATA_RECORD_NOT_FOUND`
+- `METADATA_LIFECYCLE_COLUMN_UNAVAILABLE`
+- `METADATA_TOMBSTONE_REASON_COLUMN_UNAVAILABLE`
+- `METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE`
+- `METADATA_STATUS_NOT_TOMBSTONED`
+- `METADATA_SCOPE_MISMATCH`
+- `METADATA_ONLY_FAVORABLE_BUT_AUDIT_MISSING`
+- `METADATA_ONLY_FAVORABLE_BUT_RECALL_SUPPRESSION_MISSING`
+
+Maximum possible future CM-1115 downgrade:
+
+```text
+from: no exact-approved metadata-only exact-id lifecycle observation exists
+to: one exact-approved selected-metadata lifecycle observation reports the CM-1100 proof memory as tombstoned with expected client/visibility metadata
+```
+
+Still not claimed:
+
+```text
+raw store absence = false
+chunk/vector/cache absence = false
+audit intent/commit correlation = false
+causal relation to CM-1111 apply = false
+public/default recall suppression = false
+cleanup/rollback safety = false
+long-run durability = false
+automatic retention worker safety = false
+startup/watchdog enforcement = false
+memory write reliable = false
+memory recall reliable = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1116 does not approve or execute CM-1115 and does not execute `tombstone-memory`, `record_memory`, `search_memory`, `memory_overview`, raw/store/audit/diary/`.jsonl` read, metadata store read, durable memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1115 Post Tombstone Metadata Lifecycle Verify Approval Packet - 2026-05-26
+
+Result: `CM1115_POST_TOMBSTONE_METADATA_LIFECYCLE_VERIFY_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1115 adds a draft-only exact approval packet for a possible future metadata-only exact-id lifecycle verification. It binds:
+
+```text
+HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+memory_id=codex-process-50325be15fdb479d805728fe420b4838
+required_prior_result_1=CM-1111:APPLIED_TOMBSTONED_SANITIZED
+required_prior_result_2=CM-1113:PUBLIC_SEARCH_ZERO_OVERVIEW_HINT_ONLY_OR_PUBLIC_TOOLS_BOTH_OBSERVED_INCONCLUSIVE
+request_sha256=68863c9c71c40a48852bea1bd9de93017e40684fdaa57f4a501eb9a5f3ac68d4
+max_metadata_store_reads=1
+```
+
+If separately exact-approved later, the packet would allow exactly one metadata-only exact-id `SqliteShadowStore.getRecordValidationPolicy(...)` read with selected fields only:
+
+```text
+exists
+lifecycleColumnAvailable
+tombstoneReasonColumnAvailable
+status
+clientId
+visibility
+```
+
+Current status:
+
+```text
+CM-1111 approved = false
+CM-1111 executed = false
+CM-1113 approved = false
+CM-1113 executed = false
+CM-1115 approved = false
+CM-1115 executed = false
+metadata lifecycle exact-id observation = false
+truth-table complete? = no
+```
+
+Even if executed later and favorable, CM-1115 would not prove raw store absence, chunk/vector/cache absence, audit intent/commit correlation, causal relation to CM-1111 apply beyond metadata consistency, public/default recall suppression, cleanup safety, rollback safety, long-run durability, automatic retention worker safety, startup/watchdog enforcement, `memory write reliable`, `memory recall reliable`, runtime readiness, RC readiness, production readiness, or release/cutover readiness.
+
+CM-1115 does not approve or execute CM-1111, CM-1113, or CM-1115 and does not execute `tombstone-memory`, `record_memory`, `search_memory`, `memory_overview`, raw/store/audit/diary/`.jsonl` read, metadata store read, durable memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1114 Post Tombstone Public Verify Result Interpretation Matrix - 2026-05-26
+
+Result: `CM1114_POST_TOMBSTONE_PUBLIC_VERIFY_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`.
+
+CM-1114 adds a no-execution interpretation matrix for any possible future CM-1113 public-tool observation result. It defines these result classes:
+
+- `DRAFT_ONLY_NO_EVIDENCE`
+- `FAIL_CLOSED_SOURCE_PRECONDITION_MISSING`
+- `FAIL_CLOSED_APPROVAL_INVALID`
+- `INVALID_SCOPE_EXPANSION`
+- `INVALID_RAW_OR_SECRET_OUTPUT`
+- `FAIL_CLOSED_PUBLIC_TOOL_FAILED`
+- `PUBLIC_SEARCH_ZERO_OVERVIEW_INCONCLUSIVE`
+- `PUBLIC_SEARCH_ZERO_OVERVIEW_HINT_ONLY`
+- `PUBLIC_SEARCH_POSITIVE_SANITIZED`
+- `PUBLIC_SEARCH_RAW_CONTENT_INVALID`
+- `OVERVIEW_ONLY_PARTIAL`
+- `PUBLIC_TOOLS_BOTH_OBSERVED_INCONCLUSIVE`
+- `POST_PUBLIC_VERIFY_METADATA_STATUS_MISSING`
+
+Maximum possible future CM-1113 downgrade:
+
+```text
+from: no exact-approved post-tombstone public-tool observation exists
+to: one exact-approved sanitized public-tool post-tombstone observation exists for the exact CM-1100 proof memory
+```
+
+Still not claimed:
+
+```text
+exact durable lifecycle status = false
+raw store absence = false
+raw audit correlation = false
+causal tombstone suppression = false
+cleanup/rollback safety = false
+long-run durability = false
+automatic retention worker safety = false
+startup/watchdog enforcement = false
+memory write reliable = false
+memory recall reliable = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1114 does not approve or execute CM-1113 and does not execute `tombstone-memory`, `record_memory`, `search_memory`, `memory_overview`, raw/store/audit/diary/`.jsonl` read, metadata store read, durable memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1113 Post Tombstone Sanitized Verification Approval Packet - 2026-05-26
+
+Result: `CM1113_POST_TOMBSTONE_SANITIZED_VERIFICATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1113 adds a draft-only exact approval packet for a possible future public-tool-only post-tombstone sanitized verification attempt. It binds:
+
+```text
+HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+memory_id=codex-process-50325be15fdb479d805728fe420b4838
+required_source_result_class=APPLIED_TOMBSTONED_SANITIZED
+request_sha256=4693db72ffb82ff959b852f615eefde749a33332f99025624f0634febad4a1bd
+max_mcp_tool_calls=2
+```
+
+If separately exact-approved later, and only after CM-1111 first returns `APPLIED_TOMBSTONED_SANITIZED`, the packet would allow:
+
+- exactly one `search_memory` call with `include_content=false`
+- exactly one `memory_overview` call
+- sanitized output only
+
+Current status:
+
+```text
+CM-1111 approved = false
+CM-1111 executed = false
+CM-1113 approved = false
+CM-1113 executed = false
+post-apply public-tool observation = false
+metadata-only lifecycle status observation = false
+truth-table complete? = no
+```
+
+Even if executed later, CM-1113 would be public-tool-only and may be inconclusive. It would not prove exact durable lifecycle status, raw store state, audit-log correlation, cleanup safety, rollback safety, long-run durability, automatic retention worker safety, startup/watchdog enforcement, `memory write reliable`, `memory recall reliable`, runtime readiness, RC readiness, production readiness, or release/cutover readiness.
+
+CM-1113 does not approve or execute CM-1111 or CM-1113 and does not execute `tombstone-memory`, `record_memory`, `search_memory`, `memory_overview`, raw/store/audit/diary/`.jsonl` read, metadata store read, durable memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1112 Proof Memory Retention Apply Result Interpretation Matrix - 2026-05-25
+
+Result: `CM1112_PROOF_MEMORY_RETENTION_APPLY_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`.
+
+CM-1112 adds a no-execution interpretation matrix for any possible future CM-1111 result. It defines these result classes:
+
+- `DRAFT_ONLY_NO_EVIDENCE`
+- `FAIL_CLOSED_APPROVAL_INVALID`
+- `INVALID_SCOPE_EXPANSION`
+- `INVALID_RAW_OR_SECRET_OUTPUT`
+- `FAIL_CLOSED_COMMAND_FAILED`
+- `REJECTED_NOT_FOUND`
+- `REJECTED_ALREADY_TOMBSTONED`
+- `REJECTED_FORBIDDEN_SOURCE_STATUS`
+- `REJECTED_SCHEMA_OR_POLICY_UNAVAILABLE`
+- `REJECTED_AUDIT_INTENT_FAILED`
+- `REJECTED_AFTER_PENDING_CANCELLED`
+- `APPLIED_WITH_COMMIT_AUDIT_WARNING`
+- `APPLIED_TOMBSTONED_SANITIZED`
+- `POST_APPLY_VERIFICATION_MISSING`
+
+Maximum possible future CM-1111 downgrade:
+
+```text
+from: no exact-approved proof-memory retention tombstone apply result exists
+to: one exact-approved sanitized local tombstone apply result exists for the exact CM-1100 proof memory
+```
+
+Still not claimed:
+
+```text
+post-apply public/default recall suppression = false
+post-apply memory_overview projection = false
+cleanup/rollback safety = false
+long-run durability = false
+automatic retention worker safety = false
+startup/watchdog enforcement = false
+memory write reliable = false
+memory recall reliable = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1112 does not approve or execute CM-1111 and does not execute `tombstone-memory`, `record_memory`, `search_memory`, `memory_overview`, raw/store/audit/diary/`.jsonl` read, metadata store read, durable memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1111 Proof Memory Retention Apply Approval Packet - 2026-05-25
+
+Result: `CM1111_PROOF_MEMORY_RETENTION_APPLY_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1111 adds a draft-only exact approval packet for a possible future proof-memory retention tombstone apply. It binds:
+
+```text
+HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+memory_id=codex-process-50325be15fdb479d805728fe420b4838
+request_sha256=a4c569b83f69ca1f2743321eb6d4fa6749edad5a7e0e8184d670964380c08338
+max_runs=1
+```
+
+If separately exact-approved later, the packet would allow exactly one `tombstone-memory` CLI apply/confirm run against that exact memory id, with side effects limited to:
+
+- internal exact-memory-id metadata/policy read by `TombstoneMemoryService`
+- one guarded lifecycle status update if all service guards pass
+- pending mutation audit before mutation
+- committed mutation audit after mutation, or cancelled audit if a guard changes before apply
+- sanitized CLI stdout
+
+Current status:
+
+```text
+CM-1111 approved = false
+CM-1111 executed = false
+exact CM-1100 proof memory tombstone apply = false
+exact CM-1100 post-apply verification = false
+truth-table complete? = no
+```
+
+Still not claimed:
+
+```text
+memory write reliable = false
+memory recall reliable = false
+cleanup/rollback safety = false
+public/default lifecycle suppression = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1111 does not approve or execute apply and does not execute `record_memory`, `search_memory`, `memory_overview`, raw/store/audit/diary/`.jsonl` read, metadata store read, durable memory/audit write, tombstone/cleanup/rollback/migration/import/export/backup/restore apply, provider/API call, worker start, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1110 Proof Memory Lifecycle Suppression Retention Apply Gap Review - 2026-05-25
+
+Result: `CM1110_PROOF_MEMORY_LIFECYCLE_SUPPRESSION_RETENTION_APPLY_GAP_REVIEW_COMPLETED_GAP_REVIEW_NOT_APPLIED_NOT_READY`.
+
+Accepted source/docs/test-backed evidence:
+
+- CM-1081 provides a proof-memory retention/tombstone no-apply planner whose planned actions keep `applies=false` and require separate apply approval, runtime validation, and audit before apply.
+- CM-1082 provides a temp-local metadata-only store-backed dry-run preview whose apply gate remains closed with `applyAuthorized=false`, `applyExecuted=false`, and apply run counts `0`.
+- `TombstoneMemoryService` and `tombstone-memory` CLI provide an internal dry-run-default tombstone mutation path with temp-fixture apply tests, pending/committed/cancelled audit behavior, lifecycle transition guards, secret scanning, and private cross-client mutation rejection.
+- Lifecycle read-policy runtime tests show enabled lifecycle read policy can suppress `proposal`, `rejected`, `superseded`, and `tombstoned` records, while default config keeps `enableLifecycleReadPolicy=false`.
+
+Remaining blocker:
+
+```text
+exact CM-1100 proof memory tombstone apply = false
+exact CM-1100 proof memory cleanup apply = false
+exact CM-1100 proof memory rollback apply = false
+exact CM-1100 live/default lifecycle suppression verified = false
+automatic proof-memory retention worker = false
+startup/watchdog lifecycle enforcement = false
+durable exact apply audit correlation = false
+truth-table complete? = no
+```
+
+Allowed interpretation:
+
+- The repository has bounded building blocks for proof-memory retention planning, internal tombstone mutation, and lifecycle read suppression.
+- The accepted CM-1100 proof memory has not been governed through a live, separately approved, auditable apply path.
+
+Still not claimed:
+
+```text
+memory write reliable = false
+memory recall reliable = false
+public/default write reliability = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1110 does not execute `record_memory`, `search_memory`, `memory_overview`, raw/store/audit/diary/`.jsonl` read, metadata store read, durable memory/audit write, retention/tombstone/cleanup/rollback apply, provider/API call, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1109 Proof Memory Pollution Prevention Source Review - 2026-05-25
+
+Result: `CM1109_PROOF_MEMORY_POLLUTION_PREVENTION_SOURCE_REVIEW_COMPLETED_SOURCE_TEST_BACKED_NOT_LIVE_NOT_READY`.
+
+Accepted source/test-backed evidence:
+
+- `ProofMemoryPolicy.applyProofMemoryWritePolicy(...)` maps proof-retention writes to `visibility="internal_proof"` and `retentionPolicy="short_lived_or_tombstone_after_validation"`.
+- `ProofMemoryPolicy.buildProofMemoryRecallFilters(...)` adds `visibilityExclude=["internal_proof"]` for normal recall unless internal-proof visibility is explicit.
+- `KnowledgeBaseRecallPipeline.search(...)` passes candidate filters through `buildProofMemoryRecallFilters(...)`.
+- `SqliteShadowStore.buildChunkQuery(...)` implements `visibilityExclude` as SQL candidate exclusion.
+- `tests/proof-memory-policy.test.js` covers temp-local proof-memory write isolation, normal recall exclusion, explicit proof recall, and public schema freeze.
+
+Allowed downgrade:
+
+- Governance pollution concern for the CM-1100 proof memory is reduced at source/test level.
+
+Still not claimed:
+
+```text
+live public/default suppression proof for exact CM-1100 memory = false
+CM-1107 executed = false
+memory write reliable = false
+memory recall reliable = false
+public/default write reliability = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1109 does not execute `record_memory`, `search_memory`, `memory_overview`, raw/store/audit read, metadata store read, retention/tombstone/cleanup/rollback apply, provider/API call, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1108 Post-Write Sanitized Verification Result Interpretation Matrix - 2026-05-25
+
+Result: `CM1108_POST_WRITE_SANITIZED_VERIFICATION_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`.
+
+CM-1108 adds no runtime evidence. It defines how any future CM-1107 execution must be classified:
+
+- `DRAFT_ONLY_NO_EVIDENCE`
+- `FAIL_CLOSED_APPROVAL_INVALID`
+- `FAIL_CLOSED_BASELINE_MISMATCH`
+- `INVALID_EXECUTION_SCOPE_BREACH`
+- `INVALID_MUTATION_OCCURRED`
+- `INVALID_RAW_OR_SECRET_OUTPUT`
+- `INVALID_PROVIDER_SIDE_EFFECT`
+- `INVALID_MUTATION_OR_APPLY_SIDE_EFFECT`
+- `INCONCLUSIVE_PUBLIC_SURFACE_NO_MATCH`
+- `INCONCLUSIVE_PUBLIC_SURFACE_AMBIGUOUS`
+- `PARTIAL_OVERVIEW_OBSERVATION_ONLY`
+- `BOUNDED_POST_WRITE_RECALL_OBSERVED`
+- `BOUNDED_POST_WRITE_RECALL_AND_OVERVIEW_OBSERVED`
+- `BOUNDED_EXECUTION_FAILED_OR_UNINTERPRETABLE`
+
+Maximum possible future CM-1107 downgrade:
+
+```text
+from: no bounded sanitized public-tool post-write verification attempt exists for the accepted proof memory
+to: one exact-approved bounded sanitized public-tool post-write verification attempt produced interpretable recall and/or overview evidence for the accepted proof memory
+```
+
+Still not claimed:
+
+```text
+memory write reliable = false
+memory recall reliable = false
+public/default write reliability = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1108 does not approve or execute CM-1107 and does not execute `record_memory`, `search_memory`, `memory_overview`, raw/store/audit read, metadata store read, retention/tombstone/cleanup/rollback apply, provider/API call, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1107 Post-Write Sanitized Verification Approval Packet - 2026-05-25
+
+Result: `CM1107_POST_WRITE_SANITIZED_VERIFICATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1107 drafts a future exact approval packet only. It binds:
+
+```text
+HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d
+accepted_memory_id=codex-process-50325be15fdb479d805728fe420b4838
+request_sha256=690a01fc17b96124fc7d9dbfb755e87820e4f78cef8b3e1fa26bb2695cf08902
+```
+
+If separately approved later, the packet would allow at most:
+
+- one sanitized `search_memory` attempt with `include_content=false`
+- one sanitized `memory_overview` observation
+
+Current execution state:
+
+```text
+approved = false
+executed = false
+search_memory_called = false
+memory_overview_called = false
+record_memory_called = false
+raw_store_read = false
+metadata_store_read = false
+apply_executed = false
+```
+
+Still not claimed:
+
+```text
+memory write reliable = false
+memory recall reliable = false
+public/default write reliability = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+This draft does not execute `record_memory`, `search_memory`, `memory_overview`, raw/store/audit read, metadata store read, retention/tombstone/cleanup/rollback apply, provider/API call, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1106 Write Reliability Missing Evidence Packet - 2026-05-25
+
+Result: `CM1106_WRITE_RELIABILITY_MISSING_EVIDENCE_PACKET_COMPLETED_NOT_RELIABLE_NOT_READY`.
+
+CM-1106 accepts CM-1105 as partial actual write-path evidence only and records the remaining blockers for `memory write reliable`:
+
+- read-after-write recall verification is missing.
+- `memory_overview` or projection verification is missing.
+- durable audit/store correlation is missing unless separately exact-approved.
+- duplicate / idempotence behavior is missing.
+- rejected / malformed / out-of-scope write handling is missing for the current-head live chain.
+- restart / long-run durability is missing.
+- retention/tombstone apply safety is missing and not authorized.
+- cleanup/rollback apply safety is missing and not authorized.
+- governance pollution prevention remains incomplete for this accepted proof chain.
+- public/default write reliability is missing.
+
+Next local step:
+
+```text
+CM-1107 post-write sanitized verification approval packet draft
+```
+
+Still not claimed:
+
+```text
+memory write reliable = false
+memory recall reliable = false
+public/default write reliability = false
+retention apply safe = false
+cleanup/rollback apply safe = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-1106 does not execute `record_memory`, `search_memory`, `memory_overview`, raw/store/audit read, metadata store read, retention/tombstone/cleanup/rollback apply, provider/API call, public MCP expansion, config/watchdog/startup/package change, push/tag/release/deploy/cutover, or readiness/reliability claim.
+
+## CM-1105 Memory Write Reliability Actual Evidence Review - 2026-05-25
+
+Result: `CM1105_MEMORY_WRITE_RELIABILITY_ACTUAL_EVIDENCE_REVIEW_PARTIAL_NOT_RELIABLE_NOT_READY`.
+
+Accepted partial evidence:
+
+- CM-1100 consumed exactly one separate exact approval for `record_memory`.
+- The approved write returned `success=true`, `decision=accepted`, `shadowWrite.status=ok`, and internal proof memory id `codex-process-50325be15fdb479d805728fe420b4838`.
+- CM-1101 verified returned result shape only.
+- CM-1102 classified the accepted proof memory as retention-managed using returned metadata only.
+- CM-1103 executed one separately exact-approved exact-id metadata-only no-apply dry-run preview.
+- CM-1104 pinned a sanitized receipt and marked the consumed approval as not reusable.
+
+Allowed downgrade:
+
+- The write path moves from no accepted authorized write evidence on the bearer path to one exact-approved accepted authorized write partial evidence chain.
+
+Still not claimed:
+
+```text
+memory write reliable = false
+memory recall reliable = false
+public/default write reliability = false
+retention apply safe = false
+cleanup/rollback apply safe = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+The next safe local task is CM-1106 write reliability missing-evidence packet. It must remain no-execution unless separately exact-approved.
+
+## CM-0827 Actual Next Runtime Gap Selection After Recall - 2026-05-25
+
+Result: `CM0827_NEXT_RUNTIME_GAP_SELECTION_AFTER_RECALL_MEMORY_WRITE_RELIABILITY_REVIEW_SELECTED_NOT_READY`.
+
+Preconditions:
+
+- CM-0825 proof evidence exists.
+- CM-0826 actual evidence review exists.
+- CM-0826 downgraded only the patched metadata-only recall proof-shape ambiguity.
+- `memory recall reliable`, public/default search reliability, runtime readiness, RC readiness, production readiness, release/cutover readiness, and truth-table `complete? = yes` remain not claimed.
+
+Selected next gap:
+
+```text
+memory write reliable
+```
+
+Selected next concrete task:
+
+```text
+CM-1105 memory write reliability actual evidence review
+```
+
+This selection does not execute `record_memory`, does not execute `search_memory`, does not read raw memory or `.jsonl`, does not perform store-backed reads, does not apply retention/tombstone/cleanup/rollback/migration work, does not call providers, does not expand public MCP, does not change config/watchdog/startup/package state, does not push/tag/release/deploy/cutover, and does not claim readiness or reliability.
+
+## CM-0826 Recall Reliability Blocker Actual Evidence Review - 2026-05-25
+
+Result: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`.
+
+CM-0826 reviewed the CM-0825 proof and accepted:
+
+- exact approval
+- clean current-main baseline
+- exactly four fixed CM-0824 queries
+- patched metadata-only execution path
+- sanitized-only output
+- Q1=5, Q2=5, Q3=2, Q4=0
+- complete zero side-effect counters
+
+Allowed downgrade:
+
+- The CM-0801 / CM-0814 `rawMemoryContentReads=0` ambiguity is downgraded for the CM-0825 proof shape.
+- The patched CM-0820 no-raw-content-read path now has current-main live evidence for the exact CM-0824 query set.
+
+Still not claimed:
+
+```text
+memory recall reliable = false
+public/default search reliability = false
+memory write reliable = false
+runtime ready = false
+RC ready = false
+production ready = false
+release/cutover ready = false
+truth-table complete? = no
+```
+
+CM-0827 has now consumed this review for next-gap selection only.
+
+## CM-0825 Patched True Live Recall Proof Execution - 2026-05-25
+
+Result: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PASSED_NOT_READY`.
+
+CM-0825 executed exactly once after separate exact approval:
+
+- baseline `HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d`
+- clean `main...origin/main` before proof
+- execution path `TrueLiveRecallReadonlyProofRunner -> TrueLiveRecallExecutorAdapter -> approved internal search_memory app path -> KnowledgeBaseRecallPipeline`
+- exactly four fixed CM-0824 queries
+- sanitized result counts Q1=5, Q2=5, Q3=2, Q4=0
+- `rawContentReturned=false`
+- complete side-effect counters all `0`
+
+Boundary:
+
+```text
+true live record_memory calls = 0
+direct jsonl reads = 0
+raw memory output = false
+provider/API calls = 0
+durable memory writes = 0
+durable audit writes = 0
+candidate cache writes = 0
+candidate cache flushes = 0
+sync calls = 0
+vector flushes = 0
+embedding cache writes = 0
+raw memory content reads = 0
+public MCP expansion = false
+config/watchdog/startup/package change = false
+tag/release/deploy/cutover = false
+readiness claim = false
+reliability claim = false
+```
+
+This is sanitized live proof evidence for the CM-0820 patched metadata-only path. It does not claim `memory recall reliable`, runtime readiness, RC readiness, production readiness, release readiness, or cutover readiness. CM-0826 reviewed it as narrow downgrade evidence only; `complete?` remains `no`.
+
 ## CM-1062 Memory Write Rollback Cleanup Store-Backed Dry-Run Preview - 2026-05-25
 
 Result: `CM1062_MEMORY_WRITE_ROLLBACK_CLEANUP_STORE_BACKED_DRY_RUN_PREVIEW_NOT_APPLIED_NOT_READY`.
@@ -6435,7 +8185,7 @@ No current active runtime/readiness gap is promoted to `complete` by this Day 7 
 | CM-0558 no-token JSON-RPC mutation rejection | bounded evidence only | Targeted mutation-rejection repair and HTTP/contract evidence narrow the no-token mutation boundary. It is not authorized-write reliability and not readiness evidence. | no | Keep as bounded boundary evidence; do not infer `memory write reliable`. |
 | CM-0561 search timeout side-effect guard | bounded evidence only | Targeted timeout/cooperative-abort evidence narrows timeout side-effect risk. It is not true real-store recall reliability. | no | Use only as targeted side-effect evidence until a separately approved real-store recall validation exists. |
 | CM-0738 / CM-0739 no-token readOnly search boundary | bounded evidence only | Targeted HTTP/app/recall/provider-boundary evidence supports no-token readOnly side-effect suppression. It is not a general recall-quality or reliability proof. | no | Keep readOnly/no-token boundary evidence separate from `memory recall reliable`. |
-| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0782 executor adapter implementation, CM-0783 executor adapter review, CM-0784 execution authorization review, CM-0800 exact approval recheck, CM-0801 true live proof execution, CM-0802 proof review, CM-0803 second negative-control proof plan, CM-0804 second negative-control exact approval recheck, CM-0805 second negative-control proof execution, CM-0806 second negative-control failure review, CM-0807 recall precision hardening plan, CM-0808 hardening plan review, CM-0809 bounded hardening implementation, CM-0810 bounded hardening review, CM-0811 live proof recheck, CM-0812 execution-path pass-through closeout, CM-0813 post-hardening exact-approval recheck, CM-0814 post-hardening live negative-control proof execution, CM-0815 post-hardening live negative-control proof review, CM-0819 bounded regression expansion, CM-0820 raw-read boundary patch, CM-0821 feature-branch review, CM-0831 mainline patched metadata boundary reconciliation, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner/authorization/execution/review/plan/recheck/fixture/local-patch/mainline-reconciliation evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan; CM-0782 implements an internal-only adapter with synthetic tests `5/5` plus runner regression `6/6`, complete counters, fail-closed instrumentation, and runner-safe result projection; CM-0783 accepts the adapter for Day 4 execution authorization review; CM-0784 defines the exact approval line, exactly four literal queries, sanitized output shape, and execution preconditions; CM-0801 executes exactly four true live real-store recall queries with sanitized output and complete zero side-effect counters; CM-0802 accepts Q1/Q2/Q3 as expected-recall signals at sanitized evidence level but classifies Q4 negative-control returning `2` sanitized results as a medium-risk negative-control criteria / query-design / recall-precision gap; CM-0803 defines the next separately exact-approved stricter negative-control plan with exactly four negative-control slots and expected zero results; CM-0804 confirms that plan is ready for future exact approval only; CM-0805 executes the stricter negative-control proof and fails the zero-result criteria with NC1=3, NC2=2, NC3=3, NC4=2 sanitized results despite complete zero side-effect counters; CM-0806 classifies that failure as a recall precision / negative-control suppression blocker requiring hardening before any third live query; CM-0807 defines the planning-only hardening path for thresholding, negative-control gating, score distribution review, no-result mode, stricter filters, and exact reject policy; CM-0808 reviews that plan and selects bounded implementation/tests as the next safe step; CM-0809 implements an internal optional precision policy and targeted bounded tests, default disabled, with no live proof; CM-0810 accepts CM-0809 as sufficient to enter a future exact approval recheck, not live proof execution or reliability; CM-0811 confirms the post-hardening path is ready to wait for a future exact approval gate, not execution; CM-0812 closes the internal precision-policy pass-through from runner to adapter to app to passive recall to the bounded precision policy path without widening the public contract; CM-0813 confirms that the post-hardening path is now execution-ready for a future separately exact-approved CM-0814 proof, but still not execution-approved and not reliable evidence by itself; CM-0814 executes exactly four post-hardening stricter negative-control queries with `precisionPolicyContext.enabled=true`, `proofNoResultMode=true`, sanitized output only, and complete zero side-effect counters, returning NC1=0, NC2=0, NC3=0, and NC4=0 on clean local `main` head `17500cf...`; CM-0815 accepts that fresh evidence as sufficient to downgrade the prior exact negative-control suppression blocker for this narrow proof shape, while still preserving bounded-evidence-only classification, `complete? = no`, and `RC_NOT_READY_BLOCKED`; CM-0819 expands bounded regression coverage for malformed precision metadata and approved-path context; CM-0820 patches the executor raw-read boundary so upstream raw fields fail closed before sanitization and future proofs can use a metadata-only `noRawContentRead=true` path; CM-0821 reviews feature branch `f9e7e13` as PR-ready / explicit mainline integration candidate while preserving no-reliability and no-readiness boundaries; CM-0831 confirms PR #4 is now merged into `main` at `eb1d09d8a0b49b07c70276a732e37c83e7aa6070`, `HEAD == origin/main`, and targeted metadata-only boundary tests passed `33/33` on current `main`. | no | Do not infer `memory recall reliable`, RC readiness, release readiness, or `complete? = yes` from CM-0801 through CM-0831. Treat CM-0801/CM-0814 `rawMemoryContentReads=0` as pre-patch sanitized-output boundary evidence; future proof must use the now-mainline CM-0820 metadata-only path before that counter can support stronger no-raw-content-read evidence. The exact post-hardening NC1-NC4 blocker is downgraded and the patched metadata-only boundary is now integrated into main, but broader recall reliability remains unproven and CM-0825 still requires separate exact approval before any true live proof. |
+| memory recall reliable | bounded evidence only | CM-0755 fixture-only, CM-0758 temp workspace, CM-0761/CM-0772 limited local real-path, CM-0773 local-path review, CM-0774 approval packet, CM-0775 read-only execution surface gap plan, CM-0776 internal proof runner plan, CM-0777 internal proof runner implementation, CM-0778 runner review, CM-0779 runner patch, CM-0780 patch review, CM-0781 executor adapter plan, CM-0782 executor adapter implementation, CM-0783 executor adapter review, CM-0784 execution authorization review, CM-0800 exact approval recheck, CM-0801 true live proof execution, CM-0802 proof review, CM-0803 second negative-control proof plan, CM-0804 second negative-control exact approval recheck, CM-0805 second negative-control proof execution, CM-0806 second negative-control failure review, CM-0807 recall precision hardening plan, CM-0808 hardening plan review, CM-0809 bounded hardening implementation, CM-0810 bounded hardening review, CM-0811 live proof recheck, CM-0812 execution-path pass-through closeout, CM-0813 post-hardening exact-approval recheck, CM-0814 post-hardening live negative-control proof execution, CM-0815 post-hardening live negative-control proof review, CM-0819 bounded regression expansion, CM-0820 raw-read boundary patch, CM-0821 feature-branch review, CM-0831 mainline patched metadata boundary reconciliation, CM-0762 ladder review, and CM-0766 review sync are bounded synthetic/temp-root/planning/internal-runner/authorization/execution/review/plan/recheck/fixture/local-patch/mainline-reconciliation evidence only. CM-0780 confirms CM-0779 closes the runner-local missing/partial/malformed/non-finite/negative/unknown-positive counter and raw-leakage fail-closed findings with targeted tests `6/6`; CM-0781 defines the concrete adapter/wrapper plan; CM-0782 implements an internal-only adapter with synthetic tests `5/5` plus runner regression `6/6`, complete counters, fail-closed instrumentation, and runner-safe result projection; CM-0783 accepts the adapter for Day 4 execution authorization review; CM-0784 defines the exact approval line, exactly four literal queries, sanitized output shape, and execution preconditions; CM-0801 executes exactly four true live real-store recall queries with sanitized output and complete zero side-effect counters; CM-0802 accepts Q1/Q2/Q3 as expected-recall signals at sanitized evidence level but classifies Q4 negative-control returning `2` sanitized results as a medium-risk negative-control criteria / query-design / recall-precision gap; CM-0803 defines the next separately exact-approved stricter negative-control plan with exactly four negative-control slots and expected zero results; CM-0804 confirms that plan is ready for future exact approval only; CM-0805 executes the stricter negative-control proof and fails the zero-result criteria with NC1=3, NC2=2, NC3=3, NC4=2 sanitized results despite complete zero side-effect counters; CM-0806 classifies that failure as a recall precision / negative-control suppression blocker requiring hardening before any third live query; CM-0807 defines the planning-only hardening path for thresholding, negative-control gating, score distribution review, no-result mode, stricter filters, and exact reject policy; CM-0808 reviews that plan and selects bounded implementation/tests as the next safe step; CM-0809 implements an internal optional precision policy and targeted bounded tests, default disabled, with no live proof; CM-0810 accepts CM-0809 as sufficient to enter a future exact approval recheck, not live proof execution or reliability; CM-0811 confirms the post-hardening path is ready to wait for a future exact approval gate, not execution; CM-0812 closes the internal precision-policy pass-through from runner to adapter to app to passive recall to the bounded precision policy path without widening the public contract; CM-0813 confirms that the post-hardening path is now execution-ready for a future separately exact-approved CM-0814 proof, but still not execution-approved and not reliable evidence by itself; CM-0814 executes exactly four post-hardening stricter negative-control queries with `precisionPolicyContext.enabled=true`, `proofNoResultMode=true`, sanitized output only, and complete zero side-effect counters, returning NC1=0, NC2=0, NC3=0, and NC4=0 on clean local `main` head `17500cf...`; CM-0815 accepts that fresh evidence as sufficient to downgrade the prior exact negative-control suppression blocker for this narrow proof shape, while still preserving bounded-evidence-only classification, `complete? = no`, and `RC_NOT_READY_BLOCKED`; CM-0819 expands bounded regression coverage for malformed precision metadata and approved-path context; CM-0820 patches the executor raw-read boundary so upstream raw fields fail closed before sanitization and future proofs can use a metadata-only `noRawContentRead=true` path; CM-0821 reviews feature branch `f9e7e13` as PR-ready / explicit mainline integration candidate while preserving no-reliability and no-readiness boundaries; CM-0831 confirms PR #4 is now merged into `main` at `eb1d09d8a0b49b07c70276a732e37c83e7aa6070`, `HEAD == origin/main`, and targeted metadata-only boundary tests passed `33/33` on current `main`. | no | Do not infer `memory recall reliable`, RC readiness, release readiness, or `complete? = yes` from CM-0801 through CM-0831. Treat CM-0801/CM-0814 `rawMemoryContentReads=0` as pre-patch sanitized-output boundary evidence; future proof must use the now-mainline CM-0820 metadata-only path before that counter can support stronger no-raw-content-read evidence. The exact post-hardening NC1-NC4 blocker is downgraded and the patched metadata-only boundary is now integrated into main, but broader recall reliability remains unproven. CM-0825 has now executed once under separate exact approval on 2026-05-25 and CM-0826 consumed it as a narrow patched metadata-only proof-shape downgrade only. |
 | memory write reliable | exact approval required | CM-0737 / CM-0763 / CM-0785 prove only separately exact-approved write-path evidence: one rejected `record_memory` attempt, one preflight repair / exact-only approval packet surface, one accepted repaired `record_memory` attempt with `memory_writes=1`, and no-token mutation rejection as bounded boundary evidence. CM-0786 plans the next safe exactly-one proof surface only; it does not execute or approve a write. CM-0832 defines the fuller write reliability proof matrix across unauthorized rejection, exact approval enforcement, payload validation, accepted sanitized write, durable audit accounting, shadow/vector/cache projection, idempotence, failure handling, rollback/cleanup posture, lifecycle governance, scope-aware writes, and bad-memory pollution prevention. CM-0833 adds fixture-only MemoryWriteService matrix evidence: malformed process payload rejection before diary/shadow/vector/chunk writes, sanitized accepted in-memory projection, visible shadow/vector/chunk degraded accounting, and schema metadata rejection before write paths; targeted test passed `5/5`. CM-0834 adds synthetic temp-local evidence using isolated temp root and real local diary/SQLite shadow/vector/audit/chunk store classes; targeted test passed `2/2`, covering accepted synthetic process write, projection accounting, rejected synthetic bad knowledge write before projection, and cleanup verification. CM-0835 extends the temp-local evidence to scope metadata projection, duplicate payload behavior, and secret-like pollution rejection; targeted test passed `4/4`. Duplicate synthetic payloads currently create distinct records and audit events, so idempotence remains open. CM-0836 adds a fixture-only explicit-input lifecycle/dedup/suppression preflight helper; targeted test passed `8/8`, covering same-scope active duplicate suppression, terminal lifecycle duplicate review rejection, exact scope mismatch rejection, synthetic secret-like pollution rejection, schema/version metadata rejection, tag noise normalization, lifecycle action exact-approval gating, and no implicit filesystem read / real memory scan / provider call / durable write / audit write / public MCP expansion / readiness claim. CM-0837 reviews CM-0836 as a viable runtime integration candidate only if it remains internal/optional, derives allowed scope from runtime context, uses exact bounded duplicate summaries, fails closed before diary/shadow/vector/chunk writes, maps rejection through normal write audit, and preserves existing behavior when disabled. CM-0838 implements that minimal optional runtime integration: `MemoryWriteService` now has a default-disabled internal `writePreflightEnabled` gate, imports the helper without circular dependency, uses injected bounded candidate providers only, derives allowed scope from runtime context, rejects active duplicate/scope drift/provider failure/malformed provider return/lifecycle action without exact approval before durable projection, and maps rejection to normal rejected write audit. Targeted validation passed CM-0836 helper `8/8`, CM-0838 integration `6/6`, and existing write matrix/temp-local regression `9/9`. CM-0839 reviews CM-0838 and accepts it as a bounded internal runtime integration layer sufficient for rollback/cleanup posture review and lifecycle/scope runtime governance planning/review, while explicitly preserving the no-reliability/no-readiness boundary. CM-0840 reviews rollback/cleanup posture and finds rejected/preflight-rejected writes clean from durable projection perspective, accepted writes not atomically rollbackable, SQLite/vector delete helpers partial only, diary cleanup not encapsulated by a helper, reconcile/cache cleanup not proven, and audit append-only/non-destructive by default. CM-0841 converts that posture into a fixture/temp-local bounded evidence plan. CM-0842 executes fixture-only bounded evidence `4/4`: validation-rejected and preflight-rejected duplicate writes stop before diary/SQLite/vector/chunk/reconcile/cache projection, accepted writes expose projection accounting, degraded accepted writes expose vector/chunk failure and reconcile enqueue accounting, and SQLite/vector/cache cleanup simulation is classified as `partial_cleanup_only` while diary/audit/reconcile residual posture remains explicit. CM-0843 defines a planning-only lifecycle/scope governance layer for proposal, approval, supersession, tombstone, forget/exclusion, correction, scope binding, and normal-recall pollution prevention. CM-0844 implements the first fixture-only lifecycle/scope governance contract; targeted test passed `8/8`, covering normal-recall inclusion for active exact-scope records, exclusion for proposal/rejected/preflight-rejected/superseded/tombstoned/forgotten/excluded/stale/quarantined records, out-of-scope and malformed fail-closed behavior, exact approval/receipt gating for transitions, supersession replacement id requirement, and append-only/non-destructive accepted transition fixtures. CM-0845 extends that helper with fixture-only normal-recall read-policy filtering; targeted tests passed `14/14`, accepting only active exact-scope candidates, suppressing inactive/out-of-scope/malformed/unresolved candidates, keeping sanitized blocker/mismatch metadata without raw content/text/title/snippet, failing closed on incomplete current scope, and keeping side-effect counters zero. CM-0846 adds a planning-only isolated temp-local lifecycle/scope evidence plan with synthetic records, exact bounded check count `4`, sanitized output, cleanup verification, and no-real-memory/no-provider/no-durable-write/no-apply boundaries. CM-0847 executes that bounded synthetic temp-local evidence with test `2/2`: isolated temp root and synthetic JSON only, exact bounded check count `4`, active exact-scope accepted, proposal/tombstoned/preflight-rejected/out-of-scope/folder-mismatched/malformed-scope records suppressed, sanitized mismatch/blocker metadata retained, raw content/text/title/snippet/sourceFile/jsonlLine absent from evidence output, cleanup verified, and side-effect counters zero. CM-0848 reviews and accepts CM-0847 as sufficient bounded evidence to proceed to runtime integration candidate review, not implementation. CM-0844/CM-0845/CM-0847/CM-0848 do not integrate runtime governance or execute durable real writes. This is bounded fixture/temp-local/planning/review evidence only, not true live write reliability. | no | Any further live write proof requires a separate exact approval. Next safe write-side steps are read-only `MEMORY_LIFECYCLE_SCOPE_RUNTIME_INTEGRATION_CANDIDATE_REVIEW`, candidate-provider source review, optional runtime integration candidate review, and only later a separately exact-approved exactly-one live write proof. Default unattended write reliability, broad `record_memory` reliability, production behavior, real rollback cleanup/apply, and long-run durability remain unproven. |
 | ValidationAggregator full implementation | no-touch evidence only | CM-0569 through CM-0584 plus CM-0764 and CM-0787 prove explicit-input/no-touch collector progress and fail-closed behavior, not automatic runtime evidence ingestion or final matrix authority. Current inventory is 15 explicit-input collector units; source/tests still keep `validationAggregatorFullImplementation=false` and `fullImplementationComplete=false`. | no | Do not count collectors as maturity; close only after automatic runtime evidence ingestion, current-head freshness/baseline binding, approved RC precheck evidence capture, final RC matrix integration, live evidence handoff, stale-evidence invalidation, and exact-approved durable/write/runtime evidence are proven. |
 | governance review / approval / audit runtime loop | bounded evidence only | Subject-bound/read-only governance evidence exists; production governance loop and durable memory governance flow are not proven. CM-0843 adds a planning-only lifecycle/scope governance layer after CM-0842: proposal, approval, supersession, tombstone, forget/exclusion, correction, user/project/workspace/client/agent/task/conversation/folder/visibility/retention scope binding, and default normal-recall exclusion for rejected, preflight-rejected, proposal-only, superseded, tombstoned, forgotten/excluded, stale, out-of-scope, unresolved-remediation, or malformed records. CM-0844 adds fixture-only contract evidence `8/8` for active exact-scope recall eligibility, inactive/out-of-scope/malformed/unresolved exclusion, exact approval/receipt gating, supersession replacement id requirement, and append-only/non-destructive transition fixtures. CM-0845 adds fixture-only read-policy evidence `14/14` for normal-recall candidate filtering and sanitized suppressed metadata without raw content leakage. CM-0846 adds a planning-only isolated temp-root evidence design for synthetic lifecycle/scope records, exact bounded check count `4`, expected-result and irrelevant-suppression criteria, freshness/folder behavior, timeout/error handling, sanitized output, cleanup verification, and no-readiness wording. CM-0847 executes the synthetic temp-local layer with targeted tests `2/2`, proving isolated temp root creation/cleanup, synthetic JSON-only input, exact bounded check count `4`, lifecycle and scope suppression, sanitized metadata, raw-field leakage suppression, and zero side-effect counters. CM-0848 accepts CM-0847 as sufficient to proceed to read-only runtime integration candidate review. CM-0852 adds an internal sync/cache-key hook so a future durable governance-state revision can participate in recall addressing without public MCP expansion. CM-0853 makes that hook active on current runtime reality by deriving a default governance revision from shadow lifecycle status plus merged scope metadata. CM-0854 then makes governance-only drift affect actual bounded invalidation behavior by persisting fingerprint-scoped governance revisions per target and clearing the current-fingerprint candidate cache when governance revision changes even if ordinary diary-content refresh did not occur. CM-0855 narrows that invalidation by current target family: `process` now clears `process + both`, `knowledge` now clears `knowledge + both`, and `both` still fails closed to broad current-fingerprint invalidation. CM-0856 further narrows ordinary sync invalidation by candidate dependency metadata: cache entries now persist candidate `memoryId` sets and ordinary sync changes clear by changed `memoryId` when governance revision did not drift. CM-0857 narrows the default governance-only path too: candidate-cache metadata now persists per-target governance entry snapshots, default governance drift clears by changed governance `memoryId`, and custom provider revisions without entry snapshots still fall back to target-family invalidation. CM-0858 narrows the provider path when it opts into a bounded `{ revision, entries }` snapshot: custom provider governance drift can invalidate by changed governance `memoryId`, while legacy scalar provider revisions still preserve the fail-closed target-family fallback. CM-0859 narrows provider behavior one step further by accepting sparse `{ revision, changedMemoryIds }` change-sets, so custom providers can invalidate by changed governance `memoryId` without sending full snapshot replacement. CM-0860 then fixes the architectural source gap by selecting the durable governance mutation model itself: append-only governance mutation audit as canonical event trail, SQLite shadow metadata as current projected governance state, and revision/change-set emission as the bridge into the existing invalidation chain. CM-0861 locks that design into a fixture-only packet contract with five internal-only mutation families and exact packet fields for audit intent/commit, shadow projection, revision emission, changed `memoryId` policy, rollback path, and explicit execution approval. CM-0844/CM-0845/CM-0847/CM-0848/CM-0852/CM-0853/CM-0854/CM-0855/CM-0856/CM-0857/CM-0858/CM-0859/CM-0860/CM-0861 are still bounded internal evidence/design only, not full runtime governance implementation, and perform no true live memory action or durable governance write. | no | Next minimal gate is a pure internal durable governance mutation dry-run helper against the CM-0861 packet contract, or provider-side semantic guarantees for lifecycle/tombstone/scope transitions beyond changed `memoryId` sets; full governance runtime loop or controlled live packet still requires separately exact-approved bounded scope. |
@@ -6557,6 +8307,8 @@ Result: `CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW_PREMATURE_NOT_REA
 
 Artifact: `docs/CM0827_NEXT_RUNTIME_GAP_SELECTION_PRECONDITION_REVIEW.md`.
 
+Historical note: this 2026-05-23 precondition verdict is superseded for current-state selection purposes by the 2026-05-25 CM-0825 execution evidence, CM-0826 actual evidence review, and CM-0827 actual next-runtime-gap selection. Keep this section as historical audit evidence only.
+
 Precondition verdict:
 
 - Actual `CM-0827 NEXT_RUNTIME_GAP_SELECTION_AFTER_RECALL` is premature.
@@ -6613,6 +8365,8 @@ Controlling state remains `RC_NOT_READY_BLOCKED`; `memory recall reliable` remai
 Result: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA_PREPARED_NOT_REVIEWED_NOT_READY`.
 
 Artifact: `docs/CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_CRITERIA.md`.
+
+Historical note: this criteria slice remains valid as criteria. Its statement that CM-0825 had not executed was true on 2026-05-23 and is superseded for current-state purposes by the 2026-05-25 CM-0825 execution evidence and CM-0826 actual evidence review.
 
 Criteria verdict:
 

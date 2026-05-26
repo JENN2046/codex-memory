@@ -1,4 +1,1580 @@
-# CHECKPOINT.md — codex-memory
+# CHECKPOINT.md - codex-memory
+
+## CM-1142 Expanded Dirty Scope Local Commit Isolation Approval Packet Checkpoint
+
+Status: `CM1142_EXPANDED_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1142_EXPANDED_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET.md`.
+- Updated `src/core/SelectedAuditCorrelationLocalCommitIsolationPreflight.js`.
+- Updated CM-1136/CM-1137 tests for the CM-1142 packet.
+- Added draft exact approval line with request hash `060da750a39415fd627d224d0eda1884a76679c0865d08b57a5d4ed246b91a06`.
+- Bound the draft packet to max CM doc number `1142` and max dirty status lines `94`.
+
+Validation:
+- Source/test syntax passed.
+- Targeted CM-1136/CM-1137/CM-1142 tests passed `22/22`.
+- Simulated current-facts preflight with the CM-1142 draft line returned `accepted_not_executed`, `approvalPacketId=CM-1142`, `dirtyLineCount=94`, `unknownDirtyLineCount=0`, `commitAuthorized=false`, `cleanAuthorized=false`, and `pushAuthorized=false`.
+- Simulated dry-run plan with the CM-1142 draft line returned `ready_not_executed`, `planPrepared=true`, `commitExecutableNow=false`, `pushExecutableNow=false`, and `cleanExecutableNow=false`.
+
+Boundary:
+- No approval consumed.
+- No staging.
+- No commit.
+- No push.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- If desired, user must provide the CM-1142 exact approval line as a fresh instruction.
+- Then rerun CM-1142 preflight and dry-run plan before any separate executor step.
+
+## CM-1141 Stale Local Commit Approval Scope Guard Checkpoint
+
+Status: `CM1141_STALE_LOCAL_COMMIT_APPROVAL_SCOPE_GUARD_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Updated `src/core/SelectedAuditCorrelationLocalCommitIsolationPreflight.js`.
+- Updated `tests/selected-audit-correlation-local-commit-isolation-preflight.test.js`.
+- Updated `tests/selected-audit-correlation-local-commit-isolation-preflight-cli.test.js`.
+- Added `docs/CM1141_STALE_LOCAL_COMMIT_APPROVAL_SCOPE_GUARD.md`.
+- Added fail-closed preflight class `BLOCKED_APPROVAL_PACKET_STALE_DIRTY_SCOPE_EXPANDED`.
+- Verified that current CM-1135 exact approval line is stale against the expanded current dirty scope.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationLocalCommitIsolationPreflight.js`
+- `node --check .\tests\selected-audit-correlation-local-commit-isolation-preflight.test.js`
+- `node --check .\tests\selected-audit-correlation-local-commit-isolation-preflight-cli.test.js`
+- `node --check .\tests\selected-audit-correlation-local-commit-isolation-dry-run-plan-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-local-commit-isolation-preflight.test.js .\tests\selected-audit-correlation-local-commit-isolation-preflight-cli.test.js` passed `10/10`
+- Adjacent CM-1136/CM-1137 regression tests passed `18/18`
+- Real preflight with the CM-1135 exact line returned `BLOCKED_APPROVAL_PACKET_STALE_DIRTY_SCOPE_EXPANDED`, `dirtyLineCount=93`, `unknownDirtyLineCount=0`, `approvalScopeExpansionCount=18`, and `localCommitExecutionAllowedNow=false`.
+
+Boundary:
+- No approval request.
+- No staging.
+- No commit.
+- No push.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Do not reuse the CM-1135 approval line for the current worktree.
+- Review expanded dirty scope and draft a fresh local commit isolation packet if needed.
+
+## CM-1140 Prerequisite Resolution Sequence Checkpoint
+
+Status: `CM1140_PREREQUISITE_RESOLUTION_SEQUENCE_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationPrerequisiteResolutionSequence.js`.
+- Added `src/cli/selected-audit-correlation-current-facts-resolution-sequence.js`.
+- Added `tests/selected-audit-correlation-prerequisite-resolution-sequence.test.js`.
+- Added `tests/selected-audit-correlation-current-facts-resolution-sequence-cli.test.js`.
+- Added `docs/CM1140_PREREQUISITE_RESOLUTION_SEQUENCE.md`.
+- Verified targeted CM-1140 tests `9/9`.
+- Ran real current-facts resolution-sequence smoke.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationPrerequisiteResolutionSequence.js`
+- `node --check .\src\cli\selected-audit-correlation-current-facts-resolution-sequence.js`
+- `node --check .\tests\selected-audit-correlation-prerequisite-resolution-sequence.test.js`
+- `node --check .\tests\selected-audit-correlation-current-facts-resolution-sequence-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-prerequisite-resolution-sequence.test.js .\tests\selected-audit-correlation-current-facts-resolution-sequence-cli.test.js` passed `9/9`
+- `node .\src\cli\selected-audit-correlation-current-facts-resolution-sequence.js --json --pretty` returned `BLOCKED_DIRTY_WORKTREE_ISOLATION_REQUIRED`
+
+Boundary:
+- No approval request.
+- No staging.
+- No commit.
+- No push.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Dirty-worktree isolation remains the only next allowed action class.
+- Do not request CM-1111/CM-1115/CM-1120 approval before the worktree is clean or explicitly isolated.
+
+## CM-1139 Post Full-Test Stage-Gate Recheck Checkpoint
+
+Status: `CM1139_POST_FULL_TEST_STAGE_GATE_RECHECK_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Ran `node .\src\cli\selected-audit-correlation-current-facts-stage-gate.js --json --pretty`.
+- Confirmed full `npm test` evidence does not unlock CM-1111, CM-1115, or CM-1120 execution.
+- Added `docs/CM1139_POST_FULL_TEST_STAGE_GATE_RECHECK.md`.
+
+Validation:
+- Current-facts stage gate returned `status=blocked`.
+- `planClass=BLOCKED_PREREQUISITES_PENDING`.
+- `stageClass=BLOCKED_RESOLVE_WORKTREE_BEFORE_APPROVAL`.
+- `dirtyStatusLineCount=87`.
+- Blockers remain `dirty_worktree`, `prior_result_CM-1111_missing`, and `prior_result_CM-1115_missing`.
+- `cm1111ApprovalRequestAllowed=false`.
+- `cm1115ApprovalRequestAllowed=false`.
+- `cm1120ApprovalRequestAllowed=false`.
+
+Boundary:
+- No staging.
+- No commit.
+- No push.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Dirty-worktree blocker remains.
+- CM-1111/CM-1115 prior results are still missing.
+- Do not request or execute CM-1120 until CM-1129/CM-1131/CM-1139 allow it after prerequisites are actually satisfied.
+
+## CM-1138 Full Project Test After CM-1137 Checkpoint
+
+Status: `CM1138_FULL_PROJECT_TEST_AFTER_CM1137_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Ran full local `npm test` after CM-1137 source/test surfaces were present.
+- First shorter run timed out after `124195 ms` and was not counted as pass or failure.
+- Second run passed `2725/2725`.
+- Added `docs/CM1138_FULL_PROJECT_TEST_AFTER_CM1137.md`.
+
+Validation:
+- `npm test` passed `2725/2725`
+- `fail=0`
+- `cancelled=0`
+- `skipped=0`
+- `todo=0`
+- `duration_ms=203642.1498`
+
+Boundary:
+- No staging.
+- No commit.
+- No push.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Dirty-worktree blocker remains.
+- If the user provides the exact CM-1135 approval line, rerun CM-1136 and CM-1137 before any local commit executor step.
+- Do not auto-stage, auto-commit, auto-clean, or push from this validation result.
+
+## CM-1137 Local Commit Isolation Dry-Run Plan Checkpoint
+
+Status: `CM1137_LOCAL_COMMIT_ISOLATION_DRY_RUN_PLAN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationLocalCommitIsolationDryRunPlan.js`.
+- Added `src/cli/selected-audit-correlation-local-commit-isolation-dry-run-plan.js`.
+- Added `tests/selected-audit-correlation-local-commit-isolation-dry-run-plan.test.js`.
+- Added `tests/selected-audit-correlation-local-commit-isolation-dry-run-plan-cli.test.js`.
+- Added `docs/CM1137_LOCAL_COMMIT_ISOLATION_DRY_RUN_PLAN.md`.
+- Verified targeted CM-1137 tests `7/7`.
+- Ran real dry-run plan smoke; current result is blocked because CM-1136 preflight is not accepted.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationLocalCommitIsolationDryRunPlan.js`
+- `node --check .\src\cli\selected-audit-correlation-local-commit-isolation-dry-run-plan.js`
+- `node --check .\tests\selected-audit-correlation-local-commit-isolation-dry-run-plan.test.js`
+- `node --check .\tests\selected-audit-correlation-local-commit-isolation-dry-run-plan-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-local-commit-isolation-dry-run-plan.test.js .\tests\selected-audit-correlation-local-commit-isolation-dry-run-plan-cli.test.js` passed `7/7`
+- `node .\src\cli\selected-audit-correlation-local-commit-isolation-dry-run-plan.js --json --pretty` returned `BLOCKED_PREFLIGHT_NOT_ACCEPTED`
+
+Boundary:
+- No staging.
+- No commit.
+- No push.
+- No clean/reset/restore/delete.
+- No executable stage command prepared.
+- No executable commit command prepared.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- If the user provides the exact CM-1135 approval line, rerun CM-1136 and CM-1137 first.
+- Do not auto-stage, auto-commit, auto-clean, or push from this dry-run plan.
+- Rerun CM-1131 only after the worktree is clean or explicitly isolated.
+
+## CM-1136 Local Commit Isolation Preflight Checkpoint
+
+Status: `CM1136_LOCAL_COMMIT_ISOLATION_PREFLIGHT_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationLocalCommitIsolationPreflight.js`.
+- Added `src/cli/selected-audit-correlation-local-commit-isolation-preflight.js`.
+- Added `tests/selected-audit-correlation-local-commit-isolation-preflight.test.js`.
+- Added `tests/selected-audit-correlation-local-commit-isolation-preflight-cli.test.js`.
+- Added `docs/CM1136_LOCAL_COMMIT_ISOLATION_PREFLIGHT.md`.
+- Verified targeted CM-1136 tests `8/8`.
+- Ran real no-execution preflight smoke; current result is blocked because the exact approval line is missing.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationLocalCommitIsolationPreflight.js`
+- `node --check .\src\cli\selected-audit-correlation-local-commit-isolation-preflight.js`
+- `node --check .\tests\selected-audit-correlation-local-commit-isolation-preflight.test.js`
+- `node --check .\tests\selected-audit-correlation-local-commit-isolation-preflight-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-local-commit-isolation-preflight.test.js .\tests\selected-audit-correlation-local-commit-isolation-preflight-cli.test.js` passed `8/8`
+- `node .\src\cli\selected-audit-correlation-local-commit-isolation-preflight.js --json --pretty` returned `BLOCKED_APPROVAL_MISSING`
+
+Boundary:
+- No staging.
+- No commit.
+- No push.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- If the user provides the exact CM-1135 approval line, rerun CM-1136 first.
+- Do not auto-stage, auto-commit, auto-clean, or push from this preflight.
+- Rerun CM-1131 only after the worktree is clean or explicitly isolated.
+
+## CM-1135 Dirty Scope Local Commit Isolation Approval Packet Checkpoint
+
+Status: `CM1135_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1135_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET.md`.
+- Bound a draft future one-local-commit isolation action to `HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d`.
+- Generated request hash `381e4d8385b9cd2dcc7e9b13668b42b5f5330bed6812a7b84c01b48b7d765ec2`.
+- Drafted an exact approval line for possible future user approval.
+- Documented preflight and stop conditions for any future local commit isolation.
+
+Validation:
+- Request hash generated from the documented canonical input.
+- Pending closeout validation: docs validation, ledger consistency, `git diff --check`, focused no-overclaim/secret scan, final review.
+
+Boundary:
+- Draft only.
+- Not approved.
+- No staging.
+- No commit.
+- No push.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Use the exact approval line only if the user repeats it as a fresh instruction.
+- If approved later, rerun fresh status, diff, ledger, docs, diff check, and focused scans before any local commit.
+- Rerun CM-1131 only after the worktree is clean or explicitly isolated.
+
+## CM-1134 Dirty Scope Content Review Packet Checkpoint
+
+Status: `CM1134_DIRTY_SCOPE_CONTENT_REVIEW_PACKET_COMPLETED_REVIEW_ONLY_NOT_MUTATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1134_DIRTY_SCOPE_CONTENT_REVIEW_PACKET.md`.
+- Reviewed CM-1133 dirty-scope isolation decision.
+- Reviewed CM-0826 recall actual evidence review boundary.
+- Reviewed CM-1105 write actual evidence review boundary.
+- Reviewed `AuditLogStore.readSelectedWriteAuditCorrelation(...)` helper surface without executing it.
+- Ran focused overclaim/secret/raw-content/provider/API/durable-write scans.
+- Recorded that three positive overclaim-token matches are expected negative fail-closed selected-audit tests.
+
+Validation:
+- Focused secret-token scan: no matches in focused scope.
+- Focused raw-content/provider/API/durable-write positive counter scan: no matches in focused scope.
+- Focused overclaim scan: only expected negative fail-closed selected-audit tests.
+- Pending closeout validation: docs validation, ledger consistency, `git diff --check`, final review.
+
+Boundary:
+- No staging.
+- No commit.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Make a separate explicit isolation or commit decision if desired.
+- Do not auto-stage, auto-commit, or auto-clean from CM-1134.
+- Rerun CM-1131 only after the worktree is clean or explicitly isolated.
+
+## CM-1133 Selected Audit Correlation Dirty Scope Isolation Decision Checkpoint
+
+Status: `CM1133_SELECTED_AUDIT_CORRELATION_DIRTY_SCOPE_ISOLATION_DECISION_COMPLETED_BLOCKED_NOT_MUTATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationDirtyScopeIsolationDecision.js`.
+- Added `src/cli/selected-audit-correlation-dirty-scope-isolation-decision.js`.
+- Added `tests/selected-audit-correlation-dirty-scope-isolation-decision.test.js`.
+- Added `tests/selected-audit-correlation-dirty-scope-isolation-decision-cli.test.js`.
+- Added `docs/CM1133_SELECTED_AUDIT_CORRELATION_DIRTY_SCOPE_ISOLATION_DECISION.md`.
+- Implemented a no-mutation isolation decision packet over CM-1132 inventory.
+- Verified targeted CM-1133 tests `8/8`.
+- Verified CM-1132/CM-1133 regression tests `18/18`.
+- Ran real read-only CLI smoke; current dirty scope requires human review and remains not mutated.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationDirtyScopeIsolationDecision.js`
+- `node --check .\src\cli\selected-audit-correlation-dirty-scope-isolation-decision.js`
+- `node --check .\tests\selected-audit-correlation-dirty-scope-isolation-decision.test.js`
+- `node --check .\tests\selected-audit-correlation-dirty-scope-isolation-decision-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-dirty-scope-isolation-decision.test.js .\tests\selected-audit-correlation-dirty-scope-isolation-decision-cli.test.js` passed `8/8`
+- `node --test .\tests\selected-audit-correlation-dirty-scope-isolation-decision.test.js .\tests\selected-audit-correlation-dirty-scope-isolation-decision-cli.test.js .\tests\selected-audit-correlation-dirty-scope-inventory.test.js .\tests\selected-audit-correlation-dirty-scope-inventory-cli.test.js` passed `18/18`
+- `node .\src\cli\selected-audit-correlation-dirty-scope-isolation-decision.js --json --pretty` returned blocked/not mutated
+
+Boundary:
+- No staging.
+- No commit.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No file content read by the helper.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Human review the CM-1133 bundles.
+- Make a separate explicit isolation or commit decision if desired.
+- Rerun CM-1131 only after the worktree is clean or explicitly isolated.
+
+## CM-1132 Selected Audit Correlation Dirty Scope Inventory Checkpoint
+
+Status: `CM1132_SELECTED_AUDIT_CORRELATION_DIRTY_SCOPE_INVENTORY_COMPLETED_BLOCKED_NOT_MUTATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationDirtyScopeInventory.js`.
+- Added `src/cli/selected-audit-correlation-dirty-scope-inventory.js`.
+- Added `tests/selected-audit-correlation-dirty-scope-inventory.test.js`.
+- Added `tests/selected-audit-correlation-dirty-scope-inventory-cli.test.js`.
+- Added `docs/CM1132_SELECTED_AUDIT_CORRELATION_DIRTY_SCOPE_INVENTORY.md`.
+- Implemented a read-only `git status --short` inventory over dirty worktree scope.
+- Verified targeted CM-1132 tests `10/10`.
+- Ran real read-only CLI smoke; current dirty scope is known CM evidence scope but not clean.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationDirtyScopeInventory.js`
+- `node --check .\src\cli\selected-audit-correlation-dirty-scope-inventory.js`
+- `node --check .\tests\selected-audit-correlation-dirty-scope-inventory.test.js`
+- `node --check .\tests\selected-audit-correlation-dirty-scope-inventory-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-dirty-scope-inventory.test.js .\tests\selected-audit-correlation-dirty-scope-inventory-cli.test.js` passed `10/10`
+- `node .\src\cli\selected-audit-correlation-dirty-scope-inventory.js --json --pretty` returned blocked/not mutated
+
+Boundary:
+- No staging.
+- No commit.
+- No clean/reset/restore/delete.
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Prepare a separate human-reviewed isolation or commit decision for the known CM evidence dirty scope.
+- Do not auto-commit or auto-clean.
+- Rerun CM-1131 only after the worktree is clean or explicitly isolated.
+
+## CM-1131 Selected Audit Correlation Prerequisite Stage Gate Checkpoint
+
+Status: `CM1131_SELECTED_AUDIT_CORRELATION_PREREQUISITE_STAGE_GATE_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationPrerequisiteStageGate.js`.
+- Added `src/cli/selected-audit-correlation-current-facts-stage-gate.js`.
+- Added `tests/selected-audit-correlation-prerequisite-stage-gate.test.js`.
+- Added `tests/selected-audit-correlation-current-facts-stage-gate-cli.test.js`.
+- Added `docs/CM1131_SELECTED_AUDIT_CORRELATION_PREREQUISITE_STAGE_GATE.md`.
+- Implemented a no-execution stage gate over CM-1130 current-facts prerequisite plan.
+- Verified targeted CM-1131 tests `11/11`.
+- Verified adjacent CM-1123/CM-1126/CM-1127/CM-1128/CM-1129/CM-1130/CM-1131 regression tests `49/49`.
+- Ran real read-only CLI smoke; current state is blocked before any approval request because the worktree is dirty.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationPrerequisiteStageGate.js`
+- `node --check .\src\cli\selected-audit-correlation-current-facts-stage-gate.js`
+- `node --check .\tests\selected-audit-correlation-prerequisite-stage-gate.test.js`
+- `node --check .\tests\selected-audit-correlation-current-facts-stage-gate-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-prerequisite-stage-gate.test.js .\tests\selected-audit-correlation-current-facts-stage-gate-cli.test.js` passed `11/11`
+- `node --test .\tests\selected-audit-correlation-current-facts-stage-gate-cli.test.js .\tests\selected-audit-correlation-prerequisite-stage-gate.test.js .\tests\selected-audit-correlation-current-facts-prerequisite-plan-cli.test.js .\tests\selected-audit-correlation-prerequisite-blocker-plan.test.js .\tests\selected-audit-correlation-current-facts-downgrade-review-cli.test.js .\tests\selected-audit-correlation-blocker-downgrade-review.test.js .\tests\selected-audit-correlation-current-facts-readiness-cli.test.js .\tests\selected-audit-correlation-execution-readiness.test.js .\tests\selected-audit-correlation-result-classifier.test.js` passed `49/49`
+- `node .\src\cli\selected-audit-correlation-current-facts-stage-gate.js --json --pretty` returned blocked/not executed
+
+Boundary:
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Resolve or isolate dirty worktree without overwriting user-owned work.
+- Rerun CM-1131.
+- Only if the gate advances, request separate exact CM-1111 approval.
+- Keep CM-1115 and CM-1120 blocked until their ordered gates are reached.
+
+## CM-1130 Selected Audit Correlation Prerequisite Blocker Plan Checkpoint
+
+Status: `CM1130_SELECTED_AUDIT_CORRELATION_PREREQUISITE_BLOCKER_PLAN_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Updated `src/core/SelectedAuditCorrelationPrerequisiteBlockerPlan.js`.
+- Added `src/cli/selected-audit-correlation-current-facts-prerequisite-plan.js`.
+- Added `tests/selected-audit-correlation-prerequisite-blocker-plan.test.js`.
+- Added `tests/selected-audit-correlation-current-facts-prerequisite-plan-cli.test.js`.
+- Added `docs/CM1130_SELECTED_AUDIT_CORRELATION_PREREQUISITE_BLOCKER_PLAN.md`.
+- Implemented a no-execution prerequisite plan over CM-1129 current-facts downgrade review.
+- Verified targeted CM-1130 tests `9/9`.
+- Verified adjacent CM-1123/CM-1126/CM-1127/CM-1128/CM-1129/CM-1130 regression tests `38/38`.
+- Ran real read-only CLI smoke; current state is blocked on dirty worktree and missing CM-1111/CM-1115 prior results.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationPrerequisiteBlockerPlan.js`
+- `node --check .\src\cli\selected-audit-correlation-current-facts-prerequisite-plan.js`
+- `node --check .\tests\selected-audit-correlation-prerequisite-blocker-plan.test.js`
+- `node --check .\tests\selected-audit-correlation-current-facts-prerequisite-plan-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-prerequisite-blocker-plan.test.js .\tests\selected-audit-correlation-current-facts-prerequisite-plan-cli.test.js` passed `9/9`
+- `node --test .\tests\selected-audit-correlation-current-facts-prerequisite-plan-cli.test.js .\tests\selected-audit-correlation-prerequisite-blocker-plan.test.js .\tests\selected-audit-correlation-current-facts-downgrade-review-cli.test.js .\tests\selected-audit-correlation-blocker-downgrade-review.test.js .\tests\selected-audit-correlation-current-facts-readiness-cli.test.js .\tests\selected-audit-correlation-execution-readiness.test.js .\tests\selected-audit-correlation-result-classifier.test.js` passed `38/38`
+- `node .\src\cli\selected-audit-correlation-current-facts-prerequisite-plan.js --json --pretty` returned blocked/not executed
+
+Boundary:
+- No CM-1111 approval or execution.
+- No CM-1115 approval or execution.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Resolve or isolate dirty worktree without overwriting user-owned work.
+- Require separate exact CM-1111 approval before any retention apply attempt.
+- Require separate exact CM-1115 approval after CM-1111 result before metadata verification.
+- Rerun CM-1129/CM-1130 after prerequisites.
+- Keep CM-1120 blocked until all prerequisites and separate exact approval align.
+
+## CM-1129 Selected Audit Correlation Current-Facts Downgrade Review CLI Checkpoint
+
+Status: `CM1129_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_DOWNGRADE_REVIEW_CLI_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/cli/selected-audit-correlation-current-facts-downgrade-review.js`.
+- Added `tests/selected-audit-correlation-current-facts-downgrade-review-cli.test.js`.
+- Added `docs/CM1129_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_DOWNGRADE_REVIEW_CLI.md`.
+- Implemented a read-only CLI that composes CM-1127 current-facts readiness report with the CM-1128 downgrade review guard.
+- Verified targeted CLI test `4/4`.
+- Verified adjacent CM-1123/CM-1126/CM-1127/CM-1128 regression tests `29/29`.
+- Ran real read-only CLI smoke; current state is blocked on dirty worktree and missing CM-1111/CM-1115 prior results.
+
+Validation:
+- `node --check .\src\cli\selected-audit-correlation-current-facts-downgrade-review.js`
+- `node --check .\tests\selected-audit-correlation-current-facts-downgrade-review-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-current-facts-downgrade-review-cli.test.js` passed `4/4`
+- `node --test .\tests\selected-audit-correlation-current-facts-downgrade-review-cli.test.js .\tests\selected-audit-correlation-blocker-downgrade-review.test.js .\tests\selected-audit-correlation-current-facts-readiness-cli.test.js .\tests\selected-audit-correlation-execution-readiness.test.js .\tests\selected-audit-correlation-result-classifier.test.js` passed `29/29`
+- `node .\src\cli\selected-audit-correlation-current-facts-downgrade-review.js --json --pretty` returned blocked/not executed
+
+Boundary:
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Keep CM-1120 blocked until separate exact approval, required CM-1111/CM-1115 prior result classes, clean current-facts preflight, selected sanitized observation, follow-up evidence, and favorable CM-1128/CM-1129 downgrade review all align.
+- Safe local work may continue as no-execution governance/evidence design or guard helpers.
+
+## CM-1128 Selected Audit Correlation Blocker Downgrade Review Guard Checkpoint
+
+Status: `CM1128_SELECTED_AUDIT_CORRELATION_BLOCKER_DOWNGRADE_REVIEW_GUARD_COMPLETED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationBlockerDowngradeReview.js`.
+- Added `tests/selected-audit-correlation-blocker-downgrade-review.test.js`.
+- Added `docs/CM1128_SELECTED_AUDIT_CORRELATION_BLOCKER_DOWNGRADE_REVIEW.md`.
+- Implemented a pure explicit-input review guard that consumes CM-1127/CM-1126 readiness report shapes and decides whether a narrow selected-audit-correlation blocker downgrade is allowed.
+- Verified targeted helper test `8/8`.
+- Verified adjacent CM-1123/CM-1126/CM-1127 regression tests `25/25`.
+- Confirmed current dirty CM-1127 report reviews as `BLOCKED_CURRENT_FACTS_NOT_READY`, and synthetic preflight-ready no-observation reviews as not downgrade.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationBlockerDowngradeReview.js`
+- `node --check .\tests\selected-audit-correlation-blocker-downgrade-review.test.js`
+- `node --test .\tests\selected-audit-correlation-blocker-downgrade-review.test.js` passed `8/8`
+- `node --test .\tests\selected-audit-correlation-blocker-downgrade-review.test.js .\tests\selected-audit-correlation-current-facts-readiness-cli.test.js .\tests\selected-audit-correlation-execution-readiness.test.js .\tests\selected-audit-correlation-result-classifier.test.js` passed `25/25`
+
+Boundary:
+- No CM-1120 approval or execution.
+- No Git fact collection by the CM-1128 helper.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Keep CM-1120 blocked until separate exact approval, required CM-1111/CM-1115 prior result classes, clean current-facts preflight, selected sanitized observation, follow-up evidence, and CM-1128 downgrade review all align.
+- Safe local work may continue as no-execution governance/evidence design or guard helpers.
+
+## CM-1127 Selected Audit Correlation Current-Facts Readiness CLI Checkpoint
+
+Status: `CM1127_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_READINESS_CLI_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/cli/selected-audit-correlation-current-facts-readiness.js`.
+- Added `tests/selected-audit-correlation-current-facts-readiness-cli.test.js`.
+- Added `docs/CM1127_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_READINESS_CLI.md`.
+- Implemented a read-only CLI that composes CM-1124 no-observation classifier output with the CM-1126 execution-readiness gate.
+- Verified targeted CLI test `4/4`.
+- Verified adjacent CM-1123/CM-1124/CM-1126/CM-1127 regression tests `23/23`.
+- Ran real read-only CLI smoke; current state is blocked on dirty worktree and missing CM-1111/CM-1115 prior results.
+
+Validation:
+- `node --check .\src\cli\selected-audit-correlation-current-facts-readiness.js`
+- `node --check .\tests\selected-audit-correlation-current-facts-readiness-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-current-facts-readiness-cli.test.js` passed `4/4`
+- `node --test .\tests\selected-audit-correlation-current-facts-readiness-cli.test.js .\tests\selected-audit-correlation-execution-readiness.test.js .\tests\selected-audit-correlation-current-facts-classifier-cli.test.js .\tests\selected-audit-correlation-result-classifier.test.js` passed `23/23`
+- `node .\src\cli\selected-audit-correlation-current-facts-readiness.js --json --pretty` returned blocked/not executed
+
+Boundary:
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Keep CM-1120 blocked until separate exact approval, required CM-1111/CM-1115 prior result classes, clean current-facts preflight, selected sanitized observation, and follow-up evidence.
+- Safe local work may continue as no-execution governance/evidence design or guard helpers.
+
+## CM-1126 Selected Audit Correlation Execution Readiness Gate Checkpoint
+
+Status: `CM1126_SELECTED_AUDIT_CORRELATION_EXECUTION_READINESS_GATE_COMPLETED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationExecutionReadiness.js`.
+- Added `tests/selected-audit-correlation-execution-readiness.test.js`.
+- Added `docs/CM1126_SELECTED_AUDIT_CORRELATION_EXECUTION_READINESS_GATE.md`.
+- Implemented explicit-input readiness classification for CM-1120 path states.
+- Verified targeted readiness gate test `7/7`.
+- Verified adjacent CM-1123/CM-1124 regression tests `12/12`.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationExecutionReadiness.js`
+- `node --check .\tests\selected-audit-correlation-execution-readiness.test.js`
+- `node --test .\tests\selected-audit-correlation-execution-readiness.test.js` passed `7/7`
+- `node --test .\tests\selected-audit-correlation-result-classifier.test.js .\tests\selected-audit-correlation-current-facts-classifier-cli.test.js` passed `12/12`
+
+Boundary:
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Keep CM-1120 blocked until separate exact approval, required CM-1111/CM-1115 prior result classes, clean current-facts preflight, selected sanitized observation, and follow-up evidence.
+- Safe local work may continue as no-execution governance/evidence design or guard helpers.
+
+## CM-1125 Operator State Sync After CM-1124 Checkpoint
+
+Status: `CM1125_OPERATOR_STATE_SYNC_DOCS_ONLY_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Updated `.agent_board/RUN_STATE.md` top-level current-task and recommended-next wording from stale CM-1122 state to current CM-1124 state.
+- Added CM-1125 queue, validation, ledger, checkpoint, handoff, status, and truth-table entries.
+
+Validation:
+- docs validation
+- ledger consistency
+- `git diff --check`
+- stale pointer review
+- no-overclaim review
+
+Boundary:
+- No runtime source change.
+- No test change.
+- No CM-1120 approval or execution.
+- No true audit log read.
+- No observation input read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Keep CM-1120 blocked until separate exact approval plus passing current-facts preflight and required CM-1111/CM-1115 prior result classes.
+- Safe local work may continue only as docs/board reconciliation, no-execution guard helpers, or governance design without true audit/memory/apply/provider actions.
+
+## CM-1122 Selected Audit Correlation Current-Facts Preflight CLI Checkpoint
+
+Status: `CM1122_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_PREFLIGHT_CLI_COMPLETED_BLOCKED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/cli/selected-audit-correlation-current-facts-preflight.js`.
+- Added `tests/selected-audit-correlation-current-facts-preflight-cli.test.js`.
+- Added `docs/CM1122_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_PREFLIGHT_CLI.md`.
+- Implemented a read-only current-facts CLI wrapper for CM-1121.
+- Verified targeted CLI test `7/7`.
+- Ran real CLI smoke; current state blocked on dirty worktree and missing CM-1111/CM-1115 prior results.
+
+Validation:
+- `node --check .\src\cli\selected-audit-correlation-current-facts-preflight.js`
+- `node --check .\tests\selected-audit-correlation-current-facts-preflight-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-current-facts-preflight-cli.test.js` passed `7/7`
+- `node .\src\cli\selected-audit-correlation-current-facts-preflight.js --json --pretty` returned blocked/not executed
+
+Boundary:
+- No approval consumed.
+- No command execution beyond read-only Git facts and local validation.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No true audit log read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Continue only with local no-execution governance/evidence design, or wait for separate exact approval before any CM-1120 execution.
+
+## CM-1121 Selected Audit Correlation Observation Preflight Checkpoint
+
+Status: `CM1121_SELECTED_AUDIT_CORRELATION_OBSERVATION_PREFLIGHT_ACCEPTED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `src/core/SelectedAuditCorrelationObservationPreflight.js`.
+- Added `tests/selected-audit-correlation-observation-preflight.test.js`.
+- Added `docs/CM1121_SELECTED_AUDIT_CORRELATION_OBSERVATION_PREFLIGHT.md`.
+- Implemented `evaluateSelectedAuditCorrelationObservationPreflight(...)` as a pure explicit-input fail-closed helper for CM-1120.
+- Verified targeted preflight test `5/5`.
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationObservationPreflight.js`
+- `node --check .\tests\selected-audit-correlation-observation-preflight.test.js`
+- `node --test .\tests\selected-audit-correlation-observation-preflight.test.js` passed `5/5`
+
+Boundary:
+- No approval consumed.
+- No command execution beyond local validation.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No true audit log read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Continue only with local no-execution governance/evidence design, or wait for separate exact approval before any CM-1120 execution.
+
+## CM-1120 Selected Audit Correlation Observation Approval Packet Checkpoint
+
+Status: `CM1120_SELECTED_AUDIT_CORRELATION_OBSERVATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1120_SELECTED_AUDIT_CORRELATION_OBSERVATION_APPROVAL_PACKET.md`.
+- Drafted `CM-1120-SELECTED-AUDIT-CORRELATION-OBSERVATION-APPROVAL-001`.
+- Bound the future-only request to `HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d`, memory id `codex-process-50325be15fdb479d805728fe420b4838`, CM-1118 helper evidence, CM-1119 interpretation matrix, and request hash `dfe4edcece5d561bbcdcdf38764679f6822cad77939dea06d68788a9840bad8e`.
+- Preserved required prior results: CM-1111 `APPLIED_TOMBSTONED_SANITIZED` and CM-1115 `METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE`.
+
+Boundary:
+- No approval consumed.
+- No command executed.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No true audit log read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before any CM-1120 execution, or continue local no-execution governance/evidence design work.
+
+## CM-1119 Selected Audit Correlation Result Interpretation Matrix Checkpoint
+
+Status: `CM1119_SELECTED_AUDIT_CORRELATION_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1119_SELECTED_AUDIT_CORRELATION_RESULT_INTERPRETATION_MATRIX.md`.
+- Defined future selected audit-correlation result classes for invalid preconditions, invalid approval/scope/raw output, unavailable reader, failed audit read, missing correlation, mismatched identity/source/family/phase/transition, selected correlation observed, and still-missing metadata/recall evidence.
+- Preserved the maximum possible downgrade as one exact-approved selected-field audit-correlation observation for pending and committed `memory_tombstone` metadata for the exact CM-1100 proof memory and expected CM-1111 request source.
+
+Boundary:
+- No approval consumed.
+- No command executed.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No true audit log read.
+- No raw audit read.
+- No direct `.jsonl` read.
+- No raw memory, raw store, diary, or metadata store read.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Draft CM-1120 exact approval packet for a possible future selected audit-correlation observation, or wait for separate exact approval before any true audit-correlation execution.
+
+## CM-1118 Selected Audit Correlation Reader Temp Fixture Evidence Checkpoint
+
+Status: `CM1118_SELECTED_AUDIT_CORRELATION_READER_TEMP_FIXTURE_EVIDENCE_COMPLETED_NOT_LIVE_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Updated `src/storage/AuditLogStore.js`.
+- Added `tests/audit-log-store-selected-correlation.test.js`.
+- Added `docs/CM1118_SELECTED_AUDIT_CORRELATION_READER_TEMP_FIXTURE_EVIDENCE.md`.
+- Implemented `AuditLogStore.readSelectedWriteAuditCorrelation(...)`.
+- Proved selected pending/committed mutation audit metadata projection in isolated temp fixture logs.
+- Verified raw `title`, `reason`, and `evidence` strings are not serialized by the selected projection.
+- Verified fail-closed outcomes for missing `memoryId` and absent committed pair.
+- Verified committed-only entries are not returned as correlated evidence when pending intent is absent.
+
+Validation:
+- `node --check .\src\storage\AuditLogStore.js`
+- `node --check .\tests\audit-log-store-selected-correlation.test.js`
+- `node --test .\tests\audit-log-store-selected-correlation.test.js` passed `3/3`
+- `node --test .\tests\tombstone-memory-runtime.test.js` passed `14/14`
+
+Boundary:
+- No CM-1111/CM-1115/CM-1117 approval or execution.
+- No `tombstone-memory` run against current project data.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No true audit log read.
+- No raw audit read.
+- No direct `.jsonl` read against project logs.
+- No raw memory, raw store, diary, or metadata store read.
+- No durable project memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Draft CM-1119 result interpretation matrix for any future selected audit-correlation observation, or wait for separate exact approval before any true audit-correlation execution.
+
+## CM-1117 Post Tombstone Audit Correlation Approval Packet Checkpoint
+
+Status: `CM1117_POST_TOMBSTONE_AUDIT_CORRELATION_APPROVAL_PACKET_DRAFT_BLOCKED_NO_SAFE_READER_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1117_POST_TOMBSTONE_AUDIT_CORRELATION_APPROVAL_PACKET.md`.
+- Drafted `CM-1117-POST-TOMBSTONE-AUDIT-CORRELATION-APPROVAL-001`.
+- Bound the draft to `HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d`, memory id `codex-process-50325be15fdb479d805728fe420b4838`, required prior results CM-1111 `APPLIED_TOMBSTONED_SANITIZED` and CM-1115 `METADATA_STATUS_TOMBSTONED_EXPECTED_SCOPE`, and request hash `e053d2dc0e4ede6b9d48b840fe60de461bf11cc47916a347a83fe573575430f0`.
+- Reviewed current source shape: `TombstoneMemoryService` emits pending/committed/cancelled mutation audit metadata, and temp-fixture tests cover tombstone audit order/correlation.
+- Recorded fail-closed source gap: `AuditLogStore.readRecentWriteAudit(...)` returns full recent entries, not a selected-field audit-correlation projection, so CM-1117 is not executable against current source.
+
+Boundary:
+- No approval consumed.
+- No command executed.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No audit log read.
+- No durable memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Continue local no-execution design for a safe selected-field audit-correlation reader, or wait for separate exact approval before any CM-1107, CM-1111, CM-1113, or CM-1115 execution.
+
+## CM-1116 Post Tombstone Metadata Lifecycle Result Interpretation Matrix Checkpoint
+
+Status: `CM1116_POST_TOMBSTONE_METADATA_LIFECYCLE_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1116_POST_TOMBSTONE_METADATA_LIFECYCLE_RESULT_INTERPRETATION_MATRIX.md`.
+- Defined future CM-1115 result classifications for invalid preconditions, invalid approval/scope/raw output, metadata read failure, selected-metadata favorable state, missing record, missing lifecycle columns, status mismatch, scope mismatch, and still-missing audit/recall evidence.
+- Preserved the maximum possible downgrade as one exact-approved selected-metadata lifecycle observation reporting the CM-1100 proof memory as tombstoned with expected client/visibility metadata.
+
+Boundary:
+- No approval consumed.
+- No command executed.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No durable memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107, CM-1111, CM-1113, or CM-1115 execution, or continue local no-execution bounded audit-correlation approval-packet planning.
+
+## CM-1115 Post Tombstone Metadata Lifecycle Verify Approval Packet Checkpoint
+
+Status: `CM1115_POST_TOMBSTONE_METADATA_LIFECYCLE_VERIFY_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1115_POST_TOMBSTONE_METADATA_LIFECYCLE_VERIFY_APPROVAL_PACKET.md`.
+- Drafted `CM-1115-POST-TOMBSTONE-METADATA-LIFECYCLE-VERIFY-APPROVAL-001`.
+- Bound the draft to `HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d`, memory id `codex-process-50325be15fdb479d805728fe420b4838`, required CM-1111/CM-1113 prior result classes, and request hash `68863c9c71c40a48852bea1bd9de93017e40684fdaa57f4a501eb9a5f3ac68d4`.
+- Limited any future approval to exactly one metadata-only exact-id `SqliteShadowStore.getRecordValidationPolicy` read with selected fields only.
+
+Boundary:
+- Draft only; not approved.
+- No command executed.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No durable memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107, CM-1111, CM-1113, or CM-1115 execution, or continue CM-1115 result interpretation matrix planning as no-execution docs/status/board work.
+
+## CM-1114 Post Tombstone Public Verify Result Interpretation Matrix Checkpoint
+
+Status: `CM1114_POST_TOMBSTONE_PUBLIC_VERIFY_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1114_POST_TOMBSTONE_PUBLIC_VERIFY_RESULT_INTERPRETATION_MATRIX.md`.
+- Defined future CM-1113 result classifications for invalid preconditions, invalid approval/scope/raw output, public tool failure, public search zero/positive/inconclusive outcomes, overview-only partial observation, and missing metadata status.
+- Preserved the maximum possible downgrade as one exact-approved sanitized public-tool post-tombstone observation for the exact CM-1100 proof memory.
+
+Boundary:
+- No approval consumed.
+- No command executed.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No durable memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107, CM-1111, or CM-1113 execution, or continue local no-execution metadata-only exact-id verification approval-packet planning.
+
+## CM-1113 Post Tombstone Sanitized Verification Approval Packet Checkpoint
+
+Status: `CM1113_POST_TOMBSTONE_SANITIZED_VERIFICATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `docs/CM1113_POST_TOMBSTONE_SANITIZED_VERIFICATION_APPROVAL_PACKET.md`.
+- Drafted `CM-1113-POST-TOMBSTONE-SANITIZED-VERIFY-APPROVAL-001`.
+- Bound the draft to `HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d`, memory id `codex-process-50325be15fdb479d805728fe420b4838`, required source result class `APPLIED_TOMBSTONED_SANITIZED`, and request hash `4693db72ffb82ff959b852f615eefde749a33332f99025624f0634febad4a1bd`.
+- Limited any future approval to exactly one `search_memory` call with `include_content=false` and exactly one `memory_overview` call, sanitized output only.
+
+Boundary:
+- Draft only; not approved.
+- No command executed.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No durable memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107, CM-1111, or CM-1113 execution.
+
+## CM-1112 Proof Memory Retention Apply Result Interpretation Matrix Checkpoint
+
+Status: `CM1112_PROOF_MEMORY_RETENTION_APPLY_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1112_PROOF_MEMORY_RETENTION_APPLY_RESULT_INTERPRETATION_MATRIX.md`.
+- Defined future CM-1111 result classifications for invalid approval/scope/raw output, rejected guard outcomes, audit warning, sanitized tombstone apply, and missing post-apply verification.
+- Preserved the maximum possible downgrade as one exact-approved sanitized local tombstone apply result for the exact CM-1100 proof memory.
+
+Boundary:
+- No approval consumed.
+- No command executed.
+- No `tombstone-memory` run.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No durable memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107 or CM-1111 execution, or continue local no-execution post-apply verification approval-packet planning.
+
+## CM-1111 Proof Memory Retention Apply Approval Packet Checkpoint
+
+Status: `CM1111_PROOF_MEMORY_RETENTION_APPLY_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1111_PROOF_MEMORY_RETENTION_APPLY_APPROVAL_PACKET.md`.
+- Drafted `CM-1111-PROOF-MEMORY-RETENTION-APPLY-APPROVAL-001`.
+- Bound the draft to `HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d`, memory id `codex-process-50325be15fdb479d805728fe420b4838`, and request hash `a4c569b83f69ca1f2743321eb6d4fa6749edad5a7e0e8184d670964380c08338`.
+- Limited any future approval to exactly one `tombstone-memory` CLI apply/confirm run against the exact memory id.
+
+Boundary:
+- Draft only; not approved.
+- No command executed.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No durable memory/audit write.
+- No retention/tombstone/cleanup/rollback/migration/import/export/backup/restore apply.
+- No provider/API call.
+- No worker start.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107 or CM-1111 execution, or continue CM-1112 post-apply result interpretation matrix as no-execution docs/status/board work.
+
+## CM-1110 Proof Memory Lifecycle Suppression Retention Apply Gap Review Checkpoint
+
+Status: `CM1110_PROOF_MEMORY_LIFECYCLE_SUPPRESSION_RETENTION_APPLY_GAP_REVIEW_COMPLETED_GAP_REVIEW_NOT_APPLIED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1110_PROOF_MEMORY_LIFECYCLE_SUPPRESSION_RETENTION_APPLY_GAP_REVIEW.md`.
+- Reviewed CM-1081/CM-1082 proof-memory retention/tombstone docs, retention planner, store-backed dry-run preview helper, internal tombstone service/CLI, lifecycle SQLite dry-run CLI, relevant `SqliteShadowStore` methods, and existing proof-retention/tombstone/lifecycle read-policy tests.
+- Accepted source/docs/test-backed evidence that the repository has proof-memory no-apply retention planning, temp-local metadata-only preview, internal tombstone service/CLI temp-fixture apply tests, and lifecycle read-policy tests.
+- Kept the exact CM-1100 proof memory retention/apply blocker open.
+
+Boundary:
+- Source/docs/test inspection only; tests were not rerun in this slice before docs gate validation.
+- No approval consumed.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No retention/tombstone/cleanup/rollback/migration apply.
+- No provider/API call.
+- No worker start.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107 execution, or draft CM-1111 proof-memory retention apply approval packet without executing apply.
+
+## CM-1109 Proof Memory Pollution Prevention Source Review Checkpoint
+
+Status: `CM1109_PROOF_MEMORY_POLLUTION_PREVENTION_SOURCE_REVIEW_COMPLETED_SOURCE_TEST_BACKED_NOT_LIVE_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1109_PROOF_MEMORY_POLLUTION_PREVENTION_SOURCE_REVIEW.md`.
+- Reviewed `src/core/ProofMemoryPolicy.js`, `src/recall/KnowledgeBaseRecallPipeline.js`, `src/storage/SqliteShadowStore.js`, `src/core/constants.js`, and existing `tests/proof-memory-policy.test.js`.
+- Accepted source/test-backed evidence that proof memory is `internal_proof`, normal recall adds `visibilityExclude`, SQL candidate query excludes that visibility, and public schema stays frozen.
+
+Boundary:
+- Source/test inspection only; tests were not rerun in this slice.
+- No approval consumed.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No retention/tombstone/cleanup/rollback/migration apply.
+- No provider/API call.
+- No worker start.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107 execution, or continue CM-1110 proof-memory lifecycle suppression and retention-apply gap review.
+
+## CM-1108 Post-Write Sanitized Verification Result Interpretation Matrix Checkpoint
+
+Status: `CM1108_POST_WRITE_SANITIZED_VERIFICATION_RESULT_INTERPRETATION_MATRIX_COMPLETED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1108_POST_WRITE_SANITIZED_VERIFICATION_RESULT_INTERPRETATION_MATRIX.md`.
+- Defined future CM-1107 result classifications for draft/no-evidence, approval/baseline fail-closed, invalid side effects/raw output, inconclusive public-surface results, partial overview-only observation, bounded recall observed, bounded recall+overview observed, and failed/uninterpretable execution.
+- Preserved mandatory no-overclaim closeout wording for future CM-1107 evidence.
+
+Boundary:
+- No approval consumed.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No retention/tombstone/cleanup/rollback/migration apply.
+- No provider/API call.
+- No worker start.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before CM-1107 execution, or continue local no-execution governance/read-policy work.
+
+## CM-1107 Post-Write Sanitized Verification Approval Packet Checkpoint
+
+Status: `CM1107_POST_WRITE_SANITIZED_VERIFICATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1107_POST_WRITE_SANITIZED_VERIFICATION_APPROVAL_PACKET.md`.
+- Drafted `CM-1107-POST-WRITE-SANITIZED-VERIFY-APPROVAL-001`.
+- Bound the draft to `HEAD=16a9bf6ac0c74741c6b16c79e84fb61e1e7e194d`, memory id `codex-process-50325be15fdb479d805728fe420b4838`, and request hash `690a01fc17b96124fc7d9dbfb755e87820e4f78cef8b3e1fa26bb2695cf08902`.
+- Limited any future approval to at most one sanitized `search_memory` attempt and one sanitized `memory_overview` observation.
+
+Boundary:
+- Draft only; not approved.
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No retention/tombstone/cleanup/rollback/migration apply.
+- No provider/API call.
+- No worker start.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Wait for separate exact approval before execution, or continue local no-execution governance/read-policy work.
+
+## CM-1106 Write Reliability Missing Evidence Packet Checkpoint
+
+Status: `CM1106_WRITE_RELIABILITY_MISSING_EVIDENCE_PACKET_COMPLETED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1106_WRITE_RELIABILITY_MISSING_EVIDENCE_PACKET.md`.
+- Classified the missing evidence after CM-1105.
+- Identified missing read-after-write, overview/projection, durable correlation, idempotence, failure-family, restart durability, retention/apply safety, cleanup/rollback safety, governance pollution-prevention, and public/default write reliability evidence.
+- Selected CM-1107 post-write sanitized verification approval packet draft as the next local-safe step.
+
+Boundary:
+- No `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No metadata store read.
+- No retention/tombstone/cleanup/rollback/migration apply.
+- No provider/API call.
+- No worker start.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Perform CM-1107 post-write sanitized verification approval packet draft as local docs/status/board work only.
+
+## CM-1105 Memory Write Reliability Actual Evidence Review Checkpoint
+
+Status: `CM1105_MEMORY_WRITE_RELIABILITY_ACTUAL_EVIDENCE_REVIEW_PARTIAL_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM1105_MEMORY_WRITE_RELIABILITY_ACTUAL_EVIDENCE_REVIEW.md`.
+- Reviewed CM-1100 through CM-1104 write-path evidence.
+- Accepted one narrow actual evidence chain: exact-approved accepted `record_memory` result, result-shape packet, retention classification, metadata-only no-apply dry-run preview, and sanitized receipt.
+- Downgraded only from no accepted authorized write evidence to one accepted authorized write partial evidence chain.
+
+Boundary:
+- No new `record_memory`.
+- No `search_memory`.
+- No `memory_overview`.
+- No raw memory, raw store, raw audit, diary, or `.jsonl` read.
+- No store-backed read.
+- No retention/tombstone/cleanup/rollback/migration apply.
+- No provider/API call.
+- No worker start.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- Perform CM-1106 write reliability missing-evidence packet as local docs/status/board work only.
+
+## CM-0827 Actual Next Runtime Gap Selection After Recall Checkpoint
+
+Status: `CM0827_NEXT_RUNTIME_GAP_SELECTION_AFTER_RECALL_MEMORY_WRITE_RELIABILITY_REVIEW_SELECTED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM0827_ACTUAL_NEXT_RUNTIME_GAP_SELECTION_AFTER_RECALL.md`.
+- Confirmed CM-0825 proof evidence exists and CM-0826 actual evidence review exists.
+- Compared remaining runtime gaps after the narrow recall blocker downgrade.
+- Selected `memory write reliable` as the next runtime gap.
+- Limited the next concrete step to local `CM-1105 memory write reliability actual evidence review`.
+
+Boundary:
+- No new `search_memory`.
+- No new `record_memory`.
+- No raw memory or `.jsonl` read.
+- No store-backed read.
+- No retention/tombstone/cleanup/rollback/migration apply.
+- No provider/API call.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push/tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- CM-1105 memory write reliability actual evidence review is completed above. Current next safe step is CM-1106 write reliability missing-evidence packet.
+
+## CM-0826 Recall Reliability Blocker Actual Evidence Review Checkpoint
+
+Status: `CM0826_RECALL_RELIABILITY_BLOCKER_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Added `docs/CM0826_RECALL_RELIABILITY_BLOCKER_ACTUAL_EVIDENCE_REVIEW.md`.
+- Reviewed CM-0825 evidence against CM-0826 criteria.
+- Accepted exact approval, clean current-main baseline, exact four-query shape, patched metadata-only path, sanitized-only output, complete zero counters, Q1=5, Q2=5, Q3=2, and Q4=0.
+- Downgraded only the CM-0825 patched no-raw-content-read proof-shape ambiguity.
+
+Boundary:
+- No new `search_memory` execution.
+- No `record_memory`.
+- No direct `.jsonl` read.
+- No raw memory output.
+- No provider/API call.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No release/cutover.
+- No readiness or reliability claim.
+
+Next:
+- CM-0827 actual next-runtime-gap selection and CM-1105 memory write reliability actual evidence review are completed above. Current next safe step is CM-1106 write reliability missing-evidence packet.
+
+## CM-0825 Patched True Live Recall Proof Execution Checkpoint
+
+Status: `CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_PASSED_NOT_READY`
+
+Date: 2026-05-25
+
+Completed:
+- Consumed the user-provided separate exact approval for `CM0825_EXACT_APPROVED_PATCHED_TRUE_LIVE_RECALL_PROOF_ONCE`.
+- Confirmed clean `main...origin/main` before execution.
+- Executed exactly four fixed CM-0824 queries through `TrueLiveRecallReadonlyProofRunner` and `TrueLiveRecallExecutorAdapter`.
+- Recorded sanitized result counts: Q1=5, Q2=5, Q3=2, Q4=0.
+- Confirmed `rawContentReturned=false` and complete side-effect counters all `0`.
+- Added `docs/CM0825_PATCHED_TRUE_LIVE_RECALL_PROOF_EXECUTION.md`.
+
+Boundary:
+- No `record_memory`.
+- No direct `.jsonl` read.
+- No raw memory output.
+- No provider/API call.
+- No durable memory/audit write.
+- No migration/import/export/backup/restore apply.
+- No config/watchdog/startup/package/lockfile change.
+- No public MCP expansion.
+- No tag/release/deploy/cutover.
+- No readiness or reliability claim.
+
+Next:
+- CM-0826 actual evidence review, CM-0827 actual next-runtime-gap selection, and CM-1105 memory write reliability actual evidence review are completed above. Current next safe step is CM-1106 write reliability missing-evidence packet.
 
 ## CM-1104 CM-1103 Retention Dry-Run Evidence Receipt Checkpoint
 
@@ -7611,6 +9187,99 @@ Remaining risk:
 
 Next:
 - Inspect final diff and decide separately whether a guarded local commit is desired. Keep `RC_NOT_READY_BLOCKED`; do not push or claim readiness.
+
+## CM-1123 Selected Audit Correlation Result Classifier Checkpoint
+
+Status: `COMPLETED_VALIDATED_CM1123_RESULT_CLASSIFIER_NOT_EXECUTED_NOT_READY`
+Date: 2026-05-26
+
+Completed:
+- Added `SelectedAuditCorrelationResultClassifier` as a pure explicit-input helper.
+- Added targeted classifier tests for favorable, preflight-blocked, malformed/raw, not-found, and mismatch classes.
+- Added CM-1123 evidence doc and synchronized status/truth-table/board surfaces.
+
+Changed files:
+- `src/core/SelectedAuditCorrelationResultClassifier.js`
+- `tests/selected-audit-correlation-result-classifier.test.js`
+- `docs/CM1123_SELECTED_AUDIT_CORRELATION_RESULT_CLASSIFIER.md`
+- `STATUS.md`
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`
+- `.agent_board/*`
+
+Validation:
+- `node --check .\src\core\SelectedAuditCorrelationResultClassifier.js`
+- `node --check .\tests\selected-audit-correlation-result-classifier.test.js`
+- `node --test .\tests\selected-audit-correlation-result-classifier.test.js` passed `6/6`
+- CM-1121/CM-1122 regression, docs validation, ledger consistency, diff check, no-overclaim review, and changed-scope re-review are the closeout validation set.
+
+Not validated:
+- true audit-log reads
+- raw audit/store/diary/`.jsonl` reads
+- metadata-store reads
+- true `record_memory`
+- true `search_memory`
+- `memory_overview`
+- provider/API/model calls
+- durable project memory/audit writes
+- tombstone/cleanup/rollback/migration/import/export/backup/restore apply
+- HTTP observe
+- full `npm test`
+- push-readiness or push
+
+Remaining risk:
+- CM-1123 is classifier evidence only. It does not prove actual CM-1100 audit correlation, current metadata lifecycle, public/default recall suppression, cleanup safety, rollback safety, write reliability, recall reliability, or readiness.
+
+Next:
+- Future selected audit observation remains blocked unless separate exact approval and passing current-facts preflight exist. Any future output must still be interpreted through CM-1123 and cannot produce readiness/reliability claims by itself.
+
+## CM-1124 Selected Audit Correlation Current-Facts Classifier Checkpoint
+
+Status: `COMPLETED_VALIDATED_CM1124_CURRENT_FACTS_CLASSIFIER_NO_OBSERVATION_NOT_READY`
+Date: 2026-05-26
+
+Completed:
+- Added a read-only CLI that connects CM-1122 current-facts preflight to CM-1123 classification.
+- Added tests proving no-observation classification remains `DRAFT_ONLY_NO_EVIDENCE`.
+- Added rejection for observation/raw/audit input flags before current-facts collection.
+- Added CM-1124 evidence doc and synchronized status/truth-table/board surfaces.
+
+Changed files:
+- `src/cli/selected-audit-correlation-current-facts-classifier.js`
+- `tests/selected-audit-correlation-current-facts-classifier-cli.test.js`
+- `docs/CM1124_SELECTED_AUDIT_CORRELATION_CURRENT_FACTS_CLASSIFIER.md`
+- `STATUS.md`
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`
+- `.agent_board/*`
+
+Validation:
+- `node --check .\src\cli\selected-audit-correlation-current-facts-classifier.js`
+- `node --check .\tests\selected-audit-correlation-current-facts-classifier-cli.test.js`
+- `node --test .\tests\selected-audit-correlation-current-facts-classifier-cli.test.js` passed `6/6`
+- `node --test .\tests\selected-audit-correlation-result-classifier.test.js` passed `6/6`
+- `node --test .\tests\selected-audit-correlation-current-facts-preflight-cli.test.js` passed `7/7`
+- Real read-only CLI smoke returned blocked with `dirty_worktree`, `prior_result_CM-1111_missing`, `prior_result_CM-1115_missing`, `dirtyStatusLineCount=41`, and classifier `DRAFT_ONLY_NO_EVIDENCE`
+- Real read-only CLI smoke, docs validation, ledger consistency, diff check, no-overclaim review, and changed-scope re-review are the closeout validation set.
+
+Not validated:
+- true audit-log reads
+- observation input-file reads
+- raw audit/store/diary/`.jsonl` reads
+- metadata-store reads
+- true `record_memory`
+- true `search_memory`
+- `memory_overview`
+- provider/API/model calls
+- durable project memory/audit writes
+- tombstone/cleanup/rollback/migration/import/export/backup/restore apply
+- HTTP observe
+- full `npm test`
+- push-readiness or push
+
+Remaining risk:
+- CM-1124 is no-observation classification evidence only. It does not prove actual selected audit correlation, current metadata lifecycle, public/default recall suppression, cleanup safety, rollback safety, write reliability, recall reliability, or readiness.
+
+Next:
+- Future selected audit observation remains blocked unless separate exact approval and passing current-facts preflight exist. No-observation classification cannot support blocker downgrade.
 
 ## CM-1064 Review Follow-up Negative-Control And Continuity Boundary Hardening
 
