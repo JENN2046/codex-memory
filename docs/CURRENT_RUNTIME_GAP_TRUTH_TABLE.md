@@ -28,6 +28,22 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1155 Durable Write Kernel Baseline - 2026-05-26
+
+Result: `CM1155_DURABLE_WRITE_KERNEL_BASELINE_COMPLETED_VALIDATED_NOT_READY`.
+
+CM-1155 adds the first runtime-kernel baseline after the pro review:
+
+```text
+SQLite authoritative write manifest surface
+default canonical idempotency key
+duplicate record_memory replay returns same memory id
+pending manifest recovery gate fails closed
+temp-local record_memory -> search_memory -> memory_overview integration test
+```
+
+This completes only a minimum baseline. It does not complete cross-store transactionality, file locking, atomic diary/vector/cache writes, corruption quarantine, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
 ## CM-1154 Public Default Recall Suppression Current-Facts Ingestion - 2026-05-26
 
 Result: `CM1154_PUBLIC_DEFAULT_RECALL_SUPPRESSION_CURRENT_FACTS_INGESTED_NOT_READY`.

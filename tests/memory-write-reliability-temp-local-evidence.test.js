@@ -155,7 +155,7 @@ test('temp-local write evidence persists synthetic payload into isolated stores 
   assert.equal(await pathExists(harness.rootPath), false);
 });
 
-test('temp-local write evidence records duplicate synthetic payloads as separate bounded writes', async () => {
+test('temp-local write evidence deduplicates duplicate synthetic payloads through write manifest', async () => {
   const harness = await createTempLocalHarness();
 
   try {
@@ -170,14 +170,21 @@ test('temp-local write evidence records duplicate synthetic payloads as separate
 
     assert.equal(first.decision, 'accepted');
     assert.equal(second.decision, 'accepted');
-    assert.notEqual(first.memoryId, second.memoryId);
+    assert.equal(second.reason, 'idempotent replay: existing memory write returned.');
+    assert.equal(first.memoryId, second.memoryId);
+    assert.equal(first.idempotency.replayed, false);
+    assert.equal(second.idempotency.replayed, true);
+    assert.equal(second.idempotency.authoritativeStore, 'sqlite');
 
     const shadowHealth = await harness.shadowStore.getHealth();
-    assert.equal(shadowHealth.recordCount, 2);
+    assert.equal(shadowHealth.recordCount, 1);
     assert.equal(shadowHealth.reconcileCount, 0);
+    assert.equal(shadowHealth.authoritativeStore, 'sqlite');
+    assert.equal(shadowHealth.writeManifest.total, 1);
+    assert.equal(shadowHealth.writeManifest.committed, 1);
 
     const records = await harness.shadowStore.listRecords('process');
-    assert.equal(records.length, 2);
+    assert.equal(records.length, 1);
     assert.deepEqual(new Set(records.map(record => record.taskId)), new Set(['CM-0835']));
     assert.equal(harness.auditEvents.length, 2);
     assert.deepEqual(harness.auditEvents.map(event => event.decision), ['accepted', 'accepted']);

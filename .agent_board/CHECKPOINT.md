@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1155 Durable Write Kernel Baseline Checkpoint
+
+Status: `CM1155_DURABLE_WRITE_KERNEL_BASELINE_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added SQLite `memory_write_manifests` as the authoritative write manifest surface.
+- Added default canonical idempotency in `MemoryWriteService.record()`.
+- Duplicate canonical writes now replay the same memory id instead of creating a second durable projection.
+- Pending matching manifests fail closed as a recovery gate.
+- Added temp-local runtime integration coverage for `record_memory -> search_memory -> memory_overview`.
+
+Validation:
+- Targeted runtime/MCP tests passed `29/29`.
+- Selected-audit prerequisite regression bundle passed `34/34` after aligning a stale test with the now-supported recall-suppression follow-up route.
+- Full `npm test` passed `2755/2755`.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation outside temp-local tests.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+
+Next:
+- Continue runtime kernel hardening with atomic file writes, process/file lock, and recovery replay design.
+- Keep production readiness and reliability unclaimed.
+
 ## CM-1154 Public Default Recall Suppression Current-Facts Ingestion Checkpoint
 
 Status: `CM1154_PUBLIC_DEFAULT_RECALL_SUPPRESSION_CURRENT_FACTS_INGESTED_NOT_READY`

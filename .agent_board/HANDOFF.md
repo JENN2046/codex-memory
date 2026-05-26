@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1155 Durable Write Kernel Baseline Handoff
+
+Goal: establish the first minimum durable memory write kernel baseline after the pro review.
+
+Status: CM1155_DURABLE_WRITE_KERNEL_BASELINE_COMPLETED_VALIDATED_NOT_READY.
+
+Changed files: `src/core/MemoryWriteService.js`; `src/storage/SqliteShadowStore.js`; `src/config/createConfig.js`; `tests/durable-write-kernel-idempotency-runtime.test.js`; `tests/memory-write-reliability-temp-local-evidence.test.js`; `docs/CM1155_DURABLE_WRITE_KERNEL_BASELINE.md`; status/truth-table/board surfaces.
+
+Runtime behavior: SQLite now exposes `memory_write_manifests` as the authoritative write manifest surface. `record_memory` computes a default canonical idempotency key without public schema expansion. Duplicate canonical writes replay the same memory id. Pending matching manifests fail closed and require recovery.
+
+Validation: targeted runtime/MCP tests passed `29/29`, including temp-local `record_memory -> search_memory -> memory_overview` consistency and MCP schema contract. Selected-audit prerequisite regression bundle passed `34/34`; full `npm test` passed `2755/2755`.
+
+Remaining risks: this is not full transactionality, not file locking, not atomic diary/vector/cache persistence, not corruption quarantine, not migration/import/export/backup/restore, and not production/readiness/reliability proof.
+
+Next safe step: design and implement the next narrow kernel hardening item, likely atomic file writes plus process/file write lock, with temp-local integration tests. Do not push or claim readiness/reliability.
+
 ## CM-1154 Public Default Recall Suppression Current-Facts Ingestion Handoff
 
 Goal: make current-facts gates consume the recorded CM-1153 proof so the chain does not repeat the bounded proof.

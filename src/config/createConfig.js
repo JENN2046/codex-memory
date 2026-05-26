@@ -378,6 +378,7 @@ function createConfig(overrides = {}) {
     enableSoftReadPolicy: toBoolean(overrides.enableSoftReadPolicy ?? process.env.CODEX_MEMORY_ENABLE_SOFT_READ_POLICY, false),
     enableLifecycleReadPolicy: toBoolean(overrides.enableLifecycleReadPolicy ?? process.env.CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY, false),
     enableWritePreflight: toBoolean(overrides.enableWritePreflight ?? process.env.CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT, false),
+    enableWriteManifest: toBoolean(overrides.enableWriteManifest ?? process.env.CODEX_MEMORY_ENABLE_WRITE_MANIFEST, true),
     candidateCacheTtlMs: Number.parseInt(String(overrides.candidateCacheTtlMs || process.env.CODEX_MEMORY_CANDIDATE_CACHE_TTL_MS || '3600000'), 10) || 3600000,
     candidateCacheMaxEntries: Number.parseInt(String(overrides.candidateCacheMaxEntries || process.env.CODEX_MEMORY_CANDIDATE_CACHE_MAX_ENTRIES || '200'), 10) || 200,
     lightMemoExcludedFolders: normalizeStringList(

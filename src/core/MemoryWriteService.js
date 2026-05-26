@@ -99,6 +99,18 @@ function generateMemoryId(target) {
   return `codex-${prefix}-${randomPart}`;
 }
 
+function buildDefaultIdempotencyKey(canonicalHash) {
+  return `memory-write-v1:${canonicalHash}`;
+}
+
+function supportsWriteManifest(config = {}, shadowStore = null) {
+  return config.enableShadowWrites !== false &&
+    config.enableWriteManifest !== false &&
+    shadowStore &&
+    typeof shadowStore.beginMemoryWriteManifest === 'function' &&
+    typeof shadowStore.finalizeMemoryWriteManifest === 'function';
+}
+
 function findSchemaVersionMetadataKeys(payload = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return [];
@@ -255,6 +267,7 @@ class MemoryWriteService {
     const validated = normalizeBoolean(payload.validated);
     const reusable = normalizeBoolean(payload.reusable);
     let result;
+    let writeManifestContext = null;
 
     if (!this.executionContextResolver.isWritableByCodex(executionContext)) {
       result = this.buildRejectedResult('CodexMemoryBridge only allows writes from the Codex agent context.', executionContext, target || null);
@@ -347,6 +360,80 @@ class MemoryWriteService {
       return result;
     }
 
+    const canonicalHash = computeCanonicalWriteHash(buildWritePreflightProposedWrite(payload, {
+      target,
+      title,
+      content,
+      evidence,
+      sensitivity,
+      tags,
+      validated,
+      reusable
+    }));
+    const idempotencyKey = buildDefaultIdempotencyKey(canonicalHash);
+    let memoryId = generateMemoryId(target);
+
+    if (supportsWriteManifest(this.config, this.shadowStore)) {
+      const manifestStart = await this.shadowStore.beginMemoryWriteManifest({
+        idempotencyKey,
+        memoryId,
+        canonicalHash,
+        target,
+        createdAt: new Date().toISOString()
+      });
+      const manifest = manifestStart.manifest;
+
+      if (!manifestStart.started && manifest) {
+        if (['committed', 'degraded'].includes(manifest.status)) {
+          result = {
+            ...(manifest.result || {}),
+            success: true,
+            decision: 'accepted',
+            reason: 'idempotent replay: existing memory write returned.',
+            memoryId: manifest.memoryId,
+            target,
+            title,
+            requestSource: executionContext.requestSource || this.config.defaultRequestSource,
+            idempotency: {
+              key: manifest.idempotencyKey,
+              canonicalHash: manifest.canonicalHash,
+              status: manifest.status,
+              replayed: true,
+              authoritativeStore: 'sqlite'
+            },
+            shadowWrite: manifest.result?.shadowWrite || createShadowWriteStatus('ok')
+          };
+          await this.writeAudit(result);
+          return result;
+        }
+
+        result = this.buildRejectedResult(
+          'write manifest pending recovery for this canonical write.',
+          executionContext,
+          target
+        );
+        result.idempotency = {
+          key: manifest.idempotencyKey,
+          canonicalHash: manifest.canonicalHash,
+          status: manifest.status,
+          replayed: false,
+          recoveryRequired: true,
+          authoritativeStore: 'sqlite'
+        };
+        await this.writeAudit(result);
+        return result;
+      }
+
+      if (manifest?.memoryId) {
+        memoryId = manifest.memoryId;
+        writeManifestContext = {
+          idempotencyKey,
+          canonicalHash,
+          authoritativeStore: 'sqlite'
+        };
+      }
+    }
+
     const proofPolicy = applyProofMemoryWritePolicy(payload, {
       tags,
       visibility: normalizeString(payload.visibility) || null,
@@ -354,7 +441,7 @@ class MemoryWriteService {
     });
     const createdAt = new Date().toISOString();
     const record = {
-      memoryId: generateMemoryId(target),
+      memoryId,
       target,
       title,
       content,
@@ -445,6 +532,21 @@ class MemoryWriteService {
       proofMemory: proofPolicy.proofMemory,
       shadowWrite: createShadowWriteStatus(shadowFailures.length > 0 ? 'degraded' : 'ok', shadowFailures)
     };
+    if (writeManifestContext) {
+      result.idempotency = {
+        key: writeManifestContext.idempotencyKey,
+        canonicalHash: writeManifestContext.canonicalHash,
+        status: shadowFailures.length > 0 ? 'degraded' : 'committed',
+        replayed: false,
+        authoritativeStore: writeManifestContext.authoritativeStore
+      };
+      await this.shadowStore.finalizeMemoryWriteManifest({
+        idempotencyKey: writeManifestContext.idempotencyKey,
+        status: result.idempotency.status,
+        result,
+        updatedAt: new Date().toISOString()
+      });
+    }
 
     await this.writeAudit(result);
     return result;
@@ -469,6 +571,7 @@ class MemoryWriteService {
 
 module.exports = {
   SCHEMA_VERSION_METADATA_KEYS,
+  buildDefaultIdempotencyKey,
   findSchemaVersionMetadataKeys,
   MemoryWriteService,
   validateProcessEntry

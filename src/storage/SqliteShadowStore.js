@@ -108,6 +108,19 @@ class SqliteShadowStore {
         payload_json TEXT NOT NULL,
         created_at TEXT NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS memory_write_manifests (
+        idempotency_key TEXT PRIMARY KEY,
+        memory_id TEXT NOT NULL UNIQUE,
+        canonical_hash TEXT NOT NULL,
+        target TEXT NOT NULL,
+        status TEXT NOT NULL,
+        result_json TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        committed_at TEXT
+      );
+      CREATE INDEX IF NOT EXISTS idx_memory_write_manifests_memory ON memory_write_manifests(memory_id);
+      CREATE INDEX IF NOT EXISTS idx_memory_write_manifests_status ON memory_write_manifests(status);
     `);
     this.ensureColumn('memory_chunks', 'embedding_fingerprint', 'TEXT');
     this.ensureColumn('memory_records', 'project_id', 'TEXT');
@@ -268,6 +281,101 @@ class SqliteShadowStore {
       SELECT * FROM memory_records WHERE memory_id = ?
     `).get(memoryId);
     return row ? this.mapRow(row) : null;
+  }
+
+  mapMemoryWriteManifestRow(row) {
+    if (!row) return null;
+    let result = null;
+    let resultMalformed = false;
+    if (row.result_json) {
+      try {
+        result = JSON.parse(row.result_json);
+      } catch {
+        resultMalformed = true;
+      }
+    }
+
+    return {
+      idempotencyKey: row.idempotency_key,
+      memoryId: row.memory_id,
+      canonicalHash: row.canonical_hash,
+      target: row.target,
+      status: row.status,
+      result,
+      resultMalformed,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      committedAt: row.committed_at || null
+    };
+  }
+
+  async beginMemoryWriteManifest({
+    idempotencyKey,
+    memoryId,
+    canonicalHash,
+    target,
+    createdAt = new Date().toISOString()
+  } = {}) {
+    await this.ensureReady();
+    const insert = this.db.prepare(`
+      INSERT INTO memory_write_manifests (
+        idempotency_key, memory_id, canonical_hash, target, status, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, 'pending', ?, ?)
+      ON CONFLICT(idempotency_key) DO NOTHING
+    `).run(idempotencyKey, memoryId, canonicalHash, target, createdAt, createdAt);
+
+    const row = this.db.prepare(`
+      SELECT * FROM memory_write_manifests WHERE idempotency_key = ?
+    `).get(idempotencyKey);
+    return {
+      started: insert.changes === 1,
+      manifest: this.mapMemoryWriteManifestRow(row)
+    };
+  }
+
+  async finalizeMemoryWriteManifest({
+    idempotencyKey,
+    status = 'committed',
+    result = null,
+    updatedAt = new Date().toISOString()
+  } = {}) {
+    await this.ensureReady();
+    const normalizedStatus = String(status || '').trim() || 'committed';
+    const resultJson = result ? JSON.stringify(result) : null;
+    const committedAt = ['committed', 'degraded'].includes(normalizedStatus) ? updatedAt : null;
+    const update = this.db.prepare(`
+      UPDATE memory_write_manifests
+      SET status = ?,
+        result_json = ?,
+        updated_at = ?,
+        committed_at = COALESCE(committed_at, ?)
+      WHERE idempotency_key = ?
+    `).run(normalizedStatus, resultJson, updatedAt, committedAt, idempotencyKey);
+
+    return {
+      updated: update.changes === 1,
+      changes: update.changes
+    };
+  }
+
+  async getMemoryWriteManifestByIdempotencyKey(idempotencyKey) {
+    await this.ensureReady();
+    const row = this.db.prepare(`
+      SELECT * FROM memory_write_manifests WHERE idempotency_key = ?
+    `).get(idempotencyKey);
+    return this.mapMemoryWriteManifestRow(row);
+  }
+
+  async listMemoryWriteManifestsByStatus(status, limit = 50) {
+    await this.ensureReady();
+    const normalizedLimit = Number.isInteger(limit) && limit > 0 ? Math.min(limit, 500) : 50;
+    const rows = this.db.prepare(`
+      SELECT * FROM memory_write_manifests
+      WHERE status = ?
+      ORDER BY updated_at ASC
+      LIMIT ?
+    `).all(status, normalizedLimit);
+    return rows.map(row => this.mapMemoryWriteManifestRow(row));
   }
 
   async deleteRecord(memoryId) {
@@ -1167,6 +1275,23 @@ class SqliteShadowStore {
       .get(this.config.embeddingFingerprint).count;
     const totalChunkCount = this.db.prepare('SELECT COUNT(*) AS count FROM memory_chunks').get().count;
     const reconcileCount = this.db.prepare('SELECT COUNT(*) AS count FROM reconcile_queue').get().count;
+    const manifestRows = this.db.prepare(`
+      SELECT status, COUNT(*) AS count
+      FROM memory_write_manifests
+      GROUP BY status
+    `).all();
+    const writeManifest = {
+      total: 0,
+      pending: 0,
+      committed: 0,
+      degraded: 0,
+      failed: 0
+    };
+    for (const row of manifestRows) {
+      const status = row.status || 'unknown';
+      writeManifest.total += row.count;
+      writeManifest[status] = (writeManifest[status] || 0) + row.count;
+    }
     return {
       available: true,
       dbPath: this.config.dbPath,
@@ -1174,7 +1299,9 @@ class SqliteShadowStore {
       recordCount,
       chunkCount,
       totalChunkCount,
-      reconcileCount
+      reconcileCount,
+      authoritativeStore: 'sqlite',
+      writeManifest
     };
   }
 

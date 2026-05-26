@@ -149,14 +149,22 @@ test('CM-1130 fails closed on overclaim and side-effect signals', () => {
   assert.equal(sideEffect.blockerDowngradeAllowed, false);
 });
 
-test('CM-1130 fails closed on malformed or unsupported reports', () => {
+test('CM-1130 fails closed on malformed reports and routes supported follow-up reviews', () => {
   const missing = summarizeSelectedAuditCorrelationPrerequisiteBlockerPlan(null);
   assert.equal(missing.planClass, PLAN_CLASSES.FAIL_CLOSED_REPORT_MISSING);
   assert.equal(missing.blockerDowngradeAllowed, false);
 
-  const unsupported = summarizeSelectedAuditCorrelationPrerequisiteBlockerPlan(
+  const followup = summarizeSelectedAuditCorrelationPrerequisiteBlockerPlan(
     downgradeReport({
       reviewClass: REVIEW_CLASSES.SELECTED_AUDIT_OBSERVED_BUT_FOLLOWUP_MISSING_NOT_DOWNGRADE
+    })
+  );
+  assert.equal(followup.planClass, PLAN_CLASSES.RECALL_SUPPRESSION_FOLLOWUP_PROOF_ALLOWED_NOT_READY);
+  assert.equal(followup.blockerDowngradeAllowed, false);
+
+  const unsupported = summarizeSelectedAuditCorrelationPrerequisiteBlockerPlan(
+    downgradeReport({
+      reviewClass: 'UNSUPPORTED_REVIEW_CLASS'
     })
   );
   assert.equal(unsupported.planClass, PLAN_CLASSES.FAIL_CLOSED_UNSUPPORTED_REVIEW_CLASS);
