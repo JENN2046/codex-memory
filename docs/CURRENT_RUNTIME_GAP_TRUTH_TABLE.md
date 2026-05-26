@@ -28,6 +28,21 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1156 Durable Write Kernel Atomic Recovery Baseline - 2026-05-26
+
+Result: `CM1156_DURABLE_WRITE_KERNEL_ATOMIC_RECOVERY_BASELINE_COMPLETED_VALIDATED_NOT_READY`.
+
+CM-1156 continues the minimum durable write kernel baseline:
+
+```text
+atomic diary/vector/cache file writes
+bounded lockfile write guards
+manual pending-manifest recovery replay from diary
+temp-local recovery replay integration test
+```
+
+This reduces partial-file and pending-manifest risk for the local runtime write kernel. It does not complete cross-store transactionality, audit/manifest same-transaction semantics, automatic startup recovery, corruption quarantine, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
 ## CM-1155 Durable Write Kernel Baseline - 2026-05-26
 
 Result: `CM1155_DURABLE_WRITE_KERNEL_BASELINE_COMPLETED_VALIDATED_NOT_READY`.

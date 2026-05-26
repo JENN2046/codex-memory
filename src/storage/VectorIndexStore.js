@@ -2,6 +2,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
+const { atomicWriteFile } = require('./AtomicFileWriter');
 const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
 
 function cosineSimilarity(left, right) {
@@ -77,7 +78,7 @@ class VectorIndexStore {
 
   async flush() {
     this.index.updatedAt = new Date().toISOString();
-    await fs.writeFile(this.config.vectorIndexPath, JSON.stringify(this.index, null, 2), 'utf8');
+    await atomicWriteFile(this.config.vectorIndexPath, JSON.stringify(this.index, null, 2));
   }
 
   tokenize(text) {

@@ -1,6 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
+const { atomicWriteFile, withFileLock } = require('./AtomicFileWriter');
 const {
   PROCESS_DIARY_NAME,
   KNOWLEDGE_DIARY_NAME,
@@ -159,28 +160,31 @@ class DiaryStore {
     ].join('_');
 
     const baseName = sanitizePathComponent(record.title);
-    let counter = 0;
-    let filePath;
-
-    do {
-      const suffix = counter > 0 ? `-${counter}` : '';
-      filePath = path.join(dirPath, `${datePart}-${timePart}-${baseName}${suffix}.${this.config.dailyNoteExtension}`);
-      counter += 1;
-      try {
-        await fs.access(filePath);
-      } catch {
-        break;
-      }
-    } while (true);
-
     const fileContent = buildDiaryText(record, datePart);
-    await fs.writeFile(filePath, fileContent, 'utf8');
 
-    return {
-      filePath,
-      relativePath: this.getRelativePath(filePath),
-      fileContent
-    };
+    return withFileLock(path.join(dirPath, '.codex-memory-diary-write.lock'), async () => {
+      let counter = 0;
+      let filePath;
+
+      do {
+        const suffix = counter > 0 ? `-${counter}` : '';
+        filePath = path.join(dirPath, `${datePart}-${timePart}-${baseName}${suffix}.${this.config.dailyNoteExtension}`);
+        counter += 1;
+        try {
+          await fs.access(filePath);
+        } catch {
+          break;
+        }
+      } while (true);
+
+      await atomicWriteFile(filePath, fileContent, { lock: false });
+
+      return {
+        filePath,
+        relativePath: this.getRelativePath(filePath),
+        fileContent
+      };
+    });
   }
 
   async listRecentFiles(target, limit = 10) {

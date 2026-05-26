@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1156 Durable Write Kernel Atomic Recovery Baseline Checkpoint
+
+Status: `CM1156_DURABLE_WRITE_KERNEL_ATOMIC_RECOVERY_BASELINE_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `AtomicFileWriter` with same-directory temp write, fsync, rename, and bounded lockfile guard.
+- Wired atomic writes into diary records, vector index flush, and candidate cache flush.
+- Added manual pending write-manifest recovery replay from diary into SQLite/vector/chunk projections.
+- Added temp-local coverage for clean atomic artifacts and pending-manifest recovery replay.
+
+Validation:
+- Source/test syntax checks passed for changed runtime files.
+- Targeted runtime/MCP tests passed `25/25`.
+- Full `npm test` passed `2757/2757`.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation outside temp-local tests.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No automatic startup recovery, cross-store transactionality, or audit same-transaction guarantee.
+
+Next:
+- Continue kernel hardening with automatic recovery policy, audit/manifest correlation hardening, corruption quarantine, and broader runtime integration validation.
+- Keep production readiness and reliability unclaimed.
+
 ## CM-1155 Durable Write Kernel Baseline Checkpoint
 
 Status: `CM1155_DURABLE_WRITE_KERNEL_BASELINE_COMPLETED_VALIDATED_NOT_READY`

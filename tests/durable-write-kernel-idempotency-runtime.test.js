@@ -41,6 +41,23 @@ async function withTempApp(handler) {
   }
 }
 
+async function collectFiles(rootPath) {
+  const output = [];
+  async function walk(currentPath) {
+    const entries = await fs.readdir(currentPath, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(currentPath, entry.name);
+      if (entry.isDirectory()) {
+        await walk(fullPath);
+      } else {
+        output.push(fullPath);
+      }
+    }
+  }
+  await walk(rootPath);
+  return output;
+}
+
 function processPayload() {
   return {
     target: 'process',
@@ -110,6 +127,26 @@ test('durable write kernel uses SQLite manifest idempotency across record -> sea
   });
 });
 
+test('durable write kernel leaves no temp or lock artifacts after atomic projection writes', async () => {
+  await withTempApp(async ({ app, rootPath }) => {
+    const result = await app.callTool('record_memory', processPayload(), requestContext);
+    assert.equal(result.decision, 'accepted');
+
+    await app.stores.candidateCacheStore.set('durable-kernel-atomic-cache-entry', {
+      memoryIds: [result.memoryId]
+    }, {
+      target: 'process',
+      memoryIds: [result.memoryId]
+    });
+
+    const files = await collectFiles(rootPath);
+    const transientArtifacts = files
+      .map(filePath => path.basename(filePath))
+      .filter(name => name.endsWith('.lock') || name.endsWith('.tmp'));
+    assert.deepEqual(transientArtifacts, []);
+  });
+});
+
 test('durable write kernel fails closed when matching write manifest is pending recovery', async () => {
   await withTempApp(async ({ app }) => {
     const payload = processPayload();
@@ -133,5 +170,75 @@ test('durable write kernel fails closed when matching write manifest is pending 
     assert.equal(health.recordCount, 0);
     assert.equal(health.writeManifest.total, 1);
     assert.equal(health.writeManifest.pending, 1);
+  });
+});
+
+test('durable write kernel can replay a pending manifest from diary into projections', async () => {
+  await withTempApp(async ({ app }) => {
+    const payload = processPayload();
+    const canonicalHash = computeCanonicalWriteHash(payload);
+    const idempotencyKey = buildDefaultIdempotencyKey(canonicalHash);
+    const memoryId = 'codex-process-recoverymanifest0000000000000001';
+    const now = new Date().toISOString();
+
+    await app.stores.shadowStore.beginMemoryWriteManifest({
+      idempotencyKey,
+      memoryId,
+      canonicalHash,
+      target: 'process',
+      createdAt: now
+    });
+    await app.stores.diaryStore.writeRecord({
+      memoryId,
+      target: 'process',
+      title: payload.title,
+      content: payload.content,
+      evidence: payload.evidence,
+      tags: payload.tags,
+      sensitivity: 'none',
+      validated: true,
+      reusable: false,
+      createdAt: now,
+      updatedAt: now,
+      projectId: payload.project_id,
+      workspaceId: payload.workspace_id,
+      clientId: payload.client_id,
+      taskId: payload.task_id,
+      conversationId: payload.conversation_id,
+      visibility: payload.visibility,
+      retentionPolicy: payload.retention_policy
+    });
+
+    const recovery = await app.services.writeService.recoverPendingWriteManifests({ limit: 10 });
+    assert.equal(recovery.attempted, 1);
+    assert.equal(recovery.recovered, 1);
+    assert.equal(recovery.degraded, 0);
+
+    const recoveredRecord = await app.stores.shadowStore.getRecord(memoryId);
+    assert.equal(recoveredRecord.memoryId, memoryId);
+    assert.equal(recoveredRecord.projectId, 'codex-memory');
+
+    const manifest = await app.stores.shadowStore.getMemoryWriteManifestByIdempotencyKey(idempotencyKey);
+    assert.equal(manifest.status, 'committed');
+    assert.equal(manifest.result.idempotency.recovered, true);
+
+    const duplicate = await app.callTool('record_memory', payload, requestContext);
+    assert.equal(duplicate.decision, 'accepted');
+    assert.equal(duplicate.memoryId, memoryId);
+    assert.equal(duplicate.idempotency.replayed, true);
+
+    const search = await app.callTool('search_memory', {
+      query: 'durable write kernel idempotency runtime integration marker',
+      target: 'process',
+      limit: 5,
+      include_content: false,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'durable-write-kernel-temp-workspace',
+        client_id: 'codex',
+        visibility: 'project'
+      }
+    }, requestContext);
+    assert.equal(search.results.some(result => result.memoryId === memoryId), true);
   });
 });

@@ -111,6 +111,11 @@ function supportsWriteManifest(config = {}, shadowStore = null) {
     typeof shadowStore.finalizeMemoryWriteManifest === 'function';
 }
 
+function supportsWriteManifestRecovery(config = {}, shadowStore = null) {
+  return supportsWriteManifest(config, shadowStore) &&
+    typeof shadowStore.listMemoryWriteManifestsByStatus === 'function';
+}
+
 function findSchemaVersionMetadataKeys(payload = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return [];
@@ -550,6 +555,142 @@ class MemoryWriteService {
 
     await this.writeAudit(result);
     return result;
+  }
+
+  async recoverPendingWriteManifests(options = {}) {
+    if (!supportsWriteManifestRecovery(this.config, this.shadowStore)) {
+      return {
+        attempted: 0,
+        recovered: 0,
+        degraded: 0,
+        missingDiary: 0,
+        items: []
+      };
+    }
+
+    const limit = Number.isInteger(options.limit) && options.limit > 0 ? Math.min(options.limit, 500) : 50;
+    const manifests = await this.shadowStore.listMemoryWriteManifestsByStatus('pending', limit);
+    const diaryRecords = await this.diaryStore.listRecords({ target: 'both' });
+    const diaryRecordByMemoryId = new Map(
+      diaryRecords
+        .filter(record => record?.memoryId)
+        .map(record => [record.memoryId, record])
+    );
+    const summary = {
+      attempted: manifests.length,
+      recovered: 0,
+      degraded: 0,
+      missingDiary: 0,
+      items: []
+    };
+
+    for (const manifest of manifests) {
+      const record = diaryRecordByMemoryId.get(manifest.memoryId);
+      if (!record) {
+        summary.missingDiary += 1;
+        summary.items.push({
+          memoryId: manifest.memoryId,
+          idempotencyKey: manifest.idempotencyKey,
+          status: 'pending',
+          recovered: false,
+          reason: 'diary_record_missing'
+        });
+        continue;
+      }
+
+      const shadowFailures = [];
+      let sqliteShadowReady = !this.config.enableShadowWrites;
+      if (this.config.enableShadowWrites) {
+        try {
+          await this.shadowStore.upsertRecord(record);
+          await this.shadowStore.clearReconcileTasks(record.memoryId, 'sqlite');
+          sqliteShadowReady = true;
+        } catch (error) {
+          shadowFailures.push(`sqlite:${error.message}`);
+          await this.shadowStore.enqueueReconcileTask({
+            memoryId: record.memoryId,
+            storeKind: 'sqlite',
+            reason: 'manifest_recovery_shadow_write_failed',
+            payload: record
+          });
+        }
+      }
+
+      if (this.config.enableVectorIndex) {
+        try {
+          await this.vectorStore.upsertRecord(record);
+          await this.shadowStore.clearReconcileTasks(record.memoryId, 'vector');
+        } catch (error) {
+          shadowFailures.push(`vector:${error.message}`);
+          await this.shadowStore.enqueueReconcileTask({
+            memoryId: record.memoryId,
+            storeKind: 'vector',
+            reason: 'manifest_recovery_shadow_write_failed',
+            payload: record
+          });
+        }
+      }
+
+      if (this.config.enableShadowWrites && sqliteShadowReady && this.chunkIndexingService) {
+        try {
+          await this.chunkIndexingService.indexRecord(record);
+          await this.shadowStore.clearReconcileTasks(record.memoryId, 'chunks');
+        } catch (error) {
+          shadowFailures.push(`chunks:${error.message}`);
+          await this.shadowStore.enqueueReconcileTask({
+            memoryId: record.memoryId,
+            storeKind: 'chunks',
+            reason: 'manifest_recovery_shadow_write_failed',
+            payload: record
+          });
+        }
+      }
+
+      const status = shadowFailures.length > 0 ? 'degraded' : 'committed';
+      const result = {
+        success: true,
+        decision: 'accepted',
+        targetDiary: record.target === 'knowledge' ? 'Codex knowledge' : 'Codex',
+        reason: 'recovered pending write manifest from diary.',
+        title: record.title,
+        memoryId: record.memoryId,
+        filePath: record.filePath,
+        agentAlias: null,
+        agentId: null,
+        requestSource: this.config.defaultRequestSource,
+        target: record.target,
+        idempotency: {
+          key: manifest.idempotencyKey,
+          canonicalHash: manifest.canonicalHash,
+          status,
+          replayed: false,
+          recovered: true,
+          authoritativeStore: 'sqlite'
+        },
+        shadowWrite: createShadowWriteStatus(status === 'committed' ? 'ok' : 'degraded', shadowFailures)
+      };
+
+      await this.shadowStore.finalizeMemoryWriteManifest({
+        idempotencyKey: manifest.idempotencyKey,
+        status,
+        result,
+        updatedAt: new Date().toISOString()
+      });
+      await this.writeAudit(result);
+      summary.recovered += 1;
+      if (status === 'degraded') {
+        summary.degraded += 1;
+      }
+      summary.items.push({
+        memoryId: manifest.memoryId,
+        idempotencyKey: manifest.idempotencyKey,
+        status,
+        recovered: true,
+        shadowFailureCount: shadowFailures.length
+      });
+    }
+
+    return summary;
   }
 
   async writeAudit(result) {

@@ -1,6 +1,8 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
+const { atomicWriteFile } = require('./AtomicFileWriter');
+
 class CandidateCacheStore {
   constructor(config) {
     this.config = config;
@@ -40,7 +42,7 @@ class CandidateCacheStore {
 
   async flush() {
     this.cache.updatedAt = new Date().toISOString();
-    await fs.writeFile(this.config.candidateCachePath, JSON.stringify(this.cache, null, 2), 'utf8');
+    await atomicWriteFile(this.config.candidateCachePath, JSON.stringify(this.cache, null, 2));
   }
 
   async get(key) {

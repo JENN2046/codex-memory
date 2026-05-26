@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1156 Durable Write Kernel Atomic Recovery Baseline Handoff
+
+Goal: continue CM-1155 by reducing partial-file and pending-manifest recovery risk in the local durable write kernel.
+
+Status: CM1156_DURABLE_WRITE_KERNEL_ATOMIC_RECOVERY_BASELINE_COMPLETED_VALIDATED_NOT_READY.
+
+Changed files: `src/storage/AtomicFileWriter.js`; `src/storage/DiaryStore.js`; `src/storage/VectorIndexStore.js`; `src/storage/CandidateCacheStore.js`; `src/core/MemoryWriteService.js`; `tests/durable-write-kernel-idempotency-runtime.test.js`; `docs/CM1156_DURABLE_WRITE_KERNEL_ATOMIC_RECOVERY_BASELINE.md`; status/truth-table/board surfaces.
+
+Runtime behavior: diary/vector/cache file persistence now uses atomic temp-file writes with bounded lockfile guards. `MemoryWriteService.recoverPendingWriteManifests()` can manually replay pending manifests from matching diary records into SQLite/vector/chunk projections and finalize the manifest.
+
+Validation: targeted runtime/MCP tests passed `25/25`, including atomic artifact cleanup and pending manifest recovery replay. Full `npm test` passed `2757/2757`.
+
+Remaining risks: no automatic startup recovery, no cross-store transaction, no audit/manifest same-transaction guarantee, no corruption quarantine, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: add automatic recovery policy only after a separate design/guard slice, or harden audit/manifest correlation and corruption quarantine with temp-local tests. Do not push or claim readiness/reliability.
+
 ## CM-1155 Durable Write Kernel Baseline Handoff
 
 Goal: establish the first minimum durable memory write kernel baseline after the pro review.
