@@ -5,6 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 const { CandidateCacheStore } = require('../src/storage/CandidateCacheStore');
+const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 const { VectorIndexStore } = require('../src/storage/VectorIndexStore');
 
 async function withTempDir(handler) {
@@ -157,5 +158,63 @@ test('CandidateCacheStore quarantines invalid JSON shape before rebuilding an em
     assert.equal(health.corruptionQuarantine.reason, 'candidate_cache_shape_invalid');
     assert.equal(health.corruptionQuarantine.sourcePath, candidateCachePath);
     assert.equal(health.corruptionQuarantine.quarantinePath, quarantineFiles[0]);
+  });
+});
+
+test('SqliteShadowStore reports malformed JSON fields without throwing on row mapping', async () => {
+  await withTempDir(async rootPath => {
+    const store = new SqliteShadowStore({
+      dbPath: path.join(rootPath, 'data', 'shadow.sqlite'),
+      embeddingFingerprint: 'test-fingerprint'
+    });
+    const record = {
+      memoryId: 'codex-process-sqlitejson000000000000000001',
+      target: 'process',
+      title: 'SQLite JSON corruption reporting fixture',
+      content: 'Synthetic temp-local row for SQLite JSON corruption reporting.',
+      evidence: 'cm1159 sqlite json corruption reporting evidence',
+      tags: ['cm1159', 'sqlite-json'],
+      sensitivity: 'none',
+      validated: true,
+      reusable: false,
+      createdAt: '2026-05-26T00:00:00.000Z',
+      updatedAt: '2026-05-26T00:00:00.000Z'
+    };
+
+    try {
+      await store.upsertRecord(record);
+      await store.replaceChunksForRecord(record, [{
+        chunkId: 'chunk-1',
+        chunkIndex: 0,
+        text: 'Synthetic chunk for malformed SQLite JSON field reporting.',
+        vector: [0.1, 0.2, 0.3]
+      }]);
+      store.db.prepare('UPDATE memory_records SET tags_json = ? WHERE memory_id = ?')
+        .run('{bad tags json', record.memoryId);
+      store.db.prepare('UPDATE memory_chunks SET vector_json = ?, tags_json = ? WHERE memory_id = ?')
+        .run('[bad vector json', '{"bad tags":', record.memoryId);
+
+      const records = await store.listRecords('process');
+      const chunks = await store.listChunks('process');
+      const health = await store.getHealth();
+
+      assert.equal(records.length, 1);
+      assert.deepEqual(records[0].tags, []);
+      assert.equal(records[0].tagsJsonMalformed, true);
+      assert.equal(records[0].tagsJsonParseError, 'tags_json_malformed_json');
+      assert.equal(chunks.length, 1);
+      assert.deepEqual(chunks[0].vector, []);
+      assert.equal(chunks[0].vectorJsonMalformed, true);
+      assert.equal(chunks[0].vectorJsonParseError, 'vector_json_malformed_json');
+      assert.deepEqual(chunks[0].tags, []);
+      assert.equal(chunks[0].tagsJsonMalformed, true);
+      assert.equal(chunks[0].tagsJsonParseError, 'tags_json_malformed_json');
+      assert.equal(health.jsonCorruption.malformedRecordTags, 1);
+      assert.equal(health.jsonCorruption.malformedChunkVectors, 1);
+      assert.equal(health.jsonCorruption.malformedChunkTags, 1);
+      assert.equal(health.jsonCorruption.totalMalformed, 3);
+    } finally {
+      await store.close();
+    }
   });
 });

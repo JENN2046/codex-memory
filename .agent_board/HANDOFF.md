@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1159 SQLite JSON Corruption Reporting Handoff
+
+Goal: continue CM-1158 by making selected SQLite shadow JSON-field corruption observable without unclassified `JSON.parse` crashes.
+
+Status: CM1159_SQLITE_JSON_CORRUPTION_REPORTING_COMPLETED_VALIDATED_NOT_READY.
+
+Changed files: `src/storage/SqliteShadowStore.js`; `tests/storage-corruption-quarantine.test.js`; `docs/CM1159_SQLITE_JSON_CORRUPTION_REPORTING.md`; status/truth-table/board surfaces.
+
+Runtime behavior: selected `tags_json` / `vector_json` mapping paths now fail-soft to empty arrays with malformed metadata. SQLite shadow health reports selected `jsonCorruption` counters.
+
+Validation: source/test syntax passed. Targeted storage/runtime tests passed `14/14`. Full `npm test` passed `2764/2764`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Remaining risks: no SQLite row quarantine/repair, no diary corruption quarantine, no chat index corruption quarantine, no automatic startup recovery, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1159 if guarded commit eligibility remains clean. After that, consider guarded automatic recovery policy design or broader restart/crash-window runtime validation. Do not push or claim readiness/reliability.
+
 ## CM-1158 Durable Write Kernel Corruption Quarantine Handoff
 
 Goal: continue CM-1157 by preserving corrupt JSON projection files before vector/cache rebuild.

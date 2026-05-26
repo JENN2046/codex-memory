@@ -1268,6 +1268,80 @@ class SqliteShadowStore {
     }
   }
 
+  parseJsonArrayField(value, fieldName) {
+    try {
+      const parsed = JSON.parse(value || '[]');
+      if (!Array.isArray(parsed)) {
+        return {
+          value: [],
+          malformed: true,
+          parseError: `${fieldName}_shape_invalid`
+        };
+      }
+
+      return {
+        value: parsed,
+        malformed: false,
+        parseError: null
+      };
+    } catch {
+      return {
+        value: [],
+        malformed: true,
+        parseError: `${fieldName}_malformed_json`
+      };
+    }
+  }
+
+  getJsonCorruptionHealth() {
+    const recordRows = this.db.prepare('SELECT tags_json FROM memory_records').all();
+    const chunkRows = this.db.prepare('SELECT vector_json, tags_json FROM memory_chunks').all();
+    const manifestRows = this.db.prepare(`
+      SELECT result_json FROM memory_write_manifests
+      WHERE result_json IS NOT NULL AND result_json != ''
+    `).all();
+    const reconcileRows = this.db.prepare('SELECT payload_json FROM reconcile_queue').all();
+    const result = {
+      malformedRecordTags: 0,
+      malformedChunkVectors: 0,
+      malformedChunkTags: 0,
+      malformedManifestResults: 0,
+      malformedReconcilePayloads: 0
+    };
+
+    for (const row of recordRows) {
+      if (this.parseJsonArrayField(row.tags_json, 'tags_json').malformed) {
+        result.malformedRecordTags += 1;
+      }
+    }
+    for (const row of chunkRows) {
+      if (this.parseJsonArrayField(row.vector_json, 'vector_json').malformed) {
+        result.malformedChunkVectors += 1;
+      }
+      if (this.parseJsonArrayField(row.tags_json, 'tags_json').malformed) {
+        result.malformedChunkTags += 1;
+      }
+    }
+    for (const row of manifestRows) {
+      if (this.parseOptionalJsonField(row.result_json).malformed) {
+        result.malformedManifestResults += 1;
+      }
+    }
+    for (const row of reconcileRows) {
+      if (this.parseReconcileTaskPayload(row.payload_json).payloadMalformed) {
+        result.malformedReconcilePayloads += 1;
+      }
+    }
+
+    result.totalMalformed =
+      result.malformedRecordTags +
+      result.malformedChunkVectors +
+      result.malformedChunkTags +
+      result.malformedManifestResults +
+      result.malformedReconcilePayloads;
+    return result;
+  }
+
   async getHealth() {
     await this.ensureReady();
     const recordCount = this.db.prepare('SELECT COUNT(*) AS count FROM memory_records').get().count;
@@ -1301,7 +1375,8 @@ class SqliteShadowStore {
       totalChunkCount,
       reconcileCount,
       authoritativeStore: 'sqlite',
-      writeManifest
+      writeManifest,
+      jsonCorruption: this.getJsonCorruptionHealth()
     };
   }
 
@@ -1312,13 +1387,16 @@ class SqliteShadowStore {
   }
 
   mapRow(row) {
+    const tags = this.parseJsonArrayField(row.tags_json, 'tags_json');
     return {
       memoryId: row.memory_id,
       target: row.target,
       title: row.title,
       content: row.content,
       evidence: row.evidence,
-      tags: JSON.parse(row.tags_json || '[]'),
+      tags: tags.value,
+      tagsJsonMalformed: tags.malformed,
+      tagsJsonParseError: tags.parseError,
       validated: !!row.validated,
       reusable: !!row.reusable,
       sensitivity: row.sensitivity,
@@ -1339,6 +1417,8 @@ class SqliteShadowStore {
   }
 
   mapChunkRow(row) {
+    const vector = this.parseJsonArrayField(row.vector_json, 'vector_json');
+    const tags = this.parseJsonArrayField(row.tags_json, 'tags_json');
     return {
       chunkId: row.chunk_id,
       memoryId: row.memory_id,
@@ -1348,9 +1428,13 @@ class SqliteShadowStore {
       relativePath: row.relative_path,
       chunkIndex: row.chunk_index,
       text: row.text,
-      vector: JSON.parse(row.vector_json || '[]'),
+      vector: vector.value,
+      vectorJsonMalformed: vector.malformed,
+      vectorJsonParseError: vector.parseError,
       embeddingFingerprint: row.embedding_fingerprint || null,
-      tags: JSON.parse(row.tags_json || '[]'),
+      tags: tags.value,
+      tagsJsonMalformed: tags.malformed,
+      tagsJsonParseError: tags.parseError,
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };

@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1159 SQLite JSON Corruption Reporting Checkpoint
+
+Status: `CM1159_SQLITE_JSON_CORRUPTION_REPORTING_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added safe SQLite JSON array parsing for selected row/chunk mapper fields.
+- `memory_records.tags_json` malformed values now map to empty tags plus selected malformed metadata.
+- `memory_chunks.vector_json` and `memory_chunks.tags_json` malformed values now map to empty arrays plus selected malformed metadata.
+- Added selected `jsonCorruption` counters to SQLite shadow health.
+- Added temp-local SQLite row corruption reporting test coverage.
+
+Validation:
+- Source/test syntax checks passed for changed storage/test files.
+- Targeted storage/runtime tests passed `14/14`.
+- Full `npm test` passed `2764/2764`.
+- Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No SQLite row quarantine/repair, diary corruption quarantine, chat index corruption quarantine, automatic startup recovery, or cross-store transactionality.
+
+Next:
+- Commit CM-1159 if guarded commit eligibility remains clean.
+- Continue kernel hardening with guarded automatic recovery design or broader crash-window runtime validation.
+
 ## CM-1158 Durable Write Kernel Corruption Quarantine Checkpoint
 
 Status: `CM1158_DURABLE_WRITE_KERNEL_CORRUPTION_QUARANTINE_COMPLETED_VALIDATED_NOT_READY`

@@ -28,6 +28,22 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1159 SQLite JSON Corruption Reporting - 2026-05-26
+
+Result: `CM1159_SQLITE_JSON_CORRUPTION_REPORTING_COMPLETED_VALIDATED_NOT_READY`.
+
+CM-1159 continues the minimum durable write kernel baseline:
+
+```text
+SQLite memory_records.tags_json malformed read reporting
+SQLite memory_chunks.vector_json malformed read reporting
+SQLite memory_chunks.tags_json malformed read reporting
+selected jsonCorruption health counters
+temp-local SQLite malformed-field coverage
+```
+
+This reduces the prior risk that malformed SQLite JSON fields crash selected shadow-store reads with unclassified `JSON.parse` errors. It does not complete SQLite row quarantine/repair, diary corruption handling, chat index corruption handling, cross-store transactionality, automatic startup recovery, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
 ## CM-1158 Durable Write Kernel Corruption Quarantine - 2026-05-26
 
 Result: `CM1158_DURABLE_WRITE_KERNEL_CORRUPTION_QUARANTINE_COMPLETED_VALIDATED_NOT_READY`.
