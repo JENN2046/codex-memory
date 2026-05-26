@@ -10,11 +10,11 @@ Changed files: `src/cli/selected-audit-correlation-current-facts-classifier.js`;
 
 Gate behavior: CM-1151 selected audit observation plus CM-1153 recall suppression proof now classifies as `AUDIT_SELECTED_CORRELATION_OBSERVED`; downstream stage/resolution route to `NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY`.
 
-Validation: targeted current-facts tests passed `29/29`; docs validation, ledger consistency, `git diff --check`, and focused no-secret/no-overclaim scan passed.
+Validation: targeted current-facts tests passed `29/29`; docs validation, ledger consistency, `git diff --check`, and focused no-secret/no-overclaim scan passed. Post-commit clean-head current-facts resolution gate confirmed `nextAllowedAction=record_narrow_selected_audit_correlation_blocker_downgrade_only`.
 
 Remaining risks: this only enables narrow blocker-downgrade recording. It does not prove recall/write reliability, runtime readiness, RC readiness, cleanup safety, rollback safety, production readiness, or release/cutover readiness.
 
-Next safe step: commit CM-1154, then rerun real clean-head current-facts gates. Do not claim readiness or reliability.
+Next safe step: only record the narrow downgrade if desired. Do not execute another proof, memory tool, provider/API call, apply, push, or readiness/reliability claim.
 
 ## CM-1153 Public Default Recall Suppression Proof Handoff
 

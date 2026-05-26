@@ -14,14 +14,15 @@ Validation:
 - Targeted current-facts tests passed `29/29`.
 - Docs validation, ledger consistency, and `git diff --check` passed after recording.
 - Focused no-secret/no-overclaim scan passed after recording.
+- Post-commit clean-head current-facts resolution gate returned `NARROW_DOWNGRADE_RECORD_ONLY_NOT_READY` with `nextAllowedAction=record_narrow_selected_audit_correlation_blocker_downgrade_only`.
 
 Boundary:
 - No proof execution.
 - No memory tools, provider/API, raw read, durable write/apply, push, readiness, or reliability claim.
 
 Next:
-- Commit CM-1154.
-- Rerun real clean-head current-facts gates after commit.
+- Only record the narrow downgrade if desired.
+- Keep readiness and reliability claims blocked.
 
 ## CM-1153 Public Default Recall Suppression Proof Checkpoint
 
