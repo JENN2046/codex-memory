@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1153 Public Default Recall Suppression Proof Handoff
+
+Goal: execute one bounded public/default recall suppression proof after CM-1120/CM-1152 gates allowed it.
+
+Status: CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY.
+
+Changed files: `docs/CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF.md`; `STATUS.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/*`.
+
+Execution result: clean-head gate returned `PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY`; one read-only/no-raw-content `search_memory` proof returned `targetReturned=false`, `defaultFilterTargetChunkCount=0`, `forbiddenResultFieldCount=0`, and `providerFetchAttempts=0`.
+
+Validation: proof executed and sanitized result recorded; docs validation, ledger consistency, `git diff --check`, and focused no-secret/no-overclaim scan passed.
+
+Remaining risks: this is follow-up evidence only. It does not prove broad recall reliability, write reliability, runtime readiness, RC readiness, cleanup safety, rollback safety, production readiness, or release/cutover readiness.
+
+Next safe step: commit CM-1153 record, then rerun CM-1129/CM-1131/CM-1140 current-facts gates. Do not claim readiness or reliability.
+
 ## CM-1152 Post-CM1120 Current-Facts Gate Rerun Handoff
 
 Goal: rerun current-facts gates after CM-1120 and decide whether public/default recall suppression proof is allowed.

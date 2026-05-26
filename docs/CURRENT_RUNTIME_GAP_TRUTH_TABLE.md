@@ -28,6 +28,42 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1153 Public Default Recall Suppression Proof - 2026-05-26
+
+Result: `CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY`.
+
+CM-1153 executed the one bounded public/default recall suppression proof allowed by the clean post-CM1120 current-facts gates.
+
+Pre-execution gate:
+
+```text
+HEAD=de232aac05c895ad7205180424088551ca55f4e6
+worktree=clean
+resolutionClass=PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY
+nextAllowedAction=execute_one_bounded_public_default_recall_suppression_proof_only
+```
+
+Sanitized proof output:
+
+```text
+targetMemoryId=codex-process-50325be15fdb479d805728fe420b4838
+searchMemoryCallCount=1
+target=process
+limit=5
+includeContent=false
+scopeProvided=false
+noRawContentRead=true
+readOnly=true
+resultCount=3
+targetCurrentChunkCount=2
+defaultFilterTargetChunkCount=0
+targetReturned=false
+forbiddenResultFieldCount=0
+providerFetchAttempts=0
+```
+
+This is bounded follow-up evidence only. It does not prove broad recall reliability, write reliability, runtime readiness, RC readiness, production readiness, cleanup safety, rollback safety, or release/cutover readiness.
+
 ## CM-1152 Post-CM1120 Current-Facts Gate Rerun - 2026-05-26
 
 Result: `CM1152_POST_CM1120_CURRENT_FACTS_GATE_RERUN_REPAIRED_PROOF_ALLOWED_NOT_READY`.

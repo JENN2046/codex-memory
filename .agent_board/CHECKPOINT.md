@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1153 Public Default Recall Suppression Proof Checkpoint
+
+Status: `CM1153_PUBLIC_DEFAULT_RECALL_SUPPRESSION_OBSERVED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Reran clean-head current-facts resolution gate.
+- Confirmed `PUBLIC_DEFAULT_RECALL_SUPPRESSION_PROOF_ALLOWED_NOT_READY`.
+- Executed exactly one bounded read-only/no-raw-content public/default `search_memory` proof.
+- Observed `targetReturned=false` for `codex-process-50325be15fdb479d805728fe420b4838`.
+
+Validation:
+- Bounded proof returned `resultCount=3`, `targetCurrentChunkCount=2`, `defaultFilterTargetChunkCount=0`, `forbiddenResultFieldCount=0`, and `providerFetchAttempts=0`.
+- Docs validation, ledger consistency, and `git diff --check` passed after recording.
+- Focused no-secret/no-overclaim scan passed after recording.
+
+Boundary:
+- No `record_memory` or `memory_overview`.
+- No raw content/title/snippet/text, raw audit, raw memory, diary, or `.jsonl` output.
+- No durable memory write/apply, config/dependency/startup change, push, readiness, or reliability claim.
+
+Next:
+- Commit CM-1153 record.
+- Rerun CM-1129/CM-1131/CM-1140 gates after commit.
+
 ## CM-1152 Post-CM1120 Current-Facts Gate Rerun Checkpoint
 
 Status: `CM1152_POST_CM1120_CURRENT_FACTS_GATE_RERUN_REPAIRED_PROOF_ALLOWED_NOT_READY`
