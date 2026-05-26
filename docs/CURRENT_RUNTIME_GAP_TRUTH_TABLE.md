@@ -28,6 +28,31 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1183 No-Token Memory Overview HTTP Block - 2026-05-26
+
+Result: `CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_VALIDATED_NOT_READY`.
+
+Runtime boundary change:
+
+- no-token HTTP JSON-RPC `tools/call` for `memory_overview` now returns HTTP `403`
+- rejection occurs before tool execution
+- selected error data code is `NO_TOKEN_OVERVIEW_REJECTED`
+- bearer-token authorized `memory_overview` remains executable
+
+Validated so far:
+
+- source/test syntax checks
+- targeted HTTP MCP test passed `20/20`
+- adjacent HTTP/contract/service tests passed `37/37`
+- full `npm test` passed `2789/2789`
+- docs validation, ledger consistency, and `git diff --check` passed
+
+Still not proven:
+
+- This does not implement no-token selected overview projection.
+- This does not prove full no-token governance closure.
+- This does not prove production readiness, write reliability, or recall reliability.
+
 ## CM-1182 No-Token Memory Overview Selected-Output Posture Review - 2026-05-26
 
 Result: `CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW_BLOCKED_NOT_DOWNGRADED_NOT_READY`.

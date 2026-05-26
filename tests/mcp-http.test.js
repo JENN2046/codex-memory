@@ -586,6 +586,95 @@ test('HTTP MCP no-token search_memory should reject include_content raw reads', 
   });
 });
 
+test('HTTP MCP no-token memory_overview should require bearer token authorization', async () => {
+  await withHttpServer(async ({ app, address }) => {
+    const originalGetOverview = app.services.overviewService.getOverview;
+    app.services.overviewService.getOverview = async () => {
+      throw new Error('no-token memory_overview must be rejected before tool execution');
+    };
+
+    try {
+      const response = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 11,
+          method: 'tools/call',
+          params: {
+            name: 'memory_overview',
+            arguments: {
+              limit: 3
+            }
+          }
+        })
+      });
+      const payload = await response.json();
+
+      assert.equal(response.status, 403);
+      assert.equal(payload.jsonrpc, '2.0');
+      assert.equal(payload.id, 11);
+      assert.equal(payload.error.code, -32001);
+      assert.equal(payload.error.message, 'Forbidden');
+      assert.equal(payload.error.data.code, 'NO_TOKEN_OVERVIEW_REJECTED');
+      assert.match(payload.error.data.reason, /no-token/i);
+      assert.match(payload.error.data.reason, /memory_overview/i);
+      assert.match(payload.error.data.reason, /bearer token/i);
+    } finally {
+      app.services.overviewService.getOverview = originalGetOverview;
+    }
+  });
+});
+
+test('HTTP MCP should execute memory_overview through authorized tools/call', async () => {
+  await withHttpServer(async ({ address }) => {
+    const initResponse = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'initialize',
+        params: {}
+      })
+    });
+    const sessionId = initResponse.headers.get(SESSION_HEADER);
+    assert.ok(sessionId);
+
+    const overview = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-token',
+        [SESSION_HEADER]: sessionId
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 12,
+        method: 'tools/call',
+        params: {
+          name: 'memory_overview',
+          arguments: {
+            limit: 3
+          }
+        }
+      })
+    });
+    const payload = await overview.json();
+
+    assert.equal(overview.status, 200);
+    assert.equal(payload.jsonrpc, '2.0');
+    assert.equal(payload.id, 12);
+    assert.equal(payload.result.isError, false);
+    assert.equal(payload.result.structuredContent.shadowSync.available, true);
+  }, { bearerToken: 'test-token' });
+});
+
 test('HTTP MCP should execute record_memory through authorized tools/call', async () => {
   await withHttpServer(async ({ address }) => {
     const initResponse = await fetch(address.url, {

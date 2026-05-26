@@ -8,6 +8,8 @@ const { CodexMemoryMcpServer, jsonRpcError } = require('./server');
 const SESSION_HEADER = 'Mcp-Session-Id';
 const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
 const HTTP_SESSION_STREAM_LIMIT_ERROR = 'HTTP_SESSION_STREAM_LIMIT_EXCEEDED';
+const NO_TOKEN_MUTATION_REJECTED = 'NO_TOKEN_MUTATION_REJECTED';
+const NO_TOKEN_OVERVIEW_REJECTED = 'NO_TOKEN_OVERVIEW_REJECTED';
 const SESSION_HARDENING_SPECS = {
   absoluteTtlMs: {
     envKey: 'CODEX_MEMORY_HTTP_SESSION_TTL_MS',
@@ -98,9 +100,9 @@ function createForbiddenPayload(reason) {
   };
 }
 
-function createForbiddenJsonRpcPayload(body, reason) {
+function createForbiddenJsonRpcPayload(body, reason, code = NO_TOKEN_MUTATION_REJECTED) {
   return jsonRpcError(body?.id ?? null, -32001, 'Forbidden', {
-    code: 'NO_TOKEN_MUTATION_REJECTED',
+    code,
     reason
   });
 }
@@ -276,6 +278,12 @@ function validateNoTokenJsonRpcRequest(body) {
 
   if (body.method === 'tools/call' && NO_TOKEN_BLOCKED_TOOLS.has(body.params?.name)) {
     return 'No-token HTTP MCP requests cannot call mutation tools.';
+  }
+  if (body.method === 'tools/call' && body.params?.name === 'memory_overview') {
+    return {
+      code: NO_TOKEN_OVERVIEW_REJECTED,
+      reason: 'No-token HTTP MCP memory_overview requires bearer token authorization until selected overview output is available.'
+    };
   }
   if (
     body.method === 'tools/call' &&
@@ -559,7 +567,10 @@ function createStreamableHttpServer({
       if (!bearerToken) {
         const noTokenJsonRpcRejection = validateNoTokenJsonRpcRequest(body);
         if (noTokenJsonRpcRejection) {
-          return writeJson(res, 403, createForbiddenJsonRpcPayload(body, noTokenJsonRpcRejection));
+          const rejection = typeof noTokenJsonRpcRejection === 'string'
+            ? { reason: noTokenJsonRpcRejection, code: NO_TOKEN_MUTATION_REJECTED }
+            : noTokenJsonRpcRejection;
+          return writeJson(res, 403, createForbiddenJsonRpcPayload(body, rejection.reason, rejection.code));
         }
       }
 

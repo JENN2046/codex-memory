@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1183 No-Token Memory Overview HTTP Block Handoff
+
+Goal: block no-token HTTP `memory_overview` before tool execution while preserving bearer-token authorized overview.
+
+Status: CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_VALIDATED_NOT_READY.
+
+Changed files: `src/adapters/codex-mcp/http.js`; `tests/mcp-http.test.js`; `docs/CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `.agent_board/*`.
+
+Current result: no-token `memory_overview` returns HTTP `403` with selected data code `NO_TOKEN_OVERVIEW_REJECTED` before tool execution; authorized bearer-token overview still executes in temp-local HTTP.
+
+Validation: source/test syntax passed; targeted HTTP test passed `20/20`; adjacent HTTP/contract/service tests passed `37/37`; full `npm test` passed `2789/2789`; docs validation, ledger consistency, and `git diff --check` passed.
+
+Remaining: guarded local commit if final diff inspection stays clean.
+
+Next safe step: commit the validated CM-1183 source/test/docs/board slice locally. Do not call real project-memory `memory_overview`, read raw store/`.jsonl`, call provider/API, expand public MCP, push, or claim readiness/reliability.
+
 ## CM-1182 No-Token Memory Overview Selected-Output Posture Review Handoff
 
 Goal: review no-token `memory_overview` selected-output posture and decide whether a narrow blocker downgrade is allowed.

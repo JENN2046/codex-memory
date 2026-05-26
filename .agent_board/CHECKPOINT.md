@@ -1,5 +1,39 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1183 No-Token Memory Overview HTTP Block Checkpoint
+
+Status: `CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added HTTP no-token JSON-RPC rejection for `tools/call` + `memory_overview`.
+- Added `NO_TOKEN_OVERVIEW_REJECTED` selected data code.
+- Added regression proving no-token overview is rejected before tool execution.
+- Added regression proving bearer-token overview remains executable in temp-local HTTP.
+
+Validation:
+- `node --check .\src\adapters\codex-mcp\http.js` passed.
+- `node --check .\tests\mcp-http.test.js` passed.
+- `node --test .\tests\mcp-http.test.js` passed `20/20`.
+- `node --test .\tests\mcp-http.test.js .\tests\mcp-contract.test.js .\tests\phase-a-services.test.js` passed `37/37`.
+- `npm test` passed `2789/2789`.
+- docs validation passed.
+- ledger consistency passed.
+- `git diff --check` passed.
+- changed-scope re-review found no actionable issue in the changed scope.
+
+Boundary:
+- No real project-memory `memory_overview`.
+- No raw memory store or `.jsonl` read.
+- No provider/API/model call.
+- No durable project memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/dependency change.
+- No migration, import, export, backup, or restore apply.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
 ## CM-1182 No-Token Memory Overview Selected-Output Posture Review Checkpoint
 
 Status: `CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW_BLOCKED_NOT_DOWNGRADED_NOT_READY`
