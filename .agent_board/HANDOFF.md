@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1145 CM1111 Proof Memory Retention Apply Execution Record Handoff
+
+Goal: execute and record the user exact-approved CM-1111 proof-memory retention tombstone apply once.
+
+Status: COMPLETED_VALIDATED_CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY.
+
+Changed files: `docs/CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTION_RECORD.md`; `STATUS.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `.agent_board/RUN_STATE.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`.
+
+Validation: exact approval line accepted; pre-execution Git facts confirmed `HEAD=7f7c7c10fccf424eba6d6d23018540a88382c0cb`; worktree was clean; request hash recomputed as `9d8625ab35af2653b3cbccf77ee8a5b287389ff5614dce53c657eaadf11d6b82`; one approved CLI run returned `decision=tombstoned`, `mutated=true`, `fromStatus=active`, `toStatus=tombstoned`, audit event `b1e084b1-bef9-4af9-8708-8ba47f9c21d9`, policy flags true, and `rawWorkspaceIdExposed=false`.
+
+Not validated: metadata lifecycle read, public/default recall suppression, selected audit correlation, `search_memory`, `memory_overview`, HTTP observe, full `npm test`, mainline gate, provider/API calls, cleanup/rollback/migration/import/export/backup/restore apply, push.
+
+Remaining risks: CM-1111 proves only one exact-approved sanitized local tombstone apply result. It does not prove post-apply metadata lifecycle, public/default suppression, selected audit correlation, write reliability, recall reliability, runtime readiness, RC readiness, production readiness, or release/cutover readiness.
+
+Next safe step: rerun current-facts gates. If the ordered chain still points to CM-1115, prepare/request a fresh separate CM-1115 exact approval only; do not execute CM-1115 without the user repeating the exact approval.
+
 ## CM-1144 Fresh CM1111 Approval Packet Handoff
 
 Goal: prepare the next allowed step after clean-worktree gates: a fresh CM-1111 exact approval request packet, without executing CM-1111.

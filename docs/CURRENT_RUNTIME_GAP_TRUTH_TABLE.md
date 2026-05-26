@@ -28,6 +28,57 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1145 CM1111 Proof Memory Retention Apply Execution Record - 2026-05-26
+
+Result: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`.
+
+The user exact-approved one CM-1111 tombstone apply execution:
+
+```text
+approved_head=7f7c7c10fccf424eba6d6d23018540a88382c0cb
+request_hash=9d8625ab35af2653b3cbccf77ee8a5b287389ff5614dce53c657eaadf11d6b82
+memory_id=codex-process-50325be15fdb479d805728fe420b4838
+command_runs=1
+retry_runs=0
+```
+
+Sanitized CLI result:
+
+```text
+status=ok
+decision=tombstoned
+mutated=true
+fromStatus=active
+toStatus=tombstoned
+audit_event_id=b1e084b1-bef9-4af9-8708-8ba47f9c21d9
+lifecyclePolicyApplied=true
+scopePolicyApplied=true
+redactionApplied=true
+rawWorkspaceIdExposed=false
+```
+
+Interpretation:
+
+```text
+CM-1111 result class = APPLIED_TOMBSTONED_SANITIZED
+maximum downgrade = one exact-approved sanitized local tombstone apply result exists for the exact CM-1100 proof memory
+post_apply_verification_missing = true
+```
+
+Current effect:
+
+```text
+metadata-only lifecycle status observation = false
+public/default recall suppression verified = false
+selected audit correlation observed = false
+memory write reliable = false
+memory recall reliable = false
+runtime readiness = false
+RC_READY = false
+```
+
+CM-1145 did not run `record_memory`, `search_memory`, `memory_overview`, raw memory/audit/diary/`.jsonl` output, provider/API calls, cleanup/rollback/migration/import/export/backup/restore apply, public MCP expansion, config/watchdog/startup/package changes, push/tag/release/deploy/cutover, CM-1115, or CM-1120.
+
 ## CM-1142 Expanded Dirty Scope Local Commit Isolation Approval Packet - 2026-05-26
 
 Result: `CM1142_EXPANDED_DIRTY_SCOPE_LOCAL_COMMIT_ISOLATION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.

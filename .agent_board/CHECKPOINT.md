@@ -1,5 +1,40 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1145 CM1111 Proof Memory Retention Apply Execution Record Checkpoint
+
+Status: `CM1145_CM1111_PROOF_MEMORY_RETENTION_APPLY_EXECUTED_RECORDED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Consumed the user-provided exact approval line for CM-1111 on `HEAD=7f7c7c10fccf424eba6d6d23018540a88382c0cb`.
+- Recomputed request hash `9d8625ab35af2653b3cbccf77ee8a5b287389ff5614dce53c657eaadf11d6b82`.
+- Ran exactly one approved `tombstone-memory.js --apply --confirm` command for memory id `codex-process-50325be15fdb479d805728fe420b4838`.
+- Recorded sanitized result `decision=tombstoned`, `mutated=true`, `fromStatus=active`, `toStatus=tombstoned`, audit event `b1e084b1-bef9-4af9-8708-8ba47f9c21d9`.
+- Classified the CM-1111 apply result as `APPLIED_TOMBSTONED_SANITIZED`.
+
+Validation:
+- Pre-execution Git facts matched the approval head.
+- Worktree was clean before execution.
+- Sanitized CLI output was reviewed.
+- Status/docs/board execution record added.
+
+Boundary:
+- No retry.
+- No `record_memory`, `search_memory`, or `memory_overview`.
+- No raw memory, raw audit, diary, direct `.jsonl`, content, or evidence output.
+- No provider/API call.
+- No cleanup/rollback/migration/import/export/backup/restore apply.
+- No public MCP expansion.
+- No config/watchdog/startup/package change.
+- No push.
+- No CM-1115 or CM-1120 approval/execution.
+- No readiness or reliability claim.
+
+Next:
+- Rerun current-facts gates.
+- If still in order, request only a fresh separate CM-1115 exact approval.
+
 ## CM-1144 Fresh CM1111 Approval Packet Checkpoint
 
 Status: `CM1144_FRESH_CM1111_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
