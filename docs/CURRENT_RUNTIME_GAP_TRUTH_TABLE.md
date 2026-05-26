@@ -28,6 +28,25 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1160 Pending Manifest Restart Recovery Validation - 2026-05-26
+
+Result: `CM1160_PENDING_MANIFEST_RESTART_RECOVERY_VALIDATED_NOT_READY`.
+
+CM-1160 continues the minimum durable write kernel validation ladder:
+
+```text
+pending manifest + diary-only crash window
+store/service reopen boundary
+manual pending-manifest recovery after reopen
+SQLite/vector projection rebuild
+duplicate canonical write replay after recovery
+selected audit recovered/replayed correlation
+```
+
+This strengthens temp-local evidence for recovery from a diary-written / projection-missing crash window. It does not enable automatic startup recovery, background recovery workers, scheduler/watchdog recovery, real memory recovery, cross-store transactionality, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
+Validation passed: source/test syntax, targeted storage/runtime tests `11/11`, full `npm test` `2765/2765`, docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review.
+
 ## CM-1159 SQLite JSON Corruption Reporting - 2026-05-26
 
 Result: `CM1159_SQLITE_JSON_CORRUPTION_REPORTING_COMPLETED_VALIDATED_NOT_READY`.

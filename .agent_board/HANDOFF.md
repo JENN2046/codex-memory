@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1160 Pending Manifest Restart Recovery Validation Handoff
+
+Goal: continue CM-1159 by validating a pending-manifest / diary-only crash-window recovery path across store reopen.
+
+Status: CM1160_PENDING_MANIFEST_RESTART_RECOVERY_VALIDATED_NOT_READY.
+
+Changed files: `tests/memory-write-restart-durability-temp-local-evidence.test.js`; `docs/CM1160_PENDING_MANIFEST_RESTART_RECOVERY_VALIDATION.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: a pending manifest with a matching diary record but missing SQLite/vector projections can be recovered after a store reopen by explicit `recoverPendingWriteManifests(...)`; duplicate canonical writes then replay the recovered memory id.
+
+Validation: test syntax passed. Targeted storage/runtime tests passed `11/11`. Full `npm test` passed `2765/2765`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Remaining risks: no automatic startup recovery, no background worker/scheduler recovery, no real memory recovery proof, no degraded-path restart validation, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1160 if guarded commit eligibility remains clean. After that, consider guarded automatic recovery policy design or degraded-path restart validation. Do not push or claim readiness/reliability.
+
 ## CM-1159 SQLite JSON Corruption Reporting Handoff
 
 Goal: continue CM-1158 by making selected SQLite shadow JSON-field corruption observable without unclassified `JSON.parse` crashes.

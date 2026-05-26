@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1160 Pending Manifest Restart Recovery Validation Checkpoint
+
+Status: `CM1160_PENDING_MANIFEST_RESTART_RECOVERY_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added temp-local crash-window validation for pending manifest plus diary-only write.
+- Verified recovery after closing and reopening stores.
+- Verified SQLite record/chunk and vector projection rebuild.
+- Verified recovered manifest finalization and duplicate canonical replay.
+- Verified selected audit correlation for recovered and replayed manifest metadata.
+
+Validation:
+- Test syntax check passed.
+- Targeted storage/runtime tests passed `11/11`.
+- Full `npm test` passed `2765/2765`.
+- Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No automatic startup recovery, background worker enablement, scheduler/watchdog change, or cross-store transactionality.
+
+Next:
+- Commit CM-1160 if guarded commit eligibility remains clean.
+- Continue kernel hardening with guarded automatic recovery policy design or degraded-path restart validation.
+
 ## CM-1159 SQLite JSON Corruption Reporting Checkpoint
 
 Status: `CM1159_SQLITE_JSON_CORRUPTION_REPORTING_COMPLETED_VALIDATED_NOT_READY`

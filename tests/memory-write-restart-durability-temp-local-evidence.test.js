@@ -6,7 +6,8 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 
-const { MemoryWriteService } = require('../src/core/MemoryWriteService');
+const { MemoryWriteService, buildDefaultIdempotencyKey } = require('../src/core/MemoryWriteService');
+const { computeCanonicalWriteHash } = require('../src/core/MemoryWriteLifecycleDedupSuppressionPreflight');
 const { DiaryStore } = require('../src/storage/DiaryStore');
 const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 const { VectorIndexStore } = require('../src/storage/VectorIndexStore');
@@ -210,6 +211,126 @@ test('CM-1033 accepted temp-local write projections survive store reopen', async
     assert.equal(auditAfterRestart[0].shadowWrite.status, 'ok');
     assert.equal(await pathExists(result.filePath), true);
     assert.equal(await pathExists(config.auditLogPath), true);
+  } finally {
+    if (firstStores) {
+      await firstStores.shadowStore.close();
+    }
+    if (reopenedStores) {
+      await reopenedStores.shadowStore.close();
+    }
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});
+
+test('CM-1160 pending manifest diary crash-window recovers after store reopen', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1160-manifest-restart-'));
+  const config = createConfig(rootPath);
+  let firstStores;
+  let reopenedStores;
+
+  try {
+    const payload = processPayload({
+      title: 'Checkpoint: CM-1160 pending manifest restart recovery',
+      content: [
+        'Type: checkpoint',
+        'CM1160 pending manifest restart recovery temp local marker',
+        'Purpose: prove pending manifest with diary-only write can recover after store reopen.',
+        'Boundary: synthetic temp-local files only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1160 synthetic pending manifest restart recovery evidence',
+      tags: ['cm1160', 'pending-manifest', 'restart-recovery', 'temp-local'],
+      task_id: 'CM-1160',
+      conversation_id: 'cm1160-pending-manifest-restart-recovery'
+    });
+    const canonicalHash = computeCanonicalWriteHash(payload);
+    const idempotencyKey = buildDefaultIdempotencyKey(canonicalHash);
+    const memoryId = 'codex-process-cm1160restartrecovery000000001';
+    const now = new Date().toISOString();
+
+    firstStores = openStores(config);
+    await firstStores.shadowStore.beginMemoryWriteManifest({
+      idempotencyKey,
+      memoryId,
+      canonicalHash,
+      target: 'process',
+      createdAt: now
+    });
+    await firstStores.service.diaryStore.writeRecord({
+      memoryId,
+      target: 'process',
+      title: payload.title,
+      content: payload.content,
+      evidence: payload.evidence,
+      tags: payload.tags,
+      sensitivity: payload.sensitivity,
+      validated: payload.validated,
+      reusable: payload.reusable,
+      createdAt: now,
+      updatedAt: now,
+      projectId: payload.project_id,
+      workspaceId: payload.workspace_id,
+      clientId: payload.client_id,
+      taskId: payload.task_id,
+      conversationId: payload.conversation_id,
+      visibility: payload.visibility,
+      retentionPolicy: payload.retention_policy
+    });
+
+    const beforeRestartHealth = await firstStores.shadowStore.getHealth();
+    assert.equal(beforeRestartHealth.writeManifest.pending, 1);
+    assert.equal(beforeRestartHealth.recordCount, 0);
+    assert.equal(beforeRestartHealth.chunkCount, 0);
+    assert.equal((await firstStores.vectorStore.getHealth()).vectorCount, 0);
+    await firstStores.shadowStore.close();
+    firstStores = null;
+
+    reopenedStores = openStores(config);
+    const recovery = await reopenedStores.service.recoverPendingWriteManifests({ limit: 10 });
+    assert.equal(recovery.attempted, 1);
+    assert.equal(recovery.recovered, 1);
+    assert.equal(recovery.degraded, 0);
+    assert.equal(recovery.missingDiary, 0);
+    assert.equal(recovery.items[0].memoryId, memoryId);
+    assert.equal(recovery.items[0].status, 'committed');
+
+    const manifest = await reopenedStores.shadowStore.getMemoryWriteManifestByIdempotencyKey(idempotencyKey);
+    assert.equal(manifest.status, 'committed');
+    assert.equal(manifest.memoryId, memoryId);
+    assert.equal(manifest.result.idempotency.recovered, true);
+
+    const recoveredRecord = await reopenedStores.shadowStore.getRecord(memoryId);
+    assert.equal(recoveredRecord.memoryId, memoryId);
+    assert.equal(recoveredRecord.taskId, 'CM-1160');
+    assert.equal(recoveredRecord.conversationId, 'cm1160-pending-manifest-restart-recovery');
+
+    const recoveredHealth = await reopenedStores.shadowStore.getHealth();
+    assert.equal(recoveredHealth.recordCount, 1);
+    assert.equal(recoveredHealth.chunkCount >= 1, true);
+    assert.equal(recoveredHealth.writeManifest.committed, 1);
+    assert.equal((await reopenedStores.vectorStore.getHealth()).vectorCount, 1);
+
+    const duplicate = await reopenedStores.service.record(payload);
+    assert.equal(duplicate.decision, 'accepted');
+    assert.equal(duplicate.memoryId, memoryId);
+    assert.equal(duplicate.idempotency.replayed, true);
+
+    const replayHealth = await reopenedStores.shadowStore.getHealth();
+    assert.equal(replayHealth.recordCount, 1);
+    assert.equal(replayHealth.writeManifest.total, 1);
+    assert.equal(replayHealth.writeManifest.committed, 1);
+
+    const manifestAudit = await reopenedStores.auditLogStore.readSelectedWriteManifestAuditCorrelation({
+      memoryId,
+      idempotencyKey,
+      canonicalHash
+    });
+    assert.equal(manifestAudit.found, true);
+    assert.equal(manifestAudit.selectedFieldsOnly, true);
+    assert.equal(manifestAudit.rawAuditReturned, false);
+    assert.equal(manifestAudit.recovered.memoryId, memoryId);
+    assert.equal(manifestAudit.replayed.memoryId, memoryId);
   } finally {
     if (firstStores) {
       await firstStores.shadowStore.close();
