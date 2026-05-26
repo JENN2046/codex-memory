@@ -6,7 +6,7 @@ Goal: plan a future startup recovery policy without enabling automatic recovery.
 
 Status: CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY.
 
-Local commit: pending.
+Local commit: `396cccd docs: plan startup recovery policy`.
 
 Changed files: `docs/CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `.agent_board/*`.
 
@@ -14,7 +14,7 @@ Decision: startup may become an inspection/reporting surface, but silent diary r
 
 Validation: ledger consistency, docs validation, and `git diff --check` passed.
 
-Next safe step: optionally commit CM-1181 if guarded conditions pass.
+Next safe step: review no-token `memory_overview` selected-output posture, or split actual CM-1180/CM-1181 source implementations into separate source/test tasks.
 
 ## CM-1180 SQLite Schema Version Startup Gate Plan Handoff
 

@@ -6,7 +6,7 @@ Status: `CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN_COMPLETED_NOT_IMPL
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `396cccd docs: plan startup recovery policy`.
 
 Completed:
 - Inspected current recovery building blocks.
