@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-1178 No-Token Raw Content Read Closure Handoff
+
+Goal: prevent no-token HTTP `search_memory` from requesting raw memory content.
+
+Status: CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE_VALIDATED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `src/adapters/codex-mcp/http.js`; `tests/mcp-http.test.js`; `docs/CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: no-token HTTP JSON-RPC `search_memory` with `include_content=true` now returns HTTP `403` before tool execution. Existing no-token side-effect/provider/cache/audit boundaries still pass.
+
+Validation: source/test syntax, targeted HTTP tests `18/18`, adjacent HTTP/contract/service tests `35/35`, ledger consistency, docs validation, `git diff --check`, and full `npm test` `2787/2787` passed. The first full-suite attempt timed out at `124s` without a pass/fail summary; rerun passed.
+
+Remaining risks: no-token `memory_overview` selected-output posture still needs review; this is not recall reliability, production readiness, or RC readiness.
+
+Next safe step: run docs/ledger/diff checks, then optionally commit CM-1178 if guarded conditions pass.
+
 ## CM-1177 Readonly/Syncing Search Semantic Split Handoff
 
 Goal: make readonly `search_memory` avoid candidate-cache metadata reads/writes while preserving authorized syncing search behavior.

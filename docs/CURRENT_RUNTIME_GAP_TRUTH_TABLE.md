@@ -28,6 +28,26 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1178 No-Token Raw Content Read Closure - 2026-05-26
+
+Result: `CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE_VALIDATED_NOT_READY`.
+
+CM-1178 is a narrow HTTP boundary source/test slice:
+
+- No-token HTTP JSON-RPC `search_memory` with `arguments.include_content === true` now fails at the HTTP boundary.
+- The rejection returns HTTP `403` before tool execution.
+- Authorized bearer-token `search_memory` behavior is unchanged.
+- Existing no-token search boundaries from CM-1177 remain covered.
+
+Still not proven:
+
+- This is not general recall-quality proof.
+- No-token `memory_overview` selected-output hardening may still need review.
+- No production readiness, write reliability, or recall reliability.
+- No schema migration/version startup hard stop.
+- No startup explicit rebuild/recovery policy.
+- Lifecycle is still timestamp/counter based, not a full transition log.
+
 ## CM-1177 Readonly/Syncing Search Semantic Split - 2026-05-26
 
 Result: `CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT_VALIDATED_NOT_READY`.

@@ -551,6 +551,41 @@ test('HTTP MCP no-token search_memory should not call external rerank provider',
   });
 });
 
+test('HTTP MCP no-token search_memory should reject include_content raw reads', async () => {
+  await withHttpServer(async ({ address }) => {
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 10,
+        method: 'tools/call',
+        params: {
+          name: 'search_memory',
+          arguments: {
+            query: 'no-token raw content read should be rejected',
+            target: 'process',
+            limit: 3,
+            include_content: true
+          }
+        }
+      })
+    });
+    const payload = await response.json();
+
+    assert.equal(response.status, 403);
+    assert.equal(payload.jsonrpc, '2.0');
+    assert.equal(payload.id, 10);
+    assert.equal(payload.error.code, -32001);
+    assert.equal(payload.error.message, 'Forbidden');
+    assert.equal(payload.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
+    assert.match(payload.error.data.reason, /no-token/i);
+    assert.match(payload.error.data.reason, /raw memory content/i);
+  });
+});
+
 test('HTTP MCP should execute record_memory through authorized tools/call', async () => {
   await withHttpServer(async ({ address }) => {
     const initResponse = await fetch(address.url, {

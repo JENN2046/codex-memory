@@ -1,5 +1,44 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1178 No-Token Raw Content Read Closure Checkpoint
+
+Status: `CM1178_NO_TOKEN_RAW_CONTENT_READ_CLOSURE_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Added HTTP JSON-RPC no-token rejection for `search_memory` calls with `include_content=true`.
+- Added regression proving no-token raw-content search returns HTTP `403` before tool execution.
+- Preserved existing no-token side-effect/provider/cache/audit boundary tests.
+
+Validation:
+- `node --check src\adapters\codex-mcp\http.js` passed.
+- `node --check tests\mcp-http.test.js` passed.
+- `node --test tests\mcp-http.test.js` passed `18/18`.
+- `node --test tests\mcp-http.test.js tests\mcp-contract.test.js tests\phase-a-services.test.js` passed `35/35`.
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `git diff --check` passed.
+- `npm test` passed `2787/2787` on rerun after one `124s` timeout without a pass/fail summary.
+
+Boundary:
+- No public MCP schema/tool expansion.
+- Authorized bearer-token `search_memory` behavior unchanged.
+- No real memory store mutation.
+- No provider/API call.
+- No `.env`, config, watchdog, startup, or dependency change.
+- No migration, import, export, backup, or restore.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- Confirm no-token `memory_overview` selected-output posture.
+- SQLite schema migration/version startup gate.
+- Startup explicit rebuild/recovery policy.
+- Full lifecycle transition log.
+
 ## CM-1177 Readonly/Syncing Search Semantic Split Checkpoint
 
 Status: `CM1177_READONLY_SYNCING_SEARCH_SEMANTIC_SPLIT_VALIDATED_NOT_READY`

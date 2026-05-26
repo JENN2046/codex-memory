@@ -277,6 +277,13 @@ function validateNoTokenJsonRpcRequest(body) {
   if (body.method === 'tools/call' && NO_TOKEN_BLOCKED_TOOLS.has(body.params?.name)) {
     return 'No-token HTTP MCP requests cannot call mutation tools.';
   }
+  if (
+    body.method === 'tools/call' &&
+    body.params?.name === 'search_memory' &&
+    body.params?.arguments?.include_content === true
+  ) {
+    return 'No-token HTTP MCP search_memory cannot include raw memory content.';
+  }
 
   return null;
 }
