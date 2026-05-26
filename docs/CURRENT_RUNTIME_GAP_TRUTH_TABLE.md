@@ -28,6 +28,31 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1173 CM1172 Temp-Local Reconcile Positive Dry-Run Execution Record - 2026-05-26
+
+Result: `CM1173_CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_EXECUTED_RECORDED_NOT_READY`.
+
+CM-1173 records the exact-approved CM-1172 execution:
+
+- Exact approval consumed for `HEAD=76124b3bec320b744dc11dc36f7dbca466f9a43f`.
+- Request hash recomputed as `460f2ae085293c00b850c478cd50fbe575568e116b9d01bbd554ab5ec65d6761`.
+- One isolated temp-local synthetic `vector` reconcile task was seeded through `SqliteShadowStore.enqueueReconcileTask(...)`.
+- One isolated temp-local `MemoryWriteReconcileWorker.runOnce({ dryRun:true, limit:1 })` executed.
+- Result was `decision=dry_run_completed`, `workerDecision=run_once_completed`, `success=true`.
+- Counters were `queuedBeforeCount=1`, `queuedAfterCount=1`, `scannedTaskCount=1`, `wouldReplayCount=1`, `replayedCount=0`, `clearedCount=0`, `failedCount=0`, and `skippedCount=0`.
+- Cleanup was executed and verified.
+
+Still not proven:
+
+- No startup recovery execution.
+- No runtime recovery execution.
+- No manifest recovery, repair, or cancellation execution.
+- No reconcile replay apply.
+- No durable audit write.
+- No real-store recovery proof.
+- No automatic startup recovery, scheduled recovery, retry/backoff policy, or cross-store transactionality.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1172 Temp-Local Reconcile Positive Dry-Run Approval Packet - 2026-05-26
 
 Result: `CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.

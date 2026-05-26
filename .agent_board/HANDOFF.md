@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-1173 CM-1172 Temp-Local Positive Reconcile Dry-Run Execution Record Handoff
+
+Goal: consume the exact-approved CM-1172 positive reconcile dry-run once and record the result without expanding into recovery or real-store work.
+
+Status: CM1173_CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_EXECUTED_RECORDED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `docs/CM1173_CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_EXECUTION_RECORD.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: one isolated temp-local synthetic `vector` reconcile task plus one `MemoryWriteReconcileWorker.runOnce({ dryRun:true, limit:1 })`; result was `dry_run_completed`, queued before `1`, queued after `1`, scanned `1`, would replay `1`, replayed `0`, cleared `0`, failed `0`; cleanup executed and verified.
+
+Validation: exact approval intake, pre-execution Git facts, request hash recompute, sanitized dry-run output review, cleanup verification, docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and final review passed.
+
+Remaining risks: no startup/runtime recovery execution, no manifest recovery/repair/cancel execution, no reconcile apply, no real-store recovery proof, no durable audit write proof, no background worker/scheduler recovery, no retry/backoff policy, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Post-commit state: pending.
+
+Next safe step: validate and commit the execution record, then decide the next bounded checkpoint from clean HEAD. Do not rerun CM-1172 without a new exact approval.
+
 ## CM-1172 Temp-Local Reconcile Positive Dry-Run Approval Packet Handoff
 
 Goal: prepare the exact approval request boundary for one future positive queued-task dry-run without executing it.
