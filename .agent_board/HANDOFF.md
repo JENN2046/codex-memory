@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1182 No-Token Memory Overview Selected-Output Posture Review Handoff
+
+Goal: review no-token `memory_overview` selected-output posture and decide whether a narrow blocker downgrade is allowed.
+
+Status: CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW_BLOCKED_NOT_DOWNGRADED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `docs/CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `.agent_board/*`.
+
+Decision: no downgrade is allowed. No-token `memory_overview` currently shares the authorized overview projection and can expose operational paths, memory ids, titles, reasons, file/source references, recent files, and profile/provider details.
+
+Validation: ledger consistency, docs validation, and `git diff --check` passed.
+
+Next safe step: implement a separate source/test slice that either blocks no-token `memory_overview` or adds a strict selected no-token projection. Do not claim full no-token governance, recall reliability, write reliability, or readiness.
+
 ## CM-1181 Startup Explicit Rebuild Recovery Policy Plan Handoff
 
 Goal: plan a future startup recovery policy without enabling automatic recovery.

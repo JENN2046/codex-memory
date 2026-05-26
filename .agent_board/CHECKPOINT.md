@@ -1,5 +1,46 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1182 No-Token Memory Overview Selected-Output Posture Review Checkpoint
+
+Status: `CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW_BLOCKED_NOT_DOWNGRADED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Reviewed HTTP no-token validation behavior for `memory_overview`.
+- Reviewed app routing from `memory_overview` to `MemoryOverviewService.getOverview(...)`.
+- Reviewed overview output shape for selected-output posture.
+- Documented that no-token and authorized overview currently share the same projection.
+
+Decision:
+- No narrow blocker downgrade is allowed for no-token `memory_overview`.
+- CM-1179 remains limited to covered no-token `search_memory` side-effect/raw-content behavior.
+
+Validation:
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `git diff --check` passed.
+
+Boundary:
+- No live `memory_overview`.
+- No memory tool call.
+- No raw memory store or `.jsonl` read.
+- No provider/API/model call.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No config/watchdog/startup/dependency change.
+- No migration, import, export, backup, or restore apply.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- Future source/test slice should either block no-token `memory_overview` or add a strict selected projection.
+- SQLite schema version startup gate remains unimplemented.
+- Startup explicit rebuild/recovery policy remains unimplemented.
+- Full lifecycle transition log remains open.
+
 ## CM-1181 Startup Explicit Rebuild Recovery Policy Plan Checkpoint
 
 Status: `CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`

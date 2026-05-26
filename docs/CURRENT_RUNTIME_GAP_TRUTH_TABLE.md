@@ -28,6 +28,37 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1182 No-Token Memory Overview Selected-Output Posture Review - 2026-05-26
+
+Result: `CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW_BLOCKED_NOT_DOWNGRADED_NOT_READY`.
+
+Current source facts:
+
+- HTTP no-token validation currently allows `memory_overview`.
+- `src/app.js` routes `memory_overview` to `MemoryOverviewService.getOverview(...)` without passing no-token/request context.
+- Authorized and no-token callers therefore receive the same overview projection.
+- The overview service does not intentionally return raw memory body fields such as `content` or `rawText`.
+
+Blocking output posture:
+
+- `paths` can expose operational store/log/index paths.
+- `recentAudit` can expose titles, memory ids, reasons, file paths, and agent identifiers.
+- `memoryLinks` can expose memory ids, titles, and file paths.
+- `recall.recent` can expose memory ids, source files, tags, database/profile/fingerprint details, and scores.
+- `recentFiles` can expose diary file references.
+
+Decision:
+
+- No blocker downgrade is allowed for no-token `memory_overview` selected-output posture.
+- CM-1179 remains limited to covered no-token `search_memory` side-effect/raw-content behavior.
+
+Still not proven:
+
+- No no-token selected projection for `memory_overview`.
+- No no-token overview HTTP response shape regression.
+- No full no-token governance closure.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1181 Startup Explicit Rebuild Recovery Policy Plan - 2026-05-26
 
 Result: `CM1181_STARTUP_EXPLICIT_REBUILD_RECOVERY_POLICY_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`.
