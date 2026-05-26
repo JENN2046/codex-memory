@@ -6,7 +6,7 @@ Goal: add a bounded internal rebuild path for writes whose SQLite authority exis
 
 Status: CM1176_DIARY_PROJECTION_REBUILD_FROM_SQLITE_AUTHORITY_VALIDATED_NOT_READY.
 
-Local commit: pending before guarded commit.
+Local commit: `452ca91 feat: rebuild missing diary projections`.
 
 Changed files: `src/storage/SqliteShadowStore.js`; `src/core/MemoryWriteService.js`; `tests/durable-write-kernel-idempotency-runtime.test.js`; status/truth-table/board surfaces.
 
@@ -17,6 +17,8 @@ Validation: source/test syntax, targeted durable runtime test `7/7`, adjacent re
 Remaining risks: rebuild is not automatic startup recovery; lifecycle is still not a full transition log; readonly/syncing search is not split; no-token read remains open; SQLite schema migration/version startup hard stop is still absent; no production/readiness/reliability proof.
 
 Next safe step: commit CM-1176 if guarded conditions pass, then choose the next kernel checkpoint. Do not push unless explicitly requested.
+
+Post-commit state: after `452ca91`, worktree was clean with `main...origin/main [ahead 1]` before this post-commit state sync.
 
 ## CM-1175 Write Manifest Lifecycle State Split Handoff
 

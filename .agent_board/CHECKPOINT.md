@@ -6,7 +6,7 @@ Status: `CM1176_DIARY_PROJECTION_REBUILD_FROM_SQLITE_AUTHORITY_VALIDATED_NOT_REA
 
 Date: 2026-05-26
 
-Local commit: pending before guarded commit.
+Local commit: `452ca91 feat: rebuild missing diary projections`.
 
 Completed:
 - Added internal `MemoryWriteService.rebuildMissingDiaryProjections(...)`.
@@ -37,6 +37,9 @@ Remaining:
 - Split readonly and syncing search behavior explicitly.
 - Close no-token read.
 - Add SQLite schema migration/version startup gate.
+
+Post-commit state:
+- After `452ca91`, `git status --short --branch` reported `## main...origin/main [ahead 1]`.
 
 ## CM-1175 Write Manifest Lifecycle State Split Checkpoint
 
