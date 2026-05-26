@@ -1,5 +1,25 @@
 # HANDOFF.md - codex-memory
 
+## CM-1170 Temp-Local Startup Recovery Dry-Run Execution Approval Packet Handoff
+
+Goal: prepare the exact approval request boundary after CM-1169 without executing any dry-run.
+
+Status: CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `docs/CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: none executed. The packet only describes a possible future exact-approved temp-local/fixture-only `MemoryWriteReconcileWorker.runOnce` dry-run with one max run and no apply/confirm/raw output/durable audit.
+
+Validation: docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and final review passed.
+
+Remaining risks: exact approval not yet consumed, dry-run not executed, no startup/runtime recovery proof, no real-store proof, no durable audit proof, no background worker/scheduler recovery, no retry/backoff policy, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Post-commit state: pending.
+
+Next safe step: commit packet, generate final copy/paste approval line from clean HEAD, then pause for user approval. Do not execute dry-run/startup/runtime recovery, push, or claim readiness/reliability.
+
 ## CM-1169 Temp-Local Startup Recovery Dry-Run Execution Preflight Handoff
 
 Goal: continue CM-1168 by adding a strict preflight before any future temp-local startup recovery dry-run execution.

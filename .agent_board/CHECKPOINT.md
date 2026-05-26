@@ -1,5 +1,44 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1170 Temp-Local Startup Recovery Dry-Run Execution Approval Packet Checkpoint
+
+Status: `CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Drafted `docs/CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET.md`.
+- Bound the draft to clean pre-packet `HEAD=7e633d77e5ca92787dd052f5cbee580e0a559338`.
+- Limited the future separately approved action to one temp-local/fixture-only `MemoryWriteReconcileWorker.runOnce` dry-run.
+- Required `dryRun=true`, `apply=false`, `confirm=false`, `maxRuns=1`, `isolatedTempRoot=true`, `cleanupRequired=true`, `rawOutputAllowed=false`, and `durableAuditAllowed=false`.
+- Recorded that the final request hash must be generated after this packet is committed.
+
+Validation:
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan passed.
+- Final review found no execution authorization in this packet.
+
+Boundary:
+- No exact approval consumed.
+- No dry-run execution.
+- No startup recovery execution.
+- No runtime recovery execution.
+- No manifest recovery, repair, or cancellation execution.
+- No reconcile apply.
+- No durable audit write.
+- No public MCP schema expansion.
+- No real memory store mutation.
+- No provider/API, migration/import/export/backup/restore, config/watchdog/startup/dependency change, push, production-readiness claim, or reliability claim.
+
+Next:
+- Commit this approval packet.
+- Generate the final copy/paste approval line from the resulting clean HEAD.
+- Pause before any dry-run execution until the user provides that exact approval line.
+
 ## CM-1169 Temp-Local Startup Recovery Dry-Run Execution Preflight Checkpoint
 
 Status: `CM1169_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_VALIDATED_NOT_READY`

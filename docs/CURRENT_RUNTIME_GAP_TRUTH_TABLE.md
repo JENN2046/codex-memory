@@ -28,6 +28,24 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1170 Temp-Local Startup Recovery Dry-Run Execution Approval Packet - 2026-05-26
+
+Result: `CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY`.
+
+CM-1170 prepares the next exact approval request only:
+
+- Drafts one approval packet after CM-1169.
+- Binds the request to clean `HEAD=7e633d77e5ca92787dd052f5cbee580e0a559338` before packet commit.
+- Limits any future separately approved action to one temp-local/fixture-only `MemoryWriteReconcileWorker.runOnce` dry-run.
+- Requires `dryRun=true`, `apply=false`, `confirm=false`, `maxRuns=1`, `isolatedTempRoot=true`, `cleanupRequired=true`, `rawOutputAllowed=false`, and `durableAuditAllowed=false`.
+- Forbids real stores, startup/runtime/manifest recovery execution, repair/cancel/reconcile apply, durable audit write, raw output, provider/API, public MCP expansion, config/watchdog/startup/dependency changes, migration/import/export/backup/restore, push, readiness, and reliability claims.
+
+Still not proven:
+
+- No exact approval has been consumed.
+- No dry-run has been executed.
+- No startup recovery, runtime recovery, real-store recovery proof, durable audit write, production readiness, write reliability, or recall reliability.
+
 ## CM-1169 Temp-Local Startup Recovery Dry-Run Execution Preflight - 2026-05-26
 
 Result: `CM1169_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_VALIDATED_NOT_READY`.
