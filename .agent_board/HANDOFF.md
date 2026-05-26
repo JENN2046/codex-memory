@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1158 Durable Write Kernel Corruption Quarantine Handoff
+
+Goal: continue CM-1157 by preserving corrupt JSON projection files before vector/cache rebuild.
+
+Status: CM1158_DURABLE_WRITE_KERNEL_CORRUPTION_QUARANTINE_COMPLETED_VALIDATED_NOT_READY.
+
+Changed files: `src/storage/AtomicFileWriter.js`; `src/storage/VectorIndexStore.js`; `src/storage/CandidateCacheStore.js`; `tests/storage-corruption-quarantine.test.js`; `docs/CM1158_DURABLE_WRITE_KERNEL_CORRUPTION_QUARANTINE.md`; status/truth-table/board surfaces.
+
+Runtime behavior: corrupt vector index and candidate cache JSON files are renamed to `.corrupt-*` quarantine files before a fresh empty projection is written. Missing files still initialize normally.
+
+Validation: source/test syntax passed. Targeted storage/runtime tests passed `13/13`. Full `npm test` passed `2763/2763`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Remaining risks: no SQLite row-level corruption quarantine, no diary corruption quarantine, no chat index corruption quarantine, no automatic startup recovery, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1158 if guarded commit eligibility remains clean. After that, consider SQLite JSON-field corruption reporting or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
+
 ## CM-1157 Durable Write Kernel Audit Manifest Correlation Handoff
 
 Goal: continue CM-1156 by making SQLite write-manifest outcomes observable through selected-only write audit correlation.

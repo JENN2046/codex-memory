@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1158 Durable Write Kernel Corruption Quarantine Checkpoint
+
+Status: `CM1158_DURABLE_WRITE_KERNEL_CORRUPTION_QUARANTINE_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added `quarantineFile(...)` to the atomic file writer utility.
+- Vector index corrupt JSON now quarantines the original file before rebuilding an empty index.
+- Candidate cache corrupt JSON now quarantines the original file before rebuilding an empty cache.
+- Added selected quarantine metadata to vector/cache health output.
+- Added temp-local tests for corrupt and invalid-shape vector index / candidate cache quarantine.
+
+Validation:
+- Source/test syntax checks passed for changed storage/test files.
+- Targeted storage/runtime tests passed `13/13`.
+- Full `npm test` passed `2763/2763`.
+- Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No SQLite row corruption quarantine, diary corruption quarantine, chat index corruption quarantine, automatic startup recovery, or cross-store transactionality.
+
+Next:
+- Commit CM-1158 if guarded commit eligibility remains clean.
+- Continue kernel hardening with SQLite JSON-field corruption reporting or guarded automatic recovery design.
+
 ## CM-1157 Durable Write Kernel Audit Manifest Correlation Checkpoint
 
 Status: `CM1157_DURABLE_WRITE_KERNEL_AUDIT_MANIFEST_CORRELATION_COMPLETED_VALIDATED_NOT_READY`

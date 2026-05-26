@@ -28,6 +28,21 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1158 Durable Write Kernel Corruption Quarantine - 2026-05-26
+
+Result: `CM1158_DURABLE_WRITE_KERNEL_CORRUPTION_QUARANTINE_COMPLETED_VALIDATED_NOT_READY`.
+
+CM-1158 continues the minimum durable write kernel baseline:
+
+```text
+corrupt/invalid-shape vector index JSON quarantine before rebuild
+corrupt/invalid-shape candidate cache JSON quarantine before rebuild
+selected quarantine metadata in health output
+temp-local corruption quarantine coverage
+```
+
+This reduces the prior risk that corrupt or invalid-shape JSON projection files are silently overwritten as empty state. It does not complete SQLite row-level corruption handling, diary corruption handling, chat index corruption handling, cross-store transactionality, automatic startup recovery, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
 ## CM-1157 Durable Write Kernel Audit Manifest Correlation - 2026-05-26
 
 Result: `CM1157_DURABLE_WRITE_KERNEL_AUDIT_MANIFEST_CORRELATION_COMPLETED_VALIDATED_NOT_READY`.

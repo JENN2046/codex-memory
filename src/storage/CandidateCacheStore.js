@@ -1,7 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
-const { atomicWriteFile } = require('./AtomicFileWriter');
+const { atomicWriteFile, quarantineFile } = require('./AtomicFileWriter');
 
 class CandidateCacheStore {
   constructor(config) {
@@ -17,6 +17,7 @@ class CandidateCacheStore {
       hits: 0,
       misses: 0
     };
+    this.corruptionQuarantine = null;
   }
 
   async ensureReady() {
@@ -26,14 +27,35 @@ class CandidateCacheStore {
     try {
       const raw = await fs.readFile(this.config.candidateCachePath, 'utf8');
       const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === 'object' && parsed.entries && typeof parsed.entries === 'object') {
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed) &&
+        parsed.entries &&
+        typeof parsed.entries === 'object' &&
+        !Array.isArray(parsed.entries)
+      ) {
         this.cache = parsed;
         this.ensureMetadataShape();
       } else {
+        this.corruptionQuarantine = await quarantineFile(
+          this.config.candidateCachePath,
+          'candidate_cache_shape_invalid'
+        );
         await this.flush();
       }
-    } catch {
-      await this.flush();
+    } catch (error) {
+      if (error?.code === 'ENOENT') {
+        await this.flush();
+      } else if (error instanceof SyntaxError) {
+        this.corruptionQuarantine = await quarantineFile(
+          this.config.candidateCachePath,
+          'candidate_cache_json_parse_failed'
+        );
+        await this.flush();
+      } else {
+        throw error;
+      }
     }
 
     this.pruneExpiredEntries();
@@ -354,6 +376,7 @@ class CandidateCacheStore {
       hits: this.stats.hits,
       misses: this.stats.misses,
       governanceStateRevisionTargets: Object.keys(fingerprintMetadata?.governanceStateRevisionByTarget || {}).sort(),
+      corruptionQuarantine: this.corruptionQuarantine,
       updatedAt: this.cache.updatedAt
     };
   }

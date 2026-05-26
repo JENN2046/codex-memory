@@ -2,7 +2,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
-const { atomicWriteFile } = require('./AtomicFileWriter');
+const { atomicWriteFile, quarantineFile } = require('./AtomicFileWriter');
 const { filterRecallIsolatedItems, isRecallIsolated } = require('../core/RecallIsolationClassifier');
 
 function cosineSimilarity(left, right) {
@@ -36,6 +36,7 @@ class VectorIndexStore {
       embeddingMisses: 0
     };
     this.index = this.createEmptyIndex();
+    this.corruptionQuarantine = null;
   }
 
   createEmptyIndex() {
@@ -56,12 +57,28 @@ class VectorIndexStore {
     try {
       const raw = await fs.readFile(this.config.vectorIndexPath, 'utf8');
       this.index = JSON.parse(raw);
-    } catch {
-      await this.flush();
+    } catch (error) {
+      if (error?.code === 'ENOENT') {
+        await this.flush();
+      } else if (error instanceof SyntaxError) {
+        this.corruptionQuarantine = await quarantineFile(
+          this.config.vectorIndexPath,
+          'vector_index_json_parse_failed'
+        );
+        this.index = this.createEmptyIndex();
+        await this.flush();
+      } else {
+        throw error;
+      }
     }
 
-    if (!this.index || typeof this.index !== 'object') {
+    if (!this.index || typeof this.index !== 'object' || Array.isArray(this.index)) {
+      this.corruptionQuarantine = await quarantineFile(
+        this.config.vectorIndexPath,
+        'vector_index_shape_invalid'
+      );
       this.index = this.createEmptyIndex();
+      await this.flush();
     }
     if (this.index.embeddingFingerprint !== this.config.embeddingFingerprint) {
       this.index = this.createEmptyIndex();
@@ -402,6 +419,7 @@ class VectorIndexStore {
       embeddingCacheCount: Object.keys(this.index.embeddingCache || {}).length,
       embeddingHits: this.stats.embeddingHits,
       embeddingMisses: this.stats.embeddingMisses,
+      corruptionQuarantine: this.corruptionQuarantine,
       updatedAt: this.index.updatedAt
     };
   }

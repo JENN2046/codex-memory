@@ -117,7 +117,39 @@ async function atomicWriteFile(filePath, content, options = {}) {
   }, options.lockOptions || {});
 }
 
+async function quarantineFile(filePath, reason = 'corrupt_file', options = {}) {
+  const lockPath = options.lock === false ? null : (options.lockPath || `${filePath}.lock`);
+  return withFileLock(lockPath, async () => {
+    try {
+      await fs.access(filePath);
+    } catch (error) {
+      if (error?.code === 'ENOENT') {
+        return {
+          quarantined: false,
+          reason: 'source_missing',
+          sourcePath: filePath,
+          quarantinePath: null,
+          timestamp: null
+        };
+      }
+      throw error;
+    }
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const quarantinePath = `${filePath}.corrupt-${timestamp}-${crypto.randomBytes(6).toString('hex')}`;
+    await fs.rename(filePath, quarantinePath);
+    return {
+      quarantined: true,
+      reason,
+      sourcePath: filePath,
+      quarantinePath,
+      timestamp
+    };
+  }, options.lockOptions || {});
+}
+
 module.exports = {
   atomicWriteFile,
+  quarantineFile,
   withFileLock
 };
