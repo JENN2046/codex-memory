@@ -1,5 +1,47 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1168 Temp-Local Startup Recovery Dry-Run Harness Checkpoint
+
+Status: `CM1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending guarded local commit.
+
+Completed:
+- Added planning-only `buildTempLocalStartupRecoveryDryRunHarness(...)`.
+- Required accepted CM-1167 policy design before dry-run harness readiness is accepted.
+- Re-checked policy dry-run/manual flags, future harness requirement, disabled startup defaults, and bounded `1..10` limits.
+- Required temp-local or fixture-only scope.
+- Required selected non-negative inventory counters.
+- Computed bounded dry-run candidate counts without executing recovery or dry-run.
+- Blocked startup recovery, runtime recovery, manifest recovery/repair/cancel, reconcile replay, dry-run execution, real-store writes, config/watchdog/startup changes, public MCP expansion, provider/API, migration/import/export/backup/restore, and readiness/reliability claims.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted startup safety/policy tests passed `15/15`.
+- Adjacent v1.1/governance bundle passed `39/39`.
+- Full `npm test` passed `2780/2780`.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan returned only existing sanitizer-test synthetic secret/path strings.
+- Changed-scope re-review found one actionable policy-ingestion tightening issue; CM-1168 now re-checks accepted CM-1167 policy flags/defaults/limits, and source/test syntax plus targeted tests were rerun. No remaining actionable issue in changed scope before docs updates.
+
+Boundary:
+- No startup recovery execution.
+- No runtime recovery execution.
+- No manifest recovery, repair, or cancellation execution.
+- No reconcile replay execution.
+- No dry-run execution.
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, config/watchdog/startup/dependency change, push, production-readiness claim, or reliability claim.
+
+Next:
+- Make guarded local commit.
+- After commit, record post-commit clean state.
+
 ## CM-1167 Guarded Startup Recovery Policy Design Checkpoint
 
 Status: `CM1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN_VALIDATED_NOT_READY`

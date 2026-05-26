@@ -3,9 +3,11 @@
 const TASK_ID = 'CM-1084_MEMORY_WRITE_RECONCILE_STARTUP_WORKER_SAFETY';
 const STARTUP_RECOVERY_TASK_ID = 'CM-1166_MEMORY_WRITE_STARTUP_RECOVERY_SAFETY_PREFLIGHT';
 const STARTUP_RECOVERY_POLICY_TASK_ID = 'CM-1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN';
+const STARTUP_RECOVERY_DRY_RUN_TASK_ID = 'CM-1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS';
 const ACCEPTED_MODE = 'startup_reconcile_worker_safety_review_only';
 const ACCEPTED_RECOVERY_MODE = 'startup_recovery_safety_preflight_only';
 const ACCEPTED_RECOVERY_POLICY_MODE = 'guarded_startup_recovery_policy_design_only';
+const ACCEPTED_RECOVERY_DRY_RUN_MODE = 'temp_local_startup_recovery_dry_run_harness_only';
 const ACCEPTED_SOURCES = Object.freeze([
   'temp_local_app_initialization_fixture',
   'temp_local_worker_status_fixture'
@@ -17,6 +19,10 @@ const ACCEPTED_RECOVERY_SOURCES = Object.freeze([
 const ACCEPTED_RECOVERY_POLICY_SOURCES = Object.freeze([
   'cm1166_startup_recovery_safety_preflight_report',
   'temp_local_startup_recovery_policy_fixture'
+]);
+const ACCEPTED_RECOVERY_DRY_RUN_SOURCES = Object.freeze([
+  'cm1167_guarded_startup_recovery_policy_design',
+  'temp_local_startup_recovery_dry_run_fixture'
 ]);
 const WORKER_STATUS_KEYS = Object.freeze([
   'running',
@@ -150,6 +156,25 @@ function buildStartupRecoveryPolicyApplyGate() {
     runtimeRecoveryExecuted: false,
     dryRunHarnessImplemented: false,
     dryRunExecuted: false,
+    configChangeApproved: false,
+    configChangeExecuted: false,
+    watchdogChangeApproved: false,
+    watchdogChangeExecuted: false,
+    publicMcpExpansionApproved: false,
+    publicMcpExpansionExecuted: false
+  };
+}
+
+function buildStartupRecoveryDryRunApplyGate() {
+  return {
+    startupRecoveryDryRunApproved: false,
+    startupRecoveryDryRunExecuted: false,
+    startupRecoveryExecuted: false,
+    runtimeRecoveryExecuted: false,
+    manifestRecoveryExecuted: false,
+    manifestRepairExecuted: false,
+    manifestCancelExecuted: false,
+    reconcileReplayExecuted: false,
     configChangeApproved: false,
     configChangeExecuted: false,
     watchdogChangeApproved: false,
@@ -326,6 +351,51 @@ function normalizePolicyLimit(value, fallback = 10) {
   return Number.isInteger(number) && number > 0 && number <= 10 ? number : null;
 }
 
+function hasAcceptedGuardedStartupRecoveryPolicyDesign(report) {
+  const startupRecoveryLimit = report?.policyDesign?.startupRecoveryLimit;
+  const reconcileReplayLimit = report?.policyDesign?.reconcileReplayLimit;
+  const repairLimit = report?.policyDesign?.repairLimit;
+  return isPlainObject(report) &&
+    report.taskId === STARTUP_RECOVERY_POLICY_TASK_ID &&
+    report.accepted === true &&
+    report.status === 'guarded_startup_recovery_policy_design_accepted_not_enabled' &&
+    report.priorPreflightAccepted === true &&
+    report.startupRecoveryPolicyDesigned === true &&
+    report.startupRecoveryPolicyActivated === false &&
+    report.startupRecoveryEnabled === false &&
+    report.runtimeRecoveryExecuted === false &&
+    report.dryRunExecuted === false &&
+    report.manifestRecoveryExecuted === false &&
+    report.manifestRepairExecuted === false &&
+    report.manifestCancelExecuted === false &&
+    report.configChanged === false &&
+    report.watchdogChanged === false &&
+    report.startupTaskChanged === false &&
+    report.publicMcpExpansion === false &&
+    report.providerCalled === false &&
+    report.realStoreWritten === false &&
+    report.schemaMigrationApplied === false &&
+    report.backupRestoreApplied === false &&
+    report.importExportApplied === false &&
+    report.readinessClaimed === false &&
+    report.reliabilityClaimed === false &&
+    report.policyDesign?.dryRunRequired === true &&
+    report.policyDesign?.manualApprovalRequired === true &&
+    report.policyDesign?.futureDryRunHarnessRequired === true &&
+    report.policyDesign?.startupRecoveryDefault === 'disabled' &&
+    report.policyDesign?.startupReconcileReplayDefault === 'disabled' &&
+    report.policyDesign?.nextAllowedAction === 'implement_temp_local_startup_recovery_dry_run_harness_only' &&
+    Number.isInteger(startupRecoveryLimit) &&
+    startupRecoveryLimit > 0 &&
+    startupRecoveryLimit <= 10 &&
+    Number.isInteger(reconcileReplayLimit) &&
+    reconcileReplayLimit > 0 &&
+    reconcileReplayLimit <= 10 &&
+    Number.isInteger(repairLimit) &&
+    repairLimit > 0 &&
+    repairLimit <= 10;
+}
+
 function buildGuardedStartupRecoveryPolicyDesign({
   mode = '',
   source = '',
@@ -449,6 +519,143 @@ function buildGuardedStartupRecoveryPolicyDesign({
   };
 }
 
+function buildTempLocalStartupRecoveryDryRunHarness({
+  mode = '',
+  source = '',
+  priorPolicyDesign = null,
+  inventory = {},
+  realStoreScope = '',
+  requestedDryRunExecution = false,
+  requestedStartupRecovery = false,
+  requestedRuntimeRecovery = false,
+  requestedManifestRecovery = false,
+  requestedManifestRepair = false,
+  requestedManifestCancel = false,
+  requestedReconcileReplay = false,
+  requestedConfigChange = false,
+  requestedWatchdogChange = false,
+  requestedStartupTaskChange = false,
+  requestedPublicMcpExpansion = false,
+  requestedProviderCall = false,
+  requestedRealStoreWrite = false,
+  requestedSchemaMigration = false,
+  requestedBackupRestore = false,
+  requestedImportExport = false,
+  readinessClaimed = false,
+  reliabilityClaimed = false
+} = {}) {
+  const blockers = [];
+  const normalizedMode = normalizeString(mode);
+  const normalizedSource = normalizeString(source);
+  const normalizedScope = normalizeString(realStoreScope);
+  const safeInventory = isPlainObject(inventory) ? inventory : {};
+  const pendingManifestCount = pickCounter(safeInventory.pendingManifestCount);
+  const degradedManifestCount = pickCounter(safeInventory.degradedManifestCount);
+  const reconcileTaskCount = pickCounter(safeInventory.reconcileTaskCount);
+  const policyAccepted = hasAcceptedGuardedStartupRecoveryPolicyDesign(priorPolicyDesign);
+  const startupRecoveryLimit = policyAccepted ? priorPolicyDesign.policyDesign.startupRecoveryLimit : null;
+  const reconcileReplayLimit = policyAccepted ? priorPolicyDesign.policyDesign.reconcileReplayLimit : null;
+  const repairLimit = policyAccepted ? priorPolicyDesign.policyDesign.repairLimit : null;
+
+  if (normalizedMode !== ACCEPTED_RECOVERY_DRY_RUN_MODE) {
+    blockers.push('startup_recovery_dry_run_harness_mode_required');
+  }
+  if (!ACCEPTED_RECOVERY_DRY_RUN_SOURCES.includes(normalizedSource)) {
+    blockers.push('startup_recovery_dry_run_source_required');
+  }
+  if (!policyAccepted) {
+    blockers.push('accepted_cm1167_policy_design_required');
+  }
+  if (!['temp_local', 'fixture_only'].includes(normalizedScope)) {
+    blockers.push('temp_local_dry_run_scope_required');
+  }
+  if (normalizedScope === 'real' || normalizedScope === 'production') {
+    blockers.push('real_store_scope_not_allowed');
+  }
+  if (pendingManifestCount === null) blockers.push('pending_manifest_count_must_be_non_negative_integer');
+  if (degradedManifestCount === null) blockers.push('degraded_manifest_count_must_be_non_negative_integer');
+  if (reconcileTaskCount === null) blockers.push('reconcile_task_count_must_be_non_negative_integer');
+  if (requestedDryRunExecution === true) blockers.push('dry_run_execution_not_authorized');
+  if (requestedStartupRecovery === true) blockers.push('startup_recovery_not_authorized');
+  if (requestedRuntimeRecovery === true) blockers.push('runtime_recovery_not_authorized');
+  if (requestedManifestRecovery === true) blockers.push('manifest_recovery_not_authorized');
+  if (requestedManifestRepair === true) blockers.push('manifest_repair_not_authorized');
+  if (requestedManifestCancel === true) blockers.push('manifest_cancel_not_authorized');
+  if (requestedReconcileReplay === true) blockers.push('reconcile_replay_not_authorized');
+  if (requestedConfigChange === true) blockers.push('config_change_not_authorized');
+  if (requestedWatchdogChange === true) blockers.push('watchdog_change_not_authorized');
+  if (requestedStartupTaskChange === true) blockers.push('startup_task_change_not_authorized');
+  if (requestedPublicMcpExpansion === true) blockers.push('public_mcp_expansion_not_authorized');
+  if (requestedProviderCall === true) blockers.push('provider_call_not_authorized');
+  if (requestedRealStoreWrite === true) blockers.push('real_store_write_not_authorized');
+  if (requestedSchemaMigration === true) blockers.push('schema_migration_not_authorized');
+  if (requestedBackupRestore === true) blockers.push('backup_restore_not_authorized');
+  if (requestedImportExport === true) blockers.push('import_export_not_authorized');
+  if (readinessClaimed === true) blockers.push('readiness_claim_not_authorized');
+  if (reliabilityClaimed === true) blockers.push('reliability_claim_not_authorized');
+
+  const accepted = blockers.length === 0;
+  return {
+    taskId: STARTUP_RECOVERY_DRY_RUN_TASK_ID,
+    accepted,
+    status: accepted
+      ? 'temp_local_startup_recovery_dry_run_harness_ready_not_executed'
+      : 'temp_local_startup_recovery_dry_run_harness_blocked',
+    mode: normalizedMode || null,
+    source: normalizedSource || null,
+    realStoreScope: normalizedScope || null,
+    blockerReasons: blockers,
+    priorPolicyDesignAccepted: policyAccepted,
+    inventory: {
+      pendingManifestCount,
+      degradedManifestCount,
+      reconcileTaskCount
+    },
+    dryRunPlan: {
+      startupRecoveryLimit,
+      reconcileReplayLimit,
+      repairLimit,
+      pendingManifestCandidates: pendingManifestCount === null || startupRecoveryLimit === null
+        ? null
+        : Math.min(pendingManifestCount, startupRecoveryLimit),
+      degradedManifestCandidates: degradedManifestCount === null || repairLimit === null
+        ? null
+        : Math.min(degradedManifestCount, repairLimit),
+      reconcileReplayCandidates: reconcileTaskCount === null || reconcileReplayLimit === null
+        ? null
+        : Math.min(reconcileTaskCount, reconcileReplayLimit),
+      dryRunOnly: true,
+      tempLocalOnly: normalizedScope === 'temp_local',
+      fixtureOnly: normalizedScope === 'fixture_only',
+      executionDefault: 'disabled',
+      manualApprovalRequiredBeforeApply: true,
+      nextAllowedAction: accepted
+        ? 'record_temp_local_startup_recovery_dry_run_harness_only'
+        : 'resolve_temp_local_startup_recovery_dry_run_harness_blockers'
+    },
+    dryRunHarnessReady: accepted,
+    dryRunExecuted: false,
+    startupRecoveryExecuted: false,
+    runtimeRecoveryExecuted: false,
+    manifestRecoveryExecuted: false,
+    manifestRepairExecuted: false,
+    manifestCancelExecuted: false,
+    reconcileReplayExecuted: false,
+    configChanged: false,
+    watchdogChanged: false,
+    startupTaskChanged: false,
+    publicMcpExpansion: false,
+    providerCalled: false,
+    realStoreWritten: false,
+    schemaMigrationApplied: false,
+    backupRestoreApplied: false,
+    importExportApplied: false,
+    readinessClaimed: false,
+    reliabilityClaimed: false,
+    applyGate: buildStartupRecoveryDryRunApplyGate()
+  };
+}
+
 function buildStartupSafetyReport({
   mode = '',
   source = '',
@@ -528,17 +735,21 @@ function buildStartupSafetyReport({
 
 module.exports = {
   ACCEPTED_MODE,
+  ACCEPTED_RECOVERY_DRY_RUN_MODE,
+  ACCEPTED_RECOVERY_DRY_RUN_SOURCES,
   ACCEPTED_RECOVERY_MODE,
   ACCEPTED_RECOVERY_POLICY_MODE,
   ACCEPTED_RECOVERY_POLICY_SOURCES,
   ACCEPTED_RECOVERY_SOURCES,
   ACCEPTED_SOURCES,
   STARTUP_RECOVERY_POLICY_TASK_ID,
+  STARTUP_RECOVERY_DRY_RUN_TASK_ID,
   STARTUP_RECOVERY_TASK_ID,
   TASK_ID,
   buildGuardedStartupRecoveryPolicyDesign,
   buildStartupRecoverySafetyPreflight,
   buildStartupSafetyReport,
+  buildTempLocalStartupRecoveryDryRunHarness,
   sanitizeStartupRecoveryHealth,
   sanitizeWorkerStatus
 };

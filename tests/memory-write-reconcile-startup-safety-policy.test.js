@@ -11,12 +11,14 @@ const { TOOL_DEFINITIONS } = require('../src/core/constants');
 const { SqliteShadowStore } = require('../src/storage/SqliteShadowStore');
 const {
   ACCEPTED_MODE,
+  ACCEPTED_RECOVERY_DRY_RUN_MODE,
   ACCEPTED_RECOVERY_MODE,
   ACCEPTED_RECOVERY_POLICY_MODE,
   STARTUP_RECOVERY_TASK_ID,
   buildGuardedStartupRecoveryPolicyDesign,
   buildStartupRecoverySafetyPreflight,
   buildStartupSafetyReport,
+  buildTempLocalStartupRecoveryDryRunHarness,
   sanitizeStartupRecoveryHealth,
   sanitizeWorkerStatus
 } = require('../src/core/MemoryWriteReconcileStartupSafetyPolicy');
@@ -69,6 +71,54 @@ function acceptedCm1166Preflight(overrides = {}) {
       degradedManifestCount: 1,
       reconcileTaskCount: 3
     },
+    ...overrides
+  };
+}
+
+function acceptedCm1167PolicyDesign(overrides = {}) {
+  return {
+    taskId: 'CM-1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN',
+    accepted: true,
+    status: 'guarded_startup_recovery_policy_design_accepted_not_enabled',
+    priorPreflightAccepted: true,
+    blockerReasons: [],
+    candidateCounts: {
+      pendingManifestCount: 2,
+      degradedManifestCount: 1,
+      reconcileTaskCount: 3
+    },
+    policyDesign: {
+      startupRecoveryLimit: 5,
+      reconcileReplayLimit: 4,
+      repairLimit: 3,
+      dryRunRequired: true,
+      manualApprovalRequired: true,
+      futureDryRunHarnessRequired: true,
+      missingDiaryCancellation: 'manual_approval_only',
+      degradedRepair: 'manual_after_reconcile_queue_drained_only',
+      startupRecoveryDefault: 'disabled',
+      startupReconcileReplayDefault: 'disabled',
+      nextAllowedAction: 'implement_temp_local_startup_recovery_dry_run_harness_only'
+    },
+    startupRecoveryPolicyDesigned: true,
+    startupRecoveryPolicyActivated: false,
+    startupRecoveryEnabled: false,
+    runtimeRecoveryExecuted: false,
+    dryRunExecuted: false,
+    manifestRecoveryExecuted: false,
+    manifestRepairExecuted: false,
+    manifestCancelExecuted: false,
+    configChanged: false,
+    watchdogChanged: false,
+    startupTaskChanged: false,
+    publicMcpExpansion: false,
+    providerCalled: false,
+    realStoreWritten: false,
+    schemaMigrationApplied: false,
+    backupRestoreApplied: false,
+    importExportApplied: false,
+    readinessClaimed: false,
+    reliabilityClaimed: false,
     ...overrides
   };
 }
@@ -577,6 +627,171 @@ test('CM-1167 guarded startup recovery policy design blocks startup execution, r
   assert.equal(report.applyGate.startupRecoveryExecuted, false);
   assert.equal(report.applyGate.runtimeRecoveryExecuted, false);
   assert.equal(report.applyGate.dryRunExecuted, false);
+  assert.equal(report.realStoreWritten, false);
+  assert.equal(report.readinessClaimed, false);
+  assert.equal(report.reliabilityClaimed, false);
+});
+
+test('CM-1168 temp-local startup recovery dry-run harness is ready without executing recovery', () => {
+  const report = buildTempLocalStartupRecoveryDryRunHarness({
+    mode: ACCEPTED_RECOVERY_DRY_RUN_MODE,
+    source: 'cm1167_guarded_startup_recovery_policy_design',
+    priorPolicyDesign: acceptedCm1167PolicyDesign(),
+    realStoreScope: 'temp_local',
+    inventory: {
+      pendingManifestCount: 7,
+      degradedManifestCount: 2,
+      reconcileTaskCount: 9
+    }
+  });
+
+  assert.equal(report.accepted, true);
+  assert.equal(report.status, 'temp_local_startup_recovery_dry_run_harness_ready_not_executed');
+  assert.equal(report.priorPolicyDesignAccepted, true);
+  assert.deepEqual(report.inventory, {
+    pendingManifestCount: 7,
+    degradedManifestCount: 2,
+    reconcileTaskCount: 9
+  });
+  assert.equal(report.dryRunPlan.startupRecoveryLimit, 5);
+  assert.equal(report.dryRunPlan.reconcileReplayLimit, 4);
+  assert.equal(report.dryRunPlan.repairLimit, 3);
+  assert.equal(report.dryRunPlan.pendingManifestCandidates, 5);
+  assert.equal(report.dryRunPlan.degradedManifestCandidates, 2);
+  assert.equal(report.dryRunPlan.reconcileReplayCandidates, 4);
+  assert.equal(report.dryRunPlan.dryRunOnly, true);
+  assert.equal(report.dryRunPlan.tempLocalOnly, true);
+  assert.equal(report.dryRunPlan.executionDefault, 'disabled');
+  assert.equal(report.dryRunPlan.manualApprovalRequiredBeforeApply, true);
+  assert.equal(report.dryRunPlan.nextAllowedAction, 'record_temp_local_startup_recovery_dry_run_harness_only');
+  assert.equal(report.dryRunHarnessReady, true);
+  assert.equal(report.dryRunExecuted, false);
+  assert.equal(report.startupRecoveryExecuted, false);
+  assert.equal(report.runtimeRecoveryExecuted, false);
+  assert.equal(report.manifestRecoveryExecuted, false);
+  assert.equal(report.manifestRepairExecuted, false);
+  assert.equal(report.manifestCancelExecuted, false);
+  assert.equal(report.reconcileReplayExecuted, false);
+  assert.equal(report.realStoreWritten, false);
+  assert.equal(report.readinessClaimed, false);
+  assert.equal(report.reliabilityClaimed, false);
+  assert.equal(report.applyGate.startupRecoveryDryRunExecuted, false);
+  assert.equal(report.applyGate.manifestRecoveryExecuted, false);
+});
+
+test('CM-1168 temp-local startup recovery dry-run harness requires accepted policy, temp-local scope, and selected counters', () => {
+  const report = buildTempLocalStartupRecoveryDryRunHarness({
+    mode: 'execute_startup_recovery_dry_run_now',
+    source: 'real_memory_store',
+    priorPolicyDesign: acceptedCm1167PolicyDesign({
+      taskId: 'CM-OTHER',
+      accepted: false,
+      startupRecoveryPolicyDesigned: false
+    }),
+    realStoreScope: 'broad',
+    inventory: {
+      pendingManifestCount: -1,
+      degradedManifestCount: 'many',
+      reconcileTaskCount: null
+    }
+  });
+
+  assert.equal(report.accepted, false);
+  assert.equal(report.priorPolicyDesignAccepted, false);
+  assert.ok(report.blockerReasons.includes('startup_recovery_dry_run_harness_mode_required'));
+  assert.ok(report.blockerReasons.includes('startup_recovery_dry_run_source_required'));
+  assert.ok(report.blockerReasons.includes('accepted_cm1167_policy_design_required'));
+  assert.ok(report.blockerReasons.includes('temp_local_dry_run_scope_required'));
+  assert.ok(report.blockerReasons.includes('pending_manifest_count_must_be_non_negative_integer'));
+  assert.ok(report.blockerReasons.includes('degraded_manifest_count_must_be_non_negative_integer'));
+  assert.ok(report.blockerReasons.includes('reconcile_task_count_must_be_non_negative_integer'));
+  assert.equal(report.dryRunHarnessReady, false);
+  assert.equal(report.dryRunExecuted, false);
+
+  const unsafeAcceptedShape = buildTempLocalStartupRecoveryDryRunHarness({
+    mode: ACCEPTED_RECOVERY_DRY_RUN_MODE,
+    source: 'temp_local_startup_recovery_dry_run_fixture',
+    priorPolicyDesign: acceptedCm1167PolicyDesign({
+      policyDesign: {
+        startupRecoveryLimit: 99,
+        reconcileReplayLimit: 4,
+        repairLimit: 3,
+        dryRunRequired: false,
+        manualApprovalRequired: true,
+        futureDryRunHarnessRequired: true,
+        startupRecoveryDefault: 'disabled',
+        startupReconcileReplayDefault: 'disabled',
+        nextAllowedAction: 'implement_temp_local_startup_recovery_dry_run_harness_only'
+      }
+    }),
+    realStoreScope: 'fixture_only',
+    inventory: {
+      pendingManifestCount: 1,
+      degradedManifestCount: 0,
+      reconcileTaskCount: 0
+    }
+  });
+
+  assert.equal(unsafeAcceptedShape.accepted, false);
+  assert.equal(unsafeAcceptedShape.priorPolicyDesignAccepted, false);
+  assert.ok(unsafeAcceptedShape.blockerReasons.includes('accepted_cm1167_policy_design_required'));
+});
+
+test('CM-1168 temp-local startup recovery dry-run harness blocks execution, real-store scope, and overclaims', () => {
+  const report = buildTempLocalStartupRecoveryDryRunHarness({
+    mode: ACCEPTED_RECOVERY_DRY_RUN_MODE,
+    source: 'temp_local_startup_recovery_dry_run_fixture',
+    priorPolicyDesign: acceptedCm1167PolicyDesign(),
+    realStoreScope: 'real',
+    inventory: {
+      pendingManifestCount: 1,
+      degradedManifestCount: 1,
+      reconcileTaskCount: 1
+    },
+    requestedDryRunExecution: true,
+    requestedStartupRecovery: true,
+    requestedRuntimeRecovery: true,
+    requestedManifestRecovery: true,
+    requestedManifestRepair: true,
+    requestedManifestCancel: true,
+    requestedReconcileReplay: true,
+    requestedConfigChange: true,
+    requestedWatchdogChange: true,
+    requestedStartupTaskChange: true,
+    requestedPublicMcpExpansion: true,
+    requestedProviderCall: true,
+    requestedRealStoreWrite: true,
+    requestedSchemaMigration: true,
+    requestedBackupRestore: true,
+    requestedImportExport: true,
+    readinessClaimed: true,
+    reliabilityClaimed: true
+  });
+
+  assert.equal(report.accepted, false);
+  assert.ok(report.blockerReasons.includes('real_store_scope_not_allowed'));
+  assert.ok(report.blockerReasons.includes('dry_run_execution_not_authorized'));
+  assert.ok(report.blockerReasons.includes('startup_recovery_not_authorized'));
+  assert.ok(report.blockerReasons.includes('runtime_recovery_not_authorized'));
+  assert.ok(report.blockerReasons.includes('manifest_recovery_not_authorized'));
+  assert.ok(report.blockerReasons.includes('manifest_repair_not_authorized'));
+  assert.ok(report.blockerReasons.includes('manifest_cancel_not_authorized'));
+  assert.ok(report.blockerReasons.includes('reconcile_replay_not_authorized'));
+  assert.ok(report.blockerReasons.includes('config_change_not_authorized'));
+  assert.ok(report.blockerReasons.includes('watchdog_change_not_authorized'));
+  assert.ok(report.blockerReasons.includes('startup_task_change_not_authorized'));
+  assert.ok(report.blockerReasons.includes('public_mcp_expansion_not_authorized'));
+  assert.ok(report.blockerReasons.includes('provider_call_not_authorized'));
+  assert.ok(report.blockerReasons.includes('real_store_write_not_authorized'));
+  assert.ok(report.blockerReasons.includes('schema_migration_not_authorized'));
+  assert.ok(report.blockerReasons.includes('backup_restore_not_authorized'));
+  assert.ok(report.blockerReasons.includes('import_export_not_authorized'));
+  assert.ok(report.blockerReasons.includes('readiness_claim_not_authorized'));
+  assert.ok(report.blockerReasons.includes('reliability_claim_not_authorized'));
+  assert.equal(report.applyGate.startupRecoveryDryRunExecuted, false);
+  assert.equal(report.applyGate.startupRecoveryExecuted, false);
+  assert.equal(report.applyGate.runtimeRecoveryExecuted, false);
+  assert.equal(report.applyGate.reconcileReplayExecuted, false);
   assert.equal(report.realStoreWritten, false);
   assert.equal(report.readinessClaimed, false);
   assert.equal(report.reliabilityClaimed, false);

@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-1168 Temp-Local Startup Recovery Dry-Run Harness Handoff
+
+Goal: continue CM-1167 by adding a planning-only temp-local startup recovery dry-run harness before any future dry-run execution or runtime recovery work.
+
+Status: CM1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS_VALIDATED_NOT_READY.
+
+Local commit: pending guarded local commit.
+
+Changed files: `src/core/MemoryWriteReconcileStartupSafetyPolicy.js`; `tests/memory-write-reconcile-startup-safety-policy.test.js`; `docs/CM1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: none executed. The helper consumes an accepted CM-1167 policy design, requires temp-local or fixture-only scope, requires selected non-negative inventory counters, computes bounded dry-run candidate counts, and keeps all recovery/dry-run execution flags false.
+
+Validation: source/test syntax passed. Targeted startup safety/policy tests passed `15/15`. Adjacent v1.1/governance bundle passed `39/39`. Full `npm test` passed `2780/2780`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed. The focused scan returned only existing sanitizer-test synthetic secret/path strings. Re-review found and repaired one policy-ingestion issue; no remaining actionable issue in changed scope.
+
+Remaining risks: no actual startup recovery dry-run execution, no runtime recovery execution, no real-store recovery proof, no background worker/scheduler recovery, no retry/backoff policy, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: make guarded local commit, then record post-commit clean state. Do not enable startup/runtime recovery, push, or claim readiness/reliability.
+
 ## CM-1167 Guarded Startup Recovery Policy Design Handoff
 
 Goal: continue CM-1166 by adding a guarded policy-design gate before any future startup recovery dry-run or execution work.

@@ -28,6 +28,33 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1168 Temp-Local Startup Recovery Dry-Run Harness - 2026-05-26
+
+Result: `CM1168_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_HARNESS_VALIDATED_NOT_READY`.
+
+CM-1168 continues the minimum durable write kernel hardening ladder:
+
+- Added `buildTempLocalStartupRecoveryDryRunHarness(...)`.
+- Requires accepted CM-1167 policy design and re-checks dry-run/manual flags, future harness requirement, disabled startup defaults, and bounded `1..10` limits.
+- Accepts only `temp_local` or `fixture_only` scope.
+- Accepts only selected non-negative inventory counters.
+- Computes bounded dry-run candidate counts without scanning real stores or calling recovery services.
+- Blocks dry-run execution, startup/runtime recovery, manifest recovery/repair/cancel, reconcile replay, real-store writes, provider/API, public MCP expansion, config/watchdog/startup changes, migration/import/export/backup/restore, readiness, and reliability.
+
+Validation:
+
+- Source/test syntax passed.
+- Targeted startup safety/policy tests passed `15/15`.
+- Adjacent v1.1/governance bundle passed `39/39`.
+- Full `npm test` passed `2780/2780`.
+
+Still not proven:
+
+- No actual startup recovery dry-run execution.
+- No real-store recovery proof.
+- No automatic startup recovery, scheduled recovery, retry/backoff policy, or cross-store transactionality.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1167 Guarded Startup Recovery Policy Design - 2026-05-26
 
 Result: `CM1167_GUARDED_STARTUP_RECOVERY_POLICY_DESIGN_VALIDATED_NOT_READY`.
