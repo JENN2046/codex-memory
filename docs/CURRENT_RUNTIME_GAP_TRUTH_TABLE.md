@@ -28,6 +28,26 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1161 Degraded Manifest Restart Recovery Validation - 2026-05-26
+
+Result: `CM1161_DEGRADED_MANIFEST_RESTART_RECOVERY_VALIDATED_NOT_READY`.
+
+CM-1161 continues the minimum durable write kernel validation ladder:
+
+```text
+pending manifest + diary-only crash window
+store/service reopen boundary
+manual pending-manifest recovery after reopen
+synthetic vector projection failure
+degraded manifest finalization
+reconcile queue visibility
+duplicate canonical write replay of degraded manifest
+```
+
+This strengthens temp-local evidence for recovery classification when a projection fails after restart. It does not enable automatic startup recovery, background recovery workers, scheduler/watchdog recovery, degraded projection auto-healing, real memory recovery, cross-store transactionality, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
+Validation passed: source/test syntax, targeted storage/runtime tests `12/12`, full `npm test` `2766/2766`, docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review.
+
 ## CM-1160 Pending Manifest Restart Recovery Validation - 2026-05-26
 
 Result: `CM1160_PENDING_MANIFEST_RESTART_RECOVERY_VALIDATED_NOT_READY`.

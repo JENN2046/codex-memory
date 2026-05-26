@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1161 Degraded Manifest Restart Recovery Validation Handoff
+
+Goal: continue CM-1160 by validating degraded pending-manifest recovery behavior across store reopen.
+
+Status: CM1161_DEGRADED_MANIFEST_RESTART_RECOVERY_VALIDATED_NOT_READY.
+
+Changed files: `tests/memory-write-restart-durability-temp-local-evidence.test.js`; `docs/CM1161_DEGRADED_MANIFEST_RESTART_RECOVERY_VALIDATION.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: a pending manifest with a matching diary record but a failing vector projection can be recovered after a store reopen into a degraded manifest; SQLite/chunk projection succeeds, vector remains absent, reconcile queue keeps the vector task, selected audit correlation reports degraded/recovered metadata, and duplicate canonical writes replay the degraded manifest.
+
+Validation: test syntax passed. Targeted storage/runtime tests passed `12/12`. Full `npm test` passed `2766/2766`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Remaining risks: no automatic startup recovery, no background worker/scheduler recovery, no degraded auto-healing proof, no real memory recovery proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1161 if guarded commit eligibility remains clean. After that, consider degraded reconcile replay after restart validation, missing-diary restart validation, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
+
 ## CM-1160 Pending Manifest Restart Recovery Validation Handoff
 
 Goal: continue CM-1159 by validating a pending-manifest / diary-only crash-window recovery path across store reopen.
