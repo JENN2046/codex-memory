@@ -14,7 +14,7 @@ Validation: test syntax passed. Targeted storage/runtime/reconcile tests passed 
 
 Remaining risks: no automatic startup recovery, no background worker/scheduler recovery, no degraded manifest repair/promotion policy, no real memory recovery proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
 
-Next safe step: commit CM-1162 if guarded commit eligibility remains clean. After that, consider missing-diary pending-manifest restart validation, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
+Next safe step: consider missing-diary pending-manifest restart validation, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
 
 ## CM-1161 Degraded Manifest Restart Recovery Validation Handoff
 

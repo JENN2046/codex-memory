@@ -31,7 +31,6 @@ Boundary:
 - No automatic startup recovery, background worker enablement, degraded auto-healing, manifest repair/promotion, scheduler/watchdog change, or cross-store transactionality.
 
 Next:
-- Commit CM-1162 if guarded commit eligibility remains clean.
 - Continue kernel hardening with missing-diary pending-manifest restart validation, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design.
 
 ## CM-1161 Degraded Manifest Restart Recovery Validation Checkpoint
