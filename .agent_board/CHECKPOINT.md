@@ -6,7 +6,7 @@ Status: `CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET_DR
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `8a150d7 docs: draft cm1170 dry-run approval packet`.
 
 Completed:
 - Drafted `docs/CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET.md`.
@@ -38,6 +38,9 @@ Next:
 - Commit this approval packet.
 - Generate the final copy/paste approval line from the resulting clean HEAD.
 - Pause before any dry-run execution until the user provides that exact approval line.
+
+Post-commit state:
+- After `8a150d7`, `git status --short --branch` reported `## main...origin/main [ahead 38]` with a clean worktree.
 
 ## CM-1169 Temp-Local Startup Recovery Dry-Run Execution Preflight Checkpoint
 

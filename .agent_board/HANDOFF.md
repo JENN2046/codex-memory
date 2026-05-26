@@ -6,7 +6,7 @@ Goal: prepare the exact approval request boundary after CM-1169 without executin
 
 Status: CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET_DRAFT_NOT_APPROVED_NOT_EXECUTED_NOT_READY.
 
-Local commit: pending.
+Local commit: `8a150d7 docs: draft cm1170 dry-run approval packet`.
 
 Changed files: `docs/CM1170_TEMP_LOCAL_STARTUP_RECOVERY_DRY_RUN_EXECUTION_APPROVAL_PACKET.md`; status/truth-table/board surfaces.
 
@@ -16,7 +16,7 @@ Validation: docs validation, ledger consistency, `git diff --check`, focused no-
 
 Remaining risks: exact approval not yet consumed, dry-run not executed, no startup/runtime recovery proof, no real-store proof, no durable audit proof, no background worker/scheduler recovery, no retry/backoff policy, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
 
-Post-commit state: pending.
+Post-commit state: after `8a150d7`, worktree was clean with `main...origin/main [ahead 38]`.
 
 Next safe step: commit packet, generate final copy/paste approval line from clean HEAD, then pause for user approval. Do not execute dry-run/startup/runtime recovery, push, or claim readiness/reliability.
 
