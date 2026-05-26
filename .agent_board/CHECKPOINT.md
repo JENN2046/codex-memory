@@ -1,5 +1,49 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1174 SQLite Authoritative Record Before Diary Projection Checkpoint
+
+Status: `CM1174_SQLITE_AUTHORITATIVE_RECORD_BEFORE_DIARY_PROJECTION_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Confirmed current write kernel already had write manifests, canonical idempotency, manual pending recovery, degraded repair, and cancellation from CM-1155..CM-1165.
+- Added `memory_write_manifests.record_json`.
+- Added transactional `SqliteShadowStore.attachRecordToMemoryWriteManifest(...)`.
+- Changed `MemoryWriteService.record()` to attach the authoritative SQLite record before diary projection.
+- Changed diary projection failure to degrade the accepted write instead of losing SQLite authority.
+- Changed pending manifest recovery to prefer manifest `record_json` before diary records.
+- Added a sync/prune guard that preserves active SQLite-authoritative no-`filePath` records while keeping normal stale diary prune behavior.
+- Added temp-local runtime tests for diary projection failure, default syncing search/read-only search continuity, and pending recovery from SQLite authority without diary.
+
+Validation:
+- Source/test syntax checks passed.
+- `node --test tests\durable-write-kernel-idempotency-runtime.test.js` passed `6/6`.
+- `node --test tests\phase-b-sync-cache-rerank.test.js tests\durable-write-kernel-idempotency-runtime.test.js` passed `22/22`.
+- `node --test tests\memory-write-restart-durability-temp-local-evidence.test.js` passed `7/7`.
+- `node --test tests\memory-write-reconcile-service.test.js tests\memory-write-reliability-temp-local-evidence.test.js` passed `11/11`.
+- `node --test tests\memory-write-reconcile-worker.test.js` passed `19/19`.
+- `npm test` final rerun passed `2785/2785`; an intermediate full run had non-reproduced failures and was followed by passing extraction/summary reruns.
+- `git diff --check` passed.
+
+Boundary:
+- No public MCP schema/tool expansion.
+- No real memory store mutation.
+- No provider/API call.
+- No `.env`, config, watchdog, startup, or dependency change.
+- No migration/import/export/backup/restore.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- Split manifest lifecycle into explicit `pending -> committed -> projected -> audited`.
+- Add diary projection reconcile/rebuild or clear projection semantics.
+- Split readonly and syncing search behavior explicitly.
+- Close no-token read.
+- Add SQLite schema migration/version startup gate.
+
 ## CM-1173 CM-1172 Temp-Local Positive Reconcile Dry-Run Execution Record Checkpoint
 
 Status: `CM1173_CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_EXECUTED_RECORDED_NOT_READY`

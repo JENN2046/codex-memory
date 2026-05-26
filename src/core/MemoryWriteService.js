@@ -503,13 +503,75 @@ class MemoryWriteService {
       retentionPolicy: proofPolicy.retentionPolicy
     };
 
-    const diaryWrite = await this.diaryStore.writeRecord(record);
-    record.filePath = diaryWrite.filePath;
-    record.relativePath = diaryWrite.relativePath;
-    record.rawText = diaryWrite.fileContent;
-
     const shadowFailures = [];
     let sqliteShadowReady = !this.config.enableShadowWrites;
+
+    if (
+      writeManifestContext &&
+      this.config.enableShadowWrites &&
+      this.shadowStore &&
+      typeof this.shadowStore.attachRecordToMemoryWriteManifest === 'function'
+    ) {
+      try {
+        const authoritativeWrite = await this.shadowStore.attachRecordToMemoryWriteManifest({
+          idempotencyKey: writeManifestContext.idempotencyKey,
+          record,
+          updatedAt: new Date().toISOString()
+        });
+        if (!authoritativeWrite.updated) {
+          result = this.buildRejectedResult(
+            `sqlite authoritative write manifest attach failed: ${authoritativeWrite.reason || 'unknown'}.`,
+            executionContext,
+            target
+          );
+          result.memoryId = record.memoryId;
+          result.idempotency = {
+            key: writeManifestContext.idempotencyKey,
+            canonicalHash: writeManifestContext.canonicalHash,
+            status: 'pending',
+            replayed: false,
+            recoveryRequired: true,
+            authoritativeStore: 'sqlite'
+          };
+          await this.writeAudit(result);
+          return result;
+        }
+        sqliteShadowReady = true;
+      } catch (error) {
+        result = this.buildRejectedResult(
+          `sqlite authoritative write failed: ${error.message}.`,
+          executionContext,
+          target
+        );
+        result.memoryId = record.memoryId;
+        result.idempotency = {
+          key: writeManifestContext.idempotencyKey,
+          canonicalHash: writeManifestContext.canonicalHash,
+          status: 'pending',
+          replayed: false,
+          recoveryRequired: true,
+          authoritativeStore: 'sqlite'
+        };
+        await this.writeAudit(result);
+        return result;
+      }
+    }
+
+    if (writeManifestContext) {
+      try {
+        const diaryWrite = await this.diaryStore.writeRecord(record);
+        record.filePath = diaryWrite.filePath;
+        record.relativePath = diaryWrite.relativePath;
+        record.rawText = diaryWrite.fileContent;
+      } catch (error) {
+        shadowFailures.push(`diary:${error.message}`);
+      }
+    } else {
+      const diaryWrite = await this.diaryStore.writeRecord(record);
+      record.filePath = diaryWrite.filePath;
+      record.relativePath = diaryWrite.relativePath;
+      record.rawText = diaryWrite.fileContent;
+    }
 
     if (this.config.enableShadowWrites) {
       try {
@@ -564,7 +626,7 @@ class MemoryWriteService {
       reason: `written to ${target === 'knowledge' ? 'Codex knowledge' : 'Codex'}.`,
       title,
       memoryId: record.memoryId,
-      filePath: record.filePath,
+      filePath: record.filePath || null,
       agentAlias: executionContext.agentAlias,
       agentId: executionContext.agentId || null,
       requestSource: executionContext.requestSource || this.config.defaultRequestSource,
@@ -620,7 +682,7 @@ class MemoryWriteService {
     };
 
     for (const manifest of manifests) {
-      const record = diaryRecordByMemoryId.get(manifest.memoryId);
+      const record = manifest.record || diaryRecordByMemoryId.get(manifest.memoryId);
       if (!record) {
         summary.missingDiary += 1;
         summary.items.push({

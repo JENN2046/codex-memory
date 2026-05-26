@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-1174 SQLite Authoritative Record Before Diary Projection Handoff
+
+Goal: start the real durable memory write kernel vertical slice by making SQLite authority happen before diary projection.
+
+Status: CM1174_SQLITE_AUTHORITATIVE_RECORD_BEFORE_DIARY_PROJECTION_VALIDATED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `src/storage/SqliteShadowStore.js`; `src/core/MemoryWriteService.js`; `src/recall/KnowledgeBaseSyncService.js`; `tests/durable-write-kernel-idempotency-runtime.test.js`; status/truth-table/board surfaces.
+
+Runtime behavior under test: temp-local `record_memory` now attaches an authoritative SQLite record to the pending manifest before diary projection. A synthetic diary projection failure returns accepted/degraded with `filePath=null`, keeps SQLite record/chunks available, and default syncing search plus read-only `search_memory` can find it. Diary sync/prune now preserves active SQLite-authoritative no-`filePath` records while the phase-B stale diary deletion prune regression still removes ordinary stale records. A pending manifest with manifest `record_json` and no diary record can recover projections and replay duplicate canonical writes to the same memory id.
+
+Validation: source/test syntax, targeted durable runtime test `6/6`, targeted sync/prune regression bundle `22/22`, adjacent restart `7/7`, adjacent reconcile/reliability `11/11`, worker `19/19`, final full `npm test` `2785/2785` after a non-reproduced intermediate failure, and `git diff --check` passed.
+
+Remaining risks: no explicit `pending -> committed -> projected -> audited` state split yet, no diary projection reconcile/rebuild, readonly/syncing search semantics are still not explicitly split, no no-token read closure, no schema migration/version startup hard stop, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1174 if guarded conditions pass, then choose the next kernel checkpoint from the remaining risks. Do not push unless explicitly requested.
+
 ## CM-1173 CM-1172 Temp-Local Positive Reconcile Dry-Run Execution Record Handoff
 
 Goal: consume the exact-approved CM-1172 positive reconcile dry-run once and record the result without expanding into recovery or real-store work.

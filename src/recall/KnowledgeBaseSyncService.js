@@ -125,6 +125,9 @@ class KnowledgeBaseSyncService {
         if (!existing.memoryId || activeMemoryIds.has(existing.memoryId)) {
           continue;
         }
+        if (await this.hasAuthoritativeWriteManifest(existing)) {
+          continue;
+        }
 
         await this.shadowStore.deleteRecord(existing.memoryId);
         throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
@@ -253,6 +256,22 @@ class KnowledgeBaseSyncService {
       return true;
     }
     return (await this.shadowStore.countChunksForRecord(record.memoryId)) > 0;
+  }
+
+  async hasAuthoritativeWriteManifest(record) {
+    if (!record?.memoryId || typeof this.shadowStore.getMemoryWriteManifestByMemoryId !== 'function') {
+      return false;
+    }
+    if (record.filePath) {
+      return false;
+    }
+
+    const manifest = await this.shadowStore.getMemoryWriteManifestByMemoryId(record.memoryId);
+    if (!manifest || manifest.recordMalformed) {
+      return false;
+    }
+
+    return ['pending', 'committed', 'degraded', 'repaired'].includes(manifest.status);
   }
 
   async resolveGovernanceStateSnapshot({ target, diaryRecords, existingRecords, signal } = {}) {

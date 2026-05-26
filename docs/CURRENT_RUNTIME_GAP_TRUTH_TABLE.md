@@ -28,6 +28,29 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1174 SQLite Authoritative Record Before Diary Projection - 2026-05-26
+
+Result: `CM1174_SQLITE_AUTHORITATIVE_RECORD_BEFORE_DIARY_PROJECTION_VALIDATED_NOT_READY`.
+
+CM-1174 is a runtime-kernel source/test slice:
+
+- `memory_write_manifests` now stores selected authoritative `record_json`.
+- `SqliteShadowStore.attachRecordToMemoryWriteManifest(...)` writes the record and manifest attachment in a SQLite `BEGIN IMMEDIATE` transaction.
+- `MemoryWriteService.record()` attaches the authoritative SQLite record before diary projection.
+- Diary projection failure now returns accepted/degraded with `filePath=null` instead of losing the authoritative record.
+- Pending manifest recovery now prefers manifest `record_json`, so recovery can rebuild projections without a diary record.
+- `KnowledgeBaseSyncService` preserves active SQLite-authoritative no-`filePath` records during diary sync/prune, while ordinary stale diary deletion prune still works.
+- Temp-local tests prove default syncing search and read-only search can find the SQLite/chunk projection after diary projection failure and after recovery from SQLite authority.
+
+Still not proven:
+
+- No full `pending -> committed -> projected -> audited` state split yet.
+- No diary projection reconcile/rebuild path yet.
+- Readonly and syncing search behavior are still not explicitly split.
+- No no-token read closure.
+- No schema migration/version startup hard stop.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1173 CM1172 Temp-Local Reconcile Positive Dry-Run Execution Record - 2026-05-26
 
 Result: `CM1173_CM1172_TEMP_LOCAL_RECONCILE_POSITIVE_DRY_RUN_EXECUTED_RECORDED_NOT_READY`.

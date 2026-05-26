@@ -114,6 +114,7 @@ class SqliteShadowStore {
         canonical_hash TEXT NOT NULL,
         target TEXT NOT NULL,
         status TEXT NOT NULL,
+        record_json TEXT,
         result_json TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
@@ -130,6 +131,7 @@ class SqliteShadowStore {
     this.ensureColumn('memory_records', 'conversation_id', 'TEXT');
     this.ensureColumn('memory_records', 'visibility', 'TEXT');
     this.ensureColumn('memory_records', 'retention_policy', 'TEXT');
+    this.ensureColumn('memory_write_manifests', 'record_json', 'TEXT');
     this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_memory_records_project ON memory_records(project_id);
       CREATE INDEX IF NOT EXISTS idx_memory_records_visibility ON memory_records(visibility);
@@ -175,8 +177,7 @@ class SqliteShadowStore {
     return this.getColumnDefaultValue(columnName);
   }
 
-  async upsertRecord(record) {
-    await this.ensureReady();
+  runUpsertRecord(record) {
     const statement = this.db.prepare(`
       INSERT INTO memory_records (
         memory_id, target, title, content, evidence, tags_json, validated, reusable, sensitivity,
@@ -234,6 +235,11 @@ class SqliteShadowStore {
     });
   }
 
+  async upsertRecord(record) {
+    await this.ensureReady();
+    this.runUpsertRecord(record);
+  }
+
   async replaceChunksForRecord(record, chunks = []) {
     await this.ensureReady();
     const deleteStatement = this.db.prepare(`
@@ -287,6 +293,15 @@ class SqliteShadowStore {
     if (!row) return null;
     let result = null;
     let resultMalformed = false;
+    let record = null;
+    let recordMalformed = false;
+    if (row.record_json) {
+      try {
+        record = JSON.parse(row.record_json);
+      } catch {
+        recordMalformed = true;
+      }
+    }
     if (row.result_json) {
       try {
         result = JSON.parse(row.result_json);
@@ -301,12 +316,53 @@ class SqliteShadowStore {
       canonicalHash: row.canonical_hash,
       target: row.target,
       status: row.status,
+      record,
+      recordMalformed,
       result,
       resultMalformed,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       committedAt: row.committed_at || null
     };
+  }
+
+  async attachRecordToMemoryWriteManifest({
+    idempotencyKey,
+    record,
+    updatedAt = new Date().toISOString()
+  } = {}) {
+    await this.ensureReady();
+    const recordJson = record ? JSON.stringify(record) : null;
+
+    try {
+      this.db.exec('BEGIN IMMEDIATE');
+      this.runUpsertRecord(record);
+      const update = this.db.prepare(`
+        UPDATE memory_write_manifests
+        SET record_json = ?,
+          updated_at = ?
+        WHERE idempotency_key = ? AND status = 'pending'
+      `).run(recordJson, updatedAt, idempotencyKey);
+      if (update.changes !== 1) {
+        this.db.exec('ROLLBACK');
+        return {
+          updated: false,
+          changes: update.changes,
+          reason: 'manifest_pending_guard_failed'
+        };
+      }
+      this.db.exec('COMMIT');
+      return {
+        updated: true,
+        changes: update.changes
+      };
+    } catch (error) {
+      try {
+        this.db.exec('ROLLBACK');
+      } catch {
+      }
+      throw error;
+    }
   }
 
   async beginMemoryWriteManifest({
@@ -409,6 +465,14 @@ class SqliteShadowStore {
     const row = this.db.prepare(`
       SELECT * FROM memory_write_manifests WHERE idempotency_key = ?
     `).get(idempotencyKey);
+    return this.mapMemoryWriteManifestRow(row);
+  }
+
+  async getMemoryWriteManifestByMemoryId(memoryId) {
+    await this.ensureReady();
+    const row = this.db.prepare(`
+      SELECT * FROM memory_write_manifests WHERE memory_id = ?
+    `).get(memoryId);
     return this.mapMemoryWriteManifestRow(row);
   }
 

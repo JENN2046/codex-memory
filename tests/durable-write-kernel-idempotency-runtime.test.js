@@ -58,7 +58,7 @@ async function collectFiles(rootPath) {
   return output;
 }
 
-function processPayload() {
+function processPayload(overrides = {}) {
   return {
     target: 'process',
     title: 'Checkpoint: durable write kernel idempotency runtime',
@@ -79,7 +79,31 @@ function processPayload() {
     task_id: 'CM-DURABLE-KERNEL-BASELINE',
     conversation_id: 'durable-write-kernel-idempotency-runtime',
     visibility: 'project',
-    retention_policy: 'keep'
+    retention_policy: 'keep',
+    ...overrides
+  };
+}
+
+function recordFromPayload(payload, memoryId, now = new Date().toISOString()) {
+  return {
+    memoryId,
+    target: payload.target,
+    title: payload.title,
+    content: payload.content,
+    evidence: payload.evidence,
+    tags: payload.tags,
+    sensitivity: payload.sensitivity || 'none',
+    validated: payload.validated === true,
+    reusable: payload.reusable === true,
+    createdAt: now,
+    updatedAt: now,
+    projectId: payload.project_id,
+    workspaceId: payload.workspace_id,
+    clientId: payload.client_id,
+    taskId: payload.task_id,
+    conversationId: payload.conversation_id,
+    visibility: payload.visibility,
+    retentionPolicy: payload.retention_policy
   };
 }
 
@@ -164,6 +188,96 @@ test('durable write kernel leaves no temp or lock artifacts after atomic project
       .map(filePath => path.basename(filePath))
       .filter(name => name.endsWith('.lock') || name.endsWith('.tmp'));
     assert.deepEqual(transientArtifacts, []);
+  });
+});
+
+test('durable write kernel commits SQLite authority before diary projection failure', async () => {
+  await withTempApp(async ({ app }) => {
+    const payload = processPayload({
+      title: 'Checkpoint: CM-1174 SQLite authority before diary projection failure',
+      content: [
+        'Type: checkpoint',
+        'CM1174 sqlite authoritative write before diary projection failure marker.',
+        'Purpose: prove SQLite keeps the authoritative record when diary projection fails.',
+        'Boundary: synthetic temp-local runtime only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1174 synthetic sqlite authoritative diary projection failure evidence',
+      tags: ['cm1174', 'sqlite-authoritative', 'diary-projection-failure'],
+      task_id: 'CM-1174',
+      conversation_id: 'cm1174-sqlite-authority-before-diary-projection'
+    });
+    const originalWriteRecord = app.stores.diaryStore.writeRecord.bind(app.stores.diaryStore);
+    app.stores.diaryStore.writeRecord = async () => {
+      throw new Error('cm1174 synthetic diary projection failure');
+    };
+
+    try {
+      const result = await app.callTool('record_memory', payload, requestContext);
+      assert.equal(result.decision, 'accepted');
+      assert.equal(result.success, true);
+      assert.equal(result.filePath, null);
+      assert.equal(result.shadowWrite.status, 'degraded');
+      assert.equal(result.shadowWrite.failures.some(item => item.startsWith('diary:')), true);
+      assert.equal(result.idempotency.authoritativeStore, 'sqlite');
+      assert.equal(result.idempotency.status, 'degraded');
+
+      const manifest = await app.stores.shadowStore.getMemoryWriteManifestByIdempotencyKey(result.idempotency.key);
+      assert.equal(manifest.status, 'degraded');
+      assert.equal(manifest.record.title, payload.title);
+      assert.equal(manifest.record.content, payload.content);
+      assert.equal(manifest.record.evidence, payload.evidence);
+      assert.equal(manifest.record.filePath, undefined);
+      assert.equal(manifest.result.idempotency.status, 'degraded');
+
+      const storedRecord = await app.stores.shadowStore.getRecord(result.memoryId);
+      assert.equal(storedRecord.memoryId, result.memoryId);
+      assert.equal(storedRecord.title, payload.title);
+      assert.equal(storedRecord.projectId, 'codex-memory');
+      assert.equal(storedRecord.filePath, null);
+
+      const health = await app.stores.shadowStore.getHealth();
+      assert.equal(health.authoritativeStore, 'sqlite');
+      assert.equal(health.recordCount, 1);
+      assert.equal(health.writeManifest.degraded, 1);
+      assert.equal(health.chunkCount >= 1, true);
+
+      const syncingSearch = await app.callTool('search_memory', {
+        query: 'CM1174 sqlite authoritative write before diary projection failure marker',
+        target: 'process',
+        limit: 5,
+        include_content: false,
+        scope: {
+          project_id: 'codex-memory',
+          workspace_id: 'durable-write-kernel-temp-workspace',
+          client_id: 'codex',
+          visibility: 'project'
+        }
+      }, requestContext);
+      assert.equal(syncingSearch.results.some(item => item.memoryId === result.memoryId), true);
+
+      const afterSyncingSearchHealth = await app.stores.shadowStore.getHealth();
+      assert.equal(afterSyncingSearchHealth.recordCount, 1);
+      assert.equal(afterSyncingSearchHealth.writeManifest.degraded, 1);
+
+      const readOnlySearch = await app.callTool('search_memory', {
+        query: 'CM1174 sqlite authoritative write before diary projection failure marker',
+        target: 'process',
+        limit: 5,
+        include_content: false,
+        scope: {
+          project_id: 'codex-memory',
+          workspace_id: 'durable-write-kernel-temp-workspace',
+          client_id: 'codex',
+          visibility: 'project'
+        }
+      }, {
+        ...requestContext,
+        noTokenReadOnly: true
+      });
+      assert.equal(readOnlySearch.results.some(item => item.memoryId === result.memoryId), true);
+    } finally {
+      app.stores.diaryStore.writeRecord = originalWriteRecord;
+    }
   });
 });
 
@@ -288,5 +402,89 @@ test('durable write kernel can replay a pending manifest from diary into project
       }
     }, requestContext);
     assert.equal(search.results.some(result => result.memoryId === memoryId), true);
+  });
+});
+
+test('durable write kernel recovers pending manifest from SQLite authority without diary', async () => {
+  await withTempApp(async ({ app }) => {
+    const payload = processPayload({
+      title: 'Checkpoint: CM-1174 pending manifest SQLite authority recovery',
+      content: [
+        'Type: checkpoint',
+        'CM1174 pending manifest sqlite authority recovery marker.',
+        'Purpose: prove pending manifest recovery can use SQLite record_json without diary.',
+        'Boundary: synthetic temp-local runtime only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1174 synthetic sqlite authoritative pending recovery evidence',
+      tags: ['cm1174', 'sqlite-authoritative', 'pending-recovery'],
+      task_id: 'CM-1174',
+      conversation_id: 'cm1174-pending-manifest-sqlite-authority-recovery'
+    });
+    const canonicalHash = computeCanonicalWriteHash(payload);
+    const idempotencyKey = buildDefaultIdempotencyKey(canonicalHash);
+    const memoryId = 'codex-process-cm1174sqliteauthority00000001';
+    const now = new Date().toISOString();
+    const record = recordFromPayload(payload, memoryId, now);
+
+    await app.stores.shadowStore.beginMemoryWriteManifest({
+      idempotencyKey,
+      memoryId,
+      canonicalHash,
+      target: 'process',
+      createdAt: now
+    });
+    const attach = await app.stores.shadowStore.attachRecordToMemoryWriteManifest({
+      idempotencyKey,
+      record,
+      updatedAt: now
+    });
+    assert.equal(attach.updated, true);
+
+    const beforeRecovery = await app.stores.shadowStore.getHealth();
+    assert.equal(beforeRecovery.recordCount, 1);
+    assert.equal(beforeRecovery.chunkCount, 0);
+    assert.equal(beforeRecovery.writeManifest.pending, 1);
+    assert.equal((await app.stores.vectorStore.getHealth()).vectorCount, 0);
+
+    const recovery = await app.services.writeService.recoverPendingWriteManifests({ limit: 10 });
+    assert.equal(recovery.attempted, 1);
+    assert.equal(recovery.recovered, 1);
+    assert.equal(recovery.missingDiary, 0);
+    assert.equal(recovery.degraded, 0);
+    assert.equal(recovery.items[0].status, 'committed');
+
+    const manifest = await app.stores.shadowStore.getMemoryWriteManifestByIdempotencyKey(idempotencyKey);
+    assert.equal(manifest.status, 'committed');
+    assert.equal(manifest.record.title, payload.title);
+    assert.equal(manifest.result.idempotency.recovered, true);
+
+    const afterRecovery = await app.stores.shadowStore.getHealth();
+    assert.equal(afterRecovery.recordCount, 1);
+    assert.equal(afterRecovery.chunkCount >= 1, true);
+    assert.equal(afterRecovery.writeManifest.committed, 1);
+    assert.equal((await app.stores.vectorStore.getHealth()).vectorCount, 1);
+
+    const duplicate = await app.callTool('record_memory', payload, requestContext);
+    assert.equal(duplicate.decision, 'accepted');
+    assert.equal(duplicate.memoryId, memoryId);
+    assert.equal(duplicate.idempotency.replayed, true);
+    assert.equal(duplicate.idempotency.recovered, true);
+
+    const search = await app.callTool('search_memory', {
+      query: 'CM1174 pending manifest sqlite authority recovery marker',
+      target: 'process',
+      limit: 5,
+      include_content: false,
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'durable-write-kernel-temp-workspace',
+        client_id: 'codex',
+        visibility: 'project'
+      }
+    }, {
+      ...requestContext,
+      noTokenReadOnly: true
+    });
+    assert.equal(search.results.some(item => item.memoryId === memoryId), true);
   });
 });
