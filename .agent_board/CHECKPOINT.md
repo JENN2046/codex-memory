@@ -6,7 +6,7 @@ Status: `CM1179_NO_TOKEN_SEARCH_EVIDENCE_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_
 
 Date: 2026-05-26
 
-Local commit: pending.
+Local commit: `74f1594 docs: review no-token search evidence`.
 
 Completed:
 - Reviewed committed CM-1177 and CM-1178 evidence.
