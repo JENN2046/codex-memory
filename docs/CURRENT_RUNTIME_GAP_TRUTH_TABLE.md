@@ -28,6 +28,26 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1163 Missing Diary Pending Manifest Restart Validation - 2026-05-26
+
+Result: `CM1163_MISSING_DIARY_PENDING_MANIFEST_RESTART_VALIDATED_NOT_READY`.
+
+CM-1163 continues the minimum durable write kernel validation ladder:
+
+```text
+pending write manifest exists
+matching diary record absent
+explicit recovery after store reopen
+missing diary reported
+manifest remains pending
+duplicate canonical write remains recovery-required
+no projections are created
+```
+
+This strengthens temp-local evidence that unrecoverable pending manifests fail closed when the authoritative recovery input is absent. It does not implement automatic missing-diary repair, abort/cancel policy, manifest status transition policy, automatic startup recovery, background recovery workers, scheduler/watchdog recovery, real memory recovery, cross-store transactionality, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
+Validation passed: source/test syntax, targeted storage/runtime/reconcile tests `33/33`, full `npm test` `2768/2768`, docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review.
+
 ## CM-1162 Degraded Reconcile Replay After Restart Validation - 2026-05-26
 
 Result: `CM1162_DEGRADED_RECONCILE_REPLAY_AFTER_RESTART_VALIDATED_NOT_READY`.

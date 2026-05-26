@@ -1,5 +1,40 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1163 Missing Diary Pending Manifest Restart Validation Checkpoint
+
+Status: `CM1163_MISSING_DIARY_PENDING_MANIFEST_RESTART_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added temp-local validation for a pending manifest with no matching diary record.
+- Verified explicit recovery after store reopen reports `missingDiary=1`.
+- Verified manifest remains `pending`.
+- Verified no SQLite record/chunk projection appears.
+- Verified no vector projection appears.
+- Verified reconcile queue remains empty.
+- Verified duplicate canonical write remains rejected with `recoveryRequired=true`.
+
+Validation:
+- Test syntax check passed.
+- Targeted storage/runtime/reconcile tests passed `33/33`.
+- Full `npm test` passed `2768/2768`.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan returned only expected boundary/negative wording.
+- Changed-scope re-review found no actionable issue.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No automatic missing-diary repair, manifest abort/cancel/status policy, startup recovery, background worker enablement, scheduler/watchdog change, or cross-store transactionality.
+
+Next:
+- Commit CM-1163 if guarded commit eligibility remains clean.
+- Continue kernel hardening with manifest abort/cancel policy design for unrecoverable pending writes, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design.
+
 ## CM-1162 Degraded Reconcile Replay After Restart Validation Checkpoint
 
 Status: `CM1162_DEGRADED_RECONCILE_REPLAY_AFTER_RESTART_VALIDATED_NOT_READY`

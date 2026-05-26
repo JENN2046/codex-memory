@@ -603,3 +603,99 @@ test('CM-1162 degraded manifest reconcile task replays after second store reopen
 
   assert.equal(await pathExists(rootPath), false);
 });
+
+test('CM-1163 pending manifest without diary remains recovery-required after store reopen', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1163-missing-diary-'));
+  const config = createConfig(rootPath);
+  let firstStores;
+  let reopenedStores;
+
+  try {
+    const payload = processPayload({
+      title: 'Checkpoint: CM-1163 missing diary pending manifest recovery gate',
+      content: [
+        'Type: checkpoint',
+        'CM1163 missing diary pending manifest recovery gate temp local marker',
+        'Purpose: prove pending manifest without diary remains recovery-required after store reopen.',
+        'Boundary: synthetic temp-local files only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1163 synthetic missing diary recovery gate evidence',
+      tags: ['cm1163', 'pending-manifest', 'missing-diary', 'temp-local'],
+      task_id: 'CM-1163',
+      conversation_id: 'cm1163-missing-diary-recovery-gate'
+    });
+    const canonicalHash = computeCanonicalWriteHash(payload);
+    const idempotencyKey = buildDefaultIdempotencyKey(canonicalHash);
+    const memoryId = 'codex-process-cm1163missingdiary0000000001';
+    const now = new Date().toISOString();
+
+    firstStores = openStores(config);
+    await firstStores.shadowStore.beginMemoryWriteManifest({
+      idempotencyKey,
+      memoryId,
+      canonicalHash,
+      target: 'process',
+      createdAt: now
+    });
+    const beforeRestartHealth = await firstStores.shadowStore.getHealth();
+    assert.equal(beforeRestartHealth.writeManifest.pending, 1);
+    assert.equal(beforeRestartHealth.recordCount, 0);
+    assert.equal(beforeRestartHealth.chunkCount, 0);
+    assert.equal(beforeRestartHealth.reconcileCount, 0);
+    assert.equal((await firstStores.vectorStore.getHealth()).vectorCount, 0);
+    await firstStores.shadowStore.close();
+    firstStores = null;
+
+    reopenedStores = openStores(config);
+    const recovery = await reopenedStores.service.recoverPendingWriteManifests({ limit: 10 });
+    assert.equal(recovery.attempted, 1);
+    assert.equal(recovery.recovered, 0);
+    assert.equal(recovery.degraded, 0);
+    assert.equal(recovery.missingDiary, 1);
+    assert.equal(recovery.items[0].memoryId, memoryId);
+    assert.equal(recovery.items[0].idempotencyKey, idempotencyKey);
+    assert.equal(recovery.items[0].status, 'pending');
+    assert.equal(recovery.items[0].recovered, false);
+    assert.equal(recovery.items[0].reason, 'diary_record_missing');
+
+    const manifest = await reopenedStores.shadowStore.getMemoryWriteManifestByIdempotencyKey(idempotencyKey);
+    assert.equal(manifest.status, 'pending');
+    assert.equal(manifest.memoryId, memoryId);
+    assert.equal(manifest.result, null);
+
+    const afterRecoveryHealth = await reopenedStores.shadowStore.getHealth();
+    assert.equal(afterRecoveryHealth.writeManifest.pending, 1);
+    assert.equal(afterRecoveryHealth.writeManifest.committed, 0);
+    assert.equal(afterRecoveryHealth.writeManifest.degraded, 0);
+    assert.equal(afterRecoveryHealth.recordCount, 0);
+    assert.equal(afterRecoveryHealth.chunkCount, 0);
+    assert.equal(afterRecoveryHealth.reconcileCount, 0);
+    assert.equal((await reopenedStores.vectorStore.getHealth()).vectorCount, 0);
+
+    const duplicate = await reopenedStores.service.record(payload);
+    assert.equal(duplicate.success, false);
+    assert.equal(duplicate.decision, 'rejected');
+    assert.equal(duplicate.memoryId, memoryId);
+    assert.match(duplicate.reason, /write manifest pending recovery/);
+    assert.equal(duplicate.idempotency.recoveryRequired, true);
+    assert.equal(duplicate.idempotency.status, 'pending');
+    assert.equal(duplicate.idempotency.replayed, false);
+
+    const afterDuplicateHealth = await reopenedStores.shadowStore.getHealth();
+    assert.equal(afterDuplicateHealth.writeManifest.pending, 1);
+    assert.equal(afterDuplicateHealth.recordCount, 0);
+    assert.equal(afterDuplicateHealth.chunkCount, 0);
+    assert.equal(afterDuplicateHealth.reconcileCount, 0);
+    assert.equal((await reopenedStores.vectorStore.getHealth()).vectorCount, 0);
+  } finally {
+    if (firstStores) {
+      await firstStores.shadowStore.close();
+    }
+    if (reopenedStores) {
+      await reopenedStores.shadowStore.close();
+    }
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});

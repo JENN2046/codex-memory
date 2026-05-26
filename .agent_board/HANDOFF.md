@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1163 Missing Diary Pending Manifest Restart Validation Handoff
+
+Goal: continue CM-1162 by validating the fail-closed pending-manifest recovery gate when the matching diary record is absent.
+
+Status: CM1163_MISSING_DIARY_PENDING_MANIFEST_RESTART_VALIDATED_NOT_READY.
+
+Changed files: `tests/memory-write-restart-durability-temp-local-evidence.test.js`; `docs/CM1163_MISSING_DIARY_PENDING_MANIFEST_RESTART_VALIDATION.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: a pending SQLite write manifest without a matching diary record survives store reopen, explicit `MemoryWriteService.recoverPendingWriteManifests({ limit:10 })` reports `missingDiary=1`, leaves the manifest `pending`, creates no projections, and duplicate canonical writes remain rejected with `recoveryRequired=true`.
+
+Validation: test syntax passed. Targeted storage/runtime/reconcile tests passed `33/33`. Full `npm test` passed `2768/2768`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed.
+
+Remaining risks: no automatic missing-diary repair, no manifest abort/cancel/status transition policy, no automatic startup recovery, no background worker/scheduler recovery, no real memory recovery proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1163 if guarded commit eligibility remains clean. After that, consider manifest abort/cancel policy design for unrecoverable pending writes, manifest degraded-to-repaired status policy design, or guarded automatic recovery policy design. Do not push or claim readiness/reliability.
+
 ## CM-1162 Degraded Reconcile Replay After Restart Validation Handoff
 
 Goal: continue CM-1161 by validating explicit degraded reconcile replay after a second store reopen.
