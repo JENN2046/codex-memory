@@ -28,6 +28,32 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1180 SQLite Schema Version Startup Gate Plan - 2026-05-26
+
+Result: `CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`.
+
+Current source facts:
+
+- `SqliteShadowStore.ensureReady()` creates tables and opportunistically adds known missing columns.
+- No durable schema version startup gate is currently enforced.
+- No unknown-future-schema fail-closed decision is currently exposed before ordinary runtime use.
+
+CM-1180 only plans a future gate:
+
+- expected schema version
+- read-only schema inspection
+- known additive repair evidence
+- unknown future version hard stop
+- sanitized operator health/overview facts if later needed
+
+Still not proven:
+
+- No source implementation yet.
+- No startup behavior change.
+- No SQLite migration/version hard stop.
+- No migration/import/export/backup/restore apply.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1179 No-Token Search Evidence Review - 2026-05-26
 
 Result: `CM1179_NO_TOKEN_SEARCH_EVIDENCE_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`.

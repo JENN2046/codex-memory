@@ -1,5 +1,39 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1180 SQLite Schema Version Startup Gate Plan Checkpoint
+
+Status: `CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending.
+
+Completed:
+- Inspected current `SqliteShadowStore.ensureReady()` source behavior.
+- Documented the missing schema version startup gate.
+- Drafted future acceptance criteria for schema version inspection, known additive repair evidence, and unknown future version hard stop.
+
+Validation:
+- `node .\scripts\validate_autopilot_ledger_consistency.js` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- `git diff --check` passed.
+
+Boundary:
+- No source change.
+- No SQLite migration or `ALTER TABLE`.
+- No startup behavior change.
+- No config/watchdog/startup/dependency change.
+- No real memory store mutation.
+- No migration, import, export, backup, or restore apply.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- Implement and test the future schema gate in a separate source/test slice.
+- Startup explicit rebuild/recovery policy.
+- No-token `memory_overview` selected-output posture.
+- Full lifecycle transition log.
+
 ## CM-1179 No-Token Search Evidence Review Checkpoint
 
 Status: `CM1179_NO_TOKEN_SEARCH_EVIDENCE_REVIEW_BLOCKER_DOWNGRADED_NOT_RELIABLE_NOT_READY`

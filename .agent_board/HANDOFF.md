@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1180 SQLite Schema Version Startup Gate Plan Handoff
+
+Goal: plan a future SQLite schema version startup gate without changing runtime behavior.
+
+Status: CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY.
+
+Local commit: pending.
+
+Changed files: `docs/CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN.md`; `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`; `STATUS.md`; `.agent_board/*`.
+
+Current source fact: `SqliteShadowStore.ensureReady()` creates tables and opportunistically adds known columns, but does not enforce a durable schema version startup gate or unknown future version hard stop.
+
+Validation: ledger consistency, docs validation, and `git diff --check` passed.
+
+Next safe step: optionally commit CM-1180 if guarded conditions pass.
+
 ## CM-1179 No-Token Search Evidence Review Handoff
 
 Goal: review CM-1177/CM-1178 evidence for a narrow no-token search blocker downgrade.
