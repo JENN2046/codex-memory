@@ -358,6 +358,29 @@ class SqliteShadowStore {
     };
   }
 
+  async cancelPendingMemoryWriteManifest({
+    idempotencyKey,
+    status = 'cancelled',
+    result = null,
+    updatedAt = new Date().toISOString()
+  } = {}) {
+    await this.ensureReady();
+    const normalizedStatus = String(status || '').trim() || 'cancelled';
+    const resultJson = result ? JSON.stringify(result) : null;
+    const update = this.db.prepare(`
+      UPDATE memory_write_manifests
+      SET status = ?,
+        result_json = ?,
+        updated_at = ?
+      WHERE idempotency_key = ? AND status = 'pending'
+    `).run(normalizedStatus, resultJson, updatedAt, idempotencyKey);
+
+    return {
+      updated: update.changes === 1,
+      changes: update.changes
+    };
+  }
+
   async getMemoryWriteManifestByIdempotencyKey(idempotencyKey) {
     await this.ensureReady();
     const row = this.db.prepare(`

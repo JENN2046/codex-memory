@@ -48,7 +48,9 @@ function selectWriteManifestAuditEvent(entry) {
     status: manifest.status || null,
     replayed: manifest.replayed === true,
     recovered: manifest.recovered === true,
-    recoveryRequired: manifest.recoveryRequired === true
+    recoveryRequired: manifest.recoveryRequired === true,
+    cancelled: manifest.cancelled === true,
+    cancelReason: manifest.cancelReason || null
   };
 }
 
@@ -220,7 +222,8 @@ class AuditLogStore {
         degraded: null,
         replayed: null,
         recovered: null,
-        recoveryRequired: null
+        recoveryRequired: null,
+        cancelled: null
       };
     }
 
@@ -252,6 +255,7 @@ class AuditLogStore {
       latest,
       committed: selectedEvents.find(event => normalizeAuditPhase(event.status) === 'committed') || null,
       degraded: selectedEvents.find(event => normalizeAuditPhase(event.status) === 'degraded') || null,
+      cancelled: selectedEvents.find(event => normalizeAuditPhase(event.status) === 'cancelled') || null,
       replayed: selectedEvents.find(event => event.replayed === true) || null,
       recovered: selectedEvents.find(event => event.recovered === true) || null,
       recoveryRequired: selectedEvents.find(event => event.recoveryRequired === true) || null

@@ -1,5 +1,42 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1164 Unrecoverable Pending Manifest Cancel Policy Checkpoint
+
+Status: `CM1164_UNRECOVERABLE_PENDING_MANIFEST_CANCEL_POLICY_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Completed:
+- Added guarded `SqliteShadowStore.cancelPendingMemoryWriteManifest(...)`.
+- Added explicit `MemoryWriteService.cancelUnrecoverablePendingWriteManifests(...)`.
+- Added terminal `cancelled` / `aborted` manifest handling in `record()`.
+- Extended selected write-manifest audit metadata with `cancelled` and `cancelReason`.
+- Added temp-local validation for missing-diary pending manifest cancellation.
+- Verified cancellation leaves projections absent.
+- Verified duplicate canonical writes are terminally rejected after cancellation.
+
+Validation:
+- Source/test syntax checks passed.
+- Targeted storage/runtime/reconcile/audit tests passed `39/39`.
+- Full `node --test ./tests/*.test.js` passed.
+- Full `npm test` rerun passed `2769/2769`.
+- Docs validation passed.
+- Ledger consistency passed.
+- `git diff --check` passed.
+- Focused no-secret/no-overclaim scan returned only expected boundary/negative wording plus the existing secret-scanner pattern in `MemoryWriteService`.
+- Changed-scope re-review found no actionable issue.
+- First `npm test` after source change reported `3` failures but did not reproduce on immediate reruns without code changes.
+
+Boundary:
+- No public MCP schema expansion.
+- No real memory store mutation during validation.
+- No provider/API, migration/import/export/backup/restore, push, production-readiness claim, or reliability claim.
+- No automatic startup cancellation/recovery, background worker enablement, scheduler/watchdog change, retry/backoff policy, real-store cancellation, manifest deletion, or cross-store transactionality.
+
+Next:
+- Commit CM-1164 if guarded commit eligibility remains clean.
+- Continue kernel hardening with manifest degraded-to-repaired status policy design, guarded automatic recovery policy design, or retry/backoff policy for reconcile and recovery tasks.
+
 ## CM-1163 Missing Diary Pending Manifest Restart Validation Checkpoint
 
 Status: `CM1163_MISSING_DIARY_PENDING_MANIFEST_RESTART_VALIDATED_NOT_READY`

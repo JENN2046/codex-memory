@@ -116,6 +116,11 @@ function supportsWriteManifestRecovery(config = {}, shadowStore = null) {
     typeof shadowStore.listMemoryWriteManifestsByStatus === 'function';
 }
 
+function supportsWriteManifestCancellation(config = {}, shadowStore = null) {
+  return supportsWriteManifestRecovery(config, shadowStore) &&
+    typeof shadowStore.cancelPendingMemoryWriteManifest === 'function';
+}
+
 function findSchemaVersionMetadataKeys(payload = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return [];
@@ -412,6 +417,26 @@ class MemoryWriteService {
           return result;
         }
 
+        if (['cancelled', 'aborted'].includes(manifest.status)) {
+          result = this.buildRejectedResult(
+            `write manifest ${manifest.status}: canonical write is terminally closed.`,
+            executionContext,
+            target
+          );
+          result.memoryId = manifest.memoryId || null;
+          result.idempotency = {
+            key: manifest.idempotencyKey,
+            canonicalHash: manifest.canonicalHash,
+            status: manifest.status,
+            replayed: false,
+            recoveryRequired: false,
+            cancelled: manifest.status === 'cancelled',
+            authoritativeStore: 'sqlite'
+          };
+          await this.writeAudit(result);
+          return result;
+        }
+
         result = this.buildRejectedResult(
           'write manifest pending recovery for this canonical write.',
           executionContext,
@@ -694,6 +719,104 @@ class MemoryWriteService {
     return summary;
   }
 
+  async cancelUnrecoverablePendingWriteManifests(options = {}) {
+    if (!supportsWriteManifestCancellation(this.config, this.shadowStore)) {
+      return {
+        attempted: 0,
+        cancelled: 0,
+        retained: 0,
+        items: []
+      };
+    }
+
+    const limit = Number.isInteger(options.limit) && options.limit > 0 ? Math.min(options.limit, 500) : 50;
+    const cancelReason = normalizeString(options.reason) || 'diary_record_missing';
+    const manifests = await this.shadowStore.listMemoryWriteManifestsByStatus('pending', limit);
+    const diaryRecords = await this.diaryStore.listRecords({ target: 'both' });
+    const diaryRecordByMemoryId = new Map(
+      diaryRecords
+        .filter(record => record?.memoryId)
+        .map(record => [record.memoryId, record])
+    );
+    const summary = {
+      attempted: manifests.length,
+      cancelled: 0,
+      retained: 0,
+      items: []
+    };
+
+    for (const manifest of manifests) {
+      const record = diaryRecordByMemoryId.get(manifest.memoryId);
+      if (record) {
+        summary.retained += 1;
+        summary.items.push({
+          memoryId: manifest.memoryId,
+          idempotencyKey: manifest.idempotencyKey,
+          status: manifest.status,
+          cancelled: false,
+          reason: 'diary_record_available'
+        });
+        continue;
+      }
+
+      const result = {
+        success: false,
+        decision: 'rejected',
+        targetDiary: null,
+        reason: `write manifest cancelled: ${cancelReason}.`,
+        title: null,
+        memoryId: manifest.memoryId,
+        filePath: null,
+        agentAlias: null,
+        agentId: null,
+        requestSource: this.config.defaultRequestSource,
+        target: manifest.target,
+        idempotency: {
+          key: manifest.idempotencyKey,
+          canonicalHash: manifest.canonicalHash,
+          status: 'cancelled',
+          replayed: false,
+          recovered: false,
+          recoveryRequired: false,
+          cancelled: true,
+          cancelReason,
+          authoritativeStore: 'sqlite'
+        },
+        shadowWrite: createShadowWriteStatus('skipped')
+      };
+      const cancellation = await this.shadowStore.cancelPendingMemoryWriteManifest({
+        idempotencyKey: manifest.idempotencyKey,
+        status: 'cancelled',
+        result,
+        updatedAt: new Date().toISOString()
+      });
+
+      if (!cancellation.updated) {
+        summary.retained += 1;
+        summary.items.push({
+          memoryId: manifest.memoryId,
+          idempotencyKey: manifest.idempotencyKey,
+          status: manifest.status,
+          cancelled: false,
+          reason: 'cancel_guard_failed'
+        });
+        continue;
+      }
+
+      await this.writeAudit(result);
+      summary.cancelled += 1;
+      summary.items.push({
+        memoryId: manifest.memoryId,
+        idempotencyKey: manifest.idempotencyKey,
+        status: 'cancelled',
+        cancelled: true,
+        reason: cancelReason
+      });
+    }
+
+    return summary;
+  }
+
   async writeAudit(result) {
     const idempotency = result.idempotency || null;
     await this.auditLogStore.appendWriteAudit({
@@ -715,7 +838,9 @@ class MemoryWriteService {
         status: idempotency.status || null,
         replayed: idempotency.replayed === true,
         recovered: idempotency.recovered === true,
-        recoveryRequired: idempotency.recoveryRequired === true
+        recoveryRequired: idempotency.recoveryRequired === true,
+        cancelled: idempotency.cancelled === true,
+        cancelReason: idempotency.cancelReason || null
       } : null
     });
   }

@@ -28,6 +28,26 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1164 Unrecoverable Pending Manifest Cancel Policy - 2026-05-26
+
+Result: `CM1164_UNRECOVERABLE_PENDING_MANIFEST_CANCEL_POLICY_VALIDATED_NOT_READY`.
+
+CM-1164 continues the minimum durable write kernel hardening ladder:
+
+```text
+pending write manifest exists
+matching diary record absent
+explicit cancel policy
+pending -> cancelled guard
+duplicate canonical write terminally rejected
+selected cancelled audit metadata
+no projections are created
+```
+
+This adds a bounded explicit cancellation policy for unrecoverable pending write manifests when the recovery source diary record is absent. It does not enable automatic startup cancellation, background recovery/cancellation workers, scheduler/watchdog recovery, automatic missing-diary repair, real memory recovery/cancellation, cross-store transactionality, migration/import/export/backup/restore, production readiness, write reliability, recall reliability, or RC readiness.
+
+Validation passed: source/test syntax, targeted storage/runtime/reconcile/audit tests `39/39`, full `node --test ./tests/*.test.js`, full `npm test` `2769/2769`, docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review. One earlier `npm test` run reported `3` failures but did not reproduce on immediate reruns without code changes.
+
 ## CM-1163 Missing Diary Pending Manifest Restart Validation - 2026-05-26
 
 Result: `CM1163_MISSING_DIARY_PENDING_MANIFEST_RESTART_VALIDATED_NOT_READY`.

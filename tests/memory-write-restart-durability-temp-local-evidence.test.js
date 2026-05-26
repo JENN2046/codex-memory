@@ -699,3 +699,108 @@ test('CM-1163 pending manifest without diary remains recovery-required after sto
 
   assert.equal(await pathExists(rootPath), false);
 });
+
+test('CM-1164 unrecoverable pending manifest can be explicitly cancelled after store reopen', async () => {
+  const rootPath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cm1164-cancel-manifest-'));
+  const config = createConfig(rootPath);
+  let firstStores;
+  let reopenedStores;
+
+  try {
+    const payload = processPayload({
+      title: 'Checkpoint: CM-1164 unrecoverable pending manifest cancellation',
+      content: [
+        'Type: checkpoint',
+        'CM1164 unrecoverable pending manifest cancellation temp local marker',
+        'Purpose: prove explicit cancellation terminally closes missing-diary pending manifest.',
+        'Boundary: synthetic temp-local files only, no real memory, no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'cm1164 synthetic unrecoverable manifest cancellation evidence',
+      tags: ['cm1164', 'pending-manifest', 'cancelled', 'temp-local'],
+      task_id: 'CM-1164',
+      conversation_id: 'cm1164-unrecoverable-manifest-cancellation'
+    });
+    const canonicalHash = computeCanonicalWriteHash(payload);
+    const idempotencyKey = buildDefaultIdempotencyKey(canonicalHash);
+    const memoryId = 'codex-process-cm1164cancelmanifest00000001';
+    const now = new Date().toISOString();
+
+    firstStores = openStores(config);
+    await firstStores.shadowStore.beginMemoryWriteManifest({
+      idempotencyKey,
+      memoryId,
+      canonicalHash,
+      target: 'process',
+      createdAt: now
+    });
+    await firstStores.shadowStore.close();
+    firstStores = null;
+
+    reopenedStores = openStores(config);
+    const recovery = await reopenedStores.service.recoverPendingWriteManifests({ limit: 10 });
+    assert.equal(recovery.attempted, 1);
+    assert.equal(recovery.missingDiary, 1);
+
+    const cancellation = await reopenedStores.service.cancelUnrecoverablePendingWriteManifests({
+      limit: 10,
+      reason: 'diary_record_missing'
+    });
+    assert.equal(cancellation.attempted, 1);
+    assert.equal(cancellation.cancelled, 1);
+    assert.equal(cancellation.retained, 0);
+    assert.equal(cancellation.items[0].memoryId, memoryId);
+    assert.equal(cancellation.items[0].status, 'cancelled');
+    assert.equal(cancellation.items[0].cancelled, true);
+    assert.equal(cancellation.items[0].reason, 'diary_record_missing');
+
+    const manifest = await reopenedStores.shadowStore.getMemoryWriteManifestByIdempotencyKey(idempotencyKey);
+    assert.equal(manifest.status, 'cancelled');
+    assert.equal(manifest.memoryId, memoryId);
+    assert.equal(manifest.result.success, false);
+    assert.equal(manifest.result.decision, 'rejected');
+    assert.equal(manifest.result.idempotency.cancelled, true);
+    assert.equal(manifest.result.idempotency.recoveryRequired, false);
+    assert.equal(manifest.result.idempotency.cancelReason, 'diary_record_missing');
+
+    const cancelledHealth = await reopenedStores.shadowStore.getHealth();
+    assert.equal(cancelledHealth.writeManifest.pending, 0);
+    assert.equal(cancelledHealth.writeManifest.cancelled, 1);
+    assert.equal(cancelledHealth.recordCount, 0);
+    assert.equal(cancelledHealth.chunkCount, 0);
+    assert.equal(cancelledHealth.reconcileCount, 0);
+    assert.equal((await reopenedStores.vectorStore.getHealth()).vectorCount, 0);
+
+    const duplicate = await reopenedStores.service.record(payload);
+    assert.equal(duplicate.success, false);
+    assert.equal(duplicate.decision, 'rejected');
+    assert.equal(duplicate.memoryId, memoryId);
+    assert.match(duplicate.reason, /terminally closed/);
+    assert.equal(duplicate.idempotency.status, 'cancelled');
+    assert.equal(duplicate.idempotency.cancelled, true);
+    assert.equal(duplicate.idempotency.recoveryRequired, false);
+
+    const manifestAudit = await reopenedStores.auditLogStore.readSelectedWriteManifestAuditCorrelation({
+      memoryId,
+      idempotencyKey,
+      canonicalHash
+    });
+    assert.equal(manifestAudit.found, true);
+    assert.equal(manifestAudit.selectedFieldsOnly, true);
+    assert.equal(manifestAudit.rawAuditReturned, false);
+    assert.equal(manifestAudit.cancelled.memoryId, memoryId);
+    assert.equal(manifestAudit.cancelled.status, 'cancelled');
+    assert.equal(manifestAudit.cancelled.cancelled, true);
+    assert.equal(manifestAudit.cancelled.cancelReason, 'diary_record_missing');
+    assert.equal(manifestAudit.recoveryRequired, null);
+  } finally {
+    if (firstStores) {
+      await firstStores.shadowStore.close();
+    }
+    if (reopenedStores) {
+      await reopenedStores.shadowStore.close();
+    }
+    await fs.rm(rootPath, { recursive: true, force: true });
+  }
+
+  assert.equal(await pathExists(rootPath), false);
+});

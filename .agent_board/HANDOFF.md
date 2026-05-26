@@ -1,5 +1,21 @@
 # HANDOFF.md - codex-memory
 
+## CM-1164 Unrecoverable Pending Manifest Cancel Policy Handoff
+
+Goal: continue CM-1163 by adding an explicit terminal cancellation policy for unrecoverable pending manifests.
+
+Status: CM1164_UNRECOVERABLE_PENDING_MANIFEST_CANCEL_POLICY_VALIDATED_NOT_READY.
+
+Changed files: `src/storage/SqliteShadowStore.js`; `src/core/MemoryWriteService.js`; `src/storage/AuditLogStore.js`; `tests/memory-write-restart-durability-temp-local-evidence.test.js`; `docs/CM1164_UNRECOVERABLE_PENDING_MANIFEST_CANCEL_POLICY.md`; status/truth-table/board surfaces.
+
+Runtime behavior under test: a pending SQLite write manifest without a matching diary record can be explicitly cancelled after store reopen; the cancellation is pending-guarded, leaves projections absent, makes duplicate canonical writes terminally rejected with `recoveryRequired=false`, and records selected cancelled audit metadata.
+
+Validation: source/test syntax passed. Targeted storage/runtime/reconcile/audit tests passed `39/39`. Full `node --test ./tests/*.test.js` passed. Full `npm test` rerun passed `2769/2769`. Docs validation, ledger consistency, `git diff --check`, focused no-secret/no-overclaim scan, and changed-scope re-review passed. First `npm test` after source change reported `3` failures but did not reproduce on immediate reruns without code changes.
+
+Remaining risks: no automatic startup cancellation/recovery, no background worker/scheduler recovery, no retry/backoff policy, no degraded-to-repaired manifest promotion policy, no real memory recovery/cancellation proof, no cross-store transaction, no backup/restore, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1164 if guarded commit eligibility remains clean. After that, consider manifest degraded-to-repaired status policy design, guarded automatic recovery policy design, or retry/backoff policy for reconcile and recovery tasks. Do not push or claim readiness/reliability.
+
 ## CM-1163 Missing Diary Pending Manifest Restart Validation Handoff
 
 Goal: continue CM-1162 by validating the fail-closed pending-manifest recovery gate when the matching diary record is absent.
