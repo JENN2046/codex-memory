@@ -1,5 +1,45 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1175 Write Manifest Lifecycle State Split Checkpoint
+
+Status: `CM1175_WRITE_MANIFEST_LIFECYCLE_STATE_SPLIT_VALIDATED_NOT_READY`
+
+Date: 2026-05-26
+
+Local commit: pending before guarded commit.
+
+Completed:
+- Added `memory_write_manifests.projected_at` and `audited_at`.
+- Changed SQLite authoritative attach to set `committed_at` while preserving `status='pending'` for recovery.
+- Changed manifest finalize to set `projected_at` for committed/degraded projection completion.
+- Added `writeAuditAndMarkMemoryWriteManifestAudited(...)` so `audited_at` is set only after write audit succeeds.
+- Repaired cancel policy so `pending + record_json` is treated as recoverable and retained.
+- Added selected `writeManifest.lifecycle` counters to shadow health/overview.
+- Added selected lifecycle booleans to write-manifest audit events.
+- Extended temp-local runtime tests for normal write, diary projection failure, pending recovery from SQLite authority, and duplicate replay lifecycle facts.
+
+Validation:
+- Source/test syntax checks passed.
+- `node --test tests\durable-write-kernel-idempotency-runtime.test.js` passed `6/6`.
+- `node --test tests\audit-log-store-selected-correlation.test.js tests\memory-write-restart-durability-temp-local-evidence.test.js tests\memory-write-reconcile-service.test.js tests\memory-write-reliability-temp-local-evidence.test.js tests\memory-write-reconcile-worker.test.js` passed `42/42`.
+- `npm test` final rerun passed `2785/2785`; one full run after the cancel-policy repair reported non-reproduced `2` failures before extraction/summary reruns passed.
+
+Boundary:
+- No public MCP schema/tool expansion.
+- No real memory store mutation.
+- No provider/API call.
+- No `.env`, config, watchdog, startup, or dependency change.
+- No migration/import/export/backup/restore.
+- No push.
+- No production readiness, write reliability, or recall reliability claim.
+
+Remaining:
+- Lifecycle split is timestamp/counter based, not a full transition log.
+- Add diary projection reconcile/rebuild or clear projection semantics.
+- Split readonly and syncing search behavior explicitly.
+- Close no-token read.
+- Add SQLite schema migration/version startup gate.
+
 ## CM-1174 SQLite Authoritative Record Before Diary Projection Checkpoint
 
 Status: `CM1174_SQLITE_AUTHORITATIVE_RECORD_BEFORE_DIARY_PROJECTION_VALIDATED_NOT_READY`

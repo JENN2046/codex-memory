@@ -119,6 +119,9 @@ test('durable write kernel uses SQLite manifest idempotency across record -> sea
     assert.equal(first.idempotency.authoritativeStore, 'sqlite');
     assert.equal(first.idempotency.replayed, false);
     assert.equal(second.idempotency.replayed, true);
+    assert.equal(first.idempotency.lifecycle.committed, true);
+    assert.equal(first.idempotency.lifecycle.projected, true);
+    assert.equal(first.idempotency.lifecycle.audited, true);
 
     const manifestAudit = await app.stores.auditLogStore.readSelectedWriteManifestAuditCorrelation({
       memoryId: first.memoryId,
@@ -134,6 +137,9 @@ test('durable write kernel uses SQLite manifest idempotency across record -> sea
     assert.equal(manifestAudit.matchedEventCount, 2);
     assert.equal(manifestAudit.committed.memoryId, first.memoryId);
     assert.equal(manifestAudit.committed.authoritativeStore, 'sqlite');
+    assert.equal(manifestAudit.committed.lifecycle.committed, true);
+    assert.equal(manifestAudit.committed.lifecycle.projected, true);
+    assert.equal(manifestAudit.committed.lifecycle.audited, true);
     assert.equal(manifestAudit.replayed.memoryId, first.memoryId);
     assert.equal(manifestAudit.latest.replayed, true);
     assert.equal(serializedManifestAudit.includes(payload.title), false);
@@ -144,6 +150,11 @@ test('durable write kernel uses SQLite manifest idempotency across record -> sea
     assert.equal(records.length, 1);
     assert.equal(records[0].memoryId, first.memoryId);
     assert.equal(records[0].projectId, 'codex-memory');
+    const manifest = await app.stores.shadowStore.getMemoryWriteManifestByIdempotencyKey(first.idempotency.key);
+    assert.equal(manifest.status, 'committed');
+    assert.notEqual(manifest.committedAt, null);
+    assert.notEqual(manifest.projectedAt, null);
+    assert.notEqual(manifest.auditedAt, null);
 
     const search = await app.callTool('search_memory', {
       query: 'durable write kernel idempotency runtime integration marker',
@@ -167,6 +178,9 @@ test('durable write kernel uses SQLite manifest idempotency across record -> sea
     assert.equal(overview.shadowSync.authoritativeStore, 'sqlite');
     assert.equal(overview.shadowSync.writeManifest.total, 1);
     assert.equal(overview.shadowSync.writeManifest.committed, 1);
+    assert.equal(overview.shadowSync.writeManifest.lifecycle.sqliteCommitted, 1);
+    assert.equal(overview.shadowSync.writeManifest.lifecycle.projected, 1);
+    assert.equal(overview.shadowSync.writeManifest.lifecycle.audited, 1);
     assert.equal(overview.shadowSync.recordCount, 1);
   });
 });
@@ -223,11 +237,17 @@ test('durable write kernel commits SQLite authority before diary projection fail
 
       const manifest = await app.stores.shadowStore.getMemoryWriteManifestByIdempotencyKey(result.idempotency.key);
       assert.equal(manifest.status, 'degraded');
+      assert.notEqual(manifest.committedAt, null);
+      assert.notEqual(manifest.projectedAt, null);
+      assert.notEqual(manifest.auditedAt, null);
       assert.equal(manifest.record.title, payload.title);
       assert.equal(manifest.record.content, payload.content);
       assert.equal(manifest.record.evidence, payload.evidence);
       assert.equal(manifest.record.filePath, undefined);
       assert.equal(manifest.result.idempotency.status, 'degraded');
+      assert.equal(manifest.result.idempotency.lifecycle.committed, true);
+      assert.equal(manifest.result.idempotency.lifecycle.projected, true);
+      assert.equal(manifest.result.idempotency.lifecycle.audited, true);
 
       const storedRecord = await app.stores.shadowStore.getRecord(result.memoryId);
       assert.equal(storedRecord.memoryId, result.memoryId);
@@ -239,6 +259,9 @@ test('durable write kernel commits SQLite authority before diary projection fail
       assert.equal(health.authoritativeStore, 'sqlite');
       assert.equal(health.recordCount, 1);
       assert.equal(health.writeManifest.degraded, 1);
+      assert.equal(health.writeManifest.lifecycle.sqliteCommitted, 1);
+      assert.equal(health.writeManifest.lifecycle.projected, 1);
+      assert.equal(health.writeManifest.lifecycle.audited, 1);
       assert.equal(health.chunkCount >= 1, true);
 
       const syncingSearch = await app.callTool('search_memory', {
@@ -444,7 +467,17 @@ test('durable write kernel recovers pending manifest from SQLite authority witho
     assert.equal(beforeRecovery.recordCount, 1);
     assert.equal(beforeRecovery.chunkCount, 0);
     assert.equal(beforeRecovery.writeManifest.pending, 1);
+    assert.equal(beforeRecovery.writeManifest.lifecycle.sqliteCommitted, 1);
+    assert.equal(beforeRecovery.writeManifest.lifecycle.pendingRecovery, 1);
+    assert.equal(beforeRecovery.writeManifest.lifecycle.projected, 0);
+    assert.equal(beforeRecovery.writeManifest.lifecycle.audited, 0);
     assert.equal((await app.stores.vectorStore.getHealth()).vectorCount, 0);
+
+    const cancel = await app.services.writeService.cancelUnrecoverablePendingWriteManifests({ limit: 10 });
+    assert.equal(cancel.attempted, 1);
+    assert.equal(cancel.cancelled, 0);
+    assert.equal(cancel.retained, 1);
+    assert.equal(cancel.items[0].reason, 'manifest_record_available');
 
     const recovery = await app.services.writeService.recoverPendingWriteManifests({ limit: 10 });
     assert.equal(recovery.attempted, 1);
@@ -455,13 +488,23 @@ test('durable write kernel recovers pending manifest from SQLite authority witho
 
     const manifest = await app.stores.shadowStore.getMemoryWriteManifestByIdempotencyKey(idempotencyKey);
     assert.equal(manifest.status, 'committed');
+    assert.notEqual(manifest.committedAt, null);
+    assert.notEqual(manifest.projectedAt, null);
+    assert.notEqual(manifest.auditedAt, null);
     assert.equal(manifest.record.title, payload.title);
     assert.equal(manifest.result.idempotency.recovered, true);
+    assert.equal(manifest.result.idempotency.lifecycle.committed, true);
+    assert.equal(manifest.result.idempotency.lifecycle.projected, true);
+    assert.equal(manifest.result.idempotency.lifecycle.audited, true);
 
     const afterRecovery = await app.stores.shadowStore.getHealth();
     assert.equal(afterRecovery.recordCount, 1);
     assert.equal(afterRecovery.chunkCount >= 1, true);
     assert.equal(afterRecovery.writeManifest.committed, 1);
+    assert.equal(afterRecovery.writeManifest.lifecycle.sqliteCommitted, 1);
+    assert.equal(afterRecovery.writeManifest.lifecycle.pendingRecovery, 0);
+    assert.equal(afterRecovery.writeManifest.lifecycle.projected, 1);
+    assert.equal(afterRecovery.writeManifest.lifecycle.audited, 1);
     assert.equal((await app.stores.vectorStore.getHealth()).vectorCount, 1);
 
     const duplicate = await app.callTool('record_memory', payload, requestContext);

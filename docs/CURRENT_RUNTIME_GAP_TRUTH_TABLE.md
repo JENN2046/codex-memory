@@ -28,6 +28,30 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
+## CM-1175 Write Manifest Lifecycle State Split - 2026-05-26
+
+Result: `CM1175_WRITE_MANIFEST_LIFECYCLE_STATE_SPLIT_VALIDATED_NOT_READY`.
+
+CM-1175 is a runtime-kernel source/test slice:
+
+- `memory_write_manifests` now has selected `projected_at` and `audited_at` lifecycle timestamps.
+- SQLite authoritative record attach sets `committed_at` while preserving `status='pending'` so crash-window recovery still works.
+- Manifest finalize sets `projected_at` for committed/degraded projection completion.
+- `audited_at` is set only after write audit succeeds.
+- `memory_overview` shadow health exposes selected lifecycle counters: `sqliteCommitted`, `projected`, `audited`, and `pendingRecovery`.
+- Selected write-manifest audit events include sanitized lifecycle booleans.
+- Cancel policy retains `pending + record_json` as recoverable instead of treating missing diary alone as unrecoverable.
+- Temp-local tests cover normal write, diary projection failure, pending recovery from SQLite authority, duplicate replay, selected audit, and overview lifecycle facts.
+
+Still not proven:
+
+- Lifecycle split is timestamp/counter based, not a full transition log.
+- No diary projection reconcile/rebuild path yet.
+- Readonly and syncing search behavior are still not explicitly split.
+- No no-token read closure.
+- No schema migration/version startup hard stop.
+- No production readiness, write reliability, or recall reliability.
+
 ## CM-1174 SQLite Authoritative Record Before Diary Projection - 2026-05-26
 
 Result: `CM1174_SQLITE_AUTHORITATIVE_RECORD_BEFORE_DIARY_PROJECTION_VALIDATED_NOT_READY`.

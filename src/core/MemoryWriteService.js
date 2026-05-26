@@ -418,7 +418,8 @@ class MemoryWriteService {
               recovered: manifest.result?.idempotency?.recovered === true,
               repaired: manifest.result?.idempotency?.repaired === true,
               repairReason: manifest.result?.idempotency?.repairReason || null,
-              authoritativeStore: 'sqlite'
+              authoritativeStore: 'sqlite',
+              lifecycle: this.buildWriteManifestLifecycle(manifest)
             },
             shadowWrite: manifest.result?.shadowWrite || createShadowWriteStatus('ok')
           };
@@ -440,7 +441,8 @@ class MemoryWriteService {
             replayed: false,
             recoveryRequired: false,
             cancelled: manifest.status === 'cancelled',
-            authoritativeStore: 'sqlite'
+            authoritativeStore: 'sqlite',
+            lifecycle: this.buildWriteManifestLifecycle(manifest)
           };
           await this.writeAudit(result);
           return result;
@@ -640,7 +642,13 @@ class MemoryWriteService {
         canonicalHash: writeManifestContext.canonicalHash,
         status: shadowFailures.length > 0 ? 'degraded' : 'committed',
         replayed: false,
-        authoritativeStore: writeManifestContext.authoritativeStore
+        authoritativeStore: writeManifestContext.authoritativeStore,
+        lifecycle: {
+          pending: false,
+          committed: true,
+          projected: true,
+          audited: false
+        }
       };
       await this.shadowStore.finalizeMemoryWriteManifest({
         idempotencyKey: writeManifestContext.idempotencyKey,
@@ -648,6 +656,8 @@ class MemoryWriteService {
         result,
         updatedAt: new Date().toISOString()
       });
+      await this.writeAuditAndMarkMemoryWriteManifestAudited(result);
+      return result;
     }
 
     await this.writeAudit(result);
@@ -762,7 +772,13 @@ class MemoryWriteService {
           status,
           replayed: false,
           recovered: true,
-          authoritativeStore: 'sqlite'
+          authoritativeStore: 'sqlite',
+          lifecycle: {
+            pending: false,
+            committed: true,
+            projected: true,
+            audited: false
+          }
         },
         shadowWrite: createShadowWriteStatus(status === 'committed' ? 'ok' : 'degraded', shadowFailures)
       };
@@ -773,7 +789,7 @@ class MemoryWriteService {
         result,
         updatedAt: new Date().toISOString()
       });
-      await this.writeAudit(result);
+      await this.writeAuditAndMarkMemoryWriteManifestAudited(result);
       summary.recovered += 1;
       if (status === 'degraded') {
         summary.degraded += 1;
@@ -841,7 +857,13 @@ class MemoryWriteService {
           recoveryRequired: false,
           repaired: true,
           repairReason,
-          authoritativeStore: 'sqlite'
+          authoritativeStore: 'sqlite',
+          lifecycle: {
+            pending: false,
+            committed: manifest.committedAt !== null,
+            projected: manifest.projectedAt !== null,
+            audited: false
+          }
         },
         shadowWrite: {
           ...((manifest.result && manifest.result.shadowWrite) || {}),
@@ -870,7 +892,7 @@ class MemoryWriteService {
         continue;
       }
 
-      await this.writeAudit(result);
+      await this.writeAuditAndMarkMemoryWriteManifestAudited(result);
       summary.repaired += 1;
       summary.items.push({
         memoryId: manifest.memoryId,
@@ -911,7 +933,7 @@ class MemoryWriteService {
     };
 
     for (const manifest of manifests) {
-      const record = diaryRecordByMemoryId.get(manifest.memoryId);
+      const record = manifest.record || diaryRecordByMemoryId.get(manifest.memoryId);
       if (record) {
         summary.retained += 1;
         summary.items.push({
@@ -919,7 +941,7 @@ class MemoryWriteService {
           idempotencyKey: manifest.idempotencyKey,
           status: manifest.status,
           cancelled: false,
-          reason: 'diary_record_available'
+          reason: manifest.record ? 'manifest_record_available' : 'diary_record_available'
         });
         continue;
       }
@@ -945,7 +967,13 @@ class MemoryWriteService {
           recoveryRequired: false,
           cancelled: true,
           cancelReason,
-          authoritativeStore: 'sqlite'
+          authoritativeStore: 'sqlite',
+          lifecycle: {
+            pending: false,
+            committed: manifest.committedAt !== null,
+            projected: manifest.projectedAt !== null,
+            audited: false
+          }
         },
         shadowWrite: createShadowWriteStatus('skipped')
       };
@@ -968,7 +996,7 @@ class MemoryWriteService {
         continue;
       }
 
-      await this.writeAudit(result);
+      await this.writeAuditAndMarkMemoryWriteManifestAudited(result);
       summary.cancelled += 1;
       summary.items.push({
         memoryId: manifest.memoryId,
@@ -980,6 +1008,33 @@ class MemoryWriteService {
     }
 
     return summary;
+  }
+
+  buildWriteManifestLifecycle(manifest) {
+    return {
+      pending: manifest?.status === 'pending',
+      committed: manifest?.committedAt !== null && manifest?.committedAt !== undefined,
+      projected: manifest?.projectedAt !== null && manifest?.projectedAt !== undefined,
+      audited: manifest?.auditedAt !== null && manifest?.auditedAt !== undefined
+    };
+  }
+
+  async writeAuditAndMarkMemoryWriteManifestAudited(result) {
+    if (result?.idempotency?.lifecycle) {
+      result.idempotency.lifecycle.audited = true;
+    }
+    await this.writeAudit(result);
+    if (
+      result?.idempotency?.key &&
+      this.shadowStore &&
+      typeof this.shadowStore.markMemoryWriteManifestAudited === 'function'
+    ) {
+      await this.shadowStore.markMemoryWriteManifestAudited({
+        idempotencyKey: result.idempotency.key,
+        result,
+        updatedAt: new Date().toISOString()
+      });
+    }
   }
 
   async writeAudit(result) {
@@ -1007,7 +1062,8 @@ class MemoryWriteService {
         repaired: idempotency.repaired === true,
         repairReason: idempotency.repairReason || null,
         cancelled: idempotency.cancelled === true,
-        cancelReason: idempotency.cancelReason || null
+        cancelReason: idempotency.cancelReason || null,
+        lifecycle: idempotency.lifecycle || null
       } : null
     });
   }

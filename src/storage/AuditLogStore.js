@@ -52,7 +52,15 @@ function selectWriteManifestAuditEvent(entry) {
     repaired: manifest.repaired === true,
     repairReason: manifest.repairReason || null,
     cancelled: manifest.cancelled === true,
-    cancelReason: manifest.cancelReason || null
+    cancelReason: manifest.cancelReason || null,
+    lifecycle: manifest.lifecycle && typeof manifest.lifecycle === 'object'
+      ? {
+          pending: manifest.lifecycle.pending === true,
+          committed: manifest.lifecycle.committed === true,
+          projected: manifest.lifecycle.projected === true,
+          audited: manifest.lifecycle.audited === true
+        }
+      : null
   };
 }
 

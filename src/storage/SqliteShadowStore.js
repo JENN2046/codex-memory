@@ -118,7 +118,9 @@ class SqliteShadowStore {
         result_json TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
-        committed_at TEXT
+        committed_at TEXT,
+        projected_at TEXT,
+        audited_at TEXT
       );
       CREATE INDEX IF NOT EXISTS idx_memory_write_manifests_memory ON memory_write_manifests(memory_id);
       CREATE INDEX IF NOT EXISTS idx_memory_write_manifests_status ON memory_write_manifests(status);
@@ -132,6 +134,8 @@ class SqliteShadowStore {
     this.ensureColumn('memory_records', 'visibility', 'TEXT');
     this.ensureColumn('memory_records', 'retention_policy', 'TEXT');
     this.ensureColumn('memory_write_manifests', 'record_json', 'TEXT');
+    this.ensureColumn('memory_write_manifests', 'projected_at', 'TEXT');
+    this.ensureColumn('memory_write_manifests', 'audited_at', 'TEXT');
     this.db.exec(`
       CREATE INDEX IF NOT EXISTS idx_memory_records_project ON memory_records(project_id);
       CREATE INDEX IF NOT EXISTS idx_memory_records_visibility ON memory_records(visibility);
@@ -322,7 +326,9 @@ class SqliteShadowStore {
       resultMalformed,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-      committedAt: row.committed_at || null
+      committedAt: row.committed_at || null,
+      projectedAt: row.projected_at || null,
+      auditedAt: row.audited_at || null
     };
   }
 
@@ -340,9 +346,10 @@ class SqliteShadowStore {
       const update = this.db.prepare(`
         UPDATE memory_write_manifests
         SET record_json = ?,
-          updated_at = ?
+          updated_at = ?,
+          committed_at = COALESCE(committed_at, ?)
         WHERE idempotency_key = ? AND status = 'pending'
-      `).run(recordJson, updatedAt, idempotencyKey);
+      `).run(recordJson, updatedAt, updatedAt, idempotencyKey);
       if (update.changes !== 1) {
         this.db.exec('ROLLBACK');
         return {
@@ -399,14 +406,37 @@ class SqliteShadowStore {
     const normalizedStatus = String(status || '').trim() || 'committed';
     const resultJson = result ? JSON.stringify(result) : null;
     const committedAt = ['committed', 'degraded'].includes(normalizedStatus) ? updatedAt : null;
+    const projectedAt = ['committed', 'degraded'].includes(normalizedStatus) ? updatedAt : null;
     const update = this.db.prepare(`
       UPDATE memory_write_manifests
       SET status = ?,
         result_json = ?,
         updated_at = ?,
-        committed_at = COALESCE(committed_at, ?)
+        committed_at = COALESCE(committed_at, ?),
+        projected_at = COALESCE(projected_at, ?)
       WHERE idempotency_key = ?
-    `).run(normalizedStatus, resultJson, updatedAt, committedAt, idempotencyKey);
+    `).run(normalizedStatus, resultJson, updatedAt, committedAt, projectedAt, idempotencyKey);
+
+    return {
+      updated: update.changes === 1,
+      changes: update.changes
+    };
+  }
+
+  async markMemoryWriteManifestAudited({
+    idempotencyKey,
+    result = null,
+    updatedAt = new Date().toISOString()
+  } = {}) {
+    await this.ensureReady();
+    const resultJson = result ? JSON.stringify(result) : null;
+    const update = this.db.prepare(`
+      UPDATE memory_write_manifests
+      SET result_json = COALESCE(?, result_json),
+        updated_at = ?,
+        audited_at = COALESCE(audited_at, ?)
+      WHERE idempotency_key = ?
+    `).run(resultJson, updatedAt, updatedAt, idempotencyKey);
 
     return {
       updated: update.changes === 1,
@@ -1471,13 +1501,31 @@ class SqliteShadowStore {
       degraded: 0,
       repaired: 0,
       cancelled: 0,
-      failed: 0
+      failed: 0,
+      lifecycle: {
+        sqliteCommitted: 0,
+        projected: 0,
+        audited: 0,
+        pendingRecovery: 0
+      }
     };
     for (const row of manifestRows) {
       const status = row.status || 'unknown';
       writeManifest.total += row.count;
       writeManifest[status] = (writeManifest[status] || 0) + row.count;
     }
+    const lifecycleRow = this.db.prepare(`
+      SELECT
+        SUM(CASE WHEN committed_at IS NOT NULL THEN 1 ELSE 0 END) AS sqlite_committed,
+        SUM(CASE WHEN projected_at IS NOT NULL THEN 1 ELSE 0 END) AS projected,
+        SUM(CASE WHEN audited_at IS NOT NULL THEN 1 ELSE 0 END) AS audited,
+        SUM(CASE WHEN status = 'pending' AND committed_at IS NOT NULL THEN 1 ELSE 0 END) AS pending_recovery
+      FROM memory_write_manifests
+    `).get();
+    writeManifest.lifecycle.sqliteCommitted = lifecycleRow?.sqlite_committed || 0;
+    writeManifest.lifecycle.projected = lifecycleRow?.projected || 0;
+    writeManifest.lifecycle.audited = lifecycleRow?.audited || 0;
+    writeManifest.lifecycle.pendingRecovery = lifecycleRow?.pending_recovery || 0;
     return {
       available: true,
       dbPath: this.config.dbPath,

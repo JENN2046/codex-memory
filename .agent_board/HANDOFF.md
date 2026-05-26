@@ -1,5 +1,23 @@
 # HANDOFF.md - codex-memory
 
+## CM-1175 Write Manifest Lifecycle State Split Handoff
+
+Goal: make the CM-1174 SQLite authoritative write path explain its committed/projected/audited lifecycle without weakening pending recovery.
+
+Status: CM1175_WRITE_MANIFEST_LIFECYCLE_STATE_SPLIT_VALIDATED_NOT_READY.
+
+Local commit: pending before guarded commit.
+
+Changed files: `src/storage/SqliteShadowStore.js`; `src/core/MemoryWriteService.js`; `src/storage/AuditLogStore.js`; `tests/durable-write-kernel-idempotency-runtime.test.js`; status/truth-table/board surfaces.
+
+Runtime behavior under test: temp-local `record_memory` now records SQLite authority as `committed_at`, projection completion as `projected_at`, and successful write-audit persistence as `audited_at`. A pending manifest with SQLite authority remains `status='pending'` and visible as `writeManifest.lifecycle.pendingRecovery=1` until recovery finalizes it. Cancel policy now retains `pending + record_json` as recoverable. Normal writes, degraded diary projection failure, pending recovery from SQLite authority, duplicate canonical replay, selected audit correlation, and overview lifecycle counters are covered.
+
+Validation: source/test syntax, targeted durable runtime test `6/6`, adjacent audit/restart/reconcile/reliability/worker bundle `42/42`, final full `npm test` `2785/2785` passed after one non-reproduced `2`-failure run.
+
+Remaining risks: lifecycle is still timestamp/counter based rather than a full transition log; no diary projection reconcile/rebuild, no explicit readonly/syncing search split, no no-token read closure, no SQLite schema migration/version startup hard stop, and no production/readiness/reliability proof.
+
+Next safe step: commit CM-1175 if guarded conditions pass, then choose the next kernel checkpoint. Do not push unless explicitly requested.
+
 ## CM-1174 SQLite Authoritative Record Before Diary Projection Handoff
 
 Goal: start the real durable memory write kernel vertical slice by making SQLite authority happen before diary projection.
