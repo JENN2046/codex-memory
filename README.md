@@ -80,7 +80,19 @@ HTTP MCP 入口默认拒绝无 bearer token 的 `search_memory`、`record_memory
 
 ### 外部 Provider 总闸
 
-`CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=false`（默认）控制 embedding/rerank 是否允许向外部 endpoint 发起 fetch 请求。设为 `false` 时，`ExternalEmbeddingAdapter.isConfigured()` 和 `ExternalRerankAdapter.isConfigured()` 返回 `false`，系统回落至 local-hash embedding。
+`CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER` 控制已配置的 embedding/rerank endpoint 是否允许参与索引和 fetch。
+
+**默认行为取决于 securityProfile：**
+
+| Profile | 无 endpoint | 已配置 endpoint |
+|---|---|---|
+| `local`（默认） | `false` | `true`（向后兼容） |
+| `hardened` | `false` | `false` |
+
+- `securityProfile=local` 且已配置 endpoint URL 时，未显式设置 gate 则默认允许，保持向后兼容
+- `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=false` 强制使用 local-hash 指纹和空 endpoint 列表
+- `securityProfile=hardened` 时即使已配置 endpoint 也默认拒绝；需显式 `=true` 才允许
+- `ExternalEmbeddingAdapter.isConfigured()` 和 `ExternalRerankAdapter.isConfigured()` 始终受此控制
 
 ### 输入验证
 
