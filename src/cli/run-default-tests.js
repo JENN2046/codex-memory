@@ -9,6 +9,11 @@ const { spawn } = require('node:child_process');
 // Default-safe test contract
 // Excludes provider-dependent, daemon-dependent, and self-referential tests.
 // npm test must exit 0 with no provider, no network, no daemon.
+//
+// NOTE: There is NO aggregate wrapper-level timeout. Each individual test or
+// test file's built-in timeout (or node --test --timeout) applies.
+// A wrapper-level timeout would cap the entire suite and cause false failures
+// on slow CI runners.
 // ---------------------------------------------------------------------------
 
 // Pre-existing fixture drift — generated CLI manifests do not match committed
@@ -68,6 +73,16 @@ function resolveDefaultSafeFiles(testsDir) {
   return { safeFiles, excludedDetails, totalFiles: allFiles.length };
 }
 
+function buildSpawnOptions({ cwd = process.cwd(), env = process.env } = {}) {
+  const options = {
+    cwd,
+    env,
+    stdio: ['ignore', 'inherit', 'pipe'],
+    windowsHide: true
+  };
+  return options;
+}
+
 function parseArgs(argv = []) {
   const options = { json: false };
   for (const arg of argv) {
@@ -94,13 +109,7 @@ function main() {
     process.stderr.write(`${JSON.stringify(contract, null, 2)}\n`);
   }
 
-  const child = spawn(process.execPath, ['--test', ...testPatterns], {
-    cwd: process.cwd(),
-    env: process.env,
-    stdio: ['ignore', 'inherit', 'pipe'],
-    windowsHide: true,
-    timeout: 300000
-  });
+  const child = spawn(process.execPath, ['--test', ...testPatterns], buildSpawnOptions());
 
   let stderrBuf = '';
   child.stderr.on('data', d => { stderrBuf += d; });
@@ -125,6 +134,7 @@ module.exports = {
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
   FIXTURE_DRIFT_FILES,
+  buildSpawnOptions,
   resolveDefaultSafeFiles,
   resolveExcluded
 };

@@ -9,6 +9,7 @@ const {
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
   FIXTURE_DRIFT_FILES,
+  buildSpawnOptions,
   resolveDefaultSafeFiles
 } = require('../src/cli/run-default-tests');
 
@@ -67,4 +68,27 @@ test('default runner reports excluded details with correct reasons', () => {
     assert.ok(validReasons.includes(detail.reason), `unexpected reason: ${detail.reason} for ${detail.file}`);
     assert.ok(typeof detail.file === 'string');
   }
+});
+
+test('buildSpawnOptions does not include wrapper-level timeout by default', () => {
+  const options = buildSpawnOptions();
+  assert.equal(options.hasOwnProperty('timeout'), false);
+  assert.equal(options.cwd, process.cwd());
+  assert.equal(options.windowsHide, true);
+});
+
+test('buildSpawnOptions does not include timeout when env has empty string', () => {
+  const options = buildSpawnOptions({ env: { CODEX_MEMORY_DEFAULT_TEST_TIMEOUT_MS: '' } });
+  assert.equal(options.hasOwnProperty('timeout'), false);
+});
+
+test('buildSpawnOptions does not include timeout for non-positive values', () => {
+  const options = buildSpawnOptions({ env: { CODEX_MEMORY_DEFAULT_TEST_TIMEOUT_MS: '0' } });
+  assert.equal(options.hasOwnProperty('timeout'), false);
+});
+
+test('buildSpawnOptions accepts custom cwd and env', () => {
+  const options = buildSpawnOptions({ cwd: '/tmp', env: { PATH: '/usr/bin' } });
+  assert.equal(options.cwd, '/tmp');
+  assert.equal(options.env.PATH, '/usr/bin');
 });
