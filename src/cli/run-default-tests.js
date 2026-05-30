@@ -117,7 +117,9 @@ function main() {
   child.on('close', code => {
     // Forward stderr (contains summary)
     if (stderrBuf) process.stderr.write(stderrBuf);
-    process.exit(code);
+    // null code means the child was killed by a signal (OOM, runner timeout, etc.)
+    // Map to nonzero exit to avoid masking the failure.
+    process.exit(code !== null ? code : 1);
   });
 
   child.on('error', () => {
