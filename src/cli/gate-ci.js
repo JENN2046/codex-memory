@@ -7,7 +7,8 @@ const {
   PROVIDER_DEPENDENT_FILES,
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
-  FIXTURE_DRIFT_FILES
+  FIXTURE_DRIFT_FILES,
+  buildDefaultSafeEnv
 } = require('./run-default-tests');
 
 const UNSAFE_OVERRIDE_ENV_KEYS = [
@@ -29,6 +30,13 @@ function parseArgs(argv = []) {
   return options;
 }
 
+function buildGateCiEnv(env = process.env) {
+  return {
+    ...env,
+    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+  };
+}
+
 function resolveEnvCommand(name) {
   const raw = process.env[`CODEX_MEMORY_GATE_CI_${String(name).toUpperCase()}_COMMAND_JSON`];
   if (!raw) return null;
@@ -47,7 +55,7 @@ function spawnJson(args) {
   return new Promise((resolve) => {
     const child = spawn(process.execPath, args, {
       cwd: process.cwd(),
-      env: process.env,
+      env: buildGateCiEnv(process.env),
       stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
       timeout: 120000
@@ -324,7 +332,7 @@ async function runTests() {
   return new Promise((resolve) => {
     const child = spawn(file, args, {
       cwd: process.cwd(),
-      env: process.env,
+      env: buildGateCiEnv(process.env),
       stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true
     });
@@ -419,6 +427,7 @@ function buildUnsafeOverrideRejectedResults({ generatedAt, unsafeOverride }) {
       noProvider: false,
       unsafeEnvOverrideDetected: true,
       unsafeEnvOverrideKeys: unsafeOverride.keys,
+      providerGateForcedOff: true,
       failedChecks: ['unsafeEnvOverride'],
       checksExecuted: false
     },
@@ -482,6 +491,7 @@ async function main() {
       noProvider: true,
       unsafeEnvOverrideDetected: false,
       unsafeEnvOverrideKeys: [],
+      providerGateForcedOff: true,
       failedChecks
     },
     checks

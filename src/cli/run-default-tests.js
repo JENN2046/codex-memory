@@ -73,10 +73,17 @@ function resolveDefaultSafeFiles(testsDir) {
   return { safeFiles, excludedDetails, totalFiles: allFiles.length };
 }
 
+function buildDefaultSafeEnv(env = process.env) {
+  return {
+    ...env,
+    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+  };
+}
+
 function buildSpawnOptions({ cwd = process.cwd(), env = process.env } = {}) {
   const options = {
     cwd,
-    env,
+    env: buildDefaultSafeEnv(env),
     stdio: ['ignore', 'inherit', 'pipe'],
     windowsHide: true
   };
@@ -136,6 +143,7 @@ module.exports = {
   DAEMON_DEPENDENT_FILES,
   SELF_REFERENTIAL_FILES,
   FIXTURE_DRIFT_FILES,
+  buildDefaultSafeEnv,
   buildSpawnOptions,
   resolveDefaultSafeFiles,
   resolveExcluded
