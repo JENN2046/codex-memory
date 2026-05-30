@@ -120,3 +120,28 @@ test('string true override enables soft read policy in local profile', () => {
   });
   assert.equal(config.enableSoftReadPolicy, true);
 });
+
+test('disabled provider config uses local-hash fingerprint and profile', () => {
+  const config = createConfig({
+    allowExternalProvider: false,
+    localEmbeddingUrl: 'http://example.invalid',
+    localEmbeddingModel: 'bge-m3-local',
+    localEmbedDimensions: 1024
+  });
+
+  assert.equal(config.allowExternalProvider, false);
+  assert.match(config.embeddingFingerprint, /^local-hash__/);
+  assert.match(config.vectorIndexPath, /local-hash__/);
+});
+
+test('enabled provider config uses provider fingerprint', () => {
+  const config = createConfig({
+    allowExternalProvider: true,
+    localEmbeddingUrl: 'http://example.invalid',
+    localEmbeddingModel: 'bge-m3-local',
+    localEmbedDimensions: 1024
+  });
+
+  assert.equal(config.allowExternalProvider, true);
+  assert.match(config.embeddingFingerprint, /^bge-m3-local__1024__/);
+});

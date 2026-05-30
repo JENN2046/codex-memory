@@ -200,12 +200,6 @@ function createConfig(overrides = {}) {
     return profileDefault;
   };
 
-  const allowExternalProvider = _resolveBool(
-    overrides.allowExternalProvider,
-    'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
-    false
-  );
-
   const legacyEmbeddingEndpoint = buildEmbeddingEndpoint({
     name: 'configured-primary',
     provider: overrides.embeddingProvider || process.env.CODEX_MEMORY_EMBEDDING_PROVIDER,
@@ -258,8 +252,23 @@ function createConfig(overrides = {}) {
     defaultProvider: 'nvidia'
   });
 
-  const embeddingEndpoints = [];
+  const configuredEmbeddingEndpoints = [];
   const seenEmbeddingEndpoints = new Set();
+
+  // Resolve allowExternalProvider AFTER building endpoint objects so we can
+  // detect whether endpoints are explicitly configured. If no override or env
+  // is set, but the user configured an endpoint URL, user intent is to allow it.
+  // Explicit CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=false still takes priority.
+  const anyEndpointConfigured = !!(legacyEmbeddingEndpoint || localEmbeddingEndpoint || fallbackEmbeddingEndpoint);
+  const defaultAllowProvider = overrides.allowExternalProvider === undefined
+    && process.env.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER === undefined
+    && anyEndpointConfigured;
+  const allowExternalProvider = _resolveBool(
+    overrides.allowExternalProvider,
+    'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
+    defaultAllowProvider
+  );
+
   for (const endpoint of [legacyEmbeddingEndpoint, localEmbeddingEndpoint, fallbackEmbeddingEndpoint]) {
     if (!endpoint) continue;
     const dedupeKey = JSON.stringify({
@@ -270,21 +279,19 @@ function createConfig(overrides = {}) {
     });
     if (seenEmbeddingEndpoints.has(dedupeKey)) continue;
     seenEmbeddingEndpoints.add(dedupeKey);
-    embeddingEndpoints.push(endpoint);
+    configuredEmbeddingEndpoints.push(endpoint);
   }
 
-  // embeddingEndpoints retains all configured endpoints for fingerprint/profile
-  // purposes. The provider gate (allowExternalProvider) controls whether the
-  // adapter actually fetches from them — isConfigured() checks it.
-  // When allowExternalProvider is false, all writes use local-hash vectors,
-  // but the profile directory still reflects configured endpoints. This means
-  // re-enabling the gate later may co-locate local-hash vectors with provider
-  // vectors in the same profile — a known pre-existing design constraint
-  // documented in CM_MAIN_MERGE_CANDIDATE_REVIEW_01.md.
+  // When external providers are disabled, configured endpoints must NOT
+  // participate in embeddingFingerprint/vectorIndexPath — only local-hash
+  // profile is written to disk.
+  const embeddingEndpoints = allowExternalProvider
+    ? configuredEmbeddingEndpoints
+    : [];
 
   const activeEmbeddingEndpoint = embeddingEndpoints[0] || {
-    name: '',
-    provider: '',
+    name: 'local-hash',
+    provider: 'local',
     url: '',
     apiKey: '',
     model: '',

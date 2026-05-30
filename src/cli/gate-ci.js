@@ -326,8 +326,7 @@ async function runTests() {
       cwd: process.cwd(),
       env: process.env,
       stdio: ['ignore', 'pipe', 'pipe'],
-      windowsHide: true,
-      timeout: 300000
+      windowsHide: true
     });
     let stdout = '';
     let stderr = '';

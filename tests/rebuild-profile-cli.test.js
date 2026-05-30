@@ -585,6 +585,7 @@ test('rag params profile example should load for default bge-m3-local fingerprin
     dataDir: path.join(os.tmpdir(), 'codex-memory-rag-example-data'),
     localEmbeddingUrl: 'http://127.0.0.1:18081/',
     localEmbeddingModel: 'bge-m3-local',
+    allowExternalProvider: true,
     embeddingProfileVersion: 'v1',
     ragParamsPath: path.join(process.cwd(), 'examples', 'rag-params.profiles.example.json')
   });
