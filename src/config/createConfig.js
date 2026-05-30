@@ -180,6 +180,32 @@ function createConfig(overrides = {}) {
     null
   );
 
+  // Resolve provider gate and profile BEFORE endpoint/fingerprint computation.
+  // When allowExternalProvider is false, configured endpoints must not
+  // participate in embeddingFingerprint or vectorIndexPath — only local-hash
+  // profile is written.
+  const securityProfile = String(
+    pickFirstNonEmpty(overrides.securityProfile, process.env.CODEX_MEMORY_SECURITY_PROFILE, 'local')
+  ).trim().toLowerCase();
+  const isHardened = securityProfile === 'hardened';
+
+  const _resolveBool = (overrideVal, envKey, profileDefault) => {
+    if (overrideVal !== undefined && overrideVal !== null) {
+      return toBoolean(overrideVal, profileDefault);
+    }
+    const envVal = process.env[envKey];
+    if (envVal !== undefined && envVal !== null) {
+      return toBoolean(envVal, profileDefault);
+    }
+    return profileDefault;
+  };
+
+  const allowExternalProvider = _resolveBool(
+    overrides.allowExternalProvider,
+    'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
+    false
+  );
+
   const legacyEmbeddingEndpoint = buildEmbeddingEndpoint({
     name: 'configured-primary',
     provider: overrides.embeddingProvider || process.env.CODEX_MEMORY_EMBEDDING_PROVIDER,
@@ -247,6 +273,15 @@ function createConfig(overrides = {}) {
     embeddingEndpoints.push(endpoint);
   }
 
+  // embeddingEndpoints retains all configured endpoints for fingerprint/profile
+  // purposes. The provider gate (allowExternalProvider) controls whether the
+  // adapter actually fetches from them — isConfigured() checks it.
+  // When allowExternalProvider is false, all writes use local-hash vectors,
+  // but the profile directory still reflects configured endpoints. This means
+  // re-enabling the gate later may co-locate local-hash vectors with provider
+  // vectors in the same profile — a known pre-existing design constraint
+  // documented in CM_MAIN_MERGE_CANDIDATE_REVIEW_01.md.
+
   const activeEmbeddingEndpoint = embeddingEndpoints[0] || {
     name: '',
     provider: '',
@@ -286,25 +321,8 @@ function createConfig(overrides = {}) {
     overrides.vectorIndexPath || process.env.CODEX_MEMORY_VECTOR_PATH || path.join(embeddingProfileDir, VECTOR_INDEX_FILE_NAME)
   );
 
-  // Security profile: local or hardened
-  const securityProfile = String(
-    pickFirstNonEmpty(overrides.securityProfile, process.env.CODEX_MEMORY_SECURITY_PROFILE, 'local')
-  ).trim().toLowerCase();
-  const isHardened = securityProfile === 'hardened';
-
-  // Profile-aware boolean resolver: override > env > profile default
-  // All non-null/non-undefined values go through toBoolean to normalize
-  // env-style string overrides like 'false' and 'true'.
-  const _resolveBool = (overrideVal, envKey, profileDefault) => {
-    if (overrideVal !== undefined && overrideVal !== null) {
-      return toBoolean(overrideVal, profileDefault);
-    }
-    const envVal = process.env[envKey];
-    if (envVal !== undefined && envVal !== null) {
-      return toBoolean(envVal, profileDefault);
-    }
-    return profileDefault;
-  };
+  // Security profile (resolved above before endpoint building).
+  // _resolveBool and allowExternalProvider are already computed.
 
   const baseConfig = {
     projectBasePath: basePath,

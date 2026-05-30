@@ -13,6 +13,7 @@ function createStdioServer({ app, input = process.stdin, output = process.stdout
   const server = new CodexMemoryMcpServer({ app });
   let buffer = Buffer.alloc(0);
   let drainScheduled = false;
+  let oversizedDiscardRemainingBytes = 0;
 
   async function processOneMessage(messageBuffer) {
     let message;
@@ -45,6 +46,14 @@ function createStdioServer({ app, input = process.stdin, output = process.stdout
     }
   }
 
+  function discardOversizedFrameBytes(data) {
+    if (oversizedDiscardRemainingBytes <= 0) return data;
+
+    const discardCount = Math.min(oversizedDiscardRemainingBytes, data.length);
+    oversizedDiscardRemainingBytes -= discardCount;
+    return data.slice(discardCount);
+  }
+
   async function drainBuffer() {
     if (drainScheduled) return;
     drainScheduled = true;
@@ -64,7 +73,13 @@ function createStdioServer({ app, input = process.stdin, output = process.stdout
         const bodyStart = separatorIndex + 4;
         const bodyEnd = bodyStart + contentLength;
         if (contentLength > MAX_STDIO_MESSAGE_BYTES) {
-          buffer = buffer.slice(bodyEnd);
+          const availableBodyBytes = Math.max(0, buffer.length - bodyStart);
+          const discardNow = Math.min(availableBodyBytes, contentLength);
+          const currentFrameEnd = bodyStart + discardNow;
+
+          oversizedDiscardRemainingBytes = contentLength - discardNow;
+          buffer = buffer.slice(currentFrameEnd);
+
           output.write(encodeMessage({
             jsonrpc: '2.0',
             id: null,
@@ -74,7 +89,13 @@ function createStdioServer({ app, input = process.stdin, output = process.stdout
               data: 'Message too large'
             }
           }));
-          return;
+
+          // If more oversized body bytes are still in flight, wait for them
+          // via discardOversizedFrameBytes (in input.on('data')) before
+          // resuming normal parse. Continue looking for the next valid frame
+          // if the current buffer already has one.
+          if (oversizedDiscardRemainingBytes > 0) return;
+          continue;
         }
         if (buffer.length < bodyEnd) return;
 
@@ -98,7 +119,16 @@ function createStdioServer({ app, input = process.stdin, output = process.stdout
   }
 
   input.on('data', chunk => {
-    const data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    let data = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+
+    // If we are in oversized frame discard mode, consume body bytes without
+    // adding them to the parse buffer. This prevents oversized body fragments
+    // from being misinterpreted as the next frame header.
+    if (oversizedDiscardRemainingBytes > 0) {
+      data = discardOversizedFrameBytes(data);
+      if (data.length === 0) return;
+    }
+
     buffer = Buffer.concat([buffer, data]);
 
     if (buffer.length > MAX_STDIO_BUFFER_BYTES) {

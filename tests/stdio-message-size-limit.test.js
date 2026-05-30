@@ -112,3 +112,87 @@ test('encodeMessage produces correct Content-Length header', () => {
 
   assert.ok(asString.includes(`Content-Length: ${expectedLength}`));
 });
+
+test('oversized header first then body later: no desync, valid frame after', async () => {
+  const input = new PassThrough();
+  const output = new PassThrough();
+  const app = createMockApp();
+  createStdioServer({ app, input, output });
+
+  const oversizedLength = 1024 * 1024 + 1;
+
+  // Send oversized header first (no body)
+  input.write(`Content-Length: ${oversizedLength}\r\n\r\n`);
+
+  // Collect error response
+  const errorPromise = new Promise(resolve => {
+    output.on('data', chunk => {
+      const text = chunk.toString();
+      if (text.includes('Message too large')) resolve(text);
+    });
+  });
+
+  // Now send the oversized body — must be discarded, not parsed as next frame
+  input.write(Buffer.alloc(oversizedLength).fill('x'));
+
+  await errorPromise;
+
+  // After oversized frame is fully discarded, send a valid ping
+  const validBody = JSON.stringify({ jsonrpc: '2.0', id: 99, method: 'ping' });
+  input.write(`Content-Length: ${Buffer.byteLength(validBody)}\r\n\r\n${validBody}`);
+
+  const validResult = await new Promise(resolve => {
+    output.on('data', chunk => {
+      const text = chunk.toString();
+      if (text.includes('"jsonrpc":"2.0"') && text.includes('"id":99')) resolve(text);
+    });
+  });
+
+  assert.ok(validResult, 'valid request after oversized discard must receive response');
+  assert.ok(validResult.includes('"result"'));
+});
+
+test('oversized frame then valid frame in same chunk: process both', async () => {
+  const input = new PassThrough();
+  const output = new PassThrough();
+  const app = createMockApp();
+  createStdioServer({ app, input, output });
+
+  const oversizedLength = 1024 * 1024 + 1;
+
+  // Build oversized frame + valid frame in one chunk
+  const oversizedFrame = `Content-Length: ${oversizedLength}\r\n\r\n${'x'.repeat(oversizedLength)}`;
+  const validBody = JSON.stringify({ jsonrpc: '2.0', id: 100, method: 'ping' });
+  const validFrame = `Content-Length: ${Buffer.byteLength(validBody)}\r\n\r\n${validBody}`;
+
+  input.write(oversizedFrame + validFrame);
+
+  const validResult = await new Promise(resolve => {
+    output.on('data', chunk => {
+      const text = chunk.toString();
+      if (text.includes('"jsonrpc":"2.0"') && text.includes('"id":100')) resolve(text);
+    });
+  });
+
+  assert.ok(validResult, 'valid frame after oversized in same chunk must be processed');
+  assert.ok(validResult.includes('"result"'));
+});
+
+test('headerless garbage triggers buffer overflow safety', async () => {
+  const input = new PassThrough();
+  const output = new PassThrough();
+  const app = createMockApp();
+  createStdioServer({ app, input, output });
+
+  // Write 2MB+ of garbage that never produces a valid header
+  const garbage = Buffer.alloc(2 * 1024 * 1024 + 1).fill('G');
+  input.write(garbage);
+
+  const result = await new Promise(resolve => {
+    output.on('data', chunk => {
+      resolve(chunk.toString());
+    });
+  });
+
+  assert.ok(result.includes('Buffer overflow'));
+});
