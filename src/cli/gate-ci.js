@@ -3,6 +3,24 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { DEFAULT_SUITE, runSuiteReport } = require('./real-query-suite-core');
+const {
+  PROVIDER_DEPENDENT_FILES,
+  DAEMON_DEPENDENT_FILES,
+  SELF_REFERENTIAL_FILES,
+  FIXTURE_DRIFT_FILES,
+  buildDefaultSafeEnv
+} = require('./run-default-tests');
+
+const UNSAFE_OVERRIDE_ENV_KEYS = [
+  'CODEX_MEMORY_GATE_CI_COMPARE_COMMAND_JSON',
+  'CODEX_MEMORY_GATE_CI_ROLLBACK_COMMAND_JSON',
+  'CODEX_MEMORY_GATE_CI_TEST_COMMAND_JSON'
+];
+
+function detectUnsafeEnvOverrides() {
+  const detected = UNSAFE_OVERRIDE_ENV_KEYS.filter(key => process.env[key] !== undefined);
+  return { detected: detected.length > 0, keys: detected };
+}
 
 function parseArgs(argv = []) {
   const options = { json: false };
@@ -10,6 +28,13 @@ function parseArgs(argv = []) {
     if (argv[i] === '--json') { options.json = true; continue; }
   }
   return options;
+}
+
+function buildGateCiEnv(env = process.env) {
+  return {
+    ...env,
+    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false'
+  };
 }
 
 function resolveEnvCommand(name) {
@@ -30,7 +55,7 @@ function spawnJson(args) {
   return new Promise((resolve) => {
     const child = spawn(process.execPath, args, {
       cwd: process.cwd(),
-      env: process.env,
+      env: buildGateCiEnv(process.env),
       stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
       timeout: 120000
@@ -289,19 +314,16 @@ function runLifecyclePolicySummary() {
 }
 
 async function runTests() {
-  // CI-safe tests: exclude network-dependent test files
+  // CI-safe tests: use shared exclude lists from run-default-tests.js
   const testsDir = path.join(process.cwd(), 'tests');
   const allTestFiles = fs.readdirSync(testsDir).filter(f => f.endsWith('.test.js'));
-  const ciSafeFiles = allTestFiles.filter(f => {
-    // These test files require a live HTTP MCP daemon on localhost
-    const httpDependent = ['mcp-http.test.js'];
-    // These test files may call real providers
-    const providerDependent = ['provider-smoke-cli.test.js', 'provider-benchmark-cli.test.js'];
-    // These test files call gate:ci/dashboard themselves (avoid self-referential runs)
-    const selfReferential = ['gate-ci-cli.test.js', 'dashboard-cli.test.js'];
-    const excluded = [...httpDependent, ...providerDependent, ...selfReferential];
-    return !excluded.includes(f);
-  });
+  const excluded = new Set([
+    ...PROVIDER_DEPENDENT_FILES,
+    ...DAEMON_DEPENDENT_FILES,
+    ...SELF_REFERENTIAL_FILES,
+    ...FIXTURE_DRIFT_FILES
+  ]);
+  const ciSafeFiles = allTestFiles.filter(f => !excluded.has(f));
 
   const testPatterns = ciSafeFiles.map(f => path.join('tests', f));
   const command = resolveEnvCommand('test') || [process.execPath, '--test', ...testPatterns];
@@ -310,10 +332,9 @@ async function runTests() {
   return new Promise((resolve) => {
     const child = spawn(file, args, {
       cwd: process.cwd(),
-      env: process.env,
+      env: buildGateCiEnv(process.env),
       stdio: ['ignore', 'pipe', 'pipe'],
-      windowsHide: true,
-      timeout: 300000
+      windowsHide: true
     });
     let stdout = '';
     let stderr = '';
@@ -377,7 +398,11 @@ function runDocsCheck() {
 function renderText(results) {
   const lines = [];
   lines.push(`gate:ci — ${results.generatedAt}`);
-  lines.push('mode: fixture-only  |  no network  |  no daemon  |  no provider');
+  if (results.summary.unsafeEnvOverrideDetected) {
+    lines.push('WARNING: unsafe env override detected — fixtureOnly/noNetwork/noProvider claims disabled');
+    lines.push(`  overrides: ${results.summary.unsafeEnvOverrideKeys.join(', ')}`);
+  }
+  lines.push(`mode: ${results.summary.fixtureOnly ? 'fixture-only' : 'OVERRIDDEN'}  |  ${results.summary.noNetwork ? 'no network' : 'NETWORK-ALLOWED'}  |  no daemon  |  ${results.summary.noProvider ? 'no provider' : 'PROVIDER-ALLOWED'}`);
   lines.push('─'.repeat(56));
   lines.push('');
   for (const [name, r] of Object.entries(results.checks)) {
@@ -390,9 +415,57 @@ function renderText(results) {
   return lines.join('\n') + '\n';
 }
 
+function buildUnsafeOverrideRejectedResults({ generatedAt, unsafeOverride }) {
+  return {
+    generatedAt,
+    summary: {
+      ok: false,
+      mode: 'ci',
+      fixtureOnly: false,
+      noNetwork: false,
+      noDaemon: true,
+      noProvider: false,
+      unsafeEnvOverrideDetected: true,
+      unsafeEnvOverrideKeys: unsafeOverride.keys,
+      providerGateForcedOff: true,
+      failedChecks: ['unsafeEnvOverride'],
+      checksExecuted: false
+    },
+    checks: {
+      unsafeEnvOverride: {
+        status: 'error',
+        message: 'Unsafe CODEX_MEMORY_GATE_CI_*_COMMAND_JSON override detected before checks; gate stopped fail-closed.',
+        detail: {
+          keys: unsafeOverride.keys,
+          compareExecuted: false,
+          rollbackExecuted: false,
+          testsExecuted: false,
+          docsExecuted: false
+        }
+      }
+    }
+  };
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const generatedAt = new Date().toISOString();
+
+  // Detect unsafe env overrides BEFORE running any checks. The override
+  // commands may spawn arbitrary processes, so they must not execute.
+  const unsafeOverride = detectUnsafeEnvOverrides();
+  if (unsafeOverride.detected) {
+    const results = buildUnsafeOverrideRejectedResults({ generatedAt, unsafeOverride });
+
+    if (options.json) {
+      process.stdout.write(`${JSON.stringify(results)}\n`);
+    } else {
+      process.stdout.write(renderText(results));
+    }
+
+    process.exitCode = 1;
+    return;
+  }
 
   const compare = await runCompare();
   const rollback = await runRollback();
@@ -416,6 +489,9 @@ async function main() {
       noNetwork: true,
       noDaemon: true,
       noProvider: true,
+      unsafeEnvOverrideDetected: false,
+      unsafeEnvOverrideKeys: [],
+      providerGateForcedOff: true,
       failedChecks
     },
     checks
@@ -434,3 +510,5 @@ main().catch(err => {
   process.stderr.write(`gate:ci: ${err.message}\n`);
   process.exit(1);
 });
+
+module.exports = { detectUnsafeEnvOverrides, UNSAFE_OVERRIDE_ENV_KEYS };

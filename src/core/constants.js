@@ -26,18 +26,18 @@ const TOOL_DEFINITIONS = [
       additionalProperties: false,
       properties: {
         target: { type: 'string', enum: ['process', 'knowledge'] },
-        title: { type: 'string' },
-        content: { type: 'string' },
-        evidence: { type: 'string' },
+        title: { type: 'string', minLength: 1, maxLength: 200 },
+        content: { type: 'string', minLength: 1, maxLength: 20000 },
+        evidence: { type: 'string', minLength: 1, maxLength: 8000 },
         validated: { type: 'boolean' },
         reusable: { type: 'boolean' },
         tags: {
           oneOf: [
-            { type: 'string' },
-            { type: 'array', items: { type: 'string' } }
+            { type: 'string', maxLength: 80 },
+            { type: 'array', items: { type: 'string', maxLength: 80 }, maxItems: 30 }
           ]
         },
-        sensitivity: { type: 'string' },
+        sensitivity: { type: 'string', maxLength: 80 },
         project_id: { type: 'string' },
         workspace_id: { type: 'string' },
         client_id: { type: 'string', enum: CLIENT_ID_VALUES },
@@ -57,19 +57,19 @@ const TOOL_DEFINITIONS = [
       type: 'object',
       additionalProperties: false,
       properties: {
-        query: { type: 'string' },
+        query: { type: 'string', minLength: 1, maxLength: 1000 },
         target: { type: 'string', enum: ['process', 'knowledge', 'both'] },
         limit: { type: 'integer', minimum: 1, maximum: 10 },
         include_content: { type: 'boolean' },
-        context_text: { type: 'string' },
+        context_text: { type: 'string', maxLength: 8000 },
         scope: {
           type: 'object',
           description: 'Optional recall scope filter. project_id, workspace_id, client_id, and visibility restrict candidates whenever they are supplied; strict only records hard-isolation intent.',
           additionalProperties: false,
           properties: {
-            project_id: { type: 'string', description: 'Restrict recall to records with this project_id.' },
-            workspace_id: { type: 'string', description: 'Restrict recall to records with this workspace_id. The raw value is not written to recall audit summaries.' },
-            client_id: { type: 'string', enum: CLIENT_ID_VALUES, description: 'Restrict recall to records with this client_id.' },
+            project_id: { type: 'string', maxLength: 200, description: 'Restrict recall to records with this project_id.' },
+            workspace_id: { type: 'string', maxLength: 200, description: 'Restrict recall to records with this workspace_id. The raw value is not written to recall audit summaries.' },
+            client_id: { type: 'string', enum: CLIENT_ID_VALUES, maxLength: 200, description: 'Restrict recall to records with this client_id.' },
             visibility: {
               oneOf: [
                 { type: 'string', enum: VISIBILITY_VALUES },

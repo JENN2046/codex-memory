@@ -651,6 +651,13 @@ function buildBlockedReport({ generatedAt, matrix, reason }) {
     remainingRuntimeGaps: RUNTIME_COMPLETION_GAPS,
     a5HardStops: A5_HARD_STOPS,
     aggregator: summarizeAggregatorReport(aggregatorReport),
+    evidenceTrust: {
+      level: 'self_reported_local_runner',
+      sandboxIsolationVerified: false,
+      networkIsolationVerified: false,
+      providerIsolationVerified: false,
+      durableWriteIsolationVerified: false
+    },
     safety: {
       executesCommands: false,
       startsServices: false,
@@ -769,6 +776,13 @@ function runFinalRcRuntimeEvidenceMatrix({
     remainingRuntimeGaps,
     a5HardStops: A5_HARD_STOPS,
     aggregator: summarizeAggregatorReport(aggregatorReport),
+    evidenceTrust: {
+      level: 'self_reported_local_runner',
+      sandboxIsolationVerified: false,
+      networkIsolationVerified: false,
+      providerIsolationVerified: false,
+      durableWriteIsolationVerified: false
+    },
     safety: {
       executesCommands: true,
       startsServices: false,

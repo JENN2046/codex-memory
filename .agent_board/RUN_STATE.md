@@ -1050,3 +1050,10 @@ Validation: CLI syntax passed; targeted CLI tests passed; adjacent runtime/runti
 Not validated: live recall proof, live write proof, true record_memory, true search_memory, provider smoke/benchmark, raw memory or .jsonl reads, real durable memory/audit/projection mutation, HTTP observe, full npm test, push-readiness, push.
 Remaining risk: CM-0997 is an internal CLI surface only. It does not make governance public, default-on, live-ready, RC-ready, or reliability-closed.
 Next safe step: choose another exact scoped candidate or dirty-baseline cleanup slice after fresh inspection. Keep push deferred.
+## 2026-05-30 — CM-1184 run state
+
+- Active profile: `Standard`; BHA state: `BHA_ABSENT`.
+- Autonomy: Smart Standing Authorization v3; local Green PR follow-up fix.
+- Branch: `work`.
+- Current task: CM-1184 completed; commit/PR preparation next.
+- Hard stops avoided: no push, no provider/API, no real memory, no config/watchdog/startup/dependency changes.

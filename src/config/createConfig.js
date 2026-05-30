@@ -180,6 +180,26 @@ function createConfig(overrides = {}) {
     null
   );
 
+  // Resolve provider gate and profile BEFORE endpoint/fingerprint computation.
+  // When allowExternalProvider is false, configured endpoints must not
+  // participate in embeddingFingerprint or vectorIndexPath — only local-hash
+  // profile is written.
+  const securityProfile = String(
+    pickFirstNonEmpty(overrides.securityProfile, process.env.CODEX_MEMORY_SECURITY_PROFILE, 'local')
+  ).trim().toLowerCase();
+  const isHardened = securityProfile === 'hardened';
+
+  const _resolveBool = (overrideVal, envKey, profileDefault) => {
+    if (overrideVal !== undefined && overrideVal !== null) {
+      return toBoolean(overrideVal, profileDefault);
+    }
+    const envVal = process.env[envKey];
+    if (envVal !== undefined && envVal !== null) {
+      return toBoolean(envVal, profileDefault);
+    }
+    return profileDefault;
+  };
+
   const legacyEmbeddingEndpoint = buildEmbeddingEndpoint({
     name: 'configured-primary',
     provider: overrides.embeddingProvider || process.env.CODEX_MEMORY_EMBEDDING_PROVIDER,
@@ -232,8 +252,27 @@ function createConfig(overrides = {}) {
     defaultProvider: 'nvidia'
   });
 
-  const embeddingEndpoints = [];
+  const configuredEmbeddingEndpoints = [];
   const seenEmbeddingEndpoints = new Set();
+
+  // Resolve allowExternalProvider: if endpoints are configured and the user
+  // has not explicitly set the gate, the local profile defaults to true
+  // (user intent to use the configured provider). Hardened profile keeps
+  // the default false unless CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER or an
+  // override explicitly enables the provider gate.
+  const anyRerankConfigured = !!(pickFirstNonEmpty(overrides.rerankUrl, process.env.CODEX_MEMORY_RERANK_URL)
+    && pickFirstNonEmpty(overrides.rerankModel, process.env.CODEX_MEMORY_RERANK_MODEL));
+  const anyEndpointConfigured = !!(legacyEmbeddingEndpoint || localEmbeddingEndpoint || fallbackEmbeddingEndpoint) || anyRerankConfigured;
+  const gateDefault = !isHardened
+    && overrides.allowExternalProvider === undefined
+    && process.env.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER === undefined
+    && anyEndpointConfigured;
+  const allowExternalProvider = _resolveBool(
+    overrides.allowExternalProvider,
+    'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
+    gateDefault
+  );
+
   for (const endpoint of [legacyEmbeddingEndpoint, localEmbeddingEndpoint, fallbackEmbeddingEndpoint]) {
     if (!endpoint) continue;
     const dedupeKey = JSON.stringify({
@@ -244,18 +283,25 @@ function createConfig(overrides = {}) {
     });
     if (seenEmbeddingEndpoints.has(dedupeKey)) continue;
     seenEmbeddingEndpoints.add(dedupeKey);
-    embeddingEndpoints.push(endpoint);
+    configuredEmbeddingEndpoints.push(endpoint);
   }
 
+  // When external providers are disabled, configured endpoints must NOT
+  // participate in embeddingFingerprint/vectorIndexPath — only local-hash
+  // profile is written to disk.
+  const embeddingEndpoints = allowExternalProvider
+    ? configuredEmbeddingEndpoints
+    : [];
+
   const activeEmbeddingEndpoint = embeddingEndpoints[0] || {
-    name: '',
-    provider: '',
+    name: 'local-hash',
+    provider: 'local',
     url: '',
     apiKey: '',
-    model: '',
-    path: 'v1/embeddings',
+    model: 'local-hash',
+    path: 'local-hash',
     headers: {},
-    timeoutMs: 15000,
+    timeoutMs: 0,
     dimensions: null
   };
   const inferredEmbedDimensions = parsePositiveInteger(
@@ -285,6 +331,9 @@ function createConfig(overrides = {}) {
     basePath,
     overrides.vectorIndexPath || process.env.CODEX_MEMORY_VECTOR_PATH || path.join(embeddingProfileDir, VECTOR_INDEX_FILE_NAME)
   );
+
+  // Security profile (resolved above before endpoint building).
+  // _resolveBool and allowExternalProvider are already computed.
 
   const baseConfig = {
     projectBasePath: basePath,
@@ -375,9 +424,11 @@ function createConfig(overrides = {}) {
     rerankMaxTokensPerBatch: Number.parseInt(String(overrides.rerankMaxTokensPerBatch || process.env.CODEX_MEMORY_RERANK_MAX_TOKENS || '12000'), 10) || 12000,
     rerankTimeoutMs: Number.parseInt(String(overrides.rerankTimeoutMs || process.env.CODEX_MEMORY_RERANK_TIMEOUT_MS || '12000'), 10) || 12000,
     enableCandidateCache: toBoolean(overrides.enableCandidateCache ?? process.env.CODEX_MEMORY_ENABLE_CANDIDATE_CACHE, true),
-    enableSoftReadPolicy: toBoolean(overrides.enableSoftReadPolicy ?? process.env.CODEX_MEMORY_ENABLE_SOFT_READ_POLICY, false),
-    enableLifecycleReadPolicy: toBoolean(overrides.enableLifecycleReadPolicy ?? process.env.CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY, false),
-    enableWritePreflight: toBoolean(overrides.enableWritePreflight ?? process.env.CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT, false),
+    securityProfile,
+    enableSoftReadPolicy: _resolveBool(overrides.enableSoftReadPolicy, 'CODEX_MEMORY_ENABLE_SOFT_READ_POLICY', isHardened),
+    enableLifecycleReadPolicy: _resolveBool(overrides.enableLifecycleReadPolicy, 'CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY', isHardened),
+    enableWritePreflight: _resolveBool(overrides.enableWritePreflight, 'CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT', isHardened),
+    allowExternalProvider,
     enableWriteManifest: toBoolean(overrides.enableWriteManifest ?? process.env.CODEX_MEMORY_ENABLE_WRITE_MANIFEST, true),
     candidateCacheTtlMs: Number.parseInt(String(overrides.candidateCacheTtlMs || process.env.CODEX_MEMORY_CANDIDATE_CACHE_TTL_MS || '3600000'), 10) || 3600000,
     candidateCacheMaxEntries: Number.parseInt(String(overrides.candidateCacheMaxEntries || process.env.CODEX_MEMORY_CANDIDATE_CACHE_MAX_ENTRIES || '200'), 10) || 200,

@@ -12,6 +12,7 @@ const {
   ToolArgumentValidationError,
   validateToolArguments
 } = require('../../core/ToolArgumentValidator');
+const { redactSensitiveFragments } = require('../../core/SensitiveFragmentRedaction');
 
 function jsonRpcSuccess(id, result) {
   return { jsonrpc: '2.0', id, result };
@@ -75,6 +76,23 @@ class CodexMemoryMcpServer {
       this.sessions.set(sessionId, {});
     }
     return sessionId;
+  }
+
+  _handleInternalError(id, toolName, error, code = -32603, message = 'Internal error') {
+    const requestId = `cm-${crypto.randomUUID().slice(0, 8)}`;
+    appendToolErrorLog(this.app, toolName || 'unknown', error);
+
+    // Preserve structured error data with redaction for string values
+    const data = { requestId };
+    if (error?.jsonRpcData && typeof error.jsonRpcData === 'object' && !Array.isArray(error.jsonRpcData)) {
+      for (const [key, value] of Object.entries(error.jsonRpcData)) {
+        data[key] = typeof value === 'string' ? redactSensitiveFragments(value) : value;
+      }
+    }
+
+    return {
+      response: jsonRpcError(id, code, message, data)
+    };
   }
 
   async handleJsonRpc(body, requestContext = {}) {
@@ -159,20 +177,10 @@ class CodexMemoryMcpServer {
             response: jsonRpcError(id, -32602, 'Invalid params', error.message)
           };
         }
-        appendToolErrorLog(this.app, params.name, error);
         if (Number.isInteger(error?.jsonRpcCode)) {
-          return {
-            response: jsonRpcError(
-              id,
-              error.jsonRpcCode,
-              error.jsonRpcMessage || 'Tool error',
-              error.jsonRpcData ?? error.message ?? 'Unknown tool execution error'
-            )
-          };
+          return this._handleInternalError(id, params.name, error, error.jsonRpcCode, error.jsonRpcMessage || 'Tool error');
         }
-        return {
-          response: jsonRpcError(id, -32603, 'Internal error', error.message || 'Unknown tool execution error')
-        };
+        return this._handleInternalError(id, params.name, error);
       }
     }
 

@@ -10,6 +10,7 @@ const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
 const HTTP_SESSION_STREAM_LIMIT_ERROR = 'HTTP_SESSION_STREAM_LIMIT_EXCEEDED';
 const NO_TOKEN_MUTATION_REJECTED = 'NO_TOKEN_MUTATION_REJECTED';
 const NO_TOKEN_OVERVIEW_REJECTED = 'NO_TOKEN_OVERVIEW_REJECTED';
+const NO_TOKEN_SEARCH_REJECTED = 'NO_TOKEN_SEARCH_REJECTED';
 const SESSION_HARDENING_SPECS = {
   absoluteTtlMs: {
     envKey: 'CODEX_MEMORY_HTTP_SESSION_TTL_MS',
@@ -285,12 +286,11 @@ function validateNoTokenJsonRpcRequest(body) {
       reason: 'No-token HTTP MCP memory_overview requires bearer token authorization until selected overview output is available.'
     };
   }
-  if (
-    body.method === 'tools/call' &&
-    body.params?.name === 'search_memory' &&
-    body.params?.arguments?.include_content === true
-  ) {
-    return 'No-token HTTP MCP search_memory cannot include raw memory content.';
+  if (body.method === 'tools/call' && body.params?.name === 'search_memory') {
+    return {
+      code: NO_TOKEN_SEARCH_REJECTED,
+      reason: 'No-token HTTP MCP search_memory requires bearer token authorization.'
+    };
   }
 
   return null;
@@ -602,7 +602,8 @@ function createStreamableHttpServer({
 
       writeJson(res, 200, result.response);
     } catch (error) {
-      writeJson(res, 500, jsonRpcError(null, -32603, 'Internal error', error.message || 'Unknown HTTP server error'));
+      const requestId = `cm-${crypto.randomUUID().slice(0, 8)}`;
+      writeJson(res, 500, jsonRpcError(null, -32603, 'Internal error', { requestId }));
     }
   });
 

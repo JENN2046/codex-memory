@@ -85,6 +85,12 @@ function validateValue(value, schema, path) {
       throw new ToolArgumentValidationError(`${path} must be an array`, path);
     }
     const itemSchema = schema.items || {};
+    if (typeof schema.minItems === 'number' && value.length < schema.minItems) {
+      throw new ToolArgumentValidationError(`${path} must have at least ${schema.minItems} items`, path);
+    }
+    if (typeof schema.maxItems === 'number' && value.length > schema.maxItems) {
+      throw new ToolArgumentValidationError(`${path} must have at most ${schema.maxItems} items`, path);
+    }
     for (let index = 0; index < value.length; index += 1) {
       validateValue(value[index], itemSchema, `${path}[${index}]`);
     }
@@ -101,6 +107,14 @@ function validateValue(value, schema, path) {
   validateEnum(value, schema, path);
   if (schema.type === 'integer') {
     validateNumberBounds(value, schema, path);
+  }
+  if (schema.type === 'string' && typeof value === 'string') {
+    if (typeof schema.minLength === 'number' && value.length < schema.minLength) {
+      throw new ToolArgumentValidationError(`${path} must be at least ${schema.minLength} characters`, path);
+    }
+    if (typeof schema.maxLength === 'number' && value.length > schema.maxLength) {
+      throw new ToolArgumentValidationError(`${path} must be at most ${schema.maxLength} characters`, path);
+    }
   }
 }
 

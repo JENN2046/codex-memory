@@ -10810,3 +10810,10 @@ Remaining risk:
 
 Next:
 - Keep `RC_NOT_READY_BLOCKED`; do not push or claim readiness. Commit this status-surface sync only if a separate guarded commit decision is desired.
+## CM-1184 — PR #5 hardened provider gate review fix — 2026-05-30
+
+- Status: `COMPLETED_VALIDATED` for targeted source/test scope.
+- Change: `gateDefault` now respects `securityProfile === hardened`, keeping `allowExternalProvider=false` unless `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER` or override explicitly enables it.
+- Tests: targeted `node --test tests/security-profile-config.test.js tests/external-provider-gate.test.js` passed 33/33; `git diff --check` passed.
+- Warning: `npm run test:hardening` blocked in this environment because Node v20.20.2 lacks `node:sqlite`; repo `package.json` requires Node >=22.
+- Re-review: final diff and changed source/test context reviewed; no actionable findings in changed scope.

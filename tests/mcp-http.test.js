@@ -349,205 +349,96 @@ test('HTTP MCP should reject no-token mutation tool calls', async () => {
   });
 });
 
-test('HTTP MCP no-token search_memory should avoid local maintenance writes', async () => {
+test('HTTP MCP no-token search_memory should be rejected', async () => {
   await withHttpServer(async ({ app, address }) => {
-    await app.callTool('record_memory', {
-      target: 'process',
-      title: 'HTTP no-token read-only search fixture',
-      content: 'Type: checkpoint\nread-only search should not maintain local stores',
-      evidence: 'http no-token read-only search contract test',
-      validated: true,
-      reusable: false,
-      sensitivity: 'none'
-    }, {
-      executionContext: {
-        agentAlias: 'Codex',
-        agentId: 'codex-memory-http-test',
-        requestSource: 'http-no-token-read-only-search-test'
-      }
-    });
-
-    const originalSyncTarget = app.recall.knowledgeBaseSyncService.syncTarget;
-    const originalCacheGet = app.stores.candidateCacheStore.get;
-    const originalCacheSet = app.stores.candidateCacheStore.set;
-    const originalAuditRecord = app.recall.recallAuditService.record;
-    const originalReadPolicyAudit = app.recall.recallAuditService.recordReadPolicySummary;
-    const originalVectorFlush = app.recall.candidateGenerator.vectorStore.flush;
-    const originalEmbedTextAdaptive = app.recall.candidateGenerator.vectorStore.embedTextAdaptive;
-
-    app.recall.knowledgeBaseSyncService.syncTarget = async () => {
-      throw new Error('no-token search must not sync local stores');
-    };
-    app.stores.candidateCacheStore.get = async () => {
-      throw new Error('no-token search must not read or update candidate cache metadata');
-    };
-    app.stores.candidateCacheStore.set = async () => {
-      throw new Error('no-token search must not write candidate cache');
-    };
-    app.recall.recallAuditService.record = async () => {
-      throw new Error('no-token search must not write recall audit');
-    };
-    app.recall.recallAuditService.recordReadPolicySummary = async () => {
-      throw new Error('no-token search must not write read-policy audit');
-    };
-    app.recall.candidateGenerator.vectorStore.flush = async () => {
-      throw new Error('no-token search must not flush embedding cache');
-    };
-    app.recall.candidateGenerator.vectorStore.embedTextAdaptive = async () => {
-      throw new Error('no-token search must not call external embedding providers');
-    };
-
-    try {
-      const response = await fetch(address.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 7,
-          method: 'tools/call',
-          params: {
-            name: 'search_memory',
-            arguments: {
-              query: 'read-only no-token local maintenance writes',
-              target: 'process',
-              limit: 3,
-              include_content: false
-            }
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 7,
+        method: 'tools/call',
+        params: {
+          name: 'search_memory',
+          arguments: {
+            query: 'no-token search',
+            target: 'process',
+            limit: 3,
+            include_content: false
           }
-        })
-      });
-      const payload = await response.json();
+        }
+      })
+    });
+    const payload = await response.json();
 
-      assert.equal(response.status, 200);
-      assert.equal(payload.jsonrpc, '2.0');
-      assert.equal(payload.id, 7);
-      assert.ok(Array.isArray(payload.result.structuredContent.results));
-    } finally {
-      app.recall.knowledgeBaseSyncService.syncTarget = originalSyncTarget;
-      app.stores.candidateCacheStore.get = originalCacheGet;
-      app.stores.candidateCacheStore.set = originalCacheSet;
-      app.recall.recallAuditService.record = originalAuditRecord;
-      app.recall.recallAuditService.recordReadPolicySummary = originalReadPolicyAudit;
-      app.recall.candidateGenerator.vectorStore.flush = originalVectorFlush;
-      app.recall.candidateGenerator.vectorStore.embedTextAdaptive = originalEmbedTextAdaptive;
-    }
+    assert.equal(response.status, 403);
+    assert.equal(payload.jsonrpc, '2.0');
+    assert.equal(payload.id, 7);
+    assert.equal(payload.error.code, -32001);
+    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
+    assert.ok(payload.error.data.reason.includes('bearer token'));
   });
 });
 
 test('HTTP MCP no-token search_memory should not call external embedding when cache is disabled', async () => {
-  await withHttpServer(async ({ app, address }) => {
-    await app.callTool('record_memory', {
-      target: 'process',
-      title: 'HTTP no-token cache-disabled fixture',
-      content: 'Type: checkpoint\ncache-disabled read-only search must use local hash embeddings',
-      evidence: 'http no-token cache-disabled embedding boundary test',
-      validated: true,
-      reusable: false,
-      sensitivity: 'none'
-    }, {
-      executionContext: {
-        agentAlias: 'Codex',
-        agentId: 'codex-memory-http-test',
-        requestSource: 'http-no-token-cache-disabled-search-test'
-      }
-    });
-
-    const originalEmbedTextAdaptive = app.recall.candidateGenerator.vectorStore.embedTextAdaptive;
-    app.recall.candidateGenerator.vectorStore.embedTextAdaptive = async () => {
-      throw new Error('no-token cache-disabled search must not call external embedding providers');
-    };
-
-    try {
-      const response = await fetch(address.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 8,
-          method: 'tools/call',
-          params: {
-            name: 'search_memory',
-            arguments: {
-              query: 'cache-disabled read-only search local hash embeddings',
-              target: 'process',
-              limit: 3,
-              include_content: false
-            }
+  await withHttpServer(async ({ address }) => {
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 8,
+        method: 'tools/call',
+        params: {
+          name: 'search_memory',
+          arguments: {
+            query: 'no-token search blocked',
+            target: 'process',
+            limit: 3,
+            include_content: false
           }
-        })
-      });
-      const payload = await response.json();
+        }
+      })
+    });
+    const payload = await response.json();
 
-      assert.equal(response.status, 200);
-      assert.equal(payload.jsonrpc, '2.0');
-      assert.equal(payload.id, 8);
-      assert.ok(Array.isArray(payload.result.structuredContent.results));
-    } finally {
-      app.recall.candidateGenerator.vectorStore.embedTextAdaptive = originalEmbedTextAdaptive;
-    }
+    assert.equal(response.status, 403);
+    assert.equal(payload.error.code, -32001);
+    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
   }, {}, { enableEmbeddingCache: false });
 });
 
 test('HTTP MCP no-token search_memory should not call external rerank provider', async () => {
-  await withHttpServer(async ({ app, address }) => {
-    await app.callTool('record_memory', {
-      target: 'process',
-      title: 'HTTP no-token rerank fixture',
-      content: 'Type: checkpoint\nread-only rerank search must stay local',
-      evidence: 'http no-token read-only rerank provider boundary test',
-      validated: true,
-      reusable: false,
-      sensitivity: 'none'
-    }, {
-      executionContext: {
-        agentAlias: 'Codex',
-        agentId: 'codex-memory-http-test',
-        requestSource: 'http-no-token-rerank-search-test'
-      }
-    });
-
-    const originalIsConfigured = app.recall.externalRerankAdapter.isConfigured;
-    const originalRerank = app.recall.externalRerankAdapter.rerank;
-    app.recall.externalRerankAdapter.isConfigured = () => true;
-    app.recall.externalRerankAdapter.rerank = async () => {
-      throw new Error('no-token search must not call external rerank providers');
-    };
-
-    try {
-      const response = await fetch(address.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 9,
-          method: 'tools/call',
-          params: {
-            name: 'search_memory',
-            arguments: {
-              query: 'read-only rerank search must stay local ::rerank',
-              target: 'process',
-              limit: 3,
-              include_content: false
-            }
+  await withHttpServer(async ({ address }) => {
+    const response = await fetch(address.url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 9,
+        method: 'tools/call',
+        params: {
+          name: 'search_memory',
+          arguments: {
+            query: 'no-token search blocked',
+            target: 'process',
+            limit: 3,
+            include_content: false
           }
-        })
-      });
-      const payload = await response.json();
+        }
+      })
+    });
+    const payload = await response.json();
 
-      assert.equal(response.status, 200);
-      assert.equal(payload.jsonrpc, '2.0');
-      assert.equal(payload.id, 9);
-      assert.ok(Array.isArray(payload.result.structuredContent.results));
-    } finally {
-      app.recall.externalRerankAdapter.isConfigured = originalIsConfigured;
-      app.recall.externalRerankAdapter.rerank = originalRerank;
-    }
+    assert.equal(response.status, 403);
+    assert.equal(payload.error.code, -32001);
+    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
   });
 });
 
@@ -580,9 +471,8 @@ test('HTTP MCP no-token search_memory should reject include_content raw reads', 
     assert.equal(payload.id, 10);
     assert.equal(payload.error.code, -32001);
     assert.equal(payload.error.message, 'Forbidden');
-    assert.equal(payload.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
-    assert.match(payload.error.data.reason, /no-token/i);
-    assert.match(payload.error.data.reason, /raw memory content/i);
+    assert.equal(payload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
+    assert.match(payload.error.data.reason, /bearer token/i);
   });
 });
 

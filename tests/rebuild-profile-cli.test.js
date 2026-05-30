@@ -44,6 +44,7 @@ test('rebuild-profile CLI should report dry-run profile artifacts in json mode',
         CODEX_MEMORY_DATA_DIR: path.join(tempBasePath, 'data'),
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'cli-test'
       }
     });
@@ -112,6 +113,7 @@ test('profile-health CLI should report ready current profile artifacts', async (
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'health-test'
       }
     });
@@ -168,6 +170,7 @@ test('profile-health CLI should warn for legacy chunks without fingerprint colum
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'legacy-health-test'
       }
     });
@@ -238,6 +241,7 @@ test('shadow-compare CLI should compare current and baseline profile chunks', as
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'compare-test'
       }
     });
@@ -306,6 +310,7 @@ test('shadow-compare CLI should report no-baseline without another profile', asy
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'single-profile-test'
       }
     });
@@ -386,6 +391,7 @@ test('profile-gate CLI should evaluate a fixed migration suite', async () => {
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'gate-test'
       }
     });
@@ -464,6 +470,7 @@ test('profile-gate CLI summary-only should omit full compare payload', async () 
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'gate-summary-test'
       }
     });
@@ -544,6 +551,7 @@ test('profile-gate CLI should fail require-pass when thresholds are missed', asy
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'gate-fail-test'
       }
     });
@@ -585,6 +593,7 @@ test('rag params profile example should load for default bge-m3-local fingerprin
     dataDir: path.join(os.tmpdir(), 'codex-memory-rag-example-data'),
     localEmbeddingUrl: 'http://127.0.0.1:18081/',
     localEmbeddingModel: 'bge-m3-local',
+    allowExternalProvider: true,
     embeddingProfileVersion: 'v1',
     ragParamsPath: path.join(process.cwd(), 'examples', 'rag-params.profiles.example.json')
   });
@@ -610,6 +619,7 @@ test('v8-diagnose CLI should expose terrain and meta thinking diagnostics', asyn
         CODEX_MEMORY_DATA_DIR: path.join(tempBasePath, 'data'),
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'diagnose-test'
       }
     });
@@ -674,6 +684,7 @@ test('cleanup-legacy-chunks CLI should remove only legacy chunks on confirm', as
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'cleanup-legacy-test'
       }
     });
@@ -693,6 +704,7 @@ test('cleanup-legacy-chunks CLI should remove only legacy chunks on confirm', as
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'cleanup-legacy-test'
       }
     });
@@ -787,6 +799,7 @@ test('rebuild-profile CLI confirm should clear only current profile artifacts', 
         CODEX_MEMORY_DATA_DIR: dataDir,
         CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
         CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
         CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'clean-test'
       }
     });

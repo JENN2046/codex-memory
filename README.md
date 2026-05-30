@@ -57,6 +57,91 @@
 
 Red Lane 仍硬停止：push、PR、tag、release、deploy、secret、destructive action、broad real memory scan/export、public MCP expansion、config/watchdog/startup change、unscoped dependency change、readiness/cutover claim 都不自动执行。
 
+## 安全加固（CM-HARDEN-2026-05-30）
+
+### HTTP no-token 限制
+
+HTTP MCP 入口默认拒绝无 bearer token 的 `search_memory`、`record_memory`、`memory_overview` 三大 MCP 工具调用。仅允许 `tools/list`、`initialize`、`ping` 等非记忆操作。
+
+- 即使 `include_content=false`，`search_memory` 也必须 bearer token
+- 推荐配置 `CODEX_MEMORY_HTTP_TOKEN`，生产环境不得使用无 token 模式
+- 无 token loopback 仅用于本地开发，详见 `.env.example`
+
+### 安全 Profile
+
+通过 `CODEX_MEMORY_SECURITY_PROFILE` 选择安全等级：
+
+| 值 | 说明 |
+|---|---|
+| `local`（默认） | 保守默认，不自动开启额外策略 |
+| `hardened` | 自动开启 soft read policy、lifecycle read policy、write preflight，并默认禁止 external provider |
+
+显式设置对应的 `CODEX_MEMORY_*` 环境变量会覆盖 profile 默认值。
+
+### 外部 Provider 总闸
+
+`CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER` 控制已配置的 embedding/rerank endpoint 是否允许参与索引和 fetch。
+
+**默认行为取决于 securityProfile：**
+
+| Profile | 无 endpoint | 已配置 endpoint |
+|---|---|---|
+| `local`（默认） | `false` | `true`（向后兼容） |
+| `hardened` | `false` | `false` |
+
+- `securityProfile=local` 且已配置 endpoint URL 时，未显式设置 gate 则默认允许，保持向后兼容
+- `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=false` 强制使用 local-hash 指纹和空 endpoint 列表
+- `securityProfile=hardened` 时即使已配置 endpoint 也默认拒绝；需显式 `=true` 才允许
+- `ExternalEmbeddingAdapter.isConfigured()` 和 `ExternalRerankAdapter.isConfigured()` 始终受此控制
+
+### 输入验证
+
+工具参数已增加字符串长度和数组数量限制：
+
+| 字段 | 限制 |
+|---|---|
+| `record_memory.title` | 1–200 字符 |
+| `record_memory.content` | 1–20000 字符 |
+| `record_memory.evidence` | 1–8000 字符 |
+| `record_memory.sensitivity` | ≤80 字符 |
+| `record_memory.tags` 单项 | ≤80 字符 |
+| `record_memory.tags` 数组 | ≤30 项 |
+| `search_memory.query` | 1–1000 字符 |
+| `search_memory.context_text` | ≤8000 字符 |
+| scope 字段 | ≤200 字符 |
+
+### stdio 消息大小限制
+
+stdio transport 限制单条消息 1MB（Content-Length），累计 buffer 2MB。超出返回 Transport error 且不包含原始 payload。
+
+### JSON-RPC 错误脱敏
+
+内部错误（非 validation error）的响应体仅包含 `requestId`（`cm-xxxxxxxx`），不返回本地路径、provider URL、token 类字符串或完整 stack trace。详细错误写入本地日志。错误码为 `jsonRpcCode` 的结构化错误会保留原有字段但过滤敏感字符串。
+
+## 测试契约（CM-PROVIDER-TEST-CONTRACT-01）
+
+`npm test` 使用 `src/cli/run-default-tests.js` 运行默认安全测试，遵循以下分类：
+
+| 契约 | 脚本 | 条件 |
+|---|---|---|
+| **默认安全测试** | `npm test` | 无 provider / 无网络 / 无 daemon，必须 exit 0 |
+| **Hardening 回归** | `npm run test:hardening` | 60/60 P0/P1/P2 安全回归测试 |
+| **Provider 测试** | `npm run test:provider` | 需 `CODEX_MEMORY_RUN_PROVIDER_TESTS=true` + `CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=true` |
+| **全量测试** | `npm run test:all` | `npm test` + `npm run test:hardening` |
+
+### 排除清单
+
+管理位置：`src/cli/run-default-tests.js`
+
+| 类别 | 文件数 | 说明 |
+|---|---|---|
+| provider-dependent | 4 | 需要真实 embedding/rerank endpoint |
+| daemon-dependent | 1 | 需要 live HTTP daemon |
+| self-referential | 3 | 会触发 gate-ci/dashboard 自身 |
+| fixture-drift | 4 | 预先存在的 manifest 漂移，待独立修复 |
+
+Provider 测试默认 skip（exit 0，文案 `skipped, not passed`），不会跳过假装通过。
+
 ## 当前能力
 
 - 独立 `stdio MCP` 与 `HTTP MCP` 双入口

@@ -46,6 +46,7 @@ async function withSyntheticEnv(profileVersion, handler) {
       CODEX_MEMORY_DATA_DIR: path.join(tempBasePath, 'data'),
       CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
       CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+      CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
       CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: profileVersion
     });
   } finally {
