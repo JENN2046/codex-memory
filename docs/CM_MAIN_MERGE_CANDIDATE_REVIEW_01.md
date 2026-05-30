@@ -103,3 +103,30 @@ The default test contract is clean.
 Provider-dependent tests are preserved behind an explicit provider contract.
 The branch remains not RC-ready and carries no release, deploy, or cutover authority.
 ```
+
+## Postscript: CM-MAIN-MERGE-REVIEW-FIX-01
+
+Addressing PR #5 reviewer feedback — the wrapper-level 300000ms timeout on `run-default-tests.js` was removed. The timeout capped the entire default-safe suite, not individual tests. Replaced with `buildSpawnOptions()` that has no aggregate timeout by default. Per-test timing is handled by `node --test` or individual test configuration. 4 new tests verify spawn option construction.
+
+Fix committed at `f250703`.
+
+## Postscript 2: CM-MAIN-MERGE-REVIEW-FIX-BATCH-01
+
+Second round of PR #5 review feedback — three fixes in one batch at `9535e73`:
+
+| Fix | Issue | Resolution |
+|---|---|---|
+| FIX-02 | Boolean overrides not normalized through `toBoolean` | `_resolveBool` now applies `toBoolean` to override values, not just env vars |
+| FIX-03 | Oversized stdio frames cause stream desync when body arrives in fragments | Added `oversizedDiscardRemainingBytes` discard mode that consumes oversized body bytes before resuming normal parse |
+| FIX-04 | Disabled provider configs pollute embedding fingerprint/profile | `allowExternalProvider` resolved before endpoint building; when disabled, active endpoint defaults to `local-hash` with provider `local`, model `local-hash` |
+
+Acceptance after batch:
+
+| Check | Result |
+|---|---|
+| test:hardening | PASS |
+| npm test | PASS (2739/2739, +3 new stdio +6 config tests) |
+| gate:ci | ok=true, fixtureOnly=true, noProvider=true |
+| test:provider | skipped, not passed, exit 0 |
+
+```
