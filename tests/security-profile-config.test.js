@@ -158,6 +158,34 @@ test('configured endpoint with unset provider gate auto-enables allowExternalPro
   assert.equal(config.embeddingEndpoints.length, 1);
 });
 
+test('hardened profile with configured endpoint keeps provider gate disabled by default', () => {
+  withEnv({
+    CODEX_MEMORY_SECURITY_PROFILE: 'hardened',
+    CODEX_MEMORY_EMBEDDING_URL: 'http://example.invalid',
+    CODEX_MEMORY_EMBEDDING_MODEL: 'm'
+  }, () => {
+    const config = createConfig();
+    assert.equal(config.securityProfile, 'hardened');
+    assert.equal(config.allowExternalProvider, false);
+    assert.match(config.embeddingFingerprint, /^local-hash__/);
+    assert.equal(config.embeddingEndpoints.length, 0);
+  });
+});
+
+test('hardened override with configured endpoint keeps provider gate disabled by default', () => {
+  const config = createConfig({
+    securityProfile: 'hardened',
+    localEmbeddingUrl: 'http://example.invalid',
+    localEmbeddingModel: 'bge-m3-local',
+    localEmbedDimensions: 1024
+  });
+
+  assert.equal(config.securityProfile, 'hardened');
+  assert.equal(config.allowExternalProvider, false);
+  assert.match(config.embeddingFingerprint, /^local-hash__/);
+  assert.equal(config.embeddingEndpoints.length, 0);
+});
+
 test('string true provider gate enables provider endpoint and fingerprint', () => {
   const config = createConfig({
     allowExternalProvider: 'true',

@@ -10497,3 +10497,6 @@ Validation: CLI/test syntax passed; tombstone CLI passed 8/8; supersede CLI pass
 Not validated: live recall proof, live write proof, true record_memory, true search_memory, provider smoke/benchmark, raw memory/.jsonl reads, real durable memory/audit/projection mutation, HTTP observe, full npm test, push-readiness, push.
 Remaining risks: These CLI entries are internal and dry-run-first, but confirmed apply can mutate whichever local store is selected by environment/config. Tests cover only temp fixture paths. RC remains NOT_READY_BLOCKED.
 Next safe step: choose another exact scoped candidate or dirty-baseline cleanup slice after fresh inspection. Do not push.
+## CM-1184 handoff — 2026-05-30
+
+PR #5 review issue fixed locally: hardened security profile no longer inherits endpoint auto-enable default for external provider gate. Targeted tests pass. Full hardening suite needs Node >=22 because current environment Node v20.20.2 cannot load `node:sqlite`.
