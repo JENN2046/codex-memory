@@ -221,3 +221,16 @@ test('explicit false provider gate keeps configured endpoint out of profile', ()
   assert.match(config.embeddingFingerprint, /^local-hash__/);
   assert.equal(config.embeddingEndpoints.length, 0);
 });
+
+test('rerank-only config auto-enables allowExternalProvider in local profile', () => {
+  const config = createConfig({
+    rerankUrl: 'http://example.invalid/rerank',
+    rerankApiKey: 'test-key',
+    rerankModel: 'rerank-model'
+  });
+
+  assert.equal(config.allowExternalProvider, true);
+  assert.equal(config.embeddingEndpoints.length, 0);
+});
+
+test('rerank-only config auto-enables allowExternalProvider in local profile',()=>{const c=require("../src/config/createConfig").createConfig({rerankUrl:"http://example.invalid/rerank",rerankApiKey:"test-key",rerankModel:"rerank-model"});c.allowExternalProvider===true?console.log("PASS: allowExternalProvider="+c.allowExternalProvider):console.log("FAIL");});

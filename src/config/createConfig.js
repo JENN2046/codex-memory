@@ -260,7 +260,9 @@ function createConfig(overrides = {}) {
   // (user intent to use the configured provider). Hardened profile keeps
   // the default false unless CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER or an
   // override explicitly enables the provider gate.
-  const anyEndpointConfigured = !!(legacyEmbeddingEndpoint || localEmbeddingEndpoint || fallbackEmbeddingEndpoint);
+  const anyRerankConfigured = !!(pickFirstNonEmpty(overrides.rerankUrl, process.env.CODEX_MEMORY_RERANK_URL)
+    && pickFirstNonEmpty(overrides.rerankModel, process.env.CODEX_MEMORY_RERANK_MODEL));
+  const anyEndpointConfigured = !!(legacyEmbeddingEndpoint || localEmbeddingEndpoint || fallbackEmbeddingEndpoint) || anyRerankConfigured;
   const gateDefault = !isHardened
     && overrides.allowExternalProvider === undefined
     && process.env.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER === undefined
