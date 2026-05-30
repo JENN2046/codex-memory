@@ -293,10 +293,16 @@ function createConfig(overrides = {}) {
   const isHardened = securityProfile === 'hardened';
 
   // Profile-aware boolean resolver: override > env > profile default
+  // All non-null/non-undefined values go through toBoolean to normalize
+  // env-style string overrides like 'false' and 'true'.
   const _resolveBool = (overrideVal, envKey, profileDefault) => {
-    if (overrideVal !== undefined) return overrideVal;
+    if (overrideVal !== undefined && overrideVal !== null) {
+      return toBoolean(overrideVal, profileDefault);
+    }
     const envVal = process.env[envKey];
-    if (envVal !== undefined) return toBoolean(envVal, profileDefault);
+    if (envVal !== undefined && envVal !== null) {
+      return toBoolean(envVal, profileDefault);
+    }
     return profileDefault;
   };
 

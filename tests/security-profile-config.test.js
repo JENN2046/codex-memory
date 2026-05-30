@@ -88,3 +88,35 @@ test('explicit local profile behaves same as default', () => {
     assert.equal(config.allowExternalProvider, false);
   });
 });
+
+test('string false override disables hardened lifecycle read policy', () => {
+  const config = createConfig({
+    securityProfile: 'hardened',
+    enableLifecycleReadPolicy: 'false'
+  });
+  assert.equal(config.enableLifecycleReadPolicy, false);
+});
+
+test('string false override disables hardened soft read policy', () => {
+  const config = createConfig({
+    securityProfile: 'hardened',
+    enableSoftReadPolicy: 'false'
+  });
+  assert.equal(config.enableSoftReadPolicy, false);
+});
+
+test('string false override disables hardened write preflight', () => {
+  const config = createConfig({
+    securityProfile: 'hardened',
+    enableWritePreflight: 'false'
+  });
+  assert.equal(config.enableWritePreflight, false);
+});
+
+test('string true override enables soft read policy in local profile', () => {
+  const config = createConfig({
+    securityProfile: 'local',
+    enableSoftReadPolicy: 'true'
+  });
+  assert.equal(config.enableSoftReadPolicy, true);
+});

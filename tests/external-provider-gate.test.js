@@ -124,6 +124,22 @@ test('VectorIndexStore falls back to local-hash when allowExternalProvider is fa
   assert.equal(adapter.isConfigured(), false);
 });
 
+test('string true createConfig override enables external provider', () => {
+  const { createConfig } = require('../src/config/createConfig');
+  const config = createConfig({
+    allowExternalProvider: 'true'
+  });
+  assert.equal(config.allowExternalProvider, true);
+});
+
+test('string false createConfig override disables external provider', () => {
+  const { createConfig } = require('../src/config/createConfig');
+  const config = createConfig({
+    allowExternalProvider: 'false'
+  });
+  assert.equal(config.allowExternalProvider, false);
+});
+
 test('allowExternalProvider=true with complete config allows adapter configured', () => {
   const embeddingAdapter = new ExternalEmbeddingAdapter({
     embeddingEndpoints: [{ url: 'http://example.com', model: 'test-model' }],
