@@ -92,3 +92,15 @@ test('buildSpawnOptions accepts custom cwd and env', () => {
   assert.equal(options.cwd, '/tmp');
   assert.equal(options.env.PATH, '/usr/bin');
 });
+
+test("buildSpawnOptions forces provider gate off", () => {
+  const options = buildSpawnOptions({
+    env: {
+      CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: "true",
+      CODEX_MEMORY_LOCAL_EMBEDDING_URL: "http://example.invalid"
+    }
+  });
+
+  assert.equal(options.hasOwnProperty("timeout"), false);
+  assert.equal(options.env.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER, "false");
+});
