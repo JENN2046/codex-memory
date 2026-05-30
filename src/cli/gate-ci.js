@@ -3,6 +3,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { DEFAULT_SUITE, runSuiteReport } = require('./real-query-suite-core');
+const {
+  PROVIDER_DEPENDENT_FILES,
+  DAEMON_DEPENDENT_FILES,
+  SELF_REFERENTIAL_FILES,
+  FIXTURE_DRIFT_FILES
+} = require('./run-default-tests');
 
 const UNSAFE_OVERRIDE_ENV_KEYS = [
   'CODEX_MEMORY_GATE_CI_COMPARE_COMMAND_JSON',
@@ -300,19 +306,16 @@ function runLifecyclePolicySummary() {
 }
 
 async function runTests() {
-  // CI-safe tests: exclude network-dependent test files
+  // CI-safe tests: use shared exclude lists from run-default-tests.js
   const testsDir = path.join(process.cwd(), 'tests');
   const allTestFiles = fs.readdirSync(testsDir).filter(f => f.endsWith('.test.js'));
-  const ciSafeFiles = allTestFiles.filter(f => {
-    // These test files require a live HTTP MCP daemon on localhost
-    const httpDependent = ['mcp-http.test.js'];
-    // These test files may call real providers
-    const providerDependent = ['provider-smoke-cli.test.js', 'provider-benchmark-cli.test.js'];
-    // These test files call gate:ci/dashboard themselves (avoid self-referential runs)
-    const selfReferential = ['gate-ci-cli.test.js', 'gate-ci-env-override-evidence.test.js', 'dashboard-cli.test.js'];
-    const excluded = [...httpDependent, ...providerDependent, ...selfReferential];
-    return !excluded.includes(f);
-  });
+  const excluded = new Set([
+    ...PROVIDER_DEPENDENT_FILES,
+    ...DAEMON_DEPENDENT_FILES,
+    ...SELF_REFERENTIAL_FILES,
+    ...FIXTURE_DRIFT_FILES
+  ]);
+  const ciSafeFiles = allTestFiles.filter(f => !excluded.has(f));
 
   const testPatterns = ciSafeFiles.map(f => path.join('tests', f));
   const command = resolveEnvCommand('test') || [process.execPath, '--test', ...testPatterns];
