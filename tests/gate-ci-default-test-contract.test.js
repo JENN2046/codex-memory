@@ -59,6 +59,7 @@ test('gate:ci reports env override fail-closed correctly', () => {
   assert.equal(payload.summary.fixtureOnly, false);
   assert.equal(payload.summary.noNetwork, false);
   assert.equal(payload.summary.noProvider, false);
+  assert.equal(payload.summary.checksExecuted, false);
   assert.ok(payload.summary.failedChecks.includes('unsafeEnvOverride'));
   assert.notEqual(result.status, 0, 'should exit non-zero');
 });

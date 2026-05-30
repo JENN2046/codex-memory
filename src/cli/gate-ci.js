@@ -408,9 +408,56 @@ function renderText(results) {
   return lines.join('\n') + '\n';
 }
 
+function buildUnsafeOverrideRejectedResults({ generatedAt, unsafeOverride }) {
+  return {
+    generatedAt,
+    summary: {
+      ok: false,
+      mode: 'ci',
+      fixtureOnly: false,
+      noNetwork: false,
+      noDaemon: true,
+      noProvider: false,
+      unsafeEnvOverrideDetected: true,
+      unsafeEnvOverrideKeys: unsafeOverride.keys,
+      failedChecks: ['unsafeEnvOverride'],
+      checksExecuted: false
+    },
+    checks: {
+      unsafeEnvOverride: {
+        status: 'error',
+        message: 'Unsafe CODEX_MEMORY_GATE_CI_*_COMMAND_JSON override detected before checks; gate stopped fail-closed.',
+        detail: {
+          keys: unsafeOverride.keys,
+          compareExecuted: false,
+          rollbackExecuted: false,
+          testsExecuted: false,
+          docsExecuted: false
+        }
+      }
+    }
+  };
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const generatedAt = new Date().toISOString();
+
+  // Detect unsafe env overrides BEFORE running any checks. The override
+  // commands may spawn arbitrary processes, so they must not execute.
+  const unsafeOverride = detectUnsafeEnvOverrides();
+  if (unsafeOverride.detected) {
+    const results = buildUnsafeOverrideRejectedResults({ generatedAt, unsafeOverride });
+
+    if (options.json) {
+      process.stdout.write(`${JSON.stringify(results)}\n`);
+    } else {
+      process.stdout.write(renderText(results));
+    }
+
+    process.exitCode = 1;
+    return;
+  }
 
   const compare = await runCompare();
   const rollback = await runRollback();
@@ -425,22 +472,17 @@ async function main() {
     .filter(([, v]) => v.status === 'error')
     .map(([k]) => k);
 
-  const unsafeOverride = detectUnsafeEnvOverrides();
-  if (unsafeOverride.detected) {
-    failedChecks.push('unsafeEnvOverride');
-  }
-
   const results = {
     generatedAt,
     summary: {
       ok: failedChecks.length === 0,
       mode: 'ci',
-      fixtureOnly: !unsafeOverride.detected,
-      noNetwork: !unsafeOverride.detected,
+      fixtureOnly: true,
+      noNetwork: true,
       noDaemon: true,
-      noProvider: !unsafeOverride.detected,
-      unsafeEnvOverrideDetected: unsafeOverride.detected,
-      unsafeEnvOverrideKeys: unsafeOverride.keys,
+      noProvider: true,
+      unsafeEnvOverrideDetected: false,
+      unsafeEnvOverrideKeys: [],
       failedChecks
     },
     checks
