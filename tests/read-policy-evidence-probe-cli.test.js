@@ -143,7 +143,8 @@ test('read-policy evidence probe fails closed when provider config is present', 
     ], {
       CODEX_MEMORY_BASE_PATH: tempBasePath,
       CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:9999/v1',
-      CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local'
+      CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+      CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true'
     });
 
     assert.equal(result.status, 2, result.stderr || result.stdout);

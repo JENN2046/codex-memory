@@ -255,18 +255,13 @@ function createConfig(overrides = {}) {
   const configuredEmbeddingEndpoints = [];
   const seenEmbeddingEndpoints = new Set();
 
-  // Resolve allowExternalProvider AFTER building endpoint objects so we can
-  // detect whether endpoints are explicitly configured. If no override or env
-  // is set, but the user configured an endpoint URL, user intent is to allow it.
-  // Explicit CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=false still takes priority.
-  const anyEndpointConfigured = !!(legacyEmbeddingEndpoint || localEmbeddingEndpoint || fallbackEmbeddingEndpoint);
-  const defaultAllowProvider = overrides.allowExternalProvider === undefined
-    && process.env.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER === undefined
-    && anyEndpointConfigured;
+  // allowExternalProvider defaults to false — hard gate.
+  // Only explicit CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=true or override true
+  // enables provider endpoints for fingerprint/profile participation.
   const allowExternalProvider = _resolveBool(
     overrides.allowExternalProvider,
     'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
-    defaultAllowProvider
+    false
   );
 
   for (const endpoint of [legacyEmbeddingEndpoint, localEmbeddingEndpoint, fallbackEmbeddingEndpoint]) {
@@ -424,7 +419,7 @@ function createConfig(overrides = {}) {
     enableSoftReadPolicy: _resolveBool(overrides.enableSoftReadPolicy, 'CODEX_MEMORY_ENABLE_SOFT_READ_POLICY', isHardened),
     enableLifecycleReadPolicy: _resolveBool(overrides.enableLifecycleReadPolicy, 'CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY', isHardened),
     enableWritePreflight: _resolveBool(overrides.enableWritePreflight, 'CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT', isHardened),
-    allowExternalProvider: _resolveBool(overrides.allowExternalProvider, 'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER', false),
+    allowExternalProvider,
     enableWriteManifest: toBoolean(overrides.enableWriteManifest ?? process.env.CODEX_MEMORY_ENABLE_WRITE_MANIFEST, true),
     candidateCacheTtlMs: Number.parseInt(String(overrides.candidateCacheTtlMs || process.env.CODEX_MEMORY_CANDIDATE_CACHE_TTL_MS || '3600000'), 10) || 3600000,
     candidateCacheMaxEntries: Number.parseInt(String(overrides.candidateCacheMaxEntries || process.env.CODEX_MEMORY_CANDIDATE_CACHE_MAX_ENTRIES || '200'), 10) || 200,

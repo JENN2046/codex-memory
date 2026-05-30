@@ -145,3 +145,29 @@ test('enabled provider config uses provider fingerprint', () => {
   assert.equal(config.allowExternalProvider, true);
   assert.match(config.embeddingFingerprint, /^bge-m3-local__1024__/);
 });
+
+test('configured endpoint with unset provider gate uses local-hash fingerprint', () => {
+  const config = createConfig({
+    localEmbeddingUrl: 'http://example.invalid',
+    localEmbeddingModel: 'bge-m3-local',
+    localEmbedDimensions: 1024
+  });
+
+  assert.equal(config.allowExternalProvider, false);
+  assert.match(config.embeddingFingerprint, /^local-hash__/);
+  assert.match(config.vectorIndexPath, /local-hash__/);
+  assert.equal(config.embeddingEndpoints.length, 0);
+});
+
+test('string true provider gate enables provider endpoint and fingerprint', () => {
+  const config = createConfig({
+    allowExternalProvider: 'true',
+    localEmbeddingUrl: 'http://example.invalid',
+    localEmbeddingModel: 'bge-m3-local',
+    localEmbedDimensions: 1024
+  });
+
+  assert.equal(config.allowExternalProvider, true);
+  assert.match(config.embeddingFingerprint, /^bge-m3-local__1024__/);
+  assert.equal(config.embeddingEndpoints.length, 1);
+});
