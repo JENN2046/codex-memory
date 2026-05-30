@@ -9,6 +9,9 @@ class ExternalRerankAdapter {
   }
 
   isConfigured() {
+    if (this.config.allowExternalProvider !== true) {
+      return false;
+    }
     return !!(this.config.rerankUrl && this.config.rerankApiKey && this.config.rerankModel);
   }
 

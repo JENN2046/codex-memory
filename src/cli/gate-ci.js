@@ -4,6 +4,17 @@ const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { DEFAULT_SUITE, runSuiteReport } = require('./real-query-suite-core');
 
+const UNSAFE_OVERRIDE_ENV_KEYS = [
+  'CODEX_MEMORY_GATE_CI_COMPARE_COMMAND_JSON',
+  'CODEX_MEMORY_GATE_CI_ROLLBACK_COMMAND_JSON',
+  'CODEX_MEMORY_GATE_CI_TEST_COMMAND_JSON'
+];
+
+function detectUnsafeEnvOverrides() {
+  const detected = UNSAFE_OVERRIDE_ENV_KEYS.filter(key => process.env[key] !== undefined);
+  return { detected: detected.length > 0, keys: detected };
+}
+
 function parseArgs(argv = []) {
   const options = { json: false };
   for (let i = 0; i < argv.length; i += 1) {
@@ -298,7 +309,7 @@ async function runTests() {
     // These test files may call real providers
     const providerDependent = ['provider-smoke-cli.test.js', 'provider-benchmark-cli.test.js'];
     // These test files call gate:ci/dashboard themselves (avoid self-referential runs)
-    const selfReferential = ['gate-ci-cli.test.js', 'dashboard-cli.test.js'];
+    const selfReferential = ['gate-ci-cli.test.js', 'gate-ci-env-override-evidence.test.js', 'dashboard-cli.test.js'];
     const excluded = [...httpDependent, ...providerDependent, ...selfReferential];
     return !excluded.includes(f);
   });
@@ -377,7 +388,11 @@ function runDocsCheck() {
 function renderText(results) {
   const lines = [];
   lines.push(`gate:ci — ${results.generatedAt}`);
-  lines.push('mode: fixture-only  |  no network  |  no daemon  |  no provider');
+  if (results.summary.unsafeEnvOverrideDetected) {
+    lines.push('WARNING: unsafe env override detected — fixtureOnly/noNetwork/noProvider claims disabled');
+    lines.push(`  overrides: ${results.summary.unsafeEnvOverrideKeys.join(', ')}`);
+  }
+  lines.push(`mode: ${results.summary.fixtureOnly ? 'fixture-only' : 'OVERRIDDEN'}  |  ${results.summary.noNetwork ? 'no network' : 'NETWORK-ALLOWED'}  |  no daemon  |  ${results.summary.noProvider ? 'no provider' : 'PROVIDER-ALLOWED'}`);
   lines.push('─'.repeat(56));
   lines.push('');
   for (const [name, r] of Object.entries(results.checks)) {
@@ -407,15 +422,22 @@ async function main() {
     .filter(([, v]) => v.status === 'error')
     .map(([k]) => k);
 
+  const unsafeOverride = detectUnsafeEnvOverrides();
+  if (unsafeOverride.detected) {
+    failedChecks.push('unsafeEnvOverride');
+  }
+
   const results = {
     generatedAt,
     summary: {
       ok: failedChecks.length === 0,
       mode: 'ci',
-      fixtureOnly: true,
-      noNetwork: true,
+      fixtureOnly: !unsafeOverride.detected,
+      noNetwork: !unsafeOverride.detected,
       noDaemon: true,
-      noProvider: true,
+      noProvider: !unsafeOverride.detected,
+      unsafeEnvOverrideDetected: unsafeOverride.detected,
+      unsafeEnvOverrideKeys: unsafeOverride.keys,
       failedChecks
     },
     checks
@@ -434,3 +456,5 @@ main().catch(err => {
   process.stderr.write(`gate:ci: ${err.message}\n`);
   process.exit(1);
 });
+
+module.exports = { detectUnsafeEnvOverrides, UNSAFE_OVERRIDE_ENV_KEYS };

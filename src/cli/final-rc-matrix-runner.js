@@ -141,6 +141,13 @@ function buildRejectedReport(options) {
     runtimeReady: false,
     v1RcReady: false,
     rcReady: false,
+    evidenceTrust: {
+      level: 'self_reported_local_runner',
+      sandboxIsolationVerified: false,
+      networkIsolationVerified: false,
+      providerIsolationVerified: false,
+      durableWriteIsolationVerified: false
+    },
     safety: {
       executesCommands: false,
       startsServices: false,

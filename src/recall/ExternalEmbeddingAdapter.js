@@ -9,6 +9,9 @@ class ExternalEmbeddingAdapter {
   }
 
   isConfigured() {
+    if (this.config.allowExternalProvider !== true) {
+      return false;
+    }
     return this.getEndpointCandidates().length > 0;
   }
 
