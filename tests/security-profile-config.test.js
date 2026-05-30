@@ -146,17 +146,16 @@ test('enabled provider config uses provider fingerprint', () => {
   assert.match(config.embeddingFingerprint, /^bge-m3-local__1024__/);
 });
 
-test('configured endpoint with unset provider gate uses local-hash fingerprint', () => {
+test('configured endpoint with unset provider gate auto-enables allowExternalProvider', () => {
   const config = createConfig({
     localEmbeddingUrl: 'http://example.invalid',
     localEmbeddingModel: 'bge-m3-local',
     localEmbedDimensions: 1024
   });
 
-  assert.equal(config.allowExternalProvider, false);
-  assert.match(config.embeddingFingerprint, /^local-hash__/);
-  assert.match(config.vectorIndexPath, /local-hash__/);
-  assert.equal(config.embeddingEndpoints.length, 0);
+  assert.equal(config.allowExternalProvider, true);
+  assert.match(config.embeddingFingerprint, /^bge-m3-local__1024__/);
+  assert.equal(config.embeddingEndpoints.length, 1);
 });
 
 test('string true provider gate enables provider endpoint and fingerprint', () => {
@@ -170,4 +169,27 @@ test('string true provider gate enables provider endpoint and fingerprint', () =
   assert.equal(config.allowExternalProvider, true);
   assert.match(config.embeddingFingerprint, /^bge-m3-local__1024__/);
   assert.equal(config.embeddingEndpoints.length, 1);
+});
+
+test('configured endpoint without explicit provider gate stores resolved allowExternalProvider true', () => {
+  const config = createConfig({
+    embeddingUrl: 'http://example.invalid',
+    embeddingModel: 'm'
+  });
+
+  assert.equal(config.allowExternalProvider, true);
+  assert.match(config.embeddingFingerprint, /^m__64__v1$/);
+  assert.equal(config.embeddingEndpoints.length, 1);
+});
+
+test('explicit false provider gate keeps configured endpoint out of profile', () => {
+  const config = createConfig({
+    allowExternalProvider: false,
+    embeddingUrl: 'http://example.invalid',
+    embeddingModel: 'm'
+  });
+
+  assert.equal(config.allowExternalProvider, false);
+  assert.match(config.embeddingFingerprint, /^local-hash__/);
+  assert.equal(config.embeddingEndpoints.length, 0);
 });

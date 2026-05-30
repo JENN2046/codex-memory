@@ -255,13 +255,18 @@ function createConfig(overrides = {}) {
   const configuredEmbeddingEndpoints = [];
   const seenEmbeddingEndpoints = new Set();
 
-  // allowExternalProvider defaults to false — hard gate.
-  // Only explicit CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER=true or override true
-  // enables provider endpoints for fingerprint/profile participation.
+  // Resolve allowExternalProvider: if endpoints are configured and the user
+  // has not explicitly set the gate, default to true (user intent to use
+  // the configured provider). Explicit CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER
+  // or override always takes priority.
+  const anyEndpointConfigured = !!(legacyEmbeddingEndpoint || localEmbeddingEndpoint || fallbackEmbeddingEndpoint);
+  const gateDefault = overrides.allowExternalProvider === undefined
+    && process.env.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER === undefined
+    && anyEndpointConfigured;
   const allowExternalProvider = _resolveBool(
     overrides.allowExternalProvider,
     'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
-    false
+    gateDefault
   );
 
   for (const endpoint of [legacyEmbeddingEndpoint, localEmbeddingEndpoint, fallbackEmbeddingEndpoint]) {
@@ -289,10 +294,10 @@ function createConfig(overrides = {}) {
     provider: 'local',
     url: '',
     apiKey: '',
-    model: '',
-    path: 'v1/embeddings',
+    model: 'local-hash',
+    path: 'local-hash',
     headers: {},
-    timeoutMs: 15000,
+    timeoutMs: 0,
     dimensions: null
   };
   const inferredEmbedDimensions = parsePositiveInteger(
