@@ -27,9 +27,9 @@ RC_NOT_READY_BLOCKED
 
 这是 target-bound strict-gate evidence，不是 runtime readiness、RC readiness、cutover readiness、write reliability 或 recall reliability。`CM-1210 A5-GAP-4_HTTP_EVIDENCE_REFRESH` 已在 `main@db5a4d66cf472d35e80b12d512816cda5de09220` 执行 endpoint-bound refresh：`/health` 和 `observe:http` 为 `ok`，HTTP log error `0`，watchdog recovery `0`，governance status `ok`，`noProvider=true`，`mutated=false`，`migrationApplied=false`。`CM-1211 A5-GAP-4_AUTHENTICATED_MCP_TOOL_LIST_EVIDENCE` 已在 `main@1a7d198f1f4758f0de3caf9b839cc59aa1b9802e` 执行：使用当前会话已存在 bearer token，未打印、未持久化 token，未执行 `tools/call`。Authenticated MCP `initialize` 返回 server `vcp_codex_memory` / version `0.1.0`，`tools/list` 返回且仅返回 3 个公开工具：`record_memory`、`search_memory`、`memory_overview`。
 
-`CM-1212 A5-GAP-6_AGGREGATION_REFRESH_PREFLIGHT` 已准备下一步 evidence aggregation refresh 的精确授权边界：默认只消费当前已批准并已记录的 `A5-GAP-4,A5-GAP-5` sanitized evidence；历史 `A5-GAP-1/2/3` artifacts 仅作背景，除非后续 exact approval 明确命名，否则不得被聚合器消费。CM-1212 不执行 ValidationAggregator，不扫描文件或 stores，不调用 MCP `tools/call`，不读取真实记忆，不写 durable memory/audit，不改变 config/watchdog/startup，不执行 provider、push、PR、release、deploy 或 cutover。
+`CM-1213 A5-GAP-6_AGGREGATION_REFRESH_EVIDENCE` 已在 exact approval 下执行：`main@ae014397c63a68791c0f1dbe22c38dd4bba8c697`，只消费已批准的 `A5-GAP-4,A5-GAP-5` sanitized evidence。Aggregator 接受 explicit sanitized summary，结果保持 `decision=NOT_READY_BLOCKED`、`validationAggregatorFullImplementation=false`、`runtimeEvidenceSummaryLocallyEvidencedGapCount=2`、`runtimeEvidenceSummaryRemainingGapCount=5`、`commandsExecutedByAggregator=false`。历史 `A5-GAP-1/2/3` artifacts 未被消费。
 
-当前下一步是提交或稳定 CM-1212 preflight，然后用 fresh `HEAD` 给出 exact A5-GAP-6 approval 后才可执行 aggregation refresh。不得把 CM-1210/CM-1211/CM-1212 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability 或 `RC_READY`。
+当前下一步是记录并提交 CM-1213 evidence，然后选择下一个未关闭 runtime gap。不得把 CM-1210/CM-1211/CM-1212/CM-1213 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability 或 `RC_READY`。
 
 ## 当前权威入口
 

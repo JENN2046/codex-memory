@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1213 A5-GAP-6 Aggregation Refresh Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: exact-approved `A5-GAP-6` for `main@ae014397c63a68791c0f1dbe22c38dd4bba8c697`, using only approved evidence units `A5-GAP-4,A5-GAP-5`.
+
+Result:
+
+- Fresh preflight matched branch `main` and commit `ae014397c63a68791c0f1dbe22c38dd4bba8c697`.
+- In-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })` accepted the literal sanitized summary.
+- Historical `A5-GAP-1/2/3` artifacts were not consumed.
+- Aggregator result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, locally evidenced gaps `2`, remaining gaps `5`, `commandsExecutedByAggregator=false`.
+
+Boundary:
+
+- No file/store scan.
+- No MCP `tools/call`.
+- No provider call.
+- No real memory scan.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit CM-1213 evidence.
+- Choose the next exact-approved runtime gap; current remaining set still includes governance runtime loop, recall isolation proof, migration/import/export/backup/restore approval execution, ValidationAggregator full implementation, and RC cutover.
+
 ## CM-1212 A5-GAP-6 Aggregation Refresh Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

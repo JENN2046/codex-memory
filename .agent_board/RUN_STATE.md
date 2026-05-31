@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1212 A5-GAP-6 aggregation refresh preflight prepared; execution awaits exact fresh-HEAD approval |
-| Current area | P0-mainline-health / P10-observability-admin / P6-docs-drift |
+| Current task | CM-1213 A5-GAP-6 aggregation refresh executed and recorded; await commit |
+| Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1212 prepared the exact A5-GAP-6 aggregation refresh boundary. The selected default evidence units are `A5-GAP-4,A5-GAP-5`, using CM-1208 strict-gate evidence plus CM-1210/CM-1211 HTTP/MCP evidence. Historical `A5-GAP-1/2/3` artifacts remain background only unless a future exact approval explicitly names them. No ValidationAggregator execution, file/store scan, MCP `tools/call`, provider call, real-memory scan, durable write, public MCP expansion, remote write, or readiness claim occurred. Next safe action is to commit or otherwise stabilize CM-1212, then use fresh `HEAD` for exact A5-GAP-6 approval before execution.
+CM-1213 executed the exact-approved A5-GAP-6 aggregation refresh at `main@ae014397c63a68791c0f1dbe22c38dd4bba8c697`, using only approved units `A5-GAP-4,A5-GAP-5`. The in-memory sanitized summary was accepted, `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, locally evidenced gap count `2`, remaining gap count `5`, and `commandsExecutedByAggregator=false`. Historical `A5-GAP-1/2/3` artifacts were not consumed. No file/store scan, MCP `tools/call`, provider call, real-memory scan, durable write, public MCP expansion, remote write, or readiness claim occurred. Next safe action is to validate and commit CM-1213 evidence.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

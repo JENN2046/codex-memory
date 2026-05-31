@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1212 A5-GAP-6_AGGREGATION_REFRESH_PREFLIGHT`.
+Goal: `CM-1213 A5-GAP-6_AGGREGATION_REFRESH_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the aggregation refresh approval boundary.
+Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved in-memory aggregation refresh.
 
 Workspace: `A:\codex-memory`.
 
@@ -54,11 +54,15 @@ Current Git fact and A5 rule after CM-1208:
 - Selected default future aggregation units are `A5-GAP-4,A5-GAP-5`.
 - Historical `A5-GAP-1/2/3` artifacts are background only unless a future exact approval line explicitly names them.
 - A future A5-GAP-6 execution must bind to fresh `HEAD` after CM-1212 is committed or otherwise stabilized.
+- User approved `A5-GAP-6` for `main@ae014397c63a68791c0f1dbe22c38dd4bba8c697`, using only evidence from approved A5-GAP units `A5-GAP-4,A5-GAP-5`.
+- CM-1213 executed the in-memory sanitized aggregation refresh. Result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, accepted summary, locally evidenced gaps `2`, remaining gaps `5`, `commandsExecutedByAggregator=false`.
+- Historical `A5-GAP-1/2/3` artifacts were not consumed by CM-1213.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1212:
+Validation for CM-1213:
 
 - `git diff --check`
+- in-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 - changed-scope review
@@ -72,7 +76,7 @@ Not validated:
 - true `record_memory`
 - true `search_memory`
 - true `memory_overview`
-- ValidationAggregator A5-GAP-6 execution
+- broad ValidationAggregator full implementation
 - runtime gap closure
 - personal RC dogfood
 
@@ -98,4 +102,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1212 preflight, then use fresh `HEAD` for exact A5-GAP-6 approval: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-4,A5-GAP-5.` Do not run ValidationAggregator, `tools/call`, `start:http:ensure`, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit CM-1213 evidence, then choose the next exact-approved runtime gap. Do not run `tools/call`, `start:http:ensure`, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
