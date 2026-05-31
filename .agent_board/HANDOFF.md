@@ -1,22 +1,22 @@
 # HANDOFF.md - codex-memory
 
-## CM-1196 P2 Badge Bind Status To This Reviewed Commit Handoff
+## CM-1197 P2 Badge Bind Status To This Reviewed Commit Handoff
 
-Goal: correct tracked status surfaces so CM-1185 reviewed-object binding no longer names CM-1195's invalid short object `3a5a5d88`, and instead records the full reviewed commit supplied by the latest P2 badge comment.
+Goal: correct tracked status surfaces so CM-1185 reviewed-object binding no longer names CM-1196's unavailable object `01774406e93959a00d70d0d38dc408dac5c81bb4`, and instead records the full reviewed commit supplied by the latest P2 badge comment.
 
-Status: CM1196_P2_BADGE_BIND_STATUS_TO_THIS_REVIEWED_COMMIT_COMPLETED_VALIDATED_NOT_READY.
+Status: CM1197_P2_BADGE_BIND_STATUS_TO_THIS_REVIEWED_COMMIT_COMPLETED_VALIDATED_NOT_READY.
 
 Workspace: `A:\codex-memory`.
 
 Branch: `hardening/p0-p2-security-rc-base`.
 
-Git facts: latest review feedback says the reviewed CM-1185 status-sync checkout commit is `01774406e93959a00d70d0d38dc408dac5c81bb4`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`. Local `git show`, GitHub commits API, and `git ls-remote` cannot resolve `01774406e93959a00d70d0d38dc408dac5c81bb4`; local `git cat-file -t 3a5a5d88` confirms CM-1195's short object is not valid here. Therefore `01774406e93959a00d70d0d38dc408dac5c81bb4` is recorded as review-checkout evidence only, not as a local/origin push target or CI binding object. Current local/GitHub PR #6 facts before this local fix are `HEAD == origin/hardening/p0-p2-security-rc-base == PR #6 head == dc3332fbe9bdc120960c67f1586ee4e006f477c0`, and PR #6 `Node.js tests` CI passed. Do not use `3a5a5d88`, `aa78ee6742e556de7b96b84e26949949364776a3`, CM-1193's `1f4705352f8b8d574ddcce44c52cd2c3458a14af`, CM-1192's `9eb258d8e83504646dba1175c44fc54c20ee9799`, or any earlier superseded object as the current reviewed-context sync commit. `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and were not modified by this fix.
+Git facts: latest review feedback says the reviewed CM-1185 status-sync checkout commit is `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`. Local `git show`, GitHub commits API, and `git ls-remote` cannot resolve `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890`; local `git cat-file -t 01774406e93959a00d70d0d38dc408dac5c81bb4` confirms CM-1196's object is not valid here. Therefore `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890` is recorded as review-checkout evidence only, not as a local/origin push target or CI binding object. Current local/GitHub PR #6 facts before this local fix are `HEAD == origin/hardening/p0-p2-security-rc-base == PR #6 head == 68febcc59e95493cb52a328319a781a6f7e8b505`, and PR #6 `Node.js tests` CI passed. Do not use `01774406e93959a00d70d0d38dc408dac5c81bb4`, `3a5a5d88`, `aa78ee6742e556de7b96b84e26949949364776a3`, CM-1193's `1f4705352f8b8d574ddcce44c52cd2c3458a14af`, CM-1192's `9eb258d8e83504646dba1175c44fc54c20ee9799`, or any earlier superseded object as the current reviewed-context sync commit. `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and were not modified by this fix.
 
 Changed files: `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`.
 
-Current result: status surfaces now record review-checkout evidence `01774406e93959a00d70d0d38dc408dac5c81bb4` / parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`, mark `3a5a5d88` and `aa78ee6742e556de7b96b84e26949949364776a3` as superseded evidence, preserve current PR #6 head `dc3332fbe9bdc120960c67f1586ee4e006f477c0`, and keep prior review evidence that `npm test` passed `2749/2749`, `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`, and fixture-only `gate:ci` passed. The sync keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current result: status surfaces now record review-checkout evidence `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890` / parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`, mark `01774406e93959a00d70d0d38dc408dac5c81bb4`, `3a5a5d88`, and `aa78ee6742e556de7b96b84e26949949364776a3` as superseded evidence, preserve current PR #6 head `68febcc59e95493cb52a328319a781a6f7e8b505`, and keep prior review evidence that `npm test` passed `2749/2749`, `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`, and fixture-only `gate:ci` passed. The sync keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
-Validation: git status/diff inspected; PR head and CI inspected with `gh pr view hardening/p0-p2-security-rc-base`; local/GitHub/origin object availability checked for `01774406e93959a00d70d0d38dc408dac5c81bb4`; local invalid-object check confirmed `3a5a5d88` is not valid here; ledger consistency passed; `git diff --check` passed; docs validation via `scripts/validate-local.ps1 -Area docs` passed; final tracked-scope review confirmed status/board docs only.
+Validation: git status/diff inspected; PR head and CI inspected with `gh pr view hardening/p0-p2-security-rc-base`; local/GitHub/origin object availability checked for `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890`; local invalid-object check confirmed `01774406e93959a00d70d0d38dc408dac5c81bb4` is not valid here; ledger consistency passed; `git diff --check` passed; docs validation via `scripts/validate-local.ps1 -Area docs` passed; final tracked-scope review confirmed status/board docs only.
 
 Not validated: full suite rerun, hardening rerun, `gate:mainline`, `gate:mainline:strict`, HTTP observe, provider smoke/benchmark, true memory tools, push-readiness, push.
 
