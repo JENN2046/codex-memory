@@ -89,3 +89,34 @@ test('a5 approval check helpers parse and render deterministic local reports', (
   assert.match(text, /executesApprovedAction: false/);
   assert.match(text, /runtimeReady: false/);
 });
+
+test('a5 approval check CLI exposes normalized A5-GAP-6 approved evidence units', () => {
+  const commit = '5c05a8ecb1994635180b07e16af47ad293932371';
+  const approvalLine = `I approve A5-GAP-6 for codex-memory on branch main at commit ${commit}, using only evidence from approved A5-GAP units A5-GAP-1, A5-GAP-2, A5-GAP-3, A5-GAP-4, A5-GAP-5, including P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md, no new runtime action.`;
+  const result = runCli([
+    '--json',
+    '--approval-line', approvalLine,
+    '--expected-unit', 'A5-GAP-6',
+    '--expected-branch', 'main',
+    '--expected-commit', commit
+  ]);
+
+  assert.equal(result.status, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.approvalAccepted, true);
+  assert.deepEqual(report.parsedApprovalScope.approvedEvidenceUnits, [
+    'A5-GAP-1',
+    'A5-GAP-2',
+    'A5-GAP-3',
+    'A5-GAP-4',
+    'A5-GAP-5'
+  ]);
+  assert.equal(report.parsedApprovalScope.approvedEvidenceUnitCount, 5);
+  assert.equal(
+    report.parsedApprovalScope.includedEvidenceFile,
+    'P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md'
+  );
+  assert.equal(report.parsedApprovalScope.noNewRuntimeAction, true);
+  assert.equal(report.cli.executesApprovedAction, false);
+  assert.equal(report.runtimeReady, false);
+});

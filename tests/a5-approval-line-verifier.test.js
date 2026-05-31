@@ -180,6 +180,19 @@ test('A5 approval verifier accepts documented A5-GAP-6 evidence-only line with s
   assert.equal(result.parsed.units, 'A5-GAP-1, A5-GAP-2, A5-GAP-3, A5-GAP-4, A5-GAP-5');
   assert.equal(result.parsed.includedEvidence, 'P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md');
   assert.equal(result.parsed.noNewRuntimeAction, 'no new runtime action');
+  assert.deepEqual(result.parsedApprovalScope.approvedEvidenceUnits, [
+    'A5-GAP-1',
+    'A5-GAP-2',
+    'A5-GAP-3',
+    'A5-GAP-4',
+    'A5-GAP-5'
+  ]);
+  assert.equal(result.parsedApprovalScope.approvedEvidenceUnitCount, 5);
+  assert.equal(
+    result.parsedApprovalScope.includedEvidenceFile,
+    'P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md'
+  );
+  assert.equal(result.parsedApprovalScope.noNewRuntimeAction, true);
   assertNoSideEffects(result);
 });
 

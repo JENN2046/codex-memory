@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1243 A5_APPROVAL_PATTERN_COVERAGE_EXTENDED`.
+Goal: `CM-1244 A5_GAP6_APPROVAL_SCOPE_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test verifier coverage for additional documented P66 A5 approval lines.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test verifier normalization for A5-GAP-6 approval scope.
 
 Workspace: `A:\codex-memory`.
 
@@ -68,6 +68,14 @@ Changed scope since CM-1207:
 - `src/core/A5ApprovalLineVerifier.js`
 - `docs/CM1242_A5_APPROVAL_PATTERN_COVERAGE.md`
 - `docs/CM1243_A5_APPROVAL_PATTERN_COVERAGE_EXTENDED.md`
+- `tests/a5-approval-check-cli.test.js`
+- `docs/CM1244_A5_GAP6_APPROVAL_SCOPE_NORMALIZATION.md`
+
+Current CM-1244 fact:
+
+- CM-1244 added structured `parsedApprovalScope` for `A5-GAP-6` exact approval lines: normalized approved evidence units, count, included evidence file, and no-new-runtime-action boolean.
+- Targeted verifier/CLI validation passed `21/21`.
+- CM-1244 grants no approval and executes no approved action.
 
 Current CM-1243 fact:
 

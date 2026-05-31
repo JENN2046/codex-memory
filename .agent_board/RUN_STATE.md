@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1243 A5 approval pattern coverage extended implemented and validated |
+| Current task | CM-1244 A5-GAP-6 approval scope normalization implemented and validated |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1243 extends the local A5 approval verifier to cover documented A5-GAP-1 read-only governance report, A5-GAP-2 classified isolation read-only proof, and A5-GAP-6 spaced unit list / included evidence filename / `no new runtime action` approval lines. It does not grant approval or execute approved commands. Source/test/docs validation passed; readiness remains false. Next safe action is to commit or otherwise stabilize CM-1243.
+CM-1244 extends the local A5 approval verifier and CLI JSON report with structured `parsedApprovalScope` for A5-GAP-6 exact approval lines. It does not grant approval or execute approved commands. Source/test/docs validation passed; readiness remains false. Next safe action is to commit or otherwise stabilize CM-1244.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

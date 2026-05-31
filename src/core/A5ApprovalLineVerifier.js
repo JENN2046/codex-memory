@@ -40,6 +40,25 @@ function containsPlaceholder(value) {
   return /<[^>]+>/.test(value);
 }
 
+function normalizeCommaSeparatedList(value) {
+  if (typeof value !== 'string' || !value.trim()) return [];
+  return value
+    .split(',')
+    .map(item => item.trim())
+    .filter(Boolean);
+}
+
+function buildParsedApprovalScope(unit, parsed = {}) {
+  if (unit !== 'A5-GAP-6') return {};
+  const approvedEvidenceUnits = normalizeCommaSeparatedList(parsed.units);
+  return {
+    approvedEvidenceUnits,
+    approvedEvidenceUnitCount: approvedEvidenceUnits.length,
+    includedEvidenceFile: parsed.includedEvidence || '',
+    noNewRuntimeAction: parsed.noNewRuntimeAction === 'no new runtime action'
+  };
+}
+
 function evaluateA5ApprovalLine({
   approvalLine,
   expectedUnit,
@@ -75,6 +94,7 @@ function evaluateA5ApprovalLine({
   if (unit === 'A5-GAP-3' && /, no apply/.test(line) && !parsed.noApplyBoundary) {
     failClosedReasons.push('incomplete_no_apply_boundary');
   }
+  const parsedApprovalScope = buildParsedApprovalScope(unit, parsed);
 
   const approvalAccepted = failClosedReasons.length === 0;
 
@@ -94,6 +114,7 @@ function evaluateA5ApprovalLine({
     action: unitDefinition ? unitDefinition.action : '',
     command: unitDefinition && unitDefinition.command ? unitDefinition.command : '',
     parsed,
+    parsedApprovalScope,
     failClosedReasons,
     sanitizedApprovalLine: redactSensitiveFragments(line),
     safety: {
