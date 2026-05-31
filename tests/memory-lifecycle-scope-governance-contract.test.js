@@ -101,6 +101,54 @@ test('CM-0844 excludes out-of-scope records and reports exact scope mismatches',
   assert.deepEqual(result.scopeMismatches, ['projectId', 'agentId', 'folder']);
 });
 
+test('CM-0844 normalizes blank camel-case scope fields from snake-case fallbacks', () => {
+  const result = evaluateRecallEligibility(record({
+    scope: {
+      userId: '   ',
+      user_id: exactScope.userId,
+      projectId: '   ',
+      project_id: exactScope.projectId,
+      workspaceId: '   ',
+      workspace_id: exactScope.workspaceId,
+      clientId: '   ',
+      client_id: exactScope.clientId,
+      agentId: '   ',
+      agent_id: exactScope.agentId,
+      taskId: '   ',
+      task_id: exactScope.taskId,
+      conversationId: '   ',
+      conversation_id: exactScope.conversationId,
+      folder: exactScope.folder,
+      visibility: exactScope.visibility,
+      retentionPolicy: '   ',
+      retention_policy: exactScope.retentionPolicy
+    }
+  }), {
+    userId: '   ',
+    user_id: exactScope.userId,
+    projectId: '   ',
+    project_id: exactScope.projectId,
+    workspaceId: '   ',
+    workspace_id: exactScope.workspaceId,
+    clientId: '   ',
+    client_id: exactScope.clientId,
+    agentId: '   ',
+    agent_id: exactScope.agentId,
+    taskId: '   ',
+    task_id: exactScope.taskId,
+    conversationId: '   ',
+    conversation_id: exactScope.conversationId,
+    folder: exactScope.folder,
+    visibility: exactScope.visibility,
+    retentionPolicy: '   ',
+    retention_policy: exactScope.retentionPolicy
+  });
+
+  assert.equal(result.normalRecallEligible, true);
+  assert.deepEqual(result.blockers, []);
+  assert.deepEqual(result.scopeMismatches, []);
+});
+
 test('CM-0844 fails closed when current scope or record metadata is malformed', () => {
   const incompleteScope = {
     ...exactScope,

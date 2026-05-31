@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1278 Lifecycle Scope Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test lifecycle scope governance normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryLifecycleScopeGovernanceContract.normalizeScope(...)` now uses the first non-empty normalized value across camel-case and snake_case scope field candidates.
+- Blank camel-case scope fields no longer mask valid snake_case fallbacks during recall eligibility and governance contract checks.
+- Added lifecycle governance regression proving record scope and current scope with blank camel-case plus valid snake_case fields remain normally recall eligible with no blockers or mismatches.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryLifecycleScopeGovernanceContract.js`
+- `node --check tests\memory-lifecycle-scope-governance-contract.test.js`
+- `node --test tests\memory-lifecycle-scope-governance-contract.test.js tests\memory-lifecycle-scope-read-policy-fixture.test.js tests\memory-lifecycle-scope-runtime-integration.test.js` passed `20/20`.
+- `npm test` passed `2798/2798`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1278.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1277 Memory Write Scope Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

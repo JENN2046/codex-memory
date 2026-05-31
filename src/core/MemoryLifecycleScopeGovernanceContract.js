@@ -51,7 +51,15 @@ function normalizeScope(input = {}) {
   const scope = {};
 
   for (const field of SCOPE_FIELDS) {
-    scope[field] = normalizeString(safeInput[field] || safeInput[toSnakeCase(field)]);
+    const candidates = [safeInput[field], safeInput[toSnakeCase(field)]];
+    scope[field] = '';
+    for (const candidate of candidates) {
+      const normalized = normalizeString(candidate);
+      if (normalized) {
+        scope[field] = normalized;
+        break;
+      }
+    }
   }
 
   return scope;

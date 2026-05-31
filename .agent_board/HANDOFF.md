@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1277 MEMORY_WRITE_SCOPE_FALLBACK_NORMALIZATION`.
+Goal: `CM-1278 LIFECYCLE_SCOPE_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing write-service scope fallback normalization and validating persisted scope behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing lifecycle scope governance fallback normalization and validating recall eligibility behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -59,6 +59,9 @@ Changed scope since CM-1207:
 - `src/core/MemoryWriteService.js`
 - `tests/memory-write-preflight-runtime-integration.test.js`
 - `docs/CM1267_CONTEXT_DERIVED_WRITE_SCOPE.md`
+- `src/core/MemoryLifecycleScopeGovernanceContract.js`
+- `tests/memory-lifecycle-scope-governance-contract.test.js`
+- `docs/CM1278_LIFECYCLE_SCOPE_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`
