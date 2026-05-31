@@ -315,21 +315,20 @@ function firstScopeValue(...values) {
   return '';
 }
 
-function buildLifecycleScopeGovernanceCurrentScope(requestContext = {}, scope = null) {
+function buildLifecycleScopeGovernanceCurrentScope(requestContext = {}) {
   const executionContext = requestContext.executionContext || {};
-  const safeScope = scope && typeof scope === 'object' ? scope : {};
 
   return {
-    userId: firstScopeValue(safeScope.user_id, safeScope.userId, executionContext.userId, executionContext.user_id),
-    projectId: firstScopeValue(safeScope.project_id, safeScope.projectId, executionContext.projectId, executionContext.project_id),
-    workspaceId: firstScopeValue(safeScope.workspace_id, safeScope.workspaceId, executionContext.workspaceId, executionContext.workspace_id),
+    userId: firstScopeValue(executionContext.userId, executionContext.user_id),
+    projectId: firstScopeValue(executionContext.projectId, executionContext.project_id),
+    workspaceId: firstScopeValue(executionContext.workspaceId, executionContext.workspace_id),
     clientId: firstScopeValue(executionContext.clientId, executionContext.client_id, inferRequestClientId(requestContext)),
-    agentId: firstScopeValue(safeScope.agent_id, safeScope.agentId, executionContext.agentId, executionContext.agent_id),
-    taskId: firstScopeValue(safeScope.task_id, safeScope.taskId, executionContext.taskId, executionContext.task_id),
-    conversationId: firstScopeValue(safeScope.conversation_id, safeScope.conversationId, executionContext.conversationId, executionContext.conversation_id),
-    folder: firstScopeValue(safeScope.folder, executionContext.folder),
-    visibility: firstScopeValue(safeScope.visibility, executionContext.visibility),
-    retentionPolicy: firstScopeValue(safeScope.retention_policy, safeScope.retentionPolicy, executionContext.retentionPolicy, executionContext.retention_policy)
+    agentId: firstScopeValue(executionContext.agentId, executionContext.agent_id),
+    taskId: firstScopeValue(executionContext.taskId, executionContext.task_id),
+    conversationId: firstScopeValue(executionContext.conversationId, executionContext.conversation_id),
+    folder: firstScopeValue(executionContext.folder),
+    visibility: firstScopeValue(executionContext.visibility),
+    retentionPolicy: firstScopeValue(executionContext.retentionPolicy, executionContext.retention_policy)
   };
 }
 

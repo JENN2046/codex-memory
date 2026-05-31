@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1266 Lifecycle Scope Execution Context Authority Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test privacy hardening for lifecycle scope governance read policy. No provider call, MCP external call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `buildLifecycleScopeGovernanceCurrentScope(...)` now derives current-scope fields from `requestContext.executionContext`.
+- Caller-supplied search `scope` remains candidate filtering only and no longer authenticates current project/workspace/client/visibility/task scope.
+- Added integration regression proving a Codex execution context in `project-alpha` cannot pass lifecycle scope governance filtering by searching with `project-beta` / `workspace-beta` scope.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\app.js`
+- `node --check tests\memory-lifecycle-scope-runtime-integration.test.js`
+- `node --test tests\memory-lifecycle-scope-runtime-integration.test.js tests\policy-read-preflight.test.js` passed `11/11`.
+- Default suite and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1266.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1265 Lifecycle Scope Client Identity Hardening Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

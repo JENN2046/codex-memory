@@ -93,6 +93,10 @@ test('lifecycle scope governance bridge suppresses inactive, malformed, and out-
       noTokenReadOnly: true,
       executionContext: {
         ...exactExecutionContext,
+        projectId: 'project-alpha',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex',
+        visibility: 'project',
         lifecycleScopeGovernanceReadPolicy: true
       }
     },
@@ -247,6 +251,73 @@ test('lifecycle scope governance bridge does not trust search scope client_id as
         project_id: 'project-alpha',
         workspace_id: 'workspace-alpha',
         client_id: 'claude',
+        visibility: 'private'
+      }
+    }, {
+      noTokenReadOnly: true,
+      executionContext: {
+        ...exactExecutionContext,
+        projectId: 'project-alpha',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex',
+        visibility: 'private',
+        lifecycleScopeGovernanceReadPolicy: true
+      }
+    });
+
+    assert.deepEqual(search.results.map(item => item.memoryId), []);
+  });
+});
+
+test('lifecycle scope governance bridge treats search scope as candidate filter only', async () => {
+  await withApp(async ({ app }) => {
+    app.services.passiveRecallService.search = async () => [
+      { memoryId: 'mem-beta-private', title: 'Beta private candidate' },
+      { memoryId: 'mem-alpha-private', title: 'Alpha private candidate' }
+    ];
+    app.stores.shadowStore.getRecordsScopeMap = async () => new Map([
+      ['mem-beta-private', {
+        projectId: 'project-beta',
+        workspaceId: 'workspace-beta',
+        clientId: 'codex',
+        visibility: 'private'
+      }],
+      ['mem-alpha-private', {
+        projectId: 'project-alpha',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex',
+        visibility: 'private'
+      }]
+    ]);
+    app.stores.shadowStore.getRecordsLifecycleScopeGovernanceMap = async () => buildMetadata([
+      {
+        memoryId: 'mem-beta-private',
+        lifecycleStatus: 'active',
+        scope: {
+          ...exactRecordScope,
+          projectId: 'project-beta',
+          workspaceId: 'workspace-beta',
+          visibility: 'private'
+        }
+      },
+      {
+        memoryId: 'mem-alpha-private',
+        lifecycleStatus: 'active',
+        scope: {
+          ...exactRecordScope,
+          visibility: 'private'
+        }
+      }
+    ]);
+
+    const search = await app.callTool('search_memory', {
+      query: 'synthetic lifecycle project spoof',
+      target: 'process',
+      limit: 3,
+      scope: {
+        project_id: 'project-beta',
+        workspace_id: 'workspace-beta',
+        client_id: 'codex',
         visibility: 'private'
       }
     }, {
