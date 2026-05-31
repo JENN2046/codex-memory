@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1292 Memory Write Visibility Policy Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test `record_memory` write-scope visibility fallback normalization hardening. No public MCP schema expansion, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteService.buildWritePreflightAllowedScope(...)` now normalizes write-scope visibility with first non-empty `visibility/visibility_policy` values.
+- The same normalized scope feeds write preflight allowed scope and persisted record scope.
+- Extended regression proves blank execution-context `visibility` falls through to `visibility_policy=private`.
+- Existing proof-memory regression still proves explicit payload proof marker priority is preserved over ordinary context scope.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryWriteService.js`
+- `node --check tests\memory-write-preflight-runtime-integration.test.js`
+- `node --test tests\memory-write-preflight-runtime-integration.test.js tests\phase-a-services.test.js tests\proof-memory-policy.test.js tests\memory-write-lifecycle-dedup-suppression-preflight.test.js` passed `34/34`.
+- `npm test` passed `2817/2817`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1292.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1291 Deferred Governance Visibility Policy Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

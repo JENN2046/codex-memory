@@ -394,6 +394,8 @@ test('write runtime falls through blank execution-context camel scope to snake-c
       task_id: 'CM-SNAKE-SCOPE',
       conversationId: '   ',
       conversation_id: 'snake-conversation',
+      visibility: '   ',
+      visibility_policy: 'private',
       retentionPolicy: '   ',
       retention_policy: 'snake-retention'
     }
@@ -408,6 +410,7 @@ test('write runtime falls through blank execution-context camel scope to snake-c
   assert.equal(events.shadowUpserts[0].clientId, 'claude');
   assert.equal(events.shadowUpserts[0].taskId, 'CM-SNAKE-SCOPE');
   assert.equal(events.shadowUpserts[0].conversationId, 'snake-conversation');
+  assert.equal(events.shadowUpserts[0].visibility, 'private');
   assert.equal(events.shadowUpserts[0].retentionPolicy, 'snake-retention');
   assert.equal(events.diaryWrites[0].clientId, 'claude');
 });

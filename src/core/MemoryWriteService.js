@@ -65,7 +65,7 @@ function buildWritePreflightAllowedScope(payload = {}, executionContext = {}) {
     clientId: normalizeScopeField(payload, executionContext, 'clientId', 'client_id'),
     taskId: normalizeScopeField(payload, executionContext, 'taskId', 'task_id'),
     conversationId: normalizeScopeField(payload, executionContext, 'conversationId', 'conversation_id'),
-    visibility: normalizeScopeField(payload, executionContext, 'visibility', 'visibility'),
+    visibility: normalizeScopeField(payload, executionContext, 'visibility', 'visibility_policy'),
     retentionPolicy: normalizeScopeField(payload, executionContext, 'retentionPolicy', 'retention_policy')
   };
 }
