@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1236 ValidationAggregator closure authority summary implemented; commit pending |
+| Current task | CM-1237 ValidationAggregator local proof-chain routing implemented; commit pending |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1236 added local report-shape routing for effective remaining ValidationAggregator gaps. The output now exposes `closureAuthoritySummary`, `closureAuthorityStatus`, and `nextClosureAuthority`, with current paths routing to `local_implementation_required`. Targeted source/test validation passed `22/22`; readiness remains false. Next safe action is to commit or otherwise stabilize CM-1236, then continue local ValidationAggregator implementation or prepare the next exact-approved A5 runtime gap.
+CM-1237 reconciled closure authority routing with the completed local-safe proof chain state. The open `validation_aggregator_full_implementation_incomplete` gap remains open, but current paths now route to `red_lane_authorization_required` / `explicit_red_lane_owner_approval` instead of automatic local implementation. Targeted source/test validation passed `22/22`; readiness remains false. Next safe action is to commit or otherwise stabilize CM-1237, then prepare the next exact-approved A5/Red runtime gap boundary.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

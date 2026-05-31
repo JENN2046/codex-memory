@@ -327,6 +327,10 @@ const P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS = [
   'final_rc_matrix_runner_not_executed_as_real_matrix'
 ];
 
+const P66_FULL_IMPLEMENTATION_LOCAL_PROOF_CHAIN_COMPLETE_GAPS = [
+  'validation_aggregator_full_implementation_incomplete'
+];
+
 const P66_FULL_IMPLEMENTATION_NEXT_SAFE_CLOSURE_CANDIDATES = [
   'a5_gap_3_migration_readiness_fixture_only_dry_run',
   'validation_aggregator_full_gap_accounting_structured_report',
@@ -371,7 +375,7 @@ const P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES = [
 ];
 
 function buildP66ClosureAuthoritySummary({
-  effectiveLocalImplementationGapIds = [],
+  effectiveActionableLocalImplementationGapIds = [],
   effectiveA5GatedGapIds = [],
   effectiveRedLaneGapIds = [],
   effectiveNonBaselineRemainingGapIds = [],
@@ -380,7 +384,7 @@ function buildP66ClosureAuthoritySummary({
   let status = 'readiness_authority_required';
   let nextAuthority = 'separate_readiness_authority';
 
-  if (effectiveLocalImplementationGapIds.length > 0) {
+  if (effectiveActionableLocalImplementationGapIds.length > 0) {
     status = 'local_implementation_required';
     nextAuthority = 'local_source_test_implementation';
   } else if (effectiveRedLaneGapIds.length > 0) {
@@ -401,7 +405,7 @@ function buildP66ClosureAuthoritySummary({
     status,
     nextAuthority,
     localImplementationRequired:
-      effectiveLocalImplementationGapIds.length > 0,
+      effectiveActionableLocalImplementationGapIds.length > 0,
     a5AuthorizationRequired: effectiveA5GatedGapIds.length > 0,
     redLaneAuthorizationRequired: effectiveRedLaneGapIds.length > 0,
     manualGapModelingRequired:
@@ -457,10 +461,21 @@ function buildP66FullImplementationGapAccounting({
         : true,
       redLane: P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id]
         ? P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id].redLane
-        : true
+        : true,
+      localProofChainComplete:
+        P66_FULL_IMPLEMENTATION_LOCAL_PROOF_CHAIN_COMPLETE_GAPS.includes(id)
     }));
   const effectiveLocalImplementationGapIds = effectiveRemainingGapClosureItems
     .filter(item => item.requiresLocalImplementation === true)
+    .map(item => item.id);
+  const effectiveLocalProofChainCompleteGapIds = effectiveRemainingGapClosureItems
+    .filter(item => item.localProofChainComplete === true)
+    .map(item => item.id);
+  const effectiveActionableLocalImplementationGapIds = effectiveRemainingGapClosureItems
+    .filter(item => (
+      item.requiresLocalImplementation === true &&
+      item.localProofChainComplete !== true
+    ))
     .map(item => item.id);
   const effectiveA5GatedGapIds = effectiveRemainingGapClosureItems
     .filter(item => item.requiresA5 === true)
@@ -492,10 +507,12 @@ function buildP66FullImplementationGapAccounting({
     effectiveNonBaselineRemainingGapIds.length === 0;
   const effectiveLocalImplementationGapsCleared =
     effectiveLocalImplementationGapIds.length === 0;
+  const effectiveActionableLocalImplementationGapsCleared =
+    effectiveActionableLocalImplementationGapIds.length === 0;
   const effectiveA5GatedGapsCleared = effectiveA5GatedGapIds.length === 0;
   const effectiveRedLaneGapsCleared = effectiveRedLaneGapIds.length === 0;
   const closureAuthoritySummary = buildP66ClosureAuthoritySummary({
-    effectiveLocalImplementationGapIds,
+    effectiveActionableLocalImplementationGapIds,
     effectiveA5GatedGapIds,
     effectiveRedLaneGapIds,
     effectiveNonBaselineRemainingGapIds,
@@ -531,6 +548,12 @@ function buildP66FullImplementationGapAccounting({
     effectiveRemainingGapClosureItems,
     effectiveLocalImplementationGapIds,
     effectiveLocalImplementationGapCount: effectiveLocalImplementationGapIds.length,
+    effectiveLocalProofChainCompleteGapIds,
+    effectiveLocalProofChainCompleteGapCount:
+      effectiveLocalProofChainCompleteGapIds.length,
+    effectiveActionableLocalImplementationGapIds,
+    effectiveActionableLocalImplementationGapCount:
+      effectiveActionableLocalImplementationGapIds.length,
     effectiveA5GatedGapIds,
     effectiveA5GatedGapCount: effectiveA5GatedGapIds.length,
     effectiveRedLaneGapIds,
@@ -550,6 +573,7 @@ function buildP66FullImplementationGapAccounting({
       effectiveRemainingGapsCleared,
       effectiveNonBaselineRemainingGapsAbsent,
       effectiveLocalImplementationGapsCleared,
+      effectiveActionableLocalImplementationGapsCleared,
       effectiveA5GatedGapsCleared,
       effectiveRedLaneGapsCleared,
       allBlockersCleared: totalBlockerCount === 0,
@@ -563,7 +587,7 @@ function buildP66FullImplementationGapAccounting({
       ...(a5GatedBlockerIds.length > 0 ? ['a5_gated_blockers_cleared'] : []),
       ...(!effectiveRemainingGapsCleared ? ['effective_remaining_gaps_cleared'] : []),
       ...(!effectiveNonBaselineRemainingGapsAbsent ? ['effective_non_baseline_remaining_gaps_absent'] : []),
-      ...(!effectiveLocalImplementationGapsCleared ? ['effective_local_implementation_gaps_cleared'] : []),
+      ...(!effectiveActionableLocalImplementationGapsCleared ? ['effective_actionable_local_implementation_gaps_cleared'] : []),
       ...(!effectiveA5GatedGapsCleared ? ['effective_a5_gated_gaps_cleared'] : []),
       ...(!effectiveRedLaneGapsCleared ? ['effective_red_lane_gaps_cleared'] : []),
       'readiness_authority'
@@ -2425,6 +2449,10 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.effectiveNonBaselineRemainingGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocalImplementationGapCount:
         p66FullImplementationGapAccounting.effectiveLocalImplementationGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocalProofChainCompleteGapCount:
+        p66FullImplementationGapAccounting.effectiveLocalProofChainCompleteGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingEffectiveActionableLocalImplementationGapCount:
+        p66FullImplementationGapAccounting.effectiveActionableLocalImplementationGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingEffectiveA5GatedGapCount:
         p66FullImplementationGapAccounting.effectiveA5GatedGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingEffectiveRedLaneGapCount:
@@ -3454,6 +3482,14 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.effectiveLocalImplementationGapIds,
         effectiveLocalImplementationGapCount:
           p66FullImplementationGapAccounting.effectiveLocalImplementationGapCount,
+        effectiveLocalProofChainCompleteGapIds:
+          p66FullImplementationGapAccounting.effectiveLocalProofChainCompleteGapIds,
+        effectiveLocalProofChainCompleteGapCount:
+          p66FullImplementationGapAccounting.effectiveLocalProofChainCompleteGapCount,
+        effectiveActionableLocalImplementationGapIds:
+          p66FullImplementationGapAccounting.effectiveActionableLocalImplementationGapIds,
+        effectiveActionableLocalImplementationGapCount:
+          p66FullImplementationGapAccounting.effectiveActionableLocalImplementationGapCount,
         effectiveA5GatedGapIds:
           p66FullImplementationGapAccounting.effectiveA5GatedGapIds,
         effectiveA5GatedGapCount:
