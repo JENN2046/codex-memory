@@ -1,5 +1,45 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1248 A5-GAP-6 Post-Template-Guard Aggregation Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: exact-approved in-memory evidence aggregation only. No file/store scan, MCP `tools/call`, provider call, service start, durable memory/audit write, migration/import/export/backup/restore apply, config/watchdog/startup change, remote action, cutover, readiness claim, or reliability claim.
+
+Approval:
+
+- Exact approval bound to `main@818f41369777ef418a3b4dc4057dcc84f706bea7`.
+- Local `a5:approval-check` accepted the line for `A5-GAP-6`.
+- Approved evidence units: `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
+
+Result:
+
+- Ran only an in-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })` call with literal sanitized evidence summary.
+- Aggregator accepted the explicit runtime evidence summary.
+- `runtimeEvidenceSummaryLocallyEvidencedGapCount=5`.
+- `runtimeEvidenceSummaryRemainingGapCount=2`.
+- `commandsExecutedByAggregator=false`.
+- `effectiveGapSource=accepted_runtime_summary`.
+- `effectiveRemainingFullImplementationGapIds=[validation_aggregator_full_implementation_incomplete, rc_cutover_not_executed]`.
+- `closureAuthorityStatus=red_lane_authorization_required`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- Fresh Git preflight.
+- `npm run a5:approval-check` for the exact approval line.
+- In-memory ValidationAggregator report generation.
+- `git diff --check`.
+- Ledger consistency validation.
+- Docs validation via `scripts\validate-local.ps1 -Area docs`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1248.
+- Future strict gate, runtime collector, startup/config/watchdog, provider, MCP `tools/call`, cutover, push, or readiness action still requires separate fresh exact approval.
+
 ## CM-1247 A5-GAP-6 Template Self-Check Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

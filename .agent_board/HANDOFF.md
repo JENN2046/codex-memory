@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1247 A5_GAP6_TEMPLATE_SELF_CHECK`.
+Goal: `CM-1248 A5_GAP6_POST_TEMPLATE_GUARD_AGGREGATION_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local CLI/test template self-check hardening for A5-GAP-6 approval text.
+Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved in-memory A5-GAP-6 evidence aggregation over approved sanitized A5-GAP-1..5 evidence.
 
 Workspace: `A:\codex-memory`.
 
@@ -73,6 +73,15 @@ Changed scope since CM-1207:
 - `docs/CM1245_A5_GAP6_APPROVAL_TEMPLATE_RENDERING.md`
 - `docs/CM1246_A5_GAP6_TEMPLATE_UNIT_GUARD.md`
 - `docs/CM1247_A5_GAP6_TEMPLATE_SELF_CHECK.md`
+- `docs/CM1248_A5_GAP6_POST_TEMPLATE_GUARD_AGGREGATION_EVIDENCE.md`
+
+Current CM-1248 fact:
+
+- CM-1248 consumed exact A5-GAP-6 approval bound to `main@818f41369777ef418a3b4dc4057dcc84f706bea7`.
+- The approved scope was evidence-only aggregation using sanitized `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5` evidence.
+- Aggregator accepted the summary: locally evidenced gaps `5`, remaining gaps `2`, `commandsExecutedByAggregator=false`.
+- Effective remaining gaps are `validation_aggregator_full_implementation_incomplete` and `rc_cutover_not_executed`.
+- Readiness remains false: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 Current CM-1247 fact:
 
