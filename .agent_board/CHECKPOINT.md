@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1298 Lifecycle Scope Current Visibility Policy Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test lifecycle-scope read governance current-scope fallback normalization hardening. No public MCP schema expansion, live recall, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `buildLifecycleScopeGovernanceCurrentScope(...)` now checks execution-context visibility with first non-empty normalized `visibility/visibility_policy`.
+- Lifecycle-scope read governance no longer misclassifies candidates when trusted runtime context supplies `visibility_policy` and blank `visibility`.
+- App-level regression covers `search_memory` with lifecycle-scope governance read policy enabled and `visibility_policy=project`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\memory-lifecycle-scope-runtime-integration.test.js tests\lifecycle-read-policy-runtime.test.js tests\memory-lifecycle-scope-governance-contract.test.js tests\policy-read-preflight.test.js` passed `32/32`.
+- `npm test` passed `2820/2820`.
+- Broader validation is recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1298.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1297 Recall Isolation Visibility Policy Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

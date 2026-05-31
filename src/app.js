@@ -332,7 +332,7 @@ function buildLifecycleScopeGovernanceCurrentScope(requestContext = {}) {
     taskId: firstScopeValue(executionContext.taskId, executionContext.task_id),
     conversationId: firstScopeValue(executionContext.conversationId, executionContext.conversation_id),
     folder: firstScopeValue(executionContext.folder),
-    visibility: firstScopeValue(executionContext.visibility),
+    visibility: firstScopeValue(executionContext.visibility, executionContext.visibility_policy),
     retentionPolicy: firstScopeValue(executionContext.retentionPolicy, executionContext.retention_policy)
   };
 }

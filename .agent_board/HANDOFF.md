@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1297 RECALL_ISOLATION_VISIBILITY_POLICY_FALLBACK`.
+Goal: `CM-1298 LIFECYCLE_SCOPE_CURRENT_VISIBILITY_POLICY_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall isolation visibility fallback for `visibility/visibility_policy`.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing lifecycle-scope current visibility fallback for execution-context `visibility/visibility_policy`.
 
 Workspace: `A:\codex-memory`.
 
@@ -55,6 +55,7 @@ Changed scope since CM-1207:
 - `tests/memory-lifecycle-scope-runtime-integration.test.js`
 - `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`
 - `docs/CM1266_LIFECYCLE_SCOPE_EXECUTION_CONTEXT_AUTHORITY.md`
+- `docs/CM1298_LIFECYCLE_SCOPE_CURRENT_VISIBILITY_POLICY_FALLBACK.md`
 - `src/core/ExecutionContextResolver.js`
 - `src/core/MemoryWriteService.js`
 - `tests/memory-write-preflight-runtime-integration.test.js`

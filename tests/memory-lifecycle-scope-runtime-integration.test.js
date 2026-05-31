@@ -269,6 +269,40 @@ test('lifecycle scope governance bridge does not trust search scope client_id as
   });
 });
 
+test('lifecycle scope governance bridge derives current visibility from visibility_policy fallback', async () => {
+  await withApp(async ({ app }) => {
+    app.services.passiveRecallService.search = async () => [
+      { memoryId: 'mem-policy-visible', title: 'Policy visibility candidate' }
+    ];
+    app.stores.shadowStore.getRecordsLifecycleScopeGovernanceMap = async () => buildMetadata([
+      {
+        memoryId: 'mem-policy-visible',
+        lifecycleStatus: 'active',
+        scope: exactRecordScope
+      }
+    ]);
+
+    const search = await app.callTool('search_memory', {
+      query: 'synthetic lifecycle visibility policy fallback',
+      target: 'process',
+      limit: 3
+    }, {
+      noTokenReadOnly: true,
+      executionContext: {
+        ...exactExecutionContext,
+        projectId: 'project-alpha',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex',
+        visibility: '   ',
+        visibility_policy: 'project',
+        lifecycleScopeGovernanceReadPolicy: true
+      }
+    });
+
+    assert.deepEqual(search.results.map(item => item.memoryId), ['mem-policy-visible']);
+  });
+});
+
 test('lifecycle scope governance bridge treats search scope as candidate filter only', async () => {
   await withApp(async ({ app }) => {
     app.services.passiveRecallService.search = async () => [
