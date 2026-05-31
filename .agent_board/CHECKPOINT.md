@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1288 Supersede Pair Scope Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test supersede pair scope guard fallback normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside temp-local test stores, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `SupersedeMemoryService.normalizeScopeTuple(...)` now uses the first non-empty normalized value across paired camel-case / snake_case record fields.
+- Covered pairs are `projectId/project_id`, `workspaceId/workspace_id`, `clientId/client_id`, `taskId/task_id`, `conversationId/conversation_id`, `visibility/visibility_policy`, and `retentionPolicy/retention_policy`.
+- Added a regression proving blank camel-case pair scope fields fall through to snake_case fields while `supersede_memory` remains dry-run, produces no audit entries, and leaves old/new rows unchanged.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\SupersedeMemoryService.js`
+- `node --check tests\supersede-memory-runtime.test.js`
+- `node --test tests\supersede-memory-runtime.test.js tests\supersede-memory-temp-local-evidence.test.js tests\memory-supersede-runtime-prep-helper.test.js tests\memory-supersede-pair-outcome-helper.test.js tests\memory-supersede-shadow-seam-contract.test.js` passed `34/34`.
+- `npm test` passed `2813/2813`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1288.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1287 Lifecycle Runtime-Prep Projection Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

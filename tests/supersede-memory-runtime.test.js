@@ -357,6 +357,50 @@ test('supersede_memory rejects exact pair scope mismatch before audit', async ()
   });
 });
 
+test('supersede_memory pair scope guard normalizes snake-case record fields', async () => {
+  await withService({
+    records: [
+      { memoryId: 'mem-old', status: 'active', title: 'Old memory' },
+      { memoryId: 'mem-new', status: 'proposal', title: 'New memory' }
+    ]
+  }, async ({ config, shadowStore, service }) => {
+    const getRecordsByIds = shadowStore.getRecordsByIds.bind(shadowStore);
+    shadowStore.getRecordsByIds = async ids => {
+      const records = await getRecordsByIds(ids);
+      return records.map(record => ({
+        ...record,
+        projectId: '',
+        project_id: 'project-a',
+        workspaceId: '   ',
+        workspace_id: 'workspace-a',
+        clientId: '',
+        client_id: 'codex',
+        taskId: '',
+        task_id: 'task-a',
+        conversationId: '',
+        conversation_id: 'thread-a',
+        visibility: '',
+        visibility_policy: 'project',
+        retentionPolicy: ' ',
+        retention_policy: 'retain'
+      }));
+    };
+
+    const result = await service.supersede(supersedePayload());
+    const oldRow = getRecordRow(config.dbPath, 'mem-old');
+    const newRow = getRecordRow(config.dbPath, 'mem-new');
+    const auditEntries = await readAuditEntries(config.auditLogPath);
+
+    assert.equal(result.decision, 'dry-run');
+    assert.equal(result.mutated, false);
+    assert.equal(result.oldMemoryId, 'mem-old');
+    assert.equal(result.newMemoryId, 'mem-new');
+    assert.equal(oldRow.status, 'active');
+    assert.equal(newRow.status, 'proposal');
+    assert.deepEqual(auditEntries, []);
+  });
+});
+
 test('supersede_memory forbids cross-client private mutation by default', async () => {
   await withService({
     records: [

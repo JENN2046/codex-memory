@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1287 LIFECYCLE_RUNTIME_PREP_PROJECTION_FALLBACK_NORMALIZATION`.
+Goal: `CM-1288 SUPERSEDE_PAIR_SCOPE_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing tombstone/supersede runtime-prep projection fallback normalization and validating lifecycle runtime-prep behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing `supersede_memory` pair scope fallback normalization and validating dry-run/no-audit/no-mutation behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -94,6 +94,9 @@ Changed scope since CM-1207:
 - `tests/durable-governance-tombstone-runtime-prep-helper.test.js`
 - `tests/memory-supersede-runtime-prep-helper.test.js`
 - `docs/CM1287_LIFECYCLE_RUNTIME_PREP_PROJECTION_FALLBACK_NORMALIZATION.md`
+- `src/core/SupersedeMemoryService.js`
+- `tests/supersede-memory-runtime.test.js`
+- `docs/CM1288_SUPERSEDE_PAIR_SCOPE_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

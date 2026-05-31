@@ -55,19 +55,27 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
 }
 
 function normalizeScopeTuple(record = {}) {
   return {
-    projectId: normalizeString(record.projectId),
-    workspaceId: normalizeString(record.workspaceId),
-    clientId: normalizeString(record.clientId),
-    taskId: normalizeString(record.taskId),
-    conversationId: normalizeString(record.conversationId),
-    visibility: normalizeString(record.visibility),
-    retentionPolicy: normalizeString(record.retentionPolicy)
+    projectId: firstNormalizedString(record.projectId, record.project_id),
+    workspaceId: firstNormalizedString(record.workspaceId, record.workspace_id),
+    clientId: firstNormalizedString(record.clientId, record.client_id),
+    taskId: firstNormalizedString(record.taskId, record.task_id),
+    conversationId: firstNormalizedString(record.conversationId, record.conversation_id),
+    visibility: firstNormalizedString(record.visibility, record.visibility_policy),
+    retentionPolicy: firstNormalizedString(record.retentionPolicy, record.retention_policy)
   };
 }
 
