@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1282 RECALL_ISOLATION_FALLBACK_NORMALIZATION`.
+Goal: `CM-1283 KNOWLEDGE_BASE_SYNC_SCOPE_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall isolation fallback normalization and validating recall/read-policy behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing knowledge-base sync scope fallback normalization and validating recall/sync/read-policy behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -74,6 +74,8 @@ Changed scope since CM-1207:
 - `src/core/RecallIsolationClassifier.js`
 - `tests/recall-isolation-classification-runtime.test.js`
 - `docs/CM1282_RECALL_ISOLATION_FALLBACK_NORMALIZATION.md`
+- `src/recall/KnowledgeBaseSyncService.js`
+- `docs/CM1283_KNOWLEDGE_BASE_SYNC_SCOPE_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

@@ -534,6 +534,109 @@ test('knowledge base sync derives governance state revision from existing lifecy
   assert.notEqual(resultA.syncToken, resultB.syncToken);
 });
 
+test('knowledge base sync preserves existing shadow scope when diary scope fields are blank', async () => {
+  const upserted = [];
+  const storedGovernanceEntries = [];
+  const diaryRecords = [
+    baseRecord({
+      memoryId: 'mem-governance-blank-diary',
+      updatedAt: '2026-05-19T02:00:00.000Z',
+      projectId: '   ',
+      workspaceId: '',
+      clientId: ' ',
+      taskId: '',
+      conversationId: '   ',
+      visibility: ' ',
+      retentionPolicy: ''
+    })
+  ];
+  const existingRecords = [
+    {
+      memoryId: 'mem-governance-blank-diary',
+      target: 'process',
+      title: 'Useful implementation note',
+      content: 'Alpha feature detail',
+      evidence: 'Local evidence',
+      tags: ['feature'],
+      updatedAt: '2026-05-19T01:00:00.000Z',
+      relativePath: null,
+      filePath: null,
+      rawText: null,
+      validated: false,
+      reusable: false,
+      status: 'active',
+      projectId: 'codex-memory',
+      workspaceId: 'workspace-shadow',
+      clientId: 'codex',
+      taskId: 'task-shadow',
+      conversationId: 'conversation-shadow',
+      visibility: 'private',
+      retentionPolicy: 'keep'
+    }
+  ];
+  const service = new KnowledgeBaseSyncService({
+    config: {
+      enableShadowWrites: true,
+      enableVectorIndex: false,
+      searchMemoryTimeoutMs: 50
+    },
+    diaryStore: {
+      async listRecords() {
+        return diaryRecords;
+      }
+    },
+    shadowStore: {
+      async listRecords() {
+        return existingRecords;
+      },
+      async upsertRecord(record) {
+        upserted.push({ ...record });
+      },
+      async clearReconcileTasks() {}
+    },
+    vectorStore: {},
+    chunkIndexingService: null,
+    candidateCacheStore: {
+      async getStoredGovernanceStateRevision() {
+        return '';
+      },
+      async getStoredGovernanceStateEntries() {
+        return null;
+      },
+      async clearCurrentFingerprintByMemoryIds() {},
+      async clearAll() {},
+      async setStoredGovernanceStateRevision() {},
+      async setStoredGovernanceStateEntries(_target, entries) {
+        storedGovernanceEntries.push(entries);
+      }
+    }
+  });
+
+  const result = await service.syncTarget('process');
+
+  assert.equal(result.sqliteWrites, 1);
+  assert.equal(upserted.length, 1);
+  assert.equal(upserted[0].projectId, 'codex-memory');
+  assert.equal(upserted[0].workspaceId, 'workspace-shadow');
+  assert.equal(upserted[0].clientId, 'codex');
+  assert.equal(upserted[0].taskId, 'task-shadow');
+  assert.equal(upserted[0].conversationId, 'conversation-shadow');
+  assert.equal(upserted[0].visibility, 'private');
+  assert.equal(upserted[0].retentionPolicy, 'keep');
+  assert.deepEqual(storedGovernanceEntries.at(-1), [{
+    memoryId: 'mem-governance-blank-diary',
+    target: 'process',
+    status: 'active',
+    projectId: 'codex-memory',
+    workspaceId: 'workspace-shadow',
+    clientId: 'codex',
+    taskId: 'task-shadow',
+    conversationId: 'conversation-shadow',
+    visibility: 'private',
+    retentionPolicy: 'keep'
+  }]);
+});
+
 test('knowledge base sync keeps governance state revision empty when no governance metadata exists', async () => {
   const service = new KnowledgeBaseSyncService({
     config: {

@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1283 Knowledge-Base Sync Scope Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test knowledge-base sync scope preservation and governance revision normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `KnowledgeBaseSyncService` now uses the first non-empty normalized governance field when preserving existing shadow scope during diary-to-shadow sync.
+- Blank diary `projectId`, `workspaceId`, `clientId`, `taskId`, `conversationId`, `visibility`, or `retentionPolicy` no longer masks existing shadow values.
+- Default governance revision entries use the same first-non-empty normalization for diary/existing scope fields.
+- Added regression proving `upsertRecord(...)` and stored governance entries preserve existing shadow scope/lifecycle metadata when diary scope fields are blank.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\recall\KnowledgeBaseSyncService.js`
+- `node --check tests\recall-isolation-classification-runtime.test.js`
+- `node --test tests\recall-isolation-classification-runtime.test.js tests\phase-b-sync-cache-rerank.test.js tests\policy-read-preflight.test.js` passed `53/53`.
+- `npm test` passed `2803/2803`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1283.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1282 Recall Isolation Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

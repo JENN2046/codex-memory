@@ -77,13 +77,13 @@ class KnowledgeBaseSyncService {
 
       if (this.config.enableShadowWrites && (needsRefresh || needsIsolationChunkClear)) {
         if (existing) {
-          record.projectId = record.projectId || existing.projectId || null;
-          record.workspaceId = record.workspaceId || existing.workspaceId || null;
-          record.clientId = record.clientId || existing.clientId || null;
-          record.taskId = record.taskId || existing.taskId || null;
-          record.conversationId = record.conversationId || existing.conversationId || null;
-          record.visibility = record.visibility || existing.visibility || null;
-          record.retentionPolicy = record.retentionPolicy || existing.retentionPolicy || null;
+          record.projectId = this.firstGovernanceField(record.projectId, existing.projectId) || null;
+          record.workspaceId = this.firstGovernanceField(record.workspaceId, existing.workspaceId) || null;
+          record.clientId = this.firstGovernanceField(record.clientId, existing.clientId) || null;
+          record.taskId = this.firstGovernanceField(record.taskId, existing.taskId) || null;
+          record.conversationId = this.firstGovernanceField(record.conversationId, existing.conversationId) || null;
+          record.visibility = this.firstGovernanceField(record.visibility, existing.visibility) || null;
+          record.retentionPolicy = this.firstGovernanceField(record.retentionPolicy, existing.retentionPolicy) || null;
         }
         await this.shadowStore.upsertRecord(record);
         throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
@@ -338,13 +338,13 @@ class KnowledgeBaseSyncService {
       target: record?.target || existing?.target || '',
       // Lifecycle status currently lives in shadow-store metadata, not diary records.
       status: this.normalizeGovernanceField(existing?.status),
-      projectId: this.normalizeGovernanceField(record?.projectId || existing?.projectId),
-      workspaceId: this.normalizeGovernanceField(record?.workspaceId || existing?.workspaceId),
-      clientId: this.normalizeGovernanceField(record?.clientId || existing?.clientId),
-      taskId: this.normalizeGovernanceField(record?.taskId || existing?.taskId),
-      conversationId: this.normalizeGovernanceField(record?.conversationId || existing?.conversationId),
-      visibility: this.normalizeGovernanceField(record?.visibility || existing?.visibility),
-      retentionPolicy: this.normalizeGovernanceField(record?.retentionPolicy || existing?.retentionPolicy)
+      projectId: this.firstGovernanceField(record?.projectId, existing?.projectId),
+      workspaceId: this.firstGovernanceField(record?.workspaceId, existing?.workspaceId),
+      clientId: this.firstGovernanceField(record?.clientId, existing?.clientId),
+      taskId: this.firstGovernanceField(record?.taskId, existing?.taskId),
+      conversationId: this.firstGovernanceField(record?.conversationId, existing?.conversationId),
+      visibility: this.firstGovernanceField(record?.visibility, existing?.visibility),
+      retentionPolicy: this.firstGovernanceField(record?.retentionPolicy, existing?.retentionPolicy)
     };
 
     const hasGovernanceSignal = [
@@ -367,6 +367,14 @@ class KnowledgeBaseSyncService {
 
   normalizeGovernanceField(value) {
     return typeof value === 'string' ? value.trim() : '';
+  }
+
+  firstGovernanceField(...values) {
+    for (const value of values) {
+      const normalized = this.normalizeGovernanceField(value);
+      if (normalized) return normalized;
+    }
+    return '';
   }
 
   normalizeGovernanceStateEntries(entries = null) {
