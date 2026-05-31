@@ -149,6 +149,21 @@ test('CM-0844 normalizes blank camel-case scope fields from snake-case fallbacks
   assert.deepEqual(result.scopeMismatches, []);
 });
 
+test('CM-0844 normalizes blank camel-case lifecycle ids from snake-case fallbacks', () => {
+  const result = evaluateRecallEligibility(record({
+    memoryId: '   ',
+    memory_id: 'synthetic-memory-snake',
+    lifecycleStatus: '   ',
+    lifecycle_status: 'tombstoned'
+  }), exactScope);
+
+  assert.equal(result.memoryId, 'synthetic-memory-snake');
+  assert.equal(result.lifecycleStatus, 'tombstoned');
+  assert.equal(result.normalRecallEligible, false);
+  assert.ok(result.blockers.includes('lifecycle_tombstoned_excluded_from_normal_recall'));
+  assert.equal(result.blockers.includes('memory_id_required'), false);
+});
+
 test('CM-0844 fails closed when current scope or record metadata is malformed', () => {
   const incompleteScope = {
     ...exactScope,
@@ -191,6 +206,22 @@ test('CM-0844 accepts append-only governance transition fixtures with exact scop
   assert.equal(result.appendOnly, true);
   assert.equal(result.destructiveCleanupAllowed, false);
   assert.equal(result.durableMutationExecuted, false);
+  assert.deepEqual(result.blockers, []);
+});
+
+test('CM-0844 governance transition falls through blank camel-case ids to snake-case fields', () => {
+  const result = evaluateGovernanceTransition(approvedTransition({
+    action: 'supersede',
+    targetMemoryId: '   ',
+    target_memory_id: 'synthetic-memory-active',
+    replacementMemoryId: '',
+    replacement_memory_id: 'synthetic-memory-replacement',
+    actorId: '   ',
+    actor_id: 'synthetic-reviewer'
+  }));
+
+  assert.equal(result.acceptedForGovernanceFixture, true);
+  assert.equal(result.targetMemoryId, 'synthetic-memory-active');
   assert.deepEqual(result.blockers, []);
 });
 

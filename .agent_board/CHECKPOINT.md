@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1284 Lifecycle Id/Status Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test lifecycle-scope governance id/status normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryLifecycleScopeGovernanceContract` now uses the first non-empty normalized value for paired camel-case / snake_case record id and lifecycle status fields.
+- Governance transition `targetMemoryId`, `replacementMemoryId`, and `actorId` now fall through to snake_case fields when camel-case values are blank.
+- Added regressions proving blank `memoryId` does not trigger `memory_id_required` when `memory_id` is present, blank `lifecycleStatus` falls through to `lifecycle_status=tombstoned`, and blank transition ids fall through to snake_case supersede fixture fields.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryLifecycleScopeGovernanceContract.js`
+- `node --check tests\memory-lifecycle-scope-governance-contract.test.js`
+- `node --test tests\memory-lifecycle-scope-governance-contract.test.js tests\memory-lifecycle-scope-read-policy-fixture.test.js tests\memory-lifecycle-scope-runtime-integration.test.js tests\lifecycle-read-policy-runtime.test.js` passed `28/28`.
+- `npm test` passed `2805/2805`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1284.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1283 Knowledge-Base Sync Scope Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

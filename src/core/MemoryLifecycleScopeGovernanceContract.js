@@ -42,6 +42,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function toSnakeCase(value) {
   return value.replace(/[A-Z]/g, match => `_${match.toLowerCase()}`);
 }
@@ -85,7 +93,7 @@ function missingScopeFields(scope = {}, fields = SCOPE_FIELDS) {
 }
 
 function normalizeLifecycleStatus(value) {
-  return normalizeString(value || 'active').toLowerCase().replace(/-/g, '_');
+  return (normalizeString(value) || 'active').toLowerCase().replace(/-/g, '_');
 }
 
 function normalizeGovernanceAction(value) {
@@ -111,8 +119,11 @@ function normalizeRecord(input = {}) {
   const safeInput = isPlainObject(input) ? input : {};
 
   return {
-    memoryId: normalizeString(safeInput.memoryId || safeInput.memory_id),
-    lifecycleStatus: normalizeLifecycleStatus(safeInput.lifecycleStatus || safeInput.lifecycle_status),
+    memoryId: firstNormalizedString(safeInput.memoryId, safeInput.memory_id),
+    lifecycleStatus: normalizeLifecycleStatus(firstNormalizedString(
+      safeInput.lifecycleStatus,
+      safeInput.lifecycle_status
+    )),
     scope: normalizeScope(safeInput.scope || safeInput),
     unresolvedRemediation: safeInput.unresolvedRemediation === true ||
       safeInput.unresolved_remediation === true,
@@ -177,10 +188,13 @@ function evaluateGovernanceTransition(input = {}) {
   const safeInput = isPlainObject(input) ? input : {};
   const action = normalizeGovernanceAction(safeInput.action);
   const exactApproval = safeInput.exactApproval === true;
-  const targetMemoryId = normalizeString(safeInput.targetMemoryId || safeInput.target_memory_id);
-  const replacementMemoryId = normalizeString(safeInput.replacementMemoryId || safeInput.replacement_memory_id);
+  const targetMemoryId = firstNormalizedString(safeInput.targetMemoryId, safeInput.target_memory_id);
+  const replacementMemoryId = firstNormalizedString(
+    safeInput.replacementMemoryId,
+    safeInput.replacement_memory_id
+  );
   const reason = normalizeString(safeInput.reason);
-  const actorId = normalizeString(safeInput.actorId || safeInput.actor_id);
+  const actorId = firstNormalizedString(safeInput.actorId, safeInput.actor_id);
   const approvedAt = normalizeString(safeInput.approvedAt || safeInput.approved_at);
   const scope = normalizeScope(safeInput.scope);
   const blockers = [];
@@ -243,8 +257,11 @@ function sanitizeSuppressedCandidate(candidate = {}, eligibility = {}) {
   const safeCandidate = isPlainObject(candidate) ? candidate : {};
 
   return {
-    memoryId: normalizeString(safeCandidate.memoryId || safeCandidate.memory_id) || null,
-    lifecycleStatus: eligibility.lifecycleStatus || normalizeLifecycleStatus(safeCandidate.lifecycleStatus),
+    memoryId: firstNormalizedString(safeCandidate.memoryId, safeCandidate.memory_id) || null,
+    lifecycleStatus: eligibility.lifecycleStatus || normalizeLifecycleStatus(firstNormalizedString(
+      safeCandidate.lifecycleStatus,
+      safeCandidate.lifecycle_status
+    )),
     decision: eligibility.decision || 'excluded_from_normal_recall',
     blockers: Array.isArray(eligibility.blockers) ? eligibility.blockers : [],
     scopeMismatches: Array.isArray(eligibility.scopeMismatches) ? eligibility.scopeMismatches : []
