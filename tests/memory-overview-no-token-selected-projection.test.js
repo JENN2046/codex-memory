@@ -154,6 +154,8 @@ test('no-token selected overview sanitizes core overview dependencies directly',
   assert.equal(overview.summary.accepted, 1);
   assert.equal(overview.summary.rejected, 1);
   assert.equal(overview.summary.sensitiveRejected, 1);
+  assert.equal(overview.summary.latestAcceptedAt, undefined);
+  assert.equal(overview.summary.latestRejectedAt, undefined);
   assert.equal(overview.recall.summary.totalHits, 1);
   assert.equal(overview.recall.summary.scopedRecallCount, 1);
   assert.equal(overview.shadowSync.schemaStartupGate.currentVersion, 1);
@@ -161,6 +163,8 @@ test('no-token selected overview sanitizes core overview dependencies directly',
 
   assert.doesNotMatch(serialized, /"paths"\s*:/);
   assert.doesNotMatch(serialized, /"embeddingProfile"\s*:/);
+  assert.doesNotMatch(serialized, /"latestAcceptedAt"\s*:/);
+  assert.doesNotMatch(serialized, /"latestRejectedAt"\s*:/);
   assert.doesNotMatch(serialized, /"recentAudit"\s*:/);
   assert.doesNotMatch(serialized, /"recentFiles"\s*:/);
   assert.doesNotMatch(serialized, /"memoryLinks"\s*:/);
@@ -180,4 +184,6 @@ test('no-token selected overview sanitizes core overview dependencies directly',
   assert.doesNotMatch(serialized, /fingerprint-should-not-leak/);
   assert.doesNotMatch(serialized, /project-id-should-not-leak/);
   assert.doesNotMatch(serialized, /client-id-should-not-leak/);
+  assert.doesNotMatch(serialized, /2026-06-01T01:00:00\.000Z/);
+  assert.doesNotMatch(serialized, /2026-06-01T02:00:00\.000Z/);
 });

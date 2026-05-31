@@ -152,8 +152,12 @@ test('no-token HTTP memory_overview returns selected safe overview', async () =>
     assert.equal(overview.access.recentAuditReturned, false);
     assert.equal(overview.access.memoryLinksReturned, false);
     assert.equal(overview.access.recallRecentReturned, false);
+    assert.equal(overview.summary.latestAcceptedAt, undefined);
+    assert.equal(overview.summary.latestRejectedAt, undefined);
     assert.equal(overview.shadowSync.available, true);
     assert.doesNotMatch(serialized, /"paths"\s*:/);
+    assert.doesNotMatch(serialized, /"latestAcceptedAt"\s*:/);
+    assert.doesNotMatch(serialized, /"latestRejectedAt"\s*:/);
     assert.doesNotMatch(serialized, /"recentAudit"\s*:/);
     assert.doesNotMatch(serialized, /"recentFiles"\s*:/);
     assert.doesNotMatch(serialized, /"memoryLinks"\s*:/);

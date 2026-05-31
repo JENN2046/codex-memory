@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1257 No-Token Overview Count-Only Write Summary Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local runtime privacy hardening for no-token `memory_overview` selected projection. No provider call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added count-only no-token write summary in `MemoryOverviewService.getNoTokenSelectedOverview(...)`.
+- No-token selected projection still returns aggregate write counts.
+- No-token selected projection no longer returns `latestAcceptedAt` or `latestRejectedAt` activity timestamps.
+- Bearer-token authorized `memory_overview` still uses full overview.
+- No-token `record_memory` and `search_memory` remain blocked.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryOverviewService.js`
+- `node --check tests\memory-overview-no-token-selected-projection.test.js`
+- `node --test tests\memory-overview-no-token-selected-projection.test.js tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js` passed `29/29`.
+- Default suite and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1257.
+- Full no-token governance closure, write reliability, recall reliability, and readiness remain unclaimed.
+
 ## CM-1256 No-Token Overview Core Sanitizer Test Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

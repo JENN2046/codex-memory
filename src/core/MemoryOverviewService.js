@@ -193,6 +193,20 @@ function buildNoTokenRecallSummary(summary) {
   };
 }
 
+function buildNoTokenWriteSummary(summary) {
+  return {
+    sampleSize: summary.sampleSize,
+    accepted: summary.accepted,
+    rejected: summary.rejected,
+    processAccepted: summary.processAccepted,
+    knowledgeAccepted: summary.knowledgeAccepted,
+    processRejected: summary.processRejected,
+    knowledgeRejected: summary.knowledgeRejected,
+    blockedDirectWrites: summary.blockedDirectWrites,
+    sensitiveRejected: summary.sensitiveRejected
+  };
+}
+
 function sanitizeSchemaStartupGate(schemaStartupGate) {
   if (!schemaStartupGate || typeof schemaStartupGate !== 'object') return null;
   return {
@@ -584,7 +598,7 @@ class MemoryOverviewService {
         recallRecentReturned: false,
         rawMemoryFieldsReturned: false
       },
-      summary: buildWriteSummary(writeEntries),
+      summary: buildNoTokenWriteSummary(buildWriteSummary(writeEntries)),
       recall: {
         ...buildRecallStatus(recallSummary),
         summary: buildNoTokenRecallSummary(recallSummary)
