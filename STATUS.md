@@ -23,7 +23,7 @@ RC_NOT_READY_BLOCKED
 2. 再逐个做 A5 / P66 runtime gap closure。
 3. 最后做 personal RC dogfood。
 
-当前任务是 `CM-1203 DOCUMENTATION_SURFACE_HISTORY_COMPRESSION`：压缩最大状态面，保留当前摘要，把历史流水改为索引 / Git 归档可查。
+当前任务是 `CM-1205 MEMORY_INDEX_COMPRESSION`：把 `MEMORY.md` 从陈旧 current-status / handoff 快照压成历史阶段记忆索引，active execution 继续由 `STATUS.md` 与 `.agent_board` 当前 ledger 承载。
 
 ## 当前权威入口
 
@@ -42,8 +42,9 @@ RC_NOT_READY_BLOCKED
 最近实测事实：
 
 - 分支：`main`
-- `HEAD == origin/main == 13922dac462a6d9709160b27f9be6fb5dd4506dc`
-- 最近提交：`13922da chore: salvage branch review artifacts`
+- 本地 `HEAD = abb1a266b4a74915d7242b701782a5ef90511e32`
+- `origin/main = 13922dac462a6d9709160b27f9be6fb5dd4506dc`
+- branch state：`main...origin/main [ahead 1]`
 - 当前本地 tracked worktree 有 docs/board 瘦身改动。
 - 未跟踪且未处理：`CLAUDE.md`、`docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
@@ -71,7 +72,7 @@ git log --oneline --decorate -n 10
 
 历史 hardening 证据也曾通过：`npm run test:hardening` hardening `73/73` + override evidence `6/6`；fixture-only `gate:ci` PASS。它们不构成 runtime readiness。
 
-CM-1202 / CM-1203 是 docs-only 状态面瘦身：
+CM-1202 through CM-1205 是 docs-only 状态面瘦身：
 
 - 不改 source/runtime/test/package/lock/config/env/secret/watchdog/startup。
 - 不执行 provider/API。
@@ -113,9 +114,13 @@ memory_overview
 历史 CM/Pxx 流水不再保存在 active status surface 中。查看历史：
 
 - 归档索引：[docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md](/A:/codex-memory/docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md)
+- Backlog 归档索引：[docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md](/A:/codex-memory/docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md)
+- Memory 归档索引：[docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md](/A:/codex-memory/docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md)
 - Git 中的压缩前 active surfaces：
 
 ```powershell
+git show abb1a26:MEMORY.md
+git show abb1a26:MAINTENANCE_BACKLOG.md
 git show 13922da:STATUS.md
 git show 13922da:.agent_board/HANDOFF.md
 git show 13922da:.agent_board/CHECKPOINT.md

@@ -39,7 +39,7 @@
 | [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md) | 维护期候选任务池，不替代当前 active task queue | 中频 |
 | [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md) | Phase D/E 历史运行记录索引和 checkpoint 历史 | 低频 |
 | [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) | 只做导航，不承载实时状态正文 | 低频 |
-| [MEMORY.md](/A:/codex-memory/MEMORY.md) | 恢复状态和跨会话 handoff 摘要 | 中频 |
+| [MEMORY.md](/A:/codex-memory/MEMORY.md) | 历史阶段记忆索引；不作为当前状态源 | 低频 |
 | [PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md) | 主项目收官记录，默认冻结 | 极低频 |
 
 ## README 规则
@@ -82,11 +82,13 @@ STATUS 不应该重复整条 Phase D/E 历史。历史细节进入 [PHASE_E_CHEC
 
 ## Maintenance Backlog 规则
 
-维护期任务只进入 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)。
+维护期候选方向进入 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)。
 
-Phase E 已经收官，后续 donor/provider/docs polish 不再回写 Phase E backlog。
+Active execution task 进入 [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md)，验证进入 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)。
 
-任务状态应该保持简短：
+Phase E 已经收官，后续 donor/provider/docs polish 不再回写 Phase E backlog，也不把完成流水继续追加到 `MAINTENANCE_BACKLOG.md`。
+
+候选项状态应该保持简短：
 
 - `todo`
 - `in_progress`
@@ -94,11 +96,10 @@ Phase E 已经收官，后续 donor/provider/docs polish 不再回写 Phase E ba
 - `blocked`
 - `skipped`
 
-任务完成时需要：
+任务进入执行或完成时需要：
 
-- 更新任务状态
+- 更新 `.agent_board/TASK_QUEUE.md`
 - 记录验证
-- 更新 `.agent_board`
 - 按聚合节奏本地提交
 
 ## Checkpoint 规则
@@ -134,6 +135,12 @@ checkpoint 是重要阶段记录，不是普通 gate 流水。
 - 大段历史解释
 - 可由索引链接表达的重复记录
 - secrets / provider key / `.env` 值
+
+## Memory 规则
+
+`MEMORY.md` 只保留历史阶段记忆索引。
+
+它不应该再记录“当前远端提交”、“当前 gate 结果”、“当前 handoff”或 active task 状态。此类事实进入 `STATUS.md`、`.agent_board/TASK_QUEUE.md`、`.agent_board/VALIDATION_LOG.md` 和 `.agent_board/HANDOFF.md`。
 
 ## Drift Handling
 

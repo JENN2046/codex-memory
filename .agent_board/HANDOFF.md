@@ -2,7 +2,7 @@
 
 ## Current Handoff
 
-Goal: `CM-1203 DOCUMENTATION_SURFACE_HISTORY_COMPRESSION`.
+Goal: `CM-1205 MEMORY_INDEX_COMPRESSION`.
 
 Status: `COMPLETED_VALIDATED_NOT_READY` after docs validation.
 
@@ -24,26 +24,31 @@ Current active entrypoints:
 - [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md)
 - [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)
 
-Changed scope for CM-1203:
+Changed scope for CM-1205:
 
+- `MEMORY.md`
+- `MAINTENANCE_BACKLOG.md`
+- `DOCS_GOVERNANCE.md`
+- `README.md`
 - `STATUS.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/CHECKPOINT.md`
 - `.agent_board/TASK_QUEUE.md`
+- `.agent_board/RUN_STATE.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/AUTOPILOT_LEDGER.md`
-- `.agent_board/RUN_STATE.md`
-- `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`
-- Existing CM-1202 docs-route files remain in the same local docs-only change set.
+- `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`
+- `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md`
 
-Current Git facts at the start of CM-1203:
+Current Git facts during CM-1205 local validation:
 
-- `HEAD == origin/main == 13922dac462a6d9709160b27f9be6fb5dd4506dc`
-- latest commit: `13922da chore: salvage branch review artifacts`
-- tracked worktree contained docs-only CM-1202 changes before CM-1203 compression
+- local `HEAD = abb1a266b4a74915d7242b701782a5ef90511e32`
+- `origin/main = 13922dac462a6d9709160b27f9be6fb5dd4506dc`
+- branch state: `main...origin/main [ahead 1]`
+- tracked worktree contains docs-only CM-1204/CM-1205 changes
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1203:
+Validation for CM-1205:
 
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -72,15 +77,17 @@ Boundary:
 - No public MCP expansion.
 - No push, PR, tag, release, deploy, or readiness claim.
 
-Historical handoff stream:
+Historical memory/backlog stream:
 
-- Active historical handoff content was compressed by CM-1203.
-- Pre-compression content is available through Git at `13922da`:
+- Active historical backlog content was compressed by CM-1204.
+- Active historical memory content was compressed by CM-1205.
+- Pre-compression content is available through Git at `abb1a26`:
 
 ```powershell
-git show 13922da:.agent_board/HANDOFF.md
+git show abb1a26:MAINTENANCE_BACKLOG.md
+git show abb1a26:MEMORY.md
 ```
 
 Next safe action:
 
-Continue the documentation-surface slimdown by deciding whether to commit CM-1202/CM-1203 locally. Do not start runtime gap closure until the docs surface is stable and any required exact approval is prepared.
+Decide whether to commit the docs-surface slimdown follow-up locally, or review `.agent_board/DECISIONS.md` separately. Do not start runtime gap closure until the docs surface is stable and any required exact approval is prepared.
