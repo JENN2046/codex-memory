@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1210 A5-GAP-4_HTTP_EVIDENCE_REFRESH`.
+Goal: `CM-1211 A5-GAP-4_AUTHENTICATED_MCP_TOOL_LIST_EVIDENCE`.
 
-Status: `PARTIAL_BLOCKED_AUTH_REQUIRED_NOT_READY` after endpoint health/observe passed and authenticated MCP probes failed closed without token use.
+Status: `COMPLETED_VALIDATED_NOT_READY` after authenticated MCP initialize/tools-list evidence.
 
 Workspace: `A:\codex-memory`.
 
@@ -47,21 +47,25 @@ Current Git fact and A5 rule after CM-1208:
 - `observe:http` passed with status `ok`, HTTP log error `0`, watchdog recovery `0`, watchdog ensure failure `0`, governance `ok`, `noProvider=true`, `mutated=false`, and `migrationApplied=false`.
 - Unauthenticated MCP `initialize` and `tools/list` returned Unauthorized due missing/invalid bearer token.
 - No token material was read, printed, persisted, or used.
+- User separately approved authenticated MCP initialize/tools-list for `main@1a7d198f1f4758f0de3caf9b839cc59aa1b9802e`, using current-session bearer token if already present, without printing or persisting token material, no config/watchdog/startup change, no `tools/call`.
+- Authenticated MCP `initialize` returned server `vcp_codex_memory`, version `0.1.0`, protocol version `2025-06-18`.
+- Authenticated MCP `tools/list` returned exactly `record_memory`, `search_memory`, and `memory_overview`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1210:
+Validation for CM-1211:
 
 - `git diff --check`
 - `/health` passed
 - `observe:http --json --tail 1 --audit-tail 1` passed
 - unauthenticated MCP `initialize` / `tools/list` failed closed with Unauthorized
+- authenticated MCP `initialize` passed
+- authenticated MCP `tools/list` passed with exactly 3 public tools
 
 Not validated:
 
 - `npm run test:hardening`
 - `npm run gate:mainline`
 - HTTP observe
-- authenticated MCP initialize/tools-list
 - provider smoke / benchmark
 - true `record_memory`
 - true `search_memory`
@@ -91,4 +95,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize the partial evidence record, then request separate exact approval if authenticated MCP initialize/tools-list evidence is required. Do not read/use token material, run `tools/call`, `start:http:ensure`, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit CM-1211 evidence, then consider exact-approved A5-GAP-6 evidence aggregation refresh. Do not run `tools/call`, `start:http:ensure`, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

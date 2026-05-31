@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1211 A5-GAP-4 Authenticated MCP Tool List Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: user-approved authenticated MCP initialize/tools-list evidence for `main@1a7d198f1f4758f0de3caf9b839cc59aa1b9802e`, endpoint `http://127.0.0.1:7605`, using current-session bearer token if already present, without printing or persisting token material, no config/watchdog/startup change, no `tools/call`.
+
+Result:
+
+- Fresh preflight matched branch `main` and commit `1a7d198f1f4758f0de3caf9b839cc59aa1b9802e`.
+- Current-session bearer token was present and used only in request headers.
+- Token material was not printed or persisted.
+- MCP `initialize` returned server `vcp_codex_memory`, version `0.1.0`, protocol version `2025-06-18`.
+- MCP `tools/list` returned exactly 3 public tools: `record_memory`, `search_memory`, `memory_overview`.
+
+Boundary:
+
+- No `tools/call`.
+- No config/watchdog/startup change.
+- No provider call.
+- No real memory scan.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, runtime readiness, RC readiness, cutover readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit CM-1211 evidence.
+- Then consider exact-approved A5-GAP-6 evidence aggregation refresh.
+
 ## CM-1210 A5-GAP-4 HTTP Evidence Refresh Checkpoint
 
 Status: `PARTIAL_BLOCKED_AUTH_REQUIRED_NOT_READY`

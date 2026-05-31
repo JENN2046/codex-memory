@@ -25,9 +25,9 @@ RC_NOT_READY_BLOCKED
 
 当前最新已验证 A5 单元是 `CM-1208 A5-GAP-5_STRICT_GATE_PREFLIGHT`：用户精确授权在 `main@d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d` 运行 `npm run gate:mainline:strict`，且无 remote write。该 strict gate 已通过：health ok，contract `29/29`，test `2754/2754`，compare `43/43`，rollback `43/43`。
 
-这是 target-bound strict-gate evidence，不是 runtime readiness、RC readiness、cutover readiness、write reliability 或 recall reliability。`CM-1210 A5-GAP-4_HTTP_EVIDENCE_REFRESH` 已在 `main@db5a4d66cf472d35e80b12d512816cda5de09220` 执行 endpoint-bound refresh：`/health` 和 `observe:http` 为 `ok`，HTTP log error `0`，watchdog recovery `0`，governance status `ok`，`noProvider=true`，`mutated=false`，`migrationApplied=false`。Authenticated MCP `initialize` / `tools/list` 未完成，因为无 bearer token 请求返回 Unauthorized；本次 approval 未授权读取或使用 token material。
+这是 target-bound strict-gate evidence，不是 runtime readiness、RC readiness、cutover readiness、write reliability 或 recall reliability。`CM-1210 A5-GAP-4_HTTP_EVIDENCE_REFRESH` 已在 `main@db5a4d66cf472d35e80b12d512816cda5de09220` 执行 endpoint-bound refresh：`/health` 和 `observe:http` 为 `ok`，HTTP log error `0`，watchdog recovery `0`，governance status `ok`，`noProvider=true`，`mutated=false`，`migrationApplied=false`。`CM-1211 A5-GAP-4_AUTHENTICATED_MCP_TOOL_LIST_EVIDENCE` 已在 `main@1a7d198f1f4758f0de3caf9b839cc59aa1b9802e` 执行：使用当前会话已存在 bearer token，未打印、未持久化 token，未执行 `tools/call`。Authenticated MCP `initialize` 返回 server `vcp_codex_memory` / version `0.1.0`，`tools/list` 返回且仅返回 3 个公开工具：`record_memory`、`search_memory`、`memory_overview`。
 
-当前下一步是决定是否单独授权 authenticated MCP initialize/tools-list evidence。不得把 CM-1210 的 partial evidence 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability 或 `RC_READY`。
+当前下一步是将 CM-1211 证据提交，然后再考虑 A5-GAP-6 evidence aggregation refresh。不得把 CM-1210/CM-1211 的 endpoint-bound evidence 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability 或 `RC_READY`。
 
 ## 当前权威入口
 

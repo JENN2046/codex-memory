@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1210 A5-GAP-4 HTTP evidence refresh partial; authenticated MCP evidence blocked |
+| Current task | CM-1211 A5-GAP-4 authenticated MCP tool-list evidence completed; await commit |
 | Current area | P4-http-runtime / P6-docs-drift |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1210 executed the approved A5-GAP-4 endpoint-bound HTTP refresh at `main@db5a4d66cf472d35e80b12d512816cda5de09220`. `/health` and `observe:http` passed for `http://127.0.0.1:7605`; observe reported HTTP log error `0`, watchdog recovery `0`, governance `ok`, `noProvider=true`, `mutated=false`, and `migrationApplied=false`. Unauthenticated MCP `initialize` and `tools/list` returned Unauthorized because auth is required; no token material was read, printed, persisted, or used. Next safe action is either record/commit this partial evidence or request a separate exact approval for authenticated MCP initialize/tools-list using an already-present current-session bearer token without printing or persisting token material.
+CM-1211 executed the approved authenticated MCP initialize/tools-list evidence at `main@1a7d198f1f4758f0de3caf9b839cc59aa1b9802e`. It used an already-present current-session bearer token without printing or persisting token material. MCP `initialize` returned server `vcp_codex_memory` version `0.1.0`; `tools/list` returned exactly `record_memory`, `search_memory`, and `memory_overview`. No `tools/call`, config/watchdog/startup change, provider call, real-memory scan, durable write, public MCP expansion, remote write, or readiness claim. Next safe action is to validate and commit CM-1211 evidence.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
