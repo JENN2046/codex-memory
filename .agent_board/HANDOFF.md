@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1307 RECALL_AGGREGATION_RESULT_ID_ALIAS_FALLBACK`.
+Goal: `CM-1308 SELECTED_AUDIT_LOG_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall aggregation candidate id/source alias fallback. Targeted recall isolation/bounded recall tests passed `43/43`; default `npm test` passed `2832/2832`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing selected write-audit/write-manifest audit correlation projection alias fallback. Targeted audit/write tests passed `30/30`; default `npm test` passed `2834/2834`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -62,8 +62,11 @@ Changed scope since CM-1207:
 - `docs/CM1302_LIFECYCLE_GOVERNANCE_ALIAS_FALLBACK.md`
 - `docs/CM1303_DEFERRED_GOVERNANCE_TARGET_IDS_ALIAS_FALLBACK.md`
 - `docs/CM1307_RECALL_AGGREGATION_RESULT_ID_ALIAS_FALLBACK.md`
+- `docs/CM1308_SELECTED_AUDIT_LOG_ALIAS_FALLBACK.md`
 - `src/recall/KnowledgeBaseRecallPipeline.js`
 - `tests/recall-isolation-classification-runtime.test.js`
+- `src/storage/AuditLogStore.js`
+- `tests/audit-log-store-selected-correlation.test.js`
 - `src/core/DeferredGovernanceRuntimeEntryAdapter.js`
 - `tests/deferred-governance-runtime-entry-adapter.test.js`
 - `src/core/SelectedAuditCorrelationObservationPreflight.js`

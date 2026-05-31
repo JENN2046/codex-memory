@@ -8,6 +8,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeAuditPhase(value) {
   return normalizeString(value).toLowerCase();
 }
@@ -15,18 +23,18 @@ function normalizeAuditPhase(value) {
 function selectMutationAuditEvent(event) {
   if (!event || typeof event !== 'object') return null;
   return {
-    eventId: event.event_id || null,
-    correlationId: event.correlation_id || null,
-    auditPhase: event.audit_phase || null,
+    eventId: firstNormalizedString(event.event_id, event.eventId) || null,
+    correlationId: firstNormalizedString(event.correlation_id, event.correlationId) || null,
+    auditPhase: firstNormalizedString(event.audit_phase, event.auditPhase) || null,
     mutationApplied: event.mutation_applied === true,
-    memoryId: event.memory_id || null,
-    eventType: event.event_type || null,
-    toolName: event.tool_name || null,
-    actorClientId: event.actor_client_id || null,
-    requestSource: event.request_source || null,
-    fromStatus: event.from_status || null,
-    toStatus: event.to_status || null,
-    tombstoneReason: event.tombstone_reason || null
+    memoryId: firstNormalizedString(event.memory_id, event.memoryId) || null,
+    eventType: firstNormalizedString(event.event_type, event.eventType) || null,
+    toolName: firstNormalizedString(event.tool_name, event.toolName) || null,
+    actorClientId: firstNormalizedString(event.actor_client_id, event.actorClientId) || null,
+    requestSource: firstNormalizedString(event.request_source, event.requestSource) || null,
+    fromStatus: firstNormalizedString(event.from_status, event.fromStatus) || null,
+    toStatus: firstNormalizedString(event.to_status, event.toStatus) || null,
+    tombstoneReason: firstNormalizedString(event.tombstone_reason, event.tombstoneReason) || null
   };
 }
 
@@ -36,16 +44,16 @@ function selectWriteManifestAuditEvent(entry) {
   if (!manifest || typeof manifest !== 'object') return null;
 
   return {
-    timestamp: entry.timestamp || null,
-    decision: entry.decision || null,
-    target: entry.target || null,
-    memoryId: entry.memoryId || null,
-    requestSource: entry.requestSource || null,
+    timestamp: firstNormalizedString(entry.timestamp) || null,
+    decision: firstNormalizedString(entry.decision) || null,
+    target: firstNormalizedString(entry.target) || null,
+    memoryId: firstNormalizedString(entry.memoryId, entry.memory_id) || null,
+    requestSource: firstNormalizedString(entry.requestSource, entry.request_source) || null,
     shadowWriteStatus: entry.shadowWrite?.status || null,
-    authoritativeStore: manifest.authoritativeStore || null,
-    idempotencyKey: manifest.idempotencyKey || null,
-    canonicalHash: manifest.canonicalHash || null,
-    status: manifest.status || null,
+    authoritativeStore: firstNormalizedString(manifest.authoritativeStore, manifest.authoritative_store) || null,
+    idempotencyKey: firstNormalizedString(manifest.idempotencyKey, manifest.idempotency_key) || null,
+    canonicalHash: firstNormalizedString(manifest.canonicalHash, manifest.canonical_hash) || null,
+    status: firstNormalizedString(manifest.status) || null,
     replayed: manifest.replayed === true,
     recovered: manifest.recovered === true,
     recoveryRequired: manifest.recoveryRequired === true,

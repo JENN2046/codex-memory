@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1308 Selected Audit Log Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test selected write-audit and write-manifest audit correlation projection fallback normalization hardening. No live write/recall execution, real memory/store/jsonl read, provider call, MCP external call, durable audit write outside temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `AuditLogStore` selected mutation audit projection now uses first non-empty normalized aliases for event id, correlation id, memory id, audit phase, event type, tool name, actor client id, request source, status fields, and tombstone reason.
+- Selected write manifest audit projection now uses first non-empty normalized aliases for top-level memory/request fields and manifest store/idempotency/hash fields.
+- Selected audit correlation filtering no longer misses records solely because a blank paired alias appears first.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\audit-log-store-selected-correlation.test.js tests\selected-audit-correlation-observation-preflight.test.js tests\selected-audit-correlation-current-facts-preflight-cli.test.js tests\durable-write-kernel-idempotency-runtime.test.js` passed `30/30`.
+- `npm test` passed `2834/2834`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1308 closeout.
+
+Next:
+
+- Verify fresh Git state before branch-sensitive work; if CM-1308 is committed, continue to the next runtime gap.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1307 Recall Aggregation Result ID Alias Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
