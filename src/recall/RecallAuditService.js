@@ -31,6 +31,10 @@ function firstNormalizedString(...values) {
   return '';
 }
 
+function normalizeResultMemoryId(result = {}) {
+  return firstNormalizedString(result?.memoryId, result?.memory_id);
+}
+
 function firstDefinedValue(...values) {
   for (const value of values) {
     if (value !== undefined && value !== null) return value;
@@ -134,8 +138,8 @@ class RecallAuditService {
       target: target === 'both' ? 'both' : getTargetForDiaryName(getDiaryNameForTarget(target)),
       recallType: 'read-policy',
       resultCount: safeResults.length,
-      topMemoryId: safeResults[0]?.memoryId || null,
-      memoryIds: [...new Set(safeResults.map(result => result.memoryId).filter(Boolean))],
+      topMemoryId: normalizeResultMemoryId(safeResults[0]) || null,
+      memoryIds: [...new Set(safeResults.map(result => normalizeResultMemoryId(result)).filter(Boolean))],
       scopeApplied,
       scopeMode: scopeApplied ? normalizedScopeAudit.scopeMode : 'none',
       scopeDimensions: normalizedScopeAudit.scopeDimensions,
@@ -199,12 +203,12 @@ class RecallAuditService {
       semanticCandidateCount: Number(searchPlan.semanticCandidateCount || 0),
       timeCandidateCount: Number(searchPlan.timeCandidateCount || 0),
       topScore: Number.isFinite(topResult.score) ? Number(topResult.score.toFixed(6)) : null,
-      topMemoryId: topResult.memoryId || null,
+      topMemoryId: normalizeResultMemoryId(topResult) || null,
       topMatchedTags: normalizeTagArray(topResult.matchedTags || []),
       matchedTags,
       coreTags,
       topSourceFile: topResult.sourceFile || null,
-      memoryIds: [...new Set(safeResults.map(result => result.memoryId).filter(Boolean))],
+      memoryIds: [...new Set(safeResults.map(result => normalizeResultMemoryId(result)).filter(Boolean))],
       sourceFiles,
       sourceKinds,
       contentLength: safeResults.reduce((sum, result) => sum + String(result.content || result.snippet || '').length, 0),

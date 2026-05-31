@@ -54,6 +54,31 @@ test('recall audit normalizes snake-case scope audit fields without raw workspac
   assert.equal(JSON.stringify(entry).includes('raw-workspace-must-not-pass'), false);
 });
 
+test('recall audit falls through blank memoryId to memory_id aliases', async () => {
+  const { service, appended } = createAuditHarness();
+
+  const entry = await service.record({
+    target: 'process',
+    results: [
+      {
+        memoryId: '   ',
+        memory_id: 'cm-1306-snake-top',
+        score: 0.7,
+        matchedTags: ['audit']
+      },
+      {
+        memoryId: '',
+        memory_id: 'cm-1306-snake-second',
+        score: 0.4
+      }
+    ]
+  });
+
+  assert.equal(appended.length, 1);
+  assert.equal(entry.topMemoryId, 'cm-1306-snake-top');
+  assert.deepEqual(entry.memoryIds, ['cm-1306-snake-top', 'cm-1306-snake-second']);
+});
+
 test('read policy recall audit normalizes snake-case scope audit fields', async () => {
   const { service, appended } = createAuditHarness();
 
@@ -97,4 +122,26 @@ test('read policy recall audit normalizes snake-case scope audit fields', async 
   assert.equal(entry.hiddenByLifecycleCount, 2);
   assert.equal(entry.staleResultCount, 1);
   assert.equal(entry.lifecycleColumnAvailable, true);
+});
+
+test('read policy recall audit falls through blank memoryId to memory_id aliases', async () => {
+  const { service, appended } = createAuditHarness();
+
+  const entry = await service.recordReadPolicySummary({
+    target: 'process',
+    results: [
+      { memoryId: '   ', memory_id: 'cm-1306-read-policy-top' },
+      { memoryId: '', memory_id: 'cm-1306-read-policy-second' }
+    ],
+    policyAudit: {
+      readPolicyApplied: true,
+      lifecyclePolicyApplied: true,
+      lifecycleColumnAvailable: true
+    }
+  });
+
+  assert.equal(appended.length, 1);
+  assert.equal(entry.recallType, 'read-policy');
+  assert.equal(entry.topMemoryId, 'cm-1306-read-policy-top');
+  assert.deepEqual(entry.memoryIds, ['cm-1306-read-policy-top', 'cm-1306-read-policy-second']);
 });

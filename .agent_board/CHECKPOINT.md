@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1306 Recall Audit Result Memory ID Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test recall audit result memory id fallback normalization hardening. No true-live recall execution, real memory/store/jsonl read, provider call, MCP external call, durable audit write outside test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `RecallAuditService` now normalizes result ids through first non-empty `memoryId/memory_id`.
+- Normal recall audit `topMemoryId` and `memoryIds` no longer drop snake_case ids when camel-case ids are blank.
+- Read-policy recall audit `topMemoryId` and `memoryIds` use the same normalized id path.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\recall-audit-service.test.js tests\http-observe-cli.test.js tests\governance-report-cli.test.js tests\memory-overview-no-token-selected-projection.test.js` passed `47/47`.
+- `npm test` passed `2831/2831`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1306 closeout.
+
+Next:
+
+- Commit or otherwise stabilize CM-1306.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1305 Read Policy Result Memory ID Alias Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

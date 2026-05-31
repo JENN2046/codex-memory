@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1305 READ_POLICY_RESULT_MEMORY_ID_ALIAS_FALLBACK`.
+Goal: `CM-1306 RECALL_AUDIT_RESULT_MEMORY_ID_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing search_memory post-filter read policy result memory id alias fallback. Targeted lifecycle/policy tests passed `33/33`; default `npm test` passed `2829/2829`. Commit is still pending until final diff/docs validation closeout.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall audit result memory id alias fallback. Targeted recall audit/observe/governance tests passed `47/47`; default `npm test` passed `2831/2831`. Commit is still pending until final diff/docs validation closeout.
 
 Workspace: `A:\codex-memory`.
 
