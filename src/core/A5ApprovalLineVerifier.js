@@ -11,11 +11,11 @@ const A5_APPROVAL_LINE_UNITS = Object.freeze({
   },
   'A5-GAP-3': {
     action: 'migration_boundary',
-    pattern: /^I approve A5-GAP-3 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), action (?<action>dry-run|apply|backup|restore|import|export), target (?<target>.+)\.$/
+    pattern: /^I approve A5-GAP-3 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), action (?<action>dry-run|apply|backup|restore|import|export), target (?<target>.+?)(?:, (?<noApplyBoundary>no apply, no import, no export, no backup, no restore, no durable write))?\.$/
   },
   'A5-GAP-4': {
     action: 'live_http_operation',
-    pattern: /^I approve A5-GAP-4 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), endpoint (?<endpoint>\S+), no config\/watchdog\/startup change\.$/
+    pattern: /^(?:I approve A5-GAP-4 for codex-memory|I approve A5-GAP-4 (?<authenticatedMcpToolList>authenticated MCP initialize\/tools-list evidence) for codex-memory) on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), endpoint (?<endpoint>\S+), (?:no config\/watchdog\/startup change|using current-session bearer token if already present, without printing or persisting token material, no config\/watchdog\/startup change, no tools\/call)\.$/
   },
   'A5-GAP-5': {
     action: 'cutover_context_strict_gate',
@@ -71,6 +71,9 @@ function evaluateA5ApprovalLine({
   }
   if (parsed.commit && commit && parsed.commit !== commit) {
     failClosedReasons.push('commit_mismatch');
+  }
+  if (unit === 'A5-GAP-3' && /, no apply/.test(line) && !parsed.noApplyBoundary) {
+    failClosedReasons.push('incomplete_no_apply_boundary');
   }
 
   const approvalAccepted = failClosedReasons.length === 0;

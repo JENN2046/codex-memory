@@ -102,6 +102,52 @@ test('A5 approval verifier keeps other unit shapes separate and rejects unit reu
   assert.equal(reusedAsGap5.failClosedReasons.includes('approval_line_not_exact'), true);
 });
 
+test('A5 approval verifier accepts documented A5-GAP-3 migration dry-run no-apply line', () => {
+  const commit = 'e23e86dd4a3f443a95c2a2b4aeda4da901dde797';
+  const result = evaluateA5ApprovalLine({
+    approvalLine: `I approve A5-GAP-3 for codex-memory on branch main at commit ${commit}, action dry-run, target vcp-memory:migration-readiness fixture-only readiness report, no apply, no import, no export, no backup, no restore, no durable write.`,
+    expectedUnit: 'A5-GAP-3',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, true);
+  assert.equal(result.action, 'migration_boundary');
+  assert.equal(result.parsed.action, 'dry-run');
+  assert.equal(result.parsed.target, 'vcp-memory:migration-readiness fixture-only readiness report');
+  assert.equal(result.parsed.noApplyBoundary, 'no apply, no import, no export, no backup, no restore, no durable write');
+  assertNoSideEffects(result);
+});
+
+test('A5 approval verifier accepts documented A5-GAP-4 authenticated tools-list line', () => {
+  const commit = '1a7d198f1f4758f0de3caf9b839cc59aa1b9802e';
+  const result = evaluateA5ApprovalLine({
+    approvalLine: `I approve A5-GAP-4 authenticated MCP initialize/tools-list evidence for codex-memory on branch main at commit ${commit}, endpoint http://127.0.0.1:7605, using current-session bearer token if already present, without printing or persisting token material, no config/watchdog/startup change, no tools/call.`,
+    expectedUnit: 'A5-GAP-4',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, true);
+  assert.equal(result.action, 'live_http_operation');
+  assert.equal(result.parsed.endpoint, 'http://127.0.0.1:7605');
+  assert.equal(result.parsed.authenticatedMcpToolList, 'authenticated MCP initialize/tools-list evidence');
+  assertNoSideEffects(result);
+});
+
+test('A5 approval verifier rejects broader migration wording that omits no-apply boundary', () => {
+  const commit = 'e23e86dd4a3f443a95c2a2b4aeda4da901dde797';
+  const result = evaluateA5ApprovalLine({
+    approvalLine: `I approve A5-GAP-3 for codex-memory on branch main at commit ${commit}, action dry-run, target vcp-memory:migration-readiness fixture-only readiness report, no apply.`,
+    expectedUnit: 'A5-GAP-3',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, false);
+  assert.equal(result.failClosedReasons.includes('incomplete_no_apply_boundary'), true);
+});
+
 test('A5 approval verifier does not read files or execute commands', () => {
   const originalReadFileSync = fs.readFileSync;
   const originalExistsSync = fs.existsSync;

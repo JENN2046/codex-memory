@@ -1,5 +1,47 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1242 A5 Approval Pattern Coverage Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test verifier hardening only. No A5 approval grant, strict gate execution, runtime evidence execution, dependency change, lockfile change, or external action.
+
+Result:
+
+- Added verifier coverage for documented `A5-GAP-3` migration-readiness dry-run no-apply boundary.
+- Added verifier coverage for documented authenticated `A5-GAP-4` MCP initialize/tools-list evidence line.
+- Added fail-closed rejection for incomplete `A5-GAP-3` no-apply boundary text.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\A5ApprovalLineVerifier.js`
+- `node --test tests\a5-approval-line-verifier.test.js tests\a5-approval-check-cli.test.js tests\a5-approval-check-package-entry.test.js tests\no-touch-boundary-regression.test.js` passed `17/17`.
+- `git diff --check`
+- Ledger consistency validation.
+- Docs validation via `scripts\validate-local.ps1 -Area docs`.
+
+Boundary:
+
+- No A5-GAP execution.
+- No strict gate execution.
+- No service start.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No dependency or lockfile change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1242.
+- Future A5 execution still requires a separate exact user approval line.
+
 ## CM-1241 A5 Approval Check Entrypoints Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
