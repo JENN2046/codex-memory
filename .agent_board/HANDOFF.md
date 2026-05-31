@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1263 CLIENT_ACCEPTANCE_RUNTIME_FACT_REBASE`.
+Goal: `CM-1264 SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after rebasing Claude client connected/model-side success language from current fact to historical evidence.
+Status: `COMPLETED_VALIDATED_NOT_READY` after hardening soft read private filtering against caller-supplied `scope.client_id` identity spoofing.
 
 Workspace: `A:\codex-memory`.
 
@@ -39,6 +39,9 @@ Changed scope since CM-1207:
 - `README.md`
 - `CLAUDE_MCP_ACCEPTANCE.md`
 - `docs/CM1263_CLIENT_ACCEPTANCE_RUNTIME_FACT_REBASE.md`
+- `src/app.js`
+- `tests/policy-read-preflight.test.js`
+- `docs/CM1264_SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING.md`
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
@@ -580,3 +583,29 @@ Validation:
 Next:
 
 Commit or otherwise stabilize CM-1263, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1264 Current Handoff
+
+Goal: `CM-1264 SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1264 hardens soft read policy private filtering for Codex/Claude client isolation.
+- `scope.client_id` remains a search candidate filter, but it no longer authenticates the caller for private record access.
+- Request identity is inferred from `requestContext.executionContext`.
+- Added runtime regression proving a Codex request cannot pass `scope.client_id=claude` to read Claude private records.
+- No provider/MCP external call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `node --check src\app.js`
+- `node --check tests\policy-read-preflight.test.js`
+- `node --test tests\policy-read-preflight.test.js tests\scope-filter.test.js tests\mcp-contract.test.js` passed `34/34`.
+- Full/default validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1264, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.

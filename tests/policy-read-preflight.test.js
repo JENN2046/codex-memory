@@ -326,6 +326,72 @@ test('soft read policy runtime flag filters proposal, rejected, tombstoned, and 
   });
 });
 
+test('soft read policy does not trust search scope client_id as request identity', async () => {
+  await withPolicyApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const { shadowStore } = app.stores;
+
+    const fixtures = [
+      { title: 'Scoped Private Claude', visibility: 'private', clientId: 'claude' },
+      { title: 'Scoped Private Codex', visibility: 'private', clientId: 'codex' }
+    ];
+
+    for (let index = 0; index < fixtures.length; index += 1) {
+      const fixture = fixtures[index];
+      const record = await server.handleJsonRpc({
+        jsonrpc: '2.0',
+        id: index + 1,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: fixture.title,
+            content: `Type: checkpoint\nruntime soft policy scoped identity signal\nfixture: ${fixture.title}`,
+            evidence: `runtime-soft-policy-scoped-identity-${fixture.title}`,
+            validated: true,
+            reusable: false,
+            tags: ['policy', 'runtime', 'soft-read', 'client-scope'],
+            sensitivity: 'none',
+            project_id: 'policy-runtime-project',
+            visibility: fixture.visibility,
+            client_id: fixture.clientId
+          }
+        }
+      }, requestContext);
+
+      assert.equal(record.response.result.structuredContent.decision, 'accepted');
+      await updatePolicyFields(shadowStore, record.response.result.structuredContent.memoryId, fixture);
+    }
+
+    const scopedSearch = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 300,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'runtime soft policy scoped identity signal',
+          target: 'process',
+          limit: 10,
+          include_content: true,
+          scope: {
+            project_id: 'policy-runtime-project',
+            client_id: 'claude',
+            visibility: 'private'
+          }
+        }
+      }
+    }, requestContext);
+
+    const titles = (scopedSearch.response.result.structuredContent.results || [])
+      .map(result => result.title)
+      .sort();
+
+    assert.deepEqual(titles, []);
+  });
+});
+
 test('soft read policy remains off by default', async () => {
   await withApp(async ({ app }) => {
     assert.equal(app.config.enableSoftReadPolicy, false);

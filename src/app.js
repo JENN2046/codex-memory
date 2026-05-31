@@ -422,7 +422,7 @@ async function applySoftReadPolicy(results, { config, shadowStore, requestContex
   const policyMap = memoryIds.length > 0
     ? await shadowStore.getRecordsPolicyMap(memoryIds)
     : new Map();
-  const requestClientId = inferRequestClientId(requestContext, scope);
+  const requestClientId = inferRequestClientId(requestContext);
 
   return results.filter(item => {
     const memoryId = item.memoryId || item.memory_id;
