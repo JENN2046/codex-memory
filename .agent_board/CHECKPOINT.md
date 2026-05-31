@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1218 A5-GAP-2 Recall Isolation No-Mutation Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: exact-approved `A5-GAP-2` for `main@d0f008133465b2c1be4ea66689b072fa4ca86dd9`, limited to stores `real_diary,real_sqlite,real_vector_index,real_candidate_cache,real_recall_audit`, with `no mutation`.
+
+Result:
+
+- Fresh preflight matched branch `main` and commit `d0f008133465b2c1be4ea66689b072fa4ca86dd9`.
+- Approved stores were read in no-mutation mode.
+- Sanitized result: `storeSnapshotsUnchanged=true`, `projectionLeakageTotal=0`, `rawContentOutput=false`, `recallPipelineExecuted=false`, `mcpToolsCallExecuted=false`, `durableMemoryWritten=false`, `durableAuditWritten=false`.
+- Current approved stores contained no explicit classified sample: `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`.
+
+Boundary:
+
+- No raw memory/audit output.
+- No normal recall/search pipeline execution.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1218 evidence.
+- Then prepare a fresh exact-approved `A5-GAP-6` aggregation refresh over current approved `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5` evidence only.
+
 ## CM-1217 A5-GAP-2 Recall Isolation No-Mutation Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

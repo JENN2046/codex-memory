@@ -33,9 +33,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1216 A5-GAP-6_POST_GOVERNANCE_LOOP_AGGREGATION_PREFLIGHT` 正在准备下一次 evidence aggregation refresh 的精确授权边界：默认只消费当前已批准并已记录的 `A5-GAP-1,A5-GAP-4,A5-GAP-5` sanitized evidence；历史 `A5-GAP-2/3` artifacts 仅作背景，除非后续 exact approval 明确命名，否则不得被聚合器消费。CM-1216 不执行 ValidationAggregator，不扫描文件或 stores，不调用 MCP `tools/call`，不读取真实记忆，不写 durable memory/audit，不执行 governed action，不改变 config/watchdog/startup，不执行 provider、push、PR、release、deploy 或 cutover。
 
-`CM-1217 A5-GAP-2_RECALL_ISOLATION_NO_MUTATION_PREFLIGHT` 正在准备后续 recall isolation runtime proof 的精确授权边界：限定 stores 为 `real_diary, real_sqlite, real_vector_index, real_candidate_cache, real_recall_audit`，并要求 `no mutation`。CM-1217 不执行 store scan，不输出 raw memory/audit 内容，不调用 MCP `tools/call`，不写 durable memory/audit，不调用 provider，不改变 config/watchdog/startup，不执行 push、PR、release、deploy 或 cutover。
+`CM-1218 A5-GAP-2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE` 已在 exact approval 下执行：`main@d0f008133465b2c1be4ea66689b072fa4ca86dd9`，限定 stores 为 `real_diary, real_sqlite, real_vector_index, real_candidate_cache, real_recall_audit`，并要求 `no mutation`。本次只读扫描输出 sanitized counts/booleans，未输出 raw memory/audit 内容，未执行 normal recall/search pipeline，未调用 MCP `tools/call`，未写 durable memory/audit，未调用 provider，未改变 config/watchdog/startup。结果：`storeSnapshotsUnchanged=true`、`projectionLeakageTotal=0`、`rawContentOutput=false`、`durableMemoryWritten=false`、`durableAuditWritten=false`，但限制仍为 `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`。
 
-当前下一步是提交或稳定 CM-1217 preflight，然后用 fresh `HEAD` 给出 exact A5-GAP-2 approval 后才可执行 recall isolation no-mutation proof。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness 或 `RC_READY`。
+当前下一步是提交或稳定 CM-1218 evidence，然后准备一次 fresh `A5-GAP-6` aggregation refresh，把当前 approved evidence set 明确纳入聚合评估。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness 或 `RC_READY`。
 
 ## 当前权威入口
 

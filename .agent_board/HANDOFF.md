@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1217 A5-GAP-2_RECALL_ISOLATION_NO_MUTATION_PREFLIGHT`.
+Goal: `CM-1218 A5-GAP-2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the next recall isolation approval boundary.
+Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved recall isolation no-mutation evidence.
 
 Workspace: `A:\codex-memory`.
 
@@ -33,6 +33,7 @@ Changed scope since CM-1207:
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/AUTOPILOT_LEDGER.md`
+- `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -67,11 +68,14 @@ Current Git fact and A5 rule after CM-1208:
 - Historical `A5-GAP-2/3` artifacts are background only unless a future exact approval line explicitly names them.
 - CM-1217 prepared the next exact A5-GAP-2 recall isolation no-mutation proof boundary.
 - Selected stores are `real_diary,real_sqlite,real_vector_index,real_candidate_cache,real_recall_audit`.
-- Future approval must include `no mutation`.
+- User approved `A5-GAP-2` for `main@d0f008133465b2c1be4ea66689b072fa4ca86dd9`, limited to those stores, with `no mutation`.
+- CM-1218 executed the no-mutation proof. Result: `storeSnapshotsUnchanged=true`, `projectionLeakageTotal=0`, `rawContentOutput=false`, `recallPipelineExecuted=false`, `mcpToolsCallExecuted=false`, `durableMemoryWritten=false`, `durableAuditWritten=false`.
+- Limitation remains `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1217:
+Validation for CM-1218:
 
+- exact-approved no-mutation proof script
 - `git diff --check`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -86,7 +90,6 @@ Not validated:
 - true `record_memory`
 - true `search_memory`
 - true `memory_overview`
-- A5-GAP-1 governance runtime loop execution
 - broad ValidationAggregator full implementation
 - runtime gap closure
 - personal RC dogfood
@@ -95,7 +98,7 @@ Boundary:
 
 - No source/runtime/test/package/lock/config/env/secret/watchdog/startup change.
 - No provider/API call.
-- No real memory tool call or raw store / `.jsonl` read.
+- Approved store reads occurred only for A5-GAP-2 no-mutation evidence; no raw store / `.jsonl` content was printed.
 - No durable memory/audit write.
 - No public MCP expansion.
 - No push, PR, tag, release, deploy, provider/API call, real memory call, or readiness claim.
@@ -113,4 +116,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1217 preflight, then use fresh `HEAD` for exact A5-GAP-2 approval: `I approve A5-GAP-2 for codex-memory on branch main at commit <FRESH_HEAD>, limited to stores real_diary, real_sqlite, real_vector_index, real_candidate_cache, real_recall_audit, no mutation.` Do not run store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1218 evidence, then prepare a fresh exact-approved A5-GAP-6 aggregation refresh over current approved `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5` evidence only. Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
