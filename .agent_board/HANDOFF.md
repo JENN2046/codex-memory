@@ -10,7 +10,7 @@ Workspace: `A:\codex-memory`.
 
 Branch: `hardening/p0-p2-security-rc-base`.
 
-Git facts: latest reviewed-object feedback still says the reviewed CM-1185 status-sync commit is `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`. CM-1201 addresses a later P3 review without recording a pushed-head or synthetic review-checkout commit as current project history: `.agent_board/BLOCKERS.md` / `CMB-0017` exists from the original CM-1185 status sync and is now explicitly included in scope. After this fix, branch/PR head must be read from fresh Git/GitHub facts. `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and were not modified by this fix.
+Git facts: latest reviewed-object feedback still says the reviewed CM-1185 status-sync commit is `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`. CM-1201 addresses a later P3 review without recording a pushed-head or synthetic review-checkout commit as current project history: `.agent_board/BLOCKERS.md` / `CMB-0017` is a new CM-1201 blocker-scope artifact covering CM-1185 / CM-1200 not-ready status-surface work and is explicitly included in scope. After this fix, branch/PR head must be read from fresh Git/GitHub facts. `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and were not modified by this fix.
 
 Changed/reviewed files: `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/BLOCKERS.md` (`CMB-0017` blocker surface included for handoff/review/rollback scope).
 

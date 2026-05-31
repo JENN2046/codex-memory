@@ -11,7 +11,7 @@ P2 badge correction:
 - Current local/GitHub PR #6 facts before this local fix are `HEAD == origin/hardening/p0-p2-security-rc-base == PR #6 head == 1f26d1907c6f865645e92129e05b8d6d1f48498f`, with CI `Node.js tests` passed. Local `git show`, GitHub commits API, and `git ls-remote` cannot resolve `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`. Later operators must treat `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` as review feedback evidence and keep it separate from current Git/PR head before push-readiness or CI decisions.
 
 P3 blocker-scope correction:
-- CM-1201 addresses PR review feedback without binding to a pushed-head or synthetic review-checkout commit hash: `.agent_board/BLOCKERS.md` / `CMB-0017` is a CM-1185 blocker surface from the original status sync and now appears explicitly in handoff, task, ledger, and validation scope.
+- CM-1201 addresses PR review feedback without binding to a pushed-head or synthetic review-checkout commit hash: `.agent_board/BLOCKERS.md` / `CMB-0017` is recorded as a new CM-1201 blocker-scope artifact covering CM-1185 / CM-1200 not-ready status-surface work, and appears explicitly in handoff, task, ledger, and validation scope.
 - Future operators must include `.agent_board/BLOCKERS.md` when reviewing or rolling back CM-1185/CM-1200 status-surface work, while still treating `CMB-0017` as `open-status-synced` and preserving `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 Completed:
