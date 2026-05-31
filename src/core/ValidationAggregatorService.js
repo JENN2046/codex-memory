@@ -375,6 +375,8 @@ function buildP66FullImplementationGapAccounting({
     : 'blocked_full_implementation_not_authorized';
   const effectiveRemainingGapsCleared =
     effectiveRemainingFullImplementationGapIds.length === 0;
+  const effectiveNonBaselineRemainingGapsAbsent =
+    effectiveNonBaselineRemainingGapIds.length === 0;
 
   return {
     available: true,
@@ -410,6 +412,7 @@ function buildP66FullImplementationGapAccounting({
       runtimeRequiredBlockersCleared: runtimeRequiredBlockerIds.length === 0,
       a5GatedBlockersCleared: a5GatedBlockerIds.length === 0,
       effectiveRemainingGapsCleared,
+      effectiveNonBaselineRemainingGapsAbsent,
       allBlockersCleared: totalBlockerCount === 0,
       readinessClaimAllowed: false
     },
@@ -420,6 +423,7 @@ function buildP66FullImplementationGapAccounting({
       ...(runtimeRequiredBlockerIds.length > 0 ? ['runtime_required_blockers_cleared'] : []),
       ...(a5GatedBlockerIds.length > 0 ? ['a5_gated_blockers_cleared'] : []),
       ...(!effectiveRemainingGapsCleared ? ['effective_remaining_gaps_cleared'] : []),
+      ...(!effectiveNonBaselineRemainingGapsAbsent ? ['effective_non_baseline_remaining_gaps_absent'] : []),
       'readiness_authority'
     ],
     acceptedRuntimeSummaryBound,

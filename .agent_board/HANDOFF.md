@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1232 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_DELTA`.
+Goal: `CM-1233 VALIDATION_AGGREGATOR_NON_BASELINE_GAP_GUARD`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after adding static-baseline versus effective-gap delta accounting to the ValidationAggregator full implementation report shape.
+Status: `COMPLETED_VALIDATED_NOT_READY` after adding a non-baseline remaining-gap guard to the ValidationAggregator full implementation closure criteria.
 
 Workspace: `A:\codex-memory`.
 
@@ -50,6 +50,7 @@ Changed scope since CM-1207:
 - `docs/CM1230_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_ACCOUNTING.md`
 - `docs/CM1231_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_CRITERION.md`
 - `docs/CM1232_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_DELTA.md`
+- `docs/CM1233_VALIDATION_AGGREGATOR_NON_BASELINE_GAP_GUARD.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -126,9 +127,11 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1231 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - CM-1232 adds static-baseline versus effective-gap delta fields: cleared baseline gaps, still-remaining baseline gaps, and non-baseline effective remaining gaps.
 - CM-1232 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- CM-1233 adds `effectiveNonBaselineRemainingGapsAbsent` to closure criteria and fails closed when accepted sanitized runtime summaries introduce non-baseline remaining gaps.
+- CM-1233 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1232:
+Validation for CM-1233:
 
 - `node --check src\core\ValidationAggregatorService.js`
 - `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js`
@@ -175,4 +178,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1232, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating approved units including `A5-GAP-3`: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.` Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1233, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating approved units including `A5-GAP-3`: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.` Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

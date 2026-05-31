@@ -790,6 +790,10 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     false
   );
   assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveNonBaselineRemainingGapsAbsent,
+    true
+  );
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
       'accepted_runtime_summary'
     ),
@@ -2461,6 +2465,55 @@ test('validation aggregator runtime evidence summary rejects readiness claims, s
   assertNoSensitiveSurface(secretSummary);
 });
 
+test('effective gap accounting fails closed on non-baseline remaining gaps', () => {
+  const report = buildV1RcValidationAggregatorReport({
+    runtimeEvidenceSummary: {
+      status: 'local_runtime_evidence_passed_rc_still_blocked',
+      decision: 'NOT_READY_BLOCKED',
+      runtimeReady: false,
+      finalRcMatrixReady: false,
+      v1RcReady: false,
+      rcReady: false,
+      locallyEvidencedRuntimeGaps: [
+        'runtime_schema_version_enforcement_not_fully_proven'
+      ],
+      remainingRuntimeGaps: [
+        'validation_aggregator_full_implementation_incomplete',
+        'future_unmodeled_runtime_gap'
+      ],
+      safety: {
+        mutated: false,
+        providerCalls: 0,
+        serviceStarted: false,
+        readsRealMemory: false,
+        writesDurableMemory: false,
+        realMemoryPreview: false,
+        remoteWrites: false,
+        configChanged: false,
+        migrationApplied: false,
+        importExportApplied: false
+      }
+    }
+  });
+
+  const definition = report.evidence.p66ValidationAggregatorFullImplementationDefinition;
+
+  assert.equal(report.summary.runtimeEvidenceSummaryAccepted, true);
+  assert.equal(definition.effectiveGapSource, 'accepted_runtime_summary');
+  assert.deepEqual(definition.effectiveNonBaselineRemainingGapIds, [
+    'future_unmodeled_runtime_gap'
+  ]);
+  assert.equal(definition.effectiveNonBaselineRemainingGapCount, 1);
+  assert.equal(definition.closureCriteria.effectiveNonBaselineRemainingGapsAbsent, false);
+  assert.equal(
+    definition.closureMissingCriteria.includes('effective_non_baseline_remaining_gaps_absent'),
+    true
+  );
+  assert.equal(definition.closureReady, false);
+  assert.equal(report.summary.runtimeReady, false);
+  assert.equal(report.summary.rcReady, false);
+});
+
 test('minimal implementation maps current conclusions to documented evidence sources', () => {
   const report = buildV1RcValidationAggregatorReport();
 
@@ -2636,6 +2689,10 @@ test('validation evidence reader exposes only explicit committed and local valid
     false
   );
   assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveNonBaselineRemainingGapsAbsent,
+    true
+  );
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
       'usable_validation_evidence'
     ),
@@ -2646,6 +2703,12 @@ test('validation evidence reader exposes only explicit committed and local valid
       'effective_remaining_gaps_cleared'
     ),
     true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
+      'effective_non_baseline_remaining_gaps_absent'
+    ),
+    false
   );
   assert.equal(reader.status, 'explicit_evidence_available');
   assert.equal(reader.sourceMode, 'explicit_safe_inputs_only');

@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1232 ValidationAggregator effective gap delta implemented locally; A5-GAP-6 execution still awaits exact fresh-HEAD approval |
+| Current task | CM-1233 ValidationAggregator non-baseline gap guard implemented locally; A5-GAP-6 execution still awaits exact fresh-HEAD approval |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1232 adds static-baseline versus effective-gap delta fields to the ValidationAggregator full implementation report shape. The report can now show which static baseline gaps are cleared or still remaining under an accepted sanitized runtime summary without executing A5-GAP-6 or claiming readiness. Next safe action is to commit or otherwise stabilize CM-1232, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregation, or continue the next local ValidationAggregator implementation slice.
+CM-1233 adds a non-baseline remaining-gap guard to the ValidationAggregator full implementation closure criteria. Accepted sanitized runtime summaries that introduce unmodeled remaining gaps now keep closure blocked explicitly. It does not execute A5-GAP-6, read evidence files/stores, call providers, write durable state, or change readiness booleans. Next safe action is to commit or otherwise stabilize CM-1233, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregation, or continue the next local ValidationAggregator implementation slice.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
