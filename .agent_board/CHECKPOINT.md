@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1291 Deferred Governance Visibility Policy Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test deferred-governance runtime-entry scope tuple visibility fallback normalization hardening. No runtime apply, provider call, MCP external call, broad real-memory scan, durable projection/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `DeferredGovernanceRuntimeEntryAdapter.normalizeScopeTuple(...)` now uses the first non-empty normalized value across `visibility` and `visibility_policy`.
+- Extended regression proves blank camel-case visibility falls through to `visibility_policy=private` for `memory_exclude` / `memory_forget` internal runtime entries.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\DeferredGovernanceRuntimeEntryAdapter.js`
+- `node --check tests\deferred-governance-runtime-entry-adapter.test.js`
+- `node --test tests\deferred-governance-runtime-entry-adapter.test.js tests\deferred-governance-mutation-planning-service.test.js tests\deferred-governance-bounded-apply-plan-preview.test.js tests\deferred-governance-app-runtime-entry.test.js` passed `32/32`.
+- `npm test` passed `2817/2817`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1291.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1290 V1.1 Write-Governance Scope Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

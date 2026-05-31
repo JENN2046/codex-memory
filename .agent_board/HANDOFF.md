@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1290 V11_WRITE_GOVERNANCE_SCOPE_FALLBACK_NORMALIZATION`.
+Goal: `CM-1291 DEFERRED_GOVERNANCE_VISIBILITY_POLICY_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing v1.1 write-governance target scope fallback normalization and validating no-execution proof-chain behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing deferred-governance runtime-entry visibility fallback normalization and validating no-apply internal-entry behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -111,6 +111,9 @@ Changed scope since CM-1207:
 - `tests/v1-1-write-governance-operator-receipt-audit-preview.test.js`
 - `tests/v1-1-write-governance-post-write-verification-plan.test.js`
 - `docs/CM1290_V11_WRITE_GOVERNANCE_SCOPE_FALLBACK_NORMALIZATION.md`
+- `src/core/DeferredGovernanceRuntimeEntryAdapter.js`
+- `tests/deferred-governance-runtime-entry-adapter.test.js`
+- `docs/CM1291_DEFERRED_GOVERNANCE_VISIBILITY_POLICY_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

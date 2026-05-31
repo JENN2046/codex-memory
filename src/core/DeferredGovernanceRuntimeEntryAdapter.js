@@ -65,7 +65,7 @@ function normalizeScopeTuple(args = {}, executionContext = {}) {
     clientId: ['clientId', 'client_id'],
     taskId: ['taskId', 'task_id'],
     conversationId: ['conversationId', 'conversation_id'],
-    visibility: ['visibility']
+    visibility: ['visibility', 'visibility_policy']
   })) {
     const value = firstStringValue(rawScope, inputKeys) || firstStringValue(args, inputKeys) || firstStringValue(executionContext, inputKeys);
     if (!value) continue;

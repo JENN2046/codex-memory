@@ -250,7 +250,8 @@ test('CM-0925 adapter normalizes aliases and redacts sensitive scope output', ()
     memory_ids: ['memory-1', 'memory-1', 'memory-2'],
     workspace_id: 'workspace-cm-0925-raw',
     client_id: 'codex',
-    visibility: 'private',
+    visibility: '   ',
+    visibility_policy: 'private',
     approval_id: 'approval-cm-0925',
     reason: 'bounded reason',
     evidence: 'bounded evidence',
@@ -269,6 +270,7 @@ test('CM-0925 adapter normalizes aliases and redacts sensitive scope output', ()
   assert.equal(payload.contextFlag, FAMILY_SURFACES.memory_exclude.contextFlag);
   assert.equal(payload.actorClientId, 'codex');
   assert.equal(payload.evidenceSummary, 'bounded evidence');
+  assert.equal(payload.scopeTuple.visibility, 'private');
   assert.equal(text.includes('workspace-cm-0925-raw'), false);
 });
 
