@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1244 A5_GAP6_APPROVAL_SCOPE_NORMALIZATION`.
+Goal: `CM-1245 A5_GAP6_APPROVAL_TEMPLATE_RENDERING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test verifier normalization for A5-GAP-6 approval scope.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local CLI/test template rendering for A5-GAP-6 approval text.
 
 Workspace: `A:\codex-memory`.
 
@@ -70,6 +70,14 @@ Changed scope since CM-1207:
 - `docs/CM1243_A5_APPROVAL_PATTERN_COVERAGE_EXTENDED.md`
 - `tests/a5-approval-check-cli.test.js`
 - `docs/CM1244_A5_GAP6_APPROVAL_SCOPE_NORMALIZATION.md`
+- `docs/CM1245_A5_GAP6_APPROVAL_TEMPLATE_RENDERING.md`
+
+Current CM-1245 fact:
+
+- CM-1245 added read-only `--template` rendering for `A5-GAP-6` exact approval text from caller-provided branch, commit, approved units, optional included evidence file, and no-new-runtime-action flag.
+- Template mode keeps `approvalAccepted=false`, `authorizationGranted=false`, and `executesApprovedAction=false`.
+- Targeted CLI validation passed `23/23`.
+- CM-1245 grants no approval and executes no approved action.
 
 Current CM-1244 fact:
 

@@ -3,6 +3,7 @@ const { spawnSync } = require('node:child_process');
 const test = require('node:test');
 
 const {
+  buildApprovalTemplate,
   buildCliReport,
   parseArgs,
   renderText
@@ -119,4 +120,43 @@ test('a5 approval check CLI exposes normalized A5-GAP-6 approved evidence units'
   assert.equal(report.parsedApprovalScope.noNewRuntimeAction, true);
   assert.equal(report.cli.executesApprovedAction, false);
   assert.equal(report.runtimeReady, false);
+});
+
+test('a5 approval check CLI renders an A5-GAP-6 exact approval template without granting approval', () => {
+  const commit = 'ce1e71509a6966f09cf76c1082e012db615eccbf';
+  const result = runCli([
+    '--json',
+    '--template',
+    '--expected-unit', 'A5-GAP-6',
+    '--expected-branch', 'main',
+    '--expected-commit', commit,
+    '--approved-units', 'A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5',
+    '--included-evidence', 'P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md',
+    '--no-new-runtime-action'
+  ]);
+
+  assert.equal(result.status, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.status, 'approval_template_rendered');
+  assert.equal(report.templateRendered, true);
+  assert.equal(report.approvalAccepted, false);
+  assert.equal(report.authorizationGranted, false);
+  assert.equal(report.cli.executesApprovedAction, false);
+  assert.equal(
+    report.template,
+    `I approve A5-GAP-6 for codex-memory on branch main at commit ${commit}, using only evidence from approved A5-GAP units A5-GAP-1, A5-GAP-2, A5-GAP-3, A5-GAP-4, A5-GAP-5, including P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md, no new runtime action.`
+  );
+  assert.equal(report.runtimeReady, false);
+});
+
+test('a5 approval template helper rejects unsupported template units fail-closed', () => {
+  const report = buildApprovalTemplate({
+    expectedUnit: 'A5-GAP-5',
+    expectedBranch: 'main',
+    expectedCommit: COMMIT,
+    approvedUnits: 'A5-GAP-4,A5-GAP-5'
+  });
+
+  assert.equal(report.templateRendered, false);
+  assert.equal(report.failClosedReasons.includes('unsupported_template_unit'), true);
 });

@@ -1,5 +1,49 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1245 A5-GAP-6 Approval Template Rendering Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local CLI/test hardening only. No A5 approval grant, strict gate execution, ValidationAggregator execution, Git read by the CLI, runtime evidence execution, dependency change, lockfile change, or external action.
+
+Result:
+
+- Added `--template` mode to `src/cli/a5-approval-check.js` for `A5-GAP-6`.
+- Template mode renders exact approval text from caller-provided branch, commit, approved unit list, optional included evidence file, and no-new-runtime-action flag.
+- Template mode keeps `approvalAccepted=false`, `authorizationGranted=false`, and `executesApprovedAction=false`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\cli\a5-approval-check.js`
+- `node --test tests\a5-approval-check-cli.test.js tests\a5-approval-check-package-entry.test.js tests\a5-approval-line-verifier.test.js tests\no-touch-boundary-regression.test.js` passed `23/23`.
+- `git diff --check`
+- Ledger consistency validation.
+- Docs validation via `scripts\validate-local.ps1 -Area docs`.
+
+Boundary:
+
+- No A5-GAP execution.
+- No strict gate execution.
+- No ValidationAggregator execution.
+- No Git command execution by the CLI.
+- No service start.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No dependency or lockfile change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1245.
+- Future A5 execution still requires a separate exact fresh-HEAD user approval line.
+
 ## CM-1244 A5-GAP-6 Approval Scope Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
