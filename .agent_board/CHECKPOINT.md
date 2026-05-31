@@ -1,5 +1,38 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1215 A5-GAP-1 Governance Runtime Loop Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: exact-approved `A5-GAP-1` for `main@7d66d072ccb7828770cdb1ddffb5b756152b9af3`, limited to `cm1214-governance-runtime-loop-no-durable-write sanitized test subject`, with durable write `no`.
+
+Result:
+
+- Fresh preflight matched branch `main` and commit `7d66d072ccb7828770cdb1ddffb5b756152b9af3`.
+- In-memory `evaluateGovernanceRuntimeApprovalAuditLoop(...)` accepted the sanitized governance loop input.
+- Status: `GOVERNANCE_RUNTIME_APPROVAL_AUDIT_LOOP_ACCEPTED_NOT_EXECUTED_NOT_READY`.
+- Six loop stages were evaluated with status `evaluated_not_executed`.
+- All side-effect counters were zero.
+
+Boundary:
+
+- No governed action.
+- No durable audit write.
+- No durable memory write.
+- No MCP `tools/call`.
+- No provider call.
+- No real memory scan.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit CM-1215 evidence.
+- Then either request A5-GAP-6 aggregation over `A5-GAP-1,A5-GAP-4,A5-GAP-5` or choose the next exact-approved runtime gap.
+
 ## CM-1214 A5-GAP-1 Governance Runtime Loop Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
