@@ -61,6 +61,40 @@ test('recall isolation classifier detects governance families without treating d
   assert.ok(tombstone.families.includes('tombstoned_memory'));
 });
 
+test('recall isolation classifier uses snake_case scope and lifecycle fallbacks when camelCase fields are blank', () => {
+  const scoped = classifyRecallIsolationSubject(baseRecord({
+    projectId: '  ',
+    project_id: 'codex-memory',
+    workspaceId: '',
+    workspace_id: 'workspace-main',
+    clientId: null,
+    client_id: 'codex'
+  }), {
+    expectedProjectId: 'codex-memory',
+    expectedWorkspaceId: 'workspace-main',
+    expectedClientId: 'codex'
+  });
+  assert.equal(scoped.isolated, false);
+  assert.equal(scoped.families.includes('out_of_scope_memory'), false);
+
+  const outOfScope = classifyRecallIsolationSubject(baseRecord({
+    projectId: '',
+    project_id: 'other-project'
+  }), {
+    expectedProjectId: 'codex-memory'
+  });
+  assert.equal(outOfScope.isolated, true);
+  assert.ok(outOfScope.families.includes('out_of_scope_memory'));
+
+  const tombstone = classifyRecallIsolationSubject(baseRecord({
+    status: '',
+    lifecycleStatus: '   ',
+    lifecycle_status: 'tombstoned'
+  }));
+  assert.equal(tombstone.isolated, true);
+  assert.ok(tombstone.families.includes('tombstoned_memory'));
+});
+
 test('chunk indexing clears projection chunks for isolated records', async () => {
   const calls = [];
   const service = new ChunkIndexingService({

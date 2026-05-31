@@ -47,6 +47,14 @@ function normalizeString(value) {
   return String(value || '').trim();
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeLower(value) {
   return normalizeString(value).toLowerCase();
 }
@@ -116,13 +124,13 @@ function matchesOutOfScope(subject = {}, options = {}) {
     ? options.expectedVisibility.map(normalizeString).filter(Boolean)
     : [];
 
-  if (expectedProjectId && normalizeString(subject.projectId || subject.project_id) !== expectedProjectId) {
+  if (expectedProjectId && firstNormalizedString(subject.projectId, subject.project_id) !== expectedProjectId) {
     return true;
   }
-  if (expectedWorkspaceId && normalizeString(subject.workspaceId || subject.workspace_id) !== expectedWorkspaceId) {
+  if (expectedWorkspaceId && firstNormalizedString(subject.workspaceId, subject.workspace_id) !== expectedWorkspaceId) {
     return true;
   }
-  if (expectedClientId && normalizeString(subject.clientId || subject.client_id) !== expectedClientId) {
+  if (expectedClientId && firstNormalizedString(subject.clientId, subject.client_id) !== expectedClientId) {
     return true;
   }
   if (
@@ -138,7 +146,11 @@ function matchesOutOfScope(subject = {}, options = {}) {
 function classifyRecallIsolationSubject(subject = {}, options = {}) {
   const safeSubject = subject && typeof subject === 'object' ? subject : {};
   const tags = normalizeTags(safeSubject.tags);
-  const status = normalizeLower(safeSubject.status || safeSubject.lifecycleStatus);
+  const status = normalizeLower(firstNormalizedString(
+    safeSubject.status,
+    safeSubject.lifecycleStatus,
+    safeSubject.lifecycle_status
+  ));
   const explicitFamilies = new Set(listExplicitFamilies(safeSubject, tags));
   const families = [];
   const reasons = [];

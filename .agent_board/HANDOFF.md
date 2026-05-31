@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1281 WRITE_LIFECYCLE_PREFLIGHT_FALLBACK_NORMALIZATION`.
+Goal: `CM-1282 RECALL_ISOLATION_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing write lifecycle/dedup suppression preflight fallback normalization and validating write preflight behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall isolation fallback normalization and validating recall/read-policy behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -71,6 +71,9 @@ Changed scope since CM-1207:
 - `src/core/MemoryWriteLifecycleDedupSuppressionPreflight.js`
 - `tests/memory-write-lifecycle-dedup-suppression-preflight.test.js`
 - `docs/CM1281_WRITE_LIFECYCLE_PREFLIGHT_FALLBACK_NORMALIZATION.md`
+- `src/core/RecallIsolationClassifier.js`
+- `tests/recall-isolation-classification-runtime.test.js`
+- `docs/CM1282_RECALL_ISOLATION_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`
