@@ -1,5 +1,61 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1185 Project Status Review Sync Checkpoint
+
+Status: `CM1185_PROJECT_STATUS_REVIEW_SYNC_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+P2 badge correction:
+- CM-1200 supersedes CM-1199's reviewed-object binding. Latest review feedback says the reviewed CM-1185 status-sync commit is `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`; CM-1199's `f1965a3fcd985fb9a1dfb69aeed3d118f492907d`, CM-1198's `UNKNOWN_UNRESOLVABLE_REVIEW_OBJECT`, CM-1197's `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890`, CM-1196's `01774406e93959a00d70d0d38dc408dac5c81bb4`, CM-1195's `3a5a5d88`, CM-1194's `aa78ee6742e556de7b96b84e26949949364776a3`, CM-1193's `1f4705352f8b8d574ddcce44c52cd2c3458a14af`, and CM-1192's `9eb258d8e83504646dba1175c44fc54c20ee9799` must not be used as the reviewed-context sync commit.
+- Current local/GitHub PR #6 facts before this local fix are `HEAD == origin/hardening/p0-p2-security-rc-base == PR #6 head == 1f26d1907c6f865645e92129e05b8d6d1f48498f`, with CI `Node.js tests` passed. Local `git show`, GitHub commits API, and `git ls-remote` cannot resolve `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`. Later operators must treat `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` as review feedback evidence and keep it separate from current Git/PR head before push-readiness or CI decisions.
+
+P3 blocker-scope correction:
+- CM-1201 addresses PR review feedback without binding to a pushed-head or synthetic review-checkout commit hash: `.agent_board/BLOCKERS.md` / `CMB-0017` is recorded as a new CM-1201 blocker-scope artifact covering CM-1185 / CM-1200 not-ready status-surface work, and appears explicitly in handoff, task, ledger, and validation scope.
+- Future operators must include `.agent_board/BLOCKERS.md` when reviewing or rolling back CM-1185/CM-1200 status-surface work, while still treating `CMB-0017` as `open-status-synced` and preserving `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Completed:
+- Updated `STATUS.md` top-level date and current conclusion with CM-1185 review-sync facts.
+- Recorded current branch `hardening/p0-p2-security-rc-base`.
+- Recorded pre-sync baseline: local `HEAD` and `origin/hardening/p0-p2-security-rc-base` were both `1abb5a3785af5ac96684fe3d7728eb7027e41a98` before CM-1185 status-surface edits.
+- Recorded latest reviewed-object evidence: CM-1185 was reviewed as commit `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`; do not substitute CM-1199's unavailable `f1965a3fcd985fb9a1dfb69aeed3d118f492907d`, CM-1198's `UNKNOWN_UNRESOLVABLE_REVIEW_OBJECT`, CM-1197's unavailable `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890`, CM-1196's unavailable `01774406e93959a00d70d0d38dc408dac5c81bb4`, CM-1195's invalid `3a5a5d88`, CM-1194's stale `aa78ee6742e556de7b96b84e26949949364776a3`, CM-1193's `1f4705352f8b8d574ddcce44c52cd2c3458a14af`, CM-1192's `9eb258d8e83504646dba1175c44fc54c20ee9799`, `d79c1ff6b2067e9c7062bae84bad2c14eb168310`, `11af9dd6c505eb96df496b49928ecac3b8310dad`, `af16a7298cfc798a8160e87fe0ba2d8e00b0bddd`, `483ca4a49cad5638e2448b58da0ad3d74042b63d`, `af9636742ab6f68347adfa1facb981b55c877435`, `f3f00e8f6ed61227142beb3369aae01e63fce35f`, or sibling commit `b410325a56e20881cb0ef2e876f005acbdc6b58f`.
+- Recorded local Node `v24.14.0`.
+- Recorded review evidence: `npm test` passed `2749/2749`; `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`; fixture-only `gate:ci` PASS.
+- Left untracked `CLAUDE.md` untouched and treated its `123/123` baseline as local drift, not authoritative status.
+- Updated `.agent_board` task, validation, ledger, checkpoint, handoff, run-state, and blocker status surfaces; CM-1201 explicitly includes `.agent_board/BLOCKERS.md` / `CMB-0017` in scope.
+
+Validation:
+- `git status --short --branch` inspected.
+- `git diff --stat` inspected.
+- PR review comments and the current tracked diff were inspected for the P3 blocker-scope review.
+- `Select-String` confirmed `CMB-0017` is present in `.agent_board/BLOCKERS.md`.
+- `git diff --check` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- Final tracked-scope review confirmed changes are status/board docs only.
+
+Not validated:
+- `npm test` was not rerun in this sync step; this checkpoint records the immediately prior CM-1185 review evidence.
+- `npm run test:hardening` was not rerun in this sync step; this checkpoint records the immediately prior CM-1185 review evidence.
+- `gate:mainline`
+- `gate:mainline:strict`
+- HTTP observe
+- provider smoke/benchmark
+- true `record_memory`
+- true `search_memory`
+- `memory_overview`
+- push-readiness
+- push
+
+Boundary:
+- No source/runtime/test/package/lock/config/env/secret/watchdog/startup change.
+- No provider/API/model call.
+- No real memory tool call or raw store/`.jsonl` read.
+- No durable project memory/audit write.
+- No public MCP expansion.
+- No push, PR, tag, release, or deploy.
+- No readiness, write reliability, or recall reliability claim.
+- `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` remain unchanged.
+
 ## CM-1183 No-Token Memory Overview HTTP Block Checkpoint
 
 Status: `CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_VALIDATED_NOT_READY`

@@ -1,5 +1,27 @@
 # HANDOFF.md - codex-memory
 
+## CM-1201 P3 Include BLOCKERS In CM-1200 Scope Handoff
+
+Goal: keep CM-1200's reviewed-object binding to `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, and address the follow-up P3 review by explicitly including `.agent_board/BLOCKERS.md` / `CMB-0017` in the handoff, task, ledger, and validation scope for CM-1185/CM-1200 review and rollback decisions.
+
+Status: CM1201_P3_INCLUDE_BLOCKERS_IN_CM1200_SCOPE_COMPLETED_VALIDATED_NOT_READY.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `hardening/p0-p2-security-rc-base`.
+
+Git facts: latest reviewed-object feedback still says the reviewed CM-1185 status-sync commit is `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`. CM-1201 addresses a later P3 review without recording a pushed-head or synthetic review-checkout commit as current project history: `.agent_board/BLOCKERS.md` / `CMB-0017` is a new CM-1201 blocker-scope artifact covering CM-1185 / CM-1200 not-ready status-surface work and is explicitly included in scope. After this fix, branch/PR head must be read from fresh Git/GitHub facts. `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and were not modified by this fix.
+
+Changed/reviewed files: `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/BLOCKERS.md` (`CMB-0017` blocker surface included for handoff/review/rollback scope).
+
+Current result: status surfaces keep CM-1200's review feedback evidence `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` / parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`, mark `f1965a3fcd985fb9a1dfb69aeed3d118f492907d` and earlier moving objects as superseded, and now explicitly include `.agent_board/BLOCKERS.md` / `CMB-0017` in the CM-1200/CM-1201 audit trail. The sync keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation: git status/diff inspected; PR review comments inspected; current tracked diff confirmed `.agent_board/BLOCKERS.md` is included in the scope correction; `Select-String` confirmed `CMB-0017`; ledger consistency passed; `git diff --check` passed; docs validation via `scripts/validate-local.ps1 -Area docs` passed; final tracked-scope review confirmed status/board/blocker docs only.
+
+Not validated: full suite rerun, hardening rerun, `gate:mainline`, `gate:mainline:strict`, HTTP observe, provider smoke/benchmark, true memory tools, push-readiness, push.
+
+Next safe step: choose the next local-safe reliability/governance or docs-drift task. Do not use the CM-1185 review evidence to claim runtime readiness, RC readiness, write reliability, recall reliability, or push-readiness.
+
 ## CM-1183 No-Token Memory Overview HTTP Block Handoff
 
 Goal: block no-token HTTP `memory_overview` before tool execution while preserving bearer-token authorized overview.
