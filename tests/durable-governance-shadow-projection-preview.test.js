@@ -400,3 +400,66 @@ test('CM-0865 helper falls through blank camel-case projection fields to SQLite-
   assert.equal(targetRecord.scopeVerified, true);
   assert.deepEqual(summary.blockers.blockingFindings, []);
 });
+
+test('CM-1299 helper falls through blank projection visibility and scope tuple fields to snake-case aliases', () => {
+  const sqliteStyleRecords = loadProjectionRecordsFixture().map(record => ({
+    memoryId: record.memoryId,
+    status: record.status,
+    statusReason: '   ',
+    status_reason: record.statusReason,
+    projectId: '   ',
+    project_id: record.projectId,
+    workspaceId: '   ',
+    workspace_id: record.workspaceId,
+    clientId: '   ',
+    client_id: record.clientId,
+    taskId: '   ',
+    task_id: record.taskId,
+    conversationId: '   ',
+    conversation_id: record.conversationId,
+    visibility: '   ',
+    visibility_policy: record.visibility,
+    retentionPolicy: '   ',
+    retention_policy: record.retentionPolicy,
+    supersededBy: '   ',
+    superseded_by_memory_id: record.supersededBy,
+    supersedes: '   ',
+    supersedes_memory_id: record.supersedes,
+    tombstoneReason: '   ',
+    tombstone_reason: record.tombstoneReason,
+    lifecycleUpdatedAt: '   ',
+    lifecycle_updated_at: '2026-06-01T07:59:00.000Z',
+    lifecycleActorClientId: '   ',
+    lifecycle_actor_client_id: 'codex-desktop'
+  }));
+  const dryRunInput = {
+    ...buildTombstoneDryRunInput(),
+    scopeTuple: {
+      projectId: '   ',
+      project_id: 'project-cm-0863',
+      workspaceId: '   ',
+      workspace_id: 'workspace-cm-0863',
+      clientId: '   ',
+      client_id: 'codex-desktop',
+      taskId: '   ',
+      task_id: 'CM-0863',
+      conversationId: '   ',
+      conversation_id: 'thread-cm-0863',
+      visibility: '   ',
+      visibility_policy: 'private',
+      retentionPolicy: '   ',
+      retention_policy: 'retain'
+    }
+  };
+  const summary = previewDurableGovernanceShadowProjection({
+    dryRunInput,
+    currentProjectionRecords: sqliteStyleRecords,
+    previewedAt: '2026-06-01T08:30:00.000Z'
+  });
+
+  assert.equal(summary.acceptedForProjectionPreview, true);
+  const targetRecord = summary.projectionResult.affectedRecords[0];
+  assert.equal(targetRecord.scopeVerified, true);
+  assert.deepEqual(targetRecord.scopeMismatchKeys, []);
+  assert.deepEqual(summary.blockers.blockingFindings, []);
+});

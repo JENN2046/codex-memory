@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1299 Shadow Projection Scope Tuple Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test durable governance shadow projection preview fallback normalization hardening. No apply, rollback, cleanup, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Projection record visibility now normalizes first non-empty `visibility/visibility_policy`.
+- Dry-run `scopeTuple` exact scope now accepts project/workspace/client/task/conversation/visibility/retention snake_case aliases.
+- No-apply tombstone/supersede projection preview no longer rejects SQLite/object-model style inputs only because blank camel-case fields masked valid snake_case values.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\durable-governance-shadow-projection-preview.test.js tests\durable-governance-mutation-dry-run-helper.test.js tests\durable-governance-tombstone-runtime-prep-helper.test.js tests\memory-supersede-runtime-prep-helper.test.js` passed `29/29`.
+- `npm test` passed `2821/2821`.
+- Broader validation is recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1299.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1298 Lifecycle Scope Current Visibility Policy Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

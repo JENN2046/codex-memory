@@ -69,7 +69,7 @@ function normalizeProjectionRecord(record = {}) {
     clientId: firstNormalizedString(safeRecord.clientId, safeRecord.client_id),
     taskId: firstNormalizedString(safeRecord.taskId, safeRecord.task_id),
     conversationId: firstNormalizedString(safeRecord.conversationId, safeRecord.conversation_id),
-    visibility: normalizeString(safeRecord.visibility),
+    visibility: firstNormalizedString(safeRecord.visibility, safeRecord.visibility_policy),
     retentionPolicy: firstNormalizedString(safeRecord.retentionPolicy, safeRecord.retention_policy),
     supersededBy: firstNormalizedString(safeRecord.supersededBy, safeRecord.superseded_by_memory_id),
     supersedes: firstNormalizedString(safeRecord.supersedes, safeRecord.supersedes_memory_id),
@@ -82,13 +82,13 @@ function normalizeProjectionRecord(record = {}) {
 function normalizeExactScopeTuple(scopeTuple = {}) {
   const safeTuple = isPlainObject(scopeTuple) ? scopeTuple : {};
   return {
-    projectId: normalizeString(safeTuple.projectId),
-    workspaceId: normalizeString(safeTuple.workspaceId),
-    clientId: normalizeString(safeTuple.clientId),
-    taskId: normalizeString(safeTuple.taskId),
-    conversationId: normalizeString(safeTuple.conversationId),
-    visibility: normalizeString(safeTuple.visibility),
-    retentionPolicy: normalizeString(safeTuple.retentionPolicy)
+    projectId: firstNormalizedString(safeTuple.projectId, safeTuple.project_id),
+    workspaceId: firstNormalizedString(safeTuple.workspaceId, safeTuple.workspace_id),
+    clientId: firstNormalizedString(safeTuple.clientId, safeTuple.client_id),
+    taskId: firstNormalizedString(safeTuple.taskId, safeTuple.task_id),
+    conversationId: firstNormalizedString(safeTuple.conversationId, safeTuple.conversation_id),
+    visibility: firstNormalizedString(safeTuple.visibility, safeTuple.visibility_policy),
+    retentionPolicy: firstNormalizedString(safeTuple.retentionPolicy, safeTuple.retention_policy)
   };
 }
 
