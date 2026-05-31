@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1293 EXECUTION_CONTEXT_VISIBILITY_POLICY_FALLBACK_NORMALIZATION`.
+Goal: `CM-1294 RECALL_AUDIT_SCOPE_FIELD_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing execution-context visibility fallback normalization and validating app-level write-scope persistence.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall audit scope field fallback normalization and validating observe/read-policy compatibility.
 
 Workspace: `A:\codex-memory`.
 
@@ -120,6 +120,9 @@ Changed scope since CM-1207:
 - `src/core/ExecutionContextResolver.js`
 - `tests/phase-a-services.test.js`
 - `docs/CM1293_EXECUTION_CONTEXT_VISIBILITY_POLICY_FALLBACK_NORMALIZATION.md`
+- `src/recall/RecallAuditService.js`
+- `tests/recall-audit-service.test.js`
+- `docs/CM1294_RECALL_AUDIT_SCOPE_FIELD_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

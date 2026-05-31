@@ -19,6 +19,41 @@ function normalizeScopeVisibility(visibility) {
     .filter(Boolean))];
 }
 
+function normalizeString(value) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function firstDefinedValue(...values) {
+  for (const value of values) {
+    if (value !== undefined && value !== null) return value;
+  }
+  return undefined;
+}
+
+function buildNormalizedScopeAudit(scopeAudit = null) {
+  const safeAudit = scopeAudit && typeof scopeAudit === 'object' ? scopeAudit : {};
+  const scopeApplied = !!firstDefinedValue(safeAudit.scopeApplied, safeAudit.scope_applied);
+
+  return {
+    scopeApplied,
+    scopeMode: firstNormalizedString(safeAudit.scopeMode, safeAudit.scope_mode) || 'unknown',
+    scopeDimensions: normalizeScopeDimensions(firstDefinedValue(safeAudit.scopeDimensions, safeAudit.scope_dimensions)),
+    scopeStrict: !!firstDefinedValue(safeAudit.scopeStrict, safeAudit.scope_strict),
+    scopeProjectId: firstNormalizedString(safeAudit.scopeProjectId, safeAudit.scope_project_id),
+    scopeClientId: firstNormalizedString(safeAudit.scopeClientId, safeAudit.scope_client_id),
+    scopeVisibility: normalizeScopeVisibility(firstDefinedValue(safeAudit.scopeVisibility, safeAudit.scope_visibility, safeAudit.visibility)),
+    scopeWorkspacePresent: !!firstDefinedValue(safeAudit.scopeWorkspacePresent, safeAudit.scope_workspace_present)
+  };
+}
+
 function normalizeStatusArray(statuses) {
   return [...new Set((Array.isArray(statuses) ? statuses : [])
     .map(value => String(value || '').trim().toLowerCase())
@@ -54,8 +89,8 @@ class RecallAuditService {
       policyAudit = {}
     } = options;
     const safeResults = filterRecallIsolatedItems(Array.isArray(results) ? results.filter(Boolean) : []);
-    const scopeApplied = !!scopeAudit?.scopeApplied;
-    const scopeVisibility = normalizeScopeVisibility(scopeAudit?.scopeVisibility);
+    const normalizedScopeAudit = buildNormalizedScopeAudit(scopeAudit);
+    const { scopeApplied } = normalizedScopeAudit;
 
     return {
       timestamp: new Date().toISOString(),
@@ -67,13 +102,13 @@ class RecallAuditService {
       topMemoryId: safeResults[0]?.memoryId || null,
       memoryIds: [...new Set(safeResults.map(result => result.memoryId).filter(Boolean))],
       scopeApplied,
-      scopeMode: scopeApplied ? (scopeAudit?.scopeMode || 'unknown') : 'none',
-      scopeDimensions: normalizeScopeDimensions(scopeAudit?.scopeDimensions),
-      scopeStrict: !!scopeAudit?.scopeStrict,
-      scopeProjectId: scopeApplied ? (scopeAudit?.scopeProjectId || null) : null,
-      scopeClientId: scopeApplied ? (scopeAudit?.scopeClientId || null) : null,
-      scopeVisibility,
-      scopeWorkspacePresent: !!scopeAudit?.scopeWorkspacePresent,
+      scopeMode: scopeApplied ? normalizedScopeAudit.scopeMode : 'none',
+      scopeDimensions: normalizedScopeAudit.scopeDimensions,
+      scopeStrict: normalizedScopeAudit.scopeStrict,
+      scopeProjectId: scopeApplied ? (normalizedScopeAudit.scopeProjectId || null) : null,
+      scopeClientId: scopeApplied ? (normalizedScopeAudit.scopeClientId || null) : null,
+      scopeVisibility: normalizedScopeAudit.scopeVisibility,
+      scopeWorkspacePresent: normalizedScopeAudit.scopeWorkspacePresent,
       readPolicyApplied: !!policyAudit.readPolicyApplied,
       lifecyclePolicyApplied: !!policyAudit.lifecyclePolicyApplied,
       lifecycleIncludedStatuses: normalizeStatusArray(policyAudit.lifecycleIncludedStatuses),
@@ -115,8 +150,8 @@ class RecallAuditService {
     const queryAxes = Array.isArray(queryAnalysis.metrics?.dominantAxes)
       ? queryAnalysis.metrics.dominantAxes.slice(0, 4).map(axis => axis.label)
       : [];
-    const scopeApplied = !!scopeAudit?.scopeApplied;
-    const scopeVisibility = normalizeScopeVisibility(scopeAudit?.scopeVisibility);
+    const normalizedScopeAudit = buildNormalizedScopeAudit(scopeAudit);
+    const { scopeApplied } = normalizedScopeAudit;
 
     return {
       timestamp: new Date().toISOString(),
@@ -157,13 +192,13 @@ class RecallAuditService {
       contextSemanticWidth: Number.isFinite(contextState?.semanticWidth) ? contextState.semanticWidth : null,
       contextBlendWeight: Number.isFinite(contextState?.blendWeight) ? contextState.blendWeight : null,
       scopeApplied,
-      scopeMode: scopeApplied ? (scopeAudit?.scopeMode || 'unknown') : 'none',
-      scopeDimensions: normalizeScopeDimensions(scopeAudit?.scopeDimensions),
-      scopeStrict: !!scopeAudit?.scopeStrict,
-      scopeProjectId: scopeApplied ? (scopeAudit?.scopeProjectId || null) : null,
-      scopeClientId: scopeApplied ? (scopeAudit?.scopeClientId || null) : null,
-      scopeVisibility,
-      scopeWorkspacePresent: !!scopeAudit?.scopeWorkspacePresent,
+      scopeMode: scopeApplied ? normalizedScopeAudit.scopeMode : 'none',
+      scopeDimensions: normalizedScopeAudit.scopeDimensions,
+      scopeStrict: normalizedScopeAudit.scopeStrict,
+      scopeProjectId: scopeApplied ? (normalizedScopeAudit.scopeProjectId || null) : null,
+      scopeClientId: scopeApplied ? (normalizedScopeAudit.scopeClientId || null) : null,
+      scopeVisibility: normalizedScopeAudit.scopeVisibility,
+      scopeWorkspacePresent: normalizedScopeAudit.scopeWorkspacePresent,
       fromCache: !!fromCache,
       source
     };

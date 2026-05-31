@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1294 Recall Audit Scope Field Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test recall audit scope metadata fallback normalization hardening. No live recall, provider call, MCP external call, broad real-memory scan, durable audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `RecallAuditService` now normalizes scope audit metadata across camel/snake-case aliases for applied/mode/dimensions/strict/project/client/visibility/workspace-present fields.
+- Normal recall audit and read-policy recall audit both preserve the public camel-case output shape consumed by observe/dashboard surfaces.
+- Direct regressions prove snake-case scope audit inputs are accepted and raw workspace ids are not emitted.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\recall\RecallAuditService.js`
+- `node --check tests\recall-audit-service.test.js`
+- `node --test tests\recall-audit-service.test.js tests\scope-filter.test.js tests\lifecycle-read-policy-runtime.test.js tests\http-observe-cli.test.js` passed `47/47`.
+- `npm test` passed `2819/2819`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1294.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1293 Execution Context Visibility Policy Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
