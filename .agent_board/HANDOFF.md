@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1245 A5_GAP6_APPROVAL_TEMPLATE_RENDERING`.
+Goal: `CM-1246 A5_GAP6_TEMPLATE_UNIT_GUARD`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local CLI/test template rendering for A5-GAP-6 approval text.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local CLI/test template unit guard hardening for A5-GAP-6 approval text.
 
 Workspace: `A:\codex-memory`.
 
@@ -71,6 +71,13 @@ Changed scope since CM-1207:
 - `tests/a5-approval-check-cli.test.js`
 - `docs/CM1244_A5_GAP6_APPROVAL_SCOPE_NORMALIZATION.md`
 - `docs/CM1245_A5_GAP6_APPROVAL_TEMPLATE_RENDERING.md`
+- `docs/CM1246_A5_GAP6_TEMPLATE_UNIT_GUARD.md`
+
+Current CM-1246 fact:
+
+- CM-1246 hardened read-only `A5-GAP-6` template rendering so unsupported, malformed, or duplicate `--approved-units` reject fail-closed.
+- Targeted CLI validation passed `26/26`.
+- CM-1246 grants no approval and executes no approved action.
 
 Current CM-1245 fact:
 

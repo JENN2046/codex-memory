@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1245 A5-GAP-6 approval template rendering implemented and validated |
+| Current task | CM-1246 A5-GAP-6 template unit guard implemented and validated |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1245 extends the local A5 approval checker with read-only `--template` rendering for A5-GAP-6 exact approval text. It does not grant approval or execute approved commands. Source/test/docs validation passed; readiness remains false. Next safe action is to commit or otherwise stabilize CM-1245.
+CM-1246 hardens the local A5 approval checker so A5-GAP-6 `--template` rejects unsupported, malformed, or duplicate approved units. It does not grant approval or execute approved commands. Source/test/docs validation passed; readiness remains false. Next safe action is to commit or otherwise stabilize CM-1246.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

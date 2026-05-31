@@ -6,7 +6,8 @@ const {
   buildApprovalTemplate,
   buildCliReport,
   parseArgs,
-  renderText
+  renderText,
+  validateApprovedUnits
 } = require('../src/cli/a5-approval-check');
 
 const CLI_PATH = 'src/cli/a5-approval-check.js';
@@ -159,4 +160,44 @@ test('a5 approval template helper rejects unsupported template units fail-closed
 
   assert.equal(report.templateRendered, false);
   assert.equal(report.failClosedReasons.includes('unsupported_template_unit'), true);
+});
+
+test('a5 approval template rejects invalid approved units fail-closed', () => {
+  const commit = '3f655d6062d337b3c22242727e9079f0a1879026';
+  const result = runCli([
+    '--json',
+    '--template',
+    '--expected-unit', 'A5-GAP-6',
+    '--expected-branch', 'main',
+    '--expected-commit', commit,
+    '--approved-units', 'A5-GAP-1,A5-GAP-999,NOT-A-GAP'
+  ]);
+
+  assert.equal(result.status, 1);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.templateRendered, false);
+  assert.equal(report.failClosedReasons.includes('invalid_approved_units'), true);
+  assert.deepEqual(report.invalidUnits, ['A5-GAP-999', 'NOT-A-GAP']);
+  assert.equal(report.authorizationGranted, false);
+});
+
+test('a5 approval template rejects duplicate approved units fail-closed', () => {
+  const report = buildApprovalTemplate({
+    expectedUnit: 'A5-GAP-6',
+    expectedBranch: 'main',
+    expectedCommit: '3f655d6062d337b3c22242727e9079f0a1879026',
+    approvedUnits: 'A5-GAP-1,A5-GAP-2,A5-GAP-2,A5-GAP-5'
+  });
+
+  assert.equal(report.templateRendered, false);
+  assert.equal(report.failClosedReasons.includes('duplicate_approved_units'), true);
+  assert.deepEqual(report.duplicateUnits, ['A5-GAP-2']);
+});
+
+test('a5 approved-unit validator normalizes supported units', () => {
+  const result = validateApprovedUnits(['A5-GAP-1', 'A5-GAP-2', 'A5-GAP-6']);
+
+  assert.deepEqual(result.invalidUnits, []);
+  assert.deepEqual(result.duplicateUnits, []);
+  assert.equal(result.normalizedUnits, 'A5-GAP-1, A5-GAP-2, A5-GAP-6');
 });

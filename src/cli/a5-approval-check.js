@@ -74,8 +74,32 @@ function normalizeApprovedUnits(value = '') {
   return value
     .split(',')
     .map(unit => unit.trim())
-    .filter(Boolean)
-    .join(', ');
+    .filter(Boolean);
+}
+
+function validateApprovedUnits(units = []) {
+  const supportedUnits = new Set(Object.keys(A5_APPROVAL_LINE_UNITS));
+  const seen = new Set();
+  const invalidUnits = [];
+  const duplicateUnits = [];
+
+  for (const unit of units) {
+    if (!/^A5-GAP-\d+$/.test(unit) || !supportedUnits.has(unit)) {
+      invalidUnits.push(unit);
+      continue;
+    }
+    if (seen.has(unit)) {
+      duplicateUnits.push(unit);
+      continue;
+    }
+    seen.add(unit);
+  }
+
+  return {
+    invalidUnits,
+    duplicateUnits,
+    normalizedUnits: units.join(', ')
+  };
 }
 
 function buildApprovalTemplate(options = {}) {
@@ -91,17 +115,26 @@ function buildApprovalTemplate(options = {}) {
   const failClosedReasons = [];
   const branch = options.expectedBranch || '';
   const commit = options.expectedCommit || '';
-  const approvedUnits = normalizeApprovedUnits(options.approvedUnits || '');
+  const approvedUnitList = normalizeApprovedUnits(options.approvedUnits || '');
+  const {
+    invalidUnits,
+    duplicateUnits,
+    normalizedUnits: approvedUnits
+  } = validateApprovedUnits(approvedUnitList);
 
   if (!branch) failClosedReasons.push('missing_expected_branch');
   if (!commit) failClosedReasons.push('missing_expected_commit');
   if (!approvedUnits) failClosedReasons.push('missing_approved_units');
+  if (invalidUnits.length > 0) failClosedReasons.push('invalid_approved_units');
+  if (duplicateUnits.length > 0) failClosedReasons.push('duplicate_approved_units');
 
   if (failClosedReasons.length > 0) {
     return {
       status: 'approval_template_rejected_fail_closed',
       templateRendered: false,
       template: '',
+      invalidUnits,
+      duplicateUnits,
       failClosedReasons
     };
   }
@@ -115,6 +148,8 @@ function buildApprovalTemplate(options = {}) {
     status: 'approval_template_rendered',
     templateRendered: true,
     template,
+    invalidUnits: [],
+    duplicateUnits: [],
     failClosedReasons: []
   };
 }
@@ -210,6 +245,7 @@ module.exports = {
   buildApprovalTemplate,
   parseArgs,
   usage,
+  validateApprovedUnits,
   buildCliReport,
   renderText,
   run
