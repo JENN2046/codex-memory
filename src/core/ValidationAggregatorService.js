@@ -367,6 +367,8 @@ function buildP66FullImplementationGapAccounting({
   const closureStatus = totalBlockerCount > 0
     ? 'blocked_existing_blockers'
     : 'blocked_full_implementation_not_authorized';
+  const effectiveRemainingGapsCleared =
+    effectiveRemainingFullImplementationGapIds.length === 0;
 
   return {
     available: true,
@@ -395,6 +397,7 @@ function buildP66FullImplementationGapAccounting({
       validationBlockersCleared: validationBlockerIds.length === 0,
       runtimeRequiredBlockersCleared: runtimeRequiredBlockerIds.length === 0,
       a5GatedBlockersCleared: a5GatedBlockerIds.length === 0,
+      effectiveRemainingGapsCleared,
       allBlockersCleared: totalBlockerCount === 0,
       readinessClaimAllowed: false
     },
@@ -404,6 +407,7 @@ function buildP66FullImplementationGapAccounting({
       ...(validationBlockerIds.length > 0 ? ['validation_blockers_cleared'] : []),
       ...(runtimeRequiredBlockerIds.length > 0 ? ['runtime_required_blockers_cleared'] : []),
       ...(a5GatedBlockerIds.length > 0 ? ['a5_gated_blockers_cleared'] : []),
+      ...(!effectiveRemainingGapsCleared ? ['effective_remaining_gaps_cleared'] : []),
       'readiness_authority'
     ],
     acceptedRuntimeSummaryBound,

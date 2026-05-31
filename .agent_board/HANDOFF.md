@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1230 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_ACCOUNTING`.
+Goal: `CM-1231 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_CRITERION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after adding accepted-summary effective gap accounting to the ValidationAggregator full implementation report shape.
+Status: `COMPLETED_VALIDATED_NOT_READY` after adding effective remaining-gap clearance to the ValidationAggregator full implementation closure criteria.
 
 Workspace: `A:\codex-memory`.
 
@@ -48,6 +48,7 @@ Changed scope since CM-1207:
 - `docs/CM1228_A5_GAP3_MIGRATION_READINESS_DRY_RUN_EVIDENCE.md`
 - `docs/CM1229_A5_GAP6_POST_GAP3_DRY_RUN_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1230_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_ACCOUNTING.md`
+- `docs/CM1231_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_CRITERION.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -120,9 +121,11 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1230 adds effective gap accounting to the ValidationAggregator full implementation report shape.
 - CM-1230 preserves static baseline gaps while exposing accepted-summary effective gap ids/counts when an explicit sanitized runtime summary is accepted.
 - CM-1230 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- CM-1231 adds `effectiveRemainingGapsCleared` to closure criteria and `effective_remaining_gaps_cleared` to missing criteria while effective remaining gaps remain.
+- CM-1231 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1230:
+Validation for CM-1231:
 
 - `node --check src\core\ValidationAggregatorService.js`
 - `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js`
@@ -152,7 +155,7 @@ Boundary:
 - No durable memory/audit write.
 - No apply/import/export/backup/restore.
 - No ValidationAggregator execution by CM-1229.
-- No A5-GAP-6 execution by CM-1230.
+- No A5-GAP-6 execution by CM-1230/CM-1231.
 - No public MCP expansion.
 - No push, PR, tag, release, deploy, provider/API call, real memory call, or readiness claim.
 
@@ -169,4 +172,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1230, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating approved units including `A5-GAP-3`: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.` Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1231, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating approved units including `A5-GAP-3`: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.` Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

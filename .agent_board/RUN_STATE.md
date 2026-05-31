@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1230 ValidationAggregator effective gap accounting implemented locally; A5-GAP-6 execution still awaits exact fresh-HEAD approval |
+| Current task | CM-1231 ValidationAggregator effective gap closure criterion implemented locally; A5-GAP-6 execution still awaits exact fresh-HEAD approval |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1230 adds effective gap accounting to the ValidationAggregator full implementation report shape. The report now keeps static baseline gaps while exposing accepted-summary effective gaps when an explicit sanitized runtime summary is accepted. It does not execute A5-GAP-6, read evidence files/stores, call providers, write durable state, or change readiness booleans. Next safe action is to commit or otherwise stabilize CM-1230, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregation, or continue the next local ValidationAggregator implementation slice.
+CM-1231 adds `effectiveRemainingGapsCleared` to the ValidationAggregator full implementation closure criteria. The report now fails closed when the effective remaining gap list is non-empty, even if sanitized runtime evidence is accepted. It does not execute A5-GAP-6, read evidence files/stores, call providers, write durable state, or change readiness booleans. Next safe action is to commit or otherwise stabilize CM-1231, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregation, or continue the next local ValidationAggregator implementation slice.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

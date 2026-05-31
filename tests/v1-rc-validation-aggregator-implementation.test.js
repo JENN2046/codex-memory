@@ -765,8 +765,18 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     false
   );
   assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveRemainingGapsCleared,
+    false
+  );
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
       'accepted_runtime_summary'
+    ),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
+      'effective_remaining_gaps_cleared'
     ),
     true
   );
@@ -2575,10 +2585,20 @@ test('validation evidence reader exposes only explicit committed and local valid
     false
   );
   assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveRemainingGapsCleared,
+    false
+  );
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
       'usable_validation_evidence'
     ),
     false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
+      'effective_remaining_gaps_cleared'
+    ),
+    true
   );
   assert.equal(reader.status, 'explicit_evidence_available');
   assert.equal(reader.sourceMode, 'explicit_safe_inputs_only');
