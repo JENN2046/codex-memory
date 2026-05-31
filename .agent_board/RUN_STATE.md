@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1211 A5-GAP-4 authenticated MCP tool-list evidence completed; await commit |
-| Current area | P4-http-runtime / P6-docs-drift |
+| Current task | CM-1212 A5-GAP-6 aggregation refresh preflight prepared; execution awaits exact fresh-HEAD approval |
+| Current area | P0-mainline-health / P10-observability-admin / P6-docs-drift |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1211 executed the approved authenticated MCP initialize/tools-list evidence at `main@1a7d198f1f4758f0de3caf9b839cc59aa1b9802e`. It used an already-present current-session bearer token without printing or persisting token material. MCP `initialize` returned server `vcp_codex_memory` version `0.1.0`; `tools/list` returned exactly `record_memory`, `search_memory`, and `memory_overview`. No `tools/call`, config/watchdog/startup change, provider call, real-memory scan, durable write, public MCP expansion, remote write, or readiness claim. Next safe action is to validate and commit CM-1211 evidence.
+CM-1212 prepared the exact A5-GAP-6 aggregation refresh boundary. The selected default evidence units are `A5-GAP-4,A5-GAP-5`, using CM-1208 strict-gate evidence plus CM-1210/CM-1211 HTTP/MCP evidence. Historical `A5-GAP-1/2/3` artifacts remain background only unless a future exact approval explicitly names them. No ValidationAggregator execution, file/store scan, MCP `tools/call`, provider call, real-memory scan, durable write, public MCP expansion, remote write, or readiness claim occurred. Next safe action is to commit or otherwise stabilize CM-1212, then use fresh `HEAD` for exact A5-GAP-6 approval before execution.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

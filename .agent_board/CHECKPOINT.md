@@ -1,5 +1,37 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1212 A5-GAP-6 Aggregation Refresh Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: prepare exact A5-GAP-6 evidence aggregation refresh boundary only. No ValidationAggregator execution.
+
+Result:
+
+- Fresh preflight observed branch `main`, `HEAD=7d9db9a2296b1c5b9199d2f3164eabe18c22d74f`, and local state `main...origin/main [ahead 5]` before CM-1212 edits.
+- Selected default future aggregation units: `A5-GAP-4,A5-GAP-5`.
+- Current consumable evidence map is CM-1208 strict gate, CM-1210 endpoint-bound HTTP observe/health, and CM-1211 authenticated MCP initialize/tools-list.
+- Historical `A5-GAP-1/2/3` artifacts remain background only unless a future exact approval line explicitly names them.
+
+Boundary:
+
+- No ValidationAggregator execution.
+- No file/store scan.
+- No MCP `tools/call`.
+- No provider call.
+- No real memory scan.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1212.
+- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-4,A5-GAP-5.`
+
 ## CM-1211 A5-GAP-4 Authenticated MCP Tool List Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

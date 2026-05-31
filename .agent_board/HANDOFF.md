@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1211 A5-GAP-4_AUTHENTICATED_MCP_TOOL_LIST_EVIDENCE`.
+Goal: `CM-1212 A5-GAP-6_AGGREGATION_REFRESH_PREFLIGHT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after authenticated MCP initialize/tools-list evidence.
+Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the aggregation refresh approval boundary.
 
 Workspace: `A:\codex-memory`.
 
@@ -50,16 +50,18 @@ Current Git fact and A5 rule after CM-1208:
 - User separately approved authenticated MCP initialize/tools-list for `main@1a7d198f1f4758f0de3caf9b839cc59aa1b9802e`, using current-session bearer token if already present, without printing or persisting token material, no config/watchdog/startup change, no `tools/call`.
 - Authenticated MCP `initialize` returned server `vcp_codex_memory`, version `0.1.0`, protocol version `2025-06-18`.
 - Authenticated MCP `tools/list` returned exactly `record_memory`, `search_memory`, and `memory_overview`.
+- CM-1212 prepared the next A5-GAP-6 aggregation refresh boundary only.
+- Selected default future aggregation units are `A5-GAP-4,A5-GAP-5`.
+- Historical `A5-GAP-1/2/3` artifacts are background only unless a future exact approval line explicitly names them.
+- A future A5-GAP-6 execution must bind to fresh `HEAD` after CM-1212 is committed or otherwise stabilized.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1211:
+Validation for CM-1212:
 
 - `git diff --check`
-- `/health` passed
-- `observe:http --json --tail 1 --audit-tail 1` passed
-- unauthenticated MCP `initialize` / `tools/list` failed closed with Unauthorized
-- authenticated MCP `initialize` passed
-- authenticated MCP `tools/list` passed with exactly 3 public tools
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+- changed-scope review
 
 Not validated:
 
@@ -70,6 +72,7 @@ Not validated:
 - true `record_memory`
 - true `search_memory`
 - true `memory_overview`
+- ValidationAggregator A5-GAP-6 execution
 - runtime gap closure
 - personal RC dogfood
 
@@ -95,4 +98,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit CM-1211 evidence, then consider exact-approved A5-GAP-6 evidence aggregation refresh. Do not run `tools/call`, `start:http:ensure`, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1212 preflight, then use fresh `HEAD` for exact A5-GAP-6 approval: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-4,A5-GAP-5.` Do not run ValidationAggregator, `tools/call`, `start:http:ensure`, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
