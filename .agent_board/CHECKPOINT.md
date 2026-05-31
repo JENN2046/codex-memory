@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1274 Write Scope Context Precedence Regression Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local test-only write-scope precedence regression. No runtime source behavior change, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `tests/memory-write-preflight-runtime-integration.test.js` now proves trusted `requestContext.executionContext` scope wins over conflicting public payload scope during write persistence.
+- The regression asserts persisted shadow record scope, diary write client id, and audit decision remain bound to runtime scope.
+- Public payload `project_id`, `workspace_id`, `client_id`, `task_id`, `conversation_id`, `visibility`, and `retention_policy` cannot override trusted context in this path.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check tests\memory-write-preflight-runtime-integration.test.js`
+- `node --test tests\memory-write-preflight-runtime-integration.test.js tests\phase-a-services.test.js tests\policy-read-preflight.test.js` passed `26/26`.
+- `npm test` passed `2794/2794`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1274.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1273 Policy Preflight Fixture Baseline Ownerless Private Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

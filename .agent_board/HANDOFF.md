@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1273 POLICY_PREFLIGHT_FIXTURE_BASELINE_OWNERLESS_PRIVATE`.
+Goal: `CM-1274 WRITE_SCOPE_CONTEXT_PRECEDENCE_REGRESSION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after aligning policy-read preflight fixture baseline with CM-1272 ownerless-private `gate:ci` evidence.
+Status: `COMPLETED_VALIDATED_NOT_READY` after adding a test-only regression for execution-context-first write scope persistence.
 
 Workspace: `A:\codex-memory`.
 
@@ -47,6 +47,7 @@ Changed scope since CM-1207:
 - `tests/gate-ci-cli.test.js`
 - `docs/CM1272_GATE_CI_POLICY_PREFLIGHT_OWNERLESS_PRIVATE.md`
 - `docs/CM1273_POLICY_PREFLIGHT_FIXTURE_BASELINE_OWNERLESS_PRIVATE.md`
+- `docs/CM1274_WRITE_SCOPE_CONTEXT_PRECEDENCE_REGRESSION.md`
 - `docs/CM1264_SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING.md`
 - `tests/memory-lifecycle-scope-runtime-integration.test.js`
 - `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`

@@ -209,6 +209,34 @@ test('CM-0838 derives allowed scope from runtime context and rejects payload sco
   assert.equal(events.auditWrites.length, 1);
 });
 
+test('write runtime persists execution-context scope before conflicting payload scope', async () => {
+  const { service, events } = createHarness({
+    writePreflightEnabled: false
+  });
+
+  const result = await service.record(validProcessPayload({
+    project_id: 'payload-project',
+    workspace_id: 'payload-workspace',
+    client_id: 'claude',
+    task_id: 'CM-PAYLOAD',
+    conversation_id: 'payload-conversation',
+    visibility: 'private',
+    retention_policy: 'payload-retention'
+  }));
+
+  assert.equal(result.decision, 'accepted');
+  assert.equal(events.shadowUpserts.length, 1);
+  assert.equal(events.shadowUpserts[0].projectId, runtimeScope.projectId);
+  assert.equal(events.shadowUpserts[0].workspaceId, runtimeScope.workspaceId);
+  assert.equal(events.shadowUpserts[0].clientId, runtimeScope.clientId);
+  assert.equal(events.shadowUpserts[0].taskId, runtimeScope.taskId);
+  assert.equal(events.shadowUpserts[0].conversationId, runtimeScope.conversationId);
+  assert.equal(events.shadowUpserts[0].visibility, runtimeScope.visibility);
+  assert.equal(events.shadowUpserts[0].retentionPolicy, runtimeScope.retentionPolicy);
+  assert.equal(events.diaryWrites[0].clientId, runtimeScope.clientId);
+  assert.equal(events.auditWrites[0].decision, 'accepted');
+});
+
 test('CM-0838 fails closed when bounded candidate provider throws', async () => {
   const { service, events } = createHarness({
     writePreflightEnabled: true,
