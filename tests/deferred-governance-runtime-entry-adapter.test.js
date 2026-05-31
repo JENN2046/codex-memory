@@ -274,6 +274,22 @@ test('CM-0925 adapter normalizes aliases and redacts sensitive scope output', ()
   assert.equal(text.includes('workspace-cm-0925-raw'), false);
 });
 
+test('CM-0925 adapter falls through empty target id arrays to later target aliases', () => {
+  const payload = normalizeEntryPayload({
+    targetMemoryIds: [],
+    target_memory_ids: ['   '],
+    memory_ids: ['memory-from-snake-array', 'memory-from-snake-array'],
+    memoryIds: ['memory-from-camel-array'],
+    memory_id: 'memory-from-scalar',
+    approval_id: 'approval-cm-0925',
+    reason: 'bounded reason',
+    evidence_summary: 'bounded evidence',
+    audit_correlation_id: 'correlation-cm-0925'
+  }, approvedContext('memory_exclude'), 'memory_exclude');
+
+  assert.deepEqual(payload.targetMemoryIds, ['memory-from-snake-array']);
+});
+
 test('CM-0925 adapter keeps public MCP frozen and does not perform filesystem reads', () => {
   const adapter = new DeferredGovernanceRuntimeEntryAdapter({
     memoryExcludeEnabled: true

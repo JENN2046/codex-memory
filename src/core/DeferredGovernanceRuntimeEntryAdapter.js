@@ -43,6 +43,14 @@ function normalizeStringArray(values) {
   return singleValue ? [singleValue] : [];
 }
 
+function firstStringArrayValue(...values) {
+  for (const value of values) {
+    const normalized = normalizeStringArray(value);
+    if (normalized.length > 0) return normalized;
+  }
+  return [];
+}
+
 function firstStringValue(source, keys = []) {
   for (const key of keys) {
     const value = normalizeString(source[key]);
@@ -141,13 +149,13 @@ function normalizeEntryPayload(args = {}, requestContext = {}, family, sharedGat
     }).payload;
 
   return {
-    targetMemoryIds: normalizeStringArray(
-      safeArgs.targetMemoryIds
-      || safeArgs.target_memory_ids
-      || safeArgs.memory_ids
-      || safeArgs.memoryIds
-      || safeArgs.memory_id
-      || safeArgs.memoryId
+    targetMemoryIds: firstStringArrayValue(
+      safeArgs.targetMemoryIds,
+      safeArgs.target_memory_ids,
+      safeArgs.memory_ids,
+      safeArgs.memoryIds,
+      safeArgs.memory_id,
+      safeArgs.memoryId
     ),
     scopeTuple: normalizeScopeTuple(safeArgs, executionContext),
     actorClientId: normalizeString(gatePayload.actor_client_id) ||

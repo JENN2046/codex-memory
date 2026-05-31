@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1302 LIFECYCLE_GOVERNANCE_ALIAS_FALLBACK`.
+Goal: `CM-1303 DEFERRED_GOVERNANCE_TARGET_IDS_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing lifecycle governance / write lifecycle preflight alias fallback. Commit is still pending until the final diff review.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing deferred governance runtime-entry target id alias fallback. Targeted deferred-governance tests passed `28/28`; default `npm test` passed `2825/2825`. Commit is still pending until final diff/docs validation closeout.
 
 Workspace: `A:\codex-memory`.
 
@@ -60,6 +60,9 @@ Changed scope since CM-1207:
 - `docs/CM1300_PROOF_MEMORY_POLICY_ALIAS_FALLBACK.md`
 - `docs/CM1301_SELECTED_AUDIT_CORRELATION_PREFLIGHT_ALIAS_FALLBACK.md`
 - `docs/CM1302_LIFECYCLE_GOVERNANCE_ALIAS_FALLBACK.md`
+- `docs/CM1303_DEFERRED_GOVERNANCE_TARGET_IDS_ALIAS_FALLBACK.md`
+- `src/core/DeferredGovernanceRuntimeEntryAdapter.js`
+- `tests/deferred-governance-runtime-entry-adapter.test.js`
 - `src/core/SelectedAuditCorrelationObservationPreflight.js`
 - `tests/selected-audit-correlation-observation-preflight.test.js`
 - `src/core/MemoryWriteLifecycleDedupSuppressionPreflight.js`

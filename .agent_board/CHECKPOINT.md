@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1303 Deferred Governance Target IDs Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test deferred governance runtime-entry target id fallback normalization hardening. No runtime apply, durable projection/audit write, true audit/memory read, provider call, MCP external call, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `normalizeEntryPayload(...)` now uses first non-empty normalized target id arrays across `targetMemoryIds`, `target_memory_ids`, `memory_ids`, `memoryIds`, `memory_id`, and `memoryId`.
+- Empty arrays no longer mask later non-empty aliases.
+- `memory_exclude` / `memory_forget` internal runtime-entry candidates keep target ids when mixed object-model/CLI-style aliases are supplied.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\deferred-governance-runtime-entry-adapter.test.js tests\deferred-governance-mutation-planning-service.test.js tests\durable-governance-mutation-dry-run-helper.test.js` passed `28/28`.
+- `npm test` passed `2825/2825`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1303 closeout.
+
+Next:
+
+- Commit or otherwise stabilize CM-1303.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1302 Lifecycle Governance Alias Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
