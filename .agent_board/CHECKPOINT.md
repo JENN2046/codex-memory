@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1297 Recall Isolation Visibility Policy Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test recall isolation scope fallback normalization hardening. No live recall, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `RecallIsolationClassifier.matchesOutOfScope(...)` now checks visibility with first non-empty normalized `visibility/visibility_policy`.
+- Exact-scope isolation no longer misclassifies records that only carry SQLite/object-model style `visibility_policy`.
+- Regression coverage now binds visibility fallback with existing project/workspace/client snake_case fallback behavior.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\recall-isolation-classification-runtime.test.js tests\policy-read-preflight.test.js tests\lifecycle-read-policy-runtime.test.js tests\memory-lifecycle-scope-governance-contract.test.js` passed `54/54`.
+- `npm test` passed `2819/2819`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1297.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1296 Audit Summary Alias Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

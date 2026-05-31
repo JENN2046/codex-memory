@@ -135,7 +135,7 @@ function matchesOutOfScope(subject = {}, options = {}) {
   }
   if (
     expectedVisibility.length > 0 &&
-    !expectedVisibility.includes(normalizeString(subject.visibility))
+    !expectedVisibility.includes(firstNormalizedString(subject.visibility, subject.visibility_policy))
   ) {
     return true;
   }

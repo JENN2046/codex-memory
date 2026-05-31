@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1296 AUDIT_SUMMARY_ALIAS_NORMALIZATION`.
+Goal: `CM-1297 RECALL_ISOLATION_VISIBILITY_POLICY_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after extending recall audit alias normalization into overview/observe/dashboard/governance summary consumers.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall isolation visibility fallback for `visibility/visibility_policy`.
 
 Workspace: `A:\codex-memory`.
 
@@ -132,6 +132,9 @@ Changed scope since CM-1207:
 - `tests/http-observe-cli.test.js`
 - `tests/governance-report-cli.test.js`
 - `docs/CM1296_AUDIT_SUMMARY_ALIAS_NORMALIZATION.md`
+- `src/core/RecallIsolationClassifier.js`
+- `tests/recall-isolation-classification-runtime.test.js`
+- `docs/CM1297_RECALL_ISOLATION_VISIBILITY_POLICY_FALLBACK.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

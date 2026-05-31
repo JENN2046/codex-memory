@@ -68,11 +68,14 @@ test('recall isolation classifier uses snake_case scope and lifecycle fallbacks 
     workspaceId: '',
     workspace_id: 'workspace-main',
     clientId: null,
-    client_id: 'codex'
+    client_id: 'codex',
+    visibility: ' ',
+    visibility_policy: 'project'
   }), {
     expectedProjectId: 'codex-memory',
     expectedWorkspaceId: 'workspace-main',
-    expectedClientId: 'codex'
+    expectedClientId: 'codex',
+    expectedVisibility: ['project']
   });
   assert.equal(scoped.isolated, false);
   assert.equal(scoped.families.includes('out_of_scope_memory'), false);
