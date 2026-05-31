@@ -11,7 +11,7 @@ P2 badge correction:
 - Current local/GitHub PR #6 facts before this local fix are `HEAD == origin/hardening/p0-p2-security-rc-base == PR #6 head == 1f26d1907c6f865645e92129e05b8d6d1f48498f`, with CI `Node.js tests` passed. Local `git show`, GitHub commits API, and `git ls-remote` cannot resolve `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`. Later operators must treat `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` as review feedback evidence and keep it separate from current Git/PR head before push-readiness or CI decisions.
 
 P3 blocker-scope correction:
-- CM-1201 addresses review feedback on pushed commit `557d17daa0332413f5e347eccd6446b51971b63d`: `557d17d` did not modify `.agent_board/BLOCKERS.md`, but `CMB-0017` is a CM-1185 blocker surface from the original status sync and now appears explicitly in handoff, task, ledger, and validation scope.
+- CM-1201 addresses PR review feedback without binding to a pushed-head or synthetic review-checkout commit hash: `.agent_board/BLOCKERS.md` / `CMB-0017` is a CM-1185 blocker surface from the original status sync and now appears explicitly in handoff, task, ledger, and validation scope.
 - Future operators must include `.agent_board/BLOCKERS.md` when reviewing or rolling back CM-1185/CM-1200 status-surface work, while still treating `CMB-0017` as `open-status-synced` and preserving `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
 Completed:
@@ -27,7 +27,7 @@ Completed:
 Validation:
 - `git status --short --branch` inspected.
 - `git diff --stat` inspected.
-- `git show --name-only 557d17d` and `git diff 557d17d^ 557d17d -- .agent_board/BLOCKERS.md` inspected for the P3 blocker-scope review.
+- PR review comments and the current tracked diff were inspected for the P3 blocker-scope review.
 - `Select-String` confirmed `CMB-0017` is present in `.agent_board/BLOCKERS.md`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
