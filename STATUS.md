@@ -45,7 +45,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1224 VALIDATION_AGGREGATOR_RUNTIME_SUMMARY_GAP_BINDING` 已把 accepted explicit sanitized runtime summary 绑定到 CM-1223 的 full gap accounting 输出：当 summary 被接受时，report 会输出该摘要内的 remaining / locally evidenced gap ids/counts；summary 缺失或被拒绝时不绑定。Targeted validation `node --check src\core\ValidationAggregatorService.js` 与 `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `21/21`。该变更不执行 runtime collector，不读取 evidence 文件或 stores，不消费新 A5 evidence，不改变 readiness。
 
-当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-3 approval 后才可执行 migration readiness dry-run，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1225 VALIDATION_AGGREGATOR_VALIDATION_EVIDENCE_GAP_BINDING` 已把 explicit validation evidence reader 的 freshness / gate readiness / command coverage / confidence posture 绑定到 full gap accounting 输出。Targeted validation `node --check src\core\ValidationAggregatorService.js` 与 `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `21/21`。该变更不读取 evidence 文件，不执行 validation commands 或 runtime collector，不改变 readiness。
+
+当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-3 approval 后才可执行 migration readiness dry-run，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 

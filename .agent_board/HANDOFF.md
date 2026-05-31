@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1224 VALIDATION_AGGREGATOR_RUNTIME_SUMMARY_GAP_BINDING`.
+Goal: `CM-1225 VALIDATION_AGGREGATOR_VALIDATION_EVIDENCE_GAP_BINDING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after binding accepted sanitized runtime summaries into the ValidationAggregator full gap accounting report shape.
+Status: `COMPLETED_VALIDATED_NOT_READY` after binding validation evidence freshness/gate posture into the ValidationAggregator full gap accounting report shape.
 
 Workspace: `A:\codex-memory`.
 
@@ -42,6 +42,7 @@ Changed scope since CM-1207:
 - `tests/v1-rc-validation-aggregator-implementation.test.js`
 - `docs/CM1223_VALIDATION_AGGREGATOR_FULL_GAP_ACCOUNTING.md`
 - `docs/CM1224_VALIDATION_AGGREGATOR_RUNTIME_SUMMARY_GAP_BINDING.md`
+- `docs/CM1225_VALIDATION_AGGREGATOR_VALIDATION_EVIDENCE_GAP_BINDING.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -97,9 +98,12 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1224 binds accepted explicit sanitized runtime summaries into that accounting output, exposing summary remaining/local gap ids/counts.
 - Rejected or absent summaries bind nothing.
 - CM-1224 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- CM-1225 binds explicit validation evidence freshness, gate readiness, command coverage, and confidence posture into that accounting output.
+- CM-1225 reads no evidence files and executes no validation commands; it reflects already supplied explicit inputs only.
+- CM-1225 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1224:
+Validation for CM-1225:
 
 - `node --check src\core\ValidationAggregatorService.js`
 - `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js`

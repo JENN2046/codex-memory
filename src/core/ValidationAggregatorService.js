@@ -325,7 +325,13 @@ const P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES = [
   'a5_approval_missing'
 ];
 
-function buildP66FullImplementationGapAccounting(runtimeEvidenceSummaryBridge = null) {
+function buildP66FullImplementationGapAccounting({
+  runtimeEvidenceSummaryBridge = null,
+  validationEvidenceFreshness = null,
+  validationEvidenceGateReadiness = null,
+  validationEvidenceCommandCoverage = null,
+  validationEvidenceConfidencePosture = null
+} = {}) {
   const acceptedRuntimeSummary = runtimeEvidenceSummaryBridge &&
     runtimeEvidenceSummaryBridge.accepted === true
     ? runtimeEvidenceSummaryBridge
@@ -355,6 +361,22 @@ function buildP66FullImplementationGapAccounting(runtimeEvidenceSummaryBridge = 
     acceptedRuntimeSummaryLocallyEvidencedGapIds,
     acceptedRuntimeSummaryLocallyEvidencedGapCount:
       acceptedRuntimeSummaryLocallyEvidencedGapIds.length,
+    validationEvidenceFreshnessBound: Boolean(validationEvidenceFreshness),
+    validationEvidenceFreshnessStatus: validationEvidenceFreshness
+      ? validationEvidenceFreshness.status
+      : 'no_validation_evidence_freshness',
+    validationEvidenceGateReadinessStatus: validationEvidenceGateReadiness
+      ? validationEvidenceGateReadiness.status
+      : 'no_validation_evidence_gate_readiness',
+    validationEvidenceExplicitEvidenceUsable: validationEvidenceGateReadiness
+      ? validationEvidenceGateReadiness.explicitEvidenceUsable === true
+      : false,
+    validationEvidenceCommandCoverageStatus: validationEvidenceCommandCoverage
+      ? validationEvidenceCommandCoverage.status
+      : 'no_validation_evidence_command_coverage',
+    validationEvidenceConfidencePostureStatus: validationEvidenceConfidencePosture
+      ? validationEvidenceConfidencePosture.status
+      : 'no_validation_evidence_confidence_posture',
     blockedA5HardStopIds: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS,
     blockedA5HardStopCount: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS.length,
     nextSafeClosureCandidates: P66_FULL_IMPLEMENTATION_NEXT_SAFE_CLOSURE_CANDIDATES,
@@ -1887,8 +1909,6 @@ function buildV1RcValidationAggregatorReport({
   );
   const v11HardeningValidationAggregator =
     evaluateV11HardeningValidationAggregator(v11HardeningEvidence || {});
-  const p66FullImplementationGapAccounting =
-    buildP66FullImplementationGapAccounting(runtimeEvidenceSummaryBridge);
   const validationEvidenceFreshness = summarizeValidationEvidenceFreshness({
     acceptedSources: validationEvidenceReader.acceptedSources,
     generatedAt
@@ -1948,6 +1968,14 @@ function buildV1RcValidationAggregatorReport({
     validationEvidenceCommandCoverage,
     validationEvidenceRejectionSummary
   });
+  const p66FullImplementationGapAccounting =
+    buildP66FullImplementationGapAccounting({
+      runtimeEvidenceSummaryBridge,
+      validationEvidenceFreshness,
+      validationEvidenceGateReadiness,
+      validationEvidenceCommandCoverage,
+      validationEvidenceConfidencePosture
+    });
 
   return {
     schemaVersion: 'v1-rc-validation-aggregator-v1',
@@ -2168,6 +2196,12 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.acceptedRuntimeSummaryRemainingGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryLocallyEvidencedGapCount:
         p66FullImplementationGapAccounting.acceptedRuntimeSummaryLocallyEvidencedGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingValidationFreshnessStatus:
+        p66FullImplementationGapAccounting.validationEvidenceFreshnessStatus,
+      p66ValidationAggregatorFullImplementationGapAccountingValidationGateReadinessStatus:
+        p66FullImplementationGapAccounting.validationEvidenceGateReadinessStatus,
+      p66ValidationAggregatorFullImplementationGapAccountingValidationEvidenceUsable:
+        p66FullImplementationGapAccounting.validationEvidenceExplicitEvidenceUsable,
       p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady: false,
       p66ValidationAggregatorFullImplementationFixtureReadByAggregator: false,
       p66ValidationAggregatorFullImplementationTestExecutedByAggregator: false,
@@ -3151,6 +3185,18 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.acceptedRuntimeSummaryLocallyEvidencedGapIds,
         acceptedRuntimeSummaryLocallyEvidencedGapCount:
           p66FullImplementationGapAccounting.acceptedRuntimeSummaryLocallyEvidencedGapCount,
+        validationEvidenceFreshnessBound:
+          p66FullImplementationGapAccounting.validationEvidenceFreshnessBound,
+        validationEvidenceFreshnessStatus:
+          p66FullImplementationGapAccounting.validationEvidenceFreshnessStatus,
+        validationEvidenceGateReadinessStatus:
+          p66FullImplementationGapAccounting.validationEvidenceGateReadinessStatus,
+        validationEvidenceExplicitEvidenceUsable:
+          p66FullImplementationGapAccounting.validationEvidenceExplicitEvidenceUsable,
+        validationEvidenceCommandCoverageStatus:
+          p66FullImplementationGapAccounting.validationEvidenceCommandCoverageStatus,
+        validationEvidenceConfidencePostureStatus:
+          p66FullImplementationGapAccounting.validationEvidenceConfidencePostureStatus,
         fixtureReadByAggregator: false,
         testExecutedByAggregator: false,
         helperExecutedByAggregator: false,

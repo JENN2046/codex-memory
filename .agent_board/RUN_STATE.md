@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1224 ValidationAggregator runtime-summary gap binding implemented locally; A5-GAP-3 dry-run still awaits exact fresh-HEAD approval |
+| Current task | CM-1225 ValidationAggregator validation-evidence gap binding implemented locally; A5-GAP-3 dry-run still awaits exact fresh-HEAD approval |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1224 extends the ValidationAggregator full implementation gap accounting so accepted explicit sanitized runtime summaries are reflected as bound remaining/local gap ids and counts. It does not execute runtime collectors, scan evidence files or stores, consume A5-GAP-3, or change readiness booleans. Next safe action is to commit or otherwise stabilize CM-1224, then use fresh `HEAD` for exact A5-GAP-3 approval before execution, or continue the next local ValidationAggregator implementation slice.
+CM-1225 extends the ValidationAggregator full implementation gap accounting so explicit validation evidence freshness/gate/coverage/confidence posture is reflected beside accepted runtime-summary gap facts. It does not read evidence files, execute commands, run runtime collectors, consume A5-GAP-3, or change readiness booleans. Next safe action is to commit or otherwise stabilize CM-1225, then use fresh `HEAD` for exact A5-GAP-3 approval before execution, or continue the next local ValidationAggregator implementation slice.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

@@ -228,6 +228,15 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryLocallyEvidencedGapCount,
     0
   );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingValidationFreshnessStatus,
+    'no_explicit_evidence'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingValidationGateReadinessStatus,
+    'not_ready_no_explicit_evidence'
+  );
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingValidationEvidenceUsable, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationFixtureReadByAggregator, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationTestExecutedByAggregator, false);
@@ -686,6 +695,18 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.deepEqual(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryRemainingGapIds,
     []
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationEvidenceFreshnessBound,
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationEvidenceFreshnessStatus,
+    'no_explicit_evidence'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationEvidenceExplicitEvidenceUsable,
+    false
   );
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.fixtureReadByAggregator, false);
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.testExecutedByAggregator, false);
@@ -2406,6 +2427,35 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.equal(report.summary.validationEvidenceRejectedCount, 0);
   assert.equal(report.summary.validationEvidenceConfidencePostureStatus, 'usable_but_blocked');
   assert.equal(report.summary.validationEvidenceConfidenceCanClaimV1RcReady, false);
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingValidationFreshnessStatus,
+    'fresh_passed'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingValidationGateReadinessStatus,
+    'not_ready_existing_blockers'
+  );
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingValidationEvidenceUsable, true);
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationEvidenceFreshnessStatus,
+    'fresh_passed'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationEvidenceGateReadinessStatus,
+    'not_ready_existing_blockers'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationEvidenceCommandCoverageStatus,
+    'command_coverage_present'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationEvidenceConfidencePostureStatus,
+    'usable_but_blocked'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.fullImplementationGapAccounting.fullImplementationReady,
+    false
+  );
   assert.equal(reader.status, 'explicit_evidence_available');
   assert.equal(reader.sourceMode, 'explicit_safe_inputs_only');
   assert.deepEqual(reader.contract.sourceTypes, VALIDATION_EVIDENCE_SOURCE_TYPES);
