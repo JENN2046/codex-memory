@@ -7,14 +7,14 @@ Status: `CM1185_PROJECT_STATUS_REVIEW_SYNC_COMPLETED_VALIDATED_NOT_READY`
 Date: 2026-05-31
 
 P2 badge correction:
-- User-provided fresh review evidence says the reviewed CM-1185 status-sync commit is `9eb258d8e83504646dba1175c44fc54c20ee9799`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`; `d79c1ff6b2067e9c7062bae84bad2c14eb168310` must not be used as the reviewed-context sync commit.
-- Current local/GitHub PR #6 facts after fetch are `HEAD == origin/hardening/p0-p2-security-rc-base == 7cdcc0e40da5c6439654660690634c3f5e3dbf99`, and `9eb258d8e83504646dba1175c44fc54c20ee9799` is not present in this checkout or fetchable from `origin`; later operators must rebind the current Git/PR head before push-readiness or CI decisions.
+- CM-1193 supersedes CM-1192's reviewed-object/current-head binding. User-provided fresh review evidence says the reviewed CM-1185 status-sync commit is `1f4705352f8b8d574ddcce44c52cd2c3458a14af`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`; CM-1192's `9eb258d8e83504646dba1175c44fc54c20ee9799` must not be used as the reviewed-context sync commit.
+- Current local/GitHub PR #6 facts after fetch are `HEAD == origin/hardening/p0-p2-security-rc-base == PR #6 head == c2ac50ce3e9ee31a57f613130c940705e59e7833`; CM-1192's `7cdcc0e40da5c6439654660690634c3f5e3dbf99` current-head fact is stale. `1f4705352f8b8d574ddcce44c52cd2c3458a14af` and `9eb258d8e83504646dba1175c44fc54c20ee9799` are not present in this local checkout; later operators must rebind the current Git/PR head before push-readiness or CI decisions.
 
 Completed:
 - Updated `STATUS.md` top-level date and current conclusion with CM-1185 review-sync facts.
 - Recorded current branch `hardening/p0-p2-security-rc-base`.
 - Recorded pre-sync baseline: local `HEAD` and `origin/hardening/p0-p2-security-rc-base` were both `1abb5a3785af5ac96684fe3d7728eb7027e41a98` before CM-1185 status-surface edits.
-- Recorded user-provided status-sync commit for the reviewed context: applying CM-1185 advances `HEAD` from `1abb5a3785af5ac96684fe3d7728eb7027e41a98` to `9eb258d8e83504646dba1175c44fc54c20ee9799`; do not substitute `d79c1ff6b2067e9c7062bae84bad2c14eb168310`, `11af9dd6c505eb96df496b49928ecac3b8310dad`, `af16a7298cfc798a8160e87fe0ba2d8e00b0bddd`, `483ca4a49cad5638e2448b58da0ad3d74042b63d`, `af9636742ab6f68347adfa1facb981b55c877435`, `f3f00e8f6ed61227142beb3369aae01e63fce35f`, or sibling commit `b410325a56e20881cb0ef2e876f005acbdc6b58f`.
+- Recorded user-provided status-sync commit for the reviewed context: applying CM-1185 advances `HEAD` from `1abb5a3785af5ac96684fe3d7728eb7027e41a98` to `1f4705352f8b8d574ddcce44c52cd2c3458a14af`; do not substitute CM-1192's `9eb258d8e83504646dba1175c44fc54c20ee9799`, `d79c1ff6b2067e9c7062bae84bad2c14eb168310`, `11af9dd6c505eb96df496b49928ecac3b8310dad`, `af16a7298cfc798a8160e87fe0ba2d8e00b0bddd`, `483ca4a49cad5638e2448b58da0ad3d74042b63d`, `af9636742ab6f68347adfa1facb981b55c877435`, `f3f00e8f6ed61227142beb3369aae01e63fce35f`, or sibling commit `b410325a56e20881cb0ef2e876f005acbdc6b58f`.
 - Recorded local Node `v24.14.0`.
 - Recorded review evidence: `npm test` passed `2749/2749`; `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`; fixture-only `gate:ci` PASS.
 - Left untracked `CLAUDE.md` untouched and treated its `123/123` baseline as local drift, not authoritative status.
