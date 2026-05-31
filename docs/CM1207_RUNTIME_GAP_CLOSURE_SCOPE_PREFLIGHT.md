@@ -4,6 +4,8 @@ Date: 2026-05-31
 
 Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY`
 
+Supersession note: CM-1208 has since executed and passed `A5-GAP-5` strict gate evidence for `main@d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d`. The current next preflight is CM-1209 / `A5-GAP-4` endpoint-bound HTTP evidence refresh; see [CM1209_A5_GAP4_HTTP_EVIDENCE_REFRESH_PREFLIGHT.md](/A:/codex-memory/docs/CM1209_A5_GAP4_HTTP_EVIDENCE_REFRESH_PREFLIGHT.md).
+
 ## Purpose
 
 This local preflight records the handoff from documentation-surface slimdown into runtime gap closure.

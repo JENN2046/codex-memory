@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1208 A5-GAP-5_STRICT_GATE_PREFLIGHT`.
+Goal: `CM-1209 A5-GAP-4_HTTP_EVIDENCE_REFRESH_PREFLIGHT`.
 
-Status: `BLOCKED_NOT_READY` after the approved strict gate failed in test stage; local docs-marker repair is targeted-validated but not A5 gate evidence.
+Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY` after CM-1208 passed target-bound strict gate evidence.
 
 Workspace: `A:\codex-memory`.
 
@@ -38,23 +38,22 @@ Current Git fact and A5 rule after CM-1208:
 
 - Active status surfaces must not treat validation-time `HEAD` / `origin/main` snapshots as current truth after commit or push.
 - Current branch state must be checked with fresh Git commands before branch-sensitive decisions.
-- User approved `A5-GAP-5` for `main@f81c6fa13ee4466115b8c2cabb88a5e5a6c794ce`, strict gate only, no remote write.
-- `npm run gate:mainline:strict` was executed and failed in the test stage; health, contract, compare, and rollback passed.
-- Diagnostic `npm test` failed `2753/2754` on `tests\autopilot-closed-loop-dry-run-cli.test.js` because `blocked_red_count` was 0.
-- `.agent_board/AUTOPILOT_LEDGER.md` now restores the parseable `## Blocked Red Lane Items` list; targeted `node --test .\tests\autopilot-closed-loop-dry-run-cli.test.js` passed `8/8`.
-- This is not A5 strict gate pass evidence. Rerun requires a stabilized repair and a fresh exact A5 approval for the new `HEAD` or explicitly accepted worktree state.
+- User approved `A5-GAP-5` for `main@d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d`, strict gate only, no remote write.
+- `npm run gate:mainline:strict` passed: health ok, contract `29/29`, test `2754/2754`, compare `43/43`, rollback `43/43`.
+- This is target-bound strict-gate evidence only; it is not runtime readiness, RC readiness, cutover readiness, write reliability, or recall reliability.
+- Next candidate is `A5-GAP-4` endpoint-bound live HTTP evidence refresh for `http://127.0.0.1:7605`.
+- `A5-GAP-4` requires a separate exact approval before running any HTTP observe/start/ensure action.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
 Validation for CM-1208:
 
 - `git diff --check`
-- `npm run gate:mainline:strict` failed at test stage
-- `npm test` diagnostic failed `2753/2754`
 - `node --test .\tests\autopilot-closed-loop-dry-run-cli.test.js` passed `8/8`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+- `npm run gate:mainline:strict` passed for `d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d`
 
 Not validated:
 
-- A passing rerun of `npm run gate:mainline:strict`
 - `npm run test:hardening`
 - `npm run gate:mainline`
 - HTTP observe
@@ -87,4 +86,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Stabilize the docs-marker repair, then request exact A5 approval before any strict-gate rerun. Do not run `gate:mainline:strict`, HTTP observe, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Request exact A5-GAP-4 approval before any endpoint-bound HTTP evidence refresh. Do not run `start:http:ensure`, `observe:http`, MCP initialize/tools-list probes, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

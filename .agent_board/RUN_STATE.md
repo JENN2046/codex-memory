@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1208 A5-GAP-5 strict gate preflight |
-| Current area | P0-mainline-health / P6-docs-drift |
+| Current task | CM-1209 A5-GAP-4 HTTP evidence refresh preflight completed; execution awaits exact approval |
+| Current area | P4-http-runtime / P6-docs-drift |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1208 executed the user-approved `npm run gate:mainline:strict` at fresh `main@f81c6fa13ee4466115b8c2cabb88a5e5a6c794ce`; it failed in the test stage after health, contract, compare, and rollback passed. Diagnostic `npm test` failed `2753/2754` on the autopilot closed-loop dry-run `blocked_red_count` assertion. The local docs-marker repair restores `.agent_board/AUTOPILOT_LEDGER.md` `## Blocked Red Lane Items` and targeted dry-run CLI validation passed. Do not rerun the A5 strict gate as commit-bound evidence until the marker repair is stabilized and a fresh exact A5 approval is provided for the new `HEAD` or explicitly accepted worktree state.
+CM-1208 reran the user-approved `npm run gate:mainline:strict` at fresh `main@d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d`; it passed health, contract `29/29`, test `2754/2754`, compare `43/43`, and rollback `43/43`. CM-1209 prepared exact A5-GAP-4 approval for endpoint-bound loopback HTTP evidence refresh at `http://127.0.0.1:7605`. Do not run HTTP observe, start/ensure runtime, change config/watchdog/startup, call providers, scan real memory, write durable state, push, release, deploy, or claim readiness without exact approval.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

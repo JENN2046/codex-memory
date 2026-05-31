@@ -1,8 +1,43 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1209 A5-GAP-4 HTTP Evidence Refresh Preflight Checkpoint
+
+Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY`
+
+Date: 2026-05-31
+
+Purpose: choose the next A5/P66 runtime-gap unit after CM-1208 strict-gate evidence passed.
+
+Current evidence:
+
+- CM-1208 `A5-GAP-5` strict gate passed at `main@d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d`.
+- Gate summary: health ok, contract `29/29`, test `2754/2754`, compare `43/43`, rollback `43/43`.
+- This is target-bound strict-gate evidence only and does not claim readiness.
+
+Next target:
+
+- `A5-GAP-4 live_http_operation_readiness_not_claimed`
+- Endpoint candidate: `http://127.0.0.1:7605`
+- Exact approval is required before any HTTP runtime observe/start/ensure/MCP probe action.
+
+Approval template:
+
+```text
+I approve A5-GAP-4 for codex-memory on branch main at commit <COMMIT>, endpoint http://127.0.0.1:7605, no config/watchdog/startup change.
+```
+
+Boundary:
+
+- No HTTP observe executed by this preflight.
+- No config/watchdog/startup change.
+- No provider/API call.
+- No real memory scan or durable write.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, runtime readiness, RC readiness, cutover readiness, write reliability, or recall reliability claim.
+
 ## CM-1208 A5-GAP-5 Strict Gate Checkpoint
 
-Status: `BLOCKED_NOT_READY`
+Status: `COMPLETED_VALIDATED_NOT_READY`
 
 Date: 2026-05-31
 
@@ -16,6 +51,9 @@ Result:
 - Diagnostic `npm test` failed `2753/2754`.
 - Failing assertion: `tests\autopilot-closed-loop-dry-run-cli.test.js` expected `blocked_red_count >= 1`.
 - Root cause: CM-1203 compressed `.agent_board/AUTOPILOT_LEDGER.md` from a parseable `## Blocked Red Lane Items` list into a single anchor sentence, so the dry-run parser returned `blocked_red_count = 0`.
+- Follow-up commit `d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d` restored the marker and was used for the approved rerun.
+- Exact-approved rerun at `main@d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d` passed `npm run gate:mainline:strict`.
+- Passed gate summary: health ok, contract `29/29`, test `2754/2754`, compare `43/43`, rollback `43/43`.
 
 Local repair:
 
@@ -24,7 +62,7 @@ Local repair:
 
 Boundary:
 
-- This checkpoint does not claim A5 closure or strict-gate pass.
+- This checkpoint records target-bound strict-gate pass evidence only.
 - No source/runtime/test/package/config/env/provider/real-memory change.
 - No remote write, push, PR, tag, release, deploy, readiness, write reliability, or recall reliability claim.
 - Any strict-gate rerun needs a fresh exact A5 approval after the marker repair is stabilized or the current worktree state is explicitly accepted.
