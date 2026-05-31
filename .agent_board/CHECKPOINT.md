@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1275 Soft Read Context Client Precedence Regression Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local test-only soft-read request identity precedence regression. No runtime source behavior change, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `tests/policy-read-preflight.test.js` now proves `requestContext.executionContext.clientId` wins over conflicting `agentAlias` for soft-read private visibility.
+- The regression writes Claude-private and Codex-private fixtures, then searches with `clientId=claude` and `agentAlias=Codex`.
+- The result includes only the Claude-private record, proving the Codex alias does not override the trusted client id.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check tests\policy-read-preflight.test.js`
+- `node --test tests\policy-read-preflight.test.js tests\memory-lifecycle-scope-runtime-integration.test.js tests\phase-a-services.test.js` passed `23/23`.
+- `npm test` passed `2795/2795`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1275.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1274 Write Scope Context Precedence Regression Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

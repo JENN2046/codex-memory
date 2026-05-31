@@ -392,6 +392,74 @@ test('soft read policy does not trust search scope client_id as request identity
   });
 });
 
+test('soft read policy prefers execution context client id before agent alias', async () => {
+  await withPolicyApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const { shadowStore } = app.stores;
+
+    const fixtures = [
+      { title: 'Conflicted Context Private Claude', visibility: 'private', clientId: 'claude' },
+      { title: 'Conflicted Context Private Codex', visibility: 'private', clientId: 'codex' }
+    ];
+
+    for (let index = 0; index < fixtures.length; index += 1) {
+      const fixture = fixtures[index];
+      const record = await server.handleJsonRpc({
+        jsonrpc: '2.0',
+        id: index + 1,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: fixture.title,
+            content: `Type: checkpoint\nconflicted execution context identity signal\nfixture: ${fixture.title}`,
+            evidence: `runtime-soft-policy-conflicted-context-${fixture.title}`,
+            validated: true,
+            reusable: false,
+            tags: ['policy', 'runtime', 'soft-read', 'client-scope'],
+            sensitivity: 'none',
+            project_id: 'policy-runtime-project',
+            visibility: fixture.visibility,
+            client_id: fixture.clientId
+          }
+        }
+      }, requestContext);
+
+      assert.equal(record.response.result.structuredContent.decision, 'accepted');
+      await updatePolicyFields(shadowStore, record.response.result.structuredContent.memoryId, fixture);
+    }
+
+    const conflictedSearch = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 301,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'conflicted execution context identity signal',
+          target: 'process',
+          limit: 10,
+          include_content: true
+        }
+      }
+    }, {
+      executionContext: {
+        agentAlias: 'Codex',
+        agentId: 'codex-desktop',
+        clientId: 'claude',
+        requestSource: 'codex-memory-policy-conflicted-context-test'
+      }
+    });
+
+    const titles = (conflictedSearch.response.result.structuredContent.results || [])
+      .map(result => result.title)
+      .sort();
+
+    assert.deepEqual(titles, ['Conflicted Context Private Claude']);
+  });
+});
+
 test('soft read policy does not default missing request context to Codex identity', async () => {
   await withPolicyApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });
