@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1264 SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING`.
+Goal: `CM-1265 LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after hardening soft read private filtering against caller-supplied `scope.client_id` identity spoofing.
+Status: `COMPLETED_VALIDATED_NOT_READY` after hardening lifecycle scope governance read filtering against caller-supplied `scope.client_id` identity spoofing.
 
 Workspace: `A:\codex-memory`.
 
@@ -42,6 +42,8 @@ Changed scope since CM-1207:
 - `src/app.js`
 - `tests/policy-read-preflight.test.js`
 - `docs/CM1264_SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING.md`
+- `tests/memory-lifecycle-scope-runtime-integration.test.js`
+- `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
@@ -583,6 +585,32 @@ Validation:
 Next:
 
 Commit or otherwise stabilize CM-1263, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1265 Current Handoff
+
+Goal: `CM-1265 LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1265 hardens lifecycle scope governance read filtering for Codex/Claude client isolation.
+- `scope.client_id` remains a search candidate filter, but it no longer authenticates the caller for lifecycle scope governance current-scope matching.
+- Request identity is inferred from `requestContext.executionContext`.
+- Added integration regression proving a Codex request cannot pass `scope.client_id=claude` to pass lifecycle scope governance filtering for Claude private records.
+- No provider/MCP external call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `node --check src\app.js`
+- `node --check tests\memory-lifecycle-scope-runtime-integration.test.js`
+- `node --test tests\memory-lifecycle-scope-runtime-integration.test.js tests\policy-read-preflight.test.js` passed `10/10`.
+- Full/default validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1265, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
 
 ## CM-1264 Current Handoff
 

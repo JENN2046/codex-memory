@@ -126,12 +126,7 @@ async function applyScopeFilter(results, scope, shadowStore) {
   });
 }
 
-function inferRequestClientId(requestContext = {}, scope = null) {
-  const scopedClientId = typeof scope?.client_id === 'string' ? scope.client_id.trim().toLowerCase() : '';
-  if (scopedClientId) {
-    return scopedClientId;
-  }
-
+function inferRequestClientId(requestContext = {}) {
   const executionContext = requestContext.executionContext || {};
   const candidates = [
     executionContext.clientId,
@@ -328,7 +323,7 @@ function buildLifecycleScopeGovernanceCurrentScope(requestContext = {}, scope = 
     userId: firstScopeValue(safeScope.user_id, safeScope.userId, executionContext.userId, executionContext.user_id),
     projectId: firstScopeValue(safeScope.project_id, safeScope.projectId, executionContext.projectId, executionContext.project_id),
     workspaceId: firstScopeValue(safeScope.workspace_id, safeScope.workspaceId, executionContext.workspaceId, executionContext.workspace_id),
-    clientId: firstScopeValue(safeScope.client_id, safeScope.clientId, executionContext.clientId, executionContext.client_id, inferRequestClientId(requestContext, scope)),
+    clientId: firstScopeValue(executionContext.clientId, executionContext.client_id, inferRequestClientId(requestContext)),
     agentId: firstScopeValue(safeScope.agent_id, safeScope.agentId, executionContext.agentId, executionContext.agent_id),
     taskId: firstScopeValue(safeScope.task_id, safeScope.taskId, executionContext.taskId, executionContext.task_id),
     conversationId: firstScopeValue(safeScope.conversation_id, safeScope.conversationId, executionContext.conversationId, executionContext.conversation_id),

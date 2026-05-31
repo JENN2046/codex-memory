@@ -198,3 +198,69 @@ test('internal runtime bridge filters search_memory post-results without changin
     assert.deepEqual(search.results.map(item => item.memoryId), ['mem-active']);
   });
 });
+
+test('lifecycle scope governance bridge does not trust search scope client_id as request identity', async () => {
+  await withApp(async ({ app }) => {
+    app.services.passiveRecallService.search = async () => [
+      { memoryId: 'mem-claude-private', title: 'Claude private candidate' },
+      { memoryId: 'mem-codex-private', title: 'Codex private candidate' }
+    ];
+    app.stores.shadowStore.getRecordsScopeMap = async () => new Map([
+      ['mem-claude-private', {
+        projectId: 'project-alpha',
+        workspaceId: 'workspace-alpha',
+        clientId: 'claude',
+        visibility: 'private'
+      }],
+      ['mem-codex-private', {
+        projectId: 'project-alpha',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex',
+        visibility: 'private'
+      }]
+    ]);
+    app.stores.shadowStore.getRecordsLifecycleScopeGovernanceMap = async () => buildMetadata([
+      {
+        memoryId: 'mem-claude-private',
+        lifecycleStatus: 'active',
+        scope: {
+          ...exactRecordScope,
+          clientId: 'claude',
+          visibility: 'private'
+        }
+      },
+      {
+        memoryId: 'mem-codex-private',
+        lifecycleStatus: 'active',
+        scope: {
+          ...exactRecordScope,
+          visibility: 'private'
+        }
+      }
+    ]);
+
+    const search = await app.callTool('search_memory', {
+      query: 'synthetic lifecycle client spoof',
+      target: 'process',
+      limit: 3,
+      scope: {
+        project_id: 'project-alpha',
+        workspace_id: 'workspace-alpha',
+        client_id: 'claude',
+        visibility: 'private'
+      }
+    }, {
+      noTokenReadOnly: true,
+      executionContext: {
+        ...exactExecutionContext,
+        projectId: 'project-alpha',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex',
+        visibility: 'private',
+        lifecycleScopeGovernanceReadPolicy: true
+      }
+    });
+
+    assert.deepEqual(search.results.map(item => item.memoryId), []);
+  });
+});

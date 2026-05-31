@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1265 Lifecycle Scope Client Identity Hardening Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test privacy hardening for Codex/Claude client identity isolation under lifecycle scope governance read policy. No provider call, MCP external call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `inferRequestClientId(...)` now ignores caller-supplied search scope and infers identity from `requestContext.executionContext` only.
+- `buildLifecycleScopeGovernanceCurrentScope(...)` no longer trusts `scope.client_id` as current caller identity.
+- Added integration regression proving a Codex request with `scope.client_id='claude'` cannot pass lifecycle scope governance filtering for Claude private records.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\app.js`
+- `node --check tests\memory-lifecycle-scope-runtime-integration.test.js`
+- `node --test tests\memory-lifecycle-scope-runtime-integration.test.js tests\policy-read-preflight.test.js` passed `10/10`.
+- Default suite and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1265.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1264 Soft Read Policy Client Identity Hardening Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
