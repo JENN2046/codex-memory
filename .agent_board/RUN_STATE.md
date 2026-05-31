@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1220 A5-GAP-6 post-recall-isolation aggregation evidence completed; commit/stabilize evidence next |
-| Current area | P0-mainline-health / P2-active-memory / P8-memory-governance / P10-observability-admin |
+| Current task | CM-1221 A5-GAP-3 migration-readiness dry-run preflight prepared; execution awaits exact fresh-HEAD approval |
+| Current area | P5-rollback-readiness / P8-memory-governance / P6-docs-drift |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1220 executed exact-approved A5-GAP-6 aggregation refresh at `main@57116c99ae430e8d883c73dbd871a3e68cc48e3e`, using only `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5` sanitized evidence. Result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, locally evidenced gaps `4`, remaining gaps `3`, and `commandsExecutedByAggregator=false`. No file/store scan, MCP `tools/call`, provider call, durable write, public MCP expansion, remote write, readiness claim, or reliability claim occurred. Next safe action is to commit or otherwise stabilize CM-1220 evidence, then choose the next exact-approved runtime gap.
+CM-1221 prepared the exact A5-GAP-3 fixture-only migration-readiness dry-run boundary. The future target is `npm run vcp-memory:migration-readiness -- --json`; it remains blocked until a fresh exact approval names action `dry-run`, the fixture-only target, and `no apply/import/export/backup/restore/durable write`. No dry-run execution, real apply, real-store scan, provider call, durable write, public MCP expansion, remote write, readiness claim, or reliability claim occurred. Next safe action is to commit or otherwise stabilize CM-1221, then use fresh `HEAD` for exact A5-GAP-3 approval before execution.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

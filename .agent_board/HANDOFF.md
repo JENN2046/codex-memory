@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1220 A5-GAP-6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE`.
+Goal: `CM-1221 A5-GAP-3_MIGRATION_READINESS_DRY_RUN_PREFLIGHT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved aggregation refresh.
+Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the next migration-readiness dry-run approval boundary.
 
 Workspace: `A:\codex-memory`.
 
@@ -36,6 +36,7 @@ Changed scope since CM-1207:
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
+- `docs/CM1221_A5_GAP3_MIGRATION_READINESS_DRY_RUN_PREFLIGHT.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -79,11 +80,13 @@ Current Git fact and A5 rule after CM-1208:
 - User approved `A5-GAP-6` for `main@57116c99ae430e8d883c73dbd871a3e68cc48e3e`, using only evidence from approved units `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5`.
 - CM-1220 executed the in-memory sanitized aggregation refresh. Result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, accepted summary, locally evidenced gaps `4`, remaining gaps `3`, `commandsExecutedByAggregator=false`.
 - Historical `A5-GAP-3` artifacts were not consumed by CM-1220.
+- CM-1221 prepared the next A5-GAP-3 fixture-only migration-readiness dry-run boundary.
+- Future target is `npm run vcp-memory:migration-readiness -- --json`.
+- Future approval must include action `dry-run`, target `vcp-memory:migration-readiness fixture-only readiness report`, and `no apply/import/export/backup/restore/durable write`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1220:
+Validation for CM-1221:
 
-- in-memory `buildV1RcValidationAggregatorReport`
 - `git diff --check`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -98,6 +101,7 @@ Not validated:
 - true `record_memory`
 - true `search_memory`
 - true `memory_overview`
+- A5-GAP-3 dry-run execution
 - broad ValidationAggregator full implementation
 - personal RC dogfood
 
@@ -105,7 +109,7 @@ Boundary:
 
 - No source/runtime/test/package/lock/config/env/secret/watchdog/startup change.
 - No provider/API call.
-- No real memory tool call or raw store / `.jsonl` read by CM-1219.
+- No real memory tool call or raw store / `.jsonl` read by CM-1221.
 - No durable memory/audit write.
 - No public MCP expansion.
 - No push, PR, tag, release, deploy, provider/API call, real memory call, or readiness claim.
@@ -123,4 +127,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1220 evidence, then choose the next exact-approved runtime gap. Current remaining set is migration/import/export/backup/restore approval execution, ValidationAggregator full implementation, and RC cutover/personal dogfood. Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1221 preflight, then use fresh `HEAD` for exact A5-GAP-3 approval: `I approve A5-GAP-3 for codex-memory on branch main at commit <FRESH_HEAD>, action dry-run, target vcp-memory:migration-readiness fixture-only readiness report, no apply, no import, no export, no backup, no restore, no durable write.` Do not run dry-run, additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

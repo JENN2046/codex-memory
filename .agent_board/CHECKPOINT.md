@@ -1,5 +1,37 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1221 A5-GAP-3 Migration Readiness Dry-Run Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: prepare exact A5-GAP-3 fixture-only migration-readiness dry-run boundary only. No dry-run or apply execution.
+
+Result:
+
+- Fresh preflight observed branch `main`, `HEAD=8c22842f770f4da8028dba8774f54dad9996c2f7`, and local state `main...origin/main [ahead 14]` before CM-1221 edits.
+- Future target fixed as `npm run vcp-memory:migration-readiness -- --json`.
+- Future approval must include action `dry-run`, target `vcp-memory:migration-readiness fixture-only readiness report`, and `no apply`, `no import`, `no export`, `no backup`, `no restore`, `no durable write`.
+
+Boundary:
+
+- No dry-run execution.
+- No real migration apply.
+- No import/export apply.
+- No backup creation or restore perform.
+- No real-store scan.
+- No durable memory/audit write.
+- No provider call.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1221.
+- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-3 for codex-memory on branch main at commit <FRESH_HEAD>, action dry-run, target vcp-memory:migration-readiness fixture-only readiness report, no apply, no import, no export, no backup, no restore, no durable write.`
+
 ## CM-1220 A5-GAP-6 Post-Recall-Isolation Aggregation Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
