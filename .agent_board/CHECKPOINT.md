@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1258 No-Token Overview Projection Version Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local runtime contract hardening for no-token `memory_overview` selected projection. No provider call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added `access.selectedProjectionVersion=1` to no-token selected overview output.
+- Codex/Claude clients and audit surfaces can now bind to an explicit version marker for the selected projection shape.
+- Bearer-token authorized `memory_overview` still uses full overview.
+- No-token `record_memory` and `search_memory` remain blocked.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryOverviewService.js`
+- `node --check tests\memory-overview-no-token-selected-projection.test.js`
+- `node --test tests\memory-overview-no-token-selected-projection.test.js tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js` passed `29/29`.
+- Default suite and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1258.
+- Full no-token governance closure, write reliability, recall reliability, and readiness remain unclaimed.
+
 ## CM-1257 No-Token Overview Count-Only Write Summary Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

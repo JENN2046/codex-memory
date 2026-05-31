@@ -511,6 +511,7 @@ test('HTTP MCP no-token memory_overview should return selected safe overview wit
       assert.equal(payload.result.isError, false);
       assert.equal(overview.access.mode, 'no_token_selected_overview');
       assert.equal(overview.access.selectedProjection, true);
+      assert.equal(overview.access.selectedProjectionVersion, 1);
       assert.equal(overview.access.bearerTokenRequiredForFullOverview, true);
       assert.equal(overview.access.pathsReturned, false);
       assert.equal(overview.access.embeddingFingerprintReturned, false);

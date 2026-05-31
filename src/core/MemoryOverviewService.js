@@ -589,6 +589,7 @@ class MemoryOverviewService {
       access: {
         mode: 'no_token_selected_overview',
         selectedProjection: true,
+        selectedProjectionVersion: 1,
         bearerTokenRequiredForFullOverview: true,
         pathsReturned: false,
         embeddingFingerprintReturned: false,

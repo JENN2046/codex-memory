@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1257 no-token memory_overview count-only write summary implemented |
+| Current task | CM-1258 no-token memory_overview selected projection version marker added |
 | Current area | P4-http-runtime / P0-mainline-health |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1257 narrows no-token `memory_overview` selected projection write summary to count-only output. The no-token path no longer returns `latestAcceptedAt` / `latestRejectedAt` activity timestamps while bearer-token full overview remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1257.
+CM-1258 adds `access.selectedProjectionVersion=1` to no-token `memory_overview` selected projection output so Codex/Claude clients and audit surfaces can bind to a stable selected-projection contract marker. Bearer-token full overview remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1258.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

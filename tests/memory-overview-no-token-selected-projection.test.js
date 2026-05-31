@@ -151,6 +151,7 @@ test('no-token selected overview sanitizes core overview dependencies directly',
 
   assert.equal(overview.access.mode, 'no_token_selected_overview');
   assert.equal(overview.access.selectedProjection, true);
+  assert.equal(overview.access.selectedProjectionVersion, 1);
   assert.equal(overview.summary.accepted, 1);
   assert.equal(overview.summary.rejected, 1);
   assert.equal(overview.summary.sensitiveRejected, 1);
