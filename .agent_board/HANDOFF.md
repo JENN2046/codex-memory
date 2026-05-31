@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1213 A5-GAP-6_AGGREGATION_REFRESH_EVIDENCE`.
+Goal: `CM-1214 A5-GAP-1_GOVERNANCE_RUNTIME_LOOP_PREFLIGHT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved in-memory aggregation refresh.
+Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the next governance loop approval boundary.
 
 Workspace: `A:\codex-memory`.
 
@@ -57,12 +57,14 @@ Current Git fact and A5 rule after CM-1208:
 - User approved `A5-GAP-6` for `main@ae014397c63a68791c0f1dbe22c38dd4bba8c697`, using only evidence from approved A5-GAP units `A5-GAP-4,A5-GAP-5`.
 - CM-1213 executed the in-memory sanitized aggregation refresh. Result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, accepted summary, locally evidenced gaps `2`, remaining gaps `5`, `commandsExecutedByAggregator=false`.
 - Historical `A5-GAP-1/2/3` artifacts were not consumed by CM-1213.
+- CM-1214 prepared the next exact A5-GAP-1 no-durable-write governance runtime loop proof boundary.
+- Future subject is `cm1214-governance-runtime-loop-no-durable-write sanitized test subject`.
+- Future approval must say `with durable write no`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1213:
+Validation for CM-1214:
 
 - `git diff --check`
-- in-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
 - changed-scope review
@@ -76,6 +78,7 @@ Not validated:
 - true `record_memory`
 - true `search_memory`
 - true `memory_overview`
+- A5-GAP-1 governance runtime loop execution
 - broad ValidationAggregator full implementation
 - runtime gap closure
 - personal RC dogfood
@@ -102,4 +105,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit CM-1213 evidence, then choose the next exact-approved runtime gap. Do not run `tools/call`, `start:http:ensure`, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1214 preflight, then use fresh `HEAD` for exact A5-GAP-1 approval: `I approve A5-GAP-1 for codex-memory on branch main at commit <FRESH_HEAD>, limited to cm1214-governance-runtime-loop-no-durable-write sanitized test subject, with durable write no.` Do not run governance loop execution, governed action, durable audit/memory writes, `tools/call`, `start:http:ensure`, provider calls, real memory scans, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

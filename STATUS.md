@@ -29,7 +29,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1213 A5-GAP-6_AGGREGATION_REFRESH_EVIDENCE` 已在 exact approval 下执行：`main@ae014397c63a68791c0f1dbe22c38dd4bba8c697`，只消费已批准的 `A5-GAP-4,A5-GAP-5` sanitized evidence。Aggregator 接受 explicit sanitized summary，结果保持 `decision=NOT_READY_BLOCKED`、`validationAggregatorFullImplementation=false`、`runtimeEvidenceSummaryLocallyEvidencedGapCount=2`、`runtimeEvidenceSummaryRemainingGapCount=5`、`commandsExecutedByAggregator=false`。历史 `A5-GAP-1/2/3` artifacts 未被消费。
 
-当前下一步是记录并提交 CM-1213 evidence，然后选择下一个未关闭 runtime gap。不得把 CM-1210/CM-1211/CM-1212/CM-1213 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability 或 `RC_READY`。
+`CM-1214 A5-GAP-1_GOVERNANCE_RUNTIME_LOOP_PREFLIGHT` 正在准备下一个最小 no-durable-write governance loop proof 边界：subject 为 `cm1214-governance-runtime-loop-no-durable-write sanitized test subject`，未来 exact approval 必须明确 `durable write no`。CM-1214 不执行 governance runtime loop，不写 durable audit/memory，不执行 governed action，不调用 provider，不扫描真实记忆，不改变 config/watchdog/startup，不执行 push、PR、release、deploy 或 cutover。
+
+当前下一步是提交或稳定 CM-1214 preflight，然后用 fresh `HEAD` 给出 exact A5-GAP-1 approval 后才可执行 governance loop proof。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness 或 `RC_READY`。
 
 ## 当前权威入口
 

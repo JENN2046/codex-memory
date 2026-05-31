@@ -1,5 +1,38 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1214 A5-GAP-1 Governance Runtime Loop Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: prepare exact A5-GAP-1 no-durable-write governance runtime loop proof boundary only. No governance loop execution.
+
+Result:
+
+- Fresh preflight observed branch `main`, `HEAD=54043cd`, and local state `main...origin/main [ahead 7]` before CM-1214 edits.
+- Selected subject: `cm1214-governance-runtime-loop-no-durable-write sanitized test subject`.
+- Future approval must include `with durable write no`.
+- Preferred existing contract surface: `src/core/GovernanceRuntimeApprovalAuditLoop.js`.
+
+Boundary:
+
+- No governance loop execution.
+- No governed action.
+- No durable audit write.
+- No durable memory write.
+- No MCP `tools/call`.
+- No provider call.
+- No real memory scan.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1214.
+- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-1 for codex-memory on branch main at commit <FRESH_HEAD>, limited to cm1214-governance-runtime-loop-no-durable-write sanitized test subject, with durable write no.`
+
 ## CM-1213 A5-GAP-6 Aggregation Refresh Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
