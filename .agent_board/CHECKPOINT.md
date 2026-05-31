@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1250 Schema-Gated Startup Recovery Policy Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local startup recovery policy source/test integration only. No recovery execution/apply, config/watchdog/startup install, service start, provider call, MCP call, real-memory scan, migration/import/export/backup/restore apply, remote action, cutover, readiness claim, or reliability claim.
+
+Result:
+
+- Connected CM-1249 `schemaStartupGate` health facts to `buildStartupRecoverySafetyPreflight(...)`.
+- Startup recovery preflight now requires sanitized `shadowHealth.schemaStartupGate`.
+- Accepted statuses are `initialized_current_schema_version`, `current_schema_version_confirmed`, and `older_schema_version_allowed_for_additive_repair`.
+- Absent, blocked, malformed, unaccepted, or future-versioned schema gate state now fail-closes preflight.
+- Recovery remains disabled and not executed by default.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryWriteReconcileStartupSafetyPolicy.js`
+- `node --test tests\memory-write-reconcile-startup-safety-policy.test.js tests\sqlite-schema-startup-gate.test.js tests\no-touch-boundary-regression.test.js` passed `26/26`.
+- `npm test` passed `2781/2781`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1250.
+- Real recovery/apply/startup/watchdog/cutover still requires separate fresh exact approval.
+
 ## CM-1249 SQLite Schema Startup Hard Gate Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

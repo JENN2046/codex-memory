@@ -63,6 +63,11 @@ const WRITE_MANIFEST_COUNTER_KEYS = Object.freeze([
   'cancelled',
   'failed'
 ]);
+const SCHEMA_STARTUP_GATE_ALLOWED_STATUSES = Object.freeze([
+  'initialized_current_schema_version',
+  'current_schema_version_confirmed',
+  'older_schema_version_allowed_for_additive_repair'
+]);
 
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
@@ -218,6 +223,15 @@ function sanitizeStartupRecoveryHealth(health) {
   for (const key of WRITE_MANIFEST_COUNTER_KEYS) {
     sanitizedWriteManifest[key] = pickCounter(writeManifest[key]);
   }
+  const schemaStartupGate = isPlainObject(health.schemaStartupGate)
+    ? {
+      status: normalizeString(health.schemaStartupGate.status) || null,
+      expectedVersion: pickCounter(health.schemaStartupGate.expectedVersion),
+      observedVersion: pickCounter(health.schemaStartupGate.observedVersion),
+      blocked: health.schemaStartupGate.blocked === true,
+      reason: normalizeString(health.schemaStartupGate.reason)
+    }
+    : null;
   return {
     available: health.available === true,
     authoritativeStore: normalizeString(health.authoritativeStore) || null,
@@ -225,6 +239,7 @@ function sanitizeStartupRecoveryHealth(health) {
     chunkCount: pickCounter(health.chunkCount),
     totalChunkCount: pickCounter(health.totalChunkCount),
     reconcileCount: pickCounter(health.reconcileCount),
+    schemaStartupGate,
     writeManifest: sanitizedWriteManifest
   };
 }
@@ -239,6 +254,22 @@ function hasMalformedStartupRecoveryHealth(health) {
     ...WRITE_MANIFEST_COUNTER_KEYS.map(key => health.writeManifest?.[key])
   ];
   return counters.some(value => value === null);
+}
+
+function getSchemaStartupGateBlocker(health) {
+  const gate = health?.schemaStartupGate;
+  if (!gate) return 'schema_startup_gate_required';
+  if (gate.blocked === true) return 'schema_startup_gate_blocked';
+  if (!SCHEMA_STARTUP_GATE_ALLOWED_STATUSES.includes(gate.status)) {
+    return 'schema_startup_gate_status_unaccepted';
+  }
+  if (gate.expectedVersion === null || gate.observedVersion === null) {
+    return 'schema_startup_gate_version_malformed';
+  }
+  if (gate.observedVersion > gate.expectedVersion) {
+    return 'schema_startup_gate_future_version_blocked';
+  }
+  return '';
 }
 
 function normalizeBoundedLimit(value, fallback = 50) {
@@ -286,6 +317,8 @@ function buildStartupRecoverySafetyPreflight({
   } else if (hasMalformedStartupRecoveryHealth(sanitizedHealth)) {
     blockers.push('shadow_health_counters_malformed');
   }
+  const schemaGateBlocker = getSchemaStartupGateBlocker(sanitizedHealth);
+  if (schemaGateBlocker) blockers.push(schemaGateBlocker);
   if (recoveryLimit === null) blockers.push('proposed_recovery_limit_must_be_1_to_50');
   if (repairLimit === null) blockers.push('proposed_repair_limit_must_be_1_to_50');
   if (cancelLimit === null) blockers.push('proposed_cancel_limit_must_be_1_to_50');

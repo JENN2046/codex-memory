@@ -46,6 +46,16 @@ function publicToolNames() {
   return TOOL_DEFINITIONS.map(tool => tool.name).sort();
 }
 
+function healthySchemaStartupGate() {
+  return {
+    status: 'current_schema_version_confirmed',
+    expectedVersion: 1,
+    observedVersion: 1,
+    blocked: false,
+    reason: ''
+  };
+}
+
 function acceptedCm1166Preflight(overrides = {}) {
   return {
     taskId: STARTUP_RECOVERY_TASK_ID,
@@ -73,6 +83,7 @@ function acceptedCm1166Preflight(overrides = {}) {
       degradedManifestCount: 1,
       reconcileTaskCount: 3
     },
+    schemaStartupGate: healthySchemaStartupGate(),
     ...overrides
   };
 }
@@ -374,6 +385,11 @@ test('CM-1166 startup recovery preflight observes pending manifest without enabl
     assert.equal(manifestAfterInitialize.status, 'pending');
     assert.equal(report.accepted, true);
     assert.equal(report.status, 'startup_recovery_safety_preflight_passed_not_enabled');
+    assert.equal(report.shadowHealth.schemaStartupGate.blocked, false);
+    assert.ok([
+      'initialized_current_schema_version',
+      'current_schema_version_confirmed'
+    ].includes(report.shadowHealth.schemaStartupGate.status));
     assert.equal(report.candidateCounts.pendingManifestCount, 1);
     assert.equal(report.candidateCounts.degradedManifestCount, 0);
     assert.equal(report.candidateCounts.reconcileTaskCount, 0);
@@ -418,6 +434,7 @@ test('CM-1166 startup recovery preflight blocks execution, config, provider, and
       chunkCount: 1,
       totalChunkCount: 1,
       reconcileCount: 0,
+      schemaStartupGate: healthySchemaStartupGate(),
       writeManifest: {
         total: 1,
         pending: 1,
@@ -473,6 +490,7 @@ test('CM-1166 startup recovery preflight requires exact mode, source, health, an
       chunkCount: 0,
       totalChunkCount: 0,
       reconcileCount: 0,
+      schemaStartupGate: healthySchemaStartupGate(),
       writeManifest: {
         total: 1,
         pending: 'bad',
@@ -493,6 +511,70 @@ test('CM-1166 startup recovery preflight requires exact mode, source, health, an
   assert.ok(report.blockerReasons.includes('proposed_cancel_limit_must_be_1_to_50'));
 });
 
+test('CM-1250 startup recovery preflight fails closed when schema startup gate is blocked or absent', () => {
+  const blocked = buildStartupRecoverySafetyPreflight({
+    mode: ACCEPTED_RECOVERY_MODE,
+    source: 'temp_local_write_manifest_health_fixture',
+    shadowHealth: {
+      available: true,
+      authoritativeStore: 'sqlite',
+      recordCount: 1,
+      chunkCount: 1,
+      totalChunkCount: 1,
+      reconcileCount: 0,
+      schemaStartupGate: {
+        status: 'blocked',
+        expectedVersion: 1,
+        observedVersion: 2,
+        blocked: true,
+        reason: 'future_schema_version_detected'
+      },
+      writeManifest: {
+        total: 1,
+        pending: 1,
+        committed: 0,
+        degraded: 0,
+        repaired: 0,
+        cancelled: 0,
+        failed: 0
+      }
+    }
+  });
+  const absent = buildStartupRecoverySafetyPreflight({
+    mode: ACCEPTED_RECOVERY_MODE,
+    source: 'temp_local_write_manifest_health_fixture',
+    shadowHealth: {
+      available: true,
+      authoritativeStore: 'sqlite',
+      recordCount: 1,
+      chunkCount: 1,
+      totalChunkCount: 1,
+      reconcileCount: 0,
+      writeManifest: {
+        total: 1,
+        pending: 1,
+        committed: 0,
+        degraded: 0,
+        repaired: 0,
+        cancelled: 0,
+        failed: 0
+      }
+    }
+  });
+
+  assert.equal(blocked.accepted, false);
+  assert.equal(blocked.status, 'startup_recovery_safety_preflight_blocked');
+  assert.ok(blocked.blockerReasons.includes('schema_startup_gate_blocked'));
+  assert.equal(blocked.startupRecoveryPreflightAccepted, false);
+  assert.equal(blocked.startupRecoveryEnabled, false);
+  assert.equal(blocked.runtimeRecoveryExecuted, false);
+  assert.equal(blocked.manifestRecoveryExecuted, false);
+
+  assert.equal(absent.accepted, false);
+  assert.ok(absent.blockerReasons.includes('schema_startup_gate_required'));
+  assert.equal(absent.startupRecoveryPreflightAccepted, false);
+});
+
 test('CM-1166 startup recovery health sanitizer omits paths, raw errors, and memory ids', () => {
   const sanitized = sanitizeStartupRecoveryHealth({
     available: true,
@@ -505,6 +587,14 @@ test('CM-1166 startup recovery health sanitizer omits paths, raw errors, and mem
     chunkCount: 3,
     totalChunkCount: 4,
     reconcileCount: 1,
+    schemaStartupGate: {
+      status: 'current_schema_version_confirmed',
+      expectedVersion: 1,
+      observedVersion: 1,
+      blocked: false,
+      reason: '',
+      rawError: 'raw schema error codex-process-cm1166-secret'
+    },
     writeManifest: {
       total: 4,
       pending: 1,
@@ -523,6 +613,7 @@ test('CM-1166 startup recovery health sanitizer omits paths, raw errors, and mem
     chunkCount: 3,
     totalChunkCount: 4,
     reconcileCount: 1,
+    schemaStartupGate: healthySchemaStartupGate(),
     writeManifest: {
       total: 4,
       pending: 1,
