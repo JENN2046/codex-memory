@@ -6,6 +6,11 @@ const {
 } = require('../src/core/MemoryWriteLifecycleDedupSuppressionPreflight');
 const { ExecutionContextResolver } = require('../src/core/ExecutionContextResolver');
 const { MemoryWriteService } = require('../src/core/MemoryWriteService');
+const {
+  PROOF_MEMORY_RETENTION_POLICY,
+  PROOF_MEMORY_TAG,
+  PROOF_MEMORY_VISIBILITY
+} = require('../src/core/ProofMemoryPolicy');
 
 const runtimeScope = Object.freeze({
   projectId: 'codex-memory',
@@ -345,5 +350,93 @@ test('write runtime derives record scope from execution context when payload omi
   assert.equal(events.shadowUpserts[0].visibility, 'private');
   assert.equal(events.shadowUpserts[0].retentionPolicy, 'keep');
   assert.equal(events.diaryWrites[0].clientId, 'claude');
+  assert.equal(events.auditWrites[0].decision, 'accepted');
+});
+
+test('write runtime preserves explicit payload proof marker under context-derived ordinary scope', async () => {
+  const events = {
+    diaryWrites: [],
+    shadowUpserts: [],
+    vectorUpserts: [],
+    chunkIndexes: [],
+    auditWrites: []
+  };
+  const service = new MemoryWriteService({
+    config: {
+      defaultAgentId: 'default-agent',
+      defaultRequestSource: 'default-source',
+      allowedAgentAlias: 'Codex',
+      enableShadowWrites: true,
+      enableVectorIndex: true
+    },
+    executionContextResolver: new ExecutionContextResolver({
+      defaultAgentId: 'default-agent',
+      defaultRequestSource: 'default-source',
+      allowedAgentAlias: 'Codex'
+    }),
+    diaryStore: {
+      async writeRecord(record) {
+        events.diaryWrites.push(record);
+        return {
+          filePath: '<cm-1268-fixture-diary-path>',
+          relativePath: '<cm-1268-fixture-relative-path>',
+          fileContent: '<cm-1268-fixture-raw-content-redacted>'
+        };
+      }
+    },
+    shadowStore: {
+      async upsertRecord(record) {
+        events.shadowUpserts.push(record);
+      },
+      async clearReconcileTasks() {},
+      async enqueueReconcileTask() {
+        throw new Error('unexpected reconcile task in CM-1268 fixture');
+      }
+    },
+    vectorStore: {
+      async upsertRecord(record) {
+        events.vectorUpserts.push(record);
+      }
+    },
+    chunkIndexingService: {
+      async indexRecord(record) {
+        events.chunkIndexes.push(record);
+      }
+    },
+    auditLogStore: {
+      async appendWriteAudit(event) {
+        events.auditWrites.push(event);
+      }
+    }
+  });
+
+  const result = await service.record(validProcessPayloadWithoutScope({
+    title: 'Checkpoint: explicit proof marker under context scope',
+    evidence: 'CM-1268 explicit proof marker fixture evidence.',
+    tags: ['cm-1268', 'write-scope'],
+    visibility: PROOF_MEMORY_VISIBILITY
+  }), {
+    executionContext: {
+      agentAlias: 'Codex',
+      agentId: 'codex-desktop',
+      requestSource: 'cm-1268-runtime-test',
+      projectId: 'context-project',
+      workspaceId: 'context-workspace',
+      clientId: 'codex',
+      taskId: 'CM-1268',
+      conversationId: 'context-conversation',
+      visibility: 'project',
+      retentionPolicy: 'keep'
+    }
+  });
+
+  assert.equal(result.decision, 'accepted');
+  assert.equal(result.proofMemory.applied, true);
+  assert.equal(events.shadowUpserts.length, 1);
+  assert.equal(events.shadowUpserts[0].projectId, 'context-project');
+  assert.equal(events.shadowUpserts[0].visibility, PROOF_MEMORY_VISIBILITY);
+  assert.equal(events.shadowUpserts[0].retentionPolicy, PROOF_MEMORY_RETENTION_POLICY);
+  assert.equal(events.shadowUpserts[0].tags.includes(PROOF_MEMORY_TAG), true);
+  assert.equal(events.diaryWrites[0].visibility, PROOF_MEMORY_VISIBILITY);
   assert.equal(events.auditWrites[0].decision, 'accepted');
 });

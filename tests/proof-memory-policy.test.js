@@ -60,6 +60,22 @@ test('proof memory write policy requires explicit proof retention signal', () =>
   assert.deepEqual(proof.tags.sort(), ['cm1070', PROOF_MEMORY_TAG].sort());
 });
 
+test('proof memory write policy preserves explicit payload proof marker under normalized context scope', () => {
+  const proof = applyProofMemoryWritePolicy({
+    tags: ['cm1268'],
+    visibility: PROOF_MEMORY_VISIBILITY,
+    retention_policy: 'keep'
+  }, {
+    visibility: 'project',
+    retentionPolicy: 'keep'
+  });
+
+  assert.equal(proof.proofMemory.applied, true);
+  assert.equal(proof.visibility, PROOF_MEMORY_VISIBILITY);
+  assert.equal(proof.retentionPolicy, PROOF_MEMORY_RETENTION_POLICY);
+  assert.deepEqual(proof.tags.sort(), ['cm1268', PROOF_MEMORY_TAG].sort());
+});
+
 test('proof memory recall filters exclude internal proof visibility by default', () => {
   assert.deepEqual(
     buildProofMemoryRecallFilters({ projectId: 'codex-memory' }),

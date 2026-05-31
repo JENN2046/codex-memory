@@ -1,5 +1,35 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1268 Proof Memory Payload Marker Precedence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test proof-memory write-governance hardening for Codex/Claude execution context. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ProofMemoryPolicy.isExplicitProofMemoryPayload(...)` now evaluates explicit payload proof markers separately from normalized/effective scope signals.
+- Payload `visibility=internal_proof`, `proof_namespace`, `proofNamespace`, or proof retention can still trigger proof-memory policy even when execution context provides ordinary visibility/retention.
+- Added direct policy and write-service integration regressions covering ordinary context-derived scope plus explicit payload proof marker.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ProofMemoryPolicy.js`
+- `node --check tests\proof-memory-policy.test.js`
+- `node --check tests\memory-write-preflight-runtime-integration.test.js`
+- `node --test tests\proof-memory-policy.test.js` passed `5/5`.
+- `node --test tests\memory-write-preflight-runtime-integration.test.js` passed `8/8`.
+- `npm test` passed `2790/2790`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1268.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1267 Context-Derived Write Scope Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

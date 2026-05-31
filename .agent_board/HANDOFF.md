@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1267 CONTEXT_DERIVED_WRITE_SCOPE`.
+Goal: `CM-1268 PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after preserving execution-context scope through local write records.
+Status: `COMPLETED_VALIDATED_NOT_READY` after preserving explicit proof-memory payload markers under context-derived ordinary write scope.
 
 Workspace: `A:\codex-memory`.
 
@@ -49,6 +49,9 @@ Changed scope since CM-1207:
 - `src/core/MemoryWriteService.js`
 - `tests/memory-write-preflight-runtime-integration.test.js`
 - `docs/CM1267_CONTEXT_DERIVED_WRITE_SCOPE.md`
+- `src/core/ProofMemoryPolicy.js`
+- `tests/proof-memory-policy.test.js`
+- `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
@@ -590,6 +593,34 @@ Validation:
 Next:
 
 Commit or otherwise stabilize CM-1263, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1268 Current Handoff
+
+Goal: `CM-1268 PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1268 preserves explicit proof-memory payload markers under context-derived ordinary write scope.
+- `ProofMemoryPolicy.isExplicitProofMemoryPayload(...)` now evaluates payload proof markers separately from normalized/effective scope signals.
+- Added direct policy and write-service integration regressions proving payload `visibility=internal_proof` remains proof memory even when execution context supplies ordinary `visibility=project` and `retentionPolicy=keep`.
+- No provider/MCP external call, real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `node --check src\core\ProofMemoryPolicy.js`
+- `node --check tests\proof-memory-policy.test.js`
+- `node --check tests\memory-write-preflight-runtime-integration.test.js`
+- `node --test tests\proof-memory-policy.test.js` passed `5/5`.
+- `node --test tests\memory-write-preflight-runtime-integration.test.js` passed `8/8`.
+- `npm test` passed `2790/2790`.
+- Full docs/ledger validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1268, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
 
 ## CM-1267 Current Handoff
 

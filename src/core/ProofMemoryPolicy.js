@@ -29,20 +29,20 @@ function normalizeVisibilityList(value) {
 }
 
 function isExplicitProofMemoryPayload(payload = {}, normalized = {}) {
-  const visibility = normalizeString(
-    normalized.visibility ||
-    payload.visibility ||
-    payload.proof_namespace ||
-    payload.proofNamespace
-  );
-  const retentionPolicy = normalizeString(
-    normalized.retentionPolicy ||
-    payload.retention_policy ||
-    payload.retentionPolicy
-  );
+  const visibilitySignals = [
+    payload.visibility,
+    payload.proof_namespace,
+    payload.proofNamespace,
+    normalized.visibility
+  ].map(normalizeString);
+  const retentionPolicySignals = [
+    payload.retention_policy,
+    payload.retentionPolicy,
+    normalized.retentionPolicy
+  ].map(normalizeString);
 
-  return visibility === PROOF_MEMORY_VISIBILITY ||
-    retentionPolicy === PROOF_MEMORY_RETENTION_POLICY;
+  return visibilitySignals.includes(PROOF_MEMORY_VISIBILITY) ||
+    retentionPolicySignals.includes(PROOF_MEMORY_RETENTION_POLICY);
 }
 
 function applyProofMemoryWritePolicy(payload = {}, normalized = {}) {
