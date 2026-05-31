@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const { createConfig } = require('../config/createConfig');
 const { AuditLogStore } = require('../storage/AuditLogStore');
+const { buildNormalizedScopeAudit } = require('../recall/RecallAuditService');
 const {
   collectReport: collectGovernanceReport,
   buildGovernanceSurface,
@@ -341,22 +342,23 @@ function summarizeRecallAudit(entries = []) {
       lastRecallAt = entry.timestamp || null;
     }
 
-    if (!entry?.scopeApplied) {
+    const scopeAudit = buildNormalizedScopeAudit(entry);
+    if (!scopeAudit.scopeApplied) {
       continue;
     }
 
     scoped.scopedRecallCount += 1;
     scoped.latestScopedHitAt = pickLaterTimestamp(scoped.latestScopedHitAt, entry.timestamp || null);
-    if (entry.scopeStrict) {
+    if (scopeAudit.scopeStrict) {
       scoped.strictScopedRecallCount += 1;
     }
-    incrementBreakdown(scoped.scopeModeBreakdown, typeof entry.scopeMode === 'string' ? entry.scopeMode : 'unknown');
-    for (const dimension of Array.isArray(entry.scopeDimensions) ? entry.scopeDimensions : []) {
+    incrementBreakdown(scoped.scopeModeBreakdown, scopeAudit.scopeMode || 'unknown');
+    for (const dimension of scopeAudit.scopeDimensions) {
       incrementBreakdown(scoped.scopeDimensionBreakdown, isSafeScopeDimension(dimension) ? dimension : null);
     }
-    incrementBreakdown(scoped.projectBreakdown, typeof entry.scopeProjectId === 'string' ? entry.scopeProjectId : null);
-    incrementBreakdown(scoped.clientBreakdown, typeof entry.scopeClientId === 'string' ? entry.scopeClientId : null);
-    for (const visibility of Array.isArray(entry.scopeVisibility) ? entry.scopeVisibility : []) {
+    incrementBreakdown(scoped.projectBreakdown, scopeAudit.scopeProjectId || null);
+    incrementBreakdown(scoped.clientBreakdown, scopeAudit.scopeClientId || null);
+    for (const visibility of scopeAudit.scopeVisibility) {
       incrementBreakdown(scoped.visibilityBreakdown, typeof visibility === 'string' ? visibility : null);
     }
   }

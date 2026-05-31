@@ -4,6 +4,10 @@ const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 const { createConfig } = require('../config/createConfig');
 const {
+  buildNormalizedPolicyAudit,
+  buildNormalizedScopeAudit
+} = require('../recall/RecallAuditService');
+const {
   evaluateAuthorizedWritePathAutoAuthorizationPreflight
 } = require('../core/AuthorizedWritePathAutoAuthorizationPreflight');
 const {
@@ -269,10 +273,6 @@ function readRecentJsonlEntriesSync(filePath, maxLines = READ_POLICY_AUDIT_TAIL,
   }
 }
 
-function sumNumeric(entries, field) {
-  return entries.reduce((total, entry) => total + Number(entry?.[field] || 0), 0);
-}
-
 function latestTimestamp(entries) {
   return entries
     .map(entry => entry?.timestamp)
@@ -281,20 +281,36 @@ function latestTimestamp(entries) {
     .at(-1) || null;
 }
 
+function hasAnyOwn(entry, fields = []) {
+  return fields.some(field => Object.prototype.hasOwnProperty.call(entry, field));
+}
+
+function getRecallType(entry) {
+  return typeof entry?.recallType === 'string'
+    ? entry.recallType
+    : (typeof entry?.recall_type === 'string' ? entry.recall_type : null);
+}
+
 function buildReadPolicySurface({ config = null, recallEntries = [], auditTailLimit = null } = {}) {
   const effectiveConfig = config || createConfig();
   const entries = Array.isArray(recallEntries) ? recallEntries.filter(Boolean) : [];
   const policyEntries = entries.filter(entry => (
-    entry.recallType === 'read-policy'
-    || Object.prototype.hasOwnProperty.call(entry, 'readPolicyApplied')
-    || Object.prototype.hasOwnProperty.call(entry, 'lifecyclePolicyApplied')
+    getRecallType(entry) === 'read-policy'
+    || hasAnyOwn(entry, ['readPolicyApplied', 'read_policy_applied'])
+    || hasAnyOwn(entry, ['lifecyclePolicyApplied', 'lifecycle_policy_applied'])
   ));
+  const normalizedPolicyEntries = policyEntries.map(entry => buildNormalizedPolicyAudit(entry));
+  const normalizedScopeEntries = policyEntries.map(entry => buildNormalizedScopeAudit(entry));
   const lifecycleColumnSignals = policyEntries
-    .map(entry => entry.lifecycleColumnAvailable)
-    .filter(value => typeof value === 'boolean');
+    .map((entry, index) => hasAnyOwn(entry, ['lifecycleColumnAvailable', 'lifecycle_column_available'])
+      ? normalizedPolicyEntries[index].lifecycleColumnAvailable
+      : null)
+    .filter(value => value !== null);
   const scopeWorkspaceSignals = policyEntries
-    .map(entry => entry.scopeWorkspacePresent)
-    .filter(value => typeof value === 'boolean');
+    .map((entry, index) => hasAnyOwn(entry, ['scopeWorkspacePresent', 'scope_workspace_present'])
+      ? normalizedScopeEntries[index].scopeWorkspacePresent
+      : null)
+    .filter(value => value !== null);
   const hasRecentAuditEvidence = policyEntries.length > 0;
   const lifecyclePolicyEnabled = !!effectiveConfig.enableLifecycleReadPolicy;
   const softReadPolicyEnabled = !!effectiveConfig.enableSoftReadPolicy;
@@ -320,10 +336,10 @@ function buildReadPolicySurface({ config = null, recallEntries = [], auditTailLi
     lifecycleIncludedStatuses: LIFECYCLE_INCLUDED_STATUSES,
     lifecycleExcludedStatuses: LIFECYCLE_EXCLUDED_STATUSES,
     recentReadPolicyAuditCount: policyEntries.length,
-    recentReadPolicyAppliedCount: policyEntries.filter(entry => entry.readPolicyApplied === true).length,
-    recentLifecyclePolicyAppliedCount: policyEntries.filter(entry => entry.lifecyclePolicyApplied === true).length,
-    recentHiddenByLifecycleCount: sumNumeric(policyEntries, 'hiddenByLifecycleCount'),
-    recentStaleResultCount: sumNumeric(policyEntries, 'staleResultCount'),
+    recentReadPolicyAppliedCount: normalizedPolicyEntries.filter(entry => entry.readPolicyApplied === true).length,
+    recentLifecyclePolicyAppliedCount: normalizedPolicyEntries.filter(entry => entry.lifecyclePolicyApplied === true).length,
+    recentHiddenByLifecycleCount: normalizedPolicyEntries.reduce((total, entry) => total + entry.hiddenByLifecycleCount, 0),
+    recentStaleResultCount: normalizedPolicyEntries.reduce((total, entry) => total + entry.staleResultCount, 0),
     lifecycleColumnAvailable: lifecycleColumnSignals.length > 0
       ? lifecycleColumnSignals.every(Boolean)
       : null,

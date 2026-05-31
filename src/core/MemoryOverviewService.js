@@ -2,6 +2,7 @@ const path = require('node:path');
 
 const { DEFAULT_AUDIT_WINDOW } = require('../storage/AuditLogStore');
 const { KNOWLEDGE_DIARY_NAME, PROCESS_DIARY_NAME } = require('./constants');
+const { buildNormalizedScopeAudit } = require('../recall/RecallAuditService');
 
 const DEFAULT_LIST_LIMIT = 10;
 
@@ -151,26 +152,27 @@ function buildRecallScopeSummary(entries) {
   };
 
   for (const entry of entries) {
-    if (!entry?.scopeApplied) continue;
+    const scopeAudit = buildNormalizedScopeAudit(entry);
+    if (!scopeAudit.scopeApplied) continue;
 
     const timestamp = typeof entry.timestamp === 'string' ? entry.timestamp : null;
     summary.scopedRecallCount += 1;
     summary.latestScopedHitAt = pickLaterTimestamp(summary.latestScopedHitAt, timestamp);
 
-    if (entry.scopeStrict) {
+    if (scopeAudit.scopeStrict) {
       summary.strictScopedRecallCount += 1;
     }
 
-    incrementBreakdown(summary.modeBreakdown, typeof entry.scopeMode === 'string' ? entry.scopeMode : 'unknown');
+    incrementBreakdown(summary.modeBreakdown, scopeAudit.scopeMode || 'unknown');
 
-    for (const dimension of Array.isArray(entry.scopeDimensions) ? entry.scopeDimensions : []) {
+    for (const dimension of scopeAudit.scopeDimensions) {
       incrementBreakdown(summary.dimensionBreakdown, typeof dimension === 'string' ? dimension : null);
     }
 
-    incrementBreakdown(summary.projectBreakdown, typeof entry.scopeProjectId === 'string' ? entry.scopeProjectId : null);
-    incrementBreakdown(summary.clientBreakdown, typeof entry.scopeClientId === 'string' ? entry.scopeClientId : null);
+    incrementBreakdown(summary.projectBreakdown, scopeAudit.scopeProjectId || null);
+    incrementBreakdown(summary.clientBreakdown, scopeAudit.scopeClientId || null);
 
-    for (const visibility of Array.isArray(entry.scopeVisibility) ? entry.scopeVisibility : []) {
+    for (const visibility of scopeAudit.scopeVisibility) {
       incrementBreakdown(summary.visibilityBreakdown, typeof visibility === 'string' ? visibility : null);
     }
   }

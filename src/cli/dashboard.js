@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
 const { createConfig } = require('../config/createConfig');
+const { buildNormalizedScopeAudit } = require('../recall/RecallAuditService');
 const {
   collectReport: collectGovernanceReport,
   buildGovernanceSurface,
@@ -327,21 +328,22 @@ function buildRecallScopeSummary(entries = []) {
   };
 
   for (const entry of entries) {
-    if (!entry?.scopeApplied) continue;
+    const scopeAudit = buildNormalizedScopeAudit(entry);
+    if (!scopeAudit.scopeApplied) continue;
 
     summary.scopedRecallCount += 1;
     summary.latestScopedHitAt = pickLaterTimestamp(summary.latestScopedHitAt, entry.timestamp || null);
-    if (entry.scopeStrict) {
+    if (scopeAudit.scopeStrict) {
       summary.strictScopedRecallCount += 1;
     }
 
-    incrementBreakdown(summary.scopeModeBreakdown, typeof entry.scopeMode === 'string' ? entry.scopeMode : 'unknown');
-    for (const dimension of Array.isArray(entry.scopeDimensions) ? entry.scopeDimensions : []) {
+    incrementBreakdown(summary.scopeModeBreakdown, scopeAudit.scopeMode || 'unknown');
+    for (const dimension of scopeAudit.scopeDimensions) {
       incrementBreakdown(summary.scopeDimensionBreakdown, isSafeScopeDimension(dimension) ? dimension : null);
     }
-    incrementBreakdown(summary.projectBreakdown, typeof entry.scopeProjectId === 'string' ? entry.scopeProjectId : null);
-    incrementBreakdown(summary.clientBreakdown, typeof entry.scopeClientId === 'string' ? entry.scopeClientId : null);
-    for (const visibility of Array.isArray(entry.scopeVisibility) ? entry.scopeVisibility : []) {
+    incrementBreakdown(summary.projectBreakdown, scopeAudit.scopeProjectId || null);
+    incrementBreakdown(summary.clientBreakdown, scopeAudit.scopeClientId || null);
+    for (const visibility of scopeAudit.scopeVisibility) {
       incrementBreakdown(summary.visibilityBreakdown, typeof visibility === 'string' ? visibility : null);
     }
   }

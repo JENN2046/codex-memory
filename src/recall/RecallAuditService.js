@@ -241,5 +241,7 @@ class RecallAuditService {
 }
 
 module.exports = {
-  RecallAuditService
+  RecallAuditService,
+  buildNormalizedScopeAudit,
+  buildNormalizedPolicyAudit
 };

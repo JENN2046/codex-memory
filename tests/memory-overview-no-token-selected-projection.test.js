@@ -53,12 +53,12 @@ test('no-token selected overview sanitizes core overview dependencies directly',
           memoryIds: ['memory-id-list-should-not-leak'],
           topSourceFile: 'A:/sensitive/dailynote/process/raw.md',
           sourceFiles: ['A:/sensitive/dailynote/process/raw.md'],
-          scopeApplied: true,
-          scopeStrict: true,
-          scopeMode: 'project',
-          scopeProjectId: 'project-id-should-not-leak',
-          scopeClientId: 'client-id-should-not-leak',
-          scopeVisibility: ['private-visibility-should-not-leak']
+          scope_applied: true,
+          scope_strict: true,
+          scope_mode: 'project',
+          scope_project_id: 'project-id-should-not-leak',
+          scope_client_id: 'client-id-should-not-leak',
+          scope_visibility: ['private-visibility-should-not-leak']
         }
       ]
     },

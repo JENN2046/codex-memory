@@ -392,13 +392,13 @@ test('governance-report CLI should surface recent read-policy audit evidence whe
     await fs.mkdir(path.dirname(recallLogPath), { recursive: true });
     await fs.writeFile(recallLogPath, `${JSON.stringify({
       timestamp: '2026-04-23T09:12:00.000Z',
-      recallType: 'read-policy',
-      readPolicyApplied: true,
-      lifecyclePolicyApplied: true,
-      hiddenByLifecycleCount: 2,
-      staleResultCount: 1,
-      lifecycleColumnAvailable: true,
-      scopeWorkspacePresent: true
+      recall_type: 'read-policy',
+      read_policy_applied: true,
+      lifecycle_policy_applied: true,
+      hidden_by_lifecycle_count: 2,
+      stale_result_count: 1,
+      lifecycle_column_available: true,
+      scope_workspace_present: true
     })}\n`, 'utf8');
 
     const result = await runGovernanceReport({

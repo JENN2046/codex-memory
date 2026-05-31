@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1296 Audit Summary Alias Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test audit summary metadata fallback normalization hardening. No live recall, provider call, MCP external call, broad real-memory scan, durable audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryOverviewService`, `http-observe`, and `dashboard` now normalize recall scope audit metadata before summary aggregation.
+- `governance-report` now normalizes read-policy audit policy/scope metadata before summary aggregation.
+- Snake-case JSONL records from older audit paths, external imports, or fixtures are counted by the same summary surfaces as camel-case records.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\memory-overview-no-token-selected-projection.test.js tests\http-observe-cli.test.js tests\governance-report-cli.test.js tests\dashboard-cli.test.js tests\recall-audit-service.test.js` passed `65/65`.
+- `npm test` passed `2819/2819`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1296.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1295 Read-Policy Audit Field Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1295 READ_POLICY_AUDIT_FIELD_FALLBACK_NORMALIZATION`.
+Goal: `CM-1296 AUDIT_SUMMARY_ALIAS_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing read-policy audit metadata fallback normalization and validating observe/governance-report compatibility.
+Status: `COMPLETED_VALIDATED_NOT_READY` after extending recall audit alias normalization into overview/observe/dashboard/governance summary consumers.
 
 Workspace: `A:\codex-memory`.
 
@@ -124,6 +124,14 @@ Changed scope since CM-1207:
 - `tests/recall-audit-service.test.js`
 - `docs/CM1294_RECALL_AUDIT_SCOPE_FIELD_FALLBACK_NORMALIZATION.md`
 - `docs/CM1295_READ_POLICY_AUDIT_FIELD_FALLBACK_NORMALIZATION.md`
+- `src/core/MemoryOverviewService.js`
+- `src/cli/http-observe.js`
+- `src/cli/dashboard.js`
+- `src/cli/governance-report.js`
+- `tests/memory-overview-no-token-selected-projection.test.js`
+- `tests/http-observe-cli.test.js`
+- `tests/governance-report-cli.test.js`
+- `docs/CM1296_AUDIT_SUMMARY_ALIAS_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`
