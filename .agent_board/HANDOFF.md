@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1223 VALIDATION_AGGREGATOR_FULL_GAP_ACCOUNTING`.
+Goal: `CM-1224 VALIDATION_AGGREGATOR_RUNTIME_SUMMARY_GAP_BINDING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after adding local no-touch full implementation gap accounting to the ValidationAggregator report shape.
+Status: `COMPLETED_VALIDATED_NOT_READY` after binding accepted sanitized runtime summaries into the ValidationAggregator full gap accounting report shape.
 
 Workspace: `A:\codex-memory`.
 
@@ -41,6 +41,7 @@ Changed scope since CM-1207:
 - `src/core/ValidationAggregatorService.js`
 - `tests/v1-rc-validation-aggregator-implementation.test.js`
 - `docs/CM1223_VALIDATION_AGGREGATOR_FULL_GAP_ACCOUNTING.md`
+- `docs/CM1224_VALIDATION_AGGREGATOR_RUNTIME_SUMMARY_GAP_BINDING.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -93,9 +94,12 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1223 added static no-touch full implementation gap accounting to `buildV1RcValidationAggregatorReport()`.
 - The report now exposes remaining/local full implementation gap ids/counts and next safe closure candidates.
 - CM-1223 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- CM-1224 binds accepted explicit sanitized runtime summaries into that accounting output, exposing summary remaining/local gap ids/counts.
+- Rejected or absent summaries bind nothing.
+- CM-1224 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1223:
+Validation for CM-1224:
 
 - `node --check src\core\ValidationAggregatorService.js`
 - `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js`

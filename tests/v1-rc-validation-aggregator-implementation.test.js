@@ -222,6 +222,12 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRemainingGapCount, 7);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingLocallyEvidencedGapCount, 2);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount, 3);
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound, false);
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryRemainingGapCount, 0);
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryLocallyEvidencedGapCount,
+    0
+  );
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationFixtureReadByAggregator, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationTestExecutedByAggregator, false);
@@ -675,6 +681,11 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.fullImplementationGapAccounting.readinessClaimedByAccounting,
     false
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryBound, false);
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryRemainingGapIds,
+    []
   );
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.fixtureReadByAggregator, false);
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.testExecutedByAggregator, false);
@@ -2192,6 +2203,34 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(report.summary.runtimeEvidenceSummaryRejected, false);
   assert.equal(report.summary.runtimeEvidenceSummaryLocallyEvidencedGapCount, 2);
   assert.equal(report.summary.runtimeEvidenceSummaryRemainingGapCount, 2);
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound, true);
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryRemainingGapCount, 2);
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryLocallyEvidencedGapCount,
+    2
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryBound,
+    true
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryRemainingGapIds,
+    [
+      'validation_aggregator_full_implementation_incomplete',
+      'mainline_strict_gate_not_executed_for_cutover'
+    ]
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryLocallyEvidencedGapIds,
+    [
+      'runtime_schema_version_enforcement_not_fully_proven',
+      'final_rc_matrix_runner_not_executed_as_real_matrix'
+    ]
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.fullImplementationGapAccounting.fullImplementationReady,
+    false
+  );
   assert.equal(report.summary.validationAggregatorFullImplementation, false);
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);

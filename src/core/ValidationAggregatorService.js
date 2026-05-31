@@ -325,15 +325,36 @@ const P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES = [
   'a5_approval_missing'
 ];
 
-function buildP66FullImplementationGapAccounting() {
+function buildP66FullImplementationGapAccounting(runtimeEvidenceSummaryBridge = null) {
+  const acceptedRuntimeSummary = runtimeEvidenceSummaryBridge &&
+    runtimeEvidenceSummaryBridge.accepted === true
+    ? runtimeEvidenceSummaryBridge
+    : null;
+  const acceptedRuntimeSummaryRemainingGapIds = acceptedRuntimeSummary
+    ? acceptedRuntimeSummary.remainingRuntimeGaps
+    : [];
+  const acceptedRuntimeSummaryLocallyEvidencedGapIds = acceptedRuntimeSummary
+    ? acceptedRuntimeSummary.locallyEvidencedRuntimeGaps
+    : [];
+
   return {
     available: true,
     sourceMode: 'static_report_shape_only',
+    runtimeSummaryBindingSourceMode: 'explicit_sanitized_summary_only',
     fullImplementationReady: false,
     remainingFullImplementationGapIds: P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS,
     remainingFullImplementationGapCount: P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS.length,
     locallyEvidencedFullImplementationGapIds: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS,
     locallyEvidencedFullImplementationGapCount: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS.length,
+    acceptedRuntimeSummaryBound: Boolean(acceptedRuntimeSummary),
+    acceptedRuntimeSummaryStatus: acceptedRuntimeSummary
+      ? acceptedRuntimeSummary.status
+      : 'no_accepted_runtime_summary',
+    acceptedRuntimeSummaryRemainingGapIds,
+    acceptedRuntimeSummaryRemainingGapCount: acceptedRuntimeSummaryRemainingGapIds.length,
+    acceptedRuntimeSummaryLocallyEvidencedGapIds,
+    acceptedRuntimeSummaryLocallyEvidencedGapCount:
+      acceptedRuntimeSummaryLocallyEvidencedGapIds.length,
     blockedA5HardStopIds: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS,
     blockedA5HardStopCount: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS.length,
     nextSafeClosureCandidates: P66_FULL_IMPLEMENTATION_NEXT_SAFE_CLOSURE_CANDIDATES,
@@ -1866,7 +1887,8 @@ function buildV1RcValidationAggregatorReport({
   );
   const v11HardeningValidationAggregator =
     evaluateV11HardeningValidationAggregator(v11HardeningEvidence || {});
-  const p66FullImplementationGapAccounting = buildP66FullImplementationGapAccounting();
+  const p66FullImplementationGapAccounting =
+    buildP66FullImplementationGapAccounting(runtimeEvidenceSummaryBridge);
   const validationEvidenceFreshness = summarizeValidationEvidenceFreshness({
     acceptedSources: validationEvidenceReader.acceptedSources,
     generatedAt
@@ -2140,6 +2162,12 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.locallyEvidencedFullImplementationGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount:
         p66FullImplementationGapAccounting.nextSafeClosureCandidateCount,
+      p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound:
+        p66FullImplementationGapAccounting.acceptedRuntimeSummaryBound,
+      p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryRemainingGapCount:
+        p66FullImplementationGapAccounting.acceptedRuntimeSummaryRemainingGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryLocallyEvidencedGapCount:
+        p66FullImplementationGapAccounting.acceptedRuntimeSummaryLocallyEvidencedGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady: false,
       p66ValidationAggregatorFullImplementationFixtureReadByAggregator: false,
       p66ValidationAggregatorFullImplementationTestExecutedByAggregator: false,
@@ -3113,6 +3141,16 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.locallyEvidencedFullImplementationGapCount,
         nextSafeClosureCandidates:
           p66FullImplementationGapAccounting.nextSafeClosureCandidates,
+        acceptedRuntimeSummaryBound:
+          p66FullImplementationGapAccounting.acceptedRuntimeSummaryBound,
+        acceptedRuntimeSummaryRemainingGapIds:
+          p66FullImplementationGapAccounting.acceptedRuntimeSummaryRemainingGapIds,
+        acceptedRuntimeSummaryRemainingGapCount:
+          p66FullImplementationGapAccounting.acceptedRuntimeSummaryRemainingGapCount,
+        acceptedRuntimeSummaryLocallyEvidencedGapIds:
+          p66FullImplementationGapAccounting.acceptedRuntimeSummaryLocallyEvidencedGapIds,
+        acceptedRuntimeSummaryLocallyEvidencedGapCount:
+          p66FullImplementationGapAccounting.acceptedRuntimeSummaryLocallyEvidencedGapCount,
         fixtureReadByAggregator: false,
         testExecutedByAggregator: false,
         helperExecutedByAggregator: false,
