@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1240 A5_APPROVAL_CHECK_CLI`.
+Goal: `CM-1241 A5_APPROVAL_CHECK_ENTRYPOINTS`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test implementation of an explicit-input A5 approval check CLI wrapper.
+Status: `IN_PROGRESS_TARGETED_VALIDATED_NOT_READY` after local package metadata/test implementation of standard entrypoints for the A5 approval check CLI.
 
 Workspace: `A:\codex-memory`.
 
@@ -62,6 +62,9 @@ Changed scope since CM-1207:
 - `src/cli/a5-approval-check.js`
 - `tests/a5-approval-check-cli.test.js`
 - `docs/CM1240_A5_APPROVAL_CHECK_CLI.md`
+- `package.json`
+- `tests/a5-approval-check-package-entry.test.js`
+- `docs/CM1241_A5_APPROVAL_CHECK_ENTRYPOINTS.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -153,6 +156,9 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1240 adds a local explicit-input CLI wrapper for the verifier.
 - CM-1240 exits `0` only when the supplied approval line exactly matches expected unit, branch, and commit; stale or missing approval inputs fail closed.
 - CM-1240 does not discover approval, grant approval, execute approved commands, start services, call MCP/provider, read real memory, write durable memory/audit, or claim readiness.
+- CM-1241 exposes the approval check CLI through npm script `a5:approval-check` and bin `codex-memory-a5-approval-check`.
+- CM-1241 does not add dependencies or change lockfiles.
+- CM-1241 does not grant approval, execute approved commands, call MCP/provider, read real memory, write durable memory/audit, or claim readiness.
 - CM-1229 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected future aggregation units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
 - CM-1229 does not execute ValidationAggregator, scan files/stores, call MCP tools, call providers, write durable memory/audit, or claim readiness.

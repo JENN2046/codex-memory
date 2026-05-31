@@ -19,6 +19,7 @@
     "codex-memory-shadow-compare": "./src/cli/shadow-compare.js",
     "codex-memory-profile-gate": "./src/cli/profile-gate.js",
     "codex-memory-v8-diagnose": "./src/cli/v8-diagnose.js",
+    "codex-memory-a5-approval-check": "./src/cli/a5-approval-check.js",
     "codex-memory-provider-smoke": "./src/cli/provider-smoke.js",
     "codex-memory-provider-benchmark": "./src/cli/provider-benchmark.js"
   },
@@ -50,6 +51,7 @@
     "shadow-compare": "node ./src/cli/shadow-compare.js",
     "profile-gate": "node ./src/cli/profile-gate.js",
     "v8-diagnose": "node ./src/cli/v8-diagnose.js",
+    "a5:approval-check": "node ./src/cli/a5-approval-check.js",
     "scope:acceptance": "node ./src/cli/scope-acceptance.js",
     "scope:backfill:dry-run": "node ./src/cli/scope-backfill-dry-run.js",
     "lifecycle:sqlite:dry-run": "node ./src/cli/lifecycle-sqlite-dry-run.js",

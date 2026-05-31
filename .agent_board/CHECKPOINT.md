@@ -1,5 +1,49 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1241 A5 Approval Check Entrypoints Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local package metadata/test entrypoint only. No A5 approval grant, strict gate execution, runtime evidence execution, dependency change, lockfile change, or external action.
+
+Result:
+
+- Added npm script `a5:approval-check`.
+- Added package bin `codex-memory-a5-approval-check`.
+- Added targeted package metadata test for both entrypoints.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\cli\a5-approval-check.js`
+- `node --test tests\a5-approval-check-cli.test.js tests\a5-approval-check-package-entry.test.js` passed `5/5`.
+- `npm run a5:approval-check -- --help`
+- `npm run gate:ci` passed fixture-only, no network, no daemon, no provider; CI-safe tests `2765/2765`; docs scripts `43 scripts, all targets exist`.
+- `git diff --check`
+- Ledger consistency validation.
+- Docs validation via `scripts\validate-local.ps1 -Area docs`.
+
+Boundary:
+
+- No A5-GAP execution.
+- No strict gate execution.
+- No service start.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No dependency or lockfile change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1241.
+- Future A5 execution still requires a separate exact user approval line.
+
 ## CM-1240 A5 Approval Check CLI Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

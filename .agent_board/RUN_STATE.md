@@ -7,14 +7,14 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1240 A5 approval check CLI implemented and locally committed |
+| Current task | CM-1241 A5 approval check entrypoints implemented and validated |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
 | Untracked files left untouched | `CLAUDE.md`; `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` |
-| Runtime/source touched by current task | `src/cli/a5-approval-check.js` CLI wrapper only |
+| Runtime/source touched by current task | none; package metadata/test entrypoint only |
 | Provider/API calls by current task | no |
 | Real memory tools by current task | no |
 | Durable memory/audit writes by current task | no |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1240 added a local explicit-input CLI wrapper for exact A5 approval line checks. It validates supplied text against expected unit, branch, and commit without granting approval or executing approved commands. Source/test/docs validation passed; readiness remains false. Next safe action is to select the next local-safe task or request a separate exact approval before any future A5 execution.
+CM-1241 exposes the local A5 approval check CLI through `npm run a5:approval-check -- ...` and package bin `codex-memory-a5-approval-check`. It only improves local operator entrypoints; it does not grant approval or execute approved commands. Source/test/docs validation and fixture-only `gate:ci` passed; readiness remains false. Next safe action is to select the next local-safe task or request a separate exact approval before any future A5 execution.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

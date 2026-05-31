@@ -1,6 +1,6 @@
 # codex-memory Status
 
-更新时间：2026-05-31
+更新时间：2026-06-01
 
 ## 当前结论
 
@@ -77,7 +77,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1240 A5_APPROVAL_CHECK_CLI` 已新增本地 explicit-input CLI wrapper：`src/cli/a5-approval-check.js` 可在后续 A5 执行前校验用户给出的 approval line 是否匹配 expected unit / branch / commit，并以 fail-closed exit code 暴露缺参或 stale commit。Targeted validation `node --check src\cli\a5-approval-check.js` 与 `node --test tests\a5-approval-line-verifier.test.js tests\a5-approval-check-cli.test.js` 通过，测试 `9/9`。该 CLI 不发现 approval、不授予 approval、不执行被批准命令、不启动服务、不调用 provider/MCP、不读取真实记忆、不写 durable memory/audit、不改变 readiness。
 
-CM-1240 已稳定在 tracked history 中；如需执行 strict gate，用户仍需使用 fresh HEAD 给出 exact approval。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230/CM-1231/CM-1232/CM-1233/CM-1234/CM-1235/CM-1236/CM-1237/CM-1238/CM-1239/CM-1240 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1241 A5_APPROVAL_CHECK_ENTRYPOINTS` 已把该只读 CLI 暴露为标准本地入口：`npm run a5:approval-check -- ...` 与 bin `codex-memory-a5-approval-check`。Targeted validation `node --check src\cli\a5-approval-check.js`、`node --test tests\a5-approval-check-cli.test.js tests\a5-approval-check-package-entry.test.js` 与 `npm run a5:approval-check -- --help` 通过；fixture-only `npm run gate:ci` 也通过，包含 docs script target check `43 scripts, all targets exist` 和 CI-safe tests `2765/2765`。该变更只改 package metadata/test/docs，不改依赖或 lockfile，不授予 approval，不执行被批准命令，不调用 provider/MCP，不读取真实记忆，不写 durable memory/audit，不改变 readiness。
+
+CM-1241 仍是本地前置检查能力；如需执行 strict gate，用户仍需使用 fresh HEAD 给出 exact approval。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230/CM-1231/CM-1232/CM-1233/CM-1234/CM-1235/CM-1236/CM-1237/CM-1238/CM-1239/CM-1240/CM-1241 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 
