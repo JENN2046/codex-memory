@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1301 Selected Audit Correlation Preflight Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test selected audit-correlation observation preflight fallback normalization hardening. No selected audit observation, true audit-log read, provider call, MCP external call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `normalizePreflightInput(...)` now uses first non-empty normalized aliases for packet/request hash and prior/current artifact metadata.
+- Blank camel-case `taskId` / `resultClass` / `packetId` / `requestSha256` no longer mask valid snake_case fallback fields.
+- Selected audit-correlation observation prerequisites remain explicit-input-only and still do not execute observation reads.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\selected-audit-correlation-observation-preflight.test.js tests\selected-audit-correlation-current-facts-preflight-cli.test.js tests\selected-audit-correlation-current-facts-stage-gate-cli.test.js tests\selected-audit-correlation-result-classifier.test.js` passed `28/28`.
+- `npm test` passed `2823/2823`.
+- `git diff --check`, ledger consistency, and docs validation passed.
+
+Next:
+
+- Commit or otherwise stabilize CM-1301 if validation passes.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1300 Proof Memory Policy Alias Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

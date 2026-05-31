@@ -93,6 +93,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeStatusLines(value) {
   if (Array.isArray(value)) {
     return value.map(normalizeString).filter(Boolean);
@@ -135,8 +143,8 @@ function normalizePriorResults(value = []) {
   return (Array.isArray(value) ? value : [])
     .filter(isPlainObject)
     .map(item => ({
-      taskId: normalizeString(item.taskId || item.task_id),
-      resultClass: normalizeString(item.resultClass || item.result_class)
+      taskId: firstNormalizedString(item.taskId, item.task_id),
+      resultClass: firstNormalizedString(item.resultClass, item.result_class)
     }));
 }
 
@@ -144,8 +152,8 @@ function normalizeCurrentArtifacts(value = []) {
   return (Array.isArray(value) ? value : [])
     .filter(isPlainObject)
     .map(item => ({
-      taskId: normalizeString(item.taskId || item.task_id),
-      resultClass: normalizeString(item.resultClass || item.result_class),
+      taskId: firstNormalizedString(item.taskId, item.task_id),
+      resultClass: firstNormalizedString(item.resultClass, item.result_class),
       helper: normalizeString(item.helper)
     }));
 }
@@ -155,8 +163,8 @@ function normalizePreflightInput(input = {}) {
   return {
     basisId: normalizeString(safeInput.basisId) || CM1120_BASIS_ID,
     approvalLine: normalizeString(safeInput.approvalLine),
-    packetId: normalizeString(safeInput.packetId || safeInput.packet_id),
-    requestSha256: normalizeString(safeInput.requestSha256 || safeInput.request_sha256),
+    packetId: firstNormalizedString(safeInput.packetId, safeInput.packet_id),
+    requestSha256: firstNormalizedString(safeInput.requestSha256, safeInput.request_sha256),
     gitFacts: normalizeGitFacts(safeInput.gitFacts),
     priorResults: normalizePriorResults(safeInput.priorResults || safeInput.prior_results),
     currentArtifacts: normalizeCurrentArtifacts(safeInput.currentArtifacts || safeInput.current_artifacts),

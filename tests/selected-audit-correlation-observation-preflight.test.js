@@ -190,3 +190,36 @@ test('CM-1121 preflight normalizes aliases without implicit file or command read
   assert.equal(normalized.priorResults[0].taskId, 'CM-1111');
   assert.equal(normalized.currentArtifacts[0].taskId, 'CM-1118');
 });
+
+test('CM-1121 preflight falls through blank camel-case task and result fields to snake-case aliases', () => {
+  const normalized = normalizePreflightInput(buildInput({
+    packetId: '   ',
+    packet_id: 'CM-1120-SELECTED-AUDIT-CORRELATION-OBSERVATION-APPROVAL-001',
+    requestSha256: '   ',
+    request_sha256: REQUEST_SHA256,
+    priorResults: REQUIRED_PRIOR_RESULTS.map(item => ({
+      taskId: '   ',
+      task_id: item.taskId,
+      resultClass: '   ',
+      result_class: item.resultClass
+    })),
+    currentArtifacts: REQUIRED_CURRENT_ARTIFACTS.map(item => ({
+      taskId: '   ',
+      task_id: item.taskId,
+      resultClass: '   ',
+      result_class: item.resultClass,
+      helper: item.helper
+    }))
+  }));
+
+  assert.equal(normalized.packetId, 'CM-1120-SELECTED-AUDIT-CORRELATION-OBSERVATION-APPROVAL-001');
+  assert.equal(normalized.requestSha256, REQUEST_SHA256);
+  assert.deepEqual(
+    normalized.priorResults.map(item => [item.taskId, item.resultClass]),
+    REQUIRED_PRIOR_RESULTS.map(item => [item.taskId, item.resultClass])
+  );
+  assert.deepEqual(
+    normalized.currentArtifacts.map(item => [item.taskId, item.resultClass]),
+    REQUIRED_CURRENT_ARTIFACTS.map(item => [item.taskId, item.resultClass])
+  );
+});
