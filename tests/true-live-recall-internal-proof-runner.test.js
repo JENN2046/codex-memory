@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const test = require('node:test');
 
 const {
@@ -55,6 +56,14 @@ function createZeroSideEffectCounters(overrides = {}) {
     ...ZERO_SIDE_EFFECT_COUNTERS,
     ...overrides
   };
+}
+
+function hashOpaqueId(value) {
+  return crypto
+    .createHash('sha256')
+    .update(String(value))
+    .digest('hex')
+    .slice(0, 16);
 }
 
 test('internal proof runner rejects missing approval and non-exact query count', async () => {
@@ -146,6 +155,30 @@ test('internal proof runner seals read-only proof context and emits sanitized ev
   assert.equal(report.perQuery[0].matchedMetadataKeysOnly.includes('snippet'), false);
   assert.equal(report.perQuery[0].matchedMetadataKeysOnly.includes('title'), false);
   assert.match(report.perQuery[0].topResultIdHashOrStableOpaqueId, /^[a-f0-9]{16}$/);
+});
+
+test('internal proof runner falls through blank result id aliases before hashing', async () => {
+  const runner = new TrueLiveRecallReadonlyProofRunner({
+    async searchExecutor() {
+      return {
+        results: [{
+          memoryId: '   ',
+          memory_id: 'memory-from-snake',
+          id: 'memory-from-id',
+          score: 0.5
+        }],
+        sideEffectCounters: createZeroSideEffectCounters()
+      };
+    }
+  });
+
+  const report = await runner.run({
+    approvalLine: EXACT_APPROVAL_LINE,
+    queries: createQueries(),
+    proofRunId: 'CM-1304-synthetic-proof'
+  });
+
+  assert.equal(report.perQuery[0].topResultIdHashOrStableOpaqueId, hashOpaqueId('memory-from-snake'));
 });
 
 test('internal proof runner allows a narrowed approval reference override without reviving legacy packet labeling', async () => {

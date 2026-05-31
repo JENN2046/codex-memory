@@ -278,6 +278,19 @@ function numberOrNull(value) {
   return Number.isFinite(numeric) ? Number(numeric.toFixed(6)) : null;
 }
 
+function normalizeString(value) {
+  const text = String(value ?? '').trim();
+  return text || null;
+}
+
+function firstStringValue(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
 function collectMetadataKeys(result) {
   if (!result || typeof result !== 'object') return [];
   return Object.keys(result)
@@ -295,7 +308,7 @@ function sanitizeResult(result) {
     };
   }
 
-  const idSource = result.memoryId || result.memory_id || result.id || result.sourceFile;
+  const idSource = firstStringValue(result.memoryId, result.memory_id, result.id, result.sourceFile);
   return {
     topResultIdHashOrStableOpaqueId: hashOpaqueId(idSource),
     topResultScoreIfAvailable: numberOrNull(result.score ?? result.baseScore ?? result.rerankScore),

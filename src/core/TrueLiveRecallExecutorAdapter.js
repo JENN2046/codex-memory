@@ -188,6 +188,19 @@ function numberOrNull(value) {
   return Number.isFinite(numeric) ? Number(numeric.toFixed(6)) : null;
 }
 
+function normalizeString(value) {
+  const text = String(value ?? '').trim();
+  return text || null;
+}
+
+function firstStringValue(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
 function dateOnly(value) {
   const text = String(value || '').trim();
   if (!text) return null;
@@ -212,13 +225,13 @@ function sanitizeResultForRunner(result = {}) {
   }
 
   return {
-    memoryId: result.memoryId || result.memory_id || result.id || null,
+    memoryId: firstStringValue(result.memoryId, result.memory_id, result.id),
     score: numberOrNull(result.score),
     baseScore: numberOrNull(result.baseScore ?? result.base_score),
     rerankScore: numberOrNull(result.rerankScore ?? result.rerank_score),
     target: result.target || null,
-    createdAtDateOnly: dateOnly(result.createdAt || result.created_at),
-    updatedAtDateOnly: dateOnly(result.updatedAt || result.updated_at),
+    createdAtDateOnly: dateOnly(firstStringValue(result.createdAt, result.created_at)),
+    updatedAtDateOnly: dateOnly(firstStringValue(result.updatedAt, result.updated_at)),
     sourceKinds: Array.isArray(result.sourceKinds) ? result.sourceKinds.map(String).sort() : [],
     matchedTagsCount: Array.isArray(result.matchedTags) ? result.matchedTags.length : 0,
     coreTagsCount: Array.isArray(result.coreTags) ? result.coreTags.length : 0

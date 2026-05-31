@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1304 True Live Recall Proof Metadata Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test true-live recall proof sanitized metadata fallback normalization hardening. No true-live recall execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, approval-profile change, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `sanitizeResultForRunner(...)` now uses first non-empty normalized result id/date aliases for sanitized proof metadata.
+- Internal proof runner per-query result id hashing now ignores blank result id aliases before falling through to `memory_id`, `id`, or `sourceFile`.
+- Blank camel-case `memoryId`, `createdAt`, and `updatedAt` no longer mask snake_case/id metadata in proof output.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\true-live-recall-executor-adapter.test.js tests\true-live-recall-internal-proof-runner.test.js tests\recall-proof-execution-preflight.test.js tests\recall-proof-execution-preflight-cli.test.js` passed `31/31`.
+- `npm test` passed `2827/2827`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1304 closeout.
+
+Next:
+
+- Commit or otherwise stabilize CM-1304.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1303 Deferred Governance Target IDs Alias Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1303 DEFERRED_GOVERNANCE_TARGET_IDS_ALIAS_FALLBACK`.
+Goal: `CM-1304 TRUE_LIVE_RECALL_PROOF_METADATA_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing deferred governance runtime-entry target id alias fallback. Targeted deferred-governance tests passed `28/28`; default `npm test` passed `2825/2825`. Commit is still pending until final diff/docs validation closeout.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing true-live recall proof sanitized metadata alias fallback. Targeted true-live recall proof tests passed `31/31`; default `npm test` passed `2827/2827`. Commit is still pending until final diff/docs validation closeout.
 
 Workspace: `A:\codex-memory`.
 

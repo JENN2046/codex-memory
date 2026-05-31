@@ -12,7 +12,8 @@ const {
 } = require('../src/core/TrueLiveRecallReadonlyProofRunner');
 const {
   EXPECTED_SOURCE,
-  createTrueLiveRecallExecutorAdapter
+  createTrueLiveRecallExecutorAdapter,
+  sanitizeResultForRunner
 } = require('../src/core/TrueLiveRecallExecutorAdapter');
 
 function createQueries() {
@@ -195,6 +196,23 @@ test('executor adapter binds search_memory to no-token read-only context and ret
   assert.equal(Object.prototype.hasOwnProperty.call(response.results[0], 'text'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(response.results[0], 'title'), false);
   assert.equal(Object.prototype.hasOwnProperty.call(response.results[0], 'snippet'), false);
+});
+
+test('executor adapter falls through blank sanitized metadata aliases', () => {
+  const result = sanitizeResultForRunner({
+    memoryId: '   ',
+    memory_id: 'memory-from-snake',
+    id: 'memory-from-id',
+    createdAt: '   ',
+    created_at: '2026-06-01T01:02:03.000Z',
+    updatedAt: '',
+    updated_at: '2026-06-02T01:02:03.000Z',
+    score: 0.25
+  });
+
+  assert.equal(result.memoryId, 'memory-from-snake');
+  assert.equal(result.createdAtDateOnly, '2026-06-01');
+  assert.equal(result.updatedAtDateOnly, '2026-06-02');
 });
 
 test('executor adapter fails closed when upstream returns raw result fields before sanitization', async () => {
