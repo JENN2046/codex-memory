@@ -343,6 +343,12 @@ function buildP66FullImplementationGapAccounting({
   const acceptedRuntimeSummaryLocallyEvidencedGapIds = acceptedRuntimeSummary
     ? acceptedRuntimeSummary.locallyEvidencedRuntimeGaps
     : [];
+  const effectiveRemainingFullImplementationGapIds = acceptedRuntimeSummary
+    ? acceptedRuntimeSummaryRemainingGapIds
+    : P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS;
+  const effectiveLocallyEvidencedFullImplementationGapIds = acceptedRuntimeSummary
+    ? acceptedRuntimeSummaryLocallyEvidencedGapIds
+    : P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS;
   const safeBlockers = Array.isArray(blockers) ? blockers : [];
   const validationBlockerIds = safeBlockers
     .filter(blocker => blocker.category === 'validation')
@@ -371,6 +377,15 @@ function buildP66FullImplementationGapAccounting({
     remainingFullImplementationGapCount: P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS.length,
     locallyEvidencedFullImplementationGapIds: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS,
     locallyEvidencedFullImplementationGapCount: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS.length,
+    effectiveGapSource: acceptedRuntimeSummary
+      ? 'accepted_runtime_summary'
+      : 'static_baseline',
+    effectiveRemainingFullImplementationGapIds,
+    effectiveRemainingFullImplementationGapCount:
+      effectiveRemainingFullImplementationGapIds.length,
+    effectiveLocallyEvidencedFullImplementationGapIds,
+    effectiveLocallyEvidencedFullImplementationGapCount:
+      effectiveLocallyEvidencedFullImplementationGapIds.length,
     closureStatus,
     closureReady: false,
     closureCanClaimReady: false,
@@ -2234,6 +2249,12 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.remainingFullImplementationGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingLocallyEvidencedGapCount:
         p66FullImplementationGapAccounting.locallyEvidencedFullImplementationGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingEffectiveGapSource:
+        p66FullImplementationGapAccounting.effectiveGapSource,
+      p66ValidationAggregatorFullImplementationGapAccountingEffectiveRemainingGapCount:
+        p66FullImplementationGapAccounting.effectiveRemainingFullImplementationGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocallyEvidencedGapCount:
+        p66FullImplementationGapAccounting.effectiveLocallyEvidencedFullImplementationGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount:
         p66FullImplementationGapAccounting.nextSafeClosureCandidateCount,
       p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound:
@@ -3227,6 +3248,16 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.locallyEvidencedFullImplementationGapIds,
         locallyEvidencedFullImplementationGapCount:
           p66FullImplementationGapAccounting.locallyEvidencedFullImplementationGapCount,
+        effectiveGapSource:
+          p66FullImplementationGapAccounting.effectiveGapSource,
+        effectiveRemainingFullImplementationGapIds:
+          p66FullImplementationGapAccounting.effectiveRemainingFullImplementationGapIds,
+        effectiveRemainingFullImplementationGapCount:
+          p66FullImplementationGapAccounting.effectiveRemainingFullImplementationGapCount,
+        effectiveLocallyEvidencedFullImplementationGapIds:
+          p66FullImplementationGapAccounting.effectiveLocallyEvidencedFullImplementationGapIds,
+        effectiveLocallyEvidencedFullImplementationGapCount:
+          p66FullImplementationGapAccounting.effectiveLocallyEvidencedFullImplementationGapCount,
         nextSafeClosureCandidates:
           p66FullImplementationGapAccounting.nextSafeClosureCandidates,
         acceptedRuntimeSummaryBound:

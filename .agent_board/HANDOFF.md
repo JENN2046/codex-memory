@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1229 A5-GAP-6_POST_GAP3_DRY_RUN_AGGREGATION_PREFLIGHT`.
+Goal: `CM-1230 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_ACCOUNTING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the next exact A5-GAP-6 aggregation boundary including current A5-GAP-3 dry-run evidence.
+Status: `COMPLETED_VALIDATED_NOT_READY` after adding accepted-summary effective gap accounting to the ValidationAggregator full implementation report shape.
 
 Workspace: `A:\codex-memory`.
 
@@ -47,6 +47,7 @@ Changed scope since CM-1207:
 - `docs/CM1227_VALIDATION_AGGREGATOR_CLOSURE_STATUS.md`
 - `docs/CM1228_A5_GAP3_MIGRATION_READINESS_DRY_RUN_EVIDENCE.md`
 - `docs/CM1229_A5_GAP6_POST_GAP3_DRY_RUN_AGGREGATION_PREFLIGHT.md`
+- `docs/CM1230_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_ACCOUNTING.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -116,10 +117,15 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1229 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected future aggregation units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
 - CM-1229 does not execute ValidationAggregator, scan files/stores, call MCP tools, call providers, write durable memory/audit, or claim readiness.
+- CM-1230 adds effective gap accounting to the ValidationAggregator full implementation report shape.
+- CM-1230 preserves static baseline gaps while exposing accepted-summary effective gap ids/counts when an explicit sanitized runtime summary is accepted.
+- CM-1230 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1229:
+Validation for CM-1230:
 
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js`
 - `git diff --check`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -146,6 +152,7 @@ Boundary:
 - No durable memory/audit write.
 - No apply/import/export/backup/restore.
 - No ValidationAggregator execution by CM-1229.
+- No A5-GAP-6 execution by CM-1230.
 - No public MCP expansion.
 - No push, PR, tag, release, deploy, provider/API call, real memory call, or readiness claim.
 
@@ -162,4 +169,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1229 preflight, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating approved units including `A5-GAP-3`: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.` Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1230, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating approved units including `A5-GAP-3`: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.` Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

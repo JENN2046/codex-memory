@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1229 A5-GAP-6 post-GAP3 dry-run aggregation preflight prepared; execution still awaits exact fresh-HEAD approval |
-| Current area | P0-mainline-health / P2-active-memory / P5-rollback-readiness / P8-memory-governance / P10-observability-admin |
+| Current task | CM-1230 ValidationAggregator effective gap accounting implemented locally; A5-GAP-6 execution still awaits exact fresh-HEAD approval |
+| Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1229 prepared the next exact A5-GAP-6 aggregation refresh boundary after CM-1228. Selected future units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`; no ValidationAggregator execution, evidence collection scan, store read, provider call, durable write, or readiness claim occurred. Next safe action is to commit or otherwise stabilize CM-1229, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregation, or continue the next local ValidationAggregator implementation slice.
+CM-1230 adds effective gap accounting to the ValidationAggregator full implementation report shape. The report now keeps static baseline gaps while exposing accepted-summary effective gaps when an explicit sanitized runtime summary is accepted. It does not execute A5-GAP-6, read evidence files/stores, call providers, write durable state, or change readiness booleans. Next safe action is to commit or otherwise stabilize CM-1230, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregation, or continue the next local ValidationAggregator implementation slice.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

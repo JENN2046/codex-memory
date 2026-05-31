@@ -55,7 +55,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1229 A5-GAP-6_POST_GAP3_DRY_RUN_AGGREGATION_PREFLIGHT` 已准备下一次 aggregation refresh 的精确授权边界：默认只消费当前已批准并已记录的 `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5` sanitized evidence。CM-1229 不执行 ValidationAggregator，不扫描文件或 stores，不调用 MCP `tools/call`，不读取真实记忆，不写 durable memory/audit，不改变 config/watchdog/startup，不执行 provider、push、PR、release、deploy 或 cutover。
 
-当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-6 approval 后才可聚合包括 `A5-GAP-3` 在内的已批准 sanitized evidence，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1230 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_ACCOUNTING` 已让 full gap accounting 同时保留 static baseline 与 accepted sanitized runtime summary 下的 effective gap view。无 accepted summary 时 `effectiveGapSource=static_baseline`；有 accepted summary 时切换为 `effectiveGapSource=accepted_runtime_summary`，并反映该 summary 的 remaining / locally evidenced gap ids/counts。Targeted validation `node --check src\core\ValidationAggregatorService.js` 与 `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `21/21`。该变更不执行 A5-GAP-6，不读取 evidence 文件或 stores，不改变 readiness。
+
+当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-6 approval 后才可聚合包括 `A5-GAP-3` 在内的已批准 sanitized evidence，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 

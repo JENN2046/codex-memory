@@ -1,5 +1,45 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1230 ValidationAggregator Effective Gap Accounting Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: local source/test report-shape improvement only. No evidence file read, ValidationAggregator execution, runtime evidence execution, or evidence file/store scan.
+
+Result:
+
+- Added effective gap accounting fields beside the static full implementation baseline.
+- No accepted sanitized runtime summary: `effectiveGapSource=static_baseline`.
+- Accepted sanitized runtime summary: `effectiveGapSource=accepted_runtime_summary` and effective gap ids/counts reflect the accepted summary.
+- Readiness posture remains unchanged: `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` passed `21/21`.
+
+Boundary:
+
+- No A5-GAP-6 execution.
+- No evidence file read.
+- No validation command execution by aggregator.
+- No runtime collector execution.
+- No evidence file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1230.
+- Then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`, or continue the next local ValidationAggregator implementation slice.
+
 ## CM-1229 A5-GAP-6 Post-GAP3 Dry-Run Aggregation Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
