@@ -43,6 +43,16 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) {
+      return normalized;
+    }
+  }
+  return '';
+}
+
 function findSchemaVersionMetadataKeys(payload = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return [];
@@ -73,7 +83,7 @@ function normalizeScope(input = {}) {
   const scope = {};
 
   for (const field of SCOPE_FIELDS) {
-    scope[field] = normalizeString(input[field] || input[toSnakeCase(field)]);
+    scope[field] = firstNormalizedString(input[field], input[toSnakeCase(field)]);
   }
 
   return scope;
@@ -113,9 +123,9 @@ function normalizeWriteCandidate(input = {}) {
     lifecycleStatus,
     lifecycleAction,
     reason: normalizeString(safeInput.reason),
-    supersedesMemoryId: normalizeString(safeInput.supersedesMemoryId || safeInput.supersedes_memory_id),
-    tombstoneMemoryId: normalizeString(safeInput.tombstoneMemoryId || safeInput.tombstone_memory_id),
-    forgetMemoryId: normalizeString(safeInput.forgetMemoryId || safeInput.forget_memory_id),
+    supersedesMemoryId: firstNormalizedString(safeInput.supersedesMemoryId, safeInput.supersedes_memory_id),
+    tombstoneMemoryId: firstNormalizedString(safeInput.tombstoneMemoryId, safeInput.tombstone_memory_id),
+    forgetMemoryId: firstNormalizedString(safeInput.forgetMemoryId, safeInput.forget_memory_id),
     scope: normalizeScope(safeInput),
     raw: safeInput
   };
@@ -145,8 +155,8 @@ function normalizeExistingCandidate(input = {}) {
   const normalized = normalizeWriteCandidate(safeInput);
 
   return {
-    memoryId: normalizeString(safeInput.memoryId || safeInput.memory_id),
-    canonicalHash: normalizeString(safeInput.canonicalHash || safeInput.canonical_hash) ||
+    memoryId: firstNormalizedString(safeInput.memoryId, safeInput.memory_id),
+    canonicalHash: firstNormalizedString(safeInput.canonicalHash, safeInput.canonical_hash) ||
       computeCanonicalWriteHash(safeInput),
     lifecycleStatus: normalized.lifecycleStatus,
     target: normalized.target,

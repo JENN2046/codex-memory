@@ -108,6 +108,50 @@ test('CM-0836 rejects scope mismatch before write preflight acceptance', () => {
   assert.deepEqual(summary.scopeMismatches, ['projectId', 'taskId']);
 });
 
+test('CM-0836 falls through blank camel-case write fields to snake-case fallbacks', () => {
+  const proposedWrite = {
+    ...baseWrite(),
+    projectId: '   ',
+    project_id: allowedScope.projectId,
+    workspaceId: '   ',
+    workspace_id: allowedScope.workspaceId,
+    clientId: '   ',
+    client_id: allowedScope.clientId,
+    taskId: '   ',
+    task_id: allowedScope.taskId,
+    conversationId: '   ',
+    conversation_id: allowedScope.conversationId,
+    retentionPolicy: '   ',
+    retention_policy: allowedScope.retentionPolicy,
+    lifecycleAction: 'supersede',
+    reason: 'synthetic correction',
+    supersedesMemoryId: '   ',
+    supersedes_memory_id: 'synthetic-old-memory'
+  };
+  const summary = summarizeMemoryWriteLifecycleDedupSuppressionPreflight({
+    proposedWrite,
+    allowedScope,
+    exactApproval: true,
+    existingCandidates: [
+      {
+        ...proposedWrite,
+        memoryId: '   ',
+        memory_id: 'synthetic-existing-snake-id',
+        lifecycleStatus: 'tombstoned',
+        canonicalHash: '   ',
+        canonical_hash: computeCanonicalWriteHash(proposedWrite)
+      }
+    ]
+  });
+
+  assert.equal(summary.decision, 'rejected_by_write_lifecycle_preflight');
+  assert.equal(summary.acceptedForWritePreflight, false);
+  assert.deepEqual(summary.scopeMismatches, []);
+  assert.equal(summary.blockers.includes('supersession_requires_old_memory_id'), false);
+  assert.ok(summary.blockers.includes('duplicate_terminal_lifecycle_memory_requires_review'));
+  assert.deepEqual(summary.matchedCandidateIds, ['synthetic-existing-snake-id']);
+});
+
 test('CM-0836 rejects synthetic secret-like pollution without durable writes', () => {
   const summary = summarizeMemoryWriteLifecycleDedupSuppressionPreflight({
     proposedWrite: baseWrite({

@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1281 Write Lifecycle Preflight Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test write lifecycle/dedup suppression preflight normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteLifecycleDedupSuppressionPreflight` now uses the first non-empty normalized value for scope fields, lifecycle target ids, existing candidate memory ids, and canonical hashes.
+- Blank camel-case write preflight fields no longer mask valid snake_case fallbacks.
+- Added regression proving snake_case fallback avoids scope mismatch, preserves supersession id, and matches a terminal duplicate candidate.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryWriteLifecycleDedupSuppressionPreflight.js`
+- `node --check tests\memory-write-lifecycle-dedup-suppression-preflight.test.js`
+- `node --test tests\memory-write-lifecycle-dedup-suppression-preflight.test.js tests\memory-write-preflight-runtime-integration.test.js tests\durable-write-kernel-idempotency-runtime.test.js tests\memory-write-restart-durability-temp-local-evidence.test.js` passed `33/33`.
+- `npm test` passed `2801/2801`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1281.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1280 Shadow Projection Record Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
