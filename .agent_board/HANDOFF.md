@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1299 SHADOW_PROJECTION_SCOPE_TUPLE_ALIAS_FALLBACK`.
+Goal: `CM-1300 PROOF_MEMORY_POLICY_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing no-apply shadow projection preview scope alias fallback for projection `visibility/visibility_policy` and dry-run `scopeTuple` aliases.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing proof-memory write policy visibility/retention alias fallback and payload `visibility_policy=internal_proof` recognition.
 
 Workspace: `A:\codex-memory`.
 
@@ -57,6 +57,7 @@ Changed scope since CM-1207:
 - `docs/CM1266_LIFECYCLE_SCOPE_EXECUTION_CONTEXT_AUTHORITY.md`
 - `docs/CM1298_LIFECYCLE_SCOPE_CURRENT_VISIBILITY_POLICY_FALLBACK.md`
 - `docs/CM1299_SHADOW_PROJECTION_SCOPE_TUPLE_ALIAS_FALLBACK.md`
+- `docs/CM1300_PROOF_MEMORY_POLICY_ALIAS_FALLBACK.md`
 - `src/core/ExecutionContextResolver.js`
 - `src/core/MemoryWriteService.js`
 - `tests/memory-write-preflight-runtime-integration.test.js`

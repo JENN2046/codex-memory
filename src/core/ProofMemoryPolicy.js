@@ -20,6 +20,16 @@ function uniqueTags(tags = []) {
   return [...new Set(normalizeTags(tags))];
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) {
+      return normalized;
+    }
+  }
+  return '';
+}
+
 function normalizeVisibilityList(value) {
   if (Array.isArray(value)) {
     return [...new Set(value.map(item => normalizeString(item)).filter(Boolean))];
@@ -31,6 +41,7 @@ function normalizeVisibilityList(value) {
 function isExplicitProofMemoryPayload(payload = {}, normalized = {}) {
   const visibilitySignals = [
     payload.visibility,
+    payload.visibility_policy,
     payload.proof_namespace,
     payload.proofNamespace,
     normalized.visibility
@@ -47,10 +58,16 @@ function isExplicitProofMemoryPayload(payload = {}, normalized = {}) {
 
 function applyProofMemoryWritePolicy(payload = {}, normalized = {}) {
   const tags = uniqueTags(normalized.tags ?? payload.tags);
-  const visibility = normalizeString(normalized.visibility ?? payload.visibility) || null;
-  const retentionPolicy = normalizeString(
-    normalized.retentionPolicy ??
-    payload.retention_policy ??
+  const visibility = firstNormalizedString(
+    normalized.visibility,
+    normalized.visibility_policy,
+    payload.visibility,
+    payload.visibility_policy
+  ) || null;
+  const retentionPolicy = firstNormalizedString(
+    normalized.retentionPolicy,
+    normalized.retention_policy,
+    payload.retention_policy,
     payload.retentionPolicy
   ) || null;
   const proofMemory = isExplicitProofMemoryPayload(payload, {

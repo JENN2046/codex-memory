@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1300 Proof Memory Policy Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test proof-memory write policy fallback normalization hardening. No public MCP schema expansion, live recall, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `applyProofMemoryWritePolicy(...)` now uses first non-empty normalized visibility/retention aliases across normalized and payload inputs.
+- `isExplicitProofMemoryPayload(...)` now recognizes payload `visibility_policy=internal_proof`.
+- Direct helper and future object-model style callers no longer lose proof-memory markers or ordinary visibility/retention values when blank normalized fields mask payload aliases.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\proof-memory-policy.test.js tests\memory-write-preflight-runtime-integration.test.js tests\proof-memory-retention-tombstone-plan.test.js tests\proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js` passed `27/27`.
+- `npm test` passed `2822/2822`.
+- Broader validation is recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1300.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1299 Shadow Projection Scope Tuple Alias Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

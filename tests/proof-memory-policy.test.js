@@ -76,6 +76,36 @@ test('proof memory write policy preserves explicit payload proof marker under no
   assert.deepEqual(proof.tags.sort(), ['cm1268', PROOF_MEMORY_TAG].sort());
 });
 
+test('proof memory write policy falls through blank normalized fields to payload aliases', () => {
+  const ordinary = applyProofMemoryWritePolicy({
+    tags: ['cm1300'],
+    visibility_policy: 'private',
+    retention_policy: 'keep'
+  }, {
+    visibility: '   ',
+    retentionPolicy: '   '
+  });
+
+  assert.equal(ordinary.proofMemory.applied, false);
+  assert.equal(ordinary.visibility, 'private');
+  assert.equal(ordinary.retentionPolicy, 'keep');
+
+  const proof = applyProofMemoryWritePolicy({
+    tags: ['cm1300'],
+    visibility: '   ',
+    visibility_policy: PROOF_MEMORY_VISIBILITY,
+    retention_policy: 'keep'
+  }, {
+    visibility: '   ',
+    retentionPolicy: '   '
+  });
+
+  assert.equal(proof.proofMemory.applied, true);
+  assert.equal(proof.visibility, PROOF_MEMORY_VISIBILITY);
+  assert.equal(proof.retentionPolicy, PROOF_MEMORY_RETENTION_POLICY);
+  assert.deepEqual(proof.tags.sort(), ['cm1300', PROOF_MEMORY_TAG].sort());
+});
+
 test('proof memory recall filters exclude internal proof visibility by default', () => {
   assert.deepEqual(
     buildProofMemoryRecallFilters({ projectId: 'codex-memory' }),
