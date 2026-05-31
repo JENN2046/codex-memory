@@ -1,5 +1,44 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1228 A5-GAP-3 Migration Readiness Dry-Run Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: exact-approved A5-GAP-3 fixture-only migration-readiness dry-run at `main@e23e86dd4a3f443a95c2a2b4aeda4da901dde797`.
+
+Result:
+
+- Executed only `npm run vcp-memory:migration-readiness -- --json`.
+- Result stayed blocked: `status=blocked`, `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`.
+- Safety booleans stayed true: `noMigration`, `noSQLiteWrite`, `noDiaryWrite`, `noImportExportApply`, `noRealDbMemoryWrite`, `noMcpPublicToolExpansion`.
+- Public tool list remained `record_memory`, `search_memory`, `memory_overview`.
+- `rawWorkspaceIdExposed=false` and `rawSecretExposed=false`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `v1RcReady=false`, `rcReady=false`.
+
+Validation:
+
+- `git diff --check`
+- `node --test tests\vcp-memory-migration-readiness-cli.test.js` passed `11/11`.
+
+Boundary:
+
+- No apply/import/export/backup/restore.
+- No real-store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run docs validation and commit CM-1228.
+- Then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`, or continue the next local ValidationAggregator implementation slice.
+
 ## CM-1227 ValidationAggregator Closure Status Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

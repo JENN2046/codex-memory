@@ -51,7 +51,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1227 VALIDATION_AGGREGATOR_CLOSURE_STATUS` 已把 full gap accounting 汇总为明确 closure 状态：`closureStatus=blocked_existing_blockers`、`closureReady=false`、`closureCanClaimReady=false`，并列出 closure criteria / missing criteria。Targeted validation `node --check src\core\ValidationAggregatorService.js` 与 `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `21/21`。该变更不执行 runtime collector，不读取 evidence 文件或 stores，不改变 readiness。
 
-当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-3 approval 后才可执行 migration readiness dry-run，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1228 A5-GAP-3_MIGRATION_READINESS_DRY_RUN_EVIDENCE` 已在 exact approval 下执行：`main@e23e86dd4a3f443a95c2a2b4aeda4da901dde797`，仅运行 `npm run vcp-memory:migration-readiness -- --json` fixture-only readiness report。结果保持 `status=blocked`、`fixtureOnly=true`、`mutated=false`、`migrationBlocked=true`、`noMigration=true`、`noSQLiteWrite=true`、`noDiaryWrite=true`、`noImportExportApply=true`、`noRealDbMemoryWrite=true`、`noMcpPublicToolExpansion=true`、`rawWorkspaceIdExposed=false`、`rawSecretExposed=false`。未执行 apply/import/export/backup/restore，未扫描 real stores，未写 durable memory/audit，未调用 provider，未改变 config/watchdog/startup。
+
+当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-6 approval 后才可聚合包括 `A5-GAP-3` 在内的已批准 sanitized evidence，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 
