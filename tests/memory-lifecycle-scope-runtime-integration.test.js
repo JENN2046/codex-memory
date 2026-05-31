@@ -5,7 +5,9 @@ const os = require('node:os');
 const path = require('node:path');
 
 const {
+  applyLifecycleReadPolicy,
   applyLifecycleScopeGovernanceReadPolicy,
+  applySoftReadPolicy,
   createCodexMemoryApplication
 } = require('../src/app');
 
@@ -78,6 +80,98 @@ test('lifecycle scope governance bridge is default-disabled and preserves result
   assert.equal(metadataLookups, 0);
   assert.equal(filtered.audit.lifecycleScopeGovernancePolicyApplied, false);
   assert.equal(filtered.results, results);
+});
+
+test('read policy helpers fall through blank memoryId to memory_id aliases', async () => {
+  const results = [
+    { memoryId: '   ', memory_id: 'mem-snake-active', title: 'Active Snake' },
+    { memoryId: '', memory_id: 'mem-snake-hidden', title: 'Hidden Snake' }
+  ];
+
+  const lifecycleFiltered = await applyLifecycleReadPolicy(results, {
+    config: { enableLifecycleReadPolicy: true },
+    shadowStore: {
+      async getRecordsLifecycleStatusMap(memoryIds) {
+        assert.deepEqual(memoryIds.sort(), ['mem-snake-active', 'mem-snake-hidden']);
+        return {
+          lifecycleColumnAvailable: true,
+          statuses: new Map([
+            ['mem-snake-active', 'stale'],
+            ['mem-snake-hidden', 'tombstoned']
+          ])
+        };
+      }
+    }
+  });
+
+  assert.deepEqual(lifecycleFiltered.results.map(item => item.memory_id), ['mem-snake-active']);
+  assert.equal(lifecycleFiltered.audit.hiddenByLifecycleCount, 1);
+  assert.equal(lifecycleFiltered.audit.staleResultCount, 1);
+
+  const softFiltered = await applySoftReadPolicy(results, {
+    config: { enableSoftReadPolicy: true },
+    requestContext: {
+      executionContext: {
+        client_id: 'codex'
+      }
+    },
+    shadowStore: {
+      async getRecordsPolicyMap(memoryIds) {
+        assert.deepEqual(memoryIds.sort(), ['mem-snake-active', 'mem-snake-hidden']);
+        return new Map([
+          ['mem-snake-active', { status: 'active', visibility: 'private', clientId: 'codex' }],
+          ['mem-snake-hidden', { status: 'active', visibility: 'private', clientId: 'claude' }]
+        ]);
+      }
+    }
+  });
+
+  assert.deepEqual(softFiltered.map(item => item.memory_id), ['mem-snake-active']);
+});
+
+test('lifecycle scope governance bridge falls through blank memoryId to memory_id aliases', async () => {
+  const results = [
+    { memoryId: '   ', memory_id: 'mem-snake-active', title: 'Active Snake' },
+    { memoryId: '', memory_id: 'mem-snake-drift', title: 'Drift Snake' }
+  ];
+
+  const filtered = await applyLifecycleScopeGovernanceReadPolicy(results, {
+    requestContext: {
+      executionContext: {
+        ...exactExecutionContext,
+        projectId: 'project-alpha',
+        workspaceId: 'workspace-alpha',
+        clientId: 'codex',
+        visibility: 'project',
+        lifecycleScopeGovernanceReadPolicy: true
+      }
+    },
+    scope: exactScope,
+    shadowStore: {
+      async getRecordsLifecycleScopeGovernanceMap(memoryIds) {
+        assert.deepEqual(memoryIds.sort(), ['mem-snake-active', 'mem-snake-drift']);
+        return buildMetadata([
+          {
+            memoryId: 'mem-snake-active',
+            lifecycleStatus: 'active',
+            scope: exactRecordScope
+          },
+          {
+            memoryId: 'mem-snake-drift',
+            lifecycleStatus: 'active',
+            scope: {
+              ...exactRecordScope,
+              projectId: 'project-beta'
+            }
+          }
+        ]);
+      }
+    }
+  });
+
+  assert.deepEqual(filtered.results.map(item => item.memory_id), ['mem-snake-active']);
+  assert.equal(filtered.audit.acceptedCount, 1);
+  assert.equal(filtered.audit.suppressedCount, 1);
 });
 
 test('lifecycle scope governance bridge suppresses inactive, malformed, and out-of-scope results with sanitized metadata', async () => {

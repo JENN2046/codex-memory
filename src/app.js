@@ -106,13 +106,13 @@ async function applyScopeFilter(results, scope, shadowStore) {
     return results;
   }
 
-  const memoryIds = [...new Set(results.map(item => item.memoryId || item.memory_id).filter(Boolean))];
+  const memoryIds = [...new Set(results.map(item => normalizeResultMemoryId(item)).filter(Boolean))];
   const scopeMap = memoryIds.length > 0
     ? await shadowStore.getRecordsScopeMap(memoryIds)
     : new Map();
 
   return results.filter(item => {
-    const memoryId = item.memoryId || item.memory_id;
+    const memoryId = normalizeResultMemoryId(item);
     const recordScope = scopeMap.get(memoryId) || {};
 
     if (filters.projectId && recordScope.projectId !== filters.projectId) return false;
@@ -256,6 +256,10 @@ function normalizeScopeValue(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function normalizeResultMemoryId(item = {}) {
+  return firstScopeValue(item?.memoryId, item?.memory_id);
+}
+
 function buildInternalValidateRuntimePayload(args = {}, requestContext = {}, { enabled = false } = {}) {
   return buildInternalRuntimeEntryPayload(args, requestContext, {
     enabled,
@@ -370,7 +374,7 @@ async function applyLifecycleScopeGovernanceReadPolicy(results, { requestContext
     };
   }
 
-  const memoryIds = [...new Set(results.map(item => item.memoryId || item.memory_id).filter(Boolean))];
+  const memoryIds = [...new Set(results.map(item => normalizeResultMemoryId(item)).filter(Boolean))];
   const metadata = memoryIds.length > 0 && shadowStore?.getRecordsLifecycleScopeGovernanceMap
     ? await shadowStore.getRecordsLifecycleScopeGovernanceMap(memoryIds)
     : { lifecycleColumnAvailable: false, records: new Map() };
@@ -378,7 +382,7 @@ async function applyLifecycleScopeGovernanceReadPolicy(results, { requestContext
   const currentScope = buildLifecycleScopeGovernanceCurrentScope(requestContext, scope);
   const requiredScopeFields = normalizeScopeFields(LIFECYCLE_SCOPE_GOVERNANCE_SUPPORTED_FIELDS);
   const candidates = results.map(item => {
-    const memoryId = item.memoryId || item.memory_id;
+    const memoryId = normalizeResultMemoryId(item);
     const record = metadataRecords.get(memoryId) || {};
     return {
       memoryId,
@@ -397,7 +401,7 @@ async function applyLifecycleScopeGovernanceReadPolicy(results, { requestContext
   const acceptedIds = new Set(filtered.acceptedCandidates.map(item => item.memoryId).filter(Boolean));
 
   return {
-    results: results.filter(item => acceptedIds.has(item.memoryId || item.memory_id)),
+    results: results.filter(item => acceptedIds.has(normalizeResultMemoryId(item))),
     audit: {
       ...baseAudit,
       acceptedCount: filtered.acceptedCount,
@@ -417,14 +421,14 @@ async function applySoftReadPolicy(results, { config, shadowStore, requestContex
     return results;
   }
 
-  const memoryIds = [...new Set(results.map(item => item.memoryId || item.memory_id).filter(Boolean))];
+  const memoryIds = [...new Set(results.map(item => normalizeResultMemoryId(item)).filter(Boolean))];
   const policyMap = memoryIds.length > 0
     ? await shadowStore.getRecordsPolicyMap(memoryIds)
     : new Map();
   const requestClientId = inferRequestClientId(requestContext);
 
   return results.filter(item => {
-    const memoryId = item.memoryId || item.memory_id;
+    const memoryId = normalizeResultMemoryId(item);
     const policy = policyMap.get(memoryId) || {};
     const status = String(policy.status || 'active').toLowerCase();
     if (['proposal', 'rejected', 'tombstoned'].includes(status)) {
@@ -474,7 +478,7 @@ async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
     };
   }
 
-  const memoryIds = [...new Set(results.map(item => item.memoryId || item.memory_id).filter(Boolean))];
+  const memoryIds = [...new Set(results.map(item => normalizeResultMemoryId(item)).filter(Boolean))];
   const lifecycleMap = memoryIds.length > 0
     ? await shadowStore.getRecordsLifecycleStatusMap(memoryIds)
     : { lifecycleColumnAvailable: false, statuses: new Map() };
@@ -495,7 +499,7 @@ async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
   let hiddenByLifecycleCount = 0;
 
   for (const item of results) {
-    const memoryId = item.memoryId || item.memory_id;
+    const memoryId = normalizeResultMemoryId(item);
     const status = String(statusByMemoryId.get(memoryId) || '').trim().toLowerCase();
     if (LIFECYCLE_INCLUDED_STATUSES.includes(status)) {
       kept.push(item);
@@ -510,7 +514,7 @@ async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
       ...baseAudit,
       hiddenByLifecycleCount,
       staleResultCount: kept.filter(item => {
-        const memoryId = item.memoryId || item.memory_id;
+        const memoryId = normalizeResultMemoryId(item);
         return String(statusByMemoryId.get(memoryId) || '').trim().toLowerCase() === 'stale';
       }).length,
       lifecycleColumnAvailable: true,
@@ -720,7 +724,7 @@ function createCodexMemoryApplication(overrides = {}) {
       const policyAudit = {
         ...lifecycleFiltered.audit,
         staleResultCount: policyFiltered.filter(item => {
-          const memoryId = item.memoryId || item.memory_id;
+          const memoryId = normalizeResultMemoryId(item);
           return String(statusByMemoryId.get(memoryId) || '').trim().toLowerCase() === 'stale';
         }).length
       };

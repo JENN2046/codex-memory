@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1304 TRUE_LIVE_RECALL_PROOF_METADATA_ALIAS_FALLBACK`.
+Goal: `CM-1305 READ_POLICY_RESULT_MEMORY_ID_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing true-live recall proof sanitized metadata alias fallback. Targeted true-live recall proof tests passed `31/31`; default `npm test` passed `2827/2827`. Commit is still pending until final diff/docs validation closeout.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing search_memory post-filter read policy result memory id alias fallback. Targeted lifecycle/policy tests passed `33/33`; default `npm test` passed `2829/2829`. Commit is still pending until final diff/docs validation closeout.
 
 Workspace: `A:\codex-memory`.
 

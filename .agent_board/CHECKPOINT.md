@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1305 Read Policy Result Memory ID Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test `search_memory` post-filter read policy result memory id fallback normalization hardening. No true-live recall execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write outside temp-local test stores, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `src/app.js` now normalizes result ids through first non-empty `memoryId/memory_id` before scope filter lookup.
+- Lifecycle read policy, lifecycle-scope governance read policy, soft read policy, and read-policy audit stale counters share the normalized id path.
+- Blank camel-case `memoryId` no longer masks valid snake_case `memory_id` in post-filter policy map lookups.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\memory-lifecycle-scope-runtime-integration.test.js tests\lifecycle-read-policy-runtime.test.js tests\policy-read-preflight.test.js tests\phase-a-services.test.js` passed `33/33`.
+- `npm test` passed `2829/2829`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1305 closeout.
+
+Next:
+
+- Commit or otherwise stabilize CM-1305.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1304 True Live Recall Proof Metadata Alias Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
