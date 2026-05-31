@@ -1,5 +1,45 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1236 ValidationAggregator Closure Authority Summary Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: local source/test report-shape improvement only. No evidence file read, ValidationAggregator evidence collection, runtime evidence execution, or evidence file/store scan.
+
+Result:
+
+- Added `closureAuthoritySummary`, `closureAuthorityStatus`, and `nextClosureAuthority`.
+- Current default and accepted-summary paths route next work to `local_implementation_required`.
+- The summary distinguishes local implementation, A5 approval, Red-lane approval, manual gap modeling, blocker clearance, and readiness authority.
+- Readiness posture remains unchanged: `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` passed `22/22`.
+
+Boundary:
+
+- No A5-GAP-6 execution.
+- No evidence file read.
+- No validation command execution by aggregator.
+- No runtime collector execution.
+- No evidence file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1236.
+- Continue local ValidationAggregator implementation or prepare the next exact-approved A5 runtime gap.
+
 ## CM-1235 ValidationAggregator Effective Gap Closure Map Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

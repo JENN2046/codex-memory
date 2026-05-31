@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1235 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_MAP`.
+Goal: `CM-1236 VALIDATION_AGGREGATOR_CLOSURE_AUTHORITY_SUMMARY`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test implementation of effective remaining gap closure classification.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test implementation of effective closure authority routing.
 
 Workspace: `A:\codex-memory`.
 
@@ -53,6 +53,7 @@ Changed scope since CM-1207:
 - `docs/CM1233_VALIDATION_AGGREGATOR_NON_BASELINE_GAP_GUARD.md`
 - `docs/CM1234_A5_GAP6_POST_GAP3_AGGREGATION_EVIDENCE.md`
 - `docs/CM1235_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_MAP.md`
+- `docs/CM1236_VALIDATION_AGGREGATOR_CLOSURE_AUTHORITY_SUMMARY.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -124,6 +125,10 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1235 adds closure criteria and missing criteria for these effective closure buckets.
 - CM-1235 targeted validation passed `22/22`.
 - CM-1235 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- CM-1236 adds `closureAuthoritySummary`, `closureAuthorityStatus`, and `nextClosureAuthority` to the full gap accounting output.
+- CM-1236 current paths route next work to `local_implementation_required` / `local_source_test_implementation`.
+- CM-1236 targeted validation passed `22/22`.
+- CM-1236 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - CM-1229 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected future aggregation units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
 - CM-1229 does not execute ValidationAggregator, scan files/stores, call MCP tools, call providers, write durable memory/audit, or claim readiness.

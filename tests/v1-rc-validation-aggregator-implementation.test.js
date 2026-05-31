@@ -245,6 +245,14 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   );
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveA5GatedGapCount, 6);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveRedLaneGapCount, 2);
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureAuthorityStatus,
+    'local_implementation_required'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingNextClosureAuthority,
+    'local_source_test_implementation'
+  );
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount, 3);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryRemainingGapCount, 0);
@@ -743,6 +751,29 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
       'mainline_strict_gate_not_executed_for_cutover',
       'rc_cutover_not_executed'
     ]
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuthorityStatus,
+    'local_implementation_required'
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.nextClosureAuthority,
+    'local_source_test_implementation'
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuthoritySummary,
+    {
+      status: 'local_implementation_required',
+      nextAuthority: 'local_source_test_implementation',
+      localImplementationRequired: true,
+      a5AuthorizationRequired: true,
+      redLaneAuthorizationRequired: true,
+      manualGapModelingRequired: false,
+      blockerClearanceRequired: true,
+      readinessAuthorityRequired: true,
+      canProceedAutomatically: true,
+      canClaimReadiness: false
+    }
   );
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.nextSafeClosureCandidates.includes(
@@ -2388,6 +2419,14 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveA5GatedGapCount, 1);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveRedLaneGapCount, 1);
   assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingClosureAuthorityStatus,
+    'local_implementation_required'
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingNextClosureAuthority,
+    'local_source_test_implementation'
+  );
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryBound,
     true
   );
@@ -2451,6 +2490,21 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.deepEqual(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveRedLaneGapIds,
     ['mainline_strict_gate_not_executed_for_cutover']
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureAuthoritySummary,
+    {
+      status: 'local_implementation_required',
+      nextAuthority: 'local_source_test_implementation',
+      localImplementationRequired: true,
+      a5AuthorizationRequired: true,
+      redLaneAuthorizationRequired: true,
+      manualGapModelingRequired: false,
+      blockerClearanceRequired: true,
+      readinessAuthorityRequired: true,
+      canProceedAutomatically: true,
+      canClaimReadiness: false
+    }
   );
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.fullImplementationGapAccounting.fullImplementationReady,
@@ -2552,6 +2606,10 @@ test('effective gap accounting fails closed on non-baseline remaining gaps', () 
     'future_unmodeled_runtime_gap'
   ]);
   assert.equal(definition.effectiveNonBaselineRemainingGapCount, 1);
+  assert.equal(definition.closureAuthorityStatus, 'local_implementation_required');
+  assert.equal(definition.nextClosureAuthority, 'local_source_test_implementation');
+  assert.equal(definition.closureAuthoritySummary.manualGapModelingRequired, true);
+  assert.equal(definition.closureAuthoritySummary.canClaimReadiness, false);
   assert.equal(definition.closureCriteria.effectiveNonBaselineRemainingGapsAbsent, false);
   assert.equal(
     definition.closureMissingCriteria.includes('effective_non_baseline_remaining_gaps_absent'),

@@ -370,6 +370,49 @@ const P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES = [
   'a5_approval_missing'
 ];
 
+function buildP66ClosureAuthoritySummary({
+  effectiveLocalImplementationGapIds = [],
+  effectiveA5GatedGapIds = [],
+  effectiveRedLaneGapIds = [],
+  effectiveNonBaselineRemainingGapIds = [],
+  totalBlockerCount = 0
+} = {}) {
+  let status = 'readiness_authority_required';
+  let nextAuthority = 'separate_readiness_authority';
+
+  if (effectiveLocalImplementationGapIds.length > 0) {
+    status = 'local_implementation_required';
+    nextAuthority = 'local_source_test_implementation';
+  } else if (effectiveRedLaneGapIds.length > 0) {
+    status = 'red_lane_authorization_required';
+    nextAuthority = 'explicit_red_lane_owner_approval';
+  } else if (effectiveA5GatedGapIds.length > 0) {
+    status = 'a5_authorization_required';
+    nextAuthority = 'exact_a5_owner_approval';
+  } else if (effectiveNonBaselineRemainingGapIds.length > 0) {
+    status = 'manual_gap_modeling_required';
+    nextAuthority = 'manual_review_for_unmodeled_gap';
+  } else if (totalBlockerCount > 0) {
+    status = 'blocker_clearance_required';
+    nextAuthority = 'clear_existing_blockers';
+  }
+
+  return {
+    status,
+    nextAuthority,
+    localImplementationRequired:
+      effectiveLocalImplementationGapIds.length > 0,
+    a5AuthorizationRequired: effectiveA5GatedGapIds.length > 0,
+    redLaneAuthorizationRequired: effectiveRedLaneGapIds.length > 0,
+    manualGapModelingRequired:
+      effectiveNonBaselineRemainingGapIds.length > 0,
+    blockerClearanceRequired: totalBlockerCount > 0,
+    readinessAuthorityRequired: true,
+    canProceedAutomatically: status === 'local_implementation_required',
+    canClaimReadiness: false
+  };
+}
+
 function buildP66FullImplementationGapAccounting({
   runtimeEvidenceSummaryBridge = null,
   validationEvidenceFreshness = null,
@@ -451,6 +494,15 @@ function buildP66FullImplementationGapAccounting({
     effectiveLocalImplementationGapIds.length === 0;
   const effectiveA5GatedGapsCleared = effectiveA5GatedGapIds.length === 0;
   const effectiveRedLaneGapsCleared = effectiveRedLaneGapIds.length === 0;
+  const closureAuthoritySummary = buildP66ClosureAuthoritySummary({
+    effectiveLocalImplementationGapIds,
+    effectiveA5GatedGapIds,
+    effectiveRedLaneGapIds,
+    effectiveNonBaselineRemainingGapIds,
+    totalBlockerCount
+  });
+  const closureAuthorityStatus = closureAuthoritySummary.status;
+  const nextClosureAuthority = closureAuthoritySummary.nextAuthority;
 
   return {
     available: true,
@@ -483,6 +535,9 @@ function buildP66FullImplementationGapAccounting({
     effectiveA5GatedGapCount: effectiveA5GatedGapIds.length,
     effectiveRedLaneGapIds,
     effectiveRedLaneGapCount: effectiveRedLaneGapIds.length,
+    closureAuthoritySummary,
+    closureAuthorityStatus,
+    nextClosureAuthority,
     closureStatus,
     closureReady: false,
     closureCanClaimReady: false,
@@ -2374,6 +2429,10 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.effectiveA5GatedGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingEffectiveRedLaneGapCount:
         p66FullImplementationGapAccounting.effectiveRedLaneGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureAuthorityStatus:
+        p66FullImplementationGapAccounting.closureAuthorityStatus,
+      p66ValidationAggregatorFullImplementationGapAccountingNextClosureAuthority:
+        p66FullImplementationGapAccounting.nextClosureAuthority,
       p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount:
         p66FullImplementationGapAccounting.nextSafeClosureCandidateCount,
       p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound:
@@ -3403,6 +3462,12 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.effectiveRedLaneGapIds,
         effectiveRedLaneGapCount:
           p66FullImplementationGapAccounting.effectiveRedLaneGapCount,
+        closureAuthoritySummary:
+          p66FullImplementationGapAccounting.closureAuthoritySummary,
+        closureAuthorityStatus:
+          p66FullImplementationGapAccounting.closureAuthorityStatus,
+        nextClosureAuthority:
+          p66FullImplementationGapAccounting.nextClosureAuthority,
         nextSafeClosureCandidates:
           p66FullImplementationGapAccounting.nextSafeClosureCandidates,
         acceptedRuntimeSummaryBound:
