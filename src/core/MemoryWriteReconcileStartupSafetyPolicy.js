@@ -691,6 +691,9 @@ function buildTempLocalStartupRecoveryDryRunHarness({
       dryRunOnly: true,
       tempLocalOnly: normalizedScope === 'temp_local',
       fixtureOnly: normalizedScope === 'fixture_only',
+      priorPolicySchemaGateAccepted: policyAccepted
+        ? priorPolicyDesign.policyDesign.priorPreflightSchemaGateAccepted === true
+        : false,
       executionDefault: 'disabled',
       manualApprovalRequiredBeforeApply: true,
       nextAllowedAction: accepted
@@ -733,6 +736,7 @@ function hasAcceptedTempLocalStartupRecoveryDryRunHarness(report) {
     report.dryRunPlan?.dryRunOnly === true &&
     report.dryRunPlan?.executionDefault === 'disabled' &&
     report.dryRunPlan?.manualApprovalRequiredBeforeApply === true &&
+    report.dryRunPlan?.priorPolicySchemaGateAccepted === true &&
     Number.isInteger(report.dryRunPlan?.startupRecoveryLimit) &&
     Number.isInteger(report.dryRunPlan?.reconcileReplayLimit) &&
     Number.isInteger(report.dryRunPlan?.repairLimit) &&

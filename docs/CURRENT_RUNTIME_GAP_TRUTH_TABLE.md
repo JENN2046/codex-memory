@@ -84,9 +84,9 @@ Still not proven:
 - No full no-token governance closure.
 - No production readiness, write reliability, or recall reliability.
 
-## CM-1181 / CM-1250 / CM-1251 / CM-1252 Startup Explicit Rebuild Recovery Policy - 2026-06-01
+## CM-1181 / CM-1250 / CM-1251 / CM-1252 / CM-1253 Startup Explicit Rebuild Recovery Policy - 2026-06-01
 
-Result: `CM1252_SCHEMA_GATE_DRY_RUN_POLICY_INVARIANT_VALIDATED_NOT_READY`.
+Result: `CM1253_SCHEMA_GATE_DRY_RUN_EXECUTION_PREFLIGHT_INVARIANT_VALIDATED_NOT_READY`.
 
 Current source facts:
 
@@ -98,9 +98,11 @@ Current source facts:
 - Accepted-looking legacy preflight shapes without schema gate evidence no longer advance policy design.
 - Guarded policy design now records `policyDesign.priorPreflightSchemaGateAccepted`.
 - Temp-local dry-run harness acceptance now rejects accepted-looking policy design shapes that lack that schema-gated prior-preflight invariant.
+- Temp-local dry-run harness now records `dryRunPlan.priorPolicySchemaGateAccepted`.
+- Dry-run execution preflight acceptance now rejects accepted-looking harness shapes that lack that schema-gated policy invariant.
 - Startup recovery remains disabled and not executed by default.
 
-CM-1250 through CM-1252 implement the first policy integration slices:
+CM-1250 through CM-1253 implement the first policy integration slices:
 
 - startup inspection/reporting is allowed as a future safe surface
 - silent diary rebuild is blocked
@@ -108,6 +110,7 @@ CM-1250 through CM-1252 implement the first policy integration slices:
 - schema gate blockers must stop recovery first
 - downstream policy design cannot bypass the schema gate through stale preflight shape
 - dry-run harness preparation cannot bypass the schema gate through stale policy-design shape
+- dry-run execution preflight cannot bypass the schema gate through stale harness shape
 - apply/rebuild/reconcile still require exact bounded authorization and validation
 
 Still not proven:

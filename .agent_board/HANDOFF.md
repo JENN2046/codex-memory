@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1252 SCHEMA_GATE_DRY_RUN_POLICY_INVARIANT`.
+Goal: `CM-1253 SCHEMA_GATE_DRY_RUN_EXECUTION_PREFLIGHT_INVARIANT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test propagation of SQLite schema startup gate evidence into dry-run harness policy acceptance.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test propagation of SQLite schema startup gate evidence into dry-run execution preflight acceptance.
 
 Workspace: `A:\codex-memory`.
 
@@ -82,6 +82,15 @@ Changed scope since CM-1207:
 - `docs/CM1250_SCHEMA_GATED_STARTUP_RECOVERY_POLICY.md`
 - `docs/CM1251_SCHEMA_GATE_DOWNSTREAM_POLICY_BINDING.md`
 - `docs/CM1252_SCHEMA_GATE_DRY_RUN_POLICY_INVARIANT.md`
+- `docs/CM1253_SCHEMA_GATE_DRY_RUN_EXECUTION_PREFLIGHT_INVARIANT.md`
+
+Current CM-1253 fact:
+
+- CM-1253 records `dryRunPlan.priorPolicySchemaGateAccepted` in temp-local dry-run harness output.
+- `hasAcceptedTempLocalStartupRecoveryDryRunHarness(...)` now requires this invariant.
+- Downstream `buildTempLocalStartupRecoveryDryRunExecutionPreflight(...)` rejects accepted-looking harness reports that lack schema-gated policy evidence.
+- Targeted policy/schema/no-touch validation passed `27/27`; default `npm test` passed `2782/2782`.
+- No dry-run execution, recovery execution/apply, startup/watchdog install, config change, service start, provider/MCP call, real-memory scan, migration/import/export/backup/restore apply, remote action, or readiness claim occurred.
 
 Current CM-1252 fact:
 

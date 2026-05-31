@@ -179,6 +179,7 @@ function acceptedCm1168DryRunHarness(overrides = {}) {
       dryRunOnly: true,
       tempLocalOnly: true,
       fixtureOnly: false,
+      priorPolicySchemaGateAccepted: true,
       executionDefault: 'disabled',
       manualApprovalRequiredBeforeApply: true,
       nextAllowedAction: 'record_temp_local_startup_recovery_dry_run_harness_only'
@@ -917,6 +918,7 @@ test('CM-1168 temp-local startup recovery dry-run harness is ready without execu
   assert.equal(report.dryRunPlan.reconcileReplayCandidates, 4);
   assert.equal(report.dryRunPlan.dryRunOnly, true);
   assert.equal(report.dryRunPlan.tempLocalOnly, true);
+  assert.equal(report.dryRunPlan.priorPolicySchemaGateAccepted, true);
   assert.equal(report.dryRunPlan.executionDefault, 'disabled');
   assert.equal(report.dryRunPlan.manualApprovalRequiredBeforeApply, true);
   assert.equal(report.dryRunPlan.nextAllowedAction, 'record_temp_local_startup_recovery_dry_run_harness_only');
@@ -1171,6 +1173,42 @@ test('CM-1169 temp-local startup recovery dry-run execution preflight requires a
   assert.ok(report.blockerReasons.includes('temp_local_execution_scope_required'));
   assert.equal(report.dryRunExecutionPreflightReady, false);
   assert.equal(report.dryRunExecuted, false);
+
+  const missingSchemaGateHarness = buildTempLocalStartupRecoveryDryRunExecutionPreflight({
+    mode: ACCEPTED_RECOVERY_DRY_RUN_EXECUTION_PREFLIGHT_MODE,
+    source: 'cm1168_temp_local_startup_recovery_dry_run_harness',
+    priorDryRunHarness: acceptedCm1168DryRunHarness({
+      dryRunPlan: {
+        startupRecoveryLimit: 5,
+        reconcileReplayLimit: 4,
+        repairLimit: 3,
+        pendingManifestCandidates: 5,
+        degradedManifestCandidates: 2,
+        reconcileReplayCandidates: 4,
+        dryRunOnly: true,
+        tempLocalOnly: true,
+        fixtureOnly: false,
+        executionDefault: 'disabled',
+        manualApprovalRequiredBeforeApply: true,
+        nextAllowedAction: 'record_temp_local_startup_recovery_dry_run_harness_only'
+      }
+    }),
+    executionPlan: {
+      dryRun: true,
+      apply: false,
+      confirm: false,
+      maxRuns: 1,
+      isolatedTempRoot: true,
+      cleanupRequired: true,
+      rawOutputAllowed: false,
+      durableAuditAllowed: false,
+      storeScope: 'temp_local'
+    }
+  });
+
+  assert.equal(missingSchemaGateHarness.accepted, false);
+  assert.equal(missingSchemaGateHarness.priorDryRunHarnessAccepted, false);
+  assert.ok(missingSchemaGateHarness.blockerReasons.includes('accepted_cm1168_dry_run_harness_required'));
 });
 
 test('CM-1169 temp-local startup recovery dry-run execution preflight blocks execution, real-store scope, durable audit, and overclaims', () => {

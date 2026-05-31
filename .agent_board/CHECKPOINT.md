@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1253 Schema Gate Dry-Run Execution Preflight Invariant Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local startup recovery policy source/test hardening only. No dry-run execution, recovery execution/apply, config/watchdog/startup install, service start, provider call, MCP call, real-memory scan, migration/import/export/backup/restore apply, remote action, cutover, readiness claim, or reliability claim.
+
+Result:
+
+- `buildTempLocalStartupRecoveryDryRunHarness(...)` now records `dryRunPlan.priorPolicySchemaGateAccepted`.
+- `hasAcceptedTempLocalStartupRecoveryDryRunHarness(...)` now requires that invariant.
+- Downstream `buildTempLocalStartupRecoveryDryRunExecutionPreflight(...)` no longer accepts accepted-looking dry-run harness reports that lack schema-gated policy evidence.
+- Dry-run and recovery remain disabled and not executed by default.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryWriteReconcileStartupSafetyPolicy.js`
+- `node --test tests\memory-write-reconcile-startup-safety-policy.test.js tests\sqlite-schema-startup-gate.test.js tests\no-touch-boundary-regression.test.js` passed `27/27`.
+- `npm test` passed `2782/2782`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1253.
+- Real dry-run/recovery/apply/startup/watchdog/cutover still requires separate fresh exact approval.
+
 ## CM-1252 Schema Gate Dry-Run Policy Invariant Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
