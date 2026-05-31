@@ -38,8 +38,7 @@ Boundary:
 
 Next:
 
-- Commit or otherwise stabilize CM-1240.
-- Future A5 execution still requires a separate exact user approval line.
+- Select the next local-safe task, or request a separate exact approval line before any future A5 execution.
 
 ## CM-1239 A5 Approval Line Verifier Checkpoint
 

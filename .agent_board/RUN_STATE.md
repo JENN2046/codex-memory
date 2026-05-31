@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1240 A5 approval check CLI implemented; commit pending |
+| Current task | CM-1240 A5 approval check CLI implemented and locally committed |
 | Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1240 added a local explicit-input CLI wrapper for exact A5 approval line checks. It validates supplied text against expected unit, branch, and commit without granting approval or executing approved commands. Source/test/docs validation passed; readiness remains false. Next safe action is to commit or otherwise stabilize CM-1240, then any future A5 execution still requires separate exact user approval.
+CM-1240 added a local explicit-input CLI wrapper for exact A5 approval line checks. It validates supplied text against expected unit, branch, and commit without granting approval or executing approved commands. Source/test/docs validation passed; readiness remains false. Next safe action is to select the next local-safe task or request a separate exact approval before any future A5 execution.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
