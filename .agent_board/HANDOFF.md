@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1292 MEMORY_WRITE_VISIBILITY_POLICY_FALLBACK_NORMALIZATION`.
+Goal: `CM-1293 EXECUTION_CONTEXT_VISIBILITY_POLICY_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing `record_memory` write-scope visibility fallback normalization and validating write/proof regression coverage.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing execution-context visibility fallback normalization and validating app-level write-scope persistence.
 
 Workspace: `A:\codex-memory`.
 
@@ -117,6 +117,9 @@ Changed scope since CM-1207:
 - `src/core/MemoryWriteService.js`
 - `tests/memory-write-preflight-runtime-integration.test.js`
 - `docs/CM1292_MEMORY_WRITE_VISIBILITY_POLICY_FALLBACK_NORMALIZATION.md`
+- `src/core/ExecutionContextResolver.js`
+- `tests/phase-a-services.test.js`
+- `docs/CM1293_EXECUTION_CONTEXT_VISIBILITY_POLICY_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

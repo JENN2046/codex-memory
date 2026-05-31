@@ -140,6 +140,8 @@ test('execution context resolver falls through blank camel-case scope to snake-c
         task_id: 'CM-BLANK-CAMEL',
         conversationId: '   ',
         conversation_id: 'snake-conversation',
+        visibility: '   ',
+        visibility_policy: 'private',
         retentionPolicy: '   ',
         retention_policy: 'snake-retention'
       }
@@ -152,6 +154,7 @@ test('execution context resolver falls through blank camel-case scope to snake-c
     assert.equal(stored.clientId, 'claude');
     assert.equal(stored.taskId, 'CM-BLANK-CAMEL');
     assert.equal(stored.conversationId, 'snake-conversation');
+    assert.equal(stored.visibility, 'private');
     assert.equal(stored.retentionPolicy, 'snake-retention');
   });
 });

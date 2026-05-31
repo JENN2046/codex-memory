@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1293 Execution Context Visibility Policy Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test execution-context visibility fallback normalization hardening. No public MCP schema expansion, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ExecutionContextResolver.resolve(...)` now normalizes `visibility` from the first non-empty `visibility/visibility_policy` value.
+- App-level regression proves blank camel-case execution-context `visibility` falls through to `visibility_policy=private` and persists into the shadow record scope.
+- This closes the entrypoint gap left below CM-1292's write-service normalization.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ExecutionContextResolver.js`
+- `node --check tests\phase-a-services.test.js`
+- `node --test tests\phase-a-services.test.js tests\memory-write-preflight-runtime-integration.test.js tests\policy-read-preflight.test.js` passed `29/29`.
+- `npm test` passed `2817/2817`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1293.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1292 Memory Write Visibility Policy Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -20,7 +20,7 @@ class ExecutionContextResolver {
       taskId: this.firstNormalizedString(context.taskId, context.task_id) || null,
       conversationId: this.firstNormalizedString(context.conversationId, context.conversation_id) || null,
       folder: this.normalizeString(context.folder) || null,
-      visibility: this.normalizeString(context.visibility) || null,
+      visibility: this.firstNormalizedString(context.visibility, context.visibility_policy) || null,
       retentionPolicy: this.firstNormalizedString(context.retentionPolicy, context.retention_policy) || null
     };
   }
