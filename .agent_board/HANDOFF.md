@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1225 VALIDATION_AGGREGATOR_VALIDATION_EVIDENCE_GAP_BINDING`.
+Goal: `CM-1226 VALIDATION_AGGREGATOR_BLOCKER_GAP_BINDING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after binding validation evidence freshness/gate posture into the ValidationAggregator full gap accounting report shape.
+Status: `COMPLETED_VALIDATED_NOT_READY` after binding validation/runtime-required/A5 blocker taxonomy into the ValidationAggregator full gap accounting report shape.
 
 Workspace: `A:\codex-memory`.
 
@@ -43,6 +43,7 @@ Changed scope since CM-1207:
 - `docs/CM1223_VALIDATION_AGGREGATOR_FULL_GAP_ACCOUNTING.md`
 - `docs/CM1224_VALIDATION_AGGREGATOR_RUNTIME_SUMMARY_GAP_BINDING.md`
 - `docs/CM1225_VALIDATION_AGGREGATOR_VALIDATION_EVIDENCE_GAP_BINDING.md`
+- `docs/CM1226_VALIDATION_AGGREGATOR_BLOCKER_GAP_BINDING.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -101,9 +102,11 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1225 binds explicit validation evidence freshness, gate readiness, command coverage, and confidence posture into that accounting output.
 - CM-1225 reads no evidence files and executes no validation commands; it reflects already supplied explicit inputs only.
 - CM-1225 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- CM-1226 binds validation, runtime-required, and A5-gated blocker ids/counts into that accounting output.
+- CM-1226 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1225:
+Validation for CM-1226:
 
 - `node --check src\core\ValidationAggregatorService.js`
 - `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js`

@@ -237,6 +237,8 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     'not_ready_no_explicit_evidence'
   );
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingValidationEvidenceUsable, false);
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeRequiredBlockerCount, 1);
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingA5GatedBlockerCount, 6);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationFixtureReadByAggregator, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationTestExecutedByAggregator, false);
@@ -708,6 +710,20 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationEvidenceExplicitEvidenceUsable,
     false
   );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.blockerSummaryBound,
+    true
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.validationBlockerIds,
+    ['full-final-rc-matrix-not-executed']
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.runtimeRequiredBlockerIds,
+    ['validation-aggregator-full-implementation-not-complete']
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.a5GatedBlockerCount, 6);
+  assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.totalBlockerCount, 8);
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.fixtureReadByAggregator, false);
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.testExecutedByAggregator, false);
   assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.helperExecutedByAggregator, false);
@@ -2455,6 +2471,21 @@ test('validation evidence reader exposes only explicit committed and local valid
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.fullImplementationGapAccounting.fullImplementationReady,
     false
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.runtimeRequiredBlockerIds,
+    ['validation-aggregator-full-implementation-not-complete']
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.a5GatedBlockerIds,
+    [
+      'migration-import-export-apply-a5-gated',
+      'provider-execution-a5-gated',
+      'startup-watchdog-a5-gated',
+      'codex-claude-config-switch-a5-gated',
+      'production-deploy-a5-gated',
+      'push-tag-release-deploy-a5-gated'
+    ]
   );
   assert.equal(reader.status, 'explicit_evidence_available');
   assert.equal(reader.sourceMode, 'explicit_safe_inputs_only');

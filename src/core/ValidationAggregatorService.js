@@ -330,7 +330,8 @@ function buildP66FullImplementationGapAccounting({
   validationEvidenceFreshness = null,
   validationEvidenceGateReadiness = null,
   validationEvidenceCommandCoverage = null,
-  validationEvidenceConfidencePosture = null
+  validationEvidenceConfidencePosture = null,
+  blockers = []
 } = {}) {
   const acceptedRuntimeSummary = runtimeEvidenceSummaryBridge &&
     runtimeEvidenceSummaryBridge.accepted === true
@@ -342,6 +343,16 @@ function buildP66FullImplementationGapAccounting({
   const acceptedRuntimeSummaryLocallyEvidencedGapIds = acceptedRuntimeSummary
     ? acceptedRuntimeSummary.locallyEvidencedRuntimeGaps
     : [];
+  const safeBlockers = Array.isArray(blockers) ? blockers : [];
+  const validationBlockerIds = safeBlockers
+    .filter(blocker => blocker.category === 'validation')
+    .map(blocker => blocker.id);
+  const runtimeRequiredBlockerIds = safeBlockers
+    .filter(blocker => blocker.requiresRuntimeImplementation === true)
+    .map(blocker => blocker.id);
+  const a5GatedBlockerIds = safeBlockers
+    .filter(blocker => blocker.requiresA5 === true)
+    .map(blocker => blocker.id);
 
   return {
     available: true,
@@ -377,6 +388,14 @@ function buildP66FullImplementationGapAccounting({
     validationEvidenceConfidencePostureStatus: validationEvidenceConfidencePosture
       ? validationEvidenceConfidencePosture.status
       : 'no_validation_evidence_confidence_posture',
+    blockerSummaryBound: safeBlockers.length > 0,
+    validationBlockerIds,
+    validationBlockerCount: validationBlockerIds.length,
+    runtimeRequiredBlockerIds,
+    runtimeRequiredBlockerCount: runtimeRequiredBlockerIds.length,
+    a5GatedBlockerIds,
+    a5GatedBlockerCount: a5GatedBlockerIds.length,
+    totalBlockerCount: safeBlockers.length,
     blockedA5HardStopIds: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS,
     blockedA5HardStopCount: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS.length,
     nextSafeClosureCandidates: P66_FULL_IMPLEMENTATION_NEXT_SAFE_CLOSURE_CANDIDATES,
@@ -1974,7 +1993,8 @@ function buildV1RcValidationAggregatorReport({
       validationEvidenceFreshness,
       validationEvidenceGateReadiness,
       validationEvidenceCommandCoverage,
-      validationEvidenceConfidencePosture
+      validationEvidenceConfidencePosture,
+      blockers
     });
 
   return {
@@ -2202,6 +2222,10 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.validationEvidenceGateReadinessStatus,
       p66ValidationAggregatorFullImplementationGapAccountingValidationEvidenceUsable:
         p66FullImplementationGapAccounting.validationEvidenceExplicitEvidenceUsable,
+      p66ValidationAggregatorFullImplementationGapAccountingRuntimeRequiredBlockerCount:
+        p66FullImplementationGapAccounting.runtimeRequiredBlockerCount,
+      p66ValidationAggregatorFullImplementationGapAccountingA5GatedBlockerCount:
+        p66FullImplementationGapAccounting.a5GatedBlockerCount,
       p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady: false,
       p66ValidationAggregatorFullImplementationFixtureReadByAggregator: false,
       p66ValidationAggregatorFullImplementationTestExecutedByAggregator: false,
@@ -3197,6 +3221,22 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.validationEvidenceCommandCoverageStatus,
         validationEvidenceConfidencePostureStatus:
           p66FullImplementationGapAccounting.validationEvidenceConfidencePostureStatus,
+        blockerSummaryBound:
+          p66FullImplementationGapAccounting.blockerSummaryBound,
+        validationBlockerIds:
+          p66FullImplementationGapAccounting.validationBlockerIds,
+        validationBlockerCount:
+          p66FullImplementationGapAccounting.validationBlockerCount,
+        runtimeRequiredBlockerIds:
+          p66FullImplementationGapAccounting.runtimeRequiredBlockerIds,
+        runtimeRequiredBlockerCount:
+          p66FullImplementationGapAccounting.runtimeRequiredBlockerCount,
+        a5GatedBlockerIds:
+          p66FullImplementationGapAccounting.a5GatedBlockerIds,
+        a5GatedBlockerCount:
+          p66FullImplementationGapAccounting.a5GatedBlockerCount,
+        totalBlockerCount:
+          p66FullImplementationGapAccounting.totalBlockerCount,
         fixtureReadByAggregator: false,
         testExecutedByAggregator: false,
         helperExecutedByAggregator: false,
