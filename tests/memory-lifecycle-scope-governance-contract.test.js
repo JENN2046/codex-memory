@@ -4,6 +4,7 @@ const fs = require('node:fs');
 
 const {
   evaluateGovernanceTransition,
+  filterRecallCandidatesByLifecycleScope,
   evaluateRecallEligibility
 } = require('../src/core/MemoryLifecycleScopeGovernanceContract');
 
@@ -217,12 +218,29 @@ test('CM-0844 governance transition falls through blank camel-case ids to snake-
     replacementMemoryId: '',
     replacement_memory_id: 'synthetic-memory-replacement',
     actorId: '   ',
-    actor_id: 'synthetic-reviewer'
+    actor_id: 'synthetic-reviewer',
+    approvedAt: '   ',
+    approved_at: '2026-05-23T00:00:00.000Z'
   }));
 
   assert.equal(result.acceptedForGovernanceFixture, true);
   assert.equal(result.targetMemoryId, 'synthetic-memory-active');
   assert.deepEqual(result.blockers, []);
+});
+
+test('CM-0844 accepted recall candidates fall through blank camel-case rank hints to snake-case aliases', () => {
+  const result = filterRecallCandidatesByLifecycleScope({
+    currentScope: exactScope,
+    candidates: [
+      record({
+        rankHint: '   ',
+        rank_hint: 'synthetic-rank-from-snake-case'
+      })
+    ]
+  });
+
+  assert.equal(result.acceptedCount, 1);
+  assert.equal(result.acceptedCandidates[0].rankHint, 'synthetic-rank-from-snake-case');
 });
 
 test('CM-0844 requires replacement memory id for supersession fixtures', () => {

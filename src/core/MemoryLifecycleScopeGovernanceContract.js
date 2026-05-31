@@ -195,7 +195,7 @@ function evaluateGovernanceTransition(input = {}) {
   );
   const reason = normalizeString(safeInput.reason);
   const actorId = firstNormalizedString(safeInput.actorId, safeInput.actor_id);
-  const approvedAt = normalizeString(safeInput.approvedAt || safeInput.approved_at);
+  const approvedAt = firstNormalizedString(safeInput.approvedAt, safeInput.approved_at);
   const scope = normalizeScope(safeInput.scope);
   const blockers = [];
 
@@ -283,7 +283,7 @@ function filterRecallCandidatesByLifecycleScope(input = {}) {
       acceptedCandidates.push({
         memoryId: eligibility.memoryId,
         lifecycleStatus: eligibility.lifecycleStatus,
-        rankHint: normalizeString(candidate.rankHint || candidate.rank_hint),
+        rankHint: firstNormalizedString(candidate.rankHint, candidate.rank_hint),
         scope: normalizeScope(candidate.scope || candidate)
       });
     } else {

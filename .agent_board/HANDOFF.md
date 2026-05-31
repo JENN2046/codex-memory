@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1301 SELECTED_AUDIT_CORRELATION_PREFLIGHT_ALIAS_FALLBACK`.
+Goal: `CM-1302 LIFECYCLE_GOVERNANCE_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing selected audit-correlation preflight packet/prior/artifact alias fallback. Commit is still pending until the final diff review.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing lifecycle governance / write lifecycle preflight alias fallback. Commit is still pending until the final diff review.
 
 Workspace: `A:\codex-memory`.
 
@@ -59,8 +59,11 @@ Changed scope since CM-1207:
 - `docs/CM1299_SHADOW_PROJECTION_SCOPE_TUPLE_ALIAS_FALLBACK.md`
 - `docs/CM1300_PROOF_MEMORY_POLICY_ALIAS_FALLBACK.md`
 - `docs/CM1301_SELECTED_AUDIT_CORRELATION_PREFLIGHT_ALIAS_FALLBACK.md`
+- `docs/CM1302_LIFECYCLE_GOVERNANCE_ALIAS_FALLBACK.md`
 - `src/core/SelectedAuditCorrelationObservationPreflight.js`
 - `tests/selected-audit-correlation-observation-preflight.test.js`
+- `src/core/MemoryWriteLifecycleDedupSuppressionPreflight.js`
+- `tests/memory-write-lifecycle-dedup-suppression-preflight.test.js`
 - `src/core/ExecutionContextResolver.js`
 - `src/core/MemoryWriteService.js`
 - `tests/memory-write-preflight-runtime-integration.test.js`

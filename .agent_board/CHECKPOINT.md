@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1302 Lifecycle Governance Alias Fallback Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test lifecycle governance and write lifecycle preflight fallback normalization hardening. No write, tombstone, supersede, rollback, apply, true audit/memory read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `evaluateGovernanceTransition(...)` now uses first non-empty normalized `approvedAt/approved_at`.
+- Accepted recall candidate output now uses first non-empty normalized `rankHint/rank_hint`.
+- `normalizeWriteCandidate(...)` now uses first non-empty normalized `lifecycleStatus/lifecycle_status` and `lifecycleAction/lifecycle_action`.
+- Lifecycle governance / write preflight no longer misreads blank camel-case lifecycle fields as absent/default when valid snake_case aliases exist.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\memory-lifecycle-scope-governance-contract.test.js tests\memory-write-lifecycle-dedup-suppression-preflight.test.js tests\lifecycle-read-policy-runtime.test.js tests\memory-lifecycle-scope-runtime-integration.test.js` passed `33/33`.
+- `npm test` passed `2824/2824`.
+- `git diff --check`, ledger consistency, and docs validation passed.
+
+Next:
+
+- Commit or otherwise stabilize CM-1302 if validation passes.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1301 Selected Audit Correlation Preflight Alias Fallback Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

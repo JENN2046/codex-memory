@@ -109,9 +109,9 @@ function normalizeWriteCandidate(input = {}) {
   const title = normalizeString(safeInput.title);
   const content = normalizeString(safeInput.content);
   const evidence = normalizeString(safeInput.evidence);
-  const lifecycleStatus = normalizeString(safeInput.lifecycleStatus || safeInput.lifecycle_status || 'active')
+  const lifecycleStatus = (firstNormalizedString(safeInput.lifecycleStatus, safeInput.lifecycle_status) || 'active')
     .toLowerCase();
-  const lifecycleAction = normalizeString(safeInput.lifecycleAction || safeInput.lifecycle_action || 'create')
+  const lifecycleAction = (firstNormalizedString(safeInput.lifecycleAction, safeInput.lifecycle_action) || 'create')
     .toLowerCase();
 
   return {

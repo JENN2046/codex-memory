@@ -123,7 +123,10 @@ test('CM-0836 falls through blank camel-case write fields to snake-case fallback
     conversation_id: allowedScope.conversationId,
     retentionPolicy: '   ',
     retention_policy: allowedScope.retentionPolicy,
-    lifecycleAction: 'supersede',
+    lifecycleStatus: '   ',
+    lifecycle_status: 'active',
+    lifecycleAction: '   ',
+    lifecycle_action: 'supersede',
     reason: 'synthetic correction',
     supersedesMemoryId: '   ',
     supersedes_memory_id: 'synthetic-old-memory'
