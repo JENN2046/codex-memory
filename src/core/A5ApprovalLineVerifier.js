@@ -3,11 +3,11 @@ const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const A5_APPROVAL_LINE_UNITS = Object.freeze({
   'A5-GAP-1': {
     action: 'governance_runtime_loop',
-    pattern: /^I approve A5-GAP-1 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), limited to (?<subject>.+), with durable write (?<durableWrite>yes|no)\.$/
+    pattern: /^I approve A5-GAP-1 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), limited to (?<subject>.+), with durable write (?<durableWrite>yes|no)(?:, (?<readOnlyGovernanceReport>running read-only governance report only))?\.$/
   },
   'A5-GAP-2': {
     action: 'recall_isolation_no_mutation',
-    pattern: /^I approve A5-GAP-2 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), limited to stores (?<stores>.+), no mutation\.$/
+    pattern: /^I approve A5-GAP-2 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), limited to stores (?<stores>.+?), no mutation(?:, (?<classifiedIsolationReadonly>read-only classified isolation positive-sample presence and projection proof only, no backfill, no migration, no durable write))?\.$/
   },
   'A5-GAP-3': {
     action: 'migration_boundary',
@@ -24,7 +24,7 @@ const A5_APPROVAL_LINE_UNITS = Object.freeze({
   },
   'A5-GAP-6': {
     action: 'validation_aggregator_evidence_only',
-    pattern: /^I approve A5-GAP-6 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), using only evidence from approved A5-GAP units (?<units>A5-GAP-\d(?:,A5-GAP-\d)*)\.$/
+    pattern: /^I approve A5-GAP-6 for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), using only evidence from approved A5-GAP units (?<units>A5-GAP-\d(?:, ?A5-GAP-\d)*)(?:, including (?<includedEvidence>[A-Za-z0-9_.-]+), (?<noNewRuntimeAction>no new runtime action))?\.$/
   },
   'A5-GAP-7': {
     action: 'rc_cutover',

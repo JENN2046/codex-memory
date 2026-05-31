@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1242 A5_APPROVAL_PATTERN_COVERAGE`.
+Goal: `CM-1243 A5_APPROVAL_PATTERN_COVERAGE_EXTENDED`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test verifier coverage for documented A5 approval lines.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test verifier coverage for additional documented P66 A5 approval lines.
 
 Workspace: `A:\codex-memory`.
 
@@ -67,6 +67,13 @@ Changed scope since CM-1207:
 - `docs/CM1241_A5_APPROVAL_CHECK_ENTRYPOINTS.md`
 - `src/core/A5ApprovalLineVerifier.js`
 - `docs/CM1242_A5_APPROVAL_PATTERN_COVERAGE.md`
+- `docs/CM1243_A5_APPROVAL_PATTERN_COVERAGE_EXTENDED.md`
+
+Current CM-1243 fact:
+
+- CM-1243 extended local verifier coverage for documented `A5-GAP-1` read-only governance report, `A5-GAP-2` classified isolation read-only proof, and `A5-GAP-6` spaced unit list / included evidence filename / `no new runtime action` lines.
+- Targeted verifier validation passed `20/20`.
+- CM-1243 grants no approval and executes no approved action.
 
 Current Git fact and A5 rule after CM-1208:
 

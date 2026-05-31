@@ -102,6 +102,22 @@ test('A5 approval verifier keeps other unit shapes separate and rejects unit reu
   assert.equal(reusedAsGap5.failClosedReasons.includes('approval_line_not_exact'), true);
 });
 
+test('A5 approval verifier accepts documented A5-GAP-1 read-only governance report line', () => {
+  const commit = '7b70efce7972dcda8b5c9fc11304f612ed9d7152';
+  const result = evaluateA5ApprovalLine({
+    approvalLine: `I approve A5-GAP-1 for codex-memory on branch main at commit ${commit}, limited to p66-a5-gap1-read-policy-audit-evidence-readonly sanitized report, with durable write no, running read-only governance report only.`,
+    expectedUnit: 'A5-GAP-1',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, true);
+  assert.equal(result.action, 'governance_runtime_loop');
+  assert.equal(result.parsed.durableWrite, 'no');
+  assert.equal(result.parsed.readOnlyGovernanceReport, 'running read-only governance report only');
+  assertNoSideEffects(result);
+});
+
 test('A5 approval verifier accepts documented A5-GAP-3 migration dry-run no-apply line', () => {
   const commit = 'e23e86dd4a3f443a95c2a2b4aeda4da901dde797';
   const result = evaluateA5ApprovalLine({
@@ -119,6 +135,21 @@ test('A5 approval verifier accepts documented A5-GAP-3 migration dry-run no-appl
   assertNoSideEffects(result);
 });
 
+test('A5 approval verifier accepts documented A5-GAP-2 classified isolation read-only line', () => {
+  const commit = 'ff55256';
+  const result = evaluateA5ApprovalLine({
+    approvalLine: `I approve A5-GAP-2 for codex-memory on branch main at commit ${commit}, limited to stores real_diary, real_sqlite, real_vector_index, real_candidate_cache, real_recall_audit, no mutation, read-only classified isolation positive-sample presence and projection proof only, no backfill, no migration, no durable write.`,
+    expectedUnit: 'A5-GAP-2',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, true);
+  assert.equal(result.action, 'recall_isolation_no_mutation');
+  assert.equal(result.parsed.classifiedIsolationReadonly, 'read-only classified isolation positive-sample presence and projection proof only, no backfill, no migration, no durable write');
+  assertNoSideEffects(result);
+});
+
 test('A5 approval verifier accepts documented A5-GAP-4 authenticated tools-list line', () => {
   const commit = '1a7d198f1f4758f0de3caf9b839cc59aa1b9802e';
   const result = evaluateA5ApprovalLine({
@@ -132,6 +163,23 @@ test('A5 approval verifier accepts documented A5-GAP-4 authenticated tools-list 
   assert.equal(result.action, 'live_http_operation');
   assert.equal(result.parsed.endpoint, 'http://127.0.0.1:7605');
   assert.equal(result.parsed.authenticatedMcpToolList, 'authenticated MCP initialize/tools-list evidence');
+  assertNoSideEffects(result);
+});
+
+test('A5 approval verifier accepts documented A5-GAP-6 evidence-only line with spaced units and no-new-runtime-action boundary', () => {
+  const commit = '5d6b174a6ed4b669cb4688d42b1360beb99c22e3';
+  const result = evaluateA5ApprovalLine({
+    approvalLine: `I approve A5-GAP-6 for codex-memory on branch main at commit ${commit}, using only evidence from approved A5-GAP units A5-GAP-1, A5-GAP-2, A5-GAP-3, A5-GAP-4, A5-GAP-5, including P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md, no new runtime action.`,
+    expectedUnit: 'A5-GAP-6',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, true);
+  assert.equal(result.action, 'validation_aggregator_evidence_only');
+  assert.equal(result.parsed.units, 'A5-GAP-1, A5-GAP-2, A5-GAP-3, A5-GAP-4, A5-GAP-5');
+  assert.equal(result.parsed.includedEvidence, 'P66_A5_GAP_2_SANITIZED_CLASSIFIED_SAMPLE_WRITE_EVIDENCE.md');
+  assert.equal(result.parsed.noNewRuntimeAction, 'no new runtime action');
   assertNoSideEffects(result);
 });
 
