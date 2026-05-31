@@ -72,6 +72,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeBoolean(value) {
   return value === true ? true : value === false ? false : null;
 }
@@ -97,8 +105,8 @@ function normalizePlannedActions(actions = []) {
     .map(action => ({
       action: normalizeString(action.action),
       store: normalizeString(action.store),
-      memoryId: normalizeString(action.memoryId || action.memory_id),
-      storeKind: normalizeString(action.storeKind || action.store_kind) || null,
+      memoryId: firstNormalizedString(action.memoryId, action.memory_id),
+      storeKind: firstNormalizedString(action.storeKind, action.store_kind) || null,
       expectedEntryCount: normalizeInteger(action.expectedEntryCount),
       expectedTaskCount: normalizeInteger(action.expectedTaskCount),
       applies: action.applies === true
@@ -167,7 +175,7 @@ function normalizeApplyDesign(applyDesign = {}) {
     mode: normalizeString(safeDesign.mode),
     scope: normalizeString(safeDesign.scope),
     target: normalizeString(safeDesign.target),
-    memoryId: normalizeString(safeDesign.memoryId || safeDesign.memory_id),
+    memoryId: firstNormalizedString(safeDesign.memoryId, safeDesign.memory_id),
     plannedActionIds: normalizeStringArray(safeDesign.plannedActionIds)
   };
 
@@ -182,7 +190,10 @@ function collectApplyDesignBlockers(applyDesign = {}, storeBackedPreviewReport =
   const safeDesign = isPlainObject(applyDesign) ? applyDesign : {};
   const normalized = normalizeApplyDesign(safeDesign);
   const blockers = [];
-  const previewMemoryId = normalizeString(storeBackedPreviewReport.memoryId || storeBackedPreviewReport.memory_id);
+  const previewMemoryId = firstNormalizedString(
+    storeBackedPreviewReport.memoryId,
+    storeBackedPreviewReport.memory_id
+  );
   const previewActions = normalizePlannedActions(storeBackedPreviewReport.plannedActions);
   const expectedActionIds = previewActions.map(action => [
     action.action,

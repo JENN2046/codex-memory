@@ -382,6 +382,73 @@ test('CM-1062 blocks after exact store reads when no cleanup targets exist', asy
   assert.equal(report.safety.appliesCleanup, false);
 });
 
+test('CM-1062 normalizes exact memory id and reconcile tasks from snake-case fallbacks', async () => {
+  const calls = [];
+  const stores = {
+    shadowStore: {
+      async getRecord(memoryId) {
+        calls.push(['getRecord', memoryId]);
+        return { memory_id: memoryId };
+      },
+      async listReconcileTasksForMemoryId(memoryId) {
+        calls.push(['listReconcileTasksForMemoryId', memoryId]);
+        return [
+          {
+            memoryId: '',
+            memory_id: memoryId,
+            storeKind: '   ',
+            store_kind: 'chunks'
+          }
+        ];
+      }
+    },
+    vectorStore: {
+      async hasRecord(memoryId) {
+        calls.push(['hasRecord', memoryId]);
+        return false;
+      }
+    },
+    candidateCacheStore: {
+      async countCurrentFingerprintByMemoryIds(memoryIds) {
+        calls.push(['countCurrentFingerprintByMemoryIds', memoryIds[0]]);
+        return 0;
+      }
+    }
+  };
+
+  const report = await buildMemoryWriteRollbackCleanupStoreBackedDryRunPreview({
+    designReviewReport: createAcceptedDesignReviewReport(),
+    memoryId: '   ',
+    memory_id: 'process-memory-cm-1062-snake-fallback',
+    stores
+  });
+
+  assert.equal(report.status, RESULT_STATUS_ACCEPTED);
+  assert.deepEqual(calls, [
+    ['getRecord', 'process-memory-cm-1062-snake-fallback'],
+    ['hasRecord', 'process-memory-cm-1062-snake-fallback'],
+    ['countCurrentFingerprintByMemoryIds', 'process-memory-cm-1062-snake-fallback'],
+    ['listReconcileTasksForMemoryId', 'process-memory-cm-1062-snake-fallback']
+  ]);
+  assert.equal(report.memoryId, 'process-memory-cm-1062-snake-fallback');
+  assert.deepEqual(report.plannedActions, [
+    {
+      action: 'delete_sqlite_shadow_record',
+      store: 'sqlite_shadow_record',
+      memoryId: 'process-memory-cm-1062-snake-fallback',
+      applies: false
+    },
+    {
+      action: 'clear_reconcile_tasks',
+      store: 'reconcile_queue_tasks',
+      memoryId: 'process-memory-cm-1062-snake-fallback',
+      storeKind: 'chunks',
+      expectedTaskCount: 1,
+      applies: false
+    }
+  ]);
+});
+
 test('CM-1062 blocks before store reads when required store helpers are missing', async () => {
   const report = await buildMemoryWriteRollbackCleanupStoreBackedDryRunPreview({
     designReviewReport: createAcceptedDesignReviewReport(),

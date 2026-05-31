@@ -212,6 +212,49 @@ test('CM-1085 blocks if planned actions would apply or design action ids drift',
   assert.equal(report.applyGate.rollbackApplyAuthorized, false);
 });
 
+test('CM-1085 normalizes apply design and preview planned actions from snake-case fallbacks', () => {
+  const memoryId = 'process-memory-cm-1085-snake-fallback';
+  const report = evaluateMemoryWriteRollbackCleanupApplyDesignPolicy(createValidInput({
+    storeBackedPreviewReport: createAcceptedStoreBackedPreviewReport({
+      memoryId: '   ',
+      memory_id: memoryId,
+      plannedActions: [
+        {
+          action: 'clear_reconcile_tasks',
+          store: 'reconcile_queue_tasks',
+          memoryId: '',
+          memory_id: memoryId,
+          storeKind: '   ',
+          store_kind: 'chunks',
+          expectedTaskCount: 1,
+          applies: false
+        }
+      ]
+    }),
+    applyDesign: createValidApplyDesign({
+      memoryId: '',
+      memory_id: memoryId,
+      plannedActionIds: [
+        'clear_reconcile_tasks:reconcile_queue_tasks:chunks'
+      ]
+    })
+  }));
+
+  assert.equal(report.status, RESULT_STATUS_ACCEPTED);
+  assert.equal(report.applyDesign.memoryId, memoryId);
+  assert.deepEqual(report.plannedActions, [
+    {
+      action: 'clear_reconcile_tasks',
+      store: 'reconcile_queue_tasks',
+      memoryId,
+      storeKind: 'chunks',
+      expectedEntryCount: null,
+      expectedTaskCount: 1,
+      applies: false
+    }
+  ]);
+});
+
 test('CM-1085 blocks apply approvals and cleanup rollback execution attempts', () => {
   const report = evaluateMemoryWriteRollbackCleanupApplyDesignPolicy(createValidInput({
     applyDesign: createValidApplyDesign({

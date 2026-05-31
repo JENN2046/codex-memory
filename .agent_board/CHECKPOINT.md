@@ -1,5 +1,38 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1286 Rollback Cleanup Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test rollback cleanup preview and apply-design fallback normalization hardening. No cleanup/apply/rollback execution, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside temp-local test stores, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteRollbackCleanupDryRunPreview` now uses the first non-empty normalized value for cleanup preview and reconcile task memory id / store-kind fields.
+- `MemoryWriteRollbackCleanupStoreBackedDryRunPreview` now uses the same blank-aware fallback behavior for exact memory id input and store-returned reconcile tasks before constructing no-apply cleanup preview actions.
+- `MemoryWriteRollbackCleanupApplyDesignPolicy` now normalizes preview planned actions, preview memory id, and apply-design memory id with the same first-non-empty fallback behavior.
+- Added regressions proving blank camel-case rollback cleanup fields fall through to snake_case fields while keeping cleanup/apply/rollback execution blocked.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryWriteRollbackCleanupDryRunPreview.js`
+- `node --check src\core\MemoryWriteRollbackCleanupStoreBackedDryRunPreview.js`
+- `node --check src\core\MemoryWriteRollbackCleanupApplyDesignPolicy.js`
+- `node --check tests\memory-write-rollback-cleanup-dry-run-preview.test.js`
+- `node --check tests\memory-write-rollback-cleanup-store-backed-dry-run-preview.test.js`
+- `node --check tests\memory-write-rollback-cleanup-apply-design-policy.test.js`
+- `node --test tests\memory-write-rollback-cleanup-dry-run-preview.test.js tests\memory-write-rollback-cleanup-store-backed-dry-run-preview.test.js tests\memory-write-rollback-cleanup-apply-design-policy.test.js tests\memory-write-rollback-cleanup-plan-boundary.test.js tests\memory-write-rollback-cleanup-design-review-policy.test.js` passed `30/30`.
+- `npm test` passed `2810/2810`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1286.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1285 Proof-Memory Retention Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

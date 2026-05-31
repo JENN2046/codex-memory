@@ -26,6 +26,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeLimit(value, fallback = 50) {
   return Number.isInteger(value) && value > 0 ? value : fallback;
 }
@@ -128,7 +136,7 @@ function buildPreviewInput({
 
 async function buildMemoryWriteRollbackCleanupStoreBackedDryRunPreview(input = {}) {
   const safeInput = isPlainObject(input) ? input : {};
-  const memoryId = normalizeString(safeInput.memoryId || safeInput.memory_id);
+  const memoryId = firstNormalizedString(safeInput.memoryId, safeInput.memory_id);
   const target = normalizeString(safeInput.target) || 'process';
   const previewId = normalizeString(safeInput.previewId) || 'CM-1062-store-backed-dry-run-preview';
   const limit = normalizeLimit(safeInput.reconcileTaskLimit, 50);
@@ -186,8 +194,8 @@ async function buildMemoryWriteRollbackCleanupStoreBackedDryRunPreview(input = {
   const candidateCacheEntryCount = await candidateCacheStore.countCurrentFingerprintByMemoryIds([memoryId], [target]);
   const reconcileTasks = await shadowStore.listReconcileTasksForMemoryId(memoryId, limit);
   const normalizedReconcileTasks = reconcileTasks.map(task => ({
-    memoryId: normalizeString(task.memoryId || task.memory_id),
-    storeKind: normalizeString(task.storeKind || task.store_kind)
+    memoryId: firstNormalizedString(task.memoryId, task.memory_id),
+    storeKind: firstNormalizedString(task.storeKind, task.store_kind)
   }));
 
   const previewInput = buildPreviewInput({

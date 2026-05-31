@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1285 PROOF_MEMORY_RETENTION_FALLBACK_NORMALIZATION`.
+Goal: `CM-1286 ROLLBACK_CLEANUP_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing proof-memory retention/tombstone fallback normalization and validating proof-retention/write-policy behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing rollback cleanup preview/apply-design fallback normalization and validating rollback-cleanup governance behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -82,6 +82,13 @@ Changed scope since CM-1207:
 - `tests/proof-memory-retention-tombstone-plan.test.js`
 - `tests/proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js`
 - `docs/CM1285_PROOF_MEMORY_RETENTION_FALLBACK_NORMALIZATION.md`
+- `src/core/MemoryWriteRollbackCleanupDryRunPreview.js`
+- `src/core/MemoryWriteRollbackCleanupStoreBackedDryRunPreview.js`
+- `src/core/MemoryWriteRollbackCleanupApplyDesignPolicy.js`
+- `tests/memory-write-rollback-cleanup-dry-run-preview.test.js`
+- `tests/memory-write-rollback-cleanup-store-backed-dry-run-preview.test.js`
+- `tests/memory-write-rollback-cleanup-apply-design-policy.test.js`
+- `docs/CM1286_ROLLBACK_CLEANUP_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

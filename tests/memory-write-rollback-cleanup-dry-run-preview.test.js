@@ -298,6 +298,50 @@ test('CM-1061 fails closed for reconcile task memory-id mismatch or missing stor
   assert.ok(report.blockerReasons.includes('reconcile_task_malformed'));
 });
 
+test('CM-1061 normalizes cleanup preview memory and reconcile fields from snake-case fallbacks', () => {
+  const report = evaluateMemoryWriteRollbackCleanupDryRunPreview(createValidInput({
+    cleanupPreview: {
+      ...createValidInput().cleanupPreview,
+      memoryId: '   ',
+      memory_id: 'process-memory-cm-1061-snake-fallback',
+      reconcileTasks: [
+        {
+          memoryId: '',
+          memory_id: 'process-memory-cm-1061-snake-fallback',
+          storeKind: '   ',
+          store_kind: 'chunks'
+        },
+        {
+          memoryId: 'process-memory-cm-1061-snake-fallback',
+          storeKind: 'vector'
+        }
+      ]
+    }
+  }));
+
+  assert.equal(report.status, RESULT_STATUS_ACCEPTED);
+  assert.equal(report.cleanupPreview.memoryId, 'process-memory-cm-1061-snake-fallback');
+  assert.deepEqual(report.cleanupPreview.reconcileTasks, [
+    {
+      memoryId: 'process-memory-cm-1061-snake-fallback',
+      storeKind: 'chunks'
+    },
+    {
+      memoryId: 'process-memory-cm-1061-snake-fallback',
+      storeKind: 'vector'
+    }
+  ]);
+  assert.deepEqual(
+    report.plannedActions
+      .filter(action => action.store === 'reconcile_queue_tasks')
+      .map(action => [action.memoryId, action.storeKind, action.expectedTaskCount]),
+    [
+      ['process-memory-cm-1061-snake-fallback', 'chunks', 1],
+      ['process-memory-cm-1061-snake-fallback', 'vector', 1]
+    ]
+  );
+});
+
 test('CM-1061 fails closed for apply diary audit public MCP config dependency or readiness drift', () => {
   const report = evaluateMemoryWriteRollbackCleanupDryRunPreview(createValidInput({
     cleanupPreview: {

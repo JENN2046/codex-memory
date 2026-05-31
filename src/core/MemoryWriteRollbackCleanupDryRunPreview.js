@@ -68,6 +68,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeStringArray(value) {
   if (!Array.isArray(value)) return [];
   return value.map(normalizeString).filter(Boolean);
@@ -151,8 +159,8 @@ function normalizeReconcileTasks(reconcileTasks = []) {
   return reconcileTasks
     .filter(isPlainObject)
     .map(task => ({
-      memoryId: normalizeString(task.memoryId || task.memory_id),
-      storeKind: normalizeString(task.storeKind || task.store_kind)
+      memoryId: firstNormalizedString(task.memoryId, task.memory_id),
+      storeKind: firstNormalizedString(task.storeKind, task.store_kind)
     }));
 }
 
@@ -164,7 +172,7 @@ function normalizeCleanupPreview(cleanupPreview = {}) {
     mode: normalizeString(safePreview.mode),
     scope: normalizeString(safePreview.scope),
     target: normalizeString(safePreview.target),
-    memoryId: normalizeString(safePreview.memoryId || safePreview.memory_id),
+    memoryId: firstNormalizedString(safePreview.memoryId, safePreview.memory_id),
     targetStores: normalizeStringArray(safePreview.targetStores),
     retainedStores: normalizeStringArray(safePreview.retainedStores),
     sqliteShadowRecordPresent: normalizeBoolean(safePreview.sqliteShadowRecordPresent),
