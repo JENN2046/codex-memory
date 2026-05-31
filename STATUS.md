@@ -41,7 +41,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1222 A5-GAP-6_POST_GAP3_PREFLIGHT_AGGREGATION_EVIDENCE` 已在 exact approval 下执行：`main@8700d5453a2c53584e821987d1539b30517944a1`，只消费已批准的 `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5` sanitized evidence。Aggregator 接受 explicit sanitized summary，结果保持 `decision=NOT_READY_BLOCKED`、`validationAggregatorFullImplementation=false`、`runtimeEvidenceSummaryLocallyEvidencedGapCount=4`、`runtimeEvidenceSummaryRemainingGapCount=3`。CM-1221 / A5-GAP-3 migration-readiness dry-run output 未执行、未消费。
 
-当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-3 approval 后才可执行 migration readiness dry-run，或继续做 ValidationAggregator full implementation 的本地结构化缺口核算。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1223 VALIDATION_AGGREGATOR_FULL_GAP_ACCOUNTING` 已新增本地 source/test 结构化缺口核算：`p66ValidationAggregatorFullImplementationDefinition` 现在输出 remaining / locally evidenced full implementation gap ids/counts 和 next safe closure candidates。Targeted validation `node --check src\core\ValidationAggregatorService.js` 与 `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `21/21`。该变更不执行 runtime collector，不消费 A5-GAP-3，不改变 `validationAggregatorFullImplementation=false`、`runtimeReady=false`、`rcReady=false`。
+
+当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-3 approval 后才可执行 migration readiness dry-run，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 

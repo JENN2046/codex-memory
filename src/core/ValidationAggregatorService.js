@@ -282,6 +282,12 @@ const P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS = [
   'final_rc_matrix_runner_not_executed_as_real_matrix'
 ];
 
+const P66_FULL_IMPLEMENTATION_NEXT_SAFE_CLOSURE_CANDIDATES = [
+  'a5_gap_3_migration_readiness_fixture_only_dry_run',
+  'validation_aggregator_full_gap_accounting_structured_report',
+  'a5_gap_6_sanitized_aggregation_refresh_after_each_approved_unit'
+];
+
 const P66_FULL_IMPLEMENTATION_A5_HARD_STOPS = [
   'push',
   'tag_create',
@@ -318,6 +324,27 @@ const P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES = [
   'secret_like_content_detected',
   'a5_approval_missing'
 ];
+
+function buildP66FullImplementationGapAccounting() {
+  return {
+    available: true,
+    sourceMode: 'static_report_shape_only',
+    fullImplementationReady: false,
+    remainingFullImplementationGapIds: P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS,
+    remainingFullImplementationGapCount: P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS.length,
+    locallyEvidencedFullImplementationGapIds: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS,
+    locallyEvidencedFullImplementationGapCount: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS.length,
+    blockedA5HardStopIds: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS,
+    blockedA5HardStopCount: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS.length,
+    nextSafeClosureCandidates: P66_FULL_IMPLEMENTATION_NEXT_SAFE_CLOSURE_CANDIDATES,
+    nextSafeClosureCandidateCount: P66_FULL_IMPLEMENTATION_NEXT_SAFE_CLOSURE_CANDIDATES.length,
+    commandsExecutedByAccounting: false,
+    filesReadByAccounting: false,
+    runtimeStoresReadByAccounting: false,
+    durableStateTouchedByAccounting: false,
+    readinessClaimedByAccounting: false
+  };
+}
 
 const P66_SOURCE_REGISTRY_REQUIRED_IDS = [
   'committed_fixture_evidence',
@@ -1839,6 +1866,7 @@ function buildV1RcValidationAggregatorReport({
   );
   const v11HardeningValidationAggregator =
     evaluateV11HardeningValidationAggregator(v11HardeningEvidence || {});
+  const p66FullImplementationGapAccounting = buildP66FullImplementationGapAccounting();
   const validationEvidenceFreshness = summarizeValidationEvidenceFreshness({
     acceptedSources: validationEvidenceReader.acceptedSources,
     generatedAt
@@ -2102,6 +2130,17 @@ function buildV1RcValidationAggregatorReport({
         P66_FULL_IMPLEMENTATION_A5_HARD_STOPS.length,
       p66ValidationAggregatorFullImplementationFailClosedCaseCount:
         P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES.length,
+      p66ValidationAggregatorFullImplementationGapAccountingAvailable:
+        p66FullImplementationGapAccounting.available,
+      p66ValidationAggregatorFullImplementationGapAccountingSourceMode:
+        p66FullImplementationGapAccounting.sourceMode,
+      p66ValidationAggregatorFullImplementationGapAccountingRemainingGapCount:
+        p66FullImplementationGapAccounting.remainingFullImplementationGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingLocallyEvidencedGapCount:
+        p66FullImplementationGapAccounting.locallyEvidencedFullImplementationGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount:
+        p66FullImplementationGapAccounting.nextSafeClosureCandidateCount,
+      p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady: false,
       p66ValidationAggregatorFullImplementationFixtureReadByAggregator: false,
       p66ValidationAggregatorFullImplementationTestExecutedByAggregator: false,
       p66ValidationAggregatorFullImplementationRuntimeImplemented: false,
@@ -3061,6 +3100,19 @@ function buildV1RcValidationAggregatorReport({
         remainingRuntimeGaps: P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS,
         a5HardStops: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS,
         failClosedCases: P66_FULL_IMPLEMENTATION_FAIL_CLOSED_CASES,
+        fullImplementationGapAccounting: p66FullImplementationGapAccounting,
+        fullImplementationGapAccountingAvailable:
+          p66FullImplementationGapAccounting.available,
+        remainingFullImplementationGapIds:
+          p66FullImplementationGapAccounting.remainingFullImplementationGapIds,
+        remainingFullImplementationGapCount:
+          p66FullImplementationGapAccounting.remainingFullImplementationGapCount,
+        locallyEvidencedFullImplementationGapIds:
+          p66FullImplementationGapAccounting.locallyEvidencedFullImplementationGapIds,
+        locallyEvidencedFullImplementationGapCount:
+          p66FullImplementationGapAccounting.locallyEvidencedFullImplementationGapCount,
+        nextSafeClosureCandidates:
+          p66FullImplementationGapAccounting.nextSafeClosureCandidates,
         fixtureReadByAggregator: false,
         testExecutedByAggregator: false,
         helperExecutedByAggregator: false,

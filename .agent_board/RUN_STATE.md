@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1222 A5-GAP-6 post-GAP3-preflight aggregation evidence recorded; A5-GAP-3 dry-run still awaits exact fresh-HEAD approval |
-| Current area | P0-mainline-health / P2-active-memory / P8-memory-governance / P10-observability-admin |
+| Current task | CM-1223 ValidationAggregator full gap accounting implemented locally; A5-GAP-3 dry-run still awaits exact fresh-HEAD approval |
+| Current area | P0-mainline-health / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1222 consumed exact A5-GAP-6 approval at `main@8700d5453a2c53584e821987d1539b30517944a1` and ran only an in-memory sanitized ValidationAggregator summary over approved units `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5`. Result remained `NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, locally evidenced gaps `4`, remaining gaps `3`. CM-1221 / `A5-GAP-3` dry-run output was not executed or consumed. Next safe action is to commit or otherwise stabilize CM-1222, then use fresh `HEAD` for exact A5-GAP-3 approval before execution, or continue local ValidationAggregator full implementation gap accounting.
+CM-1223 added static ValidationAggregator full implementation gap accounting to the local report shape and targeted tests. It does not execute runtime collectors, consume A5-GAP-3, or change readiness booleans. Next safe action is to commit or otherwise stabilize CM-1223, then use fresh `HEAD` for exact A5-GAP-3 approval before execution, or continue the next local ValidationAggregator implementation slice.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

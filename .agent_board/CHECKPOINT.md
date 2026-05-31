@@ -1,5 +1,43 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1223 ValidationAggregator Full Gap Accounting Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: local source/test report-shape improvement only. No runtime evidence execution.
+
+Result:
+
+- Added static full implementation gap accounting to `buildV1RcValidationAggregatorReport()`.
+- `p66ValidationAggregatorFullImplementationDefinition` now exposes remaining/local full implementation gap ids/counts and next safe closure candidates.
+- Summary now exposes gap-accounting availability, source mode, counts, and `CanClaimReady=false`.
+- Readiness posture remains unchanged: `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` passed `21/21`.
+
+Boundary:
+
+- No runtime collector execution.
+- No A5-GAP-3 consumption.
+- No file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1223.
+- Then use fresh `HEAD` for exact A5-GAP-3 approval before migration-readiness dry-run, or continue the next local ValidationAggregator implementation slice.
+
 ## CM-1222 A5-GAP-6 Post-GAP3-Preflight Aggregation Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
