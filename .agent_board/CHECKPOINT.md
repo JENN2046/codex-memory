@@ -1,5 +1,45 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1232 ValidationAggregator Effective Gap Delta Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: local source/test report-shape improvement only. No evidence file read, ValidationAggregator execution, runtime evidence execution, or evidence file/store scan.
+
+Result:
+
+- Added static-baseline versus effective-gap delta fields.
+- Default no-summary state keeps `staticBaselineClearedGapCount=0` and `staticBaselineStillRemainingGapCount=7`.
+- Accepted sanitized runtime summary state lists baseline gaps removed from effective remaining gaps.
+- Readiness posture remains unchanged: `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` passed `21/21`.
+
+Boundary:
+
+- No A5-GAP-6 execution.
+- No evidence file read.
+- No validation command execution by aggregator.
+- No runtime collector execution.
+- No evidence file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1232.
+- Then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`, or continue the next local ValidationAggregator implementation slice.
+
 ## CM-1231 ValidationAggregator Effective Gap Closure Criterion Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

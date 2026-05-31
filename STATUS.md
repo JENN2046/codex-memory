@@ -59,7 +59,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1231 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_CRITERION` 已把 `effectiveRemainingGapsCleared` 纳入 closure criteria，并在 effective remaining gap list 非空时把 `effective_remaining_gaps_cleared` 放入 missing criteria。Targeted validation `node --check src\core\ValidationAggregatorService.js` 与 `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `21/21`。该变更不执行 A5-GAP-6，不读取 evidence 文件或 stores，不改变 readiness。
 
-当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-6 approval 后才可聚合包括 `A5-GAP-3` 在内的已批准 sanitized evidence，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230/CM-1231 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1232 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_DELTA` 已让 full gap accounting 显示 static baseline 与 effective gap view 的差异：`staticBaselineClearedGapIds/count`、`staticBaselineStillRemainingGapIds/count` 与 `effectiveNonBaselineRemainingGapIds/count`。Targeted validation `node --check src\core\ValidationAggregatorService.js` 与 `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `21/21`。该变更不执行 A5-GAP-6，不读取 evidence 文件或 stores，不改变 readiness。
+
+当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-6 approval 后才可聚合包括 `A5-GAP-3` 在内的已批准 sanitized evidence，或继续做 ValidationAggregator full implementation 的后续本地实现。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230/CM-1231/CM-1232 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 

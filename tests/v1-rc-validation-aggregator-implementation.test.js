@@ -230,6 +230,15 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocallyEvidencedGapCount,
     2
   );
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingStaticBaselineClearedGapCount, 0);
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingStaticBaselineStillRemainingGapCount,
+    7
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveNonBaselineRemainingGapCount,
+    0
+  );
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount, 3);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryRemainingGapCount, 0);
@@ -704,6 +713,18 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.deepEqual(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveLocallyEvidencedFullImplementationGapIds,
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.locallyEvidencedRuntimeGaps
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.staticBaselineClearedGapIds,
+    []
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.staticBaselineStillRemainingGapIds,
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.remainingRuntimeGaps
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveNonBaselineRemainingGapIds,
+    []
   );
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.nextSafeClosureCandidates.includes(
@@ -2317,6 +2338,15 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocallyEvidencedGapCount,
     2
   );
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingStaticBaselineClearedGapCount, 5);
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingStaticBaselineStillRemainingGapCount,
+    2
+  );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveNonBaselineRemainingGapCount,
+    0
+  );
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryBound,
     true
@@ -2352,6 +2382,23 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
       'runtime_schema_version_enforcement_not_fully_proven',
       'final_rc_matrix_runner_not_executed_as_real_matrix'
     ]
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.staticBaselineClearedGapIds.includes(
+      'migration_import_export_backup_restore_approval_execution_blocked'
+    ),
+    true
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.staticBaselineStillRemainingGapIds,
+    [
+      'validation_aggregator_full_implementation_incomplete',
+      'mainline_strict_gate_not_executed_for_cutover'
+    ]
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveNonBaselineRemainingGapIds,
+    []
   );
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.fullImplementationGapAccounting.fullImplementationReady,
