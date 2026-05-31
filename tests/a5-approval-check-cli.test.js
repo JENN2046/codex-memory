@@ -140,6 +140,15 @@ test('a5 approval check CLI renders an A5-GAP-6 exact approval template without 
   const report = JSON.parse(result.stdout);
   assert.equal(report.status, 'approval_template_rendered');
   assert.equal(report.templateRendered, true);
+  assert.equal(report.templateSelfCheck.approvalAccepted, true);
+  assert.deepEqual(report.templateSelfCheck.failClosedReasons, []);
+  assert.deepEqual(report.templateSelfCheck.parsedApprovalScope.approvedEvidenceUnits, [
+    'A5-GAP-1',
+    'A5-GAP-2',
+    'A5-GAP-3',
+    'A5-GAP-4',
+    'A5-GAP-5'
+  ]);
   assert.equal(report.approvalAccepted, false);
   assert.equal(report.authorizationGranted, false);
   assert.equal(report.cli.executesApprovedAction, false);

@@ -1,5 +1,50 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1247 A5-GAP-6 Template Self-Check Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local CLI/test hardening only. No A5 approval grant, strict gate execution, ValidationAggregator execution, Git read by the CLI, runtime evidence execution, dependency change, lockfile change, or external action.
+
+Result:
+
+- Added round-trip self-check for rendered `A5-GAP-6` templates through `evaluateA5ApprovalLine(...)`.
+- Exposed `templateSelfCheck` in template-mode reports.
+- Template grammar drift now rejects fail-closed before the template is considered rendered.
+- Successful template rendering still does not grant approval or execute any action.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\cli\a5-approval-check.js`
+- `node --test tests\a5-approval-check-cli.test.js tests\a5-approval-check-package-entry.test.js tests\a5-approval-line-verifier.test.js tests\no-touch-boundary-regression.test.js` passed `26/26`.
+- `git diff --check`
+- Ledger consistency validation.
+- Docs validation via `scripts\validate-local.ps1 -Area docs`.
+
+Boundary:
+
+- No A5-GAP execution.
+- No strict gate execution.
+- No ValidationAggregator execution.
+- No Git command execution by the CLI.
+- No service start.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No dependency or lockfile change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1247.
+- Future A5 execution still requires a separate exact fresh-HEAD user approval line.
+
 ## CM-1246 A5-GAP-6 Template Unit Guard Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

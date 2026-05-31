@@ -143,14 +143,29 @@ function buildApprovalTemplate(options = {}) {
     ? `, including ${options.includedEvidence}${options.noNewRuntimeAction ? ', no new runtime action' : ''}`
     : '';
   const template = `I approve A5-GAP-6 for codex-memory on branch ${branch} at commit ${commit}, using only evidence from approved A5-GAP units ${approvedUnits}${evidenceSuffix}.`;
+  const selfCheck = evaluateA5ApprovalLine({
+    approvalLine: template,
+    expectedUnit: 'A5-GAP-6',
+    expectedBranch: branch,
+    expectedCommit: commit
+  });
 
   return {
-    status: 'approval_template_rendered',
-    templateRendered: true,
+    status: selfCheck.approvalAccepted
+      ? 'approval_template_rendered'
+      : 'approval_template_rejected_fail_closed',
+    templateRendered: selfCheck.approvalAccepted,
     template,
+    templateSelfCheck: {
+      approvalAccepted: selfCheck.approvalAccepted,
+      failClosedReasons: selfCheck.failClosedReasons,
+      parsedApprovalScope: selfCheck.parsedApprovalScope
+    },
     invalidUnits: [],
     duplicateUnits: [],
-    failClosedReasons: []
+    failClosedReasons: selfCheck.approvalAccepted
+      ? []
+      : ['template_self_check_failed', ...selfCheck.failClosedReasons]
   };
 }
 

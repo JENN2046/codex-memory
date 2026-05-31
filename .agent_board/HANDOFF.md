@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1246 A5_GAP6_TEMPLATE_UNIT_GUARD`.
+Goal: `CM-1247 A5_GAP6_TEMPLATE_SELF_CHECK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local CLI/test template unit guard hardening for A5-GAP-6 approval text.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local CLI/test template self-check hardening for A5-GAP-6 approval text.
 
 Workspace: `A:\codex-memory`.
 
@@ -72,6 +72,13 @@ Changed scope since CM-1207:
 - `docs/CM1244_A5_GAP6_APPROVAL_SCOPE_NORMALIZATION.md`
 - `docs/CM1245_A5_GAP6_APPROVAL_TEMPLATE_RENDERING.md`
 - `docs/CM1246_A5_GAP6_TEMPLATE_UNIT_GUARD.md`
+- `docs/CM1247_A5_GAP6_TEMPLATE_SELF_CHECK.md`
+
+Current CM-1247 fact:
+
+- CM-1247 added round-trip self-check for rendered `A5-GAP-6` templates through `evaluateA5ApprovalLine(...)`.
+- Targeted CLI validation passed `26/26`.
+- CM-1247 grants no approval and executes no approved action.
 
 Current CM-1246 fact:
 
