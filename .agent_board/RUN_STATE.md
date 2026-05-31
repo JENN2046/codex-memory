@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1262 memory_overview HTTP client contract regression added |
-| Current area | P4-http-runtime / P0-mainline-health |
+| Current task | CM-1263 client acceptance runtime fact rebase added |
+| Current area | P9-codex-claude-client-scope / P6-docs-drift / P0-mainline-health |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1262 adds HTTP boundary regression coverage for the client-visible `memory_overview` contract: no-token `tools/list` exposes the selected low-disclosure projection description, and bearer-token `tools/call memory_overview` still returns full-overview-only fields. Runtime behavior remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1262.
+CM-1263 rebases Claude client acceptance connected/model-side success wording from current fact to historical evidence requiring fresh validation. Runtime behavior remains unchanged. It does not run Claude CLI, call providers/MCP, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final docs/ledger/diff validation, then commit or otherwise stabilize CM-1263.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

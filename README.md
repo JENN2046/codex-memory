@@ -300,7 +300,7 @@ npm run rebuild-shadow
 
 Claude MCP 接入先看：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)。
 
-当前结论：Claude Code 本地 HTTP MCP 已添加到当前项目 local 配置，`claude mcp get/list` 显示 connected；直接 MCP `memory_overview` 调用成功。按用户最新批准，当前模型侧验收模型切换为 `deepseek-ai/deepseek-v4-flash`，且模型侧 `memory_overview` 调用已成功。非交互 `/mcp` 不可用，需在交互式 Claude Code 中手动补面板验收。
+当前结论：Claude Code 本地 HTTP MCP 接入有历史验收记录，但 connected 状态、模型侧 `memory_overview` 成功和 `/mcp` 面板状态都是运行态事实，必须按 [CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md) 用 fresh 命令重新验证后才能用于 personal RC dogfood 或 cutover 判断。该历史记录不构成当前 readiness、RC readiness、write reliability 或 recall reliability。
 
 ## Codex 接入
 

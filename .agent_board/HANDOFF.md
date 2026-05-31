@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1262 MEMORY_OVERVIEW_HTTP_CLIENT_CONTRACT`.
+Goal: `CM-1263 CLIENT_ACCEPTANCE_RUNTIME_FACT_REBASE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after HTTP boundary regression coverage for the client-visible `memory_overview` contract.
+Status: `COMPLETED_VALIDATED_NOT_READY` after rebasing Claude client connected/model-side success language from current fact to historical evidence.
 
 Workspace: `A:\codex-memory`.
 
@@ -36,6 +36,9 @@ Changed scope since CM-1207:
 - `tests/http-no-token-search-rejection.test.js`
 - `tests/mcp-http.test.js`
 - `docs/CM1262_MEMORY_OVERVIEW_HTTP_CLIENT_CONTRACT.md`
+- `README.md`
+- `CLAUDE_MCP_ACCEPTANCE.md`
+- `docs/CM1263_CLIENT_ACCEPTANCE_RUNTIME_FACT_REBASE.md`
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
@@ -554,3 +557,26 @@ Validation:
 Next:
 
 Commit or otherwise stabilize CM-1262, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1263 Current Handoff
+
+Goal: `CM-1263 CLIENT_ACCEPTANCE_RUNTIME_FACT_REBASE`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1263 rewords README and `CLAUDE_MCP_ACCEPTANCE.md` so Claude Code connected status and model-mediated `memory_overview` success are historical evidence, not current runtime truth.
+- Fresh connected/model-side validation is required before personal RC dogfood or cutover decisions.
+- No runtime behavior changed.
+- No Claude CLI execution, provider/MCP external call, real-memory scan, durable memory/audit write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `git diff --check`
+- Full docs/ledger validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1263, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.

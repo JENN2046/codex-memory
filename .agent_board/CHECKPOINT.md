@@ -1,5 +1,30 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1263 Client Acceptance Runtime Fact Rebase Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: docs/status correction for Claude client acceptance runtime facts. No runtime behavior change, Claude CLI execution, provider call, MCP external call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- README now treats Claude Code connected/model-side `memory_overview` success as historical evidence requiring fresh validation.
+- `CLAUDE_MCP_ACCEPTANCE.md` now separates historical minimal acceptance records from current runtime facts.
+- Future personal RC dogfood or cutover decisions must refresh connected/model-side evidence.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `git diff --check`
+- Ledger consistency and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1263.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1262 Memory Overview HTTP Client Contract Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
