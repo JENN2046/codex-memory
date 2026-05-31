@@ -124,7 +124,7 @@ test('no-token HTTP record_memory returns 403 Forbidden', async () => {
   });
 });
 
-test('no-token HTTP memory_overview returns 403 Forbidden', async () => {
+test('no-token HTTP memory_overview returns selected safe overview', async () => {
   await withHttpServer(async ({ address }) => {
     const response = await fetch(address.url, {
       method: 'POST',
@@ -140,9 +140,29 @@ test('no-token HTTP memory_overview returns 403 Forbidden', async () => {
       })
     });
     const payload = await response.json();
+    const overview = payload.result.structuredContent;
+    const serialized = JSON.stringify(overview);
 
-    assert.equal(response.status, 403);
-    assert.equal(payload.error.code, -32001);
+    assert.equal(response.status, 200);
+    assert.equal(payload.result.isError, false);
+    assert.equal(overview.access.mode, 'no_token_selected_overview');
+    assert.equal(overview.access.selectedProjection, true);
+    assert.equal(overview.access.bearerTokenRequiredForFullOverview, true);
+    assert.equal(overview.access.pathsReturned, false);
+    assert.equal(overview.access.recentAuditReturned, false);
+    assert.equal(overview.access.memoryLinksReturned, false);
+    assert.equal(overview.access.recallRecentReturned, false);
+    assert.equal(overview.shadowSync.available, true);
+    assert.doesNotMatch(serialized, /"paths"\s*:/);
+    assert.doesNotMatch(serialized, /"recentAudit"\s*:/);
+    assert.doesNotMatch(serialized, /"recentFiles"\s*:/);
+    assert.doesNotMatch(serialized, /"memoryLinks"\s*:/);
+    assert.doesNotMatch(serialized, /"recent"\s*:/);
+    assert.doesNotMatch(serialized, /"memoryId"\s*:/);
+    assert.doesNotMatch(serialized, /"title"\s*:/);
+    assert.doesNotMatch(serialized, /"filePath"\s*:/);
+    assert.doesNotMatch(serialized, /"sourceFile"\s*:/);
+    assert.doesNotMatch(serialized, /"embeddingFingerprint"\s*:/);
   });
 });
 

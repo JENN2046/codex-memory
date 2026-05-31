@@ -476,11 +476,11 @@ test('HTTP MCP no-token search_memory should reject include_content raw reads', 
   });
 });
 
-test('HTTP MCP no-token memory_overview should require bearer token authorization', async () => {
+test('HTTP MCP no-token memory_overview should return selected safe overview without full overview execution', async () => {
   await withHttpServer(async ({ app, address }) => {
     const originalGetOverview = app.services.overviewService.getOverview;
     app.services.overviewService.getOverview = async () => {
-      throw new Error('no-token memory_overview must be rejected before tool execution');
+      throw new Error('no-token memory_overview must use selected overview projection');
     };
 
     try {
@@ -502,16 +502,34 @@ test('HTTP MCP no-token memory_overview should require bearer token authorizatio
         })
       });
       const payload = await response.json();
+      const overview = payload.result.structuredContent;
+      const serialized = JSON.stringify(overview);
 
-      assert.equal(response.status, 403);
+      assert.equal(response.status, 200);
       assert.equal(payload.jsonrpc, '2.0');
       assert.equal(payload.id, 11);
-      assert.equal(payload.error.code, -32001);
-      assert.equal(payload.error.message, 'Forbidden');
-      assert.equal(payload.error.data.code, 'NO_TOKEN_OVERVIEW_REJECTED');
-      assert.match(payload.error.data.reason, /no-token/i);
-      assert.match(payload.error.data.reason, /memory_overview/i);
-      assert.match(payload.error.data.reason, /bearer token/i);
+      assert.equal(payload.result.isError, false);
+      assert.equal(overview.access.mode, 'no_token_selected_overview');
+      assert.equal(overview.access.selectedProjection, true);
+      assert.equal(overview.access.bearerTokenRequiredForFullOverview, true);
+      assert.equal(overview.access.pathsReturned, false);
+      assert.equal(overview.access.embeddingFingerprintReturned, false);
+      assert.equal(overview.access.recentAuditReturned, false);
+      assert.equal(overview.access.recentFilesReturned, false);
+      assert.equal(overview.access.memoryLinksReturned, false);
+      assert.equal(overview.access.recallRecentReturned, false);
+      assert.equal(overview.access.rawMemoryFieldsReturned, false);
+      assert.equal(overview.shadowSync.available, true);
+      assert.doesNotMatch(serialized, /"paths"\s*:/);
+      assert.doesNotMatch(serialized, /"recentAudit"\s*:/);
+      assert.doesNotMatch(serialized, /"recentFiles"\s*:/);
+      assert.doesNotMatch(serialized, /"memoryLinks"\s*:/);
+      assert.doesNotMatch(serialized, /"recent"\s*:/);
+      assert.doesNotMatch(serialized, /"memoryId"\s*:/);
+      assert.doesNotMatch(serialized, /"title"\s*:/);
+      assert.doesNotMatch(serialized, /"filePath"\s*:/);
+      assert.doesNotMatch(serialized, /"sourceFile"\s*:/);
+      assert.doesNotMatch(serialized, /"embeddingFingerprint"\s*:/);
     } finally {
       app.services.overviewService.getOverview = originalGetOverview;
     }

@@ -9,7 +9,6 @@ const SESSION_HEADER = 'Mcp-Session-Id';
 const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
 const HTTP_SESSION_STREAM_LIMIT_ERROR = 'HTTP_SESSION_STREAM_LIMIT_EXCEEDED';
 const NO_TOKEN_MUTATION_REJECTED = 'NO_TOKEN_MUTATION_REJECTED';
-const NO_TOKEN_OVERVIEW_REJECTED = 'NO_TOKEN_OVERVIEW_REJECTED';
 const NO_TOKEN_SEARCH_REJECTED = 'NO_TOKEN_SEARCH_REJECTED';
 const SESSION_HARDENING_SPECS = {
   absoluteTtlMs: {
@@ -279,12 +278,6 @@ function validateNoTokenJsonRpcRequest(body) {
 
   if (body.method === 'tools/call' && NO_TOKEN_BLOCKED_TOOLS.has(body.params?.name)) {
     return 'No-token HTTP MCP requests cannot call mutation tools.';
-  }
-  if (body.method === 'tools/call' && body.params?.name === 'memory_overview') {
-    return {
-      code: NO_TOKEN_OVERVIEW_REJECTED,
-      reason: 'No-token HTTP MCP memory_overview requires bearer token authorization until selected overview output is available.'
-    };
   }
   if (body.method === 'tools/call' && body.params?.name === 'search_memory') {
     return {

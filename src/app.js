@@ -812,6 +812,11 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'memory_overview') {
+        if (requestContext.noTokenReadOnly === true) {
+          return overviewService.getNoTokenSelectedOverview({
+            auditWindow: args.auditWindow
+          });
+        }
         return overviewService.getOverview({
           auditWindow: args.auditWindow,
           limit: args.limit

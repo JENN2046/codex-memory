@@ -28,34 +28,32 @@ For the current authorized public write-path closure chain, the operator-facing 
 
 A row can be treated as complete only when `complete?` is `yes`. Bounded evidence, fixture evidence, static report shape, local helper proof, target-bound gate evidence, endpoint-bound observation, or local runtime hardening does not become runtime readiness unless this table says so.
 
-## CM-1183 No-Token Memory Overview HTTP Block - 2026-05-26
+## CM-1183 / CM-1255 No-Token Memory Overview Selected Projection - 2026-06-01
 
-Result: `CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_VALIDATED_NOT_READY`.
+Result: `CM1255_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_PROJECTION_VALIDATED_NOT_READY`.
 
 Runtime boundary change:
 
-- no-token HTTP JSON-RPC `tools/call` for `memory_overview` now returns HTTP `403`
-- rejection occurs before tool execution
-- selected error data code is `NO_TOKEN_OVERVIEW_REJECTED`
+- no-token HTTP JSON-RPC `tools/call` for `memory_overview` now returns a selected safe overview projection
+- no-token selected projection bypasses full `MemoryOverviewService.getOverview(...)`
+- selected output omits paths, embedding fingerprint, recent audit rows, recent files, memory links, recent recall rows, memory ids, titles, file paths, and source files
 - bearer-token authorized `memory_overview` remains executable
 
 Validated so far:
 
-- source/test syntax checks
-- targeted HTTP MCP test passed `20/20`
-- adjacent HTTP/contract/service tests passed `37/37`
-- full `npm test` passed `2789/2789`
-- docs validation, ledger consistency, and `git diff --check` passed
+- source syntax checks for `MemoryOverviewService`, `app`, and HTTP MCP adapter
+- targeted HTTP MCP / no-token / overview tests passed `44/44`
+- full `npm test` passed `2782/2782`
+- hardening `npm run test:hardening` passed `73/73` plus override evidence `6/6`; fixture-only `gate:ci` PASS
 
 Still not proven:
 
-- This does not implement no-token selected overview projection.
 - This does not prove full no-token governance closure.
 - This does not prove production readiness, write reliability, or recall reliability.
 
 ## CM-1182 No-Token Memory Overview Selected-Output Posture Review - 2026-05-26
 
-Result: `CM1182_SUPERSEDED_BY_CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_NOT_READY`.
+Result: `CM1182_SUPERSEDED_BY_CM1255_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_PROJECTION_NOT_READY`.
 
 Historical source facts before CM-1183:
 
@@ -64,11 +62,11 @@ Historical source facts before CM-1183:
 - Authorized and no-token callers therefore receive the same overview projection.
 - The overview service does not intentionally return raw memory body fields such as `content` or `rawText`.
 
-Current source facts after CM-1183:
+Current source facts after CM-1255:
 
-- HTTP no-token JSON-RPC `tools/call` for `memory_overview` is rejected at the HTTP boundary with HTTP `403`.
-- The selected error data code is `NO_TOKEN_OVERVIEW_REJECTED`.
-- Rejection occurs before `MemoryOverviewService.getOverview(...)` execution.
+- HTTP no-token JSON-RPC `tools/call` for `memory_overview` returns selected safe overview output.
+- Selected output bypasses full `MemoryOverviewService.getOverview(...)`.
+- Selected output omits the historically risky output classes listed above.
 - Bearer-token authorized `memory_overview` remains executable.
 
 Historical blocking output posture if no-token selected projection is reintroduced:
@@ -82,12 +80,11 @@ Historical blocking output posture if no-token selected projection is reintroduc
 Decision:
 
 - No blocker downgrade is allowed for no-token `memory_overview` selected-output posture.
-- Current mitigation is the CM-1183 bearer-token requirement for no-token HTTP `memory_overview`, not a selected-output projection.
+- Current mitigation is the CM-1255 selected safe projection for no-token HTTP `memory_overview`; full overview still requires bearer-token authorization.
 - CM-1179 remains limited to covered no-token `search_memory` side-effect/raw-content behavior.
 
 Still not proven:
 
-- No no-token selected projection for `memory_overview`.
 - No full no-token governance closure.
 - No production readiness, write reliability, or recall reliability.
 

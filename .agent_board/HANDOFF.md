@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1254 RUNTIME_TRUTH_TABLE_NO_TOKEN_OVERVIEW_REBASE`.
+Goal: `CM-1255 NO_TOKEN_MEMORY_OVERVIEW_SELECTED_PROJECTION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after docs-only rebasing of stale CM-1182 no-token `memory_overview` truth-table wording onto CM-1183 HTTP block reality.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local HTTP runtime boundary source/test implementation of no-token `memory_overview` selected projection.
 
 Workspace: `A:\codex-memory`.
 
@@ -85,12 +85,28 @@ Changed scope since CM-1207:
 - `docs/CM1253_SCHEMA_GATE_DRY_RUN_EXECUTION_PREFLIGHT_INVARIANT.md`
 - `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`
 - `docs/CM1254_RUNTIME_TRUTH_TABLE_NO_TOKEN_OVERVIEW_REBASE.md`
+- `src/core/MemoryOverviewService.js`
+- `src/app.js`
+- `src/adapters/codex-mcp/http.js`
+- `tests/http-no-token-search-rejection.test.js`
+- `tests/mcp-http.test.js`
+- `docs/CM1255_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_PROJECTION.md`
+
+Current CM-1255 fact:
+
+- No-token HTTP JSON-RPC `tools/call` for `memory_overview` now returns `no_token_selected_overview`.
+- The no-token path bypasses full `MemoryOverviewService.getOverview(...)`.
+- Selected output omits paths, embedding fingerprint, recent audit rows, recent files, memory links, recent recall rows, memory ids, titles, file paths, and source files.
+- Bearer-token authorized `memory_overview` still uses full overview.
+- No-token `record_memory` and `search_memory` remain blocked.
+- Targeted HTTP/overview validation passed `44/44`; default `npm test` passed `2782/2782`; hardening passed `73/73` plus override evidence `6/6` and fixture-only `gate:ci` PASS.
+- No provider call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim occurred.
 
 Current CM-1254 fact:
 
 - CM-1254 is docs-only.
 - `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` no longer presents pre-CM-1183 no-token `memory_overview` behavior as current source fact.
-- Current truth-table fact is that no-token HTTP JSON-RPC `tools/call` for `memory_overview` returns HTTP `403` / `NO_TOKEN_OVERVIEW_REJECTED` before tool execution.
+- CM-1254's intermediate HTTP `403` / `NO_TOKEN_OVERVIEW_REJECTED` wording was superseded by CM-1255 selected safe overview output.
 - No runtime/source/test/config/startup/watchdog/provider/MCP/real-memory/durable-write/remote action or readiness claim occurred.
 
 Current CM-1253 fact:

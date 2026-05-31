@@ -178,6 +178,114 @@ function buildRecallScopeSummary(entries) {
   return summary;
 }
 
+function buildNoTokenRecallSummary(summary) {
+  return {
+    sampleSize: summary.sampleSize,
+    totalHits: summary.totalHits,
+    processHits: summary.processHits,
+    knowledgeHits: summary.knowledgeHits,
+    snippetHits: summary.snippetHits,
+    fullTextHits: summary.fullTextHits,
+    directHits: summary.directHits,
+    cacheHits: summary.cacheHits,
+    scopedRecallCount: summary.scope?.scopedRecallCount || 0,
+    strictScopedRecallCount: summary.scope?.strictScopedRecallCount || 0
+  };
+}
+
+function sanitizeSchemaStartupGate(schemaStartupGate) {
+  if (!schemaStartupGate || typeof schemaStartupGate !== 'object') return null;
+  return {
+    status: typeof schemaStartupGate.status === 'string' ? schemaStartupGate.status : null,
+    decision: typeof schemaStartupGate.decision === 'string' ? schemaStartupGate.decision : null,
+    currentVersion: Number.isInteger(schemaStartupGate.currentVersion)
+      ? schemaStartupGate.currentVersion
+      : null,
+    expectedVersion: Number.isInteger(schemaStartupGate.expectedVersion)
+      ? schemaStartupGate.expectedVersion
+      : null,
+    unknownFutureVersionDetected: schemaStartupGate.unknownFutureVersionDetected === true,
+    repairNeeded: schemaStartupGate.repairNeeded === true
+  };
+}
+
+function sanitizeNoTokenShadowHealth(health) {
+  return {
+    available: health?.available === true,
+    recordCount: Number.isFinite(health?.recordCount) ? health.recordCount : 0,
+    chunkCount: Number.isFinite(health?.chunkCount) ? health.chunkCount : 0,
+    totalChunkCount: Number.isFinite(health?.totalChunkCount) ? health.totalChunkCount : 0,
+    reconcileCount: Number.isFinite(health?.reconcileCount) ? health.reconcileCount : 0,
+    authoritativeStore: typeof health?.authoritativeStore === 'string' ? health.authoritativeStore : null,
+    schemaStartupGate: sanitizeSchemaStartupGate(health?.schemaStartupGate),
+    writeManifest: {
+      total: Number.isFinite(health?.writeManifest?.total) ? health.writeManifest.total : 0,
+      pending: Number.isFinite(health?.writeManifest?.pending) ? health.writeManifest.pending : 0,
+      committed: Number.isFinite(health?.writeManifest?.committed) ? health.writeManifest.committed : 0,
+      degraded: Number.isFinite(health?.writeManifest?.degraded) ? health.writeManifest.degraded : 0,
+      repaired: Number.isFinite(health?.writeManifest?.repaired) ? health.writeManifest.repaired : 0,
+      cancelled: Number.isFinite(health?.writeManifest?.cancelled) ? health.writeManifest.cancelled : 0,
+      failed: Number.isFinite(health?.writeManifest?.failed) ? health.writeManifest.failed : 0,
+      lifecycle: {
+        sqliteCommitted: Number.isFinite(health?.writeManifest?.lifecycle?.sqliteCommitted)
+          ? health.writeManifest.lifecycle.sqliteCommitted
+          : 0,
+        projected: Number.isFinite(health?.writeManifest?.lifecycle?.projected)
+          ? health.writeManifest.lifecycle.projected
+          : 0,
+        audited: Number.isFinite(health?.writeManifest?.lifecycle?.audited)
+          ? health.writeManifest.lifecycle.audited
+          : 0,
+        pendingRecovery: Number.isFinite(health?.writeManifest?.lifecycle?.pendingRecovery)
+          ? health.writeManifest.lifecycle.pendingRecovery
+          : 0
+      }
+    },
+    jsonCorruption: {
+      totalMalformed: Number.isFinite(health?.jsonCorruption?.totalMalformed)
+        ? health.jsonCorruption.totalMalformed
+        : 0
+    }
+  };
+}
+
+function sanitizeNoTokenIndexHealth(health) {
+  return {
+    available: health?.available === true,
+    vectorCount: Number.isFinite(health?.vectorCount) ? health.vectorCount : 0,
+    diaryVectorCount: Number.isFinite(health?.diaryVectorCount) ? health.diaryVectorCount : 0,
+    embeddingCacheCount: Number.isFinite(health?.embeddingCacheCount) ? health.embeddingCacheCount : 0,
+    embeddingHits: Number.isFinite(health?.embeddingHits) ? health.embeddingHits : 0,
+    embeddingMisses: Number.isFinite(health?.embeddingMisses) ? health.embeddingMisses : 0
+  };
+}
+
+function sanitizeNoTokenCandidateCacheHealth(health) {
+  return {
+    available: health?.available === true,
+    entryCount: Number.isFinite(health?.entryCount) ? health.entryCount : 0,
+    maxEntries: Number.isFinite(health?.maxEntries) ? health.maxEntries : null,
+    ttlMs: Number.isFinite(health?.ttlMs) ? health.ttlMs : null,
+    hits: Number.isFinite(health?.hits) ? health.hits : 0,
+    misses: Number.isFinite(health?.misses) ? health.misses : 0,
+    governanceStateRevisionTargetCount: Array.isArray(health?.governanceStateRevisionTargets)
+      ? health.governanceStateRevisionTargets.length
+      : 0
+  };
+}
+
+function sanitizeNoTokenActiveMemoryHealth(health) {
+  return {
+    available: health?.available === true,
+    status: typeof health?.status === 'string' ? health.status : null,
+    syncMinIntervalMs: Number.isFinite(health?.syncMinIntervalMs) ? health.syncMinIntervalMs : null,
+    agentCount: Number.isFinite(health?.agentCount) ? health.agentCount : 0,
+    topicCount: Number.isFinite(health?.topicCount) ? health.topicCount : 0,
+    conversationCount: Number.isFinite(health?.conversationCount) ? health.conversationCount : 0,
+    messageCount: Number.isFinite(health?.messageCount) ? health.messageCount : 0
+  };
+}
+
 function normalizeAuditEntries(entries, limit) {
   return [...entries]
     .sort((left, right) => new Date(right.timestamp || 0).getTime() - new Date(left.timestamp || 0).getTime())
@@ -440,6 +548,53 @@ class MemoryOverviewService {
         candidate: candidateCacheHealth
       },
       activeMemoryHealth,
+      adapterStatus: {
+        codexMcp: 'enabled',
+        vcpPassiveMemory: 'enabled',
+        vcpActiveMemory: activeMemoryHealth.available ? 'enabled' : 'phase-c-pending'
+      }
+    };
+  }
+
+  async getNoTokenSelectedOverview({ auditWindow = DEFAULT_AUDIT_WINDOW } = {}) {
+    const windowSize = toInt(auditWindow, DEFAULT_AUDIT_WINDOW, 10, 200);
+    const writeEntries = await this.auditLogStore.readRecentWriteAudit(windowSize);
+    const recallEntries = await this.auditLogStore.readRecentRecallAudit(windowSize);
+    const recallSummary = buildRecallSummary(recallEntries);
+    recallSummary.scope = buildRecallScopeSummary(recallEntries);
+    const shadowHealth = await this.shadowStore.getHealth();
+    const vectorHealth = await this.vectorStore.getHealth();
+    const candidateCacheHealth = this.candidateCacheStore
+      ? await this.candidateCacheStore.getHealth()
+      : { available: false };
+    const activeMemoryHealth = this.chatHistoryIndexStore
+      ? await this.chatHistoryIndexStore.getHealth()
+      : { available: false, status: 'disabled' };
+
+    return {
+      access: {
+        mode: 'no_token_selected_overview',
+        selectedProjection: true,
+        bearerTokenRequiredForFullOverview: true,
+        pathsReturned: false,
+        embeddingFingerprintReturned: false,
+        recentAuditReturned: false,
+        recentFilesReturned: false,
+        memoryLinksReturned: false,
+        recallRecentReturned: false,
+        rawMemoryFieldsReturned: false
+      },
+      summary: buildWriteSummary(writeEntries),
+      recall: {
+        ...buildRecallStatus(recallSummary),
+        summary: buildNoTokenRecallSummary(recallSummary)
+      },
+      shadowSync: sanitizeNoTokenShadowHealth(shadowHealth),
+      indexHealth: sanitizeNoTokenIndexHealth(vectorHealth),
+      cacheHealth: {
+        candidate: sanitizeNoTokenCandidateCacheHealth(candidateCacheHealth)
+      },
+      activeMemoryHealth: sanitizeNoTokenActiveMemoryHealth(activeMemoryHealth),
       adapterStatus: {
         codexMcp: 'enabled',
         vcpPassiveMemory: 'enabled',

@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1255 No-Token Memory Overview Selected Projection Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local HTTP runtime boundary source/test change. No provider call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- No-token HTTP JSON-RPC `tools/call` for `memory_overview` now returns `no_token_selected_overview`.
+- The no-token path bypasses full `MemoryOverviewService.getOverview(...)`.
+- Selected output omits paths, embedding fingerprint, recent audit rows, recent files, memory links, recent recall rows, memory ids, titles, file paths, and source files.
+- Bearer-token authorized `memory_overview` still uses full overview.
+- No-token `record_memory` and `search_memory` remain blocked.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryOverviewService.js`
+- `node --check src\app.js`
+- `node --check src\adapters\codex-mcp\http.js`
+- `node --test tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js tests\phase-b-sync-cache-rerank.test.js` passed `44/44`.
+- `npm test` passed `2782/2782`.
+- `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`; fixture-only `gate:ci` PASS.
+
+Next:
+
+- Commit or otherwise stabilize CM-1255.
+- Full no-token governance closure, write reliability, recall reliability, and readiness remain unclaimed.
+
 ## CM-1254 Runtime Truth Table No-Token Overview Rebase Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
