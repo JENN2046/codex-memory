@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1273 Policy Preflight Fixture Baseline Ownerless Private Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local test/docs fixture-baseline alignment for CI-safe soft-read policy preflight. No runtime source behavior change, provider call, MCP external call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `tests/policy-read-preflight.test.js` fixture baseline now includes ownerless private and ownerless shared records.
+- Baseline asserts 9 fixture records, 4 kept records, lifecycle filtered count 3, private visibility filtered count 2, cross-client private filtered count 1, and ownerless private filtered count 1.
+- The policy-read preflight unit baseline is now aligned with CM-1272 `gate:ci` policy preflight evidence.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check tests\policy-read-preflight.test.js`
+- `node --check tests\gate-ci-cli.test.js`
+- `node --test tests\policy-read-preflight.test.js tests\gate-ci-cli.test.js` passed `11/11`.
+- `npm test` passed `2793/2793`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1273.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1272 Gate CI Policy Preflight Ownerless Private Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

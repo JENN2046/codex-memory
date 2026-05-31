@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1272 GATE_CI_POLICY_PREFLIGHT_OWNERLESS_PRIVATE`.
+Goal: `CM-1273 POLICY_PREFLIGHT_FIXTURE_BASELINE_OWNERLESS_PRIVATE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after aligning fixture-only `gate:ci` policy preflight with CM-1271 ownerless-private fail-closed behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after aligning policy-read preflight fixture baseline with CM-1272 ownerless-private `gate:ci` evidence.
 
 Workspace: `A:\codex-memory`.
 
@@ -46,6 +46,7 @@ Changed scope since CM-1207:
 - `src/cli/gate-ci.js`
 - `tests/gate-ci-cli.test.js`
 - `docs/CM1272_GATE_CI_POLICY_PREFLIGHT_OWNERLESS_PRIVATE.md`
+- `docs/CM1273_POLICY_PREFLIGHT_FIXTURE_BASELINE_OWNERLESS_PRIVATE.md`
 - `docs/CM1264_SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING.md`
 - `tests/memory-lifecycle-scope-runtime-integration.test.js`
 - `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`
@@ -121,6 +122,14 @@ Changed scope since CM-1207:
 - `docs/CM1256_NO_TOKEN_OVERVIEW_CORE_SANITIZER_TEST.md`
 - `docs/CM1257_NO_TOKEN_OVERVIEW_COUNT_ONLY_WRITE_SUMMARY.md`
 - `docs/CM1258_NO_TOKEN_OVERVIEW_PROJECTION_VERSION.md`
+
+Current CM-1273 fact:
+
+- CM-1273 is local test/docs fixture-baseline alignment only.
+- `tests/policy-read-preflight.test.js` now includes ownerless private and ownerless shared records in the CI-safe soft-read policy preflight baseline.
+- The baseline asserts `fixtures.length=9`, `kept.length=4`, `privateVisibilityFilteredCount=2`, `crossClientPrivateFilteredCount=1`, and `ownerlessPrivateFilteredCount=1`.
+- Targeted policy/gate tests passed `11/11`; default `npm test` passed `2793/2793`.
+- No runtime source behavior changed, no provider call, no MCP external call, no real-memory scan, no durable memory/audit write, no config/watchdog/startup change, no public MCP expansion, no remote action, no readiness claim, and no reliability claim occurred.
 
 Current CM-1272 fact:
 

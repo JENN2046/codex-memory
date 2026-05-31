@@ -558,7 +558,9 @@ test('policy preflight fixture baseline documents CI-safe filtering counts', () 
     { title: 'Rejected Shared', status: 'rejected', visibility: 'shared', clientId: 'codex' },
     { title: 'Tombstoned Shared', status: 'tombstoned', visibility: 'shared', clientId: 'codex' },
     { title: 'Private Claude', status: 'active', visibility: 'private', clientId: 'claude' },
-    { title: 'Private Codex', status: 'active', visibility: 'private', clientId: 'codex' }
+    { title: 'Private Codex', status: 'active', visibility: 'private', clientId: 'codex' },
+    { title: 'Ownerless Private', status: 'active', visibility: 'private', clientId: '' },
+    { title: 'Ownerless Shared', status: 'active', visibility: 'shared', clientId: '' }
   ];
 
   const kept = applyHypotheticalSoftReadPolicy(fixtures, { requestClientId: 'codex' });
@@ -566,11 +568,19 @@ test('policy preflight fixture baseline documents CI-safe filtering counts', () 
     .filter(record => !['active', 'stale'].includes(record.status))
     .length;
   const crossClientPrivateFilteredCount = fixtures
-    .filter(record => record.visibility === 'private' && record.clientId !== 'codex')
+    .filter(record => record.visibility === 'private' && record.clientId && record.clientId !== 'codex')
+    .length;
+  const privateVisibilityFilteredCount = fixtures
+    .filter(record => record.visibility === 'private' && (!record.clientId || record.clientId !== 'codex'))
+    .length;
+  const ownerlessPrivateFilteredCount = fixtures
+    .filter(record => record.visibility === 'private' && !record.clientId)
     .length;
 
-  assert.equal(fixtures.length, 7);
-  assert.equal(kept.length, 3);
+  assert.equal(fixtures.length, 9);
+  assert.equal(kept.length, 4);
   assert.equal(lifecycleFilteredCount, 3);
   assert.equal(crossClientPrivateFilteredCount, 1);
+  assert.equal(privateVisibilityFilteredCount, 2);
+  assert.equal(ownerlessPrivateFilteredCount, 1);
 });
