@@ -7,9 +7,9 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1206 post-push Git fact wording correction |
+| Current task | CM-1207 runtime gap scope preflight |
 | Current area | P6-docs-drift |
-| Current route | documentation-surface slimdown -> A5/P66 runtime gap closure -> personal RC dogfood |
+| Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1206 keeps active status surfaces from self-pinning stale post-commit Git facts. After this docs-only correction is synced, the next safe local task is either reviewing `.agent_board/DECISIONS.md` separately or preparing the first exact runtime gap closure scope. Do not start runtime gap closure until the docs surface is accepted and the next exact runtime scope is chosen.
+CM-1207 keeps `.agent_board/DECISIONS.md` as a durable decision ledger and prepares the next runtime-gap approval scope without executing A5 work. Next safe step is to request an exact A5 approval line if the user wants runtime gap closure to begin. Do not run runtime gates, HTTP observe, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, or readiness claims without exact approval.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

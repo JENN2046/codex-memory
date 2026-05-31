@@ -1,12 +1,12 @@
 # CHECKPOINT.md - codex-memory
 
-## CM-1206 Post-Push Git Fact Wording Checkpoint
+## CM-1207 Runtime Gap Scope Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
 
 Date: 2026-05-31
 
-Purpose: prevent active status surfaces from treating validation-time `HEAD` / `origin/main` snapshots as current post-commit or post-push truth.
+Purpose: close the docs-surface slimdown loop and prepare the next runtime-gap approval scope without executing A5 work.
 
 Compressed active files in this docs-surface follow-up:
 
@@ -17,6 +17,13 @@ Current wording rule:
 
 - Do not self-pin latest post-commit SHA in active status surfaces.
 - Use fresh `git status --short --branch` and `git log --oneline --decorate -n 10` before branch-sensitive decisions.
+
+Runtime preflight rule:
+
+- `.agent_board/DECISIONS.md` remains a durable decision ledger, not a current status stream.
+- Next runtime action requires exact A5 approval.
+- Current lowest-risk candidate is `A5-GAP-5` strict gate for fresh `HEAD`, no remote write.
+- [docs/CM1207_RUNTIME_GAP_CLOSURE_SCOPE_PREFLIGHT.md](/A:/codex-memory/docs/CM1207_RUNTIME_GAP_CLOSURE_SCOPE_PREFLIGHT.md)
 
 Archive/index:
 
@@ -34,13 +41,14 @@ Validation:
 
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
-- docs validation includes autopilot ledger consistency: latest task / ledger / validation are `CM-1206 / CM-1206 / CMV-1323`
+- docs validation includes autopilot ledger consistency: latest task / ledger / validation are `CM-1207 / CM-1207 / CMV-1324`
 
 Not validated:
 
 - full test suite
 - hardening suite
 - mainline gates
+- `npm run gate:mainline:strict`
 - HTTP observe
 - provider checks
 - real memory tools
@@ -48,9 +56,9 @@ Not validated:
 
 Boundary:
 
-- Docs/board only.
+- Docs/board/preflight only.
 - No runtime/source/test/package/config/env changes.
-- No provider/API, durable write, public MCP expansion, push, release, deploy, readiness, write reliability, or recall reliability claim.
+- No provider/API, runtime gate, durable write, public MCP expansion, push, release, deploy, readiness, write reliability, or recall reliability claim.
 
 ## Current Historical Archive Rule
 

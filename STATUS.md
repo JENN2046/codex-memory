@@ -23,7 +23,7 @@ RC_NOT_READY_BLOCKED
 2. 再逐个做 A5 / P66 runtime gap closure。
 3. 最后做 personal RC dogfood。
 
-当前任务是 `CM-1205 MEMORY_INDEX_COMPRESSION`：把 `MEMORY.md` 从陈旧 current-status / handoff 快照压成历史阶段记忆索引，active execution 继续由 `STATUS.md` 与 `.agent_board` 当前 ledger 承载。
+当前任务是 `CM-1207 RUNTIME_GAP_SCOPE_PREFLIGHT`：文档面瘦身已完成到可转入 runtime gap scope 选择；`.agent_board/DECISIONS.md` 保留为长期决策 ledger，不继续压缩。下一步只准备 A5 exact approval，不执行 runtime。
 
 ## 当前权威入口
 
@@ -80,7 +80,7 @@ git log --oneline --decorate -n 10
 
 历史 hardening 证据也曾通过：`npm run test:hardening` hardening `73/73` + override evidence `6/6`；fixture-only `gate:ci` PASS。它们不构成 runtime readiness。
 
-CM-1202 through CM-1205 是 docs-only 状态面瘦身：
+CM-1202 through CM-1207 是 docs-only 状态面瘦身 / runtime-scope preflight：
 
 - 不改 source/runtime/test/package/lock/config/env/secret/watchdog/startup。
 - 不执行 provider/API。
@@ -88,6 +88,7 @@ CM-1202 through CM-1205 是 docs-only 状态面瘦身：
 - 不关闭 runtime gaps。
 - 不把 push / PR / tag / release / deploy 当作 docs 证据或 readiness 证据；remote sync 只在用户明确授权下执行。
 - 不声明 readiness 或 reliability。
+- CM-1207 只推荐下一步 A5 approval scope；不运行 `gate:mainline:strict`、HTTP observe、provider、real memory scan 或 durable write。
 
 ## 当前分支清理事实
 
@@ -114,6 +115,7 @@ memory_overview
 - [docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md)
 - [docs/P66_RUNTIME_GAP_TRUTH_TABLE.md](/A:/codex-memory/docs/P66_RUNTIME_GAP_TRUTH_TABLE.md)
 - [docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md](/A:/codex-memory/docs/P66_A5_RUNTIME_GAP_CLOSURE_APPROVAL_PACKET.md)
+- [docs/CM1207_RUNTIME_GAP_CLOSURE_SCOPE_PREFLIGHT.md](/A:/codex-memory/docs/CM1207_RUNTIME_GAP_CLOSURE_SCOPE_PREFLIGHT.md)
 
 真实 runtime gap closure 仍需要单独 exact approval、fresh Git facts、fresh evidence binding、明确验证和 fail-closed 记录。
 

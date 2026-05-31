@@ -2,7 +2,7 @@
 
 ## Current Handoff
 
-Goal: `CM-1206 POST_PUSH_GIT_FACT_WORDING_CORRECTION`.
+Goal: `CM-1207 RUNTIME_GAP_SCOPE_PREFLIGHT`.
 
 Status: `COMPLETED_VALIDATED_NOT_READY` after docs validation.
 
@@ -24,7 +24,7 @@ Current active entrypoints:
 - [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md)
 - [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)
 
-Changed scope for CM-1206:
+Changed scope for CM-1207:
 
 - `STATUS.md`
 - `.agent_board/HANDOFF.md`
@@ -33,14 +33,17 @@ Changed scope for CM-1206:
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/AUTOPILOT_LEDGER.md`
+- `docs/CM1207_RUNTIME_GAP_CLOSURE_SCOPE_PREFLIGHT.md`
 
-Current Git fact rule after CM-1206:
+Current Git fact and A5 rule after CM-1207:
 
 - Active status surfaces must not treat validation-time `HEAD` / `origin/main` snapshots as current truth after commit or push.
 - Current branch state must be checked with fresh Git commands before branch-sensitive decisions.
+- Runtime gap closure must use an exact A5 approval line; generic "continue" is not enough.
+- Current lowest-risk candidate is `A5-GAP-5` strict gate for fresh `HEAD`, no remote write.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1206:
+Validation for CM-1207:
 
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -57,6 +60,7 @@ Not validated:
 - true `record_memory`
 - true `search_memory`
 - true `memory_overview`
+- `npm run gate:mainline:strict`
 - runtime gap closure
 - personal RC dogfood
 
@@ -67,7 +71,7 @@ Boundary:
 - No real memory tool call or raw store / `.jsonl` read.
 - No durable memory/audit write.
 - No public MCP expansion.
-- No push, PR, tag, release, deploy, or readiness claim.
+- No push, PR, tag, release, deploy, runtime gate, or readiness claim.
 
 Historical memory/backlog stream:
 
@@ -82,4 +86,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-After user-authorized sync, verify Git status and remote head. Then either review `.agent_board/DECISIONS.md` separately or prepare the first exact runtime gap closure scope. Do not start runtime gap closure until the docs surface is stable and any required exact approval is prepared.
+Request exact A5 approval if runtime gap closure should begin. Do not run `gate:mainline:strict`, HTTP observe, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
