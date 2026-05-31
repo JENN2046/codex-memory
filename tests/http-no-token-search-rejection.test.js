@@ -9,6 +9,31 @@ const path = require('node:path');
 const { createCodexMemoryApplication } = require('../src/app');
 const { createStreamableHttpServer } = require('../src/adapters/codex-mcp/http');
 
+const NO_TOKEN_OVERVIEW_KEYS = [
+  'access',
+  'activeMemoryHealth',
+  'adapterStatus',
+  'cacheHealth',
+  'indexHealth',
+  'recall',
+  'shadowSync',
+  'summary'
+];
+
+const NO_TOKEN_OVERVIEW_ACCESS_KEYS = [
+  'bearerTokenRequiredForFullOverview',
+  'embeddingFingerprintReturned',
+  'memoryLinksReturned',
+  'mode',
+  'pathsReturned',
+  'rawMemoryFieldsReturned',
+  'recallRecentReturned',
+  'recentAuditReturned',
+  'recentFilesReturned',
+  'selectedProjection',
+  'selectedProjectionVersion'
+];
+
 async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-http-'));
   const app = createCodexMemoryApplication({
@@ -148,6 +173,8 @@ test('no-token HTTP memory_overview returns selected safe overview', async () =>
     assert.equal(overview.access.mode, 'no_token_selected_overview');
     assert.equal(overview.access.selectedProjection, true);
     assert.equal(overview.access.selectedProjectionVersion, 1);
+    assert.deepEqual(Object.keys(overview).sort(), NO_TOKEN_OVERVIEW_KEYS);
+    assert.deepEqual(Object.keys(overview.access).sort(), NO_TOKEN_OVERVIEW_ACCESS_KEYS);
     assert.equal(overview.access.bearerTokenRequiredForFullOverview, true);
     assert.equal(overview.access.pathsReturned, false);
     assert.equal(overview.access.recentAuditReturned, false);

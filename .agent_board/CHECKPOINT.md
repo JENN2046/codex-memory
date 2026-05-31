@@ -1941,3 +1941,50 @@ Boundary:
 - No config/watchdog/startup change.
 - No public MCP expansion.
 - No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim.
+
+## CM-1260 No-Token Overview HTTP Contract Allowlist Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Purpose: extend no-token `memory_overview` selected projection contract stability to the Codex/Claude client-visible HTTP JSON-RPC boundary.
+
+Changed:
+
+- `tests/http-no-token-search-rejection.test.js`
+- `tests/mcp-http.test.js`
+- `docs/CM1260_NO_TOKEN_OVERVIEW_HTTP_CONTRACT_ALLOWLIST.md`
+- `STATUS.md`
+- `.agent_board/TASK_QUEUE.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/AUTOPILOT_LEDGER.md`
+- `.agent_board/RUN_STATE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/HANDOFF.md`
+
+Result:
+
+- HTTP no-token `memory_overview` tests now assert exact key allowlists for the selected overview top-level fields and `access` disclosure flags.
+- This prevents accidental reintroduction of full-overview fields into the HTTP response shape used by clients.
+- No runtime implementation change.
+
+Validation:
+
+- `node --check tests\http-no-token-search-rejection.test.js`
+- `node --check tests\mcp-http.test.js`
+- `node --test tests\memory-overview-no-token-selected-projection.test.js tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js`
+- `npm test`
+- `git diff --check`
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Boundary:
+
+- No provider/API call.
+- No MCP external call.
+- No real-memory scan.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim.

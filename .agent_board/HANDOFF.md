@@ -412,3 +412,59 @@ Boundary:
 Next safe action:
 
 Commit or otherwise stabilize CM-1259, then continue with local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1260 Current Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Current branch: `main`
+
+Current work:
+
+- CM-1260 adds HTTP JSON-RPC boundary allowlist regression coverage for no-token `memory_overview` selected projection output.
+- It is test/docs/status-only.
+- It does not change runtime behavior.
+- It keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Changed files:
+
+- `tests/http-no-token-search-rejection.test.js`
+- `tests/mcp-http.test.js`
+- `docs/CM1260_NO_TOKEN_OVERVIEW_HTTP_CONTRACT_ALLOWLIST.md`
+- `STATUS.md`
+- `.agent_board/TASK_QUEUE.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/AUTOPILOT_LEDGER.md`
+- `.agent_board/RUN_STATE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/HANDOFF.md`
+
+Validation:
+
+- `node --check tests\http-no-token-search-rejection.test.js`
+- `node --check tests\mcp-http.test.js`
+- `node --test tests\memory-overview-no-token-selected-projection.test.js tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js`
+- `npm test`
+- `git diff --check`
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Not run:
+
+- `npm run test:hardening`
+- `npm run gate:mainline`
+- `npm run gate:mainline:strict`
+- HTTP observe
+- provider smoke / benchmark
+- real `record_memory`, `search_memory`, or `memory_overview`
+- runtime collector
+- cutover or personal RC dogfood
+
+Boundary:
+
+- No provider/API call, MCP external call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, push, PR, tag, release, deploy, readiness, write reliability, or recall reliability claim.
+- `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and untouched.
+
+Next safe action:
+
+Commit or otherwise stabilize CM-1260, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.

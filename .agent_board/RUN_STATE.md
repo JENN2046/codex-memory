@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1259 no-token memory_overview selected projection contract allowlist added |
+| Current task | CM-1260 no-token memory_overview HTTP selected projection contract allowlist added |
 | Current area | P4-http-runtime / P0-mainline-health |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1259 adds explicit allowlist assertions for no-token `memory_overview` selected projection output keys so Codex/Claude clients and audit surfaces have a regression guard against accidental full-overview field expansion. Runtime behavior remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1259.
+CM-1260 adds explicit allowlist assertions at the HTTP JSON-RPC boundary for no-token `memory_overview` selected projection output keys so Codex/Claude clients and audit surfaces have a regression guard on the actual client-visible response shape. Runtime behavior remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1260.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
