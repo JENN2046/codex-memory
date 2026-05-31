@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1216 A5-GAP-6_POST_GOVERNANCE_LOOP_AGGREGATION_PREFLIGHT`.
+Goal: `CM-1217 A5-GAP-2_RECALL_ISOLATION_NO_MUTATION_PREFLIGHT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the next post-governance-loop aggregation approval boundary.
+Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the next recall isolation approval boundary.
 
 Workspace: `A:\codex-memory`.
 
@@ -65,9 +65,12 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1216 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected default future aggregation units are `A5-GAP-1,A5-GAP-4,A5-GAP-5`.
 - Historical `A5-GAP-2/3` artifacts are background only unless a future exact approval line explicitly names them.
+- CM-1217 prepared the next exact A5-GAP-2 recall isolation no-mutation proof boundary.
+- Selected stores are `real_diary,real_sqlite,real_vector_index,real_candidate_cache,real_recall_audit`.
+- Future approval must include `no mutation`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1216:
+Validation for CM-1217:
 
 - `git diff --check`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
@@ -110,4 +113,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1216 preflight, then use fresh `HEAD` for exact A5-GAP-6 approval: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-4,A5-GAP-5.` Do not run ValidationAggregator, governed action, durable audit/memory writes, `tools/call`, `start:http:ensure`, provider calls, real memory scans, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1217 preflight, then use fresh `HEAD` for exact A5-GAP-2 approval: `I approve A5-GAP-2 for codex-memory on branch main at commit <FRESH_HEAD>, limited to stores real_diary, real_sqlite, real_vector_index, real_candidate_cache, real_recall_audit, no mutation.` Do not run store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1217 A5-GAP-2 Recall Isolation No-Mutation Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: prepare exact A5-GAP-2 no-mutation recall isolation proof boundary only. No store scan or runtime proof execution.
+
+Result:
+
+- Fresh preflight observed branch `main`, `HEAD=564b3f99c9e4b56146dd72a3d83067220833bac8`, and local state `main...origin/main [ahead 10]` before CM-1217 edits.
+- Selected stores: `real_diary`, `real_sqlite`, `real_vector_index`, `real_candidate_cache`, `real_recall_audit`.
+- Future approval must include `no mutation`.
+
+Boundary:
+
+- No store scan.
+- No raw content output.
+- No normal recall/search pipeline execution.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1217.
+- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-2 for codex-memory on branch main at commit <FRESH_HEAD>, limited to stores real_diary, real_sqlite, real_vector_index, real_candidate_cache, real_recall_audit, no mutation.`
+
 ## CM-1216 A5-GAP-6 Post-Governance-Loop Aggregation Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
