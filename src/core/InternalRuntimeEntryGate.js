@@ -36,12 +36,21 @@ function buildInternalRuntimeEntryPayload(
     payload[field.name] = getInternalRuntimeEntryArgumentValue(safeArgs, field.keys);
   }
 
-  payload.actor_client_id = normalizeInternalRuntimeEntryString(
-    safeArgs.actor_client_id
-    || safeArgs.actorClientId
-    || executionContext.clientId
-    || executionContext.client_id
-    || fallbackActorClientId
+  payload.actor_client_id = getInternalRuntimeEntryArgumentValue(
+    {
+      actor_client_id: safeArgs.actor_client_id,
+      actorClientId: safeArgs.actorClientId,
+      executionContextClientId: executionContext.clientId,
+      executionContextClientSnakeId: executionContext.client_id,
+      fallbackActorClientId
+    },
+    [
+      'actor_client_id',
+      'actorClientId',
+      'executionContextClientId',
+      'executionContextClientSnakeId',
+      'fallbackActorClientId'
+    ]
   );
 
   if (!enabled) {

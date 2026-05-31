@@ -86,6 +86,39 @@ test('internal runtime entry gate requires approved execution context', () => {
   assert.equal(result.payload.confirm, true);
 });
 
+test('internal runtime entry gate actor client id falls through blank aliases', () => {
+  const result = buildInternalRuntimeEntryPayload(
+    {
+      memory_id: 'mem-1',
+      reason: 'bounded reason',
+      actor_client_id: '   ',
+      actorClientId: '   '
+    },
+    {
+      executionContext: {
+        requestSource: 'internal-test',
+        internalTestRuntimeEntry: true,
+        clientId: '   ',
+        client_id: 'claude'
+      }
+    },
+    {
+      enabled: true,
+      requestSource: 'internal-test',
+      contextFlag: 'internalTestRuntimeEntry',
+      entryLabel: 'test',
+      requiredStringFields: [
+        { name: 'memory_id', keys: ['memory_id', 'memoryId'] },
+        { name: 'reason', keys: ['reason'] }
+      ],
+      fallbackActorClientId: 'codex'
+    }
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(result.payload.actor_client_id, 'claude');
+});
+
 test('internal runtime entry gate accepts approved execution context and trims payload fields', () => {
   const result = buildInternalRuntimeEntryPayload(
     {

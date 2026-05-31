@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1278 LIFECYCLE_SCOPE_FALLBACK_NORMALIZATION`.
+Goal: `CM-1279 INTERNAL_RUNTIME_ENTRY_ACTOR_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing lifecycle scope governance fallback normalization and validating recall eligibility behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing internal runtime entry actor-client fallback normalization and validating shared entry behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -62,6 +62,9 @@ Changed scope since CM-1207:
 - `src/core/MemoryLifecycleScopeGovernanceContract.js`
 - `tests/memory-lifecycle-scope-governance-contract.test.js`
 - `docs/CM1278_LIFECYCLE_SCOPE_FALLBACK_NORMALIZATION.md`
+- `src/core/InternalRuntimeEntryGate.js`
+- `tests/internal-runtime-entry-gate.test.js`
+- `docs/CM1279_INTERNAL_RUNTIME_ENTRY_ACTOR_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

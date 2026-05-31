@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1279 Internal Runtime Entry Actor Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test internal runtime-entry identity normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `buildInternalRuntimeEntryPayload(...)` now resolves `actor_client_id` from the first non-empty normalized candidate across public aliases, execution context, and fallback actor id.
+- Blank `actor_client_id`, blank `actorClientId`, and blank execution-context `clientId` no longer mask trusted execution-context `client_id`.
+- Added internal runtime-entry regression proving the actor id falls through to `client_id=claude` under blank earlier aliases.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\InternalRuntimeEntryGate.js`
+- `node --check tests\internal-runtime-entry-gate.test.js`
+- `node --test tests\internal-runtime-entry-gate.test.js tests\deferred-governance-runtime-entry-adapter.test.js tests\tombstone-memory-runtime-entry.test.js tests\supersede-memory-runtime-entry.test.js tests\validate-memory-runtime-entry.test.js` passed `29/29`.
+- `npm test` passed `2799/2799`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1279.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1278 Lifecycle Scope Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
