@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1262 Memory Overview HTTP Client Contract Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: HTTP boundary test/docs/status hardening for `memory_overview` client contract. No runtime behavior change, provider call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added no-token HTTP `tools/list` assertions that the `memory_overview` description exposes selected low-disclosure projection behavior.
+- Added bearer-token HTTP `tools/call memory_overview` assertions that authorized clients still receive full-overview-only `paths` and `embeddingProfile` fields.
+- No-token `record_memory` and `search_memory` remain blocked.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check tests\http-no-token-search-rejection.test.js`
+- `node --check tests\mcp-http.test.js`
+- `node --test tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js tests\mcp-contract.test.js` passed `38/38`.
+- Default suite and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1262.
+- Full runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1258 No-Token Overview Projection Version Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

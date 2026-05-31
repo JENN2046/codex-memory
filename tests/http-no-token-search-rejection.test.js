@@ -215,6 +215,14 @@ test('no-token HTTP tools/list is allowed', async () => {
     assert.equal(payload.jsonrpc, '2.0');
     assert.ok(Array.isArray(payload.result.tools));
     assert.ok(payload.result.tools.length > 0);
+
+    const memoryOverviewTool = payload.result.tools.find(tool => tool.name === 'memory_overview');
+    assert.ok(memoryOverviewTool);
+    assert.match(
+      memoryOverviewTool.description,
+      /HTTP no-token calls return only a selected low-disclosure overview projection/
+    );
+    assert.match(memoryOverviewTool.description, /bearer-token calls return the full overview/);
   });
 });
 

@@ -612,6 +612,15 @@ test('HTTP MCP should execute memory_overview through authorized tools/call', as
     assert.equal(payload.id, 12);
     assert.equal(payload.result.isError, false);
     assert.equal(payload.result.structuredContent.shadowSync.available, true);
+    assert.equal(payload.result.structuredContent.access, undefined);
+    assert.ok(payload.result.structuredContent.paths);
+    assert.ok(payload.result.structuredContent.paths.auditLogPath);
+    assert.ok(payload.result.structuredContent.paths.processDiaryPath);
+    assert.ok(payload.result.structuredContent.paths.knowledgeDiaryPath);
+    assert.ok(payload.result.structuredContent.embeddingProfile);
+    assert.equal(typeof payload.result.structuredContent.embeddingProfile.fingerprint, 'string');
+    assert.ok(payload.result.structuredContent.embeddingProfile.fingerprint.length > 0);
+    assert.equal(payload.result.structuredContent.embeddingProfile.provider, 'local');
   }, { bearerToken: 'test-token' });
 });
 

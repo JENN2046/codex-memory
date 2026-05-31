@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1258 NO_TOKEN_OVERVIEW_PROJECTION_VERSION`.
+Goal: `CM-1262 MEMORY_OVERVIEW_HTTP_CLIENT_CONTRACT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local runtime contract hardening of the no-token `memory_overview` selected projection.
+Status: `COMPLETED_VALIDATED_NOT_READY` after HTTP boundary regression coverage for the client-visible `memory_overview` contract.
 
 Workspace: `A:\codex-memory`.
 
@@ -33,6 +33,9 @@ Changed scope since CM-1207:
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/AUTOPILOT_LEDGER.md`
+- `tests/http-no-token-search-rejection.test.js`
+- `tests/mcp-http.test.js`
+- `docs/CM1262_MEMORY_OVERVIEW_HTTP_CLIENT_CONTRACT.md`
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
@@ -525,3 +528,29 @@ Boundary:
 Next safe action:
 
 Commit or otherwise stabilize CM-1261, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1262 Current Handoff
+
+Goal: `CM-1262 MEMORY_OVERVIEW_HTTP_CLIENT_CONTRACT`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1262 adds HTTP client contract regression coverage for `memory_overview`.
+- No-token HTTP `tools/list` now asserts that the client-visible description mentions selected low-disclosure projection behavior.
+- Bearer-token HTTP `tools/call memory_overview` now asserts that authorized clients still receive full overview fields including `paths` and `embeddingProfile`.
+- No runtime behavior changed.
+- No provider/MCP external call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `node --check tests\http-no-token-search-rejection.test.js`
+- `node --check tests\mcp-http.test.js`
+- `node --test tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js tests\mcp-contract.test.js` passed `38/38`.
+- Full/default validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1262, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.

@@ -7,14 +7,14 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1261 memory_overview schema description sync added |
+| Current task | CM-1262 memory_overview HTTP client contract regression added |
 | Current area | P4-http-runtime / P0-mainline-health |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
 | Untracked files left untouched | `CLAUDE.md`; `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` |
-| Runtime/source touched by current task | `src/core/constants.js` metadata only |
+| Runtime/source touched by current task | no |
 | Provider/API calls by current task | no |
 | Real memory tools by current task | no |
 | Durable memory/audit writes by current task | no |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1261 updates the client-visible `memory_overview` `tools/list` description and README so Codex/Claude clients see the current no-token selected projection versus bearer-token full overview behavior. Runtime execution path remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1261.
+CM-1262 adds HTTP boundary regression coverage for the client-visible `memory_overview` contract: no-token `tools/list` exposes the selected low-disclosure projection description, and bearer-token `tools/call memory_overview` still returns full-overview-only fields. Runtime behavior remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1262.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
