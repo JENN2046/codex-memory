@@ -358,3 +358,57 @@ git show abb1a26:MEMORY.md
 Next safe action:
 
 Commit or otherwise stabilize CM-1234 evidence, then continue local ValidationAggregator implementation or prepare the next exact-approved A5 runtime gap. Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+
+## CM-1259 Current Handoff
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Current branch: `main`
+
+Current work:
+
+- CM-1259 adds no-token `memory_overview` selected projection contract allowlist regression coverage.
+- It is test/docs/status-only.
+- It does not change runtime behavior.
+- It keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Changed files:
+
+- `tests/memory-overview-no-token-selected-projection.test.js`
+- `docs/CM1259_NO_TOKEN_OVERVIEW_CONTRACT_ALLOWLIST.md`
+- `STATUS.md`
+- `.agent_board/TASK_QUEUE.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/AUTOPILOT_LEDGER.md`
+- `.agent_board/RUN_STATE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/HANDOFF.md`
+
+Validation:
+
+- `node --check tests\memory-overview-no-token-selected-projection.test.js`
+- `node --test tests\memory-overview-no-token-selected-projection.test.js tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js`
+- `npm test`
+- `git diff --check`
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Not run:
+
+- `npm run test:hardening`
+- `npm run gate:mainline`
+- `npm run gate:mainline:strict`
+- HTTP observe
+- provider smoke / benchmark
+- real `record_memory`, `search_memory`, or `memory_overview`
+- runtime collector
+- cutover or personal RC dogfood
+
+Boundary:
+
+- No provider/API call, MCP external call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, push, PR, tag, release, deploy, readiness, write reliability, or recall reliability claim.
+- `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and untouched.
+
+Next safe action:
+
+Commit or otherwise stabilize CM-1259, then continue with local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.

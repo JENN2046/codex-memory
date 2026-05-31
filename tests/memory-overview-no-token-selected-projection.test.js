@@ -152,6 +152,58 @@ test('no-token selected overview sanitizes core overview dependencies directly',
   assert.equal(overview.access.mode, 'no_token_selected_overview');
   assert.equal(overview.access.selectedProjection, true);
   assert.equal(overview.access.selectedProjectionVersion, 1);
+  assert.deepEqual(Object.keys(overview).sort(), [
+    'access',
+    'activeMemoryHealth',
+    'adapterStatus',
+    'cacheHealth',
+    'indexHealth',
+    'recall',
+    'shadowSync',
+    'summary'
+  ]);
+  assert.deepEqual(Object.keys(overview.access).sort(), [
+    'bearerTokenRequiredForFullOverview',
+    'embeddingFingerprintReturned',
+    'memoryLinksReturned',
+    'mode',
+    'pathsReturned',
+    'rawMemoryFieldsReturned',
+    'recallRecentReturned',
+    'recentAuditReturned',
+    'recentFilesReturned',
+    'selectedProjection',
+    'selectedProjectionVersion'
+  ]);
+  assert.deepEqual(Object.keys(overview.summary).sort(), [
+    'accepted',
+    'blockedDirectWrites',
+    'knowledgeAccepted',
+    'knowledgeRejected',
+    'processAccepted',
+    'processRejected',
+    'rejected',
+    'sampleSize',
+    'sensitiveRejected'
+  ]);
+  assert.deepEqual(Object.keys(overview.recall).sort(), [
+    'available',
+    'message',
+    'status',
+    'summary'
+  ]);
+  assert.deepEqual(Object.keys(overview.recall.summary).sort(), [
+    'cacheHits',
+    'directHits',
+    'fullTextHits',
+    'knowledgeHits',
+    'processHits',
+    'sampleSize',
+    'scopedRecallCount',
+    'snippetHits',
+    'strictScopedRecallCount',
+    'totalHits'
+  ]);
   assert.equal(overview.summary.accepted, 1);
   assert.equal(overview.summary.rejected, 1);
   assert.equal(overview.summary.sensitiveRejected, 1);

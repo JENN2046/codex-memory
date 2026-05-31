@@ -1896,3 +1896,48 @@ git show abb1a26:MEMORY.md
 ```
 
 Repository reality remains authoritative over archived status text.
+
+## CM-1259 No-Token Overview Contract Allowlist Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Purpose: strengthen Codex/Claude no-token `memory_overview` client contract stability without widening runtime behavior.
+
+Changed:
+
+- `tests/memory-overview-no-token-selected-projection.test.js`
+- `docs/CM1259_NO_TOKEN_OVERVIEW_CONTRACT_ALLOWLIST.md`
+- `STATUS.md`
+- `.agent_board/TASK_QUEUE.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/AUTOPILOT_LEDGER.md`
+- `.agent_board/RUN_STATE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/HANDOFF.md`
+
+Result:
+
+- Direct core test now asserts exact key allowlists for selected overview top-level fields, `access`, count-only write `summary`, `recall`, and count-only `recall.summary`.
+- This prevents accidental reintroduction of full-overview fields into no-token selected projection output.
+- No runtime implementation change.
+
+Validation:
+
+- `node --check tests\memory-overview-no-token-selected-projection.test.js`
+- `node --test tests\memory-overview-no-token-selected-projection.test.js tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js`
+- `npm test`
+- `git diff --check`
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Boundary:
+
+- No provider/API call.
+- No MCP external call.
+- No real-memory scan.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim.
