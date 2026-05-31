@@ -2,49 +2,11 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
 
-function gateCiFixtureEnv() {
-  const comparePayload = {
-    summary: {
-      matchedAll: true,
-      totalCaseCount: 43,
-      matchedCaseCount: 43,
-      coreMismatchCountTotal: 0,
-      extendedMismatchCountTotal: 0,
-      message: 'Fixture compare passed'
-    }
-  };
-  const rollbackPayload = {
-    summary: {
-      rollbackReady: true,
-      totalCaseCount: 43,
-      readyCaseCount: 43,
-      coreMismatchCountTotal: 0,
-      extendedMismatchCountTotal: 0,
-      message: 'Fixture rollback passed'
-    }
-  };
-  return {
-    CODEX_MEMORY_GATE_CI_COMPARE_COMMAND_JSON: JSON.stringify([
-      '-e',
-      `console.log(${JSON.stringify(JSON.stringify(comparePayload))})`
-    ]),
-    CODEX_MEMORY_GATE_CI_ROLLBACK_COMMAND_JSON: JSON.stringify([
-      '-e',
-      `console.log(${JSON.stringify(JSON.stringify(rollbackPayload))})`
-    ]),
-    CODEX_MEMORY_GATE_CI_TEST_COMMAND_JSON: JSON.stringify([
-      process.execPath,
-      '-e',
-      "console.log('ℹ tests 1\\nℹ pass 1\\nℹ fail 0')"
-    ])
-  };
-}
-
 function runGateCi({ args = [], env = {} } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['src/cli/gate-ci.js', ...args], {
       cwd: process.cwd(),
-      env: { ...process.env, ...gateCiFixtureEnv(), ...env },
+      env: { ...process.env, ...env },
       stdio: ['ignore', 'pipe', 'pipe']
     });
     let stdout = '';
@@ -72,7 +34,10 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
     'noDaemon',
     'noNetwork',
     'noProvider',
-    'ok'
+    'ok',
+    'providerGateForcedOff',
+    'unsafeEnvOverrideDetected',
+    'unsafeEnvOverrideKeys'
   ]);
   assert.deepEqual(Object.keys(payload.checks).sort(), [
     'compare',
@@ -87,6 +52,9 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
   assert.equal(payload.summary.mode, 'ci');
   assert.equal(payload.summary.fixtureOnly, true);
   assert.equal(payload.summary.noNetwork, true);
+  assert.equal(payload.summary.providerGateForcedOff, true);
+  assert.equal(payload.summary.unsafeEnvOverrideDetected, false);
+  assert.deepEqual(payload.summary.unsafeEnvOverrideKeys, []);
   assert.deepEqual(payload.summary.failedChecks, []);
 
   assert.equal(payload.checks.compare.status, 'ok');
@@ -142,7 +110,9 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
     'mutated',
     'noDaemon',
     'noNetwork',
-    'noProvider'
+    'noProvider',
+    'ownerlessPrivateFilteredCount',
+    'privateVisibilityFilteredCount'
   ]);
   assert.equal(payload.checks.policyPreflight.detail.fixtureOnly, true);
   assert.equal(payload.checks.policyPreflight.detail.noNetwork, true);
@@ -150,11 +120,13 @@ test('gate:ci CLI should report all checks pass in json mode', async () => {
   assert.equal(payload.checks.policyPreflight.detail.noProvider, true);
   assert.equal(payload.checks.policyPreflight.detail.mutated, false);
   assert.equal(payload.checks.policyPreflight.detail.defaultPolicyEnabled, false);
-  assert.equal(payload.checks.policyPreflight.detail.inputCount, 7);
-  assert.equal(payload.checks.policyPreflight.detail.keptCount, 3);
-  assert.equal(payload.checks.policyPreflight.detail.filteredCount, 4);
+  assert.equal(payload.checks.policyPreflight.detail.inputCount, 9);
+  assert.equal(payload.checks.policyPreflight.detail.keptCount, 4);
+  assert.equal(payload.checks.policyPreflight.detail.filteredCount, 5);
   assert.equal(payload.checks.policyPreflight.detail.lifecycleFilteredCount, 3);
+  assert.equal(payload.checks.policyPreflight.detail.privateVisibilityFilteredCount, 2);
   assert.equal(payload.checks.policyPreflight.detail.crossClientPrivateFilteredCount, 1);
+  assert.equal(payload.checks.policyPreflight.detail.ownerlessPrivateFilteredCount, 1);
 
   assert.equal(payload.checks.lifecyclePolicy.status, 'ok');
   assert.deepEqual(Object.keys(payload.checks.lifecyclePolicy.detail).sort(), [
@@ -218,11 +190,31 @@ test('gate:ci CLI should emit text output by default', async () => {
   assert.ok(text.includes('14/14 query assertions passed'), 'should include query assertion counts');
   assert.ok(text.includes('fixture recall 14/14'), 'should include fixture recall standing gate counts');
   assert.ok(text.includes('policyPreflight'), 'should include policy preflight check');
-  assert.ok(text.includes('3/7 records would remain'), 'should include policy preflight counts');
+  assert.ok(text.includes('4/9 records would remain'), 'should include policy preflight counts');
   assert.ok(text.includes('lifecyclePolicy'), 'should include lifecycle policy check');
   assert.ok(text.includes('default off'), 'should include lifecycle default-off summary');
   assert.equal(text.includes('workspace_id'), false, 'should not include raw workspace_id');
   assert.ok(text.includes('tests'), 'should include tests check');
   assert.ok(text.includes('docs'), 'should include docs check');
   assert.ok(text.includes('PASS'), 'should show PASS result');
+});
+
+test('gate:ci CLI should reject command override env before checks', async () => {
+  const result = await runGateCi({
+    args: ['--json'],
+    env: {
+      CODEX_MEMORY_GATE_CI_TEST_COMMAND_JSON: JSON.stringify([
+        process.execPath,
+        '-e',
+        "console.log('should not execute')"
+      ])
+    }
+  });
+  assert.equal(result.code, 1);
+  const payload = parseJsonOutput(result.stdout);
+  assert.equal(payload.summary.ok, false);
+  assert.equal(payload.summary.unsafeEnvOverrideDetected, true);
+  assert.deepEqual(payload.summary.failedChecks, ['unsafeEnvOverride']);
+  assert.equal(payload.summary.checksExecuted, false);
+  assert.equal(payload.checks.unsafeEnvOverride.detail.testsExecuted, false);
 });

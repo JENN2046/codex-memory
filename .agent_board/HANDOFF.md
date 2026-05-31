@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1271 PRIVATE_READ_MISSING_OWNER_FAIL_CLOSED`.
+Goal: `CM-1272 GATE_CI_POLICY_PREFLIGHT_OWNERLESS_PRIVATE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after making private soft-read records fail closed when owner `client_id` is missing.
+Status: `COMPLETED_VALIDATED_NOT_READY` after aligning fixture-only `gate:ci` policy preflight with CM-1271 ownerless-private fail-closed behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -43,6 +43,9 @@ Changed scope since CM-1207:
 - `tests/policy-read-preflight.test.js`
 - `docs/CM1270_NO_CONTEXT_READ_IDENTITY_FAIL_CLOSED.md`
 - `docs/CM1271_PRIVATE_READ_MISSING_OWNER_FAIL_CLOSED.md`
+- `src/cli/gate-ci.js`
+- `tests/gate-ci-cli.test.js`
+- `docs/CM1272_GATE_CI_POLICY_PREFLIGHT_OWNERLESS_PRIVATE.md`
 - `docs/CM1264_SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING.md`
 - `tests/memory-lifecycle-scope-runtime-integration.test.js`
 - `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`
@@ -118,6 +121,23 @@ Changed scope since CM-1207:
 - `docs/CM1256_NO_TOKEN_OVERVIEW_CORE_SANITIZER_TEST.md`
 - `docs/CM1257_NO_TOKEN_OVERVIEW_COUNT_ONLY_WRITE_SUMMARY.md`
 - `docs/CM1258_NO_TOKEN_OVERVIEW_PROJECTION_VERSION.md`
+
+Current CM-1272 fact:
+
+- CM-1272 is local CLI fixture/test policy-preflight hardening for fixture-only `gate:ci`.
+- `applyFixtureSoftReadPolicy(...)` now filters private fixture records when `clientId` is missing or does not match the request client.
+- The fixture includes ownerless private and ownerless shared records.
+- Current `policyPreflight` output reports `4/9 records would remain under soft read policy`, with `privateVisibilityFilteredCount=2`, `crossClientPrivateFilteredCount=1`, and `ownerlessPrivateFilteredCount=1`.
+- Targeted gate/policy tests passed `11/11`; fixture-only `npm run gate:ci -- --json` passed with `2793/2793` CI-safe tests; default `npm test` passed `2793/2793`.
+- No provider call, MCP external call, real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim occurred.
+
+Current CM-1271 fact:
+
+- CM-1271 makes private soft-read records fail closed when owner `client_id` is missing.
+- Private records require a non-empty owner `client_id` matching the trusted request client.
+- Ownerless shared records remain visible.
+- Targeted read-policy tests passed `22/22`; default `npm test` passed `2793/2793`.
+- No provider call, MCP external call, real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim occurred.
 
 Current CM-1258 fact:
 

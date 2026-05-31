@@ -170,7 +170,7 @@ function applyFixtureSoftReadPolicy(records, { requestClientId = 'codex' } = {})
 
     const visibility = String(record.visibility || 'project').toLowerCase();
     const clientId = String(record.clientId || '').toLowerCase();
-    if (visibility === 'private' && clientId && clientId !== requestClientId) {
+    if (visibility === 'private' && (!clientId || clientId !== requestClientId)) {
       return false;
     }
 
@@ -186,18 +186,34 @@ function runPolicyPreflight() {
     { title: 'Rejected Shared', status: 'rejected', visibility: 'shared', clientId: 'codex' },
     { title: 'Tombstoned Shared', status: 'tombstoned', visibility: 'shared', clientId: 'codex' },
     { title: 'Private Claude', status: 'active', visibility: 'private', clientId: 'claude' },
-    { title: 'Private Codex', status: 'active', visibility: 'private', clientId: 'codex' }
+    { title: 'Private Codex', status: 'active', visibility: 'private', clientId: 'codex' },
+    { title: 'Ownerless Private', status: 'active', visibility: 'private', clientId: '' },
+    { title: 'Ownerless Shared', status: 'active', visibility: 'shared', clientId: '' }
   ];
 
   const kept = applyFixtureSoftReadPolicy(records, { requestClientId: 'codex' });
   const lifecycleFilteredCount = records
     .filter(record => !['active', 'stale'].includes(String(record.status || 'active').toLowerCase()))
     .length;
+  const privateVisibilityFilteredCount = records
+    .filter(record => {
+      const visibility = String(record.visibility || 'project').toLowerCase();
+      const clientId = String(record.clientId || '').toLowerCase();
+      return visibility === 'private' && (!clientId || clientId !== 'codex');
+    })
+    .length;
   const crossClientPrivateFilteredCount = records
     .filter(record => {
       const visibility = String(record.visibility || 'project').toLowerCase();
       const clientId = String(record.clientId || '').toLowerCase();
       return visibility === 'private' && clientId && clientId !== 'codex';
+    })
+    .length;
+  const ownerlessPrivateFilteredCount = records
+    .filter(record => {
+      const visibility = String(record.visibility || 'project').toLowerCase();
+      const clientId = String(record.clientId || '').toLowerCase();
+      return visibility === 'private' && !clientId;
     })
     .length;
 
@@ -215,7 +231,9 @@ function runPolicyPreflight() {
       keptCount: kept.length,
       filteredCount: records.length - kept.length,
       lifecycleFilteredCount,
-      crossClientPrivateFilteredCount
+      privateVisibilityFilteredCount,
+      crossClientPrivateFilteredCount,
+      ownerlessPrivateFilteredCount
     }
   };
 }

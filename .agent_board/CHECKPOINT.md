@@ -1,5 +1,35 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1272 Gate CI Policy Preflight Ownerless Private Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local CLI fixture/test policy-preflight hardening for fixture-only `gate:ci`. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `applyFixtureSoftReadPolicy(...)` now filters private fixture records when `clientId` is missing or does not match the request client.
+- The policy preflight fixture now covers ownerless private and ownerless shared records.
+- `policyPreflight.detail` now includes private visibility, cross-client private, and ownerless private filtered counts.
+- Fixture-only `gate:ci` reports `4/9 records would remain under soft read policy`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\cli\gate-ci.js`
+- `node --check tests\gate-ci-cli.test.js`
+- `node --test tests\gate-ci-cli.test.js tests\policy-read-preflight.test.js` passed `11/11`.
+- `npm run gate:ci -- --json` passed, with CI-safe tests `2793/2793`.
+- `npm test` passed `2793/2793`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1272.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1271 Private Read Missing Owner Fail Closed Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
