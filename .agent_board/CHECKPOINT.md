@@ -1,5 +1,35 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1285 Proof-Memory Retention Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test proof-memory retention/tombstone fallback normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ProofMemoryRetentionTombstonePlan` now uses the first non-empty normalized value for paired camel-case / snake_case proof-retention memory id, lifecycle status, retention policy, validation status, and validation time fields.
+- `ProofMemoryRetentionTombstoneStoreBackedDryRunPreview` now normalizes store records with the same blank-aware fallback behavior before constructing no-apply tombstone preview actions.
+- Added regressions proving blank camel-case proof-retention fields fall through to snake_case fields and still produce accepted no-apply tombstone preview actions.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ProofMemoryRetentionTombstonePlan.js`
+- `node --check src\core\ProofMemoryRetentionTombstoneStoreBackedDryRunPreview.js`
+- `node --check tests\proof-memory-retention-tombstone-plan.test.js`
+- `node --check tests\proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js`
+- `node --test tests\proof-memory-retention-tombstone-plan.test.js tests\proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js tests\proof-memory-policy.test.js tests\memory-write-preflight-runtime-integration.test.js` passed `26/26`.
+- `npm test` passed `2807/2807`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1285.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1284 Lifecycle Id/Status Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -186,6 +186,41 @@ test('CM-1082 blocks before store reads on apply, worker, public MCP, or real-st
   assert.equal(report.applyGate.applyExecuted, false);
 });
 
+test('CM-1082 normalizes store-backed proof retention fields from snake-case fallbacks', async () => {
+  const report = await buildProofMemoryRetentionTombstoneStoreBackedDryRunPreview(previewInput({
+    stores: {
+      shadowStore: {
+        async listProofMemoryRetentionCandidates() {
+          return [
+            {
+              memoryId: '   ',
+              memory_id: 'cm1082-proof-snake-fallback',
+              target: 'process',
+              status: '',
+              lifecycle_status: 'active',
+              visibility: PROOF_MEMORY_VISIBILITY,
+              retentionPolicy: '   ',
+              retention_policy: PROOF_MEMORY_RETENTION_POLICY,
+              tags: [PROOF_MEMORY_TAG],
+              validationStatus: '',
+              validation_status: 'accepted',
+              validatedAt: '   ',
+              validated_at: '2026-05-24T00:00:00.000Z'
+            }
+          ];
+        }
+      }
+    }
+  }));
+
+  assert.equal(report.status, RESULT_STATUS_ACCEPTED);
+  assert.equal(report.storeReadSummary.proofRecords, 1);
+  assert.equal(report.storeReadSummary.eligibleProofRecords, 1);
+  assert.deepEqual(report.plannedActions.map(action => action.memoryId), [
+    'cm1082-proof-snake-fallback'
+  ]);
+});
+
 test('CM-1082 blocks before store reads when temp-local provenance or store helper is missing', async () => {
   const report = await buildProofMemoryRetentionTombstoneStoreBackedDryRunPreview(previewInput({
     storeProvenance: 'real_store',

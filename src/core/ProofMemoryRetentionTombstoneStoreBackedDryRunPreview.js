@@ -25,6 +25,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeLimit(value) {
   if (!Number.isInteger(value)) {
     return DEFAULT_LIMIT;
@@ -163,16 +171,25 @@ function blockedResult({ target, limit, blockerReasons, readsAttempted = false }
 function normalizeStoreRecord(record = {}) {
   const safeRecord = isPlainObject(record) ? record : {};
   return {
-    memoryId: normalizeString(safeRecord.memoryId || safeRecord.memory_id),
+    memoryId: firstNormalizedString(safeRecord.memoryId, safeRecord.memory_id),
     target: normalizeString(safeRecord.target),
-    status: normalizeString(safeRecord.status || safeRecord.lifecycleStatus || safeRecord.lifecycle_status) || 'active',
+    status: firstNormalizedString(
+      safeRecord.status,
+      safeRecord.lifecycleStatus,
+      safeRecord.lifecycle_status
+    ) || 'active',
     visibility: normalizeString(safeRecord.visibility),
-    retentionPolicy: normalizeString(safeRecord.retentionPolicy || safeRecord.retention_policy),
+    retentionPolicy: firstNormalizedString(safeRecord.retentionPolicy, safeRecord.retention_policy),
     tags: Array.isArray(safeRecord.tags) ? safeRecord.tags.map(tag => normalizeString(tag)).filter(Boolean) : [],
-    validationStatus: normalizeString(safeRecord.validationStatus || safeRecord.validation_status) ||
+    validationStatus: firstNormalizedString(safeRecord.validationStatus, safeRecord.validation_status) ||
       (safeRecord.validated === true ? 'accepted' : 'pending'),
-    validatedAt: normalizeString(safeRecord.validatedAt || safeRecord.validated_at || safeRecord.validationCompletedAt || safeRecord.validation_completed_at),
-    validatedAtSource: normalizeString(safeRecord.validatedAtSource || safeRecord.validated_at_source)
+    validatedAt: firstNormalizedString(
+      safeRecord.validatedAt,
+      safeRecord.validated_at,
+      safeRecord.validationCompletedAt,
+      safeRecord.validation_completed_at
+    ),
+    validatedAtSource: firstNormalizedString(safeRecord.validatedAtSource, safeRecord.validated_at_source)
   };
 }
 

@@ -130,6 +130,50 @@ test('keeps ordinary, unvalidated, recent, and already tombstoned records out of
   assert.deepEqual(result.plannedActions, []);
 });
 
+test('normalizes blank camel-case proof retention fields from snake-case fallbacks', () => {
+  const result = buildProofMemoryRetentionTombstonePlan({
+    mode: REQUIRED_MODE,
+    scope: REQUIRED_SCOPE,
+    now: '2026-05-25T00:00:00.000Z',
+    retentionAfterValidationMs: 60 * 60 * 1000,
+    records: [
+      {
+        memoryId: '   ',
+        memory_id: 'cm1081-proof-snake-fallback',
+        status: '',
+        lifecycle_status: 'active',
+        visibility: PROOF_MEMORY_VISIBILITY,
+        retentionPolicy: '   ',
+        retention_policy: PROOF_MEMORY_RETENTION_POLICY,
+        validationStatus: '',
+        validation_status: 'accepted',
+        validatedAt: '   ',
+        validated_at: '2026-05-24T00:00:00.000Z'
+      }
+    ]
+  });
+
+  assert.equal(result.status, PLAN_STATUS_PASSED);
+  assert.equal(result.counters.proofRecords, 1);
+  assert.equal(result.counters.eligibleProofRecords, 1);
+  assert.deepEqual(result.plannedActions, [
+    {
+      action: 'tombstone_internal_proof_memory',
+      applies: false,
+      memoryId: 'cm1081-proof-snake-fallback',
+      recordIndex: 0,
+      fromStatus: 'active',
+      toStatus: 'tombstoned',
+      reason: 'proof_memory_retention_elapsed_after_validation',
+      retentionPolicy: PROOF_MEMORY_RETENTION_POLICY,
+      visibility: PROOF_MEMORY_VISIBILITY,
+      requiresSeparateApplyApproval: true,
+      requiresRuntimeValidationBeforeApply: true,
+      auditRequiredBeforeApply: true
+    }
+  ]);
+});
+
 test('fails closed when caller attempts apply, real-store mode, public MCP expansion, or worker startup', () => {
   const result = buildProofMemoryRetentionTombstonePlan({
     mode: REQUIRED_MODE,

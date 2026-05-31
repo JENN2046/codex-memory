@@ -13,6 +13,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeTags(value) {
   if (Array.isArray(value)) {
     return value.map(item => String(item || '').trim()).filter(Boolean);
@@ -34,7 +42,7 @@ function parseTime(value) {
 
 function isProofMemoryRecord(record = {}) {
   const visibility = normalizeString(record.visibility);
-  const retentionPolicy = normalizeString(record.retentionPolicy || record.retention_policy);
+  const retentionPolicy = firstNormalizedString(record.retentionPolicy, record.retention_policy);
   const tags = normalizeTags(record.tags);
 
   return visibility === PROOF_MEMORY_VISIBILITY ||
@@ -138,13 +146,23 @@ function buildProofMemoryRetentionTombstonePlan(input = {}) {
   let eligibleProofRecords = 0;
 
   input.records.forEach((record, index) => {
-    const memoryId = normalizeString(record && record.memoryId);
-    const status = normalizeString(record && record.status) || 'active';
+    const memoryId = firstNormalizedString(record && record.memoryId, record && record.memory_id);
+    const status = firstNormalizedString(
+      record && record.status,
+      record && record.lifecycleStatus,
+      record && record.lifecycle_status
+    ) || 'active';
     const proofMemory = isProofMemoryRecord(record);
     const validationAccepted = normalizeValidationAccepted(
-      record && (record.validationStatus ?? record.validated)
+      firstNormalizedString(record && record.validationStatus, record && record.validation_status) ||
+        (record && record.validated)
     );
-    const validatedAtMs = parseTime(record && (record.validatedAt || record.validationCompletedAt));
+    const validatedAtMs = parseTime(firstNormalizedString(
+      record && record.validatedAt,
+      record && record.validated_at,
+      record && record.validationCompletedAt,
+      record && record.validation_completed_at
+    ));
     const ageAfterValidationMs = validatedAtMs === null ? null : Math.max(0, nowMs - validatedAtMs);
 
     if (proofMemory) {
