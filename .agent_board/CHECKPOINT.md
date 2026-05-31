@@ -1,5 +1,46 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1240 A5 Approval Check CLI Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: local source/test CLI wrapper only. No A5 approval grant, strict gate execution, runtime evidence execution, or external action.
+
+Result:
+
+- Added `src/cli/a5-approval-check.js`.
+- Added targeted CLI tests for exact approval acceptance, stale commit rejection, missing approval rejection, and deterministic helper rendering.
+- The CLI validates explicit input only and exits non-zero on fail-closed rejection.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\cli\a5-approval-check.js`
+- `node --test tests\a5-approval-line-verifier.test.js tests\a5-approval-check-cli.test.js` passed `9/9`.
+- `git diff --check`
+- Ledger consistency validation.
+- Docs validation via `scripts\validate-local.ps1 -Area docs`.
+
+Boundary:
+
+- No A5-GAP execution.
+- No strict gate execution.
+- No service start.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1240.
+- Future A5 execution still requires a separate exact user approval line.
+
 ## CM-1239 A5 Approval Line Verifier Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

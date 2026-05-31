@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1239 A5_APPROVAL_LINE_VERIFIER`.
+Goal: `CM-1240 A5_APPROVAL_CHECK_CLI`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test implementation of an explicit-input A5 approval line verifier.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test implementation of an explicit-input A5 approval check CLI wrapper.
 
 Workspace: `A:\codex-memory`.
 
@@ -59,6 +59,9 @@ Changed scope since CM-1207:
 - `src/core/A5ApprovalLineVerifier.js`
 - `tests/a5-approval-line-verifier.test.js`
 - `docs/CM1239_A5_APPROVAL_LINE_VERIFIER.md`
+- `src/cli/a5-approval-check.js`
+- `tests/a5-approval-check-cli.test.js`
+- `docs/CM1240_A5_APPROVAL_CHECK_CLI.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -147,6 +150,9 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1239 accepts exact `A5-GAP-5` strict-gate wording only when branch and commit match.
 - CM-1239 rejects stale commit, placeholders, broader wording, and cross-unit reuse.
 - CM-1239 does not grant approval or execute commands.
+- CM-1240 adds a local explicit-input CLI wrapper for the verifier.
+- CM-1240 exits `0` only when the supplied approval line exactly matches expected unit, branch, and commit; stale or missing approval inputs fail closed.
+- CM-1240 does not discover approval, grant approval, execute approved commands, start services, call MCP/provider, read real memory, write durable memory/audit, or claim readiness.
 - CM-1229 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected future aggregation units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
 - CM-1229 does not execute ValidationAggregator, scan files/stores, call MCP tools, call providers, write durable memory/audit, or claim readiness.

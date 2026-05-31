@@ -75,7 +75,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1239 A5_APPROVAL_LINE_VERIFIER` 已新增本地 explicit-input approval verifier：`src/core/A5ApprovalLineVerifier.js` 可以在后续 A5 执行前校验 approval line 是否精确匹配 expected unit / branch / commit，并拒绝 stale commit、placeholder、跨 unit reuse 与更宽泛措辞。Targeted validation `node --check src\core\A5ApprovalLineVerifier.js` 与 `node --test tests\a5-approval-line-verifier.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `9/9`。该变更不授予 approval，不执行 strict gate，不调用 provider/MCP，不读取真实记忆，不写 durable memory/audit，不改变 readiness。
 
-当前下一步是提交 CM-1239，然后如需执行 strict gate，用户仍需使用 fresh HEAD 给出 exact approval。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230/CM-1231/CM-1232/CM-1233/CM-1234/CM-1235/CM-1236/CM-1237/CM-1238/CM-1239 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1240 A5_APPROVAL_CHECK_CLI` 已新增本地 explicit-input CLI wrapper：`src/cli/a5-approval-check.js` 可在后续 A5 执行前校验用户给出的 approval line 是否匹配 expected unit / branch / commit，并以 fail-closed exit code 暴露缺参或 stale commit。Targeted validation `node --check src\cli\a5-approval-check.js` 与 `node --test tests\a5-approval-line-verifier.test.js tests\a5-approval-check-cli.test.js` 通过，测试 `9/9`。该 CLI 不发现 approval、不授予 approval、不执行被批准命令、不启动服务、不调用 provider/MCP、不读取真实记忆、不写 durable memory/audit、不改变 readiness。
+
+当前下一步是提交或稳定 CM-1240；如需执行 strict gate，用户仍需使用 fresh HEAD 给出 exact approval。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230/CM-1231/CM-1232/CM-1233/CM-1234/CM-1235/CM-1236/CM-1237/CM-1238/CM-1239/CM-1240 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 
