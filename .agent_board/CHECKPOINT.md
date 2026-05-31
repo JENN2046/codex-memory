@@ -1,5 +1,45 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1235 ValidationAggregator Effective Gap Closure Map Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: local source/test report-shape improvement only. No evidence file read, ValidationAggregator evidence collection, runtime evidence execution, or evidence file/store scan.
+
+Result:
+
+- Added closure classification for effective remaining gaps.
+- Report now exposes local implementation, A5-gated, and Red-lane cutover gap ids/counts.
+- Closure criteria now expose the corresponding `effective*GapsCleared` booleans and missing criteria.
+- Readiness posture remains unchanged: `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` passed `22/22`.
+
+Boundary:
+
+- No A5-GAP-6 execution.
+- No evidence file read.
+- No validation command execution by aggregator.
+- No runtime collector execution.
+- No evidence file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1235.
+- Continue local ValidationAggregator implementation or prepare the next exact-approved A5 runtime gap.
+
 ## CM-1234 A5-GAP-6 Post-GAP3 Aggregation Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

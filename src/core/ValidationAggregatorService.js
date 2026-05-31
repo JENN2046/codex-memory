@@ -277,6 +277,51 @@ const P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS = [
   'rc_cutover_not_executed'
 ];
 
+const P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP = {
+  validation_aggregator_full_implementation_incomplete: {
+    category: 'local_implementation',
+    requiresLocalImplementation: true,
+    requiresA5: false,
+    redLane: false
+  },
+  governance_review_approval_audit_runtime_loop_not_executed: {
+    category: 'a5_runtime_evidence',
+    requiresLocalImplementation: false,
+    requiresA5: true,
+    redLane: false
+  },
+  recall_isolation_runtime_proof_not_executed: {
+    category: 'a5_runtime_evidence',
+    requiresLocalImplementation: false,
+    requiresA5: true,
+    redLane: false
+  },
+  migration_import_export_backup_restore_approval_execution_blocked: {
+    category: 'a5_migration_boundary',
+    requiresLocalImplementation: false,
+    requiresA5: true,
+    redLane: false
+  },
+  live_http_operation_readiness_not_claimed: {
+    category: 'a5_runtime_evidence',
+    requiresLocalImplementation: false,
+    requiresA5: true,
+    redLane: false
+  },
+  mainline_strict_gate_not_executed_for_cutover: {
+    category: 'cutover_gate',
+    requiresLocalImplementation: false,
+    requiresA5: true,
+    redLane: true
+  },
+  rc_cutover_not_executed: {
+    category: 'red_lane_cutover',
+    requiresLocalImplementation: false,
+    requiresA5: true,
+    redLane: true
+  }
+};
+
 const P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS = [
   'runtime_schema_version_enforcement_not_fully_proven',
   'final_rc_matrix_runner_not_executed_as_real_matrix'
@@ -355,6 +400,31 @@ function buildP66FullImplementationGapAccounting({
     .filter(id => effectiveRemainingFullImplementationGapIds.includes(id));
   const effectiveNonBaselineRemainingGapIds = effectiveRemainingFullImplementationGapIds
     .filter(id => !P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS.includes(id));
+  const effectiveRemainingGapClosureItems = effectiveRemainingFullImplementationGapIds
+    .map(id => ({
+      id,
+      category: P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id]
+        ? P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id].category
+        : 'unmodeled_gap',
+      requiresLocalImplementation: P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id]
+        ? P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id].requiresLocalImplementation
+        : true,
+      requiresA5: P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id]
+        ? P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id].requiresA5
+        : true,
+      redLane: P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id]
+        ? P66_FULL_IMPLEMENTATION_GAP_CLOSURE_MAP[id].redLane
+        : true
+    }));
+  const effectiveLocalImplementationGapIds = effectiveRemainingGapClosureItems
+    .filter(item => item.requiresLocalImplementation === true)
+    .map(item => item.id);
+  const effectiveA5GatedGapIds = effectiveRemainingGapClosureItems
+    .filter(item => item.requiresA5 === true)
+    .map(item => item.id);
+  const effectiveRedLaneGapIds = effectiveRemainingGapClosureItems
+    .filter(item => item.redLane === true)
+    .map(item => item.id);
   const safeBlockers = Array.isArray(blockers) ? blockers : [];
   const validationBlockerIds = safeBlockers
     .filter(blocker => blocker.category === 'validation')
@@ -377,6 +447,10 @@ function buildP66FullImplementationGapAccounting({
     effectiveRemainingFullImplementationGapIds.length === 0;
   const effectiveNonBaselineRemainingGapsAbsent =
     effectiveNonBaselineRemainingGapIds.length === 0;
+  const effectiveLocalImplementationGapsCleared =
+    effectiveLocalImplementationGapIds.length === 0;
+  const effectiveA5GatedGapsCleared = effectiveA5GatedGapIds.length === 0;
+  const effectiveRedLaneGapsCleared = effectiveRedLaneGapIds.length === 0;
 
   return {
     available: true,
@@ -402,6 +476,13 @@ function buildP66FullImplementationGapAccounting({
     staticBaselineStillRemainingGapCount: staticBaselineStillRemainingGapIds.length,
     effectiveNonBaselineRemainingGapIds,
     effectiveNonBaselineRemainingGapCount: effectiveNonBaselineRemainingGapIds.length,
+    effectiveRemainingGapClosureItems,
+    effectiveLocalImplementationGapIds,
+    effectiveLocalImplementationGapCount: effectiveLocalImplementationGapIds.length,
+    effectiveA5GatedGapIds,
+    effectiveA5GatedGapCount: effectiveA5GatedGapIds.length,
+    effectiveRedLaneGapIds,
+    effectiveRedLaneGapCount: effectiveRedLaneGapIds.length,
     closureStatus,
     closureReady: false,
     closureCanClaimReady: false,
@@ -413,6 +494,9 @@ function buildP66FullImplementationGapAccounting({
       a5GatedBlockersCleared: a5GatedBlockerIds.length === 0,
       effectiveRemainingGapsCleared,
       effectiveNonBaselineRemainingGapsAbsent,
+      effectiveLocalImplementationGapsCleared,
+      effectiveA5GatedGapsCleared,
+      effectiveRedLaneGapsCleared,
       allBlockersCleared: totalBlockerCount === 0,
       readinessClaimAllowed: false
     },
@@ -424,6 +508,9 @@ function buildP66FullImplementationGapAccounting({
       ...(a5GatedBlockerIds.length > 0 ? ['a5_gated_blockers_cleared'] : []),
       ...(!effectiveRemainingGapsCleared ? ['effective_remaining_gaps_cleared'] : []),
       ...(!effectiveNonBaselineRemainingGapsAbsent ? ['effective_non_baseline_remaining_gaps_absent'] : []),
+      ...(!effectiveLocalImplementationGapsCleared ? ['effective_local_implementation_gaps_cleared'] : []),
+      ...(!effectiveA5GatedGapsCleared ? ['effective_a5_gated_gaps_cleared'] : []),
+      ...(!effectiveRedLaneGapsCleared ? ['effective_red_lane_gaps_cleared'] : []),
       'readiness_authority'
     ],
     acceptedRuntimeSummaryBound,
@@ -2281,6 +2368,12 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.staticBaselineStillRemainingGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingEffectiveNonBaselineRemainingGapCount:
         p66FullImplementationGapAccounting.effectiveNonBaselineRemainingGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocalImplementationGapCount:
+        p66FullImplementationGapAccounting.effectiveLocalImplementationGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingEffectiveA5GatedGapCount:
+        p66FullImplementationGapAccounting.effectiveA5GatedGapCount,
+      p66ValidationAggregatorFullImplementationGapAccountingEffectiveRedLaneGapCount:
+        p66FullImplementationGapAccounting.effectiveRedLaneGapCount,
       p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount:
         p66FullImplementationGapAccounting.nextSafeClosureCandidateCount,
       p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound:
@@ -3296,6 +3389,20 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.effectiveNonBaselineRemainingGapIds,
         effectiveNonBaselineRemainingGapCount:
           p66FullImplementationGapAccounting.effectiveNonBaselineRemainingGapCount,
+        effectiveRemainingGapClosureItems:
+          p66FullImplementationGapAccounting.effectiveRemainingGapClosureItems,
+        effectiveLocalImplementationGapIds:
+          p66FullImplementationGapAccounting.effectiveLocalImplementationGapIds,
+        effectiveLocalImplementationGapCount:
+          p66FullImplementationGapAccounting.effectiveLocalImplementationGapCount,
+        effectiveA5GatedGapIds:
+          p66FullImplementationGapAccounting.effectiveA5GatedGapIds,
+        effectiveA5GatedGapCount:
+          p66FullImplementationGapAccounting.effectiveA5GatedGapCount,
+        effectiveRedLaneGapIds:
+          p66FullImplementationGapAccounting.effectiveRedLaneGapIds,
+        effectiveRedLaneGapCount:
+          p66FullImplementationGapAccounting.effectiveRedLaneGapCount,
         nextSafeClosureCandidates:
           p66FullImplementationGapAccounting.nextSafeClosureCandidates,
         acceptedRuntimeSummaryBound:

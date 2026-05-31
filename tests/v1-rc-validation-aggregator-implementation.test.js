@@ -239,6 +239,12 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveNonBaselineRemainingGapCount,
     0
   );
+  assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocalImplementationGapCount,
+    1
+  );
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveA5GatedGapCount, 6);
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveRedLaneGapCount, 2);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingNextSafeCandidateCount, 3);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryBound, false);
   assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingRuntimeSummaryRemainingGapCount, 0);
@@ -726,6 +732,18 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveNonBaselineRemainingGapIds,
     []
   );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveLocalImplementationGapIds,
+    ['validation_aggregator_full_implementation_incomplete']
+  );
+  assert.equal(report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveA5GatedGapCount, 6);
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveRedLaneGapIds,
+    [
+      'mainline_strict_gate_not_executed_for_cutover',
+      'rc_cutover_not_executed'
+    ]
+  );
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.nextSafeClosureCandidates.includes(
       'a5_gap_3_migration_readiness_fixture_only_dry_run'
@@ -792,6 +810,18 @@ test('minimal implementation reports honest blocked state without claiming v1 RC
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveNonBaselineRemainingGapsAbsent,
     true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveLocalImplementationGapsCleared,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveA5GatedGapsCleared,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveRedLaneGapsCleared,
+    false
   );
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
@@ -2352,6 +2382,12 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
     0
   );
   assert.equal(
+    report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveLocalImplementationGapCount,
+    1
+  );
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveA5GatedGapCount, 1);
+  assert.equal(report.summary.p66ValidationAggregatorFullImplementationGapAccountingEffectiveRedLaneGapCount, 1);
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.acceptedRuntimeSummaryBound,
     true
   );
@@ -2403,6 +2439,18 @@ test('validation aggregator ingests explicit sanitized runtime evidence summary 
   assert.deepEqual(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveNonBaselineRemainingGapIds,
     []
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveLocalImplementationGapIds,
+    ['validation_aggregator_full_implementation_incomplete']
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveA5GatedGapIds,
+    ['mainline_strict_gate_not_executed_for_cutover']
+  );
+  assert.deepEqual(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.effectiveRedLaneGapIds,
+    ['mainline_strict_gate_not_executed_for_cutover']
   );
   assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.fullImplementationGapAccounting.fullImplementationReady,
@@ -2693,6 +2741,18 @@ test('validation evidence reader exposes only explicit committed and local valid
     true
   );
   assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveLocalImplementationGapsCleared,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveA5GatedGapsCleared,
+    false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureCriteria.effectiveRedLaneGapsCleared,
+    false
+  );
+  assert.equal(
     report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
       'usable_validation_evidence'
     ),
@@ -2709,6 +2769,24 @@ test('validation evidence reader exposes only explicit committed and local valid
       'effective_non_baseline_remaining_gaps_absent'
     ),
     false
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
+      'effective_local_implementation_gaps_cleared'
+    ),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
+      'effective_a5_gated_gaps_cleared'
+    ),
+    true
+  );
+  assert.equal(
+    report.evidence.p66ValidationAggregatorFullImplementationDefinition.closureMissingCriteria.includes(
+      'effective_red_lane_gaps_cleared'
+    ),
+    true
   );
   assert.equal(reader.status, 'explicit_evidence_available');
   assert.equal(reader.sourceMode, 'explicit_safe_inputs_only');

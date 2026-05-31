@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1234 A5-GAP-6_POST_GAP3_AGGREGATION_EVIDENCE`.
+Goal: `CM-1235 VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_MAP`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved in-memory sanitized aggregation over approved `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5` evidence.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test implementation of effective remaining gap closure classification.
 
 Workspace: `A:\codex-memory`.
 
@@ -52,6 +52,7 @@ Changed scope since CM-1207:
 - `docs/CM1232_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_DELTA.md`
 - `docs/CM1233_VALIDATION_AGGREGATOR_NON_BASELINE_GAP_GUARD.md`
 - `docs/CM1234_A5_GAP6_POST_GAP3_AGGREGATION_EVIDENCE.md`
+- `docs/CM1235_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_MAP.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -118,6 +119,11 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1228 executed only `npm run vcp-memory:migration-readiness -- --json`.
 - CM-1228 result: `status=blocked`, `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`, `noMigration=true`, `noSQLiteWrite=true`, `noDiaryWrite=true`, `noImportExportApply=true`, `noRealDbMemoryWrite=true`, `noMcpPublicToolExpansion=true`, `rawWorkspaceIdExposed=false`, `rawSecretExposed=false`.
 - CM-1228 keeps `runtimeReady=false`, `finalRcMatrixReady=false`, `v1RcReady=false`, and `rcReady=false`.
+- CM-1235 classifies effective remaining full-implementation gaps by closure path: local implementation, A5-gated evidence, and Red-lane cutover.
+- CM-1235 adds `effectiveRemainingGapClosureItems`, `effectiveLocalImplementationGapIds/count`, `effectiveA5GatedGapIds/count`, and `effectiveRedLaneGapIds/count`.
+- CM-1235 adds closure criteria and missing criteria for these effective closure buckets.
+- CM-1235 targeted validation passed `22/22`.
+- CM-1235 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - CM-1229 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected future aggregation units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
 - CM-1229 does not execute ValidationAggregator, scan files/stores, call MCP tools, call providers, write durable memory/audit, or claim readiness.
