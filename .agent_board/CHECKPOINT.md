@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1256 No-Token Overview Core Sanitizer Test Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: test/docs-only hardening for no-token `memory_overview` selected projection. No runtime implementation change, provider call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added `tests/memory-overview-no-token-selected-projection.test.js`.
+- The test directly calls `MemoryOverviewService.getNoTokenSelectedOverview(...)` with fake dependency outputs containing raw paths, memory ids, titles, file/source paths, embedding fingerprints, project/client ids, schema DB path metadata, and candidate-cache revision targets.
+- The selected projection is asserted to omit full-overview-only fields including `paths`, `embeddingProfile`, `recentAudit`, `recentFiles`, `memoryLinks`, recall `recent`, raw memory ids, titles, file/source paths, DB paths, and embedding fingerprints.
+- The test asserts no-token selected overview does not call `diaryStore.listRecentFiles(...)`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check tests\memory-overview-no-token-selected-projection.test.js`
+- `node --test tests\memory-overview-no-token-selected-projection.test.js` passed `1/1`.
+- `node --test tests\memory-overview-no-token-selected-projection.test.js tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js` passed `29/29`.
+- Default suite and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1256.
+- Full no-token governance closure, write reliability, recall reliability, and readiness remain unclaimed.
+
 ## CM-1255 No-Token Memory Overview Selected Projection Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

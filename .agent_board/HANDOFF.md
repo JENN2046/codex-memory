@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1255 NO_TOKEN_MEMORY_OVERVIEW_SELECTED_PROJECTION`.
+Goal: `CM-1256 NO_TOKEN_OVERVIEW_CORE_SANITIZER_TEST`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local HTTP runtime boundary source/test implementation of no-token `memory_overview` selected projection.
+Status: `COMPLETED_VALIDATED_NOT_READY` after test/docs-only hardening of the no-token `memory_overview` selected projection core sanitizer boundary.
 
 Workspace: `A:\codex-memory`.
 
@@ -91,15 +91,18 @@ Changed scope since CM-1207:
 - `tests/http-no-token-search-rejection.test.js`
 - `tests/mcp-http.test.js`
 - `docs/CM1255_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_PROJECTION.md`
+- `tests/memory-overview-no-token-selected-projection.test.js`
+- `docs/CM1256_NO_TOKEN_OVERVIEW_CORE_SANITIZER_TEST.md`
 
-Current CM-1255 fact:
+Current CM-1256 fact:
 
 - No-token HTTP JSON-RPC `tools/call` for `memory_overview` now returns `no_token_selected_overview`.
 - The no-token path bypasses full `MemoryOverviewService.getOverview(...)`.
 - Selected output omits paths, embedding fingerprint, recent audit rows, recent files, memory links, recent recall rows, memory ids, titles, file paths, and source files.
 - Bearer-token authorized `memory_overview` still uses full overview.
+- Direct core-level test coverage now verifies `MemoryOverviewService.getNoTokenSelectedOverview(...)` against sensitive fake dependency output and full-overview-only diary recent-file access.
 - No-token `record_memory` and `search_memory` remain blocked.
-- Targeted HTTP/overview validation passed `44/44`; default `npm test` passed `2782/2782`; hardening passed `73/73` plus override evidence `6/6` and fixture-only `gate:ci` PASS.
+- CM-1255 targeted HTTP/overview validation passed `44/44`; CM-1256 core/HTTP regression validation passed `29/29`; default `npm test` passed `2783/2783`; prior hardening passed `73/73` plus override evidence `6/6` and fixture-only `gate:ci` PASS.
 - No provider call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim occurred.
 
 Current CM-1254 fact:
