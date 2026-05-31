@@ -10,6 +10,10 @@ P2 badge correction:
 - CM-1200 supersedes CM-1199's reviewed-object binding. Latest review feedback says the reviewed CM-1185 status-sync commit is `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`; CM-1199's `f1965a3fcd985fb9a1dfb69aeed3d118f492907d`, CM-1198's `UNKNOWN_UNRESOLVABLE_REVIEW_OBJECT`, CM-1197's `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890`, CM-1196's `01774406e93959a00d70d0d38dc408dac5c81bb4`, CM-1195's `3a5a5d88`, CM-1194's `aa78ee6742e556de7b96b84e26949949364776a3`, CM-1193's `1f4705352f8b8d574ddcce44c52cd2c3458a14af`, and CM-1192's `9eb258d8e83504646dba1175c44fc54c20ee9799` must not be used as the reviewed-context sync commit.
 - Current local/GitHub PR #6 facts before this local fix are `HEAD == origin/hardening/p0-p2-security-rc-base == PR #6 head == 1f26d1907c6f865645e92129e05b8d6d1f48498f`, with CI `Node.js tests` passed. Local `git show`, GitHub commits API, and `git ls-remote` cannot resolve `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`. Later operators must treat `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` as review feedback evidence and keep it separate from current Git/PR head before push-readiness or CI decisions.
 
+P3 blocker-scope correction:
+- CM-1201 addresses review feedback on pushed commit `557d17daa0332413f5e347eccd6446b51971b63d`: `557d17d` did not modify `.agent_board/BLOCKERS.md`, but `CMB-0017` is a CM-1185 blocker surface from the original status sync and now appears explicitly in handoff, task, ledger, and validation scope.
+- Future operators must include `.agent_board/BLOCKERS.md` when reviewing or rolling back CM-1185/CM-1200 status-surface work, while still treating `CMB-0017` as `open-status-synced` and preserving `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
 Completed:
 - Updated `STATUS.md` top-level date and current conclusion with CM-1185 review-sync facts.
 - Recorded current branch `hardening/p0-p2-security-rc-base`.
@@ -18,11 +22,13 @@ Completed:
 - Recorded local Node `v24.14.0`.
 - Recorded review evidence: `npm test` passed `2749/2749`; `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`; fixture-only `gate:ci` PASS.
 - Left untracked `CLAUDE.md` untouched and treated its `123/123` baseline as local drift, not authoritative status.
-- Updated `.agent_board` task, validation, ledger, checkpoint, handoff, run-state, and blocker status surfaces.
+- Updated `.agent_board` task, validation, ledger, checkpoint, handoff, run-state, and blocker status surfaces; CM-1201 explicitly includes `.agent_board/BLOCKERS.md` / `CMB-0017` in scope.
 
 Validation:
 - `git status --short --branch` inspected.
 - `git diff --stat` inspected.
+- `git show --name-only 557d17d` and `git diff 557d17d^ 557d17d -- .agent_board/BLOCKERS.md` inspected for the P3 blocker-scope review.
+- `Select-String` confirmed `CMB-0017` is present in `.agent_board/BLOCKERS.md`.
 - `git diff --check` passed.
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
 - Final tracked-scope review confirmed changes are status/board docs only.

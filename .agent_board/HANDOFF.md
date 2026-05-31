@@ -1,22 +1,22 @@
 # HANDOFF.md - codex-memory
 
-## CM-1200 P2 Badge Bind CM-1185 Status To 43FAE77 Handoff
+## CM-1201 P3 Include BLOCKERS In CM-1200 Scope Handoff
 
-Goal: correct tracked status surfaces so CM-1185 reviewed-object binding no longer names CM-1199's unavailable object `f1965a3fcd985fb9a1dfb69aeed3d118f492907d`, and instead records the latest review-supplied commit `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` while separating it from the current PR head.
+Goal: keep CM-1200's reviewed-object binding to `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, and address the follow-up P3 review by explicitly including `.agent_board/BLOCKERS.md` / `CMB-0017` in the handoff, task, ledger, and validation scope for CM-1185/CM-1200 review and rollback decisions.
 
-Status: CM1200_P2_BADGE_BIND_CM1185_STATUS_TO_43FAE77_COMPLETED_VALIDATED_NOT_READY.
+Status: CM1201_P3_INCLUDE_BLOCKERS_IN_CM1200_SCOPE_COMPLETED_VALIDATED_NOT_READY.
 
 Workspace: `A:\codex-memory`.
 
 Branch: `hardening/p0-p2-security-rc-base`.
 
-Git facts: latest review feedback says the reviewed CM-1185 status-sync commit is `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`. Local `git show`, GitHub commits API, and `git ls-remote` cannot resolve `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, so it is recorded as review feedback evidence rather than a local/origin push target. Current local/GitHub PR #6 facts before this local fix are `HEAD == origin/hardening/p0-p2-security-rc-base == PR #6 head == 1f26d1907c6f865645e92129e05b8d6d1f48498f`, and PR #6 `Node.js tests` CI passed. Do not use CM-1199's `f1965a3fcd985fb9a1dfb69aeed3d118f492907d`, CM-1198's `UNKNOWN_UNRESOLVABLE_REVIEW_OBJECT`, CM-1197's `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890`, `01774406e93959a00d70d0d38dc408dac5c81bb4`, `3a5a5d88`, `aa78ee6742e556de7b96b84e26949949364776a3`, CM-1193's `1f4705352f8b8d574ddcce44c52cd2c3458a14af`, CM-1192's `9eb258d8e83504646dba1175c44fc54c20ee9799`, or any earlier superseded object as the current reviewed-context sync commit. `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and were not modified by this fix.
+Git facts: latest reviewed-object feedback still says the reviewed CM-1185 status-sync commit is `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`, with parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`. CM-1201 addresses a later P3 review on pushed commit `557d17daa0332413f5e347eccd6446b51971b63d`: local evidence showed `557d17d` did not change `.agent_board/BLOCKERS.md`, while `CMB-0017` exists from the original CM-1185 status sync. Treat `557d17d` as the reviewed commit for that P3 feedback only; do not treat it as the post-CM-1201 HEAD. After this fix, branch/PR head must be read from fresh Git/GitHub facts. `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and were not modified by this fix.
 
-Changed files: `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`.
+Changed/reviewed files: `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/BLOCKERS.md` (`CMB-0017` blocker surface included for handoff/review/rollback scope).
 
-Current result: status surfaces now record review feedback evidence `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` / parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`, mark `f1965a3fcd985fb9a1dfb69aeed3d118f492907d`, `UNKNOWN_UNRESOLVABLE_REVIEW_OBJECT`, `980c5cb7b2c4e27b3d85d4f0fbbf22e20617f890`, `01774406e93959a00d70d0d38dc408dac5c81bb4`, `3a5a5d88`, and `aa78ee6742e556de7b96b84e26949949364776a3` as superseded evidence, preserve current PR #6 head `1f26d1907c6f865645e92129e05b8d6d1f48498f`, and keep prior review evidence that `npm test` passed `2749/2749`, `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`, and fixture-only `gate:ci` passed. The sync keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+Current result: status surfaces keep CM-1200's review feedback evidence `43fae77745cd0ab2b2c9435647f1a5ef0aec5518` / parent `1abb5a3785af5ac96684fe3d7728eb7027e41a98`, mark `f1965a3fcd985fb9a1dfb69aeed3d118f492907d` and earlier moving objects as superseded, and now explicitly include `.agent_board/BLOCKERS.md` / `CMB-0017` in the CM-1200/CM-1201 audit trail. The sync keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
 
-Validation: git status/diff inspected; PR head and CI inspected with `gh pr view hardening/p0-p2-security-rc-base`; local/GitHub/origin object availability checked for `43fae77745cd0ab2b2c9435647f1a5ef0aec5518`; ledger consistency passed; `git diff --check` passed; docs validation via `scripts/validate-local.ps1 -Area docs` passed; final tracked-scope review confirmed status/board docs only.
+Validation: git status/diff inspected; `git show --name-only 557d17d` and `git diff 557d17d^ 557d17d -- .agent_board/BLOCKERS.md` confirmed the P3 reviewed commit did not change `BLOCKERS.md`; `Select-String` confirmed `CMB-0017`; ledger consistency passed; `git diff --check` passed; docs validation via `scripts/validate-local.ps1 -Area docs` passed; final tracked-scope review confirmed status/board/blocker docs only.
 
 Not validated: full suite rerun, hardening rerun, `gate:mainline`, `gate:mainline:strict`, HTTP observe, provider smoke/benchmark, true memory tools, push-readiness, push.
 
