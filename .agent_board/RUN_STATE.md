@@ -5,9 +5,9 @@
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
 | Branch | main |
-| Last observed HEAD | `abb1a266b4a74915d7242b701782a5ef90511e32` |
-| Last observed remote main | `origin/main = 13922dac462a6d9709160b27f9be6fb5dd4506dc` |
-| Current task | CM-1205 memory index compression |
+| Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
+| Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
+| Current task | CM-1206 post-push Git fact wording correction |
 | Current area | P6-docs-drift |
 | Current route | documentation-surface slimdown -> A5/P66 runtime gap closure -> personal RC dogfood |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -19,12 +19,12 @@
 | Real memory tools by current task | no |
 | Durable memory/audit writes by current task | no |
 | Public MCP expansion by current task | no |
-| Push/tag/release/deploy by current task | no |
+| Push/tag/release/deploy by current task | user-authorized push only; no PR/tag/release/deploy |
 | Readiness/reliability claim by current task | no |
 
 ## Next Safe Action
 
-CM-1205 is validated locally. Decide whether to create a local commit for the docs-surface slimdown follow-up, or review `.agent_board/DECISIONS.md` separately. Do not start runtime gap closure until docs-surface slimdown is accepted and the next exact runtime scope is chosen.
+CM-1206 keeps active status surfaces from self-pinning stale post-commit Git facts. After this docs-only correction is synced, the next safe local task is either reviewing `.agent_board/DECISIONS.md` separately or preparing the first exact runtime gap closure scope. Do not start runtime gap closure until the docs surface is accepted and the next exact runtime scope is chosen.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

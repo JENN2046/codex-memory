@@ -1,17 +1,22 @@
 # CHECKPOINT.md - codex-memory
 
-## CM-1205 Memory Index Compression Checkpoint
+## CM-1206 Post-Push Git Fact Wording Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
 
 Date: 2026-05-31
 
-Purpose: shrink `MEMORY.md` so future operators treat it as a historical memory index, not a current-status source or active handoff ledger.
+Purpose: prevent active status surfaces from treating validation-time `HEAD` / `origin/main` snapshots as current post-commit or post-push truth.
 
 Compressed active files in this docs-surface follow-up:
 
 - `MEMORY.md`
 - `MAINTENANCE_BACKLOG.md`
+
+Current wording rule:
+
+- Do not self-pin latest post-commit SHA in active status surfaces.
+- Use fresh `git status --short --branch` and `git log --oneline --decorate -n 10` before branch-sensitive decisions.
 
 Archive/index:
 
@@ -29,7 +34,7 @@ Validation:
 
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
-- docs validation includes autopilot ledger consistency: latest task / ledger / validation are `CM-1205 / CM-1205 / CMV-1322`
+- docs validation includes autopilot ledger consistency: latest task / ledger / validation are `CM-1206 / CM-1206 / CMV-1323`
 
 Not validated:
 

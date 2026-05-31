@@ -2,7 +2,7 @@
 
 ## Current Handoff
 
-Goal: `CM-1205 MEMORY_INDEX_COMPRESSION`.
+Goal: `CM-1206 POST_PUSH_GIT_FACT_WORDING_CORRECTION`.
 
 Status: `COMPLETED_VALIDATED_NOT_READY` after docs validation.
 
@@ -24,12 +24,8 @@ Current active entrypoints:
 - [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md)
 - [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)
 
-Changed scope for CM-1205:
+Changed scope for CM-1206:
 
-- `MEMORY.md`
-- `MAINTENANCE_BACKLOG.md`
-- `DOCS_GOVERNANCE.md`
-- `README.md`
 - `STATUS.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/CHECKPOINT.md`
@@ -37,18 +33,14 @@ Changed scope for CM-1205:
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/AUTOPILOT_LEDGER.md`
-- `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`
-- `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md`
 
-Current Git facts during CM-1205 local validation:
+Current Git fact rule after CM-1206:
 
-- local `HEAD = abb1a266b4a74915d7242b701782a5ef90511e32`
-- `origin/main = 13922dac462a6d9709160b27f9be6fb5dd4506dc`
-- branch state: `main...origin/main [ahead 1]`
-- tracked worktree contains docs-only CM-1204/CM-1205 changes
+- Active status surfaces must not treat validation-time `HEAD` / `origin/main` snapshots as current truth after commit or push.
+- Current branch state must be checked with fresh Git commands before branch-sensitive decisions.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1205:
+Validation for CM-1206:
 
 - `git diff --check`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -90,4 +82,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Decide whether to commit the docs-surface slimdown follow-up locally, or review `.agent_board/DECISIONS.md` separately. Do not start runtime gap closure until the docs surface is stable and any required exact approval is prepared.
+After user-authorized sync, verify Git status and remote head. Then either review `.agent_board/DECISIONS.md` separately or prepare the first exact runtime gap closure scope. Do not start runtime gap closure until the docs surface is stable and any required exact approval is prepared.

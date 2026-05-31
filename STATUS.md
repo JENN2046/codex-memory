@@ -37,18 +37,26 @@ RC_NOT_READY_BLOCKED
 
 导航规则见 [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md)。文档职责边界见 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)。
 
-## 当前 Git 事实
+## Git 事实使用规则
 
-最近实测事实：
+本文件不再把 post-commit / post-push `HEAD` 或 `origin/main` 当作长期权威事实写死。提交和推送会改变这些值；当前 Git 事实必须以 fresh command output 为准。
+
+CM-1204 / CM-1205 本地验证时的历史快照是：
 
 - 分支：`main`
 - 本地 `HEAD = abb1a266b4a74915d7242b701782a5ef90511e32`
 - `origin/main = 13922dac462a6d9709160b27f9be6fb5dd4506dc`
-- branch state：`main...origin/main [ahead 1]`
-- 当前本地 tracked worktree 有 docs/board 瘦身改动。
-- 未跟踪且未处理：`CLAUDE.md`、`docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
+- 验证时 branch state：`main...origin/main [ahead 1]`
+- 验证时 tracked worktree 有 docs/board 瘦身改动。
 
-这些事实会过期。任何 merge、push、release、runtime gap closure、dogfood、approval packet 或 readiness 判断前，必须重新运行：
+该快照只用于解释 CM-1204 / CM-1205 的验证上下文，不代表读取本文件时的当前分支状态。
+
+仍保持未跟踪且未处理：
+
+- `CLAUDE.md`
+- `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
+
+任何 merge、push、release、runtime gap closure、dogfood、approval packet 或 readiness 判断前，必须重新运行：
 
 ```powershell
 git status --short --branch
@@ -78,7 +86,7 @@ CM-1202 through CM-1205 是 docs-only 状态面瘦身：
 - 不执行 provider/API。
 - 不调用真实 `record_memory` / `search_memory` / `memory_overview`。
 - 不关闭 runtime gaps。
-- 不 push / PR / tag / release / deploy。
+- 不把 push / PR / tag / release / deploy 当作 docs 证据或 readiness 证据；remote sync 只在用户明确授权下执行。
 - 不声明 readiness 或 reliability。
 
 ## 当前分支清理事实
