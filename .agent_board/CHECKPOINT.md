@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1208 A5-GAP-5 Strict Gate Checkpoint
+
+Status: `BLOCKED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: user-approved `A5-GAP-5` for `main@f81c6fa13ee4466115b8c2cabb88a5e5a6c794ce`, running `npm run gate:mainline:strict` only, no remote write.
+
+Result:
+
+- Fresh preflight matched branch `main` and commit `f81c6fa13ee4466115b8c2cabb88a5e5a6c794ce`.
+- `npm run gate:mainline:strict` failed in the test stage.
+- Gate sub-results before failure: health ok, contract ok, compare ok, rollback ok.
+- Diagnostic `npm test` failed `2753/2754`.
+- Failing assertion: `tests\autopilot-closed-loop-dry-run-cli.test.js` expected `blocked_red_count >= 1`.
+- Root cause: CM-1203 compressed `.agent_board/AUTOPILOT_LEDGER.md` from a parseable `## Blocked Red Lane Items` list into a single anchor sentence, so the dry-run parser returned `blocked_red_count = 0`.
+
+Local repair:
+
+- Restored the parseable `## Blocked Red Lane Items` list in `.agent_board/AUTOPILOT_LEDGER.md`.
+- Targeted validation passed: `node --test .\tests\autopilot-closed-loop-dry-run-cli.test.js` passed `8/8`.
+
+Boundary:
+
+- This checkpoint does not claim A5 closure or strict-gate pass.
+- No source/runtime/test/package/config/env/provider/real-memory change.
+- No remote write, push, PR, tag, release, deploy, readiness, write reliability, or recall reliability claim.
+- Any strict-gate rerun needs a fresh exact A5 approval after the marker repair is stabilized or the current worktree state is explicitly accepted.
+
 ## CM-1207 Runtime Gap Scope Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

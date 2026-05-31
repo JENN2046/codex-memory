@@ -23,7 +23,9 @@ RC_NOT_READY_BLOCKED
 2. 再逐个做 A5 / P66 runtime gap closure。
 3. 最后做 personal RC dogfood。
 
-当前任务是 `CM-1207 RUNTIME_GAP_SCOPE_PREFLIGHT`：文档面瘦身已完成到可转入 runtime gap scope 选择；`.agent_board/DECISIONS.md` 保留为长期决策 ledger，不继续压缩。下一步只准备 A5 exact approval，不执行 runtime。
+当前任务是 `CM-1208 A5-GAP-5_STRICT_GATE_PREFLIGHT`：用户已精确授权在 `main@f81c6fa13ee4466115b8c2cabb88a5e5a6c794ce` 运行 `npm run gate:mainline:strict`，且无 remote write。该 strict gate 已执行但未通过：health / contract / compare / rollback 阶段通过，test 阶段失败。诊断显示失败来自 CM-1203 文档面压缩后 `.agent_board/AUTOPILOT_LEDGER.md` 缺少可解析的 `## Blocked Red Lane Items` 列表，导致 `blocked_red_count` 为 0。
+
+当前本地后续处理只恢复了该可解析 Red Lane 列表，并通过针对性 `node --test .\tests\autopilot-closed-loop-dry-run-cli.test.js`。这不是 A5 strict gate 通过证据；如要重新运行 `npm run gate:mainline:strict`，需要先稳定/提交该 docs-marker 修复或确认新的工作树状态，然后用新的 fresh `HEAD` 重新给出 exact A5 approval。
 
 ## 当前权威入口
 
