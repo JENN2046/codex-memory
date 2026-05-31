@@ -60,6 +60,40 @@ function normalizeStatusArray(statuses) {
     .filter(Boolean))];
 }
 
+function normalizeNumber(value) {
+  const number = Number(value || 0);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function buildNormalizedPolicyAudit(policyAudit = null) {
+  const safeAudit = policyAudit && typeof policyAudit === 'object' ? policyAudit : {};
+
+  return {
+    readPolicyApplied: !!firstDefinedValue(safeAudit.readPolicyApplied, safeAudit.read_policy_applied),
+    lifecyclePolicyApplied: !!firstDefinedValue(safeAudit.lifecyclePolicyApplied, safeAudit.lifecycle_policy_applied),
+    lifecycleIncludedStatuses: normalizeStatusArray(firstDefinedValue(
+      safeAudit.lifecycleIncludedStatuses,
+      safeAudit.lifecycle_included_statuses
+    )),
+    lifecycleExcludedStatuses: normalizeStatusArray(firstDefinedValue(
+      safeAudit.lifecycleExcludedStatuses,
+      safeAudit.lifecycle_excluded_statuses
+    )),
+    hiddenByLifecycleCount: normalizeNumber(firstDefinedValue(
+      safeAudit.hiddenByLifecycleCount,
+      safeAudit.hidden_by_lifecycle_count
+    )),
+    staleResultCount: normalizeNumber(firstDefinedValue(
+      safeAudit.staleResultCount,
+      safeAudit.stale_result_count
+    )),
+    lifecycleColumnAvailable: !!firstDefinedValue(
+      safeAudit.lifecycleColumnAvailable,
+      safeAudit.lifecycle_column_available
+    )
+  };
+}
+
 class RecallAuditService {
   constructor({ auditLogStore, config = null }) {
     this.auditLogStore = auditLogStore;
@@ -90,6 +124,7 @@ class RecallAuditService {
     } = options;
     const safeResults = filterRecallIsolatedItems(Array.isArray(results) ? results.filter(Boolean) : []);
     const normalizedScopeAudit = buildNormalizedScopeAudit(scopeAudit);
+    const normalizedPolicyAudit = buildNormalizedPolicyAudit(policyAudit);
     const { scopeApplied } = normalizedScopeAudit;
 
     return {
@@ -109,13 +144,13 @@ class RecallAuditService {
       scopeClientId: scopeApplied ? (normalizedScopeAudit.scopeClientId || null) : null,
       scopeVisibility: normalizedScopeAudit.scopeVisibility,
       scopeWorkspacePresent: normalizedScopeAudit.scopeWorkspacePresent,
-      readPolicyApplied: !!policyAudit.readPolicyApplied,
-      lifecyclePolicyApplied: !!policyAudit.lifecyclePolicyApplied,
-      lifecycleIncludedStatuses: normalizeStatusArray(policyAudit.lifecycleIncludedStatuses),
-      lifecycleExcludedStatuses: normalizeStatusArray(policyAudit.lifecycleExcludedStatuses),
-      hiddenByLifecycleCount: Number(policyAudit.hiddenByLifecycleCount || 0),
-      staleResultCount: Number(policyAudit.staleResultCount || 0),
-      lifecycleColumnAvailable: !!policyAudit.lifecycleColumnAvailable,
+      readPolicyApplied: normalizedPolicyAudit.readPolicyApplied,
+      lifecyclePolicyApplied: normalizedPolicyAudit.lifecyclePolicyApplied,
+      lifecycleIncludedStatuses: normalizedPolicyAudit.lifecycleIncludedStatuses,
+      lifecycleExcludedStatuses: normalizedPolicyAudit.lifecycleExcludedStatuses,
+      hiddenByLifecycleCount: normalizedPolicyAudit.hiddenByLifecycleCount,
+      staleResultCount: normalizedPolicyAudit.staleResultCount,
+      lifecycleColumnAvailable: normalizedPolicyAudit.lifecycleColumnAvailable,
       source
     };
   }

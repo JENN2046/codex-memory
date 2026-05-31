@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1294 RECALL_AUDIT_SCOPE_FIELD_FALLBACK_NORMALIZATION`.
+Goal: `CM-1295 READ_POLICY_AUDIT_FIELD_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall audit scope field fallback normalization and validating observe/read-policy compatibility.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing read-policy audit metadata fallback normalization and validating observe/governance-report compatibility.
 
 Workspace: `A:\codex-memory`.
 
@@ -123,6 +123,7 @@ Changed scope since CM-1207:
 - `src/recall/RecallAuditService.js`
 - `tests/recall-audit-service.test.js`
 - `docs/CM1294_RECALL_AUDIT_SCOPE_FIELD_FALLBACK_NORMALIZATION.md`
+- `docs/CM1295_READ_POLICY_AUDIT_FIELD_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

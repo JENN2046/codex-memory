@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1295 Read-Policy Audit Field Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test read-policy recall audit metadata fallback normalization hardening. No live recall, provider call, MCP external call, broad real-memory scan, durable audit write outside test fixtures, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `RecallAuditService` now normalizes read-policy `policyAudit` metadata across camel/snake-case aliases.
+- Covered fields include read/lifecycle policy applied flags, included/excluded lifecycle statuses, hidden/stale counts, and lifecycle column availability.
+- Observe and governance-report output shape remains unchanged.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\recall\RecallAuditService.js`
+- `node --check tests\recall-audit-service.test.js`
+- `node --test tests\recall-audit-service.test.js tests\lifecycle-read-policy-runtime.test.js tests\http-observe-cli.test.js tests\governance-report-cli.test.js` passed `50/50`.
+- `npm test` passed `2819/2819`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1295.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1294 Recall Audit Scope Field Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

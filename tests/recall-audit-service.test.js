@@ -71,8 +71,13 @@ test('read policy recall audit normalizes snake-case scope audit fields', async 
       scope_workspace_present: false
     },
     policyAudit: {
-      readPolicyApplied: true,
-      lifecyclePolicyApplied: true
+      read_policy_applied: true,
+      lifecycle_policy_applied: true,
+      lifecycle_included_statuses: ['active', 'active', 'proposal'],
+      lifecycle_excluded_statuses: ['tombstoned', 'superseded'],
+      hidden_by_lifecycle_count: 2,
+      stale_result_count: 1,
+      lifecycle_column_available: true
     }
   });
 
@@ -87,4 +92,9 @@ test('read policy recall audit normalizes snake-case scope audit fields', async 
   assert.equal(entry.scopeWorkspacePresent, false);
   assert.equal(entry.readPolicyApplied, true);
   assert.equal(entry.lifecyclePolicyApplied, true);
+  assert.deepEqual(entry.lifecycleIncludedStatuses, ['active', 'proposal']);
+  assert.deepEqual(entry.lifecycleExcludedStatuses, ['tombstoned', 'superseded']);
+  assert.equal(entry.hiddenByLifecycleCount, 2);
+  assert.equal(entry.staleResultCount, 1);
+  assert.equal(entry.lifecycleColumnAvailable, true);
 });
