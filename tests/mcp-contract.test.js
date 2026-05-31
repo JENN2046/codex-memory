@@ -168,6 +168,21 @@ test('MCP schema contract should expose scope fields in record_memory', async ()
   });
 });
 
+test('MCP schema contract should describe memory_overview no-token selected projection', async () => {
+  await withApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const list = await server.handleJsonRpc({
+      jsonrpc: '2.0', id: 1, method: 'tools/list', params: {}
+    });
+    const tools = list.response.result.tools;
+    const memoryOverview = tools.find(t => t.name === 'memory_overview');
+    assert.ok(memoryOverview);
+    assert.match(memoryOverview.description, /HTTP no-token calls return only a selected low-disclosure overview projection/);
+    assert.match(memoryOverview.description, /bearer-token calls return the full overview/);
+    assert.equal(memoryOverview.inputSchema.additionalProperties, false);
+  });
+});
+
 test('MCP runtime schema validation should reject unknown fields with -32602', async () => {
   await withApp(async ({ app }) => {
     const server = new CodexMemoryMcpServer({ app });

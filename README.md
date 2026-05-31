@@ -61,9 +61,10 @@ Red Lane 仍硬停止：push、PR、tag、release、deploy、secret、destructiv
 
 ### HTTP no-token 限制
 
-HTTP MCP 入口默认拒绝无 bearer token 的 `search_memory`、`record_memory`、`memory_overview` 三大 MCP 工具调用。仅允许 `tools/list`、`initialize`、`ping` 等非记忆操作。
+HTTP MCP 入口默认拒绝无 bearer token 的 `search_memory`、`record_memory` 写/读调用；`memory_overview` 在无 token 时只返回 selected low-disclosure overview projection。`tools/list`、`initialize`、`ping` 等非记忆操作仍允许无 token loopback 调用。
 
 - 即使 `include_content=false`，`search_memory` 也必须 bearer token
+- 无 token `memory_overview` 不返回 full overview，只返回 `access.mode=no_token_selected_overview` / `selectedProjectionVersion=1` 的低披露健康摘要
 - 推荐配置 `CODEX_MEMORY_HTTP_TOKEN`，生产环境不得使用无 token 模式
 - 无 token loopback 仅用于本地开发，详见 `.env.example`
 
@@ -769,7 +770,7 @@ npm run rollback:mainline:plan -- --json --legacy-command "C:\Program Files\node
 
 - `record_memory`：走 Codex bridge 约束，写入 diary、shadow store、向量索引和审计日志
 - `search_memory`：兼容 process / knowledge / both 检索，支持 `include_content`
-- `memory_overview`：返回写入审计、召回审计、shadow/index 健康与最近活动概览
+- `memory_overview`：bearer-token 路径返回写入审计、召回审计、shadow/index 健康与最近活动概览；HTTP no-token 路径仅返回 selected low-disclosure overview projection
 
 ## Provider Smoke CLI
 

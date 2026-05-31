@@ -7,14 +7,14 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1260 no-token memory_overview HTTP selected projection contract allowlist added |
+| Current task | CM-1261 memory_overview schema description sync added |
 | Current area | P4-http-runtime / P0-mainline-health |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
 | Untracked files left untouched | `CLAUDE.md`; `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` |
-| Runtime/source touched by current task | no |
+| Runtime/source touched by current task | `src/core/constants.js` metadata only |
 | Provider/API calls by current task | no |
 | Real memory tools by current task | no |
 | Durable memory/audit writes by current task | no |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1260 adds explicit allowlist assertions at the HTTP JSON-RPC boundary for no-token `memory_overview` selected projection output keys so Codex/Claude clients and audit surfaces have a regression guard on the actual client-visible response shape. Runtime behavior remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1260.
+CM-1261 updates the client-visible `memory_overview` `tools/list` description and README so Codex/Claude clients see the current no-token selected projection versus bearer-token full overview behavior. Runtime execution path remains unchanged. It does not call providers, scan real memory, write durable memory/audit, change config/watchdog/startup, or claim readiness. Next safe action is final default/docs/ledger/diff validation, then commit or otherwise stabilize CM-1261.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

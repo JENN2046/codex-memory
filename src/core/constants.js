@@ -87,7 +87,7 @@ const TOOL_DEFINITIONS = [
   {
     name: 'memory_overview',
     title: 'Codex Memory Overview',
-    description: 'Operational overview of memory writes, recall activity, recent files, shadow sync, and adaptive profile.',
+    description: 'Operational overview of memory writes, recall activity, recent files, shadow sync, and adaptive profile. HTTP no-token calls return only a selected low-disclosure overview projection; bearer-token calls return the full overview.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

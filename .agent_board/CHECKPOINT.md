@@ -1942,6 +1942,55 @@ Boundary:
 - No public MCP expansion.
 - No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim.
 
+## CM-1261 Memory Overview Schema Description Sync Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Purpose: align client-visible `memory_overview` tool metadata and README with the current no-token selected projection behavior.
+
+Changed:
+
+- `src/core/constants.js`
+- `tests/mcp-contract.test.js`
+- `README.md`
+- `docs/CM1261_MEMORY_OVERVIEW_SCHEMA_DESCRIPTION_SYNC.md`
+- `STATUS.md`
+- `.agent_board/TASK_QUEUE.md`
+- `.agent_board/VALIDATION_LOG.md`
+- `.agent_board/AUTOPILOT_LEDGER.md`
+- `.agent_board/RUN_STATE.md`
+- `.agent_board/CHECKPOINT.md`
+- `.agent_board/HANDOFF.md`
+
+Result:
+
+- `memory_overview.description` now states that HTTP no-token calls return only selected low-disclosure overview projection and bearer-token calls return the full overview.
+- MCP `tools/list` contract test now locks that description.
+- README no-token behavior no longer says `memory_overview` is rejected without token.
+- No runtime execution path change.
+
+Validation:
+
+- `node --check src\core\constants.js`
+- `node --check tests\mcp-contract.test.js`
+- `node --test tests\mcp-contract.test.js tests\http-no-token-search-rejection.test.js tests\mcp-http.test.js`
+- `npm test`
+- `git diff --check`
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Boundary:
+
+- No provider/API call.
+- No MCP external call.
+- No real-memory scan.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, readiness, write reliability, or recall reliability claim.
+
 ## CM-1260 No-Token Overview HTTP Contract Allowlist Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
