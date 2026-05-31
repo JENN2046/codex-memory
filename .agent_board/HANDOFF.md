@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1275 SOFT_READ_CONTEXT_CLIENT_PRECEDENCE_REGRESSION`.
+Goal: `CM-1276 EXECUTION_CONTEXT_SCOPE_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after adding a test-only regression for soft-read execution-context client id precedence.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing execution-context paired scope normalization and validating the fallback behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -49,6 +49,7 @@ Changed scope since CM-1207:
 - `docs/CM1273_POLICY_PREFLIGHT_FIXTURE_BASELINE_OWNERLESS_PRIVATE.md`
 - `docs/CM1274_WRITE_SCOPE_CONTEXT_PRECEDENCE_REGRESSION.md`
 - `docs/CM1275_SOFT_READ_CONTEXT_CLIENT_PRECEDENCE_REGRESSION.md`
+- `docs/CM1276_EXECUTION_CONTEXT_SCOPE_FALLBACK_NORMALIZATION.md`
 - `docs/CM1264_SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING.md`
 - `tests/memory-lifecycle-scope-runtime-integration.test.js`
 - `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`

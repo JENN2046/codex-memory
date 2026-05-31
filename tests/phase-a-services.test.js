@@ -112,6 +112,50 @@ test('record_memory should not accept payload-supplied execution context', async
   });
 });
 
+test('execution context resolver falls through blank camel-case scope to snake-case scope', async () => {
+  await withApp(async ({ app }) => {
+    const result = await app.callTool('record_memory', {
+      target: 'process',
+      title: 'Checkpoint: blank camel scope fallback',
+      content: [
+        'Checkpoint: execution context resolver must not let blank camel-case scope mask snake-case scope.',
+        'Boundary: local fixture only; no provider, no readiness claim.'
+      ].join('\n'),
+      evidence: 'phase-a blank camel scope fallback regression',
+      validated: true,
+      reusable: false,
+      sensitivity: 'none'
+    }, {
+      executionContext: {
+        agentAlias: 'Codex',
+        agentId: 'codex-desktop',
+        requestSource: 'phase-a-blank-camel-scope-test',
+        projectId: '   ',
+        project_id: 'snake-project',
+        workspaceId: '   ',
+        workspace_id: 'snake-workspace',
+        clientId: '   ',
+        client_id: 'claude',
+        taskId: '   ',
+        task_id: 'CM-BLANK-CAMEL',
+        conversationId: '   ',
+        conversation_id: 'snake-conversation',
+        retentionPolicy: '   ',
+        retention_policy: 'snake-retention'
+      }
+    });
+
+    assert.equal(result.decision, 'accepted');
+    const stored = await app.stores.shadowStore.getRecord(result.memoryId);
+    assert.equal(stored.projectId, 'snake-project');
+    assert.equal(stored.workspaceId, 'snake-workspace');
+    assert.equal(stored.clientId, 'claude');
+    assert.equal(stored.taskId, 'CM-BLANK-CAMEL');
+    assert.equal(stored.conversationId, 'snake-conversation');
+    assert.equal(stored.retentionPolicy, 'snake-retention');
+  });
+});
+
 test('shadow write failure should degrade but not reject after diary write', async () => {
   await withApp(async ({ app }) => {
     const originalUpsert = app.stores.shadowStore.upsertRecord.bind(app.stores.shadowStore);

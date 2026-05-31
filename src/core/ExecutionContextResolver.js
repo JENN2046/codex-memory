@@ -13,15 +13,15 @@ class ExecutionContextResolver {
       agentAlias: this.normalizeString(context.agentAlias) || null,
       agentId: this.normalizeString(context.agentId) || this.config.defaultAgentId,
       requestSource: this.normalizeString(context.requestSource) || this.config.defaultRequestSource,
-      userId: this.normalizeString(context.userId || context.user_id) || null,
-      projectId: this.normalizeString(context.projectId || context.project_id) || null,
-      workspaceId: this.normalizeString(context.workspaceId || context.workspace_id) || null,
-      clientId: this.normalizeString(context.clientId || context.client_id) || null,
-      taskId: this.normalizeString(context.taskId || context.task_id) || null,
-      conversationId: this.normalizeString(context.conversationId || context.conversation_id) || null,
+      userId: this.firstNormalizedString(context.userId, context.user_id) || null,
+      projectId: this.firstNormalizedString(context.projectId, context.project_id) || null,
+      workspaceId: this.firstNormalizedString(context.workspaceId, context.workspace_id) || null,
+      clientId: this.firstNormalizedString(context.clientId, context.client_id) || null,
+      taskId: this.firstNormalizedString(context.taskId, context.task_id) || null,
+      conversationId: this.firstNormalizedString(context.conversationId, context.conversation_id) || null,
       folder: this.normalizeString(context.folder) || null,
       visibility: this.normalizeString(context.visibility) || null,
-      retentionPolicy: this.normalizeString(context.retentionPolicy || context.retention_policy) || null
+      retentionPolicy: this.firstNormalizedString(context.retentionPolicy, context.retention_policy) || null
     };
   }
 
@@ -31,6 +31,16 @@ class ExecutionContextResolver {
 
   normalizeString(value) {
     return typeof value === 'string' ? value.trim() : '';
+  }
+
+  firstNormalizedString(...values) {
+    for (const value of values) {
+      const normalized = this.normalizeString(value);
+      if (normalized) {
+        return normalized;
+      }
+    }
+    return '';
   }
 }
 

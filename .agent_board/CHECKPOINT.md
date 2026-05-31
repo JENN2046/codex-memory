@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1276 Execution Context Scope Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test scope normalization hardening for execution context paired fields. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ExecutionContextResolver` now uses the first non-empty normalized value across paired camel-case and snake-case scope fields.
+- Blank camel-case fields no longer mask valid snake-case fallbacks for user/project/workspace/client/task/conversation/retention scope.
+- Added app-level regression proving blank `clientId` falls through to `client_id=claude` and persists expected shadow scope.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ExecutionContextResolver.js`
+- `node --check tests\phase-a-services.test.js`
+- `node --test tests\phase-a-services.test.js tests\memory-write-preflight-runtime-integration.test.js tests\policy-read-preflight.test.js` passed `28/28`.
+- `npm test` passed `2796/2796`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1276.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1275 Soft Read Context Client Precedence Regression Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
