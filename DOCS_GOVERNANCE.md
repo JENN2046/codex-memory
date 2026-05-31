@@ -1,6 +1,6 @@
 # Docs Governance
 
-更新时间：2026-05-08
+更新时间：2026-05-31
 
 ## 目的
 
@@ -8,19 +8,39 @@
 
 这份文档规定各文档的职责边界，避免 README、STATUS、PHASE_NAVIGATION、checkpoint index 和 `.agent_board` 互相争抢事实源。
 
+## 当前瘦身路线
+
+当前文档治理的优先级是先收束状态入口，再处理 runtime gap，最后进入 personal RC dogfood。
+
+第一阶段只做文档面瘦身：
+
+- 不改 runtime 行为。
+- 不扩展 public MCP tools。
+- 不声明 readiness、write reliability 或 recall reliability。
+- 不新增并行的 root/current-state 状态源。
+- 不把历史 CM/Pxx 审查流水继续复制到多个文件。
+
+瘦身后的恢复路径应尽量只依赖少数入口：
+
+1. [README.md](/A:/codex-memory/README.md)：操作地图和能力/命令入口。
+2. [STATUS.md](/A:/codex-memory/STATUS.md)：当前事实摘要，不承载完整历史。
+3. [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)：当前后续路线。
+4. [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) 与 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)：当前任务和验证 ledger。
+
 ## 事实源分工
 
 | 文件 | 职责 | 更新频率 |
 |---|---|---|
 | [README.md](/A:/codex-memory/README.md) | operation map：能力入口、架构入口、命令入口、接入入口 | 低频 |
 | [STATUS.md](/A:/codex-memory/STATUS.md) | 当前事实状态：主线可用性、最新基线、关键能力摘要 | 中频 |
-| [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md) | 维护期唯一任务队列 | 每批任务 |
+| [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md) | 当前后续路线和阶段顺序，不承担详细任务队列 | 低频 |
+| [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) | 当前 active/local task queue | 每批任务 |
 | [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md) | 本地验证 ledger 和 board-only gate 记录 | 每批验证 |
+| [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md) | 维护期候选任务池，不替代当前 active task queue | 中频 |
 | [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md) | Phase D/E 历史运行记录索引和 checkpoint 历史 | 低频 |
 | [PHASE_NAVIGATION.md](/A:/codex-memory/PHASE_NAVIGATION.md) | 只做导航，不承载实时状态正文 | 低频 |
 | [MEMORY.md](/A:/codex-memory/MEMORY.md) | 恢复状态和跨会话 handoff 摘要 | 中频 |
 | [PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md) | 主项目收官记录，默认冻结 | 极低频 |
-| [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md) | 薄版下一阶段方向，不承担详细任务队列 | 低频 |
 
 ## README 规则
 
@@ -57,6 +77,8 @@ STATUS 应该说明：
 - 下一阶段入口
 
 STATUS 不应该重复整条 Phase D/E 历史。历史细节进入 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)。
+
+如果 STATUS 已经存在长历史，后续瘦身应只保留当前摘要，把历史 CM/Pxx 链接移入归档或索引；不要再在 README、PHASE_NAVIGATION、`.agent_board/HANDOFF.md` 中复制同一段状态正文。
 
 ## Maintenance Backlog 规则
 

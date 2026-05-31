@@ -1,10 +1,32 @@
 # codex-memory Next Phase Plan
 
-更新时间：2026-05-19
+更新时间：2026-05-31
 
 ## Purpose
 
 This active plan is the short routing document for the current post-P66 local-safe project-operator work. The full pre-compression plan is archived at [docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md](/A:/codex-memory/docs/archive/CODEX_MEMORY_NEXT_PHASE_PLAN_FULL_PRE_CM0302.md).
+
+## Current Official Route
+
+The next project route is fixed in this order:
+
+1. First execute the existing documentation-surface slimdown plan.
+   - This is the current highest-priority work.
+   - Goal: reduce the project to a small number of authoritative status entrypoints.
+   - Boundary: do not touch runtime behavior, do not expand public MCP tools, and do not claim readiness.
+
+2. Then do runtime gap closure.
+   - Close A5 / P66 runtime gaps one by one.
+   - Move from fixture-only evidence toward true runtime evidence.
+   - Each runtime or A5 action still requires the exact approval and evidence boundary required by the project rules.
+
+3. Finally do personal RC dogfood.
+   - Codex/Claude MCP connection.
+   - Minimal true end-to-end memory loop.
+   - Observe, rollback, audit, and repair based on real use.
+   - This is personal dogfood first, not public release, production readiness, or `RC_READY`.
+
+Until the documentation-surface slimdown is complete, this document is the routing authority for next-phase order. The detailed P66/A5 sections below are retained as historical context and constraint inventory; they are not the current execution order.
 
 ## Current Direction
 

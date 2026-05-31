@@ -1,22 +1,19 @@
 # Phase Navigation
 
-更新时间：2026-05-08
+更新时间：2026-05-31
 
 ## 先看哪里
 
-如果你刚回到项目，推荐按这个顺序恢复上下文：
+如果你刚回到项目，先用这条瘦身后的恢复路径：
 
-1. 当前状态：[STATUS.md](/A:/codex-memory/STATUS.md)
-2. 项目收官：[PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
-3. 阶段结论：[PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
-4. Phase E 收官：[PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
-5. 维护期 backlog：[MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
-6. 文档治理规则：[DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
-7. 下一阶段薄版计划：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
-8. `gate:ci` fixture-only 设计：[GATE_CI_FIXTURE_ONLY_DESIGN.md](/A:/codex-memory/GATE_CI_FIXTURE_ONLY_DESIGN.md)
-9. Claude MCP 最小验收：[CLAUDE_MCP_ACCEPTANCE.md](/A:/codex-memory/CLAUDE_MCP_ACCEPTANCE.md)
-10. 当前记忆：[MEMORY.md](/A:/codex-memory/MEMORY.md)
-11. Phase E 历史 backlog：[PHASE_E_BACKLOG.md](/A:/codex-memory/PHASE_E_BACKLOG.md)
+1. 操作地图：[README.md](/A:/codex-memory/README.md)
+2. 当前事实：[STATUS.md](/A:/codex-memory/STATUS.md)
+3. 后续路线：[CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
+4. 当前任务与验证：[.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) / [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)
+
+文档职责边界见：[DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)。
+
+历史 Phase D/E、checkpoint、灰度、suite 扩容和旧 CM/Pxx 证据默认按索引查，不作为恢复上下文的第一跳。
 
 ## 想确认“主链是否已经收官”
 
@@ -83,9 +80,8 @@
 
 最省事的一条路径是：
 
-1. 看 [STATUS.md](/A:/codex-memory/STATUS.md)
-2. 看 [PROJECT_CLOSURE.md](/A:/codex-memory/PROJECT_CLOSURE.md)
-3. 看 [PHASE_E_SUMMARY.md](/A:/codex-memory/PHASE_E_SUMMARY.md)
-4. 看 [PHASE_E_FINAL_CLOSEOUT.md](/A:/codex-memory/PHASE_E_FINAL_CLOSEOUT.md)
-5. 如果要继续做事，再看 [MAINTENANCE_BACKLOG.md](/A:/codex-memory/MAINTENANCE_BACKLOG.md)
-6. 如果要改文档入口，先看 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
+1. 看 [README.md](/A:/codex-memory/README.md)
+2. 看 [STATUS.md](/A:/codex-memory/STATUS.md)
+3. 看 [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)
+4. 看 [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) 和 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)
+5. 如果要改文档入口，先看 [DOCS_GOVERNANCE.md](/A:/codex-memory/DOCS_GOVERNANCE.md)
