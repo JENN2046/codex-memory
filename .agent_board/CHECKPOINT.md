@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1220 A5-GAP-6 Post-Recall-Isolation Aggregation Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: exact-approved `A5-GAP-6` for `main@57116c99ae430e8d883c73dbd871a3e68cc48e3e`, using only evidence from approved units `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5`.
+
+Result:
+
+- Fresh preflight matched branch `main`, commit `57116c99ae430e8d883c73dbd871a3e68cc48e3e`, and selected unit list.
+- In-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })` accepted the sanitized runtime evidence summary.
+- Aggregator result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `runtimeEvidenceSummaryLocallyEvidencedGapCount=4`, `runtimeEvidenceSummaryRemainingGapCount=3`, `commandsExecutedByAggregator=false`.
+- Historical `A5-GAP-3` artifacts were not consumed.
+
+Boundary:
+
+- No file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1220 evidence.
+- Then choose the next exact-approved runtime gap. Current remaining set: migration/import/export/backup/restore approval execution, ValidationAggregator full implementation, and RC cutover/personal dogfood.
+
 ## CM-1219 A5-GAP-6 Post-Recall-Isolation Aggregation Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

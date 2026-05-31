@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1219 A5-GAP-6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT`.
+Goal: `CM-1220 A5-GAP-6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the next aggregation approval boundary.
+Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved aggregation refresh.
 
 Workspace: `A:\codex-memory`.
 
@@ -35,6 +35,7 @@ Changed scope since CM-1207:
 - `.agent_board/AUTOPILOT_LEDGER.md`
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
+- `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -75,10 +76,14 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1219 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected default future aggregation units are `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5`.
 - Historical `A5-GAP-3` artifacts are background only unless a future exact approval line explicitly names them.
+- User approved `A5-GAP-6` for `main@57116c99ae430e8d883c73dbd871a3e68cc48e3e`, using only evidence from approved units `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5`.
+- CM-1220 executed the in-memory sanitized aggregation refresh. Result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, accepted summary, locally evidenced gaps `4`, remaining gaps `3`, `commandsExecutedByAggregator=false`.
+- Historical `A5-GAP-3` artifacts were not consumed by CM-1220.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1219:
+Validation for CM-1220:
 
+- in-memory `buildV1RcValidationAggregatorReport`
 - `git diff --check`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -94,7 +99,6 @@ Not validated:
 - true `search_memory`
 - true `memory_overview`
 - broad ValidationAggregator full implementation
-- runtime gap closure
 - personal RC dogfood
 
 Boundary:
@@ -119,4 +123,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1219 preflight, then use fresh `HEAD` for exact A5-GAP-6 approval: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5.` Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1220 evidence, then choose the next exact-approved runtime gap. Current remaining set is migration/import/export/backup/restore approval execution, ValidationAggregator full implementation, and RC cutover/personal dogfood. Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
