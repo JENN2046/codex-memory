@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1248 A5_GAP6_POST_TEMPLATE_GUARD_AGGREGATION_EVIDENCE`.
+Goal: `CM-1249 SQLITE_SCHEMA_STARTUP_HARD_GATE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved in-memory A5-GAP-6 evidence aggregation over approved sanitized A5-GAP-1..5 evidence.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test implementation of the SQLite schema startup hard gate.
 
 Workspace: `A:\codex-memory`.
 
@@ -74,6 +74,18 @@ Changed scope since CM-1207:
 - `docs/CM1246_A5_GAP6_TEMPLATE_UNIT_GUARD.md`
 - `docs/CM1247_A5_GAP6_TEMPLATE_SELF_CHECK.md`
 - `docs/CM1248_A5_GAP6_POST_TEMPLATE_GUARD_AGGREGATION_EVIDENCE.md`
+- `src/storage/SqliteShadowStore.js`
+- `tests/sqlite-schema-startup-gate.test.js`
+- `docs/CM1249_SQLITE_SCHEMA_STARTUP_HARD_GATE.md`
+
+Current CM-1249 fact:
+
+- CM-1249 implements the minimal SQLite schema startup hard gate planned by CM-1180.
+- `SqliteShadowStore.ensureReady()` now initializes `codex_memory_schema_meta/sqlite_schema_version=1`.
+- Invalid schema metadata and unknown future schema versions fail closed before ordinary runtime tables are initialized.
+- `getHealth()` exposes sanitized `schemaStartupGate`.
+- Targeted schema tests passed `3/3`; adjacent storage/restart/startup/no-touch tests passed `37/37`; default `npm test` passed `2780/2780`.
+- No watchdog/startup install, config change, service start, provider/MCP call, real-memory scan, migration/apply, remote action, or readiness claim occurred.
 
 Current CM-1248 fact:
 

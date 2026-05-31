@@ -1,5 +1,35 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1249 SQLite Schema Startup Hard Gate Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local runtime storage source/test change only. No config/watchdog/startup install, service start, provider call, MCP call, real-memory scan, migration/import/export/backup/restore apply, remote action, cutover, readiness claim, or reliability claim.
+
+Result:
+
+- Added internal SQLite schema metadata gate to `SqliteShadowStore.ensureReady()`.
+- New SQLite shadow DBs initialize `codex_memory_schema_meta/sqlite_schema_version=1`.
+- Current schema version proceeds.
+- Invalid schema metadata and unknown future schema versions fail closed with `SQLITE_SCHEMA_STARTUP_GATE_BLOCKED`.
+- Unknown future schema blocks before ordinary runtime tables are initialized.
+- `getHealth()` exposes sanitized `schemaStartupGate`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\storage\SqliteShadowStore.js`
+- `node --test tests\sqlite-schema-startup-gate.test.js` passed `3/3`.
+- `node --test tests\storage-corruption-quarantine.test.js tests\memory-write-restart-durability-temp-local-evidence.test.js tests\memory-write-reconcile-startup-safety-policy.test.js tests\no-touch-boundary-regression.test.js` passed `37/37`.
+- `npm test` passed `2780/2780`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1249.
+- Future startup recovery policy integration can be local source/test only; real recovery/apply/startup/watchdog/cutover still requires separate fresh exact approval.
+
 ## CM-1248 A5-GAP-6 Post-Template-Guard Aggregation Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

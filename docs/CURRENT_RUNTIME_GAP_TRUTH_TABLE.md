@@ -110,30 +110,30 @@ Still not proven:
 - No rebuild/reconcile apply.
 - No production readiness, write reliability, or recall reliability.
 
-## CM-1180 SQLite Schema Version Startup Gate Plan - 2026-05-26
+## CM-1180 / CM-1249 SQLite Schema Version Startup Gate - 2026-06-01
 
-Result: `CM1180_SQLITE_SCHEMA_VERSION_STARTUP_GATE_PLAN_COMPLETED_NOT_IMPLEMENTED_NOT_READY`.
+Result: `CM1249_SQLITE_SCHEMA_STARTUP_HARD_GATE_VALIDATED_NOT_READY`.
 
 Current source facts:
 
-- `SqliteShadowStore.ensureReady()` creates tables and opportunistically adds known missing columns.
-- No durable schema version startup gate is currently enforced.
-- No unknown-future-schema fail-closed decision is currently exposed before ordinary runtime use.
+- `SqliteShadowStore.ensureReady()` now checks internal `codex_memory_schema_meta/sqlite_schema_version` before ordinary runtime tables are initialized.
+- Current expected SQLite shadow schema version is `1`.
+- New SQLite shadow DBs initialize current schema metadata.
+- Current schema metadata proceeds.
+- Invalid schema metadata and unknown future schema versions fail closed with `SQLITE_SCHEMA_STARTUP_GATE_BLOCKED`.
+- `getHealth()` exposes sanitized `schemaStartupGate` status.
 
-CM-1180 only plans a future gate:
+CM-1249 implements the first hard-gate slice:
 
 - expected schema version
-- read-only schema inspection
-- known additive repair evidence
 - unknown future version hard stop
-- sanitized operator health/overview facts if later needed
+- sanitized operator health facts
 
 Still not proven:
 
-- No source implementation yet.
-- No startup behavior change.
-- No SQLite migration/version hard stop.
-- No migration/import/export/backup/restore apply.
+- No startup recovery policy execution.
+- No watchdog/startup installation safety.
+- No real migration/import/export/backup/restore apply.
 - No production readiness, write reliability, or recall reliability.
 
 ## CM-1179 No-Token Search Evidence Review - 2026-05-26

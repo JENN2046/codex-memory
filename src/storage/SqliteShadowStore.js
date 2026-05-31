@@ -2,6 +2,10 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 
+const SQLITE_SHADOW_SCHEMA_META_TABLE = 'codex_memory_schema_meta';
+const SQLITE_SHADOW_SCHEMA_VERSION_KEY = 'sqlite_schema_version';
+const CURRENT_SQLITE_SHADOW_SCHEMA_VERSION = 1;
+
 const RECORD_ISOLATION_HINT_FAMILIES = Object.freeze([
   'governance_records',
   'validation_transcripts',
@@ -44,14 +48,23 @@ class SqliteShadowStore {
     this.config = config;
     this.db = null;
     this.memoryRecordColumns = new Map();
+    this.schemaStartupGate = {
+      status: 'not_checked',
+      expectedVersion: CURRENT_SQLITE_SHADOW_SCHEMA_VERSION,
+      observedVersion: null,
+      blocked: false,
+      reason: ''
+    };
   }
 
   async ensureReady() {
     if (this.db) return;
     await fs.mkdir(path.dirname(this.config.dbPath), { recursive: true });
     this.db = new DatabaseSync(this.config.dbPath);
+    try {
     this.db.function('codex_memory_isolation_family_hints', { deterministic: true }, (title, content, evidence, tagsJson) =>
       deriveIsolationFamilyHints(title, content, evidence, tagsJson));
+    this.initializeSchemaStartupGate();
     this.db.exec(`
       PRAGMA foreign_keys = ON;
       PRAGMA journal_mode = WAL;
@@ -142,6 +155,106 @@ class SqliteShadowStore {
       CREATE INDEX IF NOT EXISTS idx_memory_records_client ON memory_records(client_id);
     `);
     this.refreshMemoryRecordColumnInfo();
+    } catch (error) {
+      this.closeAfterStartupFailure();
+      throw error;
+    }
+  }
+
+  closeAfterStartupFailure() {
+    if (!this.db) return;
+    this.db.close();
+    this.db = null;
+  }
+
+  makeSchemaStartupGateError({ observedVersion, reason }) {
+    const error = new Error(
+      `SQLite shadow store schema startup gate blocked: ${reason}`
+    );
+    error.code = 'SQLITE_SCHEMA_STARTUP_GATE_BLOCKED';
+    error.schemaStartupGate = {
+      status: 'blocked',
+      expectedVersion: CURRENT_SQLITE_SHADOW_SCHEMA_VERSION,
+      observedVersion,
+      blocked: true,
+      reason
+    };
+    return error;
+  }
+
+  initializeSchemaStartupGate() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS ${SQLITE_SHADOW_SCHEMA_META_TABLE} (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+    `);
+    const row = this.db.prepare(`
+      SELECT value FROM ${SQLITE_SHADOW_SCHEMA_META_TABLE}
+      WHERE key = ?
+    `).get(SQLITE_SHADOW_SCHEMA_VERSION_KEY);
+
+    if (!row) {
+      const now = new Date().toISOString();
+      this.db.prepare(`
+        INSERT INTO ${SQLITE_SHADOW_SCHEMA_META_TABLE} (key, value, updated_at)
+        VALUES (?, ?, ?)
+      `).run(
+        SQLITE_SHADOW_SCHEMA_VERSION_KEY,
+        String(CURRENT_SQLITE_SHADOW_SCHEMA_VERSION),
+        now
+      );
+      this.schemaStartupGate = {
+        status: 'initialized_current_schema_version',
+        expectedVersion: CURRENT_SQLITE_SHADOW_SCHEMA_VERSION,
+        observedVersion: CURRENT_SQLITE_SHADOW_SCHEMA_VERSION,
+        blocked: false,
+        reason: ''
+      };
+      return;
+    }
+
+    const observedVersion = Number.parseInt(String(row.value), 10);
+    if (!Number.isSafeInteger(observedVersion) || String(observedVersion) !== String(row.value)) {
+      const reason = 'invalid_schema_version_metadata';
+      this.schemaStartupGate = {
+        status: 'blocked',
+        expectedVersion: CURRENT_SQLITE_SHADOW_SCHEMA_VERSION,
+        observedVersion: row.value,
+        blocked: true,
+        reason
+      };
+      throw this.makeSchemaStartupGateError({
+        observedVersion: row.value,
+        reason
+      });
+    }
+
+    if (observedVersion > CURRENT_SQLITE_SHADOW_SCHEMA_VERSION) {
+      const reason = 'future_schema_version_detected';
+      this.schemaStartupGate = {
+        status: 'blocked',
+        expectedVersion: CURRENT_SQLITE_SHADOW_SCHEMA_VERSION,
+        observedVersion,
+        blocked: true,
+        reason
+      };
+      throw this.makeSchemaStartupGateError({
+        observedVersion,
+        reason
+      });
+    }
+
+    this.schemaStartupGate = {
+      status: observedVersion === CURRENT_SQLITE_SHADOW_SCHEMA_VERSION
+        ? 'current_schema_version_confirmed'
+        : 'older_schema_version_allowed_for_additive_repair',
+      expectedVersion: CURRENT_SQLITE_SHADOW_SCHEMA_VERSION,
+      observedVersion,
+      blocked: false,
+      reason: ''
+    };
   }
 
   ensureColumn(tableName, columnName, definition) {
@@ -1589,6 +1702,7 @@ class SqliteShadowStore {
       totalChunkCount,
       reconcileCount,
       authoritativeStore: 'sqlite',
+      schemaStartupGate: { ...this.schemaStartupGate },
       writeManifest,
       jsonCorruption: this.getJsonCorruptionHealth()
     };
@@ -1656,5 +1770,6 @@ class SqliteShadowStore {
 }
 
 module.exports = {
+  CURRENT_SQLITE_SHADOW_SCHEMA_VERSION,
   SqliteShadowStore
 };
