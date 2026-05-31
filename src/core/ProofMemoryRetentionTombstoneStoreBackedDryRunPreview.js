@@ -178,7 +178,7 @@ function normalizeStoreRecord(record = {}) {
       safeRecord.lifecycleStatus,
       safeRecord.lifecycle_status
     ) || 'active',
-    visibility: normalizeString(safeRecord.visibility),
+    visibility: firstNormalizedString(safeRecord.visibility, safeRecord.visibility_policy),
     retentionPolicy: firstNormalizedString(safeRecord.retentionPolicy, safeRecord.retention_policy),
     tags: Array.isArray(safeRecord.tags) ? safeRecord.tags.map(tag => normalizeString(tag)).filter(Boolean) : [],
     validationStatus: firstNormalizedString(safeRecord.validationStatus, safeRecord.validation_status) ||

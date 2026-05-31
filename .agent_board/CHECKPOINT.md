@@ -1,5 +1,35 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1289 Proof-Retention Visibility Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test proof-memory retention/tombstone visibility fallback normalization hardening. No tombstone/apply/cleanup/rollback execution, provider call, MCP external call, broad real-memory scan, durable memory/audit write outside temp-local test stores, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ProofMemoryRetentionTombstonePlan.isProofMemoryRecord(...)` now uses the first non-empty normalized value across `visibility` and `visibility_policy`.
+- `ProofMemoryRetentionTombstoneStoreBackedDryRunPreview.normalizeStoreRecord(...)` now applies the same visibility fallback before passing metadata into the no-apply plan.
+- Extended regressions prove blank camel-case visibility falls through to `visibility_policy=internal_proof` while still producing no-apply tombstone preview actions only.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ProofMemoryRetentionTombstonePlan.js`
+- `node --check src\core\ProofMemoryRetentionTombstoneStoreBackedDryRunPreview.js`
+- `node --check tests\proof-memory-retention-tombstone-plan.test.js`
+- `node --check tests\proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js`
+- `node --test tests\proof-memory-retention-tombstone-plan.test.js tests\proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js tests\proof-memory-policy.test.js tests\memory-write-preflight-runtime-integration.test.js` passed `26/26`.
+- `npm test` passed `2813/2813`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1289.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1288 Supersede Pair Scope Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

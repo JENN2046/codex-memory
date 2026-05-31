@@ -41,7 +41,7 @@ function parseTime(value) {
 }
 
 function isProofMemoryRecord(record = {}) {
-  const visibility = normalizeString(record.visibility);
+  const visibility = firstNormalizedString(record.visibility, record.visibility_policy);
   const retentionPolicy = firstNormalizedString(record.retentionPolicy, record.retention_policy);
   const tags = normalizeTags(record.tags);
 
