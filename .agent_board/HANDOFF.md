@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1233 VALIDATION_AGGREGATOR_NON_BASELINE_GAP_GUARD`.
+Goal: `CM-1234 A5-GAP-6_POST_GAP3_AGGREGATION_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after adding a non-baseline remaining-gap guard to the ValidationAggregator full implementation closure criteria.
+Status: `COMPLETED_VALIDATED_NOT_READY` after exact-approved in-memory sanitized aggregation over approved `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5` evidence.
 
 Workspace: `A:\codex-memory`.
 
@@ -51,6 +51,7 @@ Changed scope since CM-1207:
 - `docs/CM1231_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_CRITERION.md`
 - `docs/CM1232_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_DELTA.md`
 - `docs/CM1233_VALIDATION_AGGREGATOR_NON_BASELINE_GAP_GUARD.md`
+- `docs/CM1234_A5_GAP6_POST_GAP3_AGGREGATION_EVIDENCE.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -129,12 +130,15 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1232 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
 - CM-1233 adds `effectiveNonBaselineRemainingGapsAbsent` to closure criteria and fails closed when accepted sanitized runtime summaries introduce non-baseline remaining gaps.
 - CM-1233 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- User approved `A5-GAP-6` for `main@f7966ad152a9181f1bd912e07d095bb79f46bf09`, using only approved units `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
+- CM-1234 executed in-memory sanitized aggregation only. Result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, summary accepted, locally evidenced gaps `5`, remaining gaps `2`, effective gap source `accepted_runtime_summary`, effective remaining gaps `2`, `commandsExecutedByAggregator=false`.
+- CM-1234 keeps `runtimeReady=false`, `finalRcMatrixReady=false`, `v1RcReady=false`, and `rcReady=false`.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1233:
+Validation for CM-1234:
 
-- `node --check src\core\ValidationAggregatorService.js`
-- `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js`
+- fresh Git preflight
+- in-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })`
 - `git diff --check`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
@@ -178,4 +182,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Commit or otherwise stabilize CM-1233, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating approved units including `A5-GAP-3`: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.` Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize CM-1234 evidence, then continue local ValidationAggregator implementation or prepare the next exact-approved A5 runtime gap. Do not run additional store scans, raw content output, MCP `tools/call`, provider calls, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

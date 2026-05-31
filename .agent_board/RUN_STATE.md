@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1233 ValidationAggregator non-baseline gap guard implemented locally; A5-GAP-6 execution still awaits exact fresh-HEAD approval |
-| Current area | P0-mainline-health / P10-observability-admin |
+| Current task | CM-1234 A5-GAP-6 post-GAP3 aggregation executed; evidence record pending commit |
+| Current area | P0-mainline-health / P2-active-memory / P5-rollback-readiness / P8-memory-governance / P10-observability-admin |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1233 adds a non-baseline remaining-gap guard to the ValidationAggregator full implementation closure criteria. Accepted sanitized runtime summaries that introduce unmodeled remaining gaps now keep closure blocked explicitly. It does not execute A5-GAP-6, read evidence files/stores, call providers, write durable state, or change readiness booleans. Next safe action is to commit or otherwise stabilize CM-1233, then use fresh `HEAD` for exact A5-GAP-6 approval before aggregation, or continue the next local ValidationAggregator implementation slice.
+CM-1234 executed exact-approved A5-GAP-6 aggregation at `main@f7966ad152a9181f1bd912e07d095bb79f46bf09` using only approved `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5` sanitized evidence. Result remains `NOT_READY_BLOCKED`, full implementation false, effective remaining gaps 2, and closure not ready. Next safe action is to commit or otherwise stabilize CM-1234, then continue local ValidationAggregator implementation or prepare the next exact-approved A5 runtime gap.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

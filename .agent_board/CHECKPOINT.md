@@ -1,5 +1,44 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1234 A5-GAP-6 Post-GAP3 Aggregation Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: exact-approved in-memory sanitized A5-GAP-6 aggregation at `main@f7966ad152a9181f1bd912e07d095bb79f46bf09`.
+
+Result:
+
+- Aggregator consumed only approved units `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
+- Result stayed blocked: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`.
+- Accepted summary counts: locally evidenced gaps `5`, remaining gaps `2`.
+- Effective gap source: `accepted_runtime_summary`.
+- Effective remaining gaps: `2`; closure remains not ready.
+- `commandsExecutedByAggregator=false`.
+
+Validation:
+
+- Fresh Git preflight matched approval.
+- In-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })` completed.
+
+Boundary:
+
+- No file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No migration/import/export/backup/restore apply.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1234.
+- Continue local ValidationAggregator implementation or prepare the next exact-approved A5 runtime gap.
+
 ## CM-1233 ValidationAggregator Non-Baseline Gap Guard Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
