@@ -7,8 +7,8 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1218 A5-GAP-2 recall isolation no-mutation evidence completed; commit/stabilize evidence next |
-| Current area | P2-active-memory / P8-memory-governance / P10-observability-admin |
+| Current task | CM-1219 A5-GAP-6 post-recall-isolation aggregation preflight prepared; execution awaits exact fresh-HEAD approval |
+| Current area | P0-mainline-health / P2-active-memory / P8-memory-governance / P10-observability-admin / P6-docs-drift |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1218 executed exact-approved A5-GAP-2 recall isolation no-mutation proof at `main@d0f008133465b2c1be4ea66689b072fa4ca86dd9`. Approved stores were read in no-mutation mode. Sanitized result: `storeSnapshotsUnchanged=true`, `projectionLeakageTotal=0`, and limitation `NO_CLASSIFIED_REAL_SAMPLE_PRESENT`. No raw content output, normal recall/search pipeline, MCP `tools/call`, provider call, durable write, public MCP expansion, remote write, readiness claim, or reliability claim occurred. Next safe action is to commit or otherwise stabilize CM-1218 evidence, then prepare a fresh exact-approved A5-GAP-6 aggregation refresh over current approved evidence.
+CM-1219 prepared the exact A5-GAP-6 aggregation refresh boundary after CM-1218. The selected unit list is `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5`; historical `A5-GAP-3` is background only unless a future exact approval names it. No ValidationAggregator execution, file/store scan, MCP `tools/call`, provider call, durable write, public MCP expansion, remote write, readiness claim, or reliability claim occurred. Next safe action is to commit or otherwise stabilize CM-1219, then use fresh `HEAD` for exact A5-GAP-6 approval before execution.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
