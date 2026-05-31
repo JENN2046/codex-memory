@@ -1,5 +1,45 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1227 ValidationAggregator Closure Status Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: local source/test report-shape improvement only. No evidence file read, validation command execution, runtime evidence execution, or evidence file/store scan.
+
+Result:
+
+- Added closure status and missing criteria to the full implementation gap accounting surface.
+- Current closure status is `blocked_existing_blockers`.
+- `closureReady=false` and `closureCanClaimReady=false`.
+- Readiness posture remains unchanged: `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ValidationAggregatorService.js`
+- `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` passed `21/21`.
+
+Boundary:
+
+- No evidence file read.
+- No validation command execution by aggregator.
+- No runtime collector execution.
+- No evidence file/store scan.
+- No A5-GAP-3 execution or consumption.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1227.
+- Then use fresh `HEAD` for exact A5-GAP-3 approval before migration-readiness dry-run, or continue the next local ValidationAggregator implementation slice.
+
 ## CM-1226 ValidationAggregator Blocker Gap Binding Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

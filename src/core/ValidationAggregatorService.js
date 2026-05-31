@@ -353,6 +353,14 @@ function buildP66FullImplementationGapAccounting({
   const a5GatedBlockerIds = safeBlockers
     .filter(blocker => blocker.requiresA5 === true)
     .map(blocker => blocker.id);
+  const acceptedRuntimeSummaryBound = Boolean(acceptedRuntimeSummary);
+  const validationEvidenceExplicitEvidenceUsable = validationEvidenceGateReadiness
+    ? validationEvidenceGateReadiness.explicitEvidenceUsable === true
+    : false;
+  const totalBlockerCount = safeBlockers.length;
+  const closureStatus = totalBlockerCount > 0
+    ? 'blocked_existing_blockers'
+    : 'blocked_full_implementation_not_authorized';
 
   return {
     available: true,
@@ -363,7 +371,27 @@ function buildP66FullImplementationGapAccounting({
     remainingFullImplementationGapCount: P66_FULL_IMPLEMENTATION_REMAINING_RUNTIME_GAPS.length,
     locallyEvidencedFullImplementationGapIds: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS,
     locallyEvidencedFullImplementationGapCount: P66_FULL_IMPLEMENTATION_LOCALLY_EVIDENCED_GAPS.length,
-    acceptedRuntimeSummaryBound: Boolean(acceptedRuntimeSummary),
+    closureStatus,
+    closureReady: false,
+    closureCanClaimReady: false,
+    closureCriteria: {
+      acceptedRuntimeSummaryBound,
+      validationEvidenceExplicitEvidenceUsable,
+      validationBlockersCleared: validationBlockerIds.length === 0,
+      runtimeRequiredBlockersCleared: runtimeRequiredBlockerIds.length === 0,
+      a5GatedBlockersCleared: a5GatedBlockerIds.length === 0,
+      allBlockersCleared: totalBlockerCount === 0,
+      readinessClaimAllowed: false
+    },
+    closureMissingCriteria: [
+      ...(!acceptedRuntimeSummaryBound ? ['accepted_runtime_summary'] : []),
+      ...(!validationEvidenceExplicitEvidenceUsable ? ['usable_validation_evidence'] : []),
+      ...(validationBlockerIds.length > 0 ? ['validation_blockers_cleared'] : []),
+      ...(runtimeRequiredBlockerIds.length > 0 ? ['runtime_required_blockers_cleared'] : []),
+      ...(a5GatedBlockerIds.length > 0 ? ['a5_gated_blockers_cleared'] : []),
+      'readiness_authority'
+    ],
+    acceptedRuntimeSummaryBound,
     acceptedRuntimeSummaryStatus: acceptedRuntimeSummary
       ? acceptedRuntimeSummary.status
       : 'no_accepted_runtime_summary',
@@ -379,9 +407,7 @@ function buildP66FullImplementationGapAccounting({
     validationEvidenceGateReadinessStatus: validationEvidenceGateReadiness
       ? validationEvidenceGateReadiness.status
       : 'no_validation_evidence_gate_readiness',
-    validationEvidenceExplicitEvidenceUsable: validationEvidenceGateReadiness
-      ? validationEvidenceGateReadiness.explicitEvidenceUsable === true
-      : false,
+    validationEvidenceExplicitEvidenceUsable,
     validationEvidenceCommandCoverageStatus: validationEvidenceCommandCoverage
       ? validationEvidenceCommandCoverage.status
       : 'no_validation_evidence_command_coverage',
@@ -395,7 +421,7 @@ function buildP66FullImplementationGapAccounting({
     runtimeRequiredBlockerCount: runtimeRequiredBlockerIds.length,
     a5GatedBlockerIds,
     a5GatedBlockerCount: a5GatedBlockerIds.length,
-    totalBlockerCount: safeBlockers.length,
+    totalBlockerCount,
     blockedA5HardStopIds: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS,
     blockedA5HardStopCount: P66_FULL_IMPLEMENTATION_A5_HARD_STOPS.length,
     nextSafeClosureCandidates: P66_FULL_IMPLEMENTATION_NEXT_SAFE_CLOSURE_CANDIDATES,
@@ -2226,6 +2252,10 @@ function buildV1RcValidationAggregatorReport({
         p66FullImplementationGapAccounting.runtimeRequiredBlockerCount,
       p66ValidationAggregatorFullImplementationGapAccountingA5GatedBlockerCount:
         p66FullImplementationGapAccounting.a5GatedBlockerCount,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureStatus:
+        p66FullImplementationGapAccounting.closureStatus,
+      p66ValidationAggregatorFullImplementationGapAccountingClosureReady:
+        p66FullImplementationGapAccounting.closureReady,
       p66ValidationAggregatorFullImplementationGapAccountingCanClaimReady: false,
       p66ValidationAggregatorFullImplementationFixtureReadByAggregator: false,
       p66ValidationAggregatorFullImplementationTestExecutedByAggregator: false,
@@ -3237,6 +3267,16 @@ function buildV1RcValidationAggregatorReport({
           p66FullImplementationGapAccounting.a5GatedBlockerCount,
         totalBlockerCount:
           p66FullImplementationGapAccounting.totalBlockerCount,
+        closureStatus:
+          p66FullImplementationGapAccounting.closureStatus,
+        closureReady:
+          p66FullImplementationGapAccounting.closureReady,
+        closureCanClaimReady:
+          p66FullImplementationGapAccounting.closureCanClaimReady,
+        closureCriteria:
+          p66FullImplementationGapAccounting.closureCriteria,
+        closureMissingCriteria:
+          p66FullImplementationGapAccounting.closureMissingCriteria,
         fixtureReadByAggregator: false,
         testExecutedByAggregator: false,
         helperExecutedByAggregator: false,
