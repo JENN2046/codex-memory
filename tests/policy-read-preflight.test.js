@@ -453,6 +453,97 @@ test('soft read policy does not default missing request context to Codex identit
   });
 });
 
+test('soft read policy hides private records without owner client_id', async () => {
+  await withPolicyApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const { shadowStore } = app.stores;
+
+    const fixtures = [
+      { title: 'Missing Owner Private', visibility: 'private', clientId: '' },
+      { title: 'Missing Owner Shared', visibility: 'shared', clientId: '' },
+      { title: 'Owned Private Codex', visibility: 'private', clientId: 'codex' }
+    ];
+    let missingOwnerPrivateId = null;
+    let missingOwnerSharedId = null;
+
+    for (let index = 0; index < fixtures.length; index += 1) {
+      const fixture = fixtures[index];
+      const record = await server.handleJsonRpc({
+        jsonrpc: '2.0',
+        id: index + 1,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: fixture.title,
+            content: `Type: checkpoint\nmissing owner client identity signal\nfixture: ${fixture.title}`,
+            evidence: `runtime-soft-policy-missing-owner-${fixture.title}`,
+            validated: true,
+            reusable: false,
+            tags: ['policy', 'runtime', 'soft-read', 'missing-owner'],
+            sensitivity: 'none',
+            project_id: 'policy-runtime-project',
+            visibility: fixture.visibility,
+            client_id: fixture.clientId || 'codex'
+          }
+        }
+      }, requestContext);
+
+      assert.equal(record.response.result.structuredContent.decision, 'accepted');
+      const memoryId = record.response.result.structuredContent.memoryId;
+      if (fixture.title === 'Missing Owner Private') {
+        missingOwnerPrivateId = memoryId;
+      }
+      if (fixture.title === 'Missing Owner Shared') {
+        missingOwnerSharedId = memoryId;
+      }
+      await updatePolicyFields(shadowStore, memoryId, fixture);
+    }
+
+    const originalGetRecordsPolicyMap = shadowStore.getRecordsPolicyMap.bind(shadowStore);
+    shadowStore.getRecordsPolicyMap = async memoryIds => {
+      const policyMap = await originalGetRecordsPolicyMap(memoryIds);
+      if (policyMap.has(missingOwnerPrivateId)) {
+        policyMap.set(missingOwnerPrivateId, {
+          ...policyMap.get(missingOwnerPrivateId),
+          visibility: 'private',
+          clientId: null
+        });
+      }
+      if (policyMap.has(missingOwnerSharedId)) {
+        policyMap.set(missingOwnerSharedId, {
+          ...policyMap.get(missingOwnerSharedId),
+          visibility: 'shared',
+          clientId: null
+        });
+      }
+      return policyMap;
+    };
+
+    const search = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 401,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'missing owner client identity signal',
+          target: 'process',
+          limit: 10,
+          include_content: true
+        }
+      }
+    }, requestContext);
+
+    const titles = (search.response.result.structuredContent.results || [])
+      .map(result => result.title)
+      .sort();
+
+    assert.deepEqual(titles, ['Missing Owner Shared', 'Owned Private Codex']);
+  });
+});
+
 test('soft read policy remains off by default', async () => {
   await withApp(async ({ app }) => {
     assert.equal(app.config.enableSoftReadPolicy, false);

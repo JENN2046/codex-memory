@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1270 NO_CONTEXT_READ_IDENTITY_FAIL_CLOSED`.
+Goal: `CM-1271 PRIVATE_READ_MISSING_OWNER_FAIL_CLOSED`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after making missing trusted request context fail closed for soft-read request identity.
+Status: `COMPLETED_VALIDATED_NOT_READY` after making private soft-read records fail closed when owner `client_id` is missing.
 
 Workspace: `A:\codex-memory`.
 
@@ -42,6 +42,7 @@ Changed scope since CM-1207:
 - `src/app.js`
 - `tests/policy-read-preflight.test.js`
 - `docs/CM1270_NO_CONTEXT_READ_IDENTITY_FAIL_CLOSED.md`
+- `docs/CM1271_PRIVATE_READ_MISSING_OWNER_FAIL_CLOSED.md`
 - `docs/CM1264_SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING.md`
 - `tests/memory-lifecycle-scope-runtime-integration.test.js`
 - `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`
@@ -624,6 +625,32 @@ Validation:
 Next:
 
 Commit or otherwise stabilize CM-1268, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1271 Current Handoff
+
+Goal: `CM-1271 PRIVATE_READ_MISSING_OWNER_FAIL_CLOSED`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1271 hardens soft-read private filtering for missing owner client metadata.
+- `applySoftReadPolicy(...)` now hides private records unless `client_id` is non-empty and matches the trusted request client.
+- Added runtime regression proving ownerless private records are hidden while ownerless shared records and owned same-client private records remain visible.
+- No provider/MCP external call, real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `node --check src\app.js`
+- `node --check tests\policy-read-preflight.test.js`
+- `node --test tests\policy-read-preflight.test.js tests\memory-lifecycle-scope-runtime-integration.test.js tests\phase-a-services.test.js` passed `22/22`.
+- `npm test` passed `2793/2793`.
+- Full docs/ledger validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1271, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
 
 ## CM-1270 Current Handoff
 

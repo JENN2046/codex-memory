@@ -433,7 +433,7 @@ async function applySoftReadPolicy(results, { config, shadowStore, requestContex
 
     const visibility = String(policy.visibility || '').toLowerCase();
     const clientId = String(policy.clientId || '').toLowerCase();
-    if (visibility === 'private' && clientId && clientId !== requestClientId) {
+    if (visibility === 'private' && (!clientId || clientId !== requestClientId)) {
       return false;
     }
 

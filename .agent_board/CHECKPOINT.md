@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1271 Private Read Missing Owner Fail Closed Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test soft-read owner metadata hardening for private records. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `applySoftReadPolicy(...)` now hides private records when owner `client_id` is missing.
+- Private records require a non-empty owner `client_id` matching the trusted request client.
+- Added regression proving ownerless private records are hidden while ownerless shared records and owned same-client private records remain visible.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\app.js`
+- `node --check tests\policy-read-preflight.test.js`
+- `node --test tests\policy-read-preflight.test.js tests\memory-lifecycle-scope-runtime-integration.test.js tests\phase-a-services.test.js` passed `22/22`.
+- `npm test` passed `2793/2793`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1271.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1270 No-Context Read Identity Fail Closed Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
