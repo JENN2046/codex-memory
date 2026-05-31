@@ -1,5 +1,46 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1229 A5-GAP-6 Post-GAP3 Dry-Run Aggregation Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: preflight-only preparation for a future exact-approved A5-GAP-6 aggregation refresh after current A5-GAP-3 dry-run evidence.
+
+Result:
+
+- Fixed the future selected unit set as `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
+- Bound A5-GAP-3 to CM-1228 fixture-only migration-readiness dry-run evidence.
+- Prepared the exact future approval line using fresh post-commit `HEAD`.
+- Did not execute ValidationAggregator.
+- Did not scan files, runtime stores, or real memory.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `v1RcReady=false`, `rcReady=false`.
+
+Validation:
+
+- `git diff --check`
+- ledger consistency
+- docs validation
+
+Boundary:
+
+- No ValidationAggregator execution.
+- No evidence collection scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No migration/import/export/backup/restore apply.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit CM-1229.
+- Then use fresh `HEAD` for exact A5-GAP-6 approval before aggregating `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
+
 ## CM-1228 A5-GAP-3 Migration Readiness Dry-Run Evidence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
