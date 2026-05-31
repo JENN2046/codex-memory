@@ -443,6 +443,7 @@ function hasAcceptedGuardedStartupRecoveryPolicyDesign(report) {
     report.policyDesign?.dryRunRequired === true &&
     report.policyDesign?.manualApprovalRequired === true &&
     report.policyDesign?.futureDryRunHarnessRequired === true &&
+    report.policyDesign?.priorPreflightSchemaGateAccepted === true &&
     report.policyDesign?.startupRecoveryDefault === 'disabled' &&
     report.policyDesign?.startupReconcileReplayDefault === 'disabled' &&
     report.policyDesign?.nextAllowedAction === 'implement_temp_local_startup_recovery_dry_run_harness_only' &&
@@ -485,6 +486,7 @@ function buildGuardedStartupRecoveryPolicyDesign({
   const startupRecoveryLimit = normalizePolicyLimit(policy.startupRecoveryLimit);
   const reconcileReplayLimit = normalizePolicyLimit(policy.reconcileReplayLimit);
   const repairLimit = normalizePolicyLimit(policy.repairLimit);
+  const priorPreflightAccepted = hasAcceptedStartupRecoveryPreflight(priorPreflight);
 
   if (normalizedMode !== ACCEPTED_RECOVERY_POLICY_MODE) {
     blockers.push('startup_recovery_policy_design_mode_required');
@@ -492,7 +494,7 @@ function buildGuardedStartupRecoveryPolicyDesign({
   if (!ACCEPTED_RECOVERY_POLICY_SOURCES.includes(normalizedSource)) {
     blockers.push('startup_recovery_policy_source_required');
   }
-  if (!hasAcceptedStartupRecoveryPreflight(priorPreflight)) {
+  if (!priorPreflightAccepted) {
     blockers.push('accepted_cm1166_preflight_required');
   }
   if (startupRecoveryLimit === null) blockers.push('startup_recovery_limit_must_be_1_to_10');
@@ -536,7 +538,7 @@ function buildGuardedStartupRecoveryPolicyDesign({
     mode: normalizedMode || null,
     source: normalizedSource || null,
     blockerReasons: blockers,
-    priorPreflightAccepted: hasAcceptedStartupRecoveryPreflight(priorPreflight),
+    priorPreflightAccepted,
     candidateCounts: {
       pendingManifestCount: priorPreflight?.candidateCounts?.pendingManifestCount ?? null,
       degradedManifestCount: priorPreflight?.candidateCounts?.degradedManifestCount ?? null,
@@ -549,6 +551,7 @@ function buildGuardedStartupRecoveryPolicyDesign({
       dryRunRequired: policy.dryRunRequired === true,
       manualApprovalRequired: policy.manualApprovalRequired === true,
       futureDryRunHarnessRequired: true,
+      priorPreflightSchemaGateAccepted: priorPreflightAccepted,
       missingDiaryCancellation: 'manual_approval_only',
       degradedRepair: 'manual_after_reconcile_queue_drained_only',
       startupRecoveryDefault: 'disabled',

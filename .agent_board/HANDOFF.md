@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1251 SCHEMA_GATE_DOWNSTREAM_POLICY_BINDING`.
+Goal: `CM-1252 SCHEMA_GATE_DRY_RUN_POLICY_INVARIANT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test binding of SQLite schema startup gate evidence into downstream startup recovery policy acceptance.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test propagation of SQLite schema startup gate evidence into dry-run harness policy acceptance.
 
 Workspace: `A:\codex-memory`.
 
@@ -81,6 +81,15 @@ Changed scope since CM-1207:
 - `tests/memory-write-reconcile-startup-safety-policy.test.js`
 - `docs/CM1250_SCHEMA_GATED_STARTUP_RECOVERY_POLICY.md`
 - `docs/CM1251_SCHEMA_GATE_DOWNSTREAM_POLICY_BINDING.md`
+- `docs/CM1252_SCHEMA_GATE_DRY_RUN_POLICY_INVARIANT.md`
+
+Current CM-1252 fact:
+
+- CM-1252 records `policyDesign.priorPreflightSchemaGateAccepted` in guarded startup recovery policy design output.
+- `hasAcceptedGuardedStartupRecoveryPolicyDesign(...)` now requires this invariant.
+- Downstream `buildTempLocalStartupRecoveryDryRunHarness(...)` rejects accepted-looking policy design reports that lack schema-gated prior-preflight evidence.
+- Targeted policy/schema/no-touch validation passed `27/27`; default `npm test` passed `2782/2782`.
+- No dry-run execution, recovery execution/apply, startup/watchdog install, config change, service start, provider/MCP call, real-memory scan, migration/import/export/backup/restore apply, remote action, or readiness claim occurred.
 
 Current CM-1251 fact:
 

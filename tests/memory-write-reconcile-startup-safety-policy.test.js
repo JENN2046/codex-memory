@@ -124,6 +124,7 @@ function acceptedCm1167PolicyDesign(overrides = {}) {
       dryRunRequired: true,
       manualApprovalRequired: true,
       futureDryRunHarnessRequired: true,
+      priorPreflightSchemaGateAccepted: true,
       missingDiaryCancellation: 'manual_approval_only',
       degradedRepair: 'manual_after_reconcile_queue_drained_only',
       startupRecoveryDefault: 'disabled',
@@ -677,6 +678,7 @@ test('CM-1167 guarded startup recovery policy design accepts only disabled, dry-
   assert.equal(report.policyDesign.reconcileReplayLimit, 4);
   assert.equal(report.policyDesign.repairLimit, 3);
   assert.equal(report.policyDesign.futureDryRunHarnessRequired, true);
+  assert.equal(report.policyDesign.priorPreflightSchemaGateAccepted, true);
   assert.equal(report.policyDesign.missingDiaryCancellation, 'manual_approval_only');
   assert.equal(report.policyDesign.degradedRepair, 'manual_after_reconcile_queue_drained_only');
   assert.equal(report.policyDesign.startupRecoveryDefault, 'disabled');
@@ -973,6 +975,7 @@ test('CM-1168 temp-local startup recovery dry-run harness requires accepted poli
         dryRunRequired: false,
         manualApprovalRequired: true,
         futureDryRunHarnessRequired: true,
+        priorPreflightSchemaGateAccepted: true,
         startupRecoveryDefault: 'disabled',
         startupReconcileReplayDefault: 'disabled',
         nextAllowedAction: 'implement_temp_local_startup_recovery_dry_run_harness_only'
@@ -989,6 +992,34 @@ test('CM-1168 temp-local startup recovery dry-run harness requires accepted poli
   assert.equal(unsafeAcceptedShape.accepted, false);
   assert.equal(unsafeAcceptedShape.priorPolicyDesignAccepted, false);
   assert.ok(unsafeAcceptedShape.blockerReasons.includes('accepted_cm1167_policy_design_required'));
+
+  const missingSchemaGateBinding = buildTempLocalStartupRecoveryDryRunHarness({
+    mode: ACCEPTED_RECOVERY_DRY_RUN_MODE,
+    source: 'temp_local_startup_recovery_dry_run_fixture',
+    priorPolicyDesign: acceptedCm1167PolicyDesign({
+      policyDesign: {
+        startupRecoveryLimit: 5,
+        reconcileReplayLimit: 4,
+        repairLimit: 3,
+        dryRunRequired: true,
+        manualApprovalRequired: true,
+        futureDryRunHarnessRequired: true,
+        startupRecoveryDefault: 'disabled',
+        startupReconcileReplayDefault: 'disabled',
+        nextAllowedAction: 'implement_temp_local_startup_recovery_dry_run_harness_only'
+      }
+    }),
+    realStoreScope: 'fixture_only',
+    inventory: {
+      pendingManifestCount: 1,
+      degradedManifestCount: 0,
+      reconcileTaskCount: 0
+    }
+  });
+
+  assert.equal(missingSchemaGateBinding.accepted, false);
+  assert.equal(missingSchemaGateBinding.priorPolicyDesignAccepted, false);
+  assert.ok(missingSchemaGateBinding.blockerReasons.includes('accepted_cm1167_policy_design_required'));
 });
 
 test('CM-1168 temp-local startup recovery dry-run harness blocks execution, real-store scope, and overclaims', () => {
