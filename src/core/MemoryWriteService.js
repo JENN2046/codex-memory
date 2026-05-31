@@ -482,10 +482,11 @@ class MemoryWriteService {
       }
     }
 
+    const effectiveScope = buildWritePreflightAllowedScope(payload, executionContext);
     const proofPolicy = applyProofMemoryWritePolicy(payload, {
       tags,
-      visibility: normalizeString(payload.visibility) || null,
-      retentionPolicy: normalizeString(payload.retention_policy || payload.retentionPolicy) || null
+      visibility: effectiveScope.visibility || null,
+      retentionPolicy: effectiveScope.retentionPolicy || null
     });
     const createdAt = new Date().toISOString();
     const record = {
@@ -502,11 +503,11 @@ class MemoryWriteService {
       updatedAt: createdAt,
       visibilityPolicy: VisibilityPolicy.CODEX_ONLY,
       namespace: target === 'knowledge' ? Namespace.KNOWLEDGE : Namespace.PROCESS,
-      projectId: normalizeString(payload.project_id || payload.projectId) || null,
-      workspaceId: normalizeString(payload.workspace_id || payload.workspaceId) || null,
-      clientId: normalizeString(payload.client_id || payload.clientId) || null,
-      taskId: normalizeString(payload.task_id || payload.taskId) || null,
-      conversationId: normalizeString(payload.conversation_id || payload.conversationId) || null,
+      projectId: effectiveScope.projectId || null,
+      workspaceId: effectiveScope.workspaceId || null,
+      clientId: effectiveScope.clientId || null,
+      taskId: effectiveScope.taskId || null,
+      conversationId: effectiveScope.conversationId || null,
       visibility: proofPolicy.visibility,
       retentionPolicy: proofPolicy.retentionPolicy
     };

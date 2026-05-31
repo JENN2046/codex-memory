@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1266 LIFECYCLE_SCOPE_EXECUTION_CONTEXT_AUTHORITY`.
+Goal: `CM-1267 CONTEXT_DERIVED_WRITE_SCOPE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after hardening lifecycle scope governance read filtering against caller-supplied search-scope authority spoofing.
+Status: `COMPLETED_VALIDATED_NOT_READY` after preserving execution-context scope through local write records.
 
 Workspace: `A:\codex-memory`.
 
@@ -45,6 +45,10 @@ Changed scope since CM-1207:
 - `tests/memory-lifecycle-scope-runtime-integration.test.js`
 - `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`
 - `docs/CM1266_LIFECYCLE_SCOPE_EXECUTION_CONTEXT_AUTHORITY.md`
+- `src/core/ExecutionContextResolver.js`
+- `src/core/MemoryWriteService.js`
+- `tests/memory-write-preflight-runtime-integration.test.js`
+- `docs/CM1267_CONTEXT_DERIVED_WRITE_SCOPE.md`
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
@@ -586,6 +590,33 @@ Validation:
 Next:
 
 Commit or otherwise stabilize CM-1263, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1267 Current Handoff
+
+Goal: `CM-1267 CONTEXT_DERIVED_WRITE_SCOPE`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1267 preserves Codex/Claude execution-context scope through `record_memory` writes.
+- `ExecutionContextResolver.resolve(...)` now carries project/workspace/client/task/conversation/visibility/retention fields.
+- `MemoryWriteService.record(...)` now persists effective execution-context-first scope into records.
+- Added regression proving payloads that omit scope still write scope from execution context.
+- No provider/MCP external call, real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `node --check src\core\ExecutionContextResolver.js`
+- `node --check src\core\MemoryWriteService.js`
+- `node --check tests\memory-write-preflight-runtime-integration.test.js`
+- `node --test tests\memory-write-preflight-runtime-integration.test.js tests\memory-write-preflight-app-temp-local-evidence.test.js tests\scope-filter.test.js` passed `27/27`.
+- Full/default validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1267, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
 
 ## CM-1266 Current Handoff
 

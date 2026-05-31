@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1267 Context-Derived Write Scope Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test write-scope attribution hardening for Codex/Claude execution context. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ExecutionContextResolver.resolve(...)` now preserves project/workspace/client/task/conversation/visibility/retention fields from `requestContext.executionContext`.
+- `MemoryWriteService.record(...)` now persists effective execution-context-first scope into written records.
+- Added regression proving a payload that omits scope still writes scope from execution context.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ExecutionContextResolver.js`
+- `node --check src\core\MemoryWriteService.js`
+- `node --check tests\memory-write-preflight-runtime-integration.test.js`
+- `node --test tests\memory-write-preflight-runtime-integration.test.js tests\memory-write-preflight-app-temp-local-evidence.test.js tests\scope-filter.test.js` passed `27/27`.
+- Default suite and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1267.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1266 Lifecycle Scope Execution Context Authority Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

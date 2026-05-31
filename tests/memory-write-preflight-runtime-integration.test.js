@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const {
   computeCanonicalWriteHash
 } = require('../src/core/MemoryWriteLifecycleDedupSuppressionPreflight');
+const { ExecutionContextResolver } = require('../src/core/ExecutionContextResolver');
 const { MemoryWriteService } = require('../src/core/MemoryWriteService');
 
 const runtimeScope = Object.freeze({
@@ -110,6 +111,24 @@ function validProcessPayload(overrides = {}) {
     conversation_id: runtimeScope.conversationId,
     visibility: runtimeScope.visibility,
     retention_policy: runtimeScope.retentionPolicy,
+    ...overrides
+  };
+}
+
+function validProcessPayloadWithoutScope(overrides = {}) {
+  return {
+    target: 'process',
+    title: 'Checkpoint: context derived write scope',
+    content: [
+      'Checkpoint: runtime write scope is derived from execution context.',
+      'Purpose: keep Codex and Claude memory attribution stable when public payload omits scope.',
+      'Boundary: local fixture only; no real memory scan, no provider, no readiness claim.'
+    ].join('\n'),
+    evidence: 'CM-1267 context-derived write scope fixture evidence.',
+    tags: ['cm-1267', 'write-scope'],
+    sensitivity: 'none',
+    validated: true,
+    reusable: false,
     ...overrides
   };
 }
@@ -242,4 +261,89 @@ test('CM-0838 passes canonical hash and bounded scope to candidate provider', as
   assert.deepEqual(capturedRequest.allowedScope, runtimeScope);
   assert.equal(capturedRequest.proposedWrite.content, payload.content);
   assert.equal(capturedRequest.executionContext.projectId, runtimeScope.projectId);
+});
+
+test('write runtime derives record scope from execution context when payload omits scope', async () => {
+  const events = {
+    diaryWrites: [],
+    shadowUpserts: [],
+    vectorUpserts: [],
+    chunkIndexes: [],
+    auditWrites: []
+  };
+  const service = new MemoryWriteService({
+    config: {
+      defaultAgentId: 'default-agent',
+      defaultRequestSource: 'default-source',
+      allowedAgentAlias: 'Codex',
+      enableShadowWrites: true,
+      enableVectorIndex: true
+    },
+    executionContextResolver: new ExecutionContextResolver({
+      defaultAgentId: 'default-agent',
+      defaultRequestSource: 'default-source',
+      allowedAgentAlias: 'Codex'
+    }),
+    diaryStore: {
+      async writeRecord(record) {
+        events.diaryWrites.push(record);
+        return {
+          filePath: '<cm-1267-fixture-diary-path>',
+          relativePath: '<cm-1267-fixture-relative-path>',
+          fileContent: '<cm-1267-fixture-raw-content-redacted>'
+        };
+      }
+    },
+    shadowStore: {
+      async upsertRecord(record) {
+        events.shadowUpserts.push(record);
+      },
+      async clearReconcileTasks() {},
+      async enqueueReconcileTask() {
+        throw new Error('unexpected reconcile task in CM-1267 fixture');
+      }
+    },
+    vectorStore: {
+      async upsertRecord(record) {
+        events.vectorUpserts.push(record);
+      }
+    },
+    chunkIndexingService: {
+      async indexRecord(record) {
+        events.chunkIndexes.push(record);
+      }
+    },
+    auditLogStore: {
+      async appendWriteAudit(event) {
+        events.auditWrites.push(event);
+      }
+    }
+  });
+
+  const result = await service.record(validProcessPayloadWithoutScope(), {
+    executionContext: {
+      agentAlias: 'Codex',
+      agentId: 'codex-desktop',
+      requestSource: 'cm-1267-runtime-test',
+      projectId: 'context-project',
+      workspaceId: 'context-workspace',
+      clientId: 'claude',
+      taskId: 'CM-1267',
+      conversationId: 'context-conversation',
+      visibility: 'private',
+      retentionPolicy: 'keep'
+    }
+  });
+
+  assert.equal(result.decision, 'accepted');
+  assert.equal(events.shadowUpserts.length, 1);
+  assert.equal(events.shadowUpserts[0].projectId, 'context-project');
+  assert.equal(events.shadowUpserts[0].workspaceId, 'context-workspace');
+  assert.equal(events.shadowUpserts[0].clientId, 'claude');
+  assert.equal(events.shadowUpserts[0].taskId, 'CM-1267');
+  assert.equal(events.shadowUpserts[0].conversationId, 'context-conversation');
+  assert.equal(events.shadowUpserts[0].visibility, 'private');
+  assert.equal(events.shadowUpserts[0].retentionPolicy, 'keep');
+  assert.equal(events.diaryWrites[0].clientId, 'claude');
+  assert.equal(events.auditWrites[0].decision, 'accepted');
 });
