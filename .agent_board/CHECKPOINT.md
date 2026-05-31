@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1254 Runtime Truth Table No-Token Overview Rebase Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: docs-only status-surface correction. No runtime/source/test/config/startup/watchdog/provider/MCP/real-memory/durable-write/remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` no longer presents pre-CM-1183 no-token `memory_overview` behavior as current source fact.
+- CM-1182 is marked as superseded by CM-1183's HTTP boundary block.
+- Current fact is recorded as no-token HTTP JSON-RPC `tools/call` for `memory_overview` returning HTTP `403` / `NO_TOKEN_OVERVIEW_REJECTED` before tool execution.
+- The selected-output projection remains not implemented and not claimed.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `git diff --check`
+- `node .\scripts\validate_autopilot_ledger_consistency.js`
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
+
+Next:
+
+- Commit or otherwise stabilize CM-1254.
+- Future no-token selected overview projection would require separate source/test work and validation.
+
 ## CM-1253 Schema Gate Dry-Run Execution Preflight Invariant Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

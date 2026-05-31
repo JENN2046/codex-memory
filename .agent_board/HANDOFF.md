@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1253 SCHEMA_GATE_DRY_RUN_EXECUTION_PREFLIGHT_INVARIANT`.
+Goal: `CM-1254 RUNTIME_TRUTH_TABLE_NO_TOKEN_OVERVIEW_REBASE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test propagation of SQLite schema startup gate evidence into dry-run execution preflight acceptance.
+Status: `COMPLETED_VALIDATED_NOT_READY` after docs-only rebasing of stale CM-1182 no-token `memory_overview` truth-table wording onto CM-1183 HTTP block reality.
 
 Workspace: `A:\codex-memory`.
 
@@ -83,6 +83,15 @@ Changed scope since CM-1207:
 - `docs/CM1251_SCHEMA_GATE_DOWNSTREAM_POLICY_BINDING.md`
 - `docs/CM1252_SCHEMA_GATE_DRY_RUN_POLICY_INVARIANT.md`
 - `docs/CM1253_SCHEMA_GATE_DRY_RUN_EXECUTION_PREFLIGHT_INVARIANT.md`
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md`
+- `docs/CM1254_RUNTIME_TRUTH_TABLE_NO_TOKEN_OVERVIEW_REBASE.md`
+
+Current CM-1254 fact:
+
+- CM-1254 is docs-only.
+- `docs/CURRENT_RUNTIME_GAP_TRUTH_TABLE.md` no longer presents pre-CM-1183 no-token `memory_overview` behavior as current source fact.
+- Current truth-table fact is that no-token HTTP JSON-RPC `tools/call` for `memory_overview` returns HTTP `403` / `NO_TOKEN_OVERVIEW_REJECTED` before tool execution.
+- No runtime/source/test/config/startup/watchdog/provider/MCP/real-memory/durable-write/remote action or readiness claim occurred.
 
 Current CM-1253 fact:
 

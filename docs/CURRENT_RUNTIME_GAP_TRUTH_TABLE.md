@@ -55,16 +55,23 @@ Still not proven:
 
 ## CM-1182 No-Token Memory Overview Selected-Output Posture Review - 2026-05-26
 
-Result: `CM1182_NO_TOKEN_MEMORY_OVERVIEW_SELECTED_OUTPUT_POSTURE_REVIEW_BLOCKED_NOT_DOWNGRADED_NOT_READY`.
+Result: `CM1182_SUPERSEDED_BY_CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_NOT_READY`.
 
-Current source facts:
+Historical source facts before CM-1183:
 
 - HTTP no-token validation currently allows `memory_overview`.
 - `src/app.js` routes `memory_overview` to `MemoryOverviewService.getOverview(...)` without passing no-token/request context.
 - Authorized and no-token callers therefore receive the same overview projection.
 - The overview service does not intentionally return raw memory body fields such as `content` or `rawText`.
 
-Blocking output posture:
+Current source facts after CM-1183:
+
+- HTTP no-token JSON-RPC `tools/call` for `memory_overview` is rejected at the HTTP boundary with HTTP `403`.
+- The selected error data code is `NO_TOKEN_OVERVIEW_REJECTED`.
+- Rejection occurs before `MemoryOverviewService.getOverview(...)` execution.
+- Bearer-token authorized `memory_overview` remains executable.
+
+Historical blocking output posture if no-token selected projection is reintroduced:
 
 - `paths` can expose operational store/log/index paths.
 - `recentAudit` can expose titles, memory ids, reasons, file paths, and agent identifiers.
@@ -75,12 +82,12 @@ Blocking output posture:
 Decision:
 
 - No blocker downgrade is allowed for no-token `memory_overview` selected-output posture.
+- Current mitigation is the CM-1183 bearer-token requirement for no-token HTTP `memory_overview`, not a selected-output projection.
 - CM-1179 remains limited to covered no-token `search_memory` side-effect/raw-content behavior.
 
 Still not proven:
 
 - No no-token selected projection for `memory_overview`.
-- No no-token overview HTTP response shape regression.
 - No full no-token governance closure.
 - No production readiness, write reliability, or recall reliability.
 
