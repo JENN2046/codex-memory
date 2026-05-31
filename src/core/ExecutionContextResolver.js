@@ -3,15 +3,12 @@ class ExecutionContextResolver {
     this.config = config;
   }
 
-  resolve(requestContext = {}, payload = {}) {
+  resolve(requestContext = {}) {
     const inlineContext = requestContext.executionContext && typeof requestContext.executionContext === 'object'
       ? requestContext.executionContext
       : null;
-    const payloadContext = payload.__executionContext && typeof payload.__executionContext === 'object'
-      ? payload.__executionContext
-      : null;
 
-    const context = inlineContext || payloadContext || {};
+    const context = inlineContext || {};
     return {
       agentAlias: this.normalizeString(context.agentAlias) || null,
       agentId: this.normalizeString(context.agentId) || this.config.defaultAgentId,

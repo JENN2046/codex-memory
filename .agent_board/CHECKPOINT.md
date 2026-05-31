@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1269 Request Context Only Write Authority Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test write-authority hardening for public `record_memory`. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ExecutionContextResolver.resolve(...)` now uses only `requestContext.executionContext`.
+- Public payload `__executionContext` no longer authenticates writes or supplies trusted request source.
+- Added app-boundary regression proving a payload-supplied Codex context is rejected without trusted request-context authority.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\ExecutionContextResolver.js`
+- `node --check tests\phase-a-services.test.js`
+- `node --test tests\phase-a-services.test.js` passed `9/9`.
+- `npm test` passed `2791/2791`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1269.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1268 Proof Memory Payload Marker Precedence Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

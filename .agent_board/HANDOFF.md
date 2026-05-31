@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1268 PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE`.
+Goal: `CM-1269 REQUEST_CONTEXT_ONLY_WRITE_AUTHORITY`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after preserving explicit proof-memory payload markers under context-derived ordinary write scope.
+Status: `COMPLETED_VALIDATED_NOT_READY` after making `requestContext.executionContext` the only write-authority source for `record_memory`.
 
 Workspace: `A:\codex-memory`.
 
@@ -52,6 +52,8 @@ Changed scope since CM-1207:
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`
+- `tests/phase-a-services.test.js`
+- `docs/CM1269_REQUEST_CONTEXT_ONLY_WRITE_AUTHORITY.md`
 - `docs/CM1218_A5_GAP2_RECALL_ISOLATION_NO_MUTATION_EVIDENCE.md`
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
@@ -621,6 +623,32 @@ Validation:
 Next:
 
 Commit or otherwise stabilize CM-1268, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1269 Current Handoff
+
+Goal: `CM-1269 REQUEST_CONTEXT_ONLY_WRITE_AUTHORITY`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1269 hardens public `record_memory` write authority.
+- `ExecutionContextResolver.resolve(...)` now uses only `requestContext.executionContext` and ignores payload `__executionContext`.
+- Added app-boundary regression proving a public payload that includes `__executionContext.agentAlias=Codex` is rejected without trusted request-context authority.
+- No provider/MCP external call, real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `node --check src\core\ExecutionContextResolver.js`
+- `node --check tests\phase-a-services.test.js`
+- `node --test tests\phase-a-services.test.js` passed `9/9`.
+- `npm test` passed `2791/2791`.
+- Full docs/ledger validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1269, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
 
 ## CM-1267 Current Handoff
 
