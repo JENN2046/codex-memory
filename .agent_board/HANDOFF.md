@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1279 INTERNAL_RUNTIME_ENTRY_ACTOR_FALLBACK_NORMALIZATION`.
+Goal: `CM-1280 SHADOW_PROJECTION_RECORD_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing internal runtime entry actor-client fallback normalization and validating shared entry behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing durable governance shadow projection record fallback normalization and validating SQLite-style projection field behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -65,6 +65,9 @@ Changed scope since CM-1207:
 - `src/core/InternalRuntimeEntryGate.js`
 - `tests/internal-runtime-entry-gate.test.js`
 - `docs/CM1279_INTERNAL_RUNTIME_ENTRY_ACTOR_FALLBACK_NORMALIZATION.md`
+- `src/core/DurableGovernanceShadowProjectionPreview.js`
+- `tests/durable-governance-shadow-projection-preview.test.js`
+- `docs/CM1280_SHADOW_PROJECTION_RECORD_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

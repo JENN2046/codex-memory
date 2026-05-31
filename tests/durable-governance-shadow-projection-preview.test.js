@@ -355,3 +355,48 @@ test('CM-0865 helper accepts SQLite-style projection record fields and exposes a
   assert.equal(targetRecord.afterSqliteColumns.status_reason, 'memory retired after governance review');
   assert.equal(targetRecord.afterSqliteColumns.tombstone_reason, 'retention-expired');
 });
+
+test('CM-0865 helper falls through blank camel-case projection fields to SQLite-style fields', () => {
+  const sqliteStyleRecords = loadProjectionRecordsFixture().map(record => ({
+    memoryId: record.memoryId,
+    status: record.status,
+    statusReason: '   ',
+    status_reason: record.statusReason,
+    projectId: '   ',
+    project_id: record.projectId,
+    workspaceId: '   ',
+    workspace_id: record.workspaceId,
+    clientId: '   ',
+    client_id: record.clientId,
+    taskId: '   ',
+    task_id: record.taskId,
+    conversationId: '   ',
+    conversation_id: record.conversationId,
+    visibility: record.visibility,
+    retentionPolicy: '   ',
+    retention_policy: record.retentionPolicy,
+    supersededBy: '   ',
+    superseded_by_memory_id: record.supersededBy,
+    supersedes: '   ',
+    supersedes_memory_id: record.supersedes,
+    tombstoneReason: '   ',
+    tombstone_reason: record.tombstoneReason,
+    lifecycleUpdatedAt: '   ',
+    lifecycle_updated_at: '2026-05-23T07:59:00.000Z',
+    lifecycleActorClientId: '   ',
+    lifecycle_actor_client_id: 'codex-desktop'
+  }));
+  const summary = previewDurableGovernanceShadowProjection({
+    dryRunInput: buildTombstoneDryRunInput(),
+    currentProjectionRecords: sqliteStyleRecords,
+    previewedAt: '2026-05-23T08:30:00.000Z'
+  });
+
+  assert.equal(summary.acceptedForProjectionPreview, true);
+  const targetRecord = summary.projectionResult.affectedRecords[0];
+  assert.equal(targetRecord.before.statusReason, 'aged-out');
+  assert.equal(targetRecord.before.lifecycleUpdatedAt, '2026-05-23T07:59:00.000Z');
+  assert.equal(targetRecord.beforeSqliteColumns.lifecycle_actor_client_id, 'codex-desktop');
+  assert.equal(targetRecord.scopeVerified, true);
+  assert.deepEqual(summary.blockers.blockingFindings, []);
+});

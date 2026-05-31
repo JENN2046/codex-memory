@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1280 Shadow Projection Record Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test durable governance shadow projection preview normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `normalizeProjectionRecord(...)` now uses the first non-empty normalized value across camel-case and SQLite-style snake_case projection record candidates.
+- Blank camel-case projection fields no longer mask valid `memory_id`, `project_id`, `workspace_id`, `client_id`, `retention_policy`, lifecycle, supersession, or tombstone snake_case fields.
+- Added regression proving SQLite-style projection fields remain accepted and scope verified when paired camel-case fields are blank.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\DurableGovernanceShadowProjectionPreview.js`
+- `node --check tests\durable-governance-shadow-projection-preview.test.js`
+- `node --test tests\durable-governance-shadow-projection-preview.test.js tests\durable-governance-mutation-dry-run-helper.test.js tests\memory-supersede-runtime-prep-helper.test.js tests\durable-governance-tombstone-runtime-prep-helper.test.js` passed `26/26`.
+- `npm test` passed `2800/2800`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1280.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1279 Internal Runtime Entry Actor Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

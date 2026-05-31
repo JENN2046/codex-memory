@@ -40,6 +40,16 @@ function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) {
+      return normalized;
+    }
+  }
+  return '';
+}
+
 function normalizeStringArray(values) {
   return [...new Set(
     cloneArray(values)
@@ -51,21 +61,21 @@ function normalizeStringArray(values) {
 function normalizeProjectionRecord(record = {}) {
   const safeRecord = isPlainObject(record) ? record : {};
   return {
-    memoryId: normalizeString(safeRecord.memoryId),
+    memoryId: firstNormalizedString(safeRecord.memoryId, safeRecord.memory_id),
     status: normalizeStatus(safeRecord.status),
-    statusReason: normalizeString(safeRecord.statusReason || safeRecord.status_reason),
-    projectId: normalizeString(safeRecord.projectId),
-    workspaceId: normalizeString(safeRecord.workspaceId),
-    clientId: normalizeString(safeRecord.clientId),
-    taskId: normalizeString(safeRecord.taskId),
-    conversationId: normalizeString(safeRecord.conversationId),
+    statusReason: firstNormalizedString(safeRecord.statusReason, safeRecord.status_reason),
+    projectId: firstNormalizedString(safeRecord.projectId, safeRecord.project_id),
+    workspaceId: firstNormalizedString(safeRecord.workspaceId, safeRecord.workspace_id),
+    clientId: firstNormalizedString(safeRecord.clientId, safeRecord.client_id),
+    taskId: firstNormalizedString(safeRecord.taskId, safeRecord.task_id),
+    conversationId: firstNormalizedString(safeRecord.conversationId, safeRecord.conversation_id),
     visibility: normalizeString(safeRecord.visibility),
-    retentionPolicy: normalizeString(safeRecord.retentionPolicy),
-    supersededBy: normalizeString(safeRecord.supersededBy || safeRecord.superseded_by_memory_id),
-    supersedes: normalizeString(safeRecord.supersedes || safeRecord.supersedes_memory_id),
-    tombstoneReason: normalizeString(safeRecord.tombstoneReason || safeRecord.tombstone_reason),
-    lifecycleUpdatedAt: normalizeString(safeRecord.lifecycleUpdatedAt || safeRecord.lifecycle_updated_at),
-    lifecycleActorClientId: normalizeString(safeRecord.lifecycleActorClientId || safeRecord.lifecycle_actor_client_id)
+    retentionPolicy: firstNormalizedString(safeRecord.retentionPolicy, safeRecord.retention_policy),
+    supersededBy: firstNormalizedString(safeRecord.supersededBy, safeRecord.superseded_by_memory_id),
+    supersedes: firstNormalizedString(safeRecord.supersedes, safeRecord.supersedes_memory_id),
+    tombstoneReason: firstNormalizedString(safeRecord.tombstoneReason, safeRecord.tombstone_reason),
+    lifecycleUpdatedAt: firstNormalizedString(safeRecord.lifecycleUpdatedAt, safeRecord.lifecycle_updated_at),
+    lifecycleActorClientId: firstNormalizedString(safeRecord.lifecycleActorClientId, safeRecord.lifecycle_actor_client_id)
   };
 }
 
