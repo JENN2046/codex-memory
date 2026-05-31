@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1237 VALIDATION_AGGREGATOR_LOCAL_PROOF_CHAIN_ROUTING`.
+Goal: `CM-1238 A5-GAP-5_FRESH_STRICT_GATE_PREFLIGHT`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test reconciliation of completed local proof-chain state into closure authority routing.
+Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY` after docs-only preparation of future exact-approved strict gate boundary.
 
 Workspace: `A:\codex-memory`.
 
@@ -55,6 +55,7 @@ Changed scope since CM-1207:
 - `docs/CM1235_VALIDATION_AGGREGATOR_EFFECTIVE_GAP_CLOSURE_MAP.md`
 - `docs/CM1236_VALIDATION_AGGREGATOR_CLOSURE_AUTHORITY_SUMMARY.md`
 - `docs/CM1237_VALIDATION_AGGREGATOR_LOCAL_PROOF_CHAIN_ROUTING.md`
+- `docs/CM1238_A5_GAP5_FRESH_STRICT_GATE_PREFLIGHT.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -135,6 +136,10 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1237 keeps `validation_aggregator_full_implementation_incomplete` open, but no longer treats it as automatic local work.
 - CM-1237 targeted validation passed `22/22`.
 - CM-1237 keeps `validationAggregatorFullImplementation=false`, `fullAggregatorImplementationComplete=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+- CM-1238 prepares the next exact A5-GAP-5 approval boundary only.
+- Future command is limited to `npm run gate:mainline:strict`.
+- Future execution must bind to fresh post-CM-1238 HEAD.
+- CM-1238 does not execute strict gate, remote write, provider call, real-memory scan, config/watchdog/startup change, cutover, or readiness claim.
 - CM-1229 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected future aggregation units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
 - CM-1229 does not execute ValidationAggregator, scan files/stores, call MCP tools, call providers, write durable memory/audit, or claim readiness.

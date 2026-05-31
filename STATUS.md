@@ -71,7 +71,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1237 VALIDATION_AGGREGATOR_LOCAL_PROOF_CHAIN_ROUTING` 已把 P66 local-safe proof chain complete 状态接入 closure authority routing：`validation_aggregator_full_implementation_incomplete` 仍保持 open，但不再作为自动可继续的 local implementation next step。full gap accounting 新增 `effectiveLocalProofChainCompleteGapIds/count` 与 `effectiveActionableLocalImplementationGapIds/count`；当前默认与 accepted-summary 路径改为 `closureAuthorityStatus=red_lane_authorization_required`、`nextClosureAuthority=explicit_red_lane_owner_approval`。Targeted validation `node --check src\core\ValidationAggregatorService.js` 与 `node --test tests\v1-rc-validation-aggregator-implementation.test.js tests\no-touch-boundary-regression.test.js` 通过，测试 `22/22`。该变更不执行 A5-GAP-6，不读取 evidence 文件或 stores，不调用 MCP/provider，不写 durable memory/audit，不改变 readiness。
 
-当前下一步是准备下一项 exact-approved A5/Red runtime gap boundary，或在有明确新本地实现切片时继续 source/test 工作。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230/CM-1231/CM-1232/CM-1233/CM-1234/CM-1235/CM-1236/CM-1237 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1238 A5-GAP-5_FRESH_STRICT_GATE_PREFLIGHT` 已准备下一次 fresh strict gate 的 exact approval boundary：提交 CM-1238 后必须用新的 fresh `HEAD` 批准 `A5-GAP-5`，命令范围仅限 `npm run gate:mainline:strict`，且 `no remote write`。CM-1238 不执行 strict gate，不启动服务，不调用 provider/MCP，不读取真实记忆，不写 durable memory/audit，不改变 config/watchdog/startup，不执行 push、PR、release、deploy、cutover 或 readiness claim。
+
+当前下一步是提交 CM-1238，然后如需执行 strict gate，使用 fresh post-commit HEAD 给出 exact approval。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222/CM-1223/CM-1224/CM-1225/CM-1226/CM-1227/CM-1228/CM-1229/CM-1230/CM-1231/CM-1232/CM-1233/CM-1234/CM-1235/CM-1236/CM-1237/CM-1238 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 

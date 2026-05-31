@@ -1,5 +1,44 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1238 A5-GAP-5 Fresh Strict Gate Preflight Checkpoint
+
+Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: docs/preflight only for a future exact-approved `A5-GAP-5` cutover-context strict gate.
+
+Result:
+
+- Prepared the future approval line for fresh post-CM-1238 HEAD.
+- Future command is limited to `npm run gate:mainline:strict`.
+- Captured the current preflight baseline: `main@199aec96ae660ddad175a7566195f63fee1a0caa`, `main...origin/main [ahead 31]`, tracked worktree clean, untracked files left untouched.
+- No approval is granted by this record.
+
+Validation:
+
+- `git diff --check`
+- Ledger consistency validation.
+- Docs validation via `scripts\validate-local.ps1 -Area docs`.
+
+Boundary:
+
+- No strict gate execution.
+- No service start.
+- No evidence file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1238.
+- If execution is desired later, use fresh post-commit HEAD in the exact `A5-GAP-5` approval line.
+
 ## CM-1237 ValidationAggregator Local Proof Chain Routing Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
