@@ -84,9 +84,9 @@ Still not proven:
 - No full no-token governance closure.
 - No production readiness, write reliability, or recall reliability.
 
-## CM-1181 / CM-1250 Startup Explicit Rebuild Recovery Policy - 2026-06-01
+## CM-1181 / CM-1250 / CM-1251 Startup Explicit Rebuild Recovery Policy - 2026-06-01
 
-Result: `CM1250_SCHEMA_GATED_STARTUP_RECOVERY_POLICY_VALIDATED_NOT_READY`.
+Result: `CM1251_SCHEMA_GATE_DOWNSTREAM_POLICY_BINDING_VALIDATED_NOT_READY`.
 
 Current source facts:
 
@@ -94,14 +94,17 @@ Current source facts:
 - Worker status and dry-run behavior exist.
 - `buildStartupRecoverySafetyPreflight(...)` now requires an accepted sanitized `schemaStartupGate` from `shadowHealth`.
 - Startup recovery policy preflight fails closed if the schema gate is missing, blocked, malformed, unaccepted, or future-versioned.
+- Downstream guarded startup recovery policy acceptance now also requires the prior preflight to carry an accepted sanitized `shadowHealth.schemaStartupGate`.
+- Accepted-looking legacy preflight shapes without schema gate evidence no longer advance policy design.
 - Startup recovery remains disabled and not executed by default.
 
-CM-1250 implements the first policy integration slice:
+CM-1250 / CM-1251 implement the first policy integration slices:
 
 - startup inspection/reporting is allowed as a future safe surface
 - silent diary rebuild is blocked
 - silent reconcile apply is blocked
 - schema gate blockers must stop recovery first
+- downstream policy design cannot bypass the schema gate through stale preflight shape
 - apply/rebuild/reconcile still require exact bounded authorization and validation
 
 Still not proven:

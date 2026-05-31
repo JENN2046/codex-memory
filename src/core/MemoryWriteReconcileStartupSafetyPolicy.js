@@ -387,6 +387,7 @@ function hasAcceptedStartupRecoveryPreflight(report) {
     report.taskId === STARTUP_RECOVERY_TASK_ID &&
     report.accepted === true &&
     report.status === 'startup_recovery_safety_preflight_passed_not_enabled' &&
+    getSchemaStartupGateBlocker(report.shadowHealth) === '' &&
     report.startupRecoveryPreflightAccepted === true &&
     report.startupRecoveryEnabled === false &&
     report.runtimeRecoveryExecuted === false &&

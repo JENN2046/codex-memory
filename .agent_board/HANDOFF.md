@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1250 SCHEMA_GATED_STARTUP_RECOVERY_POLICY`.
+Goal: `CM-1251 SCHEMA_GATE_DOWNSTREAM_POLICY_BINDING`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test integration of the SQLite schema startup gate into startup recovery policy preflight.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test binding of SQLite schema startup gate evidence into downstream startup recovery policy acceptance.
 
 Workspace: `A:\codex-memory`.
 
@@ -80,6 +80,15 @@ Changed scope since CM-1207:
 - `src/core/MemoryWriteReconcileStartupSafetyPolicy.js`
 - `tests/memory-write-reconcile-startup-safety-policy.test.js`
 - `docs/CM1250_SCHEMA_GATED_STARTUP_RECOVERY_POLICY.md`
+- `docs/CM1251_SCHEMA_GATE_DOWNSTREAM_POLICY_BINDING.md`
+
+Current CM-1251 fact:
+
+- CM-1251 binds CM-1250 schema gate evidence into `hasAcceptedStartupRecoveryPreflight(...)`.
+- Downstream `buildGuardedStartupRecoveryPolicyDesign(...)` now rejects accepted-looking legacy preflight shapes without `shadowHealth.schemaStartupGate`.
+- Blocked schema gate state in an accepted-looking preflight also prevents downstream policy design acceptance.
+- Targeted policy/schema/no-touch validation passed `27/27`; default `npm test` passed `2782/2782`.
+- No recovery execution/apply, startup/watchdog install, config change, service start, provider/MCP call, real-memory scan, migration/import/export/backup/restore apply, remote action, or readiness claim occurred.
 
 Current CM-1250 fact:
 

@@ -83,7 +83,24 @@ function acceptedCm1166Preflight(overrides = {}) {
       degradedManifestCount: 1,
       reconcileTaskCount: 3
     },
-    schemaStartupGate: healthySchemaStartupGate(),
+    shadowHealth: {
+      available: true,
+      authoritativeStore: 'sqlite',
+      recordCount: 2,
+      chunkCount: 2,
+      totalChunkCount: 2,
+      reconcileCount: 3,
+      schemaStartupGate: healthySchemaStartupGate(),
+      writeManifest: {
+        total: 3,
+        pending: 2,
+        committed: 0,
+        degraded: 1,
+        repaired: 0,
+        cancelled: 0,
+        failed: 0
+      }
+    },
     ...overrides
   };
 }
@@ -711,6 +728,98 @@ test('CM-1167 guarded startup recovery policy design requires accepted CM-1166 p
   assert.ok(report.blockerReasons.includes('manual_approval_required'));
   assert.ok(report.blockerReasons.includes('temp_local_policy_scope_required'));
   assert.equal(report.startupRecoveryPolicyDesigned, false);
+});
+
+test('CM-1251 guarded startup recovery policy rejects preflight without accepted schema gate', () => {
+  const legacyAcceptedPreflight = acceptedCm1166Preflight({
+    shadowHealth: {
+      available: true,
+      authoritativeStore: 'sqlite',
+      recordCount: 2,
+      chunkCount: 2,
+      totalChunkCount: 2,
+      reconcileCount: 3,
+      writeManifest: {
+        total: 3,
+        pending: 2,
+        committed: 0,
+        degraded: 1,
+        repaired: 0,
+        cancelled: 0,
+        failed: 0
+      }
+    }
+  });
+  const blockedGatePreflight = acceptedCm1166Preflight({
+    shadowHealth: {
+      available: true,
+      authoritativeStore: 'sqlite',
+      recordCount: 2,
+      chunkCount: 2,
+      totalChunkCount: 2,
+      reconcileCount: 3,
+      schemaStartupGate: {
+        status: 'blocked',
+        expectedVersion: 1,
+        observedVersion: 2,
+        blocked: true,
+        reason: 'future_schema_version_detected'
+      },
+      writeManifest: {
+        total: 3,
+        pending: 2,
+        committed: 0,
+        degraded: 1,
+        repaired: 0,
+        cancelled: 0,
+        failed: 0
+      }
+    }
+  });
+  const legacyReport = buildGuardedStartupRecoveryPolicyDesign({
+    mode: ACCEPTED_RECOVERY_POLICY_MODE,
+    source: 'cm1166_startup_recovery_safety_preflight_report',
+    priorPreflight: legacyAcceptedPreflight,
+    proposedPolicy: {
+      startupRecoveryLimit: 5,
+      reconcileReplayLimit: 4,
+      repairLimit: 3,
+      dryRunRequired: true,
+      manualApprovalRequired: true,
+      cancelMissingDiaryAtStartup: false,
+      repairDegradedAtStartup: false,
+      recoverPendingAtStartup: false,
+      replayReconcileAtStartup: false,
+      realStoreScope: 'temp_local'
+    }
+  });
+  const blockedGateReport = buildGuardedStartupRecoveryPolicyDesign({
+    mode: ACCEPTED_RECOVERY_POLICY_MODE,
+    source: 'cm1166_startup_recovery_safety_preflight_report',
+    priorPreflight: blockedGatePreflight,
+    proposedPolicy: {
+      startupRecoveryLimit: 5,
+      reconcileReplayLimit: 4,
+      repairLimit: 3,
+      dryRunRequired: true,
+      manualApprovalRequired: true,
+      cancelMissingDiaryAtStartup: false,
+      repairDegradedAtStartup: false,
+      recoverPendingAtStartup: false,
+      replayReconcileAtStartup: false,
+      realStoreScope: 'temp_local'
+    }
+  });
+
+  assert.equal(legacyReport.accepted, false);
+  assert.equal(legacyReport.priorPreflightAccepted, false);
+  assert.ok(legacyReport.blockerReasons.includes('accepted_cm1166_preflight_required'));
+  assert.equal(legacyReport.startupRecoveryPolicyDesigned, false);
+
+  assert.equal(blockedGateReport.accepted, false);
+  assert.equal(blockedGateReport.priorPreflightAccepted, false);
+  assert.ok(blockedGateReport.blockerReasons.includes('accepted_cm1166_preflight_required'));
+  assert.equal(blockedGateReport.startupRecoveryPolicyDesigned, false);
 });
 
 test('CM-1167 guarded startup recovery policy design blocks startup execution, real-store scope, and overclaims', () => {
