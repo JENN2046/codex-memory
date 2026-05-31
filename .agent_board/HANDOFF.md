@@ -10,7 +10,7 @@ Workspace: `A:\codex-memory`.
 
 Branch: `hardening/p0-p2-security-rc-base`.
 
-Current Git facts: `HEAD == origin/hardening/p0-p2-security-rc-base == 1abb5a3785af5ac96684fe3d7728eb7027e41a98`; `CLAUDE.md` remains untracked and was not modified.
+Git facts: pre-sync local `HEAD` was `1abb5a3785af5ac96684fe3d7728eb7027e41a98`, and the pre-sync `origin/hardening/p0-p2-security-rc-base` tracking ref was also `1abb5a3785af5ac96684fe3d7728eb7027e41a98`; after applying CM-1185, the local status-sync commit was `b410325a56e20881cb0ef2e876f005acbdc6b58f`. In a local/unpushed review context, origin must not be treated as containing that status commit until an explicit push is verified. `CLAUDE.md` remains untracked and was not modified.
 
 Changed files: `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/BLOCKERS.md`.
 

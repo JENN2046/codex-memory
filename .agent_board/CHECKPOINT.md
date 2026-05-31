@@ -9,7 +9,8 @@ Date: 2026-05-31
 Completed:
 - Updated `STATUS.md` top-level date and current conclusion with CM-1185 review-sync facts.
 - Recorded current branch `hardening/p0-p2-security-rc-base`.
-- Recorded `HEAD == origin/hardening/p0-p2-security-rc-base == 1abb5a3785af5ac96684fe3d7728eb7027e41a98`.
+- Recorded pre-sync baseline: local `HEAD` and `origin/hardening/p0-p2-security-rc-base` were both `1abb5a3785af5ac96684fe3d7728eb7027e41a98` before CM-1185 status-surface edits.
+- Recorded post-sync status commit: applying CM-1185 advanced local `HEAD` to `b410325a56e20881cb0ef2e876f005acbdc6b58f`; origin did not include that commit until a later explicit push.
 - Recorded local Node `v24.14.0`.
 - Recorded review evidence: `npm test` passed `2749/2749`; `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`; fixture-only `gate:ci` PASS.
 - Left untracked `CLAUDE.md` untouched and treated its `123/123` baseline as local drift, not authoritative status.
