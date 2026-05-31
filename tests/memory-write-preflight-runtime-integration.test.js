@@ -381,6 +381,37 @@ test('write runtime derives record scope from execution context when payload omi
   assert.equal(events.auditWrites[0].decision, 'accepted');
 });
 
+test('write runtime falls through blank execution-context camel scope to snake-case scope', async () => {
+  const { service, events } = createHarness({
+    executionContext: {
+      projectId: '   ',
+      project_id: 'snake-project',
+      workspaceId: '   ',
+      workspace_id: 'snake-workspace',
+      clientId: '   ',
+      client_id: 'claude',
+      taskId: '   ',
+      task_id: 'CM-SNAKE-SCOPE',
+      conversationId: '   ',
+      conversation_id: 'snake-conversation',
+      retentionPolicy: '   ',
+      retention_policy: 'snake-retention'
+    }
+  });
+
+  const result = await service.record(validProcessPayload());
+
+  assert.equal(result.decision, 'accepted');
+  assert.equal(events.shadowUpserts.length, 1);
+  assert.equal(events.shadowUpserts[0].projectId, 'snake-project');
+  assert.equal(events.shadowUpserts[0].workspaceId, 'snake-workspace');
+  assert.equal(events.shadowUpserts[0].clientId, 'claude');
+  assert.equal(events.shadowUpserts[0].taskId, 'CM-SNAKE-SCOPE');
+  assert.equal(events.shadowUpserts[0].conversationId, 'snake-conversation');
+  assert.equal(events.shadowUpserts[0].retentionPolicy, 'snake-retention');
+  assert.equal(events.diaryWrites[0].clientId, 'claude');
+});
+
 test('write runtime preserves explicit payload proof marker under context-derived ordinary scope', async () => {
   const events = {
     diaryWrites: [],

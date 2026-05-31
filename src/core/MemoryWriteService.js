@@ -41,12 +41,21 @@ function normalizeTags(value) {
 }
 
 function normalizeScopeField(payload = {}, executionContext = {}, camelKey, snakeKey) {
-  return normalizeString(
-    executionContext[camelKey] ||
-    executionContext[snakeKey] ||
-    payload[snakeKey] ||
+  const candidates = [
+    executionContext[camelKey],
+    executionContext[snakeKey],
+    payload[snakeKey],
     payload[camelKey]
-  );
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = normalizeString(candidate);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return '';
 }
 
 function buildWritePreflightAllowedScope(payload = {}, executionContext = {}) {

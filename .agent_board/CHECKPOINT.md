@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1277 Memory Write Scope Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test write-service scope normalization hardening. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteService.normalizeScopeField(...)` now uses the first non-empty normalized value across execution-context camel, execution-context snake, payload snake, and payload camel candidates.
+- Blank execution-context camel-case fields no longer mask valid snake-case or payload fallback values during write persistence.
+- Added write integration regression proving blank execution-context camel scope falls through to snake-case scope and persists expected shadow/diary scope.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\MemoryWriteService.js`
+- `node --check tests\memory-write-preflight-runtime-integration.test.js`
+- `node --test tests\memory-write-preflight-runtime-integration.test.js tests\phase-a-services.test.js tests\policy-read-preflight.test.js` passed `29/29`.
+- `npm test` passed `2797/2797`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1277.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1276 Execution Context Scope Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
