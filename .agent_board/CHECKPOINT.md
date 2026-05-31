@@ -1,5 +1,50 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1185 Project Status Review Sync Checkpoint
+
+Status: `CM1185_PROJECT_STATUS_REVIEW_SYNC_COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Completed:
+- Updated `STATUS.md` top-level date and current conclusion with CM-1185 review-sync facts.
+- Recorded current branch `hardening/p0-p2-security-rc-base`.
+- Recorded `HEAD == origin/hardening/p0-p2-security-rc-base == 1abb5a3785af5ac96684fe3d7728eb7027e41a98`.
+- Recorded local Node `v24.14.0`.
+- Recorded review evidence: `npm test` passed `2749/2749`; `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`; fixture-only `gate:ci` PASS.
+- Left untracked `CLAUDE.md` untouched and treated its `123/123` baseline as local drift, not authoritative status.
+- Updated `.agent_board` task, validation, ledger, checkpoint, handoff, run-state, and blocker status surfaces.
+
+Validation:
+- `git status --short --branch` inspected.
+- `git diff --stat` inspected.
+- `git diff --check` passed.
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs` passed.
+- Final tracked-scope review confirmed changes are status/board docs only.
+
+Not validated:
+- `npm test` was not rerun in this sync step; this checkpoint records the immediately prior CM-1185 review evidence.
+- `npm run test:hardening` was not rerun in this sync step; this checkpoint records the immediately prior CM-1185 review evidence.
+- `gate:mainline`
+- `gate:mainline:strict`
+- HTTP observe
+- provider smoke/benchmark
+- true `record_memory`
+- true `search_memory`
+- `memory_overview`
+- push-readiness
+- push
+
+Boundary:
+- No source/runtime/test/package/lock/config/env/secret/watchdog/startup change.
+- No provider/API/model call.
+- No real memory tool call or raw store/`.jsonl` read.
+- No durable project memory/audit write.
+- No public MCP expansion.
+- No push, PR, tag, release, or deploy.
+- No readiness, write reliability, or recall reliability claim.
+- `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` remain unchanged.
+
 ## CM-1183 No-Token Memory Overview HTTP Block Checkpoint
 
 Status: `CM1183_NO_TOKEN_MEMORY_OVERVIEW_HTTP_BLOCK_VALIDATED_NOT_READY`

@@ -4,15 +4,15 @@
 |---|---|
 | Workspace root | A:\codex-memory |
 | Git repository | yes |
-| Branch | main |
-| Latest local sync | Remote fast-forward completed after user reported remote updates: local `main` aligned with `origin/main` at `000cee8` (`docs: record cm1176 post-commit state`). Post-sync checks showed `git status --short --branch` as `## main...origin/main` before CM-1177 local edits. |
+| Branch | hardening/p0-p2-security-rc-base |
+| Latest local sync | 2026-05-31 status sync confirmed `HEAD == origin/hardening/p0-p2-security-rc-base == 1abb5a3785af5ac96684fe3d7728eb7027e41a98`; tracked diff was empty before CM-1185 status-surface edits; `CLAUDE.md` was the only untracked file and remains untouched. |
 | Local HEAD at CM-0737 start | `591bab4 feat: summarize memory mainline goal readiness` |
 | Remote baseline | `origin/main = 4997db5 feat: add local autopilot control loop surfaces` |
 | Worktree at CM-0737 start | `main...origin/main [ahead 34]`; tracked worktree was clean before the approved StoreWAsk attempt and preflight repair slice. |
 | Mode | Smart Standing Authorization v3 - Budgeted Autonomy Envelope |
 | A4.8 role | legacy local-safe rail and Green Lane substrate |
-| Current task | CM-1183 no-token `memory_overview` HTTP block completed, validated, and locally committed as `a523341 fix: block no-token overview`. Source/test slice now rejects no-token HTTP JSON-RPC `tools/call` + `memory_overview` with 403 / `NO_TOKEN_OVERVIEW_REJECTED` before tool execution, while bearer-token overview remains executable in temp-local HTTP. Source/test syntax, targeted HTTP `20/20`, adjacent `37/37`, full `npm test` `2789/2789`, docs validation, ledger consistency, and `git diff --check` passed. No real project-memory `memory_overview`, raw store/`.jsonl` read, provider/API, public MCP expansion, config/watchdog/startup/dependency change, push, readiness claim, or reliability claim. |
-| Current area | P8-memory-governance / P9-codex-claude-client-scope / P0-mainline-health |
+| Current task | CM-1185 project status review sync completed and validated. Status surfaces now record the current hardening branch alignment, Node `v24.14.0`, and review evidence: `npm test` `2749/2749`, `npm run test:hardening` hardening `73/73` plus override evidence `6/6`, fixture-only `gate:ci` PASS. This was docs/board/status-only; no source/runtime/package/config/env/provider/real-memory/push/readiness action. |
+| Current area | P6-docs-drift / P10-observability-admin |
 | Next goal | Make `codex-memory` a default-usable, auditable, rollback-ready, governable, VCP-compatible, local-first memory runtime. First large phases: reliability closure for recall/write evidence, then governance closure for lifecycle/scope/pollution prevention, without readiness or reliability overclaim. |
 | Standing owner smart authorization v3 active | true |
 | Autonomy envelope active | true |
@@ -30,7 +30,8 @@
 | Destructive action allowed automatically | false |
 | Public MCP expansion allowed automatically | false |
 | Readiness claim allowed automatically | false |
-| Recommended next | Choose the next separate reliability/governance blocker. Do not touch real memory stores/provider/config/watchdog/startup/dependencies, push, or claim production readiness/write reliability/recall reliability. |
+| Recommended next | Choose the next separate local-safe reliability/governance or docs-drift task. Do not touch real memory stores/provider/config/watchdog/startup/dependencies, push, or claim production readiness/write reliability/recall reliability. |
+| Latest CM-1185 project status review sync | Branch `hardening/p0-p2-security-rc-base` is aligned with `origin/hardening/p0-p2-security-rc-base` at `1abb5a3785af5ac96684fe3d7728eb7027e41a98`; local Node is `v24.14.0`; status surfaces record `npm test` `2749/2749`, `npm run test:hardening` hardening `73/73` plus override evidence `6/6`, and fixture-only `gate:ci` PASS from the current review. `CLAUDE.md` remains untracked and untouched; its `123/123` local baseline is not authoritative. CM-1185 did not rerun full suite, mainline gates, HTTP observe, provider validation, real memory tools, push-readiness, or push. |
 | Latest CM-1183 no-token memory_overview HTTP block | Commit `a523341 fix: block no-token overview` completed the source/test slice. `src/adapters/codex-mcp/http.js` now rejects no-token `memory_overview` before tool execution with selected code `NO_TOKEN_OVERVIEW_REJECTED`; `tests/mcp-http.test.js` proves rejection happens before overview service execution and bearer-token authorized overview still works. Source/test syntax passed; targeted HTTP `20/20`, adjacent `37/37`, and full `npm test` `2789/2789` passed. |
 | Latest CM-1182 no-token memory_overview selected-output posture review | Commit `a54b680 docs: review no-token overview posture` records that no downgrade is allowed for no-token `memory_overview`: HTTP no-token currently allows it, app routing does not pass no-token context to `MemoryOverviewService`, and output can include operational paths, memory ids, titles, reasons, file/source references, recent files, and profile/provider details. CM-1179 remains limited to no-token `search_memory`. No live overview call, memory tool, raw store/`.jsonl` read, provider/API, durable write, public MCP expansion, config/startup/package change, push, readiness, or reliability claim. Ledger consistency, docs validation, and `git diff --check` passed. |
 | Latest CM-1181 startup explicit rebuild/recovery policy plan | Commit `396cccd docs: plan startup recovery policy` records that startup recovery should inspect/report but must not silently rebuild diary projections or apply reconcile tasks. Future source work should keep apply/rebuild/reconcile explicit and approval-gated for real stores. No source/startup/recovery apply change. Ledger consistency, docs validation, and `git diff --check` passed. |

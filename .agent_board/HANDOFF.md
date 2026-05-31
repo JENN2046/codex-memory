@@ -1,5 +1,27 @@
 # HANDOFF.md - codex-memory
 
+## CM-1185 Project Status Review Sync Handoff
+
+Goal: sync tracked status surfaces to the current CM-1184/CM-1185 review facts without runtime, provider, real-memory, config, or remote side effects.
+
+Status: CM1185_PROJECT_STATUS_REVIEW_SYNC_COMPLETED_VALIDATED_NOT_READY.
+
+Workspace: `A:\codex-memory`.
+
+Branch: `hardening/p0-p2-security-rc-base`.
+
+Current Git facts: `HEAD == origin/hardening/p0-p2-security-rc-base == 1abb5a3785af5ac96684fe3d7728eb7027e41a98`; `CLAUDE.md` remains untracked and was not modified.
+
+Changed files: `STATUS.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/CHECKPOINT.md`; `.agent_board/HANDOFF.md`; `.agent_board/RUN_STATE.md`; `.agent_board/VALIDATION_LOG.md`; `.agent_board/AUTOPILOT_LEDGER.md`; `.agent_board/BLOCKERS.md`.
+
+Current result: status surfaces now record Node `v24.14.0` and review evidence that `npm test` passed `2749/2749`, `npm run test:hardening` passed hardening `73/73` plus override evidence `6/6`, and fixture-only `gate:ci` passed. The sync keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation: git status/diff inspected; `git diff --check` passed; docs validation via `scripts/validate-local.ps1 -Area docs` passed; final tracked-scope review confirmed status/board docs only.
+
+Not validated: full suite rerun, hardening rerun, `gate:mainline`, `gate:mainline:strict`, HTTP observe, provider smoke/benchmark, true memory tools, push-readiness, push.
+
+Next safe step: choose the next local-safe reliability/governance or docs-drift task. Do not use the CM-1185 review evidence to claim runtime readiness, RC readiness, write reliability, recall reliability, or push-readiness.
+
 ## CM-1183 No-Token Memory Overview HTTP Block Handoff
 
 Goal: block no-token HTTP `memory_overview` before tool execution while preserving bearer-token authorized overview.
