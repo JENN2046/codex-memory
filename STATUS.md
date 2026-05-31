@@ -31,7 +31,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1215 A5-GAP-1_GOVERNANCE_RUNTIME_LOOP_EVIDENCE` 已在 exact approval 下执行：`main@7d66d072ccb7828770cdb1ddffb5b756152b9af3`，subject 为 `cm1214-governance-runtime-loop-no-durable-write sanitized test subject`，`durable write no`。本次只执行 in-memory `evaluateGovernanceRuntimeApprovalAuditLoop(...)` sanitized proof；结果 `accepted=true`、`status=GOVERNANCE_RUNTIME_APPROVAL_AUDIT_LOOP_ACCEPTED_NOT_EXECUTED_NOT_READY`、6 个 stage 均为 `evaluated_not_executed`，side-effect counters 全为 0。未执行 governed action，未写 durable audit/memory，未调用 provider，未读取真实记忆，未执行 MCP `tools/call`。
 
-当前下一步是记录并提交 CM-1215 evidence，然后选择 A5-GAP-6 aggregation refresh 或下一个未关闭 runtime gap。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness 或 `RC_READY`。
+`CM-1216 A5-GAP-6_POST_GOVERNANCE_LOOP_AGGREGATION_PREFLIGHT` 正在准备下一次 evidence aggregation refresh 的精确授权边界：默认只消费当前已批准并已记录的 `A5-GAP-1,A5-GAP-4,A5-GAP-5` sanitized evidence；历史 `A5-GAP-2/3` artifacts 仅作背景，除非后续 exact approval 明确命名，否则不得被聚合器消费。CM-1216 不执行 ValidationAggregator，不扫描文件或 stores，不调用 MCP `tools/call`，不读取真实记忆，不写 durable memory/audit，不执行 governed action，不改变 config/watchdog/startup，不执行 provider、push、PR、release、deploy 或 cutover。
+
+当前下一步是提交或稳定 CM-1216 preflight，然后用 fresh `HEAD` 给出 exact A5-GAP-6 approval 后才可执行 aggregation refresh。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness 或 `RC_READY`。
 
 ## 当前权威入口
 
