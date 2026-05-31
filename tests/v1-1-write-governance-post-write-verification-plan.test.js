@@ -41,6 +41,24 @@ function targetScope(overrides = {}) {
   };
 }
 
+function snakeTargetScope(overrides = {}) {
+  return {
+    projectRef: '   ',
+    project_id: 'codex-memory',
+    workspaceRef: '',
+    workspace_id: 'A:/codex-memory',
+    clientRef: ' ',
+    client_id: 'codex',
+    agentRef: '',
+    agent_id: 'codex-local',
+    taskRef: '',
+    task_id: 'CM-1093',
+    visibility: '',
+    visibility_policy: 'process',
+    ...overrides
+  };
+}
+
 function zeroCounters(overrides = {}) {
   return {
     ...Object.fromEntries(REQUIRED_ZERO_COUNTER_KEYS.map(key => [key, 0])),
@@ -162,6 +180,27 @@ test('CM1093 accepts exact post-write verification plan without executing verifi
   assert.equal(report.safety.executesPostWriteVerification, false);
   assert.equal(report.nextAllowedAction, 'discuss_whether_to_allow_one_exact_approved_record_memory_write');
   assert.deepEqual(report.blockerReasons, []);
+});
+
+test('CM1093 normalizes snake-case target scope fallbacks across receipt preview and verification plan', () => {
+  const report = buildV11WriteGovernancePostWriteVerificationPlan(acceptedInput({
+    receiptPreviewReport: acceptedReceiptPreview({
+      approvedAction: {
+        actionId: REQUIRED_ACTION_ID,
+        targetTool: REQUIRED_TARGET_TOOL,
+        targetScope: snakeTargetScope(),
+        payloadHash: PAYLOAD_HASH,
+        maxRecordMemoryCalls: 1
+      }
+    }),
+    verificationPlan: exactVerificationPlan({
+      targetScope: snakeTargetScope()
+    })
+  }));
+
+  assert.equal(report.status, RESULT_STATUS_ACCEPTED);
+  assert.equal(report.accepted, true);
+  assert.deepEqual(report.approvedAction.targetScope, targetScope());
 });
 
 test('CM1093 fails closed when CM1092 receipt preview is stale or not accepted', () => {

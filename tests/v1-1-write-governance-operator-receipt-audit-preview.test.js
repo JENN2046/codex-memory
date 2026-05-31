@@ -40,6 +40,24 @@ function targetScope(overrides = {}) {
   };
 }
 
+function snakeTargetScope(overrides = {}) {
+  return {
+    projectRef: '   ',
+    project_id: 'codex-memory',
+    workspaceRef: '',
+    workspace_id: 'A:/codex-memory',
+    clientRef: ' ',
+    client_id: 'codex',
+    agentRef: '',
+    agent_id: 'codex-local',
+    taskRef: '',
+    task_id: 'CM-1092',
+    visibility: '',
+    visibility_policy: 'process',
+    ...overrides
+  };
+}
+
 function zeroCounters(overrides = {}) {
   return {
     ...Object.fromEntries(REQUIRED_ZERO_COUNTER_KEYS.map(key => [key, 0])),
@@ -169,6 +187,27 @@ test('CM1092 accepts exact operator receipt and audit preview without writing re
   assert.equal(report.safety.writesOperatorReceipt, false);
   assert.equal(report.safety.writesApprovalAudit, false);
   assert.deepEqual(report.blockerReasons, []);
+});
+
+test('CM1092 normalizes snake-case target scope fallbacks across approval boundary and receipt preview', () => {
+  const report = buildV11WriteGovernanceOperatorReceiptAuditPreview(acceptedInput({
+    approvalBoundaryReport: acceptedApprovalBoundary({
+      approvedAction: {
+        actionId: REQUIRED_ACTION_ID,
+        targetTool: REQUIRED_TARGET_TOOL,
+        targetScope: snakeTargetScope(),
+        payloadHash: PAYLOAD_HASH,
+        maxRecordMemoryCalls: 1
+      }
+    }),
+    receiptPreview: exactReceiptPreview({
+      targetScope: snakeTargetScope()
+    })
+  }));
+
+  assert.equal(report.status, RESULT_STATUS_ACCEPTED);
+  assert.equal(report.accepted, true);
+  assert.deepEqual(report.approvedAction.targetScope, targetScope());
 });
 
 test('CM1092 fails closed when CM1091 approval boundary is stale or not accepted', () => {

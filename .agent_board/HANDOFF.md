@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1289 PROOF_RETENTION_VISIBILITY_FALLBACK_NORMALIZATION`.
+Goal: `CM-1290 V11_WRITE_GOVERNANCE_SCOPE_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing proof-memory retention/tombstone visibility fallback normalization and validating no-apply preview behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing v1.1 write-governance target scope fallback normalization and validating no-execution proof-chain behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -102,6 +102,15 @@ Changed scope since CM-1207:
 - `tests/proof-memory-retention-tombstone-plan.test.js`
 - `tests/proof-memory-retention-tombstone-store-backed-dry-run-preview.test.js`
 - `docs/CM1289_PROOF_RETENTION_VISIBILITY_FALLBACK_NORMALIZATION.md`
+- `src/core/V11WriteGovernancePreflight.js`
+- `src/core/V11WriteGovernanceApprovalPacketBoundary.js`
+- `src/core/V11WriteGovernanceOperatorReceiptAuditPreview.js`
+- `src/core/V11WriteGovernancePostWriteVerificationPlan.js`
+- `tests/v1-1-write-governance-preflight.test.js`
+- `tests/v1-1-write-governance-approval-packet-boundary.test.js`
+- `tests/v1-1-write-governance-operator-receipt-audit-preview.test.js`
+- `tests/v1-1-write-governance-post-write-verification-plan.test.js`
+- `docs/CM1290_V11_WRITE_GOVERNANCE_SCOPE_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

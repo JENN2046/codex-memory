@@ -111,6 +111,23 @@ function acceptedWriteRequest(overrides = {}) {
   };
 }
 
+function snakeTargetScope() {
+  return {
+    projectRef: '   ',
+    project_id: 'codex-memory',
+    workspaceRef: '',
+    workspace_id: 'A:/codex-memory',
+    clientRef: ' ',
+    client_id: 'codex',
+    agentRef: '',
+    agent_id: 'codex-local',
+    taskRef: '',
+    task_id: 'CM-1090',
+    visibility: '',
+    visibility_policy: 'process'
+  };
+}
+
 function acceptedInput(overrides = {}) {
   return {
     mode: REQUIRED_MODE,
@@ -150,6 +167,26 @@ test('CM1090 accepts sanitized write-governance preflight without executing reco
   assert.equal(report.readinessClaimed, false);
   assert.equal(report.reliabilityClaimed, false);
   assert.deepEqual(report.blockerReasons, []);
+});
+
+test('CM1090 normalizes snake-case target scope fallbacks before approval template', () => {
+  const report = buildV11WriteGovernancePreflight(acceptedInput({
+    proposedWriteRequest: acceptedWriteRequest({
+      targetScope: snakeTargetScope()
+    })
+  }));
+
+  assert.equal(report.status, RESULT_STATUS_ACCEPTED);
+  assert.equal(report.accepted, true);
+  assert.deepEqual(report.targetScope, {
+    projectRef: 'codex-memory',
+    workspaceRef: 'A:/codex-memory',
+    clientRef: 'codex',
+    agentRef: 'codex-local',
+    taskRef: 'CM-1090',
+    visibility: 'process'
+  });
+  assert.deepEqual(report.approvalPacketTemplate.targetScope, report.targetScope);
 });
 
 test('CM1090 fails closed when evidence packet is missing current-head or aggregator evidence', () => {

@@ -7,14 +7,14 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1289 proof-retention visibility fallback normalization validated |
+| Current task | CM-1290 v1.1 write-governance scope fallback normalization validated |
 | Current area | P8-memory-governance / P9-codex-claude-client-scope / P0-mainline-health |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
 | Untracked files left untouched | `CLAUDE.md`; `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` |
-| Runtime/source touched by current task | `src/core/ProofMemoryRetentionTombstonePlan.js`; `src/core/ProofMemoryRetentionTombstoneStoreBackedDryRunPreview.js`; proof-retention visibility now uses first non-empty normalized `visibility/visibility_policy` values |
+| Runtime/source touched by current task | `src/core/V11WriteGovernancePreflight.js`; `src/core/V11WriteGovernanceApprovalPacketBoundary.js`; `src/core/V11WriteGovernanceOperatorReceiptAuditPreview.js`; `src/core/V11WriteGovernancePostWriteVerificationPlan.js`; v1.1 write-governance target scope now uses first non-empty normalized ref/camel/snake values |
 | Provider/API calls by current task | no |
 | Real memory tools by current task | no |
 | Durable memory/audit writes by current task | no |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1289 fixes proof-memory retention/tombstone visibility fallback normalization so blank camel-case `visibility` does not mask SQLite-style `visibility_policy=internal_proof` in direct plan or store-backed dry-run preview. It preserves no-apply tombstone preview behavior and does not execute tombstone/apply/cleanup/rollback, call providers/MCP, scan real memory, write durable memory/audit outside temp-local test stores, change config/watchdog/startup, expand public MCP tools, or claim readiness. Next safe action after this local stage is another local-safe Codex/Claude client isolation or runtime-governance source/test slice, or a fresh exact approval path for A5/Red-lane evidence.
+CM-1290 fixes v1.1 write-governance proof-chain target scope fallback normalization so blank ref/camel scope fields do not mask snake_case fields across preflight, approval packet boundary, operator receipt/audit preview, and post-write verification plan. It does not execute governed writes, call `record_memory`, call providers/MCP, scan real memory, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness. Next safe action after this local stage is another local-safe Codex/Claude client isolation or runtime-governance source/test slice, or a fresh exact approval path for A5/Red-lane evidence.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

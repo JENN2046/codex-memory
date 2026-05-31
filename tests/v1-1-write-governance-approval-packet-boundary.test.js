@@ -38,6 +38,24 @@ function targetScope(overrides = {}) {
   };
 }
 
+function snakeTargetScope(overrides = {}) {
+  return {
+    projectRef: '   ',
+    project_id: 'codex-memory',
+    workspaceRef: '',
+    workspace_id: 'A:/codex-memory',
+    clientRef: ' ',
+    client_id: 'codex',
+    agentRef: '',
+    agent_id: 'codex-local',
+    taskRef: '',
+    task_id: 'CM-1091',
+    visibility: '',
+    visibility_policy: 'process',
+    ...overrides
+  };
+}
+
 function zeroCounters(overrides = {}) {
   return {
     ...Object.fromEntries(REQUIRED_ZERO_COUNTER_KEYS.map(key => [key, 0])),
@@ -169,6 +187,30 @@ test('CM1091 accepts exact approval packet boundary without executing record_mem
   assert.equal(report.readinessClaimed, false);
   assert.equal(report.reliabilityClaimed, false);
   assert.deepEqual(report.blockerReasons, []);
+});
+
+test('CM1091 normalizes snake-case target scope fallbacks across preflight and approval packet', () => {
+  const report = buildV11WriteGovernanceApprovalPacketBoundary(acceptedInput({
+    preflightReport: acceptedPreflight({
+      targetScope: snakeTargetScope(),
+      approvalPacketTemplate: {
+        payloadHash: PAYLOAD_HASH,
+        targetScope: snakeTargetScope(),
+        executionApproved: false,
+        recordMemoryExecutionAuthorized: false,
+        recordMemoryExecuted: false,
+        durableMemoryWritten: false,
+        durableAuditWritten: false
+      }
+    }),
+    approvalPacket: exactApprovalPacket({
+      targetScope: snakeTargetScope()
+    })
+  }));
+
+  assert.equal(report.status, RESULT_STATUS_ACCEPTED);
+  assert.equal(report.accepted, true);
+  assert.deepEqual(report.approvedAction.targetScope, targetScope());
 });
 
 test('CM1091 fails closed for blanket or implicit approval shortcuts', () => {

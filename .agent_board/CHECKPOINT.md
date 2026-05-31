@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1290 V1.1 Write-Governance Scope Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test v1.1 write-governance proof-chain target scope fallback normalization hardening. No governed write execution, provider call, MCP external call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- CM1090 write-governance preflight now normalizes `targetScope` with first non-empty ref/camel/snake aliases before blocker checks and approval template output.
+- CM1091 approval packet boundary, CM1092 operator receipt/audit preview, and CM1093 post-write verification plan now use the same target scope fallback for equality checks and normalized outputs.
+- Covered aliases are `projectRef/project_id/projectId/project`, `workspaceRef/workspace_id/workspaceId/workspace`, `clientRef/client_id/clientId/client`, `agentRef/agent_id/agentId/agent`, `taskRef/task_id/taskId/task`, and `visibility/visibility_policy`.
+- Added regressions proving snake_case scope can flow through preflight -> approval -> receipt -> verification plan without executing `record_memory` or writing durable memory/audit.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` for changed v1.1 write-governance source and tests.
+- `node --test tests\v1-1-write-governance-preflight.test.js tests\v1-1-write-governance-approval-packet-boundary.test.js tests\v1-1-write-governance-operator-receipt-audit-preview.test.js tests\v1-1-write-governance-post-write-verification-plan.test.js` passed `25/25`.
+- `npm test` passed `2817/2817`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1290.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1289 Proof-Retention Visibility Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

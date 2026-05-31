@@ -28,6 +28,15 @@ const REQUIRED_SCOPE_FIELDS = Object.freeze([
   'visibility'
 ]);
 
+const SCOPE_FIELD_CANDIDATES = Object.freeze({
+  projectRef: ['projectRef', 'project_id', 'projectId', 'project'],
+  workspaceRef: ['workspaceRef', 'workspace_id', 'workspaceId', 'workspace'],
+  clientRef: ['clientRef', 'client_id', 'clientId', 'client'],
+  agentRef: ['agentRef', 'agent_id', 'agentId', 'agent'],
+  taskRef: ['taskRef', 'task_id', 'taskId', 'task'],
+  visibility: ['visibility', 'visibility_policy']
+});
+
 const REQUIRED_AGGREGATOR_EVIDENCE_IDS = Object.freeze([
   'cm1082_proof_memory_tombstone_store_backed_dry_run_preview',
   'cm1083_reconcile_retry_backoff_durable_persistence_preview',
@@ -112,6 +121,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeCommit(value) {
   const normalized = normalizeString(value).toLowerCase();
   return /^[a-f0-9]{40}$/.test(normalized) ? normalized : '';
@@ -189,7 +206,7 @@ function normalizeScope(scope = {}) {
   const safeScope = isPlainObject(scope) ? scope : {};
   return Object.fromEntries(REQUIRED_SCOPE_FIELDS.map(field => [
     field,
-    normalizeString(safeScope[field])
+    firstNormalizedString(...(SCOPE_FIELD_CANDIDATES[field] || [field]).map(key => safeScope[key]))
   ]));
 }
 
