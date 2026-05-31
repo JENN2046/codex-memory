@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1238 A5-GAP-5_FRESH_STRICT_GATE_PREFLIGHT`.
+Goal: `CM-1239 A5_APPROVAL_LINE_VERIFIER`.
 
-Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY` after docs-only preparation of future exact-approved strict gate boundary.
+Status: `COMPLETED_VALIDATED_NOT_READY` after local source/test implementation of an explicit-input A5 approval line verifier.
 
 Workspace: `A:\codex-memory`.
 
@@ -56,6 +56,9 @@ Changed scope since CM-1207:
 - `docs/CM1236_VALIDATION_AGGREGATOR_CLOSURE_AUTHORITY_SUMMARY.md`
 - `docs/CM1237_VALIDATION_AGGREGATOR_LOCAL_PROOF_CHAIN_ROUTING.md`
 - `docs/CM1238_A5_GAP5_FRESH_STRICT_GATE_PREFLIGHT.md`
+- `src/core/A5ApprovalLineVerifier.js`
+- `tests/a5-approval-line-verifier.test.js`
+- `docs/CM1239_A5_APPROVAL_LINE_VERIFIER.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -140,6 +143,10 @@ Current Git fact and A5 rule after CM-1208:
 - Future command is limited to `npm run gate:mainline:strict`.
 - Future execution must bind to fresh post-CM-1238 HEAD.
 - CM-1238 does not execute strict gate, remote write, provider call, real-memory scan, config/watchdog/startup change, cutover, or readiness claim.
+- CM-1239 adds a local explicit-input verifier for exact A5 approval lines.
+- CM-1239 accepts exact `A5-GAP-5` strict-gate wording only when branch and commit match.
+- CM-1239 rejects stale commit, placeholders, broader wording, and cross-unit reuse.
+- CM-1239 does not grant approval or execute commands.
 - CM-1229 prepared the next A5-GAP-6 aggregation refresh boundary only.
 - Selected future aggregation units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
 - CM-1229 does not execute ValidationAggregator, scan files/stores, call MCP tools, call providers, write durable memory/audit, or claim readiness.

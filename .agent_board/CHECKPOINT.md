@@ -1,5 +1,43 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1239 A5 Approval Line Verifier Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: local source/test helper only. No A5 approval grant, strict gate execution, runtime evidence execution, or external action.
+
+Result:
+
+- Added `src/core/A5ApprovalLineVerifier.js`.
+- Added targeted tests for exact `A5-GAP-5` approval, stale commit rejection, placeholder rejection, broader wording rejection, and unit reuse rejection.
+- The helper validates explicit input only and reports fail-closed reasons.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\A5ApprovalLineVerifier.js`
+- `node --test tests\a5-approval-line-verifier.test.js tests\no-touch-boundary-regression.test.js` passed `9/9`.
+
+Boundary:
+
+- No A5-GAP execution.
+- No strict gate execution.
+- No service start.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Run diff/docs validation and commit CM-1239.
+- Future A5 execution still requires a separate exact user approval line.
+
 ## CM-1238 A5-GAP-5 Fresh Strict Gate Preflight Checkpoint
 
 Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY`
