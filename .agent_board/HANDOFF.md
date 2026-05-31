@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1209 A5-GAP-4_HTTP_EVIDENCE_REFRESH_PREFLIGHT`.
+Goal: `CM-1210 A5-GAP-4_HTTP_EVIDENCE_REFRESH`.
 
-Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY` after CM-1208 passed target-bound strict gate evidence.
+Status: `PARTIAL_BLOCKED_AUTH_REQUIRED_NOT_READY` after endpoint health/observe passed and authenticated MCP probes failed closed without token use.
 
 Workspace: `A:\codex-memory`.
 
@@ -42,21 +42,26 @@ Current Git fact and A5 rule after CM-1208:
 - `npm run gate:mainline:strict` passed: health ok, contract `29/29`, test `2754/2754`, compare `43/43`, rollback `43/43`.
 - This is target-bound strict-gate evidence only; it is not runtime readiness, RC readiness, cutover readiness, write reliability, or recall reliability.
 - Next candidate is `A5-GAP-4` endpoint-bound live HTTP evidence refresh for `http://127.0.0.1:7605`.
-- `A5-GAP-4` requires a separate exact approval before running any HTTP observe/start/ensure action.
+- User approved `A5-GAP-4` for `main@db5a4d66cf472d35e80b12d512816cda5de09220`, endpoint `http://127.0.0.1:7605`, no config/watchdog/startup change.
+- `/health` passed with service `vcp_codex_memory`, path `/mcp/codex-memory`, and `auth.required=true`.
+- `observe:http` passed with status `ok`, HTTP log error `0`, watchdog recovery `0`, watchdog ensure failure `0`, governance `ok`, `noProvider=true`, `mutated=false`, and `migrationApplied=false`.
+- Unauthenticated MCP `initialize` and `tools/list` returned Unauthorized due missing/invalid bearer token.
+- No token material was read, printed, persisted, or used.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1208:
+Validation for CM-1210:
 
 - `git diff --check`
-- `node --test .\tests\autopilot-closed-loop-dry-run-cli.test.js` passed `8/8`
-- `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`
-- `npm run gate:mainline:strict` passed for `d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d`
+- `/health` passed
+- `observe:http --json --tail 1 --audit-tail 1` passed
+- unauthenticated MCP `initialize` / `tools/list` failed closed with Unauthorized
 
 Not validated:
 
 - `npm run test:hardening`
 - `npm run gate:mainline`
 - HTTP observe
+- authenticated MCP initialize/tools-list
 - provider smoke / benchmark
 - true `record_memory`
 - true `search_memory`
@@ -86,4 +91,4 @@ git show abb1a26:MEMORY.md
 
 Next safe action:
 
-Request exact A5-GAP-4 approval before any endpoint-bound HTTP evidence refresh. Do not run `start:http:ensure`, `observe:http`, MCP initialize/tools-list probes, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.
+Commit or otherwise stabilize the partial evidence record, then request separate exact approval if authenticated MCP initialize/tools-list evidence is required. Do not read/use token material, run `tools/call`, `start:http:ensure`, provider calls, real memory scans, durable writes, migration/import/export/backup/restore apply, public MCP expansion, push, release, deploy, or readiness claims without exact approval.

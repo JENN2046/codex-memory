@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1210 A5-GAP-4 HTTP Evidence Refresh Checkpoint
+
+Status: `PARTIAL_BLOCKED_AUTH_REQUIRED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: user-approved `A5-GAP-4` for `main@db5a4d66cf472d35e80b12d512816cda5de09220`, endpoint `http://127.0.0.1:7605`, no config/watchdog/startup change.
+
+Result:
+
+- Fresh preflight matched branch `main` and commit `db5a4d66cf472d35e80b12d512816cda5de09220`.
+- `/health` passed with `ok=true`, service `vcp_codex_memory`, path `/mcp/codex-memory`, and `auth.required=true`.
+- `observe:http --json --tail 1 --audit-tail 1` passed with status `ok`.
+- Selected observe summary: HTTP log error `0`, watchdog recovery `0`, watchdog ensure failure `0`, governance `ok`, review level `nominal`, `noProvider=true`, `mutated=false`, and `migrationApplied=false`.
+- Unauthenticated MCP `initialize` and `tools/list` returned Unauthorized because bearer auth is required.
+- No token material was read, printed, persisted, or used.
+
+Boundary:
+
+- No config/watchdog/startup change.
+- No provider call.
+- No `tools/call`.
+- No real memory scan.
+- No durable memory/audit write.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, runtime readiness, RC readiness, cutover readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- If authenticated MCP initialize/tools-list evidence is required, request separate exact approval allowing use of an already-present current-session bearer token without printing or persisting it.
+
 ## CM-1209 A5-GAP-4 HTTP Evidence Refresh Preflight Checkpoint
 
 Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_READY`

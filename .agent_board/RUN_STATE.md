@@ -7,7 +7,7 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1209 A5-GAP-4 HTTP evidence refresh preflight completed; execution awaits exact approval |
+| Current task | CM-1210 A5-GAP-4 HTTP evidence refresh partial; authenticated MCP evidence blocked |
 | Current area | P4-http-runtime / P6-docs-drift |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1208 reran the user-approved `npm run gate:mainline:strict` at fresh `main@d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d`; it passed health, contract `29/29`, test `2754/2754`, compare `43/43`, and rollback `43/43`. CM-1209 prepared exact A5-GAP-4 approval for endpoint-bound loopback HTTP evidence refresh at `http://127.0.0.1:7605`. Do not run HTTP observe, start/ensure runtime, change config/watchdog/startup, call providers, scan real memory, write durable state, push, release, deploy, or claim readiness without exact approval.
+CM-1210 executed the approved A5-GAP-4 endpoint-bound HTTP refresh at `main@db5a4d66cf472d35e80b12d512816cda5de09220`. `/health` and `observe:http` passed for `http://127.0.0.1:7605`; observe reported HTTP log error `0`, watchdog recovery `0`, governance `ok`, `noProvider=true`, `mutated=false`, and `migrationApplied=false`. Unauthenticated MCP `initialize` and `tools/list` returned Unauthorized because auth is required; no token material was read, printed, persisted, or used. Next safe action is either record/commit this partial evidence or request a separate exact approval for authenticated MCP initialize/tools-list using an already-present current-session bearer token without printing or persisting token material.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

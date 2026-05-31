@@ -25,7 +25,9 @@ RC_NOT_READY_BLOCKED
 
 当前最新已验证 A5 单元是 `CM-1208 A5-GAP-5_STRICT_GATE_PREFLIGHT`：用户精确授权在 `main@d3b9bf9fb8cc92cc7b2f2112d6006940a68b3d9d` 运行 `npm run gate:mainline:strict`，且无 remote write。该 strict gate 已通过：health ok，contract `29/29`，test `2754/2754`，compare `43/43`，rollback `43/43`。
 
-这是 target-bound strict-gate evidence，不是 runtime readiness、RC readiness、cutover readiness、write reliability 或 recall reliability。`CM-1209 A5-GAP-4_HTTP_EVIDENCE_REFRESH_PREFLIGHT` 已准备对当前 `HEAD` 和 `http://127.0.0.1:7605` 的 endpoint-bound HTTP evidence refresh exact approval；未授权前不得运行 HTTP observe、改 config/watchdog/startup、调用 provider、读取/扫描 real memory、写 durable state、push 或声明 readiness。
+这是 target-bound strict-gate evidence，不是 runtime readiness、RC readiness、cutover readiness、write reliability 或 recall reliability。`CM-1210 A5-GAP-4_HTTP_EVIDENCE_REFRESH` 已在 `main@db5a4d66cf472d35e80b12d512816cda5de09220` 执行 endpoint-bound refresh：`/health` 和 `observe:http` 为 `ok`，HTTP log error `0`，watchdog recovery `0`，governance status `ok`，`noProvider=true`，`mutated=false`，`migrationApplied=false`。Authenticated MCP `initialize` / `tools/list` 未完成，因为无 bearer token 请求返回 Unauthorized；本次 approval 未授权读取或使用 token material。
+
+当前下一步是决定是否单独授权 authenticated MCP initialize/tools-list evidence。不得把 CM-1210 的 partial evidence 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability 或 `RC_READY`。
 
 ## 当前权威入口
 
