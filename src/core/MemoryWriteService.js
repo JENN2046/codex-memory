@@ -22,6 +22,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeBoolean(value) {
   if (typeof value === 'boolean') return value;
   const normalized = normalizeString(value).toLowerCase();
@@ -1228,21 +1236,21 @@ class MemoryWriteService {
     const idempotency = result.idempotency || null;
     await this.auditLogStore.appendWriteAudit({
       timestamp: new Date().toISOString(),
-      agentAlias: result.agentAlias || null,
-      agentId: result.agentId || null,
-      decision: result.decision,
-      target: result.target || null,
-      title: result.title || null,
-      memoryId: result.memoryId || null,
-      reason: result.reason,
-      filePath: result.filePath || null,
-      requestSource: result.requestSource || this.config.defaultRequestSource,
+      agentAlias: firstNormalizedString(result.agentAlias, result.agent_alias) || null,
+      agentId: firstNormalizedString(result.agentId, result.agent_id) || null,
+      decision: firstNormalizedString(result.decision) || result.decision,
+      target: firstNormalizedString(result.target) || null,
+      title: firstNormalizedString(result.title) || null,
+      memoryId: firstNormalizedString(result.memoryId, result.memory_id) || null,
+      reason: firstNormalizedString(result.reason) || result.reason,
+      filePath: firstNormalizedString(result.filePath, result.file_path) || null,
+      requestSource: firstNormalizedString(result.requestSource, result.request_source) || this.config.defaultRequestSource,
       shadowWrite: result.shadowWrite || createShadowWriteStatus('unknown'),
       writeManifest: idempotency ? {
-        authoritativeStore: idempotency.authoritativeStore || null,
-        idempotencyKey: idempotency.key || null,
-        canonicalHash: idempotency.canonicalHash || null,
-        status: idempotency.status || null,
+        authoritativeStore: firstNormalizedString(idempotency.authoritativeStore, idempotency.authoritative_store) || null,
+        idempotencyKey: firstNormalizedString(idempotency.key, idempotency.idempotencyKey, idempotency.idempotency_key) || null,
+        canonicalHash: firstNormalizedString(idempotency.canonicalHash, idempotency.canonical_hash) || null,
+        status: firstNormalizedString(idempotency.status) || null,
         replayed: idempotency.replayed === true,
         recovered: idempotency.recovered === true,
         recoveryRequired: idempotency.recoveryRequired === true,

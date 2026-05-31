@@ -415,6 +415,51 @@ test('write runtime falls through blank execution-context camel scope to snake-c
   assert.equal(events.diaryWrites[0].clientId, 'claude');
 });
 
+test('write audit normalizes blank result aliases before append', async () => {
+  const { service, events } = createHarness();
+
+  await service.writeAudit({
+    agentAlias: '   ',
+    agent_alias: 'Codex',
+    agentId: '',
+    agent_id: 'cm-1309-agent',
+    decision: 'accepted',
+    target: 'process',
+    title: 'Checkpoint: write audit alias fallback',
+    memoryId: '   ',
+    memory_id: 'mem-write-audit-snake',
+    reason: 'CM-1309 write audit alias fallback regression',
+    filePath: '',
+    file_path: '<cm-1309-relative-path>',
+    requestSource: '   ',
+    request_source: 'cm-1309-write-audit-alias-fallback',
+    shadowWrite: { status: 'ok', failures: [] },
+    idempotency: {
+      authoritativeStore: '',
+      authoritative_store: 'sqlite',
+      key: '   ',
+      idempotency_key: 'memory-write-v1:cm1309',
+      canonicalHash: '',
+      canonical_hash: 'cm1309-canonical-hash',
+      status: 'committed',
+      replayed: false,
+      recovered: false,
+      recoveryRequired: false
+    }
+  });
+
+  assert.equal(events.auditWrites.length, 1);
+  const audit = events.auditWrites[0];
+  assert.equal(audit.agentAlias, 'Codex');
+  assert.equal(audit.agentId, 'cm-1309-agent');
+  assert.equal(audit.memoryId, 'mem-write-audit-snake');
+  assert.equal(audit.filePath, '<cm-1309-relative-path>');
+  assert.equal(audit.requestSource, 'cm-1309-write-audit-alias-fallback');
+  assert.equal(audit.writeManifest.authoritativeStore, 'sqlite');
+  assert.equal(audit.writeManifest.idempotencyKey, 'memory-write-v1:cm1309');
+  assert.equal(audit.writeManifest.canonicalHash, 'cm1309-canonical-hash');
+});
+
 test('write runtime preserves explicit payload proof marker under context-derived ordinary scope', async () => {
   const events = {
     diaryWrites: [],
