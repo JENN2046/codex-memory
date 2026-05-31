@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1286 ROLLBACK_CLEANUP_FALLBACK_NORMALIZATION`.
+Goal: `CM-1287 LIFECYCLE_RUNTIME_PREP_PROJECTION_FALLBACK_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing rollback cleanup preview/apply-design fallback normalization and validating rollback-cleanup governance behavior.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing tombstone/supersede runtime-prep projection fallback normalization and validating lifecycle runtime-prep behavior.
 
 Workspace: `A:\codex-memory`.
 
@@ -89,6 +89,11 @@ Changed scope since CM-1207:
 - `tests/memory-write-rollback-cleanup-store-backed-dry-run-preview.test.js`
 - `tests/memory-write-rollback-cleanup-apply-design-policy.test.js`
 - `docs/CM1286_ROLLBACK_CLEANUP_FALLBACK_NORMALIZATION.md`
+- `src/core/DurableGovernanceTombstoneRuntimePrepHelper.js`
+- `src/core/MemorySupersedeRuntimePrepHelper.js`
+- `tests/durable-governance-tombstone-runtime-prep-helper.test.js`
+- `tests/memory-supersede-runtime-prep-helper.test.js`
+- `docs/CM1287_LIFECYCLE_RUNTIME_PREP_PROJECTION_FALLBACK_NORMALIZATION.md`
 - `src/core/ProofMemoryPolicy.js`
 - `tests/proof-memory-policy.test.js`
 - `docs/CM1268_PROOF_MEMORY_PAYLOAD_MARKER_PRECEDENCE.md`

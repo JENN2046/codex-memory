@@ -39,6 +39,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
 }
@@ -50,11 +58,16 @@ function normalizeBoolean(value) {
 function normalizeProjectionRecord(record = {}) {
   const safeRecord = isPlainObject(record) ? record : {};
   return {
-    memoryId: normalizeString(safeRecord.memoryId),
-    status: normalizeStatus(safeRecord.status),
-    clientId: normalizeString(safeRecord.clientId),
-    visibility: normalizeString(safeRecord.visibility),
-    lifecycleUpdatedAt: normalizeString(safeRecord.lifecycleUpdatedAt || safeRecord.lifecycle_updated_at)
+    ...safeRecord,
+    memoryId: firstNormalizedString(safeRecord.memoryId, safeRecord.memory_id),
+    status: normalizeStatus(firstNormalizedString(
+      safeRecord.status,
+      safeRecord.lifecycleStatus,
+      safeRecord.lifecycle_status
+    )),
+    clientId: firstNormalizedString(safeRecord.clientId, safeRecord.client_id),
+    visibility: firstNormalizedString(safeRecord.visibility, safeRecord.visibility_policy),
+    lifecycleUpdatedAt: firstNormalizedString(safeRecord.lifecycleUpdatedAt, safeRecord.lifecycle_updated_at)
   };
 }
 
@@ -161,9 +174,7 @@ function planMemorySupersedeRuntimePrep(input = {}) {
           contract: normalizedInput.dryRunInput.contract,
           ...normalizedInput.dryRunInput
         },
-    currentProjectionRecords: Array.isArray(safeInput.currentProjectionRecords)
-      ? safeInput.currentProjectionRecords
-      : normalizedInput.currentProjectionRecords,
+    currentProjectionRecords: normalizedInput.currentProjectionRecords,
     previewedAt: normalizedInput.plannedAt
   });
   const pairOutcomePreview = previewMemorySupersedePairOutcome({
@@ -174,9 +185,7 @@ function planMemorySupersedeRuntimePrep(input = {}) {
           contract: normalizedInput.dryRunInput.contract,
           ...normalizedInput.dryRunInput
         },
-    currentProjectionRecords: Array.isArray(safeInput.currentProjectionRecords)
-      ? safeInput.currentProjectionRecords
-      : normalizedInput.currentProjectionRecords,
+    currentProjectionRecords: normalizedInput.currentProjectionRecords,
     plannedAt: normalizedInput.plannedAt
   });
   const seamContractSummary = summarizeMemorySupersedeShadowSeamContract(normalizedInput.shadowSeamContract);

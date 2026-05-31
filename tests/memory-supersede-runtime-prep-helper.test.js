@@ -140,6 +140,59 @@ test('CM-0990 helper normalizes expected runtime-prep input fields', () => {
   assert.equal(normalized.runtimeSurfaceCapabilities.pairShadowSeamAvailable, true);
 });
 
+test('CM-0990 helper normalizes blank projection record fields from snake-case fallbacks', () => {
+  const records = loadProjectionRecordsFixture().map(record => {
+    if (record.memoryId === 'memory-old-001') {
+      return {
+        ...record,
+        memoryId: '',
+        memory_id: 'memory-old-001',
+        status: '   ',
+        lifecycle_status: 'active',
+        clientId: '',
+        client_id: 'codex-desktop',
+        visibility: ' ',
+        visibility_policy: 'private',
+        lifecycleUpdatedAt: '',
+        lifecycle_updated_at: '2026-05-23T11:00:00.000Z'
+      };
+    }
+    if (record.memoryId === 'memory-new-001') {
+      return {
+        ...record,
+        memoryId: '   ',
+        memory_id: 'memory-new-001',
+        status: '',
+        lifecycle_status: 'proposal',
+        clientId: '   ',
+        client_id: 'codex-desktop',
+        visibility: '',
+        visibility_policy: 'private',
+        lifecycleUpdatedAt: '   ',
+        lifecycle_updated_at: '2026-05-23T11:05:00.000Z'
+      };
+    }
+    return record;
+  });
+
+  const summary = planMemorySupersedeRuntimePrep({
+    ...buildHelperInput(),
+    currentProjectionRecords: records
+  });
+
+  assert.equal(summary.acceptedForRuntimePrep, true);
+  assert.equal(summary.shadowUpdatePlan.oldRecord.memoryId, 'memory-old-001');
+  assert.equal(summary.shadowUpdatePlan.oldRecord.fromStatus, 'active');
+  assert.equal(summary.shadowUpdatePlan.oldRecord.expectedClientId, 'codex-desktop');
+  assert.equal(summary.shadowUpdatePlan.oldRecord.expectedVisibility, 'private');
+  assert.equal(summary.shadowUpdatePlan.oldRecord.previousSnapshotRef.updated_at, '2026-05-23T11:00:00.000Z');
+  assert.equal(summary.shadowUpdatePlan.newRecord.memoryId, 'memory-new-001');
+  assert.equal(summary.shadowUpdatePlan.newRecord.fromStatus, 'proposal');
+  assert.equal(summary.shadowUpdatePlan.newRecord.expectedClientId, 'codex-desktop');
+  assert.equal(summary.shadowUpdatePlan.newRecord.expectedVisibility, 'private');
+  assert.equal(summary.shadowUpdatePlan.newRecord.previousSnapshotRef.updated_at, '2026-05-23T11:05:00.000Z');
+});
+
 test('CM-0990 helper does not perform implicit fixture reads', () => {
   const input = buildHelperInput();
   const originalReadFileSync = fs.readFileSync;

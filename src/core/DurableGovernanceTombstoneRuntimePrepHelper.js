@@ -23,6 +23,14 @@ function normalizeString(value) {
   return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
 }
@@ -30,11 +38,16 @@ function normalizeStatus(value) {
 function normalizeProjectionRecord(record = {}) {
   const safeRecord = isPlainObject(record) ? record : {};
   return {
-    memoryId: normalizeString(safeRecord.memoryId),
-    status: normalizeStatus(safeRecord.status),
-    clientId: normalizeString(safeRecord.clientId),
-    visibility: normalizeString(safeRecord.visibility),
-    lifecycleUpdatedAt: normalizeString(safeRecord.lifecycleUpdatedAt || safeRecord.lifecycle_updated_at)
+    ...safeRecord,
+    memoryId: firstNormalizedString(safeRecord.memoryId, safeRecord.memory_id),
+    status: normalizeStatus(firstNormalizedString(
+      safeRecord.status,
+      safeRecord.lifecycleStatus,
+      safeRecord.lifecycle_status
+    )),
+    clientId: firstNormalizedString(safeRecord.clientId, safeRecord.client_id),
+    visibility: firstNormalizedString(safeRecord.visibility, safeRecord.visibility_policy),
+    lifecycleUpdatedAt: firstNormalizedString(safeRecord.lifecycleUpdatedAt, safeRecord.lifecycle_updated_at)
   };
 }
 
@@ -186,7 +199,7 @@ function planDurableGovernanceTombstoneRuntimePrep(input = {}) {
   const dryRunPreview = summarizeDurableGovernanceMutationDryRun(normalizedInput.dryRunInput);
   const projectionPreview = previewDurableGovernanceShadowProjection({
     dryRunInput: input.dryRunInput,
-    currentProjectionRecords: input.currentProjectionRecords,
+    currentProjectionRecords: normalizedInput.currentProjectionRecords,
     previewedAt: normalizedInput.plannedAt
   });
   const recordMap = buildRecordMap(normalizedInput.currentProjectionRecords);

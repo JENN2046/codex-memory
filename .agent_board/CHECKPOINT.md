@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1287 Lifecycle Runtime-Prep Projection Fallback Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test tombstone and supersede runtime-prep projection-record fallback normalization hardening. No runtime apply, provider call, MCP external call, broad real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `DurableGovernanceTombstoneRuntimePrepHelper` now keeps full projection records while normalizing memory id, lifecycle status, client id, visibility, and lifecycle update time from first non-empty camel/snake candidates.
+- `MemorySupersedeRuntimePrepHelper` applies the same normalization for supersede pair runtime-prep projection records.
+- Both helpers now pass normalized projection records to downstream shadow projection and pair outcome previews, so blank camel-case fields cannot reappear in downstream checks.
+- Added regressions proving blank camel-case projection fields fall through to snake_case fields while runtime apply remains blocked and no side effects occur.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\core\DurableGovernanceTombstoneRuntimePrepHelper.js`
+- `node --check src\core\MemorySupersedeRuntimePrepHelper.js`
+- `node --check tests\durable-governance-tombstone-runtime-prep-helper.test.js`
+- `node --check tests\memory-supersede-runtime-prep-helper.test.js`
+- `node --test tests\durable-governance-tombstone-runtime-prep-helper.test.js tests\memory-supersede-runtime-prep-helper.test.js tests\durable-governance-shadow-projection-preview.test.js tests\memory-supersede-pair-outcome-helper.test.js tests\memory-supersede-shadow-seam-contract.test.js` passed `34/34` after a repair to pass normalized records downstream.
+- `npm test` passed `2812/2812`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1287.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1286 Rollback Cleanup Fallback Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
