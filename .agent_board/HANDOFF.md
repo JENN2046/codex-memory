@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1221 A5-GAP-3_MIGRATION_READINESS_DRY_RUN_PREFLIGHT`.
+Goal: `CM-1222 A5-GAP-6_POST_GAP3_PREFLIGHT_AGGREGATION_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after preparing the next migration-readiness dry-run approval boundary.
+Status: `COMPLETED_VALIDATED_NOT_READY` after consuming exact-approved sanitized aggregation evidence at `main@8700d5453a2c53584e821987d1539b30517944a1`.
 
 Workspace: `A:\codex-memory`.
 
@@ -37,6 +37,7 @@ Changed scope since CM-1207:
 - `docs/CM1219_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_PREFLIGHT.md`
 - `docs/CM1220_A5_GAP6_POST_RECALL_ISOLATION_AGGREGATION_EVIDENCE.md`
 - `docs/CM1221_A5_GAP3_MIGRATION_READINESS_DRY_RUN_PREFLIGHT.md`
+- `docs/CM1222_A5_GAP6_POST_GAP3_PREFLIGHT_AGGREGATION_EVIDENCE.md`
 
 Current Git fact and A5 rule after CM-1208:
 
@@ -83,10 +84,15 @@ Current Git fact and A5 rule after CM-1208:
 - CM-1221 prepared the next A5-GAP-3 fixture-only migration-readiness dry-run boundary.
 - Future target is `npm run vcp-memory:migration-readiness -- --json`.
 - Future approval must include action `dry-run`, target `vcp-memory:migration-readiness fixture-only readiness report`, and `no apply/import/export/backup/restore/durable write`.
+- User approved `A5-GAP-6` for `main@8700d5453a2c53584e821987d1539b30517944a1`, using only evidence from approved units `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5`.
+- CM-1222 executed the in-memory sanitized aggregation refresh. Result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, accepted summary, locally evidenced gaps `4`, remaining gaps `3`.
+- CM-1221 / `A5-GAP-3` dry-run output was not executed or consumed by CM-1222.
 - untracked and untouched: `CLAUDE.md`, `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md`
 
-Validation for CM-1221:
+Validation for CM-1222:
 
+- fresh Git preflight
+- in-memory `buildV1RcValidationAggregatorReport`
 - `git diff --check`
 - `node .\scripts\validate_autopilot_ledger_consistency.js`
 - `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\validate-local.ps1 -Area docs`

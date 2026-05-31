@@ -1,5 +1,36 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1222 A5-GAP-6 Post-GAP3-Preflight Aggregation Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-05-31
+
+Scope: exact-approved `A5-GAP-6` for `main@8700d5453a2c53584e821987d1539b30517944a1`, using only evidence from approved units `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5`.
+
+Result:
+
+- Fresh preflight matched branch `main`, commit `8700d5453a2c53584e821987d1539b30517944a1`, and selected unit list.
+- In-memory `buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })` accepted the sanitized runtime evidence summary.
+- Aggregator result: `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `runtimeEvidenceSummaryLocallyEvidencedGapCount=4`, `runtimeEvidenceSummaryRemainingGapCount=3`.
+- CM-1221 / `A5-GAP-3` migration-readiness dry-run output was not executed or consumed.
+
+Boundary:
+
+- No file/store scan.
+- No raw memory/audit output.
+- No MCP `tools/call`.
+- No provider call.
+- No durable memory/audit write.
+- No config/watchdog/startup change.
+- No public MCP expansion.
+- No push, PR, tag, release, deploy, cutover, runtime readiness, RC readiness, migration readiness, governance readiness, write reliability, or recall reliability claim.
+
+Next:
+
+- Commit or otherwise stabilize CM-1222 evidence.
+- Then either request exact fresh-HEAD A5-GAP-3 dry-run approval or continue local ValidationAggregator full implementation gap accounting.
+
 ## CM-1221 A5-GAP-3 Migration Readiness Dry-Run Preflight Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -39,7 +39,9 @@ RC_NOT_READY_BLOCKED
 
 `CM-1221 A5-GAP-3_MIGRATION_READINESS_DRY_RUN_PREFLIGHT` 正在准备下一次 migration/import/export/backup/restore approval execution 的精确授权边界：仅限 future `npm run vcp-memory:migration-readiness -- --json` fixture-only dry-run。CM-1221 不执行 dry-run，不执行 apply/import/export/backup/restore，不扫描 real stores，不写 durable memory/audit，不调用 provider，不改变 config/watchdog/startup，不执行 push、PR、release、deploy 或 cutover。
 
-当前下一步是提交或稳定 CM-1221 preflight，然后用 fresh `HEAD` 给出 exact A5-GAP-3 approval 后才可执行 migration readiness dry-run。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
+`CM-1222 A5-GAP-6_POST_GAP3_PREFLIGHT_AGGREGATION_EVIDENCE` 已在 exact approval 下执行：`main@8700d5453a2c53584e821987d1539b30517944a1`，只消费已批准的 `A5-GAP-1,A5-GAP-2,A5-GAP-4,A5-GAP-5` sanitized evidence。Aggregator 接受 explicit sanitized summary，结果保持 `decision=NOT_READY_BLOCKED`、`validationAggregatorFullImplementation=false`、`runtimeEvidenceSummaryLocallyEvidencedGapCount=4`、`runtimeEvidenceSummaryRemainingGapCount=3`。CM-1221 / A5-GAP-3 migration-readiness dry-run output 未执行、未消费。
+
+当前下一步是用 fresh `HEAD` 给出 exact A5-GAP-3 approval 后才可执行 migration readiness dry-run，或继续做 ValidationAggregator full implementation 的本地结构化缺口核算。不得把 CM-1210/CM-1211/CM-1212/CM-1213/CM-1214/CM-1215/CM-1216/CM-1217/CM-1218/CM-1219/CM-1220/CM-1221/CM-1222 解释为 runtime readiness、RC readiness、production readiness、cutover readiness、write reliability、recall reliability、governance readiness、migration readiness 或 `RC_READY`。
 
 ## 当前权威入口
 
