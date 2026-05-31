@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1306 RECALL_AUDIT_RESULT_MEMORY_ID_ALIAS_FALLBACK`.
+Goal: `CM-1307 RECALL_AGGREGATION_RESULT_ID_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall audit result memory id alias fallback. Targeted recall audit/observe/governance tests passed `47/47`; default `npm test` passed `2831/2831`. Commit is still pending until final diff/docs validation closeout.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall aggregation candidate id/source alias fallback. Targeted recall isolation/bounded recall tests passed `43/43`; default `npm test` passed `2832/2832`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -61,6 +61,9 @@ Changed scope since CM-1207:
 - `docs/CM1301_SELECTED_AUDIT_CORRELATION_PREFLIGHT_ALIAS_FALLBACK.md`
 - `docs/CM1302_LIFECYCLE_GOVERNANCE_ALIAS_FALLBACK.md`
 - `docs/CM1303_DEFERRED_GOVERNANCE_TARGET_IDS_ALIAS_FALLBACK.md`
+- `docs/CM1307_RECALL_AGGREGATION_RESULT_ID_ALIAS_FALLBACK.md`
+- `src/recall/KnowledgeBaseRecallPipeline.js`
+- `tests/recall-isolation-classification-runtime.test.js`
 - `src/core/DeferredGovernanceRuntimeEntryAdapter.js`
 - `tests/deferred-governance-runtime-entry-adapter.test.js`
 - `src/core/SelectedAuditCorrelationObservationPreflight.js`

@@ -1706,6 +1706,66 @@ test('recall aggregation and audit projection drop isolated results', async () =
   assert.equal(isRecallIsolated(entry), false);
 });
 
+test('recall aggregation normalizes candidate id and source aliases', async () => {
+  const lookups = [];
+  const pipeline = new KnowledgeBaseRecallPipeline({
+    compatibilitySyntaxAdapter: null,
+    timeExpressionParser: null,
+    tagMemoEngine: null,
+    candidateGenerator: null,
+    rerankService: null,
+    recallAuditService: null,
+    recallEnhancer: null,
+    knowledgeBaseSyncService: null,
+    shadowStore: {
+      async getRecordsByIds(ids) {
+        lookups.push(ids);
+        return [];
+      }
+    }
+  });
+
+  const aggregated = await pipeline.aggregateCandidates({
+    candidates: [
+      {
+        chunkId: 'chunk-blank',
+        memoryId: '   ',
+        memory_id: 'mem-snake',
+        target: 'process',
+        title: 'Snake memory',
+        text: 'alpha implementation detail',
+        score: 0.9,
+        source: 'rag'
+      },
+      {
+        chunkId: 'chunk-source',
+        memoryId: '',
+        source_file: 'process/2026-06-01.md',
+        target: 'process',
+        title: 'Source fallback',
+        text: 'beta implementation detail',
+        score: 0.8,
+        source: 'rag'
+      },
+      {
+        chunk_id: 'chunk-snake',
+        memoryId: '   ',
+        target: 'process',
+        title: 'Chunk fallback',
+        text: 'gamma implementation detail',
+        score: 0.7,
+        source: 'rag'
+      }
+    ]
+  });
+
+  assert.deepEqual(lookups, [['mem-snake']]);
+  assert.deepEqual(aggregated.map(item => item.memoryId), ['mem-snake', null, null]);
+  assert.equal(aggregated[0].sourceFile, 'mem-snake');
+  assert.equal(aggregated[1].sourceFile, 'process/2026-06-01.md');
+  assert.equal(aggregated[2].sourceFile, 'chunk-snake');
+});
+
 test('recall pipeline abort should skip recall audit side effect', async () => {
   const controller = new AbortController();
   let auditRecordCount = 0;

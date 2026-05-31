@@ -26,6 +26,31 @@ function sanitizeRecallText(text, fallback = '') {
   return stripped;
 }
 
+function normalizeCandidateString(value) {
+  const text = String(value ?? '').trim();
+  return text || '';
+}
+
+function firstCandidateValue(...values) {
+  for (const value of values) {
+    const normalized = normalizeCandidateString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function normalizeCandidateMemoryId(candidate = {}) {
+  return firstCandidateValue(candidate?.memoryId, candidate?.memory_id);
+}
+
+function normalizeCandidateSourceFile(candidate = {}) {
+  return firstCandidateValue(candidate?.sourceFile, candidate?.source_file);
+}
+
+function normalizeCandidateChunkId(candidate = {}) {
+  return firstCandidateValue(candidate?.chunkId, candidate?.chunk_id);
+}
+
 class KnowledgeBaseRecallPipeline {
   constructor({
     compatibilitySyntaxAdapter,
@@ -286,14 +311,18 @@ class KnowledgeBaseRecallPipeline {
     const groups = new Map();
 
     for (const candidate of filterRecallIsolatedItems(candidates)) {
-      const key = candidate.memoryId || candidate.sourceFile || candidate.chunkId;
+      const key = firstCandidateValue(
+        normalizeCandidateMemoryId(candidate),
+        normalizeCandidateSourceFile(candidate),
+        normalizeCandidateChunkId(candidate)
+      );
       if (!groups.has(key)) {
         groups.set(key, []);
       }
       groups.get(key).push(candidate);
     }
 
-    const memoryIds = [...new Set(candidates.map(candidate => candidate.memoryId).filter(Boolean))];
+    const memoryIds = [...new Set(candidates.map(candidate => normalizeCandidateMemoryId(candidate)).filter(Boolean))];
     const recordMap = new Map();
     let isolationMap = new Map();
     if (!noRawContentRead) {
@@ -312,12 +341,14 @@ class KnowledgeBaseRecallPipeline {
       .map(([key, group]) => {
         const ordered = sortByPrimaryScore(group);
         const best = ordered[0];
-        const record = best.memoryId ? recordMap.get(best.memoryId) : null;
+        const bestMemoryId = normalizeCandidateMemoryId(best);
+        const bestSourceFile = normalizeCandidateSourceFile(best);
+        const record = bestMemoryId ? recordMap.get(bestMemoryId) : null;
         if (record && isRecallIsolated(record)) {
           return null;
         }
-        if (noRawContentRead && best.memoryId) {
-          const isolationSubject = isolationMap.get(best.memoryId);
+        if (noRawContentRead && bestMemoryId) {
+          const isolationSubject = isolationMap.get(bestMemoryId);
           if (isolationSubject && isRecallIsolated(isolationSubject)) {
             return null;
           }
@@ -325,7 +356,7 @@ class KnowledgeBaseRecallPipeline {
         if (noRawContentRead) {
           return {
             target: best.target,
-            memoryId: best.memoryId || null,
+            memoryId: bestMemoryId || null,
             score: best.score,
             baseScore: best.baseScore,
             rerankScore: best.rerank_score ?? null,
@@ -351,11 +382,11 @@ class KnowledgeBaseRecallPipeline {
         return {
           target: best.target,
           title: record?.title || best.title,
-          memoryId: best.memoryId || null,
+          memoryId: bestMemoryId || null,
           score: best.score,
           baseScore: best.baseScore,
           rerankScore: best.rerank_score ?? null,
-          sourceFile: record?.relativePath || best.sourceFile || key,
+          sourceFile: record?.relativePath || bestSourceFile || key,
           matchedTags: uniqueTokens(group.flatMap(item => item.matchedTags || [])),
           coreTags: uniqueTokens(group.flatMap(item => item.coreTagsMatched || [])),
           titleHitCount: Math.max(...group.map(item => item.titleHitCount || 0)),
