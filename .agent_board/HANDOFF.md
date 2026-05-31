@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1269 REQUEST_CONTEXT_ONLY_WRITE_AUTHORITY`.
+Goal: `CM-1270 NO_CONTEXT_READ_IDENTITY_FAIL_CLOSED`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after making `requestContext.executionContext` the only write-authority source for `record_memory`.
+Status: `COMPLETED_VALIDATED_NOT_READY` after making missing trusted request context fail closed for soft-read request identity.
 
 Workspace: `A:\codex-memory`.
 
@@ -41,6 +41,7 @@ Changed scope since CM-1207:
 - `docs/CM1263_CLIENT_ACCEPTANCE_RUNTIME_FACT_REBASE.md`
 - `src/app.js`
 - `tests/policy-read-preflight.test.js`
+- `docs/CM1270_NO_CONTEXT_READ_IDENTITY_FAIL_CLOSED.md`
 - `docs/CM1264_SOFT_READ_POLICY_CLIENT_IDENTITY_HARDENING.md`
 - `tests/memory-lifecycle-scope-runtime-integration.test.js`
 - `docs/CM1265_LIFECYCLE_SCOPE_CLIENT_IDENTITY_HARDENING.md`
@@ -623,6 +624,32 @@ Validation:
 Next:
 
 Commit or otherwise stabilize CM-1268, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
+
+## CM-1270 Current Handoff
+
+Goal: `CM-1270 NO_CONTEXT_READ_IDENTITY_FAIL_CLOSED`.
+
+Status: `COMPLETED_VALIDATED_NOT_READY`.
+
+Summary:
+
+- CM-1270 hardens soft-read private filtering for missing trusted request context.
+- `inferRequestClientId(...)` now returns `null` when `requestContext.executionContext` is absent or not an object.
+- Added runtime regression proving no-context `search_memory` can see shared Codex records but not Codex private records.
+- No provider/MCP external call, real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+- Project status remains `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+
+Validation:
+
+- `node --check src\app.js`
+- `node --check tests\policy-read-preflight.test.js`
+- `node --test tests\policy-read-preflight.test.js tests\memory-lifecycle-scope-runtime-integration.test.js tests\phase-a-services.test.js` passed `21/21`.
+- `npm test` passed `2792/2792`.
+- Full docs/ledger validation is tracked in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+Commit or otherwise stabilize CM-1270, then continue local-safe client/runtime hardening or request fresh exact approval for the next A5/Red-lane evidence step.
 
 ## CM-1269 Current Handoff
 

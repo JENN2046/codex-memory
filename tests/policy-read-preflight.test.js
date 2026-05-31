@@ -392,6 +392,67 @@ test('soft read policy does not trust search scope client_id as request identity
   });
 });
 
+test('soft read policy does not default missing request context to Codex identity', async () => {
+  await withPolicyApp(async ({ app }) => {
+    const server = new CodexMemoryMcpServer({ app });
+    const { shadowStore } = app.stores;
+
+    const fixtures = [
+      { title: 'Missing Context Private Codex', visibility: 'private', clientId: 'codex' },
+      { title: 'Missing Context Shared Codex', visibility: 'shared', clientId: 'codex' }
+    ];
+
+    for (let index = 0; index < fixtures.length; index += 1) {
+      const fixture = fixtures[index];
+      const record = await server.handleJsonRpc({
+        jsonrpc: '2.0',
+        id: index + 1,
+        method: 'tools/call',
+        params: {
+          name: 'record_memory',
+          arguments: {
+            target: 'process',
+            title: fixture.title,
+            content: `Type: checkpoint\nmissing request context identity signal\nfixture: ${fixture.title}`,
+            evidence: `runtime-soft-policy-missing-context-${fixture.title}`,
+            validated: true,
+            reusable: false,
+            tags: ['policy', 'runtime', 'soft-read', 'missing-context'],
+            sensitivity: 'none',
+            project_id: 'policy-runtime-project',
+            visibility: fixture.visibility,
+            client_id: fixture.clientId
+          }
+        }
+      }, requestContext);
+
+      assert.equal(record.response.result.structuredContent.decision, 'accepted');
+      await updatePolicyFields(shadowStore, record.response.result.structuredContent.memoryId, fixture);
+    }
+
+    const searchWithoutRequestContext = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 301,
+      method: 'tools/call',
+      params: {
+        name: 'search_memory',
+        arguments: {
+          query: 'missing request context identity signal',
+          target: 'process',
+          limit: 10,
+          include_content: true
+        }
+      }
+    });
+
+    const titles = (searchWithoutRequestContext.response.result.structuredContent.results || [])
+      .map(result => result.title)
+      .sort();
+
+    assert.deepEqual(titles, ['Missing Context Shared Codex']);
+  });
+});
+
 test('soft read policy remains off by default', async () => {
   await withApp(async ({ app }) => {
     assert.equal(app.config.enableSoftReadPolicy, false);

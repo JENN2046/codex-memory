@@ -127,7 +127,12 @@ async function applyScopeFilter(results, scope, shadowStore) {
 }
 
 function inferRequestClientId(requestContext = {}) {
-  const executionContext = requestContext.executionContext || {};
+  const executionContext = requestContext.executionContext && typeof requestContext.executionContext === 'object'
+    ? requestContext.executionContext
+    : null;
+  if (!executionContext) {
+    return null;
+  }
   const candidates = [
     executionContext.clientId,
     executionContext.client_id,
@@ -143,7 +148,7 @@ function inferRequestClientId(requestContext = {}) {
     if (normalized === 'manual') return 'manual';
   }
 
-  return 'codex';
+  return null;
 }
 
 const LIFECYCLE_SCOPE_GOVERNANCE_SUPPORTED_FIELDS = Object.freeze([

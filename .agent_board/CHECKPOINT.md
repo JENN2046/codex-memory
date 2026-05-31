@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1270 No-Context Read Identity Fail Closed Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test soft-read identity hardening for missing trusted request context. No provider call, MCP external call, broad real-memory scan, durable memory/audit write outside test fixtures, config/watchdog/startup change, public MCP tool expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `inferRequestClientId(...)` now returns `null` when `requestContext.executionContext` is absent or not an object.
+- Missing trusted request context no longer defaults to Codex identity for soft read private filtering.
+- Added runtime regression proving no-context `search_memory` can see shared Codex records but not Codex private records.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check src\app.js`
+- `node --check tests\policy-read-preflight.test.js`
+- `node --test tests\policy-read-preflight.test.js tests\memory-lifecycle-scope-runtime-integration.test.js tests\phase-a-services.test.js` passed `21/21`.
+- `npm test` passed `2792/2792`.
+- Diff, ledger, and docs validation are recorded in `.agent_board/VALIDATION_LOG.md`.
+
+Next:
+
+- Commit or otherwise stabilize CM-1270.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, and RC readiness remain unclaimed.
+
 ## CM-1269 Request Context Only Write Authority Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
