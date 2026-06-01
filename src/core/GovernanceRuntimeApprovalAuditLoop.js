@@ -73,12 +73,44 @@ const FORBIDDEN_FRAGMENTS = Object.freeze([
   '.env'
 ]);
 
+const SCOPE_FIELD_ALIASES = Object.freeze({
+  projectRef: ['projectRef', 'project_ref', 'projectId', 'project_id'],
+  workspaceRef: ['workspaceRef', 'workspace_ref', 'workspaceId', 'workspace_id'],
+  clientRef: ['clientRef', 'client_ref', 'clientId', 'client_id'],
+  agentRef: ['agentRef', 'agent_ref', 'agentId', 'agent_id'],
+  taskRef: ['taskRef', 'task_ref', 'taskId', 'task_id'],
+  visibility: ['visibility', 'visibility_policy']
+});
+
+const IDENTITY_FIELD_ALIASES = Object.freeze({
+  loopId: ['loopId', 'loop_id'],
+  actionId: ['actionId', 'action_id'],
+  reviewPacketId: ['reviewPacketId', 'review_packet_id'],
+  approvalPacketId: ['approvalPacketId', 'approval_packet_id'],
+  preActionAuditEventId: ['preActionAuditEventId', 'pre_action_audit_event_id'],
+  decisionAuditEventId: ['decisionAuditEventId', 'decision_audit_event_id'],
+  postActionAuditEventId: ['postActionAuditEventId', 'post_action_audit_event_id'],
+  correlationId: ['correlationId', 'correlation_id']
+});
+
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
+}
+
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function firstAliasString(source, aliases) {
+  return firstNormalizedString(...aliases.map(alias => source[alias]));
 }
 
 function normalizeBoolean(value) {
@@ -94,7 +126,7 @@ function normalizeScope(scope = {}) {
   const normalized = {};
 
   for (const field of REQUIRED_SCOPE_FIELDS) {
-    normalized[field] = normalizeString(safeScope[field]);
+    normalized[field] = firstAliasString(safeScope, SCOPE_FIELD_ALIASES[field] || [field]);
   }
 
   return normalized;
@@ -105,7 +137,7 @@ function normalizeIdentity(identity = {}) {
   const normalized = {};
 
   for (const field of REQUIRED_IDENTITY_FIELDS) {
-    normalized[field] = normalizeString(safeIdentity[field]);
+    normalized[field] = firstAliasString(safeIdentity, IDENTITY_FIELD_ALIASES[field] || [field]);
   }
 
   return normalized;
@@ -182,48 +214,48 @@ function collectCounterBlockers(counters = {}) {
 function normalizeReviewPacket(packet = {}) {
   const safePacket = isPlainObject(packet) ? packet : {};
   return {
-    packetId: normalizeString(safePacket.packetId),
-    loopId: normalizeString(safePacket.loopId),
-    actionId: normalizeString(safePacket.actionId),
+    packetId: firstNormalizedString(safePacket.packetId, safePacket.packet_id),
+    loopId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.loopId),
+    actionId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.actionId),
     status: normalizeString(safePacket.status),
     scope: normalizeScope(safePacket.scope),
     reviewed: normalizeBoolean(safePacket.reviewed),
-    recommendsApprovalPacket: normalizeBoolean(safePacket.recommendsApprovalPacket),
-    executionApproved: normalizeBoolean(safePacket.executionApproved),
-    rawPayloadIncluded: normalizeBoolean(safePacket.rawPayloadIncluded)
+    recommendsApprovalPacket: normalizeBoolean(safePacket.recommendsApprovalPacket ?? safePacket.recommends_approval_packet),
+    executionApproved: normalizeBoolean(safePacket.executionApproved ?? safePacket.execution_approved),
+    rawPayloadIncluded: normalizeBoolean(safePacket.rawPayloadIncluded ?? safePacket.raw_payload_included)
   };
 }
 
 function normalizeApprovalPacket(packet = {}) {
   const safePacket = isPlainObject(packet) ? packet : {};
   return {
-    packetId: normalizeString(safePacket.packetId),
-    loopId: normalizeString(safePacket.loopId),
-    actionId: normalizeString(safePacket.actionId),
-    reviewPacketId: normalizeString(safePacket.reviewPacketId),
+    packetId: firstNormalizedString(safePacket.packetId, safePacket.packet_id),
+    loopId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.loopId),
+    actionId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.actionId),
+    reviewPacketId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.reviewPacketId),
     status: normalizeString(safePacket.status),
     decision: normalizeString(safePacket.decision),
     scope: normalizeScope(safePacket.scope),
-    exactActionNamed: normalizeBoolean(safePacket.exactActionNamed),
-    exactScopeNamed: normalizeBoolean(safePacket.exactScopeNamed),
-    durableAuditIntentNamed: normalizeBoolean(safePacket.durableAuditIntentNamed),
-    durableMemoryIntentNamed: normalizeBoolean(safePacket.durableMemoryIntentNamed),
-    executionApproved: normalizeBoolean(safePacket.executionApproved),
-    expiresAt: normalizeString(safePacket.expiresAt)
+    exactActionNamed: normalizeBoolean(safePacket.exactActionNamed ?? safePacket.exact_action_named),
+    exactScopeNamed: normalizeBoolean(safePacket.exactScopeNamed ?? safePacket.exact_scope_named),
+    durableAuditIntentNamed: normalizeBoolean(safePacket.durableAuditIntentNamed ?? safePacket.durable_audit_intent_named),
+    durableMemoryIntentNamed: normalizeBoolean(safePacket.durableMemoryIntentNamed ?? safePacket.durable_memory_intent_named),
+    executionApproved: normalizeBoolean(safePacket.executionApproved ?? safePacket.execution_approved),
+    expiresAt: firstNormalizedString(safePacket.expiresAt, safePacket.expires_at)
   };
 }
 
 function normalizeAuditRefs(auditRefs = {}) {
   const safeRefs = isPlainObject(auditRefs) ? auditRefs : {};
   return {
-    preActionAuditEventId: normalizeString(safeRefs.preActionAuditEventId),
-    decisionAuditEventId: normalizeString(safeRefs.decisionAuditEventId),
-    postActionAuditEventId: normalizeString(safeRefs.postActionAuditEventId),
-    correlationId: normalizeString(safeRefs.correlationId),
-    appendOnly: normalizeBoolean(safeRefs.appendOnly),
-    redactedSummaryOnly: normalizeBoolean(safeRefs.redactedSummaryOnly),
-    durableAuditWritten: normalizeBoolean(safeRefs.durableAuditWritten),
-    rawAuditPayloadIncluded: normalizeBoolean(safeRefs.rawAuditPayloadIncluded)
+    preActionAuditEventId: firstAliasString(safeRefs, IDENTITY_FIELD_ALIASES.preActionAuditEventId),
+    decisionAuditEventId: firstAliasString(safeRefs, IDENTITY_FIELD_ALIASES.decisionAuditEventId),
+    postActionAuditEventId: firstAliasString(safeRefs, IDENTITY_FIELD_ALIASES.postActionAuditEventId),
+    correlationId: firstAliasString(safeRefs, IDENTITY_FIELD_ALIASES.correlationId),
+    appendOnly: normalizeBoolean(safeRefs.appendOnly ?? safeRefs.append_only),
+    redactedSummaryOnly: normalizeBoolean(safeRefs.redactedSummaryOnly ?? safeRefs.redacted_summary_only),
+    durableAuditWritten: normalizeBoolean(safeRefs.durableAuditWritten ?? safeRefs.durable_audit_written),
+    rawAuditPayloadIncluded: normalizeBoolean(safeRefs.rawAuditPayloadIncluded ?? safeRefs.raw_audit_payload_included)
   };
 }
 

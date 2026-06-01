@@ -225,6 +225,118 @@ test('CM1087 accepts planning-only governance approval/audit loop and stops befo
   assert.equal(report.safety.reliabilityClaimed, false);
 });
 
+test('CM1087 normalizes snake-case governance loop identity scope and audit refs', () => {
+  const identity = baseIdentity();
+  const scope = baseScope();
+  const input = acceptedLoopInput();
+  const snakeScope = {
+    projectRef: '   ',
+    project_ref: scope.projectRef,
+    workspaceRef: '   ',
+    workspace_ref: scope.workspaceRef,
+    clientRef: '   ',
+    client_ref: scope.clientRef,
+    agentRef: '   ',
+    agent_ref: scope.agentRef,
+    taskRef: '   ',
+    task_ref: scope.taskRef,
+    visibility: '   ',
+    visibility_policy: scope.visibility
+  };
+
+  const report = evaluateGovernanceRuntimeApprovalAuditLoop({
+    ...input,
+    identity: {
+      loopId: '   ',
+      loop_id: identity.loopId,
+      actionId: '   ',
+      action_id: identity.actionId,
+      reviewPacketId: '   ',
+      review_packet_id: identity.reviewPacketId,
+      approvalPacketId: '   ',
+      approval_packet_id: identity.approvalPacketId,
+      preActionAuditEventId: '   ',
+      pre_action_audit_event_id: identity.preActionAuditEventId,
+      decisionAuditEventId: '   ',
+      decision_audit_event_id: identity.decisionAuditEventId,
+      postActionAuditEventId: '   ',
+      post_action_audit_event_id: identity.postActionAuditEventId,
+      correlationId: '   ',
+      correlation_id: identity.correlationId
+    },
+    scope: snakeScope,
+    reviewPacket: {
+      packetId: '   ',
+      packet_id: identity.reviewPacketId,
+      loopId: '   ',
+      loop_id: identity.loopId,
+      actionId: '   ',
+      action_id: identity.actionId,
+      status: 'reviewed_requires_approval',
+      scope: snakeScope,
+      reviewed: true,
+      recommendsApprovalPacket: null,
+      recommends_approval_packet: true,
+      executionApproved: null,
+      execution_approved: false,
+      rawPayloadIncluded: null,
+      raw_payload_included: false
+    },
+    approvalPacket: {
+      packetId: '   ',
+      packet_id: identity.approvalPacketId,
+      loopId: '   ',
+      loop_id: identity.loopId,
+      actionId: '   ',
+      action_id: identity.actionId,
+      reviewPacketId: '   ',
+      review_packet_id: identity.reviewPacketId,
+      status: 'approval_packet_valid_review_only',
+      decision: 'approved_for_planning_not_execution',
+      scope: snakeScope,
+      exactActionNamed: null,
+      exact_action_named: true,
+      exactScopeNamed: null,
+      exact_scope_named: true,
+      durableAuditIntentNamed: null,
+      durable_audit_intent_named: true,
+      durableMemoryIntentNamed: null,
+      durable_memory_intent_named: true,
+      executionApproved: null,
+      execution_approved: false,
+      expiresAt: '   ',
+      expires_at: '2026-06-01T00:00:00.000Z'
+    },
+    auditRefs: {
+      preActionAuditEventId: '   ',
+      pre_action_audit_event_id: identity.preActionAuditEventId,
+      decisionAuditEventId: '   ',
+      decision_audit_event_id: identity.decisionAuditEventId,
+      postActionAuditEventId: '   ',
+      post_action_audit_event_id: identity.postActionAuditEventId,
+      correlationId: '   ',
+      correlation_id: identity.correlationId,
+      appendOnly: null,
+      append_only: true,
+      redactedSummaryOnly: null,
+      redacted_summary_only: true,
+      durableAuditWritten: null,
+      durable_audit_written: false,
+      rawAuditPayloadIncluded: null,
+      raw_audit_payload_included: false
+    }
+  });
+
+  assert.equal(report.accepted, true);
+  assert.deepEqual(report.identity, identity);
+  assert.deepEqual(report.scope, scope);
+  assert.equal(report.reviewPacket.packetId, identity.reviewPacketId);
+  assert.equal(report.approvalPacket.packetId, identity.approvalPacketId);
+  assert.equal(report.auditRefs.correlationId, identity.correlationId);
+  assert.equal(report.auditRefs.appendOnly, true);
+  assert.equal(report.auditRefs.durableAuditWritten, false);
+});
+
 test('CM1087 supported governed action ids are exact for v1.1 hardening', () => {
   assert.deepEqual(ACCEPTED_ACTION_IDS, [
     'proof_memory_tombstone_apply',
