@@ -463,6 +463,39 @@ test('supersede_memory normalizes returned memory_id aliases before pair lookup'
   });
 });
 
+test('supersede_memory normalizes returned updated_at aliases before audit snapshots', async () => {
+  await withService({
+    records: [
+      { memoryId: 'mem-old', status: 'active', title: 'Old memory' },
+      { memoryId: 'mem-new', status: 'proposal', title: 'New memory' }
+    ]
+  }, async ({ shadowStore, service }) => {
+    const getRecordsByIds = shadowStore.getRecordsByIds.bind(shadowStore);
+    shadowStore.getRecordsByIds = async ids => {
+      const records = await getRecordsByIds(ids);
+      return records.map(record => ({
+        ...record,
+        updatedAt: '   ',
+        updated_at: record.updatedAt
+      }));
+    };
+
+    const result = await service.supersede(supersedePayload());
+
+    assert.equal(result.decision, 'dry-run');
+    assert.deepEqual(result.auditPlanPreview.pendingEvent.old_previous_snapshot_ref, {
+      memory_id: 'mem-old',
+      status: 'active',
+      updated_at: '2026-05-14T00:00:00.000Z'
+    });
+    assert.deepEqual(result.auditPlanPreview.pendingEvent.new_previous_snapshot_ref, {
+      memory_id: 'mem-new',
+      status: 'proposal',
+      updated_at: '2026-05-14T00:00:00.000Z'
+    });
+  });
+});
+
 test('supersede_memory forbids cross-client private mutation by default', async () => {
   await withService({
     records: [

@@ -113,7 +113,8 @@ function normalizePairRecord(record = {}) {
   const memoryId = firstNormalizedString(record.memoryId, record.memory_id);
   return {
     ...record,
-    memoryId
+    memoryId,
+    updatedAt: firstNormalizedString(record.updatedAt, record.updated_at)
   };
 }
 

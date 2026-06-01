@@ -200,6 +200,34 @@ test('validate_memory normalizes lifecycle status aliases from policy before tra
   });
 });
 
+test('validate_memory normalizes record memory_id and updated_at aliases before audit snapshot', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'proposal' }]
+  }, async ({ service, shadowStore }) => {
+    const readRecord = shadowStore.getRecord.bind(shadowStore);
+    shadowStore.getRecord = async memoryId => {
+      const record = await readRecord(memoryId);
+      return {
+        ...record,
+        memoryId: '   ',
+        memory_id: record.memoryId,
+        updatedAt: '   ',
+        updated_at: record.updatedAt
+      };
+    };
+
+    const result = await service.validate(validatePayload());
+
+    assert.equal(result.decision, 'dry-run');
+    assert.equal(result.memoryId, 'mem-1');
+    assert.deepEqual(result.auditEventPreview.previous_snapshot_ref, {
+      memory_id: 'mem-1',
+      status: 'proposal',
+      updated_at: '2026-05-14T00:00:00.000Z'
+    });
+  });
+});
+
 test('validate_memory writes pending audit before lifecycle mutation', async () => {
   await withService({
     records: [{ memoryId: 'mem-1', status: 'proposal' }]

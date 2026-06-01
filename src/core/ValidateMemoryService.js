@@ -59,6 +59,17 @@ function normalizePolicyStatus(policy = {}) {
   ));
 }
 
+function normalizeMutationRecord(record = {}) {
+  if (!record || typeof record !== 'object') {
+    return record;
+  }
+  return {
+    ...record,
+    memoryId: firstNormalizedString(record.memoryId, record.memory_id),
+    updatedAt: firstNormalizedString(record.updatedAt, record.updated_at)
+  };
+}
+
 function createEventId() {
   if (typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
@@ -260,14 +271,15 @@ class ValidateMemoryService {
       });
     }
 
-    const record = await this.shadowStore.getRecord(normalizedPayload.memory_id);
-    if (!record) {
+    const rawRecord = await this.shadowStore.getRecord(normalizedPayload.memory_id);
+    if (!rawRecord) {
       return this.buildRejectedResult({
         reason: 'memory not found.',
         payload: normalizedPayload,
         dryRun
       });
     }
+    const record = normalizeMutationRecord(rawRecord);
 
     const policy = await this.shadowStore.getRecordValidationPolicy(normalizedPayload.memory_id);
     if (!policy.lifecycleColumnAvailable) {
