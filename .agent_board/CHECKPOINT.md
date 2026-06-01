@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1327 Governance Loop Packet Boolean Alias Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test review-only governance runtime approval/audit loop packet boolean alias normalization. No live recall/write execution, governed action execution, real memory/store/jsonl/raw audit read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `GovernanceRuntimeApprovalAuditLoop` now normalizes review packet, approval packet, and audit-ref boolean aliases through explicit alias lists.
+- Blank or malformed camelCase packet/audit boolean fields no longer mask valid snake_case evidence values.
+- Existing fail-closed execution, durable-write, and raw-audit exposure boundaries remain unchanged.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\governance-runtime-approval-audit-loop.test.js tests\validation-aggregator-governance-runtime-loop-gap-contract-helper.test.js tests\v1-1-hardening-validation-aggregator.test.js tests\v1-1-hardening-staged-closeout.test.js` passed `35/35`.
+- `npm test` passed `2855/2855`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1327 closeout.
+
+Next:
+
+- Finish CM-1327 commit first; after that, prepare a separate Red-line/A5 plan if the project is to move from local hardening into real runtime evidence.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1326 Governance Loop Side-Effect Alias Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

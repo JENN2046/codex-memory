@@ -127,6 +127,28 @@ const REQUESTED_ACTION_ALIASES = Object.freeze({
   claimReliability: ['claimReliability', 'claim_reliability']
 });
 
+const REVIEW_PACKET_BOOLEAN_ALIASES = Object.freeze({
+  reviewed: ['reviewed'],
+  recommendsApprovalPacket: ['recommendsApprovalPacket', 'recommends_approval_packet'],
+  executionApproved: ['executionApproved', 'execution_approved'],
+  rawPayloadIncluded: ['rawPayloadIncluded', 'raw_payload_included']
+});
+
+const APPROVAL_PACKET_BOOLEAN_ALIASES = Object.freeze({
+  exactActionNamed: ['exactActionNamed', 'exact_action_named'],
+  exactScopeNamed: ['exactScopeNamed', 'exact_scope_named'],
+  durableAuditIntentNamed: ['durableAuditIntentNamed', 'durable_audit_intent_named'],
+  durableMemoryIntentNamed: ['durableMemoryIntentNamed', 'durable_memory_intent_named'],
+  executionApproved: ['executionApproved', 'execution_approved']
+});
+
+const AUDIT_REF_BOOLEAN_ALIASES = Object.freeze({
+  appendOnly: ['appendOnly', 'append_only'],
+  redactedSummaryOnly: ['redactedSummaryOnly', 'redacted_summary_only'],
+  durableAuditWritten: ['durableAuditWritten', 'durable_audit_written'],
+  rawAuditPayloadIncluded: ['rawAuditPayloadIncluded', 'raw_audit_payload_included']
+});
+
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -159,6 +181,15 @@ function firstDefinedAliasValue(source = {}, aliases = []) {
 
 function normalizeBoolean(value) {
   return value === true ? true : value === false ? false : null;
+}
+
+function firstAliasBoolean(source = {}, aliases = []) {
+  const safeSource = isPlainObject(source) ? source : {};
+  for (const alias of aliases) {
+    const normalized = normalizeBoolean(safeSource[alias]);
+    if (normalized !== null) return normalized;
+  }
+  return null;
 }
 
 function normalizeNonNegativeInteger(value) {
@@ -268,10 +299,10 @@ function normalizeReviewPacket(packet = {}) {
     actionId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.actionId),
     status: normalizeString(safePacket.status),
     scope: normalizeScope(safePacket.scope),
-    reviewed: normalizeBoolean(safePacket.reviewed),
-    recommendsApprovalPacket: normalizeBoolean(safePacket.recommendsApprovalPacket ?? safePacket.recommends_approval_packet),
-    executionApproved: normalizeBoolean(safePacket.executionApproved ?? safePacket.execution_approved),
-    rawPayloadIncluded: normalizeBoolean(safePacket.rawPayloadIncluded ?? safePacket.raw_payload_included)
+    reviewed: firstAliasBoolean(safePacket, REVIEW_PACKET_BOOLEAN_ALIASES.reviewed),
+    recommendsApprovalPacket: firstAliasBoolean(safePacket, REVIEW_PACKET_BOOLEAN_ALIASES.recommendsApprovalPacket),
+    executionApproved: firstAliasBoolean(safePacket, REVIEW_PACKET_BOOLEAN_ALIASES.executionApproved),
+    rawPayloadIncluded: firstAliasBoolean(safePacket, REVIEW_PACKET_BOOLEAN_ALIASES.rawPayloadIncluded)
   };
 }
 
@@ -285,11 +316,11 @@ function normalizeApprovalPacket(packet = {}) {
     status: normalizeString(safePacket.status),
     decision: normalizeString(safePacket.decision),
     scope: normalizeScope(safePacket.scope),
-    exactActionNamed: normalizeBoolean(safePacket.exactActionNamed ?? safePacket.exact_action_named),
-    exactScopeNamed: normalizeBoolean(safePacket.exactScopeNamed ?? safePacket.exact_scope_named),
-    durableAuditIntentNamed: normalizeBoolean(safePacket.durableAuditIntentNamed ?? safePacket.durable_audit_intent_named),
-    durableMemoryIntentNamed: normalizeBoolean(safePacket.durableMemoryIntentNamed ?? safePacket.durable_memory_intent_named),
-    executionApproved: normalizeBoolean(safePacket.executionApproved ?? safePacket.execution_approved),
+    exactActionNamed: firstAliasBoolean(safePacket, APPROVAL_PACKET_BOOLEAN_ALIASES.exactActionNamed),
+    exactScopeNamed: firstAliasBoolean(safePacket, APPROVAL_PACKET_BOOLEAN_ALIASES.exactScopeNamed),
+    durableAuditIntentNamed: firstAliasBoolean(safePacket, APPROVAL_PACKET_BOOLEAN_ALIASES.durableAuditIntentNamed),
+    durableMemoryIntentNamed: firstAliasBoolean(safePacket, APPROVAL_PACKET_BOOLEAN_ALIASES.durableMemoryIntentNamed),
+    executionApproved: firstAliasBoolean(safePacket, APPROVAL_PACKET_BOOLEAN_ALIASES.executionApproved),
     expiresAt: firstNormalizedString(safePacket.expiresAt, safePacket.expires_at)
   };
 }
@@ -301,10 +332,10 @@ function normalizeAuditRefs(auditRefs = {}) {
     decisionAuditEventId: firstAliasString(safeRefs, IDENTITY_FIELD_ALIASES.decisionAuditEventId),
     postActionAuditEventId: firstAliasString(safeRefs, IDENTITY_FIELD_ALIASES.postActionAuditEventId),
     correlationId: firstAliasString(safeRefs, IDENTITY_FIELD_ALIASES.correlationId),
-    appendOnly: normalizeBoolean(safeRefs.appendOnly ?? safeRefs.append_only),
-    redactedSummaryOnly: normalizeBoolean(safeRefs.redactedSummaryOnly ?? safeRefs.redacted_summary_only),
-    durableAuditWritten: normalizeBoolean(safeRefs.durableAuditWritten ?? safeRefs.durable_audit_written),
-    rawAuditPayloadIncluded: normalizeBoolean(safeRefs.rawAuditPayloadIncluded ?? safeRefs.raw_audit_payload_included)
+    appendOnly: firstAliasBoolean(safeRefs, AUDIT_REF_BOOLEAN_ALIASES.appendOnly),
+    redactedSummaryOnly: firstAliasBoolean(safeRefs, AUDIT_REF_BOOLEAN_ALIASES.redactedSummaryOnly),
+    durableAuditWritten: firstAliasBoolean(safeRefs, AUDIT_REF_BOOLEAN_ALIASES.durableAuditWritten),
+    rawAuditPayloadIncluded: firstAliasBoolean(safeRefs, AUDIT_REF_BOOLEAN_ALIASES.rawAuditPayloadIncluded)
   };
 }
 

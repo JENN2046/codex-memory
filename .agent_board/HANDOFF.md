@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1326 GOVERNANCE_LOOP_SIDE_EFFECT_ALIAS_NORMALIZATION`.
+Goal: `CM-1327 GOVERNANCE_LOOP_PACKET_BOOLEAN_ALIAS_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing review-only governance runtime approval/audit loop side-effect alias normalization. Targeted governance loop / aggregator tests passed `34/34`; default `npm test` passed `2854/2854`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing review-only governance runtime approval/audit loop packet/audit boolean alias normalization. Targeted governance loop / aggregator tests passed `35/35`; default `npm test` passed `2855/2855`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -81,6 +81,7 @@ Changed scope since CM-1207:
 - `docs/CM1324_TOMBSTONE_RUNTIME_PREP_AUDIT_PHASE_METADATA_PRESERVATION.md`
 - `docs/CM1325_GOVERNANCE_LOOP_ALIAS_NORMALIZATION.md`
 - `docs/CM1326_GOVERNANCE_LOOP_SIDE_EFFECT_ALIAS_NORMALIZATION.md`
+- `docs/CM1327_GOVERNANCE_LOOP_PACKET_BOOLEAN_ALIAS_NORMALIZATION.md`
 - `src/core/DurableGovernanceShadowProjectionPreview.js`
 - `src/core/DurableGovernanceTombstoneRuntimePrepHelper.js`
 - `src/core/GovernanceRuntimeApprovalAuditLoop.js`

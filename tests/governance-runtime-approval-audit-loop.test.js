@@ -436,6 +436,74 @@ test('CM1087 normalizes snake-case requested actions and side-effect counters', 
   assert.equal(blockedByDefinedSnakeAliases.blockerReasons.some(reason => reason.includes('provider_calls_unknown')), false);
 });
 
+test('CM1087 falls through blank packet and audit booleans to snake-case aliases', () => {
+  const identity = baseIdentity();
+  const scope = baseScope();
+  const report = evaluateGovernanceRuntimeApprovalAuditLoop({
+    ...acceptedLoopInput(),
+    reviewPacket: {
+      packetId: identity.reviewPacketId,
+      loopId: identity.loopId,
+      actionId: identity.actionId,
+      status: 'reviewed_requires_approval',
+      scope,
+      reviewed: true,
+      recommendsApprovalPacket: '',
+      recommends_approval_packet: true,
+      executionApproved: '',
+      execution_approved: false,
+      rawPayloadIncluded: '',
+      raw_payload_included: false
+    },
+    approvalPacket: {
+      packetId: identity.approvalPacketId,
+      loopId: identity.loopId,
+      actionId: identity.actionId,
+      reviewPacketId: identity.reviewPacketId,
+      status: 'approval_packet_valid_review_only',
+      decision: 'approved_for_planning_not_execution',
+      scope,
+      exactActionNamed: '',
+      exact_action_named: true,
+      exactScopeNamed: '',
+      exact_scope_named: true,
+      durableAuditIntentNamed: '',
+      durable_audit_intent_named: true,
+      durableMemoryIntentNamed: '',
+      durable_memory_intent_named: true,
+      executionApproved: '',
+      execution_approved: false,
+      expiresAt: '2026-06-01T00:00:00.000Z'
+    },
+    auditRefs: {
+      preActionAuditEventId: identity.preActionAuditEventId,
+      decisionAuditEventId: identity.decisionAuditEventId,
+      postActionAuditEventId: identity.postActionAuditEventId,
+      correlationId: identity.correlationId,
+      appendOnly: '',
+      append_only: true,
+      redactedSummaryOnly: '',
+      redacted_summary_only: true,
+      durableAuditWritten: '',
+      durable_audit_written: false,
+      rawAuditPayloadIncluded: '',
+      raw_audit_payload_included: false
+    }
+  });
+
+  assert.equal(report.accepted, true);
+  assert.equal(report.reviewPacket.recommendsApprovalPacket, true);
+  assert.equal(report.reviewPacket.executionApproved, false);
+  assert.equal(report.reviewPacket.rawPayloadIncluded, false);
+  assert.equal(report.approvalPacket.exactActionNamed, true);
+  assert.equal(report.approvalPacket.durableAuditIntentNamed, true);
+  assert.equal(report.approvalPacket.executionApproved, false);
+  assert.equal(report.auditRefs.appendOnly, true);
+  assert.equal(report.auditRefs.redactedSummaryOnly, true);
+  assert.equal(report.auditRefs.durableAuditWritten, false);
+  assert.equal(report.auditRefs.rawAuditPayloadIncluded, false);
+});
+
 test('CM1087 supported governed action ids are exact for v1.1 hardening', () => {
   assert.deepEqual(ACCEPTED_ACTION_IDS, [
     'proof_memory_tombstone_apply',
