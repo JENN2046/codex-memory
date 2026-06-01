@@ -288,6 +288,11 @@ test('memory_tombstone applies active to tombstoned with pending and committed a
     assert.equal(auditEvents[1].audit_phase, 'committed');
     assert.equal(auditEvents[1].event_type, 'memory_tombstone');
     assert.equal(auditEvents[1].tombstone_reason, 'retention-expired');
+    assert.deepEqual(auditEvents[1].previous_snapshot_ref, auditEvents[0].previous_snapshot_ref);
+    assert.equal(auditEvents[1].created_at, auditEvents[0].created_at);
+    assert.equal(auditEvents[1].reason, 'memory retired after governance review');
+    assert.equal(auditEvents[1].evidence, 'fixture evidence for tombstone service');
+    assert.equal(auditEvents[1].reversible, true);
   });
 });
 
@@ -344,6 +349,11 @@ test('memory_tombstone update failure after pending audit creates cancelled audi
     assert.equal(auditEvents[0].audit_phase, 'pending');
     assert.equal(auditEvents[1].audit_phase, 'cancelled');
     assert.equal(auditEvents[1].correlation_id, auditEvents[0].event_id);
+    assert.deepEqual(auditEvents[1].previous_snapshot_ref, auditEvents[0].previous_snapshot_ref);
+    assert.equal(auditEvents[1].created_at, auditEvents[0].created_at);
+    assert.equal(auditEvents[1].reason, 'memory retired after governance review');
+    assert.equal(auditEvents[1].evidence, 'fixture evidence for tombstone service');
+    assert.equal(auditEvents[1].reversible, true);
   });
 });
 

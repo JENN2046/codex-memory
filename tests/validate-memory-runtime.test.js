@@ -413,6 +413,11 @@ test('validate_memory applies proposal to active with pending and committed audi
     assert.equal(auditEvents[1].tool_name, 'validate_memory');
     assert.equal(auditEvents[1].from_status, 'proposal');
     assert.equal(auditEvents[1].to_status, 'active');
+    assert.deepEqual(auditEvents[1].previous_snapshot_ref, auditEvents[0].previous_snapshot_ref);
+    assert.equal(auditEvents[1].created_at, auditEvents[0].created_at);
+    assert.equal(auditEvents[1].reason, 'human reviewed proposal evidence');
+    assert.equal(auditEvents[1].evidence, 'fixture evidence for validation');
+    assert.equal(auditEvents[1].reversible, true);
     assert.equal(auditEvents[1].redaction_applied, true);
     assert.equal(auditEvents[1].lifecycle_policy_applied, true);
     assert.equal(auditEvents[1].scope_policy_applied, true);
@@ -461,6 +466,11 @@ test('validate_memory update failure after pending audit creates cancelled audit
     assert.equal(auditEvents[1].audit_phase, 'cancelled');
     assert.equal(auditEvents[1].mutation_applied, false);
     assert.equal(auditEvents[1].correlation_id, auditEvents[0].event_id);
+    assert.deepEqual(auditEvents[1].previous_snapshot_ref, auditEvents[0].previous_snapshot_ref);
+    assert.equal(auditEvents[1].created_at, auditEvents[0].created_at);
+    assert.equal(auditEvents[1].reason, 'human reviewed proposal evidence');
+    assert.equal(auditEvents[1].evidence, 'fixture evidence for validation');
+    assert.equal(auditEvents[1].reversible, true);
     assert.equal(auditEvents.some(event => event.audit_phase === 'committed'), false);
   });
 });

@@ -161,17 +161,9 @@ class TombstoneMemoryService {
 
   buildCommittedAuditEvent(auditEvent, committedAt) {
     return {
-      event_id: auditEvent.event_id,
+      ...auditEvent,
       correlation_id: auditEvent.event_id,
-      event_type: auditEvent.event_type,
       audit_phase: 'committed',
-      tool_name: auditEvent.tool_name,
-      memory_id: auditEvent.memory_id,
-      actor_client_id: auditEvent.actor_client_id,
-      request_source: auditEvent.request_source,
-      from_status: auditEvent.from_status,
-      to_status: auditEvent.to_status,
-      tombstone_reason: auditEvent.tombstone_reason,
       mutation_applied: true,
       committed_at: committedAt,
       redaction_applied: true,
@@ -182,17 +174,9 @@ class TombstoneMemoryService {
 
   buildCancelledAuditEvent(auditEvent, cancelReason, cancelledAt) {
     return {
-      event_id: auditEvent.event_id,
+      ...auditEvent,
       correlation_id: auditEvent.event_id,
-      event_type: auditEvent.event_type,
       audit_phase: 'cancelled',
-      tool_name: auditEvent.tool_name,
-      memory_id: auditEvent.memory_id,
-      actor_client_id: auditEvent.actor_client_id,
-      request_source: auditEvent.request_source,
-      from_status: auditEvent.from_status,
-      to_status: auditEvent.to_status,
-      tombstone_reason: auditEvent.tombstone_reason,
       mutation_applied: false,
       cancel_reason: cancelReason,
       cancelled_at: cancelledAt,

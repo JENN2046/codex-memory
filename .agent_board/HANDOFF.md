@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1322 MUTATION_AUDIT_SNAPSHOT_ALIAS_NORMALIZATION`.
+Goal: `CM-1323 MUTATION_AUDIT_PHASE_METADATA_PRESERVATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing validate/tombstone/supersede lifecycle mutation audit snapshot alias normalization before `previous_snapshot_ref` construction. Targeted lifecycle mutation tests passed `59/59`; default `npm test` passed `2852/2852`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing validate/tombstone lifecycle mutation committed/cancelled audit phase metadata preservation. Targeted lifecycle mutation/audit tests passed `74/74`; default `npm test` passed `2852/2852`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -77,6 +77,7 @@ Changed scope since CM-1207:
 - `docs/CM1320_SHADOW_PROJECTION_STATUS_ALIAS_NORMALIZATION.md`
 - `docs/CM1321_MUTATION_POLICY_STATUS_ALIAS_NORMALIZATION.md`
 - `docs/CM1322_MUTATION_AUDIT_SNAPSHOT_ALIAS_NORMALIZATION.md`
+- `docs/CM1323_MUTATION_AUDIT_PHASE_METADATA_PRESERVATION.md`
 - `src/core/DurableGovernanceShadowProjectionPreview.js`
 - `src/core/ValidateMemoryService.js`
 - `src/core/TombstoneMemoryService.js`
