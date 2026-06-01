@@ -50,6 +50,18 @@ function normalizeMemoryIdList(memoryIds = []) {
     .filter(Boolean))];
 }
 
+function firstNonEmptyString(...values) {
+  for (const value of values) {
+    const normalized = String(value || '').trim();
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function getRecordMemoryId(record) {
+  return firstNonEmptyString(record?.memoryId, record?.memory_id);
+}
+
 class SqliteShadowStore {
   constructor(config) {
     this.config = config;
@@ -302,6 +314,7 @@ class SqliteShadowStore {
   }
 
   runUpsertRecord(record) {
+    const memoryId = getRecordMemoryId(record);
     const statement = this.db.prepare(`
       INSERT INTO memory_records (
         memory_id, target, title, content, evidence, tags_json, validated, reusable, sensitivity,
@@ -335,7 +348,7 @@ class SqliteShadowStore {
     `);
 
     statement.run({
-      $memory_id: record.memoryId,
+      $memory_id: memoryId,
       $target: record.target,
       $title: record.title,
       $content: record.content,
@@ -366,6 +379,7 @@ class SqliteShadowStore {
 
   async replaceChunksForRecord(record, chunks = []) {
     await this.ensureReady();
+    const memoryId = getRecordMemoryId(record);
     const deleteStatement = this.db.prepare(`
       DELETE FROM memory_chunks
       WHERE memory_id = ?
@@ -385,11 +399,11 @@ class SqliteShadowStore {
       )
     `);
 
-    deleteStatement.run(record.memoryId, this.config.embeddingFingerprint, `${this.config.embeddingFingerprint}:*`);
+    deleteStatement.run(memoryId, this.config.embeddingFingerprint, `${this.config.embeddingFingerprint}:*`);
     for (const chunk of chunks) {
       insertStatement.run({
         $chunk_id: this.getProfileChunkId(chunk.chunkId),
-        $memory_id: record.memoryId,
+        $memory_id: memoryId,
         $target: record.target,
         $title: record.title,
         $source_file: record.filePath || null,

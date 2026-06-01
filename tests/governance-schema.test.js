@@ -206,6 +206,45 @@ test('governance schema: lookup maps normalize memory id input lists', async () 
   }
 });
 
+test('governance schema: shadow upsert and chunks normalize memory_id aliases', async () => {
+  const ctx = await createTempApp('codex-memory-governance-shadow-id-alias-');
+  try {
+    const store = ctx.app.stores.shadowStore;
+    const now = new Date().toISOString();
+    const record = {
+      memoryId: '',
+      memory_id: 'shadow-snake-id',
+      target: 'knowledge',
+      title: 'shadow id alias test',
+      content: 'testing shadow memory_id fallback',
+      evidence: 'test case',
+      tags: ['feature'],
+      validated: true,
+      reusable: true,
+      sensitivity: 'internal',
+      createdAt: now,
+      updatedAt: now
+    };
+
+    await store.upsertRecord(record);
+    await store.replaceChunksForRecord(record, [{
+      chunkId: 'chunk-snake-id',
+      chunkIndex: 0,
+      text: 'chunk for snake id fallback',
+      vector: [1, 0, 0]
+    }]);
+
+    const storedRecord = await store.getRecord('shadow-snake-id');
+    const chunks = await store.listChunks('knowledge');
+
+    assert.equal(storedRecord.memoryId, 'shadow-snake-id');
+    assert.equal(chunks.length, 1);
+    assert.equal(chunks[0].memoryId, 'shadow-snake-id');
+  } finally {
+    await closeAndRemove(ctx);
+  }
+});
+
 test('governance schema: MCP schemas declare strict scope surfaces', () => {
   const recordTool = TOOL_DEFINITIONS.find(tool => tool.name === 'record_memory');
   const searchTool = TOOL_DEFINITIONS.find(tool => tool.name === 'search_memory');

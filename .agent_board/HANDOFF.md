@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1314 VECTOR_INDEX_MEMORY_ID_ALIAS_NORMALIZATION`.
+Goal: `CM-1315 SQLITE_SHADOW_RECORD_ID_ALIAS_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing vector-index memory-id alias normalization. Targeted recall/vector tests passed `52/52`; default `npm test` passed `2840/2840`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing SQLite shadow-store record/chunk write memory-id alias normalization. Targeted shadow/sync/storage tests passed `28/28`; default `npm test` passed `2841/2841`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -69,6 +69,7 @@ Changed scope since CM-1207:
 - `docs/CM1312_CANDIDATE_GENERATOR_CACHE_MEMORY_ID_ALIAS_FALLBACK.md`
 - `docs/CM1313_SQLITE_SHADOW_MEMORY_ID_INPUT_NORMALIZATION.md`
 - `docs/CM1314_VECTOR_INDEX_MEMORY_ID_ALIAS_NORMALIZATION.md`
+- `docs/CM1315_SQLITE_SHADOW_RECORD_ID_ALIAS_NORMALIZATION.md`
 - `src/recall/KnowledgeBaseSyncService.js`
 - `src/recall/CandidateGenerator.js`
 - `src/storage/CandidateCacheStore.js`
