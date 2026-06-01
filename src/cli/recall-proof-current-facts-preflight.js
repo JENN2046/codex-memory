@@ -4,9 +4,7 @@
 const { spawnSync } = require('node:child_process');
 
 const {
-  EXACT_APPROVAL_LINE
-} = require('../core/TrueLiveRecallReadonlyProofRunner');
-const {
+  buildHeadBoundApprovalLine,
   CM0814_BASIS_ID,
   EXPECTED_CM0814_QUERY_FAMILY,
   REQUIRED_BOUNDARY_FLAGS,
@@ -114,7 +112,7 @@ function collectGitFacts({ cwd = process.cwd(), gitRunner = runGit } = {}) {
 function buildPreflightInput(gitFacts) {
   return {
     basisId: CM0814_BASIS_ID,
-    approvalLine: EXACT_APPROVAL_LINE,
+    approvalLine: buildHeadBoundApprovalLine(gitFacts.localHead),
     gitFacts,
     queries: EXPECTED_CM0814_QUERY_FAMILY.map(query => ({
       slot: query.slot,
@@ -162,6 +160,7 @@ function buildReport(options = {}, dependencies = {}) {
     blockerReasons: preflight.blockerReasons,
     gitFactErrors: errors,
     exactApprovalLineMatched: preflight.exactApprovalLineMatched,
+    approvalBinding: preflight.approvalBinding,
     cleanSyncedMainHead: preflight.cleanSyncedMainHead,
     exactQueryFamilyBound: preflight.exactQueryFamilyBound,
     internalProofSeamBound: preflight.internalProofSeamBound,
@@ -205,6 +204,7 @@ function renderText(report) {
     `liveProofStarted: ${report.liveProofStarted === true}`,
     `blockerReasons: ${(report.blockerReasons || []).join(', ') || 'none'}`,
     `gitFactErrors: ${(report.gitFactErrors || []).length}`,
+    `approvalBinding: ${report.approvalBinding?.type || '<none>'}`,
     `cleanSyncedMainHead: ${report.cleanSyncedMainHead === true}`,
     `exactQueryFamilyBound: ${report.exactQueryFamilyBound === true}`,
     `internalProofSeamBound: ${report.internalProofSeamBound === true}`,

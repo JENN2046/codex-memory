@@ -12,6 +12,7 @@ const {
   PREFLIGHT_STATUS_READY,
   REQUIRED_BOUNDARY_FLAGS,
   REQUIRED_PROOF_SEAM,
+  buildHeadBoundApprovalLine,
   evaluateRecallProofExecutionPreflight,
   normalizePreflightInput
 } = require('../src/core/RecallProofExecutionPreflight');
@@ -61,6 +62,33 @@ test('CM-0904 preflight accepts clean synced exact CM-0814 basis without executi
   assert.equal(result.safety.callsRecordMemory, false);
   assert.equal(result.safety.claimsRecallReliable, false);
   assert.equal(result.safety.claimsReadiness, false);
+});
+
+test('CM-1329 preflight accepts fresh-head-bound approval and records commit binding', () => {
+  const result = evaluateRecallProofExecutionPreflight(buildInput({
+    approvalLine: buildHeadBoundApprovalLine(CURRENT_HEAD)
+  }));
+
+  assert.equal(result.status, PREFLIGHT_STATUS_READY);
+  assert.equal(result.acceptedForExecutionPreflight, true);
+  assert.equal(result.exactApprovalLineMatched, true);
+  assert.equal(result.approvalBinding.type, 'head_bound_commit');
+  assert.equal(result.approvalBinding.commit, CURRENT_HEAD);
+  assert.deepEqual(result.blockerReasons, []);
+});
+
+test('CM-1329 preflight fails closed when approval commit does not match local HEAD', () => {
+  const differentHead = 'b6782e338dfa320679f2802b0d8e2491d8f8b55d';
+  const result = evaluateRecallProofExecutionPreflight(buildInput({
+    approvalLine: buildHeadBoundApprovalLine(differentHead)
+  }));
+
+  assert.equal(result.status, PREFLIGHT_STATUS_BLOCKED);
+  assert.equal(result.acceptedForExecutionPreflight, false);
+  assert.equal(result.exactApprovalLineMatched, false);
+  assert.equal(result.approvalBinding.type, 'head_bound_commit');
+  assert.equal(result.approvalBinding.commit, differentHead);
+  assert.ok(result.blockerReasons.includes('approval_commit_local_head_mismatch'));
 });
 
 test('CM-0904 preflight fails closed for dirty worktree even when exact query basis matches', () => {

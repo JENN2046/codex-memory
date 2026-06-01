@@ -9,6 +9,8 @@ const {
 
 const EXACT_APPROVAL_LINE = 'I approve MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_EXECUTION_ONCE for codex-memory at the current synced main head, limited to exactly four read-only true live search_memory calls against the current local codex-memory real store, using the query-family and output boundaries in docs/MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_APPROVAL_PACKET.md, with no provider call, no direct .jsonl read, no durable memory/audit write, no migration/import/export/backup/restore apply, no config/watchdog/startup change, no public MCP expansion, no package/lockfile change, no tag/release/deploy/cutover, and no readiness claim.';
 const CM0825_PATCHED_EXACT_APPROVAL_LINE = 'I approve CM0825_EXACT_APPROVED_PATCHED_TRUE_LIVE_RECALL_PROOF_ONCE for codex-memory at the current clean head containing the CM-0820 patched metadata-only recall path, limited to exactly four read-only true live recall queries through TrueLiveRecallReadonlyProofRunner and TrueLiveRecallExecutorAdapter, with noRawContentRead=true, sanitized output only, no raw memory output, no direct .jsonl read, no provider/model/API call, no durable memory/audit write, no migration/import/export/backup/restore apply, no config/watchdog/startup change, no public MCP expansion, no package/lockfile change, no tag/release/deploy/cutover, and no readiness or reliability claim.';
+const HEAD_BOUND_APPROVAL_PREFIX = 'I approve MEMORY_RECALL_TRUE_LIVE_REAL_STORE_PROOF_EXECUTION_ONCE for codex-memory on branch main at commit ';
+const HEAD_BOUND_APPROVAL_SUFFIX = ', limited to exactly four read-only true live search_memory calls against the current local codex-memory real store using the CM-0814 stricter negative-control query family, with no provider call, no direct .jsonl read, no raw memory output, no durable memory/audit write, no migration/import/export/backup/restore apply, no config/watchdog/startup change, no public MCP expansion, no package/lockfile change, no tag/release/deploy/cutover, and no readiness or reliability claim.';
 
 const PROOF_MODE = 'true_live_recall_readonly_proof';
 const EXACT_QUERY_COUNT = 4;
@@ -33,6 +35,28 @@ const CM0825_PATCHED_REQUIRED_QUERIES = [
     slot: 'Q4',
     family: 'stricter_negative_control',
     text: 'xqzv-9137-lomdra-kepv-azmuth'
+  }
+];
+const HEAD_BOUND_NEGATIVE_CONTROL_REQUIRED_QUERIES = [
+  {
+    slot: 'Q1',
+    family: 'stricter_negative_control',
+    text: 'xqzv-9137-lomdra-kepv-azmuth'
+  },
+  {
+    slot: 'Q2',
+    family: 'stricter_negative_control',
+    text: 'nareth-48291-pluvox-darnel-kiv'
+  },
+  {
+    slot: 'Q3',
+    family: 'stricter_negative_control',
+    text: 'vornik-73019-quaspel-threnn-ulo'
+  },
+  {
+    slot: 'Q4',
+    family: 'stricter_negative_control',
+    text: 'mavrix-60428-selkun-dopra-nyxal'
   }
 ];
 const APPROVAL_PROFILES = [
@@ -98,18 +122,71 @@ function normalizeApprovalReference(value) {
   return normalized || 'operator_exact_approval_required';
 }
 
-function assertExactApproval(approvalLine) {
+function isFortyCharHex(value) {
+  return /^[a-f0-9]{40}$/i.test(String(value || '').trim());
+}
+
+function normalizeCommit(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return isFortyCharHex(normalized) ? normalized : '';
+}
+
+function buildHeadBoundApprovalLine(commit) {
+  const normalizedCommit = normalizeCommit(commit);
+  if (!normalizedCommit) {
+    return '';
+  }
+  return `${HEAD_BOUND_APPROVAL_PREFIX}${normalizedCommit}${HEAD_BOUND_APPROVAL_SUFFIX}`;
+}
+
+function parseHeadBoundApprovalLine(approvalLine) {
+  const normalizedApprovalLine = normalizeApprovalLine(approvalLine);
+  const normalizedPrefix = normalizeApprovalLine(HEAD_BOUND_APPROVAL_PREFIX);
+  const normalizedSuffix = normalizeApprovalLine(HEAD_BOUND_APPROVAL_SUFFIX);
+  if (!normalizedApprovalLine.startsWith(normalizedPrefix) || !normalizedApprovalLine.endsWith(normalizedSuffix)) {
+    return null;
+  }
+
+  const commit = normalizedApprovalLine
+    .slice(normalizedPrefix.length, normalizedApprovalLine.length - normalizedSuffix.length)
+    .trim()
+    .toLowerCase();
+  if (!isFortyCharHex(commit)) {
+    return null;
+  }
+  return {
+    id: 'CM-1329_HEAD_BOUND_NEGATIVE_CONTROL',
+    approvalLine: buildHeadBoundApprovalLine(commit),
+    commit,
+    requiredQueries: HEAD_BOUND_NEGATIVE_CONTROL_REQUIRED_QUERIES
+  };
+}
+
+function assertExactApproval(approvalLine, { baselineCommit = null } = {}) {
   const normalizedApprovalLine = normalizeApprovalLine(approvalLine);
   const approvalProfile = APPROVAL_PROFILES.find(
     profile => normalizeApprovalLine(profile.approvalLine) === normalizedApprovalLine
   );
-  if (!approvalProfile) {
-    throw createProofBoundaryError('exact approval required for true live recall proof runner', {
-      reason: 'exact_approval_required'
-    });
+  if (approvalProfile) {
+    return approvalProfile;
   }
 
-  return approvalProfile;
+  const headBoundProfile = parseHeadBoundApprovalLine(normalizedApprovalLine);
+  if (headBoundProfile) {
+    const normalizedBaselineCommit = normalizeCommit(baselineCommit);
+    if (normalizedBaselineCommit && headBoundProfile.commit !== normalizedBaselineCommit) {
+      throw createProofBoundaryError('approval commit must match proof baseline commit', {
+        reason: 'approval_commit_mismatch',
+        approvalCommit: headBoundProfile.commit,
+        baselineCommit: normalizedBaselineCommit
+      });
+    }
+    return headBoundProfile;
+  }
+
+  throw createProofBoundaryError('exact approval required for true live recall proof runner', {
+    reason: 'exact_approval_required'
+  });
 }
 
 function normalizeQueries(queries, { approvalProfile = null } = {}) {
@@ -445,7 +522,7 @@ class TrueLiveRecallReadonlyProofRunner {
     target = 'both',
     limit = 5
   } = {}) {
-    const approvalProfile = assertExactApproval(approvalLine);
+    const approvalProfile = assertExactApproval(approvalLine, { baselineCommit });
     const normalizedQueries = normalizeQueries(queries, { approvalProfile });
     const proofContext = createSealedProofContext({
       baselineCommit,
@@ -573,6 +650,7 @@ module.exports = {
   EXACT_APPROVAL_LINE,
   CM0825_PATCHED_EXACT_APPROVAL_LINE,
   CM0825_PATCHED_REQUIRED_QUERIES,
+  HEAD_BOUND_NEGATIVE_CONTROL_REQUIRED_QUERIES,
   EXACT_QUERY_COUNT,
   PROOF_MODE,
   REQUIRED_QUERY_SLOTS,
@@ -582,8 +660,10 @@ module.exports = {
   TrueLiveRecallReadonlyProofRunner,
   assertNoRawExecutorLeakage,
   assertExactApproval,
+  buildHeadBoundApprovalLine,
   assertZeroSideEffects,
   createProofBoundaryError,
   createSealedProofContext,
-  normalizeQueries
+  normalizeQueries,
+  parseHeadBoundApprovalLine
 };

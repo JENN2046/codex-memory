@@ -1,5 +1,35 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1329 Recall Proof Head-Bound Approval Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs hardening for true-live recall proof approval binding. No live proof execution, `search_memory`, `record_memory`, provider/model/API call, service startup, raw memory or `.jsonl` read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, cutover, readiness claim, or reliability claim.
+
+Result:
+
+- Added head-bound recall proof approval line rendering and parsing for `on branch main at commit <40hex>`.
+- Current-facts preflight now generates head-bound approval from read-only Git facts.
+- Preflight accepts head-bound approval only when the approval commit equals local `HEAD`.
+- Runner accepts head-bound approval only when the approval commit matches `baselineCommit`, when a valid baseline commit is provided.
+- Head-bound approval profile requires the CM-0814 stricter negative-control query family.
+- Current read-only preflight remains blocked-not-executed on `local_origin_head_mismatch` and `dirty_worktree`, but now records `approvalBinding.type=head_bound_commit`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed source/CLI/tests.
+- `node --test tests\recall-proof-execution-preflight.test.js tests\recall-proof-current-facts-preflight-cli.test.js tests\true-live-recall-internal-proof-runner.test.js tests\memory-reliability-proof-baseline-readiness-cli.test.js tests\memory-reliability-proof-baseline-readiness-policy.test.js` passed `38/38`.
+- `node src\cli\recall-proof-current-facts-preflight.js --json --pretty` returned `RECALL_PROOF_EXECUTION_PREFLIGHT_BLOCKED_NOT_EXECUTED` with head-bound approval binding and no live proof.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1329 closeout.
+
+Next:
+
+- Before any live recall proof, reach clean synced `main`, rerun the read-only current-facts preflight, and require the bounded exact-approved proof path.
+- Do not claim `memory recall reliable`, runtime readiness, RC readiness, cutover readiness, or personal dogfood readiness from this approval-binding hardening step.
+
 ## CM-1328 Red-Line A5 Recall Proof Entry Plan Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

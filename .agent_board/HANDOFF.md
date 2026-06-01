@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1328 REDLINE_A5_RECALL_PROOF_ENTRY_PLAN`.
+Goal: `CM-1329 RECALL_PROOF_HEAD_BOUND_APPROVAL`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after recording the next Red-line/A5 entry plan for true-live recall negative-control proof. Read-only current-facts preflight returned `RECALL_PROOF_EXECUTION_PREFLIGHT_BLOCKED_NOT_EXECUTED` because local `main` at `7c311c8d9a535a6f49c1c1673be59a8155c1bab4` differs from `origin/main` at `0a992a87808cb2f20f40da93edf9df8c6c7d4572` and the worktree has two untracked files. Approval line, stricter negative-control query family, internal proof seam, and boundary flags were bound. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after adding commit-bound approval support to the true-live recall proof preflight and runner. Current-facts preflight now generates head-bound approval from local `HEAD`; preflight accepts it only when the approval commit equals local `HEAD`; runner accepts it only when the approval commit matches `baselineCommit` if supplied. Targeted recall proof/preflight/reliability tests passed `38/38`. Current read-only preflight remains blocked-not-executed on `local_origin_head_mismatch` and `dirty_worktree`, with `approvalBinding.type=head_bound_commit`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -84,6 +84,7 @@ Changed scope since CM-1207:
 - `docs/CM1326_GOVERNANCE_LOOP_SIDE_EFFECT_ALIAS_NORMALIZATION.md`
 - `docs/CM1327_GOVERNANCE_LOOP_PACKET_BOOLEAN_ALIAS_NORMALIZATION.md`
 - `docs/CM1328_REDLINE_A5_RECALL_PROOF_ENTRY_PLAN.md`
+- `docs/CM1329_RECALL_PROOF_HEAD_BOUND_APPROVAL.md`
 - `src/core/DurableGovernanceShadowProjectionPreview.js`
 - `src/core/DurableGovernanceTombstoneRuntimePrepHelper.js`
 - `src/core/GovernanceRuntimeApprovalAuditLoop.js`
@@ -100,6 +101,12 @@ Changed scope since CM-1207:
 - `src/storage/SqliteShadowStore.js`
 - `src/storage/VectorIndexStore.js`
 - `src/recall/ChunkIndexingService.js`
+- `src/core/RecallProofExecutionPreflight.js`
+- `src/core/TrueLiveRecallReadonlyProofRunner.js`
+- `src/cli/recall-proof-current-facts-preflight.js`
+- `tests/recall-proof-execution-preflight.test.js`
+- `tests/recall-proof-current-facts-preflight-cli.test.js`
+- `tests/true-live-recall-internal-proof-runner.test.js`
 - `src/recall/KnowledgeBaseRecallPipeline.js`
 - `src/core/SupersedeMemoryService.js`
 - `src/core/MemorySupersedePairOutcomeHelper.js`

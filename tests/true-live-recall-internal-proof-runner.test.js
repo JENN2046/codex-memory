@@ -9,10 +9,13 @@ const {
   CM0825_PATCHED_REQUIRED_QUERIES,
   EXACT_APPROVAL_LINE,
   EXACT_QUERY_COUNT,
+  HEAD_BOUND_NEGATIVE_CONTROL_REQUIRED_QUERIES,
   PROOF_MODE,
   REQUIRED_SIDE_EFFECT_COUNTER_KEYS,
   ZERO_SIDE_EFFECT_COUNTERS,
-  TrueLiveRecallReadonlyProofRunner
+  TrueLiveRecallReadonlyProofRunner,
+  assertExactApproval,
+  buildHeadBoundApprovalLine
 } = require('../src/core/TrueLiveRecallReadonlyProofRunner');
 
 function createQueries() {
@@ -95,6 +98,23 @@ test('internal proof runner rejects missing approval and non-exact query count',
       ]
     }),
     error => assertBoundaryError(error, 'broad_scan_query_rejected')
+  );
+});
+
+test('CM-1329 internal proof runner binds head-bound approval to baseline commit', () => {
+  const baselineCommit = 'a6782e338dfa320679f2802b0d8e2491d8f8b55d';
+  const approvalLine = buildHeadBoundApprovalLine(baselineCommit);
+  const profile = assertExactApproval(approvalLine, { baselineCommit });
+
+  assert.equal(profile.id, 'CM-1329_HEAD_BOUND_NEGATIVE_CONTROL');
+  assert.equal(profile.commit, baselineCommit);
+  assert.deepEqual(profile.requiredQueries, HEAD_BOUND_NEGATIVE_CONTROL_REQUIRED_QUERIES);
+
+  assert.throws(
+    () => assertExactApproval(approvalLine, {
+      baselineCommit: 'b6782e338dfa320679f2802b0d8e2491d8f8b55d'
+    }),
+    error => assertBoundaryError(error, 'approval_commit_mismatch')
   );
 });
 

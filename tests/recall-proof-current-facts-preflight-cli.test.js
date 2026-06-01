@@ -63,6 +63,8 @@ test('CM-0906 current-facts collector builds clean git facts without proof execu
   assert.equal(report.acceptedForExecutionPreflight, true);
   assert.equal(report.executionStarted, false);
   assert.equal(report.liveProofStarted, false);
+  assert.equal(report.approvalBinding.type, 'head_bound_commit');
+  assert.equal(report.approvalBinding.commit, CURRENT_HEAD);
   assert.equal(report.cleanSyncedMainHead, true);
   assert.equal(report.collectorSafety.readsCurrentGitFacts, true);
   assert.equal(report.collectorSafety.executesReadOnlyGitCommands, true);
@@ -87,6 +89,8 @@ test('CM-0906 current-facts collector fails closed for dirty worktree', () => {
   assert.equal(report.decision, 'RECALL_PROOF_EXECUTION_PREFLIGHT_BLOCKED_NOT_EXECUTED');
   assert.equal(report.acceptedForExecutionPreflight, false);
   assert.equal(report.executionStarted, false);
+  assert.equal(report.approvalBinding.type, 'head_bound_commit');
+  assert.equal(report.approvalBinding.commit, CURRENT_HEAD);
   assert.ok(report.blockerReasons.includes('dirty_worktree'));
   assert.equal(report.normalizedGitFacts.dirtyStatusLineCount, 2);
 });

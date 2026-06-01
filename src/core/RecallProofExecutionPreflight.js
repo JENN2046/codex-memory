@@ -1,9 +1,11 @@
 'use strict';
 
 const {
+  buildHeadBoundApprovalLine,
   EXACT_APPROVAL_LINE,
   EXACT_QUERY_COUNT,
-  normalizeQueries
+  normalizeQueries,
+  parseHeadBoundApprovalLine
 } = require('./TrueLiveRecallReadonlyProofRunner');
 
 const CM0814_BASIS_ID = 'CM-0814';
@@ -145,8 +147,55 @@ function collectGitBlockers(gitFacts) {
   return blockers;
 }
 
-function collectApprovalBlockers(approvalLine) {
-  return approvalLine === EXACT_APPROVAL_LINE ? [] : ['exact_approval_line_missing_or_mismatched'];
+function evaluateApprovalBinding(approvalLine, gitFacts) {
+  if (approvalLine === EXACT_APPROVAL_LINE) {
+    return {
+      accepted: true,
+      type: 'legacy_current_synced_main_head',
+      commit: null,
+      blocker: null
+    };
+  }
+
+  const headBoundProfile = parseHeadBoundApprovalLine(approvalLine);
+  if (!headBoundProfile) {
+    return {
+      accepted: false,
+      type: 'invalid',
+      commit: null,
+      blocker: 'exact_approval_line_missing_or_mismatched'
+    };
+  }
+
+  if (!isFortyCharHex(gitFacts.localHead)) {
+    return {
+      accepted: false,
+      type: 'head_bound_commit',
+      commit: headBoundProfile.commit,
+      blocker: 'approval_local_head_missing_or_malformed'
+    };
+  }
+
+  if (headBoundProfile.commit !== gitFacts.localHead.toLowerCase()) {
+    return {
+      accepted: false,
+      type: 'head_bound_commit',
+      commit: headBoundProfile.commit,
+      blocker: 'approval_commit_local_head_mismatch'
+    };
+  }
+
+  return {
+    accepted: true,
+    type: 'head_bound_commit',
+    commit: headBoundProfile.commit,
+    blocker: null
+  };
+}
+
+function collectApprovalBlockers(approvalLine, gitFacts) {
+  const binding = evaluateApprovalBinding(approvalLine, gitFacts);
+  return binding.accepted ? [] : [binding.blocker];
 }
 
 function collectQueryBlockers(queries) {
@@ -197,7 +246,7 @@ function collectBoundaryFlagBlockers(boundaryFlags) {
 function evaluateRecallProofExecutionPreflight(input = {}) {
   const normalized = normalizePreflightInput(input);
   const blockerReasons = [
-    ...collectApprovalBlockers(normalized.approvalLine),
+    ...collectApprovalBlockers(normalized.approvalLine, normalized.gitFacts),
     ...collectGitBlockers(normalized.gitFacts),
     ...collectQueryBlockers(normalized.queries),
     ...collectProofSeamBlockers(normalized.proofSeam),
@@ -205,6 +254,7 @@ function evaluateRecallProofExecutionPreflight(input = {}) {
   ];
   const uniqueBlockers = [...new Set(blockerReasons)];
   const acceptedForExecutionPreflight = uniqueBlockers.length === 0;
+  const approvalBinding = evaluateApprovalBinding(normalized.approvalLine, normalized.gitFacts);
 
   return {
     taskId: 'CM-0904_RECALL_PROOF_EXECUTION_PREFLIGHT',
@@ -212,7 +262,8 @@ function evaluateRecallProofExecutionPreflight(input = {}) {
     status: acceptedForExecutionPreflight ? PREFLIGHT_STATUS_READY : PREFLIGHT_STATUS_BLOCKED,
     acceptedForExecutionPreflight,
     executionStarted: false,
-    exactApprovalLineMatched: normalized.approvalLine === EXACT_APPROVAL_LINE,
+    exactApprovalLineMatched: approvalBinding.accepted,
+    approvalBinding,
     cleanSyncedMainHead: collectGitBlockers(normalized.gitFacts).length === 0,
     exactQueryFamilyBound: collectQueryBlockers(normalized.queries).length === 0,
     internalProofSeamBound: collectProofSeamBlockers(normalized.proofSeam).length === 0,
@@ -253,6 +304,7 @@ module.exports = {
   PREFLIGHT_STATUS_READY,
   REQUIRED_BOUNDARY_FLAGS,
   REQUIRED_PROOF_SEAM,
+  buildHeadBoundApprovalLine,
   evaluateRecallProofExecutionPreflight,
   normalizePreflightInput
 };
