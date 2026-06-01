@@ -1,5 +1,9 @@
 const crypto = require('node:crypto');
 
+const {
+  firstNonEmptyAliasString,
+  normalizeMemoryId
+} = require('./FieldAliasNormalizer');
 const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
 
 const SCHEMA_VERSION = 'memory-write-lifecycle-dedup-suppression-preflight-v1';
@@ -43,16 +47,6 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) {
-      return normalized;
-    }
-  }
-  return '';
-}
-
 function findSchemaVersionMetadataKeys(payload = {}) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return [];
@@ -83,7 +77,7 @@ function normalizeScope(input = {}) {
   const scope = {};
 
   for (const field of SCOPE_FIELDS) {
-    scope[field] = firstNormalizedString(input[field], input[toSnakeCase(field)]);
+    scope[field] = firstNonEmptyAliasString(input, [field, toSnakeCase(field)]);
   }
 
   return scope;
@@ -109,9 +103,9 @@ function normalizeWriteCandidate(input = {}) {
   const title = normalizeString(safeInput.title);
   const content = normalizeString(safeInput.content);
   const evidence = normalizeString(safeInput.evidence);
-  const lifecycleStatus = (firstNormalizedString(safeInput.lifecycleStatus, safeInput.lifecycle_status) || 'active')
+  const lifecycleStatus = (firstNonEmptyAliasString(safeInput, ['lifecycleStatus', 'lifecycle_status']) || 'active')
     .toLowerCase();
-  const lifecycleAction = (firstNormalizedString(safeInput.lifecycleAction, safeInput.lifecycle_action) || 'create')
+  const lifecycleAction = (firstNonEmptyAliasString(safeInput, ['lifecycleAction', 'lifecycle_action']) || 'create')
     .toLowerCase();
 
   return {
@@ -123,9 +117,9 @@ function normalizeWriteCandidate(input = {}) {
     lifecycleStatus,
     lifecycleAction,
     reason: normalizeString(safeInput.reason),
-    supersedesMemoryId: firstNormalizedString(safeInput.supersedesMemoryId, safeInput.supersedes_memory_id),
-    tombstoneMemoryId: firstNormalizedString(safeInput.tombstoneMemoryId, safeInput.tombstone_memory_id),
-    forgetMemoryId: firstNormalizedString(safeInput.forgetMemoryId, safeInput.forget_memory_id),
+    supersedesMemoryId: firstNonEmptyAliasString(safeInput, ['supersedesMemoryId', 'supersedes_memory_id']),
+    tombstoneMemoryId: firstNonEmptyAliasString(safeInput, ['tombstoneMemoryId', 'tombstone_memory_id']),
+    forgetMemoryId: firstNonEmptyAliasString(safeInput, ['forgetMemoryId', 'forget_memory_id']),
     scope: normalizeScope(safeInput),
     raw: safeInput
   };
@@ -155,8 +149,8 @@ function normalizeExistingCandidate(input = {}) {
   const normalized = normalizeWriteCandidate(safeInput);
 
   return {
-    memoryId: firstNormalizedString(safeInput.memoryId, safeInput.memory_id),
-    canonicalHash: firstNormalizedString(safeInput.canonicalHash, safeInput.canonical_hash) ||
+    memoryId: normalizeMemoryId(safeInput),
+    canonicalHash: firstNonEmptyAliasString(safeInput, ['canonicalHash', 'canonical_hash']) ||
       computeCanonicalWriteHash(safeInput),
     lifecycleStatus: normalized.lifecycleStatus,
     target: normalized.target,

@@ -1,20 +1,15 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 
+const {
+  firstAliasBoolean,
+  firstNonEmptyAliasString,
+  firstNonEmptyNormalizedString,
+  normalizeString
+} = require('../core/FieldAliasNormalizer');
+
 const DEFAULT_AUDIT_WINDOW = 500;
 const MAX_AUDIT_BYTES = 1024 * 1024;
-
-function normalizeString(value) {
-  return typeof value === 'string' ? value.trim() : '';
-}
-
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) return normalized;
-  }
-  return '';
-}
 
 function normalizeAuditPhase(value) {
   return normalizeString(value).toLowerCase();
@@ -23,18 +18,18 @@ function normalizeAuditPhase(value) {
 function selectMutationAuditEvent(event) {
   if (!event || typeof event !== 'object') return null;
   return {
-    eventId: firstNormalizedString(event.event_id, event.eventId) || null,
-    correlationId: firstNormalizedString(event.correlation_id, event.correlationId) || null,
-    auditPhase: firstNormalizedString(event.audit_phase, event.auditPhase) || null,
-    mutationApplied: event.mutation_applied === true,
-    memoryId: firstNormalizedString(event.memory_id, event.memoryId) || null,
-    eventType: firstNormalizedString(event.event_type, event.eventType) || null,
-    toolName: firstNormalizedString(event.tool_name, event.toolName) || null,
-    actorClientId: firstNormalizedString(event.actor_client_id, event.actorClientId) || null,
-    requestSource: firstNormalizedString(event.request_source, event.requestSource) || null,
-    fromStatus: firstNormalizedString(event.from_status, event.fromStatus) || null,
-    toStatus: firstNormalizedString(event.to_status, event.toStatus) || null,
-    tombstoneReason: firstNormalizedString(event.tombstone_reason, event.tombstoneReason) || null
+    eventId: firstNonEmptyAliasString(event, ['event_id', 'eventId']) || null,
+    correlationId: firstNonEmptyAliasString(event, ['correlation_id', 'correlationId']) || null,
+    auditPhase: firstNonEmptyAliasString(event, ['audit_phase', 'auditPhase']) || null,
+    mutationApplied: firstAliasBoolean(event, ['mutation_applied', 'mutationApplied']),
+    memoryId: firstNonEmptyAliasString(event, ['memory_id', 'memoryId']) || null,
+    eventType: firstNonEmptyAliasString(event, ['event_type', 'eventType']) || null,
+    toolName: firstNonEmptyAliasString(event, ['tool_name', 'toolName']) || null,
+    actorClientId: firstNonEmptyAliasString(event, ['actor_client_id', 'actorClientId']) || null,
+    requestSource: firstNonEmptyAliasString(event, ['request_source', 'requestSource']) || null,
+    fromStatus: firstNonEmptyAliasString(event, ['from_status', 'fromStatus']) || null,
+    toStatus: firstNonEmptyAliasString(event, ['to_status', 'toStatus']) || null,
+    tombstoneReason: firstNonEmptyAliasString(event, ['tombstone_reason', 'tombstoneReason']) || null
   };
 }
 
@@ -44,29 +39,29 @@ function selectWriteManifestAuditEvent(entry) {
   if (!manifest || typeof manifest !== 'object') return null;
 
   return {
-    timestamp: firstNormalizedString(entry.timestamp) || null,
-    decision: firstNormalizedString(entry.decision) || null,
-    target: firstNormalizedString(entry.target) || null,
-    memoryId: firstNormalizedString(entry.memoryId, entry.memory_id) || null,
-    requestSource: firstNormalizedString(entry.requestSource, entry.request_source) || null,
-    shadowWriteStatus: entry.shadowWrite?.status || null,
-    authoritativeStore: firstNormalizedString(manifest.authoritativeStore, manifest.authoritative_store) || null,
-    idempotencyKey: firstNormalizedString(manifest.idempotencyKey, manifest.idempotency_key) || null,
-    canonicalHash: firstNormalizedString(manifest.canonicalHash, manifest.canonical_hash) || null,
-    status: firstNormalizedString(manifest.status) || null,
-    replayed: manifest.replayed === true,
-    recovered: manifest.recovered === true,
-    recoveryRequired: manifest.recoveryRequired === true,
-    repaired: manifest.repaired === true,
-    repairReason: manifest.repairReason || null,
-    cancelled: manifest.cancelled === true,
-    cancelReason: manifest.cancelReason || null,
+    timestamp: firstNonEmptyNormalizedString(entry.timestamp) || null,
+    decision: firstNonEmptyNormalizedString(entry.decision) || null,
+    target: firstNonEmptyNormalizedString(entry.target) || null,
+    memoryId: firstNonEmptyAliasString(entry, ['memoryId', 'memory_id']) || null,
+    requestSource: firstNonEmptyAliasString(entry, ['requestSource', 'request_source']) || null,
+    shadowWriteStatus: firstNonEmptyAliasString(entry.shadowWrite, ['status']) || null,
+    authoritativeStore: firstNonEmptyAliasString(manifest, ['authoritativeStore', 'authoritative_store']) || null,
+    idempotencyKey: firstNonEmptyAliasString(manifest, ['idempotencyKey', 'idempotency_key']) || null,
+    canonicalHash: firstNonEmptyAliasString(manifest, ['canonicalHash', 'canonical_hash']) || null,
+    status: firstNonEmptyNormalizedString(manifest.status) || null,
+    replayed: firstAliasBoolean(manifest, ['replayed']),
+    recovered: firstAliasBoolean(manifest, ['recovered']),
+    recoveryRequired: firstAliasBoolean(manifest, ['recoveryRequired', 'recovery_required']),
+    repaired: firstAliasBoolean(manifest, ['repaired']),
+    repairReason: firstNonEmptyAliasString(manifest, ['repairReason', 'repair_reason']) || null,
+    cancelled: firstAliasBoolean(manifest, ['cancelled']),
+    cancelReason: firstNonEmptyAliasString(manifest, ['cancelReason', 'cancel_reason']) || null,
     lifecycle: manifest.lifecycle && typeof manifest.lifecycle === 'object'
       ? {
-          pending: manifest.lifecycle.pending === true,
-          committed: manifest.lifecycle.committed === true,
-          projected: manifest.lifecycle.projected === true,
-          audited: manifest.lifecycle.audited === true
+          pending: firstAliasBoolean(manifest.lifecycle, ['pending']),
+          committed: firstAliasBoolean(manifest.lifecycle, ['committed']),
+          projected: firstAliasBoolean(manifest.lifecycle, ['projected']),
+          audited: firstAliasBoolean(manifest.lifecycle, ['audited'])
         }
       : null
   };
@@ -210,18 +205,15 @@ class AuditLogStore {
     };
   }
 
-  async readSelectedWriteManifestAuditCorrelation({
-    memoryId = '',
-    idempotencyKey = '',
-    canonicalHash = '',
-    requestSource = '',
-    maxLines = DEFAULT_AUDIT_WINDOW,
-    maxBytes = MAX_AUDIT_BYTES
-  } = {}) {
-    const selectedMemoryId = normalizeString(memoryId);
-    const selectedIdempotencyKey = normalizeString(idempotencyKey);
-    const selectedCanonicalHash = normalizeString(canonicalHash);
-    const selectedRequestSource = normalizeString(requestSource);
+  async readSelectedWriteManifestAuditCorrelation(options = {}) {
+    const {
+      maxLines = DEFAULT_AUDIT_WINDOW,
+      maxBytes = MAX_AUDIT_BYTES
+    } = options;
+    const selectedMemoryId = firstNonEmptyAliasString(options, ['memoryId', 'memory_id']);
+    const selectedIdempotencyKey = firstNonEmptyAliasString(options, ['idempotencyKey', 'idempotency_key']);
+    const selectedCanonicalHash = firstNonEmptyAliasString(options, ['canonicalHash', 'canonical_hash']);
+    const selectedRequestSource = firstNonEmptyAliasString(options, ['requestSource', 'request_source']);
 
     if (!selectedMemoryId && !selectedIdempotencyKey && !selectedCanonicalHash) {
       return {

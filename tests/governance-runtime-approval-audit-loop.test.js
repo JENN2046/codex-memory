@@ -434,6 +434,31 @@ test('CM1087 normalizes snake-case requested actions and side-effect counters', 
   assert.equal(blockedByDefinedSnakeAliases.blockerReasons.includes('requested_action_not_authorized_in_cm1087'), true);
   assert.equal(blockedByDefinedSnakeAliases.blockerReasons.includes('counter_providerCalls_must_be_zero'), true);
   assert.equal(blockedByDefinedSnakeAliases.blockerReasons.some(reason => reason.includes('provider_calls_unknown')), false);
+
+  const blockedByBlankRequestedActionAlias = evaluateGovernanceRuntimeApprovalAuditLoop({
+    ...acceptedLoopInput(),
+    requestedActions: {
+      executeGovernedAction: '',
+      execute_governed_action: true,
+      write_durable_audit: false,
+      write_durable_memory: false,
+      read_real_memory: false,
+      read_raw_audit: false,
+      call_provider: false,
+      expand_public_mcp: false,
+      change_config_watchdog_startup: false,
+      change_dependencies: false,
+      claim_readiness: false,
+      claim_reliability: false
+    },
+    sideEffectCounters: snakeZeroCounters()
+  });
+
+  assert.equal(blockedByBlankRequestedActionAlias.accepted, false);
+  assert.equal(
+    blockedByBlankRequestedActionAlias.blockerReasons.includes('requested_action_not_authorized_in_cm1087'),
+    true
+  );
 });
 
 test('CM1087 falls through blank packet and audit booleans to snake-case aliases', () => {

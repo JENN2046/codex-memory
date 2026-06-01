@@ -1,5 +1,12 @@
 const crypto = require('node:crypto');
 
+const {
+  UPDATED_AT_ALIASES,
+  firstNonEmptyAliasString,
+  normalizeAuditSnapshotRef,
+  normalizeLifecycleStatus,
+  normalizeMemoryId
+} = require('./FieldAliasNormalizer');
 const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
 const { ToolArgumentValidationError, validateArgumentsAgainstSchema } = require('./ToolArgumentValidator');
 
@@ -36,24 +43,12 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) return normalized;
-  }
-  return '';
-}
-
 function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
 }
 
 function normalizePolicyStatus(policy = {}) {
-  return normalizeStatus(firstNormalizedString(
-    policy.status,
-    policy.lifecycleStatus,
-    policy.lifecycle_status
-  ));
+  return normalizeLifecycleStatus(policy);
 }
 
 function normalizeMutationRecord(record = {}) {
@@ -62,8 +57,8 @@ function normalizeMutationRecord(record = {}) {
   }
   return {
     ...record,
-    memoryId: firstNormalizedString(record.memoryId, record.memory_id),
-    updatedAt: firstNormalizedString(record.updatedAt, record.updated_at)
+    memoryId: normalizeMemoryId(record),
+    updatedAt: firstNonEmptyAliasString(record, UPDATED_AT_ALIASES)
   };
 }
 
@@ -79,11 +74,7 @@ function isAllowedTransition(fromStatus, toStatus = 'tombstoned') {
 }
 
 function createPreviousSnapshotRef(record, fromStatus) {
-  return {
-    memory_id: record.memoryId,
-    status: fromStatus,
-    updated_at: record.updatedAt || null
-  };
+  return normalizeAuditSnapshotRef({ ...record, status: fromStatus });
 }
 
 class TombstoneMemoryService {

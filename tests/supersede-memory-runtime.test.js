@@ -463,7 +463,7 @@ test('supersede_memory normalizes returned memory_id aliases before pair lookup'
   });
 });
 
-test('supersede_memory normalizes returned updated_at aliases before audit snapshots', async () => {
+test('supersede_memory normalizes returned memory_id and updated_at aliases before audit snapshots', async () => {
   await withService({
     records: [
       { memoryId: 'mem-old', status: 'active', title: 'Old memory' },
@@ -475,6 +475,8 @@ test('supersede_memory normalizes returned updated_at aliases before audit snaps
       const records = await getRecordsByIds(ids);
       return records.map(record => ({
         ...record,
+        memoryId: '   ',
+        memory_id: record.memoryId,
         updatedAt: '   ',
         updated_at: record.updatedAt
       }));

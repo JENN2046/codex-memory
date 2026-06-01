@@ -75,6 +75,146 @@ test('CM-0836 suppresses duplicate active synthetic memory in same scope', () =>
   assert.deepEqual(summary.matchedCandidateIds, ['synthetic-active-duplicate']);
 });
 
+test('CM-1340 normalizes existing candidate id and hash aliases before dedup matching', () => {
+  const proposedWrite = baseWrite();
+  const summary = summarizeMemoryWriteLifecycleDedupSuppressionPreflight({
+    proposedWrite,
+    allowedScope,
+    existingCandidates: [
+      {
+        ...proposedWrite,
+        memoryId: '   ',
+        memory_id: 'synthetic-existing-alias-duplicate',
+        canonicalHash: '',
+        canonical_hash: computeCanonicalWriteHash(proposedWrite),
+        lifecycleStatus: 'active'
+      }
+    ]
+  });
+
+  assert.equal(summary.decision, 'duplicate_suppressed');
+  assert.ok(summary.blockers.includes('duplicate_active_memory_suppressed'));
+  assert.deepEqual(summary.matchedCandidateIds, ['synthetic-existing-alias-duplicate']);
+});
+
+test('CM-1341 normalizes scope aliases before duplicate matching', () => {
+  const proposedWrite = {
+    ...baseWrite(),
+    projectId: '   ',
+    project_id: allowedScope.projectId,
+    workspaceId: '',
+    workspace_id: allowedScope.workspaceId,
+    clientId: '   ',
+    client_id: allowedScope.clientId,
+    taskId: '',
+    task_id: allowedScope.taskId,
+    conversationId: '   ',
+    conversation_id: allowedScope.conversationId,
+    visibility: allowedScope.visibility,
+    retentionPolicy: '',
+    retention_policy: allowedScope.retentionPolicy
+  };
+  const existingCandidate = {
+    ...proposedWrite,
+    memoryId: 'synthetic-scope-alias-duplicate',
+    lifecycleStatus: 'active',
+    projectId: '',
+    project_id: allowedScope.projectId,
+    workspaceId: '   ',
+    workspace_id: allowedScope.workspaceId,
+    clientId: '',
+    client_id: allowedScope.clientId,
+    taskId: '   ',
+    task_id: allowedScope.taskId,
+    conversationId: '',
+    conversation_id: allowedScope.conversationId,
+    visibility: allowedScope.visibility,
+    retentionPolicy: '   ',
+    retention_policy: allowedScope.retentionPolicy
+  };
+
+  const summary = summarizeMemoryWriteLifecycleDedupSuppressionPreflight({
+    proposedWrite,
+    allowedScope,
+    existingCandidates: [existingCandidate]
+  });
+
+  assert.equal(summary.decision, 'duplicate_suppressed');
+  assert.deepEqual(summary.scopeMismatches, []);
+  assert.deepEqual(summary.matchedCandidateIds, ['synthetic-scope-alias-duplicate']);
+});
+
+test('CM-1342 normalizes lifecycle status and action aliases before preflight decisions', () => {
+  const proposedWrite = {
+    ...baseWrite(),
+    lifecycleStatus: '   ',
+    lifecycle_status: 'active',
+    lifecycleAction: '',
+    lifecycle_action: 'create'
+  };
+  const existingCandidate = {
+    ...proposedWrite,
+    memoryId: 'synthetic-lifecycle-alias-duplicate',
+    lifecycleStatus: '',
+    lifecycle_status: 'active'
+  };
+
+  const summary = summarizeMemoryWriteLifecycleDedupSuppressionPreflight({
+    proposedWrite,
+    allowedScope,
+    existingCandidates: [existingCandidate]
+  });
+
+  assert.equal(summary.decision, 'duplicate_suppressed');
+  assert.equal(summary.blockers.includes('terminal_lifecycle_status_cannot_be_written_as_active_memory'), false);
+  assert.deepEqual(summary.matchedCandidateIds, ['synthetic-lifecycle-alias-duplicate']);
+});
+
+test('CM-1343 normalizes lifecycle target memory id aliases before required-id gating', () => {
+  const cases = [
+    {
+      action: 'supersede',
+      blankCamelField: 'supersedesMemoryId',
+      snakeField: 'supersedes_memory_id',
+      blocker: 'supersession_requires_old_memory_id'
+    },
+    {
+      action: 'tombstone',
+      blankCamelField: 'tombstoneMemoryId',
+      snakeField: 'tombstone_memory_id',
+      blocker: 'tombstone_requires_memory_id'
+    },
+    {
+      action: 'forget',
+      blankCamelField: 'forgetMemoryId',
+      snakeField: 'forget_memory_id',
+      blocker: 'forget_requires_memory_id'
+    }
+  ];
+
+  for (const fixture of cases) {
+    const proposedWrite = {
+      ...baseWrite(),
+      lifecycleAction: '   ',
+      lifecycle_action: fixture.action,
+      reason: `synthetic ${fixture.action} target`,
+      [fixture.blankCamelField]: '   ',
+      [fixture.snakeField]: `synthetic-${fixture.action}-target-memory`
+    };
+
+    const summary = summarizeMemoryWriteLifecycleDedupSuppressionPreflight({
+      proposedWrite,
+      allowedScope,
+      exactApproval: true,
+      existingCandidates: []
+    });
+
+    assert.equal(summary.decision, 'accepted_for_bounded_write_preflight');
+    assert.equal(summary.acceptedForWritePreflight, true);
+    assert.equal(summary.blockers.includes(fixture.blocker), false);
+  }
+});
+
 test('CM-0836 requires review for duplicate terminal lifecycle synthetic memory', () => {
   const proposedWrite = baseWrite();
   const summary = summarizeMemoryWriteLifecycleDedupSuppressionPreflight({

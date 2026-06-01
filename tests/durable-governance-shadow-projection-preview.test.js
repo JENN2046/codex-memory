@@ -358,7 +358,8 @@ test('CM-0865 helper accepts SQLite-style projection record fields and exposes a
 
 test('CM-0865 helper falls through blank camel-case projection fields to SQLite-style fields', () => {
   const sqliteStyleRecords = loadProjectionRecordsFixture().map(record => ({
-    memoryId: record.memoryId,
+    memoryId: '   ',
+    memory_id: record.memoryId,
     status: record.status,
     statusReason: '   ',
     status_reason: record.statusReason,

@@ -123,6 +123,31 @@ test('a5 approval check CLI exposes normalized A5-GAP-6 approved evidence units'
   assert.equal(report.runtimeReady, false);
 });
 
+test('a5 approval check CLI accepts A5-GAP-4 live-client no-write contract refresh line', () => {
+  const commit = '4fc75d68b79d2fe2bee7bcb576360b508cacb5c6';
+  const approvalLine = `I approve A5-GAP-4 live-client no-write contract refresh for codex-memory on branch main at commit ${commit}, endpoint http://127.0.0.1:7605, using current-session bearer token if already present, without printing or persisting token material, allow tools/call memory_overview and no-token rejection checks for record_memory/search_memory only, no provider, no durable write, no config/watchdog/startup change.`;
+  const result = runCli([
+    '--json',
+    '--approval-line', approvalLine,
+    '--expected-unit', 'A5-GAP-4',
+    '--expected-branch', 'main',
+    '--expected-commit', commit
+  ]);
+
+  assert.equal(result.status, 0, result.stderr);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.approvalAccepted, true);
+  assert.equal(report.authorizationGranted, true);
+  assert.equal(report.parsedApprovalScope.liveClientNoWriteContract, true);
+  assert.equal(report.parsedApprovalScope.allowsMemoryOverviewToolCall, true);
+  assert.equal(report.parsedApprovalScope.includesNoTokenRejectionChecks, true);
+  assert.equal(report.parsedApprovalScope.noProvider, true);
+  assert.equal(report.parsedApprovalScope.noDurableWrite, true);
+  assert.equal(report.cli.executesApprovedAction, false);
+  assert.equal(report.safety.callsMcpTools, false);
+  assert.equal(report.runtimeReady, false);
+});
+
 test('a5 approval check CLI renders an A5-GAP-6 exact approval template without granting approval', () => {
   const commit = 'ce1e71509a6966f09cf76c1082e012db615eccbf';
   const result = runCli([

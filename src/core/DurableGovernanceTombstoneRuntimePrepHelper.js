@@ -7,6 +7,12 @@ const {
 const {
   previewDurableGovernanceShadowProjection
 } = require('./DurableGovernanceShadowProjectionPreview');
+const {
+  firstNonEmptyAliasString,
+  LIFECYCLE_STATUS_ALIASES,
+  MEMORY_ID_ALIASES,
+  VISIBILITY_POLICY_ALIASES
+} = require('./FieldAliasNormalizer');
 const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
 const SUPPORTED_RUNTIME_PREP_FAMILIES = Object.freeze(['memory_tombstone']);
@@ -23,12 +29,8 @@ function normalizeString(value) {
   return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) return normalized;
-  }
-  return '';
+function firstRedactedAliasString(source = {}, aliases = []) {
+  return normalizeString(firstNonEmptyAliasString(source, aliases));
 }
 
 function normalizeStatus(value) {
@@ -39,15 +41,11 @@ function normalizeProjectionRecord(record = {}) {
   const safeRecord = isPlainObject(record) ? record : {};
   return {
     ...safeRecord,
-    memoryId: firstNormalizedString(safeRecord.memoryId, safeRecord.memory_id),
-    status: normalizeStatus(firstNormalizedString(
-      safeRecord.status,
-      safeRecord.lifecycleStatus,
-      safeRecord.lifecycle_status
-    )),
-    clientId: firstNormalizedString(safeRecord.clientId, safeRecord.client_id),
-    visibility: firstNormalizedString(safeRecord.visibility, safeRecord.visibility_policy),
-    lifecycleUpdatedAt: firstNormalizedString(safeRecord.lifecycleUpdatedAt, safeRecord.lifecycle_updated_at)
+    memoryId: firstRedactedAliasString(safeRecord, MEMORY_ID_ALIASES),
+    status: normalizeStatus(firstRedactedAliasString(safeRecord, LIFECYCLE_STATUS_ALIASES)),
+    clientId: firstRedactedAliasString(safeRecord, ['clientId', 'client_id']),
+    visibility: firstRedactedAliasString(safeRecord, VISIBILITY_POLICY_ALIASES),
+    lifecycleUpdatedAt: firstRedactedAliasString(safeRecord, ['lifecycleUpdatedAt', 'lifecycle_updated_at'])
   };
 }
 

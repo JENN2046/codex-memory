@@ -1,5 +1,12 @@
 const crypto = require('node:crypto');
 
+const {
+  UPDATED_AT_ALIASES,
+  firstNonEmptyAliasString,
+  normalizeAuditSnapshotRef,
+  normalizeLifecycleStatus,
+  normalizeMemoryId
+} = require('./FieldAliasNormalizer');
 const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
 const { ToolArgumentValidationError, validateArgumentsAgainstSchema } = require('./ToolArgumentValidator');
 
@@ -55,35 +62,23 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) return normalized;
-  }
-  return '';
-}
-
 function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
 }
 
 function normalizePolicyStatus(policy = {}) {
-  return normalizeStatus(firstNormalizedString(
-    policy.status,
-    policy.lifecycleStatus,
-    policy.lifecycle_status
-  ));
+  return normalizeLifecycleStatus(policy);
 }
 
 function normalizeScopeTuple(record = {}) {
   return {
-    projectId: firstNormalizedString(record.projectId, record.project_id),
-    workspaceId: firstNormalizedString(record.workspaceId, record.workspace_id),
-    clientId: firstNormalizedString(record.clientId, record.client_id),
-    taskId: firstNormalizedString(record.taskId, record.task_id),
-    conversationId: firstNormalizedString(record.conversationId, record.conversation_id),
-    visibility: firstNormalizedString(record.visibility, record.visibility_policy),
-    retentionPolicy: firstNormalizedString(record.retentionPolicy, record.retention_policy)
+    projectId: firstNonEmptyAliasString(record, ['projectId', 'project_id']),
+    workspaceId: firstNonEmptyAliasString(record, ['workspaceId', 'workspace_id']),
+    clientId: firstNonEmptyAliasString(record, ['clientId', 'client_id']),
+    taskId: firstNonEmptyAliasString(record, ['taskId', 'task_id']),
+    conversationId: firstNonEmptyAliasString(record, ['conversationId', 'conversation_id']),
+    visibility: firstNonEmptyAliasString(record, ['visibility', 'visibility_policy']),
+    retentionPolicy: firstNonEmptyAliasString(record, ['retentionPolicy', 'retention_policy'])
   };
 }
 
@@ -99,22 +94,18 @@ function isAllowedTransition(transitions, fromStatus, toStatus) {
 }
 
 function createPreviousSnapshotRef(record, fromStatus) {
-  return {
-    memory_id: record.memoryId,
-    status: fromStatus,
-    updated_at: record.updatedAt || null
-  };
+  return normalizeAuditSnapshotRef({ ...record, status: fromStatus });
 }
 
 function normalizePairRecord(record = {}) {
   if (!record || typeof record !== 'object') {
     return record;
   }
-  const memoryId = firstNormalizedString(record.memoryId, record.memory_id);
+  const memoryId = normalizeMemoryId(record);
   return {
     ...record,
     memoryId,
-    updatedAt: firstNormalizedString(record.updatedAt, record.updated_at)
+    updatedAt: firstNonEmptyAliasString(record, UPDATED_AT_ALIASES)
   };
 }
 

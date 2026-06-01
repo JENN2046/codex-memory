@@ -189,6 +189,45 @@ test('CM-0866 helper normalizes blank projection record fields from snake-case f
   });
 });
 
+test('CM-1345 helper keeps tombstone projection aliases on shared normalizer without updated_at widening', () => {
+  const records = loadProjectionRecordsFixture().map(record => (
+    record.memoryId === 'memory-tombstone-001'
+      ? {
+          ...record,
+          memoryId: '',
+          memory_id: 'memory-tombstone-001',
+          lifecycleStatus: '   ',
+          lifecycle_status: 'stale',
+          clientId: '',
+          client_id: 'codex-desktop',
+          visibility: '   ',
+          visibility_policy: 'private',
+          lifecycleUpdatedAt: '',
+          lifecycle_updated_at: '',
+          updated_at: '2026-05-22T12:00:00.000Z'
+        }
+      : record
+  ));
+
+  const plan = planDurableGovernanceTombstoneRuntimePrep({
+    dryRunInput: buildTombstoneDryRunInput(),
+    currentProjectionRecords: records,
+    runtimeSurfaceCapabilities: buildRuntimeSurfaceCapabilities(),
+    plannedAt: '2026-05-23T09:07:00.000Z'
+  });
+
+  assert.equal(plan.acceptedForRuntimePrep, true);
+  assert.equal(plan.shadowUpdatePlan.targetMemoryId, 'memory-tombstone-001');
+  assert.equal(plan.shadowUpdatePlan.fromStatus, 'stale');
+  assert.equal(plan.shadowUpdatePlan.options.expectedClientId, 'codex-desktop');
+  assert.equal(plan.shadowUpdatePlan.options.expectedVisibility, 'private');
+  assert.deepEqual(plan.auditPlan.intentEvent.previous_snapshot_ref, {
+    memory_id: 'memory-tombstone-001',
+    status: 'stale',
+    updated_at: null
+  });
+});
+
 test('CM-0866 helper rejects unsupported runtime-prep families', () => {
   const plan = planDurableGovernanceTombstoneRuntimePrep({
     dryRunInput: {

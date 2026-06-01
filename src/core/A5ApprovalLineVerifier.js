@@ -15,7 +15,7 @@ const A5_APPROVAL_LINE_UNITS = Object.freeze({
   },
   'A5-GAP-4': {
     action: 'live_http_operation',
-    pattern: /^(?:I approve A5-GAP-4 for codex-memory|I approve A5-GAP-4 (?<authenticatedMcpToolList>authenticated MCP initialize\/tools-list evidence) for codex-memory) on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), endpoint (?<endpoint>\S+), (?:no config\/watchdog\/startup change|using current-session bearer token if already present, without printing or persisting token material, no config\/watchdog\/startup change, no tools\/call)\.$/
+    pattern: /^I approve A5-GAP-4(?: (?<authenticatedMcpToolList>authenticated MCP initialize\/tools-list evidence)| (?<liveClientNoWriteContract>live-client no-write contract refresh))? for codex-memory on branch (?<branch>\S+) at commit (?<commit>[0-9a-f]{7,40}), endpoint (?<endpoint>\S+), (?:(?<endpointOnlyBoundary>no config\/watchdog\/startup change)|(?<authenticatedToolsListBoundary>using current-session bearer token if already present, without printing or persisting token material, no config\/watchdog\/startup change, no tools\/call)|(?<liveClientNoWriteBoundary>using current-session bearer token if already present, without printing or persisting token material, allow tools\/call memory_overview and no-token rejection checks for record_memory\/search_memory only, no provider, no durable write, no config\/watchdog\/startup change))\.$/
   },
   'A5-GAP-5': {
     action: 'cutover_context_strict_gate',
@@ -49,6 +49,29 @@ function normalizeCommaSeparatedList(value) {
 }
 
 function buildParsedApprovalScope(unit, parsed = {}) {
+  if (unit === 'A5-GAP-4') {
+    const liveClientNoWriteContract =
+      parsed.liveClientNoWriteContract === 'live-client no-write contract refresh';
+    return {
+      endpoint: parsed.endpoint || '',
+      authenticatedMcpToolList:
+        parsed.authenticatedMcpToolList === 'authenticated MCP initialize/tools-list evidence',
+      liveClientNoWriteContract,
+      allowsMemoryOverviewToolCall: liveClientNoWriteContract &&
+        Boolean(parsed.liveClientNoWriteBoundary),
+      includesNoTokenRejectionChecks: liveClientNoWriteContract &&
+        Boolean(parsed.liveClientNoWriteBoundary),
+      noProvider: liveClientNoWriteContract &&
+        Boolean(parsed.liveClientNoWriteBoundary),
+      noDurableWrite: liveClientNoWriteContract &&
+        Boolean(parsed.liveClientNoWriteBoundary),
+      noConfigWatchdogStartupChange: Boolean(
+        parsed.endpointOnlyBoundary ||
+        parsed.authenticatedToolsListBoundary ||
+        parsed.liveClientNoWriteBoundary
+      )
+    };
+  }
   if (unit !== 'A5-GAP-6') return {};
   const approvedEvidenceUnits = normalizeCommaSeparatedList(parsed.units);
   return {
@@ -93,6 +116,20 @@ function evaluateA5ApprovalLine({
   }
   if (unit === 'A5-GAP-3' && /, no apply/.test(line) && !parsed.noApplyBoundary) {
     failClosedReasons.push('incomplete_no_apply_boundary');
+  }
+  if (unit === 'A5-GAP-4' && parsed.authenticatedMcpToolList && !parsed.authenticatedToolsListBoundary) {
+    failClosedReasons.push('incomplete_authenticated_tools_list_boundary');
+  }
+  if (unit === 'A5-GAP-4' && parsed.liveClientNoWriteContract && !parsed.liveClientNoWriteBoundary) {
+    failClosedReasons.push('incomplete_live_client_no_write_boundary');
+  }
+  if (
+    unit === 'A5-GAP-4' &&
+    !parsed.authenticatedMcpToolList &&
+    !parsed.liveClientNoWriteContract &&
+    !parsed.endpointOnlyBoundary
+  ) {
+    failClosedReasons.push('incomplete_endpoint_only_boundary');
   }
   const parsedApprovalScope = buildParsedApprovalScope(unit, parsed);
 

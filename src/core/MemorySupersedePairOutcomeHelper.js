@@ -11,6 +11,10 @@ const {
   normalizeDurableGovernanceShadowProjectionPreviewInput,
   previewDurableGovernanceShadowProjection
 } = require('./DurableGovernanceShadowProjectionPreview');
+const {
+  firstNonEmptyAliasString,
+  MEMORY_ID_ALIASES
+} = require('./FieldAliasNormalizer');
 const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
 const SUPPORTED_PAIR_OUTCOME_FAMILIES = Object.freeze(['memory_supersede']);
@@ -27,21 +31,13 @@ function normalizeString(value) {
   return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) return normalized;
-  }
-  return '';
-}
-
 function normalizeProjectionRecordId(record = {}) {
   if (!isPlainObject(record)) {
     return record;
   }
   return {
     ...record,
-    memoryId: firstNormalizedString(record.memoryId, record.memory_id)
+    memoryId: normalizeString(firstNonEmptyAliasString(record, MEMORY_ID_ALIASES))
   };
 }
 

@@ -224,6 +224,118 @@ test('readSelectedWriteAuditCorrelation falls through blank mutation audit alias
   });
 });
 
+test('readSelectedWriteAuditCorrelation keeps snake-case mutation audit aliases when camel-case is blank', async () => {
+  await withAuditStore(async ({ store }) => {
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:00:00.000Z',
+      decision: 'pending',
+      target: 'process',
+      mutationAuditEvent: {
+        event_id: 'event-snake-preferred',
+        eventId: '   ',
+        correlation_id: '',
+        correlationId: '   ',
+        memory_id: 'mem-snake-preferred',
+        memoryId: '   ',
+        event_type: 'memory_tombstone',
+        eventType: '   ',
+        audit_phase: 'pending',
+        auditPhase: '   ',
+        tool_name: 'memory_tombstone',
+        toolName: '   ',
+        actor_client_id: 'codex',
+        actorClientId: '   ',
+        request_source: 'CM-1333-audit-alias-normalizer',
+        requestSource: '   ',
+        from_status: 'active',
+        fromStatus: '   ',
+        to_status: 'tombstoned',
+        toStatus: '   ',
+        tombstone_reason: 'proof-memory-retention-expired-after-validation',
+        tombstoneReason: '   ',
+        mutation_applied: false
+      }
+    });
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:01:00.000Z',
+      decision: 'committed',
+      target: 'process',
+      mutationAuditEvent: {
+        event_id: 'event-snake-preferred',
+        correlation_id: 'event-snake-preferred',
+        memory_id: 'mem-snake-preferred',
+        event_type: 'memory_tombstone',
+        audit_phase: 'committed',
+        tool_name: 'memory_tombstone',
+        actor_client_id: 'codex',
+        request_source: 'CM-1333-audit-alias-normalizer',
+        from_status: 'active',
+        to_status: 'tombstoned',
+        tombstone_reason: 'proof-memory-retention-expired-after-validation',
+        mutation_applied: true
+      }
+    });
+
+    const result = await store.readSelectedWriteAuditCorrelation({
+      memoryId: 'mem-snake-preferred',
+      requestSource: 'CM-1333-audit-alias-normalizer'
+    });
+
+    assert.equal(result.found, true);
+    assert.equal(result.pending.eventId, 'event-snake-preferred');
+    assert.equal(result.pending.memoryId, 'mem-snake-preferred');
+    assert.equal(result.pending.requestSource, 'CM-1333-audit-alias-normalizer');
+    assert.equal(result.pending.auditPhase, 'pending');
+    assert.equal(result.pending.tombstoneReason, 'proof-memory-retention-expired-after-validation');
+    assert.equal(result.committed.correlationId, 'event-snake-preferred');
+  });
+});
+
+test('readSelectedWriteAuditCorrelation normalizes selected mutation applied boolean aliases', async () => {
+  await withAuditStore(async ({ store }) => {
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:00:00.000Z',
+      decision: 'pending',
+      target: 'process',
+      mutationAuditEvent: {
+        event_id: 'event-mutation-applied-alias',
+        memory_id: 'mem-mutation-applied-alias',
+        event_type: 'memory_tombstone',
+        audit_phase: 'pending',
+        tool_name: 'memory_tombstone',
+        request_source: 'CM-1338-mutation-applied-alias-normalizer',
+        mutation_applied: '   ',
+        mutationApplied: false
+      }
+    });
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:01:00.000Z',
+      decision: 'committed',
+      target: 'process',
+      mutationAuditEvent: {
+        event_id: 'event-mutation-applied-alias',
+        correlation_id: 'event-mutation-applied-alias',
+        memory_id: 'mem-mutation-applied-alias',
+        event_type: 'memory_tombstone',
+        audit_phase: 'committed',
+        tool_name: 'memory_tombstone',
+        request_source: 'CM-1338-mutation-applied-alias-normalizer',
+        mutation_applied: '',
+        mutationApplied: true
+      }
+    });
+
+    const result = await store.readSelectedWriteAuditCorrelation({
+      memoryId: 'mem-mutation-applied-alias',
+      requestSource: 'CM-1338-mutation-applied-alias-normalizer'
+    });
+
+    assert.equal(result.found, true);
+    assert.equal(result.pending.mutationApplied, false);
+    assert.equal(result.committed.mutationApplied, true);
+  });
+});
+
 test('readSelectedWriteManifestAuditCorrelation returns selected manifest metadata only', async () => {
   await withAuditStore(async ({ store }) => {
     await store.appendWriteAudit({
@@ -334,6 +446,105 @@ test('readSelectedWriteManifestAuditCorrelation falls through blank manifest ali
     assert.equal(result.latest.idempotencyKey, 'memory-write-v1:snake');
     assert.equal(result.latest.canonicalHash, 'snake-hash');
     assert.equal(result.committed.memoryId, 'mem-manifest-snake');
+
+    const snakeSelectorResult = await store.readSelectedWriteManifestAuditCorrelation({
+      memory_id: 'mem-manifest-snake',
+      idempotency_key: 'memory-write-v1:snake',
+      canonical_hash: 'snake-hash',
+      request_source: 'CM-1308-manifest-alias-fallback'
+    });
+
+    assert.equal(snakeSelectorResult.found, true);
+    assert.equal(snakeSelectorResult.latest.memoryId, 'mem-manifest-snake');
+    assert.equal(snakeSelectorResult.requestSource, 'CM-1308-manifest-alias-fallback');
+  });
+});
+
+test('readSelectedWriteManifestAuditCorrelation normalizes selected manifest reason and boolean aliases', async () => {
+  await withAuditStore(async ({ store }) => {
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:00:00.000Z',
+      decision: 'accepted',
+      target: 'process',
+      memoryId: 'mem-manifest-repair-alias',
+      requestSource: 'CM-1334-manifest-alias-normalizer',
+      shadowWrite: { status: ' repaired ' },
+      writeManifest: {
+        authoritativeStore: 'sqlite',
+        idempotencyKey: 'memory-write-v1:repair-alias',
+        canonicalHash: 'repair-alias-hash',
+        status: 'repaired',
+        replayed: '',
+        recovered: '   ',
+        recoveryRequired: '',
+        recovery_required: true,
+        repaired: '   ',
+        repairReason: '   ',
+        repair_reason: 'reconcile_queue_drained',
+        cancelled: '   ',
+        cancelReason: '',
+        cancel_reason: 'not-cancelled-should-still-project-selected-reason'
+      }
+    });
+
+    const result = await store.readSelectedWriteManifestAuditCorrelation({
+      memoryId: 'mem-manifest-repair-alias',
+      idempotencyKey: 'memory-write-v1:repair-alias',
+      canonicalHash: 'repair-alias-hash',
+      requestSource: 'CM-1334-manifest-alias-normalizer'
+    });
+
+    assert.equal(result.found, true);
+    assert.equal(result.latest.shadowWriteStatus, 'repaired');
+    assert.equal(result.latest.replayed, false);
+    assert.equal(result.latest.recovered, false);
+    assert.equal(result.latest.recoveryRequired, true);
+    assert.equal(result.latest.repaired, false);
+    assert.equal(result.latest.repairReason, 'reconcile_queue_drained');
+    assert.equal(result.latest.cancelled, false);
+    assert.equal(result.latest.cancelReason, 'not-cancelled-should-still-project-selected-reason');
+    assert.equal(result.repaired.memoryId, 'mem-manifest-repair-alias');
+    assert.equal(result.recoveryRequired.memoryId, 'mem-manifest-repair-alias');
+  });
+});
+
+test('readSelectedWriteManifestAuditCorrelation normalizes selected manifest lifecycle booleans', async () => {
+  await withAuditStore(async ({ store }) => {
+    await store.appendWriteAudit({
+      timestamp: '2026-05-26T00:00:00.000Z',
+      decision: 'accepted',
+      target: 'process',
+      memoryId: 'mem-manifest-lifecycle-alias',
+      requestSource: 'CM-1337-manifest-lifecycle-alias-normalizer',
+      shadowWrite: { status: 'ok' },
+      writeManifest: {
+        authoritativeStore: 'sqlite',
+        idempotencyKey: 'memory-write-v1:lifecycle-alias',
+        canonicalHash: 'lifecycle-alias-hash',
+        status: 'committed',
+        lifecycle: {
+          pending: '   ',
+          committed: true,
+          projected: '',
+          audited: false
+        }
+      }
+    });
+
+    const result = await store.readSelectedWriteManifestAuditCorrelation({
+      memoryId: 'mem-manifest-lifecycle-alias',
+      idempotencyKey: 'memory-write-v1:lifecycle-alias',
+      canonicalHash: 'lifecycle-alias-hash',
+      requestSource: 'CM-1337-manifest-lifecycle-alias-normalizer'
+    });
+
+    assert.equal(result.found, true);
+    assert.deepEqual(result.latest.lifecycle, {
+      pending: false,
+      committed: true,
+      projected: false,
+      audited: false
+    });
   });
 });
 

@@ -5,6 +5,10 @@ const {
   computeCanonicalWriteHash,
   summarizeMemoryWriteLifecycleDedupSuppressionPreflight
 } = require('./MemoryWriteLifecycleDedupSuppressionPreflight');
+const {
+  firstNonEmptyAliasString,
+  normalizeMemoryId
+} = require('./FieldAliasNormalizer');
 const { applyProofMemoryWritePolicy } = require('./ProofMemoryPolicy');
 const { formatSecretRejectionReason, scanMemoryWritePayload } = require('./SecretScanner');
 
@@ -20,14 +24,6 @@ const SCHEMA_VERSION_METADATA_KEYS = Object.freeze([
 
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
-}
-
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) return normalized;
-  }
-  return '';
 }
 
 function normalizeBoolean(value) {
@@ -1236,21 +1232,21 @@ class MemoryWriteService {
     const idempotency = result.idempotency || null;
     await this.auditLogStore.appendWriteAudit({
       timestamp: new Date().toISOString(),
-      agentAlias: firstNormalizedString(result.agentAlias, result.agent_alias) || null,
-      agentId: firstNormalizedString(result.agentId, result.agent_id) || null,
-      decision: firstNormalizedString(result.decision) || result.decision,
-      target: firstNormalizedString(result.target) || null,
-      title: firstNormalizedString(result.title) || null,
-      memoryId: firstNormalizedString(result.memoryId, result.memory_id) || null,
-      reason: firstNormalizedString(result.reason) || result.reason,
-      filePath: firstNormalizedString(result.filePath, result.file_path) || null,
-      requestSource: firstNormalizedString(result.requestSource, result.request_source) || this.config.defaultRequestSource,
+      agentAlias: firstNonEmptyAliasString(result, ['agentAlias', 'agent_alias']) || null,
+      agentId: firstNonEmptyAliasString(result, ['agentId', 'agent_id']) || null,
+      decision: firstNonEmptyAliasString(result, ['decision']) || result.decision,
+      target: firstNonEmptyAliasString(result, ['target']) || null,
+      title: firstNonEmptyAliasString(result, ['title']) || null,
+      memoryId: normalizeMemoryId(result) || null,
+      reason: firstNonEmptyAliasString(result, ['reason']) || result.reason,
+      filePath: firstNonEmptyAliasString(result, ['filePath', 'file_path']) || null,
+      requestSource: firstNonEmptyAliasString(result, ['requestSource', 'request_source']) || this.config.defaultRequestSource,
       shadowWrite: result.shadowWrite || createShadowWriteStatus('unknown'),
       writeManifest: idempotency ? {
-        authoritativeStore: firstNormalizedString(idempotency.authoritativeStore, idempotency.authoritative_store) || null,
-        idempotencyKey: firstNormalizedString(idempotency.key, idempotency.idempotencyKey, idempotency.idempotency_key) || null,
-        canonicalHash: firstNormalizedString(idempotency.canonicalHash, idempotency.canonical_hash) || null,
-        status: firstNormalizedString(idempotency.status) || null,
+        authoritativeStore: firstNonEmptyAliasString(idempotency, ['authoritativeStore', 'authoritative_store']) || null,
+        idempotencyKey: firstNonEmptyAliasString(idempotency, ['key', 'idempotencyKey', 'idempotency_key']) || null,
+        canonicalHash: firstNonEmptyAliasString(idempotency, ['canonicalHash', 'canonical_hash']) || null,
+        status: firstNonEmptyAliasString(idempotency, ['status']) || null,
         replayed: idempotency.replayed === true,
         recovered: idempotency.recovered === true,
         recoveryRequired: idempotency.recoveryRequired === true,

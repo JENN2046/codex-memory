@@ -1,5 +1,676 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1353 A5-GAP-4 Live-Client No-Write Approval Pattern Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local approval verifier/test hardening for task-book Part 4. No live client refresh, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `A5ApprovalLineVerifier` now accepts exact `A5-GAP-4 live-client no-write contract refresh` approval text.
+- The accepted scope exposes endpoint, `allowsMemoryOverviewToolCall=true`, `includesNoTokenRejectionChecks=true`, `noProvider=true`, `noDurableWrite=true`, and `noConfigWatchdogStartupChange=true`.
+- Incomplete live-client no-write boundary text fails closed.
+- Existing endpoint-only and authenticated initialize/tools-list `A5-GAP-4` patterns remain covered.
+- `docs/CM1352_LIVE_CLIENT_CONTRACT_REFRESH_NO_WRITES_PREFLIGHT.md` now notes the CM-1353 coverage update.
+
+Validation:
+
+- `node --check` passed for changed verifier and tests.
+- Targeted A5 approval/no-touch tests passed `29/29`.
+- CLI self-check accepted the current rendered no-write approval line with `authorizationGranted=true` while keeping `executesApprovedAction=false`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1353 closeout.
+
+Next:
+
+- Request exact `A5-GAP-4 live-client no-write contract refresh` approval before executing any live-client calls.
+
+## CM-1352 Live-Client Contract Refresh No-Writes Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local docs/status preflight for task-book Part 4 live-client refresh. No service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added `docs/CM1352_LIVE_CLIENT_CONTRACT_REFRESH_NO_WRITES_PREFLIGHT.md`.
+- Defined desired no-writes live-client refresh matrix: endpoint health/observe, authenticated initialize, authenticated tools/list, authenticated full `memory_overview`, no-token selected `memory_overview`, and no-token rejected `record_memory/search_memory`.
+- Identified current verifier coverage: endpoint health/observe and authenticated initialize/tools-list are supported by existing `A5-GAP-4` patterns.
+- Identified missing verifier coverage: no-write `tools/call memory_overview` and no-token rejection checks need a separate exact approval pattern or verifier hardening before execution.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1352 closeout.
+
+Next:
+
+- If executing immediately, use existing exact A5-GAP-4 approval only for endpoint health/observe and authenticated initialize/tools-list.
+- If the full task-book Part 4 matrix is required in one run, first add a narrow approval verifier pattern for no-write `memory_overview` and no-token rejection `tools/call` checks.
+
+## CM-1351 A5-GAP-6 Post-CM1349 Source/Test Aggregation Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: exact-approved A5-GAP-6 in-memory aggregation using explicit sanitized source/test/status evidence only. No file/store scan, live recall/write execution, real memory/store/jsonl/raw audit read, provider call, MCP `tools/call`, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Consumed exact approval bound to `main@4fc75d68b79d2fe2bee7bcb576360b508cacb5c6`.
+- Included evidence map `CM1350_A5_GAP6_POST_CM1349_SOURCE_TEST_AGGREGATION_PREFLIGHT.md`.
+- Ran one in-memory `buildV1RcValidationAggregatorReport({ validationEvidenceSources, runtimeEvidenceSummary })` call.
+- Accepted 3 explicit sanitized source/test/status validation evidence rows with 0 rejections.
+- Accepted the conservative runtime summary but did not close runtime gaps from source/test evidence.
+- Result kept `decision=NOT_READY_BLOCKED`, `validationAggregatorFullImplementation=false`, `runtimeEvidenceSummaryLocallyEvidencedGapCount=0`, `runtimeEvidenceSummaryRemainingGapCount=7`, `commandsExecutedByAggregator=false`, `runtimeReady=false`, `finalRcMatrixReady=false`, and `rcReady=false`.
+
+Validation:
+
+- Fresh Git preflight matched the approval branch and commit.
+- `npm run a5:approval-check` accepted the exact approval line.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1351 closeout.
+
+Next:
+
+- Move to live-client contract refresh preflight without writes, if requested.
+- Any live client action, dogfood write/recall, strict gate refresh, or RC cutover still requires its own exact boundary.
+
+## CM-1350 A5-GAP-6 Post-CM1349 Source/Test Aggregation Preflight Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local docs/status A5-GAP-6 preflight. No ValidationAggregator execution, file/store scan, live recall/write execution, real memory/store/jsonl/raw audit read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added `docs/CM1350_A5_GAP6_POST_CM1349_SOURCE_TEST_AGGREGATION_PREFLIGHT.md`.
+- Selected only recorded sanitized source/test/status evidence as future included evidence map.
+- Explicitly separated local hardening evidence from live-client, real-write, real-recall, dogfood, and RC evidence.
+- Rendered the A5-GAP-6 approval template with basename included evidence and `no new runtime action`.
+- Template self-check accepted the grammar but did not grant authorization.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `a5-approval-check --template` grammar self-check passed for the future approval shape.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1350 closeout.
+
+Next:
+
+- Future A5-GAP-6 execution requires fresh exact approval bound to post-CM1350 `HEAD`.
+- Do not execute Aggregator, live-client refresh, dogfood, or RC cutover from this preflight alone.
+
+## CM-1349 Current Runtime Gap Delta After CM1326 Matrix Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local docs/status transition from task-book Part 1 alias/fallback normalization收口 to Part 2 runtime gap truth table. No live recall/write execution, real memory/store/jsonl/raw audit read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added `docs/CURRENT_RUNTIME_GAP_DELTA_AFTER_CM1326.md`.
+- The matrix separates local source/test hardening from partial preflight, historical runtime evidence, and missing live evidence.
+- It keeps `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`.
+- It routes next work toward A5-GAP-6 aggregation preflight, live-client contract refresh, minimal dogfood, and last-stage RC cutover.
+- Broad alias/fallback sweeping is stopped unless a direct blocker appears.
+
+Validation:
+
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1349 closeout.
+
+Next:
+
+- Prepare post-hardening A5-GAP-6 aggregation preflight using selected sanitized evidence only.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this matrix.
+
+## CM-1348 Lifecycle Scope Governance Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/docs cleanup for existing-fixture-covered lifecycle scope governance alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryLifecycleScopeGovernanceContract` now uses shared `firstNonEmptyAliasString(...)` for existing camel/snake alias pairs.
+- The local `firstNormalizedString(...)` helper was removed from this helper.
+- Scope, record id/status, governance transition ids, actor/approved metadata, and rank hint aliases are covered by existing targeted fixtures.
+- `visibility` semantics were not widened to `visibility_policy`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed source and existing targeted test.
+- Targeted lifecycle scope governance tests passed `12/12`.
+- `npm test` passed `2878/2878`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1348 closeout.
+
+Next:
+
+- Stop broad alias/fallback migration and move to task-book Part 2 runtime gap delta work.
+
+## CM-1347 Memory Supersede Pair Outcome Id Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/docs cleanup for existing-fixture-covered supersede pair outcome projection record id alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemorySupersedePairOutcomeHelper.normalizeProjectionRecordId(...)` now uses shared `firstNonEmptyAliasString(...)` with `MEMORY_ID_ALIASES`.
+- Local redaction remains preserved by routing the selected alias value through local `normalizeString(...)`.
+- The local `firstNormalizedString(...)` helper was removed from this helper.
+- Existing `CM-1319` fixture coverage verifies blank `memoryId` falls through to `memory_id` and pair record lookup keeps old/new records.
+- No new test fixture was needed for this narrower cleanup.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed source and existing targeted test.
+- Targeted pair outcome helper tests passed `7/7`.
+- `npm test` passed `2878/2878`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1347 closeout.
+
+Next:
+
+- Continue with another lifecycle helper alias migration only if the slice remains fixture-only or covered by an existing targeted fixture.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1346 Memory Supersede Runtime-Prep Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for fixture-only supersede runtime-prep projection record alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemorySupersedeRuntimePrepHelper.normalizeProjectionRecord(...)` now uses shared `firstNonEmptyAliasString(...)` for projection record alias selection.
+- Local redaction remains preserved by routing selected alias values through local `normalizeString(...)`.
+- The local `firstNormalizedString(...)` helper was removed from this helper.
+- Added a temp-local regression for old/new projection records with blank canonical aliases falling through to snake_case aliases.
+- The regression also verifies ordinary `updated_at` is not widened into `lifecycle_updated_at`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed source/test.
+- Targeted supersede runtime-prep helper tests passed `8/8`.
+- `npm test` passed `2878/2878`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1346 closeout.
+
+Next:
+
+- Continue with another lifecycle helper alias migration only if the slice remains fixture-only and narrow.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1345 Tombstone Runtime-Prep Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for fixture-only tombstone runtime-prep projection record alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `DurableGovernanceTombstoneRuntimePrepHelper.normalizeProjectionRecord(...)` now uses shared `firstNonEmptyAliasString(...)` for projection record alias selection.
+- Local redaction remains preserved by routing selected alias values through local `normalizeString(...)`.
+- The local `firstNormalizedString(...)` helper was removed from this helper.
+- Added a temp-local regression for blank canonical aliases falling through to snake_case aliases.
+- The regression also verifies ordinary `updated_at` is not widened into `lifecycle_updated_at`.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed source/test.
+- Targeted tombstone runtime-prep helper tests passed `6/6`.
+- `npm test` passed `2877/2877`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1345 closeout.
+
+Next:
+
+- Continue with supersede runtime-prep or another lifecycle helper alias migration only if the slice remains fixture-only and narrow.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1344 MemoryWriteService Audit Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for fixture-only `MemoryWriteService.writeAudit(...)` result/idempotency alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write outside fake temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteService.writeAudit(...)` now uses shared `firstNonEmptyAliasString(...)` for selected result aliases and write manifest idempotency aliases.
+- `memoryId/memory_id` now uses shared `normalizeMemoryId(...)`.
+- The local `firstNormalizedString(...)` helper was removed after its last call sites moved to shared helpers.
+- Added a fake `appendWriteAudit` regression for blank canonical aliases falling through to later snake_case / alternate aliases.
+- The change remains fixture-only write audit projection normalization and does not execute or authorize live writes.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed source/test.
+- Targeted write/preflight tests passed `25/25`.
+- `npm test` passed `2876/2876`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1344 closeout.
+
+Next:
+
+- Continue with another small alias helper migration only if a clear local fallback hotspot remains in lifecycle services or adjacent write helpers.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1343 Memory Write Dedup Lifecycle Target Id Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for fixture-only write lifecycle dedup preflight target memory id alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteLifecycleDedupSuppressionPreflight.normalizeWriteCandidate(...)` now uses shared `firstNonEmptyAliasString(...)` for `supersedesMemoryId/supersedes_memory_id`, `tombstoneMemoryId/tombstone_memory_id`, and `forgetMemoryId/forget_memory_id`.
+- The local `firstNormalizedString(...)` helper was removed after its last call sites moved to shared helpers.
+- Added a temp-local regression for `supersede`, `tombstone`, and `forget` blank camelCase plus valid snake_case target memory ids.
+- The regression verifies this cleanup does not introduce required-id blocker drift.
+- The change remains fixture-only preflight normalization and does not execute or authorize live writes.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed preflight source/test.
+- Targeted preflight/write tests passed `24/24`.
+- `npm test` passed `2875/2875`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1343 closeout.
+
+Next:
+
+- Continue with another small alias helper migration only if a clear local fallback hotspot remains; otherwise shift to the next source file with repeated alias fallback.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1342 Memory Write Dedup Lifecycle Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for fixture-only write lifecycle dedup preflight lifecycle status/action alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteLifecycleDedupSuppressionPreflight.normalizeWriteCandidate(...)` now uses shared `firstNonEmptyAliasString(...)` for `lifecycleStatus/lifecycle_status` and `lifecycleAction/lifecycle_action`.
+- Existing lifecycle camelCase/snake_case aliases remain supported without adding a new local wrapper.
+- Added a temp-local regression for blank camelCase plus valid snake_case lifecycle status/action matching duplicate suppression.
+- The regression verifies this cleanup does not introduce terminal lifecycle blocker drift.
+- The change remains fixture-only preflight normalization and does not execute or authorize live writes.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed preflight source/test.
+- Targeted preflight/write tests passed `23/23`.
+- `npm test` passed `2874/2874`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1342 closeout.
+
+Next:
+
+- Continue with another small `MemoryWriteLifecycleDedupSuppressionPreflight` alias helper migration, such as supersedes/tombstone/forget memory id alias fallback, if the slice stays fixture-only.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1341 Memory Write Dedup Scope Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for fixture-only write lifecycle dedup preflight scope alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteLifecycleDedupSuppressionPreflight.normalizeScope(...)` now uses shared `firstNonEmptyAliasString(...)`.
+- Existing `SCOPE_FIELDS` camelCase/snake_case aliases remain supported without adding a new local wrapper.
+- A first targeted fixture attempted to include unsupported `visibility_policy`; re-review narrowed the fixture back to current `visibility` semantics, so this slice does not expand visibility alias behavior.
+- Added a temp-local regression for blank camelCase plus valid snake_case proposed/existing candidate scope matching.
+- The change remains fixture-only preflight normalization and does not execute or authorize live writes.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed preflight source/test.
+- Targeted preflight/write tests passed `22/22`.
+- `npm test` passed `2873/2873`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1341 closeout.
+
+Next:
+
+- Continue with another small `MemoryWriteLifecycleDedupSuppressionPreflight` alias helper migration, such as lifecycle status/action or lifecycle action target ids, if the slice stays fixture-only.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1340 Memory Write Dedup Existing Candidate Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for fixture-only write lifecycle dedup preflight existing candidate alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `MemoryWriteLifecycleDedupSuppressionPreflight.normalizeExistingCandidate(...)` now uses shared `normalizeMemoryId(...)` for `memoryId/memory_id`.
+- Existing candidate `canonicalHash/canonical_hash` fallback now uses shared `firstNonEmptyAliasString(...)`.
+- Added a temp-local regression for blank camelCase plus valid snake_case existing candidate id/hash.
+- The change remains fixture-only preflight normalization and does not execute or authorize live writes.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed preflight source/test.
+- Targeted preflight/write tests passed `21/21`.
+- `npm test` passed `2872/2872`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1340 closeout.
+
+Next:
+
+- Continue with another small `MemoryWriteLifecycleDedupSuppressionPreflight` alias helper migration, or move to `MemoryWriteService.writeAudit(...)` only if the slice stays narrow and temp-local.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1339 AuditLogStore Selected Manifest Selector Alias Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for selected write-manifest selector alias normalization. No live recall/write execution, real audit/memory/store/jsonl read, provider call, MCP external call, durable audit write outside temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `readSelectedWriteManifestAuditCorrelation(...)` now treats the options object as the selector source.
+- Selected manifest selectors now use shared `firstNonEmptyAliasString(...)` for `memoryId/memory_id`, `idempotencyKey/idempotency_key`, `canonicalHash/canonical_hash`, and `requestSource/request_source`.
+- No local selector wrapper was added because the shared helper was sufficient.
+- Existing temp-local manifest alias fixture now covers snake_case selector inputs.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed audit source/test.
+- Targeted audit/write tests passed `28/28`.
+- `npm test` passed `2871/2871`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1339 closeout.
+
+Next:
+
+- If AuditLogStore has no higher-value local fallback left, move to the next duplicate alias hotspot file.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1338 AuditLogStore Selected Mutation Applied Boolean Helper Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for selected mutation audit event boolean helper usage. No live recall/write execution, real audit/memory/store/jsonl read, provider call, MCP external call, durable audit write outside temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Selected mutation audit event `mutationApplied` now uses shared `firstAliasBoolean(...)`.
+- The projection now falls through `mutation_applied/mutationApplied` aliases while preserving explicit `false` and explicit `true`.
+- Added a temp-local fixture regression for blank snake_case plus valid camelCase pending/committed mutation applied values.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed audit source/test.
+- Targeted audit/write tests passed `28/28`.
+- `npm test` passed `2871/2871`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1338 closeout.
+
+Next:
+
+- Continue with another small local alias migration or helper cleanup, or shift to the compact post-CM1326 runtime gap delta matrix.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1337 AuditLogStore Selected Manifest Lifecycle Boolean Helper Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs cleanup for selected write-manifest lifecycle boolean helper usage. No live recall/write execution, real audit/memory/store/jsonl read, provider call, MCP external call, durable audit write outside temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Selected write-manifest `lifecycle.pending`, `lifecycle.committed`, `lifecycle.projected`, and `lifecycle.audited` now use shared `firstAliasBoolean(...)`.
+- The lifecycle projection now follows the same boolean semantics as the selected manifest top-level lifecycle booleans: explicit `true`/`false` preserved, blank or malformed values default to `false`.
+- Added a temp-local fixture regression for selected manifest lifecycle booleans.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed audit source/test.
+- Targeted audit/write tests passed `27/27`.
+- `npm test` passed `2870/2870`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1337 closeout.
+
+Next:
+
+- Continue with another small local alias migration or helper cleanup, or shift to the compact post-CM1326 runtime gap delta matrix.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1336 AuditLogStore Alias String Wrapper Removal Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/docs cleanup for selected audit alias string helper usage. No live recall/write execution, real audit/memory/store/jsonl read, provider call, MCP external call, durable audit write outside temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Removed the local `AuditLogStore.firstAliasString(...)` wrapper.
+- Selected mutation audit event aliases now call `firstNonEmptyAliasString(...)` directly.
+- Selected write-manifest projection aliases now call `firstNonEmptyAliasString(...)` directly.
+- Alias ordering and selected projection output remain unchanged.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed audit source/test.
+- Targeted audit/write tests passed `26/26`.
+- `npm test` passed `2869/2869`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1336 closeout.
+
+Next:
+
+- Continue with another small local alias migration or helper cleanup, or shift to the compact post-CM1326 runtime gap delta matrix.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source cleanup.
+
+## CM-1335 Field Alias Boolean Helper Extraction Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs helper extraction for selected manifest boolean alias normalization. No live recall/write execution, real audit/memory/store/jsonl read, provider call, MCP external call, durable audit write outside temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `FieldAliasNormalizer` now exports shared `firstAliasBoolean(...)`.
+- The helper preserves explicit `false`, skips blank/malformed aliases, and defaults non-object/missing input to `false`.
+- `AuditLogStore` now reuses the shared helper for selected manifest replay/recovery/repair/cancel boolean aliases.
+- Core helper regression coverage now includes explicit false, malformed alias skip, and non-object default behavior.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed helper/audit source/tests.
+- Targeted helper/audit/write tests passed `35/35`.
+- `npm test` passed `2869/2869`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1335 closeout.
+
+Next:
+
+- Continue with another small local alias migration or helper cleanup, or shift to the compact post-CM1326 runtime gap delta matrix.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this helper extraction.
+
+## CM-1334 Audit Log Selected Manifest Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs hardening for selected write-manifest audit correlation alias normalization. No live recall/write execution, real audit/memory/store/jsonl read, provider call, MCP external call, durable audit write outside temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `AuditLogStore` selected write-manifest projection now trims `shadowWrite.status` through the shared selected string helper path.
+- Selected manifest recovery/repair/cancel booleans now use alias-aware boolean selection that skips non-boolean blank camelCase metadata.
+- Selected manifest `repairReason/repair_reason` and `cancelReason/cancel_reason` now use alias-aware string selection.
+- Regression coverage now includes blank camelCase plus valid snake_case selected manifest metadata.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed audit source/test.
+- Targeted audit/write tests passed `26/26`.
+- `npm test` passed `2868/2868`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1334 closeout.
+
+Next:
+
+- Continue with another small local alias migration, or shift to the compact post-CM1326 runtime gap delta matrix.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source/test helper migration.
+
+## CM-1333 Audit Log Selected Alias Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs hardening for selected write-audit and write-manifest audit correlation alias normalization. No live recall/write execution, real audit/memory/store/jsonl read, provider call, MCP external call, durable audit write outside temp-local test fixtures, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `AuditLogStore` now uses `FieldAliasNormalizer` helper paths for selected mutation audit event aliases.
+- Selected mutation audit projection keeps the previous snake-case-first event ordering for `event_id/eventId`, `correlation_id/correlationId`, `audit_phase/auditPhase`, `memory_id/memoryId`, request/source/status fields, and tombstone reason.
+- Selected write-manifest audit projection now uses shared helper paths for top-level `memoryId/memory_id`, `requestSource/request_source`, and manifest store/idempotency/hash aliases.
+- Regression coverage now includes blank camelCase plus valid snake_case mutation audit event aliases.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed audit source/test.
+- Targeted audit/write tests passed `25/25`.
+- `npm test` passed `2867/2867`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1333 closeout.
+
+Next:
+
+- Continue with another small local alias migration, or shift to the compact post-CM1326 runtime gap delta matrix.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source/test helper migration.
+
+## CM-1332 Shadow Projection Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs hardening for durable governance shadow projection alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `DurableGovernanceShadowProjectionPreview` now uses `FieldAliasNormalizer` for projection record `memoryId/memory_id` and `status/lifecycleStatus/lifecycle_status`.
+- Projection record scope, supersession, tombstone, and lifecycle metadata aliases now go through shared alias selection helper paths.
+- Exact scope tuple alias selection now uses the same helper path.
+- The projection module still applies its local sensitive-fragment redaction wrapper after helper selection.
+- Regression coverage now includes blank `memoryId` plus valid `memory_id` projection records.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed projection source/test.
+- Targeted projection/runtime-prep tests passed `29/29`.
+- `npm test` passed `2866/2866`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1332 closeout.
+
+Next:
+
+- Continue with another small local alias migration, or shift to the compact post-CM1326 runtime gap delta matrix.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source/test helper migration.
+
+## CM-1331 Mutation Audit Snapshot Normalizer Migration Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs hardening for lifecycle mutation audit snapshot alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write outside temp-local test stores, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ValidateMemoryService`, `TombstoneMemoryService`, and `SupersedeMemoryService` now use `FieldAliasNormalizer` for policy lifecycle status and mutation record id/update-time aliases.
+- Validate/tombstone `previous_snapshot_ref` now uses shared `normalizeAuditSnapshotRef(...)`.
+- Supersede old/new previous snapshot refs now use shared `normalizeAuditSnapshotRef(...)`.
+- Supersede runtime regression now covers returned `memory_id` plus `updated_at` aliases before audit snapshot construction.
+- Existing lifecycle mutation fail-closed and no-public-MCP boundaries remain unchanged.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed lifecycle mutation source/tests.
+- Targeted lifecycle mutation tests passed `59/59`.
+- `npm test` passed `2866/2866`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1331 closeout.
+
+Next:
+
+- Shadow projection remains a good next local migration candidate.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source/test helper migration.
+
+## CM-1330 Field Alias Normalizer Core Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test/docs hardening for alias/fallback normalization. No live recall/write execution, governed action execution, real memory/store/jsonl/raw audit read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- Added `src/core/FieldAliasNormalizer.js` as the shared alias/fallback helper layer.
+- Helper exports cover first-defined alias values, first non-empty normalized strings, memory id, record id, scope tuple, lifecycle status, visibility policy, side-effect counters, and audit snapshot refs.
+- `GovernanceRuntimeApprovalAuditLoop` now uses shared side-effect counter normalization.
+- Requested action boolean aliases now skip blank/malformed camelCase and can still fail closed on true snake_case action evidence.
+- This is the first migration slice only; scattered alias fallback sites remain for later controlled migration.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --check` passed for changed source/tests.
+- Targeted field alias / governance loop / aggregator tests passed `43/43`.
+- `npm test` passed `2866/2866`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1330 closeout.
+
+Next:
+
+- Continue migrating isolated alias/fallback call sites into `FieldAliasNormalizer` in small validated slices.
+- Do not claim runtime readiness, write reliability, recall reliability, RC readiness, live-client readiness, or dogfood readiness from this source/test helper step.
+
 ## CM-1329 Recall Proof Head-Bound Approval Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

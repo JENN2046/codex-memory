@@ -193,6 +193,69 @@ test('CM-0990 helper normalizes blank projection record fields from snake-case f
   assert.equal(summary.shadowUpdatePlan.newRecord.previousSnapshotRef.updated_at, '2026-05-23T11:05:00.000Z');
 });
 
+test('CM-1346 helper keeps supersede projection aliases on shared normalizer without updated_at widening', () => {
+  const records = loadProjectionRecordsFixture().map(record => {
+    if (record.memoryId === 'memory-old-001') {
+      return {
+        ...record,
+        memoryId: '',
+        memory_id: 'memory-old-001',
+        lifecycleStatus: '   ',
+        lifecycle_status: 'active',
+        clientId: '',
+        client_id: 'codex-desktop',
+        visibility: '',
+        visibility_policy: 'private',
+        lifecycleUpdatedAt: '',
+        lifecycle_updated_at: '',
+        updated_at: '2026-05-23T11:00:00.000Z'
+      };
+    }
+    if (record.memoryId === 'memory-new-001') {
+      return {
+        ...record,
+        memoryId: '   ',
+        memory_id: 'memory-new-001',
+        lifecycleStatus: '',
+        lifecycle_status: 'proposal',
+        clientId: '   ',
+        client_id: 'codex-desktop',
+        visibility: '   ',
+        visibility_policy: 'private',
+        lifecycleUpdatedAt: '',
+        lifecycle_updated_at: '',
+        updated_at: '2026-05-23T11:05:00.000Z'
+      };
+    }
+    return record;
+  });
+
+  const summary = planMemorySupersedeRuntimePrep({
+    ...buildHelperInput(),
+    currentProjectionRecords: records
+  });
+
+  assert.equal(summary.acceptedForRuntimePrep, true);
+  assert.equal(summary.shadowUpdatePlan.oldRecord.memoryId, 'memory-old-001');
+  assert.equal(summary.shadowUpdatePlan.oldRecord.fromStatus, 'active');
+  assert.equal(summary.shadowUpdatePlan.oldRecord.expectedClientId, 'codex-desktop');
+  assert.equal(summary.shadowUpdatePlan.oldRecord.expectedVisibility, 'private');
+  assert.deepEqual(summary.shadowUpdatePlan.oldRecord.previousSnapshotRef, {
+    memory_id: 'memory-old-001',
+    status: 'active',
+    updated_at: null
+  });
+  assert.equal(summary.shadowUpdatePlan.newRecord.memoryId, 'memory-new-001');
+  assert.equal(summary.shadowUpdatePlan.newRecord.fromStatus, 'proposal');
+  assert.equal(summary.shadowUpdatePlan.newRecord.expectedClientId, 'codex-desktop');
+  assert.equal(summary.shadowUpdatePlan.newRecord.expectedVisibility, 'private');
+  assert.deepEqual(summary.shadowUpdatePlan.newRecord.previousSnapshotRef, {
+    memory_id: 'memory-new-001',
+    status: 'proposal',
+    updated_at: null
+  });
+});
+
 test('CM-0990 helper does not perform implicit fixture reads', () => {
   const input = buildHelperInput();
   const originalReadFileSync = fs.readFileSync;

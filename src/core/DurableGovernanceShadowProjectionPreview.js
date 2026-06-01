@@ -4,6 +4,11 @@ const {
   normalizeDurableGovernanceMutationDryRunInput,
   summarizeDurableGovernanceMutationDryRun
 } = require('./DurableGovernanceMutationDryRunHelper');
+const {
+  firstNonEmptyAliasString,
+  normalizeLifecycleStatus,
+  normalizeMemoryId
+} = require('./FieldAliasNormalizer');
 const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 
 const SUPPORTED_PROJECTION_FAMILIES = Object.freeze([
@@ -40,14 +45,8 @@ function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
 }
 
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) {
-      return normalized;
-    }
-  }
-  return '';
+function firstAliasString(source, aliases) {
+  return normalizeString(firstNonEmptyAliasString(source, aliases));
 }
 
 function normalizeStringArray(values) {
@@ -61,38 +60,34 @@ function normalizeStringArray(values) {
 function normalizeProjectionRecord(record = {}) {
   const safeRecord = isPlainObject(record) ? record : {};
   return {
-    memoryId: firstNormalizedString(safeRecord.memoryId, safeRecord.memory_id),
-    status: normalizeStatus(firstNormalizedString(
-      safeRecord.status,
-      safeRecord.lifecycleStatus,
-      safeRecord.lifecycle_status
-    )),
-    statusReason: firstNormalizedString(safeRecord.statusReason, safeRecord.status_reason),
-    projectId: firstNormalizedString(safeRecord.projectId, safeRecord.project_id),
-    workspaceId: firstNormalizedString(safeRecord.workspaceId, safeRecord.workspace_id),
-    clientId: firstNormalizedString(safeRecord.clientId, safeRecord.client_id),
-    taskId: firstNormalizedString(safeRecord.taskId, safeRecord.task_id),
-    conversationId: firstNormalizedString(safeRecord.conversationId, safeRecord.conversation_id),
-    visibility: firstNormalizedString(safeRecord.visibility, safeRecord.visibility_policy),
-    retentionPolicy: firstNormalizedString(safeRecord.retentionPolicy, safeRecord.retention_policy),
-    supersededBy: firstNormalizedString(safeRecord.supersededBy, safeRecord.superseded_by_memory_id),
-    supersedes: firstNormalizedString(safeRecord.supersedes, safeRecord.supersedes_memory_id),
-    tombstoneReason: firstNormalizedString(safeRecord.tombstoneReason, safeRecord.tombstone_reason),
-    lifecycleUpdatedAt: firstNormalizedString(safeRecord.lifecycleUpdatedAt, safeRecord.lifecycle_updated_at),
-    lifecycleActorClientId: firstNormalizedString(safeRecord.lifecycleActorClientId, safeRecord.lifecycle_actor_client_id)
+    memoryId: normalizeString(normalizeMemoryId(safeRecord)),
+    status: normalizeStatus(normalizeLifecycleStatus(safeRecord)),
+    statusReason: firstAliasString(safeRecord, ['statusReason', 'status_reason']),
+    projectId: firstAliasString(safeRecord, ['projectId', 'project_id']),
+    workspaceId: firstAliasString(safeRecord, ['workspaceId', 'workspace_id']),
+    clientId: firstAliasString(safeRecord, ['clientId', 'client_id']),
+    taskId: firstAliasString(safeRecord, ['taskId', 'task_id']),
+    conversationId: firstAliasString(safeRecord, ['conversationId', 'conversation_id']),
+    visibility: firstAliasString(safeRecord, ['visibility', 'visibility_policy']),
+    retentionPolicy: firstAliasString(safeRecord, ['retentionPolicy', 'retention_policy']),
+    supersededBy: firstAliasString(safeRecord, ['supersededBy', 'superseded_by_memory_id']),
+    supersedes: firstAliasString(safeRecord, ['supersedes', 'supersedes_memory_id']),
+    tombstoneReason: firstAliasString(safeRecord, ['tombstoneReason', 'tombstone_reason']),
+    lifecycleUpdatedAt: firstAliasString(safeRecord, ['lifecycleUpdatedAt', 'lifecycle_updated_at']),
+    lifecycleActorClientId: firstAliasString(safeRecord, ['lifecycleActorClientId', 'lifecycle_actor_client_id'])
   };
 }
 
 function normalizeExactScopeTuple(scopeTuple = {}) {
   const safeTuple = isPlainObject(scopeTuple) ? scopeTuple : {};
   return {
-    projectId: firstNormalizedString(safeTuple.projectId, safeTuple.project_id),
-    workspaceId: firstNormalizedString(safeTuple.workspaceId, safeTuple.workspace_id),
-    clientId: firstNormalizedString(safeTuple.clientId, safeTuple.client_id),
-    taskId: firstNormalizedString(safeTuple.taskId, safeTuple.task_id),
-    conversationId: firstNormalizedString(safeTuple.conversationId, safeTuple.conversation_id),
-    visibility: firstNormalizedString(safeTuple.visibility, safeTuple.visibility_policy),
-    retentionPolicy: firstNormalizedString(safeTuple.retentionPolicy, safeTuple.retention_policy)
+    projectId: firstAliasString(safeTuple, ['projectId', 'project_id']),
+    workspaceId: firstAliasString(safeTuple, ['workspaceId', 'workspace_id']),
+    clientId: firstAliasString(safeTuple, ['clientId', 'client_id']),
+    taskId: firstAliasString(safeTuple, ['taskId', 'task_id']),
+    conversationId: firstAliasString(safeTuple, ['conversationId', 'conversation_id']),
+    visibility: firstAliasString(safeTuple, ['visibility', 'visibility_policy']),
+    retentionPolicy: firstAliasString(safeTuple, ['retentionPolicy', 'retention_policy'])
   };
 }
 

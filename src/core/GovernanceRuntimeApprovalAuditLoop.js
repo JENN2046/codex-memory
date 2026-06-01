@@ -4,6 +4,13 @@ const {
   PUBLIC_MCP_TOOLS,
   REQUIRED_LOOP_STAGE_IDS
 } = require('./GovernanceLoopBoundaryContract');
+const {
+  firstNonEmptyAliasString,
+  firstNonEmptyNormalizedString,
+  isPlainObject,
+  normalizeSideEffectCounters,
+  normalizeString
+} = require('./FieldAliasNormalizer');
 
 const TASK_ID = 'CM-1087_GOVERNANCE_RUNTIME_APPROVAL_AUDIT_LOOP';
 const RESULT_STATUS_ACCEPTED =
@@ -149,34 +156,8 @@ const AUDIT_REF_BOOLEAN_ALIASES = Object.freeze({
   rawAuditPayloadIncluded: ['rawAuditPayloadIncluded', 'raw_audit_payload_included']
 });
 
-function isPlainObject(value) {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-function normalizeString(value) {
-  return typeof value === 'string' ? value.trim() : '';
-}
-
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) return normalized;
-  }
-  return '';
-}
-
 function firstAliasString(source, aliases) {
-  return firstNormalizedString(...aliases.map(alias => source[alias]));
-}
-
-function firstDefinedAliasValue(source = {}, aliases = []) {
-  const safeSource = isPlainObject(source) ? source : {};
-  for (const alias of aliases) {
-    if (!Object.prototype.hasOwnProperty.call(safeSource, alias)) continue;
-    const value = safeSource[alias];
-    if (value !== undefined && value !== null) return value;
-  }
-  return undefined;
+  return firstNonEmptyAliasString(source, aliases);
 }
 
 function normalizeBoolean(value) {
@@ -219,21 +200,16 @@ function normalizeIdentity(identity = {}) {
 }
 
 function normalizeCounterMap(counters = {}) {
-  const safeCounters = isPlainObject(counters) ? counters : {};
-  const normalized = {};
-
-  for (const key of REQUIRED_COUNTER_KEYS) {
-    const aliases = COUNTER_KEY_ALIASES[key] || [key];
-    normalized[key] = firstDefinedAliasValue(safeCounters, aliases);
-  }
-
-  return normalized;
+  return normalizeSideEffectCounters(counters, {
+    counterKeys: REQUIRED_COUNTER_KEYS,
+    aliasesByKey: COUNTER_KEY_ALIASES
+  });
 }
 
 function normalizeBooleanMap(value = {}, aliasMap = {}) {
   const safeValue = isPlainObject(value) ? value : {};
   return Object.fromEntries(Object.entries(aliasMap).map(([key, aliases]) => {
-    return [key, normalizeBoolean(firstDefinedAliasValue(safeValue, aliases))];
+    return [key, firstAliasBoolean(safeValue, aliases)];
   }));
 }
 
@@ -294,7 +270,7 @@ function collectCounterBlockers(counters = {}) {
 function normalizeReviewPacket(packet = {}) {
   const safePacket = isPlainObject(packet) ? packet : {};
   return {
-    packetId: firstNormalizedString(safePacket.packetId, safePacket.packet_id),
+    packetId: firstNonEmptyNormalizedString(safePacket.packetId, safePacket.packet_id),
     loopId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.loopId),
     actionId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.actionId),
     status: normalizeString(safePacket.status),
@@ -309,7 +285,7 @@ function normalizeReviewPacket(packet = {}) {
 function normalizeApprovalPacket(packet = {}) {
   const safePacket = isPlainObject(packet) ? packet : {};
   return {
-    packetId: firstNormalizedString(safePacket.packetId, safePacket.packet_id),
+    packetId: firstNonEmptyNormalizedString(safePacket.packetId, safePacket.packet_id),
     loopId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.loopId),
     actionId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.actionId),
     reviewPacketId: firstAliasString(safePacket, IDENTITY_FIELD_ALIASES.reviewPacketId),
@@ -321,7 +297,7 @@ function normalizeApprovalPacket(packet = {}) {
     durableAuditIntentNamed: firstAliasBoolean(safePacket, APPROVAL_PACKET_BOOLEAN_ALIASES.durableAuditIntentNamed),
     durableMemoryIntentNamed: firstAliasBoolean(safePacket, APPROVAL_PACKET_BOOLEAN_ALIASES.durableMemoryIntentNamed),
     executionApproved: firstAliasBoolean(safePacket, APPROVAL_PACKET_BOOLEAN_ALIASES.executionApproved),
-    expiresAt: firstNormalizedString(safePacket.expiresAt, safePacket.expires_at)
+    expiresAt: firstNonEmptyNormalizedString(safePacket.expiresAt, safePacket.expires_at)
   };
 }
 

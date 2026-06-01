@@ -460,6 +460,49 @@ test('write audit normalizes blank result aliases before append', async () => {
   assert.equal(audit.writeManifest.canonicalHash, 'cm1309-canonical-hash');
 });
 
+test('CM-1344 write audit projects result aliases through shared normalizer', async () => {
+  const { service, events } = createHarness();
+
+  await service.writeAudit({
+    agentAlias: '   ',
+    agent_alias: 'Codex Alias',
+    agentId: '   ',
+    agent_id: 'cm-1344-agent',
+    decision: 'accepted',
+    target: 'knowledge',
+    title: 'Checkpoint: CM-1344 write audit shared alias normalizer',
+    memoryId: '',
+    memory_id: 'mem-cm1344-write-audit',
+    reason: 'CM-1344 shared alias normalizer regression',
+    filePath: '   ',
+    file_path: '<cm-1344-relative-path>',
+    requestSource: '',
+    request_source: 'cm-1344-write-audit-shared-alias-normalizer',
+    idempotency: {
+      authoritativeStore: '   ',
+      authoritative_store: 'sqlite',
+      key: '',
+      idempotencyKey: '   ',
+      idempotency_key: 'memory-write-v1:cm1344',
+      canonicalHash: '   ',
+      canonical_hash: 'cm1344-canonical-hash',
+      status: 'committed'
+    }
+  });
+
+  assert.equal(events.auditWrites.length, 1);
+  const audit = events.auditWrites[0];
+  assert.equal(audit.agentAlias, 'Codex Alias');
+  assert.equal(audit.agentId, 'cm-1344-agent');
+  assert.equal(audit.memoryId, 'mem-cm1344-write-audit');
+  assert.equal(audit.filePath, '<cm-1344-relative-path>');
+  assert.equal(audit.requestSource, 'cm-1344-write-audit-shared-alias-normalizer');
+  assert.equal(audit.writeManifest.authoritativeStore, 'sqlite');
+  assert.equal(audit.writeManifest.idempotencyKey, 'memory-write-v1:cm1344');
+  assert.equal(audit.writeManifest.canonicalHash, 'cm1344-canonical-hash');
+  assert.equal(audit.writeManifest.status, 'committed');
+});
+
 test('write runtime preserves explicit payload proof marker under context-derived ordinary scope', async () => {
   const events = {
     diaryWrites: [],

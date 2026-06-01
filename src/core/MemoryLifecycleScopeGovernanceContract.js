@@ -34,20 +34,17 @@ const GOVERNANCE_ACTIONS_REQUIRING_APPROVAL = Object.freeze([
   'correct'
 ]);
 
+const {
+  firstNonEmptyAliasString,
+  MEMORY_ID_ALIASES
+} = require('./FieldAliasNormalizer');
+
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
-}
-
-function firstNormalizedString(...values) {
-  for (const value of values) {
-    const normalized = normalizeString(value);
-    if (normalized) return normalized;
-  }
-  return '';
 }
 
 function toSnakeCase(value) {
@@ -59,15 +56,7 @@ function normalizeScope(input = {}) {
   const scope = {};
 
   for (const field of SCOPE_FIELDS) {
-    const candidates = [safeInput[field], safeInput[toSnakeCase(field)]];
-    scope[field] = '';
-    for (const candidate of candidates) {
-      const normalized = normalizeString(candidate);
-      if (normalized) {
-        scope[field] = normalized;
-        break;
-      }
-    }
+    scope[field] = firstNonEmptyAliasString(safeInput, [field, toSnakeCase(field)]);
   }
 
   return scope;
@@ -119,10 +108,10 @@ function normalizeRecord(input = {}) {
   const safeInput = isPlainObject(input) ? input : {};
 
   return {
-    memoryId: firstNormalizedString(safeInput.memoryId, safeInput.memory_id),
-    lifecycleStatus: normalizeLifecycleStatus(firstNormalizedString(
-      safeInput.lifecycleStatus,
-      safeInput.lifecycle_status
+    memoryId: firstNonEmptyAliasString(safeInput, MEMORY_ID_ALIASES),
+    lifecycleStatus: normalizeLifecycleStatus(firstNonEmptyAliasString(
+      safeInput,
+      ['lifecycleStatus', 'lifecycle_status']
     )),
     scope: normalizeScope(safeInput.scope || safeInput),
     unresolvedRemediation: safeInput.unresolvedRemediation === true ||
@@ -188,14 +177,14 @@ function evaluateGovernanceTransition(input = {}) {
   const safeInput = isPlainObject(input) ? input : {};
   const action = normalizeGovernanceAction(safeInput.action);
   const exactApproval = safeInput.exactApproval === true;
-  const targetMemoryId = firstNormalizedString(safeInput.targetMemoryId, safeInput.target_memory_id);
-  const replacementMemoryId = firstNormalizedString(
-    safeInput.replacementMemoryId,
-    safeInput.replacement_memory_id
-  );
+  const targetMemoryId = firstNonEmptyAliasString(safeInput, ['targetMemoryId', 'target_memory_id']);
+  const replacementMemoryId = firstNonEmptyAliasString(safeInput, [
+    'replacementMemoryId',
+    'replacement_memory_id'
+  ]);
   const reason = normalizeString(safeInput.reason);
-  const actorId = firstNormalizedString(safeInput.actorId, safeInput.actor_id);
-  const approvedAt = firstNormalizedString(safeInput.approvedAt, safeInput.approved_at);
+  const actorId = firstNonEmptyAliasString(safeInput, ['actorId', 'actor_id']);
+  const approvedAt = firstNonEmptyAliasString(safeInput, ['approvedAt', 'approved_at']);
   const scope = normalizeScope(safeInput.scope);
   const blockers = [];
 
@@ -257,10 +246,10 @@ function sanitizeSuppressedCandidate(candidate = {}, eligibility = {}) {
   const safeCandidate = isPlainObject(candidate) ? candidate : {};
 
   return {
-    memoryId: firstNormalizedString(safeCandidate.memoryId, safeCandidate.memory_id) || null,
-    lifecycleStatus: eligibility.lifecycleStatus || normalizeLifecycleStatus(firstNormalizedString(
-      safeCandidate.lifecycleStatus,
-      safeCandidate.lifecycle_status
+    memoryId: firstNonEmptyAliasString(safeCandidate, MEMORY_ID_ALIASES) || null,
+    lifecycleStatus: eligibility.lifecycleStatus || normalizeLifecycleStatus(firstNonEmptyAliasString(
+      safeCandidate,
+      ['lifecycleStatus', 'lifecycle_status']
     )),
     decision: eligibility.decision || 'excluded_from_normal_recall',
     blockers: Array.isArray(eligibility.blockers) ? eligibility.blockers : [],
@@ -283,7 +272,7 @@ function filterRecallCandidatesByLifecycleScope(input = {}) {
       acceptedCandidates.push({
         memoryId: eligibility.memoryId,
         lifecycleStatus: eligibility.lifecycleStatus,
-        rankHint: firstNormalizedString(candidate.rankHint, candidate.rank_hint),
+        rankHint: firstNonEmptyAliasString(candidate, ['rankHint', 'rank_hint']),
         scope: normalizeScope(candidate.scope || candidate)
       });
     } else {

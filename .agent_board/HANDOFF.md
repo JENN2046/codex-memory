@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1329 RECALL_PROOF_HEAD_BOUND_APPROVAL`.
+Goal: `CM-1353 A5_GAP4_LIVE_CLIENT_NO_WRITE_APPROVAL_PATTERN`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after adding commit-bound approval support to the true-live recall proof preflight and runner. Current-facts preflight now generates head-bound approval from local `HEAD`; preflight accepts it only when the approval commit equals local `HEAD`; runner accepts it only when the approval commit matches `baselineCommit` if supplied. Targeted recall proof/preflight/reliability tests passed `38/38`. Current read-only preflight remains blocked-not-executed on `local_origin_head_mismatch` and `dirty_worktree`, with `approvalBinding.type=head_bound_commit`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after adding the narrow `A5-GAP-4 live-client no-write contract refresh` approval pattern. `CM-1353` updated `src/core/A5ApprovalLineVerifier.js` and A5 approval tests so the checker can exact-match a Part 4 no-write live-client boundary covering current-session bearer token handling, `tools/call memory_overview`, no-token `record_memory/search_memory` rejection checks, no provider, no durable write, and no config/watchdog/startup change. The checker exposes parsed scope booleans but still does not execute approved actions. Targeted A5/no-touch tests passed `29/29`, and the current rendered CLI self-check returned `approvalAccepted=true`, `authorizationGranted=true`, `executesApprovedAction=false`. No service start, MCP/provider call, memory tool execution, real memory/store/jsonl/raw audit read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -13,8 +13,9 @@ Branch: `main`.
 Current route:
 
 1. Documentation-surface slimdown.
-2. A5 / P66 runtime gap closure.
-3. Personal RC dogfood.
+2. Runtime gap delta and A5-GAP-6 aggregation refresh planning.
+3. Live client contract refresh without memory writes.
+4. Personal RC dogfood later.
 
 Current active entrypoints:
 
@@ -26,6 +27,18 @@ Current active entrypoints:
 
 Changed scope since CM-1207:
 
+- `src/core/FieldAliasNormalizer.js`
+- `src/core/DurableGovernanceShadowProjectionPreview.js`
+- `src/core/ValidateMemoryService.js`
+- `src/core/MemoryWriteLifecycleDedupSuppressionPreflight.js`
+- `src/core/TombstoneMemoryService.js`
+- `src/core/SupersedeMemoryService.js`
+- `src/storage/AuditLogStore.js`
+- `tests/field-alias-normalizer.test.js`
+- `tests/memory-write-lifecycle-dedup-suppression-preflight.test.js`
+- `tests/durable-governance-shadow-projection-preview.test.js`
+- `tests/audit-log-store-selected-correlation.test.js`
+- `tests/supersede-memory-runtime.test.js`
 - `STATUS.md`
 - `.agent_board/HANDOFF.md`
 - `.agent_board/CHECKPOINT.md`

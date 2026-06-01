@@ -166,6 +166,52 @@ test('A5 approval verifier accepts documented A5-GAP-4 authenticated tools-list 
   assertNoSideEffects(result);
 });
 
+test('A5 approval verifier accepts A5-GAP-4 live-client no-write contract refresh line', () => {
+  const commit = '4fc75d68b79d2fe2bee7bcb576360b508cacb5c6';
+  const result = evaluateA5ApprovalLine({
+    approvalLine: `I approve A5-GAP-4 live-client no-write contract refresh for codex-memory on branch main at commit ${commit}, endpoint http://127.0.0.1:7605, using current-session bearer token if already present, without printing or persisting token material, allow tools/call memory_overview and no-token rejection checks for record_memory/search_memory only, no provider, no durable write, no config/watchdog/startup change.`,
+    expectedUnit: 'A5-GAP-4',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, true);
+  assert.equal(result.action, 'live_http_operation');
+  assert.equal(result.parsed.endpoint, 'http://127.0.0.1:7605');
+  assert.equal(result.parsed.liveClientNoWriteContract, 'live-client no-write contract refresh');
+  assert.equal(
+    result.parsed.liveClientNoWriteBoundary,
+    'using current-session bearer token if already present, without printing or persisting token material, allow tools/call memory_overview and no-token rejection checks for record_memory/search_memory only, no provider, no durable write, no config/watchdog/startup change'
+  );
+  assert.deepEqual(result.parsedApprovalScope, {
+    endpoint: 'http://127.0.0.1:7605',
+    authenticatedMcpToolList: false,
+    liveClientNoWriteContract: true,
+    allowsMemoryOverviewToolCall: true,
+    includesNoTokenRejectionChecks: true,
+    noProvider: true,
+    noDurableWrite: true,
+    noConfigWatchdogStartupChange: true
+  });
+  assertNoSideEffects(result);
+});
+
+test('A5 approval verifier rejects A5-GAP-4 live-client refresh with incomplete no-write boundary', () => {
+  const commit = '4fc75d68b79d2fe2bee7bcb576360b508cacb5c6';
+  const result = evaluateA5ApprovalLine({
+    approvalLine: `I approve A5-GAP-4 live-client no-write contract refresh for codex-memory on branch main at commit ${commit}, endpoint http://127.0.0.1:7605, using current-session bearer token if already present, without printing or persisting token material, no config/watchdog/startup change, no tools/call.`,
+    expectedUnit: 'A5-GAP-4',
+    expectedBranch: 'main',
+    expectedCommit: commit
+  });
+
+  assert.equal(result.approvalAccepted, false);
+  assert.equal(result.failClosedReasons.includes('incomplete_live_client_no_write_boundary'), true);
+  assert.equal(result.parsedApprovalScope.liveClientNoWriteContract, true);
+  assert.equal(result.parsedApprovalScope.allowsMemoryOverviewToolCall, false);
+  assertNoSideEffects(result);
+});
+
 test('A5 approval verifier accepts documented A5-GAP-6 evidence-only line with spaced units and no-new-runtime-action boundary', () => {
   const commit = '5d6b174a6ed4b669cb4688d42b1360beb99c22e3';
   const result = evaluateA5ApprovalLine({
