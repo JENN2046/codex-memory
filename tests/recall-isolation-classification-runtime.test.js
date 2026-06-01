@@ -1830,6 +1830,53 @@ test('vector index skips isolated records and excludes them from diary vectors',
   await fs.rm(tempDir, { recursive: true, force: true });
 });
 
+test('vector index normalizes snake-case memory id aliases before indexing and scoring', async () => {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-vector-id-alias-'));
+  const vectorIndexPath = path.join(tempDir, 'memory-vectors.json');
+  const store = new VectorIndexStore({
+    enableVectorIndex: true,
+    enableEmbeddingCache: false,
+    vectorIndexPath,
+    embeddingFingerprint: 'test-fingerprint',
+    embedDimensions: 8,
+    embeddingCacheMaxEntries: 100
+  });
+
+  try {
+    const record = baseRecord({
+      memoryId: '',
+      memory_id: 'mem-vector-snake',
+      tags: ['feature'],
+      content: 'vector alias fallback content'
+    });
+
+    assert.equal(await store.upsertRecord(record), true);
+    assert.equal(Object.prototype.hasOwnProperty.call(store.index.vectors, 'mem-vector-snake'), true);
+    assert.equal(Object.prototype.hasOwnProperty.call(store.index.vectors, ''), false);
+    assert.equal(store.index.vectors['mem-vector-snake'].memoryId, 'mem-vector-snake');
+
+    const scoreMap = await store.getScoreMap('alias fallback', [record]);
+    assert.equal(scoreMap.has('mem-vector-snake'), true);
+    assert.equal(scoreMap.has(''), false);
+
+    const diaryVectorCount = await store.rebuildDiaryVectors([
+      record,
+      baseRecord({ memoryId: '', memory_id: '', content: 'missing id should be skipped' })
+    ]);
+    assert.equal(diaryVectorCount, 1);
+    assert.equal(store.index.diaryVectors.process.recordCount, 1);
+
+    await store.upsertRecord(baseRecord({
+      memoryId: '',
+      memory_id: 'mem-vector-snake',
+      tags: ['validation-transcript']
+    }));
+    assert.equal(Object.prototype.hasOwnProperty.call(store.index.vectors, 'mem-vector-snake'), false);
+  } finally {
+    await fs.rm(tempDir, { recursive: true, force: true });
+  }
+});
+
 test('recall aggregation and audit projection drop isolated results', async () => {
   const pipeline = new KnowledgeBaseRecallPipeline({
     compatibilitySyntaxAdapter: null,

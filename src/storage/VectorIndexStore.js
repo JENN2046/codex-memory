@@ -26,6 +26,18 @@ function cosineSimilarity(left, right) {
   return dot / (Math.sqrt(leftNorm) * Math.sqrt(rightNorm));
 }
 
+function firstNonEmptyString(...values) {
+  for (const value of values) {
+    const normalized = String(value || '').trim();
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function getRecordMemoryId(record) {
+  return firstNonEmptyString(record?.memoryId, record?.memory_id);
+}
+
 class VectorIndexStore {
   constructor(config, { externalEmbeddingAdapter = null } = {}) {
     this.config = config;
@@ -270,10 +282,12 @@ class VectorIndexStore {
   async upsertRecord(record) {
     if (!this.config.enableVectorIndex) return;
     await this.ensureReady();
+    const memoryId = getRecordMemoryId(record);
+    if (!memoryId) return false;
 
     if (isRecallIsolated(record)) {
-      if (this.index.vectors[record.memoryId]) {
-        delete this.index.vectors[record.memoryId];
+      if (this.index.vectors[memoryId]) {
+        delete this.index.vectors[memoryId];
         await this.flush();
         return true;
       }
@@ -281,8 +295,8 @@ class VectorIndexStore {
     }
 
     const vector = await this.getSingleEmbeddingCached(this.buildRecordText(record), { inputKind: 'document' });
-    this.index.vectors[record.memoryId] = {
-      memoryId: record.memoryId,
+    this.index.vectors[memoryId] = {
+      memoryId,
       target: record.target,
       title: record.title,
       filePath: record.filePath || null,
@@ -300,8 +314,9 @@ class VectorIndexStore {
   async deleteRecord(memoryId) {
     if (!this.config.enableVectorIndex) return;
     await this.ensureReady();
-    if (!this.index.vectors[memoryId]) return false;
-    delete this.index.vectors[memoryId];
+    const normalizedMemoryId = firstNonEmptyString(memoryId);
+    if (!normalizedMemoryId || !this.index.vectors[normalizedMemoryId]) return false;
+    delete this.index.vectors[normalizedMemoryId];
     await this.flush();
     return true;
   }
@@ -321,13 +336,15 @@ class VectorIndexStore {
     const scoreMap = new Map();
 
     for (const record of records) {
-      const cached = this.index.vectors[record.memoryId];
+      const memoryId = getRecordMemoryId(record);
+      if (!memoryId) continue;
+      const cached = this.index.vectors[memoryId];
       const vector = cached
         && cached.embeddingFingerprint === this.config.embeddingFingerprint
         && Array.isArray(cached.vector)
         ? cached.vector
         : this.embedText(this.buildRecordText(record));
-      scoreMap.set(record.memoryId, cosineSimilarity(queryVector, vector));
+      scoreMap.set(memoryId, cosineSimilarity(queryVector, vector));
     }
 
     return scoreMap;
@@ -353,7 +370,9 @@ class VectorIndexStore {
       const vectors = [];
 
       for (const record of targetRecords) {
-        const cached = this.index.vectors[record.memoryId];
+        const memoryId = getRecordMemoryId(record);
+        if (!memoryId) continue;
+        const cached = this.index.vectors[memoryId];
         let vector = cached?.embeddingFingerprint === this.config.embeddingFingerprint
           ? cached.vector
           : null;
@@ -371,7 +390,7 @@ class VectorIndexStore {
         target,
         vector: this.averageVectors(vectors),
         embeddingFingerprint: this.config.embeddingFingerprint,
-        recordCount: targetRecords.length,
+        recordCount: vectors.length,
         updatedAt: now
       };
     }
