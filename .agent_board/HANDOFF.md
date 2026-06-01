@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1309 WRITE_AUDIT_ENTRY_ALIAS_FALLBACK`.
+Goal: `CM-1310 KNOWLEDGE_BASE_SYNC_MEMORY_ID_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing internal write audit append result/idempotency alias fallback. Targeted write/audit tests passed `32/32`; default `npm test` passed `2835/2835`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing knowledge-base sync record id alias fallback. Targeted recall/sync tests passed `60/60`; default `npm test` passed `2836/2836`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -64,6 +64,8 @@ Changed scope since CM-1207:
 - `docs/CM1307_RECALL_AGGREGATION_RESULT_ID_ALIAS_FALLBACK.md`
 - `docs/CM1308_SELECTED_AUDIT_LOG_ALIAS_FALLBACK.md`
 - `docs/CM1309_WRITE_AUDIT_ENTRY_ALIAS_FALLBACK.md`
+- `docs/CM1310_KNOWLEDGE_BASE_SYNC_MEMORY_ID_ALIAS_FALLBACK.md`
+- `src/recall/KnowledgeBaseSyncService.js`
 - `src/recall/KnowledgeBaseRecallPipeline.js`
 - `tests/recall-isolation-classification-runtime.test.js`
 - `src/storage/AuditLogStore.js`

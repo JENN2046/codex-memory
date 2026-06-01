@@ -640,6 +640,95 @@ test('knowledge base sync preserves existing shadow scope when diary scope field
   }]);
 });
 
+test('knowledge base sync normalizes snake-case memory id before shadow write and cache invalidation', async () => {
+  const upserted = [];
+  const reconcileClears = [];
+  const cacheClears = [];
+  const diaryRecords = [
+    baseRecord({
+      memoryId: '   ',
+      memory_id: 'mem-sync-snake-id',
+      updatedAt: '2026-05-19T02:00:00.000Z',
+      relativePath: 'process/snake-id.md',
+      projectId: 'codex-memory',
+      visibility: 'project'
+    })
+  ];
+  const existingRecords = [
+    {
+      memoryId: 'mem-sync-snake-id',
+      target: 'process',
+      title: 'Useful implementation note',
+      content: 'Alpha feature detail',
+      evidence: 'Local evidence',
+      tags: ['feature'],
+      updatedAt: '2026-05-19T01:00:00.000Z',
+      relativePath: 'process/snake-id.md',
+      filePath: null,
+      rawText: null,
+      validated: false,
+      reusable: false,
+      status: 'active',
+      projectId: 'codex-memory',
+      visibility: 'project'
+    }
+  ];
+  const service = new KnowledgeBaseSyncService({
+    config: {
+      enableShadowWrites: true,
+      enableVectorIndex: false,
+      searchMemoryTimeoutMs: 50
+    },
+    diaryStore: {
+      async listRecords() {
+        return diaryRecords;
+      }
+    },
+    shadowStore: {
+      async listRecords() {
+        return existingRecords;
+      },
+      async upsertRecord(record) {
+        upserted.push({ ...record });
+      },
+      async clearReconcileTasks(memoryId, storeKind = null) {
+        reconcileClears.push({ memoryId, storeKind });
+      }
+    },
+    vectorStore: {},
+    chunkIndexingService: null,
+    candidateCacheStore: {
+      async getStoredGovernanceStateRevision() {
+        return 'gov-rev-fixed';
+      },
+      async getStoredGovernanceStateEntries() {
+        return null;
+      },
+      async clearCurrentFingerprintByMemoryIds(memoryIds, targets) {
+        cacheClears.push({ memoryIds, targets });
+      },
+      async setStoredGovernanceStateRevision() {},
+      async setStoredGovernanceStateEntries() {}
+    },
+    governanceStateRevisionProvider: async () => 'gov-rev-fixed'
+  });
+
+  const result = await service.syncTarget('process');
+
+  assert.equal(result.sqliteWrites, 1);
+  assert.equal(result.changed, true);
+  assert.equal(result.governanceStateRevisionChanged, false);
+  assert.equal(upserted.length, 1);
+  assert.equal(upserted[0].memoryId, 'mem-sync-snake-id');
+  assert.equal(upserted[0].memory_id, 'mem-sync-snake-id');
+  assert.deepEqual(reconcileClears, [{ memoryId: 'mem-sync-snake-id', storeKind: 'sqlite' }]);
+  assert.deepEqual(cacheClears, [{
+    memoryIds: ['mem-sync-snake-id'],
+    targets: ['process', 'both']
+  }]);
+  assert.match(result.syncToken, /^[a-f0-9]{40}$/);
+});
+
 test('knowledge base sync keeps governance state revision empty when no governance metadata exists', async () => {
   const service = new KnowledgeBaseSyncService({
     config: {

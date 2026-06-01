@@ -59,7 +59,9 @@ class KnowledgeBaseSyncService {
 
     for (const record of diaryRecords) {
       throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
-      if (!record.memoryId) continue;
+      const memoryId = this.getRecordMemoryId(record);
+      if (!memoryId) continue;
+      record.memoryId = memoryId;
       const isolated = isRecallIsolated(record);
       if (isolated) isolatedRecords += 1;
 
@@ -71,8 +73,8 @@ class KnowledgeBaseSyncService {
       throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
       const needsRefresh = force || this.shouldRefreshRecord(existing, record) || (!isolated && !hasCurrentFingerprintChunks);
       const needsIsolationChunkClear = isolated && hasCurrentFingerprintChunks;
-      if ((needsRefresh || needsIsolationChunkClear) && record.memoryId) {
-        changedMemoryIds.add(record.memoryId);
+      if (needsRefresh || needsIsolationChunkClear) {
+        changedMemoryIds.add(memoryId);
       }
 
       if (this.config.enableShadowWrites && (needsRefresh || needsIsolationChunkClear)) {
@@ -118,25 +120,26 @@ class KnowledgeBaseSyncService {
     }
 
     if (this.config.enableShadowWrites) {
-      const activeMemoryIds = new Set(diaryRecords.map(record => record.memoryId).filter(Boolean));
+      const activeMemoryIds = new Set(diaryRecords.map(record => this.getRecordMemoryId(record)).filter(Boolean));
 
       for (const existing of existingRecords) {
         throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
-        if (!existing.memoryId || activeMemoryIds.has(existing.memoryId)) {
+        const existingMemoryId = this.getRecordMemoryId(existing);
+        if (!existingMemoryId || activeMemoryIds.has(existingMemoryId)) {
           continue;
         }
         if (await this.hasAuthoritativeWriteManifest(existing)) {
           continue;
         }
 
-        await this.shadowStore.deleteRecord(existing.memoryId);
+        await this.shadowStore.deleteRecord(existingMemoryId);
         throwIfSearchMemoryAborted(signal, this.config.searchMemoryTimeoutMs);
-        await this.shadowStore.clearReconcileTasks(existing.memoryId);
+        await this.shadowStore.clearReconcileTasks(existingMemoryId);
         prunedRecords += 1;
-        changedMemoryIds.add(existing.memoryId);
+        changedMemoryIds.add(existingMemoryId);
 
         if (this.config.enableVectorIndex) {
-          await this.vectorStore.deleteRecord(existing.memoryId);
+          await this.vectorStore.deleteRecord(existingMemoryId);
         }
       }
     }
@@ -208,13 +211,17 @@ class KnowledgeBaseSyncService {
   buildSyncToken(target, diaryRecords = [], options = {}) {
     const governanceStateRevision = this.normalizeGovernanceStateRevision(options.governanceStateRevision);
     const normalized = [...diaryRecords]
-      .filter(record => record.memoryId)
-      .sort((left, right) => String(left.memoryId).localeCompare(String(right.memoryId)))
+      .map(record => ({
+        record,
+        memoryId: this.getRecordMemoryId(record)
+      }))
+      .filter(item => item.memoryId)
+      .sort((left, right) => left.memoryId.localeCompare(right.memoryId))
       .map(record => ({
         memoryId: record.memoryId,
-        updatedAt: record.updatedAt,
-        relativePath: record.relativePath,
-        target: record.target
+        updatedAt: this.firstGovernanceField(record.record.updatedAt, record.record.updated_at) || record.record.updatedAt,
+        relativePath: this.firstGovernanceField(record.record.relativePath, record.record.relative_path) || record.record.relativePath,
+        target: this.firstGovernanceField(record.record.target) || record.record.target
       }));
 
     const payload = {
@@ -232,7 +239,18 @@ class KnowledgeBaseSyncService {
   }
 
   getRecordKey(record) {
-    return record.memoryId || record.relativePath || record.filePath;
+    return this.firstGovernanceField(
+      record?.memoryId,
+      record?.memory_id,
+      record?.relativePath,
+      record?.relative_path,
+      record?.filePath,
+      record?.file_path
+    );
+  }
+
+  getRecordMemoryId(record) {
+    return this.firstGovernanceField(record?.memoryId, record?.memory_id);
   }
 
   shouldRefreshRecord(existing, incoming) {
@@ -252,21 +270,23 @@ class KnowledgeBaseSyncService {
   }
 
   async hasCurrentFingerprintChunks(record) {
-    if (!this.chunkIndexingService || !this.shadowStore.countChunksForRecord || !record?.memoryId) {
+    const memoryId = this.getRecordMemoryId(record);
+    if (!this.chunkIndexingService || !this.shadowStore.countChunksForRecord || !memoryId) {
       return true;
     }
-    return (await this.shadowStore.countChunksForRecord(record.memoryId)) > 0;
+    return (await this.shadowStore.countChunksForRecord(memoryId)) > 0;
   }
 
   async hasAuthoritativeWriteManifest(record) {
-    if (!record?.memoryId || typeof this.shadowStore.getMemoryWriteManifestByMemoryId !== 'function') {
+    const memoryId = this.getRecordMemoryId(record);
+    if (!memoryId || typeof this.shadowStore.getMemoryWriteManifestByMemoryId !== 'function') {
       return false;
     }
-    if (record.filePath) {
+    if (this.firstGovernanceField(record.filePath, record.file_path)) {
       return false;
     }
 
-    const manifest = await this.shadowStore.getMemoryWriteManifestByMemoryId(record.memoryId);
+    const manifest = await this.shadowStore.getMemoryWriteManifestByMemoryId(memoryId);
     if (!manifest || manifest.recordMalformed) {
       return false;
     }
@@ -315,7 +335,7 @@ class KnowledgeBaseSyncService {
     );
     return this.normalizeGovernanceStateEntries(
       (Array.isArray(diaryRecords) ? diaryRecords : [])
-      .filter(record => record?.memoryId)
+      .filter(record => this.getRecordMemoryId(record))
       .map(record => this.buildGovernanceStateEntry(record, existingMap.get(this.getRecordKey(record))))
       .filter(Boolean)
     );
@@ -334,8 +354,8 @@ class KnowledgeBaseSyncService {
 
   buildGovernanceStateEntry(record, existing = null) {
     const merged = {
-      memoryId: record?.memoryId || existing?.memoryId || '',
-      target: record?.target || existing?.target || '',
+      memoryId: this.firstGovernanceField(record?.memoryId, record?.memory_id, existing?.memoryId, existing?.memory_id),
+      target: this.firstGovernanceField(record?.target, existing?.target),
       // Lifecycle status currently lives in shadow-store metadata, not diary records.
       status: this.normalizeGovernanceField(existing?.status),
       projectId: this.firstGovernanceField(record?.projectId, existing?.projectId),
@@ -382,12 +402,16 @@ class KnowledgeBaseSyncService {
       return null;
     }
     return entries
-      .filter(entry => entry && typeof entry === 'object' && entry.memoryId)
-      .map(entry => ({
-        ...entry,
-        memoryId: String(entry.memoryId),
-        target: this.normalizeGovernanceField(entry.target)
-      }))
+      .filter(entry => entry && typeof entry === 'object' && this.getRecordMemoryId(entry))
+      .map(entry => {
+        const memoryId = this.firstGovernanceField(entry.memoryId, entry.memory_id);
+        return {
+          ...entry,
+          memoryId,
+          target: this.normalizeGovernanceField(entry.target)
+        };
+      })
+      .filter(entry => entry.memoryId)
       .sort((left, right) => String(left.memoryId).localeCompare(String(right.memoryId)));
   }
 
