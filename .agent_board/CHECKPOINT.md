@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1326 Governance Loop Side-Effect Alias Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test review-only governance runtime approval/audit loop side-effect alias normalization. No live recall/write execution, governed action execution, real memory/store/jsonl/raw audit read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `GovernanceRuntimeApprovalAuditLoop` now normalizes camelCase and snake_case aliases for requested action gates and side-effect counters.
+- Snake_case side-effect counter evidence binds into canonical camelCase output and known snake_case counter aliases are not treated as unknown counters.
+- `null` / `undefined` camelCase values no longer mask defined snake_case side-effect evidence.
+- Nonzero side-effect counters and requested governed action attempts still fail closed.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\governance-runtime-approval-audit-loop.test.js tests\validation-aggregator-governance-runtime-loop-gap-contract-helper.test.js tests\v1-1-hardening-validation-aggregator.test.js tests\v1-1-hardening-staged-closeout.test.js` passed `34/34`.
+- `npm test` passed `2854/2854`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1326 closeout.
+
+Next:
+
+- Verify fresh Git state before branch-sensitive work; if CM-1326 is committed, continue to the next runtime gap.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1325 Governance Loop Alias Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

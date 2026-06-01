@@ -21,6 +21,28 @@ function zeroCounters() {
   return Object.fromEntries(REQUIRED_COUNTER_KEYS.map(key => [key, 0]));
 }
 
+function snakeZeroCounters() {
+  return {
+    provider_calls: 0,
+    api_calls: 0,
+    true_record_memory_calls: 0,
+    true_search_memory_calls: 0,
+    real_memory_reads: 0,
+    raw_jsonl_reads: 0,
+    raw_audit_reads: 0,
+    durable_memory_writes: 0,
+    durable_audit_writes: 0,
+    governed_action_executions: 0,
+    cleanup_apply_runs: 0,
+    rollback_apply_runs: 0,
+    public_mcp_expansions: 0,
+    config_watchdog_startup_changes: 0,
+    dependency_actions: 0,
+    readiness_claims: 0,
+    reliability_claims: 0
+  };
+}
+
 function baseScope(overrides = {}) {
   return {
     projectRef: 'codex-memory',
@@ -335,6 +357,83 @@ test('CM1087 normalizes snake-case governance loop identity scope and audit refs
   assert.equal(report.auditRefs.correlationId, identity.correlationId);
   assert.equal(report.auditRefs.appendOnly, true);
   assert.equal(report.auditRefs.durableAuditWritten, false);
+});
+
+test('CM1087 normalizes snake-case requested actions and side-effect counters', () => {
+  const accepted = evaluateGovernanceRuntimeApprovalAuditLoop({
+    ...acceptedLoopInput(),
+    requestedActions: {
+      execute_governed_action: false,
+      write_durable_audit: false,
+      write_durable_memory: false,
+      read_real_memory: false,
+      read_raw_audit: false,
+      call_provider: false,
+      expand_public_mcp: false,
+      change_config_watchdog_startup: false,
+      change_dependencies: false,
+      claim_readiness: false,
+      claim_reliability: false
+    },
+    sideEffectCounters: snakeZeroCounters()
+  });
+
+  assert.equal(accepted.accepted, true);
+  assert.deepEqual(accepted.sideEffectCounters, zeroCounters());
+
+  const blocked = evaluateGovernanceRuntimeApprovalAuditLoop({
+    ...acceptedLoopInput(),
+    requestedActions: {
+      execute_governed_action: true,
+      write_durable_audit: false,
+      write_durable_memory: false,
+      read_real_memory: false,
+      read_raw_audit: false,
+      call_provider: false,
+      expand_public_mcp: false,
+      change_config_watchdog_startup: false,
+      change_dependencies: false,
+      claim_readiness: false,
+      claim_reliability: false
+    },
+    sideEffectCounters: {
+      ...snakeZeroCounters(),
+      provider_calls: 1
+    }
+  });
+
+  assert.equal(blocked.accepted, false);
+  assert.equal(blocked.blockerReasons.includes('requested_action_not_authorized_in_cm1087'), true);
+  assert.equal(blocked.blockerReasons.includes('counter_providerCalls_must_be_zero'), true);
+  assert.equal(blocked.blockerReasons.some(reason => reason.includes('provider_calls_unknown')), false);
+
+  const blockedByDefinedSnakeAliases = evaluateGovernanceRuntimeApprovalAuditLoop({
+    ...acceptedLoopInput(),
+    requestedActions: {
+      executeGovernedAction: null,
+      execute_governed_action: true,
+      write_durable_audit: false,
+      write_durable_memory: false,
+      read_real_memory: false,
+      read_raw_audit: false,
+      call_provider: false,
+      expand_public_mcp: false,
+      change_config_watchdog_startup: false,
+      change_dependencies: false,
+      claim_readiness: false,
+      claim_reliability: false
+    },
+    sideEffectCounters: {
+      ...snakeZeroCounters(),
+      providerCalls: undefined,
+      provider_calls: 1
+    }
+  });
+
+  assert.equal(blockedByDefinedSnakeAliases.accepted, false);
+  assert.equal(blockedByDefinedSnakeAliases.blockerReasons.includes('requested_action_not_authorized_in_cm1087'), true);
+  assert.equal(blockedByDefinedSnakeAliases.blockerReasons.includes('counter_providerCalls_must_be_zero'), true);
+  assert.equal(blockedByDefinedSnakeAliases.blockerReasons.some(reason => reason.includes('provider_calls_unknown')), false);
 });
 
 test('CM1087 supported governed action ids are exact for v1.1 hardening', () => {

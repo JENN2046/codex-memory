@@ -93,6 +93,40 @@ const IDENTITY_FIELD_ALIASES = Object.freeze({
   correlationId: ['correlationId', 'correlation_id']
 });
 
+const COUNTER_KEY_ALIASES = Object.freeze({
+  providerCalls: ['providerCalls', 'provider_calls'],
+  apiCalls: ['apiCalls', 'api_calls'],
+  trueRecordMemoryCalls: ['trueRecordMemoryCalls', 'true_record_memory_calls'],
+  trueSearchMemoryCalls: ['trueSearchMemoryCalls', 'true_search_memory_calls'],
+  realMemoryReads: ['realMemoryReads', 'real_memory_reads'],
+  rawJsonlReads: ['rawJsonlReads', 'raw_jsonl_reads'],
+  rawAuditReads: ['rawAuditReads', 'raw_audit_reads'],
+  durableMemoryWrites: ['durableMemoryWrites', 'durable_memory_writes'],
+  durableAuditWrites: ['durableAuditWrites', 'durable_audit_writes'],
+  governedActionExecutions: ['governedActionExecutions', 'governed_action_executions'],
+  cleanupApplyRuns: ['cleanupApplyRuns', 'cleanup_apply_runs'],
+  rollbackApplyRuns: ['rollbackApplyRuns', 'rollback_apply_runs'],
+  publicMcpExpansions: ['publicMcpExpansions', 'public_mcp_expansions'],
+  configWatchdogStartupChanges: ['configWatchdogStartupChanges', 'config_watchdog_startup_changes'],
+  dependencyActions: ['dependencyActions', 'dependency_actions'],
+  readinessClaims: ['readinessClaims', 'readiness_claims'],
+  reliabilityClaims: ['reliabilityClaims', 'reliability_claims']
+});
+
+const REQUESTED_ACTION_ALIASES = Object.freeze({
+  executeGovernedAction: ['executeGovernedAction', 'execute_governed_action'],
+  writeDurableAudit: ['writeDurableAudit', 'write_durable_audit'],
+  writeDurableMemory: ['writeDurableMemory', 'write_durable_memory'],
+  readRealMemory: ['readRealMemory', 'read_real_memory'],
+  readRawAudit: ['readRawAudit', 'read_raw_audit'],
+  callProvider: ['callProvider', 'call_provider'],
+  expandPublicMcp: ['expandPublicMcp', 'expand_public_mcp'],
+  changeConfigWatchdogStartup: ['changeConfigWatchdogStartup', 'change_config_watchdog_startup'],
+  changeDependencies: ['changeDependencies', 'change_dependencies'],
+  claimReadiness: ['claimReadiness', 'claim_readiness'],
+  claimReliability: ['claimReliability', 'claim_reliability']
+});
+
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
@@ -111,6 +145,16 @@ function firstNormalizedString(...values) {
 
 function firstAliasString(source, aliases) {
   return firstNormalizedString(...aliases.map(alias => source[alias]));
+}
+
+function firstDefinedAliasValue(source = {}, aliases = []) {
+  const safeSource = isPlainObject(source) ? source : {};
+  for (const alias of aliases) {
+    if (!Object.prototype.hasOwnProperty.call(safeSource, alias)) continue;
+    const value = safeSource[alias];
+    if (value !== undefined && value !== null) return value;
+  }
+  return undefined;
 }
 
 function normalizeBoolean(value) {
@@ -148,15 +192,18 @@ function normalizeCounterMap(counters = {}) {
   const normalized = {};
 
   for (const key of REQUIRED_COUNTER_KEYS) {
-    normalized[key] = safeCounters[key];
+    const aliases = COUNTER_KEY_ALIASES[key] || [key];
+    normalized[key] = firstDefinedAliasValue(safeCounters, aliases);
   }
 
   return normalized;
 }
 
-function normalizeBooleanMap(value = {}, keys = []) {
+function normalizeBooleanMap(value = {}, aliasMap = {}) {
   const safeValue = isPlainObject(value) ? value : {};
-  return Object.fromEntries(keys.map(key => [key, normalizeBoolean(safeValue[key])]));
+  return Object.fromEntries(Object.entries(aliasMap).map(([key, aliases]) => {
+    return [key, normalizeBoolean(firstDefinedAliasValue(safeValue, aliases))];
+  }));
 }
 
 function containsForbiddenFragment(value) {
@@ -182,7 +229,9 @@ function identityMatches(identity = {}, packet = {}) {
 }
 
 function collectCounterBlockers(counters = {}) {
-  const safeCounters = isPlainObject(counters) ? counters : {};
+  const safeCounters = normalizeCounterMap(counters);
+  const rawCounters = isPlainObject(counters) ? counters : {};
+  const knownCounterAliases = new Set(Object.values(COUNTER_KEY_ALIASES).flat());
   const blockers = [];
 
   for (const key of REQUIRED_COUNTER_KEYS) {
@@ -198,8 +247,8 @@ function collectCounterBlockers(counters = {}) {
     }
   }
 
-  for (const [key, value] of Object.entries(safeCounters)) {
-    if (REQUIRED_COUNTER_KEYS.includes(key)) continue;
+  for (const [key, value] of Object.entries(rawCounters)) {
+    if (knownCounterAliases.has(key)) continue;
     const normalized = normalizeNonNegativeInteger(value);
     if (normalized === null) {
       blockers.push(`counter_${key}_unknown_malformed`);
@@ -298,19 +347,7 @@ function evaluateGovernanceRuntimeApprovalAuditLoop(input = {}) {
   const auditRefs = normalizeAuditRefs(safeInput.auditRefs);
   const sideEffectCounters = normalizeCounterMap(safeInput.sideEffectCounters);
   const blockers = [];
-  const requestedActions = normalizeBooleanMap(safeInput.requestedActions, [
-    'executeGovernedAction',
-    'writeDurableAudit',
-    'writeDurableMemory',
-    'readRealMemory',
-    'readRawAudit',
-    'callProvider',
-    'expandPublicMcp',
-    'changeConfigWatchdogStartup',
-    'changeDependencies',
-    'claimReadiness',
-    'claimReliability'
-  ]);
+  const requestedActions = normalizeBooleanMap(safeInput.requestedActions, REQUESTED_ACTION_ALIASES);
 
   if (mode !== REQUIRED_MODE) blockers.push('mode_must_be_governance_runtime_approval_audit_loop_review_only');
   if (source !== REQUIRED_SOURCE) blockers.push('source_must_be_temp_local_governance_loop_fixture');
