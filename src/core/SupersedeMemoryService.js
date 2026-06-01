@@ -98,6 +98,17 @@ function createPreviousSnapshotRef(record, fromStatus) {
   };
 }
 
+function normalizePairRecord(record = {}) {
+  if (!record || typeof record !== 'object') {
+    return record;
+  }
+  const memoryId = firstNormalizedString(record.memoryId, record.memory_id);
+  return {
+    ...record,
+    memoryId
+  };
+}
+
 function buildPairScopeMismatch(oldRecord, newRecord) {
   const oldScope = normalizeScopeTuple(oldRecord);
   const newScope = normalizeScopeTuple(newRecord);
@@ -259,7 +270,12 @@ class SupersedeMemoryService {
 
   async getPairRecords(oldMemoryId, newMemoryId) {
     const records = await this.shadowStore.getRecordsByIds([oldMemoryId, newMemoryId]);
-    const recordMap = new Map(records.map(record => [record.memoryId, record]));
+    const recordMap = new Map(
+      records
+        .map(normalizePairRecord)
+        .filter(record => record?.memoryId)
+        .map(record => [record.memoryId, record])
+    );
     return {
       oldRecord: recordMap.get(oldMemoryId) || null,
       newRecord: recordMap.get(newMemoryId) || null
