@@ -4,6 +4,18 @@ const { isRecallIsolated } = require('../core/RecallIsolationClassifier');
 const { stripMemoryMarkers } = require('../storage/DiaryStore');
 const { chunkText } = require('./chunkText');
 
+function firstNonEmptyString(...values) {
+  for (const value of values) {
+    const normalized = String(value || '').trim();
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function getRecordMemoryId(record) {
+  return firstNonEmptyString(record?.memoryId, record?.memory_id);
+}
+
 class ChunkIndexingService {
   constructor({ config, shadowStore, vectorStore }) {
     this.config = config;
@@ -12,6 +24,7 @@ class ChunkIndexingService {
   }
 
   async indexRecord(record) {
+    const memoryId = getRecordMemoryId(record);
     if (isRecallIsolated(record)) {
       await this.shadowStore.replaceChunksForRecord(record, []);
       return {
@@ -40,7 +53,7 @@ class ChunkIndexingService {
     const vectors = await this.vectorStore.getBatchEmbeddingsCached(chunkTexts, { inputKind: 'document' });
 
     const chunks = chunkTexts.map((text, index) => ({
-      chunkId: `${record.memoryId}:${index}:${this.createChunkDigest(text)}`,
+      chunkId: `${memoryId}:${index}:${this.createChunkDigest(text)}`,
       chunkIndex: index,
       text,
       vector: vectors[index] || this.vectorStore.embedText(text)

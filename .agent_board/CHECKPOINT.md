@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1316 Chunk Indexing Memory ID Alias Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test chunk-indexing memory id normalization hardening. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write outside temp-local tests, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `ChunkIndexingService` now normalizes record ids through first non-empty `memoryId/memory_id`.
+- Chunk id generation binds to the normalized id.
+- Shadow chunk replacement still receives the record object; downstream shadow-store id normalization from CM-1315 handles alias records.
+- Blank camel-case `memoryId` no longer masks populated `memory_id` during chunk id construction.
+- Isolated-record chunk cleanup remains preserved.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\recall-isolation-classification-runtime.test.js tests\memory-write-reliability-temp-local-evidence.test.js tests\memory-write-restart-durability-temp-local-evidence.test.js` passed `45/45`.
+- `npm test` passed `2842/2842`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1316 closeout.
+
+Next:
+
+- Verify fresh Git state before branch-sensitive work; if CM-1316 is committed, continue to the next runtime gap.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1315 SQLite Shadow Record ID Alias Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

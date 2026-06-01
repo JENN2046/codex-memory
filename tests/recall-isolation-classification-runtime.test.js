@@ -127,6 +127,38 @@ test('chunk indexing clears projection chunks for isolated records', async () =>
   assert.deepEqual(calls[0], { memoryId: 'mem-policy', chunks: [] });
 });
 
+test('chunk indexing normalizes memory_id aliases before chunk id generation', async () => {
+  const calls = [];
+  const service = new ChunkIndexingService({
+    config: { chunkMaxChars: 200, chunkOverlapChars: 0 },
+    shadowStore: {
+      async replaceChunksForRecord(record, chunks) {
+        calls.push({ memoryId: record.memory_id, chunks });
+      }
+    },
+    vectorStore: {
+      async getBatchEmbeddingsCached(texts) {
+        return texts.map(() => [1, 0]);
+      },
+      embedText() {
+        return [1, 0];
+      }
+    }
+  });
+
+  const result = await service.indexRecord(baseRecord({
+    memoryId: '',
+    memory_id: 'mem-chunk-snake',
+    content: 'chunk alias fallback content'
+  }));
+
+  assert.equal(result.chunkCount, 1);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].memoryId, 'mem-chunk-snake');
+  assert.equal(calls[0].chunks.length, 1);
+  assert.match(calls[0].chunks[0].chunkId, /^mem-chunk-snake:0:/);
+});
+
 test('candidate generator filters isolated chunks from fresh and cached candidates', async () => {
   const chunks = [
     {

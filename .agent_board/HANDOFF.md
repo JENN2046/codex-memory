@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1315 SQLITE_SHADOW_RECORD_ID_ALIAS_NORMALIZATION`.
+Goal: `CM-1316 CHUNK_INDEXING_MEMORY_ID_ALIAS_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing SQLite shadow-store record/chunk write memory-id alias normalization. Targeted shadow/sync/storage tests passed `28/28`; default `npm test` passed `2841/2841`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing chunk-indexing memory-id alias normalization before chunk id generation. Targeted chunk/write/restart tests passed `45/45`; default `npm test` passed `2842/2842`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -70,11 +70,13 @@ Changed scope since CM-1207:
 - `docs/CM1313_SQLITE_SHADOW_MEMORY_ID_INPUT_NORMALIZATION.md`
 - `docs/CM1314_VECTOR_INDEX_MEMORY_ID_ALIAS_NORMALIZATION.md`
 - `docs/CM1315_SQLITE_SHADOW_RECORD_ID_ALIAS_NORMALIZATION.md`
+- `docs/CM1316_CHUNK_INDEXING_MEMORY_ID_ALIAS_NORMALIZATION.md`
 - `src/recall/KnowledgeBaseSyncService.js`
 - `src/recall/CandidateGenerator.js`
 - `src/storage/CandidateCacheStore.js`
 - `src/storage/SqliteShadowStore.js`
 - `src/storage/VectorIndexStore.js`
+- `src/recall/ChunkIndexingService.js`
 - `src/recall/KnowledgeBaseRecallPipeline.js`
 - `tests/recall-isolation-classification-runtime.test.js`
 - `src/storage/AuditLogStore.js`
