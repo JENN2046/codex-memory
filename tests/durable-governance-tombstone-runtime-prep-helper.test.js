@@ -128,6 +128,17 @@ test('CM-0866 helper produces tombstone-first internal apply plan when runtime s
   assert.equal(plan.auditPlan.intentEvent.tombstone_reason, 'retention-expired');
   assert.equal(plan.auditPlan.committedEvent.audit_phase, 'committed');
   assert.equal(plan.auditPlan.committedEvent.mutation_applied, true);
+  assert.deepEqual(plan.auditPlan.committedEvent.previous_snapshot_ref, plan.auditPlan.intentEvent.previous_snapshot_ref);
+  assert.equal(plan.auditPlan.committedEvent.created_at, plan.auditPlan.intentEvent.created_at);
+  assert.equal(plan.auditPlan.committedEvent.reason, 'memory retired after tombstone governance review');
+  assert.equal(plan.auditPlan.committedEvent.evidence, 'fixture-backed tombstone runtime-prep');
+  assert.equal(plan.auditPlan.committedEvent.reversible, true);
+  assert.equal(plan.auditPlan.cancelledEvent.audit_phase, 'cancelled');
+  assert.deepEqual(plan.auditPlan.cancelledEvent.previous_snapshot_ref, plan.auditPlan.intentEvent.previous_snapshot_ref);
+  assert.equal(plan.auditPlan.cancelledEvent.created_at, plan.auditPlan.intentEvent.created_at);
+  assert.equal(plan.auditPlan.cancelledEvent.reason, 'memory retired after tombstone governance review');
+  assert.equal(plan.auditPlan.cancelledEvent.evidence, 'fixture-backed tombstone runtime-prep');
+  assert.equal(plan.auditPlan.cancelledEvent.reversible, true);
   assert.equal(plan.shadowUpdatePlan.options.expectedClientId, 'codex-desktop');
   assert.equal(plan.shadowUpdatePlan.options.expectedVisibility, 'private');
   assert.deepEqual(plan.shadowUpdatePlan.fieldChangesSqliteColumns, [

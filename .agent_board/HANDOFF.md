@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1323 MUTATION_AUDIT_PHASE_METADATA_PRESERVATION`.
+Goal: `CM-1324 TOMBSTONE_RUNTIME_PREP_AUDIT_PHASE_METADATA_PRESERVATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing validate/tombstone lifecycle mutation committed/cancelled audit phase metadata preservation. Targeted lifecycle mutation/audit tests passed `74/74`; default `npm test` passed `2852/2852`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing no-apply tombstone runtime-prep committed/cancelled audit phase metadata preservation. Targeted runtime-prep/projection tests passed `29/29`; default `npm test` passed `2852/2852`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -78,7 +78,9 @@ Changed scope since CM-1207:
 - `docs/CM1321_MUTATION_POLICY_STATUS_ALIAS_NORMALIZATION.md`
 - `docs/CM1322_MUTATION_AUDIT_SNAPSHOT_ALIAS_NORMALIZATION.md`
 - `docs/CM1323_MUTATION_AUDIT_PHASE_METADATA_PRESERVATION.md`
+- `docs/CM1324_TOMBSTONE_RUNTIME_PREP_AUDIT_PHASE_METADATA_PRESERVATION.md`
 - `src/core/DurableGovernanceShadowProjectionPreview.js`
+- `src/core/DurableGovernanceTombstoneRuntimePrepHelper.js`
 - `src/core/ValidateMemoryService.js`
 - `src/core/TombstoneMemoryService.js`
 - `src/core/SupersedeMemoryService.js`
