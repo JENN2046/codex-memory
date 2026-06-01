@@ -111,6 +111,27 @@ test('CM-0988 helper normalizes expected helper input fields', () => {
   assert.equal(JSON.stringify(input), before);
 });
 
+test('CM-1319 helper normalizes returned memory_id aliases before pair record lookup', () => {
+  const input = buildHelperInput();
+  const records = input.currentProjectionRecords.map(record => ({
+    ...record,
+    memoryId: '   ',
+    memory_id: record.memoryId
+  }));
+  const summary = previewMemorySupersedePairOutcome({
+    ...input,
+    currentProjectionRecords: records
+  });
+
+  assert.equal(summary.acceptedForPairOutcomePreview, true);
+  assert.equal(summary.pairOutcomePreview.oldMemoryId, 'memory-old-001');
+  assert.equal(summary.pairOutcomePreview.newMemoryId, 'memory-new-001');
+  assert.equal(summary.auditPlan.intentEvent.memory_id, 'memory-old-001');
+  assert.equal(summary.auditPlan.intentEvent.replacement_memory_id, 'memory-new-001');
+  assert.equal(summary.blockers.blockingFindings.includes('old_projection_record_missing'), false);
+  assert.equal(summary.blockers.blockingFindings.includes('new_projection_record_missing'), false);
+});
+
 test('CM-0988 helper does not perform implicit fixture reads', () => {
   const input = buildHelperInput();
   const originalReadFileSync = fs.readFileSync;

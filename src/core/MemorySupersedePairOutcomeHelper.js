@@ -27,6 +27,24 @@ function normalizeString(value) {
   return typeof value === 'string' ? redactSensitiveFragments(value.trim()) : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function normalizeProjectionRecordId(record = {}) {
+  if (!isPlainObject(record)) {
+    return record;
+  }
+  return {
+    ...record,
+    memoryId: firstNormalizedString(record.memoryId, record.memory_id)
+  };
+}
+
 function normalizeHelperInput(input = {}) {
   const safeInput = isPlainObject(input) ? input : {};
   const normalizedProjectionInput = normalizeDurableGovernanceShadowProjectionPreviewInput({
@@ -47,6 +65,7 @@ function normalizeHelperInput(input = {}) {
 
 function buildRecordMap(records) {
   return new Map(records
+    .map(normalizeProjectionRecordId)
     .filter(record => record.memoryId)
     .map(record => [record.memoryId, record]));
 }
