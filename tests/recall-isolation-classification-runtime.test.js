@@ -2036,6 +2036,55 @@ test('recall aggregation normalizes candidate id and source aliases', async () =
   assert.equal(aggregated[2].sourceFile, 'chunk-snake');
 });
 
+test('recall aggregation normalizes returned record memory_id aliases before record map lookup', async () => {
+  const pipeline = new KnowledgeBaseRecallPipeline({
+    compatibilitySyntaxAdapter: null,
+    timeExpressionParser: null,
+    tagMemoEngine: null,
+    candidateGenerator: null,
+    rerankService: null,
+    recallAuditService: null,
+    recallEnhancer: null,
+    knowledgeBaseSyncService: null,
+    shadowStore: {
+      async getRecordsByIds(ids) {
+        assert.deepEqual(ids, ['mem-record-snake']);
+        return [{
+          memoryId: '   ',
+          memory_id: 'mem-record-snake',
+          target: 'process',
+          title: 'Authoritative snake record',
+          content: 'Authoritative record content',
+          relativePath: 'process/authoritative-snake.md',
+          createdAt: '2026-06-01T00:00:00.000Z',
+          updatedAt: '2026-06-01T00:00:00.000Z',
+          tags: ['feature']
+        }];
+      }
+    }
+  });
+
+  const aggregated = await pipeline.aggregateCandidates({
+    includeContent: true,
+    candidates: [{
+      chunkId: 'chunk-record-snake',
+      memoryId: '',
+      memory_id: 'mem-record-snake',
+      target: 'process',
+      title: 'Chunk title should not win',
+      text: 'chunk fallback text',
+      score: 0.9,
+      source: 'rag'
+    }]
+  });
+
+  assert.equal(aggregated.length, 1);
+  assert.equal(aggregated[0].memoryId, 'mem-record-snake');
+  assert.equal(aggregated[0].title, 'Authoritative snake record');
+  assert.equal(aggregated[0].sourceFile, 'process/authoritative-snake.md');
+  assert.equal(aggregated[0].content, 'Authoritative record content');
+});
+
 test('recall pipeline abort should skip recall audit side effect', async () => {
   const controller = new AbortController();
   let auditRecordCount = 0;

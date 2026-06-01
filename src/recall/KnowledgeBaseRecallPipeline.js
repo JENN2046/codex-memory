@@ -43,6 +43,10 @@ function normalizeCandidateMemoryId(candidate = {}) {
   return firstCandidateValue(candidate?.memoryId, candidate?.memory_id);
 }
 
+function normalizeRecordMemoryId(record = {}) {
+  return firstCandidateValue(record?.memoryId, record?.memory_id);
+}
+
 function normalizeCandidateSourceFile(candidate = {}) {
   return firstCandidateValue(candidate?.sourceFile, candidate?.source_file);
 }
@@ -328,7 +332,10 @@ class KnowledgeBaseRecallPipeline {
     if (!noRawContentRead) {
       throwIfSearchMemoryAborted(signal);
       for (const record of await this.shadowStore.getRecordsByIds(memoryIds)) {
-        recordMap.set(record.memoryId, record);
+        const recordMemoryId = normalizeRecordMemoryId(record);
+        if (recordMemoryId) {
+          recordMap.set(recordMemoryId, record);
+        }
       }
       throwIfSearchMemoryAborted(signal);
     } else if (typeof this.shadowStore.getRecordsIsolationMap === 'function') {

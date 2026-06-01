@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1316 CHUNK_INDEXING_MEMORY_ID_ALIAS_NORMALIZATION`.
+Goal: `CM-1317 RECALL_AGGREGATION_RECORD_ID_ALIAS_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing chunk-indexing memory-id alias normalization before chunk id generation. Targeted chunk/write/restart tests passed `45/45`; default `npm test` passed `2842/2842`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing recall aggregation returned-record memory-id alias normalization before record-map lookup. Targeted recall tests passed `49/49`; default `npm test` passed `2843/2843`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -71,6 +71,7 @@ Changed scope since CM-1207:
 - `docs/CM1314_VECTOR_INDEX_MEMORY_ID_ALIAS_NORMALIZATION.md`
 - `docs/CM1315_SQLITE_SHADOW_RECORD_ID_ALIAS_NORMALIZATION.md`
 - `docs/CM1316_CHUNK_INDEXING_MEMORY_ID_ALIAS_NORMALIZATION.md`
+- `docs/CM1317_RECALL_AGGREGATION_RECORD_ID_ALIAS_NORMALIZATION.md`
 - `src/recall/KnowledgeBaseSyncService.js`
 - `src/recall/CandidateGenerator.js`
 - `src/storage/CandidateCacheStore.js`
