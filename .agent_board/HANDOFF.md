@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1327 GOVERNANCE_LOOP_PACKET_BOOLEAN_ALIAS_NORMALIZATION`.
+Goal: `CM-1328 REDLINE_A5_RECALL_PROOF_ENTRY_PLAN`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing review-only governance runtime approval/audit loop packet/audit boolean alias normalization. Targeted governance loop / aggregator tests passed `35/35`; default `npm test` passed `2855/2855`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after recording the next Red-line/A5 entry plan for true-live recall negative-control proof. Read-only current-facts preflight returned `RECALL_PROOF_EXECUTION_PREFLIGHT_BLOCKED_NOT_EXECUTED` because local `main` at `7c311c8d9a535a6f49c1c1673be59a8155c1bab4` differs from `origin/main` at `0a992a87808cb2f20f40da93edf9df8c6c7d4572` and the worktree has two untracked files. Approval line, stricter negative-control query family, internal proof seam, and boundary flags were bound. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -33,6 +33,7 @@ Changed scope since CM-1207:
 - `.agent_board/RUN_STATE.md`
 - `.agent_board/VALIDATION_LOG.md`
 - `.agent_board/AUTOPILOT_LEDGER.md`
+- `.agent_board/BLOCKERS.md`
 - `tests/http-no-token-search-rejection.test.js`
 - `tests/mcp-http.test.js`
 - `docs/CM1262_MEMORY_OVERVIEW_HTTP_CLIENT_CONTRACT.md`
@@ -82,6 +83,7 @@ Changed scope since CM-1207:
 - `docs/CM1325_GOVERNANCE_LOOP_ALIAS_NORMALIZATION.md`
 - `docs/CM1326_GOVERNANCE_LOOP_SIDE_EFFECT_ALIAS_NORMALIZATION.md`
 - `docs/CM1327_GOVERNANCE_LOOP_PACKET_BOOLEAN_ALIAS_NORMALIZATION.md`
+- `docs/CM1328_REDLINE_A5_RECALL_PROOF_ENTRY_PLAN.md`
 - `src/core/DurableGovernanceShadowProjectionPreview.js`
 - `src/core/DurableGovernanceTombstoneRuntimePrepHelper.js`
 - `src/core/GovernanceRuntimeApprovalAuditLoop.js`

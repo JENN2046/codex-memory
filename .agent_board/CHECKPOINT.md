@@ -1,5 +1,32 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1328 Red-Line A5 Recall Proof Entry Plan Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: docs/status-only Red-line/A5 entry plan plus read-only current-facts preflight. No live proof execution, `search_memory`, `record_memory`, provider/model/API call, service startup, raw memory or `.jsonl` read, durable memory/audit write, public MCP expansion, config/watchdog/startup change, remote action, cutover, readiness claim, or reliability claim.
+
+Result:
+
+- Next Red-line/A5 entry is fixed to the true-live recall negative-control proof path.
+- The current-facts preflight matched the implemented exact approval line, stricter negative-control query family, internal proof seam, and boundary flags.
+- The same preflight blocked execution because local `main` is not synced with `origin/main` and the worktree is not clean.
+- Observed heads: local `7c311c8d9a535a6f49c1c1673be59a8155c1bab4`; origin `0a992a87808cb2f20f40da93edf9df8c6c7d4572`.
+- `CLAUDE.md` and `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` remain untracked and untouched.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node src\cli\recall-proof-current-facts-preflight.js --json --pretty` returned `RECALL_PROOF_EXECUTION_PREFLIGHT_BLOCKED_NOT_EXECUTED`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1328 closeout.
+
+Next:
+
+- Before any live recall proof, reach clean synced `main`, rerun the read-only current-facts preflight, and require the implemented exact approval line.
+- Do not claim `memory recall reliable`, runtime readiness, RC readiness, cutover readiness, or personal dogfood readiness from this plan-only step.
+
 ## CM-1327 Governance Loop Packet Boolean Alias Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
