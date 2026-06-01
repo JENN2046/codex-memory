@@ -43,6 +43,13 @@ function deriveIsolationFamilyHints(...fields) {
   return [...families].join('|');
 }
 
+function normalizeMemoryIdList(memoryIds = []) {
+  const values = Array.isArray(memoryIds) ? memoryIds : [memoryIds];
+  return [...new Set(values
+    .map(value => (value == null ? '' : String(value).trim()))
+    .filter(Boolean))];
+}
+
 class SqliteShadowStore {
   constructor(config) {
     this.config = config;
@@ -830,7 +837,7 @@ class SqliteShadowStore {
 
   async getRecordsByIds(memoryIds = []) {
     await this.ensureReady();
-    const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
+    const uniqueIds = normalizeMemoryIdList(memoryIds);
     if (uniqueIds.length === 0) return [];
 
     const placeholders = uniqueIds.map(() => '?').join(',');
@@ -843,7 +850,7 @@ class SqliteShadowStore {
 
   async getRecordsScopeMap(memoryIds = []) {
     await this.ensureReady();
-    const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
+    const uniqueIds = normalizeMemoryIdList(memoryIds);
     if (uniqueIds.length === 0) return new Map();
 
     const placeholders = uniqueIds.map(() => '?').join(',');
@@ -866,7 +873,7 @@ class SqliteShadowStore {
 
   async getRecordsPolicyMap(memoryIds = []) {
     await this.ensureReady();
-    const uniqueIds = [...new Set(memoryIds.filter(Boolean))];
+    const uniqueIds = normalizeMemoryIdList(memoryIds);
     if (uniqueIds.length === 0) {
       return new Map();
     }
@@ -891,7 +898,7 @@ class SqliteShadowStore {
 
   async getRecordsIsolationMap(memoryIds = []) {
     await this.ensureReady();
-    const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
+    const uniqueIds = normalizeMemoryIdList(memoryIds);
     if (uniqueIds.length === 0) return new Map();
 
     this.refreshMemoryRecordColumnInfo();
@@ -933,7 +940,7 @@ class SqliteShadowStore {
 
   async getRecordsLifecycleStatusMap(memoryIds = []) {
     await this.ensureReady();
-    const uniqueIds = [...new Set(memoryIds.filter(Boolean))];
+    const uniqueIds = normalizeMemoryIdList(memoryIds);
     const result = {
       lifecycleColumnAvailable: false,
       statuses: new Map()
@@ -962,7 +969,7 @@ class SqliteShadowStore {
 
   async getRecordsLifecycleScopeGovernanceMap(memoryIds = []) {
     await this.ensureReady();
-    const uniqueIds = [...new Set((memoryIds || []).filter(Boolean))];
+    const uniqueIds = normalizeMemoryIdList(memoryIds);
     const result = {
       lifecycleColumnAvailable: false,
       records: new Map()

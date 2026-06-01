@@ -158,6 +158,54 @@ test('governance schema: upsertRecord writes and updates explicit scope fields',
   }
 });
 
+test('governance schema: lookup maps normalize memory id input lists', async () => {
+  const ctx = await createTempApp('codex-memory-governance-id-list-');
+  try {
+    const store = ctx.app.stores.shadowStore;
+    const memoryId = `scope-lookup-${Date.now()}`;
+    const now = new Date().toISOString();
+
+    await store.upsertRecord({
+      memoryId,
+      target: 'knowledge',
+      title: 'lookup normalization test',
+      content: 'testing memory id list normalization',
+      evidence: 'test case',
+      tags: ['feature'],
+      validated: true,
+      reusable: true,
+      sensitivity: 'internal',
+      projectId: 'project-a',
+      workspaceId: 'workspace-a',
+      clientId: 'codex',
+      taskId: 'task-a',
+      conversationId: 'conversation-a',
+      visibility: 'project',
+      retentionPolicy: 'permanent',
+      createdAt: now,
+      updatedAt: now
+    });
+
+    const noisyIds = [` ${memoryId} `, '', null, memoryId, '   '];
+    const records = await store.getRecordsByIds(noisyIds);
+    const scopeMap = await store.getRecordsScopeMap(noisyIds);
+    const policyMap = await store.getRecordsPolicyMap(noisyIds);
+    const isolationMap = await store.getRecordsIsolationMap(noisyIds);
+    const lifecycleStatusMap = await store.getRecordsLifecycleStatusMap(noisyIds);
+    const lifecycleScopeMap = await store.getRecordsLifecycleScopeGovernanceMap(noisyIds);
+
+    assert.equal(records.length, 1);
+    assert.equal(records[0].memoryId, memoryId);
+    assert.equal(scopeMap.get(memoryId).projectId, 'project-a');
+    assert.equal(policyMap.get(memoryId).clientId, 'codex');
+    assert.equal(isolationMap.get(memoryId).visibility, 'project');
+    assert.equal(lifecycleStatusMap.lifecycleColumnAvailable, false);
+    assert.equal(lifecycleScopeMap.records.get(memoryId).scope.taskId, 'task-a');
+  } finally {
+    await closeAndRemove(ctx);
+  }
+});
+
 test('governance schema: MCP schemas declare strict scope surfaces', () => {
   const recordTool = TOOL_DEFINITIONS.find(tool => tool.name === 'record_memory');
   const searchTool = TOOL_DEFINITIONS.find(tool => tool.name === 'search_memory');

@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1312 CANDIDATE_GENERATOR_CACHE_MEMORY_ID_ALIAS_FALLBACK`.
+Goal: `CM-1313 SQLITE_SHADOW_MEMORY_ID_INPUT_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing candidate-generator cache dependency memory id alias fallback. Targeted recall/cache tests passed `62/62`; default `npm test` passed `2838/2838`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing SQLite shadow-store batch memory-id input normalization. Targeted governance/policy/lifecycle/recall tests passed `55/55`; default `npm test` passed `2839/2839`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -67,9 +67,11 @@ Changed scope since CM-1207:
 - `docs/CM1310_KNOWLEDGE_BASE_SYNC_MEMORY_ID_ALIAS_FALLBACK.md`
 - `docs/CM1311_CANDIDATE_CACHE_GOVERNANCE_ENTRY_ID_ALIAS_FALLBACK.md`
 - `docs/CM1312_CANDIDATE_GENERATOR_CACHE_MEMORY_ID_ALIAS_FALLBACK.md`
+- `docs/CM1313_SQLITE_SHADOW_MEMORY_ID_INPUT_NORMALIZATION.md`
 - `src/recall/KnowledgeBaseSyncService.js`
 - `src/recall/CandidateGenerator.js`
 - `src/storage/CandidateCacheStore.js`
+- `src/storage/SqliteShadowStore.js`
 - `src/recall/KnowledgeBaseRecallPipeline.js`
 - `tests/recall-isolation-classification-runtime.test.js`
 - `src/storage/AuditLogStore.js`
