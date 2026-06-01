@@ -828,6 +828,43 @@ test('candidate cache store persists governance state entries per current finger
   }
 });
 
+test('candidate cache store normalizes governance entry memory_id aliases before persistence', async () => {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-governance-entry-alias-'));
+
+  try {
+    const store = new CandidateCacheStore({
+      enableCandidateCache: true,
+      candidateCachePath: path.join(tempDir, 'candidate-cache.json'),
+      embeddingFingerprint: 'test-fingerprint',
+      candidateCacheTtlMs: 60_000,
+      candidateCacheMaxEntries: 50
+    });
+
+    await store.setStoredGovernanceStateEntries('process', [
+      { memoryId: ' ', memory_id: 'mem-governance-snake-b', target: 'process', status: 'proposal' },
+      { memoryId: '', memory_id: 'mem-governance-snake-a', target: 'process', visibility: 'shared' },
+      { memoryId: ' ', memory_id: ' ', target: 'process', visibility: 'private' }
+    ]);
+
+    assert.deepEqual(await store.getStoredGovernanceStateEntries('process'), [
+      {
+        memoryId: 'mem-governance-snake-a',
+        memory_id: 'mem-governance-snake-a',
+        target: 'process',
+        visibility: 'shared'
+      },
+      {
+        memoryId: 'mem-governance-snake-b',
+        memory_id: 'mem-governance-snake-b',
+        target: 'process',
+        status: 'proposal'
+      }
+    ]);
+  } finally {
+    await fs.rm(tempDir, { recursive: true, force: true });
+  }
+});
+
 test('candidate cache store can clear current fingerprint entries and governance revisions for selected targets', async () => {
   const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-cache-targets-'));
 

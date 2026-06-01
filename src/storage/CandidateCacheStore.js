@@ -280,7 +280,8 @@ class CandidateCacheStore {
     }
     return entries
       .filter(entry => entry && typeof entry === 'object')
-      .map(entry => ({ ...entry }));
+      .map(entry => this.normalizeGovernanceStateEntry(entry))
+      .filter(Boolean);
   }
 
   async setStoredGovernanceStateRevision(target = 'both', revision = '') {
@@ -313,8 +314,9 @@ class CandidateCacheStore {
     const normalizedEntries = Array.isArray(entries)
       ? entries
         .filter(entry => entry && typeof entry === 'object')
-        .map(entry => ({ ...entry }))
-        .sort((left, right) => String(left.memoryId || '').localeCompare(String(right.memoryId || '')))
+        .map(entry => this.normalizeGovernanceStateEntry(entry))
+        .filter(Boolean)
+        .sort((left, right) => left.memoryId.localeCompare(right.memoryId))
       : null;
     const current = fingerprintMetadata.governanceStateEntriesByTarget[normalizedTarget] || null;
 
@@ -330,6 +332,29 @@ class CandidateCacheStore {
 
     await this.flush();
     return normalizedEntries;
+  }
+
+  normalizeGovernanceStateEntry(entry) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+      return null;
+    }
+    const memoryId = this.firstNonEmptyString(entry.memoryId, entry.memory_id);
+    if (!memoryId) {
+      return null;
+    }
+    return {
+      ...entry,
+      memoryId
+    };
+  }
+
+  firstNonEmptyString(...values) {
+    for (const value of values) {
+      if (value === null || value === undefined) continue;
+      const normalized = String(value).trim();
+      if (normalized) return normalized;
+    }
+    return '';
   }
 
   pruneExpiredEntries() {

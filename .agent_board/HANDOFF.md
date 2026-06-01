@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1310 KNOWLEDGE_BASE_SYNC_MEMORY_ID_ALIAS_FALLBACK`.
+Goal: `CM-1311 CANDIDATE_CACHE_GOVERNANCE_ENTRY_ID_ALIAS_FALLBACK`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing knowledge-base sync record id alias fallback. Targeted recall/sync tests passed `60/60`; default `npm test` passed `2836/2836`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing candidate-cache governance entry id alias fallback. Targeted cache/sync tests passed `52/52`; default `npm test` passed `2837/2837`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -65,7 +65,9 @@ Changed scope since CM-1207:
 - `docs/CM1308_SELECTED_AUDIT_LOG_ALIAS_FALLBACK.md`
 - `docs/CM1309_WRITE_AUDIT_ENTRY_ALIAS_FALLBACK.md`
 - `docs/CM1310_KNOWLEDGE_BASE_SYNC_MEMORY_ID_ALIAS_FALLBACK.md`
+- `docs/CM1311_CANDIDATE_CACHE_GOVERNANCE_ENTRY_ID_ALIAS_FALLBACK.md`
 - `src/recall/KnowledgeBaseSyncService.js`
+- `src/storage/CandidateCacheStore.js`
 - `src/recall/KnowledgeBaseRecallPipeline.js`
 - `tests/recall-isolation-classification-runtime.test.js`
 - `src/storage/AuditLogStore.js`
