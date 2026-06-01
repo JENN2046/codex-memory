@@ -39,8 +39,24 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function firstNormalizedString(...values) {
+  for (const value of values) {
+    const normalized = normalizeString(value);
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
 function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
+}
+
+function normalizePolicyStatus(policy = {}) {
+  return normalizeStatus(firstNormalizedString(
+    policy.status,
+    policy.lifecycleStatus,
+    policy.lifecycle_status
+  ));
 }
 
 function createEventId() {
@@ -263,7 +279,7 @@ class ValidateMemoryService {
       });
     }
 
-    const fromStatus = normalizeStatus(policy.status);
+    const fromStatus = normalizePolicyStatus(policy);
     if (!isAllowedTransition(fromStatus, 'active')) {
       return this.buildRejectedResult({
         reason: `validate_memory only allows proposal/stale -> active; current status is ${fromStatus || 'unknown'}.`,

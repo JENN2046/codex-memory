@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1320 SHADOW_PROJECTION_STATUS_ALIAS_NORMALIZATION`.
+Goal: `CM-1321 MUTATION_POLICY_STATUS_ALIAS_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing durable governance shadow projection preview status alias normalization before no-apply lifecycle guards. Targeted projection/supersede runtime-prep tests passed `29/29`; default `npm test` passed `2846/2846`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing validate/tombstone/supersede lifecycle mutation policy status alias normalization before transition guards. Targeted lifecycle mutation tests passed `56/56`; default `npm test` passed `2849/2849`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -75,8 +75,15 @@ Changed scope since CM-1207:
 - `docs/CM1318_SUPERSEDE_PAIR_RECORD_ID_ALIAS_NORMALIZATION.md`
 - `docs/CM1319_SUPERSEDE_PAIR_OUTCOME_RECORD_ID_ALIAS_NORMALIZATION.md`
 - `docs/CM1320_SHADOW_PROJECTION_STATUS_ALIAS_NORMALIZATION.md`
+- `docs/CM1321_MUTATION_POLICY_STATUS_ALIAS_NORMALIZATION.md`
 - `src/core/DurableGovernanceShadowProjectionPreview.js`
+- `src/core/ValidateMemoryService.js`
+- `src/core/TombstoneMemoryService.js`
+- `src/core/SupersedeMemoryService.js`
 - `tests/durable-governance-shadow-projection-preview.test.js`
+- `tests/validate-memory-runtime.test.js`
+- `tests/tombstone-memory-runtime.test.js`
+- `tests/supersede-memory-runtime.test.js`
 - `src/recall/KnowledgeBaseSyncService.js`
 - `src/recall/CandidateGenerator.js`
 - `src/storage/CandidateCacheStore.js`

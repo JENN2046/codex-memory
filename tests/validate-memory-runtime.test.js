@@ -177,6 +177,29 @@ test('validate_memory dry-run is default and does not mutate or audit', async ()
   });
 });
 
+test('validate_memory normalizes lifecycle status aliases from policy before transition guard', async () => {
+  await withService({
+    records: [{ memoryId: 'mem-1', status: 'proposal' }]
+  }, async ({ service, shadowStore }) => {
+    const readPolicy = shadowStore.getRecordValidationPolicy.bind(shadowStore);
+    shadowStore.getRecordValidationPolicy = async memoryId => {
+      const policy = await readPolicy(memoryId);
+      return {
+        ...policy,
+        status: '   ',
+        lifecycleStatus: '   ',
+        lifecycle_status: policy.status
+      };
+    };
+
+    const result = await service.validate(validatePayload());
+
+    assert.equal(result.decision, 'dry-run');
+    assert.equal(result.fromStatus, 'proposal');
+    assert.equal(result.auditEventPreview.from_status, 'proposal');
+  });
+});
+
 test('validate_memory writes pending audit before lifecycle mutation', async () => {
   await withService({
     records: [{ memoryId: 'mem-1', status: 'proposal' }]

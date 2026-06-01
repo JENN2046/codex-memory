@@ -7,14 +7,14 @@
 | Branch | main |
 | Last observed HEAD | not pinned in this file after commit/push; run fresh checks below |
 | Last observed remote main | not pinned in this file after commit/push; run fresh checks below |
-| Current task | CM-1320 shadow projection status alias normalization completed/validated; commit state must be checked from fresh Git |
+| Current task | CM-1321 mutation policy status alias normalization completed/validated; commit state must be checked from fresh Git |
 | Current area | P10-observability-admin / P8-memory-governance / P0-mainline-health |
 | Current route | documentation-surface slimdown completed enough -> A5/P66 runtime gap closure preflight -> personal RC dogfood later |
 | Current status | `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED` |
 | Active entrypoints | `README.md`; `STATUS.md`; `CODEX_MEMORY_NEXT_PHASE_PLAN.md`; `.agent_board/TASK_QUEUE.md`; `.agent_board/VALIDATION_LOG.md` |
 | Historical archive index | `docs/archive/CM1203_STATUS_SURFACE_ARCHIVE_INDEX.md`; `docs/archive/CM1204_MAINTENANCE_BACKLOG_ARCHIVE_INDEX.md`; `docs/archive/CM1205_MEMORY_ARCHIVE_INDEX.md` |
 | Untracked files left untouched | `CLAUDE.md`; `docs/CURRENT_FACTS_SINGLE_SOURCE_PLAN.md` |
-| Runtime/source touched by current task | `src/core/DurableGovernanceShadowProjectionPreview.js`; projection preview status now uses normalized `status/lifecycleStatus/lifecycle_status` |
+| Runtime/source touched by current task | `src/core/ValidateMemoryService.js`; `src/core/TombstoneMemoryService.js`; `src/core/SupersedeMemoryService.js`; mutation policy status now uses normalized `status/lifecycleStatus/lifecycle_status` |
 | Provider/API calls by current task | no |
 | Real memory tools by current task | no |
 | Durable memory/audit writes by current task | no |
@@ -24,7 +24,7 @@
 
 ## Next Safe Action
 
-CM-1320 fixes durable governance shadow projection preview status normalization so blank camel-case `status` in projection records does not mask `lifecycleStatus/lifecycle_status` before no-apply lifecycle guards. It does not execute live write/recall, read real memory/store/jsonl, call providers/MCP, change config/watchdog/startup, expand public MCP, or claim readiness. Targeted projection/supersede runtime-prep tests passed `29/29`; default `npm test` passed `2846/2846`. Next safe action is to verify fresh Git state; if CM-1320 is already committed, continue to the next runtime gap, otherwise commit the validated scope.
+CM-1321 fixes validate/tombstone/supersede lifecycle mutation policy status normalization so blank camel-case `status` in policy results does not mask `lifecycleStatus/lifecycle_status` before transition guards. It does not execute live write/recall, read real memory/store/jsonl, call providers/MCP, change config/watchdog/startup, expand public MCP, or claim readiness. Targeted lifecycle mutation tests passed `56/56`; default `npm test` passed `2849/2849`. Next safe action is to verify fresh Git state; if CM-1321 is already committed, continue to the next runtime gap, otherwise commit the validated scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

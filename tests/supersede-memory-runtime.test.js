@@ -192,6 +192,34 @@ test('supersede_memory dry-run is default and does not mutate or audit', async (
   });
 });
 
+test('supersede_memory normalizes lifecycle status aliases from policies before transition guards', async () => {
+  await withService({
+    records: [
+      { memoryId: 'mem-old', status: 'active', title: 'Old memory' },
+      { memoryId: 'mem-new', status: 'proposal', title: 'New memory' }
+    ]
+  }, async ({ service, shadowStore }) => {
+    const readPolicy = shadowStore.getRecordValidationPolicy.bind(shadowStore);
+    shadowStore.getRecordValidationPolicy = async memoryId => {
+      const policy = await readPolicy(memoryId);
+      return {
+        ...policy,
+        status: '   ',
+        lifecycleStatus: '   ',
+        lifecycle_status: policy.status
+      };
+    };
+
+    const result = await service.supersede(supersedePayload());
+
+    assert.equal(result.decision, 'dry-run');
+    assert.equal(result.oldFromStatus, 'active');
+    assert.equal(result.newFromStatus, 'proposal');
+    assert.equal(result.auditPlanPreview.pendingEvent.old_from_status, 'active');
+    assert.equal(result.auditPlanPreview.pendingEvent.new_from_status, 'proposal');
+  });
+});
+
 test('supersede_memory writes pending audit before pair mutation', async () => {
   await withService({
     records: [

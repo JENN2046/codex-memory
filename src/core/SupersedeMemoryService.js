@@ -67,6 +67,14 @@ function normalizeStatus(value) {
   return normalizeString(value).toLowerCase();
 }
 
+function normalizePolicyStatus(policy = {}) {
+  return normalizeStatus(firstNormalizedString(
+    policy.status,
+    policy.lifecycleStatus,
+    policy.lifecycle_status
+  ));
+}
+
 function normalizeScopeTuple(record = {}) {
   return {
     projectId: firstNormalizedString(record.projectId, record.project_id),
@@ -417,8 +425,8 @@ class SupersedeMemoryService {
       });
     }
 
-    const oldFromStatus = normalizeStatus(oldPolicy.status);
-    const newFromStatus = normalizeStatus(newPolicy.status);
+    const oldFromStatus = normalizePolicyStatus(oldPolicy);
+    const newFromStatus = normalizePolicyStatus(newPolicy);
     if (!isAllowedTransition(ALLOWED_OLD_TRANSITIONS, oldFromStatus, 'superseded')) {
       return this.buildRejectedResult({
         reason: `supersede_memory only allows old record active/stale -> superseded; current old status is ${oldFromStatus || 'unknown'}.`,
