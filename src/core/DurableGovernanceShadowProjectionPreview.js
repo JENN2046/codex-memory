@@ -62,7 +62,11 @@ function normalizeProjectionRecord(record = {}) {
   const safeRecord = isPlainObject(record) ? record : {};
   return {
     memoryId: firstNormalizedString(safeRecord.memoryId, safeRecord.memory_id),
-    status: normalizeStatus(safeRecord.status),
+    status: normalizeStatus(firstNormalizedString(
+      safeRecord.status,
+      safeRecord.lifecycleStatus,
+      safeRecord.lifecycle_status
+    )),
     statusReason: firstNormalizedString(safeRecord.statusReason, safeRecord.status_reason),
     projectId: firstNormalizedString(safeRecord.projectId, safeRecord.project_id),
     workspaceId: firstNormalizedString(safeRecord.workspaceId, safeRecord.workspace_id),

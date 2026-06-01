@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1319 SUPERSEDE_PAIR_OUTCOME_RECORD_ID_ALIAS_NORMALIZATION`.
+Goal: `CM-1320 SHADOW_PROJECTION_STATUS_ALIAS_NORMALIZATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` after fixing supersede pair outcome preview record-id alias normalization before no-apply pair/audit-plan preview. Targeted supersede preview/runtime tests passed `35/35`; default `npm test` passed `2845/2845`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` after fixing durable governance shadow projection preview status alias normalization before no-apply lifecycle guards. Targeted projection/supersede runtime-prep tests passed `29/29`; default `npm test` passed `2846/2846`. This handoff does not pin a post-sync SHA; verify commit state with fresh Git before branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 
@@ -74,6 +74,9 @@ Changed scope since CM-1207:
 - `docs/CM1317_RECALL_AGGREGATION_RECORD_ID_ALIAS_NORMALIZATION.md`
 - `docs/CM1318_SUPERSEDE_PAIR_RECORD_ID_ALIAS_NORMALIZATION.md`
 - `docs/CM1319_SUPERSEDE_PAIR_OUTCOME_RECORD_ID_ALIAS_NORMALIZATION.md`
+- `docs/CM1320_SHADOW_PROJECTION_STATUS_ALIAS_NORMALIZATION.md`
+- `src/core/DurableGovernanceShadowProjectionPreview.js`
+- `tests/durable-governance-shadow-projection-preview.test.js`
 - `src/recall/KnowledgeBaseSyncService.js`
 - `src/recall/CandidateGenerator.js`
 - `src/storage/CandidateCacheStore.js`

@@ -1,5 +1,31 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1320 Shadow Projection Status Alias Normalization Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-01
+
+Scope: local source/test durable governance shadow projection status alias normalization. No live recall/write execution, real memory/store/jsonl read, provider call, MCP external call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `DurableGovernanceShadowProjectionPreview` now normalizes projection record status through first non-empty `status/lifecycleStatus/lifecycle_status`.
+- No-apply tombstone/supersede projection preview can accept object-model records with blank `status` and populated lifecycle status alias.
+- Lifecycle guards and SQLite-column preview output bind the normalized status.
+- Readiness posture remains unchanged: `runtimeReady=false`, `finalRcMatrixReady=false`, `rcReady=false`.
+
+Validation:
+
+- `node --test tests\durable-governance-shadow-projection-preview.test.js tests\memory-supersede-pair-outcome-helper.test.js tests\memory-supersede-runtime-prep-helper.test.js tests\durable-governance-tombstone-runtime-prep-helper.test.js` passed `29/29`.
+- `npm test` passed `2846/2846`.
+- `git diff --check`, ledger consistency, docs validation, and changed-scope review are part of CM-1320 closeout.
+
+Next:
+
+- Verify fresh Git state before branch-sensitive work; if CM-1320 is committed, continue to the next runtime gap.
+- Fresh live client refresh, runtime readiness, write reliability, recall reliability, rollback readiness, and RC readiness remain unclaimed.
+
 ## CM-1319 Supersede Pair Outcome Record ID Alias Normalization Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -463,3 +463,37 @@ test('CM-1299 helper falls through blank projection visibility and scope tuple f
   assert.deepEqual(targetRecord.scopeMismatchKeys, []);
   assert.deepEqual(summary.blockers.blockingFindings, []);
 });
+
+test('CM-1320 helper falls through blank projection status to lifecycle status aliases', () => {
+  const sqliteStyleRecords = loadProjectionRecordsFixture().map(record => ({
+    memoryId: record.memoryId,
+    status: '   ',
+    lifecycleStatus: '   ',
+    lifecycle_status: record.status,
+    statusReason: record.statusReason,
+    projectId: record.projectId,
+    workspaceId: record.workspaceId,
+    clientId: record.clientId,
+    taskId: record.taskId,
+    conversationId: record.conversationId,
+    visibility: record.visibility,
+    retentionPolicy: record.retentionPolicy,
+    supersededBy: record.supersededBy,
+    supersedes: record.supersedes,
+    tombstoneReason: record.tombstoneReason,
+    lifecycleUpdatedAt: record.lifecycleUpdatedAt,
+    lifecycleActorClientId: record.lifecycleActorClientId
+  }));
+  const summary = previewDurableGovernanceShadowProjection({
+    dryRunInput: buildTombstoneDryRunInput(),
+    currentProjectionRecords: sqliteStyleRecords,
+    previewedAt: '2026-06-01T08:35:00.000Z'
+  });
+
+  assert.equal(summary.acceptedForProjectionPreview, true);
+  const targetRecord = summary.projectionResult.affectedRecords[0];
+  assert.equal(targetRecord.before.status, 'stale');
+  assert.equal(targetRecord.beforeSqliteColumns.status, 'stale');
+  assert.equal(targetRecord.after.status, 'tombstoned');
+  assert.deepEqual(summary.blockers.blockingFindings, []);
+});
