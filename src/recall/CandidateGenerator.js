@@ -15,6 +15,19 @@ function clampLimit(limit, fallback, max) {
   return Math.max(1, Math.min(max, parsed));
 }
 
+function firstNonEmptyString(...values) {
+  for (const value of values) {
+    if (value === null || value === undefined) continue;
+    const normalized = String(value).trim();
+    if (normalized) return normalized;
+  }
+  return '';
+}
+
+function normalizeCandidateMemoryId(candidate) {
+  return firstNonEmptyString(candidate?.memoryId, candidate?.memory_id);
+}
+
 class CandidateGenerator {
   constructor({ config, shadowStore, vectorStore, tagMemoEngine, candidateCacheStore = null }) {
     this.config = config;
@@ -150,7 +163,7 @@ class CandidateGenerator {
       }, {
         target,
         memoryIds: [...new Set([...semanticCandidates, ...timeCandidates]
-          .map(candidate => candidate?.memoryId)
+          .map(candidate => normalizeCandidateMemoryId(candidate))
           .filter(Boolean))]
       });
     }
@@ -287,7 +300,7 @@ class CandidateGenerator {
     return {
       chunkId: chunk.chunkId,
       chunkIndex: chunk.chunkIndex,
-      memoryId: chunk.memoryId,
+      memoryId: normalizeCandidateMemoryId(chunk),
       target: chunk.target,
       title: chunk.title,
       text: compactText(stripMemoryMarkers(chunk.text)),

@@ -217,6 +217,71 @@ test('candidate generator filters isolated chunks from fresh and cached candidat
   assert.deepEqual(cached.semanticCandidates.map(item => item.memoryId), ['mem-normal']);
 });
 
+test('candidate generator normalizes chunk memory_id aliases before cache dependency write', async () => {
+  let cachedMetadata = null;
+  const generator = new CandidateGenerator({
+    config: {
+      defaultSearchLimit: 5,
+      maxSearchLimit: 10,
+      candidatePoolMultiplier: 1,
+      rerankMultiplier: 1,
+      embeddingFingerprint: 'test'
+    },
+    shadowStore: {
+      async listChunks() {
+        return [{
+          chunkId: 'normal-snake',
+          memoryId: '  ',
+          memory_id: 'mem-candidate-snake',
+          target: 'process',
+          title: 'Alpha feature',
+          text: 'alpha implementation detail',
+          tags: ['feature'],
+          vector: [1, 0],
+          createdAt: '2026-05-19T00:00:00.000Z',
+          updatedAt: '2026-05-19T00:00:00.000Z'
+        }];
+      }
+    },
+    vectorStore: {
+      async getSingleEmbeddingCached() {
+        return [1, 0];
+      },
+      getDiaryVector() {
+        return null;
+      }
+    },
+    tagMemoEngine: {
+      scoreRecord() {
+        return {
+          boost: 0,
+          normalizedScore: 0,
+          matchedTags: [],
+          matchedCoreTags: []
+        };
+      }
+    },
+    candidateCacheStore: {
+      async get() {
+        return null;
+      },
+      async set(_key, _value, metadata) {
+        cachedMetadata = metadata;
+      }
+    }
+  });
+
+  const result = await generator.generate({
+    queryText: 'alpha',
+    queryAnalysis: { queryText: 'alpha', tokens: ['alpha'], timeRanges: [] },
+    directives: {},
+    limit: 5
+  });
+
+  assert.deepEqual(result.semanticCandidates.map(item => item.memoryId), ['mem-candidate-snake']);
+  assert.deepEqual(cachedMetadata.memoryIds, ['mem-candidate-snake']);
+});
+
 test('candidate generator abort should skip candidate cache write side effect', async () => {
   const controller = new AbortController();
   let cacheSetCount = 0;
