@@ -14,6 +14,7 @@ const {
   VALIDATION_EVIDENCE_SOURCE_CLASSES,
   VALIDATION_EVIDENCE_SOURCE_TYPES,
   RUNTIME_EVIDENCE_SUMMARY_STATUSES,
+  buildRc9MarkdownAudit,
   buildRc9DecisionPacketFromAggregatorReport,
   buildV1RcValidationAggregatorReport,
   normalizeValidationEvidenceSources,
@@ -3601,6 +3602,73 @@ test('RC-9 decision packet render keeps zero-gap reports blocked before cutover 
   assert.equal(invalidRender.markdownAuditCanClaimReadiness, false);
   assert.equal(invalidRender.markdown.includes('rc_ready = false'), true);
   assertNoSensitiveSurface({ ...zeroGapReport, rc9DecisionPacketRender: zeroGapRender });
+});
+
+test('RC-9 markdown audit fails closed when required sections or fragments are missing', () => {
+  const missingRouteAndCutover = buildRc9MarkdownAudit([
+    '# RC-9 RC Decision Packet',
+    '',
+    '## Remaining Gaps',
+    'remaining_gap_count = 0',
+    '',
+    '## Not Executed',
+    '- rc_cutover',
+    '- tag_creation',
+    '- release_creation',
+    '- deploy',
+    '- push',
+    '',
+    '## Rollback Path',
+    '- leave_local_commits_in_place',
+    '- create_backup_branch_before_future_history_operation',
+    '- use_non_destructive_git_review_commands',
+    '',
+    '## Completeness Checklist',
+    '- fresh_current_head',
+    '- strict_gate',
+    '- live_http_no_write',
+    '- governance_runtime',
+    '- recall_isolation',
+    '- migration_dry_run',
+    '- validation_aggregator_zero_gap',
+    '- not_executed_boundary',
+    '- rollback_path',
+    '',
+    '## Boundary',
+    '- decision packet only',
+    '- no release tag deploy push',
+    '- no config watchdog startup change',
+    '- no durable memory or audit write',
+    '- no MCP tool call',
+    '- no provider call',
+    '- no RC cutover',
+    '- no readiness claim'
+  ].join('\n'));
+
+  assert.equal(
+    missingRouteAndCutover.status,
+    'markdown_sections_incomplete_manual_review_required'
+  );
+  assert.equal(missingRouteAndCutover.sectionCount, 7);
+  assert.equal(missingRouteAndCutover.acceptedSectionCount, 5);
+  assert.equal(missingRouteAndCutover.missingSectionCount, 2);
+  assert.deepEqual(missingRouteAndCutover.missingSectionIds, [
+    'route',
+    'cutover_approval_boundary'
+  ]);
+  assert.deepEqual(
+    missingRouteAndCutover.sections
+      .filter(section => section.accepted !== true)
+      .map(section => [section.id, section.missingFragmentCount]),
+    [
+      ['route', 7],
+      ['cutover_approval_boundary', 9]
+    ]
+  );
+  assert.equal(missingRouteAndCutover.approvalGenerated, false);
+  assert.equal(missingRouteAndCutover.approvalAccepted, false);
+  assert.equal(missingRouteAndCutover.approvalExecuted, false);
+  assert.equal(missingRouteAndCutover.canClaimReadiness, false);
 });
 
 test('RC-9 decision packet fails closed when remaining gaps lack closure audit authority rows', () => {

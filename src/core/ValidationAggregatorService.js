@@ -5389,6 +5389,124 @@ function buildRc9DecisionPacketFromAggregatorReport(report = null) {
   };
 }
 
+function buildRc9MarkdownAudit(markdown = '') {
+  const renderedMarkdown = typeof markdown === 'string' ? markdown : '';
+  const markdownAuditSections = [
+    {
+      id: 'route',
+      requiredFragments: [
+        '## Route',
+        'ready_to_request_rc_cutover_approval =',
+        'rc_ready = false',
+        'rc_cutover_approved = false',
+        'rc_cutover_execution_allowed = false',
+        'route_approval_hint_audit_status =',
+        'route_approval_hint_can_claim_readiness = false'
+      ]
+    },
+    {
+      id: 'remaining_gaps',
+      requiredFragments: [
+        '## Remaining Gaps',
+        'remaining_gap_count ='
+      ]
+    },
+    {
+      id: 'not_executed',
+      requiredFragments: [
+        '## Not Executed',
+        '- rc_cutover',
+        '- tag_creation',
+        '- release_creation',
+        '- deploy',
+        '- push'
+      ]
+    },
+    {
+      id: 'rollback_path',
+      requiredFragments: [
+        '## Rollback Path',
+        '- leave_local_commits_in_place',
+        '- create_backup_branch_before_future_history_operation',
+        '- use_non_destructive_git_review_commands'
+      ]
+    },
+    {
+      id: 'cutover_approval_boundary',
+      requiredFragments: [
+        '## Cutover Approval Boundary',
+        'exact_approval_required = true',
+        'approval_present = false',
+        'approval_packet_accepted = false',
+        'execution_performed = false',
+        '- commit',
+        '- remote_release_tag_deploy_action_list',
+        '- config_watchdog_startup_change_scope',
+        '- rollback_path',
+        '- validation_commands'
+      ]
+    },
+    {
+      id: 'completeness_checklist',
+      requiredFragments: [
+        '## Completeness Checklist',
+        '- fresh_current_head',
+        '- strict_gate',
+        '- live_http_no_write',
+        '- governance_runtime',
+        '- recall_isolation',
+        '- migration_dry_run',
+        '- validation_aggregator_zero_gap',
+        '- not_executed_boundary',
+        '- rollback_path'
+      ]
+    },
+    {
+      id: 'boundary',
+      requiredFragments: [
+        '## Boundary',
+        '- decision packet only',
+        '- no release tag deploy push',
+        '- no config watchdog startup change',
+        '- no durable memory or audit write',
+        '- no MCP tool call',
+        '- no provider call',
+        '- no RC cutover',
+        '- no readiness claim'
+      ]
+    }
+  ].map(section => {
+    const missingFragments = section.requiredFragments
+      .filter(fragment => !renderedMarkdown.includes(fragment));
+    return {
+      id: section.id,
+      requiredFragmentCount: section.requiredFragments.length,
+      missingFragmentCount: missingFragments.length,
+      missingFragments,
+      accepted: missingFragments.length === 0,
+      canClaimReadiness: false
+    };
+  });
+  const markdownAuditMissingSectionIds = markdownAuditSections
+    .filter(section => section.accepted !== true)
+    .map(section => section.id);
+  return {
+    status: markdownAuditMissingSectionIds.length === 0
+      ? 'markdown_sections_complete_not_authorization'
+      : 'markdown_sections_incomplete_manual_review_required',
+    sourceMode: 'rendered_markdown_fragments_only',
+    sectionCount: markdownAuditSections.length,
+    acceptedSectionCount: markdownAuditSections.length - markdownAuditMissingSectionIds.length,
+    missingSectionCount: markdownAuditMissingSectionIds.length,
+    missingSectionIds: markdownAuditMissingSectionIds,
+    approvalGenerated: false,
+    approvalAccepted: false,
+    approvalExecuted: false,
+    canClaimReadiness: false,
+    sections: markdownAuditSections
+  };
+}
+
 function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}) {
   const packet = buildRc9DecisionPacketFromAggregatorReport(report);
   const generatedAt = safeEvidenceString(options.generatedAt || new Date().toISOString(), 'unknown');
@@ -5482,120 +5600,7 @@ function renderRc9DecisionPacketFromAggregatorReport(report = null, options = {}
     '- no RC cutover',
     '- no readiness claim'
   ].join('\n');
-  const markdownAuditSections = [
-    {
-      id: 'route',
-      requiredFragments: [
-        '## Route',
-        'ready_to_request_rc_cutover_approval =',
-        'rc_ready = false',
-        'rc_cutover_approved = false',
-        'rc_cutover_execution_allowed = false',
-        'route_approval_hint_audit_status =',
-        'route_approval_hint_can_claim_readiness = false'
-      ]
-    },
-    {
-      id: 'remaining_gaps',
-      requiredFragments: [
-        '## Remaining Gaps',
-        'remaining_gap_count ='
-      ]
-    },
-    {
-      id: 'not_executed',
-      requiredFragments: [
-        '## Not Executed',
-        '- rc_cutover',
-        '- tag_creation',
-        '- release_creation',
-        '- deploy',
-        '- push'
-      ]
-    },
-    {
-      id: 'rollback_path',
-      requiredFragments: [
-        '## Rollback Path',
-        '- leave_local_commits_in_place',
-        '- create_backup_branch_before_future_history_operation',
-        '- use_non_destructive_git_review_commands'
-      ]
-    },
-    {
-      id: 'cutover_approval_boundary',
-      requiredFragments: [
-        '## Cutover Approval Boundary',
-        'exact_approval_required = true',
-        'approval_present = false',
-        'approval_packet_accepted = false',
-        'execution_performed = false',
-        '- commit',
-        '- remote_release_tag_deploy_action_list',
-        '- config_watchdog_startup_change_scope',
-        '- rollback_path',
-        '- validation_commands'
-      ]
-    },
-    {
-      id: 'completeness_checklist',
-      requiredFragments: [
-        '## Completeness Checklist',
-        '- fresh_current_head',
-        '- strict_gate',
-        '- live_http_no_write',
-        '- governance_runtime',
-        '- recall_isolation',
-        '- migration_dry_run',
-        '- validation_aggregator_zero_gap',
-        '- not_executed_boundary',
-        '- rollback_path'
-      ]
-    },
-    {
-      id: 'boundary',
-      requiredFragments: [
-        '## Boundary',
-        '- decision packet only',
-        '- no release tag deploy push',
-        '- no config watchdog startup change',
-        '- no durable memory or audit write',
-        '- no MCP tool call',
-        '- no provider call',
-        '- no RC cutover',
-        '- no readiness claim'
-      ]
-    }
-  ].map(section => {
-    const missingFragments = section.requiredFragments
-      .filter(fragment => !markdown.includes(fragment));
-    return {
-      id: section.id,
-      requiredFragmentCount: section.requiredFragments.length,
-      missingFragmentCount: missingFragments.length,
-      missingFragments,
-      accepted: missingFragments.length === 0,
-      canClaimReadiness: false
-    };
-  });
-  const markdownAuditMissingSectionIds = markdownAuditSections
-    .filter(section => section.accepted !== true)
-    .map(section => section.id);
-  const markdownAudit = {
-    status: markdownAuditMissingSectionIds.length === 0
-      ? 'markdown_sections_complete_not_authorization'
-      : 'markdown_sections_incomplete_manual_review_required',
-    sourceMode: 'rendered_markdown_fragments_only',
-    sectionCount: markdownAuditSections.length,
-    acceptedSectionCount: markdownAuditSections.length - markdownAuditMissingSectionIds.length,
-    missingSectionCount: markdownAuditMissingSectionIds.length,
-    missingSectionIds: markdownAuditMissingSectionIds,
-    approvalGenerated: false,
-    approvalAccepted: false,
-    approvalExecuted: false,
-    canClaimReadiness: false,
-    sections: markdownAuditSections
-  };
+  const markdownAudit = buildRc9MarkdownAudit(markdown);
 
   return {
     ...packet,
@@ -5620,6 +5625,7 @@ module.exports = {
   VALIDATION_EVIDENCE_SOURCE_TYPES,
   VALIDATION_EVIDENCE_STATUSES,
   RUNTIME_EVIDENCE_SUMMARY_STATUSES,
+  buildRc9MarkdownAudit,
   buildRc9DecisionPacketFromAggregatorReport,
   renderRc9DecisionPacketFromAggregatorReport,
   buildV1RcValidationAggregatorReport,
