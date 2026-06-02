@@ -106,6 +106,15 @@ function detectPhaseFEvidence(cwd) {
     evidence.f2A5Gap6AggregationAccepted = true;
   }
 
+  const f3Text = readTextIfExists(path.join(docsDir, 'CM1381_PHASE_F3_TRUE_LIVE_RECALL_NEGATIVE_CONTROL_EVIDENCE.md'));
+  if (
+    f3Text.includes('Status: `COMPLETED_VALIDATED_F3_ACCEPTED_NOT_READY`') &&
+    f3Text.includes('- F3 evidence accepted: `true`') &&
+    f3Text.includes('TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY')
+  ) {
+    evidence.f3TrueLiveRecallNegativeControlAccepted = true;
+  }
+
   return evidence;
 }
 

@@ -209,6 +209,62 @@ test('Phase F personal RC snapshot F3 approval template is head-bound and non-em
   assert.match(template, /no readiness or reliability claim/);
 });
 
+test('Phase F personal RC snapshot detects committed CM-1381 F3 evidence document', () => {
+  const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'phase-f-evidence-'));
+  const docsDir = path.join(workspace, 'docs');
+  fs.mkdirSync(docsDir, { recursive: true });
+  fs.writeFileSync(path.join(docsDir, 'CM1377_PHASE_F1_LIVE_NO_WRITE_ACCEPTED_EVIDENCE.md'), [
+    '# CM-1377 Phase F1 Live No-Write Accepted Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F1_ACCEPTED_NOT_READY`',
+    '',
+    'PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_CAPTURED_NOT_READY',
+    '',
+    '- F1 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+  fs.writeFileSync(path.join(docsDir, 'CM1379_PHASE_F2_A5_GAP6_AGGREGATION_EVIDENCE.md'), [
+    '# CM-1379 Phase F2 A5-GAP-6 Aggregation Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F2_ACCEPTED_NOT_READY`',
+    '',
+    'phase_f_f1_accepted_f2_aggregation_refresh_not_ready',
+    '',
+    '- F2 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+  fs.writeFileSync(path.join(docsDir, 'CM1381_PHASE_F3_TRUE_LIVE_RECALL_NEGATIVE_CONTROL_EVIDENCE.md'), [
+    '# CM-1381 Phase F3 True-Live Recall Negative-Control Evidence',
+    '',
+    'Status: `COMPLETED_VALIDATED_F3_ACCEPTED_NOT_READY`',
+    '',
+    'TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY',
+    '',
+    '- F3 evidence accepted: `true`'
+  ].join('\n'), 'utf8');
+
+  const evidence = detectPhaseFEvidence(workspace);
+  assert.equal(evidence.f1LiveNoWriteEvidenceAccepted, true);
+  assert.equal(evidence.f2A5Gap6AggregationAccepted, true);
+  assert.equal(evidence.f3TrueLiveRecallNegativeControlAccepted, true);
+
+  const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
+    syncPacket: {
+      branch: 'main',
+      currentHead: '4bbd27892d07159ebb9397701985e31507126a74',
+      originHead: '4bbd27892d07159ebb9397701985e31507126a74',
+      ahead: 0,
+      behind: 0,
+      worktreeClean: true
+    },
+    evidence
+  });
+
+  assert.equal(snapshot.phases[2].status, 'complete');
+  assert.equal(snapshot.blockingPhase.id, 'F4');
+  assert.equal(snapshot.nextRequiredAction, 'obtain_exact_minimal_dogfood_write_approval_after_f3');
+  assert.deepEqual(snapshot.missingPhases, ['F4', 'F5']);
+  assert.equal(snapshot.approvalTemplates.f3TrueLiveRecallTemplateCurrentlyUsable, false);
+});
+
 test('Phase F personal RC snapshot can represent personal dogfood ready without RC ready', () => {
   const snapshot = buildPhaseFPersonalRcReadinessSnapshot({
     syncPacket: {

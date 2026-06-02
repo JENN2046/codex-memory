@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1380 PHASE_F3_TRUE_LIVE_RECALL_APPROVAL_SURFACE`.
+Goal: `CM-1381 PHASE_F3_TRUE_LIVE_RECALL_NEGATIVE_CONTROL_EVIDENCE`.
 
-Status: `COMPLETED_VALIDATED_F3_APPROVAL_PACKET_SURFACED_NOT_READY` for local read-only Phase F3 approval surface preparation. F1 and F2 evidence are accepted and synced. Pre-edit `recall-proof-current-facts-preflight` was ready-not-executed on clean synced `main@171cfb14e70af8665d3349be6e0b02d0f119b7e1`; CM-1380 surfaces the F3 exact template dynamically through the Phase F snapshot. Because the CM-1380 commit moves `HEAD`, regenerate the exact approval line after commit/sync and use it only when `f3TrueLiveRecallTemplateCurrentlyUsable=true`. No F3 execution, `search_memory`, MCP/provider call, real memory/jsonl/raw audit read, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F3 requires the operator to send the fresh exact approval line before execution. F4/F5 must not proceed until F3 evidence is accepted. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_F3_ACCEPTED_NOT_READY` for exact-approved Phase F3 true-live recall negative-control evidence. F1, F2, and F3 evidence are accepted; F4 remains the blocking phase. The proof ran exactly four read-only `search_memory` calls through the internal runner/adapter path and all four stricter negative-control queries returned zero sanitized results with zero side-effect counters. No `record_memory`, provider call, raw memory/jsonl/raw audit read, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim occurred. F4 minimal personal dogfood write requires separate exact approval after CM-1381 is committed/synced. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

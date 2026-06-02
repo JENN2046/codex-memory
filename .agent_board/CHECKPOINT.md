@@ -1,5 +1,39 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1381 Phase F3 True-Live Recall Negative-Control Evidence Checkpoint
+
+Status: `COMPLETED_VALIDATED_F3_ACCEPTED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: exact-approved bounded read-only true-live recall negative-control proof on clean synced `main@4bbd27892d07159ebb9397701985e31507126a74`. No `record_memory`, provider call, raw memory/jsonl/raw audit read, durable write, config/watchdog/startup change, remote action, readiness claim, or reliability claim.
+
+Result:
+
+- `TrueLiveRecallReadonlyProofRunner` executed exactly four `search_memory` calls through `createTrueLiveRecallExecutorAdapter`.
+- Q1/Q2/Q3/Q4 all returned `resultCount=0`.
+- Decision: `TRUE_LIVE_REAL_STORE_RECALL_PROOF_PASSED_NOT_READY`.
+- All side-effect counters were zero.
+- Phase F snapshot now detects CM-1381 F3 evidence and blocks at F4.
+
+Validation:
+
+- Fresh Git preflight.
+- F3 current-facts preflight.
+- Exact-approved proof runner execution.
+- `node --check` for changed snapshot CLI/test.
+- Targeted Phase F snapshot tests.
+- Snapshot CLI self-check.
+- `git diff --check`.
+- Ledger consistency check.
+- Docs validation.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Sync if approved, then prepare/request exact F4 minimal personal dogfood write approval.
+- Do not proceed to F5 until F4 evidence is accepted.
+
 ## CM-1380 Phase F3 True-Live Recall Approval Surface Checkpoint
 
 Status: `COMPLETED_VALIDATED_F3_APPROVAL_PACKET_SURFACED_NOT_READY`
