@@ -23,6 +23,11 @@ const REQUIRED_ACTIVE_FILES = [
   ".agent_board/AUTOPILOT_LEDGER.md"
 ];
 
+const REQUIRED_DOC_REFERENCES = [
+  "README.md",
+  "DOCS_GOVERNANCE.md"
+];
+
 function readText(root, relativePath, failures) {
   const fullPath = path.join(root, relativePath);
   if (!fs.existsSync(fullPath)) {
@@ -186,6 +191,15 @@ function validateLatestIds(root, facts, failures) {
   }
 }
 
+function validateReferenceDocs(root, failures) {
+  for (const relativePath of REQUIRED_DOC_REFERENCES) {
+    const text = readText(root, relativePath, failures);
+    if (!text.includes(FACTS_PATH)) {
+      failures.push(`${relativePath} must reference ${FACTS_PATH}`);
+    }
+  }
+}
+
 function validateCurrentFactsDrift(root = process.cwd()) {
   const failures = [];
   const facts = readJson(root, FACTS_PATH, failures);
@@ -194,6 +208,7 @@ function validateCurrentFactsDrift(root = process.cwd()) {
     validateActiveBlocks(root, failures);
     validateActiveBlockBindings(root, facts, failures);
     validateLatestIds(root, facts, failures);
+    validateReferenceDocs(root, failures);
   }
   return { ok: failures.length === 0, failures, facts };
 }
@@ -214,6 +229,7 @@ module.exports = {
   ACTIVE_END,
   ACTIVE_START,
   FACTS_PATH,
+  REQUIRED_DOC_REFERENCES,
   REQUIRED_ACTIVE_FILES,
   extractActiveBlock,
   validateCurrentFactsDrift

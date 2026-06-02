@@ -10,6 +10,7 @@ const {
   ACTIVE_END,
   ACTIVE_START,
   FACTS_PATH,
+  REQUIRED_DOC_REFERENCES,
   REQUIRED_ACTIVE_FILES,
   validateCurrentFactsDrift
 } = require("../scripts/validate_current_facts_drift");
@@ -111,6 +112,9 @@ function workspace() {
       writeFile(root, relativePath, activeDoc(relativePath));
     }
   }
+  for (const relativePath of REQUIRED_DOC_REFERENCES) {
+    writeFile(root, relativePath, `# ${relativePath}\n\nCurrent facts source: \`${FACTS_PATH}\`.\n`);
+  }
   return root;
 }
 
@@ -165,4 +169,12 @@ test("current facts validator rejects active block task binding drift", () => {
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);
   assert.match(result.failures.join("\n"), /active block must include current facts taskId CM-1390/);
+});
+
+test("current facts validator rejects missing reference doc entry", () => {
+  const root = workspace();
+  writeFile(root, "DOCS_GOVERNANCE.md", "# Docs Governance\n\nNo current facts entry here.\n");
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /DOCS_GOVERNANCE\.md must reference \.agent_board\/CURRENT_FACTS\.json/);
 });
