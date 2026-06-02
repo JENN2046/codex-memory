@@ -91,6 +91,7 @@ function buildRejectedReport(rejectedFlag) {
         ...report.evidence.p24Aggregator,
         minimalCliWiring: true,
         decisionExitCodeSemantics: true,
+        rc9DecisionPacketEmbedded: true,
         rejectedFlagContractHardening: true
       }
     },
@@ -127,7 +128,8 @@ function buildCliReport(options = {}) {
       p24Aggregator: {
         ...report.evidence.p24Aggregator,
         minimalCliWiring: true,
-        decisionExitCodeSemantics: true
+        decisionExitCodeSemantics: true,
+        rc9DecisionPacketEmbedded: true
       }
     },
     recommendations: [

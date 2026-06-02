@@ -33,6 +33,15 @@ test('minimal validation aggregator CLI emits valid JSON and exits successfully'
   assert.equal(report.mode, 'read-only');
   assert.equal(report.evidence.p24Aggregator.minimalCliWiring, true);
   assert.equal(report.evidence.p24Aggregator.decisionExitCodeSemantics, true);
+  assert.equal(report.evidence.p24Aggregator.rc9DecisionPacketEmbedded, true);
+  assert.equal(report.summary.rc9DecisionPacketAvailable, true);
+  assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(report.summary.rc9DecisionPacketRcCutoverApproved, false);
+  assert.equal(report.summary.rc9DecisionPacketRcCutoverExecutionAllowed, false);
+  assert.equal(report.summary.rc9DecisionPacketCanClaimRcReady, false);
+  assert.equal(report.evidence.rc9DecisionPacket.decision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
+  assert.equal(report.evidence.rc9DecisionPacket.safety.remoteWrites, false);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.status, 'static_report_shape_added_not_executed');
   assert.equal(report.evidence.p36P40EvidenceSourceMap.localEvidenceReportAvailable, true);
   assert.equal(report.evidence.p36P40EvidenceSourceMap.localEvidenceReportReadyClaim, false);
@@ -101,6 +110,9 @@ test('minimal validation aggregator CLI preserves honest blocked decision', () =
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
   assert.equal(report.summary.rcReady, false);
+  assert.equal(report.summary.rc9DecisionPacketAvailable, true);
+  assert.equal(report.evidence.rc9DecisionPacket.rcCutoverExecutionAllowed, false);
+  assert.equal(report.evidence.rc9DecisionPacket.canClaimRcReady, false);
   assert.equal(report.evidence_sources.migration_import_export_approval_packet_cli.status, 'fixture_only_cli_added_not_executed');
 });
 
@@ -162,6 +174,8 @@ test('minimal validation aggregator CLI strict mode exits 1 for current blocked 
   assert.equal(report.summary.runtimeReady, false);
   assert.equal(report.summary.finalRcMatrixReady, false);
   assert.equal(report.summary.rcReady, false);
+  assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED');
+  assert.equal(report.evidence.rc9DecisionPacket.rcReady, false);
   assert.equal(report.evidence_sources.full_final_rc_matrix.status, 'not_executed');
   assert.equal(report.evidence_sources.p36_p40_evidence_source_map.status, 'static_report_shape_added_not_executed');
   assert.equal(report.evidence_sources.p53_validation_aggregator_evidence_inventory.status, 'static_report_shape_added_not_executed');
@@ -192,6 +206,8 @@ test('minimal validation aggregator CLI strict mode does not execute A5-gated ch
   assert.equal(report.safety.durableMemoryTouched, false);
   assert.equal(report.safety.migrationApplied, false);
   assert.equal(report.safety.importExportApplied, false);
+  assert.equal(report.evidence.p24Aggregator.rc9DecisionPacketEmbedded, true);
+  assert.equal(report.evidence.rc9DecisionPacket.safety.remoteWrites, false);
 });
 
 test('minimal validation aggregator CLI help mode exits 0 without JSON report or live checks', () => {
@@ -275,7 +291,11 @@ test('minimal validation aggregator CLI rejects live or side-effect flags', () =
       'memory_overview'
     ]);
     assert.ok(report.evidence_sources.decision, flag);
+    assert.equal(report.evidence.p24Aggregator.rc9DecisionPacketEmbedded, true, flag);
     assert.equal(report.evidence.p24Aggregator.rejectedFlagContractHardening, true, flag);
+    assert.equal(report.summary.rc9DecisionPacketDecision, 'RC_NOT_READY_BLOCKED', flag);
+    assert.equal(report.evidence.rc9DecisionPacket.rcReady, false, flag);
+    assert.equal(report.evidence.rc9DecisionPacket.rcCutoverExecutionAllowed, false, flag);
   }
 });
 
