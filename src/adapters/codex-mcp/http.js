@@ -430,6 +430,10 @@ function createStreamableHttpServer({
     return header === `Bearer ${bearerToken}`;
   }
 
+  function hasBearerHeader(req) {
+    return Boolean(getSingleHeaderValue(req.headers.authorization).trim());
+  }
+
   const cleanupTimer = setInterval(() => cleanupExpiredSessions(), sessionHardening.cleanupIntervalMs);
   if (typeof cleanupTimer.unref === 'function') {
     cleanupTimer.unref();
@@ -471,13 +475,22 @@ function createStreamableHttpServer({
         });
       }
 
-      if (!authorize(req)) {
+      const authorized = authorize(req);
+      const noTokenRequest = !authorized && bearerToken && !hasBearerHeader(req);
+
+      if (!authorized && !noTokenRequest) {
         return writeJson(res, 401, createUnauthorizedPayload(), {
           'WWW-Authenticate': 'Bearer'
         });
       }
 
-      if (!bearerToken) {
+      if (!authorized && req.method !== 'POST') {
+        return writeJson(res, 401, createUnauthorizedPayload(), {
+          'WWW-Authenticate': 'Bearer'
+        });
+      }
+
+      if (!authorized || !bearerToken) {
         const noTokenWriteRejection = validateNoTokenWriteRequest(req);
         if (noTokenWriteRejection) {
           return writeJson(res, 403, createForbiddenPayload(noTokenWriteRejection));
@@ -557,7 +570,7 @@ function createStreamableHttpServer({
         return writeJson(res, 400, jsonRpcError(null, -32600, 'Invalid Request', error.message));
       }
 
-      if (!bearerToken) {
+      if (!authorized || !bearerToken) {
         const noTokenJsonRpcRejection = validateNoTokenJsonRpcRequest(body);
         if (noTokenJsonRpcRejection) {
           const rejection = typeof noTokenJsonRpcRejection === 'string'
@@ -576,7 +589,7 @@ function createStreamableHttpServer({
         ...baseRequestContext,
         sessionId: requestSessionId || undefined,
         executionContext: defaultExecutionContext,
-        noTokenReadOnly: !bearerToken
+        noTokenReadOnly: !authorized || !bearerToken
       });
 
       if (result.sessionId) {

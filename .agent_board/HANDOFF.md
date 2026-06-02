@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1365 PHASE_F1_LIVE_NO_WRITE_REJECTED_EVIDENCE`.
+Goal: `CM-1366 AUTHENTICATED_HTTP_NO_TOKEN_CONTRACT_HARDENING`.
 
-Status: `BLOCKED_NOT_READY` for exact-approved F1 live no-write evidence. CM-1365 executed the bounded harness on clean synced `main@546915bec01fd8ffd0fd974f59b6fc95966218a4`; health, initialize, tools/list, and authorized overview succeeded, but evidence was rejected fail-closed because no-token overview did not return selected projection and no-token record/search rejections did not expose expected reason codes. It did not start services, call providers, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness/reliability. F1 remains blocked and F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local HTTP MCP contract hardening. CM-1366 fixes the bearer-configured missing-token JSON-RPC POST path so no-token `memory_overview` uses selected projection and no-token `record_memory/search_memory` expose expected rejection reason codes; invalid bearer tokens still receive unauthorized handling. Targeted HTTP tests, default `npm test`, and strict mainline gate passed. It did not rerun F1 live evidence, push, call providers, execute successful `record_memory`, execute authenticated `search_memory`, read raw memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, expand public MCP tools, or claim readiness/reliability. F1 remains blocked until fresh synced HEAD plus exact A5-GAP-4 approval bound to the new commit. F2/F3/F4/F5 must not proceed. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

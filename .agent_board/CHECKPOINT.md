@@ -1,5 +1,35 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1366 Authenticated HTTP No-Token Contract Hardening Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local HTTP MCP auth-contract source/test hardening. No push, F1 live rerun, successful `record_memory`, authenticated `search_memory`, raw memory/audit read, durable memory/audit write, provider call, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- `src/adapters/codex-mcp/http.js` now treats bearer-configured missing-token JSON-RPC POSTs as no-token read-only requests rather than broad unauthorized failures.
+- No-token `memory_overview` can return selected low-disclosure overview projection.
+- No-token `record_memory` and `search_memory` expose the expected structured rejection reason codes.
+- Invalid bearer-token requests remain unauthorized.
+- `tests/mcp-http.test.js` now locks the bearer-configured missing-token F1 regression boundary and isolates the HTTP helper from ambient external provider configuration.
+
+Validation:
+
+- `node --check src\adapters\codex-mcp\http.js`
+- `node --check tests\mcp-http.test.js`
+- `node --test tests\mcp-http.test.js tests\http-no-token-search-rejection.test.js` passed `29/29`.
+- `npm test` passed `2889/2889`.
+- `npm run gate:mainline:strict` passed health, contract, test, compare, and rollback.
+
+Next:
+
+- Commit locally if guarded conditions pass.
+- Do not proceed to F2/F3/F4/F5 until F1 live evidence is accepted.
+- Future F1 rerun requires fresh synced HEAD and exact A5-GAP-4 approval bound to the new commit.
+
 ## CM-1365 Phase F1 Live No-Write Rejected Evidence Checkpoint
 
 Status: `BLOCKED_NOT_READY`

@@ -40,6 +40,7 @@ async function withHttpServer(handler, serverOptions = {}, appOverrides = {}) {
     logsDir: path.join(tempBasePath, 'logs'),
     dataDir: path.join(tempBasePath, 'data'),
     httpPort: 0,
+    allowExternalProvider: false,
     ...appOverrides
   });
 
@@ -566,6 +567,95 @@ test('HTTP MCP no-token memory_overview should return selected safe overview wit
       app.services.overviewService.getOverview = originalGetOverview;
     }
   });
+});
+
+test('HTTP MCP bearer-configured missing-token tools/call should keep no-token contract', async () => {
+  await withHttpServer(async ({ app, address }) => {
+    const originalGetOverview = app.services.overviewService.getOverview;
+    app.services.overviewService.getOverview = async () => {
+      throw new Error('missing-token memory_overview must use selected overview projection');
+    };
+
+    try {
+      const overviewResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 111,
+          method: 'tools/call',
+          params: {
+            name: 'memory_overview',
+            arguments: {}
+          }
+        })
+      });
+      const overviewPayload = await overviewResponse.json();
+      const overview = overviewPayload.result.structuredContent;
+
+      assert.equal(overviewResponse.status, 200);
+      assert.equal(overviewPayload.result.isError, false);
+      assert.equal(overview.access.mode, 'no_token_selected_overview');
+      assert.equal(overview.access.selectedProjection, true);
+      assert.equal(overview.access.selectedProjectionVersion, 1);
+
+      const recordResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 112,
+          method: 'tools/call',
+          params: {
+            name: 'record_memory',
+            arguments: {
+              target: 'process',
+              title: 'missing-token blocked mutation',
+              content: 'blocked',
+              evidence: 'missing-token regression',
+              validated: true,
+              reusable: false,
+              sensitivity: 'none'
+            }
+          }
+        })
+      });
+      const recordPayload = await recordResponse.json();
+
+      assert.equal(recordResponse.status, 403);
+      assert.equal(recordPayload.error.data.code, 'NO_TOKEN_MUTATION_REJECTED');
+
+      const searchResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 113,
+          method: 'tools/call',
+          params: {
+            name: 'search_memory',
+            arguments: {
+              query: 'missing-token blocked search',
+              target: 'process',
+              limit: 3
+            }
+          }
+        })
+      });
+      const searchPayload = await searchResponse.json();
+
+      assert.equal(searchResponse.status, 403);
+      assert.equal(searchPayload.error.data.code, 'NO_TOKEN_SEARCH_REJECTED');
+    } finally {
+      app.services.overviewService.getOverview = originalGetOverview;
+    }
+  }, { bearerToken: 'test-token' });
 });
 
 test('HTTP MCP should execute memory_overview through authorized tools/call', async () => {
