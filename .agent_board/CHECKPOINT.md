@@ -1,5 +1,33 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1373 Phase F1 Live No-Write Rerun Rejected Checkpoint
+
+Status: `COMPLETED_WITH_BLOCKED_F1_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: exact-approved bounded F1 live-client no-write rerun plus local evidence recording. No provider call, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Fresh synced `main@dd5018dfbc564975e0e6a93aebdeba38821760a0` preflight passed.
+- Exact A5-GAP-4 approval verifier passed.
+- Bounded no-write harness executed.
+- Health, initialize, tools/list, and authenticated `memory_overview` succeeded.
+- Public tools remained exactly `memory_overview`, `record_memory`, `search_memory`.
+- Evidence was rejected fail-closed because no-token `memory_overview` selected projection and no-token record/search reason codes were not present.
+
+Validation:
+
+- Fresh Git preflight passed.
+- `npm run a5:approval-check` accepted the exact A5-GAP-4 line.
+- Exact-approved F1 harness returned `PHASE_F1_LIVE_CLIENT_NO_WRITE_EVIDENCE_REJECTED_FAIL_CLOSED`.
+
+Next:
+
+- Do not proceed to F2/F3/F4/F5.
+- Investigate local source/test/runtime-contract drift or request a separate exact operator decision for service freshness/runtime alignment.
+
 ## CM-1372 Phase F Snapshot Approval Template Surfacing Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`
