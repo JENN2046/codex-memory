@@ -39,7 +39,9 @@ Branch and HEAD values are intentionally not repeated here; read `.agent_board/C
 
 RC-1 current-head local baseline is recorded in `.agent_board/CHECKPOINT.md` for target commit `fe39bdc8e95fa34084ac179e3da2113e0ac7c538`: `npm test` passed, and `npm run gate:mainline` passed after local HTTP MCP was started with `npm run start:http:ensure`.
 
-Next safe local action is RC-2 preflight only: prepare an A5-GAP-5 strict-gate approval packet bound to a fresh `HEAD`. Do not run `npm run gate:mainline:strict`, live client operations, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+RC-2 preflight packet is prepared at `docs/RC2_A5_GAP5_STRICT_GATE_PREFLIGHT.md` for target commit `b482006eec09015c67a56b8fcd4e424d4bf6692c`.
+
+Next safe action is either review/commit this RC-2 preflight packet, or provide the exact A5-GAP-5 approval line from that packet. Do not run `npm run gate:mainline:strict`, live client operations, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

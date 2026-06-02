@@ -10,6 +10,29 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## RC-2 A5-GAP-5 Strict Gate Preflight
+
+Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_EXECUTED`
+
+Date: 2026-06-02
+
+Target commit: `b482006eec09015c67a56b8fcd4e424d4bf6692c`
+
+Packet: [docs/RC2_A5_GAP5_STRICT_GATE_PREFLIGHT.md](/A:/codex-memory/docs/RC2_A5_GAP5_STRICT_GATE_PREFLIGHT.md)
+
+Result:
+
+- Prepared exact A5-GAP-5 approval packet for the current RC route.
+- Allowed future command is only `npm run gate:mainline:strict`.
+- Required approval line is bound to target commit `b482006eec09015c67a56b8fcd4e424d4bf6692c`.
+- No strict gate was run.
+- No remote write, provider call, memory tool call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, release, deploy, or cutover action occurred.
+
+Next:
+
+- If this packet is committed before execution, regenerate or update the approval line for the new post-commit `HEAD`.
+- Do not run `npm run gate:mainline:strict` until exact A5-GAP-5 approval is provided.
+
 ## RC-1 Current-Head Local Baseline
 
 Status: `COMPLETED_VALIDATED_NOT_RC_READY`
