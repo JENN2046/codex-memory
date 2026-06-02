@@ -2,17 +2,17 @@
 
 Phase: `RC-8`
 
-Mode: `A5-GAP-6 preflight packet only`
+Mode: `A5-GAP-6 exact-approved evidence-only aggregation`
 
 Risk: `A5-preflight`
 
-Decision: `DRAFT_NOT_APPROVED`
+Decision: `NOT_READY_BLOCKED`
 
 ## Purpose
 
-Prepare the smallest fresh-head `A5-GAP-6` approval boundary for evidence-only ValidationAggregator aggregation.
+Record the smallest fresh-head `A5-GAP-6` evidence-only ValidationAggregator aggregation.
 
-This packet does not execute ValidationAggregator, scan files, scan runtime stores, call MCP tools, call providers, mutate durable memory or audit state, change config/watchdog/startup, push, tag, release, deploy, execute cutover, or claim `RC_READY`.
+This evidence does not scan files, scan runtime stores, call MCP tools, call providers, mutate durable memory or audit state, change config/watchdog/startup, push, tag, release, deploy, execute cutover, or claim `RC_READY`.
 
 ## Current Git Reality
 
@@ -47,6 +47,32 @@ Evidence map:
 | `A5-GAP-4` | `docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md` | endpoint-bound live HTTP/MCP no-write evidence |
 | `A5-GAP-5` | `docs/RC2_A5_GAP5_STRICT_GATE_PREFLIGHT.md` | target-bound strict gate pass evidence |
 
+## Approval
+
+The user provided the exact approval line:
+
+```text
+I approve A5-GAP-6 for codex-memory on branch main at commit ea51fe0a7a09fc23b314e4e0ab83adc5776151e6, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.
+```
+
+Fresh preflight matched:
+
+```text
+branch = main
+HEAD = ea51fe0a7a09fc23b314e4e0ab83adc5776151e6
+worktree = clean before execution
+diff = empty before execution
+```
+
+The project approval verifier accepted the line:
+
+```text
+status=approval_line_exact_match
+approvalAccepted=true
+authorizationGranted=true
+approvedEvidenceUnitCount=5
+```
+
 ## Requested Boundary
 
 Requested unit:
@@ -67,7 +93,7 @@ Requested input:
 explicit sanitized runtimeEvidenceSummary for approved units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5
 ```
 
-Only after exact approval, the execution may call:
+Only after exact approval, the execution called:
 
 ```text
 buildV1RcValidationAggregatorReport({ runtimeEvidenceSummary })
@@ -99,31 +125,76 @@ Not allowed:
 - tag/release/deploy/cutover
 - readiness or reliability claim
 
-## Exact Approval Line
+## Sanitized Aggregator Result
 
-After this packet is committed, use the fresh post-packet `HEAD` in the approval line:
+First attempt:
 
 ```text
-I approve A5-GAP-6 for codex-memory on branch main at commit <POST_PACKET_COMMIT>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.
+runtimeEvidenceSummaryAccepted=true
+runtimeEvidenceSummaryLocallyEvidencedGapCount=0
+runtimeEvidenceSummaryRemainingGapCount=2
 ```
 
-Any broader wording is insufficient. Any reused stale commit is insufficient.
+The first attempt used a count field that the aggregator bridge does not consume. It performed the same in-memory explicit summary aggregation boundary and produced no mutation, provider call, MCP call, file/store scan, config change, remote action, or readiness claim. It was not used as the final evidence result.
 
-## Stop Conditions
+The corrected rerun used the aggregator-required `locallyEvidencedRuntimeGaps` and `remainingRuntimeGaps` arrays.
 
-Stop before execution if:
+Final sanitized result:
 
-- branch is not `main`
-- current `HEAD` does not match the approval line
-- worktree is not clean except for intended docs/board preflight edits before commit
-- approval line omits any selected unit or includes unsupported/duplicate units
-- the execution would need to scan files/stores for evidence rather than consume explicit sanitized input
-- the execution would need raw private data output
-- the execution would need mutation, durable write, provider call, MCP tool call, broad scan, remote action, or readiness claim not named in the approval line
+```yaml
+decision: NOT_READY_BLOCKED
+validationAggregatorFullImplementation: false
+runtimeEvidenceSummaryStatus: explicit_runtime_evidence_summary_available
+runtimeEvidenceSummaryAccepted: true
+runtimeEvidenceSummaryRejected: false
+runtimeEvidenceSummaryLocallyEvidencedGapCount: 5
+runtimeEvidenceSummaryRemainingGapCount: 2
+commandsExecutedByAggregator: false
+p66RuntimeSummaryBound: true
+effectiveGapSource: accepted_runtime_summary
+effectiveRemainingFullImplementationGapCount: 2
+effectiveLocallyEvidencedFullImplementationGapCount: 5
+staticBaselineClearedGapCount: 5
+staticBaselineStillRemainingGapCount: 2
+effectiveNonBaselineRemainingGapCount: 0
+effectiveLocalImplementationGapCount: 1
+effectiveA5GatedGapCount: 1
+effectiveRedLaneGapCount: 1
+closureAuthorityStatus: red_lane_authorization_required
+closureStatus: blocked_existing_blockers
+closureReady: false
+providerCalls: 0
+mutated: false
+migrationApplied: false
+importExportApplied: false
+```
+
+Locally evidenced runtime gaps:
+
+```text
+governance_review_approval_audit_runtime_loop_not_executed
+recall_isolation_runtime_proof_not_executed
+migration_import_export_backup_restore_approval_execution_blocked
+live_http_operation_readiness_not_claimed
+mainline_strict_gate_not_executed_for_cutover
+```
+
+Remaining runtime gaps:
+
+```text
+validation_aggregator_full_implementation_incomplete
+rc_cutover_not_executed
+```
+
+## Interpretation
+
+The approved `A5-GAP-6` aggregation accepted the explicit sanitized summary for approved units `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
+
+Remaining gap count is `2`, so the RC route does not enter a ready state. The next work must address `validation_aggregator_full_implementation_incomplete`; `rc_cutover_not_executed` remains Red Lane and cannot run until all previous gaps are closed and a separate exact cutover approval is provided.
 
 ## Readiness Boundary
 
-Even if the future approved aggregation accepts the sanitized summary, it will not by itself claim:
+This evidence does not claim:
 
 - production readiness
 - runtime readiness
@@ -134,4 +205,4 @@ Even if the future approved aggregation accepts the sanitized summary, it will n
 - migration/backfill readiness
 - `RC_READY`
 
-If remaining gaps are greater than zero, route returns to the corresponding earlier RC gap. If remaining gaps are zero, the next step is RC-9 decision packet preparation, not release or cutover.
+Because remaining gaps are greater than zero, this evidence does not advance to RC-10 and does not claim readiness. A later RC decision packet, if prepared, must state `RC_NOT_READY_BLOCKED` unless remaining gaps become zero.

@@ -10,13 +10,13 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
-## RC-8 A5-GAP-6 ValidationAggregator Aggregation Preflight
+## RC-8 A5-GAP-6 ValidationAggregator Aggregation Evidence
 
-Status: `PREFLIGHT_PACKET_READY_NOT_APPROVED_NOT_RC_READY`
+Status: `EVIDENCE_AGGREGATED_NOT_RC_READY`
 
 Date: 2026-06-02
 
-Scope: prepared a fresh-head `A5-GAP-6` evidence-only ValidationAggregator aggregation approval boundary. No aggregator execution, file/store scan, raw content output, MCP tool call, provider call, durable write, config/watchdog/startup change, remote action, cutover, or readiness claim occurred.
+Scope: exact-approved fresh-head `A5-GAP-6` evidence-only ValidationAggregator aggregation over approved units `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`. No file/store scan, raw content output, MCP tool call, provider call, durable write, config/watchdog/startup change, remote action, cutover, or readiness claim occurred.
 
 Changed:
 
@@ -26,13 +26,16 @@ Changed:
 
 Result:
 
-- Selected evidence units: `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`.
-- Selected evidence sources: RC-5 governance readonly, RC-6 recall isolation no-mutation, RC-7 migration dry-run, RC-4 live HTTP/MCP no-write, and RC-2 strict gate.
-- Future execution requires a fresh exact approval line bound to the post-packet commit.
+- Consumed exact A5-GAP-6 approval for `main@ea51fe0a7a09fc23b314e4e0ab83adc5776151e6`.
+- Project approval verifier returned `approvalAccepted=true` and `authorizationGranted=true`.
+- Aggregator accepted explicit sanitized summary input: `runtimeEvidenceSummaryAccepted=true`.
+- Locally evidenced runtime gap count is `5`.
+- Remaining runtime gap count is `2`.
+- Remaining runtime gaps are `validation_aggregator_full_implementation_incomplete` and `rc_cutover_not_executed`.
+- Closure remains blocked: `closureAuthorityStatus=red_lane_authorization_required`, `closureReady=false`, `validationAggregatorFullImplementation=false`.
 
 Boundary:
 
-- No ValidationAggregator execution occurred.
 - No files/stores were scanned for evidence.
 - No raw memory/private content was output.
 - No MCP external call or provider call occurred.
@@ -42,8 +45,9 @@ Boundary:
 
 Next:
 
-- Validate and commit this RC-8 preflight packet locally.
-- Then use fresh `HEAD` for the exact approval line: `I approve A5-GAP-6 for codex-memory on branch main at commit <FRESH_HEAD>, using only evidence from approved A5-GAP units A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5.`
+- Validate and commit this RC-8 evidence locally.
+- Do not enter RC-10. Remaining gaps are nonzero.
+- Next local route item is addressing `validation_aggregator_full_implementation_incomplete`; `rc_cutover_not_executed` remains blocked behind zero-gap evidence and separate exact RC cutover approval.
 
 ## RC-7 A5-GAP-3 Migration Dry-Run Evidence
 

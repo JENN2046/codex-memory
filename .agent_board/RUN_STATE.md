@@ -49,9 +49,9 @@ RC-6 A5-GAP-2 recall isolation no-mutation evidence is recorded at `docs/RC6_A5_
 
 RC-7 A5-GAP-3 migration dry-run evidence is recorded at `docs/RC7_A5_GAP3_MIGRATION_DRY_RUN_PREFLIGHT.md` for target commit `e17499294df14e7724307bb389387cd111a66797`: `npm run vcp-memory:migration-readiness -- --json` returned `status=blocked`, `fixtureOnly=true`, `mutated=false`, `migrationBlocked=true`, no migration/import/export/backup/restore apply, no durable write, no public MCP expansion, no raw workspace id, and no raw secret exposure.
 
-RC-8 A5-GAP-6 ValidationAggregator aggregation preflight is prepared at `docs/RC8_A5_GAP6_AGGREGATION_PREFLIGHT.md`: selected evidence units are `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5`, using only sanitized RC-5/6/7/4/2 evidence, with no aggregator execution until exact approval.
+RC-8 A5-GAP-6 ValidationAggregator aggregation evidence is recorded at `docs/RC8_A5_GAP6_AGGREGATION_PREFLIGHT.md` for target commit `ea51fe0a7a09fc23b314e4e0ab83adc5776151e6`: exact-approved in-memory aggregation accepted sanitized `A5-GAP-1,A5-GAP-2,A5-GAP-3,A5-GAP-4,A5-GAP-5` summary, `runtimeEvidenceSummaryAccepted=true`, locally evidenced gap count `5`, remaining gap count `2`, remaining gaps `validation_aggregator_full_implementation_incomplete` and `rc_cutover_not_executed`, `closureReady=false`, and `rcReady=false`.
 
-Next safe action is to validate and commit the RC-8 preflight packet locally, then request exact fresh-HEAD A5-GAP-6 approval. Do not execute A5-GAP-6 aggregation, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Next safe action is to validate and commit the RC-8 evidence locally, then address `validation_aggregator_full_implementation_incomplete` as the next non-cutover route blocker. Do not execute RC cutover, real apply/import/export/backup/restore, durable writes, bearer-token use, memory tools, provider calls, broad real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 
