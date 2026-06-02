@@ -2,9 +2,9 @@
 
 ## Current Handoff
 
-Goal: `CM-1363 PHASE_F1_SYNC_PACKET_GENERATOR`.
+Goal: `CM-1364 VALIDATION_ENV_ISOLATION`.
 
-Status: `COMPLETED_VALIDATED_NOT_READY` for local source/test/docs F1 sync packet generator. CM-1363 adds a read-only CLI that renders the current normal non-force push approval packet from fresh Git facts and fail-closes when the worktree is dirty or remote has unmerged commits. It does not push, pull, merge, rebase, run gates, start runtime, call MCP tools/providers, read real memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, or claim readiness/reliability. F1 live-client no-write execution remains blocked until an explicit normal non-force push approval syncs local `main`, then a fresh synced-head A5-GAP-4 approval is provided. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
+Status: `COMPLETED_VALIDATED_NOT_READY` for local test-only validation env isolation. CM-1364 closes the CM-1363 full-suite validation gap by isolating security-profile tests from ambient provider/rerank env and isolating LightMemo CLI child processes into temporary data/logs/diary paths. Default `npm test` now passes `2889/2889` in the current shell. It does not push, pull, merge, rebase, run gates, start runtime, call MCP tools/providers, read real memory/store/jsonl/raw audit, write durable memory/audit, change config/watchdog/startup, or claim readiness/reliability. F1 live-client no-write execution remains blocked until an explicit normal non-force push approval syncs local `main`, then a fresh synced-head A5-GAP-4 approval is provided. Broad alias/fallback sweeping remains stopped unless a direct blocker appears. Verify fresh Git again before any branch-sensitive work.
 
 Workspace: `A:\codex-memory`.
 

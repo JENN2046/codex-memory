@@ -5,14 +5,58 @@ const assert = require('node:assert/strict');
 
 const { createConfig } = require('../src/config/createConfig');
 
+const PROVIDER_ENV_KEYS = [
+  'CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER',
+  'CODEX_MEMORY_EMBED_DIMS',
+  'CODEX_MEMORY_EMBEDDING_PROVIDER',
+  'CODEX_MEMORY_EMBEDDING_URL',
+  'CODEX_MEMORY_EMBEDDING_API_KEY',
+  'CODEX_MEMORY_EMBEDDING_MODEL',
+  'CODEX_MEMORY_EMBEDDING_PATH',
+  'CODEX_MEMORY_EMBEDDING_HEADERS_JSON',
+  'CODEX_MEMORY_EMBEDDING_TIMEOUT_MS',
+  'CODEX_MEMORY_LOCAL_EMBEDDING_PROVIDER',
+  'CODEX_MEMORY_LOCAL_EMBEDDING_URL',
+  'CODEX_MEMORY_LOCAL_EMBEDDING_API_KEY',
+  'CODEX_MEMORY_LOCAL_EMBEDDING_MODEL',
+  'CODEX_MEMORY_LOCAL_EMBEDDING_PATH',
+  'CODEX_MEMORY_LOCAL_EMBEDDING_HEADERS_JSON',
+  'CODEX_MEMORY_LOCAL_EMBEDDING_TIMEOUT_MS',
+  'CODEX_MEMORY_LOCAL_EMBED_DIMS',
+  'CODEX_MEMORY_FALLBACK_EMBEDDING_PROVIDER',
+  'CODEX_MEMORY_FALLBACK_EMBEDDING_URL',
+  'CODEX_MEMORY_FALLBACK_EMBEDDING_API_KEY',
+  'CODEX_MEMORY_FALLBACK_EMBEDDING_MODEL',
+  'CODEX_MEMORY_FALLBACK_EMBEDDING_PATH',
+  'CODEX_MEMORY_FALLBACK_EMBEDDING_HEADERS_JSON',
+  'CODEX_MEMORY_FALLBACK_EMBEDDING_TIMEOUT_MS',
+  'CODEX_MEMORY_FALLBACK_EMBED_DIMS',
+  'CODEX_MEMORY_RERANK_URL',
+  'CODEX_MEMORY_RERANK_API_KEY',
+  'CODEX_MEMORY_RERANK_MODEL',
+  'CODEX_MEMORY_RERANK_PATH',
+  'CODEX_MEMORY_RERANK_HEADERS_JSON',
+  'CODEX_MEMORY_RERANK_TIMEOUT_MS',
+  'EMBEDDING_API_URL',
+  'EMBEDDING_API_KEY',
+  'EMBEDDING_FALLBACK_API_URL',
+  'EMBEDDING_FALLBACK_API_KEY',
+  'EMBEDDING_FALLBACK_MODEL',
+  'WhitelistEmbeddingModel',
+  'VECTORDB_DIMENSION'
+];
+
 function withEnv(envVars, fn) {
+  const scopedEnv = Object.fromEntries(PROVIDER_ENV_KEYS.map(key => [key, undefined]));
+  Object.assign(scopedEnv, envVars);
+
   const restore = {};
-  for (const key of Object.keys(envVars)) {
+  for (const key of Object.keys(scopedEnv)) {
     restore[key] = process.env[key];
-    if (envVars[key] === undefined) {
+    if (scopedEnv[key] === undefined) {
       delete process.env[key];
     } else {
-      process.env[key] = envVars[key];
+      process.env[key] = scopedEnv[key];
     }
   }
   try {
@@ -28,20 +72,28 @@ function withEnv(envVars, fn) {
   }
 }
 
+function createIsolatedConfig(overrides) {
+  let config;
+  withEnv({}, () => {
+    config = createConfig(overrides);
+  });
+  return config;
+}
+
 test('default security profile is local', () => {
-  const config = createConfig();
+  const config = createIsolatedConfig();
   assert.equal(config.securityProfile, 'local');
 });
 
 test('local profile does not enable security policies by default', () => {
-  const config = createConfig();
+  const config = createIsolatedConfig();
   assert.equal(config.enableSoftReadPolicy, false);
   assert.equal(config.enableLifecycleReadPolicy, false);
   assert.equal(config.enableWritePreflight, false);
 });
 
 test('local profile allows external provider is false by default', () => {
-  const config = createConfig();
+  const config = createIsolatedConfig();
   assert.equal(config.allowExternalProvider, false);
 });
 
@@ -94,7 +146,7 @@ test('explicit local profile behaves same as default', () => {
 });
 
 test('string false override disables hardened lifecycle read policy', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     securityProfile: 'hardened',
     enableLifecycleReadPolicy: 'false'
   });
@@ -102,7 +154,7 @@ test('string false override disables hardened lifecycle read policy', () => {
 });
 
 test('string false override disables hardened soft read policy', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     securityProfile: 'hardened',
     enableSoftReadPolicy: 'false'
   });
@@ -110,7 +162,7 @@ test('string false override disables hardened soft read policy', () => {
 });
 
 test('string false override disables hardened write preflight', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     securityProfile: 'hardened',
     enableWritePreflight: 'false'
   });
@@ -118,7 +170,7 @@ test('string false override disables hardened write preflight', () => {
 });
 
 test('string true override enables soft read policy in local profile', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     securityProfile: 'local',
     enableSoftReadPolicy: 'true'
   });
@@ -126,7 +178,7 @@ test('string true override enables soft read policy in local profile', () => {
 });
 
 test('disabled provider config uses local-hash fingerprint and profile', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     allowExternalProvider: false,
     localEmbeddingUrl: 'http://example.invalid',
     localEmbeddingModel: 'bge-m3-local',
@@ -139,7 +191,7 @@ test('disabled provider config uses local-hash fingerprint and profile', () => {
 });
 
 test('enabled provider config uses provider fingerprint', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     allowExternalProvider: true,
     localEmbeddingUrl: 'http://example.invalid',
     localEmbeddingModel: 'bge-m3-local',
@@ -179,7 +231,7 @@ test('hardened profile with configured endpoint keeps provider gate disabled by 
 });
 
 test('hardened override with configured endpoint keeps provider gate disabled by default', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     securityProfile: 'hardened',
     localEmbeddingUrl: 'http://example.invalid',
     localEmbeddingModel: 'bge-m3-local',
@@ -193,7 +245,7 @@ test('hardened override with configured endpoint keeps provider gate disabled by
 });
 
 test('string true provider gate enables provider endpoint and fingerprint', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     allowExternalProvider: 'true',
     localEmbeddingUrl: 'http://example.invalid',
     localEmbeddingModel: 'bge-m3-local',
@@ -219,7 +271,7 @@ test('configured endpoint without explicit provider gate stores resolved allowEx
 });
 
 test('explicit false provider gate keeps configured endpoint out of profile', () => {
-  const config = createConfig({
+  const config = createIsolatedConfig({
     allowExternalProvider: false,
     embeddingUrl: 'http://example.invalid',
     embeddingModel: 'm'
@@ -242,5 +294,4 @@ test('rerank-only config auto-enables allowExternalProvider in local profile', (
     assert.equal(config.embeddingEndpoints.length, 0);
   });
 });
-
 

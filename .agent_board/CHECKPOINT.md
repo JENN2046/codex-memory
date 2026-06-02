@@ -1,5 +1,34 @@
 # CHECKPOINT.md - codex-memory
 
+## CM-1364 Validation Env Isolation Checkpoint
+
+Status: `COMPLETED_VALIDATED_NOT_READY`
+
+Date: 2026-06-02
+
+Scope: local test-only validation rail hardening. No push, pull, merge, rebase, F1/F2/F3/F4/F5 execution, strict gate, service start, MCP/provider call, `record_memory`, `search_memory`, `memory_overview`, real memory/store/jsonl/raw audit read, durable memory/audit write, config/watchdog/startup change, public MCP expansion, readiness claim, or reliability claim.
+
+Result:
+
+- Isolated `security-profile-config` tests from ambient provider/rerank environment variables.
+- Isolated `lightmemo-cli` child processes into temporary data/logs/diary directories.
+- Suppressed Node warnings in LightMemo child processes so stderr remains a CLI assertion surface.
+- Restored default full-suite validation in the current ambient shell.
+
+Validation:
+
+- `node --check tests\security-profile-config.test.js` passed.
+- `node --check tests\lightmemo-cli.test.js` passed.
+- `node --test tests\security-profile-config.test.js tests\lightmemo-cli.test.js` passed `24/24`.
+- `node --test tests\lightmemo-cli.test.js` passed `3/3`.
+- `node --test tests\security-profile-config.test.js` passed `21/21`.
+- `npm test` passed `2889/2889`.
+
+Next:
+
+- Run closeout checks and guarded commit if diff remains scoped.
+- Phase F1 remains blocked until explicit normal non-force push approval and fresh synced-head A5-GAP-4 approval.
+
 ## CM-1363 Phase F1 Sync Packet Generator Checkpoint
 
 Status: `COMPLETED_VALIDATED_NOT_READY`

@@ -1,6 +1,6 @@
 # codex-memory Status
 
-更新时间：2026-06-01
+更新时间：2026-06-02
 
 ## 当前结论
 
@@ -16,6 +16,8 @@ RC_NOT_READY_BLOCKED
 原因：文档面正在瘦身；A5 / P66 runtime gaps 尚未逐项关闭；personal RC dogfood 尚未开始。不得把 docs-only、fixture-only、本地 proof、历史 gate 或历史 HTTP evidence 解释为 runtime readiness、RC readiness、write reliability 或 recall reliability。
 
 `CM-1363 PHASE_F1_SYNC_PACKET_GENERATOR` 已新增只读本地 sync packet generator：`src/core/PhaseF1SyncApprovalPacket.js` 与 `src/cli/phase-f1-sync-approval-packet.js` 可从 fresh Git facts 渲染 normal non-force `git push origin main` 的非授权 approval template，避免手写 packet 在提交后立即 stale。Targeted tests `2/2` 通过；当前未提交开发态运行 CLI 返回 `worktreeClean=false` 与 `failClosedReasons=dirty_worktree`，并保持 `pushApproved=false`、`pushExecuted=false`、`f1LiveExecutionAllowed=false`。本次不 push/pull/merge/rebase，不启动服务，不调用 MCP/provider，不读取真实 memory/store/jsonl/raw audit，不写 durable memory/audit，不改 config/watchdog/startup，不声明 readiness/reliability。
+
+`CM-1364 VALIDATION_ENV_ISOLATION` 已关闭 CM-1363 暴露的本地 validation gap：`security-profile-config` 测试现在默认清空 provider/rerank 相关环境变量，避免当前 shell 的外部 provider 配置污染 local security profile 断言；`lightmemo-cli` 测试现在把每个子进程隔离到临时 `CODEX_MEMORY_DATA_DIR` / `CODEX_MEMORY_LOGS_DIR` / `CODEX_MEMORY_DIARY_PATH`，避免全量套件中共享 `data\embedding-profiles` 文件锁冲突，并设置 `NODE_NO_WARNINGS=1` 保持 stderr 断言面稳定。Targeted tests 通过，默认 `npm test` 通过 `2889/2889`。本次只改测试与本地状态记录，不 push/pull/merge/rebase，不执行 F1/F2/F3/F4/F5，不启动服务，不调用 MCP/provider，不读取真实 memory/store/jsonl/raw audit，不写 durable memory/audit，不改 config/watchdog/startup，不声明 readiness/reliability。F1 仍 blocked：需要 explicit normal non-force push approval，然后 fresh synced-head A5-GAP-4 approval。
 
 `CM-1362 PHASE_F1_SYNC_APPROVAL_PACKET` 已准备 F1 sync approval packet：当前 fresh facts 为 `main` clean、`HEAD=c28170a`、`origin/main=be980d1`、ahead `7` / behind `0`，所以 F1 live-client no-write execution 仍必须 blocked。该 packet 只给出 normal non-force `git push origin main` 的非授权模板、禁止项和 post-push fresh checks，不执行 push/pull/merge/rebase，不启动服务，不调用 MCP/provider，不读取真实 memory/store/jsonl/raw audit，不写 durable memory/audit，不改 config/watchdog/startup，不声明 readiness/reliability。下一步需要用户明确批准该 exact push，才能同步后生成 fresh synced-head A5-GAP-4 approval。
 

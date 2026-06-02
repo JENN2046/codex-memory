@@ -1,12 +1,22 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
 
 function runLightMemo(stdin, args = []) {
   return new Promise((resolve, reject) => {
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-lightmemo-test-'));
     const child = spawn(process.execPath, ['src/cli/lightmemo.js', ...args], {
       cwd: process.cwd(),
-      env: process.env,
+      env: {
+        ...process.env,
+        CODEX_MEMORY_DATA_DIR: path.join(tempRoot, 'data'),
+        CODEX_MEMORY_LOGS_DIR: path.join(tempRoot, 'logs'),
+        CODEX_MEMORY_DIARY_PATH: path.join(tempRoot, 'dailynote'),
+        NODE_NO_WARNINGS: '1'
+      },
       stdio: ['pipe', 'pipe', 'pipe']
     });
     let stdout = '';
@@ -14,7 +24,11 @@ function runLightMemo(stdin, args = []) {
     child.stdout.on('data', chunk => { stdout += chunk.toString('utf8'); });
     child.stderr.on('data', chunk => { stderr += chunk.toString('utf8'); });
     child.on('error', reject);
-    child.on('close', code => { resolve({ code, stdout, stderr }); });
+    child.on('close', code => {
+      fs.rm(tempRoot, { recursive: true, force: true }, () => {
+        resolve({ code, stdout, stderr });
+      });
+    });
     child.stdin.write(stdin);
     child.stdin.end();
   });
