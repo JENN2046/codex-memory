@@ -12,7 +12,7 @@ Current checkpoint facts are summarized in `.agent_board/CURRENT_FACTS.json`; ol
 
 ## RC-3 A5-GAP-4 Live HTTP No-Write Preflight
 
-Status: `PREFLIGHT_ONLY_NOT_APPROVED_NOT_EXECUTED`
+Status: `ENDPOINT_BOUND_LIVE_NO_WRITE_EVIDENCE_ACCEPTED_NOT_RC_READY`
 
 Date: 2026-06-02
 
@@ -20,16 +20,21 @@ Packet: [docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md](/A:/codex-memory/docs
 
 Result:
 
-- Checked `http://127.0.0.1:7605/health` only.
+- Consumed exact A5-GAP-4 approval for `main@d843d9b9778aeaa149cfba4ac80fa0e0aab87f1f`, endpoint `http://127.0.0.1:7605`, with no config/watchdog/startup change.
 - Health was reachable and returned service `vcp_codex_memory`, version `0.1.0`, protocol `streamable-http`, path `/mcp/codex-memory`, and `auth.required=true`.
 - `/health` does not expose a Git commit or build hash, so runtime commit freshness is not proven by health alone.
-- Prepared A5-GAP-4 live HTTP / MCP no-write approval boundary.
-- No MCP `initialize`, MCP `tools/list`, memory tool call, bearer-token use, provider call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote write, readiness claim, release, deploy, or cutover action occurred.
+- MCP `initialize` succeeded for server `vcp_codex_memory`.
+- MCP `tools/list` returned exactly `memory_overview`, `record_memory`, and `search_memory`.
+- No-token `memory_overview` returned selected projection mode `no_token_selected_overview` with no raw sensitive fields detected in the serialized selected projection.
+- No-token `record_memory` returned `NO_TOKEN_MUTATION_REJECTED`.
+- No-token `search_memory` returned `NO_TOKEN_SEARCH_REJECTED` with no raw sensitive fields detected in the serialized rejection payload.
+- No bearer-token use or authenticated `memory_overview` occurred.
+- No provider call, real-memory scan, durable memory/audit write, config/watchdog/startup change, public MCP expansion, remote write, readiness claim, release, deploy, or cutover action occurred.
 
 Next:
 
-- Review/commit the RC-3 preflight packet, then regenerate the A5-GAP-4 approval line for the new post-commit `HEAD`.
-- Do not execute live HTTP / MCP evidence beyond preflight without exact A5-GAP-4 approval.
+- Continue to RC-5 governance runtime gap preflight.
+- Treat this as endpoint-bound live no-write evidence only, not RC readiness.
 
 ## RC-2 A5-GAP-5 Strict Gate Preflight
 

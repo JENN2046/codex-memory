@@ -41,9 +41,9 @@ RC-1 current-head local baseline is recorded in `.agent_board/CHECKPOINT.md` for
 
 RC-2 A5-GAP-5 strict gate evidence is recorded at `docs/RC2_A5_GAP5_STRICT_GATE_PREFLIGHT.md` for target commit `9cb7df9b0aafc5951e8650f07633a4711cef7c55`: `npm run gate:mainline:strict` passed with health ok, contract `31/31`, test `2926/2926`, compare `43/43`, and rollback `43/43`.
 
-RC-3 live HTTP / MCP no-write preflight is prepared at `docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md`: local `/health` is reachable, but health does not expose a commit/build hash, so runtime commit freshness is not proven by health alone.
+RC-4 A5-GAP-4 live HTTP / MCP no-write evidence is recorded at `docs/RC3_A5_GAP4_LIVE_HTTP_NO_WRITE_PREFLIGHT.md` for target commit `d843d9b9778aeaa149cfba4ac80fa0e0aab87f1f`: `/health`, no-token MCP `initialize`, no-token `tools/list`, no-token selected `memory_overview`, no-token `record_memory` rejection, and no-token `search_memory` rejection passed the endpoint-bound no-write contract. Authenticated `memory_overview` was not executed because bearer-token use was not authorized.
 
-Next safe action is either review/commit the RC-3 preflight packet, or provide a fresh A5-GAP-4 exact approval line after the packet is stabilized. Do not execute MCP initialize/tools-list, bearer-token use, memory tools, provider calls, real memory/store scans, durable writes, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
+Next safe action is RC-5 governance runtime gap preflight: compare the current truth table and existing governance evidence freshness against the current route, then prepare a narrow A5-GAP-1 approval boundary if fresh evidence is still needed. Do not execute governance runtime actions, durable writes, bearer-token use, memory tools, provider calls, real memory/store scans, public MCP expansion, remote actions, release/cutover actions, or broad readiness/reliability claims without separate exact scope.
 
 ## Required Fresh Checks Before Any Branch-Sensitive Action
 

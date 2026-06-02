@@ -2,15 +2,15 @@
 
 Date: 2026-06-02
 
-Mode: `A5-GAP-4 approval packet only`
+Mode: `A5-GAP-4 exact-approved live no-write evidence`
 
-Decision: `DRAFT_NOT_APPROVED`
+Decision: `ENDPOINT_BOUND_LIVE_NO_WRITE_EVIDENCE_ACCEPTED_NOT_RC_READY`
 
 ## Purpose
 
-Prepare the live HTTP / MCP no-write evidence approval boundary for the current RC route.
+Prepare and record the live HTTP / MCP no-write evidence boundary for the current RC route.
 
-This document does not approve or execute MCP `initialize`, MCP `tools/list`, no-token `memory_overview`, no-token `record_memory` / `search_memory` rejection checks, authenticated `memory_overview`, `observe:http`, provider calls, real-memory scans, durable memory/audit writes, config/watchdog/startup changes, public MCP expansion, remote writes, RC cutover, or `RC_READY` claims.
+This document records exact-approved endpoint-bound execution of MCP no-write checks. It does not record authenticated `memory_overview`, `observe:http`, provider calls, real-memory scans, durable memory/audit writes, config/watchdog/startup changes, public MCP expansion, remote writes, RC cutover, or `RC_READY` claims.
 
 ## Current Git Reality
 
@@ -20,10 +20,10 @@ Fresh preflight observed before this packet was edited:
 branch = main
 local_head = 51d746f9d1f188bd041f337c9df122094af75118
 origin_state = main ahead of origin/main by 3 local commits
-worktree_state = clean before RC-3 packet edit
+worktree_state = clean before RC-4 live no-write execution
 ```
 
-If this packet is committed before A5-GAP-4 execution, the approval line must be regenerated for the new post-commit `HEAD`.
+Fresh preflight confirmed the local `HEAD` matched the exact approval target before execution.
 
 ## Runtime Freshness Preflight
 
@@ -68,7 +68,13 @@ Gap:
 live_http_operation_readiness_not_claimed
 ```
 
-Allowed future evidence after exact approval:
+Exact approval line consumed:
+
+```text
+I approve A5-GAP-4 for codex-memory on branch main at commit d843d9b9778aeaa149cfba4ac80fa0e0aab87f1f, endpoint http://127.0.0.1:7605, no config/watchdog/startup change.
+```
+
+Evidence executed after exact approval:
 
 - `GET /health`
 - MCP `initialize`
@@ -76,7 +82,8 @@ Allowed future evidence after exact approval:
 - no-token selected `memory_overview`
 - no-token `record_memory` rejection
 - no-token `search_memory` rejection
-- authenticated `memory_overview` only if token use is explicitly authorized and token material is not printed or persisted
+
+Authenticated `memory_overview` was not executed because this approval line did not authorize bearer-token use.
 
 Not allowed by this packet:
 
@@ -89,26 +96,43 @@ Not allowed by this packet:
 - remote write, PR, tag, release, deploy, or RC cutover
 - readiness, reliability, production, release, or `RC_READY` claims
 
-## Approval Line Template
-
-Use a fresh `HEAD` immediately before approval. If this packet has been committed, replace the commit below with the new post-commit `HEAD`.
+## Live No-Write Result
 
 ```text
-I approve A5-GAP-4 for codex-memory on branch main at commit 51d746f9d1f188bd041f337c9df122094af75118, endpoint http://127.0.0.1:7605, no config/watchdog/startup change.
+endpoint = http://127.0.0.1:7605
+health.status = 200
+health.ok = true
+health.name = vcp_codex_memory
+health.path = /mcp/codex-memory
+auth.required = true
+initialize.status = 200
+initialize.serverName = vcp_codex_memory
+tools.list.status = 200
+tools = memory_overview, record_memory, search_memory
+no_token.memory_overview.status = 200
+no_token.memory_overview.accessMode = no_token_selected_overview
+no_token.memory_overview.selectedProjection = true
+no_token.memory_overview.selectedProjectionVersion = 1
+no_token.memory_overview.rawSensitiveFieldsReturned = false
+no_token.record_memory.status = 403
+no_token.record_memory.code = NO_TOKEN_MUTATION_REJECTED
+no_token.search_memory.status = 403
+no_token.search_memory.code = NO_TOKEN_SEARCH_REJECTED
+no_token.search_memory.rawSensitiveFieldsReturned = false
+tokenUsed = false
+providerCalled = false
+durableWriteIntended = false
+configWatchdogStartupChanged = false
 ```
 
-If authenticated `memory_overview` is also intended, add a separate exact token-use clause that says the token is already present in the current session and must not be printed or persisted.
-
-## Exit Criteria
-
-If approved and executed successfully, the result can only be recorded as:
+Conclusion:
 
 ```text
 ENDPOINT_BOUND_LIVE_NO_WRITE_EVIDENCE_ACCEPTED_NOT_RC_READY
 ```
 
-If execution cannot prove the required no-write surface, the result remains:
+Limitation:
 
 ```text
-LIVE_HTTP_EVIDENCE_INCOMPLETE_RC_NOT_READY_BLOCKED
+authenticated_memory_overview_not_executed_no_token_use_authorized
 ```
